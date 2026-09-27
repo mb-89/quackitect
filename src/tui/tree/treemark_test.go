@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 func markItems() []Item {

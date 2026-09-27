@@ -33,3 +33,10 @@ A craft finding named one spot, and the implementer stood at that spot anyway. A
 The write door let a line at warning land, and told the hand to leave it. A review failing on that same line sent one ticket through five drafts, and the last fail named prose alone.
 
 So a form finding stood in the Problems panel, and the push cleared it. The owner set this for the whole tree.
+
+## 7. The size meets the ask
+
+A draft named no size, so a draft touching many files for one number passed its
+review unweighed. The `size` field lists every file the approach touches, and the
+review reads that list against the ask. A spread past the ask rides out as a row,
+because the builder trims it in place.

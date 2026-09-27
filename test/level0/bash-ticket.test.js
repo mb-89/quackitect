@@ -37,6 +37,8 @@ test("freeOfTicket reads a pull, a mint and a note as free, and every other comm
     "./RUNME.sh ticket pull a-child --pass",
     "./RUNME.sh mint ticket spec/tickets/fresh.md --process=standard",
     './RUNME.sh ticket note a-thought "a line to keep"',
+    "./RUNME.sh branch take",
+    "./RUNME.sh branch list",
   ]) {
     assert.equal(freeOfTicket(command), true, command);
   }
@@ -109,4 +111,22 @@ test("PowerShell meets the same door, unnamed and named alike", async () => {
     denied(await onPowerShell({ command: "./RUNME.sh ticket pull" }, box())),
     "",
   );
+});
+
+// A description opening on the working todo's title and a colon names what stands in hand. [[spec/tickets/the-todo-joins-the-queue]]
+test("a description opening on the working todo's title and a colon passes", async () => {
+  const plan = {
+    [`${ROOT}/.se/.runtime/plan.json`]: JSON.stringify({
+      working: "fix the door",
+      todos: [],
+      places: {},
+    }),
+  };
+  const found = denied(
+    await onBash(
+      { command: "git status", description: "fix the door: read the state" },
+      box(plan),
+    ),
+  );
+  assert.equal(found, "");
 });

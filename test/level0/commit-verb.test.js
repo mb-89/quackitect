@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
-import { named, NAMED } from "./fixtures.js";
+import { NAMED, named } from "./fixtures.js";
 
 const ROOT = "/tree";
 const CLEAN = `${NAMED}: the message reads clean`;
@@ -66,6 +66,26 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
 };
 
 const ranGit = (git) => git.ran.map((one) => one.argv.join(" "));
+
+// The cold gate's doors: a staged list, a client on the disk, and a probe answering a code and its lines. [[spec/design_output/level0#the-cold-probe]]
+const CLIENT = "/bin/claude";
+const LISTED = "git diff --cached --name-only --no-renames";
+const cold = (
+  staged,
+  probed = { code: 0, lines: ["PASS hook: row"] },
+  client = CLIENT,
+) => {
+  const { it, git } = doors([], { [LISTED]: { stdout: `${staged.join("\n")}\n` } });
+  const asked = [];
+  it.claude = client;
+  it.disk.write(CLIENT, "");
+  it.cold = async (root, _it, via, say, delta) => {
+    asked.push({ root, via, delta });
+    for (const one of probed.lines) say(one);
+    return probed.code;
+  };
+  return { it, git, asked };
+};
 
 // A break of form in the message warns, and the commit lands. [[spec/design_output/work#the-battery-answers-first]]
 test("a message breaking a rule of form names every finding, and the commit lands", async () => {
@@ -151,7 +171,10 @@ test("a commit the door refuses lands nothing, and the staging comes back", asyn
   assert.equal(code, 1);
   assert.match(said, /nothing lands/);
   assert.match(said, /the hook refuses it/, "the door's own line reaches the reader");
-  assert.ok(ranGit(git).includes("git reset -q"), "the staging comes back");
+  assert.ok(
+    ranGit(git).includes("git reset -q -- ."),
+    "the staging comes back, and a merge stands",
+  );
 });
 
 // A desk's verb pushes nothing. [[spec/guidance/working]]
@@ -241,4 +264,137 @@ test("a call naming paths lands those paths alone", async () => {
     "the commit takes the paths alone",
   );
   assert.ok(!ran.includes("git add -A"), "the whole tree stays unstaged");
+});
+
+// A rename stages the move, and a commit naming the new path takes the old path's deletion with it. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("a commit naming a renamed ticket lands the old path's deletion with it", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "R100\tspec/tickets/old-name.md\tspec/tickets/new-name.md\nM\tsrc/a.js\n",
+    },
+  });
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
+  assert.ok(ran.includes(`git add -A ${both}`), "the old path stages with the new");
+  assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
+  assert.ok(!ran.some((one) => one.includes("src/a.js")), "an unnamed path stays out");
+});
+
+// A rename rewriting a file past git's similarity cut reads as a delete and an add, so the rename journal names the old path. [[spec/tickets/rename-detection-misses-rewrites]]
+test("a commit naming a renamed path lands the old path the rename journal names, where git reads no rename", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "D\tspec/tickets/old-name.md\nA\tspec/tickets/new-name.md\n",
+    },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "spec/tickets/old-name.md", to: "spec/tickets/new-name.md" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
+  assert.ok(
+    ranGit(git).includes(`git add -A ${both}`),
+    "the old path stages with the new",
+  );
+});
+
+// [[spec/design_output/level0#the-cold-probe]]
+test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
+  const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0, said);
+  assert.equal(asked.length, 1, "the probe runs once");
+  assert.equal(asked[0].via, CLIENT);
+  assert.match(said, /The cold probe passes/);
+  const ran = ranGit(git);
+  const cli = join(ROOT, "src", "scripts", "cli.js");
+  assert.ok(ran.indexOf(`node ${cli} test`) < ran.indexOf(LISTED));
+  assert.ok(
+    ran.includes("git diff --cached --binary --no-renames"),
+    "the delta reaches the probe",
+  );
+  assert.ok(ran.indexOf(LISTED) < ran.indexOf(`git commit -m ${CLEAN}`));
+});
+
+test("a staged list off the cold path runs no probe", async () => {
+  const { it, git, asked } = cold(["README.md", "src/bridge/answer.js"]);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0);
+  assert.equal(asked.length, 0);
+  assert.doesNotMatch(said, /cold probe/);
+  assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`));
+});
+
+test("a failing cold probe refuses the commit, prints its lines, and unstages", async () => {
+  const { it, git } = cold([".claude/skills/level0/hooks/level0.js"], {
+    code: 1,
+    lines: ["PASS hook: row", "FAIL canary: no level0 row names the sentence"],
+  });
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.match(said, /FAIL canary: no level0 row names the sentence/);
+  assert.match(said, /nothing lands/);
+  const ran = ranGit(git);
+  assert.ok(!ran.some((one) => one.startsWith("git commit")), "nothing commits");
+  assert.ok(
+    ran.includes("git reset -q -- ."),
+    "the staging comes back, and a merge stands",
+  );
+});
+
+test("a cold-path commit on a box holding no claude refuses in one line", async () => {
+  const { it, git, asked } = cold(["src/scripts/install.sh"], undefined, "claude");
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.equal(asked.length, 0);
+  assert.match(said, /claude stands nowhere/);
+  assert.equal(said.split("\n").filter((one) => /claude/.test(one)).length, 1);
+  assert.ok(!ranGit(git).some((one) => one.startsWith("git commit")));
+});
+
+test("a call naming paths gates on the paths it lands alone", async () => {
+  const { it, git, asked } = cold(["src/bridge/guidance.js"]);
+  git.proc.teach(
+    ["git", ...`${LISTED.slice(4)} -- src/bridge/guidance.js`.split(" ")],
+    {
+      stdout: "src/bridge/guidance.js\n",
+    },
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "src/bridge/guidance.js", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  assert.equal(asked.length, 1);
+  assert.ok(
+    ranGit(git).includes(
+      "git diff --cached --binary --no-renames -- src/bridge/guidance.js",
+    ),
+  );
 });

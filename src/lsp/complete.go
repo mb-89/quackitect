@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 // The characters an editor asks again on. [[spec/design_output/lsp#the-completion-reads-the-schema]]

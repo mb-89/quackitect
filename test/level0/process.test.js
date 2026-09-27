@@ -7,8 +7,10 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { processHash, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { FOUND, verdictIn } from "../../src/scripts/pull-chapter.js";
 import {
   askRows,
+  fromHandover,
   nameOf,
   PROCESSES,
   processAt,
@@ -111,4 +113,24 @@ test("a kind carrying no route takes no copy", () => {
 test("a mint naming no process copies nothing", () => {
   const made = withRoute(diskWith(), ROOT, join, SCHEMA, { urgency: "soon" });
   assert.deepEqual(made.fields, { urgency: "soon" });
+});
+
+// A gate's verdict field reads the gate's words. The shipped schema and route meet the contract cases in test/contract/process.test.js. [[spec/design_output/pull#the-gate]]
+test("a gate's verdicts read as the review's", () => {
+  assert.equal(verdictIn(["accept"]).said, "pass", "accept reads as pass");
+  assert.equal(verdictIn(["reject", "- the fail road is missing"]).said, "fail");
+  const points = verdictIn([
+    "accept with points",
+    "- cut-the-line: the line runs long",
+  ]);
+  assert.equal(points.said, FOUND, "accept with points reads as findings");
+  assert.deepEqual(points.findings, [
+    { name: "cut-the-line", line: "the line runs long" },
+  ]);
+});
+
+// [[spec/tickets/the-owners-words-travel-verbatim]]
+test("a mint off a handover writes the from line above the ask", () => {
+  assert.equal(fromHandover({ Ask: "the rows" }).Ask, "from: handover\n\nthe rows");
+  assert.equal(fromHandover({}).Ask, "from: handover");
 });

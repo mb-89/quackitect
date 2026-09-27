@@ -5,6 +5,7 @@
 import { join } from "node:path";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { SCHEMA } from "./pull-schema.js";
 export const ROOT = "/tree",
@@ -50,6 +51,7 @@ export function doors(files, answers = {}, more = {}) {
     proc: said.proc,
     disk,
     git: said,
+    front: fakeFront(),
     join,
     method: ROOT,
     work: ROOT,
@@ -185,14 +187,6 @@ ${step ? `step: ${step}\n` : ""}steps:
             form: command
             expects: assertion
             says: the tests fail on their own assertion
-      - name: reflect
-        does: names the class of error
-        when: returned
-        to: retro
-        evidence:
-          - name: class
-            form: text
-            says: the class
       - name: change
         does: makes the change
         evidence:
@@ -226,10 +220,6 @@ One piece of it.
 ## tests-red
 
 ### tests
-
-## reflect
-
-### class
 
 ## change
 

@@ -10,12 +10,12 @@ import { SOURCE, STAMP, viewerOf } from "../../src/scripts/tui-build.js";
 
 const ROOT = "/box";
 const EXE = `${ROOT}/.se/.runtime/bin/logview`;
-const BUILD = `go build -o ${EXE}.new .`;
+const BUILD = `go build -o ${EXE}.new ./${SOURCE}`;
 
 const source = () =>
   fakeDisk({
-    [`${ROOT}/${SOURCE}/main.go`]: "package main",
-    [`${ROOT}/${SOURCE}/go.mod`]: "module quackitect/tui",
+    [`${ROOT}/${SOURCE}/main.go`]: 'package main\n\nimport "quackitect/src/yaml"\n',
+    [`${ROOT}/go.mod`]: "module quackitect",
     [`${ROOT}/${SOURCE}/ui_test.go`]: "package main",
   });
 
@@ -27,12 +27,16 @@ const goWrites = (disk) =>
     },
   });
 
-test("a box with no binary builds one in the viewer's folder and stamps its source", () => {
+test("a box with no binary builds the viewer's folder from the root and stamps its source", () => {
   const disk = source();
   const proc = goWrites(disk);
   assert.deepEqual(viewerOf({ disk, proc, root: ROOT }), { exe: EXE, why: "" });
   assert.equal(proc.ran.length, 1);
-  assert.equal(proc.ran[0].init.cwd, `${ROOT}/${SOURCE}`);
+  assert.equal(
+    proc.ran[0].init.cwd,
+    ROOT,
+    "the build stands where the one module stands",
+  );
   assert.match(disk.read(`${ROOT}/${STAMP}`), /^[0-9a-f]{16}\n$/);
 });
 
@@ -143,7 +147,7 @@ test("a box with no go answers no viewer and names the missing program", () => {
 test("a Windows box builds logview.exe", () => {
   const disk = source();
   const proc = fakeProc({
-    [`go build -o ${EXE}.exe.new .`]: (argv) => {
+    [`go build -o ${EXE}.exe.new ./${SOURCE}`]: (argv) => {
       disk.write(argv[3], "binary");
       return { exitCode: 0 };
     },

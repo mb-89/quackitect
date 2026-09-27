@@ -13,6 +13,7 @@ import {
   GROUP_NOTE,
   groupRemote,
   heard,
+  onBranch,
   ROOT,
   ranGit,
   remoteSaying,
@@ -65,6 +66,7 @@ test("the merged set drops a branch cut on trunk's line, after trunk moves on", 
 test("branch open pushes a group off trunk, and says where it stands", () => {
   const { it, outside } = doorsSaying({
     ...remoteSaying([]),
+    ...onBranch("main"),
     [`git show origin/main:${GROUP_AT}`]: { stdout: GROUP_NOTE },
     "git rev-parse origin/main^{tree}": { stdout: "t0t0\n" },
     "git commit-tree t0t0 -p origin/main -m work/one-group opens": {
@@ -83,7 +85,7 @@ test("branch open pushes a group off trunk, and says where it stands", () => {
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
 test("branch open refuses a name trunk carries no group for", () => {
-  const { it, outside } = doorsSaying(remoteSaying([]));
+  const { it, outside } = doorsSaying({ ...remoteSaying([]), ...onBranch("main") });
 
   const { code, said } = heard(() => work(ROOT, ["open", "one-group"], it));
 
@@ -96,6 +98,7 @@ test("branch open refuses a name trunk carries no group for", () => {
 test("branch open leaves a branch already in the cloud alone", () => {
   const { it, outside } = doorsSaying({
     ...groupRemote(),
+    ...onBranch("main"),
     [`git show origin/main:${GROUP_AT}`]: { stdout: GROUP_NOTE },
   });
 

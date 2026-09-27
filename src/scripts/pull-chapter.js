@@ -10,16 +10,21 @@ import { voiceOver } from "../bridge/findings.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
+import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { notesSaid, parsed } from "./guidance-hand.js";
-import { PERSON, roleOf } from "./pull-hand-of.js";
-import { overLong } from "../../.claude/skills/level0/lib/names.js";
+import { acceptRows } from "./pull-accept.js";
+import { formatted } from "./pull-format.js";
 import { excludes, handRule, ticketsHere } from "./pull-hand.js";
+import { PERSON, roleOf } from "./pull-hand-of.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
 const NO_COMMAND = 127;
+
+// The question a gate's reviewer asks before it clears. [[spec/design_output/pull#the-gate]]
+export const BEFORE_CLEAR = "does anything here contradict what you see in the phase?";
 
 export function workAnswer(it, one, leaf) {
   const rows = [];
@@ -28,23 +33,23 @@ export function workAnswer(it, one, leaf) {
     `${WORK}  ${one.name} at ${leaf.path}, leaf ${leaf.at + 1} of ${leaf.of}${phase}`,
   );
   if (leaf.does) rows.push(`      ${leaf.does}`);
+  // A gate names the question it answers. [[spec/design_output/pull#the-gate]]
+  if (leaf.gate)
+    rows.push(`      answers: ${leaf.gate}`, `      before the clear: ${BEFORE_CLEAR}`);
+  if (leaf.final) rows.push(...acceptRows(it, one, leaf));
   rows.push("", "# Ask", "", askOf(one.text) || "(the ask stands empty)", "");
 
-  const deep = "#".repeat(leaf.path.split("/").length);
-  rows.push(`Write under ${deep} ${leaf.name} in ${one.path}, one heading a field:`);
+  // The engine writes the ticket file, so the hand answers the payload alone. [[spec/design_output/pull#the-fields-ride-the-payload]]
+  rows.push("Answer with --fields, a JSON object holding one key a field:");
   for (const field of leaf.evidence) {
     const more = field.expects !== undefined ? `, expects ${field.expects}` : "";
     const options = field.options
       ? `, one of ${[field.options].flat().join(", ")}`
       : "";
-    rows.push(
-      `  ${deep}# ${field.name}  ${field.form}${more}${options}: ${field.says ?? ""}`,
-    );
+    rows.push(`  ${field.name}  ${field.form}${more}${options}: ${field.says ?? ""}`);
   }
   if (leaf.checklist.length) {
-    rows.push(
-      `  ${deep}# ${CHECKED}  one line per item below, on how you take it into account`,
-    );
+    rows.push(`  ${CHECKED}  one line per item below, on how you take it into account`);
     rows.push("", "Checklist:");
     for (const item of leaf.checklist) rows.push(`  - ${item}`);
   }
@@ -55,11 +60,11 @@ export function workAnswer(it, one, leaf) {
   rows.push("");
   if (leaf.evidence.some((field) => field.form === "verdict")) {
     rows.push(
-      `Hand it back with ./RUNME.sh ticket pull ${one.name}, and the verdict field decides.`,
+      `Hand it back with ./RUNME.sh ticket pull ${one.name} --fields '<json>', and the verdict field decides.`,
     );
   } else {
     rows.push(
-      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass, or --fail "why", or --became <ticket>, or --answered <ticket>.`,
+      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass --fields '<json>', or --fail "why", or --became <ticket>, or --answered <ticket>.`,
     );
   }
   return rows.join("\n");
@@ -88,7 +93,7 @@ export function withPayload(text, path, payload) {
   }
   let now = String(text ?? "");
   for (const [name, said] of Object.entries(fields)) {
-    const put = withFieldText(now, path, name, String(said ?? ""));
+    const put = withFieldText(now, path, name, formatted(said));
     if (put.why) return put;
     now = put.text;
   }
@@ -229,7 +234,7 @@ export function formFault(it, field, rows, where, one, held) {
     const said = verdictIn(rows);
     if (!said.said)
       return [
-        `${where} opens with pass or fail, and it reads ${rows[0] ?? "nothing"}.`,
+        `${where} opens with pass or fail, or at a gate with accept or reject, and it reads ${rows[0] ?? "nothing"}.`,
       ];
     if (said.said === "fail" && !said.reason)
       return [`${where} fails with no finding under it.`];
@@ -247,16 +252,21 @@ export function verdictIn(rows) {
       .trim()
       .split(/[\s:.,]+/)[0]
       .toLowerCase();
-  const at = rows.findLastIndex((row) => ["pass", "fail"].includes(opener(row)));
+  const at = rows.findLastIndex((row) => Object.hasOwn(OPENERS, opener(row)));
   if (at < 0) return { said: "" };
-  const first = String(rows[at]).replace(/^[-*]\s+/, "").trim();
+  const first = String(rows[at])
+    .replace(/^[-*]\s+/, "")
+    .trim();
   const findings = FINDINGS.exec(first);
   const word = findings ? findings[0] : opener(first);
-  const rest = [first.slice(word.length).replace(/^[\s:.,]+/, ""), ...rows.slice(at + 1)]
+  const rest = [
+    first.slice(word.length).replace(/^[\s:.,]+/, ""),
+    ...rows.slice(at + 1),
+  ]
     .map((row) => row.replace(/^[-*]\s+/, "").trim())
     .filter(Boolean);
   const reason = tabled(rest).join("; ");
-  if (!findings) return { said: word, reason };
+  if (!findings) return { said: OPENERS[word], reason };
   const named = rest.filter((row) => !row.startsWith("|"));
   return { said: FOUND, reason, findings: named.map(findingOf) };
 }
@@ -272,8 +282,11 @@ function tabled(rows) {
   return out;
 }
 
-// A design review passing with findings names a child a row, as `- <child-name>: <finding>`. [[spec/design_output/pull#a-finding-rides-out]]
-const FINDINGS = /^pass\s+with\s+findings\b/i;
+// A gate's words read as the review's: accept as pass, reject as fail. [[spec/design_output/pull#the-gate]]
+const OPENERS = { pass: "pass", fail: "fail", accept: "pass", reject: "fail" };
+
+// A design review passing with findings, or a gate accepting with points, names a child a row, as `- <child-name>: <finding>`. [[spec/design_output/pull#a-finding-rides-out]]
+const FINDINGS = /^(pass\s+with\s+findings|accept\s+with\s+points)\b/i;
 export const FOUND = "findings";
 
 function findingOf(row) {
@@ -288,10 +301,16 @@ function findingFaults(it, said, where) {
   const taken = new Set(ticketsHere(it).map((one) => one.name));
   const seen = new Set();
   for (const { name, line } of said.findings) {
-    if (!name) out.push(`${where} names no child in ${line}; write it as - <child-name>: <finding>.`);
+    if (!name)
+      out.push(
+        `${where} names no child in ${line}; write it as - <child-name>: <finding>.`,
+      );
     else if (overLong(name, it.words))
-      out.push(`${where} names ${name}, and a ticket name holds at most ${it.words} words.`);
-    else if (taken.has(name)) out.push(`${where} names ${name}, which a ticket holds already.`);
+      out.push(
+        `${where} names ${name}, and a ticket name holds at most ${it.words} words.`,
+      );
+    else if (taken.has(name))
+      out.push(`${where} names ${name}, which a ticket holds already.`);
     else if (seen.has(name)) out.push(`${where} names ${name} twice.`);
     seen.add(name);
   }
@@ -409,7 +428,12 @@ export function handFaults(it, one, leaf, hand, held) {
   out.push(...signFaults(it, one, hand));
   const other = excludes(one.front, leaf, hand);
   if (other) out.push(`${leaf.path} ${other}.`);
-  if (leaf.evidence.some((field) => field.form === "verdict") && !one.private) {
+  // A gate's reviewer fixes within its own diff, as its own commit, so the guard stands down there. [[spec/design_output/pull#the-gate]]
+  if (
+    leaf.evidence.some((field) => field.form === "verdict") &&
+    !one.private &&
+    !leaf.gate
+  ) {
     const tip = tipOf(it);
     // A sibling hand commits beside this reader, and that costs the reading nothing. A commit naming this ticket is this hand's own write, which the rule refuses. [[spec/tickets/the-verdict-guard-reads-tips]]
     const moved =

@@ -303,5 +303,86 @@ test("a mcp__level0__plan call with no server answers the line", async () => {
 
   assert.match(String(said?.result ?? ""), /no server answers at .*6510/);
   assert.match(String(said.result), /mcp__level0__plan/, "the line names the tool");
-  assert.match(String(said.result), /\.\/RUNME\.sh serve/, "the line names the road back");
+  assert.match(
+    String(said.result),
+    /\.\/RUNME\.sh serve/,
+    "the line names the road back",
+  );
+});
+
+// The client drops the tools when it loads the module again, so the module marks its posts fresh until an answer hands the tools back. [[spec/design_output/level0#the-first-call-pays]]
+test("a module loaded again marks its posts fresh until the tools come back", async () => {
+  const hooks = {};
+  level0((event, fn) => {
+    hooks[event] = fn;
+  }, {});
+  const bodies = [];
+  const registered = [];
+  let answer = { register: [{ name: "plan" }] };
+  const $ = {
+    ...hand(fakeDisk(), fakeGit({}, STUB)),
+    http: {
+      fetch: async (_url, init) => {
+        bodies.push(JSON.parse(init.body));
+        const said = answer;
+        answer = {};
+        return { ok: true, status: 200, text: JSON.stringify(said) };
+      },
+    },
+    tool: { register: async (spec) => registered.push(spec) },
+  };
+  const handed = Object.assign(async (e) => e, { event: "tool.call" });
+
+  await hooks["*"]($, { tool: "Read" }, handed);
+  await hooks["*"]($, { tool: "Read" }, handed);
+
+  assert.equal(bodies[0].fresh, true, "the first post asks for the tools");
+  assert.deepEqual(registered, [{ name: "plan" }], "the answer registers them");
+  assert.equal(bodies[1].fresh, undefined, "and the next post asks no more");
+});
+
+// A wire where the host cuts the first post of a wait at its own timeout, and /health answers while the server stands. [[spec/tickets/every-server-stands-and-answers]]
+function cutting(stands) {
+  const posts = [];
+  const fetch = async (url, init) => {
+    if (url.endsWith("/health")) {
+      if (stands) return { ok: true, status: 200, text: "{}" };
+      throw new Error("Unable to connect");
+    }
+    posts.push(JSON.parse(init.body));
+    if (posts.length === 1 || !stands) throw new Error("The operation timed out.");
+    const line = "The helper a1 reports.";
+    return { ok: true, status: 200, text: JSON.stringify({ result: { result: line } }) };
+  };
+  return { posts, fetch };
+}
+
+// [[spec/tickets/every-server-stands-and-answers]]
+test("a wait the host cuts answers its signal on a live server, and the line on a dead one", async () => {
+  const hooks = {};
+  level0(
+    (event, fn) => {
+      hooks[event] = fn;
+    },
+    { cut: 0 },
+  );
+  const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
+  const call = { tool: "mcp__level0__wait", agent: "a1" };
+
+  const live = cutting(true);
+  const $ = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: live.fetch } };
+  const said = await hooks["*"]($, call, handed);
+
+  assert.equal(said?.result, "The helper a1 reports.", "the signal takes the line's place");
+  assert.equal(live.posts.length, 2, "the cut post goes again");
+  assert.ok(live.posts[0].e.since > 0, "the post carries the wait's since");
+  assert.equal(live.posts[1].e.since, live.posts[0].e.since, "and the post again the same");
+  assert.deepEqual($.logged, [], "a cut on a live server tells nobody it falls");
+
+  const dead = cutting(false);
+  const gone = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: dead.fetch } };
+  const line = await hooks["*"](gone, call, handed);
+
+  assert.match(String(line?.result ?? ""), /no server answers at .*mcp__level0__wait/);
+  assert.equal(dead.posts.length, 1, "a dead server takes no post again");
 });

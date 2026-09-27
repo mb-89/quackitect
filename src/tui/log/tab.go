@@ -14,8 +14,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
 )
 
 const (

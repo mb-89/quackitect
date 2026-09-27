@@ -1,37 +1,19 @@
-// The pull tool's pure half. The argv it hands the shell and the question it
-// puts to the judge, read with no harness standing.
-// [[spec/design_output/pull#the-checks]]
+// The pull tool's pure half. The argv it hands the shell, the spawn and the
+// session, read with no harness standing.
+// [[spec/design_output/pull#the-hand-out]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as lib from "../../.claude/skills/level0/lib/pull.js";
 import {
-  judgeAsk,
-  judgeRefusal,
   PULL_CALL,
   pullSpec,
   sessionOf,
   spawnPromptIn,
 } from "../../.claude/skills/level0/lib/pull.js";
-// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
-import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
-// The rules a leaf hands the judge, each label naming one rule. [[spec/tickets/the-judge-reads-answer-rules]]
-const RULES = [
-  {
-    label: "voice-1",
-    note: "spec/guidance/voice",
-    number: 1,
-    rule: "Say what is.",
-  },
-  {
-    label: "voice-3",
-    note: "spec/guidance/voice",
-    number: 3,
-    rule: "Put the bottom line first.",
-  },
-];
 // The hooks level one registers, keyed by their event. A registration carries a filter between the event and the handler, so the last argument is the handler. [[spec/design_output/pull#the-checks]]
 async function hooksHere() {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
@@ -72,7 +54,11 @@ test("the module registers one session start, and it registers the pull tool and
   const registered = [];
   const box = harness();
   box.$.tool.register = async (spec) => void registered.push(spec.name);
-  await starts[0](box.$, { session_id: "s1", client: "claude-code" }, async (said) => said);
+  await starts[0](
+    box.$,
+    { session_id: "s1", client: "claude-code" },
+    async (said) => said,
+  );
   assert.equal(registered[0], "pull", "the pull tool registers first");
   for (const one of READ_TOOLS) assert.ok(registered.includes(one.name), one.name);
 });
@@ -119,11 +105,6 @@ test("the tool's input reads into the same words a person types", () => {
     tool({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
     ["pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
   );
-  assert.deepEqual(tool({ ticket: "a-child", verdict: "pass" }, "--judge"), [
-    "pull",
-    "a-child",
-    "--judge",
-  ]);
   assert.deepEqual(pullArgvOf(["pull", "a-child", "--pass"]), [
     "pull",
     "a-child",
@@ -140,39 +121,55 @@ test("the tool's input reads into the same words a person types", () => {
   ]);
 });
 
-// [[spec/design_output/pull#the-checks]]
-test("the judge's question names each rule by its label and carries the evidence whole", () => {
-  const ask = judgeAsk("The approach.\nchecked:\n- one", RULES);
-  assert.match(ask, /voice-1: Say what is\.\nvoice-3: Put the bottom line first\./);
-  assert.match(ask, /Evidence:\nThe approach\.\nchecked:\n- one$/);
-  assert.match(
-    judgeRefusal("the judge answers breaks over design/draft"),
-    /^refused\n/,
+// A hand-back through the tool, over a box whose files a fake disk holds. It answers what the shell ran, what the model was asked, and what the tool answered. [[spec/tickets/the-judge-leaves-the-code]]
+async function handedBack(seed, method = "") {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register(
+    (event, ...rest) => {
+      if (event === "tool.call" && rest.length > 1) calls.push(rest);
+    },
+    { method },
   );
-});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const files = fakeDisk(seed);
+  const ran = [];
+  const asked = [];
+  const $ = {
+    fs: { read: async (path) => files.read(path) },
+    process: {
+      run: async (argv) => {
+        ran.push(argv);
+        return { stdout: "work", exitCode: 0 };
+      },
+    },
+    model: {
+      classify: async (_ask, _labels, options) => {
+        asked.push(options);
+        return "voice-3";
+      },
+    },
+  };
+  const said = await handler(
+    $,
+    { ticket: "a-child", verdict: "pass" },
+    async () => null,
+  );
+  return {
+    said: said.result,
+    judged: ran.some((argv) => argv.at(-1) === "--judge"),
+    asked,
+  };
+}
 
-// [[spec/tickets/the-judge-reads-answer-rules]]
-test("the labels the judge picks from open on follows, one label a rule after it", () => {
-  assert.equal(typeof level1.judgeLabels, "function", "the wrapper answers judgeLabels");
-  assert.deepEqual(level1.judgeLabels(RULES), ["follows", "voice-1", "voice-3"]);
-  assert.deepEqual(level1.judgeLabels([]), ["follows"]);
-});
+const judging = (enabled, model) => JSON.stringify({ judge: { enabled, model } });
 
-// [[spec/tickets/the-judge-reads-answer-rules]]
-test("a label reads back to the note, the number and the rule's own line", () => {
-  assert.equal(typeof level1.ruleBroken, "function", "the wrapper answers ruleBroken");
-  const said = level1.ruleBroken("voice-3", RULES);
-  assert.match(said, /spec\/guidance\/voice/, "the refusal names the note");
-  assert.match(said, /rule 3/, "the refusal names the number");
-  assert.match(said, /Put the bottom line first\./, "the refusal names the line");
-});
-
-// [[spec/tickets/the-judge-reads-answer-rules]]
-test("a label outside the set reads as follows, so a judge naming nothing refuses nothing", () => {
-  assert.equal(typeof level1.ruleBroken, "function", "the wrapper answers ruleBroken");
-  assert.equal(level1.ruleBroken("follows", RULES), "");
-  assert.equal(level1.ruleBroken("voice-9", RULES), "");
-  assert.equal(level1.ruleBroken("", RULES), "");
+// The engine holds no model call, so a config naming the old switch still runs the pull alone. [[spec/tickets/the-judge-leaves-the-code]]
+test("the pull tool answers what the pull prints, and asks no model", async () => {
+  const ran = await handedBack({ "spec/config/level0.json": judging(true, "haiku") });
+  assert.equal(ran.judged, false, "the tool runs no --judge road");
+  assert.deepEqual(ran.asked, [], "the tool asks no model");
+  assert.equal(ran.said, "work");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -216,9 +213,12 @@ test("an event naming no session writes nothing, and says the hand stands at the
 test("the pull hook matches the level zero call, and runs the script the method root holds", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
   const calls = [];
-  register((event, ...rest) => {
-    if (event === "tool.call" && rest.length > 1) calls.push(rest);
-  }, { method: "/vehicle/" });
+  register(
+    (event, ...rest) => {
+      if (event === "tool.call" && rest.length > 1) calls.push(rest);
+    },
+    { method: "/vehicle/" },
+  );
   const [filter, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
   assert.equal(filter?.tool, "mcp__level0__pull");
 
@@ -233,4 +233,56 @@ test("the pull hook matches the level zero call, and runs the script the method 
   };
   assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
   assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
+});
+
+// The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]
+test("the pull tool runs the verb under the harness env the shell verb reads", async () => {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { agentOf } = await import("../../src/scripts/pull-hand-of.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const before = process.env.CLAUDE_CODE_REMOTE;
+  process.env.CLAUDE_CODE_REMOTE = "true";
+  const opts = [];
+  const $ = {
+    process: {
+      run: async (_argv, said) => {
+        opts.push(said);
+        return { stdout: "wait", stderr: "", exitCode: 0 };
+      },
+    },
+  };
+  const read = [];
+  const engine = {
+    ...$,
+    env: {
+      get: async (key) => {
+        read.push(key);
+        return key === "SE_CLOUD" ? "1" : undefined;
+      },
+    },
+  };
+  await handler(engine, {}, async () => null);
+  assert.ok(read.includes("CLAUDE_CODE_REMOTE"), "the key reads through the engine");
+  assert.equal(opts[0]?.env?.SE_CLOUD, "1");
+  opts.length = 0;
+  try {
+    await handler($, {}, async () => null);
+  } finally {
+    if (before === undefined) delete process.env.CLAUDE_CODE_REMOTE;
+    else process.env.CLAUDE_CODE_REMOTE = before;
+  }
+  assert.equal(agentOf(opts[0]?.env), "claude-code-remote");
+  const { HARNESS } = await import("../../src/scripts/pull-hand-of.js");
+  const { HARNESS_KEYS } = await import(
+    "../../.claude/skills/level0/hooks/pull-tool.js"
+  );
+  assert.deepEqual(
+    HARNESS_KEYS,
+    HARNESS.map(([key]) => key),
+    "the copy stands equal",
+  );
 });

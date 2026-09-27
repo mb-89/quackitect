@@ -11,8 +11,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/x/ansi"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
 )
 
 // A tab of the case's own, carrying the whole interface and drawing one line. [[spec/design_output/tui#the-window-is-a-split]]

@@ -4,7 +4,7 @@
 // [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
 package main
 
-import "quackitect/yaml"
+import "quackitect/src/yaml"
 
 // The rule over a pointer whose note holds no heading slugging to its anchor. [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
 const DeadAnchor = "DeadAnchor"

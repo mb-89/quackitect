@@ -16,13 +16,18 @@ const RESTATED = "restated";
 const BRANCH = "work/";
 
 // Whether a hand works a leaf, answered once so the pull and the write door agree by construction. [[spec/tickets/the-one-answer-takes-shape]]
+// The conditions naming a step the owner alone answers. [[spec/tickets/the-owners-words-travel-verbatim]]
+const OWNERS = ["view", "handed"];
+
 export function writesHere(leaf, hand = {}) {
   const by = String(leaf?.by ?? "anyone");
   const at = String(leaf?.path ?? "");
   const no = (why, more = {}) => ({ writes: false, why, ...more });
 
   // A cloud box answers every question it meets, so a person's step stands open to it. [[spec/guidance/cloud]]
-  if (by === "person" && hand.agent && !hand.ownerSays && !hand.cloud)
+  // The owner's view and the owner's read are the owner's alone, on the cloud too. [[spec/tickets/the-owner-view-decides-done]]
+  const cloud = hand.cloud && !OWNERS.includes(String(leaf?.when ?? ""));
+  if (by === "person" && hand.agent && !hand.ownerSays && !cloud)
     return no(`waits for a person at ${at}`, { person: true });
   if (by === "agent" && !hand.agent) return no(`waits for an agent at ${at}`);
   // The hand the engine spawns takes it, and the caller says whether this hand is that one. [[spec/design_output/pull#a-hand-of-its-own]]
@@ -56,14 +61,21 @@ export function queueHolds(texts) {
     if (process === "group" || process.endsWith("/group"))
       return String(front.urgent ?? "") === "true";
     if (String(front.group ?? "").trim()) return false;
-    const walk = entriesIn(front.steps, "steps");
-    const step = String(front.step ?? "").trim();
-    const leaf = step
-      ? walk.find((one) => one.path === step)
-      : walk.find((one) => !one.said?.steps);
-    if (!leaf) return false;
-    return !["person", "children", "helper"].includes(String(leaf.said?.by ?? ""));
+    const by = leafBy(text);
+    if (by === null) return false;
+    return !["person", "children", "helper"].includes(by);
   });
+}
+
+// Who takes the leaf a ticket's pointer names, or its first leaf where no pointer stands. Null where no leaf stands. [[spec/tickets/the-stop-reads-the-state]]
+export function leafBy(text) {
+  const front = readNote(String(text ?? "")).front.said ?? {};
+  const walk = entriesIn(front.steps, "steps");
+  const step = String(front.step ?? "").trim();
+  const leaf = step
+    ? walk.find((one) => one.path === step)
+    : walk.find((one) => !one.said?.steps);
+  return leaf ? String(leaf.said?.by ?? "") : null;
 }
 
 // [[spec/design_output/pull#the-group-holds-the-turn]]

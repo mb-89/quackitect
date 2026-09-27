@@ -3,8 +3,13 @@
 // [[spec/design_output/work#the-battery-answers-first]]
 
 import { join } from "node:path";
+import {
+  PUBLIC_TICKETS,
+  TICKETS as PRIVATE_TICKETS,
+} from "../../.claude/skills/level0/lib/folders.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { filesOn } from "../../.claude/skills/level0/lib/warnings.js";
+import { FROM } from "../bridge/findings.js";
 import { partsTimed } from "./battery.js";
 import { files, it, root } from "./cli-doors.js";
 import { warningsStood } from "./cli-read.js";
@@ -65,15 +70,25 @@ export function stampFor({
   before = null,
   keep = 1,
 }) {
+  const held = stood.filter(holdsPush);
   return {
     sha,
     ok: code === 0,
     clean,
     at,
-    warnings: stood.length,
-    files: filesOn(stood),
+    warnings: held.length,
+    files: filesOn(held),
     ...(battery ? { battery, runs: runsKept(battery, before, sha, keep) } : {}),
   };
+}
+
+// A ticket's prose stands at warning by rule, so it holds no push, and every other warning does. [[spec/design_output/work#the-battery-answers-first]]
+export function holdsPush(one) {
+  if (one?.source !== FROM.vale) return true;
+  const file = String(one?.file ?? "").replaceAll("\\", "/");
+  return ![PUBLIC_TICKETS, PRIVATE_TICKETS].some(
+    (folder) => file.startsWith(`${folder}/`) || file.includes(`/${folder}/`),
+  );
 }
 
 // The last runs' parts at this commit, newest first, up to the count, so a retro reads a median over one tree. [[spec/guidance/retro/effect]]

@@ -5,6 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf, withEntry } from "../../src/engine/group.js";
 import { withPersonStep } from "../../src/scripts/pull.js";
@@ -23,14 +24,18 @@ import {
 
 // The ticket failed back from design/review once already. [[spec/design_output/pull#the-fail]]
 const failedOnce = () =>
-  withEntry(CHILD("open", "design/review"), {
-    step: "design/review",
-    hand: "box other",
-    hash_before: "aaaa",
-    hash_after: "aaaa",
-    returns: 1,
-    why: "thin",
-  });
+  withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/review",
+      hand: "box other",
+      hash_before: "aaaa",
+      hash_after: "aaaa",
+      returns: 1,
+      why: "thin",
+    },
+    fakeFront(),
+  );
 
 // A review failing, the ticket standing at design/review. Git keeps each commit of the hand-back with the ticket as it stood then. [[spec/design_output/pull#the-fail]]
 function failedTwice(more, text = null) {

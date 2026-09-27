@@ -44,12 +44,13 @@ import {
   root,
   TESTS,
 } from "./cli-doors.js";
-import { asksIndex, lint, version } from "./cli-read.js";
+import { asksIndex, errorsSaid, errorsStood, lint, version } from "./cli-read.js";
 import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
-import { withRoute } from "./process.js";
-import { emptyGroup } from "./pull-hand.js";
+import { FROM_HANDOVER, fromHandover, withRoute } from "./process.js";
+import { emptyGroup, ticketsHere } from "./pull-hand.js";
+import { expectedRed } from "./red-list.js";
 import { pullArgvOf } from "./pull-tool.js";
 import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
@@ -79,19 +80,31 @@ export const verbs = {
   check: {
     says: "the tests, the doors, the server, then the rules over the tree",
     // Each part runs timed, so the stamp carries the battery's report and a retro reads it. [[spec/guidance/retro/effect]]
+    // Under --errors the parts run quiet, and the check prints the red cases and the findings at error alone. [[spec/tickets/the-verbs-need-no-wrapper]]
     run: async (w) => {
-      const { code, parts, unrun } = await batteryRun(
-        [
-          ["tests", () => test()],
-          ["go", () => goHolds()],
-          ["doors", () => doorsHold()],
-          ["projections", () => projectionsHold()],
-          ["plugin", () => pluginHolds()],
-          ["server", () => serverHolds()],
-          ["rules", () => lint(w)],
-        ],
-        it.clock,
-      );
+      const errors = rest.includes("--errors");
+      const loud = console.log;
+      if (errors) console.log = () => {};
+      let ran;
+      try {
+        ran = await batteryRun(
+          [
+            ["tests", () => test(errors)],
+            ["go", () => goHolds(errors)],
+            ["doors", () => doorsHold()],
+            ["projections", () => projectionsHold()],
+            ["plugin", () => pluginHolds()],
+            ["server", () => serverHolds()],
+            ["rules", () => lint(w)],
+          ],
+          it.clock,
+        );
+      } finally {
+        console.log = loud;
+      }
+      const { code, parts, unrun } = ran;
+      if (errors)
+        for (const row of errorsSaid(timesHere(), errorsStood())) console.log(row);
       return stamped(
         code,
         batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }),
@@ -314,11 +327,12 @@ export function renameHere(argv) {
     );
     return 2;
   }
-  const it = { disk: files, join, root, git: git(outside, root) };
+  // The clock names the journal entry the move writes. [[spec/tickets/journal-the-rename-verb]]
+  const here = { disk: files, join, root, git: git(outside, root), clock: it.clock };
   // A module's name stands as no path, so `--text` rewrites it and moves nothing. [[spec/design_output/index#a-rename-reaches-a-name]]
   const said = argv.includes("--text")
-    ? renamingText(it, from, to)
-    : renaming(it, from, to);
+    ? renamingText(here, from, to)
+    : renaming(here, from, to);
   if (said.why) {
     console.error(said.why);
     return 1;
@@ -384,7 +398,7 @@ export function serveBridge(argv) {
 // [[spec/design_output/tui#the-verb-builds-it]]
 
 // The runner's flags after the node path: the spec report to the screen, and the battery's reporter to its file. [[spec/design_output/work#the-battery-answers-first]]
-export function testArgv(at) {
+export function testArgv(at, red = []) {
   return [
     "--test",
     "--test-reporter=spec",
@@ -392,16 +406,41 @@ export function testArgv(at) {
     // A reporter loads as a module, and a drive letter reads as a URL scheme, so the path goes as a file URL. [[spec/design_output/work#the-battery-answers-first]]
     `--test-reporter=${pathToFileURL(join(at, ...REPORTER.split("/"))).href}`,
     `--test-reporter-destination=${join(at, ...TIMES.split("/"))}`,
-    TESTS,
-    CONTRACT_TESTS,
+    ...(red.length ? testFiles(at, red) : [TESTS, CONTRACT_TESTS]),
   ];
 }
 
-export function test() {
+// Every test file the two globs reach, less the red list. [[spec/design_output/pull#the-gate]]
+function testFiles(at, red) {
+  const out = [];
+  for (const glob of [TESTS, CONTRACT_TESTS]) {
+    const folder = glob.slice(0, glob.lastIndexOf("/"));
+    const end = glob.slice(glob.lastIndexOf("*") + 1);
+    for (const one of files.list(join(at, ...folder.split("/")))) {
+      const path = `${folder}/${one.name}`;
+      if (one.kind === "file" && one.name.endsWith(end) && !red.includes(path))
+        out.push(path);
+    }
+  }
+  return out.sort();
+}
+
+// The tests the open tickets list as red. [[spec/design_output/pull#the-gate]]
+function redHere() {
+  return expectedRed(ticketsHere({ ...it, root }).filter((one) => !one.private));
+}
+
+export function test(quiet = false) {
   const tally = freshTally();
-  const ran = outside.run([process.execPath, ...testArgv(root)], {
+  const red = redHere();
+  if (red.length) {
+    console.log(
+      `The red list stands apart until its tests-green closes: ${red.join(", ")}`,
+    );
+  }
+  const ran = outside.run([process.execPath, ...testArgv(root, red)], {
     cwd: root,
-    inherit: true,
+    inherit: !quiet,
     env: { SE_SPAWNS: tally },
   });
   return ran.exitCode;
@@ -442,7 +481,7 @@ export function mint(argv) {
     console.error("Usage: ./RUNME.sh mint <kind> <path> [--field=value ...]\n");
     console.error(`${SCHEMAS} holds ${kinds.join(", ")}.`);
     console.error(
-      "A ticket takes --process=<name>, and the route and its hash copy in.",
+      "A ticket takes --process=<name>, and the route and its hash copy in. One off a handover line takes --from=handover.",
     );
     return 2;
   }
@@ -453,7 +492,12 @@ export function mint(argv) {
     return 2;
   }
 
-  const handed = fieldsIn(argv, schema);
+  // [[spec/tickets/the-owners-words-travel-verbatim]]
+  const handover = argv.includes(FROM_HANDOVER);
+  const handed = fieldsIn(
+    argv.filter((one) => one !== FROM_HANDOVER),
+    schema,
+  );
   if (handed.why) {
     console.error(handed.why);
     return 2;
@@ -472,7 +516,8 @@ export function mint(argv) {
     return 2;
   }
 
-  const made = mintedNote(schemas, { kind, path, fields: copied.fields });
+  const fields = handover ? fromHandover(copied.fields) : copied.fields;
+  const made = mintedNote(schemas, { kind, path, fields }, it.front);
   if (made.why) {
     console.error(made.why);
     return 2;

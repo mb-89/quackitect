@@ -13,9 +13,9 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/tui/frame"
-	"quackitect/tui/log"
-	"quackitect/tui/work"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/log"
+	"quackitect/src/tui/work"
 )
 
 // A window holding the log and a loaded work tree, the way a person opens it. [[spec/design_output/tui#the-work-tab]]

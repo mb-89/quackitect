@@ -6,11 +6,18 @@
 const { parsed, valueAt, withValue } = require("./values.js");
 
 const KEY = "session.pid";
+// The binding holds until the owner changes it, so a new window carries it over. [[spec/tickets/the-window-keeps-the-binding]]
+const KEPT = ["engine.binding"];
 
 function opened(text, pid) {
   const held = valueAt(text, KEY);
   if (held === pid) return { text: String(text ?? ""), cleared: [], same: true };
-  return { text: withValue("{}", KEY, pid), cleared: keysIn(text), same: false };
+  let fresh = withValue("{}", KEY, pid);
+  for (const key of KEPT) {
+    const value = valueAt(text, key);
+    if (value !== undefined) fresh = withValue(fresh, key, value);
+  }
+  return { text: fresh, cleared: keysIn(text), same: false };
 }
 
 function keysIn(text) {
@@ -18,7 +25,8 @@ function keysIn(text) {
   for (const [section, held] of Object.entries(parsed(text))) {
     if (!held || typeof held !== "object") continue;
     for (const leaf of Object.keys(held)) {
-      if (`${section}.${leaf}` !== KEY) out.push(`${section}.${leaf}`);
+      const key = `${section}.${leaf}`;
+      if (key !== KEY && !KEPT.includes(key)) out.push(key);
     }
   }
   return out.sort();

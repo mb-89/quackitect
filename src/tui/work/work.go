@@ -16,16 +16,16 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
-	"quackitect/tui/tree"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/tree"
 )
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const BaseAt = "spec/views/work.base"
 
 // The keys the details draw as fields, in this order, and the rest they leave to the flags and the text. [[spec/design_output/tui#the-work-tab]]
-var detailKeys = []string{"step", "group", "standing", "route", QueueKey}
+var detailKeys = []string{"step", "progress", "group", "standing", "route", QueueKey}
 
 // The tab's own tree and what stands over it, which the window tests read. [[spec/design_output/tui#the-packages-the-window-holds]]
 type Tab struct {

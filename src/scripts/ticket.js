@@ -19,7 +19,14 @@ import {
 } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote, reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
-import { fieldOf, GROUP, withField, withoutField } from "../engine/group.js";
+import {
+  askOf,
+  fieldOf,
+  GROUP,
+  TICKETS as PUBLIC,
+  withField,
+  withoutField,
+} from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 import { emptyGroup } from "./pull-hand.js";
@@ -104,12 +111,14 @@ function note(it, name, argv) {
     );
     return 2;
   }
-  if (overLong(name, it.words)) {
-    console.error(`A ticket name holds at most ${it.words} words, and ${name} holds more.`);
-    return 2;
-  }
+  // A note lands on its first call, so a name past the cap cuts to its first words and says so. [[spec/tickets/prose-verbs-land-first-try]]
+  const named = cutTo(name, it.words);
+  if (named !== name)
+    console.log(
+      `${name} holds more than ${it.words} words, so the note stands as ${named}.`,
+    );
 
-  const path = `${NOTES}/${name}.md`;
+  const path = `${NOTES}/${named}.md`;
   const at = it.join(it.root, ...path.split("/"));
   if (it.disk.exists(at)) {
     console.error(`${path} stands already. Name a note nothing holds yet.`);
@@ -121,6 +130,12 @@ function note(it, name, argv) {
     console.error(held.why);
     return 1;
   }
+
+  const twin = twinOf(it, line);
+  if (twin)
+    console.error(
+      `${twin} stands open and carries these words. Add the line there in place of a twin.`,
+    );
 
   const steps = fromHold(held.route, holdOf(it));
   const made = routedTicket(it, path, held, {
@@ -143,23 +158,68 @@ function note(it, name, argv) {
         ? `${path} stands, and it waits for a person to decide it.`
         : `${path} stands, and it waits for a retro to decide it.`,
   );
-  return said(it, NOTE, line, { ticket: name });
+  return said(it, NOTE, line, { ticket: named });
+}
+
+// A word this long carries the meaning, where a shorter one joins the sentence. [[spec/tickets/the-verbs-need-no-wrapper]]
+const LONG_WORD = 5;
+
+// The first open note or ticket whose Ask holds most of the line's longer words. [[spec/tickets/the-verbs-need-no-wrapper]]
+function twinOf(it, line) {
+  const words = longWords(line);
+  if (!words.size) return "";
+  for (const folder of [NOTES, PUBLIC]) {
+    const dir = it.join(it.root, ...folder.split("/"));
+    if (!it.disk.exists(dir)) continue;
+    for (const one of it.disk.list(dir)) {
+      if (one.kind !== "file" || !one.name.endsWith(".md")) continue;
+      const text = it.disk.read(it.join(dir, one.name));
+      if (!/^state: open$/m.test(text)) continue;
+      const ask = longWords(askOf(text));
+      const shared = [...words].filter((word) => ask.has(word)).length;
+      if (shared * 2 > words.size) return `${folder}/${one.name}`;
+    }
+  }
+  return "";
+}
+
+function longWords(text) {
+  return new Set(
+    String(text ?? "")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((word) => word.length >= LONG_WORD),
+  );
+}
+
+// The first words of a name, as many as the cap holds, joined by a hyphen. [[spec/tickets/prose-verbs-land-first-try]]
+function cutTo(name, most) {
+  if (!overLong(name, most)) return name;
+  return name
+    .split(/[-_.]+/)
+    .filter(Boolean)
+    .slice(0, most)
+    .join("-");
 }
 
 // A ticket minted off a route, the hand's line as its Ask. The Ask reads through the lint's road before any write, so a refusal writes nothing. [[spec/design_output/pull#a-draft-opens]]
 export function routedTicket(it, path, held, { steps, line, fields }) {
-  const made = mintedNote(schemasHere(it), {
-    kind: "ticket",
-    path,
-    fields: {
-      ...fields,
-      process: held.link,
-      process_hash: held.hash,
-      steps,
-      step: firstLeafOf(held.route),
-      Ask: [askRows(held.ask), "", line].join("\n").trim(),
+  const made = mintedNote(
+    schemasHere(it),
+    {
+      kind: "ticket",
+      path,
+      fields: {
+        ...fields,
+        process: held.link,
+        process_hash: held.hash,
+        steps,
+        step: firstLeafOf(held.route),
+        Ask: [askRows(held.ask), "", line].join("\n").trim(),
+      },
     },
-  });
+    it.front,
+  );
   if (made.why) return made;
   const found = askFaults(it, path, made.text);
   if (found.refused.length) return { why: lineRefusal(path, found.refused) };
@@ -196,7 +256,7 @@ function todo(it, name, argv) {
 
   it.disk.write(
     at.path,
-    off ? withoutField(text, TODO) : withField(text, TODO, "true"),
+    off ? withoutField(text, TODO, it.front) : withField(text, TODO, "true", it.front),
   );
   console.log(
     off
@@ -336,7 +396,7 @@ function update(it, name, argv) {
   }
 
   const schema = schemasHere(it).get("ticket");
-  it.disk.write(at.path, reRouted(text, schema, route.steps, held.hash));
+  it.disk.write(at.path, reRouted(text, schema, route.steps, held.hash, it.front));
   console.log(
     `${at.said} carries ${held.name} again, and ${route.kept} leaf/leaves keep what they hold.`,
   );
@@ -420,7 +480,12 @@ export function opensDraft(it, at) {
     it,
     {
       at: at.path,
-      text: withField(withField(text, "state", "open"), "step", step),
+      text: withField(
+        withField(text, "state", "open", it.front),
+        "step",
+        step,
+        it.front,
+      ),
       name: called,
       private: at.said.startsWith(`${NOTES}/`),
     },

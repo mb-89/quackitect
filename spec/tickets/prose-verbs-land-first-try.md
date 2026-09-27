@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-verbs-land-whole
 steps:
   - name: design
@@ -77,7 +77,44 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
+step: implement/tests-green
+record:
+  - step: design/draft
+    hand: box d1fe1ca62214 · claude-code-remote
+    hash_before: 6d2bc1fad2f0163354b87688e4a698d6bb7fb1e0
+    hash_after: 6d2bc1fad2f0163354b87688e4a698d6bb7fb1e0
+  - step: design/review
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: d2ac86683bb0068e36a02e7f5399c41a6e484fe2
+    hash_after: d2ac86683bb0068e36a02e7f5399c41a6e484fe2
+  - step: implement/tests-red
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 7adc7a89dfc6bc8ffeb7222f43e5c0d6cf796909
+    hash_after: 7adc7a89dfc6bc8ffeb7222f43e5c0d6cf796909
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 1bac6ae2df4cf35fcd69062c6c6adc1455bdec93
+    hash_after: 1bac6ae2df4cf35fcd69062c6c6adc1455bdec93
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7a55188b9103 · claude-code-remote
+    hash_before: 55223b3a559a67e3021b60e4ff8fb42f6b557996
+    hash_after: 55223b3a559a67e3021b60e4ff8fb42f6b557996
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 42 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/rename.js:170:1: correctness/noUnusedFunctionParameters: This parameter to is unused."
+reason: done
 ---
 
 # Ask
@@ -103,11 +140,28 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is text -->
 
+1. `judgeAsk` in `.claude/skills/level0/lib/pull.js` takes an optional third argument, the broken label. With it, the question asks for the one evidence line that breaks that rule, word for word.
+2. `judgeRefusal` in the same file takes the quoted line as a second argument, and prints it under the rule. With no line, it prints as it does now.
+3. `judged` in `.claude/skills/level0/hooks/pull-tool.js` asks `$.model.complete` with that question after `$.model.classify` names a broken label. It keeps the answer only where the evidence holds that line.
+4. `judged` counts refusals in a map keyed by ticket and step, in the hook module. Past the count, it lets the hand-back through and clears the key. A pass clears the key too.
+5. `spec/config/level0.json` gains `judge.refusalsBeforePass`, set to 3. `judged` reads it beside `judge.enabled`.
+6. `note` in `src/scripts/ticket.js` cuts a name past `it.words` to its first words, joined by a hyphen. A small helper beside `note` does the cut.
+7. `note` then writes under the cut name, logs the note row under it, and prints the cut name with the cap.
+8. `./RUNME.sh check` runs over the change and exits 0.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `.claude/skills/level0/hooks/pull-tool.js` `judged` calls `judgeAsk` and `judgeRefusal`
+- `.claude/skills/level0/hooks/pull-tool.js` `register`, the `tool.call` handler, calls `judged`
+- `test/level0/level1.test.js` "the judge's question names each rule by its label and carries the evidence whole" calls `judgeAsk` and `judgeRefusal`
+- `test/level0/vehicle.test.js` `plugin` names `judgeAsk` in a fixture string alone, and calls nothing
+- `src/scripts/ticket.js` `ticket` calls `note` through its `doing` table
+- `src/scripts/cli.js` the `ticket` entry of the verb table calls `ticket`
+- `test/level0/ticket-verb.test.js`, `test/level0/roots.test.js` and `test/level0/note-answer.test.js` call `ticket` with `note`
 
 ### tests
 
@@ -115,17 +169,28 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is list -->
 
+- `test/level0/level1.test.js` "the judge asks for the line that breaks the rule, and the refusal quotes it"
+- `test/level0/level1.test.js` "the judge lets a hand-back through past the count of refusals on one leaf"
+- `test/level0/ticket-verb.test.js` "ticket note cuts a name past the cap, writes under the cut name and says so"
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first draft
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- I opened every file, function and verb the ask names. Each claim holds, but the `complete` call shape stays unchecked, since no code calls it.
+- I searched with grep for each changed function and for the `note` verb. The callers list holds every hit.
+- The first two tests decide the judge lines, and the third decides the note line. `./RUNME.sh check` decides the last.
+
 
 ## review
 
@@ -136,6 +201,11 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- judge-cases-turn-it-on: main sets `judge.enabled` to false in `spec/config/level0.json`, so the judge runs nowhere until the owner turns it on. The two judge cases in `test/level0/level1.test.js` hand the hook a config with `enabled: true`, as `judgeRuns` there does, or they prove a judge that never runs
+- judge-quote-proves-its-call: approach item 3 asks `$.model.complete`, and no code, design note or hook fake in this tree names that call. The tests-red step proves the call against the hook runtime before the change leans on it, and reads the quote out of `classify` where the call stands nowhere
 
 # implement
 
@@ -149,17 +219,27 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/level1.test.js test/level0/ticket-verb.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The three cases fail on their own assertion. The ask names no `word for word` line, the count passes no hand-back, and the note refuses the long name. The hook's type file declares `$.model.complete`, taking a model and a prompt and answering `isAnswered` and `text`. So approach item 3 stands. The note's old refusal case turns into the cut case, because the ask replaces that refusal.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two test files the ask names
+- the hook's doors each take a fake: the disk, the process and both model calls
+- each case's comment links this ticket
+- the count and the cut each stand in one case
+- both review rows stand fixed: the judge cases turn the judge on, and the type file proves the call
 
 ## change
 
@@ -171,11 +251,19 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/pull.js .claude/skills/level0/hooks/pull-tool.js src/scripts/ticket.js spec/config/level0.json spec/config/level0.schema.json test/level0/level1.test.js test/level0/ticket-verb.test.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, and `spec/config/level0.schema.json` beside the config, because the schema reads every key the config holds
+- the hook reaches the disk, the process and both model calls, and each case hands a fake for each
+- each new function carries a comment linking this ticket
+- the count stands in `spec/config/level0.json` alone, and the hook reads it by its key
+- both review rows stand fixed: the cases turn the judge on, and the quote rides `$.model.complete`
 
 ## tests-green
 
@@ -187,11 +275,15 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/level1.test.js test/level0/ticket-verb.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -199,12 +291,28 @@ The judge answers a rule and no line, so a hand sends the same draft again blind
 
 <!-- the form is text -->
 
+A refusal from the judge now quotes the line it refuses. `judged` in the pull hook asks `$.model.complete` for the one line breaking the label `classify` names, and keeps the answer where the evidence holds it word for word. `judgeRefusal` prints it under the rule.
+
+Past `judge.refusalsBeforePass` refusals on one leaf, the hand-back goes through, and a pass clears the count. The judge itself stays off until the owner turns it on.
+
+`ticket note` cuts a name past the cap to its first words, writes the note there, and says so. One note lands on one call.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change touches the ask's files, and the config's schema beside the config
+- each case hands a fake for the disk, the process and both model calls
+- each new function's comment links this ticket
+- the count stands in the config alone
+- both review rows stand fixed in the cases and the hook
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The two judge cases the build adds hand the hook a config with `judge.enabled` set to true, as `judgeRuns` in `test/level0/level1.test.js` does. Main turns the judge off by default, so a case under the default proves nothing. [[spec/tickets/judge-cases-turn-it-on]] carries the finding into this build.
+
+Approach item 3 asks `$.model.complete`, and no code, note or fake here names that call. The tests-red step proves it against the hook runtime first. Where it stands nowhere, the quote comes out of `classify`. [[spec/tickets/judge-quote-proves-its-call]] carries the finding into this build.

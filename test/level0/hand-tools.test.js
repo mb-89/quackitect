@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { MINT_TOOL, schemasFrom } from "../../.claude/skills/level0/lib/schema.js";
 import { SPECS, TOOLS } from "../../src/bridge/tools.js";
@@ -58,13 +59,22 @@ test("a mint over a break of form writes the note, and the answer carries the wa
     work: "/tree",
     root: "/tree",
     disk,
+    front: fakeFront(),
     log: fakeLog(),
     schemas: schemasFrom([{ name: "note.schema.yaml", text: NOTE_SCHEMA }]),
     vale: {
       stands: () => true,
       lint: async () => ({
         ran: true,
-        found: [{ rule: "VoiceVale.Passive", line: 5, column: 1, message: "Cut it in two.", severity: "error" }],
+        found: [
+          {
+            rule: "VoiceVale.Passive",
+            line: 5,
+            column: 1,
+            message: "Cut it in two.",
+            severity: "error",
+          },
+        ],
       }),
     },
     projections: [],

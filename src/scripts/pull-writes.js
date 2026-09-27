@@ -20,13 +20,8 @@ import { dropHold } from "./guidance-hand.js";
 import { processAt } from "./process.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed, unlandedRows } from "./pull-landed.js";
-import {
-  childrenSay,
-  handOut,
-  holdsHere,
-  ticketsHere,
-  withPersonStep,
-} from "./pull-hand.js";
+import { childrenSay, handOut, ticketsHere, withPersonStep } from "./pull-hand.js";
+import { holdsHere } from "./pull-when.js";
 import { fromHold, NOTES, routedTicket } from "./ticket.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
@@ -37,51 +32,68 @@ export { pushed, sentOut };
 // `more` carries what rides the pass commit beside the ticket: the changes its subject names, and the files it wrote, which a refused commit takes back. [[spec/design_output/pull#a-finding-rides-out]]
 export function passed(it, who, one, leaf, held, answered, more = {}) {
   const tip = one.private ? "" : tipOf(it);
-  let text = withEntry(one.text, {
-    step: leaf.path,
-    hand: roleOf(who.hand),
-    hash_before: held.hash,
-    hash_after: tip,
-    answered,
-  });
+  let text = withEntry(
+    one.text,
+    {
+      step: leaf.path,
+      hand: roleOf(who.hand),
+      hash_before: held.hash,
+      hash_after: tip,
+      answered,
+    },
+    it.front,
+  );
   const changes = [`passes ${leaf.path}`, ...(more.changes ?? [])];
 
-  let next = leaf.leaves[leaf.at + 1];
-  while (next) {
-    const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text));
+  // A final gate's points leave the step on the gate, so it waits on them and reads again. [[spec/design_output/pull#the-final-acceptance]]
+  if (more.stays) changes.push(`waits at ${leaf.path}`);
+  let next = more.stays ? leaf : leaf.leaves[leaf.at + 1];
+  while (next && !more.stays) {
+    const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text), text);
     if (when.holds) break;
-    text = withEntry(text, { step: next.path, skipped: true, why: when.why });
+    text = withEntry(text, { step: next.path, skipped: true, why: when.why }, it.front);
     changes.push(`skips ${next.path}`);
     next = leaf.leaves[leaf.leaves.findIndex((one) => one.path === next.path) + 1];
   }
 
   if (next) {
-    text = withField(withField(text, "step", next.path), "state", OPEN);
+    text = withField(
+      withField(text, "step", next.path, it.front),
+      "state",
+      OPEN,
+      it.front,
+    );
   } else {
     const waiting = childrenWaiting(it, one, frontOf(text));
     if (waiting) {
-      text = withField(withField(text, "step", waiting.path), "state", OPEN);
+      text = withField(
+        withField(text, "step", waiting.path, it.front),
+        "state",
+        OPEN,
+        it.front,
+      );
       changes.push(`returns to ${waiting.path}, because ${waiting.why}`);
     } else {
-      text = shut(text, frontOf(text), DONE);
+      text = shut(text, frontOf(text), DONE, it.front);
       changes.push(`closes ${DONE}`);
     }
   }
 
   one.text = text;
-  const finding = landed(it, one, changes);
+  const finding = landed(it, one, changes, more.wrote ?? []);
   if (finding) {
     for (const at of more.wrote ?? []) it.disk.remove(at);
     return unlanded(one, leaf, finding);
   }
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
 }
 
-// A design review passing with findings mints a draft child a row on the trivial route, and every child is built before any is written. The children ride the parent's pass commit. [[spec/design_output/pull#a-finding-rides-out]]
+// A design review passing with findings mints a draft child a row on the trivial route, and every child is built before any is written. The children ride the parent's pass commit. A gate's points stand open at the front of the queue. [[spec/design_output/pull#a-finding-rides-out]]
 export function minted(it, who, one, leaf, held, findings, answered) {
+  const standsAs = leaf.gate ? { state: OPEN, todo: true } : { state: DRAFT };
   const route = processAt(it.disk, it.method ?? it.root, it.join, CHILD_ROUTE);
   if (route.why) return unminted(one, leaf, route.why);
   const folder = one.private ? NOTES : TICKETS;
@@ -92,7 +104,7 @@ export function minted(it, who, one, leaf, held, findings, answered) {
     const made = routedTicket(it, path, route, {
       steps: fromHold(route.route, { ticket: one.name, step: leaf.path }),
       line,
-      fields: { state: DRAFT, parent: one.name, ...(group ? { group } : {}) },
+      fields: { ...standsAs, parent: one.name, ...(group ? { group } : {}) },
     });
     if (made.why) return unminted(one, leaf, `${name} mints nothing: ${made.why}`);
     built.push({ at: it.join(it.root, ...path.split("/")), text: made.text });
@@ -103,6 +115,7 @@ export function minted(it, who, one, leaf, held, findings, answered) {
   return passed(it, who, one, leaf, held, answered, {
     changes: [`mints ${names}`],
     wrote: built.map((child) => child.at),
+    stays: leaf.final,
   });
 }
 
@@ -129,17 +142,26 @@ export function childrenWaiting(it, one, front) {
 export function failed(it, who, one, leaf, held, reason, answered) {
   const back = target(leaf, leaf.on_fail);
   const returns = returnsOf(one.front, leaf.path) + 1;
-  const text = withEntry(one.text, {
-    step: leaf.path,
-    hand: roleOf(who.hand),
-    hash_before: held.hash,
-    hash_after: one.private ? "" : tipOf(it),
-    returns,
-    why: reason,
-    answered,
-  });
+  const text = withEntry(
+    one.text,
+    {
+      step: leaf.path,
+      hand: roleOf(who.hand),
+      hash_before: held.hash,
+      hash_after: one.private ? "" : tipOf(it),
+      returns,
+      why: reason,
+      answered,
+    },
+    it.front,
+  );
   const changes = [`fails ${leaf.path} back to ${back}`];
-  one.text = withField(withField(text, "step", back), "state", OPEN);
+  one.text = withField(
+    withField(text, "step", back, it.front),
+    "state",
+    OPEN,
+    it.front,
+  );
   // At the cap a person step goes in before the target, asking the reason, so it rides the fail commit. [[spec/design_output/pull#the-fail]]
   const most = Number(it.fails);
   const capped = most > 0 && returns >= most;
@@ -150,7 +172,7 @@ export function failed(it, who, one, leaf, held, reason, answered) {
   const finding = landed(it, one, changes);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   // Where the split cap refuses the person step, the hold drops and the answer waits. [[spec/design_output/pull#the-fail]]
   if (capped && !person) {
@@ -187,7 +209,7 @@ export function returnsOf(front, path) {
 }
 
 // [[spec/design_output/pull#became]]
-export function became(it, who, one, leaf, held, successor, answered) {
+export function became(it, who, one, leaf, held, successor, answered, more = {}) {
   const all = ticketsHere(it);
   if (!all.some((held) => held.name === successor)) {
     say(REFUSED, [
@@ -195,22 +217,35 @@ export function became(it, who, one, leaf, held, successor, answered) {
     ]);
     return 1;
   }
-  const text = withEntry(one.text, {
-    step: leaf.path,
-    hand: roleOf(who.hand),
-    hash_before: held.hash,
-    hash_after: one.private ? "" : tipOf(it),
-    answered,
-  });
+  const text = withEntry(
+    one.text,
+    {
+      step: leaf.path,
+      hand: roleOf(who.hand),
+      hash_before: held.hash,
+      hash_after: one.private ? "" : tipOf(it),
+      answered,
+    },
+    it.front,
+  );
   one.text = withField(
-    shut(text, frontOf(text), "became"),
+    shut(text, frontOf(text), "became", it.front),
     "successors",
     `[${successor}]`,
+    it.front,
   );
-  const finding = landed(it, one, [`closes became ${successor}`]);
-  if (finding) return unlanded(one, leaf, finding);
+  const finding = landed(
+    it,
+    one,
+    [`closes became ${successor}`, ...(more.changes ?? [])],
+    more.wrote ?? [],
+  );
+  if (finding) {
+    for (const at of more.wrote ?? []) it.disk.remove(at);
+    return unlanded(one, leaf, finding);
+  }
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} closes became ${successor}.`, ...sent.why]);
 }
@@ -229,19 +264,23 @@ export function answeredBy(it, who, one, leaf, held, answerer, answered) {
     ]);
     return 1;
   }
-  const text = withEntry(one.text, {
-    step: leaf.path,
-    hand: roleOf(who.hand),
-    hash_before: held.hash,
-    hash_after: one.private ? "" : tipOf(it),
-    why: `${answerer} answers this ask`,
-    answered,
-  });
-  one.text = shut(text, frontOf(text), "answered");
+  const text = withEntry(
+    one.text,
+    {
+      step: leaf.path,
+      hand: roleOf(who.hand),
+      hash_before: held.hash,
+      hash_after: one.private ? "" : tipOf(it),
+      why: `${answerer} answers this ask`,
+      answered,
+    },
+    it.front,
+  );
+  one.text = shut(text, frontOf(text), "answered", it.front);
   const finding = landed(it, one, [`closes answered by ${answerer}`]);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} closes answered by ${answerer}.`, ...sent.why]);
 }
@@ -258,9 +297,14 @@ export function onward(it, who, rows) {
   return 0;
 }
 
-export function shut(text, front, reason) {
-  let now = withField(withField(text, "state", CLOSED), "reason", reason);
-  if (front.todo !== undefined) now = withField(now, "todo", "false");
+export function shut(text, front, reason, writer) {
+  let now = withField(
+    withField(text, "state", CLOSED, writer),
+    "reason",
+    reason,
+    writer,
+  );
+  if (front.todo !== undefined) now = withField(now, "todo", "false", writer);
   return now;
 }
 

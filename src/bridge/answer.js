@@ -8,10 +8,12 @@ import {
   newestNote,
   notesIn,
   questionsIn,
+  warns,
 } from "../../.claude/skills/level0/lib/answer.js";
 import { SAID } from "../../.claude/skills/level0/lib/log.js";
 
 const OWNER = new Set(["composer", "sdk"]);
+const PROMPT_WHY = "The owner sent a prompt";
 const REACHES = new Set(["AskUserQuestion", "mcp__level0__report"]);
 export const SPOKE = "agent.spoke";
 
@@ -42,19 +44,29 @@ export function onPromptSubmit(e, box) {
   // An owner's prompt opens a turn, and the report of the last turn answers nothing in it. [[spec/design_output/stop#a-talk-follows-a-report]]
   box.reported = false;
   // [[spec/design_output/level0#the-first-call-asks]]
-  demands(box, "The owner sent a prompt");
+  demands(box, PROMPT_WHY);
   box.demand.prompt = true;
+  // The newest transcript row the bridgehead found at the prompt keys the demand, so a text from before it pays nothing. [[spec/tickets/a-reply-follows-its-prompt]]
+  box.demand.before = String(e?.before ?? "");
   // A prompt asking for a note takes a parked note as its answer. [[spec/design_output/level0#a-note-answers-its-prompt]]
   if (namesNote(String(e?.text ?? ""))) box.demand.notes = notesIn(box);
   box.asks = questionsIn(String(e?.text ?? ""));
-  return { pass: true };
+  // The answer-first line rides the prompt's own event. [[spec/tickets/a-reply-follows-its-prompt]]
+  const { before: _before, ...rest } = e ?? {};
+  return { event: { ...rest, text: `${warns(PROMPT_WHY)}\n\n${String(e?.text ?? "")}` } };
+}
+
+// One writer of the spoken text, so its stamp stands beside it. [[spec/tickets/a-reply-follows-its-prompt]]
+function speaks(box, text) {
+  box.spoken = text;
+  box.spokenAt = Number(box.clock?.now?.() ?? 0);
 }
 
 export function onMessageDisplay(e, box) {
   // A helper's text reaches the agent that started it, and the owner reads none of it. [[spec/design_output/log#a-prompt-is-the-owners]]
   if (e?.agentId || e?.agent_id) return { pass: true };
   const text = String(e?.delta ?? "").trim();
-  if (text) box.spoken = text;
+  if (text) speaks(box, text);
   if (!box.demand || !text || box.demand.fits?.(text)) return { pass: true };
   return paid(box, text);
 }
@@ -78,7 +90,7 @@ export function holdsForAnswer(e, box) {
 export function onAgentSpoke(e, box) {
   const demand = box.demand;
   if (!demand) return { pass: true };
-  const fresh = textsSince(e, demand.seen);
+  const fresh = freshTexts(e, demand);
   const fitting = fresh.filter((one) => !demand.fits?.(one));
   if (fitting.length) return paid(box, fitting.at(-1));
   const newest = fresh.at(-1) ?? "";
@@ -90,6 +102,26 @@ export function onAgentSpoke(e, box) {
     detail: lacks,
   });
   return { result: { deny: lacks } };
+}
+
+// A prompt's demand reads the transcript past its own row. A transcript carrying no row ids pays a prompt nothing, so the display road pays alone. [[spec/tickets/a-reply-follows-its-prompt]] [[spec/tickets/a-late-count-pays-nothing]]
+function freshTexts(e, demand) {
+  if (!demand.prompt || !Array.isArray(e?.rows)) return textsSince(e, demand.seen);
+  return demand.before ? pastRow(e.rows, demand.before) : [];
+}
+
+function pastRow(rows, before) {
+  const at = rows.findIndex((one) => one?.id === before);
+  if (at < 0) return [];
+  const owner = rows.findIndex(
+    (one, where) => where > at && one?.role === "user" && !one?.results,
+  );
+  if (owner < 0) return [];
+  return rows
+    .slice(owner + 1)
+    .filter((one) => one?.role === "assistant")
+    .map((one) => String(one?.text ?? "").trim())
+    .filter(Boolean);
 }
 
 function textsSince(e, seen) {
@@ -112,7 +144,7 @@ export function pays(box, text) {
   const demand = box.demand;
   if (!demand) {
     box.log.say("info", "reply", text, { text });
-    box.spoken = text;
+    speaks(box, text);
     return "The reply stands in the log. Nothing asked for one, so carry on, and write it in the chat too where the owner reads it.";
   }
   const lacks = demand.fits?.(text) ?? "";
@@ -124,7 +156,7 @@ export function pays(box, text) {
 function paid(box, text) {
   const demand = box.demand;
   box.demand = null;
-  box.spoken = text;
+  speaks(box, text);
   box.log.say("info", "reply", text, { text, detail: `answers: ${demand.why}` });
   if (demand.onPaid) demand.onPaid();
   return { pass: true };
@@ -138,7 +170,7 @@ export function onTurnEnd(e, box) {
   const answered = e?.reason === "answer" && text;
   if (answered && demand && !demand.fits?.(text)) return paid(box, text);
   if (answered && text !== box.spoken) box.log.say("info", "reply", text, { text });
-  if (answered) box.spoken = text;
+  if (answered) speaks(box, text);
   if (demand && !demand.fits) box.demand = null;
   return { pass: true };
 }

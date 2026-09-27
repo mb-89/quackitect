@@ -7,6 +7,7 @@
 import { join } from "node:path";
 import { BINDING, QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import { HOLDS } from "../../.claude/skills/level0/lib/folders.js";
+import { fieldOf } from "../engine/group.js";
 import {
   CLEAR as CLEAR_TICKET,
   dropsDue,
@@ -16,8 +17,12 @@ import {
   marksDue,
   READ,
 } from "../scripts/ephemeral.js";
+import { handOf } from "../scripts/pull-hand-of.js";
 import { asks } from "./config.js";
+import { readDoorOf } from "./plan.js";
 import { waitsForOwner } from "./stop.js";
+
+const RETRO = "retro";
 
 const AT = "context.handoverAt";
 const MOST = "stop.mostInARow";
@@ -71,7 +76,38 @@ export function measures(box, tokens) {
 
 // [[spec/design_output/stop#the-queue-alone-clears]]
 export function clearsHere(box) {
-  return String(asks(box, BINDING) ?? "") === QUEUE;
+  if (String(asks(box, BINDING) ?? "") !== QUEUE) return false;
+  return !retroInHand(box);
+}
+
+// A retro runs to its end in one conversation. The session's own hold decides, so a helper's retro clears nothing away. [[spec/tickets/the-retro-holds-the-clear]] [[spec/tickets/the-retro-reads-its-hand]]
+function retroInHand(box) {
+  const retros = holdsIn(box.disk, box.work).filter(({ held }) => isRetro(box, held));
+  if (!retros.length) return false;
+  const mine = ownHand(box);
+  return retros.some(({ held }) => held?.hand === mine);
+}
+
+// A box with no process door names no hand, and holds no retro of its own. [[spec/tickets/the-retro-reads-its-hand]]
+function ownHand(box) {
+  if (!box.proc) return "";
+  try {
+    return handOf({ ...readDoorOf(box), method: box.method });
+  } catch {
+    return "";
+  }
+}
+
+function isRetro(box, held) {
+  if (String(held?.step ?? "").split("/")[0] === RETRO) return true;
+  try {
+    const text = String(box.disk.read(join(box.work, String(held?.path ?? ""))));
+    return String(fieldOf(text, "process") ?? "")
+      .replace(/\]\]$/, "")
+      .endsWith(`/${RETRO}`);
+  } catch {
+    return false;
+  }
 }
 
 // [[spec/design_output/stop#the-context-hands-over]]
@@ -104,7 +140,11 @@ export function holdsForHandover(e, box) {
     }
     if (ownerWaits(e, box)) return null;
     box.handover = { asked: 0, ...(box.handover ?? {}), phase: CLEAR };
-    box.log.say("info", "handover", "the clear stands in hand, so the turn ends and the clear follows");
+    box.log.say(
+      "info",
+      "handover",
+      "the clear stands in hand, so the turn ends and the clear follows",
+    );
     return { pass: true };
   }
   const due = box.handover;
@@ -124,7 +164,11 @@ export function holdsForHandover(e, box) {
     dropsDue(box.disk, box.work);
     return null;
   }
-  box.log.say("info", "handover", "the turn holds until the pull hands the handover ticket");
+  box.log.say(
+    "info",
+    "handover",
+    "the turn holds until the pull hands the handover ticket",
+  );
   return { result: { block: dueText(box) } };
 }
 
@@ -158,7 +202,10 @@ export function readsNext(box) {
   let put = 0;
   for (const { at, held } of holdsIn(box.disk, box.work)) {
     if (!isEphemeral(held) || held.ticket !== CLEAR_TICKET) continue;
-    box.disk.write(at, `${JSON.stringify(heldAs(READ, held.hand, held.taken), null, 2)}\n`);
+    box.disk.write(
+      at,
+      `${JSON.stringify(heldAs(READ, held.hand, held.taken), null, 2)}\n`,
+    );
     put += 1;
   }
   dropsDue(box.disk, box.work);

@@ -9,11 +9,11 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { DUE, HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
-import { heldAs, READ } from "../../src/scripts/ephemeral.js";
+import { ASKS, heldAs, READ, WRITE } from "../../src/scripts/ephemeral.js";
 import { dueHandOut } from "../../src/scripts/ephemeral-pull.js";
 import { handOut, ticketsHere } from "../../src/scripts/pull-hand.js";
-import { answerOf } from "../../src/scripts/work-answer.js";
 import { pulling } from "../../src/scripts/work.js";
+import { answerOf } from "../../src/scripts/work-answer.js";
 import { at, CHILD, doors, HAND, HOLD, heard, ROOT } from "./pull-doors.js";
 import { doorsSaying, remoteSaying } from "./work-doors.js";
 
@@ -33,7 +33,10 @@ const held = (disk) => JSON.parse(disk.read(HOLD));
 // [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
 test("a pull with no mark hands the queue, and a pull on a session due hands the handover ticket", () => {
   const plain = desk();
-  assert.match(heard(() => pulling(ROOT, ["pull"], plain.it)).said, /^work {2}free-one/m);
+  assert.match(
+    heard(() => pulling(ROOT, ["pull"], plain.it)).said,
+    /^work {2}free-one/m,
+  );
 
   const { it, disk } = desk(due);
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
@@ -63,7 +66,9 @@ test("the ticket the hand gives back hands its next leaf first, and another tick
 
   const other = desk(due);
   other.it.root = ROOT;
-  const moved = heard(() => dueHandOut(other.it, who("gone-one"), ticketsHere(other.it)));
+  const moved = heard(() =>
+    dueHandOut(other.it, who("gone-one"), ticketsHere(other.it)),
+  );
   assert.match(moved.said, /handover stands in your hand/);
 });
 
@@ -130,7 +135,9 @@ test("the read of the handover closes on a pass, and the queue hands the next le
 test("the work answer draws each ephemeral ticket as a held row at zero, with no file", () => {
   const said = answerOf({
     ...doorsSaying(remoteSaying([], {}), {
-      [join(ROOT, ".se/.runtime/hold/box-1.json")]: JSON.stringify(heldAs("clear", "box 1")),
+      [join(ROOT, ".se/.runtime/hold/box-1.json")]: JSON.stringify(
+        heldAs("clear", "box 1"),
+      ),
     }).it,
     root: ROOT,
     clock: fakeClock("2026-01-01T03:00:00.000Z"),
@@ -141,4 +148,11 @@ test("the work answer draws each ephemeral ticket as a held row at zero, with no
   assert.equal(row.state, "held");
   assert.equal(row.kind, "todo");
   assert.match(row.says, /End the turn now/);
+});
+
+// [[spec/tickets/the-owners-words-travel-verbatim]]
+test("the handover ask quotes the owner's words as said, with their transcript line", () => {
+  const said = ASKS[WRITE].join("\n");
+  assert.match(said, /The owner's words/);
+  assert.match(said, /transcript line/);
 });

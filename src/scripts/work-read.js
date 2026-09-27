@@ -1,6 +1,6 @@
 // What git answers, read as rows. The refs come off one `for-each-ref`, and the
-// paths and the contents come off one `cat-file --batch` each. Everything here
-// takes text and answers rows, so it reaches nothing outside.
+// paths and the contents come off `cat-file --batch`. Everything here takes
+// text and answers rows, so it reaches nothing outside.
 // [[spec/design_output/work#the-listing-reads-git-once]]
 
 // A git object name stands beside a tree entry as bytes, and this many. [[spec/design_output/work#the-listing-reads-git-once]]

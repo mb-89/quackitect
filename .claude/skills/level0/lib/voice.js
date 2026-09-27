@@ -39,13 +39,29 @@ export function rowsIn(texts) {
 }
 
 // [[spec/design_output/projection#the-second-target]]
+// A turn's answer is its last text, so a progress line before it scores nothing. An owner row opens the next turn. [[spec/tickets/answers-read-the-last-text]]
 export function answersIn(text) {
   const out = [];
+  let last = "";
+  const closes = () => {
+    if (last && wordsIn(last) >= SHORTEST) out.push(last);
+    last = "";
+  };
   for (const row of rowsIn(text)) {
-    const said = answerOf(row);
-    if (said && wordsIn(said) >= SHORTEST) out.push(said);
+    if (opensTurn(row)) closes();
+    last = answerOf(row) || last;
   }
+  closes();
   return out;
+}
+
+// An owner row in the transcript: a user row carrying no tool result, and neither a meta row nor a compaction summary. [[spec/tickets/answers-read-the-last-text]]
+function opensTurn(row) {
+  if (row?.type !== "user" || row?.isMeta || row?.isCompactSummary) return false;
+  if (row?.isSidechain || row?.agentId) return false;
+  const content = row?.message?.content;
+  if (!Array.isArray(content)) return true;
+  return !content.some((one) => one?.type === "tool_result");
 }
 
 // [[spec/design_output/projection#the-second-target]]

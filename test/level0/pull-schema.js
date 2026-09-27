@@ -69,6 +69,12 @@ frontmatter:
             type: string
             x-earlier: steps
             description: the earlier step a failed hand-back sends the ticket to
+          gate:
+            type: string
+            description: the question a gate answers
+          final:
+            type: boolean
+            description: whether this gate reads the whole work
           asks:
             type: string
             description: the question a person answers
@@ -76,7 +82,7 @@ frontmatter:
             type: array
             description: the words that answer asks
           when:
-            enum: [returned, cloud, desk]
+            enum: [cloud, desk, view, handed]
             description: the condition the pull reads
           checklist:
             type: array

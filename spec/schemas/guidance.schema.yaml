@@ -8,9 +8,7 @@
 # to do and what not to do. The rows go to the rules the tree sees fail, so a
 # rule takes several, one or none.
 #
-# A rule ending in the answer marker describes an answer, which evidence carries
-# nowhere, so the judge of spec/design_output/pull.md reads it over none. Every
-# reader strips both marks.
+# A rule wanting argument ends in the detail marker, and every reader strips it.
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
@@ -64,7 +62,6 @@ body:
       list: true
       ordered: true
       detailMarker: "*"
-      answerMarker: "^"
       tense: present
       maxItems: 15
       description: one rule per item, in the active voice, as an instruction

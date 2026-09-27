@@ -1,6 +1,10 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"testing"
+)
 
 // A heading retelling the chapter its pointer names drifts from it. [[spec/design_output/lsp#a-second-copy-draws]]
 func TestRestatedPointerDrawsARetelling(t *testing.T) {
@@ -124,5 +128,22 @@ func TestSharedRunAnswersTheLongestRun(t *testing.T) {
 	}
 	if said := sharedRun("`the door` reads [[a/note]]", "the door reads a note"); said != 1 {
 		t.Fatalf("a span and a link blank out, leaving one word, and this answers %d", said)
+	}
+}
+
+// The runs read off the shared count reader. [[spec/design_output/config#the-go-reader]]
+func TestTheRestatedRunsReadTheSharedCount(t *testing.T) {
+	t.Setenv(PointerIn, "")
+	t.Setenv(RuleIn, "")
+	root := t.TempDir()
+	at := filepath.Join(root, filepath.FromSlash(Tracked))
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(at, []byte(`{"restated": {"pointer": 4, "rule": 6}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if pointer, rule := restatedHere(root); pointer != 4 || rule != 6 {
+		t.Fatalf("the runs read %d and %d", pointer, rule)
 	}
 }

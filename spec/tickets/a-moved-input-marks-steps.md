@@ -209,3 +209,5 @@ Today a changed input leaves every step that read it standing as done, and a rou
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The split of the-engine-holds-the-route leaves one line of [[spec/design_input/level-two#gates]] to this ticket. The commit of a gate counts as the output of the gate, and moves no input of the phase it closes.

@@ -12,20 +12,21 @@ import { slugOf } from "./slug.js";
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 // [[spec/design_output/schema#the-render-follows-the-tree]]
-export function mintNote(schema, fields) {
+// The front goes through the writer the caller hands in, which se-front answers. [[spec/tickets/go-writes-the-frontmatter]]
+export function mintNote(schema, fields, writer) {
   const spec = schema?.frontmatter ?? {};
   const props = spec.properties ?? {};
   const given = handedIn(fields);
   const required = spec.required ?? [];
-  const rows = ["---"];
+  const values = {};
   const front = {};
 
-  for (const key of required) rows.push(...frontRows(key, props[key], given, front));
+  for (const key of required) values[key] = frontValue(key, props[key], given, front);
   for (const key of Object.keys(props)) {
     if (required.includes(key) || !given.has(slugOf(key))) continue;
-    rows.push(...frontRows(key, props[key], given, front));
+    values[key] = frontValue(key, props[key], given, front);
   }
-  rows.push("---", "");
+  const rows = [writer.mint(values).trimEnd(), ""];
 
   const level = schema?.body?.headingLevel ?? 1;
   for (const one of chaptersWanted(schema?.body?.sections ?? [], front, level)) {
@@ -47,40 +48,49 @@ export function mintNote(schema, fields) {
   return `${rows.join("\n").trimEnd()}\n`;
 }
 
-// [[spec/design_output/schema#the-render-follows-the-tree]]
-function frontRows(key, rule, given, front) {
+// The value a key takes, typed, so the writer quotes a scalar and lays out a list. `front` takes what the body's chapters read. [[spec/design_output/schema#the-render-follows-the-tree]]
+function frontValue(key, rule, given, front) {
   const said = given.get(slugOf(key));
   const bare =
     said === undefined || (typeof said !== "object" && String(said).trim() === "");
 
   if (rule?.const !== undefined) {
     front[key] = rule.const;
-    return [`${key}: ${minted(rule)}`];
+    return placeheld(rule);
   }
   const value = bare ? rule?.default : said;
-  if (
+  const block =
     value !== undefined &&
     value !== null &&
     typeof value === "object" &&
-    !Array.isArray(value)
-  ) {
+    (!Array.isArray(value) || value.some((one) => one && typeof one === "object"));
+  if (block) {
     front[key] = value;
-    return [`${key}:`, ...yamlRows(value, 2)];
-  }
-  if (Array.isArray(value) && value.some((one) => one && typeof one === "object")) {
-    front[key] = value;
-    return [`${key}:`, ...yamlRows(value, 2)];
+    return value;
   }
   if (bare && rule?.default === undefined) {
     front[key] = minted(rule);
-    return [`${key}: ${minted(rule)}`];
+    return placeheld(rule);
   }
   front[key] = value;
-  return [`${key}: ${written(value, rule)}`];
+  return written(value, rule);
+}
+
+// The placeholder minted writes, as a list where the key takes a list. [[spec/design_output/schema#the-render-follows-the-tree]]
+function placeheld(rule) {
+  const said = minted(rule);
+  if (
+    rule?.const === undefined &&
+    !Array.isArray(rule?.enum) &&
+    [rule?.type].flat().includes("array")
+  ) {
+    return [String(rule?.description ?? "what goes here")];
+  }
+  return said;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-export function reRouted(text, schema, route, hash) {
+export function reRouted(text, schema, route, hash, writer) {
   const note = readNote(text);
   const front = { ...(note.front.said ?? {}), steps: route };
   if (hash) front.process_hash = hash;
@@ -88,7 +98,7 @@ export function reRouted(text, schema, route, hash) {
   const level = schema?.body?.headingLevel ?? 1;
   const wanted = chaptersWanted(schema?.body?.sections ?? [], front, level);
   const owns = heldOwns(note.sections, wanted, level);
-  const rows = ["---", ...frontRowsHeld(front, schema), "---", ""];
+  const rows = [writer.mint(frontHeld(front, schema)).trimEnd(), ""];
 
   for (const [i, one] of wanted.entries()) {
     const deep = one.level ?? level;
@@ -143,14 +153,14 @@ function chainKeys(list, level = 1) {
   });
 }
 
-// [[spec/design_output/schema#the-render-follows-the-tree]]
-function frontRowsHeld(front, schema) {
+// The front in the schema's order, and every key it leaves out after. [[spec/design_output/schema#the-render-follows-the-tree]]
+function frontHeld(front, schema) {
   const props = Object.keys(schema?.frontmatter?.properties ?? {});
   const keys = [
     ...props.filter((key) => front[key] !== undefined),
     ...Object.keys(front).filter((key) => !props.includes(key)),
   ];
-  return keys.flatMap((key) => keyRows(key, front[key], 0));
+  return Object.fromEntries(keys.map((key) => [key, front[key]]));
 }
 
 function trimmed(own) {
@@ -158,47 +168,6 @@ function trimmed(own) {
   while (rows.length && !rows[0].trim()) rows.shift();
   while (rows.length && !rows[rows.length - 1].trim()) rows.pop();
   return rows;
-}
-
-// [[spec/design_output/schema#the-render-follows-the-tree]]
-function yamlRows(value, pad) {
-  const gap = " ".repeat(pad);
-  if (Array.isArray(value)) {
-    return value.flatMap((one) => {
-      if (!one || typeof one !== "object" || Array.isArray(one)) {
-        return [`${gap}- ${flatOf(one)}`];
-      }
-      const rows = Object.entries(one).flatMap(([key, said]) =>
-        keyRows(key, said, pad + 2),
-      );
-      return [`${gap}- ${rows[0].trim()}`, ...rows.slice(1)];
-    });
-  }
-  if (value && typeof value === "object") {
-    return Object.entries(value).flatMap(([key, said]) => keyRows(key, said, pad));
-  }
-  return [`${gap}${flatOf(value)}`];
-}
-
-function keyRows(key, said, pad) {
-  const gap = " ".repeat(pad);
-  if (said && typeof said === "object" && !Array.isArray(said)) {
-    return [`${gap}${key}:`, ...yamlRows(said, pad + 2)];
-  }
-  if (Array.isArray(said) && said.some((one) => one && typeof one === "object")) {
-    return [`${gap}${key}:`, ...yamlRows(said, pad + 2)];
-  }
-  return [`${gap}${key}: ${flatOf(said)}`];
-}
-
-function flatOf(said) {
-  if (Array.isArray(said)) return `[${said.map((one) => `"${one}"`).join(", ")}]`;
-  const flat = String(said ?? "");
-  // [[spec/design_output/pull#a-person-step-goes-in]]
-  if (/: |^[[{"'#&*!|>%@`]|: *$| #/.test(flat) && !/^\[\[.*\]\]$/.test(flat)) {
-    return `"${flat.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
-  }
-  return flat;
 }
 
 export { slugOf };
@@ -217,9 +186,7 @@ function written(said, rule) {
       ? `[[${String(one).trim()}]]`
       : String(one).trim(),
   );
-  if (Array.isArray(said) || [rule?.type].flat().includes("array")) {
-    return `[${each.map((one) => `"${one}"`).join(", ")}]`;
-  }
+  if (Array.isArray(said) || [rule?.type].flat().includes("array")) return each;
   return each[0] ?? "";
 }
 
@@ -284,7 +251,7 @@ export function mintSpec(schemas) {
 }
 
 // [[spec/design_output/schema#the-tool-writes-the-note]]
-export function mintedNote(schemas, ask) {
+export function mintedNote(schemas, ask, writer) {
   const kind = String(ask?.kind ?? "").trim();
   const path = String(ask?.path ?? "").trim();
   const kinds = [...(schemas?.keys?.() ?? [])].sort().join(", ");
@@ -306,7 +273,7 @@ export function mintedNote(schemas, ask) {
     };
   }
 
-  const text = mintNote(schema, ask?.fields);
+  const text = mintNote(schema, ask?.fields, writer);
   const found = checkNote(text, schema, path, schemas);
   if (found.length) return { why: refusedNote(path, kind, found), found };
   return { text, path, kind, left: placeholderFaults(text, schema, path) };

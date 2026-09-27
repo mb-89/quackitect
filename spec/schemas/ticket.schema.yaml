@@ -115,6 +115,14 @@ frontmatter:
             x-earlier: steps
             description: the earlier step a failed hand-back sends the ticket to
 
+          gate:
+            type: string
+            description: the question a gate answers, where a reviewer reads the phase before it and answers accept, accept with points or reject
+
+          final:
+            type: boolean
+            description: whether this gate reads the whole work, waits on every ticket under it, and closes the process on its verdict
+
           asks:
             type: string
             description: the question a person answers, on a step a person takes
@@ -124,7 +132,7 @@ frontmatter:
             description: the words that answer `asks`, where one word answers it
 
           when:
-            enum: [returned, cloud, desk]
+            enum: [cloud, desk, view, handed, backlog]
             description: the condition the pull reads, and it skips the leaf where it fails
 
           checklist:
@@ -263,6 +271,15 @@ frontmatter:
     depends_on:
       type: [array, string]
       description: the tickets this one waits for, a list or one line of names
+
+    enabled_by:
+      type: string
+      description: the config key a group waits on, which the tracked file on main turns on with true
+
+    cloud:
+      type: boolean
+      x-engine: true
+      description: whether the group's branch stands in the cloud, which branch open writes on main and the merge and the close drop
 
     successors:
       type: [array, string]

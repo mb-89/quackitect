@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { work } from "../../src/scripts/work.js";
+import { baseOnTrunk } from "../../src/scripts/work-stands.js";
 import {
   doorsSaying,
   GROUP_NOTE,
@@ -68,4 +69,51 @@ test("list marks a branch sharing no ancestor with trunk", () => {
 
   assert.match(said, /work\/orphan\s+orphan/, "the row says why no box takes it");
   assert.match(said, /work\/fine\s+todo/, "and the other reads as it stood");
+});
+
+// A shallow clone holds no base older than its depth, so the listing fetches the rest before it calls a branch an orphan. [[spec/design_output/work#the-listing-reads-git-once]]
+test("list fetches a shallow clone whole before it marks a branch an orphan", () => {
+  let whole = false;
+  const { it, outside } = doorsSaying({
+    ...ORPHANED(),
+    "git rev-parse --is-shallow-repository": () => ({
+      stdout: whole ? "false\n" : "true\n",
+    }),
+    "git fetch --unshallow origin": () => {
+      whole = true;
+      return {};
+    },
+    "git merge-base origin/main origin/work/orphan": () =>
+      whole ? { stdout: "ddd\n" } : { exitCode: 1, stdout: "" },
+  });
+
+  const { said } = heard(() => work(ROOT, ["list"], it));
+
+  assert.ok(
+    ranGit(outside).includes("git fetch --unshallow origin"),
+    "the listing fetches the history the clone lacks",
+  );
+  assert.doesNotMatch(
+    said,
+    /work\/orphan\s+orphan/,
+    "and the branch reads as it stands",
+  );
+});
+
+// The base itself: red on a shallow clone, then the commit once the history stands whole. [[spec/design_output/work#the-listing-reads-git-once]]
+test("the base fetches a shallow clone whole and asks again", () => {
+  let whole = false;
+  const { it } = doorsSaying({
+    "git rev-parse --is-shallow-repository": () => ({
+      stdout: whole ? "false\n" : "true\n",
+    }),
+    "git fetch --unshallow origin": () => {
+      whole = true;
+      return {};
+    },
+    "git merge-base origin/main origin/work/old": () =>
+      whole ? { stdout: "eee\n" } : { exitCode: 1, stdout: "" },
+  });
+
+  assert.deepEqual(baseOnTrunk(it, "work/old"), { shares: true, base: "eee" });
 });
