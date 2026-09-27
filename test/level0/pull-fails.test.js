@@ -94,7 +94,7 @@ test("a second fail on a desk puts a person step before design/draft, asking the
   );
 });
 
-// A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud]]
+// A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud/cloud]]
 test("a second fail on a cloud box puts in a person step any hand answers", () => {
   const { back, now } = failedTwice({ cloud: true });
 

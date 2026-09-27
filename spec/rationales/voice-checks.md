@@ -19,7 +19,7 @@ This tree measured that in one session:
 So the checks read as questions, and a question asked of a finished sentence
 lands where a rule read at the start does not.
 
-The output style carries the actionables of a note marked `style: true`, and the
+The output style carries the actionables of every note at the top, and the
 guidance schema holds a note to fifteen items. The voice note stands full, so a
 check joining it pushes a rule out. A note of its own costs one section in the
 style, and the style reaches a hand at every turn.

@@ -108,7 +108,11 @@ frontmatter:
           reads:
             type: [array, string]
             x-link: true
-            description: the guidance notes this step's hand reads, as links
+            description: the guidance notes a ticket minted before tags names by hand, as links
+
+          tags:
+            type: [array, string]
+            description: the words this step and the steps under it carry, and every note under a subfolder of spec/guidance whose tags all stand among a leaf's reaches that leaf
 
           on_fail:
             type: string

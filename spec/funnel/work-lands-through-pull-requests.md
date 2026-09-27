@@ -196,7 +196,7 @@ and whether a routine sees it stands unchecked. So no workflow opens one.
 | a scheduled workflow | it deletes every `claude/` branch and every `work/` branch trunk holds whole, with the repository's own token |
 | `src/scripts/work.js` | `branch open` opens the draft, `branch done` frees the open tickets and asks for the label, and `branch merge` and `branch close` retire |
 | `spec/design_output/work.md` | the round trip, the merge chapters and the close chapter follow the new road |
-| `spec/guidance/cloud.md` and `spec/rationales/cloud.md` | the hand-back ends on the label, and the line saying a box opens no pull request stays true |
+| `spec/guidance/cloud/cloud.md` and `spec/rationales/cloud.md` | the hand-back ends on the label, and the line saying a box opens no pull request stays true |
 | the routines | one takes on `pull_request.opened`, one reviews on `pull_request.labeled`, and `work` fires once a day |
 | the review's prompt | it names the three verdicts and the bar a finding clears, and says a clean report is a good review |
 | `review_branch` | its report opens on the verdict, and a finding past the bar mints a ticket onto the branch |

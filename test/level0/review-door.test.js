@@ -42,7 +42,7 @@ test("the review spawns the verb on the node the box names", async () => {
   assert.equal(proc.ran[0].argv[0], "/node/bin/node");
 });
 
-// A restart hands the box over bare, and the reader still takes the standing layer. [[spec/design_output/level0#a-restart-fills-the-box]]
+// A restart hands the box over bare, and the reader still takes the helper's text, since a subagent reads no style. [[spec/design_output/level0#a-restart-fills-the-box]]
 test("a review on a box a restart hands over bare reads the guidance into the prompt", async () => {
   const box = {
     disk: fakeDisk({

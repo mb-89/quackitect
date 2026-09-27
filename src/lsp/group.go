@@ -34,7 +34,7 @@ func groupAsksNobody(tree *Tree) []Finding {
 		}
 		child := strings.TrimSuffix(name, ".md")
 		out = append(out, fault(groupAsks, path, 1, fmt.Sprintf(
-			"%s stands at %s, a step a person takes, inside the open group %s. A desk runs ./RUNME.sh branch unblock %s <successor>. A cloud box takes the step, per rule 7 of spec/guidance/cloud.",
+			"%s stands at %s, a step a person takes, inside the open group %s. A desk runs ./RUNME.sh branch unblock %s <successor>. A cloud box takes the step, per rule 7 of spec/guidance/cloud/cloud.",
 			child, step, group, child)))
 	}
 	return out

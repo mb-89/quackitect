@@ -8,7 +8,6 @@ import {
   canary,
   canaryIn,
   canaryText,
-  carried,
   countsOf,
   envOf,
   forHelper,
@@ -17,14 +16,12 @@ import {
   layersOf,
   OWES,
   standingLayer,
-  styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
-import { heldReadsIn } from "../scripts/guidance-hand.js";
 import { tiersText } from "./agent.js";
 import { dropsDue } from "../scripts/ephemeral.js";
 import { forgetsReads, readsNext } from "./handover.js";
@@ -49,14 +46,7 @@ const TOOLS_HEADING = "# What this box has";
 const VERBS_HEADING = "# The verbs";
 
 // The notes come off both roots, file by file, the work root's winning. [[spec/design_output/vehicle#the-work-root-inherits]]
-export function guidanceHere(
-  disk,
-  method,
-  work = method,
-  env = {},
-  tooth = true,
-  argv = [],
-) {
+export function guidanceHere(disk, method, work = method, env = {}, tooth = true) {
   const reads = inherits(disk, method, work);
   const notes = readNotes(reads, GUIDANCE);
   // A note binding a kind stands beside its topic in a folder below, and its layer reaches down for it. [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -64,15 +54,11 @@ export function guidanceHere(
   const wanted = new Set([...notes, ...kinded].flatMap((one) => envOf(one.text)));
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
-  // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
-  const read = heldReadsIn(disk, join, work, env, argv);
   // A note naming a kind stands off the working hand, and the layer of that kind holds it. [[spec/tickets/the-spawn-reaches-its-guidance]]
   const free = here.filter((one) => !kindsOf(one.text).length);
-  // [[spec/design_output/level0#the-style-carries-a-note]]
-  const session = free.filter((one) => !styled(one.text));
-  const counts = countsOf(carried(session, read));
+  // Every note at the top rides the output style, so the session layer hands none and the canary counts the style. [[spec/design_output/level0#the-style-carries-the-top]]
+  const counts = countsOf(free);
   return {
-    standing: standingLayer(session, read),
     helper: standingLayer(free),
     layers: layersOf([...here, ...kinded.filter((one) => bindsHere(one.text, bound))]),
     ...counts,
@@ -217,8 +203,7 @@ function blocksOf(held, dead, tools) {
   const blocks = [];
   if (dead) blocks.push({ name: "level0-index", text: deadIndexLine(dead) });
   if (tools) blocks.push({ name: TOOLS_BLOCK, text: tools });
-  if (!held.standing) return blocks;
-  blocks.push({ name: "level0-rules", text: rulesText(held.standing) });
+  if (!held.notes) return blocks;
   blocks.push({ name: "level0-canary", text: canaryText(held.sentence) });
   return blocks;
 }
@@ -299,18 +284,6 @@ function verbsText(box) {
     VERBS_HEADING,
     "",
     ...box.verbs.map((one) => `- \`./RUNME.sh ${one.name}\`: ${one.says}`),
-  ].join("\n");
-}
-
-function rulesText(standing) {
-  return [
-    "# How this tree is worked",
-    "",
-    "These rules reach you before anything else. Vale holds the mechanical",
-    "ones at the write door, so a write breaking one comes back with the",
-    "reason and the line.",
-    "",
-    standing,
   ].join("\n");
 }
 
@@ -436,5 +409,5 @@ export function onAgentSpawn(e, box) {
 export function layerHere(guidance, kind) {
   const held = guidance?.layers?.[String(kind ?? "")];
   if (held) return held;
-  return guidance?.helper ?? guidance?.standing ?? "";
+  return guidance?.helper ?? "";
 }

@@ -161,7 +161,7 @@ test("the pull hands out the child's first leaf, writes the hold, and the answer
   assert.match(said, /writes the approach the ask calls for/);
   assert.match(said, /One piece of it\./);
   assert.match(said, /\n {2}approach {2}text: the approach/);
-  assert.match(said, /Reads spec\/guidance\/voice:\n {2}1\. Say what is\./);
+  assert.match(said, /# Reads spec\/guidance\/voice\n\n1\. Say what is\./);
   assert.match(said, /ticket pull a-child --pass/);
   const hold = JSON.parse(disk.read(HOLD));
   assert.equal(hold.ticket, "a-child");
@@ -363,7 +363,7 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
     "design/review",
     "a spawned hand can take it",
   );
-  // A cloud box takes a person's step, and a desk leaves it. [[spec/guidance/cloud]]
+  // A cloud box takes a person's step, and a desk leaves it. [[spec/guidance/cloud/cloud]]
   const asks = { text: took.replace("not: draft", "by: person") };
   assert.equal(takeable(it, asks), "design/review");
   assert.equal(takeable({ ...it, cloud: false }, asks), "");

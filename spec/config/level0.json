@@ -104,6 +104,18 @@
     "phase9switch": false,
     "phase10": false
   },
+  "pull": {
+    "comment": "The size cap. One tool answer reaches the model whole up to cap, in bytes, and the pull keeps each part margin below it. spec/design_input/level-two.md, chapter The size cap, holds the measure.",
+    "cap": 48823,
+    "margin": 4000
+  },
+  "budget": {
+    "comment": "The time budget of each call a hand makes, in milliseconds, which test/level0/budget.test.js times as the median of several runs over a fixture the size of real work. Each budget stands at about ten times the median a box measures, and at 10 where that median stays under a millisecond, so a loaded cloud box stays inside it and a call slowing by an order turns the battery red. spec/design_input/level-two.md, chapter Time budgets, asks it.",
+    "pull": 1000,
+    "handBack": 1000,
+    "resolver": 10,
+    "stale": 10
+  },
   "ops": {
     "comment": "How long an ended operation stays, in seconds. A window of zero keeps it. spec/design_output/operations.md, chapter What stays how long, says the rest.",
     "keepDone": 3600,

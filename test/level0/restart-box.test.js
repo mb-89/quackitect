@@ -217,9 +217,16 @@ test("the standing layer rides the first tool call where no context read reached
   const first = contextOf(await reads(box));
   const second = contextOf(await reads(box));
 
-  assert.match(first, /Say what is\./, "the first call carries the rules");
-  assert.match(first, /level0 holds this session/, "and the canary block");
-  assert.doesNotMatch(second, /Say what is\./, "the second call carries none");
+  assert.match(
+    first,
+    /level0 holds this session/,
+    "the first call carries the canary block",
+  );
+  assert.doesNotMatch(
+    second,
+    /level0 holds this session/,
+    "the second call carries none",
+  );
 });
 
 // [[spec/design_output/level0#rules-ride-the-first-answer]]
@@ -229,8 +236,8 @@ test("a context read hands the layer, so the call after it carries none", async 
 
   const said = contextOf(await reads(box));
 
-  assert.ok((read.after?.blocks ?? []).some((one) => one.name === "level0-rules"));
-  assert.doesNotMatch(said, /Say what is\./);
+  assert.ok((read.after?.blocks ?? []).some((one) => one.name === "level0-canary"));
+  assert.doesNotMatch(said, /level0 holds this session/);
 });
 
 // [[spec/design_output/level0#rules-ride-the-first-answer]]
@@ -244,7 +251,7 @@ test("a server restarting under a session the layer reached hands it no second t
 
   const said = contextOf(await reads(box));
 
-  assert.doesNotMatch(said, /Say what is\./);
+  assert.doesNotMatch(said, /# level0-canary/);
 });
 
 // A context read after a clear hands the layer again, as the chapter on the guidance says. [[spec/design_output/level0#the-guidance-stays-put]]
@@ -254,5 +261,5 @@ test("a context read after the layer rode a call hands it again", async () => {
 
   const read = await decide({ event: "prompt.context", e: {} }, box);
 
-  assert.ok((read.after?.blocks ?? []).some((one) => one.name === "level0-rules"));
+  assert.ok((read.after?.blocks ?? []).some((one) => one.name === "level0-canary"));
 });

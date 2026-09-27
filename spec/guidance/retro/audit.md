@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [audit]
 scope: ["an auditor of one retro"]
 rationale: [[spec/rationales/auditing]]
 ---

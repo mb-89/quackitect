@@ -16,7 +16,6 @@ import {
   parse,
   scopesIn,
   standingLayer,
-  styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
 // The whole module, so a name the library answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
 import * as lib from "../../.claude/skills/level0/lib/guidance.js";
@@ -123,6 +122,16 @@ test("a note names the variables it waits for", () => {
   assert.equal(bindsHere(waits, { TWO: "1" }), true, "one of them is enough");
 });
 
+// [[spec/design_input/level-two#guidance]]
+test("a note names the variables it waits for as an inline list, and binds where one is set", () => {
+  const waits = `---\nkind: [[guidance]]\nenv: [ONE, TWO]\n---\n\n# Actionables\n\n1. Do it.\n`;
+  assert.deepEqual(envOf(waits), ["ONE", "TWO"]);
+  assert.equal(bindsHere(waits, {}), false, "no variable set");
+  assert.equal(bindsHere(waits, { TWO: "1" }), true, "one of them is enough");
+  assert.deepEqual(lib.listOf("[a, b]"), ["a", "b"]);
+  assert.deepEqual(lib.listOf(undefined), []);
+});
+
 test("an empty, zero or false value switches nothing on", () => {
   const waits = `---\nkind: [[guidance]]\nenv: ONE\n---\n\n# Actionables\n\n1. Do it.\n`;
   for (const said of ["", "0", "false", "FALSE", "  "]) {
@@ -226,20 +235,6 @@ test("the layer of a kind holds its note beside the free ones, and the free laye
   );
 });
 
-// [[spec/design_output/level0#the-style-carries-a-note]]
-test("a note flagged style true goes to the output style, and no flag keeps it in the session", () => {
-  const flagged = note.replace(
-    'scope: ["everybody"]',
-    'scope: ["everybody"]\nstyle: true',
-  );
-  assert.equal(styled(flagged), true);
-  assert.equal(styled(note), false);
-  assert.equal(
-    styled(note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: false')),
-    false,
-  );
-});
-
 // [[spec/design_output/vehicle#the-work-root-inherits]]
 test("the standing layer joins the method's guidance with the work root's, file by file", () => {
   const rule = (said) =>
@@ -253,21 +248,21 @@ test("the standing layer joins the method's guidance with the work root's, file 
   const said = guidanceHere(disk, "/tools", "/stub", {}, true);
 
   assert.match(
-    said.standing,
+    said.helper,
     /The stub's voice rule/,
     "a note the work root names again replaces the vehicle's",
   );
   assert.ok(
-    !said.standing.includes("The vehicle's voice rule"),
+    !said.helper.includes("The vehicle's voice rule"),
     "the replaced note stays out",
   );
   assert.match(
-    said.standing,
+    said.helper,
     /The vehicle's working rule/,
     "a note the work root stays silent on comes down",
   );
   assert.match(
-    said.standing,
+    said.helper,
     /The house rule/,
     "a note the work root alone holds joins the set",
   );

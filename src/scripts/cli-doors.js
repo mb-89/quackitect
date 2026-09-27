@@ -77,6 +77,8 @@ export async function doorsHere() {
     },
     // A name on the pull asks for one ticket, and the queue binding refuses the ask. [[spec/design_output/pull#the-hand-out]]
     binding: await said.ask("engine.binding"),
+    // A hand-out past the cap less its margin splits. [[spec/design_input/level-two#the-size-cap]]
+    cap: { bytes: await said.ask("pull.cap"), margin: await said.ask("pull.margin") },
     ...handDoors(process.env),
     node: process.execPath,
     pid: process.pid,

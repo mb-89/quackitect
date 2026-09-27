@@ -24,7 +24,7 @@ export function writesHere(leaf, hand = {}) {
   const at = String(leaf?.path ?? "");
   const no = (why, more = {}) => ({ writes: false, why, ...more });
 
-  // A cloud box answers every question it meets, so a person's step stands open to it. [[spec/guidance/cloud]]
+  // A cloud box answers every question it meets, so a person's step stands open to it. [[spec/guidance/cloud/cloud]]
   // The owner's view and the owner's read are the owner's alone, on the cloud too. [[spec/tickets/the-owner-view-decides-done]]
   const cloud = hand.cloud && !OWNERS.includes(String(leaf?.when ?? ""));
   if (by === "person" && hand.agent && !hand.ownerSays && !cloud)

@@ -35,7 +35,7 @@ const stands = () =>
   rowOf(AT, "info", "bridge", "the server stands at http://127.0.0.1:6601", {
     root: "/tmp/tree",
   });
-const context = (detail = "level0-tools level0-rules level0-canary") =>
+const context = (detail = "level0-tools level0-canary") =>
   rowOf(AT, "info", "context", "3 block(s) reach the session", {
     detail,
     reason: "first",
@@ -137,7 +137,7 @@ test("a log holding the bridgehead's rows alone fails the server", () => {
 
 test("a context row naming no canary block fails the rules", () => {
   const checks = readsCold(
-    [started(), stands(), context("level0-tools level0-rules"), heard(HEARD.same)],
+    [started(), stands(), context("level0-tools"), heard(HEARD.same)],
     clean(),
   );
 

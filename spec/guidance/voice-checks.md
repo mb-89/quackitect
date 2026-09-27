@@ -2,7 +2,6 @@
 kind: [[guidance]]
 scope: ["every answer, every note and every commit message"]
 rationale: [[spec/rationales/voice-checks]]
-style: true
 ---
 
 # Actionables

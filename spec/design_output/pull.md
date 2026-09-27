@@ -600,7 +600,7 @@ field. It points `step` at the inserted row and leaves the state at `open`,
 so the ticket is a person's to pull.
 
 - a desk writes `by: person` there
-- a cloud box writes `by: anyone`, because it answers every question this branch meets, as [[spec/guidance/cloud]] says
+- a cloud box writes `by: anyone`, because it answers every question this branch meets, as [[spec/guidance/cloud/cloud]] says
 
 The engine reads the answer, so the slot check finds a reader. A
 hand-out repairs a standing person step that names no reader. The route

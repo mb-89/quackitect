@@ -81,7 +81,7 @@ test("a person step carries its reader, and a colon takes quotes", () => {
     /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine/,
   );
 
-  // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud]]
+  // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud/cloud]]
   const cloudHeld = { name: "a-child", text: CHILD("open", "design/review") };
   withPersonStep({ ...rooted, cloud: true }, cloudHeld, "design/draft", "a question");
   assert.match(

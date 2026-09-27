@@ -45,7 +45,7 @@ func TestAnOpenGroupHoldingAChildAtAPersonStepDrawsTheFinding(t *testing.T) {
 	if one.File != "spec/tickets/a-child.md" {
 		t.Errorf("the finding names %q", one.File)
 	}
-	for _, said := range []string{"a-child", "decide", "./RUNME.sh branch unblock a-child", "cloud box"} {
+	for _, said := range []string{"a-child", "decide", "./RUNME.sh branch unblock a-child", "cloud box", "spec/guidance/cloud/cloud"} {
 		if !strings.Contains(one.Message, said) {
 			t.Errorf("the message leaves out %q: %s", said, one.Message)
 		}

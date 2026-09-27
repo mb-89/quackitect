@@ -194,44 +194,33 @@ test("a pass leaves out a journaled path git ignores", () => {
   );
 });
 
-// A journal names a path a later commit takes away, and git refuses a pathspec it knows nowhere. [[spec/design_output/pull#the-refused-commit]]
-test("a pass leaves out a journaled path gone from disk and git, and stages a deleted tracked one", () => {
-  const GONE = "/tree/test/moved.test.js";
-  const DELETED = "/tree/src/deleted.js";
+// A rename moves a file its journal names, so the old path stands nowhere and git refuses a commit naming it. [[spec/design_output/pull#the-refused-commit]]
+test("a landing stages no path standing nowhere on disk and nowhere in git", () => {
+  const MOVED = "/tree/src/moved.js";
+  const LANDED = "/tree/src/landed.js";
+  const journal = (file) =>
+    JSON.stringify({
+      at: "9999-01-01T00:00:00.000Z",
+      ticket: "a-child",
+      files: [{ file }],
+    });
   const git = fakeGit(
-    {
-      [`git ls-files -- ${GONE} ${DELETED}`]: {
-        exitCode: 0,
-        stdout: "src/deleted.js\n",
-      },
-    },
+    { [`git ls-files --error-unmatch -- ${MOVED}`]: { exitCode: 1 } },
     "/tree",
   );
   const disk = fakeDisk({
     [AT]: WROTE,
-    "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
-      ticket: "a-child",
-      taken: "2026-01-02T00:00:00.000Z",
-    }),
-    "/tree/.se/.runtime/undo/20260103000000000000.json": `${JSON.stringify({
-      ticket: "a-child",
-      at: "2026-01-03T00:00:00.000Z",
-      files: [{ file: "test/moved.test.js" }, { file: "src/deleted.js" }],
-    })}\n`,
+    [LANDED]: "the new place\n",
+    "/tree/.se/.runtime/undo/1.json": journal("src/moved.js"),
+    "/tree/.se/.runtime/undo/2.json": journal("src/landed.js"),
   });
-  const ran = () => git.ran.map((it) => it.argv.join(" "));
+  const ran = () => git.ran.map((one) => one.argv.join(" "));
 
-  const finding = landed({ disk, git, root: "/tree", join }, one, [
-    "passes design/draft",
-  ]);
+  assert.equal(
+    landed({ disk, git, root: "/tree", join }, one, ["passes design/draft"]),
+    "",
+  );
 
-  assert.equal(finding, "");
-  assert.ok(
-    ran().includes(`git add -- ${AT} ${DELETED}`),
-    "the deleted tracked path stages",
-  );
-  assert.ok(
-    !ran().some((row) => row.startsWith("git add") && row.includes(GONE)),
-    "the path git knows nowhere stays out",
-  );
+  assert.ok(ran().includes(`git add -- ${AT} ${LANDED}`), ran().join("\n"));
+  assert.ok(!ran().some((row) => row.startsWith("git add") && row.includes(MOVED)));
 });

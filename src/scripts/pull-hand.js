@@ -28,8 +28,9 @@ import {
 } from "../engine/group.js";
 import { isDue } from "./ephemeral.js";
 import { dueHandOut } from "./ephemeral-pull.js";
-import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
+import { noteRows, readsFor, readsOf } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
+import { printPart } from "./pull-cap.js";
 import { acceptWaits } from "./pull-accept.js";
 import { blessWait, readAgain } from "./pull-bless.js";
 import { cleanupOf } from "./pull-cleanup.js";
@@ -478,9 +479,9 @@ export function excludes(front, leaf, hand) {
 // [[spec/design_output/pull#the-work-answer]]
 export function handed(it, who, one, leaf) {
   const hash = one.private ? "" : tipOf(it);
-  const reads = readsOf(it, leaf.reads);
+  const reads = readsOf(it, readsFor(it, leaf));
   noteRows(it, leaf.path, reads);
-  writeHold(it, who.hand, {
+  const hold = {
     ticket: one.name,
     path: one.path,
     step: leaf.path,
@@ -492,9 +493,8 @@ export function handed(it, who, one, leaf) {
     taken: it.clock ? it.clock.stamp() : "",
     refused: 0,
     reads,
-  });
-  console.log(workAnswer(it, one, leaf));
-  return 0;
+  };
+  return printPart(it, hold, workAnswer(it, one, leaf));
 }
 
 // [[spec/design_output/pull#the-work-answer]]
@@ -547,7 +547,7 @@ export function withPersonStep(it, one, before, asks, options) {
   }
   return inserted(it, one, before, `person-${standing + 1}`, {
     does: "answers the question the engine asks",
-    // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud]]
+    // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud/cloud]]
     by: it.cloud ? "anyone" : "person",
     to: "engine",
     asks,

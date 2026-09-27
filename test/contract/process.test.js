@@ -14,6 +14,7 @@ import { disk } from "../../src/doors/disk.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { firstLeaf } from "../../src/engine/group.js";
 import { withoutFalsePast } from "../../src/engine/tense.js";
+import { readsFor } from "../../src/scripts/guidance-hand.js";
 import { askRows, processAt } from "../../src/scripts/process.js";
 import { leafOf, stepPathOf } from "../../src/scripts/pull.js";
 import { leavesOf, walkOf } from "../../src/scripts/pull-route.js";
@@ -67,12 +68,13 @@ test("the standard route gates the design once, and its last leaf hands on to th
   );
   const gate = leafOf(front, "gate");
   assert.ok(gate.gate, "the gate names its question, and the schema admits it");
+  const reads = readsFor({ disk: files, root, method: root, join, env: {} }, gate);
   assert.ok(
-    gate.reads.includes("spec/guidance/review/design"),
-    "the gate reads the design note",
+    reads.includes("spec/guidance/review/design"),
+    "the gate's tags resolve the design note",
   );
   assert.ok(
-    !gate.reads.includes("spec/guidance/review/reviewing"),
+    !reads.includes("spec/guidance/review/reviewing"),
     "and no other review note",
   );
   assert.equal(

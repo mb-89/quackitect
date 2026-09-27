@@ -30,7 +30,6 @@ steps:
     by: anyone
     to: retro
     input: answer
-    reads: [[spec/guidance/working]]
     needs: [branch test]
     checklist:
       - the change follows the answer, or the discussion says why it departs

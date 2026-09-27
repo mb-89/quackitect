@@ -52,50 +52,14 @@ const holding = (disk, reads) => {
   return disk;
 };
 
-// [[spec/design_output/level0#the-standing-layer]]
-test("a hold standing drops the note its step reads from the layer a session opens with", () => {
+// [[spec/tickets/the-style-carries-the-top]]
+test("the counts read every note at the top, since the style carries each, held or not", () => {
   const disk = holding(boxed(disks()), [{ name: "spec/guidance/voice", hash: "aa" }]);
 
   const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
-  assert.ok(
-    !/Say what is\./.test(said.standing),
-    "the held step's note leaves the layer",
-  );
-  assert.match(said.standing, /Answer the owner first\./);
-});
-
-// [[spec/design_output/level0#the-standing-layer]]
-test("no hold standing leaves the layer whole", () => {
-  const disk = boxed(disks());
-
-  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
-
-  assert.match(said.standing, /Say what is\./);
-  assert.match(said.standing, /Answer the owner first\./);
-});
-
-// [[spec/design_output/level0#the-standing-layer]]
-test("no box file leaves the layer whole, and the reader mints none", () => {
-  const disk = disks();
-
-  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
-
-  assert.match(said.standing, /Say what is\./);
-  assert.ok(
-    !disk.exists(join(WORK, ".se/.runtime/box.json")),
-    "the reader mints no box",
-  );
-});
-
-// [[spec/design_output/level0#the-standing-layer]]
-test("the counts read the notes the layer carries, so the sentence reads true", () => {
-  const disk = holding(boxed(disks()), [{ name: "spec/guidance/voice", hash: "aa" }]);
-
-  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
-
-  assert.equal(said.notes, 1);
-  assert.equal(said.rules, 1);
+  assert.equal(said.notes, 2);
+  assert.equal(said.rules, 3);
 });
 
 // [[spec/design_output/level0#the-standing-layer]]
@@ -129,7 +93,6 @@ test("a note binding a kind stands off the session and the helper, and its own l
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("a spawn names its kind, and the layer of that kind reaches that hand alone", () => {
   const guidance = {
-    standing: "the session",
     helper: "a helper",
     layers: { refactor: "the hand" },
   };
@@ -137,7 +100,6 @@ test("a spawn names its kind, and the layer of that kind reaches that hand alone
   assert.equal(layerHere(guidance, "refactor"), "the hand");
   assert.equal(layerHere(guidance, ""), "a helper");
   assert.equal(layerHere(guidance, "nobody"), "a helper");
-  assert.equal(layerHere({ standing: "the session" }, "refactor"), "the session");
 });
 
 // A restart hands the box over bare, and the spawn still hands the layer. [[spec/design_output/level0#a-restart-fills-the-box]]

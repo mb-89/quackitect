@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [classify]
 scope: ["whoever runs the classify step of a retro"]
 rationale: [[spec/rationales/classifying]]
 ---

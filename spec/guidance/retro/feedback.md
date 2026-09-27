@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [feedback]
 scope: ["whoever runs the feedback step of a retro"]
 rationale: [[spec/rationales/feedback]]
 ---

@@ -9,7 +9,6 @@ steps:
   - name: run
     does: builds the trial and says what it shows
     by: anyone
-    reads: [[spec/guidance/working]]
     evidence:
       - name: shows
         form: text

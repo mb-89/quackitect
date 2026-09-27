@@ -30,7 +30,7 @@ export function unblock(it, name, argv) {
     return 2;
   }
 
-  // A cloud box answers what it meets and hands nothing out, so this verb is a desk's. [[spec/guidance/cloud]]
+  // A cloud box answers what it meets and hands nothing out, so this verb is a desk's. [[spec/guidance/cloud/cloud]]
   if (it.cloud) {
     console.error(
       "A cloud box hands no question out. Answer it, and carry the branch to done.",

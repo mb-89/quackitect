@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [signals]
 scope: ["a reader of one retro chapter"]
 rationale: [[spec/rationales/signals]]
 ---

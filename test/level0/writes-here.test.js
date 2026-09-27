@@ -33,7 +33,7 @@ test("a person's step refuses an agent, takes a person, and takes the owner's wo
   );
 });
 
-// A cloud box answers every question it meets. [[spec/guidance/cloud]]
+// A cloud box answers every question it meets. [[spec/guidance/cloud/cloud]]
 test("a person's step stands open to a cloud box, with no owner's word", () => {
   assert.deepEqual(writesHere(leaf("person"), cloud), { writes: true, why: "" });
 });
@@ -63,7 +63,7 @@ test("a retro step takes a hand at a retro, and refuses one away from it", () =>
   assert.equal(writesHere(leaf("retro"), { agent: true, atRetro: true }).writes, true);
 });
 
-// [[spec/guidance/cloud]]
+// [[spec/guidance/cloud/cloud]]
 test("the cloud test reads either variable, and a flat value reads false", () => {
   assert.equal(inCloud({ CLAUDE_CODE_REMOTE: "1" }), true);
   assert.equal(inCloud({ SE_CLOUD: "yes" }), true);

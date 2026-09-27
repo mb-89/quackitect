@@ -27,22 +27,13 @@ function tracked(it, paths) {
       .map((row) => row.trim())
       .filter(Boolean),
   );
-  return known(it, paths).filter((one) => !ignored.has(one));
+  return paths.filter((one) => !ignored.has(one) && standsSomewhere(it, one));
 }
 
-// A journal names a path a later commit takes away, and git refuses a pathspec it knows nowhere, so a path stands on disk or in the index. [[spec/design_output/pull#the-refused-commit]]
-function known(it, paths) {
-  const gone = paths.filter((one) => !it.disk.exists(one));
-  if (!gone.length) return paths;
-  const ran = it.git.run(["ls-files", "--", ...gone], true);
-  const tracked = new Set(
-    String(ran.out ?? "")
-      .split("\n")
-      .map((row) => row.trim())
-      .filter(Boolean)
-      .map((row) => it.join(it.root, ...row.split("/"))),
-  );
-  return paths.filter((one) => !gone.includes(one) || tracked.has(one));
+// A move leaves its old path in the journal, standing nowhere on disk and nowhere in git, and git refuses a commit naming it. A tracked path gone from disk still stages, as a deletion. [[spec/design_output/pull#the-refused-commit]]
+function standsSomewhere(it, path) {
+  if (it.disk.exists(path)) return true;
+  return it.git.run(["ls-files", "--error-unmatch", "--", path], true).ok;
 }
 
 // A landing the engine makes on the side stages the ticket files it writes, and a hand's edits stay out of a commit naming another ticket. [[spec/design_output/pull#the-refused-commit]]

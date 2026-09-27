@@ -4,7 +4,7 @@
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
-import { actionables, rulesOf, styled } from "./guidance.js";
+import { actionables, rulesOf } from "./guidance.js";
 import { faultsOf, grouped, PARAGRAPH, RULES, rulesFrom } from "./paragraph.js";
 
 export { ownerOf } from "./projection-owner.js";
@@ -175,7 +175,7 @@ function styleFrom(entry, texts) {
     .filter(([path]) => path.startsWith(`${folder}/`) && path.endsWith(".md"))
     .sort(([a], [b]) => (a < b ? -1 : 1))
     .map(([path, text]) => ({ name: path.slice(folder.length + 1), text }))
-    .filter((one) => styled(one.text) && actionables(one.text).length);
+    .filter((one) => !one.name.includes("/") && actionables(one.text).length);
   if (!notes.length) return out;
 
   const body = [];

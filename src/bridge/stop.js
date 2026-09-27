@@ -286,13 +286,13 @@ const CHECKS = {
   "group-in-hand": (held) => groupInHand(held.box),
   "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
   "queue-waits": (held) => queueWaits(held.box),
-  // [[spec/design_output/stop#a-helper-still-runs]]
-  "helpers-running": (held) => helpersRun(held.tasks, held.box),
+  // A cloud box that ends its turn loses its container and every helper in it, so no helper's answer wakes it there. [[spec/design_output/stop#a-helper-still-runs]]
+  "helpers-running": (held) => !cloudHere(held.box) && helpersRun(held.tasks, held.box),
   // [[spec/tickets/the-stop-reads-the-state]]
   "step-waits-on-person": (held) => stepWaitsOnPerson(held.box),
   // A claim a fact denies reads as no stop line, so the turn holds and the fact re-prompts. [[spec/design_output/stop#a-talk-follows-a-report]]
   "no-stop-line": (held) => !claimStands(held),
-  // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
+  // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud/cloud]]
   "a-person-sits-here": (held) => !cloudHere(held.box),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]
@@ -389,8 +389,10 @@ const FALLS = {
     return `the plan still holds ${held.map((one) => `"${one}"`).join(", ")}. Name each under done in mcp__level0__plan, then claim again.`;
   },
   // [[spec/design_output/stop#a-helper-still-runs]]
-  "helpers-running": () =>
-    "the harness names no helper running at this turn's end, so its answer wakes nothing.",
+  "helpers-running": (box) =>
+    cloudHere(box)
+      ? "a cloud box that ends its turn stops its container, and every helper in it stops too, so no answer wakes this session. Wait for the helper inside this turn, or do its work yourself."
+      : "the harness names no helper running at this turn's end, so its answer wakes nothing.",
 };
 
 // The checks reading the answer's text, which the stop call runs before any answer stands. [[spec/design_output/stop#a-refusal-names-its-check]]
