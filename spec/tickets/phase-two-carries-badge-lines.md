@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
 parent: the-queue-views-agree
+record:
+  - step: do
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: ba8f76c3139f834302d9d3b759a44dd360def299
+    hash_after: ba8f76c3139f834302d9d3b759a44dd360def299
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: ask
+        hash: 67bdcfea0d0255bd
+        size: 382
+    def: 67a88a4c3e102bfa
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ the-badge-reads-open-tasks carries none of the lines the owner moves at person-2
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/front.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The three badge lines leave the ask of the-queue-views-agree, which closes on the todo, the rows and the lens. The-badge-reads-open-tasks already carries them under its Discussion, where its draft takes them in. The door refuses an edit to that ask from a hand holding no step of it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the lines leave the phase one ask, and phase two carries them under its Discussion, since the door refuses an edit to its ask
+- the cleanup the check names, one comment in pull-hand-of.js, rides this change
+- the three lines stand once, on the phase two ticket
 
 # Discussion
 

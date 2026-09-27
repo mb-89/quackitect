@@ -58,7 +58,7 @@ export function handOf(it) {
   return parts.join(" · ");
 }
 
-// The id this box carries, read and never written, so a push names its box with no write. [[spec/tickets/one-writer-holds-a-branch]]
+// The id this box carries, a read alone, so a push names its box with no write. [[spec/tickets/one-writer-holds-a-branch]]
 export function boxIdHere(_it) {
   return "";
 }
