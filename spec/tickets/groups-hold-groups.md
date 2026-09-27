@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -138,6 +138,19 @@ record:
         hash: 41f88d071009b333
         size: 14929
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 1c9bcae27264fe69d8f3defaa84252abbac3e0ce
+    hash_after: 1c9bcae27264fe69d8f3defaa84252abbac3e0ce
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: c76b3dbde22c5f22
+        size: 5112
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -287,26 +300,43 @@ I assume a parent needs no route step of its own. It stands open until the dispa
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js test/level0/work-stands.test.js test/level0/work-done.test.js src/tui/work src/tickets
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/dispatch.test.js
+- test/level0/work-stands.test.js
+- test/level0/work-done.test.js
+- src/tui/work/workitems_test.go
+- src/tickets/tickets_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion, and every earlier case in the five files passes.
+
+Three things surprise me, and I decide each one here for the gate to read.
+
+1. `opensOf` in `src/scripts/dispatch-write.js` opens a branch for a parent standing on main with none. So the change drops parents there too, beside `freeIn`. The write cases give their parents `cloud: true` until then.
+2. A top group now leaves its open children loose, as the ask says. So three earlier refusal cases in `test/level0/work-done.test.js` change at tests-green to expect the filing.
+3. `waitingOn` reading `origin/main` alone moves the dispatch case on closed dependencies onto the trunk read, and its fixture changes with it.
+
+The Go cases read `person` through the JSON row, so a missing key reads false and the files compile before the field exists.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a failing case, and the doc lines, the view letter and the check stand as checkpoints the implement step answers
+- the git, disk, front and clock doors each take the fake the earlier cases use
 
 # gate
 

@@ -409,3 +409,57 @@ test("done on a feature group hands back an open agent ticket it adds, as it doe
   assert.equal(code, 0);
   assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
 });
+
+// The group leaving names a parent, and the parent stands beside it. [[spec/tickets/groups-hold-groups]]
+function nested(doors) {
+  const now = doors.disk.read(on("one-group"));
+  doors.disk.write(on("one-group"), withField(now, "group", "big-move", fakeFront()));
+  doors.disk.write(on("big-move"), GROUP_NOTE);
+  return doors;
+}
+
+// [[spec/tickets/groups-hold-groups]]
+test("branch done files each open child under the parent", () => {
+  const { it, disk } = nested(leaving(false, {}));
+  disk.write(on("a-child"), CHILD("one-group", "open"));
+  disk.write(on("a-draft"), CHILD("one-group", "draft"));
+  disk.write(on("shut-one"), CHILD("one-group", "closed"));
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
+  for (const one of ["a-child", "a-draft"])
+    assert.equal(fieldOf(disk.read(on(one)), "group"), "big-move", `${one} moves up`);
+  assert.equal(fieldOf(disk.read(on("shut-one")), "group"), "one-group");
+});
+
+// [[spec/tickets/groups-hold-groups]]
+test("branch done files each added loose ticket under the parent", () => {
+  const { it, disk } = nested(
+    leaving(false, { "a-follow-up": looseAgent, "a-question": loosePerson }),
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 0, said);
+  for (const one of ["a-follow-up", "a-question"])
+    assert.equal(
+      fieldOf(disk.read(on(one)), "group"),
+      "big-move",
+      `${one} lands under the parent`,
+    );
+});
+
+// [[spec/tickets/groups-hold-groups]]
+test("a top group leaves them loose", () => {
+  const { it, disk } = leaving(false, { "a-follow-up": looseAgent });
+  disk.write(on("a-child"), CHILD("one-group", "open"));
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
+  for (const one of ["a-child", "a-follow-up"])
+    assert.equal(fieldOf(disk.read(on(one)), "group"), "", `${one} stands loose`);
+});

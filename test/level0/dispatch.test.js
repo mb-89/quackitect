@@ -459,3 +459,116 @@ test("markOff answers the commit that opens a branch off main's tree, which the 
   });
   assert.equal(markOff(it, "work/new-group"), "0pen000");
 });
+
+// A group names its parent under `group`, and a parent hands no worker. [[spec/tickets/groups-hold-groups]]
+const under = (parent, note = GROUP_NOTE) =>
+  note.replace("state: open\n", `state: open\ngroup: ${parent}\n`);
+const shut = (note) => withField(note, "state", "closed", fakeFront());
+// A parent marked for the cloud, so no case here pushes a branch for it. [[spec/tickets/groups-hold-groups]]
+const cloudy = (note) => note.replace("state: open\n", "state: open\ncloud: true\n");
+
+// [[spec/tickets/groups-hold-groups]]
+test("a parent reaches no worker", () => {
+  const { it } = planned(
+    [
+      { name: "top", note: GROUP_NOTE },
+      { name: "child", note: under("top") },
+    ],
+    { top: GROUP_NOTE, child: under("top") },
+  );
+  assert.deepEqual(names(planOf(it).ready), ["child"]);
+});
+
+// [[spec/tickets/groups-hold-groups]]
+test("a parent closes once every child stands closed on main", () => {
+  const { it } = planned([], {
+    parent: GROUP_NOTE,
+    "a-part": shut(under("parent")),
+    "a-piece": CHILD("parent", "closed"),
+    "open-parent": GROUP_NOTE,
+    "b-piece": CHILD("open-parent", "open"),
+  });
+  assert.deepEqual(planOf(it).closes, ["parent"]);
+});
+
+// A leaf under a middle group under a grandparent waiting on a blocker. [[spec/tickets/groups-hold-groups]]
+function chained(blocker) {
+  const notes = {
+    grand: waitingOn("blocker"),
+    mid: under("grand"),
+    leaf: under("mid"),
+  };
+  return planned(
+    Object.entries(notes).map(([name, note]) => ({ name, note })),
+    { blocker, ...notes },
+  );
+}
+
+// [[spec/tickets/groups-hold-groups]]
+test("a grandparent's open dependency holds a group back", () => {
+  const plan = planOf(chained(GROUP_NOTE).it);
+  assert.ok(!names(plan.ready).includes("leaf"), `ready reads ${names(plan.ready)}`);
+  assert.deepEqual(
+    plan.waiting.find((one) => one.group === "leaf"),
+    { group: "leaf", waits: ["blocker"] },
+  );
+});
+
+// [[spec/tickets/groups-hold-groups]]
+test("that group comes free once the dependency closes", () => {
+  const plan = planOf(chained(shut(GROUP_NOTE)).it);
+  assert.deepEqual(names(plan.ready), ["leaf"]);
+  assert.equal(
+    plan.waiting.find((one) => one.group === "leaf"),
+    undefined,
+  );
+});
+
+// [[spec/tickets/groups-hold-groups]]
+test("a parent's close lands once over two runs", () => {
+  const { it, disk, outside } = writing({
+    parent: cloudy(onMain),
+    "a-piece": CHILD("parent", "closed"),
+  });
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  assert.ok(
+    disk.exists(`${WORKTREE}/spec/tickets/parent.md`),
+    "the close writes the parent",
+  );
+  assert.equal(fieldOf(written(disk, "parent"), "state"), "closed");
+  assert.equal(commits(outside).length, 1, "one commit over two runs");
+});
+
+// [[spec/tickets/groups-hold-groups]]
+test("each parent's loose agent tickets bundle into a fix group under it", () => {
+  const { it, disk, outside } = writing({
+    "a-loose-one": loose,
+    parent: cloudy(onMain),
+    "p-piece": CHILD("parent", "open"),
+  });
+  // A second fix group lints under a name of its own. [[spec/tickets/groups-hold-groups]]
+  outside.proc.teach([VALE], semicolonVale());
+  const said = heard(() => dispatch(ROOT, ["--json"], it));
+  assert.equal(said.code, 0);
+  const plan = JSON.parse(said.said);
+  assert.deepEqual(
+    [...plan.bundles].sort((a, b) => a.parent.localeCompare(b.parent)),
+    [
+      { parent: "", tickets: ["a-loose-one"] },
+      { parent: "parent", tickets: ["p-piece"] },
+    ],
+  );
+  const fixOf = (name) => {
+    assert.ok(disk.exists(`${WORKTREE}/spec/tickets/${name}.md`), `${name} is written`);
+    const fix = fieldOf(written(disk, name), "group");
+    assert.ok(disk.exists(`${WORKTREE}/spec/tickets/${fix}.md`), `${fix} is written`);
+    assert.equal(fieldOf(written(disk, fix), "fix"), "true");
+    return fix;
+  };
+  const top = fixOf("a-loose-one");
+  const nested = fixOf("p-piece");
+  assert.notEqual(top, nested, "each parent takes a fix group of its own");
+  assert.equal(fieldOf(written(disk, nested), "group"), "parent");
+  assert.equal(fieldOf(written(disk, top), "group"), "");
+});
