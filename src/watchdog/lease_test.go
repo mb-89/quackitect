@@ -63,6 +63,9 @@ func TestAnExpiredLeaseMarksEachNameOfItsPartStale(t *testing.T) {
 			t.Fatalf("%s reads current past its provider's lease", name)
 		}
 	}
+	if got := snap.Read("w/items/a"); got != 1 {
+		t.Fatalf("w/items/a reads %v past its lease, and keeps no last value", got)
+	}
 	if _, stale := snap.Stale("w/count"); stale {
 		t.Fatal("w/count reads stale, and its provider holds no lease")
 	}
