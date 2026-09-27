@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 57c2ae12b13e9fe5f974abbd208beb7d28f9e13b
+    hash_after: 9fbacd4a6c2303d4b6502713b6abd876a1d55ff3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:122:99: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -264,26 +276,43 @@ The fake git answers every command a case leaves unlisted with success, so each 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/work-cloud-marker.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A group ticket on `main` carries `cloud: true` while its branch stands in the cloud, so the queue can read the marker off files and leave git alone.
+
+| the verb | what it does to the marker |
+|---|---|
+| `open` | pushes the branch, then commits the marker on trunk and pushes trunk. A branch already standing takes the marker too |
+| `merge` | drops it in the merge commit |
+| `close` | drops it on trunk and pushes trunk before the branch goes |
+| `release` | leaves it, because the branch stays in the cloud |
+
+`open` and `close` now run on trunk alone, with a clean tree, because both commit there. The rationale's release row says the same.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four verbs, the schema, the rationale, and the tests driving open and close
+- every write goes through the git, disk and front doors, and each has its fake
+- the three new functions point at this ticket
+- the key stands once, as `CLOUD_MARK` in `work-merge.js`
+- the four review rows stand fixed, each with its case
 
 # Discussion
 
