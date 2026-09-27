@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -88,6 +88,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: 277c9318030a599e20b32b9fd72cb73831a32f72
     hash_after: 277c9318030a599e20b32b9fd72cb73831a32f72
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 5dfac167063cd9a59f094a3c70916d6b9b7f1b1e
+    hash_after: 5dfac167063cd9a59f094a3c70916d6b9b7f1b1e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
 ---
 
 # Ask
@@ -200,17 +208,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/imports
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The three planted cases fail on their want comments, and `TestFaultsNameAModuleImportingADoor` fails on its count. The clean module and the tree pass on the stub. `golang.org/x/tools` stands at `v0.42.0`, the last release asking Go 1.24. The analyzers and the tree test share `Faults`, so one predicate holds both. The commit hook reads a Go file under `testdata` as code, so the test writes the planted packages to a temp folder.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch `src/imports` and `go.mod` alone
+- the planted packages in a temp folder stand in for doors and modules
+- each file opens on a comment pointing at the Go doors note
+- the note owns the analyzers, and the code points there
+- the review row stands fixed in the note
 
 ## change
 
