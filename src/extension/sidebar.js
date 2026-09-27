@@ -20,9 +20,17 @@ const {
   treeIn,
   valuesOf,
 } = require("./lib/widgets.js");
-const { NEW_TICKET, countIn, lineArgvOf, nextIn, ticketPathOf } = require("./lib/work.js");
+const {
+  NEW_TICKET,
+  countIn,
+  lineArgvOf,
+  nextIn,
+  ticketPathOf,
+} = require("./lib/work.js");
 
 const SCHEMA = "spec/config/level0.schema.json";
+// A copy of inRun("bless.json") out of .claude/skills/level0/lib/folders.js, which BLESS_FILE in src/scripts/pull-bless.js names, because the extension loads CommonJS and those modules are ESM. [[spec/design_output/pull#the-bless]]
+const BLESS = ".se/.runtime/bless.json";
 
 function sidebarOf(door) {
   const readAll = async () => {
@@ -89,7 +97,7 @@ function sidebarOf(door) {
       const said = await readAll();
       return statesOf(valuesOf(said.tracked, said.local));
     },
-    watches: [SCHEMA, TRACKED, LOCAL],
+    watches: [SCHEMA, TRACKED, LOCAL, BLESS],
 
     async html() {
       const said = await readAll();
@@ -101,6 +109,7 @@ function sidebarOf(door) {
           { path: TRACKED, said: said.tracked },
           { path: LOCAL, said: said.local },
         ]),
+        bless: parsed(await door.read(BLESS))?.agent === true,
         script: door.scriptUri(),
         source: door.source(),
         nonce: door.nonce(),
@@ -137,6 +146,12 @@ function sidebarOf(door) {
         return door.startProcess?.(key, how);
       }
       if (message?.kind === "press" && message.key) return press(String(message.key));
+      // The bless file stands outside the config, so no config key draws or writes it. [[spec/design_output/pull#the-bless]]
+      if (message?.kind === "bless") {
+        const agent = message.value === true || message.value === "true";
+        await logbook.say("info", "sidebar", `an agent at this desk blesses: ${agent}`);
+        return door.write(BLESS, `${JSON.stringify({ agent })}\n`);
+      }
       if (message?.kind !== "set" || !message.key) return undefined;
       return set(String(message.key), message.value, "the config tree");
     },
@@ -156,7 +171,8 @@ async function counted(door, groups) {
   for (const group of groups) {
     for (const row of group.rows ?? []) {
       for (const cell of row.cells) {
-        if (cell.counts) cell.count = countIn(await door.asksVerb(lineArgvOf(cell.counts)));
+        if (cell.counts)
+          cell.count = countIn(await door.asksVerb(lineArgvOf(cell.counts)));
       }
     }
   }
@@ -174,10 +190,17 @@ async function pullsNext(door, one) {
 
 // New ticket writes a kind and an empty process where no file stands, and the save fills the rest. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
 async function newTicket(door, one) {
-  const name = String((await door.asksLine("Name the new ticket, in lower-case words")) ?? "");
+  const name = String(
+    (await door.asksLine("Name the new ticket, in lower-case words")) ?? "",
+  );
   if (!name.trim()) return undefined;
   const path = ticketPathOf(one.opens, name);
-  if (!path) return door.tells(`${name} names no ticket`, "Write lower-case words joined by a dash.", true);
+  if (!path)
+    return door.tells(
+      `${name} names no ticket`,
+      "Write lower-case words joined by a dash.",
+      true,
+    );
   if (!(await door.read(path))) await door.write(path, NEW_TICKET);
   return door.opens(path);
 }

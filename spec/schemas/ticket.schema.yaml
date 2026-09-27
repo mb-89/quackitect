@@ -122,6 +122,9 @@ frontmatter:
           final:
             type: boolean
             description: whether this gate reads the whole work, waits on every ticket under it, and closes the process on its verdict
+          bless:
+            type: boolean
+            description: whether this gate waits for a bless after its verdict
 
           asks:
             type: string

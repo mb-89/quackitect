@@ -6,6 +6,10 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fieldOf } from "../../src/engine/group.js";
 import { blessKept } from "../../src/scripts/pull-bless.js";
+import { takeable } from "../../src/scripts/pull-hand.js";
+import { stepOn } from "../../src/scripts/pull-writes.js";
+import { leafOf } from "../../src/scripts/pull-route.js";
+import { frontOf } from "../../src/engine/group.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
@@ -152,7 +156,7 @@ test("an accept at a bless gate leaves the step on the gate", () => {
 // [[spec/design_output/pull#the-bless]]
 test("a pull of the waiting gate says it waits for a bless, and takes no hold", () => {
   const made = waiting();
-  const said = heard(() => pulling(ROOT, ["pull"], made.it));
+  const said = heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
 
   assert.match(said.said, /bless/, said.said);
   assert.equal(made.disk.exists(HOLD), false, "no hand holds the gate");
@@ -258,4 +262,33 @@ test("an edit off the engine puts the step back on the gate at the hand-out", ()
 
   assert.equal(fieldOf(textOf(made), "step"), "gate", "the gate waits again");
   assert.doesNotMatch(textOf(made), BLESSED, "the stale bless drops");
+});
+
+// [[spec/design_output/pull#the-bless]]
+test("a gate waiting for its bless takes no hand, where the same gate asking none does", () => {
+  const made = waiting();
+  const plain = WAITING.replace("    bless: true\n", "");
+  assert.equal(takeable(made.it, { name: "a-child", text: WAITING }), "");
+  assert.equal(takeable(made.it, { name: "a-child", text: plain }), "gate");
+});
+
+// [[spec/design_output/pull#the-pass]]
+test("a step that stays leaves the ticket on its leaf and names the wait, and one that moves takes the next leaf", () => {
+  const made = waiting();
+  const leaf = leafOf(frontOf(WAITING), "gate");
+  const one = { name: "a-child", text: WAITING };
+
+  const stays = [];
+  assert.equal(
+    fieldOf(stepOn(made.it, one, leaf, WAITING, stays, true), "step"),
+    "gate",
+  );
+  assert.deepEqual(stays, ["waits at gate"]);
+
+  const moves = [];
+  assert.equal(
+    fieldOf(stepOn(made.it, one, leaf, WAITING, moves), "step"),
+    "implement/change",
+  );
+  assert.deepEqual(moves, []);
 });

@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { onBash } from "../../src/bridge/bash.js";
+import { blessGuard } from "../../src/bridge/bless.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { HARNESS } from "../../src/scripts/pull-hand-of.js";
@@ -91,4 +92,28 @@ test("a plain command, a read of a harness variable and a script writing under .
       'require("fs").writeFileSync(".se/scripts/out.txt", "one");\n',
   });
   assert.equal(denied(said), "");
+});
+
+// [[spec/design_output/pull#the-bless]]
+test("the guard names the variable a python script under .se sets, and passes a script reading it", () => {
+  const set = blessGuard(
+    "python .se/scripts/p.py",
+    {},
+    box({
+      [`${ROOT}/.se/scripts/p.py`]: 'import os\nos.environ["SE_CLOUD"] = "1"\n',
+    }),
+  );
+  assert.match(set, /SE_CLOUD/);
+  assert.doesNotMatch(
+    set,
+    /CLAUDECODE/,
+    "the refusal names the variable it meets alone",
+  );
+
+  assert.equal(
+    blessGuard("env -i ./RUNME.sh ticket bless a-ticket", {}, box()).length > 0,
+    true,
+    "a cleared environment is refused",
+  );
+  assert.equal(blessGuard("git status", {}, box()), "");
 });

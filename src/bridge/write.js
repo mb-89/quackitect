@@ -3,6 +3,7 @@
 // [[spec/design_output/level0#the-write-door]]
 
 import { join } from "node:path";
+import { BLESS_FILE, blessRefusal } from "../scripts/pull-bless.js";
 import { CODE } from "../../.claude/skills/level0/lib/code.js";
 import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
@@ -74,6 +75,8 @@ export async function onWrite(asked, box) {
   let writing = asWrite(e);
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
+  // [[spec/design_output/pull#the-bless]]
+  if (where === BLESS_FILE) return { result: { deny: blessRefusal() } };
   if (outside(where) || isDraft(where)) return PASS;
   const payload = ticketDoor(e, writing, where, box);
   if (payload) return { result: { deny: payload } };

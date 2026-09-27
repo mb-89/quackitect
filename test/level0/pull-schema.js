@@ -75,6 +75,9 @@ frontmatter:
           final:
             type: boolean
             description: whether this gate reads the whole work
+          bless:
+            type: boolean
+            description: whether this gate waits for a bless after its verdict
           asks:
             type: string
             description: the question a person answers

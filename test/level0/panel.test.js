@@ -209,8 +209,11 @@ test("the config section draws an open press and a shut press beside its filter"
   const opens = said.indexOf('data-fold="open"');
   const shuts = said.indexOf('data-fold="shut"');
   assert.ok(filter > 0 && opens > 0 && shuts > 0, "the filter and both presses draw");
-  assert.ok(said.indexOf("<div class=\"find\">") < filter, "one row holds the filter");
-  assert.ok(opens < said.indexOf('<div class="tree">'), "the presses stand above the tree");
+  assert.ok(said.indexOf('<div class="find">') < filter, "one row holds the filter");
+  assert.ok(
+    opens < said.indexOf('<div class="tree">'),
+    "the presses stand above the tree",
+  );
 });
 
 test("a row hovers its help, and carries the words the filter reads", () => {
@@ -229,4 +232,15 @@ test("a value carrying markup lands as text, and closes no tag", () => {
   });
   assert.ok(!said.includes("<script>x</script>"), "the value draws no tag");
   assert.match(said, /&lt;script&gt;/);
+});
+
+// [[spec/design_output/pull#the-bless]]
+test("the bless button draws held where an agent at this desk blesses, and plain where it does not", () => {
+  const held = panelHtml({ bless: true });
+  assert.match(held, /class="widget bless held" data-key="bless" data-widget="bless"/);
+  assert.match(held, /data-value="true"/);
+
+  const plain = panelHtml({ bless: false });
+  assert.match(plain, /class="widget bless" data-key="bless" data-widget="bless"/);
+  assert.match(plain, /data-value="false"/);
 });

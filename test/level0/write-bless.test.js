@@ -68,3 +68,12 @@ test("a write to another runtime file lands", async () => {
   );
   assert.equal(denied(said), "");
 });
+
+// [[spec/design_output/pull#the-bless]]
+test("the write door's refusal names the sidebar button as the hand writing the bless file", async () => {
+  const said = await onWrite(
+    { tool: "Write", file_path: BLESS_FILE, content: '{"agent": false}\n' },
+    box(),
+  );
+  assert.match(denied(said), /sidebar button/);
+});

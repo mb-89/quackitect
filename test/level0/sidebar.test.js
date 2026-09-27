@@ -446,7 +446,12 @@ test("the view opening draws the page once, and the watcher draws it again", asy
   assert.equal(drawn.length, 1);
 
   const watch = door.said.watched.at(-1);
-  assert.deepEqual(watch.paths, ["spec/config/level0.schema.json", TRACKED, LOCAL]);
+  assert.deepEqual(watch.paths, [
+    "spec/config/level0.schema.json",
+    TRACKED,
+    LOCAL,
+    BLESS_FILE,
+  ]);
 
   door.files.write(LOCAL, JSON.stringify({ stop: { hold: "finish" } }));
   await watch.draw();

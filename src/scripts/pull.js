@@ -23,6 +23,7 @@ import {
 import { inHand } from "../engine/named.js";
 import { ephemeralPull } from "./ephemeral-pull.js";
 import { rejected } from "./pull-gate.js";
+import { asksBless, blessKept } from "./pull-bless.js";
 import { dropHold, holdOf, writeHold } from "./guidance-hand.js";
 import {
   chapterOf,
@@ -410,7 +411,8 @@ export function handBack(it, who, name, verdict) {
       return 1;
     }
     Object.assign(one, { stood: one.text, payload });
-    one.text = put.text;
+    // [[spec/design_output/pull#the-bless]]
+    one.text = blessKept(put.text);
     one.front = frontOf(one.text);
   }
   const verdictField = leaf.evidence.find((field) => field.form === "verdict");
@@ -464,7 +466,7 @@ export function handBack(it, who, name, verdict) {
     return failed(it, who, one, leaf, held, said.reason, answered);
   // [[spec/design_output/pull#a-finding-rides-out]]
   if (said.findings) return minted(it, who, one, leaf, held, said.findings, answered);
-  return passed(it, who, one, leaf, held, answered);
+  return passed(it, who, one, leaf, held, answered, { stays: asksBless(leaf) });
 }
 
 // Every command field the route's other leaves hold a line under, run as the leaf's own run does. [[spec/design_output/pull#the-final-acceptance]]
