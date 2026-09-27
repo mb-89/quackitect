@@ -110,6 +110,22 @@ test("a helper's stop takes its mark off, and the stop call's claim falls", () =
   assert.match(said.result.result, /The claim falls/);
 });
 
+// A cloud box that ends its turn loses its container and its helpers, so the wait wakes nothing there. [[spec/design_output/stop#a-helper-still-runs]]
+test("a cloud box's claim of a running helper falls, and the refusal says the container stops", () => {
+  const box = { ...helperBox("queue"), cloud: true };
+  helperSpawns({ background: true, description: "review" }, box);
+  const said = TOOLS[STOP_CALL]({ reason: "your-helpers-still-run" }, box);
+  assert.match(said.result.result, /The claim falls/);
+  assert.match(
+    said.result.result,
+    /a cloud box that ends its turn stops its container/,
+  );
+  assert.match(
+    said.result.result,
+    /Wait for the helper inside this turn, or do its work yourself/,
+  );
+});
+
 // [[spec/tickets/the-stop-reads-the-state]]
 test("a helper spawned in the foreground leaves no mark", () => {
   const box = helperBox("queue");

@@ -349,8 +349,15 @@ the mark is a count. The rule
 hold, because a session waiting on its helpers keeps both. It carries no
 `yields`, because the check reads the harness, and no hand's opinion.
 
-The claim stands under every binding, `queue` too. A session waiting on its own
-helpers ends the turn on the wait, and the helper's answer wakes it. For what
+The claim stands under every binding, `queue` too, and the box decides it:
+
+| box | the check | why |
+|---|---|---|
+| a desk | reads the helpers | the helper's answer wakes the session |
+| a cloud box | answers false | an idle cloud box stops its container and every helper in it |
+
+The refusal on a cloud box says so. The box then waits for the helper inside
+the turn, or does the work itself. For what
 each binding means, see [[spec/design_output/config#the-engine-controls]].
 
 ## A refusal names its check
