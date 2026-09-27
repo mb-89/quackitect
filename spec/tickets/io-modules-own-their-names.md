@@ -160,6 +160,16 @@ record:
         hash: 60198dd1c4b48de3
         size: 1461
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: ef127b1eaa498d42e214ae5df15b902de1cfcd39
+    hash_after: ef127b1eaa498d42e214ae5df15b902de1cfcd39
+    returns: 1
+    why: "the implement waits on analyzers-read-the-io-flag: onlyq refuses os under src/modules until it reads the q.IO() flag, so the real disk, watch and env fail the tree test. The dependency now runs that way, and the analyzers ticket adds q.IO()."
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
 ---
 
 # Ask
@@ -352,14 +362,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change waits, so it touches no file yet
+no door stands reached yet
+no comment stands yet
+no fact stands added yet
 
 ## tests-green
 
