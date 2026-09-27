@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -179,6 +179,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d7db8e8df0103 · claude-code-remote
+    hash_before: 7004edf2ba6ecc4c242db6c867c9ba0134b03c4e
+    hash_after: 7004edf2ba6ecc4c242db6c867c9ba0134b03c4e
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["the-engine-holds-the-route"]
 ---
 
@@ -260,38 +272,57 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+commit-stages-a-moved-path: the add in the commit verb takes a moved path only where it stands on disk or in the index, and the commit still names it
+the accept passes on that point, and the group walks on to its retro
+retro notes: the box holds no private note
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+ticket todo parks a ticket with a parent and no group, and the next pull hands it out, so the group leaves the wait that held three boxes
+the fake git answers ls-files by its arguments, so one test proves each side of the new guard
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+10:15 the shell hook refuses branch take, since the description names no ticket and no ticket stands in hand before the take
+10:16 the shell hook refuses the catch-all ticket, which stands closed
+10:17 level zero refuses git writes in the scratchpad, so a trial of git add on a staged-away path runs nowhere
+10:19 LandingFollowsItsGate refuses a test piped through tail and chained into the commit verb
+no owner prompt turns the run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the shell hook: let branch take and ticket pull pass with no ticket, since they hand the ticket out
+the cloud guidance: name ticket todo as the road for a point minted with a parent and no group
+the voice rules: note that a command piped through tail loses its exit, so a gate reads the landing alone
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The last three boxes read the door refusal on the group line as a hard block. The todo verb writes the field the pull reads, so no door stood in the way. The git claim under the fix comes from how git matches a path, and no trial checks it here: add matches the index and the disk, and commit also matches HEAD.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the new fact stands once, in stagable in the commit verb, and the tests point at the ticket
+the change adds no number
+the change writes no header
+the badly list carries each error off the transcript with its time, and no owner prompt came
+the chapter names the role and carries no name, address or box path
 
 ## cloud
 
