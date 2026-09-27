@@ -77,12 +77,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
     hash_before: 662be7132628f329f574a568aaaf7d8ecda7d266
     hash_after: 662be7132628f329f574a568aaaf7d8ecda7d266
+  - step: design/review
+    hand: box d7da794434cd · claude-code-remote
+    hash_before: 864d3d04ba8958dc2a445ae96c1e45c8398146af
+    hash_after: 864d3d04ba8958dc2a445ae96c1e45c8398146af
+    inputs:
+      - name: design/draft
+        hash: abda20c0b5ff170c
+        size: 2395
+    def: 0f8c340e80e8ece6
 ---
 
 # Ask
@@ -153,8 +162,10 @@ each done_when line maps to a retro-mint, retro-backlog or retro-route case
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- retro-check-names-the-process: rules 4 and 5 of spec/guidance/retro/check name a ticket name, a gain, a breaks and a done_when as what an open class and a promotion carry, so a hand following them writes no process and the new ticketFaults refuses every mint; add process to both rules and to the fixtures of test/level0/retro-mint.test.js
 
 # implement
 
