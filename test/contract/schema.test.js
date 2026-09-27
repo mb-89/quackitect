@@ -7,6 +7,7 @@
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fileURLToPath } from "node:url";
 import {
   allSchemasIn,
@@ -75,7 +76,7 @@ test("every schema names the paths it governs", () => {
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 test("mint writes one note per kind, and the checker passes each one", () => {
   for (const [kind, schema] of schemas) {
-    const text = mintNote(schema);
+    const text = mintNote(schema, {}, fakeFront());
     assert.deepEqual(checkNote(text, schema, `${kind}.md`), [], `${kind} mints clean`);
     assert.match(
       text,
@@ -91,7 +92,7 @@ function departing() {
   for (const name of here.names("spec/schemas", ".schema.yaml")) {
     seed[`${FAKE}/spec/schemas/${name}`] = here.read(`spec/schemas/${name}`);
   }
-  seed[`${FAKE}/${DEPARTS}`] = mintNote(schemas.get("ticket")).replace(
+  seed[`${FAKE}/${DEPARTS}`] = mintNote(schemas.get("ticket"), {}, fakeFront()).replace(
     "\n---\n",
     "\nabout: a thing\n---\n",
   );
@@ -144,12 +145,16 @@ test("the mint copies every process onto a ticket the checker passes", () => {
   assert.ok(standing.length, `${PROCESSES} holds a process`);
   for (const path of standing.map((name) => `${PROCESSES}/${name}`)) {
     const said = readYaml(here.read(path));
-    const made = mintNote(ticket, {
-      state: "open",
-      process: path.replace(/\.yaml$/, ""),
-      process_hash: processHash(said),
-      steps: said.steps,
-    });
+    const made = mintNote(
+      ticket,
+      {
+        state: "open",
+        process: path.replace(/\.yaml$/, ""),
+        process_hash: processHash(said),
+        steps: said.steps,
+      },
+      fakeFront(),
+    );
     const found = checkNote(made, ticket, "spec/tickets/one.md", schemas);
     assert.deepEqual(
       found.filter((one) => one.severity === SEVERITY),

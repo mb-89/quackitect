@@ -16,7 +16,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/fsnotify/fsnotify"
 
-	"quackitect/tui/frame"
+	"quackitect/src/tui/frame"
 )
 
 type LinesMsg struct {

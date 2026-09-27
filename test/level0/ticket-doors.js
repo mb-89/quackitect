@@ -4,6 +4,7 @@
 
 import { join } from "node:path";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
 
 export const ROOT = "/tree";
 export const at = (path) => join(ROOT, ...path.split("/"));
@@ -162,5 +163,5 @@ export function treeWithProcesses(files = {}) {
     [at("spec/processes/trivial.yaml")]: TRIVIAL_PROCESS,
     ...files,
   });
-  return { it: { disk, join, words: 5 }, disk };
+  return { it: { disk, join, words: 5, front: fakeFront() }, disk };
 }

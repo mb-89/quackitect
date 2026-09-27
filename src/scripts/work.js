@@ -339,7 +339,7 @@ function claimGroup(it, one) {
   const role = roleOf(hand);
   it.disk.write(
     path,
-    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }),
+    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }, it.front),
   );
   it.git.run(["add", at], true);
   const committed = it.git.run(
@@ -500,14 +500,14 @@ function leaves(it, branch, at, path, says) {
   const freed = freeChildren(it, name);
 
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
-  const now = withoutField(
-    withField(
-      withField(withHashAfter(it.disk.read(path), after), "state", CLOSED),
-      "reason",
-      DONE,
-    ),
-    PARKED,
+  const was = withHashAfter(it.disk.read(path), after, it.front);
+  const shut = withField(
+    withField(was, "state", CLOSED, it.front),
+    "reason",
+    DONE,
+    it.front,
   );
+  const now = withoutField(shut, PARKED, it.front);
   it.disk.write(path, now);
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
@@ -561,10 +561,8 @@ function letGo(it, branch, name, here) {
     return 0;
   }
 
-  it.disk.write(
-    path,
-    withHashAfter(it.disk.read(path), it.git.run(["rev-parse", "HEAD"], true).out),
-  );
+  const tip = it.git.run(["rev-parse", "HEAD"], true).out;
+  it.disk.write(path, withHashAfter(it.disk.read(path), tip, it.front));
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;

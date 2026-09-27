@@ -44,6 +44,7 @@ A box reads the argument here before it asks about a ruling:
 | today | becomes | fate |
 |---|---|---|
 | `src/index` | the index process: the model, supervision, `files/`, SQLite | grows |
+| `src/q` | the model's core: names, providers, the store and the catalog check, which the index and every module import | new |
 | `src/lsp` | the LSP door keeps the protocol, and the checks and schema rules become the check module | splits |
 | `src/tui` | `quack tui`: `frame` becomes the generic shell and `tree` the base-view renderer, and the log and the work become declared views | reshaped |
 | `src/config`, `src/yaml`, `src/pointer`, `src/engine/swap` | the index's `cfg/` topic, and process supervision | merged |

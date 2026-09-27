@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import {
   checkNote,
   governorOf,
@@ -142,7 +143,7 @@ test("a note of the governed kind is weighed as it is today", () => {
 
 // [[spec/design_output/schema#a-placeholder-stands-at-warning]]
 test("a placeholder still standing is a finding at warning, and a filled field is none", () => {
-  const text = mintNote(SCHEMA, { Scope: "What this note covers." });
+  const text = mintNote(SCHEMA, { Scope: "What this note covers." }, fakeFront());
   const said = placeholderFaults(text, SCHEMA, NOTE);
   assert.ok(said.length, "the chapters left out still carry their comment");
   assert.deepEqual([...new Set(said.map((one) => one.severity))], ["warning"]);
@@ -155,7 +156,7 @@ test("a placeholder still standing is a finding at warning, and a filled field i
 });
 
 test("a field off an enum counts as no placeholder, because mint writes a real value", () => {
-  const said = placeholderFaults(mintNote(SCHEMA), SCHEMA, NOTE);
+  const said = placeholderFaults(mintNote(SCHEMA, {}, fakeFront()), SCHEMA, NOTE);
   assert.ok(
     !said.some((one) => /^status /.test(one.message)),
     "status: todo is a value the schema allows, not a placeholder",
@@ -180,11 +181,15 @@ test("the sweep carries the placeholders a minted note still holds", () => {
 // [[spec/design_output/schema#the-tool-writes-the-note]]
 test("the tool writes a note the checker passes, and names what stands empty", () => {
   const schemas = schemasIn(governedTree({}));
-  const made = mintedNote(schemas, {
-    kind: "note",
-    path: "spec/notes/fresh.md",
-    fields: { Scope: "What this note covers." },
-  });
+  const made = mintedNote(
+    schemas,
+    {
+      kind: "note",
+      path: "spec/notes/fresh.md",
+      fields: { Scope: "What this note covers." },
+    },
+    fakeFront(),
+  );
   assert.equal(made.why, undefined);
   assert.deepEqual(checkNote(made.text, schemas.get("note"), made.path), []);
   assert.match(made.text, /# Scope\n\nWhat this note covers\./);
@@ -193,7 +198,11 @@ test("the tool writes a note the checker passes, and names what stands empty", (
 
 test("the tool leaves a placeholder where a field stands absent, and names it", () => {
   const schemas = schemasIn(governedTree({}));
-  const made = mintedNote(schemas, { kind: "note", path: "spec/notes/fresh.md" });
+  const made = mintedNote(
+    schemas,
+    { kind: "note", path: "spec/notes/fresh.md" },
+    fakeFront(),
+  );
   assert.match(made.text, /<!-- what this note covers -->/);
   assert.deepEqual(
     made.left.map((one) => one.rule),
@@ -204,23 +213,31 @@ test("the tool leaves a placeholder where a field stands absent, and names it", 
 test("the tool refuses a kind no schema holds, and a path another schema governs", () => {
   const schemas = schemasIn(governedTree({}));
   assert.match(
-    mintedNote(schemas, { kind: "stranger", path: "spec/notes/one.md" }).why,
+    mintedNote(schemas, { kind: "stranger", path: "spec/notes/one.md" }, fakeFront())
+      .why,
     /holds no stranger/,
   );
   assert.match(
-    mintedNote(schemas, { kind: "note", path: "spec/notes/one.txt" }).why,
+    mintedNote(schemas, { kind: "note", path: "spec/notes/one.txt" }, fakeFront()).why,
     /names no markdown file/,
   );
-  assert.match(mintedNote(schemas, { kind: "note" }).why, /takes a kind and a path/);
+  assert.match(
+    mintedNote(schemas, { kind: "note" }, fakeFront()).why,
+    /takes a kind and a path/,
+  );
 });
 
 test("a note the schema refuses comes back with the finding, and no text", () => {
   const schemas = schemasIn(governedTree({}));
-  const made = mintedNote(schemas, {
-    kind: "note",
-    path: "spec/notes/fresh.md",
-    fields: { Scope: "# Stranger\n\nA chapter the schema never names." },
-  });
+  const made = mintedNote(
+    schemas,
+    {
+      kind: "note",
+      path: "spec/notes/fresh.md",
+      fields: { Scope: "# Stranger\n\nA chapter the schema never names." },
+    },
+    fakeFront(),
+  );
   assert.equal(made.text, undefined);
   assert.match(made.why, /refuses this write/);
   assert.ok(made.found.length);
@@ -237,7 +254,7 @@ test("the fields read the same off the command line as out of a tool call", () =
     "What stands open": "Nothing waits.",
   });
 
-  const text = mintNote(SCHEMA, handed.fields);
+  const text = mintNote(SCHEMA, handed.fields, fakeFront());
   assert.match(text, /^---\nkind: \[\[note\]\]\nstatus: done\n---/);
   assert.match(text, /# What stands open\n\nNothing waits\.\n/);
 });
@@ -250,10 +267,14 @@ test("a field the schema never names is refused, and the refusal names what it t
 });
 
 test("mint writes a link and a list in the shape the schema names", () => {
-  const text = mintNote(SCHEMA, {
-    explains: "spec/guidance/voice",
-    scope: ["people", "agents"],
-  });
+  const text = mintNote(
+    SCHEMA,
+    {
+      explains: "spec/guidance/voice",
+      scope: ["people", "agents"],
+    },
+    fakeFront(),
+  );
   assert.match(text, /\nexplains: \[\[spec\/guidance\/voice\]\]\n/);
   assert.match(text, /\nscope: \["people", "agents"\]\n/);
   assert.deepEqual(
@@ -265,7 +286,10 @@ test("mint writes a link and a list in the shape the schema names", () => {
 });
 
 test("mint keeps the kind the schema names, whatever the fields hand in", () => {
-  assert.match(mintNote(SCHEMA, { kind: "other" }), /^---\nkind: \[\[note\]\]\n/);
+  assert.match(
+    mintNote(SCHEMA, { kind: "other" }, fakeFront()),
+    /^---\nkind: \[\[note\]\]\n/,
+  );
 });
 
 // [[spec/design_output/schema#the-tool-writes-the-note]]

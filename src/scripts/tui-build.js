@@ -5,14 +5,11 @@
 
 import { BIN } from "../../.claude/skills/level0/lib/tools.js";
 import { hashText } from "../../.claude/skills/level0/lib/hash.js";
+import { goFoldersOf } from "./cli-go.js";
 
 export const SOURCE = "src/tui";
-export const SHARED = [
-  "quackitect/yaml",
-  "src/yaml",
-  "quackitect/config",
-  "src/config",
-];
+// The files at the root that pin every dependency, which each stamp reads beside its folders. [[spec/tickets/go-code-shares-one-module]]
+export const MODULE_FILES = ["go.mod", "go.sum"];
 export const STAMP = `${BIN}/.logview-source`;
 
 // The mark a key joins on, which a reader of bytes reads as text. [[spec/design_output/index#a-rename-reaches-a-name]]
@@ -21,14 +18,15 @@ const JOIN = "\x1f";
 export function viewerOf({ disk, proc, root, go = "go", windows = false }) {
   const exe = `${root}/${BIN}/logview${windows ? ".exe" : ""}`;
   const stamp = `${root}/${STAMP}`;
-  const hash = sourceHash(disk, foldersOf(root));
+  const hash = sourceHash(disk, foldersOf(disk, root));
   if (disk.exists(exe) && disk.exists(stamp) && disk.read(stamp).trim() === hash) {
     return { exe, why: "" };
   }
 
   // A running binary holds its file on Windows and renames alone, so the build lands beside it and swaps in. [[spec/design_output/tui#the-verb-builds-it]]
   const fresh = `${exe}.new`;
-  const ran = built(proc, [go, "build", "-o", fresh, "."], `${root}/${SOURCE}`);
+  // The build stands at the root, where the one module stands. [[spec/tickets/go-code-shares-one-module]]
+  const ran = built(proc, [go, "build", "-o", fresh, `./${SOURCE}`], root);
   if (ran.exitCode === 0 && disk.exists(fresh)) {
     swapsIn(disk, fresh, exe);
     disk.makeDir(`${root}/${BIN}`);
@@ -63,12 +61,11 @@ function asideOf(disk, old) {
 }
 
 // [[spec/design_output/tui#the-verb-builds-it]]
-export function foldersOf(root) {
-  const out = [`${root}/${SOURCE}`];
-  for (let at = 1; at < SHARED.length; at += 2) {
-    out.push(`${root}/${SHARED[at]}`);
-  }
-  return out;
+export function foldersOf(disk, root) {
+  return [
+    ...goFoldersOf(disk, root, SOURCE).map((one) => `${root}/${one}`),
+    ...MODULE_FILES.map((one) => `${root}/${one}`),
+  ];
 }
 
 export function sourceHash(disk, folders) {
@@ -84,6 +81,8 @@ export function sourceHash(disk, folders) {
 // Every source file under a folder and its packages, so a move under a tab's folder rebuilds the viewer. [[spec/design_output/tui#the-packages-the-window-holds]]
 function sourcesUnder(disk, folder) {
   if (!disk.exists(folder)) return [];
+  // A root module file stands as a file, and reads as itself. [[spec/tickets/go-code-shares-one-module]]
+  if (/\/go\.(mod|sum)$/.test(folder)) return [folder];
   const out = [];
   for (const one of [...disk.list(folder)].sort((a, b) =>
     a.name.localeCompare(b.name),

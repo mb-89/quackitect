@@ -8,9 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/frame"
-	"quackitect/tui/log"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/log"
 )
 
 func threeLevels() frame.Model {

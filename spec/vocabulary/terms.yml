@@ -17,6 +17,7 @@ terms:
   - {word: battery, means: "the full set of tests and checks the check verb runs whose result every push must pass"}
   - {word: binary, means: "a built program file that runs on its own such as the index server"}
   - {word: binding, means: "the setting that says how hard the doors hold where god lets every refusal through"}
+  - {word: sqlite, means: "the database engine the index keeps its rows and its full text search in as one file", source: "https://sqlite.org"}
   - {word: biome, means: "the formatter and linter that reads and rewrites javascript and json in this tree", source: "https://biomejs.dev"}
   - {word: bottom line, means: "the main point a reader acts on which goes first with the detail under it"}
   - {word: single point of truth, means: "the rule to state a thing in one place and link to it everywhere else"}

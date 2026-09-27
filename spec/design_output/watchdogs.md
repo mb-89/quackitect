@@ -29,13 +29,13 @@ loop sends nothing, even while a timer beside it runs. For the subject, see
 # Deadlines
 
 Each name and action declares its deadline with `q.Deadline`, and each kind
-carries a default under `watchdog.deadline.<kind>` in the config.
+carries a default in the config, under the key the table names.
 
-| the kind | what the deadline holds |
-|---|---|
-| `q.Derived` and `q.Fold` | a provider with a pending input commits within it |
-| `q.Action` | the action answers within it |
-| `q.Op` | the operation ends within it, per [[spec/design_output/operations]] |
+| the kind | what the deadline holds | the config key |
+|---|---|---|
+| `q.Derived` and `q.Fold` | a provider with a pending input commits within it | `watchdog.deadlineDerived`, `watchdog.deadlineFold` |
+| `q.Action` | the action answers within it | `watchdog.deadlineAction` |
+| `q.Op` | the operation ends within it, per [[spec/design_output/operations]] | `watchdog.deadlineOp` |
 
 A run past its deadline gets cancelled, its undo steps run where it is an
 action, and the index restarts its process.
@@ -60,8 +60,8 @@ and the restarts stop until the alarm clears.
 
 | the config key | what it sets |
 |---|---|
-| `watchdog.backoff.first` | the wait before the first restart |
-| `watchdog.backoff.cap` | the longest wait |
+| `watchdog.backoffFirst` | the wait before the first restart |
+| `watchdog.backoffCap` | the longest wait |
 | `watchdog.faults` | how many faults raise an alarm |
 | `watchdog.window` | the span those faults fall inside |
 

@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
 import { DONE, groupStanding, work } from "../../src/scripts/work.js";
 import { freeChildren } from "../../src/scripts/work-merge.js";
@@ -41,13 +42,17 @@ test("freeChildren takes the group off each open and draft ticket, and stages it
 
 // [[spec/design_output/work#a-box-leaves]]
 test("done writes hash_after, and closes a group whose every ticket is closed", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, outside, disk } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: withField(took, "step", "children"),
+    [on("one-group")]: withField(took, "step", "children", fakeFront()),
     [on("a-child")]: CHILD("one-group", "closed"),
     ...green,
   });
@@ -66,13 +71,17 @@ test("done writes hash_after, and closes a group whose every ticket is closed", 
 // [[spec/design_output/work#a-box-leaves]]
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
 test("done hands back a group whose ticket a hand can take, and frees that ticket", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, disk, outside } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: withField(took, "step", "children"),
+    [on("one-group")]: withField(took, "step", "children", fakeFront()),
     [on("a-child")]: CHILD("one-group", "open"),
     [on("a-draft")]: CHILD("one-group", "draft"),
     [on("shut-one")]: CHILD("one-group", "closed"),
@@ -93,13 +102,17 @@ test("done hands back a group whose ticket a hand can take, and frees that ticke
 });
 
 test("done closes a group where a ticket in it waits for a helper, and frees only that one", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, disk } = doorsSaying(onBranch("work/one-group"), {
-    [on("one-group")]: withField(took, "step", "children"),
+    [on("one-group")]: withField(took, "step", "children", fakeFront()),
     [on("a-child")]: CHILD("one-group", "open").replace(
       "    does: makes",
       "    by: helper\n    does: makes",
@@ -120,11 +133,15 @@ test("done closes a group where a ticket in it waits for a helper, and frees onl
 
 // [[spec/design_output/work#a-box-leaves]]
 test("done on a group refuses while the battery answers nothing green", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, disk } = doorsSaying(onBranch("work/one-group"), {
     [on("one-group")]: took,
   });
@@ -138,11 +155,15 @@ test("done on a group refuses while the battery answers nothing green", () => {
 
 // [[spec/design_output/work#trunk-comes-in-last-too]]
 test("done on a group refuses where trunk stands ahead of it, and names the sync", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, disk } = doorsSaying(
     {
       ...onBranch("work/one-group"),
@@ -184,20 +205,26 @@ const RETRO_GROUP = withField(
       ].join("\n"),
     ),
     { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
+    fakeFront(),
   ),
   "step",
   "children",
+  fakeFront(),
 );
 
 const written = (text, ...leaves) =>
   leaves.reduce(
     (now, leaf) =>
-      withEntry(now, {
-        step: `retro/${leaf}`,
-        hand: "box 3f9a",
-        hash_before: "c4d5e6",
-        hash_after: "c4d5e6",
-      }),
+      withEntry(
+        now,
+        {
+          step: `retro/${leaf}`,
+          hand: "box 3f9a",
+          hash_before: "c4d5e6",
+          hash_after: "c4d5e6",
+        },
+        fakeFront(),
+      ),
     text,
   );
 

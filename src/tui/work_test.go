@@ -17,8 +17,8 @@ import (
 	"testing"
 	"time"
 
-	"quackitect/tui/draw"
-	"quackitect/tui/work"
+	"quackitect/src/tui/draw"
+	"quackitect/src/tui/work"
 )
 
 const indexRowsSaid = `[

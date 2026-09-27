@@ -4,13 +4,15 @@
 // [[spec/design_output/pull#the-refused-commit]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
+// The fixtures stand on posix paths, so the verb joins them the same way on every platform. [[spec/tickets/ci-runs-a-windows-job]]
+import { posix } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { landed, landedAlone, unlandedRows } from "../../src/scripts/pull-landed.js";
 
 const AT = "/tree/spec/tickets/a-child.md";
+const { join } = posix;
 const WROTE = "---\nstate: open\n---\n\n# Ask\n\nA thing.\n";
 const RECORDED = `${WROTE}\nrecord: one\n`;
 
@@ -145,5 +147,46 @@ test("a pass stages the ticket and the hand's own paths, and leaves a sibling's 
   assert.ok(
     !ran().some((row) => row.includes("old.js")),
     "an edit before the hold stays out",
+  );
+});
+
+// A journal names a file git ignores, such as the handover, and git refuses a commit naming it. [[spec/design_output/pull#the-refused-commit]]
+test("a pass leaves out a journaled path git ignores", () => {
+  const IGNORED = "/tree/.se/HANDOVER.md";
+  const git = fakeGit(
+    {
+      [`git check-ignore -- ${AT} /tree/src/mine.js ${IGNORED}`]: {
+        exitCode: 0,
+        stdout: `${IGNORED}\n`,
+      },
+    },
+    "/tree",
+  );
+  const disk = fakeDisk({
+    [AT]: WROTE,
+    "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
+      ticket: "a-child",
+      taken: "2026-01-02T00:00:00.000Z",
+    }),
+    "/tree/.se/.runtime/undo/20260103000000000000.json": `${JSON.stringify({
+      ticket: "a-child",
+      at: "2026-01-03T00:00:00.000Z",
+      files: [{ file: "src/mine.js" }, { file: ".se/HANDOVER.md" }],
+    })}\n`,
+  });
+  const ran = () => git.ran.map((it) => it.argv.join(" "));
+
+  const finding = landed({ disk, git, root: "/tree", join }, one, [
+    "passes design/draft",
+  ]);
+
+  assert.equal(finding, "");
+  assert.ok(
+    ran().includes(`git add -- ${AT} /tree/src/mine.js`),
+    "the tracked paths stage",
+  );
+  assert.ok(
+    !ran().some((row) => row.startsWith("git add") && row.includes(IGNORED)),
+    "the ignored path stays out",
   );
 });

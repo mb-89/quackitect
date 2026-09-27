@@ -24,8 +24,8 @@ export function testVerb(it, argv, env = {}) {
   const since = named.length ? "" : sinceOf(it, holdOf(it, handOf(it)));
   const changed = named.length ? named : changedFiles(it, since);
   const files = changed.filter((path) => /\.test\.js$/.test(path));
-  // A branch changing a Go test names its module, and the verb runs that too. [[spec/design_output/pull#the-test-verb]]
-  const modules = goModulesOf(changed, it);
+  // A branch changing a Go test names its package folder, and the verb runs that too. [[spec/tickets/go-code-shares-one-module]]
+  const modules = goPackagesOf(changed, it);
 
   if (!files.length && !modules.length) {
     console.log(
@@ -45,7 +45,7 @@ export function testVerb(it, argv, env = {}) {
   for (const one of modules) {
     said.push(
       goSays(
-        it.proc.run(["go", "-C", one, "test", "./..."], {
+        it.proc.run(["go", "test", `./${one}/...`], {
           cwd: it.root,
           env: { ...env, ...goEnvOf(it) },
         }),
@@ -59,15 +59,14 @@ export function testVerb(it, argv, env = {}) {
   return bad ? 1 : 0;
 }
 
-// A changed test names the module holding it, which is the nearest folder above it carrying a go.mod. A handle reads that folder, because a module stands any depth under src. A named folder names the module at or above it. [[spec/design_output/pull#the-test-verb]]
-export function goModulesOf(paths, it) {
+// A changed test names the package folder holding it, and a named folder names itself. The one module stands at the root, so a run names the folder from there. [[spec/tickets/go-code-shares-one-module]]
+export function goPackagesOf(paths) {
   const out = new Set();
   for (const path of paths ?? []) {
     const said = String(path).replace(/\/+$/, "");
     const test = /^src\/.*_test\.go$/.test(said);
     if (!test && !isFolder(said)) continue;
-    const found = moduleOver(test ? said : `${said}/`, it);
-    if (found) out.add(found);
+    out.add(test ? said.split("/").slice(0, -1).join("/") : said);
   }
   return [...out];
 }
@@ -75,18 +74,6 @@ export function goModulesOf(paths, it) {
 // A folder under src carries no extension on its last name. [[spec/design_output/pull#the-test-verb]]
 function isFolder(path) {
   return /^src\/[^.]*$/.test(path);
-}
-
-// The folders above a path, nearest first, down to the one under src. [[spec/tickets/an-engine-takes-bridge-work]]
-function moduleOver(path, it) {
-  const parts = path.split("/").slice(0, -1);
-  while (parts.length > 1) {
-    const folder = parts.join("/");
-    if (!it?.disk || it.disk.exists(it.join(it.root, ...parts, "go.mod")))
-      return folder;
-    parts.pop();
-  }
-  return "";
 }
 
 // [[spec/design_output/pull#the-test-verb]]

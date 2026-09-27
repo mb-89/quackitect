@@ -1,4 +1,4 @@
-// The Go half of the battery: which folders are modules, what the run reads,
+// The Go half of the battery: the one module at the root, what the run reads,
 // and the findings the formatter's list reads as.
 // [[spec/design_output/index#the-compiler-it-needs]]
 
@@ -15,20 +15,21 @@ function box(files = {}) {
   return { disk: fakeDisk(files), join, root: ROOT };
 }
 
-test("a folder under src holding a module file is a module, and one holding none is not", () => {
+test("the root holding a module file is the module, and a folder holding none is not", () => {
   const it = box({
-    [at("src/config/go.mod")]: "module quackitect/config\n",
-    [at("src/tui/go.mod")]: "module quackitect/tui\n",
+    [at("go.mod")]: "module quackitect\n",
+    [at("src/config/config.go")]: "package config\n",
     [at("src/scripts/cli.js")]: "",
   });
-  assert.deepEqual(goModulesIn(it), ["src/config", "src/tui"]);
+  assert.deepEqual(goModulesIn(it), ["."]);
   assert.deepEqual(goModulesIn(box()), [], "a tree with no src folder holds no module");
 });
 
-test("the run names the pinned compiler where it stands, and leaves it out where it stands nowhere", () => {
-  const bare = goEnvOf(box());
-  assert.equal(bare.CC, undefined);
-  assert.match(bare.GOFLAGS, /sqlite_fts5/);
+test("the run takes no C compiler and no tag", () => {
+  const held = goEnvOf(box());
+  assert.equal(held.CGO_ENABLED, "0");
+  assert.equal(held.CC, undefined);
+  assert.doesNotMatch(String(held.GOFLAGS ?? ""), /sqlite_fts5/);
 });
 
 // The gate the round before this one wired, held by a case of its own. [[spec/tickets/the-colours-stand-in-config]]

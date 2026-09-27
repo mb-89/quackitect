@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
@@ -100,7 +101,7 @@ function box(said) {
   );
   const proc = git.proc;
   return {
-    it: { disk, proc, git, root: ROOT, join, words: 5, vale: VALE },
+    it: { disk, proc, git, root: ROOT, join, words: 5, vale: VALE, front: fakeFront() },
     disk,
     proc,
   };
@@ -132,7 +133,9 @@ test("an Ask breaking a rule of form opens, and the answer names the rule as a w
 
 // A private name on the Ask still refuses the open. [[spec/design_output/pull#a-draft-opens]]
 test("an Ask carrying a private name refuses the open, and the draft stands", () => {
-  const { it, disk } = box(FOUND.replace("VoiceParagraph.Characters", "VoiceVale.Private"));
+  const { it, disk } = box(
+    FOUND.replace("VoiceParagraph.Characters", "VoiceVale.Private"),
+  );
   const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
   assert.equal(ran.code, 1);
   assert.match(ran.said, /breaks the voice rules/);
@@ -260,7 +263,16 @@ test("an open commits the ticket it opens, and names it", () => {
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
     [at(AT)]: DRAFT.replace("<upstream>", "the upstream"),
   });
-  const it = { disk, proc: git.proc, git, root: ROOT, join, words: 5, vale: "" };
+  const it = {
+    disk,
+    proc: git.proc,
+    git,
+    root: ROOT,
+    join,
+    words: 5,
+    vale: "",
+    front: fakeFront(),
+  };
 
   const ran = heard(() => ticket(ROOT, ["open", "a-thing"], it));
 

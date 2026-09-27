@@ -9,7 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"quackitect/tui/tree"
+	"quackitect/src/tui/tree"
 )
 
 // The kinds a row carries, off the route a group rides, which the mark draws and the filter reads. [[spec/design_output/tree-view#the-name-column-nests]]

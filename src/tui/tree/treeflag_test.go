@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 func flagCols() []Column {

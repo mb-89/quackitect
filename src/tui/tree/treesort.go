@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 // [[spec/design_output/tree-view#a-sort-holds-several-keys]]

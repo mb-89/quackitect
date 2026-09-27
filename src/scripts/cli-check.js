@@ -116,7 +116,7 @@ export function viewerHere() {
   });
 }
 
-// Every Go module's tests run in the battery, the index's through the pinned Zig. [[spec/design_output/index#the-compiler-it-needs]]
+// Every Go module's tests run in the battery, the import rules among them. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
 // Under `check --errors` the run stays quiet, and each failing Go test reaches the error stream alone. [[spec/tickets/the-verbs-need-no-wrapper]]
 export function goHolds(quiet = false) {
   const at = { disk: files, join, root };
@@ -148,7 +148,9 @@ export function goHolds(quiet = false) {
 function goFormat(folder, env) {
   let ran;
   try {
-    ran = outside.run(["gofmt", "-l", "."], { cwd: join(root, folder), env });
+    // The root holds more than Go, so the formatter reads src alone there. [[spec/tickets/go-code-shares-one-module]]
+    const over = folder === "." ? "src" : ".";
+    ran = outside.run(["gofmt", "-l", over], { cwd: join(root, folder), env });
   } catch {
     return 0;
   }
