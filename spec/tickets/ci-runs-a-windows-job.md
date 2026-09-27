@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -87,6 +87,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: ce3805b0166862125192e187b7f332ccccb77cb1
     hash_after: ce3805b0166862125192e187b7f332ccccb77cb1
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: a1fae23f24d255eb31072c34a1f4382309c633b9
+    hash_after: a1fae23f24d255eb31072c34a1f4382309c633b9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -181,17 +189,27 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/check-workflow.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The one case fails on its first assertion, the matrix line, since the workflow names `ubuntu-latest` alone. No surprise: nothing else in the tree reads the workflow.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the new test alone, inside the ask
+- the test reads the workflow through the disk door, and touches no other door
+- the head comment names the approach and links this ticket
+- the runner names stand in the workflow, and the test matches them
+- the review passes with no rows
 
 ## change
 
