@@ -114,3 +114,14 @@ Split the sentence. The owner rules the split is the answer, and no change to th
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner rules the split is the answer. The door keeps every agent out of `approach` and `seen`, closed ticket or open, so the owner's hand in the editor makes the split. In `spec/tickets/the-queue-moves-to-plan.md`:
+
+| the line | the text it takes |
+|---|---|
+| the approach, the row sentence | A row carries what the two read off a ticket. That is the name, the path, the group, the todo and the mark, then `depends_on`, the failed hand-backs and the plan's order. |
+| the approach, the capture sentence | `placesIn` in `src/scripts/work-answer.js` takes an optional `it.capture`. It hands the hook the free lists before the sort, the rows in hand and every row. It hands it the overrides, the add days, the weights, the clock and the answer too. |
+| tests-red, `seen` | Every new case fails on its own assertion over stubs that answer nothing. The queue reads an empty list, the outline an empty map, and every compare reads even. |
+| tests-red, `checked` | two items: the Go cases read the rows a caller hands in, and the capture case runs over the fake doors in `work-doors.js` |
+
+The `do` step passes on `./RUNME.sh lint spec/tickets/the-queue-moves-to-plan.md` once the split stands.

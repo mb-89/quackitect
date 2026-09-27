@@ -73,3 +73,12 @@ The reply of a claim that stands tells the agent to write the answer again. So e
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The reply case stands in `test/level0/stop-said.test.js` beside the streamed report, because `test/level0/stop-door.test.js` stands at the line ceiling.
+
+The change lands from a box whose cold probe passes. On the owner's desk the probe's client answers 1 on the tree as it stands, before any change. The change stands tested there, and it carries four parts:
+
+- `claims` in `src/bridge/stop.js` answers a standing claim with `The claim stands. The answer before this call carries the report, so end the turn with the line stop: ${reason} alone. The owner reads the answer once.`
+- `saidReport` in `src/bridge/stop.js` sets `box.reported` where a `turn.said` text carries the needs table and names no helper
+- `turn.said` in `src/bridge/server.js` runs `saidReport`, then `onTurnSaid`
+- `test/level0/stop-said.test.js` drives the reply, a streamed report, a stream with none, and a helper's stream through `decide`
