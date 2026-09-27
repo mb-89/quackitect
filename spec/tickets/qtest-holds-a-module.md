@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -134,6 +134,18 @@ record:
     hash_before: 55a8671f3798f48fdd45818f1333ed408f70e51d
     hash_after: 55a8671f3798f48fdd45818f1333ed408f70e51d
     def: 445cd911acc62c3a
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 8c81093920222108260f2b16b2c3d31a798271d2
+    hash_after: 8c81093920222108260f2b16b2c3d31a798271d2
+    inputs:
+      - name: ask
+        hash: f29a7678c3fc0c35
+        size: 714
+      - name: [[spec/design_output/model]]
+        hash: 518103d9494e50d7
+        size: 9128
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -178,38 +190,46 @@ not yet
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Four pieces. One: q gains the action of spec/design_output/model#an-action-lists-calls, which no ticket builds yet: a Call struct (Door, Verb, Args, Undo, NoUndo, Then), and ActionIn and Action, which register a function from its input to a list of calls. Two: src/q/qtest, the fake index. New takes the test and a register function, builds a catalog, runs the catalog check and fails the test on a fault. It registers the input families files/, buffers/, cfg/, clock/minute and session/ itself, per proposal (k), and Seed commits the values a case names through those writers. Run runs a derived provider, Land folds events, and Act runs an action, hands each call the answer the case gives it, and follows Then. Commits answers every commit since the build, off a hook the store gains (Store.OnCommit). Three: src/modules/modules.go, a package that stands so the rules read a package there. Four: src/imports gains the onlyq rule in Faults and as an analyzer: a package under src/modules imports q, q/qtest and a listed pure standard library alone, and calls no time.Now. Weighed: a hook on the store over a diff of snapshots, since a diff misses a commit that lands the same value. Assumed: the action need not reach the index runner here, since the index runs no action yet.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/store.go: Store.Commit, which calls the OnCommit hook,src/imports/imports.go: Faults, which gains the onlyq rule,src/imports/tree_test.go: TestTheTreeHoldsTheImportRules, which reads Faults over every package
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/qtest/qtest_test.go: TestADerivedProviderRunsThroughTheFake,src/q/qtest/qtest_test.go: TestAFoldReducesTheSeededEvents,src/q/qtest/qtest_test.go: TestAnActionAnswersItsCallsAndThen,src/q/qtest/qtest_test.go: TestCommitsReadEveryCommitOfTheRun,src/imports/imports_test.go: a planted modules/nosy importing os, with its want comment,src/imports/imports_test.go: TestFaultsNameAModuleImportingOs
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/action.go,src/q/store.go,src/q/qtest/qtest.go,src/q/qtest/qtest_test.go,src/modules/modules.go,src/imports/imports.go,src/imports/imports_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened spec/design_output/model (the fake index, actions), go-doors (the build checks imports), src/q, and src/imports, and checked each claim there
+the callers come off a grep for Commit and Faults over src
+each done_when line names its test: go test and the check for the first and the last, the qtest cases for the run and the commits, the planted package for onlyq
 
 ## tests-red
 
