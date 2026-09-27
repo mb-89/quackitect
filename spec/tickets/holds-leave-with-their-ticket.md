@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/owner-read
+step: design/draft
 steps:
   - name: design
     steps:
@@ -117,6 +117,10 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
