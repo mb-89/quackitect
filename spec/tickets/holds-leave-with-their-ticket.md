@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: accept
 steps:
   - name: design
@@ -205,6 +205,35 @@ record:
         hash: 6ff8893262e81181
         size: 1715
     def: 5050b7ed72b70652
+  - step: accept
+    hand: box d6f05e3a585030 · claude-code · helper-8
+    hash_before: 3d44664fda750bcaf0953e60508038c7b031736a
+    hash_after: 3d44664fda750bcaf0953e60508038c7b031736a
+    answered:
+      - name: design/tests-red/tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: implement/change/lint
+        exit: 0
+        said: The rules pass.
+      - name: implement/tests-green/tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: implement/tests-green/check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:265:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 260b59b15e28d7e0
+        size: 565
+      - name: implement
+        hash: 6ff8893262e81181
+        size: 1715
+    def: 5050b7ed72b70652
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -453,8 +482,14 @@ A hold leaves with its ticket. `stillHeld` in `src/engine/named.js` reads the ti
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- editor-reads-skip-closed-holds: `graphOf` in `src/extension/lib/route-host.js` and `personal` in `src/extension/lib/fields.js` read the hold a person keeps on a closed ticket. The page then reads it held, and the fields draw marks, until the next pull. The hold chapter of `spec/design_output/pull.md` says the readers skip it. The lens still reads and watches the older `hold.json`, which the tests-green says leaves the readers.
+accept: the whole work answers the ask, and every command of the route passes.
+- The case where a hold drops at the next pull decides the first done line.
+- The case where a pull names no closed ticket in hand decides the second.
+- The point of the last round stands closed as editor-reads-skip-closed-holds.
+- `holdsIn` in `src/extension/lib/lens.js` now skips a hold on a closed ticket, and `graphOf`, `personal` and the lens read through it.
+- The lens reads and watches the hold folder alone, so the older `hold.json` leaves the editor.
+- The diff since the last verdict adds nothing past the ask, beyond line breaks a formatter wrote in two test files.
+- The working todo of a plan still stands in hand after its ticket closes, a road beside the holds, and the note working-todo-outlives-its-close parks it.
 
 # view
 
