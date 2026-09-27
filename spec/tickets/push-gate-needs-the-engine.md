@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -159,6 +159,18 @@ record:
         hash: 06a30175056ddca0
         size: 2916
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 908c43fcccb4e6358343990790ed5f44356daf02
+    hash_after: 908c43fcccb4e6358343990790ed5f44356daf02
+    inputs:
+      - name: design/draft
+        hash: 06a30175056ddca0
+        size: 2916
+      - name: design/tests-red
+        hash: a22f7e8ffed41ca9
+        size: 826
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -311,8 +323,9 @@ Two cases fail on their own assertion over the stubs: the push with no engine la
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
