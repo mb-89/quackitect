@@ -77,7 +77,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: 662be7132628f329f574a568aaaf7d8ecda7d266
+    hash_after: 662be7132628f329f574a568aaaf7d8ecda7d266
 ---
 
 # Ask
@@ -99,32 +104,47 @@ Today `src/engine/retro/mint.js` writes every class as a standard ticket, and a 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+- A class's ticket names its route under process, and a promotion's ticket does too.
+- ticketFaults in src/engine/retro/mint.js refuses a ticket naming no process, or one processAt finds nowhere.
+- mintOne passes --process= off the ticket, and the constant ROUTE leaves.
+- The verb retro backlog in src/engine/retro/backlog.js reads every ticket trunk closes in the window and naming no group, off the since collect writes.
+- closedIn, cut out of cloudInto in src/scripts/retro-collect.js, answers those closes for both.
+- A prose criterion is an Ask bullet naming no command in backticks. The verb prints each one.
+- The verb answers 1 while backlog.json in the retro's folder holds no verdict for a printed criterion. It answers 0 once each holds `holds` or `falls short` with its reason.
+- spec/processes/retro.yaml gains the step backlog after audit, its evidence that command, and chapter takes input backlog.
+- A criterion falling short reaches classify as a finding, as spec/guidance/retro/classify reads the retro's folder.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/engine/retro/mint.js mintOne, which reads the route off the ticket,src/engine/retro/mint.js mintFaults and ticketFaults, which refuse a ticket naming no process,src/engine/retro/mint.js mint, which calls both,src/scripts/retro.js retro, whose dispatch gains backlog,src/scripts/retro-collect.js cloudInto, which shares closedIn,spec/processes/retro.yaml the steps audit and chapter
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/retro-mint.test.js a class naming trivial mints a trivial ticket,test/level0/retro-mint.test.js a class naming no process is refused,test/level0/retro-mint.test.js a class naming a process that stands nowhere is refused,test/level0/retro-backlog.test.js the backlog verb prints each prose criterion of a backlog ticket the window closes,test/level0/retro-backlog.test.js the backlog verb answers 1 while a criterion holds no verdict, and 0 once each does,test/level0/retro-backlog.test.js a group's ticket and a criterion naming a command stay out,test/level0/retro-route.test.js the retro route holds backlog after audit
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+mint.js, classes.js, retro.js, retro-collect.js and retro.yaml stand opened, and each claim checked there
+the callers list names each function the process field and the backlog step change
+each done_when line maps to a retro-mint, retro-backlog or retro-route case
 
 ## review
 
