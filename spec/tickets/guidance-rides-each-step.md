@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [the-engine-holds-the-route]
-step: children
+step: retro/notes
 record:
   - step: sync
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -96,6 +96,10 @@ record:
     hand: box d7d9cc78d3ce · claude-code-remote
     hash_before: e64a605e9bc71b5199418425140b5b3ace942f22
     hash_after: e64a605e9bc71b5199418425140b5b3ace942f22
+  - step: children
+    hand: the engine
+    hash_before: a3748922cf6104dd78626ca035f739135bc5791a
+    hash_after: a3748922cf6104dd78626ca035f739135bc5791a
 ---
 
 # Ask
