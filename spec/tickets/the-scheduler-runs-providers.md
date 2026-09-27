@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: d58b4c54229fcc738e36ef9d2760a938cae8b975
+    hash_after: d58b4c54229fcc738e36ef9d2760a938cae8b975
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: dda7a3cac8ec23ec
+        size: 714
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -334,26 +357,33 @@ the scheduler reuses the catalog key test and owner lookup, so no catalog rule s
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/scheduler_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A derived provider now runs when a name it reads moves. The new Scheduler in src/q hears every commit, and starts a run of each provider reading a moved owner. A move during a run leaves one pending run, so a provider never runs twice at once. Serve builds the scheduler over its store, and its stop stops it. A family keyed by a key segment waits on one-wave-settles-a-change.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the scheduler, the Serve wiring, and a case beside each
+the scheduler reaches no door, since spawn is a hand the caller passes
+scheduler.go and the Serve lines point at the provider kinds section
+the rules of the catalog stand in check.go and q.go alone, and the scheduler calls them
 
 # accept
 
