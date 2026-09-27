@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -97,6 +97,14 @@ record:
     hand: box d7d8cca563b1 · claude-code-remote · helper-4
     hash_before: 562b42d790624630618dc6a84a48234302f41c07
     hash_after: 562b42d790624630618dc6a84a48234302f41c07
+  - step: implement/tests-red
+    hand: box d7d8cca563b1 · claude-code-remote
+    hash_before: d6dfdc6b40f22ef491f0416a0b350a2ab6ceb149
+    hash_after: d6dfdc6b40f22ef491f0416a0b350a2ab6ceb149
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 20 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -178,20 +186,31 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-bless.test.js test/level0/write-bless.test.js test/level0/bash-bless.test.js test/level0/schema-bless.test.js test/level0/sidebar.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- Every case fails on its own assertion, and src/scripts/pull-bless.js stands as a stub so no import breaks.
+- The ticket schema stands in three places: spec/schemas/ticket.schema.yaml, SCHEMA in test/level0/pull-schema.js and TICKET_SCHEMA in test/level0/fixtures.js. The change adds bless to each, and a note takes the copies to the retro.
+- The write door calls box.biome.stands, so write-bless.test.js fakes biome.
+- A script under .se writes any .se path unread today, since scriptsIn drops the targets FREE admits.
+- schema-bless.test.js reads the tracked schemas off the disk, since the ask names those files.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the tests touch the files the draft names, and sidebar.test.js takes two cases at its end
+every door the tests reach runs on a fake from src/doors/fake, and biome takes one in write-bless
+the header of each new file links spec/design_output/pull#the-bless
+the bless file path stands once in pull-bless.js for the change to import
+the four review rows each meet a case: script targets, the button, a process file, HARNESS over CLOUD
 
 ## change
 

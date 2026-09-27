@@ -453,3 +453,24 @@ test("the view opening draws the page once, and the watcher draws it again", asy
   assert.equal(drawn.length, 2);
   assert.match(drawn[1], /class="widget at-0-1-1-1 away"/);
 });
+
+const BLESS_FILE = ".se/.runtime/bless.json";
+
+// The bless file stands outside the config, so the button draws off no schema entry. [[spec/tickets/bless-button-draws-itself]]
+test("the sidebar draws the bless button with no schema entry naming it", async () => {
+  const said = await sidebarOf(doorOf()).html();
+  assert.match(said, /data-widget="bless"/);
+});
+
+// [[spec/design_output/pull#the-bless]]
+test("a bless message writes the bless file, and leaves the config files alone", async () => {
+  const door = doorOf();
+  const sidebar = sidebarOf(door);
+
+  await sidebar.took({ kind: "bless", value: true });
+  assert.deepEqual(JSON.parse(door.files.read(BLESS_FILE)), { agent: true });
+  assert.equal(door.files.exists(LOCAL), false, "the local config takes nothing");
+
+  await sidebar.took({ kind: "bless", value: false });
+  assert.deepEqual(JSON.parse(door.files.read(BLESS_FILE)), { agent: false });
+});
