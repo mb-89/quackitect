@@ -334,6 +334,7 @@ test("release refuses a branch already standing at done", () => {
 
 test("close refuses a branch outside trunk, and deletes one inside it", () => {
   const inside = {
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
     "git rev-list --count origin/main..main": { stdout: "0\n" },
     "git branch -r --merged origin/main": {
       stdout: "  origin/main\n  origin/work/landed\n",
@@ -354,6 +355,7 @@ test("close refuses a branch outside trunk, and deletes one inside it", () => {
 // [[spec/design_output/work#a-merged-branch-closes]]
 test("close takes a name carrying its own prefix", () => {
   const inside = {
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
     "git rev-list --count origin/main..main": { stdout: "0\n" },
     "git branch -r --merged origin/main": {
       stdout: "  origin/main\n  origin/claude/roaming-hopper-ab12cd\n",
@@ -375,6 +377,7 @@ test("close takes a name carrying its own prefix", () => {
 
 test("close holds a trunk carrying commits origin has never seen", () => {
   const { it, outside } = doorsSaying({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
     "git rev-list --count origin/main..main": { stdout: "2\n" },
   });
 

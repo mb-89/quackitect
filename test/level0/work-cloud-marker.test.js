@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, withEntry, withField } from "../../src/engine/group.js";
 import { work } from "../../src/scripts/work.js";
+import { CLOUD_MARK } from "../../src/scripts/work-merge.js";
 import {
   doorsSaying,
   GROUP_AT,
@@ -23,7 +24,7 @@ import {
   SHA,
 } from "./work-doors.js";
 
-const MARKED = withField(GROUP_NOTE, "cloud", "true", fakeFront());
+const MARKED = withField(GROUP_NOTE, CLOUD_MARK, "true", fakeFront());
 const BRANCH_PUSH = `git push origin ${SHA}:refs/heads/work/one-group`;
 const TRUNK_PUSH = "git push origin main";
 
@@ -44,7 +45,7 @@ test("branch open writes the marker on trunk once the branch push lands", () => 
   const { code, said } = heard(() => work(ROOT, ["open", "one-group"], it));
 
   assert.equal(code, 0, said);
-  assert.equal(fieldOf(disk.read(on("one-group")), "cloud"), "true");
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "true");
   const ran = ranGit(outside);
   assert.ok(
     ran.includes("git commit -m one-group: opens in the cloud"),
@@ -77,7 +78,7 @@ test("a refused branch push leaves trunk without the marker", () => {
   const { code } = heard(() => work(ROOT, ["open", "one-group"], it));
 
   assert.equal(code, 1);
-  assert.equal(fieldOf(disk.read(on("one-group")), "cloud"), "");
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "");
   assert.ok(!ranGit(outside).includes(TRUNK_PUSH));
 });
 
@@ -95,7 +96,7 @@ test("branch open marks a branch already standing in the cloud", () => {
 
   assert.equal(code, 0, said);
   assert.match(said, /already stands in the cloud/);
-  assert.equal(fieldOf(disk.read(on("one-group")), "cloud"), "true");
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "true");
   assert.ok(ranGit(outside).includes(TRUNK_PUSH));
   assert.ok(!ranGit(outside).includes(BRANCH_PUSH));
 });
@@ -109,7 +110,7 @@ test("branch merge drops the marker on the merge commit", () => {
   );
 
   assert.equal(code, 0, said);
-  assert.equal(fieldOf(disk.read(on("one-group")), "cloud"), "");
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "");
   assert.ok(ranGit(outside).includes("git commit --amend --no-edit"));
 });
 
@@ -127,7 +128,7 @@ test("branch close drops the marker on trunk before the branch goes", () => {
   const { code, said } = heard(() => work(ROOT, ["close", "one-group", "--force"], it));
 
   assert.equal(code, 0, said);
-  assert.equal(fieldOf(disk.read(on("one-group")), "cloud"), "");
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "");
   const ran = ranGit(outside);
   assert.ok(ran.includes("git commit -m one-group: leaves the cloud"), ran.join("\n"));
   assert.ok(
@@ -166,6 +167,6 @@ test("branch release leaves the marker, and the branch stands at todo", () => {
 
   assert.equal(code, 0, said);
   assert.match(said, /stands at todo again/);
-  assert.equal(fieldOf(disk.read(on("one-group")), "cloud"), "true");
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "true");
   assert.ok(!ranGit(outside).includes(TRUNK_PUSH));
 });

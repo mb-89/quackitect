@@ -54,7 +54,7 @@ import { freeIn, trigger } from "./work-free.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, freeChildren, merge } from "./work-merge.js";
+import { close, freeChildren, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import {
   childrenHere,
   DONE,
@@ -139,6 +139,7 @@ function openGroup(it, name) {
     );
     return 2;
   }
+  if (offTrunk(it, "open")) return 2;
   const at = ticketAt(name);
   const text = textAt(it, `origin/${TRUNK}`, at);
   if (!text) {
@@ -158,7 +159,7 @@ function openGroup(it, name) {
   it.git.fetch();
   if (standOf(it).some((one) => one.branch === branch)) {
     console.log(`${branch} already stands in the cloud, carrying ${at}.`);
-    return 0;
+    return marksTrunk(it, name) ? 0 : 1;
   }
   const mark = markOff(it, branch);
   if (!mark) {
@@ -173,6 +174,7 @@ function openGroup(it, name) {
   }
 
   console.log(`${branch} stands at ${TODO} in the cloud, carrying ${at}.`);
+  if (!marksTrunk(it, name)) return 1;
   console.log("Run ./RUNME.sh cloud trigger to fire a box at it.");
   return 0;
 }

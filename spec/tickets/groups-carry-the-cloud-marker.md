@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 90c7e9d8d62f2c588cc49a0a7d3166fa61b9237d
+    hash_after: 90c7e9d8d62f2c588cc49a0a7d3166fa61b9237d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -234,14 +242,20 @@ The fake git answers every command a case leaves unlisted with success, so each 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/scripts/work.js src/scripts/work-merge.js test/level0/work-cloud-marker.test.js test/level0/work-open.test.js test/level0/work.test.js spec/schemas/ticket.schema.yaml spec/rationales/git-stays-the-archive.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four verbs, the schema, the rationale, and the tests of open and close
+- every write goes through the git, disk and front doors, and each has its fake
+- `marks`, `marksTrunk` and `offTrunk` point at this ticket
+- the key stands once, as `CLOUD_MARK` in `work-merge.js`, and the test reads it there
+- the four review rows stand fixed, each with its case in the marker test
 
 ## tests-green
 
