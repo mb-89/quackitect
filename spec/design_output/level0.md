@@ -1419,7 +1419,9 @@ writes the reply meets a refusal, writes the reply, and calls again.
 An ask pressed while a prompt stands unpaid waits for the pay, so the first
 call still meets the gate. A call with nothing new comes back refused. The
 refusal quotes the last text seen and its length, so a stale read and a wrong
-reply read apart. `AskUserQuestion` and the report tool pass the hold.
+reply read apart. `AskUserQuestion` and the report tool pass the hold. On a
+cloud box `holdsCloudAsk` in `src/bridge/cloud-ask.js` refuses the ask first,
+because nobody sits there to answer.
 
 Each refusal writes a `gate` line at `debug`, because the agent reads the
 refusal itself.

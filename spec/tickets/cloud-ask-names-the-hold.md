@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-engine-fixes-its-faults
 parent: cloud-boxes-ask-nobody
+record:
+  - step: do
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 2f985b2f0954a30dd384a8d16a37b342320bb2c8
+    hash_after: 2f985b2f0954a30dd384a8d16a37b342320bb2c8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 50 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: ask
+        hash: 82e625c5652e38ff
+        size: 167
+    def: eee19cdc3d1d980c
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ parent: cloud-boxes-ask-nobody
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/answer-door.test.js test/level0/answer.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer hold in `spec/design_output/level0.md` said `AskUserQuestion` passes it. That holds on a desk. On a cloud box `holdsCloudAsk` refuses the ask first, so the note now says so beside the hold, and points at the file owning the door. The answer door's tests cover the hold the line describes, and the cloud case waits in `test/level0/cloud-ask.test.js` for its parent.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: one sentence beside the hold line
+- the change reveals no cleanup
+- the note points at `src/bridge/cloud-ask.js`, which owns the door
 
 # Discussion
 
