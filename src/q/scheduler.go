@@ -118,3 +118,12 @@ func (one *Scheduler) Stop() {
 	one.mu.Unlock()
 	one.Settle()
 }
+
+// Drops a name from the watched ones, so a wave keeps it pending until a reader asks. [[spec/design_output/model#one-wave-settles-a-change]]
+func (one *Scheduler) Unwatch(name string) {}
+
+// Reads a name, running it first where it stands pending and unwatched. [[spec/design_output/model#one-wave-settles-a-change]]
+func (one *Scheduler) Read(name string) any { return one.store.Snapshot().Read(name) }
+
+// How many run lists the scheduler keeps. [[spec/design_output/model#one-wave-settles-a-change]]
+func (one *Scheduler) Lists() int { return 0 }

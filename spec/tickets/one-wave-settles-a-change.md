@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 29b4a748030e83f399fd1cdcae7dc8ec519af5e3
+    hash_after: 29b4a748030e83f399fd1cdcae7dc8ec519af5e3
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 1893dad055aa6604
+        size: 3020
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -242,26 +255,32 @@ each done_when line names its case, or the command go test or the check
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/scheduler_test.go src/q/qtest/wave_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/scheduler_test.go
+src/q/qtest/wave_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The four scheduler cases fail on their own assertion: the stubs keep no list, an equal commit runs again, an unwatched name runs with no reader, and why reads no pending. The two qtest cases read B never run, since the fake index builds no scheduler. The surprise: the change during a wave needs the provider to seed the fake index from inside its run, so the case holds the index in a variable the run closes over.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a red case in scheduler_test.go or wave_test.go, and the commands decide the rest
+the cases run over a catalog and a store in memory, and the fake index, so no door stands unfaked
 
 # gate
 

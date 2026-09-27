@@ -90,3 +90,61 @@ func TestAMoveAfterStopRunsNothing(t *testing.T) {
 		t.Fatalf("t/double reads %v after a move past the stop", got)
 	}
 }
+
+// Counts each run of t/double off t/n, the one provider the wave cases read. [[spec/design_output/model#one-wave-settles-a-change]]
+func doubled(t *testing.T) (*Store, Writer, *Scheduler, *int) {
+	t.Helper()
+	c := New()
+	hand := GivenIn(c, "t/n", 0)
+	runs := 0
+	DerivedIn(c, "t/double", 0, func(in countOf) int { runs++; return in.N * 2 })
+	s := NewStore(c)
+	return s, hand, NewScheduler(s, spawned, failOn(t)), &runs
+}
+
+func TestASecondChangeReusesTheKeptList(t *testing.T) {
+	s, hand, scheduler, _ := doubled(t)
+	seed(t, s, hand, "t/n", 1)
+	scheduler.Settle()
+	seed(t, s, hand, "t/n", 2)
+	scheduler.Settle()
+	if got := scheduler.Lists(); got != 1 {
+		t.Fatalf("the scheduler keeps %d run lists after two changes of t/n", got)
+	}
+}
+
+func TestAnEqualCommitRunsNothingBelow(t *testing.T) {
+	s, hand, scheduler, runs := doubled(t)
+	seed(t, s, hand, "t/n", 3)
+	scheduler.Settle()
+	seed(t, s, hand, "t/n", 3)
+	scheduler.Settle()
+	if *runs != 1 {
+		t.Fatalf("t/double runs %d times over two equal commits", *runs)
+	}
+}
+
+func TestAnUnwatchedPendingNameRunsWhenRead(t *testing.T) {
+	s, hand, scheduler, runs := doubled(t)
+	scheduler.Unwatch("t/double")
+	seed(t, s, hand, "t/n", 3)
+	scheduler.Settle()
+	if *runs != 0 {
+		t.Fatalf("an unwatched t/double runs %d times with no reader", *runs)
+	}
+	if got := scheduler.Read("t/double"); got != 6 || *runs != 1 {
+		t.Fatalf("a read of t/double answers %v after %d runs", got, *runs)
+	}
+}
+
+func TestWhyNamesAPendingValue(t *testing.T) {
+	s, hand, scheduler, _ := doubled(t)
+	scheduler.Unwatch("t/double")
+	seed(t, s, hand, "t/n", 3)
+	scheduler.Settle()
+	at := s.Snapshot().Revision
+	said, err := s.Why("t/double")
+	if err != nil || said.State != "pending" || said.Pending != at {
+		t.Fatalf("why t/double answers %s at %d, %v", said.State, said.Pending, err)
+	}
+}

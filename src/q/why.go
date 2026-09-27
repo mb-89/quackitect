@@ -14,6 +14,7 @@ type Why struct {
 	Value    any        `json:"value"`
 	State    string     `json:"state"`
 	Since    *time.Time `json:"since,omitempty"`
+	Pending  int64      `json:"pending,omitempty"`
 	Provider Provider   `json:"provider"`
 	Inputs   []WhyInput `json:"inputs,omitempty"`
 	Readers  []string   `json:"readers,omitempty"`
