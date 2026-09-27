@@ -4,13 +4,27 @@
 // [[spec/tickets/the-last-gate-accepts]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { readYaml } from "../../.claude/skills/level0/lib/schema-yaml.js";
-import { fieldOf } from "../../src/engine/group.js";
+import { fieldOf, frontOf } from "../../src/engine/group.js";
+import { workAnswer } from "../../src/scripts/pull-chapter.js";
+import { rejected } from "../../src/scripts/pull-gate.js";
+import { takeable } from "../../src/scripts/pull-hand.js";
+import { leafOf } from "../../src/scripts/pull-route.js";
 import { holdsHere } from "../../src/scripts/pull-when.js";
+import { entriesOf } from "../../src/scripts/pull-writes.js";
 import { pulling } from "../../src/scripts/work.js";
-import { at, doors, filled, heard, ranGit, ROOT, standing } from "./pull-doors.js";
+import {
+  at,
+  BRANCH,
+  doors,
+  filled,
+  HAND,
+  heard,
+  ranGit,
+  ROOT,
+  SHA,
+  standing,
+} from "./pull-doors.js";
 
 const LAST = "c".repeat(40);
 
@@ -88,6 +102,32 @@ The fix.
 # Discussion
 `;
 
+// The route a point's fix ticket takes. [[spec/tickets/the-last-gate-accepts]]
+const TRIVIAL = `for: a fix small enough that the ask is the design
+steps:
+  - name: do
+    does: makes the change
+    by: anyone
+    to: retro
+    evidence:
+      - name: says
+        form: text
+        says: what changes
+`;
+
+// The question route the cap mints onto, one person step. [[spec/tickets/the-last-gate-accepts]]
+const QUESTION = `for: a question only a person answers
+steps:
+  - name: answer
+    does: answers the question the ask carries
+    by: person
+    to: engine
+    evidence:
+      - name: answer
+        form: text
+        says: the answer
+`;
+
 // A verdict short of accept, recorded at the acceptance. [[spec/tickets/the-last-gate-accepts]]
 const SHORT = (returns) => `  - step: accept
     hand: box other
@@ -137,6 +177,8 @@ test("past its cap the process closes became onto a question ticket", () => {
   const record = `record:\n${SHORT(1)}${SHORT(2)}`;
   const files = standing(
     filled(FINAL(record), "## verdict", "reject\n- the work misses a line still"),
+    undefined,
+    { [at("spec/processes/question.yaml")]: QUESTION },
   );
   const made = doors(files, {}, { fails: 2 });
   heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
@@ -148,7 +190,7 @@ test("past its cap the process closes became onto a question ticket", () => {
 });
 
 // [[spec/tickets/the-last-gate-accepts]]
-test("a process inside a delivery skips its acceptance, and the delivery's gate reads it", () => {
+test("a process inside a delivery skips its acceptance", () => {
   const { it } = doors({});
   const loose = "---\nkind: [[ticket]]\n---\n\n# Ask\n\nOne.\n";
   const held = "---\nkind: [[ticket]]\ngroup: one-group\n---\n\n# Ask\n\nOne.\n";
@@ -162,15 +204,84 @@ test("a process inside a delivery skips its acceptance, and the delivery's gate 
     false,
     "a ticket in a delivery skips it",
   );
+});
 
-  const group = readYaml(
-    readFileSync(new URL("../../spec/processes/group.yaml", import.meta.url), "utf8"),
+// A first run finds no verdict, so its diff starts at the first take. [[spec/tickets/first-accept-names-its-base]]
+test("a first run names the diff since the first take", () => {
+  const take = "d".repeat(40);
+  const text = FINAL(
+    `record:\n  - step: implement/change\n    hand: box other\n    hash_before: ${take}\n    hash_after: ${LAST}\n`,
   );
-  const names = group.steps.map((one) => one.name);
-  const gate = group.steps.find((one) => String(one.final) === "true");
-  assert.ok(gate, "the group route carries a final gate");
+  const { it } = doors({});
+  const one = { name: "a-child", text, front: frontOf(text) };
+  assert.match(
+    workAnswer(it, one, leafOf(frontOf(text), "accept")),
+    new RegExp(`since ${take}`),
+  );
+});
+
+// [[spec/tickets/the-last-gate-accepts]]
+test("a final gate stands untakeable while a fix ticket under it stands open", () => {
+  const { it } = doors({});
+  const one = { name: "a-child", text: FINAL() };
+  assert.equal(takeable(it, one, [one, { name: "fix-it", text: FIX }]), "");
+});
+
+// [[spec/tickets/the-last-gate-accepts]]
+test("accept with points at a final gate mints the fix and waits at the gate", () => {
+  const files = standing(
+    filled(
+      FINAL(),
+      "## verdict",
+      "accept with points\n- cut-the-long-line: the list runs long",
+    ),
+    undefined,
+    { [at("spec/processes/trivial.yaml")]: TRIVIAL },
+  );
+  const made = doors(files);
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+
+  const text = made.disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(text, "step"), "accept", "the step stays on the gate");
+  assert.equal(fieldOf(text, "state"), "open");
   assert.ok(
-    names.indexOf(gate.name) > names.indexOf("children"),
-    "the delivery's gate follows its children",
+    entriesOf(frontOf(text)).some((one) => one.step === "accept"),
+    "the record keeps the verdict",
+  );
+  assert.ok(
+    made.disk.exists(at("spec/tickets/cut-the-long-line.md")),
+    "the fix ticket stands",
+  );
+});
+
+// [[spec/tickets/the-last-gate-accepts]]
+test("the reject road closes a final gate past its cap", () => {
+  const record = `record:\n${SHORT(1)}${SHORT(2)}`;
+  const text = FINAL(record);
+  const made = doors(
+    standing(text, undefined, { [at("spec/processes/question.yaml")]: QUESTION }),
+    {},
+    { fails: 2 },
+  );
+  const one = { name: "a-child", text, front: frontOf(text), private: false };
+  const who = { hand: HAND, branch: BRANCH };
+  made.it.root = ROOT;
+  const { said } = heard(() =>
+    rejected(
+      made.it,
+      who,
+      one,
+      leafOf(frontOf(text), "accept"),
+      { hash: SHA },
+      "short still",
+      [],
+    ),
+  );
+
+  assert.match(said, /a-child closes became a-child-question/);
+  assert.ok(
+    made.disk.exists(at("spec/tickets/a-child-question.md")),
+    "the question stands",
   );
 });

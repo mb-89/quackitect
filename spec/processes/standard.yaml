@@ -122,6 +122,18 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    reads: [[spec/guidance/review/design]]
+    input: [ask, implement]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: view
     does: reads the change in the view the ask names
     by: person

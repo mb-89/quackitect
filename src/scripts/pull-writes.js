@@ -45,8 +45,10 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
   );
   const changes = [`passes ${leaf.path}`, ...(more.changes ?? [])];
 
-  let next = leaf.leaves[leaf.at + 1];
-  while (next) {
+  // A final gate's points leave the step on the gate, so it waits on them and reads again. [[spec/design_output/pull#the-final-acceptance]]
+  if (more.stays) changes.push(`waits at ${leaf.path}`);
+  let next = more.stays ? leaf : leaf.leaves[leaf.at + 1];
+  while (next && !more.stays) {
     const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text), text);
     if (when.holds) break;
     text = withEntry(text, { step: next.path, skipped: true, why: when.why }, it.front);
@@ -113,6 +115,7 @@ export function minted(it, who, one, leaf, held, findings, answered) {
   return passed(it, who, one, leaf, held, answered, {
     changes: [`mints ${names}`],
     wrote: built.map((child) => child.at),
+    stays: leaf.final,
   });
 }
 
@@ -206,7 +209,7 @@ export function returnsOf(front, path) {
 }
 
 // [[spec/design_output/pull#became]]
-export function became(it, who, one, leaf, held, successor, answered) {
+export function became(it, who, one, leaf, held, successor, answered, more = {}) {
   const all = ticketsHere(it);
   if (!all.some((held) => held.name === successor)) {
     say(REFUSED, [
@@ -231,8 +234,16 @@ export function became(it, who, one, leaf, held, successor, answered) {
     `[${successor}]`,
     it.front,
   );
-  const finding = landed(it, one, [`closes became ${successor}`]);
-  if (finding) return unlanded(one, leaf, finding);
+  const finding = landed(
+    it,
+    one,
+    [`closes became ${successor}`, ...(more.changes ?? [])],
+    more.wrote ?? [],
+  );
+  if (finding) {
+    for (const at of more.wrote ?? []) it.disk.remove(at);
+    return unlanded(one, leaf, finding);
+  }
   dropHold(it, who.hand);
   const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);

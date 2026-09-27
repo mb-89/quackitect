@@ -18,6 +18,7 @@ import { excludes, handRule, ticketsHere } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { formatted } from "./pull-format.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
+import { acceptRows } from "./pull-accept.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
 const NO_COMMAND = 127;
@@ -29,6 +30,7 @@ export function workAnswer(it, one, leaf) {
     `${WORK}  ${one.name} at ${leaf.path}, leaf ${leaf.at + 1} of ${leaf.of}${phase}`,
   );
   if (leaf.does) rows.push(`      ${leaf.does}`);
+  if (leaf.final) rows.push(...acceptRows(it, one, leaf));
   rows.push("", "# Ask", "", askOf(one.text) || "(the ask stands empty)", "");
 
   // The engine writes the ticket file, so the hand answers the payload alone. [[spec/design_output/pull#the-fields-ride-the-payload]]

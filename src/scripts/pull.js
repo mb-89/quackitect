@@ -441,6 +441,9 @@ export function handBack(it, who, name, verdict) {
   const fails = verdict.said === "fail";
   const answered =
     found.length || becomes ? [] : commandsRun(it, leaf, chapter, fails ? [] : found);
+  // A final gate runs every command field of the route, and the record keeps each answer. [[spec/design_output/pull#the-final-acceptance]]
+  if (leaf.final && !becomes && !found.length)
+    answered.push(...routeRun(it, one, leaf, fails ? [] : found));
   found.push(...handFaults(it, one, leaf, who.hand, held));
 
   if (found.length) return refused(it, who, one, leaf, held, found);
@@ -462,6 +465,28 @@ export function handBack(it, who, name, verdict) {
   // [[spec/design_output/pull#a-finding-rides-out]]
   if (said.findings) return minted(it, who, one, leaf, held, said.findings, answered);
   return passed(it, who, one, leaf, held, answered);
+}
+
+// Every command field the route's other leaves hold a line under, run as the leaf's own run does. [[spec/design_output/pull#the-final-acceptance]]
+function routeRun(it, one, leaf, found) {
+  return leaf.leaves
+    .filter((other) => other.path !== leaf.path)
+    .flatMap((other) => {
+      const chapter = chapterOf(one.text, other.path);
+      const evidence = [other.said.evidence ?? []]
+        .flat()
+        .filter((field) => String(field?.form) === "command")
+        .filter((field) =>
+          String((chapter.fields.get(field.name) ?? [])[0] ?? "").trim(),
+        );
+      if (!evidence.length) return [];
+      return commandsRun(it, { path: other.path, evidence }, chapter, found).map(
+        (ran) => ({
+          ...ran,
+          name: `${other.path}/${ran.name}`,
+        }),
+      );
+    });
 }
 
 // [[spec/design_output/pull#the-hand-back-refused]]

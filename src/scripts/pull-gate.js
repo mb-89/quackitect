@@ -4,6 +4,7 @@
 // [[spec/design_output/pull#the-gate]]
 
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
+import { acceptAsks, acceptCapped } from "./pull-accept.js";
 import { frontOf, OPEN, withEntry, withField } from "../engine/group.js";
 import { dropHold } from "./guidance-hand.js";
 import { roleOf } from "./pull-hand-of.js";
@@ -25,6 +26,9 @@ const REJECTS_BEFORE_PERSON = 2;
 
 // [[spec/design_output/pull#the-gate]]
 export function rejected(it, who, one, leaf, held, reason, answered) {
+  // Past its cap a final gate closes onto a question. [[spec/design_output/pull#the-final-acceptance]]
+  if (leaf.final && acceptCapped(it, one, leaf))
+    return acceptAsks(it, who, one, leaf, held, reason, answered);
   const round = returnsOf(one.front, leaf.path) + 1;
   one.text = withEntry(
     one.text,

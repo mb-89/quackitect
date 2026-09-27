@@ -649,6 +649,26 @@ A step carrying `gate` is a gate: its value names the question it answers, and a
 - A copy keeps no leaf a condition holds, no person step and no earlier copy.
 - Tests-red lists its red files under `red`. `expectedRed` in `src/scripts/red-list.js` reads every ticket past tests-red and short of tests-green. The check's test run leaves those files out and names them.
 
+## The final acceptance
+
+A gate carrying `final: true` reads the whole work, and the process closes on its verdict. [[spec/design_input/level-two#the-final-acceptance]] asks it, and `src/scripts/pull-accept.js` holds it.
+
+| the moment | what the engine does |
+|---|---|
+| the hand-out | waits while a ticket naming this one as `parent` or `group` stands open |
+| the hand-out | names the diff since the base, merges and all |
+| the hand-back | runs every command field of the route, and the record keeps each answer |
+| `accept with points` | mints the fix tickets and leaves the step on the gate, so it waits on them and reads again |
+| a verdict short of accept past `work.failsBeforePerson` | mints a question ticket and closes the process `became` onto it |
+
+| the run | the base of its diff |
+|---|---|
+| a rerun | the `hash_after` of the gate's last verdict |
+| the first run of a ticket | the `hash_before` of its first take |
+| the first run of a group | its merge base with trunk |
+
+The standard route carries its acceptance under `when: backlog`, which holds where the ticket names no group. So a process inside a delivery ends after implement, and the group route's acceptance after `children` reads it.
+
 # A leaf comes back
 
 `ticket pull <ticket> --back <leaf>` puts a leaf back into the hand that

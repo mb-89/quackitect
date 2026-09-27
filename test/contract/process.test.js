@@ -36,6 +36,18 @@ test("the question route opens at a step waiting for a person", () => {
 
 // A standard ticket meets one review, on its design, and goes on to the code. [[spec/tickets/one-review-a-ticket]]
 // [[spec/design_output/pull#the-gate]]
+// A process inside a delivery ends after implement, so the delivery's own acceptance reads its children. [[spec/tickets/the-last-gate-accepts]]
+test("the group route reads its children through a final acceptance", () => {
+  const steps = routeOf("group").steps;
+  const names = steps.map((one) => one.name);
+  const gate = steps.find((one) => String(one.final) === "true");
+  assert.ok(gate, "the group route carries a final gate");
+  assert.ok(
+    names.indexOf(gate.name) > names.indexOf("children"),
+    "it follows the children",
+  );
+});
+
 test("the standard route gates the design once, and its last leaf hands on to the retro", () => {
   const front = routeOf("standard");
 
@@ -48,9 +60,10 @@ test("the standard route gates the design once, and its last leaf hands on to th
       "gate",
       "implement/change",
       "implement/tests-green",
+      "accept",
       "view",
     ],
-    "one gate, and the owner's view the one verdict after the code",
+    "one gate on the design, then the final acceptance and the owner's view after the code",
   );
   const gate = leafOf(front, "gate");
   assert.ok(gate.gate, "the gate names its question, and the schema admits it");

@@ -37,6 +37,16 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    reads: [[spec/guidance/review/design]]
+    input: [ask, children]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
     reads: [[spec/guidance/working]]
     to: retro
