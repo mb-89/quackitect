@@ -11,6 +11,7 @@ import {
 import {
   actionables,
   bindsHere,
+  envOf,
   listOf,
   parse,
   rulesOf,
@@ -184,7 +185,6 @@ export function notesSaid(it, paths) {
 // The notes a leaf's tags resolve, then any a ticket minted before the tags still names under reads. [[spec/design_input/level-two#guidance]]
 export function readsFor(it, leaf, env = it.env ?? {}) {
   if (!leaf) return [];
-  if (!leaf.tags?.length) return leaf.reads;
   const found = resolved(it, leaf.tags, env);
   return [...found, ...leaf.reads.filter((one) => !found.includes(one))];
 }
@@ -200,13 +200,17 @@ export function tagsOf(it, path) {
   return [...new Set([...folders, ...own])];
 }
 
-// Every note under a subfolder whose tags all stand among the step's, where its env binds here. [[spec/design_input/level-two#guidance]]
+// Every note under a subfolder whose tags all stand among the step's, where its env binds here. A note binding an env reaches every step where it binds, since its env picks the hand. [[spec/tickets/cloud-note-reaches-every-step]]
 export function resolved(it, tags, env = {}) {
   const at = it.join(it.root, ...GUIDANCE.split("/"));
   if (!it.disk.exists(at)) return [];
   const has = new Set([tags ?? []].flat().map(String));
   return underFolders(it, at)
-    .filter((path) => tagsOf(it, path).every((one) => has.has(one)))
+    .filter(
+      (path) =>
+        envOf(guidanceText(it, path)).length ||
+        tagsOf(it, path).every((one) => has.has(one)),
+    )
     .filter((path) => bindsHere(guidanceText(it, path), env))
     .sort();
 }

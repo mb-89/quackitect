@@ -212,7 +212,7 @@ test("a first run names the diff since the first take", () => {
   const text = FINAL(
     `record:\n  - step: implement/change\n    hand: box other\n    hash_before: ${take}\n    hash_after: ${LAST}\n`,
   );
-  const { it } = doors({});
+  const { it } = doors({}, {}, { root: ROOT });
   const one = { name: "a-child", text, front: frontOf(text) };
   assert.match(
     workAnswer(it, one, leafOf(frontOf(text), "accept")),

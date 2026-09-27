@@ -109,7 +109,7 @@ One piece of it.
 `;
 
 const handOut = (path) => {
-  const { it } = doors({});
+  const { it } = doors({}, {}, { root: ROOT });
   const one = { name: "a-child", text: GATED, front: frontOf(GATED) };
   return workAnswer(it, one, leafOf(frontOf(GATED), path));
 };

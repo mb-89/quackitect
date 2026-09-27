@@ -92,6 +92,23 @@ test("a note under a subfolder reaches a step carrying all its tags, and its env
   );
 });
 
+// [[spec/tickets/cloud-note-reaches-every-step]]
+test("a note binding an env reaches every step where its env binds, whatever the step's tags", () => {
+  const it = tree();
+  assert.ok(
+    resolved(it, ["code"], { SE_CLOUD: "1" }).includes("spec/guidance/cloud/cloud"),
+    "a code step on a cloud box carries the cloud note",
+  );
+  assert.ok(
+    resolved(it, [], { SE_CLOUD: "1" }).includes("spec/guidance/cloud/cloud"),
+    "a step carrying no tag on a cloud box carries the cloud note",
+  );
+  assert.ok(
+    !resolved(it, ["code"], {}).includes("spec/guidance/cloud/cloud"),
+    "a desk carries no cloud note",
+  );
+});
+
 // [[spec/design_input/level-two#guidance]]
 test("a note no step of any process reaches stands unreached, and a reached one does not", () => {
   assert.deepEqual(unreached(tree()), []);
