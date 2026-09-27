@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: implement/tests-green
+step: design/review
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -110,6 +110,9 @@ record:
         exit: 0
         said: The rules pass.
     def: 21d63335f32dfcda
+  - step: design/review
+    hand: the engine
+    stale: design/draft
 ---
 
 # Ask
