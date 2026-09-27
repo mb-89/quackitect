@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -191,7 +191,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d7db8e8df0103 · claude-code-remote
+    hash_before: 7578df0490f560f353791417ce1853bee742413a
+    hash_after: 7578df0490f560f353791417ce1853bee742413a
+    inputs:
+      - name: retro/write
+        hash: d5d7bfc6d26983f3
+        size: 1928
+    def: 4da1ca5da87d5bbc
 depends_on: ["the-engine-holds-the-route"]
+reason: done
 ---
 
 # Ask
@@ -331,20 +341,28 @@ the chapter names the role and carries no name, address or box path
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+10:17 a git trial in the scratchpad, which level zero refuses as a repository write
+no host, right or install stood missing
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+10:15 the shell hook asking a ticket before branch take hands one out
+10:19 LandingFollowsItsGate on a piped test chained into the commit verb
+no conflict at sync, no trunk guard, no cap, and no test failing on the box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step parks
+no ticket stands minted with no group
+the group passes its retro, and branch done hands the branch back for the merge
 
 # Discussion
 
