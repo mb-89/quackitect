@@ -78,6 +78,7 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [the-badge-reads-open-tasks]
+group: open-tasks-switch-lands
 ---
 
 # Ask

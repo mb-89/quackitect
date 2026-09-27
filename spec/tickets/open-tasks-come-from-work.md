@@ -77,12 +77,13 @@ steps:
 step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-depends_on: [the-queue-moves-to-plan, groups-carry-the-cloud-marker]
+depends_on: [the-queue-becomes-a-module]
+group: open-tasks-shadow-lands
 ---
 
 # Ask
 
-`work/rows` and `work/open-tasks` stand in the work module, ported from `work-answer.js`, and read the cloud marker and no git.
+`work/rows` and `work/open-tasks` stand in `src/modules/work`, ported from `work-answer.js`. They read the names of the queue module and the cloud marker, and no git. The tests run through `q/qtest` alone.
 
 The badge and the header then read one provider. Without it they keep counting two ways.
 
