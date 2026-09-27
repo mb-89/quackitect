@@ -162,6 +162,8 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 
 <!-- the form is command -->
 
+    ./RUNME.sh retro notes
+
 ## write
 
 <!-- writes the retro over the box's own window -->
