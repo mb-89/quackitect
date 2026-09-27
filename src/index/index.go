@@ -13,8 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	_ "github.com/mattn/go-sqlite3" // the real SQLite, through cgo, so FTS5 answers
-	"quackitect/pointer"
+	_ "modernc.org/sqlite" // SQLite in pure Go, with FTS5. [[spec/design_output/index#the-compiler-it-needs]]
+	"quackitect/src/pointer"
 )
 
 const shape = `
@@ -48,6 +48,7 @@ CREATE INDEX IF NOT EXISTS link_target ON link (target);
 CREATE INDEX IF NOT EXISTS link_to ON link (to_path);
 CREATE VIRTUAL TABLE IF NOT EXISTS note_text USING fts5 (path UNINDEXED, id, body);
 CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNINDEXED, text);
+CREATE TABLE IF NOT EXISTS op (id TEXT PRIMARY KEY, body TEXT NOT NULL);
 `
 
 const version = "3"
@@ -95,7 +96,7 @@ func ownsGit(abs string) bool {
 }
 
 func Open(root, at string) (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", dsn(at))
+	db, err := sql.Open("sqlite", dsn(at))
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +111,7 @@ func Open(root, at string) (*sql.DB, error) {
 	if err := removeFile(at); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return nil, err
 	}
-	db, err = sql.Open("sqlite3", dsn(at))
+	db, err = sql.Open("sqlite", dsn(at))
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +122,7 @@ func Open(root, at string) (*sql.DB, error) {
 }
 
 func dsn(at string) string {
-	return "file:" + at + "?_journal_mode=WAL&_busy_timeout=5000&_synchronous=NORMAL"
+	return "file:" + at + "?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)&_pragma=synchronous(NORMAL)"
 }
 
 func fresh(db *sql.DB, root string) bool {

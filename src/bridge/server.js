@@ -11,6 +11,7 @@ import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
+import { front } from "../doors/front.js";
 import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
@@ -316,6 +317,8 @@ export function boxOf(method, work = method, doors = {}) {
     disk: files,
     clock: time,
     proc: outside,
+    // [[spec/tickets/go-writes-the-frontmatter]]
+    front: doors.front ?? front(files, outside, method),
     index: doors.index ?? index(files, outside, time, method, work),
     vale: doors.vale ?? vale(files, outside, method, work),
     biome: doors.biome ?? biome(files, outside, method),

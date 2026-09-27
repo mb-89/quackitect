@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import {
   fieldOf,
@@ -120,7 +121,7 @@ test("take leaves a group whose open children no hand on this box can take at to
     '    does: makes the change the ask names\n    needs: ["nowhere here"]\n',
   );
   const { it, outside } = doorsSaying(groupRemote(), {
-    [on("one-group")]: withField(GROUP_NOTE, "step", "children"),
+    [on("one-group")]: withField(GROUP_NOTE, "step", "children", fakeFront()),
     [on("a-child")]: parked,
     ...HAND,
   });
@@ -149,7 +150,7 @@ const NEEDS = CHILD("one-group", "open").replace(
 );
 const taking = (files) => {
   const { it } = doorsSaying(groupRemote(), {
-    [on("one-group")]: withField(GROUP_NOTE, "step", "children"),
+    [on("one-group")]: withField(GROUP_NOTE, "step", "children", fakeFront()),
     ...files,
     ...HAND,
   });
@@ -290,11 +291,15 @@ test("a take whose sync conflicts after the claim still hands the box its ask", 
 
 // [[spec/design_output/work#the-take-writes-the-record]]
 test("a take on a box holding its branch hands the ask again, and claims nothing new", () => {
-  const held = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box d462e994b4cef",
-    hash_before: SHA,
-  });
+  const held = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box d462e994b4cef",
+      hash_before: SHA,
+    },
+    fakeFront(),
+  );
   for (const argv of [["take"], ["take", "another-group"]]) {
     const { it, outside } = doorsSaying(groupRemote(held), {
       [on("one-group")]: held,
@@ -320,16 +325,20 @@ test("a take on a box holding its branch hands the ask again, and claims nothing
 
 // [[spec/design_output/work#held-derives-from-the-record]]
 test("a group holds where the record says so, and stands free where it says nothing", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
 
   assert.equal(groupStanding(GROUP_NOTE), TODO);
   assert.equal(groupStanding(took), HELD);
-  assert.equal(groupStanding(withHashAfter(took, "d4e5f6")), TODO);
-  assert.equal(groupStanding(withField(took, "state", "closed")), DONE);
+  assert.equal(groupStanding(withHashAfter(took, "d4e5f6", fakeFront())), TODO);
+  assert.equal(groupStanding(withField(took, "state", "closed", fakeFront())), DONE);
   assert.equal(groupStanding(""), "");
 });
 
@@ -338,7 +347,11 @@ test("list names a group and a loose ticket, each on its own row", () => {
   const loose = CHILD("one-group", "open").replace("group: one-group\n", "");
   const { it } = doorsSaying(
     groupRemote(
-      withEntry(GROUP_NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" }),
+      withEntry(
+        GROUP_NOTE,
+        { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
+        fakeFront(),
+      ),
       {
         when: 1767225600,
         objects: {
@@ -415,11 +428,15 @@ test("a branch carrying no group names no ticket, and a child with no step says 
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 test("a group held past staleAfter stands under yours, with its three answers", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const doors = (stale) => {
     const said = doorsSaying(groupRemote(took, { when: 1767225600 }));
     said.it.clock = fakeClock("2026-01-01T03:00:00.000Z");
@@ -438,7 +455,7 @@ test("a group held past staleAfter stands under yours, with its three answers", 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 test("merge runs the check on the merge commit, and undoes the merge on red", () => {
   const red = {
-    [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
+    [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
       exitCode: 1,
       stdout: "two tests fail\n",
     },
@@ -455,6 +472,25 @@ test("merge runs the check on the merge commit, and undoes the merge on red", ()
     ranGit(outside).includes(`git reset --hard ${SHA}`),
     "trunk stands where it was",
   );
+});
+
+// The check under --errors prints the red cases alone, and the merge hands each one on. [[spec/tickets/the-verbs-need-no-wrapper]]
+test("merge on a red check prints each failing case the check names", () => {
+  const red = {
+    [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
+      exitCode: 1,
+      stdout:
+        "test/level0/one.test.js: a first case: it broke\ntest/level0/two.test.js: a second case: it broke\n",
+    },
+  };
+  const { it } = doorsSaying(merging(red));
+  it.node = "node";
+
+  const { code, said } = heard(() => work(ROOT, ["merge", "one-group"], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /one\.test\.js: a first case/, "the first case");
+  assert.match(said, /two\.test\.js: a second case/, "and the second");
 });
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
@@ -495,11 +531,15 @@ test("merge frees an open ticket of the group it takes in, and leaves a closed o
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 test("release writes hash_after onto a held group, and frees it for anybody", () => {
-  const took = withEntry(GROUP_NOTE, {
-    step: "sync",
-    hand: "box 3f9a",
-    hash_before: "a1b2c3",
-  });
+  const took = withEntry(
+    GROUP_NOTE,
+    {
+      step: "sync",
+      hand: "box 3f9a",
+      hash_before: "a1b2c3",
+    },
+    fakeFront(),
+  );
   const { it, outside, disk } = doorsSaying(groupRemote(took), {
     [on("one-group")]: took,
   });
@@ -527,6 +567,7 @@ test("release on a group nobody holds writes nothing, and says so", () => {
 // [[spec/design_output/work#a-merged-branch-closes]]
 test("close drops a group's branch once trunk holds it", () => {
   const { it, outside } = doorsSaying({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
     "git rev-list --count origin/main..main": { stdout: "0\n" },
     "git branch -r --merged origin/main": {
       stdout: "  origin/main\n  origin/work/one-group\n",

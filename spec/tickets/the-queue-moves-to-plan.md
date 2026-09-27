@@ -74,11 +74,15 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-group: open-tasks-land-in-shadow
 depends_on: [the-tickets-topic-lands]
+record:
+  - step: design/draft
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 4ea861630244956d5302df5592328b58086c84a7
+    hash_after: 4ea861630244956d5302df5592328b58086c84a7
 ---
 
 # Ask
@@ -103,11 +107,30 @@ The count reads the queue. Without the port the pilot reads JavaScript it means 
 
 <!-- the form is text -->
 
+A new package `src/plan` ports the two pure halves of the queue, as functions over rows a caller hands in. It reads no git and no file, so the work module feeds it next.
+
+| the Go function | the JavaScript it ports |
+|---|---|
+| `Queued(list, all, at)` | `queued`, with `waitsUnder`, `chainUnder`, `failsOn` and `daysStood` in `src/scripts/pull-queue.js` |
+| `Outline(persons, held, rest, all, places)` | `outlineIn`, with `kidsOf`, `bestUnder`, `anchored`, `levelOf` and `numberUnder` in `src/scripts/pull-outline.js` |
+| `Compare(left, right)` | `compareOutline` and `segmentsOf` |
+| `First`, `Last`, `End`, `CloudPlace` | the four words the outline file exports |
+
+A row carries what the two read off a ticket: the name, the path, the group, the todo, the mark, `depends_on`, the failed hand-backs and the plan's order. `tickets.Ticket` takes `DependsOn` and `Fails`, so a row comes off the one reading. The day a ticket came in stays an input, a map by path, because git is live input nowhere. The work module names its source.
+
+The golden file `src/plan/testdata/queue.golden.json` holds one real run of the queue. `placesIn` in `src/scripts/work-answer.js` takes an optional `it.capture`, and hands it the free lists before the sort, the rows in hand, every row, the overrides, the add days, the weights, the clock and the answer. `test/level0/queue-golden.js` runs `placesIn` over this tree with that hook and writes the file. The Go test replays the inputs and compares every place to the answer.
+
+One difference stands in the port: a tie in JavaScript reads the name through `localeCompare`, and Go compares bytes. The golden file shows whether any tie in this tree meets it.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/work-answer.js`, `placesIn`, which takes the capture hook
+- `src/tickets/tickets.go`, `Of`, which reads `depends_on` and the failed hand-backs
+- the Go port has no caller yet, and [[spec/tickets/open-tasks-come-from-work]] calls it
 
 ### tests
 
@@ -115,17 +138,37 @@ The count reads the queue. Without the port the pilot reads JavaScript it means 
 
 <!-- the form is list -->
 
+- `src/plan/queue_test.go`, `TestTheMarkStandsOverTheScore`
+- `src/plan/queue_test.go`, `TestABlockerOfABlockerCounts`
+- `src/plan/queue_test.go`, `TestATieKeepsThePlansOrder`
+- `src/plan/outline_test.go`, `TestAPersonsRowCountsDown`
+- `src/plan/outline_test.go`, `TestATodoStandsBeforeTheRowItNames`
+- `src/plan/outline_test.go`, `TestPlacesCompareAsNumbers`
+- `src/plan/golden_test.go`, `TestQueueGolden`, which decides the golden line of the ask
+- `src/tickets/tickets_test.go`, `TestOfReadsTheWaitsAndTheFails`
+
+The done lines and the test deciding each:
+
+- `go test ./...` passes: `go test ./...` from the root
+- the golden file: `TestQueueGolden`
+- the check: `./RUNME.sh check`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every function the approach names stands opened in `pull-queue.js`, `pull-outline.js` and `placesIn` in `work-answer.js`
+- the callers come off a search for `queued`, `outlineIn` and `compareOutline` over the tree
+- each done line names its test, and the golden line names `TestQueueGolden`
 
 ## review
 
@@ -208,3 +251,5 @@ The count reads the queue. Without the port the pilot reads JavaScript it means 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The sentence naming `it.capture` under the approach runs past the cap, and the full check stops on it. The review sends it back to the draft to split, because the door keeps every other hand out of the approach. [[spec/tickets/rationale-drops-release-row]] waits on that split to pass.

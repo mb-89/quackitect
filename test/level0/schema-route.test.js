@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { placeholderFaults } from "../../.claude/skills/level0/lib/schema-body.js";
 import { mintNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema-read.js";
@@ -147,7 +148,7 @@ test("a chapter missing for a step is refused, and a chapter naming none too", (
 
 // [[spec/design_output/schema#the-render-follows-the-tree]]
 test("mint writes the route as a block, and a chapter per step under it", () => {
-  const text = mintNote(ROUTED);
+  const text = mintNote(ROUTED, {}, fakeFront());
   assert.match(text, /steps:\n {2}- name: do\n {4}does: makes the change\n/);
   assert.match(text, /# do\n\n<!-- makes the change -->\n/);
   assert.match(
@@ -159,7 +160,7 @@ test("mint writes the route as a block, and a chapter per step under it", () => 
 
 // [[spec/design_output/schema#a-placeholder-stands-at-warning]]
 test("a field stands at warning while it is empty, and a step's chapter never does", () => {
-  const left = placeholderFaults(mintNote(ROUTED), ROUTED, ROUTE);
+  const left = placeholderFaults(mintNote(ROUTED, {}, fakeFront()), ROUTED, ROUTE);
   assert.deepEqual(
     left.map((one) => one.message.split(" ")[0]),
     ["Ask", "change"],

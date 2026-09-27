@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import {
   PATCH,
   patchSpec,
@@ -60,6 +61,7 @@ function routed(seed = {}) {
     disk,
     clock: fakeClock(),
     log: fakeLog(),
+    front: fakeFront(),
     proc: { run: () => ({ exitCode: 1, stdout: "", stderr: "" }) },
     index: {
       dead: () => "",
@@ -280,6 +282,7 @@ function commitDoors() {
     root: ROOT,
     method: ROOT,
     join,
+    front: fakeFront(),
     node: "node",
     git,
     disk: fakeDisk(TICKETS),

@@ -1,18 +1,18 @@
-// A produced vehicle stands on its own: its own identity, its own verbs, and
-// no path reaching back to the tree it came out of. It runs over a fake
-// install, so it reaches no network, no editor and no home of a person.
+// A produced vehicle stands on its own: its own identity, its own roots, and
+// no path reaching back to the tree it came out of. It runs off a fixture root
+// holding the marker, the run script, the package and a private folder, so a
+// case copies a handful of files in place of the whole method.
 // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { after, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { IDENTITY, MARKER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { identityHere, produce } from "../../src/scripts/vehicle.js";
-import { FETCHING } from "./fetching.js";
+import { identityHere, produce, rootsHere } from "../../src/scripts/vehicle.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -28,39 +28,45 @@ const SHELL =
   process.platform === "win32"
     ? (GIT_BASH.find((one) => files.exists(one)) ?? "bash")
     : "sh";
-const quoted = (said) => String(said).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const either = (path) => `(?:${quoted(path)}|${quoted(path.split("\\").join("/"))})`;
+const slashed = (path) => String(path).split("\\").join("/");
 
-// One vehicle serves every case, because producing one writes every file of the method, and the cases read it in order. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+// The fixture's files that travel, and the private one that stays behind. [[spec/design_output/vehicle#what-travels-into-a-vehicle]]
+const TRAVELS = [MARKER, "RUNME.sh", "package.json"];
+const PRIVATE = ".se/held.md";
+
+// One fixture and one vehicle serve every case, and the cases read them in order. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
 const where = files.tempDir("vehicle-");
+const method = join(where, "method");
 const dest = join(where, "vehicle");
 after(() => files.remove(where));
 
-test("a vehicle carries the method, its run bits, and no private material", () => {
-  const put = produce(files, root, dest);
-  assert.equal(put.ok, true);
-  assert.ok(put.count > 100, `a whole method comes over, and this says ${put.count}`);
+for (const path of [...TRAVELS, PRIVATE]) {
+  files.makeDir(dirname(join(method, path)));
+  files.write(join(method, path), path === "RUNME.sh" ? "#!/bin/sh\n" : "{}\n");
+}
+files.runnable(join(method, "RUNME.sh"));
 
-  for (const path of ["RUNME.sh", "package.json", ".vale.ini"]) {
+test("a vehicle carries the fixture's marker and run bits, and leaves its private folder behind", () => {
+  const put = produce(files, method, dest);
+  assert.equal(put.ok, true, put.why);
+  assert.equal(put.count, TRAVELS.length, "the files that travel, and no more");
+
+  for (const path of TRAVELS) {
     assert.ok(files.exists(join(dest, path)), `${path} travels`);
   }
-  assert.ok(
-    files.exists(join(dest, ".claude/skills/level0/.claude-plugin/plugin.json")),
-    "the vehicle carries the marker, so it reads as a method root",
-  );
-  for (const path of [".git", ".se", "node_modules"]) {
-    assert.equal(files.exists(join(dest, path)), false, `${path} stays behind`);
-  }
+  assert.equal(files.exists(join(dest, ".se")), false, ".se stays behind");
 
   const ran = outside.run([SHELL, "-c", "test -x RUNME.sh"], { cwd: dest });
   assert.equal(ran.exitCode, 0, "RUNME.sh comes over runnable");
 });
 
+// Another hand made the method's identity, so it carries another pid, and two ids made in one millisecond stand apart. [[spec/design_output/vehicle#what-a-vehicle-needs]]
 test("a vehicle makes an identity of its own", () => {
-  const mine = identityHere(files, clock(), root, process.pid);
+  const mine = identityHere(files, clock(), method, process.pid + 1);
   const other = identityHere(files, clock(), dest, process.pid);
 
   assert.ok(other, "the vehicle answers an identity");
+  assert.ok(files.exists(join(dest, IDENTITY)), "and writes it inside itself");
   assert.notEqual(
     other,
     mine,
@@ -69,34 +75,18 @@ test("a vehicle makes an identity of its own", () => {
   assert.equal(identityHere(files, clock(), dest, process.pid), other, "and keeps it");
 });
 
-// The vehicle borrows the method's modules through a link and the survey this box wrote, so its install fetches nothing and probes nothing. [[spec/design_output/vehicle#a-vehicle-stands-alone]]
-function fakeInstall(dest) {
-  files.link(join(root, "node_modules"), join(dest, "node_modules"));
-  files.makeDir(dirname(join(dest, ...TOOLS.split("/"))));
-  files.copy(join(root, ...TOOLS.split("/")), join(dest, ...TOOLS.split("/")));
-}
+// The vehicle verb reads its roots through `rootsHere`, so the roots it answers are the verb's. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
+test("a vehicle names itself as method and work, with no tree behind it", () => {
+  const pair = rootsHere(files, {}, dest);
 
-test("a vehicle answers its own verbs, with no tree behind it", () => {
-  fakeInstall(dest);
-
-  // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
-  const home = join(where, "home");
-  files.makeDir(join(home, ".vscode", "extensions"));
-  const said = outside.run([SHELL, "RUNME.sh", "vehicle"], {
-    cwd: dest,
-    env: { HOME: home, USERPROFILE: home, SE_INSTALL_SKIP: FETCHING },
-  });
-  assert.equal(said.exitCode, 0, said.stderr);
-  assert.match(
-    said.stdout,
-    new RegExp(`method\\s+${either(dest)}`),
-    "it names itself as method",
-  );
-  assert.match(said.stdout, new RegExp(`work\\s+${either(dest)}`), "and as work");
-  assert.match(said.stdout, /drives itself/);
-  assert.equal(
-    said.stdout.includes(root),
-    false,
-    "nothing in the answer reaches the tree it came from",
-  );
+  assert.equal(slashed(pair.method), slashed(dest), "it names itself as method");
+  assert.equal(slashed(pair.work), slashed(dest), "and as work");
+  assert.equal(pair.itself, true, "it drives itself");
+  for (const path of [root, method]) {
+    assert.equal(
+      JSON.stringify(pair).includes(slashed(path)),
+      false,
+      `nothing in the answer reaches ${path}`,
+    );
+  }
 });

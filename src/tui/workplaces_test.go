@@ -10,8 +10,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/tui/frame"
-	"quackitect/tui/work"
+	"quackitect/src/tui/frame"
+	"quackitect/src/tui/work"
 )
 
 const answerSaid = `{

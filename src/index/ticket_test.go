@@ -4,8 +4,9 @@
 package main
 
 import (
-	"strings"
 	"testing"
+
+	"quackitect/src/tickets"
 )
 
 const heldGroup = `---
@@ -135,40 +136,17 @@ func TestAStandingReadsOffTheGroupsRecordThroughTheTicket(t *testing.T) {
 		t.Fatal(err)
 	}
 	rows := byName(said)
-	if rows["one-group"].Standing != standingHeld {
+	if rows["one-group"].Standing != tickets.StandingHeld {
 		t.Fatalf("a record entry carrying hash_before and no hash_after holds the group, and it stands at %q", rows["one-group"].Standing)
 	}
-	if rows["a-child"].Standing != standingHeld {
+	if rows["a-child"].Standing != tickets.StandingHeld {
 		t.Fatalf("a child stands where its group's branch stands, and it stands at %q", rows["a-child"].Standing)
 	}
-	if rows["old-group"].Standing != standingDone || rows["an-old-child"].Standing != standingDone {
+	if rows["old-group"].Standing != tickets.StandingDone || rows["an-old-child"].Standing != tickets.StandingDone {
 		t.Fatal("a closed group stands done, and its child with it")
 	}
 	if rows["a-loose-one"].Standing != "" {
 		t.Fatalf("a ticket in no group carries no standing, and reads %q", rows["a-loose-one"].Standing)
-	}
-}
-
-// A note keeps its state, and its route says what it is, which the tab draws as a letter. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
-func TestANoteKeepsItsStateAndNamesItsRoute(t *testing.T) {
-	t.Parallel()
-	note := "---\nkind: [[ticket]]\nstate: open\nprocess: [[note]]\n---\n\n# Ask\n\nA thought.\n"
-	said := ticketOf(".se/tickets/parked.md", "parked", note, 1)
-	if said.State != openState || said.Route != "note" {
-		t.Fatalf("a note reads open on the route note, and reads %+v", said)
-	}
-	if strings.Contains(said.Route, "/") {
-		t.Fatal("the route reads as its bare name")
-	}
-}
-
-// A todo names the row the ticket stands before, or reads true, and either lights the flag. [[spec/design_output/pull#the-queue-is-an-outline]]
-func TestATodoNamingARowLightsTheFlag(t *testing.T) {
-	t.Parallel()
-	for said, want := range map[string]bool{"true": true, "a-loose-one": true, `"a-loose-one"`: true, "false": false, "": false} {
-		if todoIn(said) != want {
-			t.Fatalf("todo %q reads %v", said, want)
-		}
 	}
 }
 
@@ -184,20 +162,5 @@ func TestATicketStandsOnlyDirectlyUnderTheTicketFolders(t *testing.T) {
 	}
 	if len(said) != 5 {
 		t.Fatalf("a ticket-kind note outside the two ticket folders answers no ticket, and the index answers %d", len(said))
-	}
-}
-
-func TestAGroupNobodyHoldsStandsAtTodo(t *testing.T) {
-	if heldIn("state: open\nrecord:\n  - step: sync\n    hash_before: aaa\n    hash_after: bbb\n") {
-		t.Fatal("an entry with both hashes holds nothing")
-	}
-	if heldIn("state: open\nsteps:\n  - name: do\n") {
-		t.Fatal("a ticket with no record holds nothing")
-	}
-	if !heldIn("record:\n  - step: sync\n    hash_before: aaa\nurgent: true\n") {
-		t.Fatal("an open entry holds the group, whatever key follows the record")
-	}
-	if groupStanding("open", "steps:\n  - name: do\n") != standingTodo {
-		t.Fatal("a group nobody holds stands at todo")
 	}
 }

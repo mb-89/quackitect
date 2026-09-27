@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -77,6 +78,23 @@ func stringOf(one any) string {
 		return text
 	}
 	return fmt.Sprint(one)
+}
+
+// A count the reader answers, or zero where the key stands nowhere. [[spec/design_output/config#the-go-reader]]
+func Count(root, key string) int {
+	said, held := Value(root, key)
+	if !held {
+		return 0
+	}
+	switch one := said.(type) {
+	case float64:
+		return int(one)
+	case string:
+		if whole, err := strconv.Atoi(strings.TrimSpace(one)); err == nil {
+			return whole
+		}
+	}
+	return 0
 }
 
 func read(root, path string) map[string]any {

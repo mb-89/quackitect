@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { heldIn, withField } from "../../src/engine/group.js";
 import { work } from "../../src/scripts/work.js";
 import { trigger } from "../../src/scripts/work-free.js";
@@ -30,8 +31,8 @@ const shared = (value) => JSON.stringify({ migration: { phase2switch: value } })
 
 // Two free groups: the first names the switch, and the second names none. Each holds a child a hand takes. [[spec/design_output/work#a-switch-holds-a-group]]
 function twoGroups(value, files = {}) {
-  const first = switched(withField(GROUP_NOTE, "step", "children"));
-  const second = withField(GROUP_NOTE, "step", "children");
+  const first = switched(withField(GROUP_NOTE, "step", "children", fakeFront()));
+  const second = withField(GROUP_NOTE, "step", "children", fakeFront());
   const answers = {
     ...remoteSaying(
       [

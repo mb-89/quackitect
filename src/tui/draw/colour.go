@@ -12,7 +12,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/muesli/termenv"
 
-	"quackitect/config"
+	"quackitect/src/config"
 )
 
 // The file the colours stand in, under the folder the Vale styles share. [[spec/design_output/tui#colours]]

@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"strings"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 // The paths the vocabulary layer names, and the defaults where it names none. [[spec/design_output/lsp#the-hover-shows-a-term]]

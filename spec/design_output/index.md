@@ -367,27 +367,22 @@ read as broken links forever, which costs `dangling` its meaning.
 
 ## The compiler it needs
 
-SQLite arrives through cgo, because the C build carries FTS5 and answers faster
-than a walk. So a build needs a C compiler, and this tree takes them in order:
+The index builds with Go alone. SQLite arrives through a pure Go driver
+carrying FTS5 and `bm25`, so every build runs with `CGO_ENABLED=0` and no C
+compiler.
 
-| what stands | what the build uses |
+| the part | what it holds |
 |---|---|
-| the pinned Zig in `.se/.runtime/bin/zig` | `CC=<zig> cc` |
-| a working `cc`, `gcc` or `clang` | that one |
-| neither | the installer downloads the pinned Zig, and builds with it |
+| the root `go.mod` | the driver's pin |
+| `src/scripts/install.sh` | the index build, beside the language server's |
+| `goEnvOf` in `src/scripts/cli-go.js` | the environment every Go test runs under |
 
-`src/scripts/install.sh` holds the pin. The installer compiles a probe file, because a name on
-the PATH answers `--version` from a wrapper carrying no backend. Such a wrapper
-fails on the first translation unit, deep inside the SQLite build, where the
-fault reads as anything but a missing compiler.
-
-`GOFLAGS=-tags=sqlite_fts5` rides with the compiler in one place. The driver
-compiles the full-text module in only when asked, so a build carrying the one
-carries the other.
+The driver pin stays on a release asking for the Go the root `go.mod` names.
+For the reasoning, see [[spec/rationales/the-index-drops-cgo]].
 
 The battery runs each module's tests, then the Go formatter over that module's
 folder. A file the formatter writes another way turns the check red, and the
-check names that file. `formatFaults` in `src/scripts/go-tests.js` writes the
+check names that file. `formatFaults` in `src/scripts/cli-go.js` writes the
 findings, and a case drives it. A box carrying no formatter leaves the gate
 silent, the way a box carrying no Go leaves the tests unrun.
 

@@ -3,7 +3,11 @@
 // route as JSON, checks it with `aheadOnly`, and answers JSON on both roads.
 // [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 
-import { canonicalOf, entriesIn, readNote } from "../../.claude/skills/level0/lib/schema.js";
+import {
+  canonicalOf,
+  entriesIn,
+  readNote,
+} from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 
 const FLAG = "--steps=";
@@ -74,8 +78,12 @@ export function routed(it, at, argv, schema) {
   const said = aheadOnly(front, steps);
   if (said.why) return answer(1, { refused: said.why, at: said.at });
 
-  it.disk.write(at.path, reRouted(text, schema, said.steps));
-  return answer(0, { ticket: at.said, step: String(front.step ?? ""), steps: said.steps });
+  it.disk.write(at.path, reRouted(text, schema, said.steps, "", it.front));
+  return answer(0, {
+    ticket: at.said,
+    step: String(front.step ?? ""),
+    steps: said.steps,
+  });
 }
 
 function listIn(said) {

@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fileURLToPath } from "node:url";
 import { disk as realDisk } from "../../src/doors/disk.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
@@ -113,6 +114,7 @@ function doors(more = {}) {
     proc: said.proc,
     disk,
     git: said,
+    front: fakeFront(),
     join,
     clock: fakeClock(),
     agent: true,

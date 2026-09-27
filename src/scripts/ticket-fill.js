@@ -40,7 +40,11 @@ export function filled(it, at, argv, schemas) {
     return 2;
   }
 
-  const made = mintedNote(schemas, { kind: "ticket", path: at.said, fields: copied.fields });
+  const made = mintedNote(
+    schemas,
+    { kind: "ticket", path: at.said, fields: copied.fields },
+    it.front,
+  );
   if (made.why) {
     console.error(made.why);
     return 2;

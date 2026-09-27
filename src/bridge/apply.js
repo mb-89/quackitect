@@ -22,6 +22,7 @@ import {
   FOLDER as UNDONE,
   undoSpec,
 } from "../../.claude/skills/level0/lib/undo.js";
+import { ticketNamed } from "../engine/group.js";
 import { FIELD_HOW, ticketFault } from "../engine/named.js";
 import { onWrite } from "./write.js";
 
@@ -65,7 +66,12 @@ async function lands(e, took, box) {
   const refused = await checked(took, box, e.agentId);
   if (refused) return { result: { result: refused } };
   if (e.preview === true) return { result: { result: wouldLand(took) } };
-  const wrote = writes(took, String(e.on ?? ""), box);
+  const wrote = writes(
+    took,
+    String(e.on ?? ""),
+    box,
+    ticketNamed(String(e.ticket ?? "")),
+  );
   // A break of form lands with the batch, and its note rides the answer. [[spec/design_output/level0#the-panel-holds-a-warning]]
   const warned = wrote.landed ? (took.warned ?? []) : [];
   return { result: { result: [wrote.said, ...warned].join("\n\n") } };
@@ -100,10 +106,10 @@ async function checked(took, box, agentId) {
 }
 
 // [[spec/design_output/apply#the-journal-holds-both-halves]]
-function writes(took, on, box) {
+function writes(took, on, box, ticket) {
   const at = box.clock.stamp();
   const where = join(box.root, UNDONE, nameOf(at));
-  const journal = journalOf(at, on, "level0", took.files);
+  const journal = journalOf(at, on, "level0", took.files, ticket);
   try {
     box.disk.makeDir(join(box.root, UNDONE));
     box.disk.write(where, `${JSON.stringify(journal, null, 2)}\n`);

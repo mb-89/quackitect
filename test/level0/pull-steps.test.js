@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
 import {
@@ -56,14 +57,18 @@ test("a hand-back meeting the refusal cap fails the leaf back, carrying the find
 
 // [[spec/design_output/pull#a-person-step-goes-in]]
 test("a person step carries its reader, and a colon takes quotes", () => {
-  const once = withEntry(CHILD("open", "design/review"), {
-    step: "design/review",
-    hand: "box other",
-    hash_before: "aaaa",
-    hash_after: "aaaa",
-    returns: 1,
-    why: "thin",
-  });
+  const once = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/review",
+      hand: "box other",
+      hash_before: "aaaa",
+      hash_after: "aaaa",
+      returns: 1,
+      why: "thin",
+    },
+    fakeFront(),
+  );
   const twice = filled(once, "### verdict", "fail\n- still thin");
   const { it } = doors(standing(twice), {}, { fails: 2, cloud: false });
   const rooted = { ...it, root: ROOT };
@@ -91,14 +96,18 @@ test("a person step carries its reader, and a colon takes quotes", () => {
   );
   assert.equal(withEngineReader(rooted, { text: now }), "");
 
-  const colon = withEntry(CHILD("open", "design/review"), {
-    step: "design/review",
-    hand: "box other",
-    hash_before: "aaaa",
-    hash_after: "aaaa",
-    returns: 1,
-    why: "thin",
-  });
+  const colon = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/review",
+      hand: "box other",
+      hash_before: "aaaa",
+      hash_after: "aaaa",
+      returns: 1,
+      why: "thin",
+    },
+    fakeFront(),
+  );
   const asked = {
     name: "a-child",
     text: filled(colon, "### verdict", "fail\n- breaks Sentence at line 2: too long"),
@@ -201,14 +210,18 @@ test("a command answering the wrong word or exit refuses the hand-back, and the 
 
 // [[spec/design_output/pull#the-hand-back-matches-the-hold]]
 test("a hand-back the record answers gets the recorded answer, and a stale take hash gets refused", () => {
-  const answered = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
+  const answered = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/draft",
+      hand: HAND,
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
   const { it, disk } = doors(
-    standing(answered, withField(GROUP_NOTE, "step", "children")),
+    standing(answered, withField(GROUP_NOTE, "step", "children", fakeFront())),
   );
   disk.write(
     HOLD,
@@ -269,7 +282,10 @@ test("a rejected push fetches, rebases the commit, tries once more, and then ans
   heard(() => pulling(ROOT, ["pull"], stuck.it));
   const refused = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], stuck.it));
   assert.equal(refused.code, 1);
-  assert.match(refused.said, /work\/one-group moves on origin, and one rebase falls short/);
+  assert.match(
+    refused.said,
+    /work\/one-group moves on origin, and one rebase falls short/,
+  );
   assert.ok(ranGit(stuck.outside).includes("git rebase --abort"));
   assert.equal(
     stuck.disk.exists(HOLD),
@@ -326,7 +342,9 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
     "  - name: design\n",
     '  - name: design\n    needs: ["deploy now"]\n',
   );
-  const { it } = doors(standing(child, withField(GROUP_NOTE, "step", "children")));
+  const { it } = doors(
+    standing(child, withField(GROUP_NOTE, "step", "children", fakeFront())),
+  );
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
@@ -341,17 +359,21 @@ test("a group whose open children all wait stands at children, and hands no retr
     .replace("        not: draft\n", "")
     .replace("  - name: design\n", '  - name: design\n    needs: ["deploy now"]\n');
   const { it, disk } = doors(
-    standing(parked, withField(GROUP_NOTE, "step", "children")),
+    standing(parked, withField(GROUP_NOTE, "step", "children", fakeFront())),
     {
       sh: { exitCode: 0, stdout: "" },
     },
   );
-  const held = withEntry(parked, {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
+  const held = withEntry(
+    parked,
+    {
+      step: "design/draft",
+      hand: HAND,
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
   disk.write(at("spec/tickets/a-child.md"), held);
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
@@ -373,7 +395,9 @@ test("a group whose open children all wait stands at children, and hands no retr
 // [[spec/design_output/pull#children-before-their-group]]
 test("every child closed passes the children step by the engine, and a dropped child fails it back", () => {
   const shut = CHILD("closed", "implement/change", "reason: done\n");
-  const done = doors(standing(shut, withField(GROUP_NOTE, "step", "children")));
+  const done = doors(
+    standing(shut, withField(GROUP_NOTE, "step", "children", fakeFront())),
+  );
   heard(() => pulling(ROOT, ["pull"], done.it));
   const passed = done.disk.read(at("spec/tickets/one-group.md"));
   assert.equal(recordIn(passed).at(-1).step, "children");
@@ -381,7 +405,9 @@ test("every child closed passes the children step by the engine, and a dropped c
   assert.equal(fieldOf(passed, "step"), "retro/notes");
 
   const dropped = CHILD("closed", "design/draft", "reason: dropped\n");
-  const back = doors(standing(dropped, withField(GROUP_NOTE, "step", "children")));
+  const back = doors(
+    standing(dropped, withField(GROUP_NOTE, "step", "children", fakeFront())),
+  );
   const { said } = heard(() => pulling(ROOT, ["pull"], back.it));
   assert.equal(
     fieldOf(back.disk.read(at("spec/tickets/one-group.md")), "step"),
@@ -400,12 +426,16 @@ test("every child closed passes the children step by the engine, and a dropped c
 
 // [[spec/design_output/pull#children-before-their-group]]
 test("the group's last leaf returns to children while a child stands open, and closes done once none does", () => {
-  const last = withEntry(withField(GROUP_NOTE, "step", "retro/cloud"), {
-    step: "children",
-    hand: HAND,
-    skipped: true,
-    why: "the box leaves it while a-child stand open",
-  });
+  const last = withEntry(
+    withField(GROUP_NOTE, "step", "retro/cloud", fakeFront()),
+    {
+      step: "children",
+      hand: HAND,
+      skipped: true,
+      why: "the box leaves it while a-child stand open",
+    },
+    fakeFront(),
+  );
   const parked = withEntry(
     CHILD("open", "design/review")
       .replace("        not: draft\n", "")
@@ -416,6 +446,7 @@ test("the group's last leaf returns to children while a child stands open, and c
       hash_before: SHA,
       hash_after: SHA,
     },
+    fakeFront(),
   );
   const open = doors(standing(parked, filled(last, "### lacked", "- nothing")));
   heard(() => pulling(ROOT, ["pull"], open.it));
@@ -486,7 +517,7 @@ A thing to look at.
   const later = doors(
     standing(
       CHILD("closed", "implement/change", "reason: done\n"),
-      withField(GROUP_NOTE, "step", "children"),
+      withField(GROUP_NOTE, "step", "children", fakeFront()),
       {
         [at(".se/tickets/a-note.md")]: note(false),
         [at(".se/tickets/a-piece.md")]: note(false, "trivial"),
@@ -503,7 +534,7 @@ A thing to look at.
   later.disk.remove(HOLD);
   later.disk.write(
     at("spec/tickets/one-group.md"),
-    withField(GROUP_NOTE, "state", "closed"),
+    withField(GROUP_NOTE, "state", "closed", fakeFront()),
   );
   const shut = heard(() => pulling(ROOT, ["pull"], later.it));
   assert.match(
@@ -515,7 +546,7 @@ A thing to look at.
   const trunk = doors(
     standing(
       CHILD("closed", "implement/change", "reason: done\n"),
-      withField(GROUP_NOTE, "state", "closed"),
+      withField(GROUP_NOTE, "state", "closed", fakeFront()),
       {
         [at(".se/tickets/a-note.md")]: note(false),
         [at(".se/tickets/a-piece.md")]: note(false, "trivial"),

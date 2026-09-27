@@ -16,10 +16,12 @@ import {
   verbLine,
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
+import { RULE as GIT_WRITE } from "../../.claude/skills/level0/lib/git-writes.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
 
+// Every git write answers the git-write rule too, so a case over another rule reads that rule's rows alone. [[spec/design_output/bash#git-writes-take-verbs]]
 const rules = (command, most = 5, it = {}) =>
-  findings(command, most, it).map((one) => one.rule);
+  findings(command, most, it).flatMap(({ rule }) => (rule === GIT_WRITE ? [] : rule));
 const paths = (command) => writesAPath(command).map((one) => one.path);
 
 test("the rules reach a prose file and a code file, and stop at the ignored roots", () => {
@@ -281,7 +283,10 @@ test("a branch cut past the cap is refused, and one inside it passes", () => {
 // The cap is a ceiling, so the refusal says so. [[spec/tickets/the-small-faults-land]]
 test("the branch refusal says a name holds at most the cap", () => {
   const [said] = findings("git switch -c a-name-that-runs-past-the-cap", 5);
-  assert.match(said.message, /A name holds at most 5 words, and a-name-that-runs-past-the-cap holds more/);
+  assert.match(
+    said.message,
+    /A name holds at most 5 words, and a-name-that-runs-past-the-cap holds more/,
+  );
 });
 
 // [[spec/design_output/bash#a-test-run-points-somewhere]]
@@ -433,6 +438,11 @@ test("the description names the verbs, and answers the same string twice", () =>
   const said = verbLine();
   assert.equal(said, verbLine());
   for (const verb of VERBS) assert.match(said, new RegExp(`./RUNME.sh ${verb}`));
+  // A git write, `git mv` under the tickets among them, meets the door, so the line names it. [[spec/tickets/verb-line-names-new-refusals]]
+  assert.match(
+    said,
+    /every git command that writes the repository, naming the verb standing for it/,
+  );
 });
 
 // A landing waits on its gate, so a chain running it whatever the gate answers comes back refused. [[spec/design_output/bash#a-landing-follows-its-gate]]
@@ -485,4 +495,76 @@ test("a variable resolving to a free path passes, and a temp variable passes unr
   assert.deepEqual(paths("echo x > $TMPDIR/msg.md"), []);
   assert.deepEqual(paths(`echo x > $${"{TMPDIR}"}/msg.md`), []);
   assert.deepEqual(paths("out=spec; echo x > $out/y.md"), ["spec/y.md"]);
+});
+
+// A read gates nothing, so a landing after one passes, and a pipe answers its last command, so a gate piped ahead of a landing refuses. [[spec/tickets/doors-read-what-commands-do]]
+test("a read before a semicolon gates nothing, and a gate piped before a double ampersand refuses", () => {
+  for (const command of [
+    "cat a.md; git commit -m 'x'",
+    "grep -n x a.md; ./RUNME.sh ticket pull a-child --pass",
+    "git status; git commit -m 'x'",
+    "ls spec | head && git commit -m 'x'",
+  ]) {
+    assert.ok(!rules(command).includes("LandingFollowsItsGate"), command);
+  }
+  for (const command of [
+    "./RUNME.sh check | tail -3 && git commit -m 'x'",
+    "node --test a.test.js | grep ok && ./RUNME.sh ticket pull a-child --pass",
+  ]) {
+    assert.ok(rules(command).includes("LandingFollowsItsGate"), command);
+  }
+});
+
+// [[spec/tickets/doors-read-what-commands-do]]
+test("a redirect into the harness scratchpad passes, and a tree path of the same shape still meets the rules", () => {
+  for (const path of [
+    "/private/tmp/claude-501/-Users-user-proj/0b1c/scratchpad/out.md",
+    "/var/folders/ab/T/claude-501/-Users-user-proj/0b1c/scratchpad/out.md",
+    "C:/Users/user/AppData/Local/Temp/claude/C--proj/0b1c/scratchpad/out.md",
+  ]) {
+    assert.deepEqual(rules(`echo x > ${path}`), [], path);
+  }
+  assert.deepEqual(rules("echo x > spec/claude-1/a/scratchpad/out.md"), [
+    "ShellWritesNothing",
+  ]);
+});
+
+// A ticket moves through the rename verb, which rewrites every reach, and one command answers one row. [[spec/design_output/bash#git-writes-take-verbs]]
+test("git mv under spec/tickets refuses and names the rename verb", () => {
+  const found = findings("git mv spec/tickets/old-name.md spec/tickets/new-name.md", 5);
+  assert.deepEqual(
+    found.map((one) => one.rule),
+    ["TicketMovesByRename"],
+  );
+  assert.match(found[0].message, /\.\/RUNME\.sh rename/);
+});
+
+// The agent reaches git through the engine alone, so every git write names the verb standing for it, or the road where none stands. [[spec/design_output/bash#git-writes-take-verbs]]
+test("every git command that writes the repository refuses and names its verb", () => {
+  const verbOf = (said) => findings(said, 5).filter((one) => one.rule === GIT_WRITE);
+  const [lands, merges, syncs] = ["commit", "branch merge", "branch sync"].map(
+    (verb) => new RegExp(`\\./RUNME\\.sh ${verb}`),
+  );
+  for (const [command, road] of [
+    ['git commit -m "one"', lands],
+    ["git add -A", lands],
+    ["git push origin main", /\.\/RUNME\.sh push/],
+    ["git merge origin/claude/a-thing", merges],
+    ["git pull origin main", syncs],
+    ["git mv src/a.js src/b.js", /\.\/RUNME\.sh rename/],
+    ["git stash", lands],
+    ["git rebase main", syncs],
+    ["git reset --hard HEAD~1", /mcp__level0__undo/],
+    ["git tag v1", /person/],
+    ["git cherry-pick abc123", merges],
+    ["git -C . revert abc123", lands],
+    ["./RUNME.sh check && git commit -m 'x'", lands],
+  ]) {
+    const found = verbOf(command).map((one) => [one.severity, road.test(one.message)]);
+    assert.deepEqual(found, [["error", true]], command);
+  }
+  const reads = ["git status", "git log --oneline", "git diff --cached", "git fetch"];
+  for (const command of [...reads, "git show HEAD:a.md", './RUNME.sh commit "one"']) {
+    assert.deepEqual(verbOf(command), [], command);
+  }
 });

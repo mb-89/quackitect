@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 // The window reads the colours at start, and a case run stands in for that start. [[spec/tickets/the-colours-stand-in-config]]

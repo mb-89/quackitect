@@ -26,7 +26,11 @@ export function rowsIn(lines) {
 // The cases, each with its time and its file, the slowest first. [[spec/guidance/retro/effect]]
 export function slowestIn(lines, most = SLOWEST) {
   return rowsIn(lines)
-    .map((row) => ({ name: String(row.name ?? ""), ms: Number(row.ms) || 0, file: String(row.file ?? "") }))
+    .map((row) => ({
+      name: String(row.name ?? ""),
+      ms: Number(row.ms) || 0,
+      file: String(row.file ?? ""),
+    }))
     .sort((a, b) => b.ms - a.ms)
     .slice(0, most);
 }
@@ -46,7 +50,7 @@ export function filesIn(lines) {
 // The red cases in their own words: the file, the name, and the error's first line. [[spec/guidance/retro/effect]]
 export function redIn(lines) {
   return rowsIn(lines)
-    .filter((row) => row.ok === false)
+    .filter((row) => row.ok === false && !row.todo)
     .map((row) => ({
       file: String(row.file ?? ""),
       name: String(row.name ?? ""),
@@ -78,7 +82,11 @@ export function partsTimed(clock) {
 }
 
 // One report: the parts as timed, their sum, the slowest cases, a time a file, the parts a red run left unrun, the red cases, and the spawns. [[spec/guidance/retro/effect]]
-export function batteryOf(parts, lines, { most = SLOWEST, unrun = [], spawns = null } = {}) {
+export function batteryOf(
+  parts,
+  lines,
+  { most = SLOWEST, unrun = [], spawns = null } = {},
+) {
   const timed = {};
   let total = 0;
   for (const [name, ms] of Object.entries(parts ?? {})) {
@@ -110,7 +118,9 @@ export function medianParts(runs) {
 function medianOf(all) {
   const sorted = [...all].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
+  return sorted.length % 2
+    ? sorted[mid]
+    : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 
 // A case keys on its file and its name, because two files share a name. [[spec/guidance/retro/effect]]

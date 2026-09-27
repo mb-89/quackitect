@@ -54,7 +54,8 @@ export function disk() {
     // [[spec/design_output/extension#the-link-stands]]
     link: (target, path) => symlinkSync(target, path, "junction"),
     isLink,
-    realOf: (path) => realpathSync(path),
+    // The native form expands a Windows short name, so a path reads as the shell prints it. [[spec/tickets/ci-runs-a-windows-job]]
+    realOf: (path) => realpathSync.native(path),
   };
 }
 

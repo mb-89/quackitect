@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-migration-writes-its-specs
+record:
+  - step: do
+    hand: box d7a540d981d5 · claude-code-remote
+    hash_before: dfa1e8c7e6527e7506cc260ceb7f67149a4b9902
+    hash_after: ea84ce6fe55af5eb311008d0e072fd4429bb0a5b
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-hook-protocol-gets-specified.md:59:1: ListItem: A sentence in a list item holds 20 words, and this one "
+reason: done
 ---
 
 # Ask
@@ -44,27 +57,33 @@ Phase 5 ports the cage onto this protocol. The hook answers more than a forward,
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+[[spec/design_output/hook-protocol]] specifies the answer protocol. The hook
+module posts each event to the hooks door with the session, the fill and the
+`before` id. The door answers a list of effects the hook module runs in order.
 
-<!-- the form is text -->
+- `rows`, `spawn` and `classify` ask back with a call id, so the answer gate and the judge run through the door
+- a step's stream posts once, as `turn.said`
+- `clear` ends the turn, clears and resubmits, and `log` writes through `ui.log`
+- the build writes the tool list, and the hook registers it at session start
+
+Weighed: HTTP for the hook module, against the bus. HTTP wins, because the hook
+module imports its own folder alone and carries no bus client. Assumed: a round
+of asks takes a cap the door sets.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change follows the ask: the note covers each road the ask names, and the tool list
+- the cleanup it reveals: the judge's own road in `pull-tool.js` goes when the cage ports
+- the note points at the cage rationale for the refusal, and restates none of it
 
-<!-- the form is checklist -->
 
 # Discussion
 

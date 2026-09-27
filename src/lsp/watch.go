@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"quackitect/yaml"
+	"quackitect/src/yaml"
 )
 
 // The pause before the server asks a door that failed again. [[spec/design_output/lsp#the-panel-follows-the-index]]

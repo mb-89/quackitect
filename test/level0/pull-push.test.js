@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, withEntry, withField } from "../../src/engine/group.js";
 import { pushed } from "../../src/scripts/pull-writes.js";
 import { pulling } from "../../src/scripts/work.js";
@@ -133,14 +134,18 @@ test("a tests-red close on a desk moves the step and stays local", () => {
 
 // [[spec/design_output/pull#the-hand-back-matches-the-hold]]
 test("a hand-back the record holds already pushes again, and a refusal says the record holds it", () => {
-  const answered = withEntry(CHILD("open", "design/review"), {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
+  const answered = withEntry(
+    CHILD("open", "design/review"),
+    {
+      step: "design/draft",
+      hand: HAND,
+      hash_before: SHA,
+      hash_after: SHA,
+    },
+    fakeFront(),
+  );
   const { it, disk } = doors(
-    standing(answered, withField(GROUP_NOTE, "step", "children")),
+    standing(answered, withField(GROUP_NOTE, "step", "children", fakeFront())),
     {
       [`git push origin ${BRANCH}`]: {
         exitCode: 1,

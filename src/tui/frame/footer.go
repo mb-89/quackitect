@@ -10,7 +10,7 @@ import (
 
 	"github.com/charmbracelet/x/ansi"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 // [[spec/design_output/tui#the-footer-carries-status]]

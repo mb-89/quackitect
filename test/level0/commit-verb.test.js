@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
-import { named, NAMED } from "./fixtures.js";
+import { NAMED, named } from "./fixtures.js";
 
 const ROOT = "/tree";
 const CLEAN = `${NAMED}: the message reads clean`;
@@ -171,7 +171,10 @@ test("a commit the door refuses lands nothing, and the staging comes back", asyn
   assert.equal(code, 1);
   assert.match(said, /nothing lands/);
   assert.match(said, /the hook refuses it/, "the door's own line reaches the reader");
-  assert.ok(ranGit(git).includes("git reset -q"), "the staging comes back");
+  assert.ok(
+    ranGit(git).includes("git reset -q -- ."),
+    "the staging comes back, and a merge stands",
+  );
 });
 
 // A desk's verb pushes nothing. [[spec/guidance/working]]
@@ -263,6 +266,55 @@ test("a call naming paths lands those paths alone", async () => {
   assert.ok(!ran.includes("git add -A"), "the whole tree stays unstaged");
 });
 
+// A rename stages the move, and a commit naming the new path takes the old path's deletion with it. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("a commit naming a renamed ticket lands the old path's deletion with it", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "R100\tspec/tickets/old-name.md\tspec/tickets/new-name.md\nM\tsrc/a.js\n",
+    },
+  });
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
+  assert.ok(ran.includes(`git add -A ${both}`), "the old path stages with the new");
+  assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
+  assert.ok(!ran.some((one) => one.includes("src/a.js")), "an unnamed path stays out");
+});
+
+// A rename rewriting a file past git's similarity cut reads as a delete and an add, so the rename journal names the old path. [[spec/tickets/rename-detection-misses-rewrites]]
+test("a commit naming a renamed path lands the old path the rename journal names, where git reads no rename", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "D\tspec/tickets/old-name.md\nA\tspec/tickets/new-name.md\n",
+    },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "spec/tickets/old-name.md", to: "spec/tickets/new-name.md" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const both = "-- spec/tickets/new-name.md spec/tickets/old-name.md";
+  assert.ok(
+    ranGit(git).includes(`git add -A ${both}`),
+    "the old path stages with the new",
+  );
+});
+
 // [[spec/design_output/level0#the-cold-probe]]
 test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
   const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);
@@ -307,7 +359,10 @@ test("a failing cold probe refuses the commit, prints its lines, and unstages", 
   assert.match(said, /nothing lands/);
   const ran = ranGit(git);
   assert.ok(!ran.some((one) => one.startsWith("git commit")), "nothing commits");
-  assert.ok(ran.includes("git reset -q"), "the staging comes back");
+  assert.ok(
+    ran.includes("git reset -q -- ."),
+    "the staging comes back, and a merge stands",
+  );
 });
 
 test("a cold-path commit on a box holding no claude refuses in one line", async () => {

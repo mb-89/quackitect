@@ -10,7 +10,7 @@ import (
 	"errors"
 	"strings"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 // The key a preset names presses it, in any tab, under any pane. [[spec/design_output/tui#one-key-filters-the-line]]

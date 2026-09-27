@@ -12,7 +12,7 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 
-	"quackitect/tui/draw"
+	"quackitect/src/tui/draw"
 )
 
 // The column whose letters the flags draw in. [[spec/design_output/tree-view#a-flag-draws-a-letter]]

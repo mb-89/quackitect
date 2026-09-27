@@ -325,6 +325,8 @@ export function helperEnds(e, box) {
 
 // The ticket in hand, or its group, stands at a leaf a person takes. [[spec/tickets/the-stop-reads-the-state]]
 function stepWaitsOnPerson(box) {
+  // A cloud box hands a person's step back as a ticket through branch done, so no step there waits on a person. [[spec/design_output/stop#three-in-a-row]]
+  if (cloudHere(box)) return false;
   return holdsIn(box.disk, box.work).some(({ held }) => {
     const text = ticketText(box, String(held?.ticket ?? ""));
     if (!text) return false;

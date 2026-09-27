@@ -31,16 +31,20 @@ export function undoSpec() {
 }
 
 // [[spec/design_output/apply#an-entry-says-whose-apply]]
-export function journalOf(at, on, by, files) {
+// The entry names the ticket its call serves, so a hand-back stages the files its own hand wrote. [[spec/design_output/pull#the-refused-commit]]
+export function journalOf(at, on, by, files, ticket = "") {
   return {
     on: String(on ?? ""),
     by: String(by ?? ""),
     at: String(at ?? ""),
+    ticket: String(ticket ?? ""),
     files: (files ?? []).map((one) => ({
       file: one.file,
       was: one.born ? "" : one.was,
-      made: one.made,
+      made: one.gone ? "" : one.made,
       did_not_exist: Boolean(one.born),
+      // A move removes its old path, so the entry holds the text the undo writes back. [[spec/tickets/journal-the-rename-verb]]
+      did_not_stay: Boolean(one.gone),
     })),
   };
 }
@@ -69,6 +73,13 @@ export function restores(entry, held) {
 
   for (const one of files) {
     const said = held?.[one.file];
+    if (one.did_not_stay) {
+      if (!said?.exists) continue;
+      return {
+        ok: false,
+        why: `undo refused: ${one.file} stands again since the apply. Somebody's work would go, so nothing comes back`,
+      };
+    }
     if (!said?.exists) {
       if (one.did_not_exist) continue;
       return {

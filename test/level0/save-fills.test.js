@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { ticketLensOf } from "../../src/extension/lib/lens.js";
 import { ticket } from "../../src/scripts/ticket.js";
@@ -34,7 +35,7 @@ function doorOver(disk) {
     read: async () => "",
     runsVerb: async ([verb, ...rest]) => {
       assert.equal(verb, "ticket");
-      const ran = heard(() => ticket(ROOT, rest, { disk, join }));
+      const ran = heard(() => ticket(ROOT, rest, { disk, join, front: fakeFront() }));
       return { code: ran.code, out: ran.said, err: "" };
     },
     says: (lines) => said.says.push(lines),
