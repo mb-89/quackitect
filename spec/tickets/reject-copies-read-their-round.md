@@ -118,7 +118,7 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 0c57d926e888efe8
         size: 1351
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2326ed644e · claude-code-remote · helper-4
+    hash_before: aac392e94ab265fb978ee8ef638fce3aba751fdd
+    hash_after: aac392e94ab265fb978ee8ef638fce3aba751fdd
+    inputs:
+      - name: design/draft
+        hash: 0c57d926e888efe8
+        size: 1351
+      - name: design/tests-red
+        hash: f004df8bc19e41fc
+        size: 568
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,11 @@ Both cases fail on their own assertion: the copy of tests-red reads draft, and t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- second-draft-pass-case: the third done_when line meets no case in test/level0/pull-gate.test.js; the draft points at the schema-slots case, which checks the route alone, so add a case there that rejects, hands draft-2 back, and finds its pass landing
+- reject-fixture-takes-standard-route: the GATED fixture holds input on implement/change, while the standard route holds it on the implement phase and has tests-green read design/tests-red, so add a case finding both rewired after a reject
 
 # implement
 
