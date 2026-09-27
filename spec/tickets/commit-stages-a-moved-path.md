@@ -68,3 +68,5 @@ movedFrom in src/scripts/commit-verb.js adds the old path of a rename the rename
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This ticket carries `parent` and no `group`, so `childrenOf` in src/scripts/pull-hand.js leaves it out and the pull on work/the-process-stays-editable answers wait. The mint in src/scripts/pull-writes.js now names a group's own gate as the group, so a point minted from here on stands in its group. The accept minted this ticket before that fix, and no verb writes `group` on a standing ticket. Add `group: the-process-stays-editable` to its frontmatter, and the next cloud pull on the branch hands it out. Until then a desk pull on main hands it out as a free ticket.
