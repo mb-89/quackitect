@@ -301,3 +301,17 @@ none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner's words, as said:
+
+```text
+Hold is a state of the ticket and the ticket can only ever be in one state.
+So it's either held or it's closed. When it's closed, it can't be held.
+```
+
+So the draft reads a hand's hold off the ticket's record, where held derives already. For details, see [[spec/design_output/work#held-derives-from-the-record]]. The hold file under `.se/.runtime/hold` keeps what a ticket carries nowhere:
+
+- the guidance reads
+- the refusals
+- the part of a split hand-out
+- the ephemeral tickets
