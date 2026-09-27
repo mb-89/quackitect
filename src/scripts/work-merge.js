@@ -11,6 +11,7 @@ import {
   TICKETS,
   ticketAt,
   ticketNamed,
+  withField,
   withoutField,
 } from "../engine/group.js";
 import {
@@ -26,6 +27,51 @@ import {
 
 // A branch a cloud routine cuts carries no group, so it reads against trunk by its commits. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = /^claude\//;
+
+// The key the group ticket on trunk carries while its branch stands in the cloud. [[spec/rationales/git-stays-the-archive]]
+export const CLOUD_MARK = "cloud";
+
+// Sets the marker on trunk's copy of a group, or drops it, and stages the file where it moves. [[spec/tickets/groups-carry-the-cloud-marker]]
+export function marks(it, name, on) {
+  const at = ticketAt(name);
+  const path = it.join(it.root, at);
+  let text = "";
+  try {
+    text = it.disk.read(path);
+  } catch {
+    return false;
+  }
+  if (!text || (fieldOf(text, CLOUD_MARK) === "true") === on) return false;
+  it.disk.write(
+    path,
+    on
+      ? withField(text, CLOUD_MARK, "true", it.front)
+      : withoutField(text, CLOUD_MARK, it.front),
+  );
+  it.git.run(["add", at], true);
+  return true;
+}
+
+// The marker lands on trunk once the branch stands, so a refused branch push leaves trunk bare, and a second open writes a marker the first one lost. [[spec/tickets/groups-carry-the-cloud-marker]]
+export function marksTrunk(it, name) {
+  if (!marks(it, name, true)) return true;
+  it.git.run(["commit", "-m", `${name}: opens in the cloud`], true);
+  if (it.git.run(["push", "origin", TRUNK]).ok) return true;
+  console.error(
+    `The push of ${TRUNK} comes back refused, so it carries no marker. Run ./RUNME.sh branch open ${name} again.`,
+  );
+  return false;
+}
+
+// The trunk and a clean tree, which every verb committing on trunk stands on. [[spec/tickets/groups-carry-the-cloud-marker]]
+export function offTrunk(it, verb) {
+  const on = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (on !== TRUNK) {
+    console.error(`branch ${verb} runs on ${TRUNK}, and this is ${on}.`);
+    return true;
+  }
+  return dirty(it);
+}
 
 export function merge(it, name) {
   if (CLOUD.test(name ?? "")) return mergeCloud(it, name);
@@ -74,7 +120,9 @@ export function merge(it, name) {
   }
 
   const freed = freeChildren(it, name);
-  if (freed.length) it.git.run(["commit", "--amend", "--no-edit"], true);
+  // The merge takes the branch out of the cloud, so its commit drops the marker. [[spec/tickets/groups-carry-the-cloud-marker]]
+  const unmarked = marks(it, name, false);
+  if (freed.length || unmarked) it.git.run(["commit", "--amend", "--no-edit"], true);
 
   // A merge carrying a new tool builds it, because the install ran before the merge and read the old wants. [[spec/design_output/work#the-merge-lands-the-truth]]
   installs(it);
@@ -200,6 +248,7 @@ function checkSays(it) {
 // [[spec/design_output/work#a-merged-branch-closes]]
 export function close(it, name, argv) {
   const forced = (argv ?? []).includes("--force");
+  if (offTrunk(it, "close")) return 2;
   it.git.run(["fetch", "--prune", "origin"], true);
 
   // [[spec/design_output/work#a-merged-branch-closes]] holds this proof.
@@ -227,6 +276,14 @@ export function close(it, name, argv) {
       console.error(`${branch} is outside ${TRUNK}, so closing it drops its work.`);
       console.error(`Merge it first, or run close ${ticketNamed(branch)} --force.`);
       continue;
+    }
+    // [[spec/design_output/work#a-merged-branch-closes]] holds the order: trunk loses the marker on origin before the branch goes.
+    if (marks(it, ticketNamed(branch), false)) {
+      it.git.run(["commit", "-m", `${ticketNamed(branch)}: leaves the cloud`], true);
+      if (!it.git.run(["push", "origin", TRUNK]).ok) {
+        console.error(`The push of ${TRUNK} comes back refused, so ${branch} stands.`);
+        continue;
+      }
     }
     if (!it.git.run(["push", "origin", "--delete", branch]).ok) continue;
     it.git.run(["branch", "-D", branch], true);

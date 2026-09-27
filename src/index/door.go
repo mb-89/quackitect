@@ -142,7 +142,7 @@ func trackedIn(root string) func(rel string) bool {
 }
 
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
-	registersFiles(catalog)
+	registersTopics(catalog)
 	ops.Registers(catalog)
 	watchdog.Registers(catalog)
 	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-catalog-check]]

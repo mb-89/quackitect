@@ -268,6 +268,11 @@ frontmatter:
       type: string
       description: the config key a group waits on, which the tracked file on main turns on with true
 
+    cloud:
+      type: boolean
+      x-engine: true
+      description: whether the group's branch stands in the cloud, which branch open writes on main and the merge and the close drop
+
     successors:
       type: [array, string]
       description: the tickets this one became, on reason became

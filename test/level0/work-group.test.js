@@ -567,6 +567,7 @@ test("release on a group nobody holds writes nothing, and says so", () => {
 // [[spec/design_output/work#a-merged-branch-closes]]
 test("close drops a group's branch once trunk holds it", () => {
   const { it, outside } = doorsSaying({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
     "git rev-list --count origin/main..main": { stdout: "0\n" },
     "git branch -r --merged origin/main": {
       stdout: "  origin/main\n  origin/work/one-group\n",
