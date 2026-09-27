@@ -9,8 +9,25 @@ import { everyHold } from "./guidance-hand.js";
 export function landed(it, one, changes, also = []) {
   const paths = journaled(it, one.name);
   if (paths.mine.length)
-    return landing(it, one, changes, unique([one.at, ...also, ...paths.mine]));
+    return landing(
+      it,
+      one,
+      changes,
+      tracked(it, unique([one.at, ...also, ...paths.mine])),
+    );
   return landing(it, one, changes, null, paths.theirs);
+}
+
+// A journal names files git ignores, the handover among them, and git refuses a commit naming one. [[spec/design_output/pull#the-refused-commit]]
+function tracked(it, paths) {
+  const ran = it.git.run(["check-ignore", "--", ...paths], true);
+  const ignored = new Set(
+    String(ran.out ?? "")
+      .split("\n")
+      .map((row) => row.trim())
+      .filter(Boolean),
+  );
+  return paths.filter((one) => !ignored.has(one));
 }
 
 // A landing the engine makes on the side stages the ticket files it writes, and a hand's edits stay out of a commit naming another ticket. [[spec/design_output/pull#the-refused-commit]]
