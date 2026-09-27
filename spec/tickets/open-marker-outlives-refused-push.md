@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: open-tasks-land-in-shadow
 parent: groups-carry-the-cloud-marker
+record:
+  - step: do
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: 733253ae6faecf59c6642d825a9bfe78c763c88d
+    hash_after: 4d74a4411b9d1a268b2f7e77d576d8fb76d7ccc9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:122:99: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
