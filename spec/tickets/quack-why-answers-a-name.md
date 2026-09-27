@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -84,6 +84,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: 0208338391e9a9900bd2b8a039d3df532afa0dbf
     hash_after: 7f44da3191089f4d1dd4022e91127495c5050d06
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: a82aebfdbb184ffc29b3d2bd9b4d7c58779d652a
+    hash_after: a82aebfdbb184ffc29b3d2bd9b4d7c58779d652a
 ---
 
 # Ask
@@ -183,6 +187,10 @@ The command line:
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- why-reads-the-stale-mark: `Snapshot.Stale` stands in `src/q/store.go` now. So `Why.Value` answers the state `stale since <time>`, and a test covers it.
 
 # implement
 
