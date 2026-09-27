@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -104,6 +104,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 480f0584dd08236ed1f6fa39815f65246268d79d
+    hash_after: 480f0584dd08236ed1f6fa39815f65246268d79d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/ops passes; green, src/watchdog passes; green, src/q passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -291,11 +303,15 @@ Every new test fails on its assertion against stubs that compile. The rest of ea
 
 <!-- the form is command -->
 
+    ./RUNME.sh test src/ops src/watchdog src/q src/index
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -303,11 +319,34 @@ Every new test fails on its assertion against stubs that compile. The rest of ea
 
 <!-- the form is text -->
 
+Operations and leases stand in the core, over an injected clock.
+
+| the part | what it does |
+|---|---|
+| `src/ops` | `Book` starts an operation under `ops/<id>`, queues writers one at a time, and moves by the states table alone |
+| `src/ops` | `Restart`, `Expire` and `Sweep` fail an operation in flight, fail one past its deadline, and drop an ended one past its window |
+| `src/watchdog` | `Dog` holds the leases, marks an expired provider stale, doubles the wait to its cap, and raises an alarm under `session/alarms` |
+| `src/q` | `q.Op` and `q.Writes` declare an action, and a stale mark keys by provider until its next commit |
+| `src/index` | the table `op` keeps each operation, and the door fails every one in flight at its start |
+| `src/config` | `config.Count` reads a count, and `src/lsp` reads through it |
+
+What I assume, for the reader at the merge:
+
+- The keys take the two-level form the environment names back, such as `ops.keepDone`. Both notes name the new keys.
+- The defaults are my own guess. The windows take an hour and a day. The wait runs from a second to a minute. Five faults in five minutes raise an alarm.
+- A bare `go test ./...` fails on `fts5` in `src/index`, so the first done line waits on [[spec/tickets/sqlite-runs-pure-go]]. The test verb passes the tag.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and `src/config` and `src/lsp` for the one count reader
+- the clock and the keep take fakes in each test
+- each file opens on a comment pointing at its design note
+- the key names stand in the config alone, and both notes point at them
+- the review rows stand fixed, and `says` names each assumption
 
 # Discussion
 
