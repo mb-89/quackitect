@@ -114,10 +114,23 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: dbd85cdf1921393f89549d642e0bdec066ff159c
+    hash_after: dbd85cdf1921393f89549d642e0bdec066ff159c
+    inputs:
+      - name: ask
+        hash: 2149c1e4d90b8c82
+        size: 412
+      - name: [[spec/design_output/model]]
+        hash: 518103d9494e50d7
+        size: 9128
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -149,38 +162,46 @@ A key picking a provider changes nothing today, because the check reads no key.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+q gains Catalog.Names, every name the catalog registers, one a group. The index gains providersOf(root, catalog), which asks config.Value for providers.<name> over each name, so the tracked file, the environment and the local file each reach the pick, and answers the keys that stand. Serve hands those keys to catalog.Check and to q.NewStore in place of nil, so the check reads the pick and the store runs the provider it picks. Weighed: a key read a name at a time over a walk of the providers map, since the layered reader answers a key and the environment layer lists no map. Assumed: a name carries no dot, since config splits a key on the dot, and every name the catalog holds today carries none.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/door.go: Serve, which calls Check and NewStore,src/q/check.go: Catalog.Check and pick, which read the keys,src/q/store.go: NewStore, which picks the active provider off the keys
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/index/start_test.go: TestAProviderKeyReachesTheCatalogCheck,src/index/start_test.go: TestAProviderKeyNamingNoAltRefusesTheStart,src/q/catalog_test.go: TestNamesListEveryGroupOnce
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/check.go,src/q/catalog_test.go,src/index/door.go,src/index/start_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened Serve in door.go, Check and pick in check.go, NewStore, and config.Value, and checked each claim there
+the callers come off a grep for Check( and NewStore( over src, and the tests call both with keys already
+the second done_when line meets TestAProviderKeyNamingNoAltRefusesTheStart, and go test and the check decide the rest
 
 ## tests-red
 
