@@ -2,7 +2,7 @@
 // over a command line runs here before the command does.
 // [[spec/design_output/bash#what-the-door-reads]]
 
-import { isAbsolute, join } from "node:path";
+import { join } from "node:path";
 import {
   commitIn,
   findings,
@@ -16,8 +16,7 @@ import {
   deskRefusal,
   onDesk,
 } from "../../.claude/skills/level0/lib/cloud.js";
-import { linesIn } from "../../.claude/skills/level0/lib/marks.js";
-import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { RULE as GIT_WRITE } from "../../.claude/skills/level0/lib/git-writes.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import {
   refusedCommand,
@@ -38,13 +37,12 @@ import {
   touchesGit,
   versionRefs,
 } from "../../.claude/skills/level0/lib/trunk.js";
-import { WORK_BRANCH } from "../engine/group.js";
-import { DESCRIPTION_HOW, ticketFault, ticketOf } from "../engine/named.js";
 import { formIn, refusesIn, rowOf } from "../../.claude/skills/level0/lib/warnings.js";
+import { WORK_BRANCH } from "../engine/group.js";
+import { DESCRIPTION_HOW, inHand, ticketFault, ticketOf } from "../engine/named.js";
 import { heldTests } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
-import { marksSeen } from "./write.js";
 
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
@@ -60,13 +58,13 @@ export async function onBash(e, box) {
     deskGuard,
     trunkGuard,
     versionGuard,
+    gitWriteDoor,
   ];
   const held = {};
   for (const check of checks) {
     const found = await check(command, e, box, held);
     if (found) return { result: { deny: found } };
   }
-  marksShown(command, box);
   return messageWarns(held.warned ?? [], box) ?? PASS;
 }
 
@@ -80,6 +78,15 @@ export async function onPowerShell(e, box) {
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
 function ticketDoor(command, e, box) {
   if (freeOfTicket(command)) return "";
+  // A description opening on the working todo's title and a colon names what stands in hand. [[spec/tickets/the-todo-joins-the-queue]]
+  const todo = inHand({ disk: box.disk, root: box.work }).todo;
+  if (
+    todo &&
+    String(e?.description ?? "")
+      .trim()
+      .startsWith(`${todo}:`)
+  )
+    return "";
   const fault = ticketFault(
     ticketOf(e?.description),
     { disk: box.disk, root: box.work },
@@ -98,43 +105,6 @@ function ticketDoor(command, e, box) {
   return fault;
 }
 
-// The shell reads that hand the agent a file's lines, each a shape and the span it prints. [[spec/design_output/level0#a-lone-shell-read-marks]]
-const SHOWS = [
-  { shape: /^cat\s+(\S+)$/, span: () => null },
-  { shape: /^head\s+-n\s*(\d+)\s+(\S+)$/, span: (n) => ({ from: 1, to: Number(n) }) },
-  {
-    shape: /^tail\s+-n\s*(\d+)\s+(\S+)$/,
-    span: (n, text) => ({ from: linesIn(text) - Number(n) + 1, to: linesIn(text) }),
-  },
-  {
-    shape: /^sed\s+-n\s+(['"]?)(\d+),(\d+)p\1\s+(\S+)$/,
-    span: (_q, from, to) => ({ from: Number(from), to: Number(to) }),
-  },
-];
-// A pipe, a chain or a redirection hands the agent something else than the file. [[spec/design_output/level0#a-lone-shell-read-marks]]
-const JOINS = /[|;&<>`$()\n]/;
-
-// A lone shell read hands the agent what it prints, so the mark comes off it. [[spec/design_output/level0#a-lone-shell-read-marks]]
-function marksShown(command, box) {
-  const line = command.trim();
-  if (JOINS.test(line)) return;
-  for (const one of SHOWS) {
-    const found = line.match(one.shape);
-    if (!found) continue;
-    const named = found.at(-1).replace(/^['"]|['"]$/g, "");
-    const path = isAbsolute(named) ? named : join(box.root, named);
-    const where = relativeTo(box.root, path);
-    if (!where || where.startsWith("..") || isAbsolute(where)) return;
-    try {
-      const text = String(box.disk.read(path));
-      marksSeen(box, where, text, one.span(...found.slice(1, -1), text));
-    } catch {
-      // [[spec/design_output/level0#a-lone-shell-read-marks]]
-    }
-    return;
-  }
-}
-
 // [[spec/design_output/bash#the-description-names-verbs]]
 export function onDescribe(e) {
   if (String(e?.tool ?? "") !== "Bash") return PASS;
@@ -148,11 +118,13 @@ function reader(box) {
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box, held) {
-  const found = findings(command, asks(box, "names.words"), {
+  const all = findings(command, asks(box, "names.words"), {
     cloud: cloudHere(box),
     script: (path) => fileText(reader(box), path),
     subjects: (undo) => subjectsOf(box, undo),
   });
+  held.gitWrites = all.filter((one) => one.rule === GIT_WRITE);
+  const found = all.filter((one) => one.rule !== GIT_WRITE);
   const voiced = await commitVoice(command, box);
   found.push(...refusesIn(voiced));
   held.warned = formIn(voiced);
@@ -169,6 +141,18 @@ async function commandRules(command, _e, box, held) {
     detail: command,
   });
   return refusedCommand(command, found);
+}
+
+// Every other guard reads a git write first, so its own reason answers before the verb does. [[spec/design_output/bash#git-writes-take-verbs]]
+function gitWriteDoor(command, _e, box, held) {
+  const rows = held.gitWrites ?? [];
+  if (!rows.length) return "";
+  box.log.say("warn", "bash", "refused a git write that a verb stands for", {
+    tool: "Bash",
+    rule: GIT_WRITE,
+    detail: command,
+  });
+  return refusedCommand(command, rows);
 }
 
 // A revert reads each revision alone, and a reset walks the range it drops. [[spec/design_output/bash#a-pull-commit-stands]]

@@ -46,9 +46,12 @@ import {
   WAIT,
   walkOf,
 } from "./pull-route.js";
-import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./pull-spawn.js";
+import { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
 import { NOTES, opensDraft, schemasHere } from "./ticket.js";
+import { holdsHere } from "./pull-when.js";
+
+export { holdsHere };
 
 export function ticketsHere(it) {
   const out = [];
@@ -130,7 +133,8 @@ export function handOut(it, who) {
   repairPersonSteps(it, who);
   const all = ticketsHere(it);
   // A session due takes the clear's tickets once the ticket in hand stands done, and a helper takes none. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
-  if (!who.wanted && !who.oneStep && isDue(it.disk, it.root)) return dueHandOut(it, who, all);
+  if (!who.wanted && !who.oneStep && isDue(it.disk, it.root))
+    return dueHandOut(it, who, all);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
   const tagged = taggedIn(all);
@@ -153,7 +157,6 @@ export function handOut(it, who) {
 
   const why = [];
   let other = null;
-  let person = null;
   for (const pool of asked) {
     for (const found of pool) {
       const one = agentOpens(found.text) ? openedHere(it, found, all) : found;
@@ -164,20 +167,16 @@ export function handOut(it, who) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
-      // A hand-out frees a group, so a ticket in no group waits for its person where it stands. [[spec/tickets/the-desk-findings-wait]]
-      if (said.person && !person && fieldOf(one.text, GROUP))
-        person = { name: one.name, leaf: said.person };
       if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
     if (other && !who.oneStep) return spawnAnswer(other);
   }
 
   // [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
-  const cleanup = who.wanted || why.length || person ? null : cleanupOf(it);
+  // A person's step waits under its reason, and the note names who answers it. [[spec/design_output/work#a-person-step-leaves]]
+  const cleanup = who.wanted || why.length ? null : cleanupOf(it);
   if (cleanup) say(cleanup.word, cleanup.rows);
   else say(WAIT, why.length ? why : [nothingFor(who)]);
-  // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
-  if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;
 }
 
@@ -258,7 +257,7 @@ export function spawnAnswer(other) {
   const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
   say(SPAWN, [
     `${other.one.name} at ${other.leaf.path} ${other.why}.`,
-    "Spawn a hand of its own with the prompt below, and pull again once it answers.",
+    "Spawn a hand of its own with the prompt below in the background, and take the next item. Pull again once it answers.",
   ]);
   console.log("");
   console.log(spawnPrompt(other.one.name, other.leaf, helper));
@@ -325,7 +324,7 @@ export function advanced(it, one, all) {
       return { why: `stands at ${path || "no step"}, which its route lacks` };
     }
 
-    const when = holdsHere(it, leaf.when, front);
+    const when = holdsHere(it, leaf.when, front, text);
     if (!when.holds) {
       text = withEntry(text, { step: leaf.path, skipped: true, why: when.why });
       changes.push(`skips ${leaf.path}`);
@@ -388,24 +387,6 @@ export function advanced(it, one, all) {
   return { why: "loops in its route" };
 }
 
-// [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function holdsHere(it, when, front) {
-  if (!when) return { holds: true };
-  if (when === "cloud")
-    return { holds: Boolean(it.cloud), why: "the box runs off the cloud" };
-  if (when === "desk") return { holds: !it.cloud, why: "the box runs on the cloud" };
-  if (when === "returned") {
-    const last = entriesOf(front)
-      .filter((one) => !one.skipped)
-      .at(-1);
-    return {
-      holds: Number(last?.returns ?? 0) > 0,
-      why: "the ticket arrives here by no on_fail",
-    };
-  }
-  return { holds: false, why: `${when} names no condition the pull reads` };
-}
-
 // [[spec/design_output/pull#children-before-their-group]]
 export function childrenSay(all, name) {
   const mine = all.filter((one) => !one.private && fieldOf(one.text, GROUP) === name);
@@ -431,7 +412,6 @@ export function admits(it, who, one, leaf, all) {
     const spawns = String(leaf.by) === HELPER && Boolean(it.agent);
     return {
       why: said.why,
-      ...(said.person ? { person: leaf } : {}),
       ...(spawns ? { other: leaf } : {}),
     };
   }

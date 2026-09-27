@@ -5,6 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as lib from "../../.claude/skills/level0/lib/pull.js";
+// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
+import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import {
   judgeAsk,
   judgeRefusal,
@@ -13,9 +15,8 @@ import {
   sessionOf,
   spawnPromptIn,
 } from "../../.claude/skills/level0/lib/pull.js";
-// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
-import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 // The rules a leaf hands the judge, each label naming one rule. [[spec/tickets/the-judge-reads-answer-rules]]
 const RULES = [
@@ -72,7 +73,11 @@ test("the module registers one session start, and it registers the pull tool and
   const registered = [];
   const box = harness();
   box.$.tool.register = async (spec) => void registered.push(spec.name);
-  await starts[0](box.$, { session_id: "s1", client: "claude-code" }, async (said) => said);
+  await starts[0](
+    box.$,
+    { session_id: "s1", client: "claude-code" },
+    async (said) => said,
+  );
   assert.equal(registered[0], "pull", "the pull tool registers first");
   for (const one of READ_TOOLS) assert.ok(registered.includes(one.name), one.name);
 });
@@ -153,7 +158,11 @@ test("the judge's question names each rule by its label and carries the evidence
 
 // [[spec/tickets/the-judge-reads-answer-rules]]
 test("the labels the judge picks from open on follows, one label a rule after it", () => {
-  assert.equal(typeof level1.judgeLabels, "function", "the wrapper answers judgeLabels");
+  assert.equal(
+    typeof level1.judgeLabels,
+    "function",
+    "the wrapper answers judgeLabels",
+  );
   assert.deepEqual(level1.judgeLabels(RULES), ["follows", "voice-1", "voice-3"]);
   assert.deepEqual(level1.judgeLabels([]), ["follows"]);
 });
@@ -173,6 +182,93 @@ test("a label outside the set reads as follows, so a judge naming nothing refuse
   assert.equal(level1.ruleBroken("follows", RULES), "");
   assert.equal(level1.ruleBroken("voice-9", RULES), "");
   assert.equal(level1.ruleBroken("", RULES), "");
+});
+
+// The hand-back the judge reads, over a box whose files a fake disk holds. It answers what the shell ran, what the model was asked, and what the tool answered. [[spec/design_output/pull#the-checks]]
+async function handedBack(seed, method = "") {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register(
+    (event, ...rest) => {
+      if (event === "tool.call" && rest.length > 1) calls.push(rest);
+    },
+    { method },
+  );
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const files = fakeDisk(seed);
+  const ran = [];
+  const asked = [];
+  const material = { step: "design/draft", evidence: "The approach.", rules: RULES };
+  const $ = {
+    fs: { read: async (path) => files.read(path) },
+    process: {
+      run: async (argv) => {
+        ran.push(argv);
+        const asks = argv.at(-1) === "--judge";
+        return { stdout: asks ? JSON.stringify(material) : "work", exitCode: 0 };
+      },
+    },
+    model: {
+      classify: async (_ask, _labels, options) => {
+        asked.push(options);
+        return "voice-3";
+      },
+    },
+  };
+  const said = await handler(
+    $,
+    { ticket: "a-child", verdict: "pass" },
+    async () => null,
+  );
+  return {
+    said: said.result,
+    judged: ran.some((argv) => argv.at(-1) === "--judge"),
+    asked,
+  };
+}
+
+const judging = (enabled, model) => JSON.stringify({ judge: { enabled, model } });
+
+// The slash command writes the per-box file, so the switch reaches the judge through the one resolver. [[spec/design_output/config#the-layers]]
+test("the judge reads its switch through the layers, so the per-box file beats the tracked one", async () => {
+  const off = await handedBack({
+    "spec/config/level0.json": judging(true, "haiku"),
+    ".se/.runtime/config.json": judging(false),
+  });
+  assert.equal(off.judged, false, "the per-box off stops the judge");
+  assert.equal(off.said, "work");
+  assert.deepEqual(off.asked, []);
+
+  const on = await handedBack({
+    "spec/config/level0.json": judging(false, "haiku"),
+    ".se/.runtime/config.json": judging(true, "opus"),
+  });
+  assert.equal(on.judged, true, "the per-box on starts the judge");
+  assert.deepEqual(
+    on.asked,
+    [{ model: "opus" }],
+    "the per-box model reaches the judge",
+  );
+  assert.match(on.said, /^refused\n/);
+});
+
+// A stub holds no tracked file of its own, so the defaults come off the vehicle's. [[spec/design_output/vehicle#the-work-root-inherits]]
+test("the judge takes its defaults off the method root, and the work root's own file beats them", async () => {
+  const under = await handedBack(
+    { "/vehicle/spec/config/level0.json": judging(true, "haiku") },
+    "/vehicle/",
+  );
+  assert.equal(under.judged, true, "the method root's switch reaches a stub");
+  assert.deepEqual(under.asked, [{ model: "haiku" }]);
+
+  const over = await handedBack(
+    {
+      "/vehicle/spec/config/level0.json": judging(true, "haiku"),
+      "spec/config/level0.json": judging(false),
+    },
+    "/vehicle/",
+  );
+  assert.equal(over.judged, false, "the work root's file beats the method root's");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -216,9 +312,12 @@ test("an event naming no session writes nothing, and says the hand stands at the
 test("the pull hook matches the level zero call, and runs the script the method root holds", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
   const calls = [];
-  register((event, ...rest) => {
-    if (event === "tool.call" && rest.length > 1) calls.push(rest);
-  }, { method: "/vehicle/" });
+  register(
+    (event, ...rest) => {
+      if (event === "tool.call" && rest.length > 1) calls.push(rest);
+    },
+    { method: "/vehicle/" },
+  );
   const [filter, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
   assert.equal(filter?.tool, "mcp__level0__pull");
 
@@ -233,4 +332,196 @@ test("the pull hook matches the level zero call, and runs the script the method 
   };
   assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
   assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
+});
+
+// The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]
+test("the pull tool runs the verb under the harness env the shell verb reads", async () => {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { agentOf } = await import("../../src/scripts/pull-hand-of.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const before = process.env.CLAUDE_CODE_REMOTE;
+  process.env.CLAUDE_CODE_REMOTE = "true";
+  const opts = [];
+  const $ = {
+    process: {
+      run: async (_argv, said) => {
+        opts.push(said);
+        return { stdout: "wait", stderr: "", exitCode: 0 };
+      },
+    },
+  };
+  const read = [];
+  const engine = {
+    ...$,
+    env: {
+      get: async (key) => {
+        read.push(key);
+        return key === "SE_CLOUD" ? "1" : undefined;
+      },
+    },
+  };
+  await handler(engine, {}, async () => null);
+  assert.ok(read.includes("CLAUDE_CODE_REMOTE"), "the key reads through the engine");
+  assert.equal(opts[0]?.env?.SE_CLOUD, "1");
+  opts.length = 0;
+  try {
+    await handler($, {}, async () => null);
+  } finally {
+    if (before === undefined) delete process.env.CLAUDE_CODE_REMOTE;
+    else process.env.CLAUDE_CODE_REMOTE = before;
+  }
+  assert.equal(agentOf(opts[0]?.env), "claude-code-remote");
+  const { HARNESS } = await import("../../src/scripts/pull-hand-of.js");
+  const { HARNESS_KEYS } = await import(
+    "../../.claude/skills/level0/hooks/pull-tool.js"
+  );
+  assert.deepEqual(
+    HARNESS_KEYS,
+    HARNESS.map(([key]) => key),
+    "the copy stands equal",
+  );
+});
+
+// The pull hook over a config, answering whether the judge ran and how often it asked the model. [[spec/tickets/every-road-has-a-caller]]
+async function judgeRuns(config) {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const ran = [];
+  const asked = [];
+  const material = {
+    ticket: "a-child",
+    step: "design/draft",
+    evidence: "x",
+    rules: RULES,
+  };
+  const $ = {
+    fs: { read: async () => JSON.stringify(config) },
+    process: {
+      run: async (argv) => {
+        ran.push(argv);
+        const judging = argv.includes("--judge");
+        return {
+          stdout: judging ? JSON.stringify(material) : "done",
+          stderr: "",
+          exitCode: 0,
+        };
+      },
+    },
+    model: {
+      classify: async (...said) => {
+        asked.push(said);
+        return "follows";
+      },
+    },
+  };
+  await handler($, { ticket: "a-child", verdict: "pass" }, async () => null);
+  return { judged: ran.some((argv) => argv.includes("--judge")), asked: asked.length };
+}
+
+// The pull hook over a config and a model answering one label and one line, the leaf's ticket apart, so each case keeps its own count. [[spec/tickets/prose-verbs-land-first-try]]
+async function judgeHook(config, { ticket, label, quote }) {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const material = { ticket, step: "design/draft", evidence: "one\ntwo", rules: RULES };
+  const $ = {
+    fs: { read: async () => JSON.stringify(config) },
+    process: {
+      run: async (argv) => ({
+        stdout: argv.includes("--judge") ? JSON.stringify(material) : "done",
+        stderr: "",
+        exitCode: 0,
+      }),
+    },
+    model: {
+      classify: async () => label,
+      complete: async () => ({ isAnswered: true, text: quote }),
+    },
+  };
+  return async () =>
+    (await handler($, { ticket, verdict: "pass" }, async () => null)).result;
+}
+
+// [[spec/tickets/prose-verbs-land-first-try]]
+test("the judge asks for the line that breaks the rule, and the refusal quotes it", async () => {
+  const ask = judgeAsk("one\ntwo", RULES, "voice-3");
+  assert.match(ask, /voice-3: Put the bottom line first\./);
+  assert.match(ask, /word for word/);
+  assert.match(
+    judgeRefusal("at design/draft, voice-3", "two"),
+    /\n {2}the line: two\n/,
+  );
+
+  const on = { judge: { enabled: true } };
+  const quoted = await judgeHook(on, {
+    ticket: "a-quote",
+    label: "voice-3",
+    quote: "two",
+  });
+  assert.match(await quoted(), /\n {2}the line: two\n/);
+  const loose = await judgeHook(on, {
+    ticket: "a-loose",
+    label: "voice-3",
+    quote: "nowhere",
+  });
+  const said = await loose();
+  assert.match(said, /^refused/);
+  assert.doesNotMatch(said, /nowhere/, "a line the evidence holds nowhere stays out");
+});
+
+// [[spec/tickets/prose-verbs-land-first-try]]
+test("the judge lets a hand-back through past the count of refusals on one leaf", async () => {
+  const { default: config } = await import("../../spec/config/level0.json", {
+    with: { type: "json" },
+  });
+  assert.equal(config.judge.refusalsBeforePass, 3);
+
+  const on = { judge: { enabled: true, refusalsBeforePass: 2 } };
+  const hand = await judgeHook(on, {
+    ticket: "a-count",
+    label: "voice-1",
+    quote: "one",
+  });
+  assert.match(await hand(), /^refused/);
+  assert.match(await hand(), /^refused/);
+  assert.equal(await hand(), "done", "past the count the pull runs");
+  assert.match(await hand(), /^refused/, "the pass clears the count");
+});
+
+// The judge runs where the config turns it on alone. The hook's line waits on the owner, because the hand working the ticket holds no write under .claude. [[spec/tickets/the-judge-waits-on-true]]
+const HOOK_WAITS =
+  "judged in the pull hook reads enabled !== true once the owner lands it";
+test("a config naming no judge runs no judge, and true alone turns it on", {
+  todo: HOOK_WAITS,
+}, async () => {
+  assert.deepEqual(await judgeRuns({}), { judged: false, asked: 0 });
+  assert.deepEqual(await judgeRuns({ judge: {} }), { judged: false, asked: 0 });
+  assert.deepEqual(await judgeRuns({ judge: { enabled: false } }), {
+    judged: false,
+    asked: 0,
+  });
+  assert.deepEqual(await judgeRuns({ judge: { enabled: true } }), {
+    judged: true,
+    asked: 1,
+  });
+});
+
+// [[spec/tickets/every-road-has-a-caller]]
+test("the config schema declares the judge off by default", async () => {
+  const { default: schema } = await import("../../spec/config/level0.schema.json", {
+    with: { type: "json" },
+  });
+  assert.equal(schema.properties.judge?.properties?.enabled?.type, "boolean");
+  assert.equal(schema.properties.judge?.properties?.enabled?.default, false);
 });

@@ -19,12 +19,7 @@ import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
-import {
-  POINTER,
-  PORT_BASE,
-  SETTINGS,
-  SETTINGS_LOCAL,
-} from "../../.claude/skills/level0/lib/vehicle.js";
+import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { vale } from "../doors/vale.js";
 import { guidanceHere } from "../bridge/guidance.js";
 import {
@@ -56,8 +51,10 @@ import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { FIX_USAGE, fixFlags } from "./cli-fix.js";
 import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
-import { writeSurvey } from "../engine/tools.js";
+import { whereIs, writeSurvey } from "../engine/tools.js";
 import { viewerOf } from "./tui-build.js";
+import { lspProbe } from "./lsp-probe.js";
+import { hookRows, hooksNamed } from "./cli-hooks.js";
 
 export function treeHere() {
   return treeOf({
@@ -91,7 +88,7 @@ export function splitDoors() {
   return { root, join, disk: files, clock: it.clock };
 }
 
-// The commit verb reads the message through Vale, lands it, and runs the check. [[spec/design_output/work#the-battery-answers-first]]
+// The commit verb reads the message through Vale, runs the cold probe on a cold-path commit, lands it, and runs the check. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#the-cold-probe]]
 export function commitDoors() {
   return {
     root,
@@ -104,6 +101,8 @@ export function commitDoors() {
     log: it.log,
     vale: vale(files, outside, root),
     env: process.env,
+    pid: it.pid,
+    claude: whereIs(files, root, "claude", known),
   };
 }
 
@@ -118,7 +117,8 @@ export function viewerHere() {
 }
 
 // Every Go module's tests run in the battery, the index's through the pinned Zig. [[spec/design_output/index#the-compiler-it-needs]]
-export function goHolds() {
+// Under `check --errors` the run stays quiet, and each failing Go test reaches the error stream alone. [[spec/tickets/the-verbs-need-no-wrapper]]
+export function goHolds(quiet = false) {
   const at = { disk: files, join, root };
   const env = goEnvOf(at);
   let worst = 0;
@@ -128,11 +128,16 @@ export function goHolds() {
       ran = outside.run([go, "test", "./..."], {
         cwd: join(root, folder),
         env,
-        inherit: true,
+        inherit: !quiet,
       });
     } catch {
       console.log("go stands nowhere, so the Go tests go unrun here.");
       return 0;
+    }
+    if (quiet && ran.exitCode) {
+      for (const row of String(ran.stdout ?? "").split("\n")) {
+        if (/^\s*--- FAIL/.test(row)) console.error(`${folder}: ${row.trim()}`);
+      }
     }
     worst = worst || ran.exitCode || goFormat(folder, env);
   }
@@ -471,76 +476,12 @@ export function sidebarSays() {
   return "unlinked: run ./RUNME.sh";
 }
 
-// The three settings files the client reads, the tree's own first. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-function settingsFiles(root, home) {
-  const rows = [
-    { at: join(root, SETTINGS), name: SETTINGS },
-    { at: join(root, SETTINGS_LOCAL), name: SETTINGS_LOCAL },
-  ];
-  // The name a reader sees joins with a slash on every box, and the path joins the way the box does. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-  if (home) rows.push({ at: join(home, SETTINGS), name: `${home}/${SETTINGS}` });
-  return rows;
-}
-
-// A command path parses as a URL, so a probe holds these two schemes alone. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-const REACHED = new Set(["http:", "https:"]);
-
-function addressOf(said) {
-  try {
-    const url = new URL(String(said));
-    return REACHED.has(url.protocol) ? url.href : "";
-  } catch {
-    return "";
-  }
-}
-
-// Every string a settings tree holds, whatever key carries it. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-function stringsIn(said, out = []) {
-  if (typeof said === "string") out.push(said);
-  else if (Array.isArray(said)) for (const one of said) stringsIn(one, out);
-  else if (said && typeof said === "object")
-    for (const one of Object.values(said)) stringsIn(one, out);
-  return out;
-}
-
-// Every hook address the settings files name, in reading order, each off the file naming it first. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-export function hooksNamed(disk, at, home) {
-  const found = new Map();
-  for (const file of settingsFiles(at, home)) {
-    let said = null;
-    try {
-      said = JSON.parse(String(disk.read(file.at)));
-    } catch {
-      continue;
-    }
-    for (const one of stringsIn(said?.hooks)) {
-      const where = addressOf(one);
-      if (where && !found.has(where)) found.set(where, { where, file: file.name });
-    }
-  }
-  return [...found.values()];
-}
-
-// One row a hook, off calls the probe runs together, so a box of dead hooks answers inside the first minute. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-export async function hookRows(found, get = fetch) {
-  return Promise.all(found.map((one) => hookRow(one, get)));
-}
-
-async function hookRow(one, get) {
-  const label = `hook ${new URL(one.where).host}`;
-  try {
-    await get(one.where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
-    return [label, `stands at ${one.where}, off ${one.file}`];
-  } catch {
-    return [label, `warn: answers nothing at ${one.where}, off ${one.file}`];
-  }
-}
-
 export async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
     ...WANTED.map((one) => [one.name, standsAt(found[one.name])]),
     ["biome lsp-proxy", files.exists(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
+    ["se-lsp lsp", lspProbe(outside, found["se-lsp"]?.path ?? "", root)],
     [
       "editor",
       files.exists(join(root, EDITOR_SETTINGS))

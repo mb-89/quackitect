@@ -20,13 +20,8 @@ import { dropHold } from "./guidance-hand.js";
 import { processAt } from "./process.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed, unlandedRows } from "./pull-landed.js";
-import {
-  childrenSay,
-  handOut,
-  holdsHere,
-  ticketsHere,
-  withPersonStep,
-} from "./pull-hand.js";
+import { childrenSay, handOut, ticketsHere, withPersonStep } from "./pull-hand.js";
+import { holdsHere } from "./pull-when.js";
 import { fromHold, NOTES, routedTicket } from "./ticket.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
@@ -48,7 +43,7 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
 
   let next = leaf.leaves[leaf.at + 1];
   while (next) {
-    const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text));
+    const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text), text);
     if (when.holds) break;
     text = withEntry(text, { step: next.path, skipped: true, why: when.why });
     changes.push(`skips ${next.path}`);
@@ -69,13 +64,13 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
   }
 
   one.text = text;
-  const finding = landed(it, one, changes);
+  const finding = landed(it, one, changes, more.wrote ?? []);
   if (finding) {
     for (const at of more.wrote ?? []) it.disk.remove(at);
     return unlanded(one, leaf, finding);
   }
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
 }
@@ -150,7 +145,7 @@ export function failed(it, who, one, leaf, held, reason, answered) {
   const finding = landed(it, one, changes);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   // Where the split cap refuses the person step, the hold drops and the answer waits. [[spec/design_output/pull#the-fail]]
   if (capped && !person) {
@@ -210,7 +205,7 @@ export function became(it, who, one, leaf, held, successor, answered) {
   const finding = landed(it, one, [`closes became ${successor}`]);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} closes became ${successor}.`, ...sent.why]);
 }
@@ -241,7 +236,7 @@ export function answeredBy(it, who, one, leaf, held, answerer, answered) {
   const finding = landed(it, one, [`closes answered by ${answerer}`]);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
-  const sent = sentOut(it, one, who.branch, leaf);
+  const sent = sentOut(it, one, who.branch);
   if (!sent.ok) return refusedPush(sent);
   return onward(it, who, [`${one.name} closes answered by ${answerer}.`, ...sent.why]);
 }

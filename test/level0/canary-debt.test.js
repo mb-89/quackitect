@@ -4,8 +4,8 @@
 // [[spec/design_output/level0#the-line-lands-once]]
 // [[spec/design_output/level0#the-debt-survives-a-restart]]
 
-import { join } from "node:path";
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import {
   canary,
@@ -46,23 +46,26 @@ const paidRow = () => rowOf(AT, "info", "level0", HEARD.same, { detail: LINE });
 const compactRow = () => rowOf(AT, "info", "compact", "a compaction runs");
 
 const owes = (it) => Boolean(owesCanary({ tool: "Read" }, it));
+// A box whose session the layer reached, so the line stands owed. [[spec/design_output/level0#rules-ride-the-first-answer]]
+const reached = () =>
+  box([rowOf(AT, "info", "context", "4 block(s) reach the session")]);
 
 test("a step carrying the line pays the debt, and the next call meets no gate", () => {
-  const it = box();
-  assert.equal(owes(it), true, "a box with no session of its own owes it");
+  const it = reached();
+  assert.equal(owes(it), true, "a box the layer reached owes it");
 
   onTurnSaid({ text: `${LINE}\n\nThe work goes on.` }, it);
   assert.equal(owes(it), false);
 });
 
 test("a step without the line leaves the debt standing", () => {
-  const it = box();
+  const it = reached();
   onTurnSaid({ text: "The work goes on." }, it);
   assert.equal(owes(it), true);
 });
 
 test("a helper's step pays nothing, because a helper carries a canary of its own", () => {
-  const it = box();
+  const it = reached();
   onTurnSaid({ text: LINE, agentId: "a-helper" }, it);
   assert.equal(owes(it), true);
 });
@@ -85,8 +88,16 @@ test("a restart after the line leaves the gate quiet", () => {
   assert.equal(owes(box([paidRow()])), false);
 });
 
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a server starting late, before the layer reached the session, asks for no canary", () => {
+  assert.equal(owes(box()), false);
+});
+
 test("a restart before the line asks for the canary", () => {
-  assert.equal(owes(box([rowOf(AT, "info", "context", "1 block(s) reach the session")])), true);
+  assert.equal(
+    owes(box([rowOf(AT, "info", "context", "1 block(s) reach the session")])),
+    true,
+  );
 });
 
 test("a compaction after the line opens the debt again, and a restart reads that", () => {
@@ -123,4 +134,51 @@ test("the line draws highlighted in the wording that owes it and the wording tha
       `the line stands on a line of its own: ${said}`,
     );
   }
+});
+
+// A context repeats the canary, and the repeat draws a finding. [[spec/tickets/answers-read-the-last-text]]
+function heard(it) {
+  const said = [];
+  it.log = { say: (...row) => said.push(row) };
+  return said;
+}
+
+const repeats = (said) =>
+  said.filter((one) => one[0] === "warn" && one[2] === HEARD.again);
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a second step opening on the canary in one context draws the repeat finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: `${LINE}\n\nThe work goes on.` }, it);
+  onTurnSaid({ text: `${LINE}\n\nThe next piece.` }, it);
+  assert.equal(repeats(said).length, 1);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a step that pays, then the turn's end carrying the same text, draws no finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: `${LINE}\n\nThe work stands done.` }, it);
+  onTurnComplete({ reason: "answer", answer: `${LINE}\n\nThe work stands done.` }, it);
+  assert.equal(repeats(said).length, 0);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("the canary alone written twice in one context draws the finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: LINE }, it);
+  onTurnSaid({ text: LINE }, it);
+  assert.equal(repeats(said).length, 1);
+});
+
+// [[spec/tickets/answers-read-the-last-text]]
+test("a line after a compaction pays and draws no finding", () => {
+  const it = box();
+  const said = heard(it);
+  onTurnSaid({ text: LINE }, it);
+  onSessionCompact({ trigger: "auto" }, it);
+  onTurnSaid({ text: LINE }, it);
+  assert.equal(repeats(said).length, 0);
 });

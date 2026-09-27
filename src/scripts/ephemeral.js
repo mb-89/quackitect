@@ -23,6 +23,8 @@ export const ASKS = {
   [WRITE]: [
     "The context passed context.handoverAt, and the ticket in hand stands done.",
     `Write ${HANDOVER}: what stands, what waits, and the ticket the queue hands next.`,
+    // The owner's words travel as the owner said them. [[spec/tickets/the-owners-words-travel-verbatim]]
+    "Quote the owner's words under The owner's words, as said, each with its session and transcript line.",
     `Name no file under ${RETRO}: the next retro reads that folder, and a hand does not.`,
     "Hand it back with ./RUNME.sh ticket pull --pass.",
   ],
@@ -90,7 +92,8 @@ export function handoverFault(disk, root) {
   try {
     text = disk.exists(at) ? String(disk.read(at)) : "";
   } catch {}
-  if (!text.trim()) return `${HANDOVER} stands nowhere, or stands empty. Write it first.`;
+  if (!text.trim())
+    return `${HANDOVER} stands nowhere, or stands empty. Write it first.`;
   const retro = retroIn(text);
   if (retro)
     return `${HANDOVER} names ${retro}. Name the ticket or the class by its name, and take the path out.`;

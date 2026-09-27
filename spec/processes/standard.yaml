@@ -14,10 +14,25 @@ ask:
   - name: done_when
     form: list
     says: one line each, decidable, naming the command that decides it
+  - name: view
+    form: text
+    says: the view the owner reads the change in and the number there, in the owner's words, or none
+  - name: from
+    form: text
+    says: handover where the ask comes off a handover line, so the owner reads it first, or none
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -40,6 +55,9 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
       - name: review
         does: reads the approach against the ask
         not: draft
@@ -95,3 +113,14 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: [ask, implement/tests-green]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows

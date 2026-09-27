@@ -24,7 +24,11 @@ import {
   textAt,
 } from "./work-stands.js";
 
+// A branch a cloud routine cuts carries no group, so it reads against trunk by its commits. [[spec/design_output/work#a-cloud-branch-comes-in]]
+const CLOUD = /^claude\//;
+
 export function merge(it, name) {
+  if (CLOUD.test(name ?? "")) return mergeCloud(it, name);
   if (dirty(it)) return 2;
   const branch = name ? `work/${name}` : "";
   if (!branch) {
@@ -90,6 +94,50 @@ export function merge(it, name) {
   return 0;
 }
 
+// [[spec/design_output/work#a-cloud-branch-comes-in]]
+function mergeCloud(it, branch) {
+  if (dirty(it)) return 2;
+  const on = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (on !== TRUNK) {
+    console.error(`branch merge runs on ${TRUNK}, and this is ${on}.`);
+    return 2;
+  }
+  it.git.run(["fetch", "--prune", "origin"], true);
+  const left = it.git
+    .run(["cherry", TRUNK, `origin/${branch}`], true)
+    .out.split("\n")
+    .filter((row) => row.startsWith("+"));
+  const was = it.git.run(["rev-parse", "HEAD"], true).out;
+  if (
+    left.length &&
+    !it.git.run(["merge", "--no-ff", "--no-edit", `origin/${branch}`]).ok
+  ) {
+    console.error(`${branch} conflicts. Resolve it, commit, then run branch close.`);
+    return 1;
+  }
+
+  const said = checkSays(it);
+  if (!said.ok) {
+    if (left.length) it.git.run(["reset", "--hard", was], true);
+    console.error(`The check answers red on ${TRUNK}, so ${branch} stands.`);
+    console.error(said.says || "Run ./RUNME.sh check to read what it says.");
+    return 1;
+  }
+  // [[spec/design_output/work#a-merged-branch-closes]] holds the order: trunk reaches origin before the branch goes.
+  if (!it.git.run(["push", "origin", TRUNK]).ok) {
+    console.error(`The push of ${TRUNK} comes back refused, so ${branch} stands.`);
+    return 1;
+  }
+  if (!it.git.run(["push", "origin", "--delete", branch]).ok) return 1;
+  it.git.run(["branch", "-D", branch], true);
+  console.log(
+    left.length
+      ? `${branch} is merged, the check passes, and the branch is gone.`
+      : `${TRUNK} carries ${branch} already, the check passes, and the branch is gone.`,
+  );
+  return 0;
+}
+
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 function movedOnTrunk(it, branch) {
   // One read answers what trunk and a branch share, and the listing reads it too. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -114,8 +162,8 @@ function movedOnTrunk(it, branch) {
   return out;
 }
 
-// [[spec/design_output/work#the-merge-frees-the-tickets]]
-function freeChildren(it, name) {
+// branch done frees them on the branch, and the merge frees what an older branch still holds. [[spec/design_output/work#the-merge-frees-the-tickets]]
+export function freeChildren(it, name) {
   const out = [];
   for (const one of childrenHere(it, name)) {
     if (fieldOf(one.text, "state") === CLOSED) continue;
@@ -128,17 +176,15 @@ function freeChildren(it, name) {
 }
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
+// The check under --errors prints the red cases alone, so the merge hands on every row. [[spec/tickets/the-verbs-need-no-wrapper]]
 function checkSays(it) {
   const ran = it.proc.run(
-    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check"],
+    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check", "--errors"],
     {
       cwd: it.root,
     },
   );
-  const rows = String(ran.stdout ?? "")
-    .trim()
-    .split("\n");
-  return { ok: ran.exitCode === 0, says: rows.at(-1) ?? "" };
+  return { ok: ran.exitCode === 0, says: String(ran.stdout ?? "").trim() };
 }
 
 // [[spec/design_output/work#a-merged-branch-closes]]

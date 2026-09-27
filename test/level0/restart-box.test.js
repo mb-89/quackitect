@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
+import { SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { MINT_TOOL } from "../../.claude/skills/level0/lib/schema.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TOOLS_BLOCK } from "../../src/bridge/guidance.js";
@@ -202,4 +203,56 @@ test("a box building its own log writes at the level the config names, and follo
   await box.log.event(said, await decide(said, box));
   assert.match(kinds(), /"kind":"hook"/, "a debug box writes it");
   assert.deepEqual(box.log.lines(), [], "the server's door keeps no row in memory");
+});
+
+const RULES = "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n";
+const guided = (files = {}) =>
+  restarted({ [at("spec/guidance/rules.md")]: RULES, ...files });
+const contextOf = (said) => (said?.after?.context ?? []).join("\n");
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("the standing layer rides the first tool call where no context read reached the server, and once", async () => {
+  const box = guided();
+
+  const first = contextOf(await reads(box));
+  const second = contextOf(await reads(box));
+
+  assert.match(first, /Say what is\./, "the first call carries the rules");
+  assert.match(first, /level0 holds this session/, "and the canary block");
+  assert.doesNotMatch(second, /Say what is\./, "the second call carries none");
+});
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a context read hands the layer, so the call after it carries none", async () => {
+  const box = guided();
+  const read = await decide({ event: "prompt.context", e: {} }, box);
+
+  const said = contextOf(await reads(box));
+
+  assert.ok((read.after?.blocks ?? []).some((one) => one.name === "level0-rules"));
+  assert.doesNotMatch(said, /Say what is\./);
+});
+
+// [[spec/design_output/level0#rules-ride-the-first-answer]]
+test("a server restarting under a session the layer reached hands it no second time", async () => {
+  const row = JSON.stringify({
+    level: "info",
+    kind: "context",
+    said: "4 block(s) reach the session",
+  });
+  const box = guided({ [at(SESSION)]: `${row}\n` });
+
+  const said = contextOf(await reads(box));
+
+  assert.doesNotMatch(said, /Say what is\./);
+});
+
+// A context read after a clear hands the layer again, as the chapter on the guidance says. [[spec/design_output/level0#the-guidance-stays-put]]
+test("a context read after the layer rode a call hands it again", async () => {
+  const box = guided();
+  await reads(box);
+
+  const read = await decide({ event: "prompt.context", e: {} }, box);
+
+  assert.ok((read.after?.blocks ?? []).some((one) => one.name === "level0-rules"));
 });

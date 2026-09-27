@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quackitect Migration Inventory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root{
+  --bg:#F4F6F3; --panel:#FFFFFF; --ink:#18201C; --muted:#5A665F; --line:#CDD5CF;
+  --accent:#A95A14; --accent-soft:#F5E6D4; --door-bg:#E2E9EF; --hot:#B23A2A; --code:#EAEEE9;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --cond:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#111613; --panel:#19201C; --ink:#E3E9E4; --muted:#9AA79F; --line:#34403A;
+    --accent:#E59A4C; --accent-soft:#3B2B1B; --door-bg:#1E2A33; --hot:#F07A66; --code:#1D2521;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#111613; --panel:#19201C; --ink:#E3E9E4; --muted:#9AA79F; --line:#34403A;
+  --accent:#E59A4C; --accent-soft:#3B2B1B; --door-bg:#1E2A33; --hot:#F07A66; --code:#1D2521;
+  color-scheme:dark;
+}
+body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:15.5px; line-height:1.6; padding-inline:16px; padding-block:40px 72px;}
+main{max-width:1000px; margin:0 auto; display:flex; flex-direction:column; gap:56px;}
+.prose{max-width:68ch;}
+header{display:flex; flex-direction:column; gap:14px;}
+.eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted);}
+h1{font-family:var(--cond); font-weight:600; font-size:clamp(30px,5vw,46px); line-height:1.08; margin:0; text-wrap:balance;}
+h1 em{font-style:normal; color:var(--accent);}
+h2{font-family:var(--cond); font-weight:600; font-size:25px; line-height:1.2; margin:0 0 10px; text-wrap:balance;}
+p{margin:0 0 12px;}
+.lede{font-size:18px; color:var(--ink); max-width:62ch; margin:0;}
+section{display:flex; flex-direction:column; gap:14px;}
+code,.mono{font-family:var(--mono); font-size:.9em;}
+p code, li code, td code{background:var(--code); padding:1px 5px; border-radius:3px;}
+.decisions{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.decisions div{background:var(--panel); padding:14px 16px; display:flex; flex-direction:column; gap:4px;}
+.decisions b{font-family:var(--cond); font-weight:600; font-size:15px;}
+.decisions span{color:var(--muted); font-size:14px; line-height:1.45;}
+figure{margin:0; display:flex; flex-direction:column; gap:10px;}
+.scroll{overflow-x:auto; background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:12px;}
+.scroll svg{display:block; width:100%; min-width:760px; height:auto; color:var(--ink);}
+figcaption{font-size:14px; color:var(--muted); max-width:78ch; line-height:1.5;}
+figcaption ol{margin:6px 0 0; padding-left:22px;}
+/* svg classes */
+.bx{fill:var(--panel); stroke:var(--line); stroke-width:1.2;}
+.bx-strong{fill:var(--panel); stroke:var(--ink); stroke-width:1.2;}
+.bx-accent{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.6;}
+.frame{fill:none; stroke:var(--muted); stroke-width:1; stroke-dasharray:5 4;}
+.frame-accent{fill:none; stroke:var(--accent); stroke-width:2;}
+.door{fill:var(--panel); stroke:var(--ink); stroke-width:1.3;}
+.fake{fill:var(--bg); stroke:var(--muted); stroke-width:1; stroke-dasharray:3 2;}
+.fk{font-family:var(--mono); font-size:10.5px; fill:var(--muted);}
+.lab-door{font-family:var(--cond); font-size:12.5px; font-weight:600; fill:currentColor;}
+.term{fill:var(--code); stroke:var(--ink); stroke-width:1.3;}
+.tt{font-family:var(--mono); font-size:12.5px; fill:currentColor;}
+.tm{font-family:var(--mono); font-size:12.5px; fill:var(--muted);}
+.ta{font-family:var(--mono); font-size:12.5px; fill:var(--accent); font-weight:500;}
+.tabon{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.2;}
+.sel{fill:var(--accent-soft);}
+.div{stroke:var(--line); stroke-width:1.2;}
+.chip{fill:var(--panel); stroke:var(--ink); stroke-width:1;}
+.chip-in{fill:var(--panel); stroke:var(--ink); stroke-width:1; stroke-dasharray:4 3;}
+.ln{stroke:currentColor; stroke-width:1.3; fill:none;}
+.hot{stroke:var(--hot); stroke-width:2; fill:none;}
+.hotfill{fill:var(--hot);}
+.accfill{fill:var(--accent);}
+.inkfill{fill:currentColor;}
+.t{font-family:var(--sans); font-size:13px; font-weight:600; fill:currentColor;}
+.s{font-family:var(--sans); font-size:11px; fill:var(--muted);}
+.m{font-family:var(--mono); font-size:11.5px; fill:currentColor;}
+.lab{font-family:var(--sans); font-size:11px; font-style:italic; fill:var(--muted);}
+.lab-hot{font-family:var(--sans); font-size:11.5px; font-weight:600; fill:var(--hot);}
+.lab-acc{font-family:var(--cond); font-size:13px; font-weight:600; fill:var(--accent);}
+/* code + tables */
+pre{margin:0; background:var(--code); border:1px solid var(--line); border-radius:6px; padding:16px 18px; overflow-x:auto; font-family:var(--mono); font-size:13px; line-height:1.55;}
+pre .c{color:var(--muted);}
+pre .k{color:var(--accent); font-weight:500;}
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:6px; background:var(--panel);}
+table{border-collapse:collapse; width:100%; font-size:14px; min-width:640px;}
+th,td{text-align:left; vertical-align:top; padding:9px 12px; border-bottom:1px solid var(--line);}
+th{font-family:var(--cond); font-weight:600; font-size:13px; letter-spacing:.03em; color:var(--muted); background:var(--bg);}
+tr:last-child td{border-bottom:none;}
+td.num{font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--muted);}
+.pill{display:inline-block; font-family:var(--mono); font-size:11.5px; padding:1px 7px; border-radius:10px; border:1px solid var(--line); white-space:nowrap;}
+.pill.grow{border-color:var(--accent); color:var(--accent);}
+.pill.port{border-color:var(--ink);}
+.pill.shrink{color:var(--muted);}
+.pill.gen{border-style:dashed;}
+.two{display:grid; grid-template-columns:1fr; gap:18px;}
+@media (max-width:760px){ .two{grid-template-columns:1fr;} .decisions{grid-template-columns:1fr;} }
+ul.rules{margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; max-width:74ch;}
+ul.rules b{font-weight:600;}
+
+.stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.stats div{background:var(--panel); padding:14px 16px; display:flex; flex-direction:column; gap:2px;}
+.stats b{font-family:var(--cond); font-size:30px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.1;}
+.stats span{font-size:13.5px; color:var(--muted); line-height:1.4;}
+@media (max-width:760px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr));} }
+.gaps{display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden;}
+.gaps > div{background:var(--panel); padding:12px 16px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:16px;}
+.gaps b{font-family:var(--cond); font-weight:600; font-size:15px; display:block; margin-bottom:2px;}
+.gaps p{margin:0; font-size:14px; color:var(--muted); line-height:1.5;}
+.gaps .fix{color:var(--ink);}
+.gaps .fix::before{content:"Proposal: "; font-weight:600; color:var(--accent);}
+@media (max-width:760px){ .gaps > div{grid-template-columns:1fr; gap:6px;} }
+td b{font-weight:600;}
+</style>
+</head>
+<body>
+
+<main>
+<div style="border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:10px 14px;font-size:14px;color:var(--muted)">Snapshot of the design conversation of 26 Sep 2026. Where this page and the notes differ, the notes win: <code>spec/design_input/the-index-holds-the-model.md</code>, <code>spec/design_input/the-migration-runs-in-slices.md</code>, <code>spec/design_output/migration.md</code> and <code>spec/rationales/</code>.</div>
+<header>
+  <div class="eyebrow">Detailed pass · quackitect · 26 Sep 2026</div>
+  <h1>What goes, what stays, <em>what moves</em></h1>
+  <p class="lede">This is a folder-by-folder inventory of quackitect against the target (the index as the central model, one-file modules, doors on both sides). Seven readers covered every source folder, the plugin, the specs and the tests. Line counts are from <code>wc -l</code>; everything else is their reading of the code, checked against it.</p>
+</header>
+
+<section>
+  <h2>In numbers</h2>
+  <div class="stats">
+    <div><b>~50k</b><span>lines of source code today: about 24k JS in scripts, bridge, engine and the plugin lib, and about 24k Go</span></div>
+    <div><b>~10k</b><span>of them only move data between processes and languages (ports, standing files, spawns, stdout JSON, caches). They go without replacement</span></div>
+    <div><b>~2.3k</b><span>lines of JS checks that already exist in Go. The JS twin goes</span></div>
+    <div><b>~23k</b><span>of 43.7k test lines are deleted or replaced by replay and generic contract tests. Most of the rest is rewritten in Go</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Two rules added today</h2>
+  <p class="prose">Both came from the owner's earlier "wirings" system, which let every part read and write every variable. Both change how a module is written, so they are fixed before any code is ported.</p>
+  <div class="gaps">
+    <div><div><b>Input, processing, output</b><p>A provider or an action declares its inputs up front. The index hands it one consistent snapshot of all of them, taken at one model revision. Processing is pure and cannot call the index. Output is one atomic commit: the names it provides, or the list of door calls an action makes.</p></div>
+    <p class="fix">Inputs become a struct whose fields name the values they read (<code>`q:"work/places"`</code>), in place of <code>q.Get</code> during the computation. Each run costs one round trip, which matters now that modules are separate processes. A run never mixes an old value with a new one. Outputs carry the revision they were computed from, and a change during the run simply triggers the next run.</p></div>
+    <div><div><b>The wiring analyzer</b><p>The agent can ask any name: who writes it, who reads it, where it comes from, and where the function behind it lives. Unlike the old system, only one part can write a given name, and the analyzer makes that visible.</p></div>
+    <p class="fix">Declared inputs make the whole wiring known without running anything. The index records the file and line of each registration. <code>quack why work/open-tasks</code> (also an agent tool and an index-tab view) prints the provider and its file, the inputs down to files, git and events, and every reader.</p></div>
+  </div>
+<pre><span class="c">// modules/work/open_tasks.go, rewritten for input · processing · output</span>
+<span class="k">type</span> openTasksIn <span class="k">struct</span> {
+	Places Places `q:"work/places"`            <span class="c">// input: declared, delivered as one snapshot</span>
+}
+
+<span class="k">var</span> OpenTasks = q.Derived("work/open-tasks", 0,
+	q.Doc("The tickets this box can take: the number in the work tab's brackets."),
+	<span class="k">func</span>(in openTasksIn) (int, error) {     <span class="c">// processing: pure, no index access</span>
+		<span class="k">return</span> in.Places.Takeable, nil          <span class="c">// output: committed at once, with the snapshot's revision</span>
+	})</pre>
+<pre><span class="c">$ quack why work/open-tasks</span>
+work/open-tasks = 3                       rev 4812 · provided by work.local
+  provider   modules/work/open_tasks.go:9
+  reads      work/places                  modules/work/places.go:14
+               reads tickets/*             modules/tickets/ticket.go:22  ← files/spec/tickets/*.md
+               reads git/refs/work/*       input · git door
+               reads plan/order            modules/plan/order.go:11      ← files/.se/.runtime/plan.json
+  read by    VS Code badge (work/editor) · TUI work view header</pre>
+</section>
+
+<section>
+  <h2>By area</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Area</th><th>Lines</th><th>Goes without replacement</th><th>Moves to Go</th><th>Stays</th></tr></thead>
+      <tbody>
+        <tr><td><code>src/scripts</code>: work, pull, ticket</td><td class="num">6.9k</td><td>~700: stdout JSON hops, three <code>cli.js check</code> spawns, re-reading git on every call, dispatch and usage</td><td>The pull state machine, queue and outline, the "one answer" (<code>work-answer.js</code>), branch standing, route walk, ticket writes → <code>work</code>, <code>pull</code>, <code>tickets</code>, <code>plan</code></td><td>·</td></tr>
+        <tr><td><code>src/scripts</code>: CLI, check, retro, install</td><td class="num">5.2k</td><td>~790 of verb routing (<code>cli.js</code> table, <code>cli-doors</code>, <code>cli-served</code>, <code>serve.js</code>, <code>tui-build.js</code>); ~350 of 598 lines of <code>install.sh</code></td><td>Battery and stamp, commit and push, log reading, retro, vehicle and stub, styles → <code>check</code>, <code>work</code>, <code>log</code>, <code>retro</code>, <code>vehicle</code></td><td>Editor linking, trust, brand, browser and bundle (install and extension tooling)</td></tr>
+        <tr><td><code>src/bridge</code>, <code>src/doors</code>, <code>src/engine</code></td><td class="num">8.2k</td><td>~1.4k: server lifecycle, reload and self-test, caches, spawning <code>se-index</code> per Grep, state kept alive across restarts</td><td>Every cage rule (stop, write, bash, answer, grace, handover, plan cadence, god mode) → the cage module; the tools → actions; the doors → Go doors with fakes; retro → <code>retro</code></td><td>·</td></tr>
+        <tr><td><code>.claude/skills/level0</code> (hooks + lib)</td><td class="num">11.9k</td><td>~3.5k: the start road, the pull process hop, the Grep relay, the Copilot copy of the cage, standing files, and ~2.3k of JS twins of Go checks</td><td>Config layering, guidance, the answer gate, voice, bash guard, tickets, apply and undo, projections → matching modules</td><td>The hook module, cut from 706 to about 200 lines</td></tr>
+        <tr><td><code>src/index</code>, <code>src/lsp</code>, config, yaml, pointer (Go)</td><td class="num">8.9k</td><td>~1.7k: the standing-file protocol (written twice), three self-spawn loops, the LSP's index client, <code>/findings</code> port, the long poll and hash-diff caches</td><td>The LSP rules and schema checker → <code>check</code>; tickets → <code>tickets</code>; config → <code>cfg/</code></td><td>The index core (walk, watch, SQLite, FTS, grep and glob), the LSP protocol and features, yaml</td></tr>
+        <tr><td><code>src/tui</code> (Go)</td><td class="num">5.7k</td><td>~420: its own index client, spawning <code>branch list --json</code>, <code>--count</code>, the TUI writing <code>plan.json</code> and ticket fronts itself</td><td>Place, edit and flip logic → <code>plan</code> and <code>tickets</code> actions</td><td>frame, draw and tree (the generic shell and base-view renderer), the log view</td></tr>
+        <tr><td><code>src/extension</code> (JS)</td><td class="num">3.0k</td><td>~850: bridge process control, verb spawning and stdout parsing, its own log reader, its own config layering, runtime imports of repo JS</td><td>Lens and field-mark logic → <code>pull</code> and <code>tickets</code> names</td><td>The generic sidebar renderer, the route drawing (React Flow), lens and inset UI</td></tr>
+        <tr><td>tests (<code>test/</code>, <code>*_test.go</code>)</td><td class="num">43.7k JS + ~9.5k Go</td><td>~8.9k plumbing tests</td><td>~18.5k business-logic tests, re-hosted in Go and expected to shrink 35–50%. ~6.1k event→decision tests are replaced by session-log replay</td><td>~2–3k extension and hook-module tests; the Vale rule cases</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>What goes without replacement</h2>
+  <ul class="rules">
+    <li><b>Process lifecycle.</b> The bridge server's start, takeover, reload, self-test and respawn. Four standing files with ports (<code>index.json</code>, <code>lsp.json</code>, <code>panel.json</code>, <code>vehicle.json</code>), plus <code>show-panel</code>. The server is started three ways and its health probed three ways. Binaries are swapped in two ways and checked for staleness in two ways, one by mtime, one by source hash.</li>
+    <li><b>Verb plumbing.</b> The <code>cli.js</code> dispatch table, usage texts and hand-written flag parsing. The stdout JSON protocols: <code>branch list --json</code>, <code>ticket yours</code>, route and fill JSON, <code>--judge</code>, and the "spawn" text the hook parses. The sidebar count's four-process chain on every redraw.</li>
+    <li><b>Caches and change detectors.</b> Four separate mtime:size detectors, <code>caches.js</code>, projection and Vale-style staleness checks, the LSP parse cache, and the hash-diff caches in the LSP and the TUI over a long-poll <code>changes</code> call. Dependency tracking in the index replaces all of them.</li>
+    <li><b>Code that exists only because the server restarts.</b> The marks file, the canary debt rebuilt from the log, <code>fillsBox</code>, and about 20 cache fields on the box.</li>
+    <li><b>The second cage.</b> <code>copilot-runtime.js</code> (313 lines) re-implements the write door, the trunk refusal, the stop checks and handover for Copilot. Copilot then gets the same rules through the hooks door.</li>
+    <li><b>Twins.</b> About 2.3k lines of JS checks (tree rules, schema, size, magic, names, paths, private, slug, the Vale and Biome parsers) whose Go twins already run in <code>src/lsp</code>. Also every "spelled again here" constant in Go.</li>
+    <li><b>install.sh.</b> Three Go builds become one <code>go build</code>. The Zig download (~90 lines) goes too if the index moves to pure-Go SQLite (see gaps).</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Duplications, the evidence</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Fact</th><th>Copies</th><th>Where, and what already differs</th></tr></thead>
+      <tbody>
+        <tr><td>Config resolution</td><td class="num">5</td><td><code>lib/config.js</code>, <code>config.go</code>, <code>bridge/config.js</code> (<b>no env layer</b>), extension <code>widgets.js</code> (<b>no env layer</b>), <code>lsp/config.go</code>. Only JS merges method and work roots, so one key can resolve differently depending on who reads it.</td></tr>
+        <tr><td>Frontmatter parse and write</td><td class="num">5 + 3</td><td>Five parsers (<code>index/front.go</code>, <code>index/ticket.go</code>, <code>lsp/note.go</code>, <code>schema-read.js</code>, <code>group.js</code>). Three writers; Go quotes values and JS doesn't.</td></tr>
+        <tr><td>Ask chapter</td><td class="num">3</td><td><code>group.js</code> keeps comments; <code>pull-chapter.js</code> and <code>index/ticket.go</code> drop them. The queue's text and the index's text already differ.</td></tr>
+        <tr><td>Held / group standing</td><td class="num">3</td><td><code>group.js</code>, <code>work-stands.js</code>, <code>index/ticket.go</code>, and the TUI overrides it again in <code>Placed</code>.</td></tr>
+        <tr><td>Current leaf of a route</td><td class="num">4</td><td><code>group.js</code>, <code>pull-route.js</code>, <code>ticket.js</code>, <code>lsp/group.go</code>, plus the extension's <code>lens.js</code>. A fixture test exists only to keep two of them in step.</td></tr>
+        <tr><td>Hold folder readers</td><td class="num">4</td><td><code>guidance-hand.js</code>, <code>ephemeral.js</code>, <code>named.js</code>, <code>lens.js</code>, plus a <code>folders.test.js</code> that only checks the copies agree.</td></tr>
+        <tr><td>Session log rows</td><td class="num">3</td><td><code>lib/log.js</code>, <code>tui/log/record.go</code>, extension <code>rows.js</code>; the level ladder is written twice.</td></tr>
+        <tr><td>Index client</td><td class="num">4</td><td><code>lsp/indexed.go</code>, <code>tui/work/workindex.go</code>, <code>src/doors/index.js</code>, <code>lib/index.js</code>.</td></tr>
+        <tr><td>Cloud detection</td><td class="num">4</td><td><code>cloud.js</code> treats "0" as not cloud; the hook's start script checks only that the variable is set; <code>copilot.js</code> and the Copilot runtime each use their own signals.</td></tr>
+        <tr><td>Walk skip lists, globs</td><td class="num">4 + 3</td><td>Four skip lists, three glob translators (two in Go with different features).</td></tr>
+        <tr><td><code>.se/.runtime</code> paths, port 6510, <code>se-index</code>, <code>plan.json</code>, <code>tools.json</code></td><td class="num">10+</td><td>Spelled again across Go, JS, shell and the stub hook "because this module imports nothing".</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>Gaps the inventory found in the design</h2>
+  <p class="prose">These are cases today's code handles and the target design didn't cover yet. Each needs a decision before the phase that meets it.</p>
+  <div class="gaps">
+    <div><div><b>State folded from events</b><p>About 25 session values (demand, grace, handover, claims, marks, calls, helpers…) are reducers over the event stream, not functions of files.</p></div><p class="fix">A third provider kind, <code>q.Fold(name, default, func(state, event) state)</code>, over the <code>session/</code> input. It still has one owner, and the IPO rule applies per event.</p></div>
+    <div><div><b>Git is not a file</b><p>Origin refs, blobs by ref, merge-base and log change on fetch and commit. The file watcher doesn't see them.</p></div><p class="fix">Decided: git is never live input. A group in the cloud is marked in its ticket on main, so the queue reads only files. Reading the archive is an explicit operation through the git door, outside the index.</p></div>
+    <div><div><b>Actions are transactions</b><p>A hand-back writes, stages, commits (the git hook may refuse and trigger a revert), pushes with a rebase retry, and runs the check first on trunk.</p></div><p class="fix">An action's output is an ordered list of door calls with an undo per step. The index runs one writing action at a time. Git hooks only read names, so they can never deadlock against a running action.</p></div>
+    <div><div><b>Unsaved editor buffers</b><p>The LSP checks open buffers, not only what's on disk.</p></div><p class="fix">A <code>buffers/</code> input owned by the LSP door. Check names read the buffer where one is open and the file otherwise.</p></div>
+    <div><div><b>Time and identity</b><p>Stale claims and queue ages depend on the clock. Which hand is calling depends on the caller's environment and <code>box.json</code>.</p></div><p class="fix">A <code>clock/minute</code> input from the clock door. Every inbound call carries a session id, and per-session names live under <code>session/&lt;id&gt;/</code>.</p></div>
+    <div><div><b>NLP in the checks</b><p>The tense, sentence-length and vocabulary vetoes use wink-nlp (JS). Go has no tagger that tags the same way.</p></div><p class="fix">Keep wink behind a small "prose" outbound door running as a Node sidecar. Findings stay identical, and a Go port can be considered later.</p></div>
+    <div><div><b>The hook protocol is bigger than "forward, register, spawn"</b><p>The answers also cover streaming, context fill, transcript rows, clear plus resubmit, <code>model.classify</code> and <code>ui.log</code>, and tools must be registered before the index answers.</p></div><p class="fix">Write the answer-verb spec before phase 5. The tool list is generated at build time into a file the hook reads at session start.</p></div>
+    <div><div><b>Cold start</b><p>Git hooks run with no index running, and a fresh cloud clone has no binary. Copilot command hooks time out after 60 s.</p></div><p class="fix">One <code>quack</code> binary. <code>quack hook</code> starts the index if none answers. The cloud setup builds the binary, or downloads a pinned release build.</p></div>
+    <div><div><b>cgo, Zig and several Go modules</b><p>The index needs cgo SQLite with FTS5 (and Zig on Windows). The LSP promises no cgo. There are seven go.mod files, and the TUI is on Go 1.27 while the rest are on 1.24.</p></div><p class="fix">One Go module and one Go version. Test pure-Go SQLite (modernc, FTS5 support to verify) in phase 1. If it holds, Zig and cgo leave the install.</p></div>
+    <div><div><b>Byte-identical outputs</b><p>Ticket frontmatter rewrites and the generated Vale rules must not churn.</p></div><p class="fix">The Go writer becomes the only writer, preceded by one normalising commit over all tickets. The Vale output is compared byte for byte in CI.</p></div>
+    <div><div><b>Twins that differ</b><p>Pointer resolution, config env naming, skip lists and the schema subset differ between their copies, so picking one changes findings.</p></div><p class="fix">For each twin, run both over the whole tree and compare (golden files). The owner decides each difference before the JS copy goes.</p></div>
+    <div><div><b>Architecture guards</b><p>DoorsOnly, FakeDoorsInTest and OutsideInDoors are Vale scans of JS imports.</p></div><p class="fix">A <code>go/analysis</code> check over the import rules (modules import no doors, doors and renderers import no modules), run by the check.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Bugs found on the way</h2>
+  <ul class="rules">
+    <li><b>The judge switch does nothing.</b> <code>hooks/pull-tool.js</code> reads the tracked <code>level0.json</code> directly, but <code>/se-config-judge-enabled-false</code> writes the local layer.</li>
+    <li><b>Lost log lines.</b> <code>extension/lib/logbook.js</code> rewrites the whole <code>session.jsonl</code> for every line, so it races the other writers.</li>
+    <li><b>Config differs by reader.</b> The bridge's <code>asks</code> and the extension's <code>valuesOf</code> skip the env layer.</li>
+    <li><b>Windows gaps.</b> <code>trust.js</code> reads only <code>HOME</code>. Drive-letter normalising (<code>rooted</code>) exists only in the index, so the LSP roots paths differently on Windows. Four places pick the home directory with conflicting precedence.</li>
+    <li><b>Drift already visible.</b> <code>pull-route.js BRANCH</code> lists <code>new</code> and lacks <code>open</code> and <code>unblock</code>. The TUI's ticket links ignore <code>.se/tickets</code>. A second vehicle's port 6511 collides with the window door's.</li>
+    <li><b>Dead code.</b> <code>readThroughTheReader</code>, <code>prepush.lintedBy</code>, <code>work-stands</code> <code>branches</code>/<code>frontField</code>/<code>ticketsOn</code>, <code>freeNow</code> (tests only), unused env constants in <code>lsp/config.go</code>, and the <code>inset-probe</code> skill.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>The pilot, corrected</h2>
+  <p class="prose">The count depends on the queue logic (<code>work-answer.js</code>), so the pilot is bigger than one badge. Its steps and the order of all the work are now on their own page: <a href="the-migration-runs-in-slices.html">Quackitect Migration Plan</a>.</p>
+</section>
+
+<section>
+  <h2>Tests after the move</h2>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Bucket</th><th>Lines</th><th>Fate</th></tr></thead>
+      <tbody>
+        <tr><td>Plumbing (servers, start road, swap, standing files, CLI glue, install, folders)</td><td class="num">8.9k</td><td><span class="pill">delete</span></td></tr>
+        <tr><td>Event → decision through the bridge</td><td class="num">6.1k</td><td><span class="pill port">replay</span> Recorded session logs replayed into the hooks door, asserting the same decisions. The harness is ~1–2k lines, and logs must be recorded at debug level</td></tr>
+        <tr><td>Business logic (pull, work, ticket, retro, schema, stop, bash, apply…)</td><td class="num">18.5k</td><td><span class="pill port">port</span> Go module tests with door fakes. The argv-keyed fake worlds collapse, so expect 35–50% less</td></tr>
+        <tr><td>Vale and prose rules</td><td class="num">4.3k</td><td><span class="pill grow">keep</span> The cases stay, run behind the Vale door</td></tr>
+        <tr><td>Extension and UI</td><td class="num">3.3k</td><td><span class="pill grow">keep</span> in JS, roughly halved by the generic renderer</td></tr>
+        <tr><td>Door contracts</td><td class="num">1.1k</td><td><span class="pill port">port</span> one-to-one, real door against its fake</td></tr>
+        <tr><td>New: generic contract tests</td><td class="num">·</td><td><span class="pill gen">new</span> Over every registered name: has a default, type and doc; reachable from the CLI, HTTP and MCP; every stop-rule <code>runs:</code> resolves; every fake matches its door</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="prose">The node tests ran in 25 s here (2,194 tests; 3 failed and 81 skipped, mostly because Vale, Biome and esbuild were missing in this environment). The Go tests took about 48 s run one module at a time, not counting the index.</p>
+</section>
+
+<section>
+  <h2>Decisions needed from the owner</h2>
+  <ul class="rules">
+    <li><b>The prose door.</b> Keep wink-nlp as a Node sidecar door, or re-baseline the tense and vocabulary rules in Go?</li>
+    <li><b>SQLite.</b> If pure-Go SQLite holds up in phase 1, drop cgo and Zig?</li>
+    <li><b>One writer for frontmatter.</b> Accept one normalising commit over all tickets?</li>
+    <li><b>Twins.</b> Review the golden-file differences per twin (pointer resolution, config env naming, skip lists) as each is merged?</li>
+    <li><b>Fix now or later.</b> Fix the judge switch and the log race now, before the migration reaches them?</li>
+  </ul>
+</section>
+</main>
+
+</body>
+</html>

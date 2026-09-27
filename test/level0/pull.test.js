@@ -156,7 +156,7 @@ test("the pull hands out the child's first leaf, writes the hold, and the answer
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 0);
-  assert.match(said, /^work {2}a-child at design\/draft, leaf 1 of 5 under design/);
+  assert.match(said, /^work {2}a-child at design\/draft, leaf 1 of 4 under design/);
   assert.match(said, /writes the approach the ask calls for/);
   assert.match(said, /One piece of it\./);
   assert.match(said, /### approach {2}text: the approach/);

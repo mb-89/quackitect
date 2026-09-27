@@ -267,12 +267,13 @@ compiler_here() {
 # step with the index above: that one is C and waits on a toolchain, and this
 # one builds beside it in under a second on every box.
 # [[spec/design_output/index#the-compiler-it-needs]]
-# A binary older than its own source lints against rules the tree no longer
-# carries, so a source newer than the binary asks for the build again.
+# A binary built off other source lints against rules the tree no longer
+# carries, so a hash of its folder and of each folder its go.mod replaces
+# stands beside it, and a hash that moves asks for the build again.
+# [[spec/design_output/lsp#the-build-beside-the-index]]
 lsp_here() {
   if [ ! -x "$bin/se-lsp${exe}" ]; then return 1; fi
-  newer=$(find "$root/src/lsp" -name '*.go' -newer "$bin/se-lsp${exe}" -print -quit 2>/dev/null || true)
-  [ -z "$newer" ]
+  (cd "$root" && node src/scripts/go-source.js fresh se-lsp) 2>/dev/null
 }
 
 # A running server holds its binary open, and Windows refuses a write over it
@@ -292,6 +293,7 @@ get_lsp() {
   say "  building the language server"
   (cd "$root/src/lsp" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}.new" .) || return 1
   swap_in "$bin/se-lsp${exe}.new" "$bin/se-lsp${exe}" || return 1
+  (cd "$root" && node src/scripts/go-source.js stamp se-lsp) || return 1
   lsp_here
 }
 
@@ -319,12 +321,12 @@ get_modules() {
   go_sums > "$go_stamp"
 }
 
-# A binary older than its own source walks by rules the tree no longer carries,
-# so a source newer than the binary asks for the build again.
+# A binary built off other source walks by rules the tree no longer carries,
+# so the index keys on the same hash the language server keys on.
+# [[spec/design_output/lsp#the-build-beside-the-index]]
 index_here() {
   if [ ! -x "$bin/se-index${exe}" ]; then return 1; fi
-  newer=$(find "$root/src/index" -name '*.go' -newer "$bin/se-index${exe}" -print -quit 2>/dev/null || true)
-  [ -z "$newer" ]
+  (cd "$root" && node src/scripts/go-source.js fresh se-index) 2>/dev/null
 }
 
 # [[spec/design_output/index#the-compiler-it-needs]]
@@ -366,6 +368,7 @@ get_index() {
   (cd "$root/src/index" && CC="$cc" CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 \
     go build -o "$bin/se-index${exe}.new" .) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
+  (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here
 }
 

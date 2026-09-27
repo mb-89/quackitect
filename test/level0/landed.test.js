@@ -4,6 +4,7 @@
 // [[spec/design_output/pull#the-refused-commit]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -90,4 +91,59 @@ test("the refusal names the finding and where the ticket stays", () => {
     "",
     "Fix it, and a-child stays in hand at design/draft.",
   ]);
+});
+
+// A pass stages the ticket and the files its hand's journals name since the hold, so a sibling hand's edit stays out. [[spec/design_output/pull#the-refused-commit]]
+test("a pass stages the ticket and the hand's own paths, and leaves a sibling's edit unstaged", () => {
+  const journal = (ticket, at, file) =>
+    `${JSON.stringify({ on: "", by: "level0", at, ticket, files: [{ file }] })}\n`;
+  const git = fakeGit({}, "/tree");
+  const disk = fakeDisk({
+    [AT]: WROTE,
+    "/tree/.se/.runtime/hold/a-hand.json": JSON.stringify({
+      ticket: "a-child",
+      taken: "2026-01-02T00:00:00.000Z",
+    }),
+    "/tree/.se/.runtime/undo/20260101000000000000.json": journal(
+      "a-child",
+      "2026-01-01T00:00:00.000Z",
+      "src/old.js",
+    ),
+    "/tree/.se/.runtime/undo/20260103000000000000.json": journal(
+      "a-child",
+      "2026-01-03T00:00:00.000Z",
+      "src/mine.js",
+    ),
+    "/tree/.se/.runtime/undo/20260104000000000000.json": journal(
+      "a-sibling",
+      "2026-01-04T00:00:00.000Z",
+      "src/theirs.js",
+    ),
+  });
+  const ran = () => git.ran.map((it) => it.argv.join(" "));
+
+  const finding = landed({ disk, git, root: "/tree", join }, one, [
+    "passes design/draft",
+  ]);
+
+  assert.equal(finding, "");
+  assert.ok(
+    ran().includes(`git add -- ${AT} /tree/src/mine.js`),
+    "the hand's paths stage",
+  );
+  assert.ok(!ran().includes("git add -A"), "the whole tree stays out");
+  assert.ok(
+    ran().includes(
+      `git commit -m a-child: passes design/draft -- ${AT} /tree/src/mine.js`,
+    ),
+    "the commit takes the ticket and the hand's paths",
+  );
+  assert.ok(
+    !ran().some((row) => row.includes("theirs.js")),
+    "the sibling's edit stays unstaged",
+  );
+  assert.ok(
+    !ran().some((row) => row.includes("old.js")),
+    "an edit before the hold stays out",
+  );
 });

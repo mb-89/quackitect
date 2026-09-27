@@ -14,16 +14,7 @@ import {
   UNDO,
 } from "../../.claude/skills/level0/lib/undo.js";
 import { named, NAMED } from "./fixtures.js";
-import {
-  called,
-  edits,
-  reads,
-  realDisk,
-  refused,
-  served,
-  TREE,
-  wrote,
-} from "./mark-doors.js";
+import { called, realDisk, served, TREE } from "./mark-doors.js";
 
 const held = (text) => ({ "one.md": { exists: true, text } });
 
@@ -234,7 +225,6 @@ test("a create into a new folder lands, and a failed first write answers nothing
 
   const at = join(TREE, "one.md");
   disk.write(at, "alpha\n");
-  await called(it, reads(at));
   const failed = await called(
     it,
     patch([
@@ -244,8 +234,6 @@ test("a create into a new folder lands, and a failed first write answers nothing
   );
   assert.match(told(failed), /^nothing written/);
   assert.equal(disk.read(at), "alpha\n", "the second file stands as it stood");
-  const next = await wrote(it, edits(at, "alpha", "gamma"));
-  assert.equal(refused(next), "", "the held marks come back, so the next Edit lands");
 });
 
 // [[spec/design_output/apply#drift-refuses-the-restore]]

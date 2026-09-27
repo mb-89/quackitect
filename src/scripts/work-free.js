@@ -4,7 +4,7 @@
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
 import { aged, STALE, spanOf } from "../engine/group.js";
-import { MS, ROUTINE, standingAll, standOf, TODO, waitingOn } from "./work.js";
+import { MS, ROUTINE, standingAll, standOf, TODO, waitsOf } from "./work.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
 export function tipAge(one, now) {
@@ -33,7 +33,7 @@ export function freeIn(stand, standing, it = null, now = 0) {
     .filter(
       (one) => standing.get(one.branch) === TODO || staleHere(it, now, one, standing),
     )
-    .filter((one) => !waitingOn(one.ticket, standing).length);
+    .filter((one) => !waitsOf(one, standing).length);
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

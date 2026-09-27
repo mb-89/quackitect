@@ -134,19 +134,27 @@ derives it at every hand-out:
 | one stands open | waits, and names the child it waits for |
 | every one closes `done`, `became` or `answered` | writes a pass by `the engine`, and moves on |
 
-A group at `children` hands no leaf out while a child stands open. So a box
-with nothing at a step it can take writes no retro. The wait names the person
-step each child holds, and `branch done` leaves the group at `todo`. A child
+A group at `children` hands no leaf out while a child stands open. The wait
+names the person step each child holds. `branch done` frees the open children
+so the pull reaches the retro. For details, see
+[[spec/design_output/work#a-box-leaves]]. A child
 reopening past the `children` step sends the group's last leaf back there,
 which leaves the group open the same way.
 
 ## A condition skips a leaf
 
-`when` reads `cloud`, `desk` or `returned`. `cloud` and `desk` read the doors
-the command line hands in off the environment. `returned` holds where the
-newest record entry that is no skip carries `returns`, which a fail writes. A
-leaf whose condition fails takes a `skipped` entry with the reason. The pull
-then moves to the next leaf, or closes the ticket `done` past the last.
+`when` reads `cloud` or `desk`, off the doors the command line hands in off
+the environment. A leaf whose condition fails takes a `skipped` entry with the
+reason. The pull then moves to the next leaf, or closes the ticket `done` past
+the last. A closed ticket carrying `when: returned` stands as history, and the
+check reads no row on it.
+
+The conditions below read the ticket's Ask, and `src/scripts/pull-when.js` reads them:
+
+| `when` | holds where the Ask carries |
+|---|---|
+| `view` | a `view:` line naming anything but `none` |
+| `handed` | `from: handover`, which a mint under `--from=handover` writes |
 
 ## A need is a verb
 
@@ -160,6 +168,7 @@ holds no open note.
 | the route says | the pull admits |
 |---|---|
 | `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
+| `by: person` under `when: view` or `when: handed` | a hand off a harness, or one under `--owner-says`. An agent waits, on a cloud box too |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -412,6 +421,16 @@ judge run carries the `--fields` payload of the hand-back. The material lays
 the payload over the ticket before it reads the evidence, so the judge reads
 what the hand writes.
 
+The wrapper reads `judge.enabled` and `judge.model` through `configOf`, over
+`$.fs`, so the switch a slash command sets reaches the judge:
+
+| the layer | how the judge reads it |
+|---|---|
+| the method root's `spec/config/level0.json` | first, as [[spec/design_output/vehicle#the-work-root-inherits]] says |
+| the work root's `spec/config/level0.json` | over the method root's |
+| the environment | nowhere, because `$` carries no environment |
+| `.se/.runtime/config.json` | over both tracked files |
+
 The evidence holds the prose fields alone. The leaf names the form of each
 field it asks for. So the material leaves out a field whose form reads
 `command`, and a heading carrying no line. A chapter of commands hands the
@@ -569,20 +588,16 @@ the turn open for a hand-back nobody owes.
 | the road | what `pushed` does |
 |---|---|
 | a desk | pushes nothing and runs no check: the hand-back stands on this box, as with the commit verb. [[spec/guidance/working]] |
-| trunk | runs `./RUNME.sh check` over the commit first, so the stamp names the commit the push carries |
-| a red check | pushes nothing, and the answer names the check's own lines |
-| a tests-red leaf | stands on this box on trunk, and the next green push carries it |
+| a cloud box | pushes its work branch with no check, because that push meets no battery |
 | a moved branch | fetches, rebases once, and pushes again |
-| a rebase on trunk | runs the check again, because the rebase moves the commit off the stamp |
 | any other refusal | answers the push door's own lines, and runs no rebase |
-| a work branch | pushes with no check, because its push meets no battery |
+
+No cloud box hands back on trunk, so the push holds no trunk road. For the
+read behind this, see [[spec/tickets/every-road-has-a-caller]].
 
 Git names a moved branch with `fetch first` or `non-fast-forward`, and the
 rebase runs on those words alone. A rebase that fails puts the tree back, and
 the answer says to push the branch and pull again.
-
-The cost: a pass on trunk runs one full check, and the hand runs none of its
-own. At tests-green the `check` field runs the check, and `pushed` runs it again.
 
 The re-push of a hand-back the record holds already answers the same way.
 `repairPersonSteps` in `src/scripts/pull-hand.js` lands the engine's own repair,
@@ -597,8 +612,14 @@ what the hand writes, the index empties, and the hold stays. The pull answers
 again. So a record's `hash_after` names a commit the branch holds, and a
 refused commit writes no record. `src/scripts/pull-landed.js` holds the landing.
 
-A hand-back stages the whole tree, because the hand's work lands with it. The
-engine lands a skip, a close, a repair or an unblock on the side. Such a
+A hand-back stages the ticket, the children it mints, and the files its hand's
+journals name. The apply door writes the ticket a call serves into its undo
+journal, and a journal stamped before the hold takes the ticket counts none. So
+a sibling hand's edit stays out of the commit.
+
+A hand writing through no journal hands back the whole tree, less the files the
+other tickets' journals name. The engine lands a skip, a close, a repair or an
+unblock on the side. Such a
 landing stages and commits the ticket files it writes alone. So a hand's edits
 stay out of a commit naming another ticket.
 
@@ -680,11 +701,12 @@ So a hand fixes what the sweep names later through the one road there is.
 
 # Done leaves no takeable step
 
-`branch done` refuses while a ticket of the group stands at a step a hand
-can take. A hand can take a step where `by` names no person, no child and no
-helper, and the box holds every verb it needs. A step under `not` counts, because a spawned hand takes
-it. So a box leaves a group only when every open step waits for a person, or
-when the group closes.
+`branch done` frees every open ticket of the group, so the group it hands back
+holds no step a hand can take. For details, see
+[[spec/design_output/work#a-box-leaves]]. `takeable` answers what a hand can
+take: a step where `by` names no person, no child and no helper, and the box
+holds every verb it needs. A step under `not` counts, because a spawned hand
+takes it. The take reads it before it claims a group.
 
 # The group holds the turn
 
@@ -800,3 +822,19 @@ every run does, and it names the first that does not.
 - a named folder under `src` names the module at or above it
 - a named run reads no branch point
 - a named run takes the check's spawn tally, and a Go run takes `goEnvOf` too
+
+## A test proves red
+
+`./RUNME.sh test --red <test> <source>...` proves a test fails for the reason
+it names. It writes each source's working text under `.se/.runtime/red`, with
+a list of the sources. Then it writes each source as `HEAD` holds it, and a
+source new to the change stands aside whole. It runs the test, and puts every
+source back.
+
+| the test answers | the verb answers | exit |
+|---|---|---|
+| `assertion` | `red` | 0 |
+| anything else | `refused` | 1 |
+
+A run killed while the sources stand aside leaves the list on disk, and the
+next run puts them back before it starts.

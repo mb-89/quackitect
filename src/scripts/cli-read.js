@@ -18,15 +18,35 @@ import {
   walkOver,
 } from "../bridge/findings.js";
 import { readTools } from "../engine/tools.js";
+import { redIn } from "./battery.js";
 import { treeHere } from "./cli-check.js";
 import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
 import { serverFaults } from "./cli-served.js";
 
 // What the last lint left standing at warning. The stamp takes it, and `branch done` reads the stamp. [[spec/design_output/work#the-battery-answers-first]]
 let stood = [];
+// What the last lint refused, each row under its shown path, so `check --errors` names it. [[spec/tickets/the-verbs-need-no-wrapper]]
+let erred = [];
 
 export function warningsStood() {
   return stood;
+}
+
+export function errorsStood() {
+  return erred;
+}
+
+// What `check --errors` prints: a row a red case the reporter wrote, then a row a finding at error. [[spec/tickets/the-verbs-need-no-wrapper]]
+export function errorsSaid(lines, found) {
+  const rows = [
+    ...redIn(lines).map((one) =>
+      [one.file, one.name, one.said].filter(Boolean).join(": "),
+    ),
+    ...(found ?? [])
+      .filter((one) => one.severity !== WARNING)
+      .map((one) => asLine(one, one.file)),
+  ];
+  return rows.length ? rows : ["The check names no red case and no finding at error."];
 }
 
 export function version() {
@@ -100,6 +120,7 @@ export async function readingFor(where, served) {
 
 export async function lint(where) {
   stood = [];
+  erred = [];
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
@@ -131,6 +152,9 @@ export async function lint(where) {
 
   // [[spec/design_output/schema#warning-now-and-error-later]]
   stood = found.filter((one) => one.severity === WARNING);
+  erred = found
+    .filter((one) => one.severity !== WARNING)
+    .map((one) => ({ ...one, file: show(one.file ?? where[0]) }));
   const refused = found.length - stood.length;
   const note = refused
     ? []

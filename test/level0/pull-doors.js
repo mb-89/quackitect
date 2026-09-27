@@ -185,14 +185,6 @@ ${step ? `step: ${step}\n` : ""}steps:
             form: command
             expects: assertion
             says: the tests fail on their own assertion
-      - name: reflect
-        does: names the class of error
-        when: returned
-        to: retro
-        evidence:
-          - name: class
-            form: text
-            says: the class
       - name: change
         does: makes the change
         evidence:
@@ -226,10 +218,6 @@ One piece of it.
 ## tests-red
 
 ### tests
-
-## reflect
-
-### class
 
 ## change
 
