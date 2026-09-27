@@ -116,11 +116,20 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: bef1e8f201056af701666e600fe8265cd6fd5ad7
+    hash_after: 022588768a02426710268c5a3312ae3ca4f45f5d
+    inputs:
+      - name: ask
+        hash: 9e98d07b09f0f5b3
+        size: 839
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -154,38 +163,79 @@ Without it every editor reload and every closed shell drops the bridge. Every le
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The bridge stands until someone stops it. Both desk starts take the detached road that `respawn` in `src/doors/proc.js` already gives a code-move restart, and nothing kills the server with its starter.
+
+| part | where | what changes |
+|---|---|---|
+| the editor start | `startProcess` in `src/extension/editor-process.js` | imports the proc door the way `settled` imports the vehicle, and starts the server through `respawn`, with `out` at `SERVE_LOG`. It holds the row as adopted, so `stopProcess` stops it over the wire |
+| the kill on close | the same file | the `dispose` pushing `child.kill()`, the `exit` watch and `spawn` leave. `adoptsProcess` in `activate` takes the standing server again after a reload |
+| the shell start | `serveBridge` in `src/scripts/cli.js` | without `--inspect`, it calls `servesDetached` and returns. With `--inspect` it runs in the foreground as today, because the debugger holds it |
+| the desk road | `servesDetached(it)` in `src/scripts/serve.js`, new | probes the port with `probeOf`. A standing server stays, and the line says so. A silent port takes `it.proc.respawn`, and a fall names what `serve.log` holds |
+| the note | `The hook button` in `spec/design_output/extension.md`, and `The cloud starts the server` in `spec/design_output/level0.md` | the server outlives the window, and the shell start returns |
+
+The light follows the server already: `rechecks` runs on each write to `serve.log`, and a detached start writes there.
+
+The editor may run inside a Windows job object, and no case reads one. A checkpoint closes the editor with the server standing, then asks `/health`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/extension/sidebar.js`, the hook button, which calls `startProcess` and `stopProcess`
+- `src/extension/extension.js`, `activate`, which calls `adoptsProcess`
+- `src/scripts/cli.js`, the `serve` verb, which calls `serveBridge`
+- `src/bridge/server.js`, `respawned`, which calls `respawn` and stays as it stands
+- `src/scripts/serve.js`, `main`, which calls `servesHere` and stays as it stands
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/serve.test.js`, a desk serve starts the server detached where nothing answers, and returns
+- `test/level0/serve.test.js`, a desk serve finds a standing server and starts nothing
+- `test/level0/serve.test.js`, a detached start that falls names what the server wrote
+- `test/contract/desk-start.test.js`, a server the proc door starts detached writes its marker after its starter exits
+- a checkpoint: the owner closes the editor with the server standing, and `/health` answers on the next open
+
+The done lines and the case deciding each:
+
+- the start the editor makes: the contract case, because `src/extension/editor-process.js` loads under the editor alone, and the checkpoint
+- the serve that returns, and the second run that leaves it: the first two serve cases
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
+- the job object the code read names as plausible: the checkpoint settles it
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/extension/editor-process.js`
+- `src/scripts/cli.js`
+- `src/scripts/serve.js`
+- `test/level0/serve.test.js`
+- `test/contract/desk-start.test.js`
+- `spec/design_output/extension.md`
+- `spec/design_output/level0.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `startProcess`, `stopProcess`, `adoptsProcess`, `settled`, `rechecks`, `serveBridge`, `probeOf`, `servesHere`, `respawn` and its fake stand opened, and each reads as the approach says
+- the callers come off a search for `startProcess`, `stopProcess`, `serveBridge`, `servesHere` and `.respawn(` over `src`
+- each done line names its case, and the editor line names the contract case and the checkpoint
 
 ## tests-red
 
