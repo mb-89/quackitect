@@ -15,6 +15,7 @@ import {
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import {
   processHash,
+  ROUND,
   slotFaults,
 } from "../../.claude/skills/level0/lib/schema-route.js";
 import { GOVERNED, ROUTED, routed, treeWith } from "./schema-notes.js";
@@ -166,6 +167,11 @@ steps:
 `),
     [],
   );
+});
+
+test("the round suffix names a reject's copy, and leaves its origin bare", () => {
+  assert.equal("design/draft-2".replace(ROUND, ""), "design/draft");
+  assert.equal("design/tests-red".replace(ROUND, ""), "design/tests-red");
 });
 
 test("a reject's copies read as read where a later step reads the leaves they copy", () => {

@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
 import { takeable } from "../../src/scripts/pull.js";
+import { excludes } from "../../src/scripts/pull-hand.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
@@ -326,6 +327,25 @@ test("a pass writes the record, moves the step, commits by ticket and step, push
     said,
     /^spawn\n {2}a-child at design\/review waits for a hand other than box d462e994b4cef, which wrote design\/draft/m,
   );
+});
+
+// [[spec/design_output/pull#the-hand-rule]]
+test("a gate waits for a hand other than the one writing a copy of the leaf it names", () => {
+  const walk = [
+    { path: "design", parent: "", name: "design" },
+    { path: "design/draft", parent: "design", name: "draft" },
+    { path: "design/draft-2", parent: "design", name: "draft-2" },
+    { path: "gate", parent: "", name: "gate" },
+  ];
+  const front = {
+    record: [
+      { step: "design/draft", hand: "box first" },
+      { step: "design/draft-2", hand: HAND },
+    ],
+  };
+  const gate = { path: "gate", parent: "", not: "design/draft", walk };
+  assert.match(excludes(front, gate, HAND), /waits for a hand other than/);
+  assert.equal(excludes(front, gate, "box third"), "");
 });
 
 // [[spec/design_output/pull#a-hand-of-its-own]]

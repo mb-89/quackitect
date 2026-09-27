@@ -7,7 +7,7 @@ import { fault, show } from "./schema-fault.js";
 import { readYaml } from "./schema-yaml.js";
 
 // The suffix a gate's reject names each copy with, `<leaf>-<round>`. [[spec/design_output/pull#the-gate]]
-const ROUND = /-\d+$/;
+export const ROUND = /-\d+$/;
 
 // [[spec/design_output/schema#keywords-that-name-a-step]]
 export function refersFaults(key, value, rule, held, at, line) {
