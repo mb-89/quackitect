@@ -259,17 +259,28 @@ The agent weighs a `--became` hand-back for the stuck step, and refuses it, beca
 
 <!-- the form is list -->
 
+- none: every tool and host this run needs answers on the box
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the hook `LandingFollowsItsGate`, twice, on a commit piped before a pull
+- the ticket door, on a split under another ticket's approach
+- the stop hook, which turns the turn toward `branch done`
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/queue-approach-sentence-split]], a person step with no group
+- [[spec/tickets/holds-leave-with-their-ticket]], minted with no group
+- the queue port and the open-tasks children, out of the group at `branch done`
+- the handover names the blocked step and the question
 
 # Discussion
 
