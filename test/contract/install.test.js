@@ -15,7 +15,10 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 test("every binary this tree builds rebuilds when its source moves ahead", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
   for (const one of ["lsp", "index"]) {
-    assert.ok(rebuilt(said).includes(one), `${one} never rebuilds when its source moves`);
+    assert.ok(
+      rebuilt(said).includes(one),
+      `${one} never rebuilds when its source moves`,
+    );
   }
 });
 
@@ -92,4 +95,11 @@ test("the install bundles the drawing and resolves a browser, both as wants", ()
   }
   assert.match(said, /node src\/scripts\/bundle\.js/, "the want runs the bundle step");
   assert.match(said, /node src\/scripts\/browser\.js/, "the want asks the resolver");
+});
+
+// The index builds with Go alone. [[spec/design_output/index#the-compiler-it-needs]]
+test("the install downloads no Zig", () => {
+  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  assert.doesNotMatch(said, /zig/i);
+  assert.doesNotMatch(said, /CGO_ENABLED=1|sqlite_fts5/);
 });

@@ -318,3 +318,24 @@ func TestAnIndexUnderAnotherRootIsDropped(t *testing.T) {
 		t.Fatalf("the index kept %d row(s) from the tree before it", count)
 	}
 }
+
+// The pure driver answers a line search and its ranking. [[spec/design_output/index#the-compiler-it-needs]]
+func TestTheIndexOpensWithoutCgo(t *testing.T) {
+	db, err := Open(tree(t), filepath.Join(t.TempDir(), "index.db"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	for n, text := range []string{"the duck swims", "the duck swims and the duck quacks"} {
+		if _, err := db.Exec(`INSERT INTO line_text (path, n, text) VALUES (?, ?, ?)`, "one.md", n+1, text); err != nil {
+			t.Fatal(err)
+		}
+	}
+	var n int
+	if err := db.QueryRow(`SELECT n FROM line_text WHERE line_text MATCH ? ORDER BY bm25(line_text) LIMIT 1`, "duck").Scan(&n); err != nil {
+		t.Fatalf("the line search answers %v", err)
+	}
+	if n != 2 {
+		t.Fatalf("bm25 ranks line %d first", n)
+	}
+}

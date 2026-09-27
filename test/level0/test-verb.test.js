@@ -68,11 +68,7 @@ test("a named test file runs under the check's spawn tally, and a named Go folde
     ROOT,
     "the Go run stands at the root, where the module stands",
   );
-  assert.match(
-    String(go.init.env?.GOFLAGS),
-    /sqlite_fts5/,
-    "the Go run takes the Go env",
-  );
+  assert.equal(go.init.env?.CGO_ENABLED, "0", "the Go run takes the Go env");
 });
 
 // [[spec/design_output/pull#the-test-verb]]

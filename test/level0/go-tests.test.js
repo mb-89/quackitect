@@ -25,10 +25,11 @@ test("the root holding a module file is the module, and a folder holding none is
   assert.deepEqual(goModulesIn(box()), [], "a tree with no src folder holds no module");
 });
 
-test("the run names the pinned compiler where it stands, and leaves it out where it stands nowhere", () => {
-  const bare = goEnvOf(box());
-  assert.equal(bare.CC, undefined);
-  assert.match(bare.GOFLAGS, /sqlite_fts5/);
+test("the run takes no C compiler and no tag", () => {
+  const held = goEnvOf(box());
+  assert.equal(held.CGO_ENABLED, "0");
+  assert.equal(held.CC, undefined);
+  assert.doesNotMatch(String(held.GOFLAGS ?? ""), /sqlite_fts5/);
 });
 
 // The gate the round before this one wired, held by a case of its own. [[spec/tickets/the-colours-stand-in-config]]

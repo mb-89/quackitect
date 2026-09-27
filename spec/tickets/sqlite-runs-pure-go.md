@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/tests-red
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -88,6 +88,14 @@ record:
     hand: box d7d598fb92101 · claude-code-remote
     hash_before: 4bd72d95f1cb7b742e64e651f042e2fcfc4e4567
     hash_after: 4bd72d95f1cb7b742e64e651f042e2fcfc4e4567
+  - step: implement/tests-red
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 493b53e5b59804d053495b93482ab8fd30c7d455
+    hash_after: 493b53e5b59804d053495b93482ab8fd30c7d455
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -196,17 +204,27 @@ pass with findings
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/level0/go-tests.test.js test/level0/test-verb.test.js test/contract/install.test.js test/level0/review.test.js test/contract/tree.test.js src/index
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Three node cases fail on their own assertion. `TestTheIndexOpensWithoutCgo` fails under `CGO_ENABLED=0` on the stub the old driver builds, and passes under the tag today. The review case and the survey fixture drop the compiler, and each passes on both sides. They answer [[spec/tickets/the-compiler-leaves-every-caller]].
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch the files the draft and its review name
+- the disk and the process take fakes, and the index test opens a real file
+- each new case carries a comment pointing at the index note
+- each fact points at the index note
+- the review row stands answered in the review and survey cases
 
 ## change
 
