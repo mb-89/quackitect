@@ -127,3 +127,23 @@ test("branch merge refuses a branch a pull request carries, and names it", () =>
     "nothing merges",
   );
 });
+
+// [[spec/tickets/groups-land-through-pull-requests]]
+test("a pull request standing at another commit leaves the merge to run", () => {
+  const { it, outside } = doorsSaying(
+    merging({
+      "git rev-parse origin/work/one-group": { stdout: "tip999\n" },
+      "git ls-remote origin refs/pull/*/head": { stdout: "abc000\trefs/pull/7/head\n" },
+    }),
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    ranGit(outside).includes("git merge --no-ff --no-edit origin/work/one-group"),
+  );
+});

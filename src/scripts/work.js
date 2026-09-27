@@ -52,12 +52,12 @@ import {
 } from "./pull.js";
 import { readyToMerge, review } from "./work-review.js";
 import { serving } from "./serve.js";
-import { readFree, trigger } from "./work-free.js";
+import { handsStuck, readFree, stuckFirst, trigger } from "./work-free.js";
 import { fixRefuses } from "./work-fix.js";
 import { testVerb } from "./work-test.js";
 import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, filesUp, marksTrunk, merge, offTrunk } from "./work-merge.js";
+import { close, filesUp, marks, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import {
   childrenHere,
   DONE,
@@ -228,6 +228,8 @@ function take(it, name = "") {
     return 0;
   }
   const { stand, standing, trunk, free: all } = readFree(it);
+  const stuck = stuckFirst(it, stand, standing);
+  if (stuck) return handsStuck(it, stuck, onBranch);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
   // A branch sharing no ancestor with trunk reaches no sync, so the take says which it passes over. [[spec/design_output/work#the-listing-reads-git-once]]
   for (const one of stand.filter((held) => standing.get(held.branch) === ORPHAN)) {
@@ -506,6 +508,8 @@ function leaves(it, branch, at, path, says, moved = []) {
   const now = withoutField(shut, PARKED, it.front);
   it.disk.write(path, now);
   it.git.run(["add", at], true);
+  // The pull request carries the close, so the branch drops the cloud marker it took from main. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+  marks(it, name, false);
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
 

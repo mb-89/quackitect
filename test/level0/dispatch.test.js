@@ -20,7 +20,7 @@ import { fixName } from "../../src/scripts/dispatch-write.js";
 import { cutTo } from "../../src/scripts/ticket.js";
 import { markOff } from "../../src/scripts/work.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
-import { freeNow } from "../../src/scripts/work-free.js";
+import { freeNow, stuckIn } from "../../src/scripts/work-free.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
 import { semicolonVale } from "./semicolon-vale.js";
 import {
@@ -154,6 +154,15 @@ test("a group at done past work.staleAfter reads as a stuck hand-over", () => {
     },
   );
   assert.deepEqual(planOf(it).stuck, [{ group: "landing", why: "stale" }]);
+});
+
+test("stuckIn answers behind where main holds commits the branch lacks, and nothing where it holds none", () => {
+  const { it } = doorsSaying({
+    "git rev-list --count origin/work/landing..origin/main": { stdout: "3\n" },
+    "git rev-list --count origin/work/level..origin/main": { stdout: "0\n" },
+  });
+  assert.equal(stuckIn(it, { branch: "work/landing" }, 0), "behind");
+  assert.equal(stuckIn(it, { branch: "work/level" }, 0), "");
 });
 
 test("a group at done, up to date and fresh, stands out of the stuck list", () => {

@@ -424,7 +424,7 @@ test("read prints the group a branch carries, and refuses a branch carrying none
 // A group at done whose branch stands behind main is open work, and the take hands it out first. [[spec/tickets/groups-land-through-pull-requests]]
 test("branch take hands out a stuck hand-over first, and prints sync, check and push", () => {
   const shut = withField(GROUP_NOTE, "state", CLOSED, fakeFront());
-  const { it, disk } = doorsSaying(
+  const { it, disk, outside } = doorsSaying(
     {
       ...remoteSaying(
         [
@@ -445,10 +445,15 @@ test("branch take hands out a stuck hand-over first, and prints sync, check and 
   const { code, said } = heard(() => work(ROOT, ["take"], { ...it, cloud: true }));
 
   assert.equal(code, 0, said);
-  assert.match(said, /work\/landing/);
-  assert.match(said, /\.\/RUNME\.sh branch sync/);
-  assert.match(said, /\.\/RUNME\.sh check/);
-  assert.match(said, /push/);
+  assert.ok(
+    ranGit(outside).includes("git switch work/landing"),
+    "the take moves onto the branch",
+  );
+  assert.match(said, /You are on work\/landing, whose hand-over stands behind/);
+  assert.match(
+    said,
+    /Run \.\/RUNME\.sh branch sync, then \.\/RUNME\.sh check, then push the branch/,
+  );
   assert.equal(
     disk.read(on("landing")),
     shut,

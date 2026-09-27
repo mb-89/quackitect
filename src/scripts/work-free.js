@@ -3,8 +3,9 @@
 // nothing, so the claim goes stale and the branch comes back to the queue.
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { aged, parentsIn, STALE, spanOf } from "../engine/group.js";
-import { MS, ROUTINE, standingAll, TODO, waitsOf } from "./work.js";
+import { DONE, MS, ROUTINE, standingAll, TODO, waitsOf } from "./work.js";
 import { readWork, trunkOf } from "./work-stands.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -46,6 +47,35 @@ export function readFree(it, now = 0) {
   const trunk = trunkOf(read.loose);
   const free = freeIn(read.stand, standing, it, now, trunk);
   return { stand: read.stand, standing, trunk, free };
+}
+
+// A group at done still standing on origin carries no merge yet: behind trunk it needs a sync, and past the span it stays red. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+export function stuckIn(it, one, at) {
+  const said = it.git.run(
+    ["rev-list", "--count", `origin/${one.branch}..origin/${TRUNK}`],
+    true,
+  );
+  if (Number(String(said.out ?? "").trim()) > 0) return "behind";
+  return staleClaim(one, at, it).stale ? "stale" : "";
+}
+
+// The first stuck hand-over, which the take hands out ahead of a free group. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+export function stuckFirst(it, stand, standing, at = 0) {
+  for (const one of stand.filter((held) => standing.get(held.branch) === DONE)) {
+    const why = stuckIn(it, one, at);
+    if (why) return { one, why };
+  }
+  return null;
+}
+
+// The take moves onto a stuck branch and writes no record, because the group stands closed. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+export function handsStuck(it, stuck, onBranch) {
+  if (!onBranch(it, stuck.one.branch)) return 1;
+  console.log(`You are on ${stuck.one.branch}, whose hand-over stands ${stuck.why}.`);
+  console.log(
+    "Run ./RUNME.sh branch sync, then ./RUNME.sh check, then push the branch, and its pull request lands.",
+  );
+  return 0;
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

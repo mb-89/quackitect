@@ -101,6 +101,14 @@ export function merge(it, name) {
     return 1;
   }
 
+  const pull = pullCarrying(it, branch);
+  if (pull) {
+    console.error(
+      `${branch} stands in pull request #${pull}, and GitHub lands it once the check passes.`,
+    );
+    return 1;
+  }
+
   const moved = movedOnTrunk(it, branch);
   if (moved.length) {
     console.error(
@@ -150,6 +158,17 @@ export function merge(it, name) {
   if (close(it, name, []))
     console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
   return 0;
+}
+
+// The number of the pull request whose head stands at the branch tip, or nothing. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+function pullCarrying(it, branch) {
+  const tip = it.git.run(["rev-parse", `origin/${branch}`], true).out;
+  if (!tip) return "";
+  const row = it.git
+    .run(["ls-remote", "origin", "refs/pull/*/head"], true)
+    .out.split("\n")
+    .find((one) => one.split("\t")[0] === tip);
+  return row ? (row.split("\t")[1] ?? "").split("/")[2] : "";
 }
 
 // [[spec/design_output/work#a-cloud-branch-comes-in]]

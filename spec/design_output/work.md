@@ -251,7 +251,7 @@ is the box saying it leaves. It reads in this order:
 | a `retro` leaf that applies on this box, unwritten | refuses, names the leaf, and files nothing |
 | an open or draft ticket naming the group | files it into the group's parent, or loose where the group stands at the top, and names it |
 | an open ticket the branch adds with no group | files it into the group's parent, or leaves it loose at the top |
-| the rest | closes the group `reason: done`, so `branch merge` takes it |
+| the rest | closes the group `reason: done` and drops the cloud marker, so the pull request carries the close |
 
 A closed ticket stays in the group, as its history. A box that wants the group
 open for the next box runs `branch release`, which leaves it at `todo`.
@@ -363,11 +363,15 @@ a rejected push and takes the next. For details, see
    group ticket on `main`, and a desk fills its ask.
 2. `./RUNME.sh branch open <name>` pushes `work/<name>` off trunk, standing at
    `todo`.
-3. A session works the branch and pushes to it. A cloud session stops there,
-   because the harness holds `main` shut and a cloud box opens no pull request.
+3. A session works the branch and pushes to it.
 4. That session answers the group's leaves, writes its retro under the ticket's
    retro chapter, then runs `./RUNME.sh branch done`.
-5. `./RUNME.sh branch list --done` names every branch standing at `done`.
+5. The work skill opens a pull request over `work/<name>` against `main`, with
+   auto-merge on. GitHub lands it once the check stands green on Linux and
+   Windows, and `branch merge` refuses a branch a pull request carries.
+6. `./RUNME.sh branch take` hands out a branch at `done` standing behind
+   `main` or stale ahead of a free group, and asks for a sync, the check and a
+   push.
 
 The pull's hand-out says what a branch does next, so no branch carries a copy
 of it. For details, see [[spec/design_output/pull#the-hand-out]].

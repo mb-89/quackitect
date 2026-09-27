@@ -3,11 +3,10 @@
 // through dispatch-write.js, and the dry run prints it and writes nothing.
 // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 
-import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { CLOSED, fieldOf, GROUP, isGroup } from "../engine/group.js";
 import { land, opens, opensOf, writeState, writesOf } from "./dispatch-write.js";
 import { waitsOnPerson } from "./work-answer.js";
-import { freeIn, staleClaim } from "./work-free.js";
+import { freeIn, staleClaim, stuckIn } from "./work-free.js";
 import {
   DONE,
   HELD,
@@ -63,7 +62,7 @@ function planned(it, now) {
       .map((one) => ({ group: one.name, waits: waitsOf(one, standing, trunk) })),
     stuck: stand
       .filter((one) => of(one) === DONE)
-      .map((one) => ({ group: one.name, why: stuckWhy(it, one, at) }))
+      .map((one) => ({ group: one.name, why: stuckIn(it, one, at) }))
       .filter((one) => one.why),
     bundles: bundlesOf(read.loose, idle),
     opens: opened,
@@ -71,16 +70,6 @@ function planned(it, now) {
     questions: questionsOf(read, standing),
   };
   return { plan, read };
-}
-
-// A group at done still standing on origin carries no merge yet: behind trunk it needs a sync, and past the span it stays red. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
-function stuckWhy(it, one, at) {
-  const said = it.git.run(
-    ["rev-list", "--count", `origin/${one.branch}..origin/${TRUNK}`],
-    true,
-  );
-  if (Number(String(said.out ?? "").trim()) > 0) return "behind";
-  return staleClaim(one, at, it).stale ? "stale" : "";
 }
 
 // The groups on trunk no hand reaches: open, on no branch, opening none this run, and waiting on nothing. A ticket filed into one stands loose under it. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
