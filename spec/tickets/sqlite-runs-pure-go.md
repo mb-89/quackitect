@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -84,6 +84,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: 39a9a56ed9b59728a1b8f13dd7dfdc8fcb75375f
     hash_after: 39a9a56ed9b59728a1b8f13dd7dfdc8fcb75375f
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 4bd72d95f1cb7b742e64e651f042e2fcfc4e4567
+    hash_after: 4bd72d95f1cb7b742e64e651f042e2fcfc4e4567
 ---
 
 # Ask
@@ -175,6 +179,10 @@ The schema, the queries and the ranking stay as they stand, so the search answer
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- the-compiler-leaves-every-caller: take Zig out of `BORROWED` in `src/scripts/work-review.js` and its row in `test/level0/review.test.js`. Also move the fixture at `test/contract/tree.test.js` off the Zig probe. The callers list names none of the three.
 
 # implement
 
