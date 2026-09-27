@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -84,6 +84,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: fb30c49323723d9767cf3fd2eb803f4b0048eb60
     hash_after: fb30c49323723d9767cf3fd2eb803f4b0048eb60
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 277c9318030a599e20b32b9fd72cb73831a32f72
+    hash_after: 277c9318030a599e20b32b9fd72cb73831a32f72
 ---
 
 # Ask
@@ -179,6 +183,10 @@ The other analyzers of [[spec/design_output/go-doors#the-build-checks-imports]] 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- doors-note-names-every-analyzer: add the analyzer `nodoor` to the table of [[spec/design_output/go-doors#the-build-checks-imports]]. The note then owns every analyzer, and the code points there.
 
 # implement
 
