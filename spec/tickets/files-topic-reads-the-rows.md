@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -84,6 +84,10 @@ record:
     hand: box d7a69cb6601d7 · claude-code-remote
     hash_before: 85d541d35ac8ddd2ebef68b23469cc38ea31d092
     hash_after: d05637e98a855bf6d470f9530a06162ed13441d0
+  - step: design/review
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: 9eb7eccbcf2afc7735d19f2ef0ed67493a3024d6
+    hash_after: 9eb7eccbcf2afc7735d19f2ef0ed67493a3024d6
 ---
 
 # Ask
@@ -175,6 +179,8 @@ The index registers the family `files/<path...>`, and the door commits its value
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
+
+pass
 
 <!-- the form is verdict -->
 
