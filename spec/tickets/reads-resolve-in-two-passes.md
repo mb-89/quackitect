@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-wiring-file-binds-ports]
+record:
+  - step: design/draft
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: ce8476e00bc870b36d177b46c9a380b1ba8021eb
+    hash_after: ce8476e00bc870b36d177b46c9a380b1ba8021eb
+    inputs:
+      - name: ask
+        hash: 41c6943945b32e52
+        size: 936
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -154,38 +167,60 @@ Modules load in any order, so one pass refuses a sound wiring. An instance that 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Load` in `src/q/wiring.go` runs two passes over the instances, in any wiring order.
+The first pass registers each instance, names its out-ports, and binds each in-port whose writer stands already.
+It leaves every other wired in-port open.
+The second pass binds the open in-ports against every writer, and names a fault where one stays open.
+`registration` in `src/q/q.go` gains `instance` and `port`, and `input` gains `port`, so each fault names the port as `<instance>.<port>`.
+`twice` in `src/q/check.go` names both out-ports writing one standard name.
+`inputFaults` names the in-port, the writer port, and both types on a type apart.
+A new `Start(w Wiring, types)` in `src/q/wiring.go` runs `Load`, then `Check`, and answers `(*Store, error)`.
+On any fault it answers no store and a `Refused` error, one fault a line, each naming its port.
+`Store` in `src/q/store.go` gains `Down(instance) error`, which marks an instance that runs nowhere, copied into each `Snapshot`.
+`Snapshot.Read` answers the writer built-in value while its instance stands down, and `Snapshot.NotProvided(name)` answers the mark.
+`Why` in `src/q/why.go` reads the state `not provided` there.
+Assumption: the mark covers a writer down alone, and a name with no value keeps the state `default`, since `why_test.go` holds it.
+Assumption: a module type nobody registers keeps the `NoType` refusal, since it is a fault of the binary and no crash.
+The index manager calls `Down` on a crash later. The composition root of `io-modules-own-their-names` calls `Start`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/wiring_test.go: loaded,src/q/wiring_test.go: TestAnUnwiredInPortAnswersAFault,src/q/qtest/qtest.go: Over,src/q/catalog_test.go: every case calling `Check`,src/q/store_test.go: the case calling `Check`,src/q/store.go: Land,src/q/q.go: derivedOf,src/q/why.go: why,src/q/qtest/qtest.go: Read,src/index/door.go: the why and read handlers calling `Snapshot().Read`,src/index/v1.go: the read calling `snap.Read`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: `go test ./...` from the root,src/q/start_test.go: TestAReaderRegisteredBeforeItsWriterStarts,src/q/start_test.go: TestAnInPortWithNoWireAndNoBuiltInRefusesNamingThePort,src/q/start_test.go: TestTwoOutPortsOnOneStandardNameRefuseNamingBoth,src/q/start_test.go: TestAnInPortWiredToAnotherTypeRefusesNamingBothTypes,src/q/start_test.go: TestAnInstanceThatRunsNowhereReadsTheBuiltInMarkedNotProvided,RUNME.sh: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/wiring.go,src/q/check.go,src/q/q.go,src/q/store.go,src/q/why.go,src/q/start_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened `Load`, `bind`, `outName`, `Check`, `twice`, `inputFaults`, `NewStore`, `Snapshot.Read` and `Why`, and checked each claim there.
+I grepped every caller of `Load`, `Check`, `NewStore` and `Snapshot.Read` across `src`, and the callers list names each.
+Each done_when line names its test in `src/q/start_test.go`, or the command `go test ./...` or `./RUNME.sh check`.
 
 ## tests-red
 
