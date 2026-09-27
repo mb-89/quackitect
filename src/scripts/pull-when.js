@@ -24,6 +24,12 @@ export function holdsHere(it, when, _front, text = "") {
     const from = askLine(text, FROM).toLowerCase();
     return { holds: from === HANDOVER, why: "the ask comes off no handover" };
   }
+  // A ticket in a delivery skips its own acceptance, because the delivery's reads it. [[spec/design_output/pull#the-final-acceptance]]
+  if (when === "backlog")
+    return {
+      holds: !groupOf(text),
+      why: "the delivery's acceptance reads this ticket",
+    };
   return { holds: false, why: `${when} names no condition the pull reads` };
 }
 
@@ -43,4 +49,10 @@ export function askLine(text, name) {
       .match(new RegExp(`^${name}:[ \\t]*(.*)$`, "im"))?.[1]
       ?.trim() ?? "";
   return said.toLowerCase() === NONE ? "" : said;
+}
+
+// The group the frontmatter names, or nothing. [[spec/design_output/pull#the-final-acceptance]]
+function groupOf(text) {
+  const front = String(text ?? "").split(/^---\s*$/m)[1] ?? "";
+  return front.match(/^group:[ \t]*(\S.*)$/m)?.[1]?.trim() ?? "";
 }

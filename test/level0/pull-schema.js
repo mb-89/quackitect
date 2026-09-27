@@ -69,6 +69,12 @@ frontmatter:
             type: string
             x-earlier: steps
             description: the earlier step a failed hand-back sends the ticket to
+          gate:
+            type: string
+            description: the question a gate answers
+          final:
+            type: boolean
+            description: whether this gate reads the whole work
           asks:
             type: string
             description: the question a person answers

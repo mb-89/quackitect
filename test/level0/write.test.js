@@ -48,6 +48,9 @@ A small thing.
 # Discussion
 `;
 
+// A draft takes a hand's write, where an open ticket takes its answers through the pull. [[spec/design_output/pull#the-fields-ride-the-payload]]
+const DRAFT = GOOD.replace("state: open", "state: draft");
+
 const BAD = `---
 kind: [[ticket]]
 state: open
@@ -154,7 +157,9 @@ test("a group's ask naming a child of its own comes back refused", async () => {
 // No door reads a mark, so a write over a file the hand has read none of meets the rules alone. [[spec/tickets/every-road-has-a-caller]]
 test("a write over a standing file lands whether or not the hand read it", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
-  assert.deepEqual(await onWrite(write(at, GOOD), box({ [at]: GOOD })), { pass: true });
+  assert.deepEqual(await onWrite(write(at, DRAFT), box({ [at]: DRAFT })), {
+    pass: true,
+  });
 
   const numbered = join(TREE, "notes.txt");
   const it = served(realDisk({ [numbered]: NUMBERED }));
@@ -240,8 +245,8 @@ test("a box with no vale lets the write land, and says so in the log once", asyn
 // A field the engine owns comes back to its value on the disk, and the prose beside it lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("a Write carrying state and a prose field lands the prose, puts state back, and names it", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
-  const it = box({ [at]: GOOD });
-  const wrote = GOOD.replace("state: open", "state: closed").replace(
+  const it = box({ [at]: DRAFT });
+  const wrote = DRAFT.replace("state: draft", "state: closed").replace(
     "## change\n",
     "## change\n\nThe door puts the field back.\n",
   );
@@ -249,7 +254,7 @@ test("a Write carrying state and a prose field lands the prose, puts state back,
   const said = await onWrite(write(at, wrote), it);
 
   assert.equal(said?.result?.deny, undefined, "the write lands");
-  assert.match(said.event.content, /^state: open$/m, "state stands at its disk value");
+  assert.match(said.event.content, /^state: draft$/m, "state stands at its disk value");
   assert.match(said.event.content, /The door puts the field back\./, "the prose lands");
   assert.match(said.after.context.join("\n"), /state/, "the answer names the field");
 });
@@ -257,13 +262,13 @@ test("a Write carrying state and a prose field lands the prose, puts state back,
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("an Edit over state, a route line and a prose field lands the prose and puts the rest back", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
-  const it = box({ [at]: GOOD });
-  const old_string = GOOD.slice(
-    GOOD.indexOf("state: open"),
-    GOOD.indexOf("## change\n") + "## change\n".length,
+  const it = box({ [at]: DRAFT });
+  const old_string = DRAFT.slice(
+    DRAFT.indexOf("state: draft"),
+    DRAFT.indexOf("## change\n") + "## change\n".length,
   );
   const new_string = old_string
-    .replace("state: open", "state: closed")
+    .replace("state: draft", "state: closed")
     .replace("makes the change the ask names", "makes it")
     .replace("## change\n", "## change\n\nThe door puts the route back.\n");
 
@@ -285,19 +290,39 @@ test("an Edit over state, a route line and a prose field lands the prose and put
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("an Edit changing engine fields alone comes back refused, naming them, because nothing of it lands", async () => {
   const at = join(WORK, "spec", "tickets", "good.md");
-  const it = box({ [at]: GOOD });
+  const it = box({ [at]: DRAFT });
 
   const said = await onWrite(
     {
       tool: "Edit",
       file_path: at,
-      old_string: "state: open",
+      old_string: "state: draft",
       new_string: "state: closed",
     },
     it,
   );
 
   assert.match(said?.result?.deny ?? "", /state/);
+});
+
+// An open ticket takes its answers through the pull, and its Discussion from anybody. [[spec/design_output/pull#the-fields-ride-the-payload]]
+test("the door refuses an agent write to an open ticket, and a draft takes one", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const byHand = (text) =>
+    text.replace("## change\n", "## change\n\nWritten by hand.\n");
+
+  const open = await onWrite(write(at, byHand(GOOD)), box({ [at]: GOOD }));
+  assert.match(open?.result?.deny ?? "", /--fields/, "the refusal names the payload");
+
+  const draft = await onWrite(write(at, byHand(DRAFT)), box({ [at]: DRAFT }));
+  assert.equal(draft?.result?.deny, undefined, "a draft takes the write");
+
+  const talk = GOOD.replace(
+    "# Discussion\n",
+    "# Discussion\n\n- A line anybody adds.\n",
+  );
+  const said = await onWrite(write(at, talk), box({ [at]: GOOD }));
+  assert.equal(said?.result?.deny, undefined, "the Discussion takes a line");
 });
 
 // The door reads a closed ticket as history, the way the check reads it. [[spec/tickets/a-closed-ticket-takes-writes]]

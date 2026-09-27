@@ -7,6 +7,7 @@ package tickets
 import (
 	"path"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"quackitect/src/q"
@@ -50,6 +51,8 @@ type Ticket struct {
 	Todo     bool   `json:"todo"`
 	Standing string `json:"standing"`
 	Says     string `json:"says"`
+	// The leaves the record passes over the leaves the route holds, as done/all. [[spec/design_output/index#the-index-answers-the-tickets]]
+	Progress string `json:"progress"`
 	// The time the file last changed, off the file table, so a view sorts the newest done ticket first. [[spec/design_output/index#the-index-answers-the-tickets]]
 	Changed int64 `json:"changed"`
 }
@@ -77,16 +80,17 @@ func Of(path, name, text string, changed int64) Ticket {
 		state = openState
 	}
 	one := Ticket{
-		Name:    name,
-		Path:    path,
-		State:   state,
-		Step:    word(front.Get("step")),
-		Route:   routeOf(word(front.Get("process"))),
-		Group:   linkName(word(front.Get("group"))),
-		Urgent:  word(front.Get("urgent")) == "true",
-		Todo:    todoIn(word(front.Get("todo"))),
-		Says:    askIn(body),
-		Changed: changed,
+		Name:     name,
+		Path:     path,
+		State:    state,
+		Step:     word(front.Get("step")),
+		Route:    routeOf(word(front.Get("process"))),
+		Group:    linkName(word(front.Get("group"))),
+		Urgent:   word(front.Get("urgent")) == "true",
+		Todo:     todoIn(word(front.Get("todo"))),
+		Says:     askIn(body),
+		Progress: progressOf(frontText(text)),
+		Changed:  changed,
 	}
 	if one.Route == groupRoute {
 		one.Standing = standingOf(state, front)
@@ -216,4 +220,76 @@ func routeOf(said string) string {
 // The name a link carries, with the brackets off. [[spec/design_output/index#a-note-and-its-links]]
 func linkName(said string) string {
 	return strings.TrimSpace(strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(said), "[["), "]]"))
+}
+
+// The front's own rows between its two fences, unparsed, so a reading keeps the indent the parse drops. [[spec/design_output/index#the-index-answers-the-tickets]]
+func frontText(text string) string {
+	rows := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
+	if strings.TrimSpace(rows[0]) != frontFence {
+		return ""
+	}
+	for at := 1; at < len(rows); at++ {
+		if strings.TrimSpace(rows[at]) == frontFence {
+			return strings.Join(rows[1:at], "\n")
+		}
+	}
+	return ""
+}
+
+// The leaves the record passes, closed or skipped, over the leaves the route holds, as done/all, and nothing where the route holds none. A step item is a `- name:` line whose nearest line two columns in is a `steps:` key, so an evidence item counts nothing. [[spec/design_output/index#the-index-answers-the-tickets]]
+func progressOf(head string) string {
+	lines := strings.Split(head, "\n")
+	last := map[int]string{}
+	indents := []int{}
+	inSteps := false
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if trimmed == "" {
+			continue
+		}
+		indent := len(line) - len(strings.TrimLeft(line, " "))
+		if indent == 0 {
+			inSteps = trimmed == "steps:"
+		}
+		if inSteps && indent >= 2 && strings.HasPrefix(trimmed, "- name:") && last[indent-2] == "steps:" {
+			indents = append(indents, indent)
+		}
+		last[indent] = trimmed
+	}
+	all := 0
+	for at, indent := range indents {
+		if at+1 == len(indents) || indents[at+1] <= indent {
+			all++
+		}
+	}
+	if all == 0 {
+		return ""
+	}
+	return strconv.Itoa(len(passedSteps(lines))) + "/" + strconv.Itoa(all)
+}
+
+// The steps a record entry closes, by a hash after or a skip. [[spec/design_output/index#the-index-answers-the-tickets]]
+func passedSteps(lines []string) map[string]bool {
+	out := map[string]bool{}
+	inRecord := false
+	step := ""
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if line != "" && line[0] != ' ' {
+			inRecord = trimmed == "record:"
+			continue
+		}
+		if !inRecord {
+			continue
+		}
+		if said, found := strings.CutPrefix(trimmed, "- step:"); found {
+			step = strings.TrimSpace(said)
+			continue
+		}
+		after, isAfter := strings.CutPrefix(trimmed, "hash_after:")
+		if (isAfter && strings.TrimSpace(after) != "" && strings.TrimSpace(after) != `""`) || trimmed == "skipped: true" {
+			out[step] = true
+		}
+	}
+	return out
 }

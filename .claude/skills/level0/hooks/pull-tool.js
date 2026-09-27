@@ -1,49 +1,25 @@
 // The plugin's one hook module: the bridgehead, then the pull as a tool. A
-// shell verb reaches no model and no agent, and the hook process reaches both,
-// so the judge and the spawn run here.
-// [[spec/design_output/pull#the-checks]]
+// shell verb reaches no agent, and the hook process does, so the spawn runs
+// here. The tool asks no model, so a hand-back answers the same way twice.
+// [[spec/tickets/the-judge-leaves-the-code]]
 
-import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
-import {
-  judgeAsk,
-  judgeLabels,
-  judgeRefusal,
-  PULL_CALL,
-  pullSpec,
-  ruleBroken,
-  SESSION,
-  sessionOf,
-  spawnPromptIn,
-} from "../lib/pull.js";
+import { PULL_CALL, pullSpec, SESSION, sessionOf, spawnPromptIn } from "../lib/pull.js";
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
 import { register as bridgehead, READ_TOOLS } from "./level0.js";
 
 const CLI_SCRIPT = "src/scripts/cli.js";
 // The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
 let cli = ["node", CLI_SCRIPT];
-// The tracked files the judge reads its switch from, the method root's under the work root's own. [[spec/design_output/vehicle#the-work-root-inherits]]
-let tracked = [TRACKED];
-let schema = SCHEMA;
 // The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
-const ENABLED = "judge.enabled";
-const MODEL = "judge.model";
-const REFUSALS = "judge.refusalsBeforePass";
-// The quote call names a model, and classify's default is the small one. [[spec/tickets/prose-verbs-land-first-try]]
-const QUOTE_MODEL = "haiku";
-// The refusals each leaf meets, by ticket and step, so a hand-back past the count goes through. [[spec/tickets/prose-verbs-land-first-try]]
-const refusals = new Map();
 const RUNNING = 600000;
-const JUDGE = "--judge";
 const BACKGROUND =
   "The hand works in the background. Take the next item, and pull again once it answers.";
 
 export function register(on, options) {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
   cli = ["node", method ? `${method}/${CLI_SCRIPT}` : CLI_SCRIPT];
-  tracked = method ? [`${method}/${TRACKED}`, TRACKED] : [TRACKED];
-  schema = method ? `${method}/${SCHEMA}` : SCHEMA;
   // The engine takes one session start a module, so the bridgehead registers none and this one registers its read tools beside the pull. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   bridgehead(on, options);
   on("session.start", async ($, e, next) => {
@@ -58,10 +34,6 @@ export function register(on, options) {
   });
 
   on("tool.call", { tool: PULL_CALL }, async ($, e, _next) => {
-    if (String(e?.ticket ?? "").trim()) {
-      const said = await judged($, e);
-      if (said) return { result: said };
-    }
     const answer = await pulled($, e);
     // The hand works in the background, and the lead takes the next item. [[spec/tickets/the-hook-awaits-the-spawn]]
     const prompt = spawnPromptIn(answer);
@@ -145,64 +117,4 @@ async function spawned($, prompt) {
   if (said?.deny) return `the spawn is refused: ${said.deny}`;
   if (said?.isError) return `the hand failed: ${said.text ?? ""}`;
   return "";
-}
-
-// The switch reads through the one resolver, so the per-box file a slash command writes beats the tracked one. [[spec/design_output/pull#the-checks]]
-async function judged($, e) {
-  const settings = configOf({ tracked, schema, read: async (path) => $.fs.read(path) });
-  if ((await settings.ask(ENABLED)) === false) return "";
-
-  const ran = await $.process.run([...toolCall(e), JUDGE], await running($));
-  const material = parsed(ran.stdout);
-  if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
-
-  const model = await settings.ask(MODEL);
-  let said;
-  try {
-    said = await $.model.classify(
-      judgeAsk(material.evidence, material.rules),
-      judgeLabels(material.rules),
-      { model },
-    );
-  } catch {
-    return "";
-  }
-  const key = `${material.ticket} ${material.step}`;
-  const broke = ruleBroken(said, material.rules);
-  if (!broke) {
-    refusals.delete(key);
-    return "";
-  }
-  // Past the count the hand-back goes through, and the count starts over. [[spec/tickets/prose-verbs-land-first-try]]
-  const most = Number(await settings.ask(REFUSALS)) || 0;
-  const count = (refusals.get(key) ?? 0) + 1;
-  if (most && count > most) {
-    refusals.delete(key);
-    return "";
-  }
-  refusals.set(key, count);
-  const line = await quoted($, material, said, model || QUOTE_MODEL);
-  return judgeRefusal(`at ${material.step}, ${broke}`, line);
-}
-
-// The model names the line, and the line stands where the evidence holds it word for word. [[spec/tickets/prose-verbs-land-first-try]]
-async function quoted($, material, label, model) {
-  try {
-    const said = await $.model.complete({
-      model,
-      prompt: judgeAsk(material.evidence, material.rules, label),
-    });
-    const line = said?.isAnswered ? String(said.text ?? "").trim() : "";
-    return line && String(material.evidence).includes(line) ? line : "";
-  } catch {
-    return "";
-  }
-}
-
-function parsed(text) {
-  try {
-    return JSON.parse(String(text ?? "").trim() || "null");
-  } catch {
-    return null;
-  }
 }

@@ -80,26 +80,6 @@
         }
       }
     },
-    "judge": {
-      "type": "object",
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "enabled": {
-          "type": "boolean",
-          "default": false
-        },
-        "model": {
-          "type": "string",
-          "help": "The model the judge asks, where the judge runs."
-        },
-        "refusalsBeforePass": {
-          "type": "number",
-          "help": "The refusals one leaf meets before the judge lets its hand-back through."
-        }
-      }
-    },
     "context": {
       "type": "object",
       "properties": {

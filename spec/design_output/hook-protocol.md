@@ -57,8 +57,7 @@ door then answers the effects that follow.
 | `classify` | `model.classify`, with the ask, the labels and the model | the label |
 
 A round of asks stops at the cap the door sets, and the last answer stands. So
-the answer gate reads the rows it asks for, and the pull's judge runs through
-`classify` in place of its own road in `pull-tool.js`.
+the answer gate reads the rows it asks for.
 
 # A step streams once
 

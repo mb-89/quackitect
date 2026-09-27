@@ -33,7 +33,7 @@ const CONFIG = JSON.stringify({
   comment: "The controls.",
   stop: { comment: "The tooth.", enabled: true, mostInARow: 3 },
   log: { level: "info" },
-  judge: { model: "haiku" },
+  helper: { find: "haiku" },
 });
 
 const SAID = JSON.stringify({
@@ -50,9 +50,9 @@ const SAID = JSON.stringify({
       required: ["level"],
       properties: { level: { type: "string", enum: ["info", "warn", "error"] } },
     },
-    judge: {
+    helper: {
       type: "object",
-      properties: { model: { type: "string" } },
+      properties: { find: { type: "string" } },
     },
   },
 });
@@ -79,7 +79,7 @@ test("every settable value takes a command, and a comment takes none", () => {
   assert.deepEqual(
     [...drawn().keys()].sort(),
     [
-      ".claude/commands/se-config-judge-model.md",
+      ".claude/commands/se-config-helper-find.md",
       ".claude/commands/se-config-log-level-error.md",
       ".claude/commands/se-config-log-level-info.md",
       ".claude/commands/se-config-log-level-warn.md",
@@ -108,14 +108,14 @@ test("a small set of options takes one file each, and a number takes an argument
     /config log.level warn/,
   );
   assert.match(
-    files.get(".claude/commands/se-config-judge-model.md"),
-    /config judge.model \$ARGUMENTS/,
+    files.get(".claude/commands/se-config-helper-find.md"),
+    /config helper.find \$ARGUMENTS/,
   );
 });
 
 // [[spec/design_output/projection#a-name-carries-the-path]]
 test("a name carries the path it sits on, and the leaf keeps its case", () => {
-  assert.equal(nameOf(configPath("judge.model").stem), "se-config-judge-model.md");
+  assert.equal(nameOf(configPath("helper.find").stem), "se-config-helper-find.md");
   assert.equal(
     nameOf(configPath("log.level").stem, "info"),
     "se-config-log-level-info.md",
@@ -241,15 +241,15 @@ test("check names a target somebody edits, one missing and one standing over", (
     ".claude/commands/se-config-log-level-info.md",
     "somebody edits this by hand\n",
   );
-  found.delete(".claude/commands/se-config-judge-model.md");
+  found.delete(".claude/commands/se-config-helper-find.md");
   found.set(
-    ".claude/commands/se-config-judge-hold-warm.md",
+    ".claude/commands/se-config-helper-hold-warm.md",
     "a value nobody declares\n",
   );
 
   assert.deepEqual(staleIn(wanted, found), [
-    { path: ".claude/commands/se-config-judge-hold-warm.md", how: "extra" },
-    { path: ".claude/commands/se-config-judge-model.md", how: "missing" },
+    { path: ".claude/commands/se-config-helper-find.md", how: "missing" },
+    { path: ".claude/commands/se-config-helper-hold-warm.md", how: "extra" },
     { path: ".claude/commands/se-config-log-level-info.md", how: "differs" },
   ]);
 });
@@ -268,13 +268,13 @@ test("the owner of a path is the projection whose target holds it", () => {
     ENTRY,
   );
   assert.equal(
-    ownerOf(entries, "/home/one/tree/.claude/commands/se-config-judge-model.md"),
+    ownerOf(entries, "/home/one/tree/.claude/commands/se-config-helper-find.md"),
     ENTRY,
   );
-  assert.equal(ownerOf(entries, ".claude\\commands\\se-judge-model.md"), ENTRY);
+  assert.equal(ownerOf(entries, ".claude\\commands\\se-helper-find.md"), ENTRY);
   assert.equal(ownerOf(entries, "spec/config/level0.json"), undefined);
   assert.equal(ownerOf(entries, ".claude/settings.json"), undefined);
-  assert.equal(ownerOf([], ".claude/commands/se-config-judge-model.md"), undefined);
+  assert.equal(ownerOf([], ".claude/commands/se-config-helper-find.md"), undefined);
 });
 
 // Two entries share one folder, so each names the files it writes. [[spec/design_output/projection#the-write-door-refuses-one]]
@@ -328,20 +328,20 @@ test("a second entry projects with no code change", () => {
   assert.equal(entries.length, 2);
 
   const said = new Map([
-    [OTHER, JSON.stringify({ judge: { model: "sonnet" } })],
+    [OTHER, JSON.stringify({ helper: { find: "sonnet" } })],
     [SCHEMA, SAID],
   ]);
   const files = writesOf(entries[1], said);
   assert.deepEqual(
     [...files.keys()],
-    [".claude/commands/level1/se-config-judge-model.md"],
+    [".claude/commands/level1/se-config-helper-find.md"],
   );
   assert.match(
-    files.get(".claude/commands/level1/se-config-judge-model.md"),
+    files.get(".claude/commands/level1/se-config-helper-find.md"),
     /Source: spec\/config\/level1\.json/,
   );
   assert.equal(
-    ownerOf(entries, ".claude/commands/level1/se-config-judge-model.md"),
+    ownerOf(entries, ".claude/commands/level1/se-config-helper-find.md"),
     entries[1],
     "the nearer target owns the path, so the refusal names the right source",
   );
@@ -399,7 +399,7 @@ test("a value the declaration drops leaves a file standing over", () => {
       .filter((one) => one.how === "extra")
       .map((one) => one.path),
     [
-      ".claude/commands/se-config-judge-model.md",
+      ".claude/commands/se-config-helper-find.md",
       ".claude/commands/se-config-stop-enabled-false.md",
       ".claude/commands/se-config-stop-enabled-true.md",
       ".claude/commands/se-config-stop-mostInARow.md",

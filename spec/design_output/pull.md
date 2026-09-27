@@ -391,11 +391,18 @@ hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
 
 ## The fields ride the payload
 
-A hand fills the slots through the write door, or hands the fields back as
-the pull's payload. `--fields '{"verdict": "pass"}'` carries one key per
-field of the leaf in hand, and `checked` where a checklist stands. The engine
-puts each text under its heading in memory, past the mint's comments, and runs
-the checks over that text. The pull refuses a key naming no field of the leaf.
+A hand hands the fields back as the pull's payload, and the engine writes the
+ticket file. `--fields '{"verdict": "pass"}'` carries one key per field of
+the leaf in hand, and `checked` where a checklist stands. `formatted` in
+`src/scripts/pull-format.js` formats each answer first. The engine puts each
+text under its heading in memory, past the mint's comments, and runs the
+checks over that text. The pull refuses a key naming no field of the leaf.
+
+The write door refuses an agent a write to an open ticket under
+`spec/tickets`, past its Discussion. A draft and a closed ticket take one.
+`ticketDoor` in `src/bridge/write.js` holds it. The work tab draws the
+progress the index row carries: the leaves the record closes over the leaves
+of the route.
 
 A refused payload reaches no disk. It rides the hold, so the next hand-back
 with no `--fields` meets the same checks over the same text. A refusal at the
@@ -408,72 +415,8 @@ rules refuse reaches no branch.
 2. the schema over the whole ticket, then every field of the leaf against its form
 3. every command field, run from the root through `sh -c`
 4. the hand rule, and the tip on a verdict leaf
-5. the judge, which runs in the plugin wrapper alone
 
-Every check but the judge runs in the shell, so a person's hand-back meets them too.
-
-The wrapper under `.claude/skills/level0` imports nothing past its own folder,
-because the plugin validator refuses an import that leaves it. So the shell
-hands it the material: `ticket pull <ticket> --judge` prints the leaf's
-evidence and the rules its reads name, as JSON. The wrapper asks the model
-once over that, and a label answers `refused` before the shell runs. The
-judge run carries the `--fields` payload of the hand-back. The material lays
-the payload over the ticket before it reads the evidence, so the judge reads
-what the hand writes.
-
-The wrapper reads `judge.enabled` and `judge.model` through `configOf`, over
-`$.fs`, so the switch a slash command sets reaches the judge:
-
-| the layer | how the judge reads it |
-|---|---|
-| the method root's `spec/config/level0.json` | first, as [[spec/design_output/vehicle#the-work-root-inherits]] says |
-| the work root's `spec/config/level0.json` | over the method root's |
-| the environment | nowhere, because `$` carries no environment |
-| `.se/.runtime/config.json` | over both tracked files |
-
-The evidence holds the prose fields alone. The leaf names the form of each
-field it asks for. So the material leaves out a field whose form reads
-`command`, and a heading carrying no line. A chapter of commands hands the
-wrapper nothing, and the wrapper then skips the judge.
-
-### The judge answers a label
-
-The judge picks one answer from `follows` and one label per rule it holds.
-`judgeLabels` builds that set, and `ruleBroken` reads a label back to its
-rule. So an answer names the rule, and the refusal carries the note, the
-number and the rule's own line.
-
-| the answer | what it does |
-|---|---|
-| `follows` | the shell runs, and the hand-back carries on |
-| a label the material holds | `judgeRefusal` names the note, the number and the line |
-| a label outside the set | the same as `follows`, because a judge naming nothing refuses nothing |
-
-A label is the note's path under `spec/guidance`, with each slash as a hyphen,
-then a hyphen and the rule's number in that note. `labelOf` writes it, and
-`forEvidence` hands one per rule. A leaf reads several notes, and `actionables`
-numbers from one inside each, so the note's name keeps one label on one rule.
-
-### A rule describing an answer
-
-`forEvidence` drops the rules a note marks, and keeps the chapter's own
-numbering across the drop. So a label names the line the note holds under that
-number, and a reader opens one place.
-
-| the mark a rule ends in | what it says |
-|---|---|
-| the star | the rationale this note links argues for the rule |
-| the answer mark | the rule describes an answer, which evidence carries nowhere |
-
-`spec/schemas/guidance.schema.yaml` names both marks. A note writes the answer
-mark in a code span, because a paragraph admits the character nowhere else,
-and `actionables` strips either form. So every reader of the chapter reads the
-rule whole, and the output style shows no mark.
-
-Evidence carries no answer, so a judge reading an answer rule over evidence
-refuses a hand that keeps every rule. The answer gate holds those rules
-already. A leaf whose rules all carry the mark hands the wrapper an empty
-list, and the judge stands silent there.
+Every check runs in the shell, so a person's hand-back meets them too.
 
 ## The fields hold their forms
 
@@ -691,6 +634,42 @@ and answers it itself.
 [[spec/rationales/cloud]] carries what a count costs where it reaches a person
 first.
 
+# The gate
+
+A step carrying `gate` is a gate: its value names the question it answers, and a reviewer other than the author reads the phase before it. [[spec/design_input/level-two#gates]] asks it.
+
+| the verdict | what the engine does |
+|---|---|
+| `accept` | reads as `pass`, and hands out the next phase |
+| `accept with points` | mints a fix ticket a row on the trivial route, `open` and `todo: true`, carrying `parent`, and goes on |
+| `reject` | `rejected` in `src/scripts/pull-gate.js` puts the leaves of the phase in again at its end, each named `<leaf>-<round>`, and points `step` at the first copy |
+| a second `reject` | puts a person step in before the copies too, through `withPersonStep` |
+
+- The hand-out of a gate prints its question, and `BEFORE_CLEAR` in `src/scripts/pull-chapter.js` beside it.
+- The reviewer fixes within its own diff, as its own commit. So at a gate, `handFaults` lets a commit naming the ticket stand.
+- A copy keeps no leaf a condition holds, no person step and no earlier copy.
+- Tests-red lists its red files under `red`. `expectedRed` in `src/scripts/red-list.js` reads every ticket past tests-red and short of tests-green. The check's test run leaves those files out and names them.
+
+## The final acceptance
+
+A gate carrying `final: true` reads the whole work, and the process closes on its verdict. [[spec/design_input/level-two#the-final-acceptance]] asks it, and `src/scripts/pull-accept.js` holds it.
+
+| the moment | what the engine does |
+|---|---|
+| the hand-out | waits while a ticket naming this one as `parent` or `group` stands open |
+| the hand-out | names the diff since the base, merges and all |
+| the hand-back | runs every command field of the route, and the record keeps each answer |
+| `accept with points` | mints the fix tickets and leaves the step on the gate, so it waits on them and reads again |
+| a verdict short of accept past `work.failsBeforePerson` | mints a question ticket and closes the process `became` onto it |
+
+| the run | the base of its diff |
+|---|---|
+| a rerun | the `hash_after` of the gate's last verdict |
+| the first run of a ticket | the `hash_before` of its first take |
+| the first run of a group | its merge base with trunk |
+
+The standard route carries its acceptance under `when: backlog`, which holds where the ticket names no group. So a process inside a delivery ends after implement, and the group route's acceptance after `children` reads it.
+
 # A leaf comes back
 
 `ticket pull <ticket> --back <leaf>` puts a leaf back into the hand that
@@ -737,7 +716,7 @@ names where the work goes on, and `answered` names where it stands done.
 
 A private ticket takes no hash, no commit and no push, because git ignores
 `.se`. A note, `by: retro`, goes to the hand whose group stands at a retro
-step. A note with the tag goes first, to anybody.
+step, and `handOut` hands it before the group, whose step waits on it. A note with the tag goes first, to anybody.
 
 The stop hook counts an open private ticket the way it counts a hold, so a
 breakdown a hand mints carries the turn. A note carries nothing, because it

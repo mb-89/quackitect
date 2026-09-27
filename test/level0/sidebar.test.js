@@ -151,8 +151,8 @@ test("a number typed as text lands as the number the schema says", async () => {
 
 test("a key the schema leaves alone lands as the text a person types", async () => {
   const door = doorOf();
-  await sidebarOf(door).took({ kind: "set", key: "judge.model", value: "sonnet" });
-  assert.equal(local(door).judge.model, "sonnet");
+  await sidebarOf(door).took({ kind: "set", key: "helper.find", value: "sonnet" });
+  assert.equal(local(door).helper.find, "sonnet");
 });
 
 // [[spec/design_output/extension#the-log-opens-a-terminal]]

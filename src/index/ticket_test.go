@@ -108,6 +108,22 @@ func TestTheIndexAnswersEveryTicketWithItsFields(t *testing.T) {
 	}
 }
 
+// The work tab draws the progress off this row. [[spec/design_output/index#the-index-answers-the-tickets]]
+func TestATicketRowCarriesTheProgressOfItsRoute(t *testing.T) {
+	db := opened(t, ticketTree(t))
+	said, err := Tickets(db)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows := byName(said)
+	if rows["one-group"].Progress != "1/2" {
+		t.Fatalf("a group past sync and holding children reads 1/2, and reads %q", rows["one-group"].Progress)
+	}
+	if rows["a-child"].Progress != "0/1" {
+		t.Fatalf("a child with no record reads 0/1, and reads %q", rows["a-child"].Progress)
+	}
+}
+
 // [[spec/design_output/index#the-index-answers-the-tickets]]
 func TestATicketCarriesTheTimeItsFileLastChanged(t *testing.T) {
 	db := opened(t, ticketTree(t))
