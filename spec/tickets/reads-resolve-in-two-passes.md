@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: aa0fb1a917cce672
         size: 2936
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: cb3596229973134926051dd165e071827d258ca9
+    hash_after: cb3596229973134926051dd165e071827d258ca9
+    inputs:
+      - name: design/draft
+        hash: aa0fb1a917cce672
+        size: 2936
+      - name: design/tests-red
+        hash: 205ea49bec3293cf
+        size: 1067
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,9 @@ the cases run over a catalog and a store in memory, so no door stands unfaked
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
