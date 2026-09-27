@@ -118,18 +118,20 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [reads-resolve-in-two-passes]
+depends_on: [io-modules-own-their-names]
 ---
 
 # Ask
 
-The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
+A module declares a projection of `files/` with a glob, a codec and a kind, per [[spec/design_output/model#everything-on-disk-mirrors]]. The kinds `loaded`, `saved` and `dump` stand. The config, the plan and the holds become loaded projections, and each codec keeps one contract suite.
 
-Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
+The codec is then the one code knowing a file format. A write goes back one way, through `disk`, so no module writes a file past it.
 
 - `go test ./...` from the root passes
-- a case moves an input and reads the provider's new value
-- a case moves an input twice during a run, and reads one pending run and no overlap
+- each codec's suite round-trips every committed file of its glob, byte for byte
+- a case writes through `disk` with a stale revision, and reads the refusal
+- a case restores a saved file with a removed name, a changed type and a new name
+- a case dumps a prefix with `quack dump`, and nothing reads it back
 - `./RUNME.sh check` exits 0
 
 # design

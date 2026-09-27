@@ -118,18 +118,20 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [reads-resolve-in-two-passes]
+depends_on: [qtest-holds-a-module]
 ---
 
 # Ask
 
-The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
+The IO modules `watch`, `disk`, `clock` and `env` stand, each with the flag, per [[spec/design_output/model#io-modules]]. `watch` writes `files/<path...>`, and `clock` writes `clock/minute`. `env` writes `env/<name>` at start, and `disk` writes a file on request. The `hooks` IO module lands in phase 5, with [[spec/tickets/the-hooks-door-lands]].
 
-Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
+The core then stores what a module commits, and knows no input of its own. Each IO module keeps its fake inside, and its test needs no disk and no clock.
 
 - `go test ./...` from the root passes
-- a case moves an input and reads the provider's new value
-- a case moves an input twice during a run, and reads one pending run and no overlap
+- a case reads the index core as the writer of no name under `files/`, `clock/` or `env/`
+- a case sends `disk` a write request, and reads the file come back through `watch`
+- each IO module's test runs over `qtest` and the fake of its outside
+- each fake of the outside passes one contract suite, run against the fake and the real outside
 - `./RUNME.sh check` exits 0
 
 # design

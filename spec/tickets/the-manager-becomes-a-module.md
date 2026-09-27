@@ -118,18 +118,19 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [reads-resolve-in-two-passes]
+depends_on: [ops-keeps-one-state, stale-names-keep-their-value]
 ---
 
 # Ask
 
-The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
+The index's own management moves into `src/modules/index`, a module flagged with `q.IO()` that the index always loads, per [[spec/design_output/model#the-index-manager]]. It holds the operations, the leases and the alarms, and writes `index/`, `ops/<id>` and `session/alarms` as registered outputs.
 
-Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
+The core then holds no logic of its own. The manager tests like every IO module, over `qtest` and the fakes of its outside.
 
 - `go test ./...` from the root passes
-- a case moves an input and reads the provider's new value
-- a case moves an input twice during a run, and reads one pending run and no overlap
+- `src/ops` and `src/watchdog` move under `src/modules/index`, which `go list ./src/modules/index/...` shows
+- a case starts the index with no other module, and reads the manager loaded
+- a case reads the manager as the writer of `ops/<id>`, `session/alarms` and `index/health`
 - `./RUNME.sh check` exits 0
 
 # design

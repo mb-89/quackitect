@@ -122,14 +122,14 @@ group: the-foundation-closes-its-gaps
 
 # Ask
 
-`q/qtest` stands as [[spec/design_output/model#the-fake-index]] says. `src/modules/` holds the module packages, and the `onlyq` analyzer holds each one to `q`, `q/qtest` and the pure standard library. The import analyzers read the packages that stand, where today they guard folders holding no Go package.
+`q/qtest` stands as [[spec/design_output/model#the-fake-index]] says, and `src/modules/` holds the module packages. The fake index keeps one contract suite, run against `qtest` and the real index in process, per [[spec/design_output/model#the-fake-keeps-a-contract]].
 
-A module tests against a fake index alone, per the owner's rule. Without the harness and the analyzer, a module reaches past the index unseen.
+A module tests against a fake index alone, per the owner's rule. Without the suite, the fake drifts from the index it stands for, and a green module test proves the fake.
 
 - `go test ./...` from the root passes
 - a case runs a derived provider, a fold and an action through `qtest`
-- a case reads the commits and the door calls each run answers
-- a case plants a module importing `os`, and `onlyq` names it
+- a case reads the commits and the requests each run answers
+- the contract suite passes against `qtest` and the real index, with no port and no NATS
 - `./RUNME.sh check` exits 0
 
 # design

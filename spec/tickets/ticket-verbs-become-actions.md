@@ -87,7 +87,7 @@ The `ticket` verbs become actions returning operations, each in shadow against i
 
 An agent calls the index, and parses no standard output.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

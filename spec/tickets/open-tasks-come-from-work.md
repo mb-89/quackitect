@@ -87,7 +87,7 @@ group: open-tasks-shadow-lands
 
 The badge and the header then read one provider. Without it they keep counting two ways.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case reads `work/open-tasks` over a fake tree of tickets
 - `./RUNME.sh check` exits 0
 

@@ -118,18 +118,22 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [reads-resolve-in-two-passes]
+depends_on: [commits-name-their-writer]
 ---
 
 # Ask
 
-The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
+A fake module drives the index through every transaction a module makes, per [[spec/design_output/model#the-index-meets-fake-modules]]. The index's own tests run over it, and none of them leans on a real module.
 
-Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
+The index then tests against the contract its modules see. A change to the core shows its effect on every module at once.
 
 - `go test ./...` from the root passes
-- a case moves an input and reads the provider's new value
-- a case moves an input twice during a run, and reads one pending run and no overlap
+- a case reads the two passes, and the refusal of a read left open
+- a case reads a write refused from a module registering no such output
+- a case reads one snapshot, the commit and the push
+- a case reads the built-in value marked `not provided` for a writer running nowhere
+- a case reads the stale mark after a lease expires
+- a case reads writing actions run one at a time, and a read answering while one runs
 - `./RUNME.sh check` exits 0
 
 # design

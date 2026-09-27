@@ -118,18 +118,20 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [reads-resolve-in-two-passes]
+depends_on: [io-modules-own-their-names]
 ---
 
 # Ask
 
-The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
+The import analyzers become the ones [[spec/design_output/model#the-build-checks-imports]] names: `onlyq`, `ioonly`, `fakesuite` and `nomodule`. They read a package's flag off its `q.IO()` registration, and `nodoor` and `noname` leave.
 
-Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
+A module without the flag then reaches the outside nowhere. A fake with no contract suite beside it fails the build, `q/qtest` among them.
 
 - `go test ./...` from the root passes
-- a case moves an input and reads the provider's new value
-- a case moves an input twice during a run, and reads one pending run and no overlap
+- a case plants a module without the flag importing `os`, and `onlyq` names it
+- a case plants an IO module importing `os`, and no analyzer names it
+- a case plants a fake with no suite beside it, and `fakesuite` names it
+- a case plants a module importing another module, and `nomodule` names it
 - `./RUNME.sh check` exits 0
 
 # design

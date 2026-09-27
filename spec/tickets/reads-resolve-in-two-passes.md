@@ -118,18 +118,18 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [reads-resolve-in-two-passes]
 ---
 
 # Ask
 
-The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
+The catalog resolves each read to its writer in two passes, per [[spec/design_output/model#the-index-resolves-in-passes]]. A read still open after the second refuses the start loudly. A reader whose writer registers and runs nowhere takes the built-in value, marked `not provided`.
 
-Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
+Modules load in any order, so one pass refuses a sound catalog. A writer that crashes then fails the start, where its readers could run on the built-in value.
 
 - `go test ./...` from the root passes
-- a case moves an input and reads the provider's new value
-- a case moves an input twice during a run, and reads one pending run and no overlap
+- a case registers a reader before its writer, and the index starts
+- a case leaves a read open, and reads the refusal naming the reader, its file and line, and the name
+- a case registers a writer that runs nowhere, and reads the built-in value marked `not provided`
 - `./RUNME.sh check` exits 0
 
 # design

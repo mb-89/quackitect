@@ -86,7 +86,7 @@ The LSP's rules and schema checks move into the check module, and run in shadow 
 
 One copy of each rule then answers the editor, the check and the write door.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each finding the two disagree on
 - `./RUNME.sh check` exits 0
 

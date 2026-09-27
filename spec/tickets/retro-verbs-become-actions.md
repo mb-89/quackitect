@@ -87,7 +87,7 @@ The `retro` verbs become actions returning operations, in shadow against `cli.js
 
 A retro collect runs long, and a handle keeps its caller free.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

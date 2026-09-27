@@ -86,7 +86,7 @@ The `guidance/` topic answers the rules a step reads.
 
 The guidance a step hands out then comes from one place.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a golden file holds the rules the old path and the new one hand for every leaf of every process
 - `./RUNME.sh check` exits 0
 

@@ -118,12 +118,12 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [qtest-holds-a-module, the-scheduler-runs-providers]
+depends_on: [qtest-holds-a-module, the-scheduler-runs-providers, projections-read-the-mirror]
 ---
 
 # Ask
 
-`src/tickets` moves to `src/modules/tickets`, as a `q.Derived` over `files/`. Its tests run through `q/qtest` alone. The index stops importing it, and stops computing `tickets/all` itself.
+`src/tickets` moves to `src/modules/tickets`, as the loaded projection of `spec/tickets/*.md` with the markdown codec, per [[spec/design_output/model#everything-on-disk-mirrors]]. It writes `tickets/all` off `files/<path...>`. Its tests run through `q/qtest` alone, and the index stops importing it.
 
 The index then holds no module's logic, and the tickets module tests like every other.
 

@@ -82,12 +82,13 @@ group: go-cage-lands-in-shadow
 
 # Ask
 
-The hooks door stands, with fold providers for `session/`, and answers each event beside the bridge server.
+The `hooks` IO module stands under `src/modules/hooks`, flagged with `q.IO()`, and writes `session/<id>/events`. The fold modules answer `session/`, and the cage answers each event beside the bridge server.
 
 Every cage rule after this one runs on it.
 
-- - `go test ./...` from the root passes
-- an inbound fake replays a recorded hook event, and the door answers it
+- `go test ./...` from the root passes
+- an inbound fake replays a recorded hook event, and `session/<id>/events` holds it
+- the IO module's test runs over `qtest` and its inbound fake
 - `./RUNME.sh check` exits 0
 
 # design

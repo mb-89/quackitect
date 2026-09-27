@@ -87,7 +87,7 @@ The `branch` verbs become work actions returning operations, and each runs in sh
 
 An agent calls the index, and parses no standard output.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

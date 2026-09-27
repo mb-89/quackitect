@@ -118,18 +118,21 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
-depends_on: [reads-resolve-in-two-passes]
+depends_on: [projections-read-the-mirror, the-manager-becomes-a-module, reads-resolve-in-two-passes]
 ---
 
 # Ask
 
-The index runs a derived provider when an input moves, and keeps one run pending while one runs. It runs no provider twice at once, per [[spec/design_output/model#the-provider-kinds]].
+The config module stands under `src/modules/config`, loaded always, per [[spec/design_output/model#the-config-module]]. It owns every topic carrying the flag `config`, and resolves each key off its layers: override, context, environment, local, default and built-in. Its tests run through `qtest`.
 
-Nothing runs a provider today when its input moves, so a value stands at its built-in value until a caller runs it by hand.
+A key then answers one value off one resolver, and a script's own values leave with the script, even on a crash.
 
 - `go test ./...` from the root passes
-- a case moves an input and reads the provider's new value
-- a case moves an input twice during a run, and reads one pending run and no overlap
+- a case lets a context's lease run out, and reads the layer below
+- a case nests two contexts, and reads the inner one win and hand back on exit
+- a case opens two unrelated contexts on one key, and reads the refusal naming the holder
+- a case sets a shared key in every other layer, and reads the default file's value
+- a case sets an override over a context, and reads the override win
 - `./RUNME.sh check` exits 0
 
 # design

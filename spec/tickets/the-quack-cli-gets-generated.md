@@ -86,7 +86,7 @@ group: quack-verbs-land-in-shadow
 
 A command then costs no hand-written verb.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case reads the help of a fake action off `quack --help`
 - `./RUNME.sh check` exits 0
 

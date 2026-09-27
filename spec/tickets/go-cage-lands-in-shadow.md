@@ -82,7 +82,7 @@ cloud: true
 
 # Ask
 
-Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the cage. The hooks door, the fold providers for `session/`, the rules ported one at a time, and Copilot on the same door. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
+Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the cage. The `hooks` IO module, the fold modules over `session/`, the rules ported one at a time, and Copilot on the same IO module. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
 Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 

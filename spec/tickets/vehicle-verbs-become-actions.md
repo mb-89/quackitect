@@ -87,7 +87,7 @@ The `vehicle` and `stub` verbs become actions returning operations, in shadow ag
 
 Every verb then answers through the index.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

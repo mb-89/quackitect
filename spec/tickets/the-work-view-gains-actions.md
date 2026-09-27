@@ -87,7 +87,7 @@ depends_on: [the-tui-becomes-a-shell]
 
 The work view stops computing what it shows.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case draws the work view over a fake `work/rows`
 - `./RUNME.sh check` exits 0
 
