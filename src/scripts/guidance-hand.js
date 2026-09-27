@@ -208,6 +208,11 @@ export function resolved(it, tags, env = {}) {
     .sort();
 }
 
+// Every note under a subfolder that no step of any process reaches. The change step fills this in. [[spec/design_input/level-two#guidance]]
+export function unreached(_it) {
+  return [];
+}
+
 // [[spec/design_output/level0#the-standing-layer]]
 export function alwaysOn(it, env = {}) {
   const at = it.join(it.root, ...GUIDANCE.split("/"));

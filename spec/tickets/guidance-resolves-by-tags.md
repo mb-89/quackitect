@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d8cca5d3cd · claude-code-remote · helper-2
     hash_before: 0767ae03db9546538a1c98cebde1e923b1892888
     hash_after: 0767ae03db9546538a1c98cebde1e923b1892888
+  - step: implement/tests-red
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 503bdeac09f8081dcf3c173cf54ab861f98275a8
+    hash_after: 503bdeac09f8081dcf3c173cf54ab861f98275a8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -177,20 +185,27 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/guidance-tags.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The level0 cases fail on their assertions: the env match lets no cloud note in under SE_CLOUD, unreached answers an empty list, the pull prints no note section, and the guidance verb takes no --step. The contract case for the schemas fails because the ticket schema names no tags on a step. What surprises me: resolved and tagsOf stand already, and the cloud miss sits in bindsHere, not in the tag match. unreached stands as a bare stub answering an empty list, so the files load and reach their assertions.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: two test files and a bare unreached stub in guidance-hand.js, all under the ask
+every door the change reaches has a fake: the level0 cases read fakeDisk alone, and the contract case drives the real disk door
+a comment names the approach the change implements: each file opens on the claim and links level-two#guidance
+every fact the change adds stands in one place: the tests link the design input and copy no rule
+every row the design review passes with stands fixed in the change: the review rows land at the change step, and these tests hold the schema, resolve, unreached, pull and verb rows
 
 ## change
 
