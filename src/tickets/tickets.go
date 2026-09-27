@@ -33,6 +33,8 @@ const (
 	commentClose = "-->"
 	codeFence    = "```"
 	frontFence   = "---"
+	// A record's returns reads as a float of this width, the width a JavaScript number holds. [[spec/tickets/the-queue-moves-to-plan]]
+	floatBits = 64
 )
 
 // The two folders a ticket stands directly under, the same ones FOLDERS in src/extension/lib/lens.js names, spelled again here because a Go module imports no JavaScript. [[spec/design_output/index#the-index-answers-the-tickets]]
@@ -56,8 +58,8 @@ type Ticket struct {
 	// The time the file last changed, off the file table, so a view sorts the newest done ticket first. [[spec/design_output/index#the-index-answers-the-tickets]]
 	Changed int64 `json:"changed"`
 	// The tickets this one waits on, and the hand-backs that failed on it, which the queue weighs. [[spec/tickets/the-queue-moves-to-plan]]
-	DependsOn []string `json:"depends_on"`
-	Fails     int      `json:"fails"`
+	DependsOn []string `json:"depends_on,omitempty"`
+	Fails     int      `json:"fails,omitempty"`
 }
 
 // [[spec/tickets/the-tickets-topic-lands]]
@@ -83,17 +85,19 @@ func Of(path, name, text string, changed int64) Ticket {
 		state = openState
 	}
 	one := Ticket{
-		Name:     name,
-		Path:     path,
-		State:    state,
-		Step:     word(front.Get("step")),
-		Route:    routeOf(word(front.Get("process"))),
-		Group:    linkName(word(front.Get("group"))),
-		Urgent:   word(front.Get("urgent")) == "true",
-		Todo:     todoIn(word(front.Get("todo"))),
-		Says:     askIn(body),
-		Progress: progressOf(frontText(text)),
-		Changed:  changed,
+		Name:      name,
+		Path:      path,
+		State:     state,
+		Step:      word(front.Get("step")),
+		Route:     routeOf(word(front.Get("process"))),
+		Group:     linkName(word(front.Get("group"))),
+		Urgent:    word(front.Get("urgent")) == "true",
+		Todo:      todoIn(word(front.Get("todo"))),
+		Says:      askIn(body),
+		Progress:  progressOf(frontText(text)),
+		Changed:   changed,
+		DependsOn: dependsOnIn(front),
+		Fails:     failsIn(front),
 	}
 	if one.Route == groupRoute {
 		one.Standing = standingOf(state, front)
@@ -174,6 +178,47 @@ func heldIn(front *yaml.Doc) bool {
 		}
 	}
 	return false
+}
+
+// The tickets one waits on, a list or one line split at each comma, the rule dependsOn in src/engine/group.js holds. [[spec/tickets/the-queue-moves-to-plan]]
+func dependsOnIn(front *yaml.Doc) []string {
+	var out []string
+	for _, line := range yaml.StringsOf(front.Get("depends_on")) {
+		for _, part := range strings.Split(line, ",") {
+			bare := strings.TrimSuffix(strings.TrimPrefix(strings.TrimSpace(part), "["), "]")
+			bare = strings.TrimSpace(trimOne(bare, `"'`))
+			if bare != "" {
+				out = append(out, bare)
+			}
+		}
+	}
+	return out
+}
+
+// One quote off each end, where one stands there. [[spec/tickets/the-queue-moves-to-plan]]
+func trimOne(said, quotes string) string {
+	if said != "" && strings.ContainsRune(quotes, rune(said[0])) {
+		said = said[1:]
+	}
+	if said != "" && strings.ContainsRune(quotes, rune(said[len(said)-1])) {
+		said = said[:len(said)-1]
+	}
+	return said
+}
+
+// The hand-backs that failed on a ticket, each a record item carrying returns, the rule failsOn in src/scripts/pull-queue.js holds. [[spec/tickets/the-queue-moves-to-plan]]
+func failsIn(front *yaml.Doc) int {
+	count := 0
+	for _, item := range yaml.AsList(front.Get("record")) {
+		entry := yaml.AsDoc(item)
+		if entry == nil {
+			continue
+		}
+		if returns, err := strconv.ParseFloat(word(entry.Get("returns")), floatBits); err == nil && returns > 0 {
+			count++
+		}
+	}
+	return count
 }
 
 // The Ask chapter up to the next heading. A fence reads as text, and every comment drops, one over several rows included. [[spec/tickets/the-tickets-topic-lands]]

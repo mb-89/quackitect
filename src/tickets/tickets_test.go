@@ -50,6 +50,14 @@ func TestOfReadsTheWaitsAndTheFails(t *testing.T) {
 	}
 }
 
+// [[spec/tickets/the-queue-moves-to-plan]]
+func TestAReturnsReadingNoNumberCountsNoFail(t *testing.T) {
+	text := "---\nstate: open\nrecord:\n  - step: do\n    returns: soon\n  - step: do\n    returns: 1\n---\n"
+	if said := Of("spec/tickets/one.md", "one", text, 0).Fails; said != 1 {
+		t.Fatalf("the fails read %d, and one returns reads as a number", said)
+	}
+}
+
 func TestAskDropsComments(t *testing.T) {
 	text := "---\nkind: [[ticket]]\n---\n\n# Ask\n\nline one\n<!-- one row -->\nline two\n<!--\nmany rows\n-->\nline three\n\n# design\n\nnot the ask\n"
 	if said := Ask(text); said != "line one\nline two\nline three" {

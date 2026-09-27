@@ -55,6 +55,15 @@ func TestATieKeepsThePlansOrder(t *testing.T) {
 	}
 }
 
+// A tie reads the name the way localeCompare does, so a todo title carrying a capital sorts beside its small letter. [[spec/tickets/the-queue-moves-to-plan]]
+func TestATieReadsTheNameWhateverItsCase(t *testing.T) {
+	list := []Row{{Name: "Beta todo"}, {Name: "alpha"}, {Name: "a"}, {Name: "A"}}
+	said := namesOf(Queued(list, list, At{}))
+	if want := []string{"a", "A", "alpha", "Beta todo"}; !reflect.DeepEqual(said, want) {
+		t.Fatalf("the queue reads %v, and the letters order it before their case: %v", said, want)
+	}
+}
+
 func TestTheDaysAndTheFailsWeigh(t *testing.T) {
 	list := []Row{
 		{Name: "a-new", Path: "spec/tickets/a-new.md"},

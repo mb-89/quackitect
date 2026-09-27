@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [the-tickets-topic-lands]
@@ -104,6 +104,15 @@ record:
         exit: 1
         said: assertion, 1 test(s) fail on their own assertion
     def: 06865600120e8b38
+  - step: implement/change
+    hand: person
+    hash_before: fb94c5004ca077e571a464890fadd26d7e45792d
+    hash_after: fb94c5004ca077e571a464890fadd26d7e45792d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: 21d63335f32dfcda
 ---
 
 # Ask
@@ -240,14 +249,21 @@ Every new case fails on its own assertion over stubs that answer nothing: the qu
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/plan/queue.go src/plan/outline.go src/plan/queue_test.go src/plan/outline_test.go src/plan/golden_test.go src/tickets/tickets.go src/tickets/tickets_test.go src/scripts/work-answer.js test/level0/work-answer.test.js test/level0/queue-golden.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the golden file it writes under `src/plan/testdata`
+- the change reaches no door: the port reads the rows a caller hands in
+- the golden script runs the real doors from the command line alone
+- a comment in each file names the ticket the change implements
+- the weights and the day stand in `src/plan/queue.go`, and the four words in `src/plan/outline.go`
+- the design review passes with no row
 
 ## tests-green
 
