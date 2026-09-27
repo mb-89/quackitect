@@ -26,7 +26,6 @@ steps:
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-group: open-tasks-land-in-shadow
 parent: groups-carry-the-cloud-marker
 record:
   - step: do
