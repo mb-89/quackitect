@@ -4,9 +4,9 @@ kind: [[rationale]]
 
 # Why
 
-The migration decided this in its specs, and the owner read the call at the
-merge. The index and its processes spoke NATS, with the server running inside
-the index. An agent reads this note before it asks again.
+The migration's specs proposed this. It stood a proposal until the owner
+confirmed it, as (h) in [[spec/funnel/the-owner-rules-the-specs]]. The index and its processes spoke NATS, with
+the server running inside the index.
 
 ## 1. What it weighed
 

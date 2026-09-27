@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
-import { DONE, groupStanding, work } from "../../src/scripts/work.js";
+import { DONE, work } from "../../src/scripts/work.js";
 import { freeChildren } from "../../src/scripts/work-merge.js";
 import {
   CHILD,
@@ -70,7 +70,7 @@ test("done writes hash_after, and closes a group whose every ticket is closed", 
 
 // [[spec/design_output/work#a-box-leaves]]
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
-test("done hands back a group whose ticket a hand can take, and frees that ticket", () => {
+test("done refuses while a ticket naming the group stands open or draft, and names each with its step", () => {
   const took = withEntry(
     GROUP_NOTE,
     {
@@ -90,18 +90,31 @@ test("done hands back a group whose ticket a hand can take, and frees that ticke
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
-  assert.equal(code, 0);
+  assert.equal(code, 1);
   const now = disk.read(on("one-group"));
-  assert.equal(recordIn(now).at(-1).hash_after, SHA);
-  assert.equal(groupStanding(now), DONE, "branch merge can take it");
-  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "");
-  assert.equal(fieldOf(disk.read(on("a-draft")), "group"), "");
-  assert.equal(fieldOf(disk.read(on("shut-one")), "group"), "one-group");
-  assert.match(said, /a-draft leaves the group/);
-  assert.ok(ranGit(outside).includes("git push origin work/one-group"));
+  assert.equal(recordIn(now).at(-1).hash_after, undefined, "the box stays");
+  assert.equal(fieldOf(now, "state"), "open");
+  for (const one of ["a-child", "a-draft", "shut-one"])
+    assert.equal(
+      fieldOf(disk.read(on(one)), "group"),
+      "one-group",
+      `${one} keeps its group`,
+    );
+  assert.match(said, /a-child stands at do/);
+  assert.match(said, /a-draft/);
+  assert.doesNotMatch(said, /shut-one/, "a closed ticket counts nowhere");
+  assert.match(
+    said,
+    /branch release/,
+    "the refusal names the road that leaves the group open",
+  );
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git push")),
+    "nothing is pushed",
+  );
 });
 
-test("done closes a group where a ticket in it waits for a helper, and frees only that one", () => {
+test("done refuses where a ticket in the group waits for a helper, and a ticket of another group counts nowhere", () => {
   const took = withEntry(
     GROUP_NOTE,
     {
@@ -123,11 +136,10 @@ test("done closes a group where a ticket in it waits for a helper, and frees onl
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
-  assert.equal(code, 0);
-  const now = disk.read(on("one-group"));
-  assert.equal(recordIn(now).at(-1).hash_after, SHA, "the box leaves either way");
-  assert.equal(fieldOf(now, "state"), "closed");
-  assert.match(said, /a-child leaves the group/);
+  assert.equal(code, 1);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "open");
+  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "one-group");
+  assert.match(said, /a-child/);
   assert.doesNotMatch(said, /elsewhere/, "a ticket of another group counts nowhere");
 });
 
@@ -232,7 +244,7 @@ const written = (text, ...leaves) =>
 test("done refuses while the group's retro stands open, and names the retro step", () => {
   const { it, disk } = doorsSaying(onBranch("work/one-group"), {
     [on("one-group")]: RETRO_GROUP,
-    [on("a-child")]: CHILD("one-group", "open"),
+    [on("a-child")]: CHILD("one-group", "closed"),
     ...green,
   });
 
@@ -244,11 +256,22 @@ test("done refuses while the group's retro stands open, and names the retro step
   const now = disk.read(on("one-group"));
   assert.equal(recordIn(now).at(-1).hash_after, undefined, "the box stays");
   assert.equal(fieldOf(now, "state"), "open");
-  assert.equal(
-    fieldOf(disk.read(on("a-child")), "group"),
-    "",
-    "the open ticket leaves, so the pull reaches the retro",
-  );
+  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "one-group");
+});
+
+// [[spec/design_output/work#a-box-leaves]]
+test("done names the open ticket before the retro, and frees none of it", () => {
+  const { it, disk } = doorsSaying(onBranch("work/one-group"), {
+    [on("one-group")]: RETRO_GROUP,
+    [on("a-child")]: CHILD("one-group", "open"),
+    ...green,
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /a-child stands at do/);
+  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "one-group");
 });
 
 // [[spec/design_output/work#a-box-leaves]]

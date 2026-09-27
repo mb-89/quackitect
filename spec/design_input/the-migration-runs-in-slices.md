@@ -54,14 +54,14 @@ Every group outside the migration keeps moving.
 Each group names the one before it under `depends_on`, the way every group in
 this tree chains. A child names a sibling alone, where its work needs the other
 first. Nothing outside the migration waits on these groups, and none carries
-`urgent`. The keys `phase0`, `phase1` and `phase2shadow` start at `true`, and
-every other key starts at `false`.
+`urgent`. The keys `phase0`, `phase1`, `phase1gaps` and `phase2shadow` read
+`true`, and every other key reads `false`.
 
 | phase | the groups, each with its key under `migration` | done when |
 |---|---|---|
 | 0, the decisions and the specs | [[spec/tickets/the-migration-writes-its-specs]], `phase0` | the inner protocol and the LSP door stand chosen in [[spec/design_output/inner-protocol]], and a design note covers each part of the model |
-| 1, the foundation, with no change in behaviour | [[spec/tickets/the-foundation-lands-unchanged]], `phase1` | the index answers `/v1` and the old API side by side, and the check stands green on Linux and Windows |
-| 2, the pilot: `work/open-tasks` | [[spec/tickets/open-tasks-land-in-shadow]], `phase2shadow`, then [[spec/tickets/open-tasks-switch-over]], `phase2switch` | the badge and the work tab's brackets read one name |
+| 1, the foundation, with no change in behaviour | [[spec/tickets/the-foundation-lands-unchanged]], `phase1`, then [[spec/tickets/the-foundation-closes-its-gaps]], `phase1gaps` | the index answers `/v1` and the old API side by side, and the check stands green on Linux and Windows |
+| 2, the pilot: `work/open-tasks` | [[spec/tickets/open-tasks-shadow-lands]], `phase2shadow`, then [[spec/tickets/open-tasks-switch-lands]], `phase2switch` | the badge and the work tab's brackets read one name |
 | 3, the read-only topics | [[spec/tickets/read-topics-land-in-shadow]], `phase3shadow`, then [[spec/tickets/read-topics-switch-over]], `phase3switch` | no JavaScript twin of a Go check stands |
 | 4, the actions and the command line | [[spec/tickets/quack-verbs-land-in-shadow]], `phase4shadow`, then [[spec/tickets/quack-verbs-switch-over]], `phase4switch` | agents call `quack` and no `./RUNME.sh` verb, and `cli.js` leaves the tree |
 | 5, the cage | [[spec/tickets/go-cage-lands-in-shadow]], `phase5shadow`, then [[spec/tickets/go-cage-switches-over]], `phase5switch` | the bridge server leaves the tree |
@@ -72,7 +72,9 @@ every other key starts at `false`.
 | 10, Node leaves the boxes | [[spec/tickets/node-leaves-the-boxes]], `phase10` | `install.sh` installs no Node |
 
 A group's ask names its work, and its children carry the done criteria. A
-group's `split` step mints the children a later phase finds it lacks. What each
+group's `split` step mints the children a later phase finds it lacks. Phase 2's
+first groups, `open-tasks-land-in-shadow` and `open-tasks-switch-over`, close
+with their work unbuilt, and the two groups the table names build it. What each
 folder holds today, and where it goes, stands in
 [[spec/design_output/migration]].
 
@@ -84,6 +86,7 @@ folder holds today, and where it goes, stands in
 | Go alone writes frontmatter, after one commit that rewrites every ticket in the Go writer's form | five parsers and three writers become one of each |
 | the prose checks move to Go, with wink as the reference until its differences stand accepted | they are the last reason Node runs at runtime |
 | Linux and Windows behave the same, and CI runs both | the cloud boxes run Linux, and some people work on Windows |
+| a group closes only when its own done criteria hold, checked by the command each names, and no child it names stands open | a group closing over open children merges its work unbuilt, and `branch done` refuses it, per [[spec/design_output/work#a-box-leaves]] |
 
 # The settled rulings
 

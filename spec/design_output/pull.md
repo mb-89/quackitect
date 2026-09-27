@@ -135,9 +135,9 @@ derives it at every hand-out:
 | every one closes `done`, `became` or `answered` | writes a pass by `the engine`, and moves on |
 
 A group at `children` hands no leaf out while a child stands open. The wait
-names the person step each child holds. `branch done` frees the open children
-so the pull reaches the retro. For details, see
-[[spec/design_output/work#a-box-leaves]]. A child
+names the person step each child holds. `branch done` refuses while a child
+stands open, so the group reaches the retro once every child closes. For
+details, see [[spec/design_output/work#a-box-leaves]]. A child
 reopening past the `children` step sends the group's last leaf back there,
 which leaves the group open the same way.
 
@@ -732,8 +732,8 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 
 # Done leaves no takeable step
 
-`branch done` frees every open ticket of the group, so the group it hands back
-holds no step a hand can take. For details, see
+`branch done` closes a group only where no ticket naming it stands open, and a
+box leaving work undone runs `branch release`. For details, see
 [[spec/design_output/work#a-box-leaves]]. `takeable` answers what a hand can
 take: a step where `by` names no person, no child and no helper, and the box
 holds every verb it needs. A step under `not` counts, because a spawned hand

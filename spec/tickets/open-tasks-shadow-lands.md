@@ -17,7 +17,6 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    reads: [[spec/guidance/working]]
     checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
     evidence:
       - name: children
@@ -26,8 +25,17 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    tags: ["review", "accept"]
+    input: ["ask", "children"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
-    reads: [[spec/guidance/working]]
     to: retro
     steps:
       - name: notes
@@ -74,17 +82,16 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 step: sync
 process: [[spec/processes/group]]
-process_hash: 57b2cccd0445ea9a
-depends_on: [read-topics-land-in-shadow]
-enabled_by: migration.phase3switch
-cloud: true
+process_hash: 5d4a884bfb2491ff
+enabled_by: migration.phase2shadow
+depends_on: [the-foundation-closes-its-gaps]
 ---
 
 # Ask
 
-Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase3switch` to read true in the tracked config on `main`.
+Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow. The queue and `work/open-tasks` stand as modules under `src/modules`, and run beside the chain that counts them today. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
 
-Done when no JavaScript twin of a Go check stands.
+Done when every child closes through the command it names, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
 # sync
 
@@ -113,6 +120,16 @@ Done when no JavaScript twin of a Go check stands.
 <!-- the form is checklist -->
 
 # children
+
+# accept
+
+<!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
 
 # retro
 
