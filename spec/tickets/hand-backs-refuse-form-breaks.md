@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -13,6 +14,16 @@ steps:
           - name: read
             form: verdict
             says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md?
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["refuse at the hand-back", "drop the ticket"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -116,7 +127,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +158,16 @@ from: none
 <!-- pass where the ask says what the owner said, or fail with the owner's words -->
 
 <!-- the form is verdict -->
+
+## person-1
+
+<!-- The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
 
 ## draft
 
@@ -298,3 +318,10 @@ from: none
 <!-- what anybody adds, at any time, on this ticket -->
 
 - the ask says the check exits 1 on these lines, and it exits 0 on them. They stand at warning, so the push waits and the check passes. The fault stands as the ask names it otherwise
+- the push holds no ticket warning: `stampFor` in `src/scripts/cli-stamp.js` drops ticket prose from the count
+- the harm left: a break of form on an open ticket stands in the Problems panel, and no agent hand clears it
+- the change: `voiceFaults` in `src/scripts/pull-chapter.js` answers every finding as a refusal, naming the field above the line
+- `refused` in `src/scripts/pull.js` keeps the hold and the payload, so the fields ride the hold today
+- `warnsOf` and the warned road leave `handBack`, and `voiceOver` stays, so the write door and the lint keep their warnings
+- tests: `test/level0/pull-fields.test.js` turns its landing case into a refusal, and adds the unchanged ticket with the payload held
+- the change reverses the form-lands call of `spec/rationales/voice.md` section 11 for a hand-back, so the draft waits on the owner
