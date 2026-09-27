@@ -49,7 +49,8 @@ import { batteryRun, stamped } from "./cli-stamp.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
 import { FROM_HANDOVER, fromHandover, withRoute } from "./process.js";
-import { emptyGroup } from "./pull-hand.js";
+import { emptyGroup, ticketsHere } from "./pull-hand.js";
+import { expectedRed } from "./red-list.js";
 import { pullArgvOf } from "./pull-tool.js";
 import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
@@ -397,7 +398,7 @@ export function serveBridge(argv) {
 // [[spec/design_output/tui#the-verb-builds-it]]
 
 // The runner's flags after the node path: the spec report to the screen, and the battery's reporter to its file. [[spec/design_output/work#the-battery-answers-first]]
-export function testArgv(at) {
+export function testArgv(at, red = []) {
   return [
     "--test",
     "--test-reporter=spec",
@@ -405,14 +406,39 @@ export function testArgv(at) {
     // A reporter loads as a module, and a drive letter reads as a URL scheme, so the path goes as a file URL. [[spec/design_output/work#the-battery-answers-first]]
     `--test-reporter=${pathToFileURL(join(at, ...REPORTER.split("/"))).href}`,
     `--test-reporter-destination=${join(at, ...TIMES.split("/"))}`,
-    TESTS,
-    CONTRACT_TESTS,
+    ...(red.length ? testFiles(at, red) : [TESTS, CONTRACT_TESTS]),
   ];
+}
+
+// Every test file the two globs reach, less the red list. [[spec/design_output/pull#the-gate]]
+function testFiles(at, red) {
+  const out = [];
+  for (const glob of [TESTS, CONTRACT_TESTS]) {
+    const folder = glob.slice(0, glob.lastIndexOf("/"));
+    const end = glob.slice(glob.lastIndexOf("*") + 1);
+    for (const one of files.list(join(at, ...folder.split("/")))) {
+      const path = `${folder}/${one.name}`;
+      if (one.kind === "file" && one.name.endsWith(end) && !red.includes(path))
+        out.push(path);
+    }
+  }
+  return out.sort();
+}
+
+// The tests the open tickets list as red. [[spec/design_output/pull#the-gate]]
+function redHere() {
+  return expectedRed(ticketsHere({ ...it, root }).filter((one) => !one.private));
 }
 
 export function test(quiet = false) {
   const tally = freshTally();
-  const ran = outside.run([process.execPath, ...testArgv(root)], {
+  const red = redHere();
+  if (red.length) {
+    console.log(
+      `The red list stands apart until its tests-green closes: ${red.join(", ")}`,
+    );
+  }
+  const ran = outside.run([process.execPath, ...testArgv(root, red)], {
     cwd: root,
     inherit: !quiet,
     env: { SE_SPAWNS: tally },

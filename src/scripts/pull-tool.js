@@ -12,9 +12,11 @@ export function toolArgv(said = {}) {
   const ticket = String(said.ticket ?? "").trim();
   const verdict = String(said.verdict ?? "").trim();
   if (ticket) out.push(ticket);
-  if (verdict === "pass") out.push("--pass");
-  if (verdict === "fail" || verdict === "became" || verdict === "answered") {
-    out.push(`--${verdict}`, String(said.reason ?? "").trim());
+  // A gate's words take the flags a review's take. [[spec/design_output/pull#the-gate]]
+  const word = { accept: "pass", reject: "fail" }[verdict] ?? verdict;
+  if (word === "pass") out.push("--pass");
+  if (word === "fail" || word === "became" || word === "answered") {
+    out.push(`--${word}`, String(said.reason ?? "").trim());
   }
   if (said.fields && typeof said.fields === "object") {
     out.push("--fields", JSON.stringify(said.fields));

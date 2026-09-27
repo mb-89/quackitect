@@ -34,7 +34,8 @@ test("the question route opens at a step waiting for a person", () => {
 });
 
 // A standard ticket meets one review, on its design, and goes on to the code. [[spec/tickets/one-review-a-ticket]]
-test("the standard route reviews the design once, and its last leaf hands on to the retro", () => {
+// [[spec/design_output/pull#the-gate]]
+test("the standard route gates the design once, and its last leaf hands on to the retro", () => {
   const front = routeOf("standard");
 
   assert.deepEqual(
@@ -42,24 +43,29 @@ test("the standard route reviews the design once, and its last leaf hands on to 
     [
       "design/owner-read",
       "design/draft",
-      "design/review",
-      "implement/tests-red",
+      "design/tests-red",
+      "gate",
       "implement/change",
       "implement/tests-green",
       "view",
     ],
-    "one review, and the owner's view the one verdict after the code",
+    "one gate, and the owner's view the one verdict after the code",
   );
-  const review = leafOf(front, "design/review");
+  const gate = leafOf(front, "gate");
+  assert.ok(gate.gate, "the gate names its question, and the schema admits it");
   assert.ok(
-    review.reads.includes("spec/guidance/review/design"),
-    "the review reads the design note",
+    gate.reads.includes("spec/guidance/review/design"),
+    "the gate reads the design note",
   );
   assert.ok(
-    !review.reads.includes("spec/guidance/review/reviewing"),
+    !gate.reads.includes("spec/guidance/review/reviewing"),
     "and no other review note",
   );
-  assert.equal(review.on_fail, "draft", "a fail goes back to the draft");
+  assert.equal(
+    gate.not,
+    "design/draft",
+    "the author of the draft reviews nothing of it",
+  );
   const draft = leafOf(front, "design/draft");
   assert.equal(
     draft.evidence.find((one) => one.name === "tests")?.form,
@@ -79,8 +85,8 @@ test("the standard route reviews the design once, and its last leaf hands on to 
   assert.equal(leafOf(front, "implement/tests-green").said.to, "retro");
   assert.deepEqual(
     walkOf(front).find((one) => one.path === "implement")?.said.input,
-    ["design/draft", "design/review"],
-    "the code reads the draft and the review's findings",
+    ["design/draft", "gate"],
+    "the code reads the draft and the gate's verdict",
   );
   assert.deepEqual(
     slotFaults(front, "spec/processes/standard.yaml"),

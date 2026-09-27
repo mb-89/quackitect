@@ -1,7 +1,5 @@
-// A gate between two phases: the reviewer's own commit hands back, accept
-// with points mints a fix ticket a point, and a reject puts the phase in
-// again, with a person step from the second reject on. The doors stand in
-// pull-doors.js beside this file.
+// The gate between phases, driven through the pull over the fake doors in
+// pull-doors.js: what each verdict writes into the ticket file.
 // [[spec/design_output/pull#the-gate]]
 
 import assert from "node:assert/strict";
@@ -9,6 +7,8 @@ import { test } from "node:test";
 import { fieldOf, frontOf } from "../../src/engine/group.js";
 import { handFaults } from "../../src/scripts/pull-chapter.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
+import { toolArgv } from "../../src/scripts/pull-tool.js";
+import { returnsOf } from "../../src/scripts/pull-writes.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, doors, filled, heard, ROOT, standing } from "./pull-doors.js";
 
@@ -17,6 +17,7 @@ steps:
   - name: do
     does: makes the change
     by: anyone
+    to: retro
     evidence:
       - name: says
         form: text
@@ -46,6 +47,7 @@ steps:
             says: the test files standing red
   - name: gate
     gate: the design answers the ask
+    input: [design/draft, design/tests-red]
     evidence:
       - name: verdict
         form: verdict
@@ -54,6 +56,7 @@ steps:
     steps:
       - name: change
         does: makes the change
+        to: retro
         evidence:
           - name: says
             form: text
@@ -184,4 +187,22 @@ test("a second reject inserts a person step", () => {
     "tests-red-3",
   ]);
   assert.equal(fieldOf(text, "step"), "design/person-1", "the person answers first");
+  assert.equal(
+    returnsOf(frontOf(text), "gate"),
+    2,
+    "the record counts the second reject",
+  );
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("the pull tool reads a gate's accept and reject as the pass and fail flags", () => {
+  assert.deepEqual(toolArgv({ ticket: "a-child", verdict: "accept" }), [
+    "pull",
+    "a-child",
+    "--pass",
+  ]);
+  assert.deepEqual(
+    toolArgv({ ticket: "a-child", verdict: "reject", reason: "no fail road" }),
+    ["pull", "a-child", "--fail", "no fail road"],
+  );
 });

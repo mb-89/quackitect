@@ -115,6 +115,10 @@ frontmatter:
             x-earlier: steps
             description: the earlier step a failed hand-back sends the ticket to
 
+          gate:
+            type: string
+            description: the question a gate answers, where a reviewer reads the phase before it and answers accept, accept with points or reject
+
           asks:
             type: string
             description: the question a person answers, on a step a person takes

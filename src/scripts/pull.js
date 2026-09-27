@@ -23,6 +23,7 @@ import {
 } from "../engine/group.js";
 import { inHand } from "../engine/named.js";
 import { ephemeralPull } from "./ephemeral-pull.js";
+import { rejected } from "./pull-gate.js";
 import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
 import {
   chapterOf,
@@ -482,6 +483,9 @@ export function handBack(it, who, name, verdict) {
     return became(it, who, one, leaf, held, said.reason, answered);
   if (said.said === "answered")
     return answeredBy(it, who, one, leaf, held, said.reason, answered);
+  // A gate's reject puts the phase in again, where a review's fail sends the ticket back. [[spec/design_output/pull#the-gate]]
+  if (said.said === "fail" && leaf.gate)
+    return rejected(it, who, one, leaf, held, said.reason, answered);
   if (said.said === "fail")
     return failed(it, who, one, leaf, held, said.reason, answered);
   // [[spec/design_output/pull#a-finding-rides-out]]

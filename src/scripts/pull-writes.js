@@ -75,8 +75,9 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
   return onward(it, who, [`${one.name} ${changes.join(", ")}.`, ...sent.why]);
 }
 
-// A design review passing with findings mints a draft child a row on the trivial route, and every child is built before any is written. The children ride the parent's pass commit. [[spec/design_output/pull#a-finding-rides-out]]
+// A design review passing with findings mints a draft child a row on the trivial route, and every child is built before any is written. The children ride the parent's pass commit. A gate's points stand open at the front of the queue. [[spec/design_output/pull#a-finding-rides-out]]
 export function minted(it, who, one, leaf, held, findings, answered) {
+  const standsAs = leaf.gate ? { state: OPEN, todo: true } : { state: DRAFT };
   const route = processAt(it.disk, it.method ?? it.root, it.join, CHILD_ROUTE);
   if (route.why) return unminted(one, leaf, route.why);
   const folder = one.private ? NOTES : TICKETS;
@@ -87,7 +88,7 @@ export function minted(it, who, one, leaf, held, findings, answered) {
     const made = routedTicket(it, path, route, {
       steps: fromHold(route.route, { ticket: one.name, step: leaf.path }),
       line,
-      fields: { state: DRAFT, parent: one.name, ...(group ? { group } : {}) },
+      fields: { ...standsAs, parent: one.name, ...(group ? { group } : {}) },
     });
     if (made.why) return unminted(one, leaf, `${name} mints nothing: ${made.why}`);
     built.push({ at: it.join(it.root, ...path.split("/")), text: made.text });

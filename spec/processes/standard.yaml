@@ -1,8 +1,9 @@
-# A change that wants an approach first, one review of it, and tests before
-# code. The ask is the owner's words, the design phase turns them into an
-# approach a reader can disagree with, and the rest implements it. A finding
-# the review names rides out as a child ticket, so the parent goes on.
-# [[spec/design_output/pull#a-finding-rides-out]]
+# A change that wants an approach and its red tests first, a gate on them, and
+# code after. The ask is the owner's words, the design phase turns them into an
+# approach a reader can disagree with and tests that fail, and the rest
+# implements it. A point the gate names rides out as a fix ticket, so the
+# process goes on.
+# [[spec/design_output/pull#the-gate]]
 for: a change that wants an approach first, one review of it, and tests before code
 ask:
   - name: gain
@@ -58,37 +59,45 @@ steps:
           - name: size
             form: list
             says: every file the approach touches, one a line
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: [branch test]
-    input: [design/draft, design/review]
-    checklist:
-      - the change touches no file the ask leaves out
-      - every door the change reaches has a fake
-      - a comment names the approach the change implements
-      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
-      - every row the design review passes with stands fixed in the change
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        reads: [[spec/guidance/code/testing]]
+        needs: [branch test]
+        input: draft
+        checklist:
+          - every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides
+          - every door the tests reach has a fake
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    reads: [[spec/guidance/review/design]]
+    input: [design/draft, design/tests-red]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    reads: [[spec/guidance/code/testing]]
+    needs: [branch test]
+    input: [design/draft, gate]
+    checklist:
+      - the change touches no file the ask leaves out
+      - every door the change reaches has a fake
+      - a comment names the approach the change implements
+      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
+    steps:
       - name: change
         does: makes the change
         reads: [[spec/guidance/code/code]]
@@ -99,7 +108,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests

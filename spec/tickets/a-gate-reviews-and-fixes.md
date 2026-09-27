@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 7 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: 2b301846d5e144798579ecfacae0fc2ed0e6eb10
+    hash_after: 2b301846d5e144798579ecfacae0fc2ed0e6eb10
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -241,14 +249,20 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/scripts/pull-gate.js src/scripts/red-list.js src/scripts/pull.js src/scripts/pull-chapter.js src/scripts/pull-writes.js src/scripts/cli.js spec/processes/standard.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the pull, the check's test run, the schema, the standard route, the design output and the cases
+- the gate cases run over the fake disk and the fake git
+- each new file and function links the chapter The gate
+- the chapter The gate owns the verdict table, and the comments point at it
+- the review rows stand fixed: the verdict map, the form fault, the reject road, the fix flag on a gate alone, and the red list in the chapter
 
 ## tests-green
 

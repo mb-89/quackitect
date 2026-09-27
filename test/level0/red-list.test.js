@@ -4,6 +4,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { resolve } from "node:path";
+import { testArgv } from "../../src/scripts/cli.js";
 import { expectedRed } from "../../src/scripts/red-list.js";
 
 const TICKET = (record) => `---
@@ -63,5 +65,19 @@ test("the red list holds a ticket past tests-red, and drops it at tests-green", 
   assert.deepEqual(
     expectedRed([{ name: "a-child", text: TICKET("  - step: design/draft\n") }]),
     [],
+  );
+});
+
+// The runner's file list reads the tree this case stands in. [[spec/design_output/pull#the-gate]]
+test("the check's run names every test file but the red ones, and the globs where none stands red", () => {
+  const at = resolve(".");
+  const red = "test/level0/red-list.test.js";
+  const argv = testArgv(at, [red]);
+  assert.ok(!argv.includes(red), "the red file stays out");
+  assert.ok(argv.includes("test/level0/pull-gate.test.js"), "every other file runs");
+  assert.ok(!argv.some((one) => one.includes("*")), "and no glob reaches the red one");
+  assert.ok(
+    testArgv(at).some((one) => one.includes("*")),
+    "no red list runs the globs",
   );
 });
