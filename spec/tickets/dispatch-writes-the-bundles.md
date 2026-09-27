@@ -118,11 +118,23 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-prints-its-plan, fix-groups-end-the-chain]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 92d2a92fd9306e5cc5888e0cf4191611aa91f4c4
+    hash_after: 92d2a92fd9306e5cc5888e0cf4191611aa91f4c4
+    inputs:
+      - name: ask
+        hash: cdb31e14a8203fe3
+        size: 1517
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -165,38 +177,59 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+dispatch without --dry carries the plan out in src/scripts/dispatch.js, and --dry keeps printing it with no write. The run reads origin/main once, as the commit C it names, and the write branch is claude/dispatch-<short C>. Where any claude/dispatch-* branch stands on origin unmerged into origin/main, the run writes nothing and prints the plan, so the skill still starts the workers it names. Where claude/dispatch-<short C> stands already, the run writes nothing too, so a second run over one main makes no second commit. Otherwise it gathers the writes. A fix bundle mints one group ticket named loose-fixes-<short C>, through withRoute and mintedNote with the group process, carrying fix: true and an ask the dispatch writes, and each loose agent ticket takes group: that name. A ready group on origin/main standing with no work branch, open, carrying no cloud marker and waiting on nothing, opens: its work branch gets a commit off the trunk tree, pushed to work/<name>, and its ticket takes cloud: true. A ticket for a person stays loose, and the plan names it under questions. With writes in hand, the run adds a detached worktree at .se/.runtime/dispatch off origin/main, writes each file there through the disk door, and runs git -C on it: add, commit, push HEAD to refs/heads/claude/dispatch-<short C>. It then removes the worktree. No push names main, and the box checkout moves nowhere. The plan grows opens, the groups on main to open. askFaults in src/scripts/ticket-ask-lint.js reads the fix group ask before the write, and a fault stops the run with code 1.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/cli.js: the dispatch verb row, which already calls dispatch(it.work, rest, it)
+- src/scripts/dispatch.js: planOf gains opens, and dispatch gains the write road
+- src/scripts/process.js: withRoute copies the group route into the fix group
+- .claude/skills/level0/lib/schema-mint.js: mintedNote writes the fix group text
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/dispatch.test.js: the run writes one fix group carrying fix: true, holding the loose agent tickets
+- test/level0/dispatch.test.js: the run makes one commit on claude/dispatch-<commit>, and no push names main
+- test/level0/dispatch.test.js: a second run over one main finds the branch standing and writes nothing
+- test/level0/dispatch.test.js: an unmerged claude/dispatch branch stops every write, and the plan still names the workers
+- test/level0/dispatch.test.js: a ticket for a person stays loose, and stands under the questions
+- test/level0/dispatch.test.js: a ready group on main with no branch opens work/<name>, and a group with a branch stays
+- test/level0/dispatch.test.js: the fix group name holds names.words at most
+- test/level0/dispatch.test.js: askFaults finds nothing in the fix group ask
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/dispatch.js
+- src/scripts/dispatch-write.js
+- test/level0/dispatch.test.js
+- test/level0/work-doors.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened dispatch.js, work.js openGroup and markOff, work-merge.js marksTrunk, cli.js mint, process.js withRoute, schema-mint.js mintedNote, ticket-ask-lint.js askFaults and the git door, and each claim stands there
+- the callers list names the verb row, the plan, the route copy and the mint
+- each done_when line names its case, and ./RUNME.sh check decides the last
 
 ## tests-red
 
