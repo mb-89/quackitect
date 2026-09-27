@@ -561,6 +561,16 @@
         "margin": { "type": "number", "unit": "bytes", "help": "The room the pull keeps free below the cap. A hand-out past cap less margin splits, and the next pull on the step prints the rest." }
       }
     },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "comment": { "type": "string" },
+        "pull": { "type": "number", "unit": "milliseconds", "help": "The median time the pull takes to hand out a leaf over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond." },
+        "handBack": { "type": "number", "unit": "milliseconds", "help": "The median time a hand-back takes to land over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond." },
+        "resolver": { "type": "number", "unit": "milliseconds", "help": "The median time the guidance resolver takes over many notes, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond." },
+        "stale": { "type": "number", "unit": "milliseconds", "help": "The median time the query for stale steps takes to read, hash and compare the notes a hold names, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond." }
+      }
+    },
     "ops": {
       "type": "object",
       "properties": {

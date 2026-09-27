@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 9148b135dd24a10fd56792351d202b3da347b64b
+    hash_after: 9148b135dd24a10fd56792351d202b3da347b64b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -207,14 +215,20 @@ Every case fails on its own assertion: the config names no budget yet, and guida
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint spec/config/level0.json spec/config/level0.schema.json test/level0/budget.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the config and its schema, and the projection writes a command for each new key
+- the change reaches no door
+- the comment on budget names the chapter Time budgets and the test timing it
+- each budget stands once, in spec/config/level0.json, and the schema says its unit and its headroom
+- the review's rows stand fixed: the budgets sit about ten times over a measured median, and the schema says the unit and the headroom
 
 ## tests-green
 
