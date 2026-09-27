@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -171,6 +171,15 @@ record:
         hash: a22f7e8ffed41ca9
         size: 826
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: b3d5ba05ed6cf2ec2838b5320c00cecccb180d79
+    hash_after: b3d5ba05ed6cf2ec2838b5320c00cecccb180d79
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -336,14 +345,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `bash.js` and `prepush.js` of the size list. The `holds` gate landed with cloud-boxes-leave-trunk-alone under prepush-reds-land-together
+- `markedPush` reads the command alone, and `main` reads the variable once
+- `markedPush` and the gate point at this ticket
+- the variable's name stands once, as `ENGINE` in `runs.js`
 
 ## tests-green
 

@@ -7,7 +7,12 @@
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
-import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import {
+  ENGINE,
+  STAMP,
+  saysGreen,
+  stampOf,
+} from "../../.claude/skills/level0/lib/runs.js";
 import {
   reaches,
   refusedTodo,
@@ -189,6 +194,7 @@ async function main() {
     inCloud(process.env),
     heldBy(git(outside, root)),
     boxIdHere({ root, method: root, join, disk: files }),
+    process.env[ENGINE] === "1",
   );
   if (said.code !== 0) console.error(said.said);
   return said.code;

@@ -22,7 +22,12 @@ import {
   refusedCommand,
   refusedDelta,
 } from "../../.claude/skills/level0/lib/refuse.js";
-import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import {
+  ENGINE,
+  STAMP,
+  saysGreen,
+  stampOf,
+} from "../../.claude/skills/level0/lib/runs.js";
 import { fileText } from "../../.claude/skills/level0/lib/scripted.js";
 import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.js";
 import {
@@ -67,12 +72,17 @@ export async function onBash(e, box) {
     const found = await check(command, e, box, held);
     if (found) return { result: { deny: found } };
   }
-  return messageWarns(held.warned ?? [], box) ?? PASS;
+  const warned = messageWarns(held.warned ?? [], box);
+  const marked = markedPush(command, e);
+  return warned || marked ? { ...warned, ...marked } : PASS;
 }
 
+const VERB = /(^|[\s;&|(])\.\/RUNME\.sh(\s|$)/;
+
 // A push or a verb the engine lets through carries the mark, so the push door gates it. [[spec/tickets/push-gate-needs-the-engine]]
-export function markedPush(_command, _e) {
-  return null;
+export function markedPush(command, e) {
+  if (!touchesGit(command).pushes && !VERB.test(command)) return null;
+  return { event: { ...e, command: `export ${ENGINE}=1; ${command}` } };
 }
 
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
