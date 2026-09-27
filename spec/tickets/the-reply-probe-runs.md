@@ -101,3 +101,5 @@ Run the reply probe on a desk whose client loads function hooks, and write what 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+On the owner's desk, `./RUNME.sh probe` holds `compact` and `cold` alone. The `do` step behind `answer` adds `reply`, so the run this question asks for waits on that step.
