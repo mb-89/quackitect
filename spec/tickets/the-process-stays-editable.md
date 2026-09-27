@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: b7fa2cef48afc8fdb8e12f0e4f724331903209eb
     hash_after: b7fa2cef48afc8fdb8e12f0e4f724331903209eb
+  - step: accept
+    hand: box d7da794434cd · claude-code-remote
+    hash_before: c996d530c18b0c144549d69c7d6f184f1ca7deaf
+    hash_after: c996d530c18b0c144549d69c7d6f184f1ca7deaf
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-process-stays-editable already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: f62f4ae3f6fd31d9
+        size: 289
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/level-two]]
+        hash: b8bf73d993bb8909
+        size: 15501
+    def: 07c43ae7253713ec
 depends_on: ["the-engine-holds-the-route"]
 ---
 
@@ -176,8 +195,10 @@ no child waits on another, since each review row lands after its parent passes d
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- commit-stages-a-moved-path: movedFrom in src/scripts/commit-verb.js adds the old path of a rename the rename verb journals, after the rename stages its deletion, so git add refuses the pathspec and the commit stands undone; keep a from path out where it stands neither on disk nor in the index
 
 # retro
 
