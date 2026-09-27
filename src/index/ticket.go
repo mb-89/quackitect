@@ -49,6 +49,8 @@ type Ticket struct {
 	Todo     bool   `json:"todo"`
 	Standing string `json:"standing"`
 	Says     string `json:"says"`
+	// The leaves the record passes over the leaves the route holds, as done/all. [[spec/design_output/index#the-index-answers-the-tickets]]
+	Progress string `json:"progress"`
 	// The time the file last changed, off the file table, so a view sorts the newest done ticket first. [[spec/design_output/index#the-index-answers-the-tickets]]
 	Changed int64 `json:"changed"`
 }

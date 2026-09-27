@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d6cb0fb1105 · claude-code-remote · helper-2
     hash_before: efb1c7dda5c5f9ce54ce3b734e77df85fffe55e8
     hash_after: efb1c7dda5c5f9ce54ce3b734e77df85fffe55e8
+  - step: implement/tests-red
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: a25354675be4e8ad9c1f15d89b5bc9ec02084156
+    hash_after: a25354675be4e8ad9c1f15d89b5bc9ec02084156
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -193,20 +201,31 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/pull-format.test.js test/level0/write.test.js src/index/ticket_test.go src/tui/work/workitems_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- the hand-out still sends the hand into the file, and names no payload
+- the formatter answers its input, so the payload keeps its blanks
+- the door lets an agent write an open ticket
+- the index row and the tab carry no progress
+- what surprises the hand: the engine-field cases wrote over an open ticket, so they take a draft now
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hand-out, the payload, the door, the index row, the tab and the cases
+- the door cases run over the fake disk, and the Go cases over a tree each case writes
+- each new file links the chapter it implements
+- the formatter stands in one module, and the payload reader calls it
+- the review rows stand fixed: the payload in the hand-out, the Discussion admitted, the formatter over the payload alone, the tab case in its package
 
 ## change
 
