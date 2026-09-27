@@ -34,3 +34,12 @@ func TestFaultsNameAModuleImportingADoor(t *testing.T) {
 		t.Fatalf("the faults read %v", said)
 	}
 }
+
+func TestAFolderSharingAPrefixStandsOutsideTheRules(t *testing.T) {
+	if said := Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}); len(said) != 0 {
+		t.Fatalf("src/modulesx reads as a module: %v", said)
+	}
+	if said := Faults("quackitect/src/q", []string{"quackitect/src/modules/work"}); len(said) != 0 {
+		t.Fatalf("the q core reads as a door: %v", said)
+	}
+}

@@ -116,7 +116,7 @@ export function viewerHere() {
   });
 }
 
-// Every Go module's tests run in the battery, the index's through the pinned Zig. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
+// Every Go module's tests run in the battery, the import rules among them. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
 export function goHolds() {
   const at = { disk: files, join, root };
   const env = goEnvOf(at);

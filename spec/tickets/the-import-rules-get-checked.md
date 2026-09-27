@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-foundation-lands-unchanged
@@ -96,6 +96,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, a test of src/imports fails
+  - step: implement/change
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: f16b0baebc974bce86f4f98d1611149000c5bd63
+    hash_after: f16b0baebc974bce86f4f98d1611149000c5bd63
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -240,11 +248,19 @@ The three planted cases fail on their want comments, and `TestFaultsNameAModuleI
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/imports`, `go.mod` and the comment of `goHolds`, which the draft names
+- the planted packages in a temp folder stand in for doors and modules
+- each file opens on a comment pointing at the Go doors note
+- the note owns the analyzers, and the list of renderers points at the migration note
+- the review row stands fixed in the note
 
 ## tests-green
 
