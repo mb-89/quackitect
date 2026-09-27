@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d6cb0fb1105 · claude-code-remote
+    hash_before: faa12f648e52123207f27fceb1002fc76e237034
+    hash_after: faa12f648e52123207f27fceb1002fc76e237034
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 28 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/a-gate-reviews-and-fixes.md:265:3: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -271,26 +283,34 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/level0/process.test.js test/level0/pull-gate.test.js test/level0/red-list.test.js test/contract/process.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A step carrying `gate` is a gate, and the standard route runs design with draft and tests-red, then the gate, then implement. The reviewer's own commit hands back at a gate. Accept with points mints an open fix ticket a point, at the front of the queue. A reject puts the phase in again as copies, and a second reject asks a person first. Tests-red lists its red files, and the check leaves them out until tests-green closes. The shipped schema and route meet the contract cases, since a level0 case reads fakes alone. For details, see [[spec/design_output/pull#the-gate]].
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the pull, the check's test run, the schema, the standard route, the design output and the cases
+- the gate cases run over the fake disk and the fake git
+- each new file and function links the chapter The gate
+- the chapter The gate owns the verdict table, and the comments point at it
+- the review rows stand fixed in the change, and the says field names where each lands
 
 # Discussion
 
