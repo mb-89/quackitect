@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: c22c9f5e28a58838
         size: 623
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 824e4494c2aa9bc8b22f8cb7cf1a359e5fd94cbf
+    hash_after: 824e4494c2aa9bc8b22f8cb7cf1a359e5fd94cbf
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -310,14 +319,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `src/scripts/prepush.js` alone. Under prepush-reds-land-together, `holds` also takes the hold and engine reads the other two drafts name, and their wiring in `main` stays with them
+- `holds` reads its outside through arguments, and the cases hand it every one
+- each new read points at the ticket it serves
+- the refusal words stand once, in `cloudLeavesTrunk` and `heldElsewhere`
 
 ## tests-green
 
