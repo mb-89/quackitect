@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -243,6 +243,19 @@ record:
         hash: 22fc99331ec488bc
         size: 87937
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 34397260a34420ecf5eafd1817e7f7a8814787d0
+    hash_after: 34397260a34420ecf5eafd1817e7f7a8814787d0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0dbbf5047a23c593
+        size: 3078
+    def: 08e16d07b0de477c
 group: the-cloud-works-its-queue
 ---
 
@@ -365,7 +378,7 @@ The approach takes this as unmeasured: the client reads the plugins before any S
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Three cases fail on their own assertion against a stub boot that runs nothing, and the settings file carries no SessionStart hook yet. The case where the stamp matches passes on the stub, as a negative case does. The fake proc throws on a command nobody taught it, so each case teaches the install line and nothing else, and a stray run fails loud.
+Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the restale reads the same four.
 
 ### checked
 
@@ -373,7 +386,7 @@ Three cases fail on their own assertion against a stub boot that runs nothing, a
 <!-- the form is checklist -->
 
 - every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
-- the boot cases reach the disk and the process through fakeDisk and fakeProc alone, and the settings case reads the tracked file the ask names
+- the boot cases reach the disk and the process through fakeDisk and fakeProc alone
 
 ## draft-2
 
