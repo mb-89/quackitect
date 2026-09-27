@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -133,6 +133,18 @@ record:
     hash_before: fac6090e3f77aa3f4601a712d472ea9a0114c852
     hash_after: fac6090e3f77aa3f4601a712d472ea9a0114c852
     def: 799c3bd685e25728
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: d0c8cdb013ce8a3e9fc98f0d16df4147543c529e
+    hash_after: d0c8cdb013ce8a3e9fc98f0d16df4147543c529e
+    inputs:
+      - name: ask
+        hash: 7b7b7a2d0a5b5975
+        size: 511
+      - name: [[spec/funnel/the-owner-rules-the-specs]]
+        hash: 632da9d1c9abae9f
+        size: 3518
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -175,38 +187,46 @@ Keep both keys and commit the merge. record: (the sync rows) and cloud: true are
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A registration hands back a q.Writer, and Store.Commit takes one. GivenIn, Given, DerivedIn, Derived, FoldIn and Fold return Writer{one *registration}. Commit(read, as Writer, values) refuses each name whose active owner (Store.owner) is not as.one, with the error: <name> belongs to the provider at <owner.where>, not the one at <as.where>. Run and Land commit as Writer{one}, the owner they already resolve. The Registers functions of ops, tickets and watchdog return their Writer; the index door keeps the files, tickets and ops writers on the door struct, and watchdog.New takes its Writer. q.Given stays, per proposal (k) in spec/funnel/the-owner-rules-the-specs, and it gains no caller here. Weighed: a writer token over a string name, because a string any caller spells. Assumed: an inactive alternative of a group (a key picks another) meets the refusal too, since it names no active owner.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/store.go: Store.Run,src/q/store.go: Store.Land,src/watchdog/lease.go: Dog.publish, Registers, New,src/index/ops.go: door.opensBook,src/index/topic.go: door.publishes, registersTopics,src/index/door.go: Serve,src/ops/ops.go: Registers,src/tickets/tickets.go: Registers,src/q/store_test.go, src/q/why_test.go, src/watchdog/lease_test.go, src/tickets/tickets_test.go: every Commit call
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/store_test.go: TestCommitRefusesANameOfAnotherProvider,src/q/store_test.go: TestCommitTakesTheOwnersWriter,src/q/store_test.go: TestCommitRefusesAnInactiveAlternative
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/q.go,src/q/store.go,src/q/store_test.go,src/q/why_test.go,src/watchdog/lease.go,src/watchdog/lease_test.go,src/ops/ops.go,src/tickets/tickets.go,src/tickets/tickets_test.go,src/index/door.go,src/index/ops.go,src/index/topic.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened q.go, store.go, lease.go, ops.go, tickets.go, door.go, index/ops.go and topic.go, and checked each claim there
+the callers list comes off a grep for Commit( and Registers( over src
+go test ./... decides the first done_when line, TestCommitRefusesANameOfAnotherProvider the second, and ./RUNME.sh check the third
 
 ## tests-red
 
