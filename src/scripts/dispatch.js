@@ -1,10 +1,11 @@
 // The dispatcher's plan: what stands ready, stuck, loose and waiting on a
-// person, read off origin/main and the work branches. The dry run prints it
-// and writes nothing. The writes land with the bundles, in a later child.
+// person, read off origin/main and the work branches. The run carries it out
+// through dispatch-write.js, and the dry run prints it and writes nothing.
 // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { CLOSED, fieldOf, GROUP, isGroup } from "../engine/group.js";
+import { land, opens, opensOf, writeState, writesOf } from "./dispatch-write.js";
 import { waitsOnPerson } from "./work-answer.js";
 import { freeIn, staleClaim } from "./work-free.js";
 import { DONE, HELD, readWork, standingAll, TODO, waitsOf } from "./work-stands.js";
@@ -16,11 +17,17 @@ const PARTS = [
   ["held", "groups a fresh hold keeps"],
   ["waiting", "groups waiting on another"],
   ["bundles", "loose agent tickets, one fix group per parent"],
+  ["opens", "groups on main that open a branch"],
   ["questions", "tickets waiting on a person"],
 ];
 
 // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 export function planOf(it, now = 0) {
+  return planned(it, now).plan;
+}
+
+// The plan beside the read it stands on, which the writes take their texts from. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
+function planned(it, now) {
   const at = now || (it.clock ? it.clock.now().getTime() : 0);
   const read = readWork(it, true);
   const stand = read.stand.filter((one) => one.ticket);
@@ -29,7 +36,7 @@ export function planOf(it, now = 0) {
   const freed = new Set(free.map((one) => one.branch));
   const of = (one) => standing.get(one.branch);
 
-  return {
+  const plan = {
     ready: free.map((one) => ({ group: one.name, branch: one.branch })),
     held: stand
       .filter((one) => of(one) === HELD && !freed.has(one.branch))
@@ -46,8 +53,10 @@ export function planOf(it, now = 0) {
       .map((one) => ({ group: one.name, why: stuckWhy(it, one, at) }))
       .filter((one) => one.why),
     bundles: bundlesOf(read.loose),
+    opens: opensOf(read, standing),
     questions: questionsOf(read, standing),
   };
+  return { plan, read };
 }
 
 // A group at done still standing on origin carries no merge yet: behind trunk it needs a sync, and past the span it stays red. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
@@ -103,22 +112,39 @@ function questionsOf(read, standing) {
 export function dispatch(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
   const said = argv ?? [];
-  if (!said.includes("--dry")) {
-    console.error("./RUNME.sh dispatch runs under --dry alone, and writes nothing.");
-    console.error(
-      "The writes land with spec/tickets/dispatch-writes-the-bundles. Run ./RUNME.sh dispatch --dry.",
-    );
-    return 2;
-  }
   // The plan reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch?.();
-  const plan = planOf(it);
-  if (said.includes("--json")) {
-    console.log(JSON.stringify(plan));
+  const { plan, read } = planned(it, 0);
+  const code = said.includes("--dry") ? 0 : carried(it, plan, read);
+  if (said.includes("--json")) console.log(JSON.stringify(plan));
+  else for (const line of printed(plan)) console.log(line);
+  return code;
+}
+
+// The writes, where no write branch stands in their way. The plan carries what happened under write. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
+function carried(it, plan, read) {
+  const state = writeState(it);
+  plan.write = { branch: state.branch, state: state.state, why: "" };
+  if (state.state !== "free") return 0;
+  if (!plan.bundles.length && !plan.opens.length) {
+    plan.write.state = "nothing";
     return 0;
   }
-  for (const line of printed(plan)) console.log(line);
+  const writes = writesOf(it, plan, read, state.main);
+  if (writes.why) return refused(plan, writes.why);
+  const left = opens(it, plan.opens);
+  if (left.length)
+    return refused(plan, `The push of ${left.join(", ")} came back refused.`);
+  const why = land(it, state.branch, writes.files, state.main);
+  if (why) return refused(plan, why);
+  plan.write.state = "pushed";
   return 0;
+}
+
+function refused(plan, why) {
+  plan.write.state = "refused";
+  plan.write.why = why;
+  return 1;
 }
 
 // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
@@ -129,6 +155,12 @@ function printed(plan) {
     const rows = plan[key].map((one) => `  ${rowOf(key, one)}`);
     out.push(...(rows.length ? rows : ["  none"]));
   }
+  if (plan.write) {
+    out.push(
+      `the writes: ${plan.write.state}${plan.write.branch ? `, on ${plan.write.branch}` : ""}`,
+    );
+    if (plan.write.why) out.push(`  ${plan.write.why}`);
+  }
   return out;
 }
 
@@ -138,5 +170,6 @@ function rowOf(key, one) {
   if (key === "held") return `${one.branch}, held ${one.age}`;
   if (key === "waiting") return `work/${one.group} waits for ${one.waits.join(", ")}`;
   if (key === "bundles") return `${one.parent || "the top"}: ${one.tickets.join(", ")}`;
+  if (key === "opens") return `work/${one}`;
   return `${one.ticket}${one.group ? `, holding ${one.group} open` : ""}`;
 }

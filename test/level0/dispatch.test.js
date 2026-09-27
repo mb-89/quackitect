@@ -8,24 +8,28 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import {
   fieldOf,
+  isGroup,
   withEntry,
   withField,
   withHashAfter,
 } from "../../src/engine/group.js";
+import { verbs } from "../../src/scripts/cli.js";
+import { dispatch, planOf } from "../../src/scripts/dispatch.js";
+import { fixName } from "../../src/scripts/dispatch-write.js";
+import { cutTo } from "../../src/scripts/ticket.js";
+import { markOff } from "../../src/scripts/work.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
+import { freeNow } from "../../src/scripts/work-free.js";
 import { TICKET_SCHEMA } from "./fixtures.js";
 import { semicolonVale } from "./semicolon-vale.js";
-import { dispatch, planOf } from "../../src/scripts/dispatch.js";
-import { verbs } from "../../src/scripts/cli.js";
-import { freeNow } from "../../src/scripts/work-free.js";
 import {
   CHILD,
   doorsSaying,
   GROUP_NOTE,
   heard,
+  ROOT,
   ranGit,
   remoteSaying,
-  ROOT,
 } from "./work-doors.js";
 
 const FROM = "2026-01-02T00:00:00.000Z";
@@ -254,6 +258,10 @@ const onMain = GROUP_NOTE.replace("urgent: true\n", "");
 function writing(trunk, { groups = [], standing = [], merged = [] } = {}) {
   const doors = planned(groups, trunk, {
     "git rev-parse origin/main": { stdout: `${MAIN}\n` },
+    "git rev-parse origin/main^{tree}": { stdout: "7ree000\n" },
+    "git commit-tree 7ree000 -p origin/main -m work/new-group opens": {
+      stdout: "0pen000\n",
+    },
     [`${VALE} --config=.vale.ini --output=JSON --no-exit --path=spec/tickets/${FIX_NAME}.md`]:
       semicolonVale(),
   });
@@ -290,7 +298,10 @@ test("the run writes one fix group carrying fix: true, holding the loose agent t
   assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
   const group = written(disk, FIX_NAME);
   assert.equal(fieldOf(group, "fix"), "true");
-  assert.match(fieldOf(group, "process"), /group\]\]$/);
+  assert.ok(
+    isGroup(group),
+    `the fix group runs the group process: ${fieldOf(group, "process")}`,
+  );
   for (const name of ["a-loose-one", "b-loose-one"])
     assert.equal(
       fieldOf(written(disk, name), "group"),
@@ -412,4 +423,38 @@ test("askFaults finds nothing in the fix group's ask", () => {
     refused: [],
     warned: [],
   });
+});
+
+test("the run removes its worktree after the push, and moves the box's own checkout nowhere", () => {
+  const { it, outside } = writing({ "a-loose-one": loose });
+  assert.equal(heard(() => dispatch(ROOT, [], it)).code, 0);
+  const rows = gitRows(outside);
+  const pushed = rows.findIndex((row) =>
+    row.endsWith(`HEAD:refs/heads/${WRITE_BRANCH}`),
+  );
+  const removed = rows.lastIndexOf(`git worktree remove --force ${WORKTREE}`);
+  assert.ok(pushed >= 0 && removed > pushed, "the worktree goes after the push");
+  assert.deepEqual(
+    rows.filter((row) =>
+      /^git (switch|checkout|reset|merge|commit|add)( |$)/.test(row),
+    ),
+    [],
+    "no command runs over the box's own checkout",
+  );
+});
+
+test("the fix group's name cuts to a cap below its own words", () => {
+  assert.equal(cutTo("loose-fixes-abc", 2), "loose-fixes");
+  assert.equal(fixName({ words: 2 }, MAIN), "loose-fixes");
+  assert.equal(fixName({ words: 5 }, MAIN), FIX_NAME);
+});
+
+test("markOff answers the commit that opens a branch off main's tree, which the dispatch pushes", () => {
+  const { it } = doorsSaying({
+    "git rev-parse origin/main^{tree}": { stdout: "7ree000\n" },
+    "git commit-tree 7ree000 -p origin/main -m work/new-group opens": {
+      stdout: "0pen000\n",
+    },
+  });
+  assert.equal(markOff(it, "work/new-group"), "0pen000");
 });

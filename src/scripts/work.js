@@ -182,7 +182,7 @@ function openGroup(it, name) {
 }
 
 // The branch opens on a commit of its own, off trunk's tree, because a branch standing where trunk stands reads merged once trunk moves, and the queue then hides it. [[spec/design_output/work#a-merged-branch-closes]]
-function markOff(it, branch) {
+export function markOff(it, branch) {
   const tree = it.git.run(["rev-parse", `origin/${TRUNK}^{tree}`], true);
   if (!tree.ok || !tree.out) return "";
   const said = it.git.run(
