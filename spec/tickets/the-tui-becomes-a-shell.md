@@ -88,6 +88,7 @@ Every tool built on this tree then draws in the same shell.
 
 - `go test ./...` from the root passes
 - a case draws the `index` tab over a fake catalog
+- a case draws the `help` tab, and reads each doc equal to the registration's `q.Doc`
 - `./RUNME.sh check` exits 0
 
 # design

@@ -123,12 +123,14 @@ depends_on: [the-hooks-door-lands]
 
 # Ask
 
-The `mcp` IO module stands, flagged with `q.IO()`, and serves every action as a tool from the registry, per [[spec/design_output/model#the-io-process]]. Each tool answers within the wait its call sets, per [[spec/design_output/model#a-caller-sets-its-wait]]. The default wait is a config key of the IO module.
+The `mcp` IO module stands, flagged with `q.IO()`, and keeps no tool list of its own, per [[spec/design_output/model#what-each-surface-gets]]. Every action in the registry becomes a tool at start, with its name off the action's name and its description off `q.Doc`. Its input schema comes off the input type and its field tags, the source OpenAPI reads through Huma. The module adds the `wait` argument to every tool, and each tool answers within it, per [[spec/design_output/model#a-caller-sets-its-wait]]. The default wait is a config key of the IO module.
 
-Copilot carries no function hooks, so MCP is its road to the index. With the wait built in, an agent needs one call once the system runs live.
+Copilot carries no function hooks, so MCP is its road to the index. A new action reaches it with no change to the MCP code, and an agent needs one call once the system runs live.
 
 - `go test ./...` from the root passes
 - an inbound fake replays a recorded MCP session, and the IO module answers it
+- a case adds an action to a fake registry, and reads a new tool listed, with the MCP module unchanged
+- a case reads a tool's description equal to its action's `q.Doc`
 - a case calls a tool with no wait, and reads the default of a second off its config key
 - a case passes a wait argument to a tool, and reads the call wait that long
 - a case calls a slow tool, and reads `still running` with the fraction done, the time and the handle

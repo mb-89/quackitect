@@ -191,9 +191,15 @@ imports between packages alone, so modules in one topic package call each
 other's functions directly, on purpose. The module names no HTTP library, no
 MCP and no editor, because only the IO modules know those.
 
+A module declares how what it exposes presents itself, and a view decides
+where it shows. `spec/views/work.base` names `badge: work/open-tasks`, and
+the renderer takes the label, the doc and the icon off the registration.
+
         var OpenTasks = q.Derived("open-tasks", 0,
-        q.Doc("The tickets this box can take."),
-        q.Show(q.Badge{On: "work/editor"}),
+                q.Doc("The tickets this box can take."),
+        q.Label("Open tasks"),
+        q.Icon("checklist"),
+        q.Looks(q.Count),
         func(in openTasksIn) (int, error) {
             return in.Places.Takeable, nil
         })
@@ -218,7 +224,9 @@ database and no port.
 
 # The registry builds each surface
 
-That one file reaches every surface, and no surface names it:
+That one file reaches every surface, and no surface names it. One source gives the same text everywhere. A thing's name, description and help
+read alike in the command line, the window, the sidebar, OpenAPI and MCP. The command line is
+one more client of `/v1`, with no path of its own:
 
 | the surface | what the file gives it |
 |---|---|
@@ -226,12 +234,13 @@ That one file reaches every surface, and no surface names it:
 | the `http` IO module | `GET /v1/values/work/open-tasks`, typed in the OpenAPI 3.1 document and on `/docs`, through Huma |
 | the `sse` IO module | a stream that pushes on change alone |
 | the hook module and the `mcp` IO module | a tool Claude, Copilot and every other agent reads |
-| the editor | the badge on the work editor button |
+| the editor | the badge `spec/views/work.base` places, drawn with the port's own label and look |
 | the window | the value and its help in the index tab |
 | the start-up check | a unique name, a built-in value, one provider |
 
 Claude Code takes its tools through the hook module. Copilot carries no
-function hooks, so it takes the same tools over MCP.
+function hooks, so it takes the same tools over MCP. Every action becomes a tool
+at the next start, and no surface keeps a list of its own.
 
 # A view is a declaration
 
@@ -245,6 +254,10 @@ already. It gains the name it reads and the actions its keys call:
       - { key: p,     calls: work/place }
       - { key: enter, edits: cell }
       - { button: pull, calls: work/pull }
+
+A view decides composition alone: which values and actions show, where, and in
+what order. It writes no label, description or help of its own, and the renderer
+takes those off the registrations. A view leaves out a proposed icon, or anything else, as it likes.
 
 The window is the first renderer, and it is the command line with tabs:
 

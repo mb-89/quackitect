@@ -117,19 +117,20 @@ steps:
 step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: quack-verbs-land-in-shadow
+group: the-foundation-closes-its-gaps
+depends_on: [the-wiring-file-binds-ports]
 ---
 
 # Ask
 
-`POST /v1/actions/<name>` stands for every action, off the registry. It answers within the wait the request sets with `Prefer: wait=N`, per RFC 7240 and [[spec/design_output/model#a-caller-sets-its-wait]]. The default wait is a config key of the `http` IO module.
+The core takes the presentation declarations on everything a module exposes, per [[spec/design_output/model#a-module-is-one-file]]: `q.Doc`, `q.Label`, `q.Icon` and `q.Looks`. An action's input and output fields carry `label` and `doc` tags. The start refuses an exposed port, key, action or field with no description.
 
-An action then answers over HTTP the way it answers on the command line, and a script needs one request.
+Every surface then reads one text off the registration, and no view or surface writes its own. A description missing shows at start, so the check refuses it before a merge.
 
 - `go test ./...` from the root passes
-- a case posts to a fake action with `Prefer: wait=5`, and reads the result
-- a case posts with `Prefer: wait=0`, and reads `202` with the fraction done, the time and the handle path
-- a case posts with no `Prefer`, and reads the default wait off its config key
+- a case registers a port with a label, an icon and a look, and reads them off the catalog
+- a case registers an action with no `q.Doc`, and reads the start refuse it naming the file and line
+- a case registers an input field with no `doc` tag, and reads the refusal naming the field
 - `./RUNME.sh check` exits 0
 
 # design

@@ -78,16 +78,17 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: quack-verbs-land-in-shadow
+depends_on: [actions-answer-over-http]
 ---
 
 # Ask
 
-`quack` builds its command tree off the registry, with help from each `q.Doc`. [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]] asks it.
+`quack` builds its command tree off the registry, with help from each `q.Doc` and each field's tags. [[spec/design_input/the-index-holds-the-model#the-registry-builds-each-surface]] asks it. It reaches the index over `/v1`, the way every other client does, with no path of its own.
 
-A command then costs no hand-written verb.
+A command then costs no hand-written verb, and its help reads the text every other surface reads.
 
 - `go test ./...` from the root passes
-- a case reads the help of a fake action off `quack --help`
+- a case reads the help of a fake action off `quack --help`, equal to its `q.Doc`
 - a case runs a slow fake action, and reads `quack run` follow it and `--detach` answer at once
 - `./RUNME.sh check` exits 0
 
