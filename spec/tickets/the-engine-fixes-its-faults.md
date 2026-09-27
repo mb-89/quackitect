@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 cloud: true
 record:
   - step: sync
@@ -101,6 +101,15 @@ record:
         exit: 0
         said: work/the-engine-fixes-its-faults already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: f7555284792e611f5daccc1403294db32558656a
+    hash_after: f7555284792e611f5daccc1403294db32558656a
+    inputs:
+      - name: ask
+        hash: 3827a3cc3d458ead
+        size: 295
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -129,14 +138,35 @@ Done when every child closes through the command it names.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/a-rewind-spares-landed-tests]], standard
+- [[spec/tickets/behind-read-reaches-past-ask]], trivial
+- [[spec/tickets/box-keys-fold-drive-letters]], trivial
+- [[spec/tickets/cloud-ask-names-the-hold]], trivial
+- [[spec/tickets/cloud-boxes-ask-nobody]], standard
+- [[spec/tickets/cloud-boxes-leave-trunk-alone]], standard
+- [[spec/tickets/commit-skips-landed-moves]], trivial
+- [[spec/tickets/kept-red-reads-red-list]], trivial
+- [[spec/tickets/kept-red-subject-matches-whole]], trivial
+- [[spec/tickets/one-writer-holds-a-branch]], standard
+- [[spec/tickets/phase-two-carries-badge-lines]], trivial
+- [[spec/tickets/prepush-reds-land-together]], trivial
+- [[spec/tickets/push-gate-needs-the-engine]], standard
+- [[spec/tickets/serve-probes-the-register-port]], trivial
+- [[spec/tickets/sync-takes-its-own-branch]], standard
+- [[spec/tickets/the-bridge-outlives-its-starter]], standard
+- [[spec/tickets/the-queue-views-agree]], standard
+- [[spec/tickets/the-reply-probe-runs]], question
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one change a review reads whole
+- the goal's parts each meet a child: the trunk guard, the desk push, the kept red leaf, and the one count. The desk trials stand as person questions such as a-desk-runs-probe-reply
+- every child stands closed, so none waits on another
 
 # children
 
