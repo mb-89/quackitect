@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -257,6 +257,15 @@ record:
         hash: 894c4d79a61e9314
         size: 1231
     def: 4133e17eb1a59324
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: cd04bfcb3286dc0e6e32d8f95f09635f88538472
+    hash_after: cd04bfcb3286dc0e6e32d8f95f09635f88538472
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -558,14 +567,20 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files of the size list and three more. The file ceiling moves `childrenSay` into `src/scripts/pull-children.js`, with its own test, and `src/scripts/pull.js` exports it
+- the keep reaches git through `it.git` alone, and the fake git of `pull-doors.js` answers every case
+- `pull-kept.js`, `stepOn` and `advanced` point at `spec/design_output/pull#kept-red-leaves`
+- the reads stand once, under Kept red leaves in `pull.md`, and the code points there
+- the gate point kept-red-subject-matches-whole lands here. The search reads the ticket name and each whole change
 
 ## tests-green
 

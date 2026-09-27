@@ -74,6 +74,7 @@ import {
 import { NOTES, schemasHere } from "./ticket.js";
 
 export * from "./pull-chapter.js";
+export * from "./pull-children.js";
 export * from "./pull-escalate.js";
 export * from "./pull-hand.js";
 export * from "./pull-route.js";
