@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [the-engine-holds-the-route]
-step: split
+step: children
 record:
   - step: sync
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -92,6 +92,10 @@ record:
       - name: sync
         exit: 0
         said: work/guidance-rides-each-step already carries every commit on main.
+  - step: split
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: e64a605e9bc71b5199418425140b5b3ace942f22
+    hash_after: e64a605e9bc71b5199418425140b5b3ace942f22
 ---
 
 # Ask
@@ -116,14 +120,29 @@ Each step carries the guidance its tags resolve, and the notes at the top ride t
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/guidance-resolves-by-tags]], standard
+- [[spec/tickets/the-style-carries-the-top]], standard
+- [[spec/tickets/cloud-note-reaches-every-step]], trivial
+- [[spec/tickets/an-answer-stays-under-cap]], standard
+- [[spec/tickets/refusals-stay-under-cap]], trivial
+- [[spec/tickets/long-line-cuts-by-bytes]], trivial
+- [[spec/tickets/each-call-meets-its-budget]], standard
+- [[spec/tickets/budget-fixture-grows-with-work]], trivial
+- [[spec/tickets/budget-headroom-on-cloud-boxes]], trivial
+- [[spec/tickets/budget-names-the-resolver-call]], trivial
+- [[spec/tickets/rest-line-names-plain-pull]], trivial
+- [[spec/tickets/the-callers-name-dueHandOut]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one change with its test, small enough to review whole
+- the chapters Guidance, The size cap and Time budgets each map onto closed children, and nothing of the ask stands outside them
+- the one child waiting on another, cloud-note-reaches-every-step, is a child of the ticket it follows
 
 # children
 
