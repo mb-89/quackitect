@@ -140,6 +140,9 @@ record:
         hash: b8bf73d993bb8909
         size: 15501
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box d7db071a74cf · claude-code-remote
+    hash_before: e7de3998544b942d0ab5246230d8a088adfd61f0
 depends_on: ["the-engine-holds-the-route"]
 ---
 
