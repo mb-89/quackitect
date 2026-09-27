@@ -160,7 +160,7 @@ function doors(files, answers = {}, more = {}) {
       front: fakeFront(),
       clock: fakeClock(),
       agent: true,
-      // This verb is a desk's, and a case driving the cloud road says so. [[spec/guidance/cloud]]
+      // This verb is a desk's, and a case driving the cloud road says so. [[spec/guidance/cloud/cloud]]
       cloud: false,
       env: {},
       ...more,
@@ -176,7 +176,7 @@ const standing = (child = CHILD(), extra = {}) => ({
   ...extra,
 });
 
-// A cloud box answers the step itself, so it hands nothing out. [[spec/guidance/cloud]]
+// A cloud box answers the step itself, so it hands nothing out. [[spec/guidance/cloud/cloud]]
 test("unblock refuses a cloud box, and names the pull instead", () => {
   const { it, disk } = doors(standing(), {}, { cloud: true });
 

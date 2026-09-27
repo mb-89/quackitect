@@ -138,7 +138,7 @@ test("a desk's pull on a group branch whose one child waits for a person refuses
   assert.doesNotMatch(said, /branch unblock/);
 });
 
-// A cloud box answers every question it meets, so that step stands open to it. [[spec/guidance/cloud]]
+// A cloud box answers every question it meets, so that step stands open to it. [[spec/guidance/cloud/cloud]]
 test("a cloud box takes the person's step, and the answer names no unblock", () => {
   const { said } = heard(() =>
     pulling(

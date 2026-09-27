@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [accept]
 scope: ["a branch coming back at done, before a desk merges it"]
 rationale: [[spec/rationales/reviewing]]
 ---

@@ -43,13 +43,14 @@ frontmatter:
       x-link: true
       description: the note arguing for the starred rules, one link
 
+    tags:
+      type: array
+      description: the words a note carries beside the folders on its path, and it reaches a step carrying all of them
+
     env:
       type: array
       description: the variables saying a session is in scope, where that scope is a machine
 
-    style:
-      type: boolean
-      description: true puts this note into the output style, which the client sends with every request
 
 body:
   headingLevel: 1

@@ -262,8 +262,8 @@ markdown, so the compare reads the ending the shape names.
 
 # The third target
 
-A guidance note carrying `style: true` goes into the output style, and the
-client sends the style with every request. The shape `output style` reads
+Every guidance note at the top of its folder goes into the output style, and
+the client sends the style with every request. The shape `output style` reads
 the folder of notes and writes one file:
 
     {
@@ -277,15 +277,11 @@ the folder of notes and writes one file:
 | piece | what it holds |
 |---|---|
 | `from` | a folder, and the reads list every note at its top |
-| the flag | `style` in the note's frontmatter, and `guidance.schema.yaml` admits it |
 | the file | `level0.md`, with the name, a description and `keep-coding-instructions: true` |
-| the body | the Actionables of every note carrying the flag, under a heading naming the note, and its Examples table under them |
+| the body | the Actionables of every note at the top, under a heading naming the note, and its Examples table under them |
 
 `.claude/settings.json` selects the style by name, so every clone reads it.
-The session's standing block drops a note carrying the flag, because the
-client carries it. A helper's prompt keeps every note, because a subagent
-reads no style. For details, see
-[[spec/design_output/level0#the-style-carries-a-note]].
+For details, see [[spec/design_output/level0#the-style-carries-the-top]].
 
 # A missing layer fails
 

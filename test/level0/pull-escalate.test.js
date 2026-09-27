@@ -22,7 +22,7 @@ import {
   standing,
 } from "./pull-doors.js";
 
-// A desk hands the question to a person, and a cloud box answers it itself. [[spec/guidance/cloud]]
+// A desk hands the question to a person, and a cloud box answers it itself. [[spec/guidance/cloud/cloud]]
 test("branch escalate inserts a person step before the held leaf, drops the hold, and a desk pushes nothing", () => {
   const { it, disk, outside } = deskDoors(standing());
   heard(() => pulling(ROOT, ["pull"], it));

@@ -27,7 +27,13 @@ function tracked(it, paths) {
       .map((row) => row.trim())
       .filter(Boolean),
   );
-  return paths.filter((one) => !ignored.has(one));
+  return paths.filter((one) => !ignored.has(one) && standsSomewhere(it, one));
+}
+
+// A move leaves its old path in the journal, standing nowhere on disk and nowhere in git, and git refuses a commit naming it. A tracked path gone from disk still stages, as a deletion. [[spec/design_output/pull#the-refused-commit]]
+function standsSomewhere(it, path) {
+  if (it.disk.exists(path)) return true;
+  return it.git.run(["ls-files", "--error-unmatch", "--", path], true).ok;
 }
 
 // A landing the engine makes on the side stages the ticket files it writes, and a hand's edits stay out of a commit naming another ticket. [[spec/design_output/pull#the-refused-commit]]

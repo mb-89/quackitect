@@ -65,6 +65,9 @@ frontmatter:
             type: [array, string]
             x-link: true
             description: the guidance notes this step's hand reads
+          tags:
+            type: [array, string]
+            description: the words a note's tags resolve against
           on_fail:
             type: string
             x-earlier: steps

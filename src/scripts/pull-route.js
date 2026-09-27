@@ -18,9 +18,11 @@ import {
   holdOf,
   notesSaid,
   parsed,
+  readsFor,
   readsOf,
   writeHold,
 } from "./guidance-hand.js";
+import { cutRefusal, printPart } from "./pull-cap.js";
 import { agentOf, BOX, handOf, roleOf } from "./pull-hand-of.js";
 
 export const HOLDS = OWNED_HOLDS;
@@ -95,10 +97,13 @@ export { agentOf, BOX, handOf, holdAt, holdOf, parsed, roleOf };
 
 // A second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function stillHeld(it, held) {
+  // A hand-out past the cap prints its next part, and the step stays whole. [[spec/design_input/level-two#the-size-cap]]
+  if (held.rest) return printPart(it, held, held.rest);
   const now = readsOf(it, stepReads(it, held));
   const why = handsAgain(held, now);
   if (why) writeHold(it, held.hand, { ...held, reads: now });
-  say(REFUSED, [
+  const again = `  Read them whole with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`;
+  const rows = [
     `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
     `Hand it back: ./RUNME.sh ticket pull ${held.ticket}${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""} --pass, or --fail "why".`,
     ...(why
@@ -110,7 +115,11 @@ export function stillHeld(it, held) {
           "",
           `Read them again with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`,
         ]),
-  ]);
+  ];
+  // A refusal reprinting the notes stays under the cap too. [[spec/design_input/level-two#the-size-cap]]
+  console.error(
+    cutRefusal(it, [REFUSED, ...rows.map((row) => `  ${row}`)].join("\n"), again),
+  );
   return 1;
 }
 
@@ -118,7 +127,7 @@ export function stepReads(it, held) {
   const at = it.join(it.root, ...String(held.path ?? "").split("/"));
   if (!held.path || !it.disk.exists(at))
     return (held.reads ?? []).map((one) => one.name);
-  return leafOf(frontOf(it.disk.read(at)), held.step)?.reads ?? [];
+  return readsFor(it, leafOf(frontOf(it.disk.read(at)), held.step));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
@@ -174,6 +183,7 @@ export function leafOf(front, path) {
     asks: String(leaf.said.asks ?? ""),
     options: [leaf.said.options ?? []].flat().map(String),
     reads: sum("reads").map(bare),
+    tags: [...new Set(sum("tags"))],
     needs: sum("needs"),
     checklist: sum("checklist"),
     evidence: [leaf.said.evidence ?? []].flat().filter((one) => one?.name),

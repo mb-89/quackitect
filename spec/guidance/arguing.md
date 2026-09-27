@@ -2,7 +2,6 @@
 kind: [[guidance]]
 scope: ["every answer the agent writes to the owner"]
 rationale: [[spec/rationales/arguing]]
-style: true
 ---
 
 # Actionables

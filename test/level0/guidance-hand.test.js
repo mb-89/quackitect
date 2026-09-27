@@ -11,7 +11,13 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { everyHold, heldReads, heldTests } from "../../src/scripts/guidance-hand.js";
+import {
+  everyHold,
+  heldReads,
+  heldTests,
+  resolved,
+  tagsOf,
+} from "../../src/scripts/guidance-hand.js";
 import { pulling, work } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
 
@@ -302,20 +308,61 @@ test("the standing verb drops the note the hand --as names already reads", async
 
 // Several hands hold on one box, and the commit door reads the tests every held ticket carries. [[spec/design_output/tree#the-rules-over-two-files]]
 test("every hold on the box answers, and the tests each held ticket carries come back once", () => {
-  const ticket = (line) => `# Ask\n\nThe prose names test/level0/prose.test.js.\n\n### tests\n\n    ${line}\n`;
+  const ticket = (line) =>
+    `# Ask\n\nThe prose names test/level0/prose.test.js.\n\n### tests\n\n    ${line}\n`;
   const it = {
     root: ROOT,
     join,
     disk: fakeDisk({
-      [at(".se/.runtime/hold/a-hand.json")]: JSON.stringify({ ticket: "one", path: "spec/tickets/one.md" }),
-      [at(".se/.runtime/hold/b-hand.json")]: JSON.stringify({ ticket: "two", path: "spec/tickets/two.md" }),
-      [at(".se/.runtime/hold/c-hand.json")]: JSON.stringify({ ticket: "gone", path: "spec/tickets/gone.md" }),
-      [at("spec/tickets/one.md")]: ticket("./RUNME.sh branch test test/level0/one.test.js"),
-      [at("spec/tickets/two.md")]: ticket("./RUNME.sh branch test test/level0/one.test.js src/engine/queue/pick_test.go"),
+      [at(".se/.runtime/hold/a-hand.json")]: JSON.stringify({
+        ticket: "one",
+        path: "spec/tickets/one.md",
+      }),
+      [at(".se/.runtime/hold/b-hand.json")]: JSON.stringify({
+        ticket: "two",
+        path: "spec/tickets/two.md",
+      }),
+      [at(".se/.runtime/hold/c-hand.json")]: JSON.stringify({
+        ticket: "gone",
+        path: "spec/tickets/gone.md",
+      }),
+      [at("spec/tickets/one.md")]: ticket(
+        "./RUNME.sh branch test test/level0/one.test.js",
+      ),
+      [at("spec/tickets/two.md")]: ticket(
+        "./RUNME.sh branch test test/level0/one.test.js src/engine/queue/pick_test.go",
+      ),
     }),
   };
 
   assert.equal(everyHold(it).length, 3);
-  assert.deepEqual(heldTests(it), ["test/level0/one.test.js", "src/engine/queue/pick_test.go"]);
+  assert.deepEqual(heldTests(it), [
+    "test/level0/one.test.js",
+    "src/engine/queue/pick_test.go",
+  ]);
   assert.deepEqual(heldTests({ ...it, disk: fakeDisk({}) }), []);
+});
+
+// A note under a subfolder carries its folders and its own tags, and a step carrying them all reaches it. [[spec/design_input/level-two#guidance]]
+test("tagsOf reads the folders and the frontmatter, and resolved answers the notes a step's tags reach", () => {
+  const root = "/tree";
+  const note = (front) =>
+    `---\nkind: [[guidance]]\n${front}---\n\n# Actionables\n\n1. One rule.\n`;
+  const it = {
+    root,
+    method: root,
+    join,
+    disk: fakeDisk({
+      [join(root, "spec/guidance/code/code.md")]: note(""),
+      [join(root, "spec/guidance/code/testing.md")]: note("tags: [testing]\n"),
+      [join(root, "spec/guidance/voice.md")]: note(""),
+    }),
+  };
+  assert.deepEqual(tagsOf(it, "spec/guidance/code/testing"), ["code", "testing"]);
+  assert.deepEqual(tagsOf(it, "spec/guidance/voice"), []);
+  assert.deepEqual(resolved(it, ["code"], {}), ["spec/guidance/code/code"]);
+  assert.deepEqual(resolved(it, ["code", "testing"], {}), [
+    "spec/guidance/code/code",
+    "spec/guidance/code/testing",
+  ]);
 });

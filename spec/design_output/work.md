@@ -246,7 +246,7 @@ on:
 
 | the box | who answers the step |
 |---|---|
-| a cloud box | the box itself, and it moves on. [[spec/guidance/cloud]] |
+| a cloud box | the box itself, and it moves on. [[spec/guidance/cloud/cloud]] |
 | a desk, under the owner's word | the hand `--owner-says` sends in, and the record names both. [[spec/design_output/pull#the-hand-rule]] |
 | a desk, under a person's own hand | that person, through their own pull |
 | an agent on a desk, with no word | nobody: the pull answers `wait` and names the step |
@@ -291,7 +291,7 @@ behind them runs on. The verb refuses these:
 - a successor nobody holds yet
 
 A desk mints that last one with `./RUNME.sh mint ticket`, and writes what stands
-open into its ask. [[spec/guidance/cloud]] says why the cloud road differs.
+open into its ask. [[spec/guidance/cloud/cloud]] says why the cloud road differs.
 
 ## A successor stands on question
 

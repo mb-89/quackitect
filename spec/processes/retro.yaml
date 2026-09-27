@@ -10,7 +10,7 @@ steps:
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
     by: person
     needs: ["ticket note"]
-    reads: [[spec/guidance/retro/feedback]]
+    tags: [retro, feedback]
     evidence:
       - name: notes
         form: list
@@ -21,7 +21,7 @@ steps:
     to: owner
     input: feedback
     needs: ["retro"]
-    reads: [[spec/guidance/retro/collect]]
+    tags: [retro, collect]
     evidence:
       - name: run
         form: command
@@ -32,7 +32,7 @@ steps:
     by: anyone
     input: collect
     needs: ["retro"]
-    reads: [[spec/guidance/retro/effect]]
+    tags: [retro, effect]
     evidence:
       - name: effect
         form: command
@@ -43,7 +43,7 @@ steps:
     by: anyone
     input: effect
     needs: ["retro", "retro audit"]
-    reads: [[spec/guidance/retro/audit]]
+    tags: [retro, audit]
     checklist:
       - the code the window lands follows [[spec/guidance/code/code]]
       - every change lands with a test that fails before it and passes after, as [[spec/guidance/code/testing]] asks
@@ -72,7 +72,7 @@ steps:
     by: anyone
     input: audit
     needs: ["retro"]
-    reads: [[spec/guidance/retro/chapter]]
+    tags: [retro, chapter]
     evidence:
       - name: chapters
         form: command
@@ -83,7 +83,7 @@ steps:
     by: anyone
     input: chapter
     needs: ["retro"]
-    reads: [[[spec/guidance/retro/read]], [[spec/guidance/retro/signals]]]
+    tags: [retro, read, signals]
     evidence:
       - name: matrix
         form: command
@@ -94,7 +94,7 @@ steps:
     by: anyone
     input: read
     needs: ["retro"]
-    reads: [[spec/guidance/retro/classify]]
+    tags: [retro, classify]
     evidence:
       - name: classes
         form: command
@@ -106,7 +106,7 @@ steps:
     to: owner
     input: classify
     needs: ["retro"]
-    reads: [[spec/guidance/retro/check]]
+    tags: [retro, check]
     evidence:
       - name: report
         form: command
@@ -126,7 +126,7 @@ steps:
     by: anyone
     input: report
     needs: ["retro"]
-    reads: [[spec/guidance/retro/check]]
+    tags: [retro, check]
     evidence:
       - name: minted
         form: command

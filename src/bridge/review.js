@@ -24,14 +24,7 @@ async function reviewsBranch(e, box) {
 
   // The node path comes off the box the server root builds. [[spec/design_output/doors#a-door-reads-the-outside]]
   const ran = box.proc.run(
-    [
-      box.node,
-      `${box.method}/src/scripts/cli.js`,
-      "branch",
-      "review",
-      name,
-      "--json",
-    ],
+    [box.node, `${box.method}/src/scripts/cli.js`, "branch", "review", name, "--json"],
     {
       cwd: box.work,
       timeoutMs: GATHERING,
@@ -52,7 +45,7 @@ async function reviewsBranch(e, box) {
   return {
     spawn: {
       // A restart hands the box over bare, so the accessor reads the guidance again. [[spec/design_output/level0#a-restart-fills-the-box]]
-      prompt: readerAsks(material, guidanceOf(box)?.standing ?? ""),
+      prompt: readerAsks(material, guidanceOf(box)?.helper ?? ""),
       description: `read ${material.branch}`,
       subagentType: "general-purpose",
     },

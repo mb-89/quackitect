@@ -1,8 +1,9 @@
 // The verb answering the guidance a hand holds. Unnamed it answers the held
-// step's notes and the always-on ones, and named it answers one note. It reads
-// the hand --as names, the same hand the pull takes.
+// step's notes and the always-on ones, named it answers one note, and --step
+// answers the notes a process step resolves by its tags.
 // [[spec/design_output/pull#the-work-answer]]
 
+import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import {
   alwaysOn,
   asIn,
@@ -10,10 +11,17 @@ import {
   handHere,
   holdOf,
   notesSaid,
+  PROCESSES,
+  readsFor,
 } from "./guidance-hand.js";
+import { leafOf } from "./pull-route.js";
+
+const STEP = "--step";
 
 // [[spec/design_output/pull#the-work-answer]]
 export function guidance(it, argv = [], env = {}) {
+  const asked = stepIn(argv);
+  if (asked) return stepNotes(it, asked, env);
   const name = nameIn(argv);
   if (name) return oneNote(it, name);
   const held = holdOf(it, handHere(it, argv));
@@ -35,6 +43,31 @@ function oneNote(it, name) {
     return 1;
   }
   return said(it, [name]);
+}
+
+// A step reads as <process>:<path>, the path its leaf stands at in the route. [[spec/design_input/level-two#guidance]]
+function stepNotes(it, step, env) {
+  const [name, path = ""] = step.split(":");
+  const at = it.join(it.root, ...`${PROCESSES}/${name}.yaml`.split("/"));
+  if (!it.disk.exists(at)) {
+    console.error(`${name} names no process under ${PROCESSES}.`);
+    return 1;
+  }
+  const front = { steps: readYaml(String(it.disk.read(at))).steps };
+  const leaf = leafOf(front, path);
+  if (!leaf) {
+    console.error(`${name} names no step ${path}, or names one holding steps.`);
+    return 1;
+  }
+  return said(it, readsFor(it, leaf, env));
+}
+
+function stepIn(argv) {
+  const rest = [...(argv ?? [])].map(String);
+  const at = rest.indexOf(STEP);
+  if (at >= 0) return String(rest[at + 1] ?? "").trim();
+  const inline = rest.find((one) => one.startsWith(`${STEP}=`));
+  return inline ? inline.slice(STEP.length + 1).trim() : "";
 }
 
 function said(it, paths) {

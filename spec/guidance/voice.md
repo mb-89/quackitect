@@ -2,7 +2,6 @@
 kind: [[guidance]]
 scope: ["all output, agents and people"]
 rationale: [[spec/rationales/voice]]
-style: true
 ---
 
 # Actionables

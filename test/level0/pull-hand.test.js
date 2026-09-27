@@ -14,7 +14,16 @@ import {
   takeable,
   ticketsHere,
 } from "../../src/scripts/pull-hand.js";
-import { doors, heard } from "./pull-doors.js";
+import {
+  at as PULL_AT,
+  doors,
+  HOLD,
+  heard,
+  CHILD as PULL_CHILD,
+  ROOT as PULL_ROOT,
+  standing,
+} from "./pull-doors.js";
+import { pulling } from "../../src/scripts/work.js";
 import { CHILD, ROOT } from "./work-doors.js";
 
 const at = (rel) => join(ROOT, ...rel.split("/"));
@@ -130,4 +139,37 @@ test("the pull reads cloud and desk, and returned names no condition it reads", 
     holds: false,
     why: "returned names no condition the pull reads",
   });
+});
+
+// A box naming no cap splits nothing, so the hand-out prints whole and the hold carries no rest. [[spec/design_input/level-two#the-size-cap]]
+test("handed prints the whole hand-out and writes a hold with no rest where no cap stands", () => {
+  const { it, disk } = doors(standing());
+  const { code, said } = heard(() => pulling(PULL_ROOT, ["pull"], it));
+  assert.equal(code, 0);
+  assert.match(said, /ticket pull a-child --pass/);
+  assert.doesNotMatch(said, /for the rest/);
+  const hold = JSON.parse(disk.read(HOLD));
+  assert.equal(hold.step, "design/draft");
+  assert.equal(hold.rest, undefined);
+});
+
+// The hold records the notes a leaf's tags resolve, so the guidance verb reads them back. [[spec/design_input/level-two#guidance]]
+test("handed records in the hold the notes a tagged leaf resolves", () => {
+  const tagged = PULL_CHILD().replace(
+    "    reads: [[spec/guidance/voice]]\n",
+    "    tags: [code]\n",
+  );
+  const code =
+    "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Reach the outside through a door.\n";
+  const { it, disk } = doors({
+    ...standing(tagged),
+    [PULL_AT("spec/guidance/code/code.md")]: code,
+  });
+  const { code: exit } = heard(() => pulling(PULL_ROOT, ["pull"], it));
+  assert.equal(exit, 0);
+  const hold = JSON.parse(disk.read(HOLD));
+  assert.deepEqual(
+    hold.reads.map((one) => one.name),
+    ["spec/guidance/code/code"],
+  );
 });

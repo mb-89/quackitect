@@ -14,7 +14,7 @@ import {
   workAnswer,
 } from "../../src/scripts/pull-chapter.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
-import { doors } from "./pull-doors.js";
+import { at, doors, ROOT } from "./pull-doors.js";
 import { CHARACTERS, semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
@@ -109,7 +109,7 @@ One piece of it.
 `;
 
 const handOut = (path) => {
-  const { it } = doors({});
+  const { it } = doors({}, {}, { root: ROOT });
   const one = { name: "a-child", text: GATED, front: frontOf(GATED) };
   return workAnswer(it, one, leafOf(frontOf(GATED), path));
 };
@@ -129,4 +129,30 @@ test("a pull on a step carrying no gate prints neither question", () => {
   const said = handOut("draft");
   assert.doesNotMatch(said, /answers:/);
   assert.ok(!said.includes(BEFORE_CLEAR));
+});
+
+// [[spec/design_input/level-two#guidance]]
+test("a hand-out on a tagged leaf prints each note its tags resolve as a section", () => {
+  const code =
+    "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Reach the outside through a door.\n";
+  const { it } = doors(
+    { [at("spec/guidance/code/code.md")]: code },
+    {},
+    { root: ROOT },
+  );
+  const tagged = GATED.replace(
+    "  - name: gate\n",
+    "  - name: gate\n    tags: [code]\n",
+  );
+  const one = { name: "a-child", text: tagged, front: frontOf(tagged) };
+  const said = workAnswer(it, one, leafOf(frontOf(tagged), "gate"));
+  assert.match(
+    said,
+    /# Reads spec\/guidance\/code\/code\n\n1\. Reach the outside through a door\./,
+  );
+  assert.doesNotMatch(
+    handOut("gate"),
+    /spec\/guidance\/code/,
+    "an untagged leaf resolves none",
+  );
 });

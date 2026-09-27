@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [collect]
 scope: ["whoever runs the collect step of a retro"]
 rationale: [[spec/rationales/collecting]]
 ---

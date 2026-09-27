@@ -43,7 +43,7 @@ test("an agent hand-back on a person's step comes back refused, and names the st
     [],
     "and the owner sends an agent in",
   );
-  // A cloud box answers every question it meets. [[spec/guidance/cloud]]
+  // A cloud box answers every question it meets. [[spec/guidance/cloud/cloud]]
   assert.deepEqual(
     handFaults({ ...it, agent: true, cloud: true }, one, leaf, "box one", {}),
     [],

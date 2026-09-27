@@ -1,6 +1,6 @@
 ---
 kind: [[rationale]]
-explains: [[spec/guidance/cloud]]
+explains: [[spec/guidance/cloud/cloud]]
 ---
 
 # Why

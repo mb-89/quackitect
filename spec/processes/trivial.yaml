@@ -19,7 +19,7 @@ steps:
     by: anyone
     to: retro
     input: ask
-    reads: [[spec/guidance/working]]
+    tags: [code, testing]
     needs: [branch test]
     checklist:
       - the change follows the ask, or the discussion says why it departs

@@ -110,7 +110,7 @@ async function landsAndPushes(it, argv, message, paths) {
     return 1;
   }
   console.log("The commit lands, and the check answers green on it.");
-  // A desk's verb pushes nothing, and a cloud box pushes, because it dies with its tree. [[spec/guidance/working]] [[spec/guidance/cloud]]
+  // A desk's verb pushes nothing, and a cloud box pushes, because it dies with its tree. [[spec/guidance/working]] [[spec/guidance/cloud/cloud]]
   if (argv.includes("--no-push") || !cloudHere(it)) return 0;
 
   if (!it.git.run(["push", "origin", branch]).ok) {

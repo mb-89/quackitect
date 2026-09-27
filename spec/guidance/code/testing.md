@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [testing]
 scope: ["every test, check and benchmark in this tree"]
 rationale: [[spec/rationales/testing]]
 ---

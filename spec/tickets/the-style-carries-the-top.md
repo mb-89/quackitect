@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -77,7 +77,44 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/draft
+step: implement/tests-green
+record:
+  - step: design/draft
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 946f720fba4dae3be85f3897102af0696733ceac
+    hash_after: 946f720fba4dae3be85f3897102af0696733ceac
+  - step: design/review
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: ac4e5372d7cb31e9ca0410f436ee4c4ad7fcff91
+    hash_after: ac4e5372d7cb31e9ca0410f436ee4c4ad7fcff91
+  - step: implement/tests-red
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: fb343665d930d3a79b9c8b8bc788139e3bcfd94d
+    hash_after: fb343665d930d3a79b9c8b8bc788139e3bcfd94d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: 8bb8bfda526ec49521ee79c2d690c3f85a78b6d0
+    hash_after: b24fcbceb5c7a65b46edd452c30c50378cf9962c
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/projection.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 601. Split it by topic."
+  - step: implement/tests-green
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: 493f74aebf50f6e1aa6e8825c617517d985df17c
+    hash_after: 493f74aebf50f6e1aa6e8825c617517d985df17c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "test/level0/projection.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 601. Split it by topic."
+reason: done
 ---
 
 # Ask
@@ -100,32 +137,43 @@ Today working, tickets and guidance arrive once in the standing layer, and a lon
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+- `styleFrom` in `.claude/skills/level0/lib/projection.js` writes every note at the top of `spec/guidance` into `.claude/output-styles/level0.md`, in place of the notes marked `style`. The `style` key leaves `spec/schemas/guidance.schema.yaml` and the notes.
+- `guidanceHere` in `src/bridge/guidance.js` hands the session no top note, since the style carries them. `blocksOf` writes the canary with no rules block, and the handover block rides as before.
+- The canary counts the rules and the notes of the style, so its line says what level zero loaded.
+- The tools block and the index line stay as they stand. They carry the box and its verbs, and no rule.
+- `./RUNME.sh rename spec/guidance/cloud spec/guidance/cloud/cloud` moves the note with its `env`, and rewrites every link reaching it. The group process's cloud steps carry the `cloud` tag, so the resolver of guidance-resolves-by-tags hands the note on a cloud box.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/bridge/guidance.js layerOf and layerRides, which read guidanceHere and blocksOf,src/scripts/cli-check.js project and projectionsHold, which run the projection,src/scripts/cli-check.js standing, which prints the standing layer,src/scripts/probe-cold.js, which looks for level0-rules beside level0-canary
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/style-top.test.js the projection writes every note at the top of spec/guidance into the output style,test/level0/style-top.test.js the standing layer carries the canary and the handover alone
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: styleFrom, styled, guidanceHere, blocksOf, the rename verb, both schemas
+- the callers list names every reader of guidanceHere, blocksOf and the projection, found by a search
+- each done_when line names a case in test/level0/style-top.test.js, and the check reads the move
 
 ## review
 
@@ -134,8 +182,10 @@ Today working, tickets and guidance arrive once in the standing layer, and a lon
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- cloud-note-reaches-every-step: once spec/guidance/cloud.md moves under a subfolder, the tag resolver hands it only at steps tagged cloud, so on a cloud box its session-wide rules (pull first on main, commit and push each finished thing, branch done last) reach no standard-process leaf and no moment before the first pull; hand the note on every leaf where its env binds, or tag every process leaf cloud
 
 # implement
 
@@ -146,20 +196,27 @@ Today working, tickets and guidance arrive once in the standing layer, and a lon
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/style-top.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: the style leaves out a note carrying no style key, and the layer hands a level0-rules block before the canary. The surprise: blocksOf writes the canary only where the standing text stands, so an empty session layer drops the canary too, and the change moves the canary off that guard. src/bridge/review.js reads the standing text for its reader, a caller the draft misses, and it takes the helper text instead.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch one new file, the one the ask names
+- the fakes are the fake disk and the fake proc from src/doors/fake
+- the file header names the ticket the tests hold
+- each assertion names a claim once, in its own test
+- the review rows (the tests asserting level0-rules, the helper layer keeping the top notes) ride the change step
 
 ## change
 
@@ -168,14 +225,20 @@ Today working, tickets and guidance arrive once in the standing layer, and a lon
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, plus the callers and tests the review rows name
+- the doors reached are the disk, the proc and git, and the tests drive their fakes
+- a comment in guidanceHere points at the chapter The style carries the top
+- the rule stands once, in spec/design_output/level0, and projection.md points at it
+- the review rows stand fixed: the tests read level0-canary, the probe reads the canary alone, the helper keeps every top note
 
 ## tests-green
 
@@ -184,26 +247,34 @@ Today working, tickets and guidance arrive once in the standing layer, and a lon
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/style-top.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every note at the top of spec/guidance now rides the output style, which the client sends with every request. The session layer hands the canary and the handover alone, so the working, tickets and guidance rules stay in view through a long conversation. The canary counts the top notes, and a helper still reads them in its prompt. The cloud note moves to spec/guidance/cloud/cloud.md, and its env hands it to every step on a cloud box. The pull now stages no path a move leaves behind.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, the callers the review names, and the staging fix the hand-back needs
+- the doors reached are the disk, the proc and git, and the tests drive their fakes
+- a comment in guidanceHere points at the chapter The style carries the top
+- the rule stands once, in spec/design_output/level0, and projection.md points at it
+- the review rows stand fixed, and the tests pass on the commit
 
 # Discussion
 
