@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 11b3f8366db5c7ec97f28a145958eb3408a892ac
+    hash_after: 11b3f8366db5c7ec97f28a145958eb3408a892ac
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 623a41b5929eb16d
+        size: 3143
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -249,26 +262,33 @@ each done_when line names its case, or the command go test or the check
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/wiring_test.go src/quack/main_test.go src/quack/golden_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/wiring_test.go
+src/quack/main_test.go
+src/quack/golden_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The family map fails the type check, the index still imports src/tickets, the root loads no tickets module, and the stub module answers all as a given. The surprise: the golden case reads the tree, and a module test reads no disk, so it stands in the root and reads the golden file at its old path until the build moves it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a red case: the golden file in src/quack/golden_test.go, the import rule in TestTheIndexImportsNoModule, with go test and the check deciding the rest
+the family case runs over a catalog in memory, and the golden case seeds the fake index, so no door stands unfaked
 
 # gate
 

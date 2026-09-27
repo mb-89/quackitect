@@ -170,3 +170,23 @@ func TestTakeJoinsTheLoadedCatalog(t *testing.T) {
 		t.Fatalf("clock/minute reads %v in the joined catalog", got)
 	}
 }
+
+type filesOf struct {
+	Files map[string]Content `q:"files/<path...>"`
+}
+
+// A derived input of a map over a family takes every value the store holds under it, keyed by the path. [[spec/tickets/tickets-becomes-a-module]]
+func TestAFamilyInputReadsEveryKey(t *testing.T) {
+	c := New()
+	hand := GivenIn(c, "files/<path...>", Content{}, Doc("a file"))
+	DerivedIn(c, "t/texts", "", func(in filesOf) string { return in.Files["a.md"].Text + in.Files["b/c.md"].Text }, Doc("the two texts"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses a family map: %v", faults)
+	}
+	s := NewStore(c)
+	seed(t, s, hand, "files/a.md", Content{Hash: "a", Text: "one "})
+	seed(t, s, hand, "files/b/c.md", Content{Hash: "c", Text: "two"})
+	if got := run(t, s, "t/texts"); got != "one two" {
+		t.Fatalf("t/texts reads %q", got)
+	}
+}
