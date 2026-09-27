@@ -69,3 +69,5 @@ the approach opens work/<name> on a commit off the trunk tree, which markOff in 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- Commit `061bd246` exports `markOff` from `src/scripts/work.js` and calls it from `src/scripts/dispatch-write.js`, and `test/level0/dispatch.test.js` holds it. The `size` list stands under the draft leaf of the closed parent, and a hand here writes no evidence under another leaf. So the file lands as a line under the parent's `Discussion` in its place.
