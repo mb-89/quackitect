@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-foundation-closes-its-gaps
 parent: ports-declare-their-looks
+record:
+  - step: do
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 80a92d8531484e19351679b6a7668df1b2385195
+    hash_after: 80a92d8531484e19351679b6a7668df1b2385195
+    why: ports-declare-their-looks answers this ask
+reason: answered
 ---
 
 # Ask
