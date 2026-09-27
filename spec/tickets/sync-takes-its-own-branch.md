@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 2622c78095a29ba1
         size: 659
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 3eca6891b818f8681e7c836e61fc8190288e36e4
+    hash_after: 3eca6891b818f8681e7c836e61fc8190288e36e4
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:294:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -314,14 +323,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `work-stands.js` and `work.md` of the size list
+- every git call runs through `it.git`, which the fake git of the sync cases answers
+- `ownIn` points at `spec/design_output/work#trunk-comes-in-first`
+- the own step stands once, in that section
 
 ## tests-green
 

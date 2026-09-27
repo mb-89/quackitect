@@ -393,7 +393,9 @@ after the first reading.
 # Trunk comes in first
 
 `branch sync` merges `origin/main` into the branch. `branch take` runs it, so a
-routine pays nothing to remember it. A conflict then stops the take, while the
+routine pays nothing to remember it. On a work branch it first merges
+`origin/<the branch>`, so a commit another hand pushes there comes in, and both
+sides stand. A conflict there stops the sync, and trunk waits for it. A conflict then stops the take, while the
 work it costs still sits ahead.
 
 On `main`, `branch sync` merges `origin/main` into the desk's `main`. So a desk

@@ -390,6 +390,10 @@ export function sync(it) {
     );
     return 2;
   }
+  if (branch !== TRUNK) {
+    const own = ownIn(it, branch);
+    if (own) return own;
+  }
   const from = branch === TRUNK ? `origin/${TRUNK}` : TRUNK;
 
   it.git.run(["fetch", "origin", TRUNK], true);
@@ -403,6 +407,19 @@ export function sync(it) {
   const merged = it.git.run(["merge", `origin/${TRUNK}`, "--no-edit", "-m", message]);
   if (!merged.ok) return settles(it, { branch, from, behind, message });
 
+  console.log(`${branch} took ${behind} commit(s) from ${from}.`);
+  return 0;
+}
+
+// Another hand's push onto the branch comes in by a plain merge, so both sides' commits stand. [[spec/design_output/work#trunk-comes-in-first]]
+function ownIn(it, branch) {
+  const from = `origin/${branch}`;
+  it.git.run(["fetch", "origin", branch], true);
+  const behind = it.git.run(["rev-list", "--count", `HEAD..${from}`], true).out.trim();
+  if (!behind || behind === "0") return 0;
+  const message = `${branch}: take ${from} in`;
+  const merged = it.git.run(["merge", from, "--no-edit", "-m", message]);
+  if (!merged.ok) return settles(it, { branch, from, behind, message });
   console.log(`${branch} took ${behind} commit(s) from ${from}.`);
   return 0;
 }
