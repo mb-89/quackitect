@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: children
+step: retro/notes
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
 depends_on: [open-tasks-land-in-shadow]
@@ -93,6 +93,10 @@ record:
     hand: box d7d80931cecf · claude-code-remote
     hash_before: 6bf3f8303b230669979340d08e654ca7d7c6019b
     hash_after: 6bf3f8303b230669979340d08e654ca7d7c6019b
+  - step: children
+    hand: the engine
+    hash_before: 2635e46d354e6697f658e662212f277ccfbdea46
+    hash_after: 2635e46d354e6697f658e662212f277ccfbdea46
 ---
 
 # Ask
