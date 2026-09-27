@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -215,6 +215,11 @@ record:
         hash: d6c724cf430b4044
         size: 2389
     def: 08e16d07b0de477c
+  - step: design/person-1
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: cb283afbeb2e92103d450464c2457412c8865039
+    hash_after: cb283afbeb2e92103d450464c2457412c8865039
+    def: de8d3ba136f0aaf6
 ---
 
 # Ask
@@ -356,7 +361,6 @@ The rerun meets the same four cases failing on their own assertion over the stub
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
 
 I rewire by hand
