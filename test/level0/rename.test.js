@@ -6,7 +6,10 @@
 import assert from "node:assert/strict";
 import { join, win32 } from "node:path";
 import { test } from "node:test";
+import { restores } from "../../.claude/skills/level0/lib/undo.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { HOLDS } from "../../src/scripts/guidance-hand.js";
 // The whole module, so a name the verb answers nowhere yet fails an assertion. [[spec/tickets/a-rename-reaches-every-note]]
 import * as rename from "../../src/scripts/rename.js";
 
@@ -64,14 +67,22 @@ test("the move carries a file of any ending, and the rewrite reaches one too", (
   const said = rename.renaming(it, `src/${OLD}`, `src/${NEW}`);
 
   assert.equal(said.why, "");
-  assert.equal(disk.exists(at(`src/${NEW}/Makefile`)), true, "a file with no ending moves");
+  assert.equal(
+    disk.exists(at(`src/${NEW}/Makefile`)),
+    true,
+    "a file with no ending moves",
+  );
   assert.equal(disk.exists(at(`src/${NEW}/icon.png`)), true, "and a picture moves too");
   assert.match(
     disk.read(at(".gitignore")),
     /src\/widget\/gadget/,
     "a file with no ending rewrites, and the name after the path stands",
   );
-  assert.match(disk.read(at("spec/funnel/a-page.html")), /src\/widget/, "a page of markup rewrites");
+  assert.match(
+    disk.read(at("spec/funnel/a-page.html")),
+    /src\/widget/,
+    "a page of markup rewrites",
+  );
   assert.equal(
     disk.read(at(`src/${NEW}/icon.png`)),
     `\u0089PNG\u0000src/${OLD}\r\n`,
@@ -95,13 +106,18 @@ test("the move carries a file of any ending, and the rewrite reaches one too", (
 test("a source the reader leaves out stands in the answer, so no reach drops in silence", () => {
   const disk = fakeDisk({
     [at(`src/${OLD}/main.go`)]: "package main\n",
-    [at("src/scripts/one.js")]: `const KEY = "\u0000";\nexport const SOURCE = "src/${OLD}";\n`,
+    [at("src/scripts/one.js")]:
+      `const KEY = "\u0000";\nexport const SOURCE = "src/${OLD}";\n`,
   });
   const it = { disk, join, root: ROOT };
 
   const said = rename.renaming(it, `src/${OLD}`, `src/${NEW}`);
 
-  assert.deepEqual(said.skipped, ["src/scripts/one.js"], "the run names the file it skips");
+  assert.deepEqual(
+    said.skipped,
+    ["src/scripts/one.js"],
+    "the run names the file it skips",
+  );
   assert.match(
     disk.read(at("src/scripts/one.js")),
     /src\/gadget/,
@@ -225,4 +241,78 @@ test("a name standing nowhere answers a fault, and moves nothing", () => {
 
   assert.match(said.why, /src\/nobody/, "the fault names what stands nowhere");
   assert.equal(disk.exists(at(`src/${NEW}`)), false, "and nothing moves");
+});
+
+// A pass commit stages the files the journals of its ticket name, so the move writes one. [[spec/tickets/journal-the-rename-verb]]
+test("a move writes a journal naming the ticket in hand, and the undo puts the move back", () => {
+  const disk = fakeDisk({
+    [at(`spec/tickets/${OLD}.md`)]: "a ticket\n",
+    [at("spec/a-note.md")]: `see [[spec/tickets/${OLD}]]\n`,
+    [at(`${HOLDS}/a-hand.json`)]: JSON.stringify({ ticket: "a-ticket" }),
+  });
+  const it = { disk, join, root: ROOT, clock: fakeClock() };
+
+  const said = rename.renaming(it, `spec/tickets/${OLD}.md`, `spec/tickets/${NEW}.md`);
+
+  assert.equal(said.why, "");
+  const folder = at(".se/.runtime/undo");
+  const [row] = disk.list(folder);
+  const entry = JSON.parse(disk.read(join(folder, row.name)));
+  assert.equal(entry.ticket, "a-ticket");
+  assert.deepEqual(entry.moved, {
+    from: `spec/tickets/${OLD}.md`,
+    to: `spec/tickets/${NEW}.md`,
+  });
+  assert.deepEqual(entry.files.map((one) => one.file).sort(), [
+    "spec/a-note.md",
+    `spec/tickets/${OLD}.md`,
+    `spec/tickets/${NEW}.md`,
+  ]);
+  const now = {
+    "spec/a-note.md": { exists: true, text: `see [[spec/tickets/${NEW}]]\n` },
+    [`spec/tickets/${NEW}.md`]: { exists: true, text: "a ticket\n" },
+    [`spec/tickets/${OLD}.md`]: { exists: false },
+  };
+  const put = restores(entry, now);
+  assert.equal(put.ok, true, put.why);
+  assert.deepEqual(put.removes, [`spec/tickets/${NEW}.md`]);
+  assert.deepEqual(put.writes.map((one) => one.file).sort(), [
+    "spec/a-note.md",
+    `spec/tickets/${OLD}.md`,
+  ]);
+  const back = restores(entry, {
+    ...now,
+    [`spec/tickets/${OLD}.md`]: { exists: true, text: "x" },
+  });
+  assert.match(back.why, /stands again/);
+});
+
+test("a move under two holds names no ticket", () => {
+  const disk = fakeDisk({
+    [at(`src/${OLD}.js`)]: "one\n",
+    [at(`${HOLDS}/one.json`)]: JSON.stringify({ ticket: "one" }),
+    [at(`${HOLDS}/two.json`)]: JSON.stringify({ ticket: "two" }),
+  });
+  rename.renaming(
+    { disk, join, root: ROOT, clock: fakeClock() },
+    `src/${OLD}.js`,
+    `src/${NEW}.js`,
+  );
+  const folder = at(".se/.runtime/undo");
+  const [row] = disk.list(folder);
+  assert.equal(JSON.parse(disk.read(join(folder, row.name))).ticket, "");
+});
+
+// The cli hands the rename its clock through a context of its own, and a name standing nowhere refuses before any write. [[spec/tickets/journal-the-rename-verb]]
+test("the cli's rename over a name standing nowhere refuses, and writes no journal", async () => {
+  const { renameHere } = await import("../../src/scripts/cli.js");
+  const said = [];
+  const was = console.error;
+  console.error = (one) => said.push(String(one));
+  try {
+    assert.equal(renameHere(["src/stands-nowhere-at-all", "src/nor-here"]), 1);
+  } finally {
+    console.error = was;
+  }
+  assert.match(said.join("\n"), /stands nowhere/);
 });

@@ -48,13 +48,25 @@ export function pullSpec() {
   };
 }
 
-// [[spec/design_output/pull#the-checks]]
-export function judgeAsk(evidence, rules) {
-  const listed = (rules ?? []).map((one) => `${one.label}: ${one.rule}`).join("\n");
+// A broken label asks for the one line that breaks its rule, so the refusal quotes it. [[spec/tickets/prose-verbs-land-first-try]]
+export function judgeAsk(evidence, rules, label = "") {
+  const broken = (rules ?? []).find((one) => String(one.label) === String(label));
+  const listed = (broken ? [broken] : (rules ?? []))
+    .map((one) => `${one.label}: ${one.rule}`)
+    .join("\n");
+  const head = broken
+    ? [
+        "A hand wrote this evidence at one step of a ticket, and one line of it",
+        `breaks the rule under ${broken.label}. Answer that one line, word for word,`,
+        "and nothing else.",
+      ]
+    : [
+        "A hand wrote this evidence at one step of a ticket, and the step reads the",
+        "rules below, each under its own label. Answer follows where the evidence",
+        "keeps every rule. Answer the label of the first rule one line of it breaks.",
+      ];
   return [
-    "A hand wrote this evidence at one step of a ticket, and the step reads the",
-    "rules below, each under its own label. Answer follows where the evidence",
-    "keeps every rule. Answer the label of the first rule one line of it breaks.",
+    ...head,
     "",
     "Guidance:",
     listed,
@@ -96,11 +108,13 @@ export function sessionOf(e) {
   };
 }
 
-export function judgeRefusal(said) {
+// The quoted line stands under the rule, so the hand fixes that line on its next try. [[spec/tickets/prose-verbs-land-first-try]]
+export function judgeRefusal(said, line = "") {
   return [
     "refused",
     "  the judge reads the evidence against the step's guidance, and it breaks a rule.",
     `  ${String(said ?? "").trim()}`,
+    ...(line ? [`  the line: ${line}`] : []),
     "",
     "  Fix it, and the ticket stays in hand.",
   ].join("\n");

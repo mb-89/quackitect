@@ -198,7 +198,7 @@ export const merging = (extra = {}) => ({
   },
   [`git diff --unified=0 base111..origin/main -- ${GROUP_AT}`]: { stdout: "" },
   "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 0 },
-  [`node ${join(ROOT, "src/scripts/cli.js")} check`]: {
+  [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
     exitCode: 0,
     stdout: "green\n",
   },

@@ -46,6 +46,7 @@ const CONTEXT = "context";
 export const TOOLS_BLOCK = "level0-tools";
 export const HANDOVER_BLOCK = "level0-handover";
 const TOOLS_HEADING = "# What this box has";
+const VERBS_HEADING = "# The verbs";
 
 // The notes come off both roots, file by file, the work root's winning. [[spec/design_output/vehicle#the-work-root-inherits]]
 export function guidanceHere(
@@ -267,7 +268,38 @@ function toolsText(box) {
   if (!lines.length) return "";
   // The tiers ride the tools block, so a spawn names its model before the Agent door asks. [[spec/design_output/level0#a-spawn-names-its-tier]]
   const tiers = tiersText(box);
-  return [TOOLS_HEADING, "", ...lines, ...(tiers ? ["", tiers] : [])].join("\n");
+  const verbs = verbsText(box);
+  return [
+    TOOLS_HEADING,
+    "",
+    ...lines,
+    ...(verbs ? ["", verbs] : []),
+    ...(tiers ? ["", tiers] : []),
+  ].join("\n");
+}
+
+// The command line's help rows stand as the one source of the verbs, read once a box. A spawn that fails leaves the part out. [[spec/tickets/the-verbs-need-no-wrapper]]
+function verbsText(box) {
+  if (!box.verbs) {
+    let said = "";
+    try {
+      const ran = box.proc.run(
+        [box.node ?? "node", `${box.method}/src/scripts/cli.js`, "help"],
+        { cwd: box.work },
+      );
+      if (ran.exitCode === 0) said = String(ran.stdout ?? "");
+    } catch {}
+    box.verbs = [...said.matchAll(/^ {2}(\S+)\s+(.+)$/gm)].map((one) => ({
+      name: one[1],
+      says: one[2].trim(),
+    }));
+  }
+  if (!box.verbs.length) return "";
+  return [
+    VERBS_HEADING,
+    "",
+    ...box.verbs.map((one) => `- \`./RUNME.sh ${one.name}\`: ${one.says}`),
+  ].join("\n");
 }
 
 function rulesText(standing) {

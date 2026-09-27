@@ -2,6 +2,15 @@
 // it: an import, a path, a note link and a word in prose.
 // [[spec/design_output/index#a-rename-reaches-a-name]]
 
+import {
+  journalOf,
+  nameOf,
+  FOLDER as UNDONE,
+} from "../../.claude/skills/level0/lib/undo.js";
+import { everyHold } from "./guidance-hand.js";
+
+export const BY = "rename";
+
 // The folders a walk leaves alone, as the findings reader leaves them. [[spec/design_output/index#a-rename-reaches-a-name]]
 const SKIP = new Set([".git", "node_modules", ".se", ".claude-plugin", "bin"]);
 // How far into a file the reader looks for the byte a text file holds nowhere. [[spec/design_output/index#a-rename-reaches-a-name]]
@@ -112,6 +121,7 @@ export function renaming(it, from, to) {
   }
 
   const held = filesUnder(it, source);
+  const journal = movesOf(it, held.length ? held : [source], source, from, to);
   const moved = held.length
     ? held.map((file) => slashed(file.slice(source.length + 1)))
     : [String(to)];
@@ -131,7 +141,53 @@ export function renaming(it, from, to) {
     );
     if (said === text) continue;
     it.disk.write(file, said);
-    wrote.push(slashed(file.slice(it.root.length + 1)));
+    const path = slashed(file.slice(it.root.length + 1));
+    wrote.push(path);
+    const born = journal.get(path);
+    if (born) born.made = said;
+    else journal.set(path, { file: path, was: text, made: said });
   }
+  journals(it, from, to, [...journal.values()]);
   return { moved, wrote, skipped: shortened(it, read.skipped), why: "" };
+}
+
+// Each text file the move carries, as its old path gone and its new path born. A picture's bytes stay out, because the journal holds text. [[spec/tickets/journal-the-rename-verb]]
+function movesOf(it, files, source, from, to) {
+  const out = new Map();
+  for (const file of files) {
+    const text = it.disk.read(file);
+    if (!readsAsText(text)) continue;
+    const under = file === source ? "" : `/${slashed(file.slice(source.length + 1))}`;
+    const was = `${from}${under}`;
+    const now = `${to}${under}`;
+    out.set(was, { file: was, was: text, gone: true });
+    out.set(now, { file: now, made: text, born: true });
+  }
+  return out;
+}
+
+// The entry names the ticket the box's one hold carries, so the pass commit of that ticket stages the move. [[spec/design_output/pull#the-refused-commit]]
+function journals(it, from, to, files) {
+  if (!it.clock || !files.length) return;
+  const stamp = it.clock.stamp();
+  // The move rides the entry, so the commit verb lands the old path where git reads no rename. [[spec/tickets/rename-detection-misses-rewrites]]
+  const entry = {
+    ...journalOf(stamp, `${BY}:${stamp}`, BY, files, heldTicket(it)),
+    moved: { from: String(from), to: String(to) },
+  };
+  it.disk.makeDir(it.join(it.root, ...UNDONE.split("/")));
+  it.disk.write(
+    it.join(it.root, ...UNDONE.split("/"), nameOf(stamp)),
+    `${JSON.stringify(entry, null, 2)}\n`,
+  );
+}
+
+// Several holds name several tickets, and a move belongs to none of them alone. [[spec/tickets/journal-the-rename-verb]]
+function heldTicket(it) {
+  const named = new Set(
+    everyHold(it)
+      .map(({ held }) => String(held?.ticket ?? ""))
+      .filter(Boolean),
+  );
+  return named.size === 1 ? [...named][0] : "";
 }

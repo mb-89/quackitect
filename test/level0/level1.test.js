@@ -5,6 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import * as lib from "../../.claude/skills/level0/lib/pull.js";
+// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
+import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import {
   judgeAsk,
   judgeRefusal,
@@ -13,8 +15,6 @@ import {
   sessionOf,
   spawnPromptIn,
 } from "../../.claude/skills/level0/lib/pull.js";
-// The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
-import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
@@ -334,6 +334,58 @@ test("the pull hook matches the level zero call, and runs the script the method 
   assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
 });
 
+// The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]
+test("the pull tool runs the verb under the harness env the shell verb reads", async () => {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { agentOf } = await import("../../src/scripts/pull-hand-of.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const before = process.env.CLAUDE_CODE_REMOTE;
+  process.env.CLAUDE_CODE_REMOTE = "true";
+  const opts = [];
+  const $ = {
+    process: {
+      run: async (_argv, said) => {
+        opts.push(said);
+        return { stdout: "wait", stderr: "", exitCode: 0 };
+      },
+    },
+  };
+  const read = [];
+  const engine = {
+    ...$,
+    env: {
+      get: async (key) => {
+        read.push(key);
+        return key === "SE_CLOUD" ? "1" : undefined;
+      },
+    },
+  };
+  await handler(engine, {}, async () => null);
+  assert.ok(read.includes("CLAUDE_CODE_REMOTE"), "the key reads through the engine");
+  assert.equal(opts[0]?.env?.SE_CLOUD, "1");
+  opts.length = 0;
+  try {
+    await handler($, {}, async () => null);
+  } finally {
+    if (before === undefined) delete process.env.CLAUDE_CODE_REMOTE;
+    else process.env.CLAUDE_CODE_REMOTE = before;
+  }
+  assert.equal(agentOf(opts[0]?.env), "claude-code-remote");
+  const { HARNESS } = await import("../../src/scripts/pull-hand-of.js");
+  const { HARNESS_KEYS } = await import(
+    "../../.claude/skills/level0/hooks/pull-tool.js"
+  );
+  assert.deepEqual(
+    HARNESS_KEYS,
+    HARNESS.map(([key]) => key),
+    "the copy stands equal",
+  );
+});
+
 // The pull hook over a config, answering whether the judge ran and how often it asked the model. [[spec/tickets/every-road-has-a-caller]]
 async function judgeRuns(config) {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
@@ -373,6 +425,79 @@ async function judgeRuns(config) {
   await handler($, { ticket: "a-child", verdict: "pass" }, async () => null);
   return { judged: ran.some((argv) => argv.includes("--judge")), asked: asked.length };
 }
+
+// The pull hook over a config and a model answering one label and one line, the leaf's ticket apart, so each case keeps its own count. [[spec/tickets/prose-verbs-land-first-try]]
+async function judgeHook(config, { ticket, label, quote }) {
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const calls = [];
+  register((event, ...rest) => {
+    if (event === "tool.call" && rest.length > 1) calls.push(rest);
+  }, {});
+  const [, handler] = calls.find(([one]) => one?.tool === PULL_CALL) ?? [];
+  const material = { ticket, step: "design/draft", evidence: "one\ntwo", rules: RULES };
+  const $ = {
+    fs: { read: async () => JSON.stringify(config) },
+    process: {
+      run: async (argv) => ({
+        stdout: argv.includes("--judge") ? JSON.stringify(material) : "done",
+        stderr: "",
+        exitCode: 0,
+      }),
+    },
+    model: {
+      classify: async () => label,
+      complete: async () => ({ isAnswered: true, text: quote }),
+    },
+  };
+  return async () =>
+    (await handler($, { ticket, verdict: "pass" }, async () => null)).result;
+}
+
+// [[spec/tickets/prose-verbs-land-first-try]]
+test("the judge asks for the line that breaks the rule, and the refusal quotes it", async () => {
+  const ask = judgeAsk("one\ntwo", RULES, "voice-3");
+  assert.match(ask, /voice-3: Put the bottom line first\./);
+  assert.match(ask, /word for word/);
+  assert.match(
+    judgeRefusal("at design/draft, voice-3", "two"),
+    /\n {2}the line: two\n/,
+  );
+
+  const on = { judge: { enabled: true } };
+  const quoted = await judgeHook(on, {
+    ticket: "a-quote",
+    label: "voice-3",
+    quote: "two",
+  });
+  assert.match(await quoted(), /\n {2}the line: two\n/);
+  const loose = await judgeHook(on, {
+    ticket: "a-loose",
+    label: "voice-3",
+    quote: "nowhere",
+  });
+  const said = await loose();
+  assert.match(said, /^refused/);
+  assert.doesNotMatch(said, /nowhere/, "a line the evidence holds nowhere stays out");
+});
+
+// [[spec/tickets/prose-verbs-land-first-try]]
+test("the judge lets a hand-back through past the count of refusals on one leaf", async () => {
+  const { default: config } = await import("../../spec/config/level0.json", {
+    with: { type: "json" },
+  });
+  assert.equal(config.judge.refusalsBeforePass, 3);
+
+  const on = { judge: { enabled: true, refusalsBeforePass: 2 } };
+  const hand = await judgeHook(on, {
+    ticket: "a-count",
+    label: "voice-1",
+    quote: "one",
+  });
+  assert.match(await hand(), /^refused/);
+  assert.match(await hand(), /^refused/);
+  assert.equal(await hand(), "done", "past the count the pull runs");
+  assert.match(await hand(), /^refused/, "the pass clears the count");
+});
 
 // The judge runs where the config turns it on alone. The hook's line waits on the owner, because the hand working the ticket holds no write under .claude. [[spec/tickets/the-judge-waits-on-true]]
 const HOOK_WAITS =

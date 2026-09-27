@@ -4,21 +4,21 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { skip, test } from "node:test";
-import { fakeFront } from "../../src/doors/fake/front.js";
+import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { mintedNote } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { slotFaults } from "../../.claude/skills/level0/lib/schema-route.js";
-import { voiceOver } from "../../src/bridge/findings.js";
+import { REFUSES } from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
-import { proc } from "../../src/doors/proc.js";
+import { fakeFront } from "../../src/doors/fake/front.js";
 import { firstLeaf } from "../../src/engine/group.js";
-import { readTools, whereIs } from "../../src/engine/tools.js";
+import { withoutFalsePast } from "../../src/engine/tense.js";
 import { askRows, processAt } from "../../src/scripts/process.js";
 import { leafOf, stepPathOf } from "../../src/scripts/pull.js";
 import { leavesOf, walkOf } from "../../src/scripts/pull-route.js";
 import { schemasHere } from "../../src/scripts/ticket.js";
+import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -90,48 +90,63 @@ test("the standard route reviews the design once, and its last leaf hands on to 
   );
 });
 
-const vale = whereIs(files, root, "vale", readTools(files, root));
-const ifVale = files.exists(vale) ? test : skip;
+const ruled = rulesIn(root);
 const CLEAN = "A line the voice passes.";
 
-// Every route renders a ticket at its mint, and real Vale reads it the way the verbs read an Ask. A line the route writes carries no finding, so no verb meets the door on its first write. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-ifVale(
-  "a ticket minted off every route under spec/processes draws no finding from the voice rules",
-  () => {
-    const it = { disk: files, proc: proc(), root, join, vale };
-    const names = files
-      .list(join(root, "spec", "processes"))
-      .filter((one) => one.name.endsWith(".yaml"))
-      .map((one) => one.name.replace(/\.yaml$/, ""));
-    assert.ok(names.length > 1, "the tree ships its routes");
-    const found = [];
-    for (const name of names) {
-      const held = processAt(files, root, join, name);
-      const path = `spec/tickets/${name}-rendered.md`;
-      const made = mintedNote(
-        schemasHere(it),
-        {
-          kind: "ticket",
-          path,
-          fields: {
-            state: "open",
-            process: held.link,
-            process_hash: held.hash,
-            steps: held.route,
-            step: firstLeaf(held.route),
-            Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
-          },
+// Every route's minted ticket, declared up front, so one Vale run reads them all. [[spec/design_output/doors#one-contract-test-per-door]]
+const routes = files
+  .list(join(root, "spec", "processes"))
+  .filter((one) => one.name.endsWith(".yaml"))
+  .map((one) => one.name.replace(/\.yaml$/, ""));
+const minted = new Map(
+  routes.map((name) => {
+    const held = processAt(files, root, join, name);
+    const made = mintedNote(
+      schemasHere({ disk: files, root, join }),
+      {
+        kind: "ticket",
+        path: `spec/tickets/${name}-rendered.md`,
+        fields: {
+          state: "open",
+          process: held.link,
+          process_hash: held.hash,
+          steps: held.route,
+          step: firstLeaf(held.route),
+          Ask: [askRows(held.ask), "", CLEAN].join("\n").trim(),
         },
-        fakeFront(),
-      );
-      assert.equal(made.why, undefined, `${name} mints: ${made.why}`);
-      const rows = made.text.split("\n");
-      for (const one of voiceOver(it, path, made.text)) {
-        found.push(`${name}:${one.line} ${one.rule} | ${rows[one.line - 1]}`);
+      },
+      fakeFront(),
+    );
+    return [name, made];
+  }),
+);
+
+// Every route renders a ticket at its mint, and real Vale reads it the way the verbs read an Ask: the rows past the tense reader, at a severity that refuses. A line the route writes carries no finding, so no verb meets the door on its first write. [[spec/design_output/pull#the-voice-reads-the-evidence]]
+ruled.ifVale(
+  "a ticket minted off every route draws no finding from the voice rules, in one Vale run",
+  ruled.proves(
+    Object.fromEntries(
+      routes.map((name) => [
+        name,
+        at(minted.get(name).text ?? "", `spec/tickets/${name}-rendered.md`),
+      ]),
+    ),
+    ({ found, text }) => {
+      assert.ok(routes.length > 1, "the tree ships its routes");
+      const faults = [];
+      for (const name of routes) {
+        const made = minted.get(name);
+        assert.equal(made.why, undefined, `${name} mints: ${made.why}`);
+        const rows = text(name).split("\n");
+        for (const one of withoutFalsePast(text(name), found(name))) {
+          if (!REFUSES.has(one.severity)) continue;
+          faults.push(`${name}:${one.line} ${one.rule} | ${rows[one.line - 1]}`);
+        }
       }
-    }
-    assert.deepEqual(found, [], "a route writes no line the voice refuses");
-  },
+      assert.deepEqual(faults, [], "a route writes no line the voice refuses");
+      assert.equal(ruled.spawned(), 1, "one Vale run reads every route");
+    },
+  ),
 );
 
 const guidanceOf = (name) =>

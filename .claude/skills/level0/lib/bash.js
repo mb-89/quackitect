@@ -4,12 +4,13 @@
 
 import { testIn } from "./bash-test.js";
 import { CODE } from "./code.js";
+import { gitWriteRows } from "./git-writes.js";
 import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
 import { pullCommitsIn } from "./pulled.js";
 import { scriptWrites } from "./scripted.js";
 import { assigned, holdsAName, resolved } from "./shell-values.js";
-import { baseName, BREAKS, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
+import { BREAKS, baseName, clean, READERS, SHELLS, tokensOf } from "./tokens.js";
 import { PROSE } from "./vale.js";
 
 export { tokensOf };
@@ -34,6 +35,8 @@ export const FREE = [
   /(^|\/)node_modules(\/|$)/,
   /^\$\{?(TMPDIR|TMP|TEMP)\b/i,
   /^%(TMP|TEMP)%/i,
+  // The harness scratchpad, under a claude folder of the temp root, which a desk holds outside /tmp. It reads absolute alone, so a tree path of the same shape meets the rules. [[spec/tickets/doors-read-what-commands-do]]
+  /^(?:[A-Za-z]:)?\/(?:[^/]+\/)*claude(?:-[^/]*)?\/[^/]+\/[^/]+\/scratchpad(\/|$)/,
 ];
 
 const PASSES = new Set(["sudo", "env", "command", "nohup", "time", "exec"]);
@@ -291,6 +294,7 @@ export function findings(command, most, it = {}) {
       ]),
     );
   }
+  out.push(...gitWriteRows(said));
   return out;
 }
 
@@ -302,7 +306,8 @@ export function verbLine() {
     "Reach for the verb before the raw command.",
     "Level zero refuses a shell write to a file the rules reach, a commit carrying",
     "no message, a branch name past five words, a test run naming no file, a commit",
-    "whose delta carries something private, and a revert or a reset over a pull commit.",
+    "whose delta carries something private, a revert or a reset over a pull commit,",
+    "and every git command that writes the repository, naming the verb standing for it.",
   ].join(" ");
 }
 
@@ -453,10 +458,11 @@ function landingsAfterGates(command) {
   const { text } = withoutHeredocs(String(command ?? ""));
   const out = [];
   let segment = [];
-  let gate = "";
+  let pipeline = [];
+  let before = { pipeline: [], op: "" };
   const settle = () => {
     const landing = landingOf(segment);
-    if (gate && landing) out.push(landing);
+    if (landing && gatesLoosely(before)) out.push(landing);
   };
   for (const one of tokensOf(text)) {
     if (!(one.op && BREAKS.has(one.text))) {
@@ -464,11 +470,46 @@ function landingsAfterGates(command) {
       continue;
     }
     settle();
-    if (segment.length) gate = GATES.has(one.text) ? one.text : "";
+    if (segment.length) pipeline.push(segment);
+    if (one.text !== "|" && pipeline.length) {
+      before = { pipeline, op: one.text };
+      pipeline = [];
+    }
     segment = [];
   }
   settle();
   return out;
+}
+
+// A read gates nothing, so the landing after it waits on no answer. A gate before `;`, `||` or `&` runs the landing whatever it answers, and so does a gate piped into a read, because the pipe answers its last command. [[spec/tickets/doors-read-what-commands-do]]
+function gatesLoosely({ pipeline, op }) {
+  if (!pipeline.length || pipeline.every(isRead)) return false;
+  if (GATES.has(op)) return true;
+  return op === "&&" && pipeline.length > 1;
+}
+
+// The commands that read and land nothing, so none of them is a gate. [[spec/tickets/doors-read-what-commands-do]]
+const READS = new Set([
+  "cat",
+  "grep",
+  "rg",
+  "ls",
+  "head",
+  "tail",
+  "wc",
+  "cd",
+  "pwd",
+  "echo",
+  "printf",
+  "find",
+]);
+const GIT_READS = new Set(["status", "log", "diff", "show", "branch", "rev-parse"]);
+
+function isRead(segment) {
+  const words = wordsIn(segment);
+  const name = baseName(words[0]);
+  if (name === "git") return GIT_READS.has(afterGit(words)[0]);
+  return READS.has(name);
 }
 
 // What a segment lands, where it lands at all: a ticket pull, a ticket open, a git commit or the commit verb. [[spec/design_output/bash#a-landing-follows-its-gate]]
