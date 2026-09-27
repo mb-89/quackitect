@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 3d1b5e98078a6929cb1e508ff7820d3ae42580a5
+    hash_after: 3d1b5e98078a6929cb1e508ff7820d3ae42580a5
+    inputs:
+      - name: ask
+        hash: 6badf2fef8cc2c49
+        size: 930
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,68 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+On a work branch, `sync` takes the remote's copy of the branch in before trunk, through the merge and the settle trunk already uses.
+
+| part | where | what it does |
+|---|---|---|
+| the own read | `ownIn(it, branch)` in `src/scripts/work-stands.js`, new | runs `git fetch origin <branch>`, then `git rev-list --count HEAD..origin/<branch>`, and answers the count, or zero where the remote holds no such branch |
+| the own merge | the same function | where the count stands above zero, runs `git merge origin/<branch> --no-edit -m "<branch>: take origin/<branch> in"`, and on a refusal hands `settles` the branch, `from` as `origin/<branch>`, the count and the message |
+| the order | `sync` | calls `ownIn` first on a work branch, stops on its answer of 1, prints `<branch> took N commit(s) from origin/<branch>.`, then runs the trunk step as it runs now |
+| the note | `spec/design_output/work.md`, where trunk comes in first | names the own step ahead of trunk |
+
+`settles` already names each file a hand must resolve, and settles a ticket front key by key, so a conflict with the remote stops as a trunk conflict does. A plain merge keeps both sides' commits, and rewrites nothing another hand pushed. On `main`, `sync` stands as it is.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/work.js`, the `sync` verb, which reads `sync(it) === 1`
+- `src/scripts/work-stands.js`, `settles`, which the own merge now calls too
+- the group route's `sync` step, which needs `branch sync`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/work-sync.test.js`, sync on a work branch merges a diverged remote branch and keeps both sides
+- `test/level0/work-sync.test.js`, sync on a work branch leaves the branch alone where the remote carries nothing new
+- `test/level0/work-sync.test.js`, a conflict with the remote branch stops and names the files
+
+The done lines and the case deciding each:
+
+- the diverged merge: the first case
+- nothing new: the second case
+- the conflict: the third case
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/work-stands.js`
+- `test/level0/work-sync.test.js`
+- `spec/design_output/work.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `sync`, `settles`, `unmergedIn` and the `sync` verb in `work.js` stand opened, and each reads as the table says
+- a search for `sync(` over `src/scripts` names the callers
+- each done line names the case deciding it
 
 ## tests-red
 
