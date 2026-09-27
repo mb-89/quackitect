@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -199,7 +199,30 @@ record:
       - name: check
         exit: 1
         said: FAIL
+  - step: implement/tests-green
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 86c96507eed7623d287ac0a8ac2a9fb645ee3128
+    hash_after: 86c96507eed7623d287ac0a8ac2a9fb645ee3128
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 84472a113fb13fb0
+        size: 805
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: the-foundation-closes-its-gaps
+reason: done
 ---
 
 # Ask
