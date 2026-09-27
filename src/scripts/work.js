@@ -64,7 +64,6 @@ import {
   dirty,
   groupStanding,
   ORPHAN,
-  standingAll,
   standingIn,
   standOf,
   sync,
