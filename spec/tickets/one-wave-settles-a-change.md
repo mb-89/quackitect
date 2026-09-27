@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [reads-resolve-in-two-passes, the-scheduler-runs-providers]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: e1570ee30e66cb8eaf3f1bd528694a440c99818b
+    hash_after: e1570ee30e66cb8eaf3f1bd528694a440c99818b
+    inputs:
+      - name: ask
+        hash: b3163d05e98f7004
+        size: 1066
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +168,72 @@ A module fed twice by one change then runs once, off inputs of one settled state
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The scheduler in src/q/scheduler.go settles each change as one wave, per the wave chapter of the model, in place of its mark a provider.
+At start it gives each derived provider a height: 0 with no input, else one past the highest height among the owners of its inputs. A given stands at 0. The cycle fault of the catalog check refuses a start where no height stands.
+The first time an owner moves, it builds that owner's run list, every derived provider downstream sorted by height, and keeps it while the process lives.
+A commit from outside a wave marks the run lists of its moved owners pending at its revision, and starts a wave where none runs. A commit during a wave joins the next one.
+The wave runs lowest height first. A provider runs where an input owner moves in this wave, and clears where none does, which is early cutoff.
+The store gains a quiet run for the wave: it computes the value, compares the hash of its JSON form to the old one, and commits where it moves, with no hand heard. The wave then pushes once, through the hands OnCommit holds.
+A commit from outside reaches the scheduler through a hook of its own on the store, with the names whose JSON form moves, so an equal value starts no wave.
+Demand: every name starts watched. Unwatch drops one, and a provider stays watched while a watched provider stands below it. A wave skips an unwatched provider and keeps it pending, and Scheduler.Read runs its pending upstream and then it, waiting for no write.
+Why reads a hook the scheduler sets on the store, and answers pending since r for a value a wave holds.
+qtest builds a scheduler whose spawn runs in place, so a seed settles its wave before it answers.
+A keyed family stays out of the waves, as the scheduler keeps it today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/scheduler.go: NewScheduler, kick, runs and Settle, which the waves replace
+src/q/store.go: Commit and Run, which gain the quiet run and the move hook
+src/q/why.go: Why, which reads the pending hook
+src/q/qtest/qtest.go: New and Over, which build the scheduler
+src/index/door.go: Serve, which builds the scheduler as it does
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/q/qtest/wave_test.go: TestTheDiamondRunsBOnceAfterA
+src/q/qtest/wave_test.go: TestAChangeDuringAWaveWaitsForTheNext
+src/q/scheduler_test.go: TestASecondChangeReusesTheKeptList
+src/q/scheduler_test.go: TestAnEqualCommitRunsNothingBelow
+src/q/scheduler_test.go: TestAnUnwatchedPendingNameRunsWhenRead
+src/q/scheduler_test.go: TestWhyNamesAPendingValue
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/scheduler.go
+src/q/scheduler_test.go
+src/q/store.go
+src/q/why.go
+src/q/qtest/qtest.go
+src/q/qtest/wave_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened the scheduler, Store.Commit, Store.Run, OnCommit, Why, qtest.New and Over, and the cycle walk, and checked each claim there
+I grepped every caller of NewScheduler, OnCommit and Run, and the callers list names each the change touches
+each done_when line names its case, or the command go test or the check
 
 ## tests-red
 
