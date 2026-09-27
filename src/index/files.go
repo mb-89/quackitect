@@ -34,6 +34,24 @@ func Files(db *sql.DB) ([]Held, error) {
 	return out, rows.Err()
 }
 
+// One path the hashes read, and the size of the head the caller hashed before. [[spec/design_output/pull#an-input-marks-its-steps]]
+type HashAsk struct {
+	Path string `json:"path"`
+	Size int    `json:"size"`
+}
+
+// The hash of a text, its size, and the hash of its head at the size asked. [[spec/design_output/pull#an-input-marks-its-steps]]
+type Hash struct {
+	Hash string `json:"hash"`
+	Size int    `json:"size"`
+	Head string `json:"head"`
+}
+
+// [[spec/design_output/pull#an-input-marks-its-steps]]
+func Hashes(db *sql.DB, asks []HashAsk) (map[string]Hash, error) {
+	return map[string]Hash{}, nil
+}
+
 // The text of each path named, or of every path where none is named. A binary file answers the empty text. [[spec/design_output/index#a-reader-takes-the-tree]]
 func Texts(db *sql.DB, paths []string) (map[string]string, error) {
 	query, args := `SELECT path, text FROM file`, []any{}

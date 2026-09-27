@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-process-stays-editable
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d8cca563b1 · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d9b0d5dfcf · claude-code-remote
     hash_before: faad7c206edabd9c8a3d276f9671f9e12f3eebd8
     hash_after: faad7c206edabd9c8a3d276f9671f9e12f3eebd8
+  - step: implement/tests-red
+    hand: box d7d9b0d5dfcf · claude-code-remote
+    hash_before: 660f728105f49c6e69ce32872b0bcc88cedea573
+    hash_after: 660f728105f49c6e69ce32872b0bcc88cedea573
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -166,20 +174,31 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull-stale.test.js src/index
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- Five engine cases and the Go case fail on their own assertion, and the append case passes against the stub, because it guards against a mark.
+- The input schema admits ask, diff and an earlier step, and no note link. A note link inside an input chapter counts as an input node, and the index hashes it.
+- The front writer drops an empty list, so the def field marks an entry the stale read reads.
+- The CLI doors hold no index, so cli-doors.js gains one.
+- A fake index behaves over the fake disk, so a moved note moves its hash.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the tests touch the files the draft names, plus the fake index
+every door the tests reach runs on a fake, and the index takes one in src/doors/fake/index.js
+the header of each new file links the design section
+the hash stands once in hash.js, and the Go side ports it with a case pinning both to one value
+the two review rows meet the change: the bless hash and the test schema copy
 
 ## change
 

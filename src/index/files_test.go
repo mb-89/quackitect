@@ -72,3 +72,23 @@ func TestTheTextsAnswerThePathsNamedOrEveryPath(t *testing.T) {
 		t.Fatalf("no path named answers every path, and it answers %d", len(every))
 	}
 }
+
+// The hash reads the text as the engine's hashText does, so a note hashed on either side matches. [[spec/design_output/pull#an-input-marks-its-steps]]
+func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
+	db := opened(t, tree(t))
+
+	said, err := Hashes(db, []HashAsk{{Path: "src/plain.js", Size: 10}, {Path: "nowhere.md"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	one, ok := said["src/plain.js"]
+	if !ok || len(said) != 1 {
+		t.Fatalf("the hashes answer the one path standing, and they answer %v", said)
+	}
+	if one.Hash != "8f93e4f24776ff1d" || one.Size != 43 {
+		t.Fatalf("the hash and the size match hashText over the text, and they read %v", one)
+	}
+	if one.Head != "e0ce802675de49b5" {
+		t.Fatalf("the head hashes the first ten units, and it reads %q", one.Head)
+	}
+}
