@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 3f153a2bd6be3e573eb0fd7d3b297599e9cf6423
+    hash_after: 3f153a2bd6be3e573eb0fd7d3b297599e9cf6423
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/ops fails
+    inputs:
+      - name: design/draft
+        hash: 2c23db1c6fc9a5e2
+        size: 4127
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -247,26 +260,31 @@ each done_when line names its test: the three call cases and the wait case decid
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/ops/call_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/ops/call_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion over the stubs: Call answers an empty Answer, so the quick, slow and failing calls read no handle, and the session wait meets no running call. The config case finds watchdog.deadlineOp beside watchdog.deadlineAction. The surprise: nothing runs an action through the book today, since the index answers /v1 reads alone, so Call stands as the first runner, and the slow case holds its git request on a channel the case closes. The cases call q.NewStore(c, nil), which the implement of the-wiring-file-binds-ports drops.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case: the quick, slow and wait cases, the config case for the fold, and the grep for Op() and the check as commands
+the cases run over the memory keep, a moved clock and a fake accept that holds a request on a channel, so no door stands unfaked
 
 # gate
 
