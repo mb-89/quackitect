@@ -26,6 +26,7 @@ const (
 type Write struct {
 	Path string
 	Text string
+	Read string
 }
 
 // The verbs the disk module takes, over forward-slash paths. [[spec/design_output/model#io-modules-and-their-fakes]]

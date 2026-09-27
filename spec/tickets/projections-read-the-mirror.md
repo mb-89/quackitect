@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: d61379a1068636d3ff2368e986bed310d4b6f061
+    hash_after: d61379a1068636d3ff2368e986bed310d4b6f061
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: a55f08634181c2f9
+        size: 4172
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -267,26 +280,31 @@ each done_when line names its test above, or the command `go test ./...` or `./R
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/codec_test.go src/q/projection_test.go src/modules/files/disk_test.go src/quack/codec_test.go src/quack/dump_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/codec_test.go,src/q/projection_test.go,src/modules/files/disk_test.go,src/quack/codec_test.go,src/quack/dump_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion over the stubs. The codec writes nothing back, the projection registers a plain given so its run finds no derived provider, and the restore, the save and the dump answer nothing. The fake disk takes a stale write, the root wires no projection, and the dump path reads empty. The surprise: a module test cannot read the tree, so the round trip over committed files stands in the root, the one package that may.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a case: the round trip in `src/quack/codec_test.go`, the stale write in `disk_test.go`, the restore in `projection_test.go`, and the dump in `dump_test.go`, with the commands deciding the rest
+the disk cases run over the fake disk, and the store cases over a catalog in memory, so every door the cases reach has a fake
 
 # gate
 

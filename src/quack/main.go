@@ -35,6 +35,18 @@ var modules = map[string]ioModule{
 	}},
 }
 
+// A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
+type projection struct {
+	glob      string
+	roundTrip func(body []byte) ([]byte, error)
+}
+
+// [[spec/design_output/model#everything-on-disk-mirrors]]
+func projections() []projection { return nil }
+
+// The file quack dump writes a prefix to. [[spec/design_output/model#everything-on-disk-mirrors]]
+func dumpPath(prefix string) string { return "" }
+
 func main() {
 	starts, err := wired()
 	if err != nil {
