@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: 78d6bc5b0523f970
         size: 6491
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-3
+    hash_before: 327648a9b5bbb64cf75b255f47fb43cbd13b5ea8
+    hash_after: 327648a9b5bbb64cf75b255f47fb43cbd13b5ea8
+    inputs:
+      - name: design/draft
+        hash: 78d6bc5b0523f970
+        size: 6491
+      - name: design/tests-red
+        hash: 9f2faac845a5d98a
+        size: 915
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -339,8 +351,15 @@ the module cases run over an op table in memory and a work loop stepped by hand,
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- manager-waits-on-tickets-module: depends_on omits tickets-becomes-a-module, though the approach takes its topic.go as the base, and both edit src/index/topic.go, src/index/topic_test.go and src/quack/main.go
+- topic-test-loses-both-halves: once both land, TestTheTopicsCommitThroughTheirOwnWriters keeps neither its tickets half nor its ops half, so the implement step drops it or points it at a topic that stands
+- qtest-hands-a-store: the manager cases run over q.NewStore as the clock cases do, since qtest.Index keeps its store unexported, and the ask's qtest line waits on qtest handing an IO module its store
+- index-writes-past-health: the ask names index/ as a registered output, and the approach writes index/health alone
+- draft-test-list-drifts: the draft names the root cases in src/quack/main_test.go and TestAnOperationPastItsWindowLeavesTheStore in manager_test.go, while the red cases stand in src/quack/manager_test.go and no red file holds the window case
+- tick-expiry-takes-a-case: the tick calls Expire, which nothing calls today, so the change adds behaviour past the move and needs a case of its own
 
 # implement
 
