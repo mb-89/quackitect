@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-red
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
@@ -83,6 +83,10 @@ record:
     hand: box d7d70c069f441 · claude-code-remote
     hash_before: 97cf64d82fe5c3d221b61bb2511f50641f372d21
     hash_after: 97cf64d82fe5c3d221b61bb2511f50641f372d21
+  - step: design/review
+    hand: box d7d70c069f441 · claude-code-remote · helper-2
+    hash_before: d59ca81ff3d975bf503d26803866c28fb810546b
+    hash_after: d59ca81ff3d975bf503d26803866c28fb810546b
 ---
 
 # Ask
@@ -180,6 +184,15 @@ The done lines and the test deciding each:
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- tickets-register-in-the-catalog: `tickets/all` registers in `q.Main`, yet `door_test.go` hands `Serve` a `q.New()` catalog, and `Store.Commit` refuses a name its catalog holds no provider of, so the files commit fails. Register it beside `registersFiles`, in the catalog `Serve` takes.
+- the-golden-keys-group-hash: a golden row keys on the ticket's own hash, yet a child's standing reads its group. A take moves the group's record and flips the child's standing while the child's hash stands, so `TestTreeGolden` goes red. Key a child's row on its group's hash too.
+- ask-reading-names-its-differences: the `Ask` row claims the reading of `pull-chapter.js`, yet `readNote` in `schema-read.js` drops every fenced row and `COMMENT` in `pull-route.js` drops a one-row comment alone. Name each difference, so the shadow compare expects it.
+- private-tickets-reach-tickets-all: `contentsOf` reads tracked rows alone, so a `tickets/all` built beside the `files/` rows drops the `.se/tickets` notes the `tickets` verb answers. Build it off the note read `Tickets` runs.
+- the-window-held-override-goes: `Placed` in `src/tui/work/workplaces.go` reads held off the queue place whatever the index answers, a held reading the approach leaves standing against the ask's one held rule.
+- go-test-names-the-root: the done line reads `go test ./...` from the root, and its test runs two folders. Name `go test ./...` itself.
 
 # implement
 
