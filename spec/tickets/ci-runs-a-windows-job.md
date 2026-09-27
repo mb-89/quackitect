@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d598fb92101 · claude-code-remote
+    hash_before: c2d90cce6cc1f76cf1367792ebc9bbc6ad2ea58d
+    hash_after: 485dd1a5a55da77ce6e2f4f1bc6f4a91ee548695
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sqlite-runs-pure-go.md:111:1: Sentence: A sentence holds 25 words. Cut this one in two."
+reason: done
 ---
 
 # Ask
@@ -253,11 +265,15 @@ The one case fails on its first assertion, the matrix line, since the workflow n
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/contract/check-workflow.test.js test/contract/stub.test.js test/contract/vehicle.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -265,11 +281,25 @@ The one case fails on its first assertion, the matrix line, since the workflow n
 
 <!-- the form is text -->
 
+The check workflow runs over a matrix of `ubuntu-latest` and `windows-latest` under `shell: bash`, and each system keys its own cache of the binaries. Run 36282415957 on commit `485dd1a5a` passes on both runners. The first runs showed two faults, each fixed here:
+
+| the fault | the fix |
+|---|---|
+| the vehicle test fetched the Go modules into its fake home, and a runner that is no root fails to remove their read-only cache | `go-modules` joins the wants the vehicle test skips, in `test/contract/fetching.js` |
+| Windows hands the temp folder under its short name, and the shell prints the long one | the disk door's `realOf` takes the native form, and the two shim cases compare against it |
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the workflow and its test, and the files the Windows run names
+- a passing run is a done line, so those files stand inside the ask
+- the disk door's fake keeps its own `realOf`, which reads no short name
+- the workflow and the door line each link this ticket
+- the runner list stands in the workflow alone, and the skip list in `fetching.js` alone
+- the review passes with no rows
 
 # Discussion
 
