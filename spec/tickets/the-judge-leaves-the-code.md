@@ -255,3 +255,5 @@ pass with findings
 <!-- what anybody adds, at any time, on this ticket -->
 
 The `mcp__level0__patch` door writes under `.claude` on a cloud box, and the harness refuses its own Edit tool there alone. A probe under judge-cut-meets-claude-door appends to `lib/marks.js` through the door, and `mcp__level0__undo` puts it back. So the builder writes the cut through the door. A write under `.claude` can still come back refused. There the builder mints a question ticket carrying the owner's commands, per cloud rule 7, and hands back no red check.
+
+The helpers leave in this cut, beside the callers that hold them. The Ask of judge-cut-takes-its-helpers names each, with its cases, and its Discussion adds the answer mark.
