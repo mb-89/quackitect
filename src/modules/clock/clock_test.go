@@ -12,7 +12,7 @@ import (
 func TestTheMinuteMovesOnTick(t *testing.T) {
 	c := q.New()
 	hand := Registers(c)
-	s := q.NewStore(c, nil)
+	s := q.NewStore(c)
 	at := time.Date(2026, 1, 1, 0, 0, 30, 0, time.UTC)
 	fake := NewFake(at)
 	stop := Start(fake, func(values map[string]any) error {

@@ -217,7 +217,7 @@ func TestEveryMoveReachesTheIndex(t *testing.T) {
 func TestRegistersHandsTheWriterOfItsFamily(t *testing.T) {
 	c := q.New()
 	as := Registers(c)
-	store := q.NewStore(c, nil)
+	store := q.NewStore(c)
 	if _, err := store.Commit(0, as, map[string]any{Name("7"): Op{ID: "7"}}); err != nil {
 		t.Fatal(err)
 	}

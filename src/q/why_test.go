@@ -41,7 +41,7 @@ func whyOf(t *testing.T, s *Store, name string) Why {
 
 func TestWhyNamesTheProvidersFileAndLine(t *testing.T) {
 	c, line := whyCatalog()
-	said := whyOf(t, NewStore(c, nil), "t/two")
+	said := whyOf(t, NewStore(c), "t/two")
 	where := fmt.Sprintf("why_test.go:%d", line)
 	if said.Provider.Name != "t/two" || said.Provider.Kind != "derived" || !strings.HasSuffix(said.Provider.Where, where) {
 		t.Fatalf("the provider reads %+v, not %s", said.Provider, where)
@@ -53,7 +53,7 @@ func TestWhyNamesTheProvidersFileAndLine(t *testing.T) {
 
 func TestWhyWalksTheInputsDownToTheGivenNames(t *testing.T) {
 	c, _ := whyCatalog()
-	said := whyOf(t, NewStore(c, nil), "t/four")
+	said := whyOf(t, NewStore(c), "t/four")
 	if len(said.Inputs) != 1 || said.Inputs[0].Field != "Two" || said.Inputs[0].Why.Name != "t/two" {
 		t.Fatalf("t/four reads %+v", said.Inputs)
 	}
@@ -65,7 +65,7 @@ func TestWhyWalksTheInputsDownToTheGivenNames(t *testing.T) {
 
 func TestWhyNamesEveryReader(t *testing.T) {
 	c, _ := whyCatalog()
-	s := NewStore(c, nil)
+	s := NewStore(c)
 	if said := whyOf(t, s, "t/n").Readers; len(said) != 1 || said[0] != "t/two" {
 		t.Fatalf("t/n reads readers %v", said)
 	}
@@ -76,7 +76,7 @@ func TestWhyNamesEveryReader(t *testing.T) {
 
 func TestWhyReadsWhetherTheValueStandsAtItsDefault(t *testing.T) {
 	c, _ := whyCatalog()
-	s := NewStore(c, nil)
+	s := NewStore(c)
 	if said := whyOf(t, s, "t/n"); said.State != "default" || said.Value != 0 {
 		t.Fatalf("t/n reads %v at %s", said.Value, said.State)
 	}
@@ -97,14 +97,14 @@ func TestWhyReadsWhetherTheValueStandsAtItsDefault(t *testing.T) {
 
 func TestWhyAnswersEachKeyOfAFamily(t *testing.T) {
 	c, _ := whyCatalog()
-	if said := whyOf(t, NewStore(c, nil), "f/a"); said.Name != "f/a" || said.Provider.Name != "f/<id>" {
+	if said := whyOf(t, NewStore(c), "f/a"); said.Name != "f/a" || said.Provider.Name != "f/<id>" {
 		t.Fatalf("f/a reads %+v", said)
 	}
 }
 
 func TestWhyOfANameTheCatalogLacksRefuses(t *testing.T) {
 	c, _ := whyCatalog()
-	if _, err := NewStore(c, nil).Why("t/none"); err == nil || !strings.Contains(err.Error(), "t/none") {
+	if _, err := NewStore(c).Why("t/none"); err == nil || !strings.Contains(err.Error(), "t/none") {
 		t.Fatalf("why t/none answers %v", err)
 	}
 }
@@ -121,7 +121,7 @@ func TestWhyAnswersACycleOnce(t *testing.T) {
 	c := New()
 	DerivedIn(c, "c/x", 0, func(in yOf) int { return in.Y })
 	DerivedIn(c, "c/y", 0, func(in xOf) int { return in.X })
-	said := whyOf(t, NewStore(c, nil), "c/x")
+	said := whyOf(t, NewStore(c), "c/x")
 	back := said.Inputs[0].Why.Inputs
 	if len(back) != 1 || back[0].Why.Name != "c/x" || len(back[0].Why.Inputs) != 0 {
 		t.Fatalf("the walk reads %+v", said.Inputs)

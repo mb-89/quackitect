@@ -18,7 +18,7 @@ const (
 	patience = 2 * time.Second
 )
 
-// A store holding t/read, one request, and t/save, two.
+// A store holding t/read, one request, and t/save, two. [[spec/design_output/model#a-caller-sets-its-wait]]
 func actions() *q.Store {
 	c := q.New()
 	q.ActionIn(c, "t/read", func(path string) []q.Request {
@@ -30,10 +30,10 @@ func actions() *q.Store {
 			{Module: "git", Verb: "commit", Args: path, NoUndo: "a case"},
 		}
 	}, q.Deadline(time.Minute), q.Writes())
-	return q.NewStore(c, nil)
+	return q.NewStore(c)
 }
 
-// Answers the disk at once and holds git until the case lets it go.
+// Answers the disk at once and holds git until the case lets it go. [[spec/design_output/model#a-caller-sets-its-wait]]
 func held(gate chan struct{}) func(q.Request) (any, error) {
 	return func(one q.Request) (any, error) {
 		if one.Module == "git" {

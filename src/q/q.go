@@ -33,7 +33,6 @@ type registration struct {
 	typ      reflect.Type
 	def      any
 	missing  bool
-	alt      string
 	doc      string
 	deadline time.Duration
 	op       bool
@@ -85,7 +84,6 @@ func New() *Catalog { return &Catalog{} }
 type Option func(*registration)
 
 func Doc(text string) Option             { return func(one *registration) { one.doc = text } }
-func Alt(name string) Option             { return func(one *registration) { one.alt = name } }
 func Deadline(span time.Duration) Option { return func(one *registration) { one.deadline = span } }
 
 // An action declares its writes; the Op option stands until every call takes a record and a wait. [[spec/design_output/model#a-caller-sets-its-wait]]
@@ -159,7 +157,7 @@ func givenOf[T any](name string, def T) *registration {
 	return &registration{name: name, kind: given, typ: typeOf[T](), def: def, missing: missing(def)}
 }
 
-// Each field tagged q:"<name>" reads that name off the snapshot. [[spec/design_output/model#snapshots-and-revisions]]
+// Each field tagged q:"<name>" reads that name off the snapshot. The run reads the registration's inputs, so the name the wiring binds reaches it. [[spec/tickets/the-wiring-file-binds-ports]]
 func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration {
 	inType := typeOf[In]()
 	var inputs []input
@@ -171,17 +169,18 @@ func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration
 			}
 		}
 	}
-	run := func(snap Snapshot) any {
+	one := &registration{name: name, kind: derived, typ: typeOf[Out](), def: def, missing: missing(def), inputs: inputs}
+	one.run = func(snap Snapshot) any {
 		filled := reflect.New(inType).Elem()
-		for _, one := range inputs {
-			value := reflect.ValueOf(snap.Read(one.name))
-			if value.IsValid() && value.Type().AssignableTo(one.typ) {
-				filled.FieldByName(one.field).Set(value)
+		for _, in := range one.inputs {
+			value := reflect.ValueOf(snap.Read(in.name))
+			if value.IsValid() && value.Type().AssignableTo(in.typ) {
+				filled.FieldByName(in.field).Set(value)
 			}
 		}
 		return fn(filled.Interface().(In))
 	}
-	return &registration{name: name, kind: derived, typ: typeOf[Out](), def: def, missing: missing(def), inputs: inputs, run: run}
+	return one
 }
 
 func foldOf[S, E any](name string, def S, step func(S, E) S) *registration {

@@ -130,7 +130,7 @@ func TestPathTakesTheTwoFoldersAlone(t *testing.T) {
 func TestRegistersTakeTheCatalogServeTakes(t *testing.T) {
 	catalog := q.New()
 	all := Registers(catalog)
-	store := q.NewStore(catalog, nil)
+	store := q.NewStore(catalog)
 	if _, err := store.Commit(0, all, map[string]any{AllName: []Ticket{{Name: "one"}}}); err != nil {
 		t.Fatal(err)
 	}

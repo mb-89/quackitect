@@ -3,10 +3,23 @@
 // [[spec/design_output/model#the-wiring-file]]
 package q
 
+import (
+	"fmt"
+	"strings"
+
+	"quackitect/src/yaml"
+)
+
 // The mark a wire carries where an in-port reads its built-in value. [[spec/design_output/model#the-wiring-file]]
 const BuiltIn = "built-in"
 
-const Unwired Kind = "an in-port with no wire"
+// The file the index reads the wiring from, which a fault of the wiring names. [[spec/tickets/the-wiring-file-binds-ports]]
+const WiringFile = "spec/wiring.yaml"
+
+const (
+	Unwired Kind = "an in-port with no wire"
+	NoType  Kind = "an instance of a module type nobody registers"
+)
 
 type Instance struct {
 	Name   string
@@ -19,14 +32,104 @@ type Wiring struct {
 	Wires     map[string]string
 }
 
-// [[spec/design_output/model#the-wiring-file]]
+// Instances stand as a block map of `<instance>:` over `module: <type>`, since src/yaml reads no flow map. [[spec/tickets/the-wiring-file-binds-ports]]
 func ReadWiring(text string) (Wiring, error) {
-	return Wiring{}, nil
+	doc := yaml.AsDoc(yaml.Read(text))
+	if doc == nil {
+		return Wiring{}, fmt.Errorf("%s reads no map", WiringFile)
+	}
+	w := Wiring{Wires: map[string]string{}}
+	instances := yaml.AsDoc(doc.Get("instances"))
+	for _, name := range instances.Keys() {
+		module := yaml.AsString(yaml.AsDoc(instances.Get(name)).Get("module"))
+		if module == "" {
+			return Wiring{}, fmt.Errorf("%s: the instance %s names no module", WiringFile, name)
+		}
+		w.Instances = append(w.Instances, Instance{Name: name, Module: module})
+	}
+	wires := yaml.AsDoc(doc.Get("wires"))
+	for _, port := range wires.Keys() {
+		to := yaml.AsString(wires.Get(port))
+		if to == "" {
+			return Wiring{}, fmt.Errorf("%s: the wire of %s names nothing", WiringFile, port)
+		}
+		w.Wires[port] = to
+	}
+	return w, nil
 }
 
-// [[spec/design_output/model#the-wiring-file]]
+// Each instance registers on a catalog of its own, and Load renames its registrations in place, so every Writer a module holds stays valid. It answers every fault at once. [[spec/tickets/the-wiring-file-binds-ports]]
 func Load(w Wiring, types map[string]func(*Catalog)) (*Catalog, []Fault) {
-	return New(), nil
+	type loaded struct {
+		instance string
+		regs     []*registration
+	}
+	var faults []Fault
+	var all []loaded
+	writers := map[string]string{}
+	for _, one := range w.Instances {
+		register, ok := types[one.Module]
+		if !ok {
+			faults = append(faults, Fault{Kind: NoType, Name: one.Name, Where: []string{WiringFile}, Says: fmt.Sprintf("the module type %s registers nowhere", one.Module)})
+			continue
+		}
+		local := New()
+		register(local)
+		regs := local.all()
+		for _, reg := range regs {
+			port := one.Name + "." + reg.name
+			reg.name = outName(w, one.Name, reg.name)
+			writers[port] = reg.name
+		}
+		all = append(all, loaded{one.Name, regs})
+	}
+	c := New()
+	for _, each := range all {
+		for _, reg := range each.regs {
+			faults = append(faults, bind(w, each.instance, reg, writers)...)
+		}
+		c.regs = append(c.regs, each.regs...)
+	}
+	return c, faults
+}
+
+// An out-port takes the standard name its wire names, and otherwise `<instance>/<port>`, a family port keeping its key segments. A config key stands under `<instance>/config/<key>`. [[spec/tickets/the-wiring-file-binds-ports]]
+func outName(w Wiring, instance, port string) string {
+	if to, ok := w.Wires[instance+"."+port]; ok && !strings.HasPrefix(port, "config/") && to != BuiltIn && !strings.Contains(to, ".") {
+		return to
+	}
+	return instance + "/" + port
+}
+
+// An in-port takes its wire: a standard name, the name of the writer a port-to-port wire names, or no read under BuiltIn, where the field keeps its zero value. [[spec/tickets/the-wiring-file-binds-ports]]
+func bind(w Wiring, instance string, reg *registration, writers map[string]string) []Fault {
+	var faults []Fault
+	kept := reg.inputs[:0]
+	for _, in := range reg.inputs {
+		port := instance + "." + in.name
+		to, wired := w.Wires[port]
+		switch {
+		case strings.HasPrefix(in.name, "config/"):
+			in.name = instance + "/" + in.name
+		case !wired:
+			faults = append(faults, Fault{Kind: Unwired, Name: reg.name, Where: []string{reg.where}, Says: fmt.Sprintf("field %s reads %s, which %s wires nowhere", in.field, port, WiringFile)})
+			continue
+		case to == BuiltIn:
+			continue
+		case strings.Contains(to, "."):
+			name, ok := writers[to]
+			if !ok {
+				faults = append(faults, Fault{Kind: Unwired, Name: reg.name, Where: []string{reg.where}, Says: fmt.Sprintf("field %s reads %s, whose wire names %s, a port no instance writes", in.field, port, to)})
+				continue
+			}
+			in.name = name
+		default:
+			in.name = to
+		}
+		kept = append(kept, in)
+	}
+	reg.inputs = kept
+	return faults
 }
 
 // A config key by its local name, which the wiring files under `<instance>/config/<key>`. [[spec/design_output/model#config-comes-off-the-registrations]]

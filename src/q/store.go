@@ -33,15 +33,9 @@ type Snapshot struct {
 	store    *Store
 }
 
-func NewStore(c *Catalog, keys map[string]string) *Store {
+func NewStore(c *Catalog) *Store {
 	groups := byName(c.all())
-	active := map[string]*registration{}
-	for _, group := range groups {
-		if chosen, fault := pick(group, keys); fault == nil {
-			active[group.name] = chosen
-		}
-	}
-	return &Store{groups: groups, active: active, values: map[string]cell{}}
+	return &Store{groups: groups, active: activeOf(groups), values: map[string]cell{}}
 }
 
 func (s *Store) owner(name string) *registration {

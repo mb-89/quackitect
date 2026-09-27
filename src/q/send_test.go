@@ -12,7 +12,7 @@ func sender(t *testing.T, requests func(string) []Request) *Store {
 	t.Helper()
 	c := New()
 	ActionIn(c, "t/save", requests)
-	return NewStore(c, nil)
+	return NewStore(c)
 }
 
 func TestSendRunsTheRequestsInOrderAndFollowsThen(t *testing.T) {

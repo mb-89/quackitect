@@ -23,10 +23,10 @@ func dogOf(t *testing.T, settings Settings, register func(*q.Catalog)) (*Dog, *q
 	if register != nil {
 		register(c)
 	}
-	if faults := c.Check(nil); len(faults) > 0 {
+	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
-	store := q.NewStore(c, nil)
+	store := q.NewStore(c)
 	now := &clock{now: time.Unix(1_700_000_000, 0)}
 	return New(now.Now, store, as, settings), store, now
 }

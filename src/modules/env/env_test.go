@@ -11,7 +11,7 @@ import (
 func TestEnvWritesEachVariableAtStart(t *testing.T) {
 	c := q.New()
 	hand := Registers(c)
-	s := q.NewStore(c, nil)
+	s := q.NewStore(c)
 	err := Start(FakeEnv{"SE_ROLE": "cloud", "HOME": "/root"}, func(values map[string]any) error {
 		_, err := s.Commit(s.Snapshot().Revision, hand, values)
 		return err

@@ -1,0 +1,5 @@
+# The instances the index loads, and the wire binding each port to a name.
+# io-modules-own-their-names wires the first instances.
+# [[spec/design_output/model#the-wiring-file]]
+instances:
+wires:

@@ -86,7 +86,7 @@ func TestV1WritesItsOpenAPIDocument(t *testing.T) {
 func TestV1ReadsAStaleName(t *testing.T) {
 	c := q.New()
 	q.GivenIn(c, "t/n", 0)
-	store := q.NewStore(c, nil)
+	store := q.NewStore(c)
 	since := time.Unix(1_700_000_000, 0)
 	if err := store.Stale("t/n", since); err != nil {
 		t.Fatal(err)

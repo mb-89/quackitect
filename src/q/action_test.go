@@ -9,7 +9,7 @@ func TestAnActionAnswersItsRequests(t *testing.T) {
 	ActionIn(c, "t/save", func(path string) []Request {
 		return []Request{{Module: "disk", Verb: "write", Args: path, NoUndo: "a case"}}
 	})
-	s := NewStore(c, nil)
+	s := NewStore(c)
 	asked, err := s.Act("t/save", "a.md")
 	if err != nil {
 		t.Fatal(err)

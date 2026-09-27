@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: c7cf080aaa594786
         size: 1024
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: b77f51fe02a4ba1dad21bb1342063f186aaf2ab9
+    hash_after: b77f51fe02a4ba1dad21bb1342063f186aaf2ab9
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -329,14 +338,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change reaches past the size list in src/q/why.go, which drops Provider.Alt with the alt option, in six test files the dropped keys argument of NewStore and Check forces to compile, and in src/q/qtest/qtest_test.go, whose new case proves Over asks for no provider key; the ask names the providers keys leaving, so each stands inside it
+no door is new: Load registers modules on a catalog of their own, and the wiring tests plant their own module types in place of any door
+comments on ReadWiring, Load, outName and bind in src/q/wiring.go and on NoModule in src/imports/imports.go point at the wiring file chapter of the model and at this ticket
+the wiring file format stands in spec/design_output/model.md alone, and spec/wiring.yaml points at it in its header
 
 ## tests-green
 

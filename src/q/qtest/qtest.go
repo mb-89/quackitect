@@ -33,10 +33,10 @@ func New(t testing.TB, register func(*q.Catalog)) *Index {
 // Drives a catalog another hand filled, the real index's among them, through the same steps as the fake. [[spec/design_output/model#the-fake-keeps-a-contract]]
 func Over(t testing.TB, c *q.Catalog, inputs q.Writer) *Index {
 	t.Helper()
-	if faults := c.Check(nil); len(faults) > 0 {
+	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
-	one := &Index{t: t, store: q.NewStore(c, nil), inputs: inputs}
+	one := &Index{t: t, store: q.NewStore(c), inputs: inputs}
 	one.store.OnCommit(func(values map[string]any) { one.commits = append(one.commits, values) })
 	return one
 }

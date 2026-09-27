@@ -84,7 +84,7 @@ func (h heldOps) All() ([]ops.Op, error) {
 func TestAnOperationPastItsWindowLeavesTheStore(t *testing.T) {
 	c := q.New()
 	one := &door{writers: registersTopics(c)}
-	one.store = q.NewStore(c, nil)
+	one.store = q.NewStore(c)
 	now := time.Unix(0, 0)
 	book, err := ops.New(func() time.Time { return now }, heldOps{}, ops.Settings{Done: time.Minute, Failed: time.Minute})
 	if err != nil {
@@ -115,7 +115,7 @@ func TestAnOperationPastItsWindowLeavesTheStore(t *testing.T) {
 func TestASweepWithNoBookDropsNothing(t *testing.T) {
 	c := q.New()
 	one := &door{writers: registersTopics(c)}
-	one.store = q.NewStore(c, nil)
+	one.store = q.NewStore(c)
 	before := one.store.Snapshot().Revision
 	one.sweepsOps()
 	if after := one.store.Snapshot().Revision; after != before {

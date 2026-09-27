@@ -26,3 +26,15 @@ func TestADerivedProviderReadsASeededFile(t *testing.T) {
 		t.Fatalf("t/lines reads %v", got)
 	}
 }
+
+// Over drives a catalog another hand fills, and asks for no provider key, since the wiring file picks a module in place of a key. [[spec/tickets/the-wiring-file-binds-ports]]
+func TestOverDrivesACatalogWithNoProviderKeys(t *testing.T) {
+	c := q.New()
+	inputs := q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
+	q.DerivedIn(c, "t/lines", 0, func(in linesOf) int { return strings.Count(in.File.Text, "\n") })
+	fake := Over(t, c, inputs)
+	fake.Seed(map[string]any{"files/a.md": q.Content{Hash: "h", Text: "one\n"}})
+	if got := fake.Run("t/lines"); got != 1 {
+		t.Fatalf("t/lines reads %v", got)
+	}
+}

@@ -123,7 +123,7 @@ func TestPublishesTickets(t *testing.T) {
 func TestTheTopicsCommitThroughTheirOwnWriters(t *testing.T) {
 	catalog := q.New()
 	as := registersTopics(catalog)
-	store := q.NewStore(catalog, nil)
+	store := q.NewStore(catalog)
 	both := map[string]any{filesPrefix + "a.md": q.Content{Text: "a"}, tickets.AllName: []tickets.Ticket{}}
 	if _, err := store.Commit(0, q.Join(as.files, as.tickets), both); err != nil {
 		t.Fatal(err)

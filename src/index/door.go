@@ -145,8 +145,8 @@ func trackedIn(root string) func(rel string) bool {
 func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	topics := registersTopics(catalog)
 	watchdog.Registers(catalog)
-	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-index-resolves-in-passes]]
-	if faults := catalog.Check(nil); len(faults) > 0 {
+	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
+	if faults := catalog.Check(); len(faults) > 0 {
 		said := make([]string, 0, len(faults))
 		for _, one := range faults {
 			said = append(said, one.String())
@@ -165,7 +165,7 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
-	one.store, one.writers, one.published = q.NewStore(catalog, nil), topics, map[string]bool{}
+	one.store, one.writers, one.published = q.NewStore(catalog), topics, map[string]bool{}
 	if err := one.opensBook(); err != nil {
 		db.Close()
 		return nil, nil, err

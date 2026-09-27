@@ -23,7 +23,6 @@ type Why struct {
 type Provider struct {
 	Name  string `json:"name"`
 	Kind  string `json:"kind"`
-	Alt   string `json:"alt,omitempty"`
 	Where string `json:"where"`
 }
 
@@ -54,7 +53,7 @@ func (s *Store) why(snap Snapshot, name string, seen map[string]bool) Why {
 		Name:     name,
 		Value:    snap.Read(name),
 		State:    "default",
-		Provider: Provider{Name: one.name, Kind: kinds[one.kind], Alt: one.alt, Where: one.where},
+		Provider: Provider{Name: one.name, Kind: kinds[one.kind], Where: one.where},
 		Readers:  s.readersOf(one),
 	}
 	if _, ok := snap.values[name]; ok {

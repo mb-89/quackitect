@@ -15,7 +15,7 @@ func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 	q.ActionIn(c, "t/save", func(one Write) []q.Request {
 		return []q.Request{{Module: "disk", Verb: "write", Args: one, Undo: &q.Request{Module: "disk", Verb: "remove", Args: one.Path}}}
 	})
-	s := q.NewStore(c, nil)
+	s := q.NewStore(c)
 	disk := NewFakeDisk()
 	stop, err := Start(NewFakeWatchOver(disk), func(values map[string]any) error {
 		_, err := s.Commit(s.Snapshot().Revision, hand, values)
@@ -36,7 +36,7 @@ func TestADiskWriteComesBackThroughWatch(t *testing.T) {
 func TestAPushedChangeReachesTheFamily(t *testing.T) {
 	c := q.New()
 	hand := Registers(c)
-	s := q.NewStore(c, nil)
+	s := q.NewStore(c)
 	watch := NewFakeWatch()
 	stop, err := Start(watch, func(values map[string]any) error {
 		_, err := s.Commit(s.Snapshot().Revision, hand, values)

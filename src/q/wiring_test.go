@@ -13,7 +13,7 @@ type weightOf struct {
 	Weight int `q:"config/weight"`
 }
 
-// Loads the wiring, and answers the store and the writer each instance's given port hands back.
+// Loads the wiring, and answers the store and the writer each instance's given port hands back. [[spec/design_output/model#the-wiring-file]]
 func loaded(t *testing.T, w Wiring, types map[string]func(*Catalog, map[string]Writer), instance ...string) (*Store, map[string]Writer) {
 	t.Helper()
 	hands := map[string]Writer{}
@@ -25,10 +25,10 @@ func loaded(t *testing.T, w Wiring, types map[string]func(*Catalog, map[string]W
 	if len(faults) > 0 {
 		t.Fatalf("the load refuses: %v", faults)
 	}
-	if faults := c.Check(nil); len(faults) > 0 {
+	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
-	return NewStore(c, nil), hands
+	return NewStore(c), hands
 }
 
 func seed(t *testing.T, s *Store, hand Writer, name string, value any) {
