@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -185,6 +185,18 @@ record:
         hash: f134a7899a5eeb1c
         size: 3048
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 54c0cfa924ddefbc4a513e65ea9228cc9fb9cfdf
+    hash_after: 54c0cfa924ddefbc4a513e65ea9228cc9fb9cfdf
+    inputs:
+      - name: design/draft
+        hash: f134a7899a5eeb1c
+        size: 3048
+      - name: design/tests-red
+        hash: 08402033f055fd7e
+        size: 610
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -337,8 +349,9 @@ The test reads the real skill files through the disk door, so FakeDoorsInTest pu
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 # implement
 
