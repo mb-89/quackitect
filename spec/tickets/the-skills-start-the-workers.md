@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [dispatch-writes-the-bundles]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -197,6 +197,15 @@ record:
         hash: 08402033f055fd7e
         size: 610
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 740a70cc04ef7abe6adf3287c4cd4050bfbaf480
+    hash_after: f2cc4cb50efaa28a6e639fb56f376fb4cd379c9a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -362,14 +371,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint .claude/skills/dispatch/SKILL.md .claude/skills/work/SKILL.md spec/guidance/cloud/cloud.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four files the size list names
+- the skills reach no door, and the contract test reads the real disk as its folder allows
+- each skill links the design input or the guidance it carries out
+- the road stands once in each skill, and rule 2 of the cloud guidance points at the work skill
 
 ## tests-green
 
