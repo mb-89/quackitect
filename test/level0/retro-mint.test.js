@@ -8,7 +8,12 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { faultsOf } from "../../src/engine/retro/classes.js";
-import { askOf, mintFaults, promotionName, withAsk } from "../../src/engine/retro/mint.js";
+import {
+  askOf,
+  mintFaults,
+  promotionName,
+  withAsk,
+} from "../../src/engine/retro/mint.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";
@@ -34,6 +39,7 @@ const CLASS = {
   status: "open",
   ticket: {
     name: "the-land-verb-lands",
+    process: "standard",
     gain: "a commit lands in one call",
     breaks: "every commit costs a round of refusals",
     done_when: ["./RUNME.sh land answers 0 over a clean tree"],
@@ -154,7 +160,12 @@ test("a promotion carrying no ticket mints nothing, and the verb names it by its
   const promotions = [
     { what: "the land rule", from: "memory", to: "spec/guidance/working" },
     { what: "", from: "memory", to: "spec/guidance/voice" },
-    { what: "a rule minted already", from: "memory", to: "spec/guidance/retro", tickets: ["the-land-verb-lands"] },
+    {
+      what: "a rule minted already",
+      from: "memory",
+      to: "spec/guidance/retro",
+      tickets: ["the-land-verb-lands"],
+    },
   ];
   const { code, said } = heard(() =>
     retro(ROOT, ["mint", RETRO], doors([FIXED], promotions)),
@@ -167,7 +178,10 @@ test("a promotion carrying no ticket mints nothing, and the verb names it by its
 });
 
 test("a promotion's name reads its what, and its place where the what stands empty", () => {
-  assert.equal(promotionName({ what: " the land rule " }, 0), 'promotion "the land rule"');
+  assert.equal(
+    promotionName({ what: " the land rule " }, 0),
+    'promotion "the land rule"',
+  );
   assert.equal(promotionName({}, 2), "promotion 3");
 });
 
@@ -176,7 +190,9 @@ test("a promotion's ticket stands checked by the mint alone, and classes read it
   const record = {
     classes: [],
     dispositions: {},
-    promotions: [{ what: "the land rule", from: "memory", to: "spec/guidance/working" }],
+    promotions: [
+      { what: "the land rule", from: "memory", to: "spec/guidance/working" },
+    ],
     limits: [],
     checklist: [],
   };
@@ -192,6 +208,7 @@ test("every promotion mints one ticket with its ask, after the classes", () => {
     to: "spec/guidance/working",
     ticket: {
       name: "the-rule-lands",
+      process: "trivial",
       gain: "the owner states the rule once",
       breaks: "the owner repeats the rule the next day",
       done_when: ["spec/guidance/working holds the rule"],
