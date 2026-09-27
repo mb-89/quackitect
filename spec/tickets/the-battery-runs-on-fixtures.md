@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-verbs-land-whole
 steps:
   - name: design
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+  - step: implement/tests-green
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 00b5db2318c03b694f8598b7aaf0beed6a1339f6
+    hash_after: 00b5db2318c03b694f8598b7aaf0beed6a1339f6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 19 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-verbs-need-no-wrapper.md:184:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+reason: done
 ---
 
 # Ask
@@ -267,7 +279,7 @@ The bundle case fails on its claim that the script lands in the temp folder, bec
 <!-- the form is checklist -->
 
 - The change touches `src/scripts/bundle.js` alone, which the ask's drawing-bundle line names.
-- The change reaches the disk through esbuild as before, and the contract case drives it for real.
+- The change reaches the disk through the bundler as before, and the contract case drives it for real.
 - The comment over `bundle` links this ticket, whose approach item 4 it implements.
 - `ENTRY` and `OUT` stay the one place the drawing's paths stand, as the defaults.
 - The review's one finding stands fixed on the ask.
@@ -282,11 +294,15 @@ The bundle case fails on its claim that the script lands in the temp folder, bec
 
 <!-- the form is command -->
 
+    ./RUNME.sh test test/contract/vehicle.test.js test/contract/process.test.js test/contract/cli-verbs.test.js test/contract/drawing-bundle.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -294,11 +310,19 @@ The bundle case fails on its claim that the script lands in the temp folder, bec
 
 <!-- the form is text -->
 
+Four slow cases now prove their step over a fixture. The vehicle case produces off a small root and reads the roots `rootsHere` answers. The route case reads every minted ticket in one Vale run. The test verb case reads its row as text. The bundle case bundles a stub entry into a temp folder, through the entry and out `bundle` now takes. The `slowest` list in `.se/.runtime/check.json` names none of the four. The three Vale files the owner keeps lead it, for the reason approach item 7 names. `drawing-page.test.js` now bundles the real drawing in its `before`, the risk the approach names, and a fresh install leaves that bundle current.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The change touches the four test files and `src/scripts/bundle.js`, each of which the ask names.
+- The change reaches no new door. The bundle case drives the bundler for real, in `test/contract`.
+- The comment over `bundle` links this ticket, and each case links the design note it follows.
+- `ENTRY` and `OUT` stay the one place the drawing's paths stand.
+- The review's one finding stands fixed on the ask, and the check exits 0 with its `slowest` list read.
 
 # Discussion
 
