@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [each-thing-stands-in-place, the-gates-read-the-state, the-owners-word-reaches-work, the-servers-and-views-hold, the-verbs-land-whole]
-step: split
+step: children
 record:
   - step: sync
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -92,6 +92,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-engine-holds-the-route already carries every commit on main.
+  - step: split
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: b7d315446b960a9e71c26a4b0daa4cb04d4f4946
+    hash_after: e0508228bae46ba264124c6e2159da80ed35cdc8
 ---
 
 # Ask
@@ -116,14 +120,28 @@ A hand meets one step at a time. The engine holds the route, writes the ticket f
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[a-pull-hands-one-step]] standard
+[[a-gate-reviews-and-fixes]] standard
+[[the-last-gate-accepts]] standard
+[[the-judge-leaves-the-code]] standard
+[[answer-mark-loses-its-reader]] trivial
+[[judge-cut-clears-the-checks]] trivial
+[[judge-cut-meets-claude-door]] trivial
+[[judge-pointers-leave-other-notes]] trivial
+[[first-accept-names-its-base]] trivial, became the-last-gate-accepts
+[[judge-cut-takes-its-helpers]] trivial, became the-judge-leaves-the-code
+[[a-gate-names-its-question]] trivial, new
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each child is a standard or trivial ticket, and the new one touches pull-chapter.js and its test alone
+The loop sits with a-pull-hands-one-step, Gates with a-gate-reviews-and-fixes, the-judge-leaves-the-code and a-gate-names-its-question, The final acceptance with the-last-gate-accepts; the gate commit line of Gates sits with a-moved-input-marks-steps, which owns the stale marking
+a-gate-names-its-question waits on no open ticket, since every other child stands closed
 
 # children
 
