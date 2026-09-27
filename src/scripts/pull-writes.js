@@ -19,6 +19,7 @@ import {
 import { dropHold } from "./guidance-hand.js";
 import { processAt } from "./process.js";
 import { asksBless } from "./pull-bless.js";
+import { defOf, inputsOf } from "./pull-stale.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed, unlandedRows } from "./pull-landed.js";
 import { childrenSay, handOut, ticketsHere, withPersonStep } from "./pull-hand.js";
@@ -41,6 +42,9 @@ export function passed(it, who, one, leaf, held, answered, more = {}) {
       hash_before: held.hash,
       hash_after: tip,
       answered,
+      // [[spec/design_output/pull#an-input-marks-its-steps]]
+      inputs: inputsOf(it, one.text, leaf),
+      def: defOf(it, one.text, leaf),
     },
     it.front,
   );

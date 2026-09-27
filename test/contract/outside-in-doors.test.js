@@ -152,3 +152,9 @@ test("the hand a root builds carries the pid and the node path", () => {
   assert.equal(typeof it.node, "string");
   assert.ok(it.node.length > 0);
 });
+
+// The stale read asks the index for the hash of a note, so the hand a root builds carries the index door. [[spec/design_output/pull#an-input-marks-its-steps]]
+test("the hand a root builds carries an index door that answers a question", () => {
+  assert.equal(typeof it.index?.ask, "function");
+  assert.equal(typeof it.index?.dead, "function");
+});

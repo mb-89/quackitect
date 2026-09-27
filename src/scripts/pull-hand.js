@@ -31,7 +31,7 @@ import { dueHandOut } from "./ephemeral-pull.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
 import { acceptWaits } from "./pull-accept.js";
-import { blessHolds, blessWait } from "./pull-bless.js";
+import { blessWait, readAgain } from "./pull-bless.js";
 import { cleanupOf } from "./pull-cleanup.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landedAlone } from "./pull-landed.js";
@@ -294,7 +294,7 @@ export function offer(it, who, one, all) {
       : dependsOn(one.front).filter((dep) => !closedHere(it, all, dep));
   if (open.length) return { why: `waits for ${open.join(", ")}` };
 
-  const moved = advanced(it, blessHolds(it, one), all);
+  const moved = advanced(it, readAgain(it, one), all);
   if (moved.why) return { why: moved.why };
   if (!moved.leaf) return {};
   const why = (moved.leaf.final && acceptWaits(one, all)) || blessWait(one, moved.leaf);

@@ -303,12 +303,19 @@ test("a pass writes the record, moves the step, commits by ticket and step, push
   const now = disk.read(at("spec/tickets/a-child.md"));
   assert.equal(fieldOf(now, "step"), "design/review");
   assert.equal(fieldOf(now, "state"), "open");
-  assert.deepEqual(recordIn(now).at(-1), {
+  const { def, ...entry } = recordIn(now).at(-1);
+  assert.deepEqual(entry, {
     step: "design/draft",
     hand: HAND,
     hash_before: SHA,
     hash_after: SHA,
   });
+  // [[spec/design_output/pull#an-input-marks-its-steps]]
+  assert.match(
+    String(def),
+    /^[0-9a-f]{16}$/,
+    "the entry carries its definition's hash",
+  );
   assert.ok(ranGit(outside).includes("git add -A"));
   assert.ok(ranGit(outside).includes("git commit -m a-child: passes design/draft"));
   assert.ok(ranGit(outside).includes(`git push origin ${BRANCH}`));

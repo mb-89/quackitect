@@ -242,6 +242,39 @@ frontmatter:
             type: string
             description: the reason the pull passes it over
 
+          blessed:
+            type: string
+            description: the hash of what a bless at this gate reads
+
+          stale:
+            type: string
+            description: the inputs whose move marks this leaf for a redo
+
+          def:
+            type: string
+            description: the hash of the leaf's definition when it passed
+
+          inputs:
+            type: array
+            description: one entry per input the leaf read when it passed
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: the input, as ask, a leaf path, or a note link
+
+                hash:
+                  type: string
+                  description: the hash of the input's text
+
+                size:
+                  type: integer
+                  description: the length of the text the hash reads
+
           answered:
             type: array
             description: one entry per command field, as the engine runs it

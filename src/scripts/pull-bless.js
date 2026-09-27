@@ -6,7 +6,7 @@ import { cloudHere } from "../../.claude/skills/level0/lib/cloud.js";
 import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { frontOf, recordIn, withEntry, withField } from "../engine/group.js";
-import { chapterOf } from "./pull-chapter.js";
+import { chapterText, staleRead } from "./pull-stale.js";
 import { agentOf, handOf, roleOf } from "./pull-hand-of.js";
 import { landedAlone } from "./pull-landed.js";
 import { leafOf, leavesOf, REFUSED, say, stepPathOf, walkOf } from "./pull-route.js";
@@ -35,10 +35,7 @@ export function hashText(text, leaf) {
     .filter((path) =>
       inputs.some((input) => path === input || path.startsWith(`${input}/`)),
     );
-  const read = [leaf.path, ...under].map((path) => {
-    const chapter = chapterOf(text, path);
-    return [path, chapter.own, [...chapter.fields]];
-  });
+  const read = [leaf.path, ...under].map((path) => [path, chapterText(text, path)]);
   return hashOf(JSON.stringify(read)).slice(0, HASH);
 }
 
@@ -114,6 +111,11 @@ export function blessHolds(it, one) {
     return one;
   }
   return one;
+}
+
+// The hand-out reads a ticket again before it offers a leaf: the bless, then the inputs and the process. [[spec/design_output/pull#an-input-marks-its-steps]]
+export function readAgain(it, one) {
+  return staleRead(it, blessHolds(it, one));
 }
 
 // Why the hand-out passes a gate waiting for its bless, or nothing. [[spec/design_output/pull#the-bless]]

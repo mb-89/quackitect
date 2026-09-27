@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fieldOf } from "../../src/engine/group.js";
-import { blessKept } from "../../src/scripts/pull-bless.js";
+import { blessKept, readAgain } from "../../src/scripts/pull-bless.js";
 import { takeable } from "../../src/scripts/pull-hand.js";
 import { stepOn } from "../../src/scripts/pull-writes.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
@@ -291,4 +291,24 @@ test("a step that stays leaves the ticket on its leaf and names the wait, and on
     "implement/change",
   );
   assert.deepEqual(moves, []);
+});
+
+// [[spec/design_output/pull#an-input-marks-its-steps]]
+test("the read again before a hand-out puts a ticket whose bless an edit strips back on the gate", () => {
+  const made = waiting({ agent: true, cloud: true });
+  blessing(made);
+  made.disk.write(TICKET, textOf(made).replace("The approach.", "An edit by hand."));
+
+  const one = {
+    name: "a-child",
+    path: "spec/tickets/a-child.md",
+    at: TICKET,
+    text: textOf(made),
+  };
+  one.front = frontOf(one.text);
+  const read = readAgain(made.it, one);
+
+  assert.equal(read, one, "the read answers the ticket it reads");
+  assert.equal(fieldOf(read.text, "step"), "gate");
+  assert.equal(fieldOf(textOf(made), "step"), "gate", "the disk takes the move");
 });

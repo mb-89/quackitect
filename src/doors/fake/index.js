@@ -9,7 +9,7 @@ export function fakeIndex(disk, root, join) {
   const asked = [];
   const hashes = (params) => {
     const out = {};
-    for (const one of params?.paths ?? []) {
+    for (const one of params?.asks ?? []) {
       const at = join(root, ...String(one.path).split("/"));
       if (!disk.exists(at)) continue;
       const text = String(disk.read(at));
