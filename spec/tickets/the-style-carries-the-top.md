@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: 8bb8bfda526ec49521ee79c2d690c3f85a78b6d0
+    hash_after: b24fcbceb5c7a65b46edd452c30c50378cf9962c
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/projection.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 601. Split it by topic."
 ---
 
 # Ask
@@ -205,14 +213,20 @@ Both cases fail on their own assertion: the style leaves out a note carrying no 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask names, plus the callers and tests the review rows name
+- the doors reached are the disk, the proc and git, and the tests drive their fakes
+- a comment in guidanceHere points at the chapter The style carries the top
+- the rule stands once, in spec/design_output/level0, and projection.md points at it
+- the review rows stand fixed: the tests read level0-canary, the probe reads the canary alone, the helper keeps every top note
 
 ## tests-green
 
