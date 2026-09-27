@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
     hash_before: c9357e0c72b41a81c1081d9f320a0a3ecf21e4cb
     hash_after: c9357e0c72b41a81c1081d9f320a0a3ecf21e4cb
+  - step: design/review
+    hand: box d7d8cca5d3cd · claude-code-remote · helper-2
+    hash_before: 0767ae03db9546538a1c98cebde1e923b1892888
+    hash_after: 0767ae03db9546538a1c98cebde1e923b1892888
 ---
 
 # Ask
@@ -155,8 +159,14 @@ first
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- test/contract/process.test.js, the group route case, asserts gate.reads holds spec/guidance/review/design and lacks review/reviewing. The processes drop reads, so the case reads the notes resolved from the gate's tags, and the callers list names it.
+- test/level0/pull.test.js pins the old print form, Reads spec/guidance/voice: and an indented 1. The new section form breaks it, so the builder moves it to the heading form the guidance-tags cases pin.
+- spec/guidance/review/reviewing reaches no step today. The builder gives it accept, so the final accept reaches it, and the design gate, carrying review alone, keeps off it as the contract case asks. Each retro note gains its own name as a tag.
+- spec/processes/trivial.yaml gives its do step code and testing, because a trivial fix to code meeting no code rule is the fault the ask names.
+- The schema case and the tree case stand in test/contract, since they read the real tree, while the ask names test/level0. The tests line of the draft names each file as it lands, and tests-green says why.
 
 # implement
 
