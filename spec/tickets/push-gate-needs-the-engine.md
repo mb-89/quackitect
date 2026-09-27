@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -13,6 +14,16 @@ steps:
           - name: read
             form: verdict
             says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: Which signal reads as the engine running for the push gate? The bridge answering on its port leaves a push unguarded while the bridge stands down.
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["the bridge answers on its port", "the level0 hooks load in the session"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -116,7 +127,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -146,6 +156,16 @@ Without it every push from a desk waits on a green `./RUNME.sh check`. A test re
 <!-- pass where the ask says what the owner said, or fail with the owner's words -->
 
 <!-- the form is verdict -->
+
+## person-1
+
+<!-- Which signal reads as the engine running for the push gate? The bridge answering on its port leaves a push unguarded while the bridge stands down. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
 
 ## draft
 
