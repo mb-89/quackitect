@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { START } from "../../.claude/skills/level0/hooks/level0.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
@@ -27,7 +28,16 @@ function box(answers, files = {}, cloud = true) {
     },
   });
   return {
-    it: { proc, disk: fakeDisk(files), root: ROOT, join, cloud, node: "node" },
+    it: {
+      proc,
+      disk: fakeDisk(files),
+      clock: fakeClock(),
+      env: {},
+      root: ROOT,
+      join,
+      cloud,
+      node: "node",
+    },
     proc,
   };
 }

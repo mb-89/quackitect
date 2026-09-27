@@ -5,6 +5,7 @@
 
 import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.js";
 import { POINTER, pointerOf } from "../../.claude/skills/level0/lib/vehicle.js";
+import { registeredPort } from "../bridge/vehicle.js";
 
 const HEALTH_WAIT = 2000;
 
@@ -12,7 +13,20 @@ export function portIn(it) {
   try {
     return pointerOf(it.disk.read(it.join(it.root, POINTER))).port;
   } catch {
-    return pointerOf(`{"method":"${it.root}"}`).port;
+    // A vehicle tree carries no pointer, so the probe reads the port variable, then the register, as the listen in `src/bridge/server.js` does. [[spec/tickets/serve-probes-the-register-port]]
+    const env = it.env ?? {};
+    // The register stamps its entry with the clock, so a door holding none reads the base. [[spec/tickets/serve-probes-the-register-port]]
+    const registered = it.clock
+      ? registeredPort(
+          it.disk,
+          env,
+          it.clock,
+          it.root,
+          it.pid ?? 0,
+          Boolean(it.windows),
+        )
+      : pointerOf(`{"method":"${it.root}"}`).port;
+    return Number(env.SE_BRIDGE_PORT) || registered;
   }
 }
 
