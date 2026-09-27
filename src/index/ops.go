@@ -5,6 +5,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"quackitect/src/ops"
@@ -67,4 +68,18 @@ func (one *door) hears(book *ops.Book) {
 }
 
 // An operation past its window leaves the book, the table and the store together. [[spec/design_output/model#what-stays-how-long]]
-func (one *door) sweepsOps() {}
+func (one *door) sweepsOps() {
+	if one.book == nil {
+		return
+	}
+	var names []string
+	for _, id := range one.book.Sweep() {
+		names = append(names, ops.Name(id))
+	}
+	if len(names) == 0 {
+		return
+	}
+	if _, err := one.store.Drop(one.store.Snapshot().Revision, one.writers.ops, names...); err != nil {
+		fmt.Fprintln(stderr, "the ops sweep did not drop:", err)
+	}
+}

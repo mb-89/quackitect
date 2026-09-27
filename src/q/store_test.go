@@ -198,6 +198,23 @@ func TestADropRefusesANameNobodyProvides(t *testing.T) {
 	}
 }
 
+// [[spec/design_output/model#what-stays-how-long]]
+func TestARefusedDropLeavesEveryValue(t *testing.T) {
+	c := New()
+	n := GivenIn(c, "t/n", 0)
+	s := NewStore(c, nil)
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
+		t.Fatal(err)
+	}
+	before := s.Snapshot().Revision
+	if _, err := s.Drop(before, n, "t/n", "t/gone"); err == nil {
+		t.Fatal("the drop takes a name nobody provides")
+	}
+	if after := s.Snapshot(); after.Read("t/n") != 1 || after.Revision != before {
+		t.Fatalf("the refused drop leaves t/n at %v, revision %d", after.Read("t/n"), after.Revision)
+	}
+}
+
 // [[spec/design_output/model#the-fake-index]]
 func TestAListenerReadsTheSnapshotOfItsCommit(t *testing.T) {
 	c := New()

@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -156,6 +156,15 @@ record:
         hash: e0793d011fade350
         size: 979
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 2057cdb90078bc9d572053e3dab054f509690477
+    hash_after: 2057cdb90078bc9d572053e3dab054f509690477
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -282,14 +291,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/store.go src/index/ops.go src/index/door.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/q/store.go, src/index/ops.go and src/index/door.go, all three on the size list, and their tests
+the change reaches no new door: Drop runs in memory, and the index cases run over a memory keep and a clock the case moves
+each function the change fills points at spec/design_output/model#what-stays-how-long, and the guards header names the sweep
+the windows stay in ops.SettingsOf alone, and sweepsOps reads what Book.Sweep answers
 
 ## tests-green
 

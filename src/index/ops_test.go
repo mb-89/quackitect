@@ -110,3 +110,15 @@ func TestAnOperationPastItsWindowLeavesTheStore(t *testing.T) {
 		t.Fatalf("the store holds %s past its window: %+v", ops.Name(id), got)
 	}
 }
+
+// [[spec/design_output/model#what-stays-how-long]]
+func TestASweepWithNoBookDropsNothing(t *testing.T) {
+	c := q.New()
+	one := &door{writers: registersTopics(c)}
+	one.store = q.NewStore(c, nil)
+	before := one.store.Snapshot().Revision
+	one.sweepsOps()
+	if after := one.store.Snapshot().Revision; after != before {
+		t.Fatalf("the sweep with no book moves the store from %d to %d", before, after)
+	}
+}

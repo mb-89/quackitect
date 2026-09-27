@@ -326,7 +326,7 @@ func (one *door) tells(err error) {
 	}
 }
 
-// The sweep on a clock, which catches a change the watch misses and clears nothing. [[spec/design_output/index#a-change-moves-its-rows]]
+// The sweep on a clock, which catches a change the watch misses, and takes each operation past its window out of the store. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) guards() {
 	for range time.Tick(sweepEvery) {
 		one.guard.Lock()
@@ -334,6 +334,7 @@ func (one *door) guards() {
 			one.moved()
 		}
 		one.guard.Unlock()
+		one.sweepsOps()
 	}
 }
 
