@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: do
 steps:
   - name: do
@@ -40,7 +40,24 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-queue-moves-to-plan.md:122:99: Sentence: A sentence holds 25 words. Cut this one in two."
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 7825ed108c050a09939ceb1e3eedcf881148493f
+    hash_after: 6f3983125c16e1805d66599b5d8d8b6f73b98e7c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/queue-approach-sentence-split.md:61:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 50ae9d0066952c30
+        size: 250
+    def: 95a53cdbde78eefb
 parent: groups-carry-the-cloud-marker
+reason: done
 ---
 
 # Ask
@@ -58,15 +75,13 @@ the `release` departure holds, because `release` writes `hash_after` and leaves 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
 
-    ./RUNME.sh lint spec/rationales/git-stays-the-archive.md
+    ./RUNME.sh test test/level0/work-cloud-marker.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
     ./RUNME.sh check
@@ -74,20 +89,18 @@ the `release` departure holds, because `release` writes `hash_after` and leaves 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
-The table in `spec/rationales/git-stays-the-archive.md` loses its release row, so it names the merge and the close alone as the verbs clearing the marker. What `release` does stands in its code and in `test/level0/work-cloud-marker.test.js`, and the rationale points at no verb that leaves the marker alone.
+The table in `spec/rationales/git-stays-the-archive.md` names the merge and the close alone as the verbs clearing the marker. What `release` does stands in its code and in `test/level0/work-cloud-marker.test.js`, the case this step runs.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- The change follows the ask: the row naming the merge and the close stands, and the release row goes.
-- The change reveals no cleanup.
-- The change adds no fact, and drops one the code and its test already own.
+- the change follows the ask: the row naming the merge and the close stands, and the release row goes
+- the change reveals no cleanup
+- the change adds no fact, and drops one the code and its test already own
 
 # Discussion
 
