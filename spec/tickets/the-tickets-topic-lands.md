@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,18 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: a0574facf8574b69ef4c758a0e99d58a321fb655
+    hash_after: 2e0784a654d01223de7490f87d54e18ab72a7911
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tickets passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/tickets-register-in-the-catalog.md:39:1: CodeSpans: A sentence holds 4 code spans, and this one holds 6. Ca"
+reason: done
 ---
 
 # Ask
@@ -276,26 +288,44 @@ The review's findings shape the tests:
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test src/tickets src/index
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`src/tickets` holds the one reading of a ticket, and the index answers its `tickets` verb and `tickets/all` through it. The golden file `src/tickets/testdata/tree.golden.json` holds every ticket's Ask and standing, and `go test ./src/tickets -update` writes it again.
+
+The Ask reading differs from the JavaScript readers in three places, which the shadow child compares at runtime:
+
+| the text | `src/tickets` | `pull-chapter.js` | `group.js` |
+|---|---|---|---|
+| a fenced block | kept as text | dropped | dropped |
+| a comment over several rows | dropped | kept past its first row | kept |
+| a one-row comment | dropped | dropped | kept |
+
+The held rule reads any open record item, as `group.js` does, off a parsed record in place of a line scan.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `src/tickets`, the index's tickets reading and its wiring
+- the golden test reads the tree's ticket folder as a fixture, and reaches no door
+- each file and function points at this ticket or its design section
+- the reading stands in `src/tickets` alone, and the index points there
+- the window's held override moves to `tui-shell-lands-in-shadow`, and the other four findings stand fixed here
 
 # Discussion
 
