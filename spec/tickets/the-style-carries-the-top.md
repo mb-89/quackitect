@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d9cc78d3ce · claude-code-remote
     hash_before: ac4e5372d7cb31e9ca0410f436ee4c4ad7fcff91
     hash_after: ac4e5372d7cb31e9ca0410f436ee4c4ad7fcff91
+  - step: implement/tests-red
+    hand: box d7d9cc78d3ce · claude-code-remote
+    hash_before: fb343665d930d3a79b9c8b8bc788139e3bcfd94d
+    hash_after: fb343665d930d3a79b9c8b8bc788139e3bcfd94d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -168,20 +176,27 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/style-top.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: the style leaves out a note carrying no style key, and the layer hands a level0-rules block before the canary. The surprise: blocksOf writes the canary only where the standing text stands, so an empty session layer drops the canary too, and the change moves the canary off that guard. src/bridge/review.js reads the standing text for its reader, a caller the draft misses, and it takes the helper text instead.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch one new file, the one the ask names
+- the fakes are the fake disk and the fake proc from src/doors/fake
+- the file header names the ticket the tests hold
+- each assertion names a claim once, in its own test
+- the review rows (the tests asserting level0-rules, the helper layer keeping the top notes) ride the change step
 
 ## change
 
