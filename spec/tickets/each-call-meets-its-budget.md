@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -87,6 +87,14 @@ record:
     hand: box d7d8cca5d3cd · claude-code-remote · helper-2
     hash_before: e8e5d80d56770f1313586ed2ebe62f5809ff7cec
     hash_after: e8e5d80d56770f1313586ed2ebe62f5809ff7cec
+  - step: implement/tests-red
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 92ab5d4a8fe75efb9eb9ca84e9f0d0d0e8afd8d7
+    hash_after: 92ab5d4a8fe75efb9eb9ca84e9f0d0d0e8afd8d7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
 ---
 
 # Ask
@@ -170,20 +178,27 @@ pass with findings
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/budget.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion: the config names no budget yet, and guidance-hand.js answers no resolved until guidance-resolves-by-tags lands. The fixture carries a group of many children and as many loose tickets, and many notes under many folders, so a call slowing with the work it carries turns the case red. Each case times the median of several runs, which a loaded box moves less than a single run.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch test/level0/budget.test.js alone
+- the cases drive the fake disk, git and clock of test/level0/pull-doors.js
+- the file header names the chapter Time budgets
+- each budget stands once, in spec/config/level0.json, and the case reads it there
+- the review's rows stand in the test: the fixture grows with the work, the resolver case names resolved in guidance-hand.js, the stale case times readsOf with handsAgain, and the median answers the loaded box
 
 ## change
 
