@@ -119,11 +119,26 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 
 <!-- the form is list -->
 
+- [[spec/tickets/groups-carry-the-cloud-marker]], standard
+- [[spec/tickets/the-tickets-topic-lands]], standard
+- [[spec/tickets/ask-reading-names-its-differences]], trivial
+- [[spec/tickets/close-force-guards-trunk-checkout]], trivial
+- [[spec/tickets/go-test-names-the-root]], trivial
+- [[spec/tickets/open-marker-outlives-refused-push]], trivial
+- [[spec/tickets/open-marks-standing-branches]], trivial
+- [[spec/tickets/private-tickets-reach-tickets-all]], trivial
+- [[spec/tickets/the-golden-keys-group-hash]], trivial
+- [[spec/tickets/tickets-register-in-the-catalog]], trivial
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each child stands closed, and each trivial child reads whole in one diff.
+- The children carry the cloud marker and the tickets topic. The queue port and `work/open-tasks` left the group at `branch done`, and a next group carries them: [[spec/tickets/the-queue-moves-to-plan]], [[spec/tickets/open-tasks-come-from-work]], [[spec/tickets/open-tasks-run-in-shadow]].
+- No child here waits on another, so none names `depends_on`.
 
 # children
 
