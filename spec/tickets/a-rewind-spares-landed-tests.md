@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -266,6 +266,29 @@ record:
         exit: 0
         said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: d79b1f3bdd6aff14939c75a402c1277bb59f9c23
+    hash_after: d79b1f3bdd6aff14939c75a402c1277bb59f9c23
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: design/tests-red-2
+        hash: 894c4d79a61e9314
+        size: 1231
+    def: 4882efc47f2d410b
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -589,26 +612,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-kept.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A stale review used to send a ticket back to its red leaf after the change had landed. The red tests passed by then, so no rerun could pass the leaf, and the ticket stranded. `keptRed` in `src/scripts/pull-kept.js` now keeps such a leaf. It needs a red pass and a later pass after it. It finds the commit that passed the red leaf, and checks that each test file that commit landed still stands at HEAD, through a rename. `stepOn` and `advanced` write a kept entry and walk on. So a rewind after the change walks on to green, and a rewind before it still runs the tests red. `spec/design_output/pull#kept-red-leaves` holds the reads.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list, plus the split of `childrenSay` the file ceiling forces
+- every git read runs through `it.git`, which the fake git answers
+- the code points at `spec/design_output/pull#kept-red-leaves`
+- the reads stand once, in `pull.md`
 
 # accept
 
