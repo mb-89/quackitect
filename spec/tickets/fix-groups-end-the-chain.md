@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 1a04d2a3bdbe669d84c2b458cf24b0d0511da9bc
+    hash_after: 1a04d2a3bdbe669d84c2b458cf24b0d0511da9bc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 13 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:271:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 8b4209e6b4a73d66
+        size: 755
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-done.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A group ticket carrying fix: true reads as a fix group. branch done on a fix group reads the tickets its branch adds, off git diff against origin/main, and refuses where any stands open, loose and at an agent step. The refusal names each one with the mint of a question ticket and the became that retires it. A fix group then hands its rest to a person, and a chain of follow-ups ends at the owner. A feature group reads no fix field and hands back its loose agent tickets as before. The rule stands in src/scripts/work-fix.js, since work.js stands at the file ceiling, and an orphan link comment in work.js left to make the room.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches work-fix.js, the one line in finish, its import, and the cases
+- the cases reach git and the disk through the fakes alone
+- the header of src/scripts/work-fix.js names the chapter it implements
+- the fix field stands once as FIX in work-fix.js and once in the schema
 
 # accept
 
