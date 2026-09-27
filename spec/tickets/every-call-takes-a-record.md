@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ops-keeps-one-state]
+record:
+  - step: design/draft
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: f6f9f0ae66a91bd07e9deba7f90632e4ee7776a1
+    hash_after: f6f9f0ae66a91bd07e9deba7f90632e4ee7776a1
+    inputs:
+      - name: ask
+        hash: 17806c17b7526713
+        size: 965
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -154,38 +167,78 @@ The split between `q.Action` and `q.Op` then leaves, and an author guesses no le
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Five pieces, following spec/design_output/model at a caller sets its wait, the agent does not poll, the handle is a name and the states.
+
+One, the split leaves: q.Op, the registration field op and Declared.Op go from src/q. An action declares q.Deadline and q.Writes alone.
+
+Two, src/ops/call.go adds Call(book, store, name, input, caller, wait, accept), which answers an Answer. Call starts the operation in the book with the action's Declared. It runs the action on a goroutine through Store.Send of io-modules-own-their-names, or through Store.Act where Send stands unbuilt, and ends it with Finish or Fail. It then waits through the wait. An operation ending within the wait answers its result. One running past it answers Running true, with the handle, the fraction done and the time gone by. The runner counts progress itself: each request answered moves Progress.Done, and each list Then answers adds to Progress.Known. So an action with no steps answers the time gone by alone.
+
+Three, the book wakes its waiters: Book.Wait(id, span) answers the operation once it ends or the span runs out, over a channel each move closes. Book.Progress(id, done, known, step) records the step and pushes the move. Book.Open(caller) answers the session's operations standing queued or running. Book.WaitCaller(caller, span) waits on all of them, which ops/wait with no handle answers.
+
+Four, spec/config/level0.json and its schema drop watchdog.deadlineOp. watchdog.deadlineAction takes its 600 seconds and the help line: the span an action's operation ends within. ./RUNME.sh project writes the slash command projections again, so se-config-watchdog-deadlineOp leaves.
+
+Five: the tests ride a fake accept, which answers each request at once or blocks until the case lets it go. The book runs over the memory keep the ops tests use and a clock the case moves.
+
+Weighed: the runner counts the requests as the fraction done, against a progress call from the module. A module names requests and reaches nothing, so the index alone sees the steps. Assumed: each surface's default wait comes with its IO module, the hooks, MCP and HTTP, so Call takes the wait its caller hands. The Stop hook's line comes with the hooks module in phase 5.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/q.go: Op and registration.op, which leave
+src/q/store.go: Declared and Store.Declared, which drop Op
+src/q/store_test.go: TestAnActionDeclaresItsHandleAndItsWrite
+src/ops/ops.go: Book.Start, move and end, which wake the waiters
+src/ops/ops_test.go: the writer and reader declarations
+src/index/v1.go: valueOf, which reads Store.Declared
+spec/config/level0.json and spec/config/level0.schema.json: watchdog.deadlineOp
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/ops/call_test.go: TestAQuickCallAnswersItsResultWithinTheWait
+src/ops/call_test.go: TestASlowCallAnswersStillRunningWithItsHandleAndFraction
+src/ops/call_test.go: TestAFailingCallAnswersItsReason
+src/ops/call_test.go: TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations
+src/ops/call_test.go: TestTheConfigHoldsOneActionDeadline, reading spec/config/level0.json through src/config for no watchdog.deadlineOp
+src/q/store_test.go: TestAnActionDeclaresItsDeadlineAndItsWrite, in place of the handle case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/q.go
+src/q/store.go
+src/q/store_test.go
+src/ops/ops.go
+src/ops/call.go
+src/ops/call_test.go
+src/ops/ops_test.go
+spec/config/level0.json
+spec/config/level0.schema.json
+.claude/commands/se-config-watchdog-deadlineOp.md, which the projection removes
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened spec/design_output/model at a caller sets its wait, the agent does not poll, the handle is a name, the states and deadlines, src/q/q.go Op, src/q/store.go Declared, src/ops/ops.go Book, src/index/v1.go and spec/config/level0.json, and checked each claim there
+the callers come off a grep for Op(), Declared, deadlineOp and deadlineAction over src, spec/config and .claude
+each done_when line names its test: the three call cases and the wait case decide the calls, a grep for Op() over src/q decides the split, TestTheConfigHoldsOneActionDeadline decides the fold, and go test and the check decide the first and last
 
 ## tests-red
 
