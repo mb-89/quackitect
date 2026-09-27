@@ -77,12 +77,16 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d1fe1ca62214 · claude-code-remote
     hash_before: 4becee0083ccd911a19d3584843fd30dc157c3e8
     hash_after: 4becee0083ccd911a19d3584843fd30dc157c3e8
+  - step: design/review
+    hand: box d7d6327f2b101 · claude-code-remote
+    hash_before: 545a42b269093f13f9e77ade788d3a21baebc76b
+    hash_after: 545a42b269093f13f9e77ade788d3a21baebc76b
 ---
 
 # Ask
@@ -193,6 +197,10 @@ A hand reads the failing case off the last lines of `check`, `test` and `branch 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass with findings
+
+- wrapper-ask-names-its-files: approach items 1 and 4 change `src/scripts/cli-check.js`, `src/scripts/cli-read.js` and `src/bridge/guidance.js`. The ask names none of them, and the implement checklist refuses a file the ask leaves out. Name each on its ask line.
 
 # implement
 
