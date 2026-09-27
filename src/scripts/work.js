@@ -28,6 +28,7 @@ import {
   WORK_BRANCH,
   withEntry,
   withField,
+  withEveryTakeClosed,
   withHashAfter,
   withoutField,
 } from "../engine/group.js";
@@ -569,7 +570,7 @@ function letGo(it, branch, name, here) {
   }
 
   const tip = it.git.run(["rev-parse", "HEAD"], true).out;
-  it.disk.write(path, withHashAfter(it.disk.read(path), tip, it.front));
+  it.disk.write(path, withEveryTakeClosed(it.disk.read(path), tip, it.front));
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;

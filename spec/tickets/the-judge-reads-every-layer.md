@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+todo: false
+step: decide
 steps:
   - name: decide
     does: says what the note becomes, and closes it
@@ -16,9 +18,19 @@ steps:
       - name: says
         form: text
         says: why, in a line, or what the successor carries
-step: decide
 process: [[spec/processes/note]]
-process_hash: 9d7b26202041cf4d
+process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 863bbc8406c2826e1a54ae02c4edb35733ee9507
+    hash_after: 863bbc8406c2826e1a54ae02c4edb35733ee9507
+    inputs:
+      - name: ask
+        hash: 5e0a28906d846b28
+        size: 709
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -42,14 +54,16 @@ The fix lands with this note: `judged` asks `configOf` over `$.fs`, the method r
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The fix landed, and the-judge-leaves-the-code then took the judge and its switch out of pull-tool.js and the config, so no reader of that switch stands.
 
 # Discussion
 

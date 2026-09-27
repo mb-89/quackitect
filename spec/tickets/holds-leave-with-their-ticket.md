@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: accept
 steps:
   - name: design
     steps:
@@ -121,6 +121,65 @@ record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 22e19c6f6aef1f50ee12c0cd673c94fec2f6451c
+    hash_after: 22e19c6f6aef1f50ee12c0cd673c94fec2f6451c
+    inputs:
+      - name: ask
+        hash: 260b59b15e28d7e0
+        size: 565
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 2be1307f1e3eff1b9e49f05a53b7507619990f40
+    hash_after: 2be1307f1e3eff1b9e49f05a53b7507619990f40
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 5a2cadb20cc0ce0b
+        size: 2807
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: 8b5abad781707f4d1fe90d44877c539aab43cc4b
+    hash_after: 8b5abad781707f4d1fe90d44877c539aab43cc4b
+    inputs:
+      - name: design/draft
+        hash: 5a2cadb20cc0ce0b
+        size: 2807
+      - name: design/tests-red
+        hash: b1d5d7b286e9be5f
+        size: 907
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 035693a5ff2e121b318ba71e0c171312f9359cff
+    hash_after: 035693a5ff2e121b318ba71e0c171312f9359cff
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 3ee99ef0ec43d1d7c95dc4b49efdaed5c6c8487a
+    hash_after: 3ee99ef0ec43d1d7c95dc4b49efdaed5c6c8487a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-views-agree.md:245:115: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: b1d5d7b286e9be5f
+        size: 907
+    def: ec253787263043a7
 ---
 
 # Ask
@@ -161,38 +220,77 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The owner rules that a hold is a state of the ticket, so a closed ticket stands in no hand. The ticket's state decides, and the hold file keeps what a ticket carries nowhere: the reads, the refusals, the part of a split hand-out, the ephemeral tickets.
+
+| part | where |
+|---|---|
+| `holdsIn` answers a hold only where its ticket stands open, and an ephemeral hold, which names no path, stands | `src/scripts/ephemeral.js` |
+| `everyHold`, `holdsAnywhere` and `holdOf` read through it | `src/scripts/guidance-hand.js` |
+| `inHand` reads through it, so the door names no closed ticket in hand | `src/engine/named.js` |
+| `holdStands` reads through it, so a closed ticket holds no turn open | `src/bridge/stop.js` |
+| the pull removes each hold file whose ticket stands closed or gone, before it reads the hand | `src/scripts/pull.js` |
+| the design says the state decides | `spec/design_output/pull.md`, chapter The hand and the hold |
+
+The readers stay pure, and the pull alone removes a file.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/pull.js`, `pull`, which reads `holdOf` for the hand
+- `src/scripts/work-answer.js`, the held rows, off `holdsIn`
+- `src/bridge/handover.js`, the retro holds and the handover reads, off `holdsIn`
+- `src/bridge/stop.js`, the checks `ticket-in-hand` and the helper hold, off `holdStands` and `holdsIn`
+- `src/engine/named.js`, `ticketFault`, and `src/bridge/bash.js`, the shell door, off `inHand`
+- `src/scripts/guidance-hand.js`, `heldTests`, off `everyHold`
+- `src/scripts/retro-collect.js`, `src/scripts/pull-landed.js`, `src/scripts/rename.js`, `src/scripts/ticket.js`, `src/scripts/work-test.js`, `src/scripts/guidance-verb.js`, `src/scripts/pull-escalate.js`, off `holdOf`, `everyHold` or `holdsAnywhere`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/holds-leave.test.js`, a hold on a ticket another hand closes drops at the next pull
+- `test/level0/holds-leave.test.js`, a pull after that close names no closed ticket in hand
+- `test/level0/holds-leave.test.js`, the door and the stop read no closed ticket in hand
+- `test/level0/holds-leave.test.js`, an ephemeral hold stands, since it names no ticket file
+
+The done lines and the case deciding each:
+
+- the hold drops at the next pull: the first case
+- no closed ticket in hand: the second and third cases
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/ephemeral.js`
+- `src/scripts/guidance-hand.js`
+- `src/engine/named.js`
+- `src/bridge/stop.js`
+- `src/scripts/pull.js`
+- `test/level0/holds-leave.test.js`
+- `spec/design_output/pull.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `holdsIn`, `everyHold`, `holdOf`, `inHand` and `holdStands` stand opened, and none reads the ticket's state today
+- the callers come off a search for `holdOf(`, `everyHold(`, `holdsAnywhere(`, `holdsIn(` and `inHand(` over `src`
+- each done line names the case deciding it
 
 ## tests-red
 
@@ -201,26 +299,40 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/holds-leave.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/holds-leave.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion over the tree as it stands:
+
+| the case | the class of fault it guards |
+|---|---|
+| the readers answer no hold on a closed ticket | a hold file stands over the ticket's own state |
+| an ephemeral hold stands | a state read drops a hold that names no ticket file |
+| the hold drops at the next pull | a closed ticket blocks every other take by its hand |
+| a pull names no closed ticket in hand | the door and the stop read a closed ticket as work |
+
+The ephemeral case reads red because the closed hold stands beside it today.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case above that fails: the drop at the next pull, and no closed ticket in hand
+- the doors the cases reach stand behind their fakes: the fake disk and the fake git of pull-doors.js
 
 # gate
 
@@ -229,8 +341,25 @@ none
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the approach answers the ask, and a red test decides each done line.
+
+- The case where a hold drops at the next pull decides the first done line.
+- The case where a pull names no closed ticket in hand decides the second.
+- Every case fails on its own assertion over the tree as it stands.
+
+Rows for the implement step to fix in place:
+
+- The pull removes each closed hold before `holdOf` reads the hand, and keeps each ephemeral hold.
+- A case pins an ephemeral hold standing after a pull, because the clear runs on it.
+- The draft lists a case for the door and the stop, and the file carries none for the stop.
+- A case over `holdStands` in `src/bridge/stop.js` closes that gap.
+- The callers line for `src/bridge/stop.js` names a helper hold, and its `holdsIn` caller is `stepWaitsOnPerson`.
+- `everyHold` reads the older `hold.json` too, and no verb writes that file.
+- A drop on a gone ticket reaches past the ask, so a case pins it, or it leaves.
+- `lensesOf` in `src/extension/lib/lens.js` reads the holds before the state, so a closed ticket draws a held lens.
+- Read the state first there, since the draft misses that reader of the hold folder.
 
 # implement
 
@@ -241,14 +370,19 @@ none
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/engine/named.js src/scripts/ephemeral.js src/scripts/guidance-hand.js src/bridge/stop.js src/scripts/pull.js src/scripts/ticket.js src/extension/lib/lens.js spec/design_output/pull.md test/level0/holds-leave.test.js test/level0/ticket-verb.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files match the draft size, plus the lens and the older hold file readers the gate rows name
+- the change reaches the disk door alone, and every case runs over the fake disk
+- each changed reader links the hold chapter of `spec/design_output/pull.md`, which says the state decides
+- `stillHeld` in `src/engine/named.js` owns the rule, and every hold reader calls it
 
 ## tests-green
 
@@ -257,26 +391,33 @@ none
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/holds-leave.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A hold leaves with its ticket. `stillHeld` in `src/engine/named.js` reads the ticket file a hold names, and a file reading `state: closed` stands in no hand. Every hold reader calls it, the door and the stop among them. The pull removes each closed hold file before it reads the hand. The lens reads the state before the holds. A hold naming no path stands. So does one whose ticket file stands on another branch alone, since a work branch or a mint moves the file. The older `hold.json`, which no verb writes, leaves the readers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files match the draft size, plus the lens and the older hold file readers the gate rows name
+- the change reaches the disk door alone, and every case runs over the fake disk
+- each changed reader links the hold chapter of `spec/design_output/pull.md`, which says the state decides
+- `stillHeld` in `src/engine/named.js` owns the rule, and every hold reader calls it
 
 # accept
 

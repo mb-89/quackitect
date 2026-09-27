@@ -8,7 +8,13 @@ import { test } from "node:test";
 import { START } from "../../.claude/skills/level0/hooks/level0.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { portIn, probeOf, serving, startOf } from "../../src/scripts/serve.js";
+import {
+  portIn,
+  probeOf,
+  servesDetached,
+  serving,
+  startOf,
+} from "../../src/scripts/serve.js";
 
 const ROOT = "/tree";
 
@@ -86,4 +92,50 @@ test("the port reads off the pointer, and stands at the base without one", () =>
   );
   assert.equal(portIn(pointed.it), 6512);
   assert.equal(portIn(box({ probe: 1 }).it), 6510);
+});
+
+const SERVER_AT = join(ROOT, "src", "bridge", "server.js");
+const SERVE_LOG = join(ROOT, ".se", ".log", "serve.log");
+
+function desk(answers, files = {}) {
+  const proc = fakeProc({
+    [probeOf("node", 6510).join(" ")]: { exitCode: answers.probe },
+    [["node", SERVER_AT, ROOT].join(" ")]: answers.stands
+      ? { stands: true }
+      : { exitCode: answers.exitCode ?? 1 },
+  });
+  return { it: { proc, disk: fakeDisk(files), root: ROOT, join, node: "node" }, proc };
+}
+
+const detached = (proc) =>
+  proc.ran.filter((one) =>
+    one.argv.join(" ").split("\\").join("/").includes("src/bridge/server.js"),
+  ).length;
+
+// A desk start stands detached, so the shell returns and the server stays. [[spec/tickets/the-bridge-outlives-its-starter]]
+test("a desk serve starts the server detached where nothing answers, and returns", async () => {
+  const { it, proc } = desk({ probe: 1, stands: true });
+  const said = await servesDetached(it);
+  assert.equal(detached(proc), 1, "one detached start");
+  assert.match(said, /starts detached at port 6510/);
+});
+
+// [[spec/tickets/the-bridge-outlives-its-starter]]
+test("a desk serve finds a standing server and starts nothing", async () => {
+  const { it, proc } = desk({ probe: 0 });
+  const said = await servesDetached(it);
+  assert.equal(detached(proc), 0, "no start over a standing server");
+  assert.match(said, /answers at port 6510/);
+});
+
+// [[spec/tickets/the-bridge-outlives-its-starter]]
+test("a detached start that falls names what the server wrote", async () => {
+  const { it } = desk(
+    { probe: 1, exitCode: 1 },
+    {
+      [SERVE_LOG]:
+        "the server stands at http://127.0.0.1:6510\nError: listen EADDRINUSE\n",
+    },
+  );
+  assert.match(await servesDetached(it), /falls: Error: listen EADDRINUSE/);
 });

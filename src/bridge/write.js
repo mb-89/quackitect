@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { BLESS_FILE, blessRefusal } from "../scripts/pull-bless.js";
 import { CODE } from "../../.claude/skills/level0/lib/code.js";
 import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
+import { markersIn, stagesIn } from "../../.claude/skills/level0/lib/markers.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import {
   carriedFrom,
@@ -78,10 +79,14 @@ export async function onWrite(asked, box) {
   // [[spec/design_output/pull#the-bless]]
   if (where === BLESS_FILE) return { result: { deny: blessRefusal() } };
   if (outside(where) || isDraft(where)) return PASS;
-  const payload = ticketDoor(e, writing, where, box);
+  // A ticket a merge leaves unmerged takes a hand's whole write, and a marker left in it refuses the write. [[spec/design_output/pull#a-merge-opens-the-ticket]]
+  const merging = unmergedTicket(where, box);
+  const marked = merging ? markedWrite(e, writing, where, box) : "";
+  if (marked) return { result: { deny: marked } };
+  const payload = merging ? "" : ticketDoor(e, writing, where, box);
   if (payload) return { result: { deny: payload } };
   // The engine's fields come back first, so every door reads the write that lands. [[spec/design_output/schema#the-verbs-own-their-fields]]
-  const restored = engineRestores(e, writing, where, box);
+  const restored = merging ? null : engineRestores(e, writing, where, box);
   if (restored?.deny) return { result: { deny: restored.deny } };
   if (restored) {
     e = restored.e;
@@ -90,7 +95,7 @@ export async function onWrite(asked, box) {
 
   // No door reads a mark, so a write meets the rules alone. [[spec/tickets/every-road-has-a-caller]]
   const checks = [ownerDoor, privateDoor, schemaDoor, voiceDoor];
-  const held = {};
+  const held = { merging };
   for (const check of checks) {
     const found = await check(e, writing, where, box, held);
     if (found) return { result: { deny: found } };
@@ -144,6 +149,34 @@ function ticketDoor(e, writing, where, box) {
 
 const TICKETS_ON_GIT = "spec/tickets/";
 
+// git lists the ticket unmerged while a merge stands over it. [[spec/design_output/pull#a-merge-opens-the-ticket]]
+function unmergedTicket(where, box) {
+  if (!where.startsWith(TICKETS_ON_GIT) || !where.endsWith(".md") || !box.proc)
+    return false;
+  try {
+    const ran = box.proc.run(["git", "ls-files", "-u", "--", where], { cwd: box.work });
+    return stagesIn(ran.stdout).size > 0;
+  } catch {
+    return false;
+  }
+}
+
+// [[spec/design_output/pull#a-merge-opens-the-ticket]]
+function markedWrite(e, writing, where, box) {
+  const lines = markersIn(wholeAfter(e, writing, box.disk));
+  if (!lines.length) return "";
+  box.log.say(
+    "warn",
+    "ticket",
+    `refused a write to ${where} carrying conflict markers`,
+    {
+      file: where,
+      tool: String(e.tool),
+    },
+  );
+  return `${where} still carries conflict markers, at line(s) ${lines.join(", ")}. Write it whole without them: keep the lines each side holds that the ticket needs, and drop every marker line.`;
+}
+
 // A write to a ticket carrying an engine field, turned into one carrying the disk's value there. An edit whose text the field reaches past takes the refusal the ticket door gives. [[spec/design_output/schema#the-verbs-own-their-fields]]
 function engineRestores(e, writing, where, box) {
   if (!where.endsWith(".md") || e.tool === "MultiEdit" || e.replace_all) return null;
@@ -190,7 +223,7 @@ function privateDoor(e, writing, where, box) {
 }
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
-function schemaDoor(e, writing, where, box) {
+function schemaDoor(e, writing, where, box, held = {}) {
   if (!box.schemas) box.schemas = schemasHere(box.disk, box.method);
   const schemas = box.schemas;
   // [[spec/tickets/each-folder-holds-its-kind]]
@@ -224,22 +257,23 @@ function schemaDoor(e, writing, where, box) {
   }
 
   // [[spec/design_output/schema#the-three-places]]
-  const held = schema
+  // A merge's markers stand in the text on disk, so a merging write reads as a first one. [[spec/design_output/pull#a-merge-opens-the-ticket]]
+  const faults = schema
     ? ticketFaults(
-        textAt(box.disk, writing.path),
+        held.merging ? "" : textAt(box.disk, writing.path),
         whole,
         schema,
         where,
         kidsOf(where, box),
       )
     : [];
-  if (held.length) {
-    box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, {
+  if (faults.length) {
+    box.log.say("warn", "ticket", `refused ${faults.length} line(s) in ${where}`, {
       file: where,
-      rule: held[0]?.rule,
+      rule: faults[0]?.rule,
       tool: String(e.tool),
     });
-    return refusedTicket(where, kind, held);
+    return refusedTicket(where, kind, faults);
   }
   return "";
 }

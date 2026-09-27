@@ -9,7 +9,8 @@ import { test } from "node:test";
 import { onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
+import { conflicted, TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
 import {
   edits,
   NUMBERED,
@@ -359,4 +360,61 @@ test("a screenshot written under spec/tickets comes back refused, naming the tic
   );
   assert.match(said?.result?.deny ?? "", /spec\/tickets\/screen\.png/);
   assert.match(said.result.deny, /ticket/);
+});
+
+// A merge leaves a ticket unmerged with its markers in, and the verbs write no ticket that reads as none, so the door opens it to a hand until the merge commits. [[spec/design_output/pull#a-merge-opens-the-ticket]]
+test("an unmerged ticket takes a hand's whole write, and the same write outside a merge comes back refused", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const marked = GOOD.replace(
+    "state: open\n",
+    `state: open\n${conflicted(["record: []"], ["cloud: true"]).join("\n")}\n`,
+  );
+  const resolved = GOOD.replace("## change\n", "## change\n\nWritten by hand.\n");
+  const merging = (listed) => {
+    const it = box({ [at]: marked });
+    it.proc = fakeProc({
+      "git ls-files -u -- spec/tickets/good.md": { stdout: listed },
+    });
+    return it;
+  };
+
+  const inMerge = await onWrite(
+    write(at, resolved),
+    merging("100644 abc123 2\tspec/tickets/good.md\n"),
+  );
+  assert.equal(inMerge?.result?.deny, undefined, "the unmerged ticket takes the write");
+
+  const outside = await onWrite(write(at, resolved), {
+    ...merging(""),
+    disk: fakeDisk({
+      [join(METHOD, "spec", "schemas", "ticket.schema.yaml")]: SCHEMA,
+      [at]: GOOD,
+    }),
+  });
+  assert.match(
+    outside?.result?.deny ?? "",
+    /--fields/,
+    "outside a merge the door holds",
+  );
+});
+
+test("a write to an unmerged ticket still carrying a marker comes back refused, naming the lines", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const marked = GOOD.replace(
+    "state: open\n",
+    `state: open\n${conflicted(["record: []"], ["cloud: true"]).join("\n")}\n`,
+  );
+  const it = box({ [at]: marked });
+  it.proc = fakeProc({
+    "git ls-files -u -- spec/tickets/good.md": {
+      stdout: "100644 abc123 2\tspec/tickets/good.md\n",
+    },
+  });
+
+  const said = await onWrite(write(at, marked), it);
+
+  assert.match(
+    said?.result?.deny ?? "",
+    /still carries conflict markers, at line\(s\) 4, 6, 8/,
+  );
 });

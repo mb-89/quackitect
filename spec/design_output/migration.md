@@ -9,7 +9,7 @@ refines:
 
 What today's tree holds against the model, folder by folder, and what each
 piece becomes. A box working a phase reads its slice here before it ports it.
-The order of the phases stands in
+The graph of the phases stands in
 [[spec/design_input/the-migration-runs-in-slices]].
 
 `wc -l` over a folder answers its size, so this note carries none.
@@ -118,21 +118,21 @@ already differ.
 
 # The bugs on the way
 
-The inventory names these, and each stands on a ticket of its own:
+The inventory names these, each on a ticket of its own. A bug a later phase
+carries names the ticket that carries it:
 
-- [[spec/tickets/the-judge-reads-every-layer]], which carries its fix
-- [[spec/tickets/the-sidebar-log-appends]], which carries its fix
-- [[spec/tickets/config-reads-differ-by-reader]]
-- [[spec/tickets/one-reader-names-the-home]]
-- [[spec/tickets/the-lsp-folds-drive-letters]]
-- [[spec/tickets/the-need-list-lacks-verbs]]
-- [[spec/tickets/window-links-reach-private-tickets]]
-- [[spec/tickets/vehicles-take-the-window-port]]
-- [[spec/tickets/the-dead-exports-leave]]
-- [[spec/tickets/the-hook-log-loses-lines]]
-
-A phase porting one of these folders takes the ticket's fix with it, or closes
-the ticket as answered by its own.
+| the bug | where it stands |
+|---|---|
+| [[spec/tickets/the-judge-reads-every-layer]] | fixed, and the judge stands in the code no more |
+| [[spec/tickets/the-sidebar-log-appends]] | fixed |
+| [[spec/tickets/one-reader-names-the-home]] | fixed |
+| [[spec/tickets/the-lsp-folds-drive-letters]] | fixed |
+| [[spec/tickets/window-links-reach-private-tickets]] | fixed |
+| [[spec/tickets/vehicles-take-the-window-port]] | fixed |
+| [[spec/tickets/config-reads-differ-by-reader]] | [[spec/tickets/cfg-topic-holds-one-resolver]] |
+| [[spec/tickets/the-hook-log-loses-lines]] | [[spec/tickets/a-down-index-refuses-calls]] |
+| [[spec/tickets/the-need-list-lacks-verbs]] | [[spec/tickets/pull-verbs-become-actions]] |
+| [[spec/tickets/the-dead-exports-leave]] | each row leaves with its file, as phases 4 and 7 port the folder |
 
 # The tests after the move
 

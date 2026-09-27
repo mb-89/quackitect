@@ -126,12 +126,13 @@ function lens(title, act, ticket, path) {
 function lensesOf({ path, text, holds }) {
   const ticket = ticketOf(path);
   if (!ticket) return [];
+  // A hold is a state of the ticket, so a ticket past open draws no held button. [[spec/design_output/pull#the-hand-and-the-hold]]
+  if (fieldOf(text, "state") !== "open") return [];
   const naming = (holds ?? []).filter((one) => one?.ticket === ticket);
   const mine = naming.find(personHolds);
   if (mine) return handBackOf(ticket, path, text, mine);
   if (naming.length)
     return [lens(`held by ${naming[0].hand} at ${naming[0].step}`, "", ticket, path)];
-  if (fieldOf(text, "state") !== "open") return [];
   const leaf = leafAt(text, "");
   const step = leaf?.path ?? fieldOf(text, "step");
   const by = leaf ? byOf(leaf) : "anyone";

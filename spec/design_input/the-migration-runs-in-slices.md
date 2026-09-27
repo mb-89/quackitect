@@ -13,7 +13,8 @@ The asks, one to a line:
 
 - Land everything on `main`, and let the cage keep `main` whole.
 - Grow the new system beside the old one, and let it take over one slice at a time.
-- Run the phases below in order, each one a group of tickets in the existing process.
+- Run the phases below as a graph, each one a group of tickets in the existing process.
+- Let a group start once the groups it needs land.
 - Hold each phase behind a switch the owner turns on, and hold nothing else.
 - Read the settled rulings before any question, and ask none of them again.
 
@@ -48,11 +49,16 @@ Every group outside the migration keeps moving.
 
 # The phases
 
-Each group names the one before it under `depends_on`, the way every group in
-this tree chains. A child names a sibling alone, where its work needs the other
-first. Nothing outside the migration waits on these groups, and none carries
-`urgent`. The keys `phase0`, `phase1`, `phase1gaps` and `phase2shadow` read
-`true`, and every other key reads `false`.
+Each group names the groups whose work its children need under `depends_on`,
+and nothing more, so groups needing none of each other run side by side. A
+switch group names its own shadow group, and each group keeps its key under
+`enabled_by`. A phase number names the slice, and sets no order past the edges
+below.
+
+A child names a sibling alone, where its work needs the other first. Nothing
+outside the migration waits on these groups, and none carries `urgent`. The keys `phase0`, `phase1`, `phase1gaps` and every `phaseNshadow` read `true`,
+so a shadow group starts once the groups it names land. Every `phaseNswitch`
+key and `phase10` read `false` until the owner reads the shadow before it.
 
 | phase | the groups, each with its key under `migration` | done when |
 |---|---|---|
@@ -68,7 +74,7 @@ first. Nothing outside the migration waits on these groups, and none carries
 | 9, the deployment | [[spec/tickets/module-processes-land-in-shadow]], `phase9shadow`, then [[spec/tickets/module-processes-switch-over]], `phase9switch` | a crash in one part leaves the others running, and raises an alarm |
 | 10, Node leaves the boxes | [[spec/tickets/node-leaves-the-boxes]], `phase10` | `install.sh` installs no Node |
 
-The chain, each group with its switch, and the owner's hand between a shadow and
+The graph, each group with its switch, and the owner's hand between a shadow and
 its switch-over:
 
 ```mermaid
@@ -77,25 +83,55 @@ flowchart TD
   p1 --> p1g["phase 1: the gaps, phase1gaps"]
   p1g --> p2s["phase 2: open-tasks shadow, phase2shadow"]
   p2s -. "the owner sets phase2switch" .-> p2w["phase 2: open-tasks switch, phase2switch"]
-  p2w --> p3s["phase 3: read-only topics shadow, phase3shadow"]
+  p2s --> p3s["phase 3: read-only topics shadow, phase3shadow"]
   p3s -.-> p3w["phase 3: switch, phase3switch"]
-  p3w --> p4s["phase 4: quack verbs shadow, phase4shadow"]
+  p2s --> p4s["phase 4: quack verbs shadow, phase4shadow"]
+  p3s --> p4s
   p4s -.-> p4w["phase 4: switch, phase4switch"]
-  p4w --> p5s["phase 5: the cage shadow, phase5shadow"]
+  p2w --> p4w
+  p3w --> p4w
+  p4s --> p5s["phase 5: the cage shadow, phase5shadow"]
   p5s -.-> p5w["phase 5: switch, phase5switch"]
-  p5w --> p6s["phase 6: the window shadow, phase6shadow"]
+  p4w --> p5w
+  p3s --> p6s["phase 6: the window shadow, phase6shadow"]
+  p4s --> p6s
   p6s -.-> p6w["phase 6: switch, phase6switch"]
-  p6w --> p7s["phase 7: lsp and the checks shadow, phase7shadow"]
+  p3w --> p6w
+  p4w --> p6w
+  p3s --> p7s["phase 7: lsp and the checks shadow, phase7shadow"]
+  p4s --> p7s
   p7s -.-> p7w["phase 7: switch, phase7switch"]
-  p7w --> p8s["phase 8: the extension shadow, phase8shadow"]
+  p3w --> p7w
+  p6s --> p8s["phase 8: the extension shadow, phase8shadow"]
   p8s -.-> p8w["phase 8: switch, phase8switch"]
-  p8w --> p9s["phase 9: the deployment shadow, phase9shadow"]
+  p6w --> p8w
+  p5w --> p9s["phase 9: the deployment shadow, phase9shadow"]
+  p7w --> p9s
+  p8w --> p9s
   p9s -.-> p9w["phase 9: switch, phase9switch"]
   p9w --> p10["phase 10: Node leaves, phase10"]
 ```
 
 Every arrow is `depends_on`. A dotted one marks the owner's switch as well, set
 once the shadow before it runs clean.
+
+What each edge carries:
+
+| the group | waits on | because |
+|---|---|---|
+| open-tasks shadow | the gaps | the queue module stands on `q/qtest` |
+| read-only topics shadow | open-tasks shadow | the pilot builds the `migration` module, the slice key and the `shadow` row every later shadow reuses |
+| the actions shadow | open-tasks shadow, read-only topics shadow | the pull reads the queue module, and hands the rules the `guidance/` topic answers |
+| the actions switch | open-tasks switch, read-only topics switch | `cli.js` leaves, and with it the count chain and the JavaScript checks, so both slices stand at `new` first |
+| the cage shadow | the actions shadow | Copilot reaches the cage through `quack hook`, and MCP lists the actions as tools |
+| the cage switch | the actions switch | the bridge serves the agents' tools until the index answers them |
+| the window shadow | read-only topics shadow, the actions shadow | the log view reads `log/`, and the work view's keys call actions |
+| the window switch | read-only topics switch, the actions switch | the window drops its own reads and writes once those paths stand at `new` |
+| the editor checks shadow | read-only topics shadow, the actions shadow | the rules move into the check module, and `quack lsp` joins the command line |
+| the editor checks switch | read-only topics switch | the LSP's rules leave once the `check/` names answer alone |
+| the extension shadow | the window shadow | the sidebar draws the base files, and a badge reads the label the window draws |
+| the extension switch | the window switch | the sidebar and the window read one name off the index |
+| the deployment shadow | the cage, editor checks and extension switches | the IO process holds every listener, so each IO module stands alone first |
 
 A group's ask names its work, and its children carry the done criteria. A
 group's `split` step mints the children a later phase finds it lacks. Phase 2's

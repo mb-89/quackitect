@@ -47,10 +47,19 @@ export function inHand({ disk, root }) {
   for (const one of rows) {
     const held = parsedAt(disk, join(folder, one.name));
     const ticket = String(held?.ticket ?? "").trim();
-    if (ticket && !tickets.includes(ticket)) tickets.push(ticket);
+    if (ticket && !tickets.includes(ticket) && stillHeld(disk, root, held))
+      tickets.push(ticket);
   }
   const plan = parsedAt(disk, join(root, ...PLANS.split("/")));
   return { tickets, todo: String(plan?.working ?? "").trim() };
+}
+
+// A hold stands while its ticket does, so a hold on a ticket that reads closed stands in no hand. A hold naming no path stands, and so does one whose ticket file stands on another branch alone. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function stillHeld(disk, root, held) {
+  const path = String(held?.path ?? "").trim();
+  if (!path) return true;
+  const text = readAt(disk, join(root, ...path.split("/")));
+  return text === null || fieldOf(text, STATE) !== CLOSED;
 }
 
 function handLine(hand) {

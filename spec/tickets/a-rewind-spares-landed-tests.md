@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/person-1
 steps:
   - name: design
     steps:
@@ -53,6 +53,16 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "The route strands: the reject round wires no input, and the route verb refuses the rewire. Do you rewire four inputs by hand, or does the engine fix land first?"
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["I rewire by hand", "the engine fix lands first"]
       - name: draft-2
         does: writes the approach the ask calls for
         from: anyone
@@ -329,6 +339,16 @@ Over a keptRed that keeps nothing, four cases fail on their own assertion: the k
 
 - each done line meets a case above: the keep, the rename replay, and the check at tests-green
 - the git door the cases reach answers through the fake git of pull-doors.js
+
+## person-1
+
+<!-- The route strands: the reject round wires no input, and the route verb refuses the rewire. Do you rewire four inputs by hand, or does the engine fix land first? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
 
 ## draft-2
 

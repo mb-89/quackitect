@@ -140,7 +140,13 @@ export function merge(it, name) {
   console.log(`${branch} is merged, and the check passes on the merge commit.`);
   for (const one of freed)
     console.log(`  ${one} lost its group, and stands loose on ${TRUNK}.`);
-  console.log(`Run ./RUNME.sh branch close ${name}.`);
+  // Trunk on origin holds the whole branch once the push lands, so the close drops nothing, and a dependent reads the branch gone. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  if (!it.git.run(["push", "origin", TRUNK]).ok) {
+    console.log(`Push ${TRUNK}, then run ./RUNME.sh branch close ${name}.`);
+    return 0;
+  }
+  // A remote refusing the delete leaves the branch, and trunk's closed ticket frees what waits. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  if (close(it, name, [])) console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
   return 0;
 }
 

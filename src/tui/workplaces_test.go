@@ -54,6 +54,18 @@ func TestTheAnswerReadsAsPlacesAndTheGroupsOnACloud(t *testing.T) {
 	}
 }
 
+// A merged group the queue places on the cloud lights the letter, and so does its ticket. [[spec/tickets/marked-groups-stay-cloud]]
+func TestAMergedGroupPlacedOnTheCloudLightsTheLetterAndSoDoesItsTicket(t *testing.T) {
+	t.Parallel()
+	said, err := work.PlacesIn([]byte(`{"branches":[{"branch":"work/a-marked-group","name":"a-marked-group","merged":true,"queue":"∞","tickets":[{"name":"its-child","queue":"∞"}]}],"loose":[]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !said.Cloud["a-marked-group"] || !said.Cloud["its-child"] {
+		t.Fatalf("a merged group at infinity stands on the cloud with its ticket, and the flags read %v", said.Cloud)
+	}
+}
+
 // The places land over the tree, the queue column draws them, and the cloud letter lights on the group. [[spec/design_output/tui#the-work-tab]]
 func TestThePlacesLandOverTheTreeAndALaterTreeTakesThemAgain(t *testing.T) {
 	t.Parallel()

@@ -141,6 +141,17 @@ export function withHashAfter(text, after, front) {
   return front.after(text, after);
 }
 
+// A merge keeping two boxes' rows leaves two takes open, and a release closes each, so the group reads free. [[spec/design_output/work#held-derives-from-the-record]]
+export function withEveryTakeClosed(text, after, front) {
+  let said = text;
+  while (heldIn(said)) {
+    const next = withHashAfter(said, after, front);
+    if (next === said) break;
+    said = next;
+  }
+  return said;
+}
+
 // [[spec/design_output/work#a-box-leaves]]
 export function withField(text, key, value, front) {
   return front.set(text, key, value);

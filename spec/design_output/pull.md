@@ -223,6 +223,15 @@ pull refuses a second hand-out while a hold stands, and `ticket pull --drop`
 drops the hold with the leaf where it stands. The stop hook reads the
 folder, so a turn ending with a hold standing carries on.
 
+A hold stands while its ticket does. The readers stay pure, and the pull alone
+removes a file.
+
+| the hold | what the readers and the pull do |
+|---|---|
+| its ticket file reads `state: closed` | the readers skip it, and the next pull removes it before it reads the hand |
+| it names no path, as an ephemeral ticket's does | the readers read it |
+| its ticket file stands on another branch alone | the readers read it |
+
 A clear and a compaction each empty `reads` in every hold on the box, and the
 ticket and the step stay. So the next pull hands the notes again. For details,
 see [[spec/design_output/stop#the-context-hands-over]].
@@ -408,6 +417,15 @@ A refused payload reaches no disk. It rides the hold, so the next hand-back
 with no `--fields` meets the same checks over the same text. A refusal at the
 cap inserts the person step on the ticket without the payload, so a word the
 rules refuse reaches no branch.
+
+### A merge opens the ticket
+
+A merge conflict leaves an open ticket with its markers in, and no verb writes
+a ticket that reads so. While git lists the ticket unmerged, the write door
+takes a hand's whole write there, past the ticket door and the engine's fields.
+It refuses a write still carrying a marker line, and names each line. The schema
+reads the write as a first one, because the markers stand in the text on disk.
+The merge commit closes it again.
 
 ## The checks
 

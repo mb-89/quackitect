@@ -75,7 +75,7 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [read-topics-switch-over]
+depends_on: [open-tasks-shadow-lands, read-topics-land-in-shadow]
 enabled_by: migration.phase4shadow
 cloud: true
 ---

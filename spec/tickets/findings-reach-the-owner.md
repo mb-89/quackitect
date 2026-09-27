@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: answer
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -17,7 +18,6 @@ steps:
     by: anyone
     to: retro
     input: answer
-    reads: [[spec/guidance/working]]
     needs: ["branch test"]
     checklist: ["the change follows the answer, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
@@ -33,8 +33,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
-process_hash: 1f3006ec4b044a89
-step: answer
+process_hash: d1a6e26348695e24
 ---
 
 # Ask

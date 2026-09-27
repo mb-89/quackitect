@@ -119,7 +119,17 @@ export function remoteSaying(refs, objects = {}) {
     .map((one) => `  origin/${one.branch}`)
     .join("\n");
   const named = new Map(refs.map((one) => [one.tip, one.branch]));
+  // A landed group's ticket stands closed on trunk, which is what the listing reads. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  const closedOnTrunk = Object.fromEntries(
+    refs
+      .filter((one) => one.merged)
+      .map((one) => [
+        `git show origin/main:spec/tickets/${one.branch.replace(/^work\//, "")}.md`,
+        { stdout: "---\nkind: [[ticket]]\nstate: closed\n---\n" },
+      ]),
+  );
   return {
+    ...closedOnTrunk,
     [`git for-each-ref --format=${REF_FORMAT} refs/remotes/origin/work/`]: {
       stdout: rows ? `${rows}\n` : "",
     },
@@ -203,6 +213,14 @@ export const merging = (extra = {}) => ({
     exitCode: 0,
     stdout: "green\n",
   },
+  // The merge pushes trunk and closes the branch trunk now holds. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  "git push origin main": { exitCode: 0 },
+  "git rev-list --count origin/main..main": { stdout: "0\n" },
+  "git branch -r --merged origin/main": { stdout: "  origin/main\n  origin/work/one-group\n" },
+  "git branch -r --points-at origin/main": { stdout: "  origin/main\n" },
+  "git rev-list --first-parent origin/main": { stdout: `${SHA}\n` },
+  "git rev-parse origin/work/one-group": { stdout: "b9\n" },
+  "git push origin --delete work/one-group": { exitCode: 0 },
   ...extra,
 });
 

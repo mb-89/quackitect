@@ -1,10 +1,31 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/person-2
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: The badge follows the queue with no window reload. Does that line wait for the-badge-reads-open-tasks in phase 2, while this ticket lands the rest now?
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["wait for phase 2 and land the rest now", "an interim redraw off the bridge now"]
+      - name: person-2
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: Phase 2 moves the badge onto work/open-tasks. Do the redraw line, its sidebar case and the compare step move to the-badge-reads-open-tasks, while this ticket lands the todo, the rows and the lens?
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["move them to phase 2", "keep them here"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -76,7 +97,6 @@ steps:
             says: what changes and why, for a reader who was not there
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
-step: design/draft
 record:
   - step: design/draft
     hand: box 63693613eded · claude-code-remote
@@ -88,6 +108,11 @@ record:
     hash_after: b4d3c8ed536c28bad242530e350e48a8db83a241
     returns: 1
     why: "the redraw runs `./RUNME.sh tui work --count` on every burst of ticket, plan and hold writes. Each run starts node, can build the viewer, and reads git over every work branch, thirteen seconds on the owner's desk. The owner rules on sidebar-lands-in-shadow that the sidebar builds and restarts nothing, and draws a question mark until the engine answers. The redraft reads a count the engine already keeps, and spawns no verb on a draw; the count stands at 68 on the owner's desk, because the queue reads a group as the cloud's by its branch alone. the-queue-reads-the-marker reads `cloud: true` in its place, so the redraft names it under `depends_on`, and the badge and the brackets agree on the local count once it lands"
+  - step: design/person-1
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: ccc6f854a3a0c823c6ef7aabd3a6a948366ce048
+    hash_after: ccc6f854a3a0c823c6ef7aabd3a6a948366ce048
+    def: 3acd0a8c729a3d0a
 ---
 
 # Ask
@@ -111,6 +136,27 @@ The badge counts the rows the tab draws, and the sidebar redraws on a config cha
 - `./RUNME.sh check` exits 0
 
 # design
+
+## person-1
+
+<!-- The badge follows the queue with no window reload. Does that line wait for the-badge-reads-open-tasks in phase 2, while this ticket lands the rest now? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+<!-- the form is choice -->
+
+wait for phase 2 and land the rest now
+
+## person-2
+
+<!-- Phase 2 moves the badge onto work/open-tasks. Do the redraw line, its sidebar case and the compare step move to the-badge-reads-open-tasks, while this ticket lands the todo, the rows and the lens? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is choice -->
 
 ## draft
 
@@ -293,3 +339,14 @@ fail
 - the count lands on main, so the badge and the brackets read `Places.Takeable` off `PlacesAt`
 - `src/tui/workcount_test.go` holds the printed count equal to the brackets
 - the briefcase icon and the rest of the ask stand open
+- the owner answers person-1 with a yes, and doubts it. Word for word: "Does the badge redraw wait for phase two? Yeah, I guess. I'm not sure. Yeah, I guess." The redraft asks again where phase 2 moves the badge elsewhere
+- the redraft reads main, and each line below stands checked in the code
+- done on main: the count, the flag, the briefcase and the help naming the brackets
+- open: `Placed` in `src/tui/work/workplaces.go` builds `standing` from the top items alone, so a nested todo draws twice
+- open: `childRows` in `src/scripts/work-list.js` draws the step alone
+- open: `refsHere` in `src/scripts/work-stands.js` marks `orphan` alone
+- open: `lensesOf` in `src/extension/lib/lens.js` reads the ticket text alone
+- the lens reads `cloud: true` off the group file, as `placesIn` in `src/scripts/work-answer.js` does, and spawns no verb
+- the engine keeps no count yet, so the badge redraw waits for phase 2, as person-1 answers
+- the old draft names `workcount.go` and `Drawn`, and neither stands on main
+- this ticket waits for the-queue-reads-the-marker. The door refuses a front write on an open ticket, so the line stands here

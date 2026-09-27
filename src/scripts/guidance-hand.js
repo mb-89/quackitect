@@ -3,10 +3,7 @@
 // a moved hash hands them again.
 // [[spec/design_output/pull#the-work-answer]]
 
-import {
-  HOLD as OWNED_HOLD,
-  HOLDS as OWNED_HOLDS,
-} from "../../.claude/skills/level0/lib/folders.js";
+import { HOLDS as OWNED_HOLDS } from "../../.claude/skills/level0/lib/folders.js";
 
 import {
   actionables,
@@ -19,11 +16,12 @@ import {
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { carriedIn } from "../../.claude/skills/level0/lib/tested.js";
 import { hashOf, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { stillHeld } from "../engine/named.js";
+import { holdsIn } from "./ephemeral.js";
 import { agentOf, BOX, handOf } from "./pull-hand-of.js";
 import { leafOf, leavesOf } from "./pull-route.js";
 
 export const HOLDS = OWNED_HOLDS;
-export const HOLD = OWNED_HOLD;
 export const GUIDANCE = "spec/guidance";
 export const PROCESSES = "spec/processes";
 const YAML = /\.yaml$/;
@@ -36,32 +34,21 @@ export function holdAt(it, hand) {
   return it.join(it.root, ...`${HOLDS}/${slug}.json`.split("/"));
 }
 
+// The hold of one hand, where its ticket stands. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function holdOf(it, hand) {
   const at = holdAt(it, hand);
-  return it.disk.exists(at) ? parsed(it.disk.read(at)) : null;
+  const held = it.disk.exists(at) ? parsed(it.disk.read(at)) : null;
+  return held && stillHeld(it.disk, it.root, held) ? held : null;
 }
 
-// Whether any hand holds a step on this box, out of the folder and the older file alike. [[spec/design_output/pull#the-hand-and-the-hold]]
+// Whether any hand holds a step on this box, where its ticket stands. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function holdsAnywhere(it) {
   return everyHold(it)[0] ?? null;
 }
 
-// Every hold on this box, one a hand, because several hands work one box. [[spec/design_output/pull#the-hand-and-the-hold]]
+// Every hold on this box whose ticket stands, one a hand, because several hands work one box. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function everyHold(it) {
-  const folder = it.join(it.root, ...HOLDS.split("/"));
-  const rows = it.disk.exists(folder)
-    ? it.disk
-        .list(folder)
-        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
-        .map((one) => it.join(folder, one.name))
-    : [];
-  const out = [];
-  for (const at of [...rows, it.join(it.root, ...HOLD.split("/"))]) {
-    if (!it.disk.exists(at)) continue;
-    const held = parsed(it.disk.read(at));
-    if (held) out.push({ at, held });
-  }
-  return out;
+  return holdsIn(it.disk, it.root);
 }
 
 // The tests every held ticket's command lines carry, which the commit door counts beside the staged ones. [[spec/design_output/tree#the-rules-over-two-files]]
