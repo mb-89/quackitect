@@ -28,6 +28,7 @@ import {
   WORK_BRANCH,
   withEntry,
   withField,
+  withEveryTakeClosed,
   withHashAfter,
   withoutField,
 } from "../engine/group.js";
@@ -569,9 +570,7 @@ function letGo(it, branch, name, here) {
   }
 
   const tip = it.git.run(["rev-parse", "HEAD"], true).out;
-  let text = it.disk.read(path);
-  for (let next; heldIn(text) && (next = withHashAfter(text, tip, it.front)) !== text; ) text = next; // A merge keeping two boxes' rows leaves two takes open, and the release closes each. [[spec/design_output/work#held-derives-from-the-record]]
-  it.disk.write(path, text);
+  it.disk.write(path, withEveryTakeClosed(it.disk.read(path), tip, it.front));
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;

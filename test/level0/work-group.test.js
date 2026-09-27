@@ -562,6 +562,7 @@ test("release closes every open take a merge left, so the group reads free", () 
   const text = disk.read(on("one-group"));
   assert.deepEqual(recordIn(text).map((row) => row.hash_after), [SHA, SHA]);
   assert.equal(groupStanding(text), TODO);
+  assert.equal(heldIn(text), null, "no take stands open after the release");
 });
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
