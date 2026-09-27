@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
 steps:
   - name: design
     steps:
@@ -14,16 +13,6 @@ steps:
           - name: read
             form: verdict
             says: pass where the ask says what the owner said, or fail with the owner's words
-      - name: person-1
-        does: answers the question the engine asks
-        by: person
-        to: engine
-        asks: The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md?
-        evidence:
-          - name: answer
-            form: choice
-            says: the answer, which the step behind this one reads
-            options: ["refuse at the hand-back", "drop the ticket"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -127,30 +116,38 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-record:
-  - step: design/owner-read
-    skipped: true
-    why: the ask comes off no handover
-  - step: design/person-1
-    hand: box d6f05e3a585030 · claude-code · the owner says so
-    hash_before: dfc0996ac0aff760095677c90c4ad37533b4ed1e
-    hash_after: dfc0996ac0aff760095677c90c4ad37533b4ed1e
-    def: 1b6221c418192ec9
+group: the-cloud-works-its-queue
+depends_on: [dispatch-writes-the-bundles]
+step: design/owner-read
 ---
 
 # Ask
 
-A hand-back refuses a field that breaks a rule of form, and names the rule and the line. The hand fixes the field while the leaf stands in its hand. [[spec/design_output/level0#the-panel-holds-a-warning]] lets a break of form land at warning, for a later hand to clear.
+A group holds groups, per [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]. A child group waits on its own `depends_on` and on every ancestor's. A parent closes once no child stands open. A ticket a group files lands in that group's parent, so a fix bundle and a ticket for a person hold the parent open. So a big move runs as a chain of parent groups, and a review inside it is a ticket for a person.
 
-An open ticket refuses every later hand's write outside Discussion. So a break of form an engine-written field carries stays, and the check exits 1 until the owner edits the line by hand. Every check field then fails, and the push waits.
+Without it an ordered move takes a config switch the owner edits, and a group's follow-up lands loose, tied to no move. The work tab nests rows at any depth already, through `itemsOfTickets` in `src/tui/work/workitems.go`. For the nesting, see [[spec/design_output/tree-view#the-name-column-nests]]. It lacks a mark saying what holds a parent open. The index row carries no reading of a ticket for a person, and no flag in `spec/views/work.base` reads one.
 
-- a case under test/level0 refuses a hand-back whose field breaks a rule of form, naming the rule
-- a case under test/level0 holds the ticket unchanged after that refusal, with the fields riding the hold
-- ./RUNME.sh check exits 0
+- a case in `test/level0/dispatch.test.js` hands a group holding a group to no worker
+- a case there lists that parent to close once every child stands closed on `main`
+- a case there holds a group back while its parent's parent waits on an open group
+- that case frees the group once the open group closes
+- `waitingOn` in `src/scripts/work-stands.js` reads a dependency off its ticket on `origin/main` alone
+- a case in `test/level0/work-stands.test.js` finds a parent with no branch holding its dependents
+- a case in `test/level0/dispatch.test.js` finds a parent's close written once over two runs
+- a case there bundles each parent's loose agent tickets into a fix group under that parent
+- a case in `test/level0/work-done.test.js` finds `branch done` moving each open child under the parent
+- that case moves each ticket the branch adds with no group there too
+- a case there leaves them loose where the group stands at the top
+- the work tab lights a letter on a group row over an open ticket for a person
+- `spec/views/work.base` names that flag, and the rows carry its key
+- a case in `src/tui/work/workitems_test.go` lights the letter over a ticket two levels down
+- `spec/design_output/tree-view.md` names the letter, and `spec/design_output/work.md` carries the parent rules
+- `spec/guidance/tickets.md` tells a hand to nest a group for a big move alone
+- `./RUNME.sh check` exits 0
 
-view: none
+The view: the work tab in the window. A parent group's row lights the new letter while a ticket for a person stands open under it.
 
-from: none
+The source: none.
 
 # design
 
@@ -163,17 +160,6 @@ from: none
 <!-- pass where the ask says what the owner said, or fail with the owner's words -->
 
 <!-- the form is verdict -->
-
-## person-1
-
-<!-- The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md? -->
-
-### answer
-
-<!-- the answer, which the step behind this one reads -->
-<!-- the form is choice -->
-
-drop the ticket
 
 ## draft
 
@@ -322,12 +308,3 @@ drop the ticket
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-- the ask says the check exits 1 on these lines, and it exits 0 on them. They stand at warning, so the push waits and the check passes. The fault stands as the ask names it otherwise
-- the push holds no ticket warning: `stampFor` in `src/scripts/cli-stamp.js` drops ticket prose from the count
-- the harm left: a break of form on an open ticket stands in the Problems panel, and no agent hand clears it
-- the change: `voiceFaults` in `src/scripts/pull-chapter.js` answers every finding as a refusal, naming the field above the line
-- `refused` in `src/scripts/pull.js` keeps the hold and the payload, so the fields ride the hold today
-- `warnsOf` and the warned road leave `handBack`, and `voiceOver` stays, so the write door and the lint keep their warnings
-- tests: `test/level0/pull-fields.test.js` turns its landing case into a refusal, and adds the unchanged ticket with the payload held
-- the change reverses the form-lands call of `spec/rationales/voice.md` section 11 for a hand-back, so the draft waits on the owner

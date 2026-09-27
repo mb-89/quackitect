@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -143,6 +143,18 @@ record:
         hash: 34100fc0dd71b112
         size: 3626
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d6f05e3a585030 · claude-code · helper-4
+    hash_before: f23575da65e6ed5a4f8cda5b519c43920a71801c
+    hash_after: e76311df0e6d5365717cc12165045fc7982590fd
+    inputs:
+      - name: design/draft
+        hash: 34100fc0dd71b112
+        size: 3626
+      - name: design/tests-red
+        hash: 61870ef475e8bd94
+        size: 1345
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -299,8 +311,19 @@ The contract case passes today, and it guards the road the change takes. `respaw
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- serve-probes-the-register-port: `portIn` in `src/scripts/serve.js` reads the pointer, and a vehicle tree carries none, so the probe asks `PORT_BASE`. A server started with no `--port` listens where `registeredPort` in `src/bridge/vehicle.js` says. Where the register hands this vehicle another port, `./RUNME.sh serve` meets another vehicle's bridge and starts nothing, and `servesHere` shares the read. The probe and the listen take one port.
+- box-keys-fold-drive-letters: `boxesOf` in `src/bridge/server.js` keys a box on the raw root, and `answersEvent` hands it the root each event carries, so a `C:` root and a `c:` root build two boxes on one server. On this desk the standing bridge runs from a `C:` root, and the register names a `c:` one. The key folds the way `same` in `.claude/skills/level0/lib/vehicle.js` compares two paths.
+| the spot | what the builder does in place |
+|---|---|
+| the third serve case | teaches the fake the server start as a function that appends the error line to `serve.log` on the fake disk, and `servesDetached` names the part the start wrote, the way `respawned` in `src/bridge/server.js` reads it. The case seeds the line before the start, which pins a read naming an earlier run's error |
+| `servesDetached` and the editor start | pass `waitMs` to `respawn`, the way `respawned` passes `RESPAWN_WAIT`, because the default settles at once and a fall goes unseen |
+| the editor start | makes `.se/.log` before `respawn` opens `serve.log`, the way `respawned` does, because `openSync` throws where the folder stands nowhere |
+| `The light follows the server` in `spec/design_output/extension.md` | drops the row on the button's own child, and `RESPAWN_GRACE`, `KILL_AFTER` and the `spawn` import leave with the child |
+| the checkpoint | rides no leaf, because the ask names no `view:` and `holdsHere` in `src/scripts/pull-when.js` skips the view leaf without one. The `says` of tests-green asks the owner to close the editor with a server standing and then ask `/health`, and accept reads the answer under Discussion |
+| the Windows job | keeps the draft's road. Every editor utility process on this desk, the extension hosts among them, runs inside a job, and the agent's shell stands in a job that lets a child leave and kills nothing on close. The standing bridge outlives its gone parent. No read from outside reaches the extension host's own job flags, so the checkpoint decides the editor road, and a start through WMI, which parents the server outside the editor's job, stands next where it fails, unchecked |
 
 # implement
 

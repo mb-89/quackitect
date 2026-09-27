@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: answer
+step: do
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -34,6 +34,22 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
+record:
+  - step: answer
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: c1540a401286b74d1986ad3ed5cc5ecac7a18b7f
+    hash_after: c1540a401286b74d1986ad3ed5cc5ecac7a18b7f
+    inputs:
+      - name: ask
+        hash: 4a7ea35c497553e1
+        size: 1382
+      - name: [[spec/tickets/a-reply-follows-its-prompt]]
+        hash: dab8242d80a4310b
+        size: 26112
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -67,8 +83,9 @@ Run the reply probe on a desk whose client loads function hooks, and write what 
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The answer waits for the do step. The owner rules that the do step adds `./RUNME.sh probe reply` first, and then the probe runs on this Windows desk, whose client loads function hooks.
 
 # do
 
@@ -101,3 +118,5 @@ Run the reply probe on a desk whose client loads function hooks, and write what 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+On the owner's desk, `./RUNME.sh probe` holds `compact` and `cold` alone. The `do` step behind `answer` adds `reply`, so the run this question asks for waits on that step.

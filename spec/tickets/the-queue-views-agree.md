@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-2
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -113,6 +113,11 @@ record:
     hash_before: ccc6f854a3a0c823c6ef7aabd3a6a948366ce048
     hash_after: ccc6f854a3a0c823c6ef7aabd3a6a948366ce048
     def: 3acd0a8c729a3d0a
+  - step: design/person-2
+    hand: box d6f05e3a585030 · claude-code · the owner says so
+    hash_before: 470addc968f88b7ac21abe0d29f596cd90dbc64e
+    hash_after: 470addc968f88b7ac21abe0d29f596cd90dbc64e
+    def: b235913657b5dd0b
 ---
 
 # Ask
@@ -155,8 +160,9 @@ wait for phase 2 and land the rest now
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+move them to phase 2
 
 ## draft
 

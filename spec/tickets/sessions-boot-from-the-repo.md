@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
 steps:
   - name: design
     steps:
@@ -14,16 +13,6 @@ steps:
           - name: read
             form: verdict
             says: pass where the ask says what the owner said, or fail with the owner's words
-      - name: person-1
-        does: answers the question the engine asks
-        by: person
-        to: engine
-        asks: The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md?
-        evidence:
-          - name: answer
-            form: choice
-            says: the answer, which the step behind this one reads
-            options: ["refuse at the hand-back", "drop the ticket"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -127,30 +116,26 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-record:
-  - step: design/owner-read
-    skipped: true
-    why: the ask comes off no handover
-  - step: design/person-1
-    hand: box d6f05e3a585030 · claude-code · the owner says so
-    hash_before: dfc0996ac0aff760095677c90c4ad37533b4ed1e
-    hash_after: dfc0996ac0aff760095677c90c4ad37533b4ed1e
-    def: 1b6221c418192ec9
+group: the-cloud-works-its-queue
+step: design/owner-read
 ---
 
 # Ask
 
-A hand-back refuses a field that breaks a rule of form, and names the rule and the line. The hand fixes the field while the leaf stands in its hand. [[spec/design_output/level0#the-panel-holds-a-warning]] lets a break of form land at warning, for a later hand to clear.
+A cloud session boots off the repo alone, per [[spec/design_input/the-cloud-runs-itself#the-boot]]. A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/install.sh` under the skip list the setup names today. It returns at once where the tools stand. The setup of [[spec/design_output/level0#the-setup-installs-the-cage]] also writes the trust flag and the auto mode into the box's home. No project file reaches either, so this ticket finds whether a cloud session still needs them. Where it does, those lines stay in the setup.
 
-An open ticket refuses every later hand's write outside Discussion. So a break of form an engine-written field carries stays, and the check exits 1 until the owner edits the line by hand. Every check field then fails, and the push waits.
+Without it every new environment needs a setup script a person pastes by hand. A box whose setup drifts from the tree then boots with no cage.
 
-- a case under test/level0 refuses a hand-back whose field breaks a rule of form, naming the rule
-- a case under test/level0 holds the ticket unchanged after that refusal, with the fields riding the hold
-- ./RUNME.sh check exits 0
+- `.claude/settings.json` carries a `SessionStart` hook running the install
+- a case in `test/level0/hooks.test.js` reads the hook there
+- a case there finds the hook returning at once on a box where every tool stands
+- `spec/design_output/level0.md` names the hook as the road
+- that note says which lines of the setup still stand, and why
+- `./RUNME.sh check` exits 0
 
-view: none
+The view: none.
 
-from: none
+The source: none.
 
 # design
 
@@ -163,17 +148,6 @@ from: none
 <!-- pass where the ask says what the owner said, or fail with the owner's words -->
 
 <!-- the form is verdict -->
-
-## person-1
-
-<!-- The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md? -->
-
-### answer
-
-<!-- the answer, which the step behind this one reads -->
-<!-- the form is choice -->
-
-drop the ticket
 
 ## draft
 
@@ -322,12 +296,3 @@ drop the ticket
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-- the ask says the check exits 1 on these lines, and it exits 0 on them. They stand at warning, so the push waits and the check passes. The fault stands as the ask names it otherwise
-- the push holds no ticket warning: `stampFor` in `src/scripts/cli-stamp.js` drops ticket prose from the count
-- the harm left: a break of form on an open ticket stands in the Problems panel, and no agent hand clears it
-- the change: `voiceFaults` in `src/scripts/pull-chapter.js` answers every finding as a refusal, naming the field above the line
-- `refused` in `src/scripts/pull.js` keeps the hold and the payload, so the fields ride the hold today
-- `warnsOf` and the warned road leave `handBack`, and `voiceOver` stays, so the write door and the lint keep their warnings
-- tests: `test/level0/pull-fields.test.js` turns its landing case into a refusal, and adds the unchanged ticket with the payload held
-- the change reverses the form-lands call of `spec/rationales/voice.md` section 11 for a hand-back, so the draft waits on the owner

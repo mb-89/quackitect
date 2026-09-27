@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
 steps:
   - name: design
     steps:
@@ -14,16 +13,6 @@ steps:
           - name: read
             form: verdict
             says: pass where the ask says what the owner said, or fail with the owner's words
-      - name: person-1
-        does: answers the question the engine asks
-        by: person
-        to: engine
-        asks: The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md?
-        evidence:
-          - name: answer
-            form: choice
-            says: the answer, which the step behind this one reads
-            options: ["refuse at the hand-back", "drop the ticket"]
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -127,30 +116,37 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-record:
-  - step: design/owner-read
-    skipped: true
-    why: the ask comes off no handover
-  - step: design/person-1
-    hand: box d6f05e3a585030 · claude-code · the owner says so
-    hash_before: dfc0996ac0aff760095677c90c4ad37533b4ed1e
-    hash_after: dfc0996ac0aff760095677c90c4ad37533b4ed1e
-    def: 1b6221c418192ec9
+group: the-cloud-works-its-queue
+depends_on: [the-skills-start-the-workers, groups-hold-groups]
+step: design/owner-read
 ---
 
 # Ask
 
-A hand-back refuses a field that breaks a rule of form, and names the rule and the line. The hand fixes the field while the leaf stands in its hand. [[spec/design_output/level0#the-panel-holds-a-warning]] lets a break of form land at warning, for a later hand to clear.
+A worker hands its group over as a pull request, per [[spec/design_input/the-cloud-runs-itself#the-hand-over]]. `branch done` writes the close on the branch. The group ticket closes, every open child moves to the parent or stands loose, and the cloud marker drops.
 
-An open ticket refuses every later hand's write outside Discussion. So a break of form an engine-written field carries stays, and the check exits 1 until the owner edits the line by hand. Every check field then fails, and the push waits.
+The work skill then opens a pull request over `work/<name>` against `main` through the GitHub connector, with auto-merge on. The merge lands once the check stands green on Linux and Windows. A group at done whose branch stands behind `main`, or past `work.staleAfter`, counts as open work. `branch take` hands it to a worker to sync or fix.
 
-- a case under test/level0 refuses a hand-back whose field breaks a rule of form, naming the rule
-- a case under test/level0 holds the ticket unchanged after that refusal, with the fields riding the hold
-- ./RUNME.sh check exits 0
+Without it every landing waits for a desk running `branch merge`, and a phone lands nothing. The branches pile up on origin, since a cloud session meets a refusal on a branch delete.
 
-view: none
+- a case in `test/level0/work-done.test.js` finds `branch done` writing the close on the branch alone
+- that case finds the open children moved and the cloud marker dropped, and `main` untouched
+- the work skill ends on the pull request with auto-merge on
+- the dispatch skill opens its write branch's pull request the same way
+- `.github/workflows/check.yml` runs on a pull request against `main`, beside a push
+- a case in `test/contract/check-workflow.test.js` reads both triggers
+- a case in `test/level0/work.test.js` finds `branch take` handing out a stuck hand-over first
+- that case finds the ask printed: sync, check and push
+- a case in `test/level0/work-merge-cloud.test.js` finds `branch merge` refusing a branch a pull request carries
+- the refusal reads a `refs/pull/<n>/head` on origin at the branch tip, and names the pull request
+- `spec/design_output/work.md` carries the new round trip
+- `AGENTS.md` and `spec/guidance/cloud/cloud.md` say the work skill opens the pull request
+- `spec/funnel/work-lands-through-pull-requests.md` leaves
+- `./RUNME.sh check` exits 0
 
-from: none
+The view: none.
+
+The source: none.
 
 # design
 
@@ -163,17 +159,6 @@ from: none
 <!-- pass where the ask says what the owner said, or fail with the owner's words -->
 
 <!-- the form is verdict -->
-
-## person-1
-
-<!-- The ask rests on a red check and a held push, and ticket prose holds neither. Does a hand-back still refuse a break of form, against the form-lands call in voice.md? -->
-
-### answer
-
-<!-- the answer, which the step behind this one reads -->
-<!-- the form is choice -->
-
-drop the ticket
 
 ## draft
 
@@ -322,12 +307,3 @@ drop the ticket
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-- the ask says the check exits 1 on these lines, and it exits 0 on them. They stand at warning, so the push waits and the check passes. The fault stands as the ask names it otherwise
-- the push holds no ticket warning: `stampFor` in `src/scripts/cli-stamp.js` drops ticket prose from the count
-- the harm left: a break of form on an open ticket stands in the Problems panel, and no agent hand clears it
-- the change: `voiceFaults` in `src/scripts/pull-chapter.js` answers every finding as a refusal, naming the field above the line
-- `refused` in `src/scripts/pull.js` keeps the hold and the payload, so the fields ride the hold today
-- `warnsOf` and the warned road leave `handBack`, and `voiceOver` stays, so the write door and the lint keep their warnings
-- tests: `test/level0/pull-fields.test.js` turns its landing case into a refusal, and adds the unchanged ticket with the payload held
-- the change reverses the form-lands call of `spec/rationales/voice.md` section 11 for a hand-back, so the draft waits on the owner

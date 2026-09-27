@@ -110,3 +110,12 @@ Report back under `## answer`:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The agent runs steps 1 to 3 on the owner's Windows desk. Steps 4 to 6 wait on the owner's editor.
+
+| the step | what the desk shows |
+|---|---|
+| `.se/.runtime/bin` | `vale.exe` and `vale-ls.exe` stand as Windows builds, beside `vale` and `vale-ls` as Linux builds |
+| the doctor's `vale` row | `3.20.0`, at `.se/.runtime/bin/vale` |
+| the doctor's `vale-ls` row | `0.5.1`, at `.se/.runtime/bin/vale-ls` |
+| the tracked `vale.valeCLI.path` | `.se/.runtime/bin/vale`, the Linux build on this desk |
