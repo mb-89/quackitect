@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [effect]
 scope: ["whoever runs the effect step of a retro"]
 rationale: [[spec/rationales/effect]]
 ---

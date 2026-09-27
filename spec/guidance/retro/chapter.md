@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [chapter]
 scope: ["whoever runs the chapter step of a retro"]
 rationale: [[spec/rationales/chaptering]]
 ---

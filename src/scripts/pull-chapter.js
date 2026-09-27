@@ -12,7 +12,7 @@ export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
-import { notesSaid, parsed } from "./guidance-hand.js";
+import { notesSaid, parsed, readsFor } from "./guidance-hand.js";
 import { acceptRows } from "./pull-accept.js";
 import { formatted } from "./pull-format.js";
 import { excludes, handRule, ticketsHere } from "./pull-hand.js";
@@ -55,7 +55,7 @@ export function workAnswer(it, one, leaf) {
   }
   if (leaf.asks) rows.push("", `Asks: ${leaf.asks}`);
 
-  rows.push(...notesSaid(it, leaf.reads));
+  rows.push(...notesSaid(it, readsFor(it, leaf)));
 
   rows.push("");
   if (leaf.evidence.some((field) => field.form === "verdict")) {

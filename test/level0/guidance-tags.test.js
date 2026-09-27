@@ -133,3 +133,11 @@ test("the guidance verb prints the notes a named step resolves", () => {
   assert.equal(none.code, 1);
   assert.match(none.said, /fixture names no step nowhere/);
 });
+
+// [[spec/design_input/level-two#guidance]]
+test("the guidance verb refuses a step naming a process that stands nowhere", () => {
+  const { it } = doors(NOTES, {}, { root: ROOT });
+  const lost = heard(() => guidance(it, ["--step", "nowhere:do"]));
+  assert.equal(lost.code, 1);
+  assert.match(lost.said, /nowhere names no process/);
+});

@@ -18,6 +18,7 @@ import {
   holdOf,
   notesSaid,
   parsed,
+  readsFor,
   readsOf,
   writeHold,
 } from "./guidance-hand.js";
@@ -126,7 +127,7 @@ export function stepReads(it, held) {
   const at = it.join(it.root, ...String(held.path ?? "").split("/"));
   if (!held.path || !it.disk.exists(at))
     return (held.reads ?? []).map((one) => one.name);
-  return leafOf(frontOf(it.disk.read(at)), held.step)?.reads ?? [];
+  return readsFor(it, leafOf(frontOf(it.disk.read(at)), held.step));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
@@ -182,6 +183,7 @@ export function leafOf(front, path) {
     asks: String(leaf.said.asks ?? ""),
     options: [leaf.said.options ?? []].flat().map(String),
     reads: sum("reads").map(bare),
+    tags: [...new Set(sum("tags"))],
     needs: sum("needs"),
     checklist: sum("checklist"),
     evidence: [leaf.said.evidence ?? []].flat().filter((one) => one?.name),

@@ -200,9 +200,20 @@ function bare(said) {
 
 // [[spec/design_output/level0#guidance-a-variable-switches-on]]
 export function envOf(text) {
-  const said = parse(text).front.env;
-  if (!said) return [];
-  return (Array.isArray(said) ? said : [said])
+  return listOf(parse(text).front.env);
+}
+
+// The frontmatter reader answers an inline list as its text, so the brackets and commas split here. [[spec/design_input/level-two#guidance]]
+export function listOf(said) {
+  if (said === undefined || said === null) return [];
+  return (
+    Array.isArray(said)
+      ? said
+      : String(said)
+          .trim()
+          .replace(/^\[|\]$/g, "")
+          .split(",")
+  )
     .map((one) => String(one).trim())
     .filter(Boolean);
 }

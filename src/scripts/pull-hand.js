@@ -28,7 +28,7 @@ import {
 } from "../engine/group.js";
 import { isDue } from "./ephemeral.js";
 import { dueHandOut } from "./ephemeral-pull.js";
-import { noteRows, readsOf } from "./guidance-hand.js";
+import { noteRows, readsFor, readsOf } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
 import { printPart } from "./pull-cap.js";
 import { acceptWaits } from "./pull-accept.js";
@@ -477,7 +477,7 @@ export function excludes(front, leaf, hand) {
 // [[spec/design_output/pull#the-work-answer]]
 export function handed(it, who, one, leaf) {
   const hash = one.private ? "" : tipOf(it);
-  const reads = readsOf(it, leaf.reads);
+  const reads = readsOf(it, readsFor(it, leaf));
   noteRows(it, leaf.path, reads);
   const hold = {
     ticket: one.name,

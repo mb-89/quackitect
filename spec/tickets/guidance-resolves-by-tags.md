@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: d8e0d1ef7a34ab7616c0b2db4f5ae3c48b894f21
+    hash_after: d8e0d1ef7a34ab7616c0b2db4f5ae3c48b894f21
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-style-carries-the-top.md:143:56: Vocabulary: blocksof stands outside the words this tree writes. Write "
 ---
 
 # Ask
@@ -214,14 +222,20 @@ every row the design review passes with stands fixed in the change: the review r
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the schemas, the resolver in guidance-hand.js, its callers leafOf, stepReads, handed and workAnswer, the guidance verb, the processes, the notes gaining tags, and the cases beside each changed module
+every door the change reaches has a fake: the resolver and unreached read the disk door alone, which fakeDisk stands in for, and the contract cases drive the real disk
+a comment names the approach the change implements: listOf, readsFor, unreached, underFolders, notesSaid and the verb step reader each link level-two#guidance
+every fact the change adds stands in one place: listOf serves envOf and tagsOf alike, and notesSaid prints through rulesOf in place of a second numbering
+every row the design review passes with stands fixed in the change: process.test.js reads the notes the gate tags resolve, pull.test.js pins the heading form, reviewing gains accept and the final accepts carry review and accept, each retro note gains its own name, trivial do carries code and testing, and the tag cases stand in test/contract where they read the tree
 
 ## tests-green
 

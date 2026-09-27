@@ -123,6 +123,16 @@ test("a note names the variables it waits for", () => {
   assert.equal(bindsHere(waits, { TWO: "1" }), true, "one of them is enough");
 });
 
+// [[spec/design_input/level-two#guidance]]
+test("a note names the variables it waits for as an inline list, and binds where one is set", () => {
+  const waits = `---\nkind: [[guidance]]\nenv: [ONE, TWO]\n---\n\n# Actionables\n\n1. Do it.\n`;
+  assert.deepEqual(envOf(waits), ["ONE", "TWO"]);
+  assert.equal(bindsHere(waits, {}), false, "no variable set");
+  assert.equal(bindsHere(waits, { TWO: "1" }), true, "one of them is enough");
+  assert.deepEqual(lib.listOf("[a, b]"), ["a", "b"]);
+  assert.deepEqual(lib.listOf(undefined), []);
+});
+
 test("an empty, zero or false value switches nothing on", () => {
   const waits = `---\nkind: [[guidance]]\nenv: ONE\n---\n\n# Actionables\n\n1. Do it.\n`;
   for (const said of ["", "0", "false", "FALSE", "  "]) {

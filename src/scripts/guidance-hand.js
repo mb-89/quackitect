@@ -11,16 +11,21 @@ import {
 import {
   actionables,
   bindsHere,
+  listOf,
   parse,
+  rulesOf,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { carriedIn } from "../../.claude/skills/level0/lib/tested.js";
-import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
+import { hashOf, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./pull-hand-of.js";
+import { leafOf, leavesOf } from "./pull-route.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const HOLD = OWNED_HOLD;
 export const GUIDANCE = "spec/guidance";
+export const PROCESSES = "spec/processes";
+const YAML = /\.yaml$/;
 const MARKDOWN = /\.md$/;
 const DRAFT = /^_/;
 
@@ -165,16 +170,23 @@ export function heldReads(it, argv = []) {
   return (held?.reads ?? []).map((one) => one.name);
 }
 
-// [[spec/design_output/pull#what-a-hand-out-reads]]
+// Each note stands as a section: a heading naming it, its rules numbered as the note numbers them, then its Examples table. [[spec/design_input/level-two#guidance]]
 export function notesSaid(it, paths) {
   const rows = [];
   for (const path of paths) {
-    const items = actionables(guidanceText(it, path));
-    if (!items.length) continue;
-    rows.push("", `Reads ${path}:`);
-    for (const [i, item] of items.entries()) rows.push(`  ${i + 1}. ${item}`);
+    const text = guidanceText(it, path);
+    if (!actionables(text).length) continue;
+    rows.push("", `# Reads ${path}`, "", ...rulesOf(text));
   }
   return rows;
+}
+
+// The notes a leaf's tags resolve, then any a ticket minted before the tags still names under reads. [[spec/design_input/level-two#guidance]]
+export function readsFor(it, leaf, env = it.env ?? {}) {
+  if (!leaf) return [];
+  if (!leaf.tags?.length) return leaf.reads;
+  const found = resolved(it, leaf.tags, env);
+  return [...found, ...leaf.reads.filter((one) => !found.includes(one))];
 }
 
 // A note under a subfolder carries a tag for each folder on its path, then the tags its frontmatter names. A note at the top carries none, since it rides the output style. [[spec/design_input/level-two#guidance]]
@@ -184,16 +196,8 @@ export function tagsOf(it, path) {
     .split("/")
     .slice(0, -1);
   if (!folders.length) return [];
-  const said = parse(guidanceText(it, path)).front.tags;
-  // The frontmatter reader answers an inline list as its text, so the brackets and commas split here. [[spec/design_input/level-two#guidance]]
-  const own = (
-    Array.isArray(said)
-      ? said
-      : String(said ?? "")
-          .replace(/^\[|\]$/g, "")
-          .split(",")
-  ).map((one) => String(one).trim());
-  return [...new Set([...folders, ...own.filter(Boolean)])];
+  const own = listOf(parse(guidanceText(it, path)).front.tags);
+  return [...new Set([...folders, ...own])];
 }
 
 // Every note under a subfolder whose tags all stand among the step's, where its env binds here. [[spec/design_input/level-two#guidance]]
@@ -201,16 +205,43 @@ export function resolved(it, tags, env = {}) {
   const at = it.join(it.root, ...GUIDANCE.split("/"));
   if (!it.disk.exists(at)) return [];
   const has = new Set([tags ?? []].flat().map(String));
-  return namesUnder(it, at, GUIDANCE)
-    .filter((path) => path.split("/").length > GUIDANCE.split("/").length + 1)
+  return underFolders(it, at)
     .filter((path) => tagsOf(it, path).every((one) => has.has(one)))
     .filter((path) => bindsHere(guidanceText(it, path), env))
     .sort();
 }
 
-// Every note under a subfolder that no step of any process reaches. The change step fills this in. [[spec/design_input/level-two#guidance]]
-export function unreached(_it) {
-  return [];
+// Every note under a subfolder whose tags no leaf of any process carries whole. The env stays out, since a cloud note still reaches its cloud step. [[spec/design_input/level-two#guidance]]
+export function unreached(it) {
+  const at = it.join(it.root, ...GUIDANCE.split("/"));
+  if (!it.disk.exists(at)) return [];
+  const leaves = everyLeafTags(it);
+  return underFolders(it, at)
+    .filter(
+      (path) => !leaves.some((has) => tagsOf(it, path).every((one) => has.has(one))),
+    )
+    .sort();
+}
+
+function everyLeafTags(it) {
+  const at = it.join(it.root, ...PROCESSES.split("/"));
+  if (!it.disk.exists(at)) return [];
+  const out = [];
+  for (const one of it.disk.list(at)) {
+    if (one.kind !== "file" || !YAML.test(one.name)) continue;
+    const front = {
+      steps: readYaml(String(it.disk.read(it.join(at, one.name)))).steps,
+    };
+    for (const leaf of leavesOf(front))
+      out.push(new Set(leafOf(front, leaf.path).tags));
+  }
+  return out;
+}
+
+// The notes under a subfolder, since a note at the top rides the output style and resolves by no tag. [[spec/design_input/level-two#guidance]]
+function underFolders(it, at) {
+  const depth = GUIDANCE.split("/").length + 1;
+  return namesUnder(it, at, GUIDANCE).filter((path) => path.split("/").length > depth);
 }
 
 // [[spec/design_output/level0#the-standing-layer]]

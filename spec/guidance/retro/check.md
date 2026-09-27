@@ -1,5 +1,6 @@
 ---
 kind: [[guidance]]
+tags: [check]
 scope: ["whoever runs the check step of a retro"]
 rationale: [[spec/rationales/verifying]]
 ---
