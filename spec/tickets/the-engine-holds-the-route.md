@@ -75,7 +75,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 94d924fb96257431
 depends_on: [each-thing-stands-in-place, the-gates-read-the-state, the-owners-word-reaches-work, the-servers-and-views-hold, the-verbs-land-whole]
-step: sync
+step: split
 record:
   - step: sync
     hand: box d7d6cb0fb1105 · claude-code-remote
@@ -84,6 +84,14 @@ record:
   - step: sync
     hand: box d7d809305dcf · claude-code-remote
     hash_before: 494f004fffa7938a7239d80dcb5cf34d6e503684
+  - step: sync
+    hand: box d7d809305dcf · claude-code-remote
+    hash_before: 71ba97316dfc0a372d59368234d7a194586c27f5
+    hash_after: e3d4199415dec09ba628b9c2e8bdaf194d72668d
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-engine-holds-the-route already carries every commit on main.
 ---
 
 # Ask
@@ -97,8 +105,9 @@ A hand meets one step at a time. The engine holds the route, writes the ticket f
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
