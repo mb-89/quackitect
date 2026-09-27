@@ -1504,8 +1504,8 @@ asserts each line of them.
 - `AskUserQuestion`, which reaches the owner itself. A door refusing it stops a
   session from asking the one thing it needs.
 
-`answer.enabled` in `spec/config/level0.json` turns the door off, the way the judge
-and the tooth turn off. A rule nobody can turn off stops the tree on the day it
+`answer.enabled` in `spec/config/level0.json` turns the door off, the way the tooth
+turns off. A rule nobody can turn off stops the tree on the day it
 reads something wrongly.
 
 The door sits inside the write door's own `tool.call` hook, after the log line
