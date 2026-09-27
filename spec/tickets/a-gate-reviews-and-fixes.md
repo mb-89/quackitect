@@ -77,12 +77,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: the-engine-holds-the-route
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d7d6cb0fb1105 · claude-code-remote
     hash_before: 418254f005756d217cb9c5ef8d39454c96d50bef
     hash_after: 418254f005756d217cb9c5ef8d39454c96d50bef
+  - step: design/review
+    hand: box d7d6cb0fb1105 · claude-code-remote · helper-2
+    hash_before: 46efa876a4c88d1dd62e695ed14eaa13bf52786f
+    hash_after: 46efa876a4c88d1dd62e695ed14eaa13bf52786f
 ---
 
 # Ask
@@ -180,6 +184,13 @@ Weighed: a reject inserts copies, as the design input asks for `draft-2`, so eac
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- the callers list names `.claude/skills/level0/hooks/pull-tool.js` for the verdict map, and the map stands in `src/scripts/pull-tool.js`, which reads `pass` and `fail` alone: the builder adds `accept`, `accept with points` and `reject` there
+- `formFault` in `src/scripts/pull-chapter.js` refuses a verdict opening with a word past pass or fail: the builder widens its message and its check with `verdictIn`
+- `handBack` in `src/scripts/pull.js` sends every fail to `failed` in `src/scripts/pull-writes.js`: the builder routes a gate's reject to `rejected` there, and names `failed` in the callers list
+- `minted` mints each child at `state: draft` today: the gate's `fix` flag sets `open` and `todo: true`, and leaves a design review's children as they stand
+- the ask reads the red list from the process, and the approach reads it from a `red` field on each ticket: the builder names that choice in the design output chapter The gate
 
 # implement
 
