@@ -74,10 +74,15 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+step: design/review
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: open-tasks-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d7d70c069f441 · claude-code-remote
+    hash_before: da11ae9b47e9d173880efc7d04b8881e32144a75
+    hash_after: da11ae9b47e9d173880efc7d04b8881e32144a75
 ---
 
 # Ask
@@ -101,11 +106,30 @@ The queue then reads files alone. Without the marker every count reads git on ev
 
 <!-- the form is text -->
 
+The group ticket on `main` carries `cloud: true` while its branch stands in the cloud. Each verb writes it through the front door, `withField` and `withoutField` in `src/engine/group.js`, and commits on trunk.
+
+| the verb | what it does to the marker on `main` |
+|---|---|
+| `open` | runs on trunk with a clean tree, as `merge` does. It sets `cloud: true`, commits `<group>: opens in the cloud` and pushes trunk. Then `markOff` cuts the branch off the new trunk tip. A refused trunk push opens no branch |
+| `merge` | drops `cloud` on the merge commit, amended in beside `freeChildren`, before the check runs |
+| `close` | drops `cloud` on trunk where it still stands, commits and pushes trunk, then deletes the branch. A merged group reads clear already, so the forced close of an unmerged one is where this bites |
+| `release` | leaves the marker. The branch stays in the cloud at `todo`, and the queue hands it to the next box |
+
+The schema names `cloud` as a boolean the verbs write, beside `enabled_by`, marked `x-engine`, so the door refuses a hand's edit.
+
+The release row departs from the ask. The ask names the release among the clearing verbs, and [[spec/rationales/git-stays-the-archive]] says the same. `release` puts the branch back to `todo` in the cloud and deletes nothing. Clearing there marks a live branch as gone, and the queue then counts it on trunk. The drift the rationale's third chapter names is exactly that.
+
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 
 <!-- the form is list -->
+
+- `src/scripts/work.js`, `openGroup`, through the `open` verb
+- `src/scripts/work-merge.js`, `merge`, through the `merge` verb
+- `src/scripts/work-merge.js`, `close`, through the `close` verb
+- `src/scripts/work.js`, `release`, which stays as it stands
+- `spec/schemas/ticket.schema.yaml`, the `properties` map
 
 ### tests
 
@@ -113,17 +137,33 @@ The queue then reads files alone. Without the marker every count reads git on ev
 
 <!-- the form is list -->
 
+- `test/level0/work-cloud-marker.test.js`, `branch open writes the marker on trunk before it pushes the branch`
+- `test/level0/work-cloud-marker.test.js`, `branch open refuses off trunk, and pushes nothing`
+- `test/level0/work-cloud-marker.test.js`, `branch merge drops the marker on the merge commit`
+- `test/level0/work-cloud-marker.test.js`, `branch close drops the marker on trunk before the branch goes`
+- `test/level0/work-cloud-marker.test.js`, `branch release leaves the marker, and the branch stands at todo`
+
+The done lines and the test deciding each:
+
+- the four verbs: `./RUNME.sh test test/level0/work-cloud-marker.test.js`
+- the check: `./RUNME.sh check`
+
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 
 <!-- the form is list -->
 
+- first
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: `openGroup`, `markOff`, `release` and `letGo` in `src/scripts/work.js`, and `merge` and `close` in `src/scripts/work-merge.js`
+- the callers come off a search for `openGroup` and for each verb in the dispatch table of `work`
+- each done line names its test file, and the check verb decides the last
 
 ## review
 
