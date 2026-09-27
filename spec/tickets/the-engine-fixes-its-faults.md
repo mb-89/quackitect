@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 cloud: true
 record:
   - step: sync
@@ -139,6 +139,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 4b4c962d1d59ae48bb4fc73c94d7d959ffeae344
+    hash_after: 4b4c962d1d59ae48bb4fc73c94d7d959ffeae344
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -230,38 +242,70 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- a-rewind-spares-landed-tests: gate accepted with two points, then built. `keptRed` keeps a landed red leaf, and `stepOn` and `advanced` walk past it
+- kept-red-subject-matches-whole and kept-red-reads-red-list: the whole-change subject match, and the red list read through `redListOf`
+- cloud-boxes-ask-nobody and cloud-ask-names-the-hold: the cloud ask door, and the note naming it
+- cloud-boxes-leave-trunk-alone, one-writer-holds-a-branch and push-gate-needs-the-engine: the three `holds` reads, landed together under prepush-reds-land-together
+- sync-takes-its-own-branch: `branch sync` merges `origin/<the branch>` before trunk
+- gate-points-pass-the-push: drafted off the retro note, for the owner to open
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- every gate read the named functions and the git history before its verdict, so each draft's claims met the code before the build
+- landing the three `holds` changes in one change let each `tests-green` pass on the shared red file
+- the commit verb ran the check and pushed on every finished thing, so origin matched the box after each step
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 21:36 the plan tool answered that no server stood at the event port while the shell read 200 there. A second call passed with no change on this side
+- 21:40, 21:52 and 22:03 the push door refused each gate hand-back, because the gate's points carry the todo tag
+- 21:41 `./RUNME.sh commit -m` came back refused. The verb takes the message as its first argument
+- 21:42 and 21:53 a ticket name under `working` in the plan turned into a todo, and the pull waited on it
+- 21:45 `keptRed` read `leaf.leaves` off a bare walk entry and threw
+- 21:44 the split verb moved `childrenSay` with no header and no imports, and the `pull.js` re-export broke `pull-steps`
+- 21:45, 21:52 and 22:17 the Bash door refused a `git stash` and two chains whose landing followed a pipe
+- 21:52 a doc-only trivial step found no green command: the check ends on another ticket's lint line, and `branch test` answers missing
+- 22:03 three tickets held red cases in one test file, so no `tests-green` could pass alone
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the tagged gate points: gate-points-pass-the-push
+- the plan tool's reach to the server: the bridge note in `spec/design_output/level0.md`, once a desk reproduces it
+- the commit verb's usage: the refusal names the positional message
+- a ticket name under `working`: the plan tool names a todo title, not a ticket
+- the walk entry: `keptRed` reads the route order off the ticket text
+- the split verb: it copies the imports and header a cut function needs
+- the doc-only step: the trivial route names the owning test file
+- the shared red file: a draft naming a test file another open ticket holds red names it under `depends_on`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The pull hands gates and builds of one group to one box, so the builder reads the other tickets' drafts anyway. A shared red file turns that into one change. Each close still ran its own route, and the accept read the whole diff against the goal.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands in the file owning it, and the retro points there
+- the retro adds no number
+- the retro adds no file header
+- no owner prompt came in this run, and each error carries its time
+- the chapter names roles alone
 
 ## cloud
 
