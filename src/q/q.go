@@ -18,6 +18,7 @@ const (
 	given provider = iota
 	derived
 	fold
+	action
 )
 
 type input struct {
@@ -41,6 +42,7 @@ type registration struct {
 	inputs   []input
 	run      func(Snapshot) any
 	step     func(state, event any) (any, error)
+	act      func(input any) ([]Call, error)
 }
 
 type Catalog struct {

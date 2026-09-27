@@ -32,6 +32,12 @@ var NoDoor = &analysis.Analyzer{
 	Run:  noDoor.run,
 }
 
+var OnlyQ = &analysis.Analyzer{
+	Name: "onlyq",
+	Doc:  "a package under src/modules imports q, q/qtest and the pure standard library alone",
+	Run:  func(*analysis.Pass) (any, error) { return nil, nil },
+}
+
 var NoName = &analysis.Analyzer{
 	Name: "noname",
 	Doc:  "a door, the index or a renderer imports no package under src/modules",

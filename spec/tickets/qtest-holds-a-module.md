@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -146,6 +146,19 @@ record:
         hash: 518103d9494e50d7
         size: 9128
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: b95e12c9b38561d54f2b62ac0639b5547d0977cc
+    hash_after: b95e12c9b38561d54f2b62ac0639b5547d0977cc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q/qtest fails
+    inputs:
+      - name: design/draft
+        hash: 9b0c0ae0accddc1f
+        size: 2504
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -238,26 +251,31 @@ each done_when line names its test: go test and the check for the first and the 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/qtest
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/action_test.go,src/q/qtest/qtest_test.go,src/imports/imports_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The action, commits and onlyq cases fail on their assertions, since Store.Act answers no call, Commit reaches no OnCommit hand, and OnlyQ reports nothing. The derived and fold cases pass already, since Run and Land stand. The surprise: q holds no action at all, so this ticket builds q.Call and q.ActionIn beside the harness. The fake types files/, buffers/ and cfg/ as text and clock/minute as an int64, and the index types files/ as its own Content, so the two part until a later ticket names one type in q.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a red case: the action and commits cases in qtest, and the planted modules/nosy for onlyq, and go test and the check decide the rest as commands
+the fake index is the fake the module tests ask for, and the analyzer reads planted packages in a temporary folder, so no door stands unfaked
 
 # gate
 

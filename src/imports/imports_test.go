@@ -16,6 +16,7 @@ var planted = map[string]string{
 	"doors/disk/disk.go":     "package disk\n\nfunc Read() string { return \"\" }\n",
 	"doors/nosy/nosy.go":     "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
 	"modules/leaky/leaky.go": "package leaky\n\nimport \"quackitect/src/doors/disk\" // want `quackitect/src/modules/leaky imports quackitect/src/doors/disk`\n\nfunc Name() string { return disk.Read() }\n",
+	"modules/nosy/nosy.go":   "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
 	"modules/work/work.go":   "package work\n\nimport \"quackitect/src/modules/names\"\n\nfunc Name() string { return names.Of() }\n",
 	"modules/names/names.go": "package names\n\nfunc Of() string { return \"work\" }\n",
 	"tui/frame/frame.go":     "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
@@ -53,4 +54,15 @@ func TestAModuleImportingAModulePasses(t *testing.T) {
 	dir := plant(t)
 	analysistest.Run(t, dir, NoDoor, "quackitect/src/modules/work")
 	analysistest.Run(t, dir, NoName, "quackitect/src/modules/work")
+}
+
+// [[spec/design_output/go-doors#the-build-checks-imports]]
+func TestAModuleImportingOsIsNamed(t *testing.T) {
+	analysistest.Run(t, plant(t), OnlyQ, "quackitect/src/modules/nosy")
+}
+
+func TestFaultsNameAModuleImportingOs(t *testing.T) {
+	if said := Faults("quackitect/src/modules/work", []string{"strings", "quackitect/src/q", "os"}); len(said) != 1 {
+		t.Fatalf("the faults read %v", said)
+	}
 }

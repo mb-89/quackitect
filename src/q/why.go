@@ -32,7 +32,7 @@ type WhyInput struct {
 	Why   Why    `json:"why"`
 }
 
-var kinds = map[provider]string{given: "given", derived: "derived", fold: "fold"}
+var kinds = map[provider]string{given: "given", derived: "derived", fold: "fold", action: "action"}
 
 func (s *Store) Why(name string) (Why, error) {
 	if s.owner(name) == nil {

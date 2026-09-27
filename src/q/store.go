@@ -23,6 +23,7 @@ type Store struct {
 	revision int64
 	values   map[string]cell
 	stale    map[*registration]time.Time
+	heard    []func(values map[string]any)
 }
 
 type Snapshot struct {
@@ -89,6 +90,13 @@ func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, err
 	s.revision++
 	s.values = next
 	return s.revision, nil
+}
+
+// Each commit reaches every hand that listens, which the fake index reads. [[spec/design_output/model#the-fake-index]]
+func (s *Store) OnCommit(fn func(values map[string]any)) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.heard = append(s.heard, fn)
 }
 
 func (s *Store) Run(name string) error {
