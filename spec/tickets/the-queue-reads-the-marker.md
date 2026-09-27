@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -193,6 +193,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: cbe30051934381f47e7ee405e729edffe36281fa
+    hash_after: cbe30051934381f47e7ee405e729edffe36281fa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: 93ef7f626e9673f1
+        size: 721
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -342,26 +365,33 @@ the marker key stands once, as CLOUD_MARK in work-merge.js, and cloudsIn imports
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/queue-cloud.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The queue reads a group's place in the cloud off the marker cloud: true on its ticket, and off no git ref. cloudsIn answers each marked group and each ticket naming one, and placesIn takes its cloud set from it. A branch with no marker now stands on the desk, and a marker with no branch stands on the cloud. The cases in work-answer.test.js and work-list.test.js planted a branch with no marker and read it on the cloud, so their group now carries the marker. Every group on a remote work branch with no marker stands closed and merged, so no live group moves.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/scripts/work-answer.js, its cases, and the two fixtures that planted a branch with no marker, which the callers list missed
+the cases run over the door fakes and a fake clock
+cloudsIn, placesIn and both fixtures carry a comment naming this ticket
+the marker key stands once, as CLOUD_MARK in work-merge.js
 
 # accept
 
