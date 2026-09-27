@@ -195,7 +195,7 @@ const (
 )
 
 // [[spec/design_output/editor#what-the-editor-runs]]
-var Extensions = []string{"chrischinchilla.vale-vscode", "biomejs.biome"}
+var Extensions = []string{"chrischinchilla.vale-vscode", "biomejs.biome", "bierner.markdown-mermaid"}
 
 // [[spec/design_output/tools#what-the-survey-writes]]
 var Wanted = []string{"node", "vale", "biome", "vale-ls", "se-lsp", "go", "git", "claude", "sh", "python"}

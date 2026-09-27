@@ -1,6 +1,6 @@
 // The index answers /v1 through Huma, on a port of its own beside the old
 // API, with openapi.json and the docs.
-// [[spec/design_output/surfaces]]
+// [[spec/design_output/model#surfaces]]
 package main
 
 import (
@@ -26,7 +26,7 @@ type valueOut struct {
 	}
 }
 
-// [[spec/design_output/surfaces]]
+// [[spec/design_output/model#surfaces]]
 func (one *door) servesV1() (net.Listener, *http.Server, error) {
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
@@ -49,7 +49,7 @@ func (one *door) servesV1() (net.Listener, *http.Server, error) {
 	return listen, server, nil
 }
 
-// A name the catalog lacks answers a problem, and a stale one carries its mark. [[spec/design_output/watchdogs#a-stale-mark]]
+// A name the catalog lacks answers a problem, and a stale one carries its mark. [[spec/design_output/model#a-stale-mark]]
 func valueOf(store *q.Store, name string) (*valueOut, error) {
 	if _, ok := store.Declared(name); !ok {
 		return nil, huma.Error404NotFound("the catalog holds no provider of " + name)

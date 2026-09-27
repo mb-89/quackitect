@@ -41,7 +41,7 @@ reason and the line.
 5. Hold a note to the items its schema allows. [[spec/schemas]]
 6. Star a rule wanting argument, and argue it in the rationale. [[spec/schemas]]
 7. Move a rule a program can check to that program, and leave a link in its place. A rule a reader holds by memory slips, and a check holds.
-8. Write the present tense. `spec/rationales` is the one place the past tense belongs.
+8. Write the present tense. A rationale under `spec/rationales` also takes the past, for the history it tells.
 9. Write a new handover before you finish. Level zero consumes the one it finds, so the next session starts blind without it.
 10. Write this chapter to stand alone, because level zero hands the reader this and nothing else.
 11. Call `mint_note` to write a new note, because a governed folder holds one kind alone. [[spec/schemas]]

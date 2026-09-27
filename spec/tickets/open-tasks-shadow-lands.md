@@ -90,7 +90,7 @@ cloud: true
 
 # Ask
 
-Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow. The queue and `work/open-tasks` stand as modules under `src/modules`, and run beside the chain that counts them today. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
+Phase 2 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow. The queue and `work/open-tasks` stand as modules under `src/modules`, and run beside the chain that counts them today. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/openTasks`, which the `migration` module declares as a shared key in the default file.
 
 Done when every child closes through the command it names, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 

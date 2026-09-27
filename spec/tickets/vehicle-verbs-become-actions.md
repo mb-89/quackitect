@@ -83,11 +83,11 @@ depends_on: [runme-hands-verbs-to-quack]
 
 # Ask
 
-The `vehicle` and `stub` verbs become actions returning operations, in shadow against `cli.js`.
+The `vehicle` and `stub` verbs become actions answering within the wait their caller sets, in shadow against `cli.js`.
 
 Every verb then answers through the index.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

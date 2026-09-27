@@ -120,7 +120,7 @@ reason: done
 
 Phase 0 of [[spec/design_input/the-migration-runs-in-slices#the-phases]]: the specs every later phase builds on, and every open question answered. A box reads the settled rulings there first, and asks none of them again.
 
-Done when [[spec/design_output/inner-protocol]] names the inner protocol and the LSP door. A design note covers each part of the model.
+Done when [[spec/design_output/model#the-inner-protocol]] names the inner protocol and the LSP door. A design note covers each part of the model.
 
 # sync
 
@@ -172,16 +172,16 @@ Done when [[spec/design_output/inner-protocol]] names the inner protocol and the
 
 ### done
 
-- [[spec/tickets/declared-views-get-specified]]: [[spec/design_output/views]]
-- [[spec/tickets/doors-get-specified]]: [[spec/design_output/go-doors]]
-- [[spec/tickets/operations-get-specified]]: [[spec/design_output/operations]]
+- [[spec/tickets/declared-views-get-specified]]: [[spec/design_output/model#views]]
+- [[spec/tickets/doors-get-specified]]: [[spec/design_output/model#io-modules]]
+- [[spec/tickets/operations-get-specified]]: [[spec/design_output/model#operations]]
 - [[spec/tickets/the-decisions-get-rationales]]: a rationale per ruling, and a map in the migration note
-- [[spec/tickets/the-hook-protocol-gets-specified]]: [[spec/design_output/hook-protocol]]
+- [[spec/tickets/the-hook-protocol-gets-specified]]: [[spec/design_output/model#the-hook-protocol]]
 - [[spec/tickets/the-index-model-gets-specified]]: [[spec/design_output/model]]
 - [[spec/tickets/the-inner-protocol-gets-chosen]]: NATS and `quack lsp`, a rationale each, the funnel gone
-- [[spec/tickets/watchdogs-get-specified]]: [[spec/design_output/watchdogs]]
-- [[spec/tickets/processes-get-placed]], minted at split: [[spec/design_output/processes]]
-- [[spec/tickets/surfaces-get-specified]], minted at split: [[spec/design_output/surfaces]]
+- [[spec/tickets/watchdogs-get-specified]]: [[spec/design_output/model#watchdogs]]
+- [[spec/tickets/processes-get-placed]], minted at split: [[spec/design_output/model#processes]]
+- [[spec/tickets/surfaces-get-specified]], minted at split: [[spec/design_output/model#surfaces]]
 
 ### well
 

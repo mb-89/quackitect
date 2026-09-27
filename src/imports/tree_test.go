@@ -1,6 +1,6 @@
 // Both rules over every package of the module, so a single import that
 // breaks one turns the battery red.
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 package imports
 
 import (

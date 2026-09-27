@@ -44,7 +44,7 @@ reason: done
 
 # Ask
 
-A design note specifies the doors: one file each with its fake, the inbound replay, and the doors process. It names the import rules the build checks. [[spec/design_input/the-index-holds-the-model#doors-on-both-sides]] asks it. So does [[spec/design_input/the-index-holds-the-model#the-build-holds-the-rules]].
+A design note specifies the doors: one file each with its fake, the inbound replay, and the doors process. It names the import rules the build checks. [[spec/design_input/the-index-holds-the-model#io-modules-on-both-sides]] asks it. So does [[spec/design_input/the-index-holds-the-model#the-build-holds-the-rules]].
 
 A door is the one road to the outside, and a fake in the same file keeps every test in memory.
 
@@ -65,7 +65,7 @@ A door is the one road to the outside, and a fake in the same file keeps every t
 
 ## says
 
-[[spec/design_output/go-doors]] specifies the doors of the model. A door is one
+[[spec/design_output/model#io-modules]] specifies the doors of the model. A door is one
 Go file holding its interface, the real one, the fake and a registration. A
 contract test under the `contract` tag runs one case list over both.
 

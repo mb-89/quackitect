@@ -86,7 +86,7 @@ The window becomes the generic shell: declared views on the left, and `index`, `
 
 Every tool built on this tree then draws in the same shell.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case draws the `index` tab over a fake catalog
 - `./RUNME.sh check` exits 0
 

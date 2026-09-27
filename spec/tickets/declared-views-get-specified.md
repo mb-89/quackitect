@@ -65,7 +65,7 @@ Phase 6 builds one renderer, and it draws what the declarations say and nothing 
 
 ## says
 
-[[spec/design_output/views]] specifies the declared views. A base file gains
+[[spec/design_output/model#views]] specifies the declared views. A base file gains
 `reads`, `badge`, `actions` and `follow`. An action entry pairs a trigger with
 an effect: a call, a cell edit, a form, a jump or a preset cycle.
 

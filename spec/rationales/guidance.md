@@ -28,8 +28,11 @@ and it is one reader at a time.
 So the argument sits one link away. A reader who accepts the rule pays nothing
 for it, and a reader who wants to fight it knows where to go.
 
-Naming one folder for the past also makes the tense rule enforceable. Every
-other folder refuses it, and a linter decides that. The schema proposed a
+Naming one folder where the past may stand also makes the tense rule
+enforceable. Every other folder refuses the past, and a linter decides that. A
+rationale may write the past for what happened, and the present for what
+stands, the way an engineer's rationale mixes both. It need not write the
+past. The schema proposed a
 `Motivation` chapter here as well, and three things in the tree sent it back:
 
 | what said so | what it said |

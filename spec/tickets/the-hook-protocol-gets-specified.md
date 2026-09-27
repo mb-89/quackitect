@@ -65,7 +65,7 @@ Phase 5 ports the cage onto this protocol. The hook answers more than a forward,
 
 ## says
 
-[[spec/design_output/hook-protocol]] specifies the answer protocol. The hook
+[[spec/design_output/model#the-hook-protocol]] specifies the answer protocol. The hook
 module posts each event to the hooks door with the session, the fill and the
 `before` id. The door answers a list of effects the hook module runs in order.
 

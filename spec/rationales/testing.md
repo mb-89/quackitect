@@ -87,14 +87,32 @@ somebody else would make differently, and skip it on a one-line fix.
 ## 11. The fake index
 
 The owner ruled that every module tested in isolation against a fake index. A
-module talked to the index alone, and a door call went through the index as part
-of an action's commit. So the module had one peer, and one fake stood in for it.
+module talked to the index alone, and a request out went through the index as
+part of an action's commit. So a plain module had one peer, and one fake stood
+in for it.
 
 | what the rule bought | what it cost |
 |---|---|
 | an agent reading one module and the names it read, and nothing past them | a harness, `q/qtest`, standing beside the index |
-| a module test with no disk, no git, no database and no port | a module naming door calls, and leaving the running to the index |
+| a module test with no disk, no git, no database and no port | a module naming its requests, and leaving the running to the index |
 
 A door fake in a module test made the module reach past the index. The fake
 index held it to the one peer the design gave it. For the harness, see
 [[spec/design_output/model#the-fake-index]].
+
+## 13. A fake keeps a contract
+
+The owner ruled that every fake stood for a contract. Each contract had one
+suite of cases, written once, run against the fake and the real thing.
+The JavaScript doors carried that shape already, one contract test a door.
+
+| the contract | its fake | its real thing |
+|---|---|---|
+| an IO module's outside world | the fake in the IO module's file | the disk, the repository, the process, the clock |
+| the `q` interface a module sees | `q/qtest` | the index, in process, as a library |
+| the transport between processes | a loopback bus in memory | NATS |
+
+A fake no suite held to the real thing drifted, and a module test passing over
+it proved the fake. One suite, run both ways, proved the fake behaved like the
+world. The index's suite ran in process, with no port and no NATS, so it stayed
+simple. The transport kept a suite of its own.

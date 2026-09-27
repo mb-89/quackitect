@@ -123,9 +123,9 @@ depends_on: [the-watchdog-starts-for-real]
 
 # Ask
 
-A name whose provider's lease expires keeps its last value, marked `stale since <time>`, per [[spec/design_output/watchdogs#a-stale-mark]].
+A name whose provider's lease expires keeps its last value, marked `stale since <time>`, per [[spec/design_output/model#a-stale-mark]].
 
-A stale value falling back to its default reads as a fact nobody computed.
+A stale value falling back to its built-in value reads as a fact nobody computed.
 
 - `go test ./...` from the root passes
 - a case lets a lease expire, and reads the last value with its mark

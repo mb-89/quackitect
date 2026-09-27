@@ -4,9 +4,8 @@ kind: [[rationale]]
 
 # Why
 
-The migration's specs proposed this. It stood a proposal until the owner
-confirmed it, as (h) in [[spec/funnel/the-owner-rules-the-specs]]. The index and its processes spoke NATS, with
-the server running inside the index.
+The migration's specs proposed this, and the owner ruled it. The index and its
+processes spoke NATS, with the server running inside the index.
 
 ## 1. What it weighed
 

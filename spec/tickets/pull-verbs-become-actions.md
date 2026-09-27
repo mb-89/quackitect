@@ -83,11 +83,11 @@ depends_on: [ticket-verbs-become-actions]
 
 # Ask
 
-The pull becomes an action returning an operation, in shadow against `cli.js`.
+The pull becomes an action answering within the wait its caller sets, in shadow against `cli.js`.
 
-The hand-back is the longest road a hook waits on, and a handle frees it.
+The hand-back is the longest road a hook waits on, and the wait frees it.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

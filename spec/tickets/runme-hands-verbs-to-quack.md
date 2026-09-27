@@ -83,7 +83,7 @@ depends_on: [the-quack-cli-gets-generated]
 
 # Ask
 
-`./RUNME.sh` hands a verb `quack` knows to it, and every other verb to `cli.js`. The key `slices.verbs` holds the road.
+`./RUNME.sh` hands a verb `quack` knows to it, and every other verb to `cli.js`. The key `migration/config/slices/verbs` holds the road.
 
 The old verbs keep working while each topic ports.
 

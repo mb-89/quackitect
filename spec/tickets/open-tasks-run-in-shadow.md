@@ -83,7 +83,7 @@ group: open-tasks-shadow-lands
 
 # Ask
 
-The key `slices.openTasks` takes `old`, `shadow` or `new`. Under `shadow`, the old count answers, the new one runs beside it, and a mismatch writes a `shadow` row.
+The key `migration/config/slices/openTasks` takes `old`, `shadow` or `new`. Under `shadow`, the old count answers, the new one runs beside it, and a mismatch writes a `shadow` row.
 
 The owner judges the switch off these rows. Without them the go rests on hope.
 

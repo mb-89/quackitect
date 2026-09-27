@@ -4,10 +4,9 @@ kind: [[rationale]]
 
 # Why
 
-The migration's specs proposed this. It stood a proposal until the owner
-confirmed it, as (i) in [[spec/funnel/the-owner-rules-the-specs]]. The editor started `quack lsp` over stdio.
-The command relayed each message to the LSP door in the doors process, over a
-TCP stream of its own.
+The migration's specs proposed this, and the owner ruled it. The editor started
+`quack lsp` over stdio. The command relayed each message to the `lsp` IO module,
+over a TCP stream of its own.
 
 ## 1. What it weighed
 
@@ -19,9 +18,9 @@ TCP stream of its own.
 ## 2. Why the relay won
 
 `quack` was the one binary already, so the relay added a verb and no program. It
-started the index and the doors where none answered, the road `quack hook`
+started the index and the IO modules where none answered, the road `quack hook`
 took. The extension learned no port and held no reconnection, and an editor
-other than VS Code reached the same door.
+other than VS Code reached the same IO module.
 
 ## 3. What it gave up
 

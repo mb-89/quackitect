@@ -86,7 +86,7 @@ The `check/` names stand, and each twin runs over the whole tree both ways. The 
 
 Several twins disagree today, so picking one changes findings. The golden files make each change a choice.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a golden file per twin stands under the check module
 - `./RUNME.sh check` exits 0
 

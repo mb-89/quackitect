@@ -82,7 +82,7 @@ group: lsp-door-switches-over
 
 # Ask
 
-`slices.lsp` moves to `new`, and the LSP's own server, port and index client leave the tree.
+`migration/config/slices/lsp` moves to `new`, and the LSP's own server, port and index client leave the tree.
 
 A second server drifts from the model.
 
