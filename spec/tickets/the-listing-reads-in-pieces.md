@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
 state: open
+todo: true
+step: decide
 steps:
   - name: decide
     does: says what the note becomes, and closes it
@@ -16,9 +18,8 @@ steps:
       - name: says
         form: text
         says: why, in a line, or what the successor carries
-step: decide
 process: [[spec/processes/note]]
-process_hash: 9d7b26202041cf4d
+process_hash: e02a0935ed78eb92
 ---
 
 # Ask
