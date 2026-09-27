@@ -77,7 +77,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: guidance-rides-each-step
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d7d8cca5d3cd · claude-code-remote
@@ -95,6 +95,14 @@ record:
       - name: tests
         exit: 1
         said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/change
+    hand: box d7d8cca5d3cd · claude-code-remote
+    hash_before: 1e9be65e307d19744e23ca82b67dce9ab9c0c9f2
+    hash_after: 1e9be65e307d19744e23ca82b67dce9ab9c0c9f2
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -207,14 +215,20 @@ The config case fails on the missing pull key, and the split case fails on the m
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/pull-cap.js src/scripts/pull-route.js src/scripts/pull-hand.js src/scripts/cli-doors.js test/level0/pull-cap.test.js spec/config/level0.json spec/config/level0.schema.json
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the config, its schema, the doors, the pull's hand-out and still-held answer, and one new module, each named in the approach
+- the change reaches the disk through writeHold alone, and the fake disk answers it in every case
+- the header of src/scripts/pull-cap.js names the chapter The size cap, and each function links it
+- the cap and its margin stand once, in spec/config/level0.json, and the doors read them there
+- the review's rows stand fixed: the closing line names the plain pull with its --as, a long line cuts at a character, and the still-held refusal stays under the cap; the callers row answers dueHandOut in src/scripts/ephemeral-pull.js
 
 ## tests-green
 

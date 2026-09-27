@@ -28,8 +28,9 @@ import {
 } from "../engine/group.js";
 import { isDue } from "./ephemeral.js";
 import { dueHandOut } from "./ephemeral-pull.js";
-import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
+import { noteRows, readsOf } from "./guidance-hand.js";
 import { workAnswer } from "./pull-chapter.js";
+import { printPart } from "./pull-cap.js";
 import { acceptWaits } from "./pull-accept.js";
 import { cleanupOf } from "./pull-cleanup.js";
 import { roleOf } from "./pull-hand-of.js";
@@ -478,7 +479,7 @@ export function handed(it, who, one, leaf) {
   const hash = one.private ? "" : tipOf(it);
   const reads = readsOf(it, leaf.reads);
   noteRows(it, leaf.path, reads);
-  writeHold(it, who.hand, {
+  const hold = {
     ticket: one.name,
     path: one.path,
     step: leaf.path,
@@ -490,9 +491,8 @@ export function handed(it, who, one, leaf) {
     taken: it.clock ? it.clock.stamp() : "",
     refused: 0,
     reads,
-  });
-  console.log(workAnswer(it, one, leaf));
-  return 0;
+  };
+  return printPart(it, hold, workAnswer(it, one, leaf));
 }
 
 // [[spec/design_output/pull#the-work-answer]]

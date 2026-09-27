@@ -3,14 +3,12 @@
 // [[spec/design_input/level-two#the-size-cap]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { test } from "node:test";
+import said from "../../spec/config/level0.json" with { type: "json" };
+import schema from "../../spec/config/level0.schema.json" with { type: "json" };
+import { partOf } from "../../src/scripts/pull-cap.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, doors, HOLD, heard, ROOT, standing } from "./pull-doors.js";
-
-const TREE = join(import.meta.dirname, "..", "..");
-const tracked = (path) => JSON.parse(readFileSync(join(TREE, path), "utf8"));
 
 // A note long enough to carry the hand-out past a small cap. [[spec/design_input/level-two#the-size-cap]]
 const RULES = Array.from(
@@ -23,8 +21,6 @@ const bytes = (text) => Buffer.byteLength(text, "utf8");
 
 // [[spec/design_input/level-two#the-size-cap]]
 test("the config names the cap and its margin, and the schema declares both", () => {
-  const said = tracked("spec/config/level0.json");
-  const schema = tracked("spec/config/level0.schema.json");
   assert.equal(typeof said.pull?.cap, "number");
   assert.equal(typeof said.pull?.margin, "number");
   assert.ok(said.pull.margin < said.pull.cap, "the margin stands below the cap");
@@ -68,6 +64,28 @@ test("a hand-out past the margin splits, and the next pull on the same step prin
   const after = heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(after.code, 1);
   assert.match(after.said, /a-child stands in your hand at design\/draft/);
+});
+
+// [[spec/design_input/level-two#the-size-cap]]
+test("a line longer than the room cuts at a character, and the parts join to the whole", () => {
+  const line = "é".repeat(50);
+  const { head, rest } = partOf(line, 11);
+  assert.ok(bytes(head) <= 11);
+  assert.equal(head + rest, line);
+});
+
+// [[spec/design_input/level-two#the-size-cap]]
+test("a refusal reprinting the notes stays under the margin, and names the verb printing them whole", () => {
+  const { it, disk } = doors(standing(), {}, { cap: CAP });
+  disk.write(at("spec/guidance/voice.md"), LONG);
+  heard(() => pulling(ROOT, ["pull"], it));
+  for (let i = 0; i < 10 && JSON.parse(disk.read(HOLD)).rest; i++)
+    heard(() => pulling(ROOT, ["pull"], it));
+  disk.write(at("spec/guidance/voice.md"), LONG.replace("Rule 1 ", "Rule one "));
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
+  assert.equal(code, 1);
+  assert.ok(bytes(said) <= CAP.bytes - CAP.margin);
+  assert.match(said, /branch guidance/);
 });
 
 // [[spec/design_input/level-two#the-size-cap]]
