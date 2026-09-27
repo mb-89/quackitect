@@ -19,3 +19,12 @@ func TestEachLayerParsesOffItsFile(t *testing.T) {
 		}
 	}
 }
+
+func TestAFilePastBothLayersRunsNothing(t *testing.T) {
+	c := q.New()
+	q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
+	Registers(c)
+	if err := q.NewStore(c).Run("config/spec/other.json"); err == nil {
+		t.Fatal("config/spec/other.json runs")
+	}
+}

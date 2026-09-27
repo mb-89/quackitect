@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: af1e3560ddbca13ec0759056969481c191ee2256
+    hash_after: af1e3560ddbca13ec0759056969481c191ee2256
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/modules/files passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: ccfd8911c1f05b99
+        size: 1111
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -372,26 +395,33 @@ the files prefix, the config names, the plan and the hold glob each carry a comm
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/codec_test.go src/q/projection_test.go src/modules/files/disk_test.go src/quack/codec_test.go src/quack/dump_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A module now declares a projection of files/ with a glob, a codec and a kind. A loaded projection runs per file, and parses it through its codec. The JSON codec keeps key order and every literal, and writes a file back byte for byte. The store saves, restores and dumps a prefix, and quack dump writes the dump under .se/dump/ through disk. The disk refuses a write whose file moved since its writer read it. The config, the plan and the holds load as projections beside the watch, and the watch hears the JSON files of the runtime folder and its holds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list names, past the wiring file, and the two owner comments the check asks
+the disk refusal runs over the fake disk, and the watch rule runs over the fake and the real watch
+each new function carries a pointer at the mirrors chapter of the model
+every runtime name a module spells carries the name of the file owning it on the line above
 
 # accept
 

@@ -29,6 +29,7 @@ var skipped = map[string]bool{".git": true, "node_modules": true}
 const private = ".se"
 
 // The dot folders under the private one the watch adds by name, since a loaded projection reads their JSON files. Each stands alone, and no folder under it joins. [[spec/design_output/model#everything-on-disk-mirrors]]
+// .claude/skills/level0/lib/folders.js owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
 var named = map[string]bool{".se/.runtime": true, ".se/.runtime/hold": true}
 
 const namedExt = ".json"
