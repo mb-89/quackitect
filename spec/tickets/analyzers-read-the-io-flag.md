@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: 5c3d72c7578d0e01
         size: 2340
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: a3a981c96dfcbb08baa7e3557a5e5744d67b2d07
+    hash_after: a3a981c96dfcbb08baa7e3557a5e5744d67b2d07
+    inputs:
+      - name: design/draft
+        hash: 5c3d72c7578d0e01
+        size: 2340
+      - name: design/tests-red
+        hash: bce2b59d1790ecde
+        size: 795
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -281,8 +293,12 @@ the cases plant their packages in a folder of the test, so they reach no door
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the draft names TestAnIOModuleImportingOsIsNamedByNone, TestAFakeWithNoSuiteIsNamed and TestTheCoreImportingOsIsNamed in imports_test.go, and they stand in analyzers_test.go: the builder aligns the draft lines
+- the approach adds a call rule for time.Now to onlyq and ioonly, and no case plants a call: the builder plants one for each, or leaves the call rule out
+- the ask holds q/qtest to fakesuite through its suite.go, and no case plants qtest without it: the builder plants that case
 
 # implement
 
