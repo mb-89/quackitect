@@ -62,6 +62,26 @@ test("the merged set drops a branch cut on trunk's line, after trunk moves on", 
   assert.deepEqual([...mergedHere(it)], ["work/landed"]);
 });
 
+// A cloud clone holds its last commits alone, so a merge from before them reads as unmerged until the history comes in. [[spec/design_output/work#a-merged-branch-closes]]
+test("a shallow clone takes its whole history before the merged set reads it", () => {
+  const { it, outside } = doorsSaying({
+    "git rev-parse --is-shallow-repository": { stdout: "true\n" },
+    "git fetch --unshallow --quiet origin": { stdout: "" },
+    "git branch -r --merged origin/main": { stdout: "  origin/main\n  origin/work/landed\n" },
+    "git branch -r --points-at origin/main": { stdout: "  origin/main\n" },
+    "git rev-list --first-parent origin/main": { stdout: "m2\nm1\n" },
+    "git rev-parse origin/work/landed": { stdout: "b9\n" },
+  });
+
+  assert.deepEqual([...mergedHere(it)], ["work/landed"]);
+  const ran = ranGit(outside);
+  assert.ok(
+    ran.indexOf("git fetch --unshallow --quiet origin") <
+      ran.indexOf("git branch -r --merged origin/main"),
+  );
+  assert.ok(ran.includes("git fetch --unshallow --quiet origin"));
+});
+
 // [[spec/design_output/work#a-group-is-a-ticket]]
 test("branch open pushes a group off trunk, and says where it stands", () => {
   const { it, outside } = doorsSaying({
