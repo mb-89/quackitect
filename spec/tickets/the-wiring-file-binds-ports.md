@@ -132,7 +132,7 @@ A module then stays local, and one file holds the layout. An alternative calcula
 - a case wires an in-port port to port, and reads the name `<instance>/<port>` of its writer
 - a case reads an out-port with no wire as `<instance>/<port>`
 - a case loads one module type as two instances, each with its own config
-- no module under `src/modules` spells another module's path, which `onlyq` holds
+- no module under `src/modules` spells another module's path, which `nomodule` holds
 - `./RUNME.sh check` exits 0
 
 # design

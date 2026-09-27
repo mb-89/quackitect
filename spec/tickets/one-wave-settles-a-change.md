@@ -125,7 +125,7 @@ depends_on: [reads-resolve-in-two-passes, the-scheduler-runs-providers]
 
 The start gives every module a height, and a name builds its run list the first time it changes. A change settles as one wave, per [[spec/design_output/model#one-wave-settles-a-change]]. Early cutoff and demand stand, and `quack why` names a value a wave holds as `pending since r`.
 
-A module fed twice by one change then runs once, off inputs of one settled state. A reader sees no half-settled mix, and a read waits on nothing.
+A module fed twice by one change then runs once, off inputs of one settled state. A reader sees no half-settled mix. A read waits on nothing, except the read of an unwatched pending name, which waits for its run and for no write.
 
 - `go test ./...` from the root passes
 - a `qtest` case runs the diamond X, A and B, and reads B run once, after A

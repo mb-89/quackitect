@@ -123,12 +123,12 @@ depends_on: [ops-keeps-one-state, stale-names-keep-their-value]
 
 # Ask
 
-The index's own management moves into `src/modules/index`, a module flagged with `q.IO()` that the index always loads, per [[spec/design_output/model#the-index-manager]]. It holds the operations, the leases and the alarms, and writes `index/`, `ops/<id>` and `session/alarms` as registered outputs.
+The index's own management moves into one module file with `q.IO()`, in the package `src/modules/index`. The index always loads it, per [[spec/design_output/model#the-index-manager]]. It holds the operations, the leases and the alarms, and writes `index/`, `ops/<id>` and `session/alarms` as registered outputs.
 
 The core then holds no logic of its own. The manager tests like every IO module, over `qtest` and the fakes of its outside.
 
 - `go test ./...` from the root passes
-- `src/ops` and `src/watchdog` move under `src/modules/index`, which `go list ./src/modules/index/...` shows
+- `src/ops` and `src/watchdog` fold into the package `src/modules/index` beside the manager's file, which `go list ./src/modules/index/...` shows
 - a case starts the index with no other module, and reads the manager loaded
 - a case reads the manager as the writer of `ops/<id>`, `session/alarms` and `index/health`
 - `./RUNME.sh check` exits 0

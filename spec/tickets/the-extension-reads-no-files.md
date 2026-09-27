@@ -82,7 +82,7 @@ group: sidebar-switches-over
 
 # Ask
 
-`slices.sidebar` moves to `new`. The extension spawns no verb and reads no file itself. A new window sets its values as overrides, and wipes the local file no more.
+`migration/config/slices/sidebar` moves to `new`. The extension spawns no verb and reads no file itself. A new window sets its values as overrides, and wipes the local file no more.
 
 The extension then shows what the index holds, and computes nothing.
 

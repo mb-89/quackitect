@@ -87,7 +87,7 @@ group: module-processes-land-in-shadow
 The operating system then holds the boundary.
 
 - `go test ./...` from the root passes
-- a case kills the fake IO process, and reads its names as stale
+- a case kills the fake IO process, and reads its names at their built-in values, with the mark `not provided`
 - `./RUNME.sh check` exits 0
 
 # design
