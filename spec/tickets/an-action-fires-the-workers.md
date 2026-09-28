@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-owner-stores-the-token, dispatch-writes-the-bundles, the-skills-start-the-workers, groups-land-through-pull-requests]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,18 @@ record:
         hash: f12745c23d9b6e33
         size: 4376
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d81be38d5cd0 · claude-code-remote · helper-4
+    hash_before: 4c8c24b62b57bfb3b8f638558603dba5ddf2f7f0
+    hash_after: 4c8c24b62b57bfb3b8f638558603dba5ddf2f7f0
+    inputs:
+      - name: design/draft
+        hash: f12745c23d9b6e33
+        size: 4376
+      - name: design/tests-red
+        hash: 35d1422fb21984cf
+        size: 908
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -305,8 +317,13 @@ the fire cases reach the outside through the fake http door alone, and the contr
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- No case drives `dispatch --json --fire` through dispatch.js. Fix in implement/change: add one case over the fake http door.
+- The routine cap holds per run. Fix in implement/change: the workflow's cron fires hourly, and no faster.
+- The version header value stands in the test alone. Fix in implement/change: one exported constant beside `FIRE_CAP` owns it.
+- The draft's tests list puts the skill case in the fire test. It stands in the workflow contract file, as tests-red says.
 
 # implement
 
