@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-foundation-closes-its-gaps
 parent: the-manager-becomes-a-module
+record:
+  - step: do
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0a0acd8471e38fd1030b4ef36bf5f4fa08e21c31
+    hash_after: d42153f34dddee7bbc7570835df9cc30f58371be
+reason: became
+successors: [the-catalog-reads-as-rows]
 ---
 
 # Ask
