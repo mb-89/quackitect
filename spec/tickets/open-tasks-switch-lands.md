@@ -209,3 +209,13 @@ Done when the badge and the work tab's brackets read one name, and every child c
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The cloud box flips `migration.phase2switch` to true in this group, on a green shadow.
+
+| weighed | what it read |
+|---|---|
+| the shadow log | `./RUNME.sh log --kind shadow` holds no row after the box ran the old count with the index up |
+| both counts on one queue | `./RUNME.sh tui work --count` and the index's `work/open-tasks` read one value, and read one value again after a todo closed |
+| a false alarm | one early pair disagreed, since the old count read before the plan added todos and the index read after. Read on one queue, the pair agrees |
+| the tests | `./RUNME.sh test src/modules/work src/modules/queue src/tui/work src/modules/migration` answers green |
+| the strongest objection | the shadow read one box alone, so the evidence is two reads there. One commit on `migration.opentasks` puts the old count back, which makes the flip cheap to undo |
