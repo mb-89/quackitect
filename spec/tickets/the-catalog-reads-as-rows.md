@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-manager-becomes-a-module, ports-declare-their-looks]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: c3d31ce011191c91195cfa3a88d01bb812654df4
+    hash_after: c3d31ce011191c91195cfa3a88d01bb812654df4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/index fails
+    inputs:
+      - name: design/draft
+        hash: b107ab46f5080e28
+        size: 3591
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -251,26 +264,31 @@ each test starts the manager over qtest.New with an action carrying doc-tagged f
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/index/manager_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/index/manager_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion with no stub, because the fake reads a name nobody registers as nil, which reads as no rows. The cases pin the row keys as lowercase name, provider, state, doc, fields and kind, which the draft leaves open. The state of index/health turns answered only after a step, so the names case leans on the step committing index/names again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case: the names, the actions and the docs, and the check as a command
+the cases run over the fake index and an op table in memory, and reach no door
 
 # gate
 

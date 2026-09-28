@@ -236,3 +236,117 @@ func TestAnOperationPastItsWindowLeavesTheStore(t *testing.T) {
 		t.Fatalf("the op table holds 1 past its window: %s", body)
 	}
 }
+
+// An action whose input fields carry their docs, so a catalog row names each field. [[spec/tickets/the-catalog-reads-as-rows]]
+type askIn struct {
+	Ticket string `json:"ticket" label:"Ticket" doc:"the ticket the ask reads"`
+}
+
+// The manager started over a catalog holding its own names, an action and a config key, stepped once. [[spec/tickets/the-catalog-reads-as-rows]]
+func catalogued(t *testing.T) *qtest.Index {
+	t.Helper()
+	var as q.Writer
+	ix := qtest.New(t, func(c *q.Catalog) {
+		as = Registers(c)
+		q.ActionIn(c, "t/ask", func(askIn) []q.Request { return nil }, q.Doc("asks about a ticket"))
+		q.CfgIn(c, "depth", 3, q.Doc("how deep the ask reads"))
+	})
+	l := &loop{now: time.Unix(1000, 0).UTC()}
+	starts(t, l.outside(t, ix.Store(), as, rowsOf(map[string]string{})))
+	l.step(t)
+	return ix
+}
+
+// A list read as the JSON it commits, one map a row. [[spec/tickets/the-catalog-reads-as-rows]]
+func rowsRead(t *testing.T, value any) []map[string]any {
+	t.Helper()
+	text, err := json.Marshal(value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out []map[string]any
+	if err := json.Unmarshal(text, &out); err != nil {
+		return nil
+	}
+	return out
+}
+
+func rowNamed(t *testing.T, topic string, rows []map[string]any, name string) map[string]any {
+	t.Helper()
+	for _, row := range rows {
+		if row["name"] == name {
+			return row
+		}
+	}
+	t.Fatalf("%s holds no row naming %s: %v", topic, name, rows)
+	return nil
+}
+
+// A field row carries its key and its doc, whatever the row calls them. [[spec/tickets/the-catalog-reads-as-rows]]
+func carries(row map[string]any, wants ...string) bool {
+	for _, want := range wants {
+		found := false
+		for _, value := range row {
+			found = found || value == want
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
+}
+
+// [[spec/tickets/the-catalog-reads-as-rows]]
+func TestIndexNamesNameEachNameItsProviderAndState(t *testing.T) {
+	ix := catalogued(t)
+	rows := rowsRead(t, ix.Read("index/names"))
+	for _, want := range []struct{ name, kind, state string }{
+		{"index/health", "given", "answered"},
+		{"t/ask", "action", "default"},
+		{"config/depth", "given", "default"},
+	} {
+		row := rowNamed(t, "index/names", rows, want.name)
+		provider := fields(t, row["provider"])
+		if provider["name"] != want.name || provider["kind"] != want.kind {
+			t.Fatalf("index/names reads the provider of %s as %v", want.name, row["provider"])
+		}
+		if row["state"] != want.state {
+			t.Fatalf("index/names reads %s in the state %v, not %s", want.name, row["state"], want.state)
+		}
+	}
+}
+
+// [[spec/tickets/the-catalog-reads-as-rows]]
+func TestIndexActionsNameEachActionWithItsDocAndFields(t *testing.T) {
+	ix := catalogued(t)
+	rows := rowsRead(t, ix.Read("index/actions"))
+	row := rowNamed(t, "index/actions", rows, "t/ask")
+	if row["doc"] != "asks about a ticket" {
+		t.Fatalf("index/actions reads the doc of t/ask as %v", row["doc"])
+	}
+	fieldRows := rowsRead(t, row["fields"])
+	if len(fieldRows) != 1 || !carries(fieldRows[0], "ticket", "the ticket the ask reads") {
+		t.Fatalf("index/actions reads the fields of t/ask as %v", row["fields"])
+	}
+	for _, one := range rows {
+		if one["name"] == HealthName {
+			t.Fatalf("index/actions names %s, which no action provides", HealthName)
+		}
+	}
+}
+
+// [[spec/tickets/the-catalog-reads-as-rows]]
+func TestIndexDocsNameEachNameActionAndKeyWithItsDoc(t *testing.T) {
+	ix := catalogued(t)
+	rows := rowsRead(t, ix.Read("index/docs"))
+	for _, want := range []struct{ name, kind, doc string }{
+		{HealthName, "name", "the index's own lease: its part, its last renewal and its term"},
+		{"t/ask", "action", "asks about a ticket"},
+		{"config/depth", "key", "how deep the ask reads"},
+	} {
+		row := rowNamed(t, "index/docs", rows, want.name)
+		if row["kind"] != want.kind || row["doc"] != want.doc {
+			t.Fatalf("index/docs reads %s as the %v %q, not the %s %q", want.name, row["kind"], row["doc"], want.kind, want.doc)
+		}
+	}
+}
