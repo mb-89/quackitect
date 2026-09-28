@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -194,6 +194,18 @@ record:
         hash: 8e30f5495b854973
         size: 4839
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-8
+    hash_before: 5bb9c0a2443eb339c6213e173161e3385e6d689e
+    hash_after: 5bb9c0a2443eb339c6213e173161e3385e6d689e
+    inputs:
+      - name: design/draft
+        hash: 8e30f5495b854973
+        size: 4839
+      - name: design/tests-red
+        hash: 14217a810eb895d8
+        size: 825
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -372,11 +384,12 @@ the family case runs over a catalog in memory, and the golden case seeds the fak
 <!-- the form is verdict -->
 
 pass
-- the approach answers the ask, and a red case decides every done_when line: TestTheIndexImportsNoModule, TestTreeGolden through qtest, go test ./... and the check
-- the build registers the markdown codec through q.ProjectIn with q.Loaded over spec/tickets/*.md, and q.Also over .se/tickets/*.md, so all reads the loaded projection the ask names; the draft parses inside the run of all, which leaves the codec out of c.Projections and out of TestEveryCodecRoundTripsItsCommittedFiles, so projections() in src/quack/main.go takes the tickets module too
-- Changed on q.Content reaches the Watch interface, FakeWatch and Start in src/modules/files/watch.go, whose hand carries no mtime, and every Content literal; the callers list names hears and ContentOf alone, and a Content stamped by mtime commits again on a touch that keeps the hash
-- the golden case stands in src/quack/golden_test.go, where the tests list names src/modules/tickets/golden_test.go, and goldenAt reads ../tickets/testdata, which leaves with src/tickets; the build moves the golden file, points goldenAt at it, and drops src/tickets/golden_test.go
-- the stub Ticket in src/modules/tickets/tickets.go carries a subset of the fields; the moved package keeps every field the tickets door method answers today, Progress, Changed, DependsOn and Fails among them
+- the approach answers the ask: src/modules/tickets registers notes through q.ProjectIn with q.Loaded over spec/tickets/*.md and q.Also over .se/tickets/*.md, all derives from a family map of files/<path...>, spec/wiring.yaml binds tickets.files/<path...> and tickets.all, and src/index/door.go reads tickets/all off the store after scheduler.Settle
+- the red of design/tests-red came from TestAKeyReadsItsEntryOfTheResolvedValues in src/q/wiring_test.go, a red case of the-config-module-resolves-layers, so the record proves no case of this ticket red; the cases stand and assert each done_when line, TestTheIndexImportsNoModule over go list -deps, TestTreeGolden through qtest.New, TestTheWiredTreeAnswersItsTickets and TestTheServedIndexAnswersItsTickets, and each passes on the code already standing
+- go test ./... from the root fails today on red cases of other tickets in the group, in src/q, src/q/qtest, src/modules/config and src/modules/index, so the first done_when line closes only once those land; every package this ticket touches passes, and go list -deps ./src/index names nothing under src/modules
+- ./RUNME.sh check exits 0 on 5bb9c0a24, with warnings on this ticket's prose and on src/q/qtest/suite.go
+- the draft names the projection port notes/<path...>, and NotesPort in src/modules/tickets/tickets.go reads notes; the builder fixes the draft's word or the port in place
+- the size list leaves out src/q/wiring_test.go and src/modules/tickets/module_test.go, which the tests list names
 
 # implement
 
