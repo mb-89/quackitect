@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-topics-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 5dcd24a0eab81d8174fcf34a86e72c751f1e8060
+    hash_after: fddad13aacebede00c3c248fd7ed6a856515dd12
+    inputs:
+      - name: ask
+        hash: 5afd790b5072669d
+        size: 386
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,39 @@ Several twins disagree today, so picking one changes findings. The golden files 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The check module, src/modules/check, declares one `check/<twin>` name per twin, each a list of findings whose built-in value stands empty, so the names stand before phase 7 moves the rules in. Its testdata folder holds one golden file per twin. A twin's golden holds the findings only one side reports over the whole tree: the JavaScript side and the Go side, keyed by file, rule, line and message. The twins: tree (treeFaults on both sides, plus the rule names each side runs), schema (the note kinds schemasIn finds), size (sizeFaults under the code ceilings), magic (magicIn), names (overLong under names.words), paths (isDraft over every tracked path), private (carriesTheName over every tracked line, for one fixed name), slug (slugOf over every heading of every tracked note), vale (fromJson over captured Vale output) and biome (fromJson over captured Biome output). The two parsers read a tool's output and no tree, so their golden runs over captured outputs under the module's testdata. src/scripts/check-twins.js runs every JavaScript twin over a tree it takes, and test/level0/check-twins.js prints them as JSON over this tree's tracked files. src/lsp/twins_test.go runs every Go twin over the same files, since src/lsp stands as package main and no module imports it. It runs node for the JavaScript side, and compares each twin's differences with its golden, and -update writes them. Weighed: a runtime shadow row per twin waits for phase 7, where the LSP answers the check names, so this phase holds each difference as a golden the owner reads at the merge. Assumed: node stands on every box that runs go test, as the check already runs the node tests beside it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/lsp/twins_test.go: TestTwinGoldens calls treeFaults, schemasIn, sizeFaults, magicIn, overLong, isDraft, carriesTheName, slugOf, valeRowsOf and biomeRowsOf,test/level0/check-twins.js: its entry calls twinsOf in src/scripts/check-twins.js,src/scripts/check-twins.js: twinsOf calls treeFaults, schemasIn, sizeFaults, magicIn, overLong, isDraft, carriesTheName, slugOf and both fromJson,src/modules/check/check.go: Registers, which no wiring loads yet
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/lsp/twins_test.go: TestTwinGoldens,src/modules/check/check_test.go: TestEveryTwinNameStands,test/level0/check-twins.test.js: every twin answers over a tree it takes,test/level0/check-twins.test.js: a twin's golden file stands for every twin
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened every twin on both sides: tree.js RULES and check.go Rules, schema.js and schema.go schemasIn, size.js and textfaults.go sizeFaults, magic.js and textfaults.go magicIn, names.js and names.go overLong, paths.js and paths.go isDraft, private.js and private.go carriesTheName, slug.js and restated.go slugOf, vale.js and code.js fromJson beside outside.go valeRowsOf and biomeRowsOf.
+The callers list names every caller of the new code: the Go golden test, the node entry and the module, which no wiring loads yet.
+go test ./... decides through TestTwinGoldens and TestEveryTwinNameStands, the golden per twin through TestTwinGoldens and the node golden test, and ./RUNME.sh check through the commit verb.
 
 ## tests-red
 
