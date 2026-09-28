@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/tests-green
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -166,6 +166,12 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
+  - step: gate
+    hand: the engine
+    stale: design/draft
 ---
 
 # Ask
