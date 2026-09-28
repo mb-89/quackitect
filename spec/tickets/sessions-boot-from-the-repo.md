@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
+step: design/draft
 steps:
   - name: design
     steps:
@@ -367,6 +367,12 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft-2
+    hand: the engine
+    stale: [[spec/design_output/level0]]
 group: the-cloud-works-its-queue
 ---
 
