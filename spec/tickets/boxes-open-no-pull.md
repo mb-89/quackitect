@@ -33,8 +33,21 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
-step: answer
+step: do
 group: the-cloud-follow-ups-land
+record:
+  - step: answer
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: ccec105cc0521f631d0a0d9b12fa122abbd2ef7b
+    hash_after: ccec105cc0521f631d0a0d9b12fa122abbd2ef7b
+    inputs:
+      - name: ask
+        hash: 763d4f27c5def99a
+        size: 505
+      - name: [[spec/tickets/the-cloud-works-its-queue]]
+        hash: 7b2d07e7792d5e73
+        size: 15971
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -54,8 +67,9 @@ The agent takes the call `AGENTS.md` makes, and opens none. `AGENTS.md` names it
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The owner rules that a cloud box opens its group's pull request from work/<group> against main, with auto-merge on and the merge method MERGE. The owner merges nothing by hand. The work skill stands, and AGENTS.md changes to match it: a cloud session working a group opens the group's pull request through the work skill, and a desk session opens none.
 
 # do
 
