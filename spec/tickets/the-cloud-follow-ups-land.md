@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: children-2
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -25,12 +26,15 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: children-2
+    by: children
+    on_fail: split
   - name: accept
     gate: does the work of every child add up to the goal, and does every command of the route pass
     final: true
     does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
     tags: ["review", "accept"]
-    input: ["ask", "children"]
+    input: ["ask", "children", "children-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -48,7 +52,7 @@ steps:
             says: retro notes, which passes when the private folder is empty
       - name: write
         does: writes the retro over the box's own window
-        input: ["children", "notes"]
+        input: ["children", "notes", "children-2"]
         checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it", "every header the change writes says what its file is for, and counts nothing", "the chapter carries the run's owner prompts and errors off the transcript, each with its time", "the chapter says the role, and carries no name, address or path of the box"]
         evidence:
           - name: done
@@ -82,7 +86,6 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: accept
 record:
   - step: sync
     hand: box d81c8e27d9d7 · claude-code-remote
@@ -106,6 +109,16 @@ record:
     hand: the engine
     hash_before: 1ece928c7e2c8f44ee7b952806bebc637114d05d
     hash_after: 1ece928c7e2c8f44ee7b952806bebc637114d05d
+  - step: accept
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: 739cc9f5f74103f04cb98ad6bd85346f40fc0ef7
+    hash_after: b58305e33f9ae911ccb9021dab18c1e77772b8fb
+    returns: 1
+    why: boxes-open-no-pull and the-owner-runs-the-dispatch stand open inside the group, so two of the three rulings stand unanswered
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-cloud-follow-ups-land already carries every commit on main.
 ---
 
 # Ask
@@ -153,6 +166,8 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 
 # children
 
+# children-2
+
 # accept
 
 <!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
@@ -160,8 +175,10 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- boxes-open-no-pull and the-owner-runs-the-dispatch stand open inside the group, so two of the three rulings stand unanswered
 
 # retro
 
