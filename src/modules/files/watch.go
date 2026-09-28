@@ -16,6 +16,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 
 	"quackitect/src/q"
+	"quackitect/src/watcher"
 )
 
 // The out-port family, by its local name. [[spec/design_output/model#the-wiring-file]]
@@ -60,7 +61,10 @@ type watch struct{ root string }
 func NewWatch(root string) Watch { return watch{root} }
 
 func (one watch) Changes(hand Hand) (func(), error) {
-	eyes, err := fsnotify.NewWatcher()
+	// The watcher's loop adds a folder while a stop runs, and its Close returns. [[spec/tickets/a-watch-stops-mid-add]]
+	eyes, err := watcher.New(func(eyes *watcher.Watcher, event fsnotify.Event) {
+		one.hears(eyes, event, hand)
+	})
 	if err != nil {
 		return func() {}, err
 	}
@@ -71,21 +75,11 @@ func (one watch) Changes(hand Hand) (func(), error) {
 	for folder := range named {
 		_ = eyes.Add(filepath.Join(one.root, filepath.FromSlash(folder)))
 	}
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		for event := range eyes.Events {
-			one.hears(eyes, event, hand)
-		}
-	}()
-	return func() {
-		eyes.Close()
-		<-done
-	}, nil
+	return func() { eyes.Close() }, nil
 }
 
 // Every folder under root, so a write in a folder below reaches the watch. [[spec/design_output/model#io-modules-and-their-fakes]]
-func (one watch) adds(eyes *fsnotify.Watcher, from string) error {
+func (one watch) adds(eyes *watcher.Watcher, from string) error {
 	return filepath.WalkDir(from, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil || !entry.IsDir() {
 			return err
@@ -97,7 +91,7 @@ func (one watch) adds(eyes *fsnotify.Watcher, from string) error {
 	})
 }
 
-func (one watch) hears(eyes *fsnotify.Watcher, event fsnotify.Event, hand Hand) {
+func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand) {
 	rel, err := filepath.Rel(one.root, event.Name)
 	if err != nil || strings.HasPrefix(rel, "..") {
 		return
