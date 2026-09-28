@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-manager-becomes-a-module, ports-declare-their-looks]
-step: gate
+step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +148,9 @@ record:
         hash: b107ab46f5080e28
         size: 3591
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/model]]
 ---
 
 # Ask
