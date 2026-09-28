@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -188,6 +188,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 689ba7395a71a0fb405625e0bc3d785d256cd0fa
+    hash_after: 689ba7395a71a0fb405625e0bc3d785d256cd0fa
+    inputs:
+      - name: ask
+        hash: 5e3a08e9f018fdfc
+        size: 704
+      - name: [[spec/design_output/model]]
+        hash: 1717325681c1003e
+        size: 74654
+    def: 7883b3d10633c780
 ---
 
 # Ask
