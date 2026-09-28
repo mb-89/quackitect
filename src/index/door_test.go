@@ -52,6 +52,29 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	}
 }
 
+// The door answers the settled value of one name, the one a reader beside the old path compares. [[spec/tickets/open-tasks-run-in-shadow]]
+func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
+	root := tree(t)
+	c := q.New()
+	q.OutIn(c, "work/open-tasks", 3, q.Doc("a count the case reads"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, err := posts(standing, []string{"value", "work/open-tasks"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if said.Error != "" || said.Result != 3.0 {
+		t.Fatalf("value answered %#v, and the error %q", said.Result, said.Error)
+	}
+}
+
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())

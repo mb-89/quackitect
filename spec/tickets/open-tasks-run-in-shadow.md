@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 81fa1b40004bfbb4
         size: 377
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 544a8d8ea5e37569ba9964be895af070ec747ac0
+    hash_after: 544a8d8ea5e37569ba9964be895af070ec747ac0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 5560bb486339a576
+        size: 2570
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -206,26 +219,33 @@ every done_when line names the test that decides it: TestAShadowMismatchWritesAS
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/tui/work/shadow_test.go
+src/modules/migration/migration_test.go
+src/index/door_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The mismatch case writes no row, the slice key names no provider, and the door answers no method called value. The match case and the old case pass on the stub, since they guard against a row, and they stay as guards once the shadow writes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides: TestAShadowMismatchWritesAShadowRow plants the mismatch, the hand runs the log verb over the row at tests-green, and the check closes there
+every door the tests reach has a fake: the index count stands behind a fake the case sets, and the files are a temporary tree
 
 # gate
 
