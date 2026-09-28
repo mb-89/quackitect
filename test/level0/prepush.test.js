@@ -9,12 +9,13 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   carriedBy,
-  heldBy as readsHold,
   holds,
   lintedBy,
   namesIn,
   rangeOf,
+  heldBy as readsHold,
   refsIn,
+  staleBy,
 } from "../../src/scripts/prepush.js";
 
 const SHA = "a1b2c3d4e5f6a7b8";
@@ -42,19 +43,38 @@ function fakeRepo(names, texts) {
 }
 
 function stamp(over = {}) {
-  return JSON.stringify({ sha: SHA, ok: true, clean: true, at: "now", ...over });
+  return JSON.stringify({
+    sha: SHA,
+    ok: true,
+    clean: true,
+    at: "now",
+    ...over,
+  });
 }
 
 test("git's lines read as refs, and a blank line reads as nothing", () => {
   assert.deepEqual(refsIn(`${toTrunk}\n${toWork}`), [
-    { local: "refs/heads/main", sha: SHA, remote: "refs/heads/main", was: ZEROS },
-    { local: "refs/heads/work/x", sha: SHA, remote: "refs/heads/work/x", was: ZEROS },
+    {
+      local: "refs/heads/main",
+      sha: SHA,
+      remote: "refs/heads/main",
+      was: ZEROS,
+    },
+    {
+      local: "refs/heads/work/x",
+      sha: SHA,
+      remote: "refs/heads/work/x",
+      was: ZEROS,
+    },
   ]);
 });
 
 test("a push to a work branch meets no door, whatever the stamp says", () => {
   assert.deepEqual(holds(refsIn(toWork), ""), { code: 0, said: "" });
-  assert.deepEqual(holds(refsIn(toWork), stamp({ ok: false })), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), stamp({ ok: false })), {
+    code: 0,
+    said: "",
+  });
 });
 
 // [[spec/tickets/cloud-boxes-leave-trunk-alone]]
@@ -100,6 +120,55 @@ test("the holding box pushes its own branch", () => {
     "0ther1d",
   );
   assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/stale-hold-frees-the-branch]]
+test("a push to a work branch another box holds past work.staleAfter lands", () => {
+  const said = holds(
+    refsIn(toWork),
+    stamp(),
+    () => [],
+    true,
+    heldBy(HOLDER),
+    "myb0x",
+    true,
+    () => true,
+  );
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/stale-hold-frees-the-branch]]
+test("a push to a work branch another box holds under work.staleAfter refuses", () => {
+  const said = holds(
+    refsIn(toWork),
+    stamp(),
+    () => [],
+    true,
+    heldBy(HOLDER),
+    "myb0x",
+    true,
+    () => false,
+  );
+  assert.equal(said.code, 1);
+  assert.match(said.said, /box 0ther1d/);
+});
+
+// The age of the tip on origin against the span, read the way the list reads it. [[spec/tickets/stale-hold-frees-the-branch]]
+test("the stale reader reads the origin tip's time against the span", () => {
+  const now = Date.parse("2026-01-01T12:00:00.000Z");
+  const at = (ago) => ({
+    run: (args) =>
+      args.join(" ") === "log -1 --format=%ct origin/work/x"
+        ? { ok: true, out: String(Math.floor(now / 1000) - ago) }
+        : { ok: false, out: "" },
+  });
+  const ref = refsIn(toWork)[0];
+  assert.equal(staleBy(at(31 * 60), "30m", now)(ref), true);
+  assert.equal(staleBy(at(29 * 60), "30m", now)(ref), false);
+  assert.equal(
+    staleBy({ run: () => ({ ok: false, out: "" }) }, "30m", now)(ref),
+    false,
+  );
 });
 
 // [[spec/tickets/one-writer-holds-a-branch]]
