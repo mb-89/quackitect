@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -61,6 +61,23 @@ record:
       - name: check
         exit: 1
         said: "spec/tickets/the-owner-runs-the-dispatch.md:1:1: GroupAsksNobody: the-owner-runs-the-dispatch stands at answer, a step a"
+  - step: do
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: f60dfed7c2d706106c8293f7b9f0018b3a1952bf
+    hash_after: 899aa84b4f530e650c058c279289c8cc4f78596a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 34 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/replayed-red-leaf-reads-green.md:18:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: e73fa4a78d44d170
+        size: 364
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -93,7 +110,7 @@ The owner rules that a cloud box opens its group's pull request from work/<group
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-./RUNME.sh check
+./RUNME.sh test test/level0/dispatch.test.js
 
 ## check
 
@@ -107,7 +124,7 @@ The owner rules that a cloud box opens its group's pull request from work/<group
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The work skill owns how a box hands its group over: it opens the pull request from work/<group> against main and turns auto-merge on with the merge method MERGE, so the owner merges nothing by hand. AGENTS.md already let a cloud session open that pull request, and now says it merges itself, pointing at the work skill for the rest.
+The work skill owns how a box hands its group over. It opens the pull request from the group branch against main, and turns auto-merge on with the merge method MERGE, so the owner merges nothing by hand. AGENTS.md already let a cloud session open that pull request, and now says it merges itself, pointing at the work skill for the rest. No test reads the two prose files. The check holds their form, and the dispatch suite covers the hand-over they finish.
 
 ## checked
 
