@@ -33,7 +33,24 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
-step: answer
+step: do
+todo: true
+record:
+  - step: answer
+    hand: box 1327ac97a972 · claude-code-remote
+    hash_before: d6241668cf60387c9634dc5c8d0007b3d5dacef6
+    hash_after: d6241668cf60387c9634dc5c8d0007b3d5dacef6
+    inputs:
+      - name: ask
+        hash: 5b7169bbcf8dbea4
+        size: 1297
+      - name: [[spec/tickets/sessions-boot-from-the-repo]]
+        hash: 53882550d875ff45
+        size: 36217
+      - name: [[spec/tickets/a-rewind-spares-landed-tests]]
+        hash: a63fe78443cd598c
+        size: 20553
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -61,8 +78,9 @@ The road to pass it as owner, from the root of a clone on `work/the-cloud-works-
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The box decides that no owner pass is needed, and the owner agrees in chat. sessions-boot-from-the-repo stands closed. Its evidence reruns the landed boot cases against the tree before the change, where they fail on their own assertion.
 
 # do
 
