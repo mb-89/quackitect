@@ -82,7 +82,17 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
+record:
+  - step: sync
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: 9729e9d5f4f6c01750f6cc86451f8f84a6d775cf
+    hash_after: c171a7f85b51e8f0c3412a9e6dd019f4adda24e7
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-cloud-follow-ups-land took 2 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -102,8 +112,9 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
