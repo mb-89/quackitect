@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 cloud: true
 record:
   - step: sync
@@ -150,6 +150,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d81be38d5cd0 · claude-code-remote
+    hash_before: 34cbd1cec5bb72075ed5aaa87a494e886002c02e
+    hash_after: 34cbd1cec5bb72075ed5aaa87a494e886002c02e
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -253,38 +265,64 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+an-action-fires-the-workers closes done: the dispatch Action fires the work routine, opens the issues and opens the write branch's pull request
+the dispatch rows read with forward slashes, so the worktree cases pass on Windows
+main comes in twice, and the second merge keeps both sides' cases
+list-fields-land-one-a-line and a-helper-pulls-past-the-plan stand loose for a fix group
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the fire page answers the header, the caps and the error envelope, so the fire script carries each once
+the fake http door answers the fire cases, so no case reaches the network
+the gate helper names the version constant and a case through the verb, and the change takes both
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+18:13, branch take moves the box onto another group's stuck hand-over, and a release and a checkout bring it back
+18:20, the door refuses a date in the draft's prose, and the draft names the version by the fire page
+18:22, the engine joins each list field with commas, so the red list names one file standing nowhere
+18:24, the plan's work in hand stops the gate helper's pull, and the helper loops until the plan clears
+18:29, DoorsOnly refuses a local server import in the contract case, and the wire door serves it
+18:30, the skills contract still holds the dispatch skill to the JSON road the ask retires
+18:31, the commit door pairs each changed file with a staged test, and a contract case names both
+18:36, the Windows runner reads backslashed git rows in two worktree cases
+18:39, main conflicts in the work-stands case file, and the merge keeps both sides
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the list join: spec/tickets/list-fields-land-one-a-line
+the helper loop: spec/tickets/a-helper-pulls-past-the-plan
+the backslashed rows: gitRows in the dispatch fixtures now reads forward slashes
+the take's detour: a prompt naming its branch pulls on that branch, and skips the take
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask reads as one ticket, and it reaches a door, a script, a workflow and a skill. The door carries most of the weight, because the tree holds the outside inside a door. The session starts with no owner prompt, so every call stands as its own.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the version, the cap and the label each stand once, in the fire script
+the fire script names each number as a constant at its top
+every new file opens with a comment saying what it does
+the run carries no owner prompt, and each error stands with its time
+the chapter names roles alone
 
 ## cloud
 
