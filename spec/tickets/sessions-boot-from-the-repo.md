@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -460,6 +460,22 @@ record:
         hash: e8bdd44da574dc87
         size: 89362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 0d1f2ff1970e76940c260f2555c12497fbebe643
+    hash_after: 0d1f2ff1970e76940c260f2555c12497fbebe643
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: dd385901fd27601c
+        size: 3263
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: 08e16d07b0de477c
 group: the-cloud-works-its-queue
 ---
 
@@ -563,7 +579,7 @@ test/level0/hooks.test.js
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The change landed at 370af06b9 before a note section staled the draft, so the boot cases answer green on the tip, and the test verb with the sources set aside answers green too. The script runs those cases against 370af06b9^, and five of them fail on their own assertion there: the SessionStart hook, the install without a manifest, the install without the modules, the install SE_CLOUD marks, and the exit 0 where the install fails.
+The boot cases answer green on the tip, because the change stands landed at 370af06b9. The script runs them against 370af06b9^, and four fail on their own assertion there. The case where everything stands, the case off a cloud box, and the case leaving the modules to the bridgehead pass there, as negative cases do.
 
 ### checked
 
@@ -571,7 +587,7 @@ The change landed at 370af06b9 before a note section staled the draft, so the bo
 <!-- the form is checklist -->
 
 every done_when line meets a boot case in test/level0/hooks.test.js that fails before the change, or the check line, which the hand answers at tests-green
-the cases reach the disk and the process through the fakes alone, as the earlier tests-red recorded
+the cases reach the disk and the process through fakeDisk and fakeProc alone
 
 ## draft-2
 
