@@ -185,12 +185,13 @@ func contextual(contexts []Context, leases []string, name string) (string, bool)
 	return "", false
 }
 
-// The key as src/config names it, `<instance>.<key>`, which EnvOf turns into its variable. [[spec/design_output/config#the-go-reader]]
+// The key as src/config names it, `<instance>.<key>` with a dot between its segments, which EnvOf turns into its variable. [[spec/design_output/config#the-go-reader]]
 func dotted(key q.Key) string {
+	local := strings.ReplaceAll(key.Local, "/", ".")
 	if key.Instance == "" {
-		return key.Local
+		return local
 	}
-	return key.Instance + "." + key.Local
+	return key.Instance + "." + local
 }
 
 // A variable's text stands as its JSON literal where it reads as JSON, and as a JSON string otherwise. [[spec/design_output/model#a-keys-layers]]
@@ -202,18 +203,17 @@ func literalOfText(text string) string {
 	return string(quoted)
 }
 
-// The literal a layer file sets for the key, under its instance and then its key. [[spec/design_output/model#config-comes-off-the-registrations]]
+// The literal a layer file sets for the key, under its instance and then each segment of its key, as src/config reads a dotted key. [[spec/design_output/model#config-comes-off-the-registrations]]
 func filed(file q.Ordered, key q.Key) (string, bool) {
-	scope := file
+	path := strings.Split(key.Local, "/")
 	if key.Instance != "" {
-		var ok bool
-		if scope, ok = member(file, key.Instance); !ok {
+		path = append([]string{key.Instance}, path...)
+	}
+	value, ok := file, true
+	for _, name := range path {
+		if value, ok = member(value, name); !ok {
 			return "", false
 		}
-	}
-	value, ok := member(scope, key.Local)
-	if !ok {
-		return "", false
 	}
 	if !value.Object && !value.Array {
 		return value.Literal, value.Literal != ""

@@ -161,7 +161,7 @@ func TestALeasePastItsTermLeavesIndexLeases(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(one.stop)
+	t.Cleanup(one.stops)
 	one.dog.Hold("t/short", 10*time.Second)
 	one.dog.Hold("t/long", time.Hour)
 	l.now = l.now.Add(5 * time.Second)

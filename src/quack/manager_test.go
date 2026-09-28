@@ -10,10 +10,49 @@ import (
 	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/config"
+	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
+
+// An override on watchdog/beat re-arms the manager's tick at its span, and one on watchdog/lease holds the index's lease at its term, through the config module's layers. [[spec/design_output/model#a-lease]]
+func TestAnOverrideSetsTheSpanTheManagerTicksAt(t *testing.T) {
+	var as q.Writer
+	ix := qtest.New(t, func(c *q.Catalog) {
+		q.OutIn(c, "env/<name>", "", q.Doc("an SE_ variable, as the case seeds it"))
+		as = manager.Registers(c)
+		config.Registers(c)
+	})
+	var spans []time.Duration
+	var steps []func()
+	stop, err := manager.Start(manager.Outside{
+		Root: t.TempDir(), Store: ix.Store(), As: as, Rows: opRows{heldTable{}},
+		Steps: func(hand func()) { steps = append(steps, hand) },
+		Now:   time.Now,
+		Every: func(span time.Duration, _ func(time.Time)) func() {
+			spans = append(spans, span)
+			return func() {}
+		},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(stop)
+	ix.Land(config.HeldName, config.Change{Kind: config.Overrides, Values: map[string]string{manager.BeatKey: "2", manager.LeaseKey: "7"}})
+	if len(spans) == 0 || spans[len(spans)-1] != 2*time.Second {
+		t.Fatalf("an override of 2 on %s ticks at %v", manager.BeatKey, spans)
+	}
+	for _, step := range steps {
+		step()
+	}
+	if lease, _ := ix.Read(manager.HealthName).(manager.Lease); lease.Term != 7*time.Second {
+		t.Fatalf("an override of 7 on %s holds the term %v", manager.LeaseKey, lease.Term)
+	}
+}
 
 // An op table in memory, as the index hands one. [[spec/design_output/model#an-operation-outlives-callers]]
 type heldTable map[string][]byte

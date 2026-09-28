@@ -4,9 +4,9 @@
 package index
 
 import (
+	"sync"
 	"time"
 
-	"quackitect/src/config"
 	"quackitect/src/q"
 )
 
@@ -17,6 +17,12 @@ const (
 	LeasesName   = "index/leases"
 	builtInBeat  = 5 * time.Second
 	builtInLease = 30 * time.Second
+)
+
+// The keys the manager declares, each a span in seconds, which the config module resolves off every layer. [[spec/design_output/model#a-lease]]
+const (
+	BeatKey  = "config/watchdog/beat"
+	LeaseKey = "config/watchdog/lease"
 )
 
 // One row of the op table: the id, and the body it holds. [[spec/design_output/model#an-operation-outlives-callers]]
@@ -53,6 +59,8 @@ func Registers(c *q.Catalog) q.Writer {
 		q.OutIn(c, NamesName, []NameRow{}, q.Doc("each name, its provider and its state"), q.Looks(q.Rows)),
 		q.OutIn(c, ActionsName, []ActionRow{}, q.Doc("each action, its doc and its input fields"), q.Looks(q.Rows)),
 		q.OutIn(c, DocsName, []DocRow{}, q.Doc("each name, action and key, with its doc"), q.Looks(q.Rows)),
+		q.CfgIn(c, "watchdog/beat", int(builtInBeat/time.Second), q.Doc("the seconds between two ticks of the manager")),
+		q.CfgIn(c, "watchdog/lease", int(builtInLease/time.Second), q.Doc("the seconds the index's own lease holds past a renewal")),
 	)
 }
 
@@ -61,7 +69,11 @@ type managed struct {
 	from Outside
 	book *Book
 	dog  *Dog
-	stop func()
+	mu   sync.Mutex
+	beat time.Duration
+	term time.Duration
+	tick func()
+	done bool
 }
 
 // [[spec/design_output/model#the-index-manager]]
@@ -70,7 +82,7 @@ func Start(from Outside) (stop func(), err error) {
 	if err != nil {
 		return nil, err
 	}
-	return one.stop, nil
+	return one.stops, nil
 }
 
 // Opens the book over the rows and fails what a restart leaves in flight, holds the index's lease, hands the work loop its step, and ticks at the beat. [[spec/design_output/model#the-index-manager]]
@@ -87,18 +99,52 @@ func begins(from Outside) (*managed, error) {
 	// The catalog stays fixed once the store starts, so its rows commit once. [[spec/tickets/the-catalog-reads-as-rows]]
 	names, actions, docs := catalogOf(from.Store)
 	one.commits(map[string]any{NamesName: names, ActionsName: actions, DocsName: docs})
-	one.dog.Hold(leasePart, spanOf(from.Root, "watchdog.lease", builtInLease))
+	read := from.Store.Snapshot()
+	one.term = spanIn(read.Read(LeaseKey), builtInLease)
+	one.dog.Hold(leasePart, one.term)
 	from.Steps(one.renews)
-	one.stop = from.Every(spanOf(from.Root, "watchdog.beat", builtInBeat), one.ticks)
+	one.beat = spanIn(read.Read(BeatKey), builtInBeat)
+	one.tick = from.Every(one.beat, one.ticks)
+	from.Store.OnCommit(one.hears)
 	return one, nil
 }
 
-// A key in seconds, or the built-in span where the tree sets none above zero, since a ticker takes no zero. [[spec/design_output/model#a-lease]]
-func spanOf(root, key string, builtIn time.Duration) time.Duration {
-	if seconds := config.Count(root, key); seconds > 0 {
+// A key in seconds, or the built-in span where it reads none above zero, since a ticker takes no zero. [[spec/design_output/model#a-lease]]
+func spanIn(value any, builtIn time.Duration) time.Duration {
+	if seconds, ok := value.(int); ok && seconds > 0 {
 		return time.Duration(seconds) * time.Second
 	}
 	return builtIn
+}
+
+// A commit moving a span holds the lease at its new term, or ticks at the new beat from here on. [[spec/design_output/model#a-lease]]
+func (one *managed) hears(values map[string]any) {
+	lease, leased := values[LeaseKey]
+	beat, beats := values[BeatKey]
+	if !leased && !beats {
+		return
+	}
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	if one.done {
+		return
+	}
+	if term := spanIn(lease, builtInLease); leased && term != one.term {
+		one.term = term
+		one.dog.Hold(leasePart, term)
+	}
+	if span := spanIn(beat, builtInBeat); beats && span != one.beat {
+		one.tick()
+		one.beat, one.tick = span, one.from.Every(span, one.ticks)
+	}
+}
+
+// Stops the tick, and every span a later commit moves. [[spec/design_output/model#the-index-manager]]
+func (one *managed) stops() {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	one.done = true
+	one.tick()
 }
 
 func (one *managed) commits(values map[string]any) {

@@ -66,6 +66,7 @@ type loop struct {
 	now   time.Time
 	hands []func()
 	ticks []func(time.Time)
+	spans []time.Duration
 }
 
 func (l *loop) outside(t *testing.T, s *q.Store, as q.Writer, rows Rows) Outside {
@@ -73,8 +74,9 @@ func (l *loop) outside(t *testing.T, s *q.Store, as q.Writer, rows Rows) Outside
 		Root: t.TempDir(), Store: s, As: as, Rows: rows,
 		Steps: func(hand func()) { l.hands = append(l.hands, hand) },
 		Now:   func() time.Time { return l.now },
-		Every: func(_ time.Duration, hand func(time.Time)) func() {
+		Every: func(span time.Duration, hand func(time.Time)) func() {
 			l.ticks = append(l.ticks, hand)
+			l.spans = append(l.spans, span)
 			return func() {}
 		},
 	}
@@ -189,13 +191,24 @@ func TestAStartFailsTheOpsInFlightUnderOpsId(t *testing.T) {
 	}
 }
 
+// A lease key resolving to zero holds the built-in term, and a beat moving past its start re-arms the tick. The config module's own layers meet the manager in src/quack. [[spec/design_output/model#a-lease]]
 func TestALeaseAtZeroTakesTheBuiltInTerm(t *testing.T) {
-	t.Setenv("SE_WATCHDOG_LEASE", "0")
-	s, l, from, _ := manager(t)
-	starts(t, from)
+	var as, resolved q.Writer
+	ix := qtest.New(t, func(c *q.Catalog) {
+		resolved = q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the values each key resolves, as the case seeds them"))
+		as = Registers(c)
+	})
+	l := &loop{now: time.Unix(1000, 0).UTC()}
+	starts(t, l.outside(t, ix.Store(), as, rowsOf(map[string]string{})))
+	ix.SeedAs(resolved, map[string]any{q.ResolvedName: q.Resolved{LeaseKey: "0", BeatKey: "3"}})
+	ix.Run(LeaseKey)
+	ix.Run(BeatKey)
 	l.step(t)
-	if term := fields(t, s.Snapshot().Read("index/health"))["term"]; term != float64(builtInLease) {
+	if term := fields(t, ix.Read("index/health"))["term"]; term != float64(builtInLease) {
 		t.Fatalf("a lease at zero reads the term %v, not %v", term, float64(builtInLease))
+	}
+	if last := l.spans[len(l.spans)-1]; last != 3*time.Second {
+		t.Fatalf("a beat of 3 ticks at %v", l.spans)
 	}
 }
 
@@ -206,7 +219,7 @@ func TestATickFailsAnOperationPastItsDeadline(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(one.stop)
+	t.Cleanup(one.stops)
 	id, err := one.book.Start("t/read", nil, "s1", q.Declared{Deadline: time.Minute})
 	if err != nil {
 		t.Fatal(err)

@@ -149,6 +149,24 @@ func TestASharedKeyReadsTheDefaultFileAlone(t *testing.T) {
 	}
 }
 
+// A module declaring a key of two segments, which a layer file nests. [[spec/design_output/model#config-comes-off-the-registrations]]
+func nested(c *q.Catalog) {
+	q.CfgIn(c, "stop/after", 1, q.Doc("the seconds before a stop"))
+}
+
+// A key of two segments reads its nested member, and its variable spells the segments with dots. [[spec/design_output/model#config-comes-off-the-registrations]]
+func TestANestedKeyReadsItsNestedMember(t *testing.T) {
+	ix := layered(t, "queue", nested)
+	ix.Seed(files(`{"queue": {"stop": {"after": 4}}}`, `{}`))
+	if got := settles(t, ix, "queue/config/stop/after"); got != 4 {
+		t.Fatalf("queue/config/stop/after reads %v off the nested file", got)
+	}
+	ix.Seed(map[string]any{"env/" + EnvOf("queue.stop.after"): "6"})
+	if got := settles(t, ix, "queue/config/stop/after"); got != 6 {
+		t.Fatalf("queue/config/stop/after reads %v, not the value %s carries", got, EnvOf("queue.stop.after"))
+	}
+}
+
 // [[spec/design_output/model#a-keys-layers]]
 func TestAnEnvValueBeatsTheLocalFile(t *testing.T) {
 	ix := layered(t, "queue", weighed)
