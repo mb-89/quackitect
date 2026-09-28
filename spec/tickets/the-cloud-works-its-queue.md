@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 cloud: true
 record:
   - step: sync
@@ -105,6 +105,18 @@ record:
         exit: 0
         said: work/the-cloud-works-its-queue already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: a75879490275fbe0a3e37247b7e9c793978e2171
+    hash_after: a75879490275fbe0a3e37247b7e9c793978e2171
+    inputs:
+      - name: ask
+        hash: ab2df188412542cd
+        size: 716
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -133,14 +145,18 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/agents-keeps-the-desk-rule]], trivial,[[spec/tickets/an-action-fires-the-workers]], standard,[[spec/tickets/boot-and-bridgehead-install-once]], trivial,[[spec/tickets/boot-hook-names-its-span]], trivial,[[spec/tickets/boot-probes-an-untrusted-clone]], trivial,[[spec/tickets/dispatch-cuts-the-fix-name]], trivial,[[spec/tickets/dispatch-drops-the-trunk-marker]], trivial,[[spec/tickets/dispatch-prints-its-plan]], standard,[[spec/tickets/dispatch-removes-its-worktree]], trivial,[[spec/tickets/dispatch-reuses-mark-off]], trivial,[[spec/tickets/dispatch-write-file-size]], trivial,[[spec/tickets/dispatch-writes-the-bundles]], standard,[[spec/tickets/done-points-at-the-pull]], trivial,[[spec/tickets/fix-groups-end-the-chain]], standard,[[spec/tickets/fix-schema-case-reads-fix]], trivial,[[spec/tickets/groups-hold-groups]], standard,[[spec/tickets/groups-land-through-pull-requests]], standard,[[spec/tickets/merge-reads-open-pulls]], trivial,[[spec/tickets/reject-copies-read-their-round]], standard,[[spec/tickets/reject-fixture-takes-standard-route]], trivial,[[spec/tickets/second-draft-pass-case]], trivial,[[spec/tickets/sessions-boot-from-the-repo]], standard,[[spec/tickets/take-case-asserts-the-switch]], trivial,[[spec/tickets/take-hands-a-stale-handover]], trivial,[[spec/tickets/take-reads-the-parent-chain]], trivial,[[spec/tickets/the-skills-start-the-workers]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every child is a point ticket on the trivial route or a standard ticket reviewed whole, and none needs a group of its own
+the children add up to the goal: the dispatch plan and its bundles, the fix groups, groups holding groups, the pull request hand-back, the boot, and the Action; the old road keeps working because every child lands beside it
+an-action-fires-the-workers names the-owner-stores-the-token and the tickets it builds on under depends_on, and so do the standard tickets that wait on another
 
 # children
 
