@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-shadow-lands
 depends_on: ["the-queue-becomes-a-module"]
+record:
+  - step: design/draft
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: fc92e8ab8af638964ad4dd22f14a4232e3488b8f
+    hash_after: fc92e8ab8af638964ad4dd22f14a4232e3488b8f
+    inputs:
+      - name: ask
+        hash: 7c0201f8ee4678b7
+        size: 502
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,45 @@ The badge and the header then read one name, `work/open-tasks`. Without it they 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A topic package src/modules/work holds two modules, one file each. rows.go registers the derived out-port rows over the in-ports tickets (tickets/all), places (queue/places) and cloud (tickets/cloud): one row a ticket, in the shape rowOfTicket in src/scripts/work-answer.js answers, with name, kind (group where the route reads group, ticket otherwise), state (held where the place reads 0), step, progress, group, urgent, person, held, waits (a dependency still open), todo, says, queue and cloud, and one row of kind todo for every placed name no ticket carries, which is a plan todo or the plan work with no file. open_tasks.go registers the derived out-port open-tasks over places alone: the count of places that read anything but the cloud place, the count countTakeable in src/tui/work/workplaces.go answers today off the verb. The wiring loads the instance work and binds work.tickets, work.places and work.cloud, and src/quack/main.go adds the work type. The module imports q and src/ticket alone, and reads no git. Assumption: the old answer adds a row for each ephemeral hold, which the holds module answers apart. The rows port leaves those out, and the shadow names any count they move.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/main.go: modules, the table the wiring loads types from
+spec/wiring.yaml: the instances and wires
+no reader of work/rows or work/open-tasks stands yet: open-tasks-run-in-shadow adds the first
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/work/open_tasks_test.go: TestOpenTasksCountsEveryPlaceOffTheCloud
+src/modules/work/open_tasks_test.go: TestOpenTasksReadsAFakeTreeOfTickets
+src/modules/work/rows_test.go: TestARowCarriesItsPlaceAndItsFlags
+src/modules/work/rows_test.go: TestAPlacedTodoStandsAsARow
+src/quack/main_test.go: TestTheWiredTreeAnswersItsOpenTasks
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file, function and verb the approach names stands opened, and each claim checked there: read rowOfTicket, placesIn and answerOf in work-answer.js, countTakeable and PlacesIn in src/tui/work/workplaces.go, and the queue places port
+the callers list names every caller of what the approach changes: the root table and the wiring, and no reader of the new names stands yet
+every done_when line names the test that decides it: go test from the root, TestOpenTasksReadsAFakeTreeOfTickets for the fake tree, and the check
 
 ## tests-red
 
