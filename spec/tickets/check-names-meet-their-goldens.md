@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: 5afd790b5072669d
         size: 386
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 358fef1601e0e657f4c62bb057d97724d9e6fbba
+    hash_after: 358fef1601e0e657f4c62bb057d97724d9e6fbba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 69c8aa2cc80f8682
+        size: 3168
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -197,26 +210,31 @@ go test ./... decides through TestTwinGoldens and TestEveryTwinNameStands, the g
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/check-twins.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/check-twins.test.js,src/lsp/twins_test.go,src/modules/check/check_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The node golden case fails on its own assertion, since no golden file stands for any twin, and TestTwinGoldens fails the same way for all ten twins. The check module test fails to build, since the module stands nowhere yet. The first run of the node twins case failed too, and the fault stood in the fixture: the JavaScript magic twin reads Go files alone, so the fixture now carries one. The surprise: the patch door reads a captured Biome report as a live one, and raises its rows as warnings, so both captured outputs stand as text files.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Every done_when line meets a red test: go test ./... through TestTwinGoldens and TestEveryTwinNameStands, the golden per twin through both golden cases, and the check through the commit verb.
+Every door the tests reach takes a fake or a captured answer: the node case runs over a fake disk and a fake git, and the parsers read captured tool output. TestTwinGoldens reads the real tree on purpose, since the ask runs each twin over the whole tree.
 
 # gate
 
