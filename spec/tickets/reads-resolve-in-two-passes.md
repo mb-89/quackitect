@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,11 +114,81 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-wiring-file-binds-ports]
+record:
+  - step: design/draft
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: ce8476e00bc870b36d177b46c9a380b1ba8021eb
+    hash_after: ce8476e00bc870b36d177b46c9a380b1ba8021eb
+    inputs:
+      - name: ask
+        hash: 41c6943945b32e52
+        size: 936
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: d147a2ac3ce62a2be6e6daa1d21b60adb2ea7208
+    hash_after: d147a2ac3ce62a2be6e6daa1d21b60adb2ea7208
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: aa0fb1a917cce672
+        size: 2936
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: cb3596229973134926051dd165e071827d258ca9
+    hash_after: cb3596229973134926051dd165e071827d258ca9
+    inputs:
+      - name: design/draft
+        hash: aa0fb1a917cce672
+        size: 2936
+      - name: design/tests-red
+        hash: 205ea49bec3293cf
+        size: 1067
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 19cae9bc022be2687d2ca018e368f58efe4baa55
+    hash_after: 19cae9bc022be2687d2ca018e368f58efe4baa55
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: b8e08227a453a005edb4d00a5acb5d17b3bbe527
+    hash_after: b8e08227a453a005edb4d00a5acb5d17b3bbe527
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 205ea49bec3293cf
+        size: 1067
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -154,38 +224,60 @@ Modules load in any order, so one pass refuses a sound wiring. An instance that 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Load` in `src/q/wiring.go` runs two passes over the instances, in any wiring order.
+The first pass registers each instance, names its out-ports, and binds each in-port whose writer stands already.
+It leaves every other wired in-port open.
+The second pass binds the open in-ports against every writer, and names a fault where one stays open.
+`registration` in `src/q/q.go` gains `instance` and `port`, and `input` gains `port`, so each fault names the port as `<instance>.<port>`.
+`twice` in `src/q/check.go` names both out-ports writing one standard name.
+`inputFaults` names the in-port, the writer port, and both types on a type apart.
+A new `Start(w Wiring, types)` in `src/q/wiring.go` runs `Load`, then `Check`, and answers `(*Store, error)`.
+On any fault it answers no store and a `Refused` error, one fault a line, each naming its port.
+`Store` in `src/q/store.go` gains `Down(instance) error`, which marks an instance that runs nowhere, copied into each `Snapshot`.
+`Snapshot.Read` answers the writer built-in value while its instance stands down, and `Snapshot.NotProvided(name)` answers the mark.
+`Why` in `src/q/why.go` reads the state `not provided` there.
+Assumption: the mark covers a writer down alone, and a name with no value keeps the state `default`, since `why_test.go` holds it.
+Assumption: a module type nobody registers keeps the `NoType` refusal, since it is a fault of the binary and no crash.
+The index manager calls `Down` on a crash later. The composition root of `io-modules-own-their-names` calls `Start`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/wiring_test.go: loaded,src/q/wiring_test.go: TestAnUnwiredInPortAnswersAFault,src/q/qtest/qtest.go: Over,src/q/catalog_test.go: every case calling `Check`,src/q/store_test.go: the case calling `Check`,src/q/store.go: Land,src/q/q.go: derivedOf,src/q/why.go: why,src/q/qtest/qtest.go: Read,src/index/door.go: the why and read handlers calling `Snapshot().Read`,src/index/v1.go: the read calling `snap.Read`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: `go test ./...` from the root,src/q/start_test.go: TestAReaderRegisteredBeforeItsWriterStarts,src/q/start_test.go: TestAnInPortWithNoWireAndNoBuiltInRefusesNamingThePort,src/q/start_test.go: TestTwoOutPortsOnOneStandardNameRefuseNamingBoth,src/q/start_test.go: TestAnInPortWiredToAnotherTypeRefusesNamingBothTypes,src/q/start_test.go: TestAnInstanceThatRunsNowhereReadsTheBuiltInMarkedNotProvided,RUNME.sh: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/wiring.go,src/q/check.go,src/q/q.go,src/q/store.go,src/q/why.go,src/q/start_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened `Load`, `bind`, `outName`, `Check`, `twice`, `inputFaults`, `NewStore`, `Snapshot.Read` and `Why`, and checked each claim there.
+I grepped every caller of `Load`, `Check`, `NewStore` and `Snapshot.Read` across `src`, and the callers list names each.
+Each done_when line names its test in `src/q/start_test.go`, or the command `go test ./...` or `./RUNME.sh check`.
 
 ## tests-red
 
@@ -194,26 +286,31 @@ Modules load in any order, so one pass refuses a sound wiring. An instance that 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/start_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every start case fails on its own assertion over the stubs: Start answers no store and the error 'the start stands unbuilt', so the started cases refuse and the refused cases find no port named in the error. Down answers nil and NotProvided answers false. The surprise: Load already binds in two passes, since it names every writer before it binds any in-port, so a reader loaded before its writer binds today, and the work left is Start, the port names in each fault, and the down mark. The send and writer cases in src/q stand red on the lists of io-modules-own-their-names and commits-name-their-writer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a case: the reader before its writer, the unwired in-port, the two out-ports on one standard name, the in-port of another type and the instance that runs nowhere each have a case in src/q/start_test.go, and go test and the check decide the rest as commands
+the cases run over a catalog and a store in memory, so no door stands unfaked
 
 # gate
 
@@ -222,8 +319,9 @@ Modules load in any order, so one pass refuses a sound wiring. An instance that 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -234,14 +332,19 @@ Modules load in any order, so one pass refuses a sound wiring. An instance that 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, and `src/q/start_test.go` from tests-red
+every case runs over a catalog and a store in memory, so the change reaches no door
+each new function points at the design section on passes, the approach it implements
+the port name stands once in `portName`, and the down mark once in `Store.down`
 
 ## tests-green
 
@@ -250,26 +353,33 @@ Modules load in any order, so one pass refuses a sound wiring. An instance that 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/start_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index now starts through `Start`, which loads the wiring, checks the catalog, and answers every fault at once in a `Refused` error. Each fault names its port as `<instance>.<port>`. Two writers of one standard name name both out-ports, and a type apart names both ports and both types. `Load` already named every writer before it bound an in-port, so a reader loaded before its writer binds. `Store.Down` marks an instance that runs nowhere. Its names then read their built-in value, `NotProvided` answers true, and `Why` reads the state `not provided`. The index manager calls `Down` on a crash in a later ticket.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, and `src/q/start_test.go`
+every case runs over a catalog and a store in memory, so the change reaches no door
+each new function points at the design section on passes, the approach it implements
+the port name stands once in `portName`, and the down mark once in `Store.down`
 
 # accept
 
