@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 6dd7f9919826ca01c96a0207d2f8678625e7be45
+    hash_after: 6dd7f9919826ca01c96a0207d2f8678625e7be45
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q/qtest fails
+    inputs:
+      - name: design/draft
+        hash: f01d0e05c0bba219
+        size: 2745
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,34 @@ Each done_when line names its case in the tests list, and go test and the check 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/qtest/module_test.go src/modules/index/module_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/qtest/module_test.go
+src/modules/index/module_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each of the eight cases fails on its own assertion over the stub, which registers nothing. The q cases read no active provider of w/out, the open in-port case reads no refusal, and the manager cases read no action named save.
+The surprise: go vet refuses an unkeyed q.Instance outside package q, so the fake's wiring names its fields where start_test.go leaves them bare.
+The fake's names stand unbound where no wiring loads it, so the manager cases read out and save, where the q cases read w/out and r/seen.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Each of the six middle done_when lines meets its case in the two red files, and go test and the check decide the first and the last.
+The store, the book and the dog stand in memory, and the fake module stands in for every module, so no door needs a fake of its own.
 
 # gate
 
