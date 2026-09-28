@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -160,6 +160,19 @@ record:
         hash: 1717325681c1003e
         size: 74654
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: cc7be837a68b4e6f07191b32855a68b5be744cc3
+    hash_after: cc7be837a68b4e6f07191b32855a68b5be744cc3
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 1893dad055aa6604
+        size: 3020
+    def: 08e16d07b0de477c
 ---
 
 # Ask
