@@ -3,26 +3,51 @@
 // [[spec/tickets/open-tasks-run-in-shadow]]
 
 import assert from "node:assert/strict";
-import { PassThrough } from "node:stream";
 import { test } from "node:test";
 import { exitsDrained } from "../../src/scripts/cli.js";
 
 const BIG = 4 * 65536;
+const SIP = 1024;
 
-test("a verb exits only once a slow reader holds every byte it wrote", async () => {
-  const out = new PassThrough({ highWaterMark: 1024 });
+// A pipe that answers each write once a reader takes every byte up to it, as a pipe to another process does. [[spec/tickets/open-tasks-run-in-shadow]]
+function pipe() {
+  const waiting = [];
+  let held = 0;
+  let taken = 0;
+  const answer = () => {
+    while (waiting.length && waiting[0].upTo <= taken) waiting.shift().done?.();
+  };
+  return {
+    write(chunk, done) {
+      held += chunk.length;
+      waiting.push({ upTo: held, done });
+      answer();
+      return false;
+    },
+    take(count) {
+      taken = Math.min(held, taken + count);
+      answer();
+    },
+    get held() {
+      return held;
+    },
+    get taken() {
+      return taken;
+    },
+  };
+}
+
+test("a verb exits only once a slow reader holds every byte it wrote", () => {
+  const out = pipe();
   out.write("x".repeat(BIG));
-  let read = 0;
-  let readAtExit = -1;
-  const exited = new Promise((resolve) => {
-    exitsDrained(3, out, (code) => {
-      readAtExit = read;
-      resolve(code);
-    });
+  let code;
+  let takenAtExit = -1;
+  exitsDrained(3, out, (said) => {
+    code = said;
+    takenAtExit = out.taken;
   });
-  out.on("data", (chunk) => {
-    read += chunk.length;
-  });
-  assert.equal(await exited, 3);
-  assert.equal(readAtExit, BIG);
+  assert.equal(code, undefined, "the verb exits before the reader takes a byte");
+  while (out.taken < out.held) out.take(SIP);
+  assert.equal(code, 3);
+  assert.equal(takenAtExit, BIG);
 });
