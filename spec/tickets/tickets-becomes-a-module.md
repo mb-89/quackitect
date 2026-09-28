@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -169,6 +169,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: adf7aae4401abd32186719ffc063db939b24386e
+    hash_after: adf7aae4401abd32186719ffc063db939b24386e
+    inputs:
+      - name: ask
+        hash: 42d340698d441fd1
+        size: 648
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -203,33 +215,38 @@ The index then holds no module's logic, and the tickets module tests like every 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-The package moves whole to src/modules/tickets, and its reading functions stay as they stand.
-Registers takes the local names alone: an in-port files/<path...> and an out-port all, a derived provider over every file.
-The run of all parses each file under spec/tickets/*.md and .se/tickets/*.md through the markdown codec, keeps the ticket kind, and answers tickets.All over them.
-The markdown codec is a q.Codec over a Note of front and body, which writes a file back byte for byte, per the mirrors chapter of the model.
-q gains one read: a derived input of type map[string]T, tagged with a family, takes every value the store holds under it, keyed by the path. The type check takes that map against a family of T.
-The watch stamps q.Content with Changed, the file's mtime, so a ticket keeps the time a view sorts by.
-spec/wiring.yaml loads a tickets instance, and wires files/<path...> in and tickets/all out. The root takes a module with no start.
-The index drops Tickets, the tickets topic and its writer, and the tickets method reads tickets/all off the store.
-The index cases on tickets move to the root, since an index test imports no module.
-Assumption: the private folder stays in all, as tickets/all reads it today, although the ask names spec/tickets alone.
-Assumption: Changed joins Content, since the ask is silent on the sort a view reads.
+The package moves whole to `src/modules/tickets`, and its reading functions stay as they stand.
+`Registers` takes local names alone. `notes/<path...>` is the loaded projection of both ticket folders through the markdown codec, so `projections()` round-trips every ticket.
+The out-port `all` is a derived provider over a family map of `files/<path...>`. It keeps each ticket-kind note directly under a folder, parses it through the same codec, and answers `All`.
+The markdown codec is a `q.Codec` over a `Note` of head and body, which writes a file back byte for byte.
+`q` gains one read. A derived input of type `map[string]T`, tagged with a family, takes every value the store holds under it, keyed by the path. The type check takes that map against a family of `T`.
+`q.Content` gains `Changed`, the file time in nanoseconds, and the watch stamps it. The ticket keeps the time the work tab sorts by.
+The watch hands no file standing before its start, so `files.Seeds` walks the tree once and commits it before the watch runs. The root starts the watch through it.
+`spec/wiring.yaml` loads a tickets instance and wires `files/<path...>` in and `tickets/all` out. The root loads a module with no start.
+The index drops `Tickets`, the topic and its writer. Its tickets method settles the scheduler and reads `tickets/all` off the store, and that commit ticks the changes call.
+`onlyq` lists `src/yaml` beside `q`, since `q` rests on it and it imports the pure standard library alone.
+Assumption: the private folder stays in `all`, as it did in the index.
+Assumption: a tree with no wiring file answers no ticket, since the manager's case holds that it loads nothing past the manager. A private note parks that gap.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-src/index/door.go: answers, whose tickets method reads the store
-src/index/topic.go: registersTopics and publishes, which drop the tickets topic
+src/index/door.go: opens, settle, walks and answers, which drop the publish and read the store
+src/index/topic.go: registersTopics, writers and publishes, which leave
 src/index/ticket.go: Tickets, which leaves
-src/index/topic_test.go: TestTheTopicsCommitThroughTheirOwnWriters, which names the ops writer alone
-src/index/ticket_test.go and src/index/door_test.go: the tickets cases, which move to src/quack
+src/index/contract_test.go, core_test.go and sweep_test.go: the registersTopics calls
+src/index/ticket_test.go and topic_test.go: the tickets cases, which move to the module and the root
 src/q/q.go: derivedOf, which fills a family map
-src/q/check.go: the type check of an input
-src/modules/files/watch.go: hears and ContentOf, which stamp Changed
-src/quack/main.go: modules and load, which take a module with no start
+src/q/store.go: Snapshot, which reads a family
+src/q/check.go: inputFaults, which takes a family map
+src/modules/files/watch.go: Watch, hears, FakeWatch, Push and Start, which carry the time
+src/modules/files/watch_contract_test.go: the two Changes hands
+src/imports/imports.go: pastQ, which lists src/yaml
+src/quack/main.go: modules, projections and load
 spec/wiring.yaml: the tickets instance and its two wires
+test/contract/index.test.js: the tickets case, whose tree carries the wiring
 
 ### tests
 
@@ -237,10 +254,13 @@ spec/wiring.yaml: the tickets instance and its two wires
 <!-- the form is list -->
 
 ./...: go test ./... from the root
-src/modules/tickets/golden_test.go: TestTreeGolden, through qtest by the port all
+src/modules/tickets/module_test.go: TestAllAnswersEveryTicketWithItsFields, TestATicketCarriesTheTimeItsFileLastChanged and TestTheMarkdownCodecRoundTripsANote
 src/q/wiring_test.go: TestAFamilyInputReadsEveryKey
-src/quack/main_test.go: TestTheIndexImportsNoModule, over go list -deps ./src/index
-src/quack/main_test.go: TestTheWiredTreeAnswersItsTickets
+src/q/catalog_test.go: TestAFamilyMapOfAnotherTypeFailsTheCheck
+src/modules/files/files_test.go: TestTheSeedCommitsTheStandingTreeOnce
+src/imports/imports_test.go: TestAModuleReadsYamlAsQDoes
+src/quack/golden_test.go: TestTreeGolden, through qtest by the port all
+src/quack/main_test.go: TestTheIndexImportsNoModule, TestTheWiredTreeAnswersItsTickets and TestTheServedIndexAnswersItsTickets
 RUNME.sh: ./RUNME.sh check
 
 ### answers
@@ -248,7 +268,11 @@ RUNME.sh: ./RUNME.sh check
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-first
+the loaded projection: `notes/<path...>` registers through `q.ProjectIn` with `q.Loaded` and `q.Also`, and `projections()` takes every module type
+`Changed` on `q.Content`: the watch interface, `FakeWatch`, `Start` and both contract hands carry it
+a touch keeping the hash: the watch already commits on every event, so the stamp adds no commit
+the golden case: it stays in `src/quack`, reads `testdata/tree.golden.json`, and `src/tickets` leaves
+the stub `Ticket`: the moved package keeps every field, `Progress`, `Changed`, `DependsOn` and `Fails` among them
 
 ### size
 
@@ -257,27 +281,38 @@ first
 
 src/tickets moves to src/modules/tickets, with markdown.go added
 src/q/q.go
+src/q/store.go
 src/q/check.go
-src/q/wiring_test.go
+src/q/catalog_test.go
 src/modules/files/watch.go
+src/modules/files/watch_contract_test.go
+src/modules/files/files_test.go
+src/imports/imports.go
+src/imports/imports_test.go
 src/index/door.go
 src/index/topic.go
 src/index/ticket.go
-src/index/topic_test.go
 src/index/ticket_test.go
+src/index/topic_test.go
+src/index/contract_test.go
+src/index/core_test.go
+src/index/sweep_test.go
 src/index/door_test.go
 src/quack/main.go
 src/quack/main_test.go
+src/quack/golden_test.go
+src/quack/testdata/tree.golden.json
 spec/wiring.yaml
+test/contract/index.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-I opened tickets.go, its golden case, the index topic, Tickets, the tickets method, Load and bind in the wiring, derivedOf and the type check, and checked each claim there
-I grepped every importer of src/tickets and every test naming tickets under src/index, and the callers list names each
-each done_when line names its case, or the command go test or the check
+I opened every file and function the approach names, and the build stands on each claim.
+I grepped every importer of `src/tickets` and every caller of the topic, the watch hand and `pastQ`.
+Each done_when line names its case, or `go test` or the check.
 
 ## tests-red
 
