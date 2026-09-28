@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/draft
 steps:
   - name: design
     steps:
@@ -159,6 +159,12 @@ record:
         hash: b4c4261b71323728
         size: 2103
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: ask, [[spec/design_input/the-index-holds-the-model]]
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
 ---
 
 # Ask
