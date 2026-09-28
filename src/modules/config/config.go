@@ -3,7 +3,11 @@
 // [[spec/design_output/model#everything-on-disk-mirrors]]
 package config
 
-import "quackitect/src/q"
+import (
+	"strings"
+
+	"quackitect/src/q"
+)
 
 // The two files the layers stand in. src/config owns the names, and a module spells them again because it imports q alone. [[spec/design_output/config#the-layers]]
 const (
@@ -11,6 +15,11 @@ const (
 	// .claude/skills/level0/lib/folders.js owns this name. [[spec/design_output/config#the-layers]]
 	Local = ".se/.runtime/config.json"
 )
+
+// The variable the environment layer reads for a key. src/config.EnvOf owns the spelling, and a module spells it again because it imports q alone. [[spec/design_output/config#the-go-reader]]
+func EnvOf(key string) string {
+	return "SE_" + strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))
+}
 
 // The names the module writes past its projections: the contexts and overrides it holds, and the values it resolves. [[spec/design_output/model#the-config-module]]
 const (
