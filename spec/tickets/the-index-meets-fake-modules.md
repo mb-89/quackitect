@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -148,6 +148,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0d4a5dfc38607b03fc6249d821d531a70722c187
+    hash_after: 0d4a5dfc38607b03fc6249d821d531a70722c187
+    inputs:
+      - name: ask
+        hash: 19410b7019023e83
+        size: 834
+      - name: [[spec/design_output/model]]
+        hash: 1717325681c1003e
+        size: 74654
+    def: 7883b3d10633c780
 ---
 
 # Ask
