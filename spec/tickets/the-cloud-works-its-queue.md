@@ -148,16 +148,41 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 <!-- every child as a link, one a line, with its process -->
 <!-- the form is list -->
 
-[[spec/tickets/agents-keeps-the-desk-rule]], trivial,[[spec/tickets/an-action-fires-the-workers]], standard,[[spec/tickets/boot-and-bridgehead-install-once]], trivial,[[spec/tickets/boot-hook-names-its-span]], trivial,[[spec/tickets/boot-probes-an-untrusted-clone]], trivial,[[spec/tickets/dispatch-cuts-the-fix-name]], trivial,[[spec/tickets/dispatch-drops-the-trunk-marker]], trivial,[[spec/tickets/dispatch-prints-its-plan]], standard,[[spec/tickets/dispatch-removes-its-worktree]], trivial,[[spec/tickets/dispatch-reuses-mark-off]], trivial,[[spec/tickets/dispatch-write-file-size]], trivial,[[spec/tickets/dispatch-writes-the-bundles]], standard,[[spec/tickets/done-points-at-the-pull]], trivial,[[spec/tickets/fix-groups-end-the-chain]], standard,[[spec/tickets/fix-schema-case-reads-fix]], trivial,[[spec/tickets/groups-hold-groups]], standard,[[spec/tickets/groups-land-through-pull-requests]], standard,[[spec/tickets/merge-reads-open-pulls]], trivial,[[spec/tickets/reject-copies-read-their-round]], standard,[[spec/tickets/reject-fixture-takes-standard-route]], trivial,[[spec/tickets/second-draft-pass-case]], trivial,[[spec/tickets/sessions-boot-from-the-repo]], standard,[[spec/tickets/take-case-asserts-the-switch]], trivial,[[spec/tickets/take-hands-a-stale-handover]], trivial,[[spec/tickets/take-reads-the-parent-chain]], trivial,[[spec/tickets/the-skills-start-the-workers]], standard
+- [[spec/tickets/agents-keeps-the-desk-rule]], on the trivial process
+- [[spec/tickets/an-action-fires-the-workers]], on the standard process
+- [[spec/tickets/boot-and-bridgehead-install-once]], on the trivial process
+- [[spec/tickets/boot-hook-names-its-span]], on the trivial process
+- [[spec/tickets/boot-probes-an-untrusted-clone]], on the trivial process
+- [[spec/tickets/dispatch-cuts-the-fix-name]], on the trivial process
+- [[spec/tickets/dispatch-drops-the-trunk-marker]], on the trivial process
+- [[spec/tickets/dispatch-prints-its-plan]], on the standard process
+- [[spec/tickets/dispatch-removes-its-worktree]], on the trivial process
+- [[spec/tickets/dispatch-reuses-mark-off]], on the trivial process
+- [[spec/tickets/dispatch-write-file-size]], on the trivial process
+- [[spec/tickets/dispatch-writes-the-bundles]], on the standard process
+- [[spec/tickets/done-points-at-the-pull]], on the trivial process
+- [[spec/tickets/fix-groups-end-the-chain]], on the standard process
+- [[spec/tickets/fix-schema-case-reads-fix]], on the trivial process
+- [[spec/tickets/groups-hold-groups]], on the standard process
+- [[spec/tickets/groups-land-through-pull-requests]], on the standard process
+- [[spec/tickets/merge-reads-open-pulls]], on the trivial process
+- [[spec/tickets/reject-copies-read-their-round]], on the standard process
+- [[spec/tickets/reject-fixture-takes-standard-route]], on the trivial process
+- [[spec/tickets/second-draft-pass-case]], on the trivial process
+- [[spec/tickets/sessions-boot-from-the-repo]], on the standard process
+- [[spec/tickets/take-case-asserts-the-switch]], on the trivial process
+- [[spec/tickets/take-hands-a-stale-handover]], on the trivial process
+- [[spec/tickets/take-reads-the-parent-chain]], on the trivial process
+- [[spec/tickets/the-skills-start-the-workers]], on the standard process
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every child is a point ticket on the trivial route or a standard ticket reviewed whole, and none needs a group of its own
-the children add up to the goal: the dispatch plan and its bundles, the fix groups, groups holding groups, the pull request hand-back, the boot, and the Action; the old road keeps working because every child lands beside it
-an-action-fires-the-workers names the-owner-stores-the-token and the tickets it builds on under depends_on, and so do the standard tickets that wait on another
+every child is a point ticket on the trivial route, or a standard ticket reviewed whole, and needs no group of its own.
+the children cover the dispatch plan, its bundles, the fix groups, nested groups, the pull request hand-back, the boot and the Action. The old road keeps working beside them.
+an-action-fires-the-workers names the-owner-stores-the-token and its bases under depends_on, as do the standard tickets waiting on another.
 
 # children
 
