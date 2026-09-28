@@ -61,6 +61,7 @@ export function holds(
   box = "",
   engine = true,
   stale = () => false,
+  atTip = () => null,
 ) {
   // [[spec/design_output/work#a-version-branch-stands]]
   const versions = refs
@@ -92,14 +93,15 @@ export function holds(
     };
   }
 
-  // A hold past work.staleAfter names a box that left, so its branch takes the push. [[spec/tickets/stale-hold-frees-the-branch]]
+  // A hold past work.staleAfter names a box that left, so its branch takes the push that moves the hold, and no other. [[spec/tickets/stale-hold-moves-by-take]]
   for (const one of refs) {
     const branch = String(one.remote ?? "").replace(HEADS, "");
     if (!branch.startsWith(WORK_BRANCH)) continue;
     const hand = String(heldBy(one) ?? "");
     const holder = BOX.exec(hand)?.[1] ?? "";
-    if (hand && holder !== box && !stale(one))
-      return { code: 1, said: heldElsewhere(branch, hand) };
+    if (!hand || holder === box) continue;
+    if (!stale(one)) return { code: 1, said: heldElsewhere(branch, hand) };
+    if (!movesHold(atTip(one), box)) return { code: 1, said: staleTakes(branch, hand) };
   }
 
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -152,7 +154,36 @@ export function heldElsewhere(branch, hand) {
     `${branch} stands in the hand of ${hand}, and a branch has one writer.`,
     "",
     `Land the change on ${TRUNK}, and the holder takes it in with \`./RUNME.sh branch sync\`.`,
-    "The hold frees itself once the tip stands quiet past work.staleAfter.",
+    "Once the tip stands quiet past work.staleAfter, `./RUNME.sh branch take` moves the hold.",
+  ].join("\n");
+}
+
+// A tip moves the hold where it names this box, or nobody. A tip the door reads nothing of moves nothing. [[spec/tickets/stale-hold-moves-by-take]]
+export function movesHold(tipHand, box) {
+  if (tipHand === null || tipHand === undefined) return false;
+  if (!tipHand) return true;
+  return Boolean(box) && BOX.exec(tipHand)?.[1] === box;
+}
+
+// The hand the pushed tip holds its group in, off the group ticket at that sha. Null where the tip carries no ticket. [[spec/tickets/stale-hold-moves-by-take]]
+export function heldAtTip(repo) {
+  return (ref) => {
+    const branch = String(ref?.remote ?? "").replace(HEADS, "");
+    if (!branch.startsWith(WORK_BRANCH)) return null;
+    const group = branch.slice(WORK_BRANCH.length);
+    const said = repo.run(["show", `${ref.sha}:${TICKETS}/${group}.md`], true);
+    return said.ok ? (heldIn(said.out)?.hand ?? "") : null;
+  };
+}
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+export function staleTakes(branch, hand) {
+  const group = branch.slice(WORK_BRANCH.length);
+  return [
+    `${branch} stands in a stale hold of ${hand}, and a plain push leaves the hold where it stands.`,
+    "",
+    `Take it over with \`./RUNME.sh branch take ${group}\`, which moves the hold and takes ${TRUNK} in.`,
+    "Then push your work on top.",
   ].join("\n");
 }
 
@@ -230,6 +261,7 @@ async function main() {
     boxIdHere({ root, method: root, join, disk: files }),
     process.env[ENGINE] === "1",
     staleBy(git(outside, root), await spanHere(files, root), clock().now().getTime()),
+    heldAtTip(git(outside, root)),
   );
   if (said.code !== 0) console.error(said.said);
   return said.code;
