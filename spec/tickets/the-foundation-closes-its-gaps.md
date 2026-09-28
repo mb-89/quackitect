@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children-2
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -149,6 +149,10 @@ record:
       - name: sync/sync
         exit: 0
         said: work/the-foundation-closes-its-gaps already carries every commit on main.
+  - step: children-2
+    hand: the engine
+    hash_before: d80b7ae1a0ef1465f25559d6ed4dd9ef81216c29
+    hash_after: d80b7ae1a0ef1465f25559d6ed4dd9ef81216c29
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
