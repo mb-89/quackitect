@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-shadow-lands
 depends_on: [qtest-holds-a-module]
+record:
+  - step: design/draft
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 99cb02ce58097d02b115a72f671b6c983b64ba3f
+    hash_after: 99cb02ce58097d02b115a72f671b6c983b64ba3f
+    inputs:
+      - name: ask
+        hash: c3a643be79067a7a
+        size: 626
+      - name: [[spec/tickets/the-queue-moves-to-plan]]
+        hash: ec8f43b68ad91062
+        size: 13436
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -151,38 +164,69 @@ The count reads the queue. Without the move the pilot reads a port the owner's r
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new pure package src/ticket holds the Ticket type, and tickets.Ticket becomes an alias of it, so the wire tickets/all -> queue.rows carries one Go type while onlyq keeps the queue off the tickets package; src/imports adds src/ticket to pureTree. Ticket gains Cloud (the front's cloud: true), Held (a record row with hash_before and no hash_after) and Person (the leaf at step reads by: person), each read once in tickets.Of. The tickets module adds the out-port cloud: the names a marked group holds, itself and every ticket naming it, as cloudsIn in src/scripts/work-answer.js reads them. src/plan's queue.go and outline.go move into src/modules/queue with their tests and golden file, and src/plan leaves. src/modules/queue/places.go registers the derived out-port places, map name to place, off the in-ports rows (tickets/all), plan (the plan projection), cloud (tickets/cloud), stood (path to the second it came in, built-in empty, since the module reads no git), minute (clock/minute) and the config keys blockScore, dayScore and failScore at the built-in values the work block holds. The split ports placesIn: a note-route or closed or cloud row takes no place; a held row or the plan's working ticket stands in hand; a person step or a non-trivial draft waits on a person; an open ticket, or a trivial draft, whose dependencies all stand closed or absent goes to the agents; every other open row and every plan todo goes back. A cloud row that stands open takes the place ∞. spec/wiring.yaml loads the instance queue and wires queue.rows, queue.cloud, queue.minute and queue.stood (built-in); src/quack/main.go adds the queue type to its table. Assumption: the old takeable reads the box's hand rules and verbs, which a pure module cannot; the golden split follows a ticket's own text alone, so the port takes that reading and the shadow rows show any box where it differs.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/main.go: projected, modules, projections
+src/quack/golden_test.go: TestTreeGolden reads []tickets.Ticket
+src/quack/codec_test.go: reads queue.Plan
+src/modules/tickets/tickets.go: Registers, allOf, All, Of
+src/index/answers.go: the tickets answer reads tickets.Of
+src/imports/imports.go: pureTree
+src/plan/golden_test.go, queue_test.go, outline_test.go: move with the code
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/queue/golden_test.go: TestQueueGolden seeds the golden rows through qtest and reads places
+src/modules/queue/places_test.go: TestACloudRowStandsAtInfinity
+src/modules/queue/places_test.go: TestTheWorkingTicketStandsAtZero
+src/modules/queue/places_test.go: TestANoteTakesNoPlace
+src/modules/tickets/tickets_test.go: TestTheCloudPortNamesAMarkedGroup
+src/modules/tickets/tickets_test.go: TestAFrontReadsHeldPersonAndCloud
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/ticket/ticket.go
+src/modules/tickets/tickets.go
+src/modules/tickets/tickets_test.go
+src/modules/queue/queue.go
+src/modules/queue/places.go
+src/modules/queue/places_test.go
+src/modules/queue/score.go (from src/plan/queue.go)
+src/modules/queue/outline.go (from src/plan/outline.go)
+src/modules/queue/golden_test.go (from src/plan/golden_test.go)
+src/modules/queue/testdata/queue.golden.json (moved)
+src/imports/imports.go
+spec/wiring.yaml
+src/quack/main.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file, function and verb the approach names stands opened, and each claim checked there: read work-answer.js placesIn, pull-hand.js takeable, plan/*.go, qtest, tickets.go, quack/main.go, wiring.yaml, imports.go and the golden split
+the callers list names every caller of what the approach changes: grep over src for tickets.Ticket, queue.Registers, queue.Plan and the plan import
+every done_when line names the test that decides it: go test ./... from the root; TestQueueGolden runs through qtest; onlyq runs in ./RUNME.sh check over src/modules/queue; ./RUNME.sh check
 
 ## tests-red
 
