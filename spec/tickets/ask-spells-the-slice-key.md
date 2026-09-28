@@ -69,3 +69,5 @@ the ask names migration/config/slices/openTasks, and the catalog refuses a segme
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The implement step lands the key as `migration/config/opentasks`, and the default file sets `migration.opentasks`. The catalog refuses a capital, so `openTasks` fails there. A variable maps a key of two levels alone, so `migration.slices.open-tasks` fails the round trip in `test/contract/tree.test.js`. The owner confirms `opentasks`, or names another single lowercase word.
