@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-shadow-lands
@@ -132,6 +132,19 @@ record:
         hash: ec8f43b68ad91062
         size: 13436
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 15006cb1660c10060746530d183a91d0913902af
+    hash_after: 15006cb1660c10060746530d183a91d0913902af
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/queue fails
+    inputs:
+      - name: design/draft
+        hash: bde2cab92a460de6
+        size: 3857
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -179,7 +192,7 @@ src/quack/codec_test.go: reads queue.Plan
 src/modules/tickets/tickets.go: Registers, allOf, All, Of
 src/index/answers.go: the tickets answer reads tickets.Of
 src/imports/imports.go: pureTree
-src/plan/golden_test.go, queue_test.go, outline_test.go: move with the code
+src/modules/queue/golden_test.go, queue_test.go, outline_test.go: move with the code
 
 ### tests
 
@@ -211,9 +224,9 @@ src/modules/tickets/tickets_test.go
 src/modules/queue/queue.go
 src/modules/queue/places.go
 src/modules/queue/places_test.go
-src/modules/queue/score.go (from src/plan/queue.go)
-src/modules/queue/outline.go (from src/plan/outline.go)
-src/modules/queue/golden_test.go (from src/plan/golden_test.go)
+src/modules/queue/score.go (from src/modules/queue/score.go)
+src/modules/queue/outline.go (from src/modules/queue/outline.go)
+src/modules/queue/golden_test.go (from src/modules/queue/golden_test.go)
 src/modules/queue/testdata/queue.golden.json (moved)
 src/imports/imports.go
 spec/wiring.yaml
@@ -235,26 +248,33 @@ every done_when line names the test that decides it: go test ./... from the root
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/queue/golden_test.go
+src/modules/queue/places_test.go
+src/modules/tickets/queue_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion. places reads an empty map, Of reads none of held, person, cloud or the todo anchor, and the cloud port reads empty. The catalog refused camel-case config names, so the weights stand as weight/block, weight/day and weight/fail. The golden split follows the text of a ticket. Every back row waits on an open ticket or is a plan todo, so the golden file seeds through the fake index with no box state.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test that fails: TestQueueGolden runs the golden file through the fake index, and go test and the import rules run in the check, which closes at tests-green
+every door the tests reach has a fake: the cases reach no door, only the fake index
 
 # gate
 
