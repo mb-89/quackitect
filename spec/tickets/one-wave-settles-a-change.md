@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -173,6 +173,18 @@ record:
         hash: 1893dad055aa6604
         size: 3020
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-6
+    hash_before: 4c9cba807c6eb90227ff466e9bb1c41fbb16f2f4
+    hash_after: 4c9cba807c6eb90227ff466e9bb1c41fbb16f2f4
+    inputs:
+      - name: design/draft
+        hash: 1893dad055aa6604
+        size: 3020
+      - name: design/tests-red
+        hash: e03fc55117ad3930
+        size: 792
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -317,8 +329,13 @@ the cases run over a catalog and a store in memory, and the fake index, so no do
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- src/q/qtest/suite.go: the case commits read every commit of the run seeds cfg/width and then runs t/wide by hand. Once New and Over build a scheduler, the wave runs t/wide on the seed and pushes it, so the hand run adds one more commit, and qtest_test.go and TestTheIndexKeepsTheContract in src/index/contract_test.go go red. The callers list and the size leave suite.go out, and the builder rewrites that case in place
+- src/index/door.go: Serve keeps scheduler.Settle as its drains and calls scheduler.Stop at the stop, and the cases call Settle too, so the waves keep both where the callers line says they replace them
+- src/q/scheduler_test.go: TestAnEqualCommitRunsNothingBelow reads the runs alone, and the ask names no push below it too, so the builder adds a counting hand on OnCommit to the case
+- src/q/scheduler_test.go: TestWhyNamesAPendingValue reads State and Pending, and the ask names the text pending since r, which lines writes as a time today, so the builder adds a read of said.Text
 
 # implement
 
