@@ -2,6 +2,7 @@
 // names the ticket and what changes. A commit the hook refuses lands nothing.
 // [[spec/design_output/pull#the-refused-commit]]
 
+import { stagedFault, unmergedFault } from "../../.claude/skills/level0/lib/markers.js";
 import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
 import { everyHold } from "./guidance-hand.js";
 
@@ -41,16 +42,23 @@ export function landedAlone(it, one, changes, also = []) {
   return landing(it, one, changes, [one.at, ...also]);
 }
 
+// A merge standing unresolved refuses the landing before anything stages, and a marker the index carries refuses it before the commit. [[spec/design_output/work#no-commit-carries-a-marker]]
 function landing(it, one, changes, paths, kept = []) {
+  const merging = one.private ? "" : unmergedFault(it.git);
+  if (merging) return merging;
   const stood = it.disk.exists(one.at) ? it.disk.read(one.at) : "";
   it.disk.write(one.at, one.text);
   if (one.private) return "";
   it.git.run(paths ? ["add", "--", ...paths] : ["add", "-A"], true);
   if (!paths && kept.length) it.git.run(["reset", "-q", "--", ...kept], true);
+  const only = paths ? ["--", ...paths] : [];
+  const marked = stagedFault(it.git, only);
   const commit = ["commit", "-m", `${one.name}: ${changes.join(", ")}`];
-  const ran = it.git.run(paths ? [...commit, "--", ...paths] : commit, true);
+  const ran = marked
+    ? { ok: false, err: marked }
+    : it.git.run([...commit, ...only], true);
   if (ran.ok) return "";
-  it.git.run(paths ? ["reset", "-q", "--", ...paths] : ["reset", "-q"], true);
+  it.git.run(["reset", "-q", ...only], true);
   it.disk.write(one.at, stood);
   return ran.err || ran.out || "the commit answers nothing";
 }

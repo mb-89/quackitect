@@ -74,6 +74,22 @@ One piece of it.
 # Discussion
 `;
 
+// A route whose red pass ran before its final gate, the verdict written. [[spec/tickets/accept-reads-red-as-green]]
+const REDDENED = filled(
+  FINAL()
+    .replace(
+      "  - name: accept\n",
+      "  - name: tests-red\n    does: writes the failing cases\n    evidence:\n      - name: tests\n        form: command\n        expects: assertion\n        says: the cases fail\n  - name: accept\n",
+    )
+    .replace(
+      "# accept\n",
+      "# tests-red\n\n## tests\n\n./RUNME.sh test test/one.test.js\n\n# accept\n",
+    ),
+  "## verdict",
+  "accept",
+);
+const RED_RUN = "sh -c ./RUNME.sh test test/one.test.js";
+
 // A fix ticket the acceptance minted, standing open under it. [[spec/tickets/the-last-gate-accepts]]
 const FIX = `---
 kind: [[ticket]]
@@ -168,7 +184,76 @@ test("a rerun names the diff since its last verdict, and runs every command", ()
   heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
   assert.ok(
     ranGit(made.outside).some((one) => one.includes("./RUNME.sh lint")),
-    "the hand-back runs every command field of the route",
+    "the hand-back runs every command field of the leaves before the gate",
+  );
+});
+
+// A group's second round meets the command its last retro wrote, which drains only at the retro past the gate. [[spec/design_output/pull#the-final-acceptance]]
+test("a final gate leaves the command of a leaf past it to that leaf", () => {
+  const made = doors(
+    standing(
+      filled(
+        FINAL()
+          .replace(
+            "group: one-group\n",
+            "  - name: retro\n    steps:\n      - name: notes\n        does: decides every note\n        evidence:\n          - name: drained\n            form: command\n            expects: 0\n            says: the notes drain\ngroup: one-group\n",
+          )
+          .replace(
+            "# Discussion\n",
+            "# retro\n\n## notes\n\n### drained\n\n./RUNME.sh retro notes\n\n# Discussion\n",
+          ),
+        "## verdict",
+        "accept",
+      ),
+    ),
+    {
+      "sh -c ./RUNME.sh retro notes": { stdout: "1 note(s) stand open\n", exitCode: 1 },
+    },
+  );
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+  const back = heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+
+  assert.doesNotMatch(back.said, /refused/, "the gate takes the verdict");
+  const ran = ranGit(made.outside);
+  assert.ok(
+    ran.some((one) => one.includes("./RUNME.sh lint")),
+    "the leaf before the gate runs",
+  );
+  assert.ok(
+    !ran.some((one) => one.includes("retro notes")),
+    "the leaf past the gate waits",
+  );
+});
+
+// [[spec/tickets/accept-reads-red-as-green]]
+test("a final gate passes over a red pass whose cases now run green", () => {
+  const made = doors(standing(REDDENED), {
+    [RED_RUN]: { stdout: "green, 2 test(s) pass in 1 file(s)\n" },
+  });
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+  const back = heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+
+  assert.doesNotMatch(back.said, /refused/, "the gate takes the verdict");
+  const text = made.disk.read(at("spec/tickets/a-child.md"));
+  assert.ok(
+    entriesOf(frontOf(text)).some((one) => one.step === "accept"),
+    "the record keeps the verdict",
+  );
+});
+
+// [[spec/tickets/accept-reads-red-as-green]]
+test("a final gate refuses a red pass whose cases still fail", () => {
+  const made = doors(standing(REDDENED), {
+    [RED_RUN]: { stdout: "assertion, 1 test(s) fail on their own assertion\n" },
+  });
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+  const back = heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+
+  assert.match(back.said, /refused/, "the gate refuses the verdict");
+  assert.match(
+    back.said,
+    /tests under tests-red expects green/,
+    "the refusal names the red field",
   );
 });
 

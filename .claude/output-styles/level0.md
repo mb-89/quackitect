@@ -41,7 +41,7 @@ reason and the line.
 5. Hold a note to the items its schema allows. [[spec/schemas]]
 6. Star a rule wanting argument, and argue it in the rationale. [[spec/schemas]]
 7. Move a rule a program can check to that program, and leave a link in its place. A rule a reader holds by memory slips, and a check holds.
-8. Write the present tense. `spec/rationales` is the one place the past tense belongs.
+8. Write the present tense. A rationale under `spec/rationales` also takes the past, for the history it tells.
 9. Write a new handover before you finish. Level zero consumes the one it finds, so the next session starts blind without it.
 10. Write this chapter to stand alone, because level zero hands the reader this and nothing else.
 11. Call `mint_note` to write a new note, because a governed folder holds one kind alone. [[spec/schemas]]
@@ -67,7 +67,7 @@ reason and the line.
 9. Keep a doubt as a note, an ask as a ticket, and a step in hand as a todo. A todo names no work the pull hands out anyway, and a note takes no place in the queue.
 10. Keep a note under `.se/tickets` until the mint moves it. A private ticket stays off git, and one moved by hand lands on git unread.
 11. Put a thing for later on a ticket, and in no memory folder. A memory folder stands on one box, and the retro drains it into the tree.
-12. Name the group a ticket lands in under `group`, and read a group as one branch with children. [[spec/design_output/work]]
+12. Name the group a ticket lands in under `group`, and read a group as one branch with children. Nest a group under a parent for a big move alone. [[spec/design_output/work#a-group-holds-groups]]
 13. Run `./RUNME.sh ticket update <ticket>` after a process file changes, so the leaves ahead take the new route.
 14. Mark a ticket `urgent` where a break stops work until somebody fixes it, and mark no other. A defect that waits stands unmarked, and so does every finding a retro mints.
 15. Open every file, function and verb your step names, and check each claim there before you hand it back. A second review round names an author who skips that check.

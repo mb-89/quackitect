@@ -83,11 +83,11 @@ depends_on: [runme-hands-verbs-to-quack]
 
 # Ask
 
-The `branch` verbs become work actions returning operations, and each runs in shadow against its `cli.js` twin.
+The `branch` verbs become work actions answering within the wait their caller sets, and each runs in shadow against its `cli.js` twin.
 
 An agent calls the index, and parses no standard output.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

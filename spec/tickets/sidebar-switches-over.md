@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [sidebar-lands-in-shadow]
+depends_on: [sidebar-lands-in-shadow, tui-shell-switches-over]
 enabled_by: migration.phase8switch
 cloud: true
 ---
 
 # Ask
 
-Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase8switch` to read true in the tracked config on `main`.
+Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase8switch` to read true in the tracked config on `main`.
 
 Done when the extension spawns no verb and reads no file itself.
 

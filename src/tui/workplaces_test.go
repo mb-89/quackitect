@@ -11,6 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"quackitect/src/tui/frame"
+	"quackitect/src/tui/tree"
 	"quackitect/src/tui/work"
 )
 
@@ -51,6 +52,18 @@ func TestTheAnswerReadsAsPlacesAndTheGroupsOnACloud(t *testing.T) {
 	}
 	if _, err := work.PlacesIn([]byte("no json")); err == nil {
 		t.Fatal("an answer that reads as no JSON says so")
+	}
+}
+
+// A merged group the queue places on the cloud lights the letter, and so does its ticket. [[spec/tickets/marked-groups-stay-cloud]]
+func TestAMergedGroupPlacedOnTheCloudLightsTheLetterAndSoDoesItsTicket(t *testing.T) {
+	t.Parallel()
+	said, err := work.PlacesIn([]byte(`{"branches":[{"branch":"work/a-marked-group","name":"a-marked-group","merged":true,"queue":"∞","tickets":[{"name":"its-child","queue":"∞"}]}],"loose":[]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !said.Cloud["a-marked-group"] || !said.Cloud["its-child"] {
+		t.Fatalf("a merged group at infinity stands on the cloud with its ticket, and the flags read %v", said.Cloud)
 	}
 }
 
@@ -135,4 +148,39 @@ func TestARootHoldingNoVerbAnswersWhy(t *testing.T) {
 		t.Fatal("a root with no survey runs node off the path")
 	}
 	var _ tea.Msg = said
+}
+
+// A todo the index nests under its group takes no second row at the left. [[spec/tickets/the-queue-views-agree]]
+func TestATodoUnderItsGroupDrawsOnce(t *testing.T) {
+	t.Parallel()
+	places, err := work.PlacesIn([]byte(`{"branches":[],"loose":[{"name":"a-todo","queue":"1","kind":"todo"},{"name":"a-free-todo","queue":"2","kind":"todo"}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	grid := &tree.Tree{Items: []tree.Item{{
+		Name: "a-group", Keys: map[string]string{},
+		Kids: []tree.Item{{Name: "a-todo", Keys: map[string]string{}}},
+	}}}
+	work.Placed(grid, places)
+	count := 0
+	var walk func([]tree.Item)
+	walk = func(items []tree.Item) {
+		for _, one := range items {
+			if one.Name == "a-todo" {
+				count++
+			}
+			walk(one.Kids)
+		}
+	}
+	walk(grid.Items)
+	if count != 1 {
+		t.Fatalf("a todo under its group draws once, and it draws %d times", count)
+	}
+	free := false
+	for _, one := range grid.Items {
+		free = free || one.Name == "a-free-todo"
+	}
+	if !free {
+		t.Fatal("a todo the tree lacks still lands as a row at the left")
+	}
 }

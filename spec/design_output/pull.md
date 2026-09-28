@@ -168,7 +168,7 @@ holds no open note.
 | the route says | the pull admits |
 |---|---|
 | `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
-| `by: person` under `when: view` or `when: handed` | a hand off a harness, or one under `--owner-says`. An agent waits, on a cloud box too |
+| `by: person` under `when: view` or `when: handed` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -222,6 +222,15 @@ step, the group, the take hash, and the guidance notes by name and hash. The
 pull refuses a second hand-out while a hold stands, and `ticket pull --drop`
 drops the hold with the leaf where it stands. The stop hook reads the
 folder, so a turn ending with a hold standing carries on.
+
+A hold stands while its ticket does. The readers stay pure, and the pull alone
+removes a file.
+
+| the hold | what the readers and the pull do |
+|---|---|
+| its ticket file reads `state: closed` | the readers skip it, and the next pull removes it before it reads the hand |
+| it names no path, as an ephemeral ticket's does | the readers read it |
+| its ticket file stands on another branch alone | the readers read it |
 
 A clear and a compaction each empty `reads` in every hold on the box, and the
 ticket and the step stay. So the next pull hands the notes again. For details,
@@ -408,6 +417,15 @@ A refused payload reaches no disk. It rides the hold, so the next hand-back
 with no `--fields` meets the same checks over the same text. A refusal at the
 cap inserts the person step on the ticket without the payload, so a word the
 rules refuse reaches no branch.
+
+### A merge opens the ticket
+
+A merge conflict leaves an open ticket with its markers in, and no verb writes
+a ticket that reads so. While git lists the ticket unmerged, the write door
+takes a hand's whole write there, past the ticket door and the engine's fields.
+It refuses a write still carrying a marker line, and names each line. The schema
+reads the write as a first one, because the markers stand in the text on disk.
+The merge commit closes it again.
 
 ## The checks
 
@@ -658,7 +676,8 @@ A gate carrying `final: true` reads the whole work, and the process closes on it
 |---|---|
 | the hand-out | waits while a ticket naming this one as `parent` or `group` stands open |
 | the hand-out | names the diff since the base, merges and all |
-| the hand-back | runs every command field of the route, and the record keeps each answer |
+| the hand-back | runs every command field of the leaves before the gate, and the record keeps each answer. A leaf past the gate, a retro's among them, runs its own when the route reaches it |
+| the hand-back | reruns a red pass expecting its cases green, because the green pass after it turns those cases green |
 | `accept with points` | mints the fix tickets and leaves the step on the gate, so it waits on them and reads again |
 | a verdict short of accept past `work.failsBeforePerson` | mints a question ticket and closes the process `became` onto it |
 
@@ -729,6 +748,24 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 |---|---|
 | a leaf past `step` | copies the new route onto the leaves ahead, as `updated` does |
 | a leaf at or before `step` | copies the new route, and sets `step` to the first leaf whose `def` differs |
+
+## Kept red leaves
+
+A red leaf holds a command field expecting `assertion`. Once the change lands, its tests pass, so a rewind handing it out again strands the ticket. `keptRed` in `src/scripts/pull-kept.js` keeps it, and `stepOn` and `advanced` write its entry and walk on.
+
+| read | how |
+|---|---|
+| the red pass | the last entry of the leaf carrying `def`, with no `stale`, `skipped` or `returns` |
+| a later pass | an entry after it, of a leaf past the red leaf in route order, of the same kind |
+| the red commit | the first commit after the red pass's `hash_after` whose subject names the ticket and carries the whole change `passes <leaf>` |
+| the red tests | the leaf's `red` list, through `redListOf` in `src/scripts/red-list.js`, or the files under `test/` the red commit lands where the leaf lists none |
+| they stand | `git diff -M --name-status` from the red commit to HEAD deletes none of them, and a rename keeps one |
+
+The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the change line reads `keeps <leaf>`.
+
+- A rewind before a later leaf passes hands the leaf out, so a case the edited draft adds runs red.
+- A red commit landing no test, and a private ticket with an empty `hash_after`, keep nothing.
+- A case appended to a red file after the change lands runs green at once. The change it guards already stands.
 
 # Done leaves no takeable step
 

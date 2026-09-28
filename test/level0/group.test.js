@@ -18,6 +18,7 @@ import {
   todoOf,
   ticketAt,
   withEntry,
+  withEveryTakeClosed,
   withField,
   withHashAfter,
   withoutField,
@@ -313,4 +314,15 @@ test("a todo reads as nothing, first, or the row it names", () => {
   assert.equal(todoOf({ todo: "true" }), "first");
   assert.equal(todoOf({ todo: "a-loose-one" }), "a-loose-one");
   assert.equal(todoOf({ todo: " last " }), "last");
+});
+
+// [[spec/design_output/work#held-derives-from-the-record]]
+test("closing every take shuts each open row a merge left, and leaves a closed row as it stands", () => {
+  const one = withEntry(NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1" }, fakeFront());
+  const done = withEntry(one, { step: "split", hand: "box 3f9a", hash_before: "a1", hash_after: "b2" }, fakeFront());
+  const both = withEntry(done, { step: "sync", hand: "box 7c1d", hash_before: "d4" }, fakeFront());
+  const shut = withEveryTakeClosed(both, "ff", fakeFront());
+  assert.equal(heldIn(shut), null);
+  assert.deepEqual(recordIn(shut).map((row) => row.hash_after), ["ff", "b2", "ff"]);
+  assert.equal(withEveryTakeClosed(shut, "ee", fakeFront()), shut, "a free group stays as it stands");
 });

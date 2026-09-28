@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: answer
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -17,7 +18,6 @@ steps:
     by: anyone
     to: retro
     input: answer
-    reads: [[spec/guidance/working]]
     needs: ["branch test"]
     checklist: ["the change follows the answer, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
@@ -33,9 +33,8 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
-process_hash: 1f3006ec4b044a89
-depends_on: [the-process-stays-editable]
-step: answer
+process_hash: d1a6e26348695e24
+depends_on: ["the-process-stays-editable"]
 ---
 
 # Ask
@@ -88,3 +87,15 @@ The owner decides how the editor draws and edits a process file: the steps, the 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A box decides this, under the owner's ruling that a cloud box decides every step itself. The answer for the `answer` step:
+
+- the editor draws a process file with the drawing a ticket takes, off the graph `./RUNME.sh graph` answers
+- a person edits there every row [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]] names but the pointer
+- those rows are the steps, their order, `on_fail`, `by` and `when`
+- a gate draws as a marked node, and its question and `final` edit as leaf fields, the way `by` does
+- the tags draw as labels on a node, and edit as a leaf field
+- the bless stays `./RUNME.sh ticket bless` on a ticket, because a process file holds no verdict to bless
+- a change reaches the open tickets through `./RUNME.sh ticket update`
+
+What I weighed: the design input already rules the drawing and the rows it edits, and says a desk trial decides how far editing goes. So the answer takes that input whole, and the trial stays with the editor ticket the `do` step mints. A wrong call costs one ticket's edit before any code lands.

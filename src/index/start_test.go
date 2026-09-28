@@ -1,7 +1,7 @@
 // The start: the door checks the catalog it takes, and a fault refuses it
 // before a listener or a standing file stands.
-// [[spec/design_output/model#the-catalog-check]]
-package main
+// [[spec/design_output/model#the-index-resolves-in-passes]]
+package index
 
 import (
 	"os"
@@ -15,8 +15,8 @@ import (
 func TestABrokenCatalogRefusesTheStart(t *testing.T) {
 	root := tree(t)
 	broken := q.New()
-	q.GivenIn(broken, "t/n", 0)
-	q.GivenIn(broken, "t/n", 0)
+	q.OutIn(broken, "t/n", 0)
+	q.OutIn(broken, "t/n", 0)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), broken)
 	if err == nil {
 		stop()

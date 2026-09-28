@@ -13,7 +13,7 @@ import {
   OFF,
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
-import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
+import { TICKETS } from "../../.claude/skills/level0/lib/folders.js";
 import { SESSION, tallied } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
@@ -168,9 +168,14 @@ function claims(e, box) {
   });
   return {
     result: {
-      result: `The claim stands. Write the answer, and end that same message with the line stop: ${reason} on a line of its own, last. The owner reads that one message.`,
+      result: `The claim stands. The answer before this call carries the report, so end the turn with the line stop: ${reason} alone. The owner reads the answer once.`,
     },
   };
+}
+
+// The answer before the stop call streams as turn.said, so a report there stands for the turn, and the line after the call comes alone. [[spec/design_output/stop#a-talk-follows-a-report]]
+export function saidReport(e, box) {
+  if (!e?.agentId && reportStands(e?.text)) box.reported = true;
 }
 
 // The message ending the turn carries the report, so the owner reads what the talk is about where the stop line stands. [[spec/design_output/stop#a-talk-follows-a-report]]
@@ -424,14 +429,9 @@ function groupInHand(box) {
   }
 }
 
-function holdStands(box) {
-  try {
-    return box.disk
-      .list(join(box.work, HOLDS))
-      .some((one) => one.name.endsWith(".json"));
-  } catch {
-    return false;
-  }
+// A hold keeps the turn open while its ticket stands, so a closed ticket keeps none. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function holdStands(box) {
+  return holdsIn(box.disk, box.work).length > 0;
 }
 
 function privateStands(box) {

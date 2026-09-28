@@ -10,6 +10,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { landed, landedAlone, unlandedRows } from "../../src/scripts/pull-landed.js";
+import { OPENS } from "./fixtures.js";
 
 const AT = "/tree/spec/tickets/a-child.md";
 const { join } = posix;
@@ -223,4 +224,41 @@ test("a landing stages no path standing nowhere on disk and nowhere in git", () 
 
   assert.ok(ran().includes(`git add -- ${AT} ${LANDED}`), ran().join("\n"));
   assert.ok(!ran().some((row) => row.startsWith("git add") && row.includes(MOVED)));
+});
+
+// A step commit concluding a merge carries its markers, so an unmerged path refuses the landing before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]
+test("a landing while git lists an unmerged path writes nothing, stages nothing and names the path", () => {
+  const git = fakeGit(
+    { "git ls-files -u": { stdout: "100644 abc123 2\tspec/tickets/a-group.md\n" } },
+    "/tree",
+  );
+  const disk = fakeDisk({ [AT]: WROTE });
+  const ran = () => git.ran.map((it) => it.argv.join(" "));
+
+  const finding = landed({ disk, git }, one, ["passes design/draft"]);
+
+  assert.match(finding, /spec\/tickets\/a-group\.md {2}git lists it unmerged/);
+  assert.match(finding, /Resolve the merge first/);
+  assert.equal(disk.read(AT), WROTE, "the ticket stands as it stood");
+  assert.ok(!ran().some((row) => row.startsWith("git add")), ran().join("\n"));
+  assert.ok(!ran().some((row) => row.startsWith("git commit")), ran().join("\n"));
+});
+
+test("a landing whose staged delta adds a conflict marker commits nothing and puts the ticket back", () => {
+  const delta = [
+    "diff --git a/src/a.go b/src/a.go",
+    "+++ b/src/a.go",
+    "@@ -1,0 +2,1 @@",
+    `+${OPENS}`,
+  ].join("\n");
+  const git = fakeGit({ "git diff --cached --unified=0": { stdout: delta } }, "/tree");
+  const disk = fakeDisk({ [AT]: WROTE });
+  const ran = () => git.ran.map((it) => it.argv.join(" "));
+
+  const finding = landed({ disk, git }, one, ["passes design/draft"]);
+
+  assert.match(finding, /src\/a\.go:2 {2}a conflict marker/);
+  assert.equal(disk.read(AT), WROTE);
+  assert.ok(ran().includes("git reset -q"), "the index empties");
+  assert.ok(!ran().some((row) => row.startsWith("git commit")), ran().join("\n"));
 });

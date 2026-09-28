@@ -83,11 +83,11 @@ depends_on: [runme-hands-verbs-to-quack]
 
 # Ask
 
-The `ticket` verbs become actions returning operations, each in shadow against its `cli.js` twin.
+The `ticket` verbs become actions answering within the wait their caller sets, each in shadow against its `cli.js` twin.
 
 An agent calls the index, and parses no standard output.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each answer the two disagree on
 - `./RUNME.sh check` exits 0
 

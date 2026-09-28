@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
-import { NAMED, named } from "./fixtures.js";
+import { conflicted, NAMED, named } from "./fixtures.js";
 
 const ROOT = "/tree";
 const CLEAN = `${NAMED}: the message reads clean`;
@@ -349,6 +349,71 @@ test("a journaled old path the index still holds stages with the new path", asyn
   assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
 });
 
+// A rename that landed long ago leaves its old path nowhere, and git refuses a pathspec matching nothing. [[spec/tickets/commit-skips-landed-moves]]
+test("a journaled old path standing nowhere stays out of the commit", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": { stdout: "M\tspec/tickets/new-name.md\n" },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "spec/tickets/old-name.md", to: "spec/tickets/new-name.md" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- spec/tickets/new-name.md`),
+    ran.join("\n"),
+  );
+  const lands = ran.filter((one) => /^git (add|commit) /.test(one));
+  assert.ok(
+    !lands.some((one) => one.includes("old-name")),
+    "the old path joins no pathspec",
+  );
+});
+
+// A move an earlier commit lands leaves its journal behind, and its old path stands nowhere, so the commit names the new path alone. [[spec/tickets/commit-stages-a-moved-path]]
+test("a path under a journaled folder move standing nowhere stays out of the commit", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "M\tsrc/modules/index/lease_test.go\n",
+    },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "src/watchdog", to: "src/modules/index" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "src/modules/index/lease_test.go", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- src/modules/index/lease_test.go`),
+    "the commit names the new path alone",
+  );
+  assert.ok(
+    !ran.some((one) => /^git (add|commit)/.test(one) && one.includes("src/watchdog")),
+    "the old path stays out of the add and the commit",
+  );
+});
+
 // [[spec/design_output/level0#the-cold-probe]]
 test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
   const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);
@@ -431,4 +496,32 @@ test("a call naming paths gates on the paths it lands alone", async () => {
       "git diff --cached --binary --no-renames -- src/bridge/guidance.js",
     ),
   );
+});
+
+// The verb concludes a merge once its files carry no marker, so a marker left on disk refuses before the tests run. [[spec/design_output/work#no-commit-carries-a-marker]]
+test("an unmerged file still carrying a marker refuses the commit and stages nothing", async () => {
+  const path = "spec/tickets/a-group.md";
+  const { it, git } = doors([], {
+    "git ls-files -u": { stdout: `100644 abc123 2\t${path}\n` },
+  });
+  it.disk.write(join(ROOT, path), `${conflicted(["a: 1"], ["b: 2"]).join("\n")}\n`);
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.match(said, /spec\/tickets\/a-group\.md:1 {2}a conflict marker/);
+  assert.ok(!ranGit(git).includes("git add -A"), ranGit(git).join("\n"));
+});
+
+test("an unmerged file written clean lands the merge through the verb", async () => {
+  const path = "spec/tickets/a-group.md";
+  const { it, git } = doors([], {
+    "git ls-files -u": { stdout: `100644 abc123 2\t${path}\n` },
+  });
+  it.disk.write(join(ROOT, path), "---\nstate: open\n---\n");
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 0, said);
+  assert.ok(ranGit(git).includes(`git commit -m ${CLEAN}`));
 });

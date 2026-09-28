@@ -83,12 +83,12 @@ depends_on: [lsp-rules-move-to-check]
 
 # Ask
 
-The LSP door stands, in the shape phase 0 chooses, and relays the editor to the check module.
+The `lsp` IO module stands, and `quack lsp` relays the editor's stdio to it, as [[spec/design_output/model#the-editor-starts-quack-lsp]] says. It hands each request to the check module through the index.
 
 The editor then reaches the one model.
 
-- - `go test ./...` from the root passes
-- an inbound fake replays a recorded LSP session, and the door answers it
+- `go test ./...` from the root passes
+- an inbound fake replays a recorded LSP session, and the IO module answers it
 - `./RUNME.sh check` exits 0
 
 # design

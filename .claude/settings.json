@@ -6,6 +6,20 @@
   "env": {
     "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"
   },
+  "$hooks": "THE BOOT. A cloud box lacking the plugin manifest installs it as a session starts, for the session after it, and the timeout in seconds matches STARTING, the span the start road allows the same install. See spec/design_output/level0.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/src/scripts/boot.js",
+            "timeout": 180
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "mcp__level0",
@@ -23,7 +37,9 @@
       "Bash(./RUNME.sh branch merge:*)",
       "Bash(./RUNME.sh branch close:*)",
       "Bash(./RUNME.sh commit:*)",
-      "Bash(./RUNME.sh push)"
+      "Bash(./RUNME.sh push)",
+      "Bash(./RUNME.sh branch take:*)",
+      "Bash(./RUNME.sh ticket pull:*)"
     ],
     "deny": [
       "Artifact"

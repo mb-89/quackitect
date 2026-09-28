@@ -41,6 +41,7 @@ steps:
             says: the approach
       - name: tests-red
         does: writes the tests
+        input: draft
         evidence:
           - name: red
             form: list
@@ -56,6 +57,7 @@ steps:
     steps:
       - name: change
         does: makes the change
+        input: design/draft
         to: retro
         evidence:
           - name: says
@@ -95,6 +97,19 @@ The approach.
 # Discussion
 `;
 
+// The standard route's shape: the implement phase reads the design, and tests-green reads the red tests. [[spec/processes/standard]]
+const STANDARD = GATED()
+  .replace(
+    "  - name: implement\n    steps:\n",
+    "  - name: implement\n    input: [design/draft, gate]\n    steps:\n",
+  )
+  .replace("        input: design/draft\n", "")
+  .replace(
+    "group: one-group\n",
+    "      - name: tests-green\n        does: makes the tests pass\n        input: design/tests-red\n        to: retro\ngroup: one-group\n",
+  )
+  .replace("## change\n\n### says\n", "## change\n\n### says\n\n## tests-green\n");
+
 const REJECTED_ONCE = `record:
   - step: gate
     hand: box other
@@ -103,8 +118,8 @@ const REJECTED_ONCE = `record:
 `;
 
 // The ticket at its gate, the verdict filled, handed out and handed back. [[spec/design_output/pull#the-gate]]
-function gated(rows, record = "") {
-  const files = standing(filled(GATED(record), "## verdict", rows), undefined, {
+function gated(rows, record = "", note = GATED(record)) {
+  const files = standing(filled(note, "## verdict", rows), undefined, {
     [at("spec/processes/trivial.yaml")]: TRIVIAL,
   });
   const made = doors(files, {}, { words: 5 });
@@ -117,6 +132,16 @@ const namesUnder = (text, phase) =>
   (frontOf(text).steps.find((one) => one.name === phase)?.steps ?? []).map(
     (one) => one.name,
   );
+
+const inputAt = (text, path) => {
+  let list = frontOf(text).steps;
+  let step;
+  for (const part of path.split("/")) {
+    step = list.find((one) => one.name === part);
+    list = step?.steps ?? [];
+  }
+  return [step?.input ?? []].flat().map(String);
+};
 
 // [[spec/design_output/pull#the-gate]]
 test("a gate hand-back admits the reviewer's own commit", () => {
@@ -169,6 +194,69 @@ test("a reject inserts the phase again before the gate", () => {
   ]);
   assert.equal(fieldOf(text, "step"), "design/draft-2", "the copy stands in hand");
   assert.match(text, /^## draft-2$/m, "the copy takes a chapter of its own");
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("a reject's copy reads the copy of its sibling", () => {
+  const { back, text } = gated("reject\n- the fail road is missing");
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "design/tests-red-2"), ["draft-2"]);
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("a reject leaves the first round reading itself", () => {
+  const { back, text } = gated("reject\n- the fail road is missing");
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "design/tests-red"), ["draft"]);
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("after a reject the gate and implement read both rounds", () => {
+  const { back, text } = gated("reject\n- the fail road is missing");
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "gate"), [
+    "design/draft",
+    "design/tests-red",
+    "design/draft-2",
+    "design/tests-red-2",
+  ]);
+  assert.deepEqual(inputAt(text, "implement/change"), [
+    "design/draft",
+    "design/draft-2",
+  ]);
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("after a reject on the standard route, implement and tests-green read both rounds", () => {
+  const { back, text } = gated("reject\n- the fail road is missing", "", STANDARD);
+
+  assert.equal(back.code, 0, back.said);
+  assert.deepEqual(inputAt(text, "implement"), [
+    "design/draft",
+    "gate",
+    "design/draft-2",
+  ]);
+  assert.deepEqual(inputAt(text, "implement/tests-green"), [
+    "design/tests-red",
+    "design/tests-red-2",
+  ]);
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("after a reject the pass of draft-2 lands", () => {
+  const { it, back } = gated("reject\n- the fail road is missing");
+  assert.equal(back.code, 0, back.said);
+
+  heard(() => pulling(ROOT, ["pull"], it));
+  const fields = JSON.stringify({ approach: "The approach takes the fail road." });
+  const passed = heard(() =>
+    pulling(ROOT, ["pull", "a-child", "--pass", "--fields", fields], it),
+  );
+  assert.equal(passed.code, 0, passed.said);
+  assert.match(passed.said, /a-child passes design\/draft-2/);
 });
 
 // [[spec/design_output/pull#the-gate]]

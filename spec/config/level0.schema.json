@@ -350,7 +350,7 @@
         "editor": {
           "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the number in the work tab's brackets.",
           "widget": "action",
-          "icon": "🗂",
+          "icon": "💼",
           "group": "work",
           "row": 0,
           "column": 0,
@@ -476,6 +476,15 @@
         "comment": {
           "type": "string"
         },
+        "opentasks": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The open-tasks count: old answers alone, shadow runs the index's count beside it and logs a mismatch, new answers the index's."
+        },
         "phase0": {
           "type": "boolean",
           "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud."
@@ -490,11 +499,11 @@
         },
         "phase2shadow": {
           "type": "boolean",
-          "help": "Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-land-in-shadow. A write on this box turns nothing on in the cloud."
+          "help": "Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-shadow-lands. A write on this box turns nothing on in the cloud."
         },
         "phase2switch": {
           "type": "boolean",
-          "help": "Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-over. A write on this box turns nothing on in the cloud."
+          "help": "Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-lands. A write on this box turns nothing on in the cloud."
         },
         "phase3shadow": {
           "type": "boolean",
@@ -647,6 +656,16 @@
           "unit": "seconds",
           "help": "The span the faults of an alarm fall inside."
         },
+        "beat": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span between two beats of the index's work loop."
+        },
+        "lease": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The term a lease runs without a beat before its part reads stale."
+        },
         "deadlineDerived": {
           "type": "number",
           "unit": "seconds",
@@ -660,12 +679,7 @@
         "deadlineAction": {
           "type": "number",
           "unit": "seconds",
-          "help": "The span an action answers within."
-        },
-        "deadlineOp": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span an operation ends within."
+          "help": "The span an action's operation ends within."
         }
       }
     }

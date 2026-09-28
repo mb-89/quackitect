@@ -82,11 +82,12 @@ group: sidebar-switches-over
 
 # Ask
 
-`slices.sidebar` moves to `new`. The extension spawns no verb and reads no file itself.
+`migration/config/slices/sidebar` moves to `new`. The extension spawns no verb and reads no file itself. A new window sets its values as overrides, and wipes the local file no more.
 
 The extension then shows what the index holds, and computes nothing.
 
 - `git grep -n 'spawn(' src/extension` names no verb spawn
+- a case opens a new window over a local file, and reads the file unchanged
 - `./RUNME.sh check` exits 0
 
 # design

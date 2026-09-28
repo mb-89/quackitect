@@ -40,7 +40,8 @@ body:
   sections:
     - header: Why
       required: true
-      tense: past
+            tense: [present, past]
+
       description: the argument, and what it measures
 
       subsections:

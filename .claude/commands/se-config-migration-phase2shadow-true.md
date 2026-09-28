@@ -1,5 +1,5 @@
 ---
-description: "config / migration / phase2shadow: sets migration.phase2shadow to true. Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-land-in-shadow. A write on this box turns nothing on in the cloud."
+description: "config / migration / phase2shadow: sets migration.phase2shadow to true. Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-shadow-lands. A write on this box turns nothing on in the cloud."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

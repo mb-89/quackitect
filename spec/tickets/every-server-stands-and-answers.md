@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-step: implement/person-1
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,6 +96,46 @@ record:
     hand: box d7a44d6f73215 · claude-code-remote
     hash_before: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
     hash_after: 5c3d6d4364231de251fd2e293cb4a2e6815931b6
+  - step: implement/person-1
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 85966908a6f832707aa48df9b45f43025ef035f9
+    hash_after: 85966908a6f832707aa48df9b45f43025ef035f9
+    def: bf05c6b330242055
+  - step: implement/tests-red
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: da98c6cea41a4c341fb2fb8dc292c6911b45acd5
+    hash_after: da98c6cea41a4c341fb2fb8dc292c6911b45acd5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+    def: 06865600120e8b38
+  - step: implement/change
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: e196690dc66eb368e464e44a22216c254140aa21
+    hash_after: e196690dc66eb368e464e44a22216c254140aa21
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: 21d63335f32dfcda
+  - step: implement/tests-green
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 2e3dc623bbeb63aca7632d948175a726c8fd965b
+    hash_after: 2e3dc623bbeb63aca7632d948175a726c8fd965b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 76 test(s) pass in 7 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/holds-leave-with-their-ticket.md:138:1: ListItem: A sentence in a list item holds 20 words, and this one ho"
+    inputs:
+      - name: implement/tests-red
+        hash: de5823c9e8724438
+        size: 1810
+    def: a27db29c1d1562f2
+reason: done
 ---
 
 # Ask
@@ -224,14 +264,20 @@ pass
 ### answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is choice -->
+
+pass on the record
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: this leaf writes the answer alone
+- the doors the tests reach stand behind their fakes, as tests-red records
+- the approach stands named in each file the change carries
+- every fact stands once: the red of each case stands in the seen field of tests-red
+- the design review passes with no row this leaf leaves open
 
 ## tests-red
 
@@ -240,7 +286,6 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
 
     ./RUNME.sh test test/level0/bridgehead.test.js test/level0/wait.test.js test/level0/server-crash.test.js test/level0/go-source.test.js test/level0/tools.test.js test/level0/lsp.test.js test/level0/doctor-hooks.test.js
@@ -248,33 +293,32 @@ pass
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
 
-Stubs of `restarts`, `clientOf`, `lspProbe` and the three `go-source.js` exports move each failure onto the assertions. Eleven cases stand red on their own assertion.
+The code landed ahead of its tests, so this leaf switches each landed behaviour off to its old form and runs the cases on this tree. Every case fails on its own assertion:
 
-| case | what it sees red |
+| the case | the class of fault it guards |
 |---|---|
-| the wait the host cuts | the plain `no server answers` line, because the hook reads the cut as a fall |
-| the wait posted again | the quiet counts from the second post, and the cap runs its whole span again |
-| the restart | the child waits on the open connection |
-| the three `go-source.js` cases | no folder, no stamp |
-| the here case | `rebuilt` reads `-newer` alone |
-| the client | the fake client's own cap stops at four starts again |
-| the three probe rows | an empty row |
+| a wait the host cuts answers its signal on a live server, and the line on a dead one | a host timeout on a long post reads as a dead server |
+| a wait posted again under its since carries on its watch | a post sent again restarts its own cap |
+| a restart starts the child once the port stops listening, with a connection open | an open connection holds a restart back |
+| a move in the folder, an imported folder or the module rebuilds the binary | a binary runs stale after a change in any source it reads |
+| the client the editor builds starts the server again on every close | the language client gives up on a server after a few falls |
+| a language server that answers, or exits, draws its doctor row | the doctor reads a dead server as a live one |
+| a here case asking go-source.js fresh names the binary that rebuilds | one form of the freshness ask, so it pins an instance and a second form slips past |
 
-The surprise: the probe that sends `initialized` waits five seconds on the sweep of the whole tree. The probe sends none, and answers in half a second.
+The change step puts each behaviour back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the tests touch the seven test files the design names, and the one contract file the restart reaches
-- the probe runs over the fake process door, and the stamp over the fake disk
-- the restart runs over a server shaped as node's
-- each new case names the ticket as the approach it holds
+- the switch touches the files the landed commit changed, and no other
+- the doors the cases reach stand behind their fakes: the fake process, the fake disk and the fake client
+- each switched function keeps the comment naming its approach
+- each behaviour stands once, in the function its case drives
+- the design review passes with no row this leaf leaves open
 
 ## change
 
@@ -283,23 +327,20 @@ The surprise: the probe that sends `initialized` waits five seconds on the sweep
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
 
-    ./RUNME.sh lint
+    ./RUNME.sh lint src/bridge/server.js src/bridge/wait.js src/extension/lib/lsp.js .claude/skills/level0/hooks/level0.js .claude/skills/level0/lib/tools.js src/scripts/go-source.js src/scripts/lsp-probe.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the change touches the files the ask names, the design notes, the install and `.vale.ini`
-- `.vale.ini` lets `go-source.js` read its argument, as it lets `bundle.js`
-- the probe reaches the process door, and the stamp the disk door, and each has a fake
-- the restart reaches the wire door's server, and a contract case holds the real one
-- every new comment points at [[spec/design_output/level0]] or [[spec/design_output/lsp]], and the design notes point at the files
-- the design review stands unread, so no row of it stands fixed yet
+- the change puts back the behaviours the landed commit carries, in the files it changed, and no other
+- the doors the change reaches stand behind their fakes: the process, the disk and the client
+- each function keeps the comment naming its approach
+- each behaviour stands once, in the function its case drives
+- the design review passes with no row this leaf leaves open
 
 ## tests-green
 
@@ -308,7 +349,6 @@ The surprise: the probe that sends `initialized` waits five seconds on the sweep
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
 
     ./RUNME.sh test test/level0/bridgehead.test.js test/level0/wait.test.js test/level0/server-crash.test.js test/level0/go-source.test.js test/level0/tools.test.js test/level0/lsp.test.js test/level0/doctor-hooks.test.js
@@ -316,7 +356,6 @@ The surprise: the probe that sends `initialized` waits five seconds on the sweep
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
     ./RUNME.sh check
@@ -324,30 +363,20 @@ The surprise: the probe that sends `initialized` waits five seconds on the sweep
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
-Every server comes back on its own now.
-
-| server | what changes | why |
-|---|---|---|
-| level zero | the hook posts a cut wait again where `/health` answers, and the server carries on the wait under its `since` | the host cut a long wait, and the hook read the cut as a dead server |
-| level zero | a restart starts the child once the listen ends | node's close waited on every open connection, a wait among them |
-| `se-lsp` and `se-index` | each keys on a hash of its folder and every folder its `go.mod` replaces | a move in a shared package left the binary stale |
-| the editor's client | every close starts `se-lsp` again, after a second | the client stopped at its own cap, and a rebuild ends the server |
-| `doctor` | a `se-lsp lsp` row off a probe naming each diagnostic, or the exit | a person read no sign of a server that falls |
+The landed code runs again, and the cases that showed red with each behaviour off pass. A wait the host cuts on a live server answers its signal or its cap. A restart starts its child with a connection open. A binary rebuilds after a change in any source it reads. The editor starts se-lsp again after every fall, and the doctor tells a live server from a dead one.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the change touches the files the design names, the design notes, the install and `.vale.ini`
-- every door the change reaches has a fake, and the wire a contract case beside it
-- the wait's name stands in `wait.js`, and the hook spells it again with a pointer
-- the hash stands in `tui-build.js`, and `go-source.js` calls it
-- the design review stands unread, so no row of it stands fixed yet
+- the change touches the files the landed commit changed, and no other
+- the doors the cases reach stand behind their fakes
+- each function keeps the comment naming its approach
+- each behaviour stands once, in the function its case drives
+- the design review passes with no row this leaf leaves open
 
 # Discussion
 

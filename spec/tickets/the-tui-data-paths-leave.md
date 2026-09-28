@@ -82,7 +82,7 @@ group: tui-shell-switches-over
 
 # Ask
 
-`slices.window` moves to `new`, and the window's own index client, its spawns and its own writes leave the tree.
+`migration/config/slices/window` moves to `new`, and the window's own index client, its spawns and its own writes leave the tree.
 
 The window stops computing a second copy of any value.
 

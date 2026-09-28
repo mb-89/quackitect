@@ -87,7 +87,7 @@ The log becomes a declared view over `log/`.
 
 The log view then reads the rows one owner holds.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case draws the log view over fake rows
 - `./RUNME.sh check` exits 0
 

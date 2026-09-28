@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -90,4 +92,19 @@ func jsonHolds(body []byte, key string) bool {
 	}
 	_, held := said[key]
 	return held
+}
+
+// An editor and a shell spell the drive letter in two cases, and both name one tree. A box with no drive letters reads the root as it stands. [[spec/design_output/index#a-door-comes-back]]
+func TestADriveLetterInEitherCaseNamesOneTree(t *testing.T) {
+	root := t.TempDir()
+	lower := root
+	if volume := filepath.VolumeName(root); len(volume) == 2 && volume[1] == ':' {
+		lower = strings.ToLower(volume) + root[len(volume):]
+	}
+	if rooted(lower) != rooted(root) {
+		t.Fatalf("%q and %q read as two roots", lower, root)
+	}
+	if !current(Standing{Port: 1, Root: lower, Stamp: stampHere()}, root) {
+		t.Fatalf("a standing root spelled %q reads as another tree than %q", lower, root)
+	}
 }

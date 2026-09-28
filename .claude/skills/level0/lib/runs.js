@@ -5,8 +5,8 @@
 import { inRun } from "./folders.js";
 
 export const STAMP = inRun("check.json");
-// The read marks the write door keeps, so a restart keeps them. [[spec/design_output/level0#the-marks-survive-a-restart]]
-export const MARKS = inRun("marks.json");
+// The variable a push the engine lets through carries, so the push door gates the battery on a session the level0 hooks hold. [[spec/tickets/push-gate-needs-the-engine]]
+export const ENGINE = "SE_ENGINE";
 // The plan this box holds: the todos and the work in hand. [[spec/design_output/stop#the-plan]]
 export const PLANS = inRun("plan.json");
 const SHORT_SHA = 8;

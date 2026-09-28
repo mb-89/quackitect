@@ -12,7 +12,7 @@ export const TICKET_RULE = "TicketMovesByRename";
 const LANDS =
   "Land the change through ./RUNME.sh commit, which stages, commits and runs the check.";
 const MERGES = "Take a branch in with ./RUNME.sh branch merge <branch>, on main.";
-const SYNCS = "Take main into a work branch with ./RUNME.sh branch sync.";
+const SYNCS = "Take main in with ./RUNME.sh branch sync, on main or a work branch.";
 
 // [[spec/design_output/bash#git-writes-take-verbs]]
 export const GIT_WRITES = {

@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [tui-shell-lands-in-shadow]
+depends_on: [tui-shell-lands-in-shadow, quack-verbs-switch-over, read-topics-switch-over]
 enabled_by: migration.phase6switch
 cloud: true
 ---
 
 # Ask
 
-Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase6switch` to read true in the tracked config on `main`.
+Phase 6 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase6switch` to read true in the tracked config on `main`.
 
 Done when the window reads its data off the index alone.
 

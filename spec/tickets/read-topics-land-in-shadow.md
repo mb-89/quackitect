@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [open-tasks-switch-lands]
+depends_on: [open-tasks-shadow-lands]
 enabled_by: migration.phase3shadow
 cloud: true
 ---
 
 # Ask
 
-Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the read-only topics. `cfg/`, `log/`, `guidance/` and the `check/` names, and the prose checks in Go, each with its own key. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
+Phase 3 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the read-only topics. Every `<instance>/config/` subtopic, `log/`, `guidance/` and the `check/` names, and the prose checks in Go, each with its own key. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds each topic's key under `migration/config/slices/`, which the `migration` module declares as shared keys in the default file.
 
 Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 

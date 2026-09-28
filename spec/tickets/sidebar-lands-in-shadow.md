@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [lsp-door-switches-over]
+depends_on: [tui-shell-lands-in-shadow]
 enabled_by: migration.phase8shadow
 cloud: true
 ---
 
 # Ask
 
-Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the extension. A generic sidebar and form renderer, and `spec/config/level0.schema.json` generated from the declarations. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
+Phase 8 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the extension. A generic sidebar and form renderer, and `spec/config/level0.schema.json` generated from the declarations. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/sidebar`, which the `migration` module declares as a shared key in the default file.
 
 Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 
@@ -191,3 +191,13 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner's word on the sidebar, for the split:
+
+- the plugin opens as a dumb little adapter
+- a value it cannot know yet draws as a question mark, the Work count among them
+- once the whole engine stands, the sidebar pulls the right values
+- the sidebar rebuilds nothing and restarts nothing
+- the same holds for every adapter
+
+Today the first draw waits on `./RUNME.sh tui work --count`, which can build the Go viewer before it answers. `counted` in `src/extension/sidebar.js` runs it, and `it.viewer()` in `src/scripts/tui.js` builds.

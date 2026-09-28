@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [go-cage-lands-in-shadow]
+depends_on: [go-cage-lands-in-shadow, quack-verbs-switch-over]
 enabled_by: migration.phase5switch
 cloud: true
 ---
 
 # Ask
 
-Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase5switch` to read true in the tracked config on `main`.
+Phase 5 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase5switch` to read true in the tracked config on `main`.
 
 Done when the bridge server leaves the tree.
 

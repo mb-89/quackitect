@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: answer
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -17,7 +18,6 @@ steps:
     by: anyone
     to: retro
     input: answer
-    reads: [[spec/guidance/working]]
     needs: ["branch test"]
     checklist: ["the change follows the answer, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
@@ -33,8 +33,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
-process_hash: 1f3006ec4b044a89
-step: answer
+process_hash: d1a6e26348695e24
 ---
 
 # Ask
@@ -93,3 +92,13 @@ The question comes from `owner-terms-await-question`, a finding on `the-owners-w
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A box decides this, under the owner's ruling that a cloud box decides every step itself. The answer for the `answer` step:
+
+| the thing | the word |
+|---|---|
+| the button in the sidebar opening the work editor | the work button |
+| the tab of the window `./RUNME.sh tui` opens | the work tab |
+| the brackets on that tab | the count |
+
+What I weighed: the tree already writes these words, and `spec/vocabulary/terms.yml` carries sidebar. No transcript line quotes the owner naming them otherwise. A wrong word costs one line of the terms file, so it undoes cheaply. The box taking this ticket writes the table as the answer, and the `do` step lands the terms.

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -119,13 +119,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-watchdog-starts-for-real]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 1f17c229d1742f91237d615dd95ddf6a2044e6f6
+    hash_after: 8afec3498a85f1421734a481d177c0dcee422622
+    why: operations-and-leases-land answers this ask
+reason: answered
 ---
 
 # Ask
 
-A name whose provider's lease expires keeps its last value, marked `stale since <time>`, per [[spec/design_output/watchdogs#a-stale-mark]].
+A name whose provider's lease expires keeps its last value, marked `stale since <time>`, per [[spec/design_output/model#a-stale-mark]].
 
-A stale value falling back to its default reads as a fact nobody computed.
+A stale value falling back to its built-in value reads as a fact nobody computed.
 
 - `go test ./...` from the root passes
 - a case lets a lease expire, and reads the last value with its mark

@@ -1,7 +1,7 @@
 // One running index answers a name over /v1 and over the old API, a name the
 // catalog lacks as a problem, and its OpenAPI document.
-// [[spec/design_output/surfaces]]
-package main
+// [[spec/design_output/model#surfaces]]
+package index
 
 import (
 	"encoding/json"
@@ -20,7 +20,12 @@ import (
 func standingV1(t *testing.T) Standing {
 	t.Helper()
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	c := q.New()
+	hand := q.OutIn(c, "files/<path...>", q.Content{})
+	file := func(_ string, commit Commit) (func(), error) {
+		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
+	}
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,11 +87,11 @@ func TestV1WritesItsOpenAPIDocument(t *testing.T) {
 	}
 }
 
-// The value carries its stale mark. [[spec/design_output/watchdogs#a-stale-mark]]
+// The value carries its stale mark. [[spec/design_output/model#a-stale-mark]]
 func TestV1ReadsAStaleName(t *testing.T) {
 	c := q.New()
-	q.GivenIn(c, "t/n", 0)
-	store := q.NewStore(c, nil)
+	q.OutIn(c, "t/n", 0)
+	store := q.NewStore(c)
 	since := time.Unix(1_700_000_000, 0)
 	if err := store.Stale("t/n", since); err != nil {
 		t.Fatal(err)

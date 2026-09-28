@@ -19,6 +19,7 @@ function answering an object of verbs, and `./RUNME.sh doors` names every one:
 | `git` | a repository | `src/doors/git.js` |
 | `clock` | the time now | `src/doors/clock.js` |
 | `log` | the log every door writes | `src/doors/log.js` |
+| `http` | a server over the network | `src/doors/http.js` |
 
 Everything above a door takes it as an argument. The command line builds every
 door once and hands them on, so a caller names what it reaches and a test hands

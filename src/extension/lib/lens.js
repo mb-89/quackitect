@@ -4,11 +4,13 @@
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 
 const FOLDERS = ["spec/tickets", ".se/tickets"];
+// The folder a group's ticket stands in, the first of the two. [[spec/design_output/work#a-group-is-a-ticket]]
+const GROUPS = FOLDERS[0];
+// The marker of [[spec/tickets/marked-groups-stay-cloud]], owned by `CLOUD_MARK` in src/scripts/work-merge.js and spelled again here because the extension bundles alone.
+const CLOUD = "cloud";
 // The hold folder of [[spec/design_output/pull#the-hand-and-the-hold]], owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension bundles alone.
 const HOLDS = ".se/.runtime/hold";
-// The one-hand hold file, which folders.js owns beside the hold folder. [[spec/design_output/pull#the-hand-and-the-hold]]
-const HOLD = ".se/.runtime/hold.json";
-const HOLD_WATCHES = [`${HOLDS}/*.json`, HOLD];
+const HOLD_WATCHES = [`${HOLDS}/*.json`];
 const CLI = "src/scripts/cli.js";
 const COMMAND = "quackitect.ticket";
 // The names the pull reads a harness off, from [[spec/design_output/pull#the-hand-rule]].
@@ -123,15 +125,19 @@ function lens(title, act, ticket, path) {
 }
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-function lensesOf({ path, text, holds }) {
+function lensesOf({ path, text, holds, group }) {
   const ticket = ticketOf(path);
   if (!ticket) return [];
+  // A ticket the cloud holds, by its own marker or its group's, takes no hand here. [[spec/tickets/the-queue-views-agree]]
+  if (fieldOf(text, CLOUD) === "true" || fieldOf(group ?? "", CLOUD) === "true")
+    return [];
+  // A hold is a state of the ticket, so a ticket past open draws no held button. [[spec/design_output/pull#the-hand-and-the-hold]]
+  if (fieldOf(text, "state") !== "open") return [];
   const naming = (holds ?? []).filter((one) => one?.ticket === ticket);
   const mine = naming.find(personHolds);
   if (mine) return handBackOf(ticket, path, text, mine);
   if (naming.length)
     return [lens(`held by ${naming[0].hand} at ${naming[0].step}`, "", ticket, path)];
-  if (fieldOf(text, "state") !== "open") return [];
   const leaf = leafAt(text, "");
   const step = leaf?.path ?? fieldOf(text, "step");
   const by = leaf ? byOf(leaf) : "anyone";
@@ -199,13 +205,23 @@ function answerOf(ran) {
 }
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-function holdsIn(names, readOf) {
+async function holdsIn(names, readOf) {
   const paths = (names ?? [])
     .filter((one) => one.endsWith(".json"))
     .map((one) => `${HOLDS}/${one}`);
-  return Promise.all([...paths, HOLD].map(readOf)).then((texts) =>
-    texts.map(parsedOrNull).filter(Boolean),
-  );
+  const holds = (await Promise.all(paths.map(readOf)))
+    .map(parsedOrNull)
+    .filter(Boolean);
+  const stands = await Promise.all(holds.map((one) => stillHeld(one, readOf)));
+  return holds.filter((_, at) => stands[at]);
+}
+
+// A hold stands while its ticket does, as the engine's stillHeld reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
+async function stillHeld(hold, readOf) {
+  const path = String(hold?.path ?? "").trim();
+  if (!path) return true;
+  const text = await readOf(path);
+  return !text || fieldOf(text, "state") !== "closed";
 }
 
 function parsedOrNull(text) {
@@ -221,7 +237,12 @@ function ticketLensOf(door) {
   const holds = async () => holdsIn(await door.list(HOLDS), (path) => door.read(path));
   return {
     watches: HOLD_WATCHES,
-    lenses: async (path, text) => lensesOf({ path, text, holds: await holds() }),
+    // The group file reads through the door, and no verb runs on a draw. [[spec/tickets/the-queue-views-agree]]
+    lenses: async (path, text) => {
+      const name = fieldOf(text, "group");
+      const group = name ? await door.read(`${GROUPS}/${name}.md`) : "";
+      return lensesOf({ path, text, holds: await holds(), group });
+    },
     async took(act, ticket, path) {
       let reason = "";
       if (act === "fail") {
@@ -258,7 +279,6 @@ module.exports = {
   CLI,
   COMMAND,
   HARNESS,
-  HOLD,
   HOLDS,
   HOLD_WATCHES,
   answerOf,

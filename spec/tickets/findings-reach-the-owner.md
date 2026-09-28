@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: answer
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -17,7 +18,6 @@ steps:
     by: anyone
     to: retro
     input: answer
-    reads: [[spec/guidance/working]]
     needs: ["branch test"]
     checklist: ["the change follows the answer, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
@@ -33,8 +33,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
-process_hash: 1f3006ec4b044a89
-step: answer
+process_hash: d1a6e26348695e24
 ---
 
 # Ask
@@ -87,3 +86,15 @@ The owner decides how a finding reaches the owner: as a question ticket, as a no
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A box decides this, under the owner's rulings of the day. The answer for the `answer` step:
+
+| the finding | the road |
+|---|---|
+| work a box can do | a ticket in the group the box works, closing before the group reaches done |
+| work a person alone can do | a ticket on [[spec/processes/person]], loose on `main`, with every command in its ask |
+| a doubt with no work in it yet | a note, which the retro decides |
+
+No finding opens a GitHub issue. A finding carries three fields: the failure it names, the evidence as a command and its output, and what it leaves unchecked.
+
+What I weighed: the owner's ruling "If a box opens a ticket that it can solve itself, it assigns it to its own group". The owner also ruled "We have a ticket system for that". Rule 9 of the tickets chapter keeps a doubt as a note and an ask as a ticket. The Findings chapter of [[spec/design_input/level-two]] asks for the road and the fields alone. The box taking this ticket writes the answer, and the `do` step carries it into that chapter.

@@ -78,16 +78,16 @@ step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 group: go-cage-lands-in-shadow
-depends_on: [the-hooks-door-lands]
+depends_on: [the-hooks-door-lands, the-mcp-module-lands]
 ---
 
 # Ask
 
-Copilot reaches the hooks door, through MCP and `quack hook <event>`, in shadow against `copilot-runtime.js`.
+Copilot reaches the `hooks` IO module, through MCP and `quack hook <event>`, in shadow against `copilot-runtime.js`.
 
 Copilot then meets the same rules as Claude, from one copy.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `./RUNME.sh log --kind shadow` names each decision the two disagree on
 - `./RUNME.sh check` exits 0
 

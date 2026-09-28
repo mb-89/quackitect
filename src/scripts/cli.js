@@ -55,6 +55,7 @@ import { pullArgvOf } from "./pull-tool.js";
 import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
+import { detachedStart } from "./serve.js";
 import { ticket } from "./ticket.js";
 import {
   detach,
@@ -66,6 +67,8 @@ import {
 } from "./vehicle.js";
 import { voice } from "./voice.js";
 import { cloud, pulling, work } from "./work.js";
+import { dispatch } from "./dispatch.js";
+import { joinsGroup } from "./work-fix.js";
 import { testVerb } from "./work-test.js";
 
 // The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
@@ -90,7 +93,7 @@ export const verbs = {
         ran = await batteryRun(
           [
             ["tests", () => test(errors)],
-            ["go", () => goHolds(errors)],
+            ["go", () => goHolds(errors, redHere())],
             ["doors", () => doorsHold()],
             ["projections", () => projectionsHold()],
             ["plugin", () => pluginHolds()],
@@ -150,6 +153,11 @@ export const verbs = {
   cloud: {
     says: "the cloud routine: trigger",
     run: async () => cloud(it.work, rest, it),
+  },
+  // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
+  dispatch: {
+    says: "the dispatcher's plan: --dry prints it, --json prints it as JSON, and --fire fires the workers",
+    run: async () => dispatch(it.work, rest, it),
   },
   ticket: {
     says: "tickets: pull, note, update, open, todo, route, yours, fill",
@@ -246,6 +254,11 @@ export const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
 export const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
 export const rest = argv.slice(argv.indexOf(verb) + 1);
 
+// A verb's exit waits for its output to drain, so a reader on a pipe gets every byte. [[spec/tickets/open-tasks-run-in-shadow]]
+export function exitsDrained(code, out, exit) {
+  out.write("", () => exit(code));
+}
+
 // [[spec/design_output/doors#a-script-guards-its-main]]
 if (runsHere(import.meta.url, process.argv)) {
   if (verb === "help" || !verbs[verb]) {
@@ -256,7 +269,11 @@ if (runsHere(import.meta.url, process.argv)) {
     }
     process.exit(verb === "help" ? 0 : 2);
   }
-  process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
+  exitsDrained(
+    (await verbs[verb].run(where.length ? where : ["."])) ?? 0,
+    process.stdout,
+    process.exit,
+  );
 }
 
 // [[spec/design_output/vehicle#what-a-vehicle-needs]]
@@ -385,8 +402,14 @@ export function theStub(argv) {
   return 0;
 }
 
-export function serveBridge(argv) {
+// Without the debugger the server stands detached, so the verb returns and the server stays. [[spec/design_output/level0#a-desk-serve-returns]]
+export async function serveBridge(argv, doors = { ...it, root }) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
+  if (!inspect.length) {
+    const { code, said } = await detachedStart(doors);
+    console.log(said);
+    return code;
+  }
   const server = join(root, "src", "bridge", "server.js");
   return outside.run([process.execPath, ...inspect, server, root], {
     cwd: root,
@@ -472,6 +495,11 @@ function spawnsHere() {
 
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
+// A ticket a box mints on its branch joins the group the box works, and any other note stands as handed. [[spec/tickets/a-box-keeps-its-tickets]]
+export function mintFields(kind, path, fields, branch) {
+  return kind === "ticket" ? joinsGroup(fields, branch, basename(path, ".md")) : fields;
+}
+
 export function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
   const schemas = schemasIn(treeHere());
@@ -516,7 +544,12 @@ export function mint(argv) {
     return 2;
   }
 
-  const fields = handover ? fromHandover(copied.fields) : copied.fields;
+  const said = handover ? fromHandover(copied.fields) : copied.fields;
+  const branch = git(outside, root).run(
+    ["rev-parse", "--abbrev-ref", "HEAD"],
+    true,
+  ).out;
+  const fields = mintFields(kind, path, said, branch);
   const made = mintedNote(schemas, { kind, path, fields }, it.front);
   if (made.why) {
     console.error(made.why);

@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  EXTENSIONS,
   VALE_LS_VERSION,
   valeLsAsset,
   valeLsUrl,
@@ -34,4 +35,13 @@ test("the url carries the pinned version and the release host", () => {
     "https://github.com/vale-cli/vale-ls/releases/download/" +
       `v${VALE_LS_VERSION}/vale-ls-x86_64-unknown-linux-gnu.zip`,
   );
+});
+
+// The design draws its diagrams in Mermaid, so the editor's preview takes the extension that renders them. [[spec/design_output/editor#what-the-tracked-settings-say]]
+test("the extensions on offer carry the Mermaid preview beside Vale and Biome", () => {
+  assert.deepEqual(EXTENSIONS, [
+    "chrischinchilla.vale-vscode",
+    "biomejs.biome",
+    "bierner.markdown-mermaid",
+  ]);
 });

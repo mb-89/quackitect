@@ -23,7 +23,9 @@ import { asksBless } from "./pull-bless.js";
 import { defOf, inputsOf } from "./pull-stale.js";
 import { roleOf } from "./pull-hand-of.js";
 import { landed, unlandedRows } from "./pull-landed.js";
-import { childrenSay, handOut, ticketsHere, withPersonStep } from "./pull-hand.js";
+import { childrenSay } from "./pull-children.js";
+import { handOut, ticketsHere, withPersonStep } from "./pull-hand.js";
+import { keptRed } from "./pull-kept.js";
 import { holdsHere } from "./pull-when.js";
 import { fromHold, NOTES, routedTicket } from "./ticket.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
@@ -70,9 +72,13 @@ export function stepOn(it, one, leaf, before, changes, stays = false) {
   let next = stays ? leaf : leaf.leaves[leaf.at + 1];
   while (next && !stays) {
     const when = holdsHere(it, String(next.said.when ?? ""), frontOf(text), text);
-    if (when.holds) break;
-    text = withEntry(text, { step: next.path, skipped: true, why: when.why }, it.front);
-    changes.push(`skips ${next.path}`);
+    // [[spec/design_output/pull#kept-red-leaves]]
+    const entry = when.holds
+      ? keptRed(it, text, next, one.name)
+      : { step: next.path, skipped: true, why: when.why };
+    if (!entry) break;
+    text = withEntry(text, entry, it.front);
+    changes.push(`${entry.kept ? "keeps" : "skips"} ${next.path}`);
     next = leaf.leaves[leaf.leaves.findIndex((one) => one.path === next.path) + 1];
   }
 

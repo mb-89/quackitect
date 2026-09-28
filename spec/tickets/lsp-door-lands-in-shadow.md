@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [tui-shell-switches-over]
+depends_on: [read-topics-land-in-shadow, quack-verbs-land-in-shadow]
 enabled_by: migration.phase7shadow
 cloud: true
 ---
 
 # Ask
 
-Phase 7 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the LSP door and the checks. The rules move into the check module, and a `buffers/` input carries unsaved editor text. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
+Phase 7 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the `lsp` IO module and the checks. The rules move into the check module, and a `buffers/` input carries unsaved editor text. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/lsp`, which the `migration` module declares as a shared key in the default file.
 
 Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 

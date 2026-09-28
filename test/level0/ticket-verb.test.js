@@ -9,7 +9,7 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import { processAt } from "../../src/scripts/process.js";
 import {
   fromHold,
-  HOLD,
+  HOLDS,
   NOTE,
   NOTES,
   routedTicket,
@@ -18,6 +18,9 @@ import {
 } from "../../src/scripts/ticket.js";
 import { semicolonVale } from "./semicolon-vale.js";
 import { at, heard, ROOT, treeWithProcesses } from "./ticket-doors.js";
+
+// The pull writes a hold into the folder, one file a hand. [[spec/design_output/pull#the-hand-and-the-hold]]
+const HOLD = `${HOLDS}/box-1.json`;
 
 test("ticket note writes a private ticket off the note process, and says so", () => {
   const said = treeWithProcesses();

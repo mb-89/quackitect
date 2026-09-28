@@ -4,9 +4,14 @@
 
 import { join } from "node:path";
 import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
-import { FOLDER as LOG_FOLDER, SERVE } from "../../.claude/skills/level0/lib/log.js";
+import {
+  FOLDER as LOG_FOLDER,
+  reasonIn,
+  SERVE,
+  wroteSince,
+} from "../../.claude/skills/level0/lib/log.js";
 import { runsHere } from "../../.claude/skills/level0/lib/paths.js";
-import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import { PORT_BASE, rootKey } from "../../.claude/skills/level0/lib/vehicle.js";
 import { awake } from "../doors/awake.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
@@ -34,6 +39,7 @@ import { onBash, onDescribe, onPowerShell } from "./bash.js";
 import { bindingLine } from "./binding.js";
 import { dropsAll, dropsMoved } from "./caches.js";
 import { asks, asksText } from "./config.js";
+import { holdsCloudAsk } from "./cloud-ask.js";
 import { holdsGrace } from "./grace.js";
 import {
   onAgentSpawn,
@@ -81,6 +87,7 @@ import {
   helperSpawns,
   holdsCall,
   onStop,
+  saidReport,
   sawCall,
   sawPrompt,
   SPECS as stopSpecs,
@@ -113,7 +120,10 @@ const DOORS = {
   "session.compact": onSessionCompact,
   "session.end": onSessionEnd,
   "session.measure": onSessionMeasure,
-  "turn.said": onTurnSaid,
+  "turn.said": (e, box) => {
+    saidReport(e, box);
+    return onTurnSaid(e, box);
+  },
   "turn.complete": endsTurn,
   // A helper's stop reports, a session due holds for the handover, and the answer gate holds ahead of the tooth. [[spec/design_output/stop#the-context-hands-over]] [[spec/design_output/level0#the-gate-reads-the-answer]]
   "classic.Stop": async (e, box) => {
@@ -279,8 +289,12 @@ async function onToolCall(e, box) {
     asksForPlan(box, box.calls);
   }
   // The engine's own ask meets the call after the owner's hold and before the answer door. [[spec/design_output/stop#the-grace]]
+  // A cloud box's ask meets its door first of these. [[spec/design_output/level0#the-cloud-ask-door]]
   const held = letsThrough(
-    holdsCall(e, box) ?? holdsGrace(e, box, ENDS_TURN) ?? holdsForAnswer(e, box),
+    holdsCall(e, box) ??
+      holdsCloudAsk(e, box) ??
+      holdsGrace(e, box, ENDS_TURN) ??
+      holdsForAnswer(e, box),
     { e },
     box,
   );
@@ -339,8 +353,8 @@ export function boxesOf(method, doors = {}) {
   const held = new Map();
   return (root) => {
     const work = String(root || method);
-    if (!held.has(work)) held.set(work, boxOf(method, work, doors));
-    return held.get(work);
+    if (!held.has(rootKey(work))) held.set(rootKey(work), boxOf(method, work, doors));
+    return held.get(rootKey(work));
   };
 }
 
@@ -432,7 +446,7 @@ export async function respawned(own, argv, exit = process.exit, wait = RESPAWN_W
   const born = await own.proc.respawn(argv, { out, waitMs: wait });
   if (!born.fell) return exit(0);
   const now = own.disk.exists(out) ? String(own.disk.read(out)) : "";
-  const wrote = (now.startsWith(was) ? now.slice(was.length) : now).trim();
+  const wrote = wroteSince(was, now);
   try {
     await own.log.say(
       "fatal",
@@ -449,19 +463,6 @@ export function restarts(server, then, soon = setImmediate) {
   server.close();
   server.closeIdleConnections?.();
   soon(then);
-}
-
-// The line naming the fault, out of what the child wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]
-function reasonIn(wrote) {
-  const lines = wrote
-    .split("\n")
-    .map((one) => one.trim())
-    .filter(Boolean);
-  return (
-    lines.find((one) => /error/i.test(one)) ??
-    lines.at(-1) ??
-    `it wrote nothing to ${SERVE}`
-  );
 }
 
 // A crash writes its error last, so the log says why the server falls. [[spec/design_output/level0#a-crash-writes-its-error]]

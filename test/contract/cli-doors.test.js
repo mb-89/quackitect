@@ -15,3 +15,9 @@ test("the doors carry the cap and its margin the config names", () => {
   assert.equal(Number(it.cap.bytes), bytes);
   assert.equal(Number(it.cap.margin), margin);
 });
+
+// [[spec/tickets/serve-probes-the-register-port]]
+test("the doors carry the process id and the platform, as the listen reads the register", () => {
+  assert.equal(it.pid, process.pid);
+  assert.equal(it.windows, process.platform === "win32");
+});

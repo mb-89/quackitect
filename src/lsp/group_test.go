@@ -111,3 +111,27 @@ func TestAChildOfAClosedGroupPasses(t *testing.T) {
 		t.Fatalf("a child of a closed group answers %v", found)
 	}
 }
+
+// A person leaf gated `when: handed` stands skipped where the Ask comes off no handover, as the pull reads it. [[spec/design_output/pull#a-condition-skips-a-leaf]]
+const atHanded = `state: open
+step: design/owner-read
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        by: person
+        when: handed
+`
+
+// [[spec/design_output/pull#a-condition-skips-a-leaf]]
+func TestAHandedLeafOffNoHandoverPasses(t *testing.T) {
+	if found := groupAsksNobody(groupTree(groupChild(atHanded))); len(found) != 0 {
+		t.Fatalf("a handed leaf off no handover answers %v", found)
+	}
+}
+
+// [[spec/design_output/pull#a-condition-skips-a-leaf]]
+func TestAHandedLeafOffAHandoverDrawsTheFinding(t *testing.T) {
+	child := strings.Replace(groupChild(atHanded), "One piece of it.", "One piece of it.\n\nfrom: handover", 1)
+	onlyOne(t, groupAsksNobody(groupTree(child)), "GroupAsksNobody")
+}

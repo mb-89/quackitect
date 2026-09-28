@@ -5,8 +5,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { work } from "../../src/scripts/work.js";
 import { merge } from "../../src/scripts/work-merge.js";
-import { doorsSaying, heard, merging, ranGit, ROOT } from "./work-doors.js";
+import { doorsSaying, heard, merging, ROOT, ranGit } from "./work-doors.js";
 
 // A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = "claude/a-thing";
@@ -61,8 +62,112 @@ test("merge names main as carrying a claude branch's work, and deletes the branc
 // The install ran before the merge and read the old wants, so the merge runs it again before the check. [[spec/design_output/work#the-merge-lands-the-truth]]
 test("merge builds the merged tree's tools before its check", () => {
   const { ran } = cloudMerge("+ abc123\n");
-  const install = ran.findIndex((one) => one.endsWith("src/scripts/install.sh"));
+  const install = ran.findIndex((one) =>
+    one.endsWith(join("src", "scripts", "install.sh")),
+  );
   const check = ran.indexOf(CHECK);
   assert.ok(install >= 0, "the merge runs the install");
   assert.ok(install < check, "and runs it before the check");
+});
+
+// A work branch's merge closes it once trunk reaches origin, and a refused push leaves it standing. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+test("merge of a work branch pushes main and closes the branch, and keeps it where the push comes back refused", () => {
+  const closed = doorsSaying(merging());
+  closed.it.node = "node";
+  const shut = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...closed.it, cloud: false }),
+  );
+  assert.equal(shut.code, 0, shut.said);
+  const ran = ranGit(closed.outside);
+  assert.ok(
+    ran.indexOf("git push origin main") <
+      ran.indexOf("git push origin --delete work/one-group"),
+  );
+
+  const kept = doorsSaying(merging({ "git push origin main": { exitCode: 1 } }));
+  kept.it.node = "node";
+  const held = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...kept.it, cloud: false }),
+  );
+  assert.equal(held.code, 0, held.said);
+  assert.ok(!ranGit(kept.outside).includes("git push origin --delete work/one-group"));
+  assert.match(held.said, /then run \.\/RUNME\.sh branch close one-group/);
+
+  const refused = doorsSaying(
+    merging({ "git push origin --delete work/one-group": { exitCode: 1 } }),
+  );
+  refused.it.node = "node";
+  const left = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...refused.it, cloud: false }),
+  );
+  assert.equal(left.code, 0, "a refused delete leaves the merge green");
+  assert.match(left.said, /stands on the remote, and trunk carries its ticket closed/);
+});
+
+// GitHub lands a branch a pull request carries, so the desk merge leaves it alone. [[spec/tickets/groups-land-through-pull-requests]]
+test("branch merge refuses a branch a pull request carries, and names it", () => {
+  const { it, outside } = doorsSaying(
+    merging({
+      "git rev-parse origin/work/one-group": { stdout: "tip999\n" },
+      "git ls-remote origin refs/pull/*/head": {
+        stdout: "abc000\trefs/pull/7/head\ntip999\trefs/pull/42/head\n",
+      },
+    }),
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 1, said);
+  assert.match(said, /pull request #42/);
+  assert.match(said, /branch merge one-group --closed/);
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git merge")),
+    "nothing merges",
+  );
+});
+
+// A closed pull keeps its head ref, so --closed takes the merge past it. [[spec/tickets/merge-reads-open-pulls]]
+test("branch merge --closed runs past a pull request standing at the tip", () => {
+  const { it, outside } = doorsSaying(
+    merging({
+      "git rev-parse origin/work/one-group": { stdout: "tip999\n" },
+      "git ls-remote origin refs/pull/*/head": {
+        stdout: "tip999\trefs/pull/42/head\n",
+      },
+    }),
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group", "--closed"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    ranGit(outside).some((one) => one.startsWith("git merge")),
+    "the merge runs",
+  );
+});
+
+// [[spec/tickets/groups-land-through-pull-requests]]
+test("a pull request standing at another commit leaves the merge to run", () => {
+  const { it, outside } = doorsSaying(
+    merging({
+      "git rev-parse origin/work/one-group": { stdout: "tip999\n" },
+      "git ls-remote origin refs/pull/*/head": { stdout: "abc000\trefs/pull/7/head\n" },
+    }),
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 0, said);
+  assert.ok(
+    ranGit(outside).includes("git merge --no-ff --no-edit origin/work/one-group"),
+  );
 });

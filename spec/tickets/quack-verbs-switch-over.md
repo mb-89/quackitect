@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [quack-verbs-land-in-shadow]
+depends_on: [quack-verbs-land-in-shadow, open-tasks-switch-lands, read-topics-switch-over]
 enabled_by: migration.phase4switch
 cloud: true
 ---
 
 # Ask
 
-Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `slices` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase4switch` to read true in the tracked config on `main`.
+Phase 4 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], switched over. The slice's key under `migration/config/slices/` moves to `new`, and the old path leaves the tree. The group waits for `migration.phase4switch` to read true in the tracked config on `main`.
 
 Done when agents call `quack` and no `./RUNME.sh` verb, and `cli.js` leaves the tree.
 

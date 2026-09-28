@@ -22,6 +22,7 @@ import {
 } from "../engine/group.js";
 import { inHand } from "../engine/named.js";
 import { ephemeralPull } from "./ephemeral-pull.js";
+import { dropsClosedHolds } from "./ephemeral.js";
 import { rejected } from "./pull-gate.js";
 import { asksBless, blessKept } from "./pull-bless.js";
 import { dropHold, holdOf, writeHold } from "./guidance-hand.js";
@@ -73,10 +74,15 @@ import {
 import { NOTES, schemasHere } from "./ticket.js";
 
 export * from "./pull-chapter.js";
+export * from "./pull-children.js";
 export * from "./pull-escalate.js";
 export * from "./pull-hand.js";
 export * from "./pull-route.js";
 export * from "./pull-writes.js";
+
+// [[spec/design_output/pull#the-final-acceptance]]
+const RED = "assertion";
+const GREEN = "green";
 
 export function pull(it, argv) {
   const rest = (argv ?? []).slice(1);
@@ -107,6 +113,8 @@ export function pull(it, argv) {
   const took = as ? `${handOf(it)} · ${as}` : handOf(it);
   const hand = it.ownerSays ? `${took} · ${SAYS}` : took;
   const plainHand = took;
+  // A hold on a closed ticket leaves before the pull reads the hand. [[spec/design_output/pull#the-hand-and-the-hold]]
+  dropsClosedHolds(it.disk, it.root);
   const held = holdOf(it, hand);
   const who = { hand, plainHand, branch, group, held, oneStep: Boolean(as) };
   it.argv = rest;
@@ -443,7 +451,7 @@ export function handBack(it, who, name, verdict) {
   const fails = verdict.said === "fail";
   const answered =
     found.length || becomes ? [] : commandsRun(it, leaf, chapter, fails ? [] : found);
-  // A final gate runs every command field of the route, and the record keeps each answer. [[spec/design_output/pull#the-final-acceptance]]
+  // A final gate runs every command field of the leaves before it, and the record keeps each answer. [[spec/design_output/pull#the-final-acceptance]]
   if (leaf.final && !becomes && !found.length)
     answered.push(...routeRun(it, one, leaf, fails ? [] : found));
   found.push(...handFaults(it, one, leaf, who.hand, held));
@@ -469,26 +477,27 @@ export function handBack(it, who, name, verdict) {
   return passed(it, who, one, leaf, held, answered, { stays: asksBless(leaf) });
 }
 
-// Every command field the route's other leaves hold a line under, run as the leaf's own run does. [[spec/design_output/pull#the-final-acceptance]]
+// Every command field the leaves before the gate hold a line under, run as the leaf's own run does. A leaf past the gate, a retro's among them, runs its own when the route reaches it, so a line an earlier round wrote there waits. [[spec/design_output/pull#the-final-acceptance]]
 function routeRun(it, one, leaf, found) {
-  return leaf.leaves
-    .filter((other) => other.path !== leaf.path)
-    .flatMap((other) => {
-      const chapter = chapterOf(one.text, other.path);
-      const evidence = [other.said.evidence ?? []]
-        .flat()
-        .filter((field) => String(field?.form) === "command")
-        .filter((field) =>
-          String((chapter.fields.get(field.name) ?? [])[0] ?? "").trim(),
-        );
-      if (!evidence.length) return [];
-      return commandsRun(it, { path: other.path, evidence }, chapter, found).map(
-        (ran) => ({
-          ...ran,
-          name: `${other.path}/${ran.name}`,
-        }),
+  const at = leaf.leaves.findIndex((other) => other.path === leaf.path);
+  return leaf.leaves.slice(0, at < 0 ? leaf.leaves.length : at).flatMap((other) => {
+    const chapter = chapterOf(one.text, other.path);
+    const evidence = [other.said.evidence ?? []]
+      .flat()
+      .filter((field) => String(field?.form) === "command")
+      .filter((field) => String((chapter.fields.get(field.name) ?? [])[0] ?? "").trim())
+      // A red pass reruns expecting its cases green, since the green pass after it turns those cases green. [[spec/design_output/pull#the-final-acceptance]]
+      .map((field) =>
+        String(field.expects) === RED ? { ...field, expects: GREEN } : field,
       );
-    });
+    if (!evidence.length) return [];
+    return commandsRun(it, { path: other.path, evidence }, chapter, found).map(
+      (ran) => ({
+        ...ran,
+        name: `${other.path}/${ran.name}`,
+      }),
+    );
+  });
 }
 
 // [[spec/design_output/pull#the-hand-back-refused]]

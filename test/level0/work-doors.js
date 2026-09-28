@@ -110,6 +110,8 @@ const NAME_FILLER = "x".repeat(20);
 const TREE_AT = `:${TICKETS}`;
 
 // The three reads a listing runs, and an object stands under `<branch>:<path>`. [[spec/design_output/work#the-listing-reads-git-once]]
+const TRUNK_TIP = "trunk";
+
 export function remoteSaying(refs, objects = {}) {
   const rows = refs
     .map((one) => `origin/${one.branch} ${one.tip} ${one.when ?? 0}`)
@@ -119,7 +121,26 @@ export function remoteSaying(refs, objects = {}) {
     .map((one) => `  origin/${one.branch}`)
     .join("\n");
   const named = new Map(refs.map((one) => [one.tip, one.branch]));
+  // A landed group's ticket stands closed on trunk, which is what the listing reads. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  const closedOnTrunk = Object.fromEntries(
+    refs
+      .filter((one) => one.merged)
+      .map((one) => [
+        `git show origin/main:spec/tickets/${one.branch.replace(/^work\//, "")}.md`,
+        { stdout: "---\nkind: [[ticket]]\nstate: closed\n---\n" },
+      ]),
+  );
+  // Each ref shares the trunk tip as its base unless the case names an older one, which reads behind. [[spec/design_output/work#the-listing-reads-git-once]]
+  const bases = Object.fromEntries(
+    refs.map((one) => [
+      `git merge-base origin/main origin/${one.branch}`,
+      { stdout: `${one.base ?? TRUNK_TIP}\n` },
+    ]),
+  );
   return {
+    ...closedOnTrunk,
+    ...bases,
+    "git rev-parse origin/main": { stdout: `${TRUNK_TIP}\n` },
     [`git for-each-ref --format=${REF_FORMAT} refs/remotes/origin/work/`]: {
       stdout: rows ? `${rows}\n` : "",
     },
@@ -203,6 +224,16 @@ export const merging = (extra = {}) => ({
     exitCode: 0,
     stdout: "green\n",
   },
+  // The merge pushes trunk and closes the branch trunk now holds. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  "git push origin main": { exitCode: 0 },
+  "git rev-list --count origin/main..main": { stdout: "0\n" },
+  "git branch -r --merged origin/main": {
+    stdout: "  origin/main\n  origin/work/one-group\n",
+  },
+  "git branch -r --points-at origin/main": { stdout: "  origin/main\n" },
+  "git rev-list --first-parent origin/main": { stdout: `${SHA}\n` },
+  "git rev-parse origin/work/one-group": { stdout: "b9\n" },
+  "git push origin --delete work/one-group": { exitCode: 0 },
   ...extra,
 });
 
