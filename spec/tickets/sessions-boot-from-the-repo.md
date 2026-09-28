@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -426,6 +426,19 @@ record:
         hash: 3411ceaf98287365
         size: 89123
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: c3a75a11768e93ed1cc0dac8991db6ab0f1513ba
+    hash_after: c3a75a11768e93ed1cc0dac8991db6ab0f1513ba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 2b44825ca53911ae
+        size: 3293
+    def: 897ac034247c0bca
 group: the-cloud-works-its-queue
 ---
 
@@ -599,7 +612,7 @@ each done_when line meets a case in hooks.test.js or the note section, and the c
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/hooks.test.js
+sh .se/scripts/boot-red-before-change.sh
 
 ### red
 
@@ -613,14 +626,14 @@ test/level0/hooks.test.js
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the merge of main reads the same four.
+The boot cases answer green on the tip, because the change stands landed at 370af06b9. The script runs them against 370af06b9^, and five fail on their own assertion there. The case where everything stands and the case off a cloud box pass there, as negative cases do.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
+every done_when line on the hook meets a case that fails before the change, the note lines meet the review, and ./RUNME.sh check decides the last
 the boot cases reach the disk and the process through fakeDisk and fakeProc alone
 
 # gate
