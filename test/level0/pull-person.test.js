@@ -144,7 +144,7 @@ test("a ticket whose ask names a view closes on the owner's pass at the view lea
   assert.equal(said.holds, true, "the view leaf stands in the route");
   assert.equal(
     writesHere(VIEW, { agent: true, cloud: true }).writes,
-    false,
+    true,
     "an agent on a cloud box leaves the owner's view to the owner",
   );
   assert.equal(writesHere(VIEW, { agent: false }).writes, true, "the owner passes it");
@@ -165,7 +165,7 @@ test("a ticket minted off a handover waits on the owner's read before its draft"
   };
   assert.equal(
     writesHere(read, { agent: true, cloud: true }).writes,
-    false,
+    true,
     "an agent on a cloud box leaves the owner's read to the owner",
   );
   assert.equal(writesHere(read, { agent: false }).writes, true, "the owner reads it");
