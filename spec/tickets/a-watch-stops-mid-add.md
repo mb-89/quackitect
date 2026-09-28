@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d81e857fa7fb · claude-code-remote
+    hash_before: ad8df81d4bf28669b7d385e4ecda5e18b74f62b1
+    hash_after: 0d2f74335c8df4d25826186a14255f4bc39c17b6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/modules/files passes; green, src/watcher passes; green, src/watcher/watchertest pass
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-watches-close-cleanly.md:94:116: Vocabulary: fsnotify stands outside the words this tree writes. Write "
+    inputs:
+      - name: design/tests-red
+        hash: 004db41549785bb0
+        size: 604
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -320,26 +343,33 @@ the loop stands once, in src/watcher, and both watches call it
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Both Go watches now stand on src/watcher. On Windows, fsnotify Add waits on a reply from its reader, and the reader picks the stop or the add at random, so a stop landing while the events loop added a folder hung for good. That hang failed check (windows-latest) at random. The watcher drains Events and Errors into an unbounded queue on one goroutine, so the reader never waits on a send, and hands each event to its hear function on a second one. Add and Close share one lock and a closed flag, so no Add runs once Close starts, and Close drops the lock before it waits on both loops. A fake in src/watcher/watcher_test.go holds the Windows timing, so the hang shows on every platform, and each watch carries a test stopping it while folders appear. The race run passes too: `CGO_ENABLED=1 go test -race -count=1 ./src/watcher/... ./src/modules/files/ ./src/index/`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the two watches the ask names, door.go for the field type, and the new src/watcher package they share
+the door the change reaches, fsnotify, has its fake with the Windows timing in src/watcher/watcher_test.go
+each changed function points at the ticket whose approach it implements
+the loop stands once, in src/watcher, and the test helpers once, in src/watcher/watchertest
 
 # accept
 
