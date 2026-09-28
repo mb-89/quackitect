@@ -67,7 +67,7 @@ type Presentation struct {
 
 // The type an action's last request answers, which its caller receives. [[spec/design_output/model#the-options]]
 func Answers[Out any]() Option {
-	return func(one *registration) {}
+	return func(one *registration) { one.answers = typeOf[Out]() }
 }
 
 // [[spec/design_output/model#the-options]]

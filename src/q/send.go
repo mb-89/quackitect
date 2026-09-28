@@ -3,7 +3,11 @@
 // [[spec/design_output/model#an-action-lists-requests]]
 package q
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+	"reflect"
+)
 
 // Runs the action's requests through accept, which reaches the IO module each names. [[spec/design_output/model#an-action-lists-requests]]
 func (s *Store) Send(name string, input any, accept func(Request) (any, error)) error {
@@ -49,6 +53,12 @@ func (s *Store) Deliver(name string, input any, accept func(Request) (any, error
 		}
 		list = last.Then(answers)
 		known += len(list)
+	}
+	// The caller receives the type q.Answers declares, or a refusal naming the action. [[spec/tickets/deliver-checks-the-declared-type]]
+	if want := s.owner(name).answers; want != nil {
+		if got := reflect.TypeOf(said); got == nil || !got.AssignableTo(want) {
+			return nil, fmt.Errorf("%s answers a %T, and q.Answers declares a %s", name, said, want)
+		}
 	}
 	return said, nil
 }

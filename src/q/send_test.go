@@ -5,6 +5,7 @@ package q
 
 import (
 	"errors"
+	"strings"
 	"testing"
 )
 
@@ -70,4 +71,28 @@ func TestAFailingRequestUndoesTheOnesBeforeIt(t *testing.T) {
 func asText(args any) string {
 	text, _ := args.(string)
 	return text
+}
+
+// An action declaring its answer through q.Answers. [[spec/tickets/deliver-checks-the-declared-type]]
+func answering(t *testing.T) *Store {
+	t.Helper()
+	c := New()
+	ActionIn(c, "t/count", func(string) []Request {
+		return []Request{{Module: "disk", Verb: "count", NoUndo: "a read"}}
+	}, Answers[int]())
+	return NewStore(c)
+}
+
+func TestDeliverHandsBackAnAnswerOfTheDeclaredType(t *testing.T) {
+	said, err := answering(t).Deliver("t/count", "a", func(Request) (any, error) { return 3, nil }, nil)
+	if err != nil || said != 3 {
+		t.Fatalf("the delivery answers %v and %v", said, err)
+	}
+}
+
+func TestDeliverRefusesAnAnswerOfAnotherTypeNamingTheAction(t *testing.T) {
+	said, err := answering(t).Deliver("t/count", "a", func(Request) (any, error) { return "three", nil }, nil)
+	if err == nil || said != nil || !strings.Contains(err.Error(), "t/count") {
+		t.Fatalf("a string answer to t/count answers %v and %v", said, err)
+	}
 }

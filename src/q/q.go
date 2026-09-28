@@ -42,6 +42,7 @@ type registration struct {
 	looks    Look
 	fields   []Field
 	out      []Field
+	answers  reflect.Type
 	deadline time.Duration
 	writes   bool
 	io       bool
