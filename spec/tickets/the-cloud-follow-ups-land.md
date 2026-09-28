@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -123,6 +123,25 @@ record:
     hand: the engine
     hash_before: 8e878face1f8c58aba336e27f371ee00d7a71b19
     hash_after: 8e878face1f8c58aba336e27f371ee00d7a71b19
+  - step: accept
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: f2c29a8c3fcb8b9b428e5a40ad746ca6d7fe51e7
+    hash_after: e2f2f0985ddbe355a09edcb75787521a1503a7a0
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-cloud-follow-ups-land took 3 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: ccd35afe8c09c8f0
+        size: 309
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: children-2
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: bf1fe6cde364dfd7
 ---
 
 # Ask
@@ -181,8 +200,7 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- boxes-open-no-pull and the-owner-runs-the-dispatch stand open inside the group, so two of the three rulings stand unanswered
+accept
 
 # retro
 
