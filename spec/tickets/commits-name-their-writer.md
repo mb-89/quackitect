@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -211,6 +211,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: d836591a69af374d9d12dc1b71fc7b014ce16e65
+    hash_after: d836591a69af374d9d12dc1b71fc7b014ce16e65
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/quack passes; green, src/modules/clock passes; green, src/modules/env passes; green, src
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-config-module-resolves-layers.md:327:86: Vocabulary: qtest stands outside the words this tree writes. W"
+    inputs:
+      - name: design/tests-red
+        hash: 623705f159ea865b
+        size: 812
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -406,26 +429,37 @@ The refusal's wording stands once, in the store's commit, and every comment link
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/writer_test.go src/quack/given_test.go src/modules/clock src/modules/env src/modules/files
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The store's commit now refuses a name whose active owner the writer does not hold, the way the drop already did. So only a name's writer writes it.
+The given form leaves the core. q.OutIn registers an out-port a module's start commits, and the provider kind reads out.
+The clock, env, watch and manager register through OutIn, and so does the fake index for the families it stands in for.
+The fake index gains SeedAs, so a case seeds its own out-port as its own writer. The wave cases take it.
+go test over the root still shows red cases in config, index, q and qtest. Each one fails at HEAD the same way, and another ticket's red list holds its file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change stays inside the draft's size list, the sweep over the given form's callers, and the three refusal cases the commit door asks.
+The store stands in memory, and the fake index holds every case this change adds.
+A comment on OutIn, on the store's refusal and on SeedAs names the approach, each with a link to this ticket.
+The refusal's wording stands once, in the store's commit.
 
 # accept
 
