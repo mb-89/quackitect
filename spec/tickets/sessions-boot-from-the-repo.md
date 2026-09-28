@@ -685,3 +685,5 @@ the boot hook section in the level zero note owns the setup lines and the probes
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The change stands landed at `implement/change`, and the check runs green over it. The boot hook section it writes into the level zero note marks the draft stale, and the route walks back to `design/tests-red`. That step expects a failing assertion, and the boot cases pass now, so no run passes it. The ticket waits on [[spec/tickets/a-rewind-spares-landed-tests]], which owns the fix.
