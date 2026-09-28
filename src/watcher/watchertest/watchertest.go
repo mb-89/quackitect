@@ -17,6 +17,9 @@ import (
 // The time a stop takes before the test reads it as hung. [[spec/tickets/a-watch-stops-mid-add]]
 const Hung = 10 * time.Second
 
+// How deep the folders go under the root before Appearing starts again at the root. [[spec/tickets/a-watch-stops-mid-add]]
+const depth = 10
+
 // Makes folders under root, each under the one before, until quit closes. [[spec/tickets/a-watch-stops-mid-add]]
 func Appearing(root string, quit <-chan struct{}) {
 	go func() {
@@ -27,8 +30,8 @@ func Appearing(root string, quit <-chan struct{}) {
 				return
 			default:
 			}
-			at = filepath.Join(at, fmt.Sprint(n%10))
-			if os.MkdirAll(at, 0o755) != nil || n%10 == 9 {
+			at = filepath.Join(at, fmt.Sprint(n%depth))
+			if os.MkdirAll(at, 0o755) != nil || n%depth == depth-1 {
 				at = root
 			}
 		}

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-watches-close-cleanly
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 004db41549785bb0
         size: 604
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d81e857fa7fb · claude-code-remote
+    hash_before: 16175736115b50141679bed17496b6a50ea0ab89
+    hash_after: 16175736115b50141679bed17496b6a50ea0ab89
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -290,14 +299,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/watcher/watcher.go src/watcher/watcher_test.go src/watcher/watchertest/watchertest.go src/watcher/watchertest/watchertest_test.go src/index/watch.go src/index/door.go src/index/watch_test.go src/modules/files/watch.go src/modules/files/watch_stop_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and src/watcher/watchertest beside them for the shared test helpers
+the door the change reaches, fsnotify, has its fake in src/watcher/watcher_test.go
+each changed function carries a comment pointing at the ticket whose approach it implements
+the loop stands once, in src/watcher, and both watches call it
 
 ## tests-green
 
