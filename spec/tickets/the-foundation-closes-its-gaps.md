@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: children-2
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -23,6 +24,9 @@ steps:
         form: list
         says: every child as a link, one a line, with its process
   - name: children
+    by: children
+    on_fail: split
+  - name: children-2
     by: children
     on_fail: split
   - name: accept
@@ -80,12 +84,8 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: accept
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-enabled_by: migration.phase1gaps
-depends_on: [the-foundation-lands-unchanged]
-cloud: true
 record:
   - step: sync
     hand: box d7dcc17af0d5 · claude-code-remote
@@ -139,6 +139,19 @@ record:
     hand: the engine
     hash_before: 692cc7bc2d2a4115afa4dd7e9390b66fdf4265e6
     hash_after: 692cc7bc2d2a4115afa4dd7e9390b66fdf4265e6
+  - step: accept
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 98dabab15c869e9bc078a07709103d9d72403b31
+    hash_after: 3d1f7da6b591bf335c636f04f3857820cba70097
+    returns: 1
+    why: "windows-check-finds-the-quack-exe: the Windows check fails on `TestTheIndexLoadsTheManagerWithNoOtherModule`, since `src/quack/manager_test.go` builds `quack` with no `.exe`; v1-start-failure-stops-the-parts: `Serve` in `src/index/door.go` returns on a failed `servesV1` and leaves the beats, the IO modules and the scheduler running; the-contract-drives-the-door: the real side of the q suite runs through `qtest.Over`, so no case meets the door's own scheduler"
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-foundation-closes-its-gaps already carries every commit on main.
+depends_on: ["the-foundation-lands-unchanged"]
+enabled_by: migration.phase1gaps
+cloud: true
 ---
 
 # Ask
@@ -225,6 +238,8 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 
 # children
 
+# children-2
+
 # accept
 
 <!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
@@ -232,8 +247,12 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- windows-check-finds-the-quack-exe: the Windows check fails on `TestTheIndexLoadsTheManagerWithNoOtherModule`, since `src/quack/manager_test.go` builds `quack` with no `.exe`
+- v1-start-failure-stops-the-parts: `Serve` in `src/index/door.go` returns on a failed `servesV1` and leaves the beats, the IO modules and the scheduler running
+- the-contract-drives-the-door: the real side of the q suite runs through `qtest.Over`, so no case meets the door's own scheduler
 
 # retro
 
