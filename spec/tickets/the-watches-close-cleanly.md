@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d81eeae76310c · claude-code-remote
@@ -134,6 +134,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: 98719cbffb6a18e06c8261846cea5696f518c9b6
+    hash_after: 98719cbffb6a18e06c8261846cea5696f518c9b6
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -208,38 +220,61 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+[[spec/tickets/a-watch-stops-mid-add]]: both Go watches stand on src/watcher, whose stop returns while the loop adds a folder
+src/watcher/watchertest: the stop helpers the three stop tests share, and Appearing waits on its last folder
+the parked note pull-named-todo-meets-queue, decided and dropped into the improve list below
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the fsnotify source in the module cache confirmed the cause before any code, so the design took one draft
+a fake with the Windows timing turned a Windows-only hang into a red test on every platform
+the gate helper named four conditions the implementation then held, and the race run stayed green
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+22:49 every shell call came back refused until the plan named a todo, since no ticket stood yet on a fresh box
+22:53 branch open refused a dirty tree, and it pushes main through marksTrunk, which the dispatch prompt forbids, so the box branched by hand on the dispatcher's road
+23:05 the gate helper looped on the pull: the plan's working field named the ticket, and the pull read it as a todo in hand
+23:10 the container restarted mid-gate, and the helper's report came back only through its output file
+23:16 the check went red on ExtensionsOnOffer: the language server stood built from main before the fast-forward
+23:19 the push door named another box: the take wrote box.json, the restart removed it, and identity.json carried another id
+the only owner prompt stood at the session start: the dispatch task naming the hang, its run and its cause
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+src/scripts/pull.js: let a named pull of the working todo past the queue gate, so a helper pulls while the plan names the ticket
+src/scripts/work.js openGroup: a cloud box opens a group branch without the trunk push, as dispatch-write.js opens does
+src/scripts/pull-hand-of.js boxIdHere: read one id for the box, so the take and the push door name the same hand after a restart
+the install step: rebuild se-lsp when its source moves past the binary, so a fast-forward leaves no stale rule behind
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The cause stood verified in the prompt, so the risk sat in the design: a plain lock across Add deadlocks where the reader blocks on the unbuffered Events send. Draining into an unbounded queue answers both traps at once. The route asked for a red test, and a random race gives a flaky one, so the fake took the reader's choices from backend_windows.go and made the hang certain in a few rounds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the loop stands once in src/watcher, and both watches call it
+the numbers the change adds carry names: Hung and depth in watchertest
+the headers of watcher.go and watchertest.go say what each file is for
+the badly list carries the run's errors with their times, and the one owner prompt
+the chapter names roles alone, and no path or address of the box
 
 ## cloud
 
