@@ -24,9 +24,9 @@ import (
 	"quackitect/src/q"
 )
 
-// The folder quack dump writes to, which no projection covers, and the argument count of the verb. [[spec/design_output/model#everything-on-disk-mirrors]]
+// The folder quack dump writes to, a dot folder the watch stands off, so neither files/ nor a projection reads a dump back, and the argument count of the verb. [[spec/design_output/model#everything-on-disk-mirrors]]
 const (
-	dumpFolder = ".se/dump/"
+	dumpFolder = ".se/.dump/"
 	dumpArgs   = 3
 )
 
