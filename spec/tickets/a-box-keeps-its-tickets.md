@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: boxes-keep-their-own-tickets
 step: do
+record:
+  - step: do
+    hand: box d81cb7b9efd7 · claude-code-remote
+    hash_before: 821af3d821df70e46162463fd5cfedfe4bfce57b
+    hash_after: 1697ac70e45a2c786a7f32177f170cbb7ddd0781
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 65 test(s) pass in 6 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-notes-say-boxes-decide.md:34:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: b7ce13081a1737c1
+        size: 923
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,34 @@ Without it `branch done` files every open child loose on main, and a box hands i
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-done.test.js test/level0/work-fix.test.js test/level0/unblock.test.js test/level0/ticket-fill.test.js test/level0/cloud-ask.test.js test/contract/process.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A group reaches done once every ticket a box can close stands closed. `leftRefuses` in `src/scripts/work-fix.js` makes `branch done` refuse while a child, or a ticket the branch adds with no group, stands open off the person route. It names the pull of each. The new route `spec/processes/person` carries work a person alone can do, and `filesUp` hands it loose on main, past any parent. The mint on a `work/` branch names the branch's group through `joinsGroup`, so a box's own question, finding or fix stays in its group. `branch unblock` takes a successor on the person route alone, and the cloud ask door names that route.
+
+What I weighed: the owner's words name the person route's cases, a trial on the owner's machine, a secret, a setting. A route of its own marks them where the frontmatter already names a route, so no new field is needed. A child group still files into its parent, because it is no agent ticket. `GroupAsksNobody` stands as it is, because a person-route ticket minted on a branch names no group.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, or the discussion says why it departs: the tests stand in `work-done`, `work-fix`, `unblock` and `ticket-fill`, not the file names the ask guessed
+- the cleanup the change reveals is in the change: the cloud ask door and the question route's header name the person route
+- every fact the change adds stands in one place: [[spec/design_output/work#a-box-leaves]] owns the rule, and the code points at it
 
 # Discussion
 
