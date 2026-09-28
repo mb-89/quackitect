@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: split
+step: children
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase1gaps
@@ -123,6 +123,18 @@ record:
         exit: 0
         said: work/the-foundation-closes-its-gaps already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 5f4e2162f2d682c4881893b0f0de0556ec0e045b
+    hash_after: 5f4e2162f2d682c4881893b0f0de0556ec0e045b
+    inputs:
+      - name: ask
+        hash: 5e9ae3babf8a6830
+        size: 359
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -149,14 +161,63 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/a-drop-refuses-another-writer]], trivial
+- [[spec/tickets/action-outputs-carry-field-tags]], trivial
+- [[spec/tickets/actions-answer-typed-results]], standard
+- [[spec/tickets/analyzers-read-the-io-flag]], standard
+- [[spec/tickets/approach-names-opens]], trivial
+- [[spec/tickets/check-runs-off-the-loop]], trivial
+- [[spec/tickets/commits-name-their-writer]], standard
+- [[spec/tickets/config-spells-the-env-name]], trivial
+- [[spec/tickets/deliver-checks-the-declared-type]], trivial
+- [[spec/tickets/door-and-lease-commit-callers]], trivial
+- [[spec/tickets/draft-names-the-qtest-store]], trivial
+- [[spec/tickets/draft-test-list-drifts]], trivial
+- [[spec/tickets/env-layer-reads-its-variables]], trivial
+- [[spec/tickets/every-call-takes-a-record]], standard
+- [[spec/tickets/files-seed-one-type]], trivial
+- [[spec/tickets/go-checks-need-go]], standard
+- [[spec/tickets/golden-carries-the-given-ask]], trivial
+- [[spec/tickets/index-lease-names-a-provider]], trivial
+- [[spec/tickets/index-writes-past-health]], trivial
+- [[spec/tickets/io-modules-own-their-names]], standard
+- [[spec/tickets/looks-reads-a-field-label]], trivial
+- [[spec/tickets/manager-waits-on-tickets-module]], trivial
+- [[spec/tickets/one-wave-settles-a-change]], standard
+- [[spec/tickets/ops-keeps-one-state]], standard
+- [[spec/tickets/ports-declare-their-looks]], standard
+- [[spec/tickets/projections-read-the-mirror]], standard
+- [[spec/tickets/qtest-hands-a-store]], trivial
+- [[spec/tickets/qtest-holds-a-module]], standard
+- [[spec/tickets/qtest-shares-a-red-package]], trivial
+- [[spec/tickets/reads-resolve-in-two-passes]], standard
+- [[spec/tickets/stale-names-keep-their-value]], standard
+- [[spec/tickets/surfaces-read-the-output-fields]], trivial
+- [[spec/tickets/the-catalog-reads-as-rows]], standard
+- [[spec/tickets/the-check-refuses-undescribed-modules]], trivial
+- [[spec/tickets/the-config-module-resolves-layers]], standard
+- [[spec/tickets/the-index-meets-fake-modules]], standard
+- [[spec/tickets/the-manager-becomes-a-module]], standard
+- [[spec/tickets/the-queue-reads-the-marker]], standard
+- [[spec/tickets/the-scheduler-runs-providers]], standard
+- [[spec/tickets/the-watchdog-starts-for-real]], standard
+- [[spec/tickets/the-wiring-file-binds-ports]], standard
+- [[spec/tickets/tick-expiry-takes-a-case]], trivial
+- [[spec/tickets/tickets-becomes-a-module]], standard
+- [[spec/tickets/topic-test-loses-both-halves]], trivial
+- [[spec/tickets/windows-ci-turns-green]], standard
+- [[spec/tickets/zero-beat-refuses-the-start]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child closed through its own route, the standard ones through a gate, so each stood small enough to review whole
+- the children cover the phase's done line: the index answers over modules, the contract suites stand beside each fake, and windows-ci-turns-green holds the Windows check, so no child is minted
+- each child that waited on another names it under depends_on
 
 # children
 
