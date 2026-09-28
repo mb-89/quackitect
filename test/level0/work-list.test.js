@@ -32,7 +32,11 @@ function listed(flag = []) {
         { branch: "work/landed", tip: "bbb", merged: true },
       ],
       {
-        "work/one-group:spec/tickets/one-group.md": GROUP_NOTE,
+        // The marker, and no branch, puts a group on the cloud. [[spec/tickets/the-queue-reads-the-marker]]
+        "work/one-group:spec/tickets/one-group.md": GROUP_NOTE.replace(
+          "state: open\n",
+          "state: open\ncloud: true\n",
+        ),
         "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
         "work/one-group:spec/tickets/a-done-child.md": CHILD("one-group", "closed"),
         "work/landed:spec/tickets/landed.md": GROUP_NOTE,

@@ -7,7 +7,7 @@ import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { recordIn } from "../engine/group.js";
-import { goEnvOf } from "./cli-go.js";
+import { goEnvOf, goTestNames } from "./cli-go.js";
 import { changedFiles, handOf, holdOf } from "./pull.js";
 
 const CUT_ERROR = 160;
@@ -42,10 +42,21 @@ export function testVerb(it, argv, env = {}) {
     );
     said.push(testSays(ran, files));
   }
+  const read = (path) => it.disk.read(it.join(it.root, ...path.split("/")));
   for (const one of modules) {
+    // A named Go test file runs its own cases alone, so a package holding another ticket's red cases answers for this one. [[spec/design_output/pull#the-test-verb]]
+    const own = named.includes(one)
+      ? []
+      : goTestNames(
+          named.filter((path) => dirname(path) === one),
+          read,
+        );
+    const only = own.length
+      ? ["-run", `^(${own.join("|")})$`, `./${one}/`]
+      : [`./${one}/...`];
     said.push(
       goSays(
-        it.proc.run(["go", "test", `./${one}/...`], {
+        it.proc.run(["go", "test", ...only], {
           cwd: it.root,
           env: { ...env, ...goEnvOf(it) },
         }),

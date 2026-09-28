@@ -14,38 +14,89 @@ import (
 
 type provider int
 
+// The mark a q tag carries after its name where the input reads with no writer. [[spec/tickets/the-config-module-resolves-layers]]
+const optionalMark = "optional"
+
 const (
-	given provider = iota
+	out provider = iota
 	derived
 	fold
+	action
 )
 
 type input struct {
-	field string
-	name  string
-	typ   reflect.Type
+	field    string
+	name     string
+	port     string
+	typ      reflect.Type
+	optional bool
+	absolute bool
 }
 
 type registration struct {
 	name     string
+	instance string
+	port     string
 	kind     provider
 	typ      reflect.Type
 	def      any
 	missing  bool
-	alt      string
 	doc      string
+	label    string
+	icon     string
+	looks    Look
+	fields   []Field
+	out      []Field
+	answers  reflect.Type
 	deadline time.Duration
-	op       bool
 	writes   bool
+	io       bool
 	where    string
+	key      bool
+	shared   bool
 	inputs   []input
 	run      func(Snapshot) any
+	keyed    func(snap Snapshot, name string) (any, error)
+	mirror   Mirror
+	globs    []string
+	trip     func(body []byte) ([]byte, error)
 	step     func(state, event any) (any, error)
+	act      func(input any) ([]Request, error)
+}
+
+// The value under files/<path>, one type for every writer and reader of the family: the empty Content stands for a path the tree tracks nowhere. [[spec/tickets/files-seed-one-type]]
+type Content struct {
+	Hash string `json:"hash"`
+	Text string `json:"text"`
+	// The time the file last changed, in nanoseconds, as the index's file table stores it, so a view sorts by it. [[spec/tickets/tickets-becomes-a-module]]
+	Changed int64 `json:"changed,omitempty"`
 }
 
 type Catalog struct {
 	mu   sync.Mutex
 	regs []*registration
+}
+
+// The hand a registration gives its module, which a commit names as its writer. [[spec/tickets/commits-name-their-writer]]
+type Writer struct{ ones []*registration }
+
+// Whether the hand carries the registration. [[spec/tickets/commits-name-their-writer]]
+func (w Writer) holds(one *registration) bool {
+	for _, held := range w.ones {
+		if held == one {
+			return true
+		}
+	}
+	return false
+}
+
+// [[spec/tickets/commits-name-their-writer]]
+func Join(hands ...Writer) Writer {
+	var joined Writer
+	for _, hand := range hands {
+		joined.ones = append(joined.ones, hand.ones...)
+	}
+	return joined
 }
 
 var Main = New()
@@ -55,35 +106,50 @@ func New() *Catalog { return &Catalog{} }
 type Option func(*registration)
 
 func Doc(text string) Option             { return func(one *registration) { one.doc = text } }
-func Alt(name string) Option             { return func(one *registration) { one.alt = name } }
 func Deadline(span time.Duration) Option { return func(one *registration) { one.deadline = span } }
 
-// An action declares its writes; the Op option stands until every call takes a record and a wait. [[spec/design_output/model#a-caller-sets-its-wait]]
-func Op() Option     { return func(one *registration) { one.op = true } }
+// An action declares its writes, and every call of it takes a record and a wait. [[spec/design_output/model#a-caller-sets-its-wait]]
 func Writes() Option { return func(one *registration) { one.writes = true } }
 
-func Given[T any](name string, def T, opts ...Option) {
-	Main.add(givenOf(name, def), callerAt(2), opts)
+// Marks the registration of an IO module, whose package reaches the outside. [[spec/design_output/model#io-modules-are-modules]]
+func IO() Option { return func(one *registration) { one.io = true } }
+
+// An out-port a module's start commits, with its built-in value, so what comes in has a writer module like any output. [[spec/tickets/commits-name-their-writer]]
+func OutIn[T any](c *Catalog, name string, def T, opts ...Option) Writer {
+	return c.add(outOf(name, def), callerAt(2), opts)
 }
 
-func GivenIn[T any](c *Catalog, name string, def T, opts ...Option) {
-	c.add(givenOf(name, def), callerAt(2), opts)
+func Derived[In, Out any](name string, def Out, fn func(In) Out, opts ...Option) Writer {
+	return Main.add(derivedOf(name, def, fn), callerAt(2), opts)
 }
 
-func Derived[In, Out any](name string, def Out, fn func(In) Out, opts ...Option) {
-	Main.add(derivedOf(name, def, fn), callerAt(2), opts)
+func DerivedIn[In, Out any](c *Catalog, name string, def Out, fn func(In) Out, opts ...Option) Writer {
+	return c.add(derivedOf(name, def, fn), callerAt(2), opts)
 }
 
-func DerivedIn[In, Out any](c *Catalog, name string, def Out, fn func(In) Out, opts ...Option) {
-	c.add(derivedOf(name, def, fn), callerAt(2), opts)
+func Fold[S, E any](name string, def S, step func(S, E) S, opts ...Option) Writer {
+	return Main.add(foldOf(name, def, step), callerAt(2), opts)
 }
 
-func Fold[S, E any](name string, def S, step func(S, E) S, opts ...Option) {
-	Main.add(foldOf(name, def, step), callerAt(2), opts)
+func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ...Option) Writer {
+	return c.add(foldOf(name, def, step), callerAt(2), opts)
 }
 
-func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ...Option) {
-	c.add(foldOf(name, def, step), callerAt(2), opts)
+// A fold whose step refuses an event, so the land answers the error and keeps the state. [[spec/tickets/the-config-module-resolves-layers]]
+func GuardIn[S, E any](c *Catalog, name string, def S, step func(S, E) (S, error), opts ...Option) Writer {
+	return c.add(guardOf(name, def, step), callerAt(2), opts)
+}
+
+// Marks a config key the whole project shares, which reads the default file alone. [[spec/design_output/model#a-keys-layers]]
+func Shared() Option { return func(one *registration) { one.shared = true } }
+
+// Marks every input of the registration optional, so each passes the check with no writer and reads its zero value. [[spec/tickets/the-config-module-resolves-layers]]
+func Optional() Option {
+	return func(one *registration) {
+		for i := range one.inputs {
+			one.inputs[i].optional = true
+		}
+	}
 }
 
 func callerAt(skip int) string {
@@ -94,7 +160,7 @@ func callerAt(skip int) string {
 	return fmt.Sprintf("%s:%d", file, line)
 }
 
-func (c *Catalog) add(one *registration, where string, opts []Option) {
+func (c *Catalog) add(one *registration, where string, opts []Option) Writer {
 	one.where = where
 	for _, opt := range opts {
 		opt(one)
@@ -102,6 +168,23 @@ func (c *Catalog) add(one *registration, where string, opts []Option) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.regs = append(c.regs, one)
+	return Writer{[]*registration{one}}
+}
+
+// A registration the wiring loads reads as `<instance>.<port>`, and any other as its name. [[spec/design_output/model#the-index-resolves-in-passes]]
+func (one *registration) portName() string {
+	if one.instance == "" {
+		return one.name
+	}
+	return one.instance + "." + one.port
+}
+
+// Takes every registration of another catalog, such as the one the wiring loads. [[spec/design_output/model#the-wiring-file]]
+func (c *Catalog) Take(other *Catalog) {
+	regs := other.all()
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.regs = append(c.regs, regs...)
 }
 
 func (c *Catalog) all() []*registration {
@@ -124,11 +207,11 @@ func missing(value any) bool {
 	return false
 }
 
-func givenOf[T any](name string, def T) *registration {
-	return &registration{name: name, kind: given, typ: typeOf[T](), def: def, missing: missing(def)}
+func outOf[T any](name string, def T) *registration {
+	return &registration{name: name, kind: out, typ: typeOf[T](), def: def, missing: missing(def)}
 }
 
-// Each field tagged q:"<name>" reads that name off the snapshot. [[spec/design_output/model#snapshots-and-revisions]]
+// Each field tagged q:"<name>" reads that name off the snapshot, and q:"<name>,optional" reads it where nobody writes it. The run reads the registration's inputs, so the name the wiring binds reaches it. [[spec/tickets/the-wiring-file-binds-ports]]
 func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration {
 	inType := typeOf[In]()
 	var inputs []input
@@ -136,24 +219,39 @@ func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration
 		for i := range inType.NumField() {
 			field := inType.Field(i)
 			if read, ok := field.Tag.Lookup("q"); ok {
-				inputs = append(inputs, input{field: field.Name, name: read, typ: field.Type})
+				name, mark, _ := strings.Cut(read, ",")
+				inputs = append(inputs, input{field: field.Name, name: name, typ: field.Type, optional: mark == optionalMark})
 			}
 		}
 	}
-	run := func(snap Snapshot) any {
+	one := &registration{name: name, kind: derived, typ: typeOf[Out](), def: def, missing: missing(def), inputs: inputs}
+	one.run = func(snap Snapshot) any {
 		filled := reflect.New(inType).Elem()
-		for _, one := range inputs {
-			value := reflect.ValueOf(snap.Read(one.name))
-			if value.IsValid() && value.Type().AssignableTo(one.typ) {
-				filled.FieldByName(one.field).Set(value)
+		for _, in := range one.inputs {
+			value := reflect.ValueOf(snap.Read(in.name))
+			if in.family() {
+				value = snap.family(in.name, in.typ)
+			}
+			if value.IsValid() && value.Type().AssignableTo(in.typ) {
+				filled.FieldByName(in.field).Set(value)
 			}
 		}
 		return fn(filled.Interface().(In))
 	}
-	return &registration{name: name, kind: derived, typ: typeOf[Out](), def: def, missing: missing(def), inputs: inputs, run: run}
+	return one
+}
+
+// An input of a map by path over a family, such as map[string]Content over files/<path...>, reads every value the family holds. [[spec/tickets/tickets-becomes-a-module]]
+func (in input) family() bool {
+	return in.typ.Kind() == reflect.Map && in.typ.Key().Kind() == reflect.String && keyed(in.name)
 }
 
 func foldOf[S, E any](name string, def S, step func(S, E) S) *registration {
+	return guardOf(name, def, func(state S, event E) (S, error) { return step(state, event), nil })
+}
+
+// A fold whose step answers an error, which the land hands back with the state kept. [[spec/tickets/the-config-module-resolves-layers]]
+func guardOf[S, E any](name string, def S, step func(S, E) (S, error)) *registration {
 	apply := func(state, event any) (any, error) {
 		now, ok := state.(S)
 		if !ok {
@@ -163,7 +261,7 @@ func foldOf[S, E any](name string, def S, step func(S, E) S) *registration {
 		if !ok {
 			return nil, fmt.Errorf("%s takes a %s, not a %T", name, typeOf[E](), event)
 		}
-		return step(now, one), nil
+		return step(now, one)
 	}
 	return &registration{name: name, kind: fold, typ: typeOf[S](), def: def, missing: missing(def), step: apply}
 }

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,11 +114,78 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-scheduler-runs-providers]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 09dec5e6bc344458da4622fba6c1423c34bcc14f
+    hash_after: 09dec5e6bc344458da4622fba6c1423c34bcc14f
+    inputs:
+      - name: ask
+        hash: 0166fa6e285204cc
+        size: 416
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 07f3abdbdfd4607a3c74c570cc32c057f6d7c7e5
+    hash_after: 07f3abdbdfd4607a3c74c570cc32c057f6d7c7e5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 7937c3edef8d23d5
+        size: 2033
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-3
+    hash_before: 2835c3b6f5c0e5e5952cb5f31ae83f0844426929
+    hash_after: 2835c3b6f5c0e5e5952cb5f31ae83f0844426929
+    inputs:
+      - name: design/draft
+        hash: 7937c3edef8d23d5
+        size: 2033
+      - name: design/tests-red
+        hash: 4494a4079413700d
+        size: 620
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0488d68da8a4a19b9489194bb27f5b7a51ee1cc7
+    hash_after: 0488d68da8a4a19b9489194bb27f5b7a51ee1cc7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: b4c5e8b13c9e959fc2eec8cd47ef443d8cb0b14d
+    hash_after: b4c5e8b13c9e959fc2eec8cd47ef443d8cb0b14d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/watchdog passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: 4494a4079413700d
+        size: 620
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -151,38 +218,66 @@ A watchdog nothing starts watches nothing, so a hung part looks healthy.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Serve builds the watchdog over its store, with the writer watchdog.Registers hands back, and the index takes a lease under the part index.
+The beat comes off the work loop. A ticker at watchdog.beat pushes a tick into the dirty queue, and each step of sweeps beats the lease before it settles.
+So an idle loop beats through the same queue as its work, and a hung loop beats nothing while the ticker runs, per the lease chapter of the model.
+Each step then runs Dog.Check, which marks an expired lease stale, and Book.Expire, which fails an operation past its deadline.
+Assumption: the ask's start of ops reads as that deadline watch, since Serve opens the book and sweeps it already.
+The ticker stops with the stop func Serve answers.
+Serve wraps a new serves, which answers the door too, so a case reads the lease through a new Dog.Lease.
+Two config keys join the watchdog block: watchdog.beat for the tick and watchdog.lease for the term, in seconds.
+Fault answers a nil error with an empty error text in place of a panic.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/door.go: Serve, which builds the dog and starts the ticker
+src/index/door.go: sweeps, which beats, checks and expires on each step
+src/watchdog/lease.go: Fault, which takes a nil error
+src/watchdog/lease.go: Lease, which a case reads
+src/ops/ops.go: Expire, which the loop calls
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/index/door_test.go: TestTheIndexLeaseRenewsOffItsWorkLoop
+src/watchdog/lease_test.go: TestAFaultWithNoErrorRaisesNoPanic
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/index/door.go
+src/index/door_test.go
+src/watchdog/lease.go
+src/watchdog/lease_test.go
+spec/config/level0.json
+spec/config/level0.schema.json
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened Serve, sweeps, guards, opensBook, the Dog and Book.Expire, and checked each claim there
+I grepped Hold, Beat, Check and Expire across src, and none has a caller past its tests, so the callers list names the new ones
+each done_when line names its case, or the command go test or the check
 
 ## tests-red
 
@@ -191,26 +286,32 @@ A watchdog nothing starts watches nothing, so a hung part looks healthy.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/door_test.go src/watchdog/lease_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/index/door_test.go
+src/watchdog/lease_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The nil fault panics on err.Error in the alarm branch, and the recover turns it into the case's own failure. The lease case stops on the door with no dog. The surprise: serves already names the main verb, so the door that answers itself is opens.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a red case, or the command go test or the check
+the lease case reads a real door over a temp tree, and the fault case runs over the store in memory, so no door stands unfaked
 
 # gate
 
@@ -219,8 +320,13 @@ A watchdog nothing starts watches nothing, so a hung part looks healthy.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- check-runs-off-the-loop: the approach runs Dog.Check inside sweeps, the loop it watches, so a hung loop never marks its own lease expired; run Check on the ticker goroutine or in guards, and keep Beat as a step of sweeps
+- index-lease-names-a-provider: the part index names no catalog provider, so Store.Stale errors and Dog.Check drops the expired index lease silently; register a name for the part, or have Check answer an expired part with no provider
+- zero-beat-refuses-the-start: config.Count answers 0 for a missing watchdog.beat, and time.NewTicker panics on 0; refuse the start or take a default where the beat stands at 0
+- approach-names-opens: the approach says Serve wraps a new serves, and the tree names it opens, as tests-red saw; the callers list names Book.Expire, a callee the change leaves alone
 
 # implement
 
@@ -231,14 +337,19 @@ A watchdog nothing starts watches nothing, so a hung part looks healthy.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index/door.go src/index/beats.go src/index/beats_test.go src/watchdog/lease.go src/watchdog/lease_test.go spec/config/level0.json spec/config/level0.schema.json
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and src/index/beats.go with its test, which hold the lease pieces so door.go stays under the file ceiling
+the lease case reads a real door over a temp tree, and the fault case runs over the store in memory
+beats.go points at the lease chapter of the model over each piece it adds
+the built-in spans stand in beats.go, and the tree values in spec/config/level0.json
 
 ## tests-green
 
@@ -247,26 +358,33 @@ A watchdog nothing starts watches nothing, so a hung part looks healthy.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/door_test.go src/watchdog/lease_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index builds its watchdog at the open and holds a lease under the part index. A ticker at watchdog.beat asks the work loop for a step, and each step of sweeps beats the lease. The ticker checks the leases itself, off the loop, so a hung loop lets its lease expire. A beat or lease the tree sets at zero takes a built-in span, since a ticker takes no zero. Fault with no error raises its alarm with an empty text. The gate points check-runs-off-the-loop and zero-beat-refuses-the-start ride this change, and index-lease-names-a-provider stays open.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and beats.go beside door.go
+the lease case reads a real door over a temp tree, and the fault case reads the store in memory
+beats.go points at the lease chapter of the model
+the built-in spans stand in beats.go alone
 
 # accept
 

@@ -1,7 +1,7 @@
 // The questions the index answers. Each one stands in place of a walk, and
 // the door hands them to a verb and to the write door alike.
 // [[spec/design_output/index#the-questions-it-answers]]
-package main
+package index
 
 import (
 	"database/sql"

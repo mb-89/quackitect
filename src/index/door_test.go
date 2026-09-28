@@ -1,16 +1,21 @@
 // The door, driven over loopback. A case puts one up on a tree it wrote, asks
 // it the questions a verb asks, and reads the answers back as JSON.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package main
+package index
 
 import (
 	"path/filepath"
 	"strconv"
+	"sync/atomic"
 	"testing"
 	"time"
 
+	"quackitect/src/config"
 	"quackitect/src/q"
 )
+
+// The polls a case waits through for a value the scheduler commits. [[spec/tickets/the-scheduler-runs-providers]]
+const topicPolls = 100
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	root := tree(t)
@@ -198,7 +203,7 @@ func tickOf(t *testing.T, said answer) int64 {
 func TestTheDoorAnswersWhy(t *testing.T) {
 	root := tree(t)
 	catalog := q.New()
-	q.GivenIn(catalog, "t/n", 0)
+	q.OutIn(catalog, "t/n", 0)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
 	if err != nil {
 		t.Fatal(err)
@@ -246,5 +251,86 @@ func TestTheDoorAnswersTheHashesOfThePathsAsked(t *testing.T) {
 	one, found := rows["src/plain.js"].(map[string]any)
 	if !ok || !found || one["hash"] != "8f93e4f24776ff1d" || one["head"] != "e0ce802675de49b5" {
 		t.Fatalf("hashes answered %#v", said.Result)
+	}
+}
+
+// Serve builds the scheduler over its store, so a move an IO module commits runs the provider reading it. [[spec/tickets/the-scheduler-runs-providers]]
+func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
+	type countOf struct {
+		N int `q:"t/n"`
+	}
+	root := tree(t)
+	catalog := q.New()
+	hand := q.OutIn(catalog, "t/n", 0)
+	q.DerivedIn(catalog, "t/double", 0, func(in countOf) int { return in.N * 2 })
+	moves := func(_ string, commit Commit) (func(), error) {
+		return func() {}, commit(hand, map[string]any{"t/n": 3})
+	}
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog, moves)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var said answer
+	for range topicPolls {
+		said, err = posts(standing, []string{"call", "read", `{"name":"t/double"}`})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if said.Result == float64(6) {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	t.Fatalf("t/double reads %#v after t/n moves to 3", said.Result)
+}
+
+// The manager's step runs on the work loop, and the loop's idle tick runs it, so the lease it renews stands off the loop. [[spec/design_output/model#a-lease]]
+func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
+	root := tree(t)
+	write(t, root, config.Tracked, `{"watchdog":{"beat":1,"lease":5}}`)
+	var stepped atomic.Int64
+	manage := func(_ string, _ *q.Store, _ OpRows, steps func(func())) (func(), error) {
+		steps(func() { stepped.Add(1) })
+		return func() {}, nil
+	}
+	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	for range topicPolls {
+		if stepped.Load() > 0 {
+			return
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+	t.Fatal("the work loop runs no step the manager hands it")
+}
+
+// The door answers the dump text, and the root writes it. [[spec/design_output/model#everything-on-disk-mirrors]]
+func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
+	root := tree(t)
+	catalog := q.New()
+	q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, err := posts(standing, []string{"dump", "t/"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if text, _ := said.Result.(string); text != "{\n  \"t/n\": 4\n}\n" {
+		t.Fatalf("the dump of t/ answers %#v, %q", said.Result, said.Error)
 	}
 }
