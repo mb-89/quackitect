@@ -18,6 +18,10 @@ func TestTheFakeHandsAnIOModuleItsStore(t *testing.T) {
 	if ix.Store() == nil {
 		t.Fatal("the fake hands an IO module no store")
 	}
+	ix.Seed(map[string]any{"clock/minute": int64(3)})
+	if got := ix.Store().Snapshot().Read("clock/minute"); got != int64(3) {
+		t.Fatalf("the store the fake hands reads clock/minute %v", got)
+	}
 }
 
 type linesOf struct {

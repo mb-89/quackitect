@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -207,6 +207,15 @@ record:
         hash: 19d6902ff3d8808d
         size: 803
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 973951a38283d27acfe4343a92f5bb28e4be2cee
+    hash_after: 973951a38283d27acfe4343a92f5bb28e4be2cee
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -418,17 +427,17 @@ accept with points
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-./RUNME.sh lint src/index src/modules/index src/quack/main.go src/quack/manager_test.go
+./RUNME.sh lint src/q/qtest/qtest.go src/q/qtest/qtest_test.go src/modules/index
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the change touches the files the draft names, and the rename verb rewrote the old src/ops and src/watchdog paths in three ticket files, as it rewrites every reach of a moved name
-the manager cases run over q.NewStore with an op table in memory and a work loop stepped by hand, and the root cases run the built binary and an op table in memory
-each file under src/modules/index points at the index manager chapter of the model
-spanOf stands in src/index/beats.go and src/modules/index/manager.go, since neither package may import the other, and the retro weighs a shared home
+the change touches src/q/qtest, which the second gate names for the qtest line of the ask
+the manager case runs over the fake index, the fake every module tests over
+qtest.go points at this ticket over Store
+Store answers the one store the fake holds, and no second copy stands
 
 ## tests-green
 
