@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -373,6 +373,21 @@ record:
   - step: design/draft-2
     hand: the engine
     stale: [[spec/design_output/level0]]
+  - step: design/draft
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: c62f13fc79044197ac4282186a7087f79400f579
+    hash_after: c62f13fc79044197ac4282186a7087f79400f579
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 3411ceaf98287365
+        size: 89123
+    def: 7883b3d10633c780
 group: the-cloud-works-its-queue
 ---
 
@@ -438,7 +453,7 @@ The approach takes this as unmeasured: the client reads the plugins before any S
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-the first session: the setup keeps its install line, and the note names the probe that retires it,the trust claim: the approach drops it, and the setup keeps the trust flag and the mode,the stamp and HEAD: no stamp stands, the manifest and the modules decide, and the stub `stampOf` goes,a tool gone under a matching stamp: a case holds the modules gone,the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`,the restale off main: the level zero note gains the branch sync free-verb line alone, which the boot leaves untouched
+the first session: the setup keeps its install line, and the note names the probe that retires it,the trust claim: the approach drops it, and the setup keeps the trust flag and the mode,the stamp and HEAD: no stamp stands, the manifest and the modules decide, and the stub `stampOf` goes,a tool gone under a matching stamp: a case holds the modules gone,the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`,the restale after implement: the boot hook section the change writes into the level zero note stales this draft, and the approach stands as it read
 
 ### size
 
