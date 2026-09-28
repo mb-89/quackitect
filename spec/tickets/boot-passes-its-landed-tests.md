@@ -51,6 +51,12 @@ record:
         hash: a63fe78443cd598c
         size: 20553
     def: 2280015d497a3abd
+  - step: do
+    hand: box 1327ac97a972 · claude-code-remote
+    hash_before: 98e8a74414deead060152b6cfd22042ee8ee24da
+    hash_after: cf959123b46ee7e1cc26e2ca3b4496134bd8c0ac
+    returns: 1
+    why: "the hand-back met refused 5 times: tests under do expects green, and ./RUNME.sh lint spec/tickets/boot-passes-its-landed-tests.md spec/tickets/the-cloud-works-its-queue.md answers spec/tickets/boot-passes-its-landed-tests.md:83:36: Passive: Write in the active voice and name who acts: 'is needed'."
 ---
 
 # Ask
