@@ -150,6 +150,16 @@ func TestASharedKeyReadsTheDefaultFileAlone(t *testing.T) {
 }
 
 // [[spec/design_output/model#a-keys-layers]]
+func TestAnEnvValueBeatsTheLocalFile(t *testing.T) {
+	ix := layered(t, "queue", weighed)
+	ix.Seed(files(`{"queue": {"weight": 3}}`, `{"queue": {"weight": 5}}`))
+	ix.Seed(map[string]any{"env/" + EnvOf("queue.weight"): "8"})
+	if got := settles(t, ix, "queue/config/weight"); got != 8 {
+		t.Fatalf("queue/config/weight reads %v, not the value %s carries", got, EnvOf("queue.weight"))
+	}
+}
+
+// [[spec/design_output/model#a-keys-layers]]
 func TestAnOverrideWinsOverAContext(t *testing.T) {
 	ix := layered(t, "queue", weighed)
 	ix.Seed(files(`{}`, `{}`))

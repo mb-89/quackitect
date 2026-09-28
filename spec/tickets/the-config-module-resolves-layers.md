@@ -448,3 +448,8 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- `env-layer-reads-its-variables` folds into this change. The environment layer sits inside `config/values`, so it lands with step Twelve, not after it.
+- The draft's last assumption no longer holds: `input.family` in `src/q/q.go` reads `env/<name>` as one map today.
+- `TestAnEnvValueBeatsTheLocalFile` in `src/modules/config/config_test.go` joins the red cases, and step Seventeen turns it green.
+- Step Seventeen names the variable through `EnvOf` in `src/modules/config/config.go`, which `config-spells-the-env-name` adds.
