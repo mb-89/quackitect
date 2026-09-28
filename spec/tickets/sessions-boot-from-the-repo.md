@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -398,6 +398,19 @@ record:
       - name: tests
         exit: 0
         said: green, 10 test(s) pass in 1 file(s)
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 681e1b82306c01034867f4fdeefd20915a973f93
+    hash_after: 681e1b82306c01034867f4fdeefd20915a973f93
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 2b44825ca53911ae
+        size: 3293
+    def: 08e16d07b0de477c
 group: the-cloud-works-its-queue
 ---
 
@@ -490,7 +503,7 @@ each `done_when` line meets a case or the note, and the check decides the last
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh test test/level0/hooks.test.js
+sh .se/scripts/boot-red-before-change.sh
 
 ### red
 
@@ -504,15 +517,15 @@ test/level0/hooks.test.js
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Four cases fail on their own assertion against the stub boot, and the settings file carries no SessionStart hook yet. The case where everything stands and the case off a cloud box pass on the stub, as negative cases do. The run after the merge of main reads the same four.
+The change landed at 370af06b9 before a note section staled the draft, so the boot cases answer green on the tip, and the test verb with the sources set aside answers green too. The script runs those cases against 370af06b9^, and five of them fail on their own assertion there: the SessionStart hook, the install without a manifest, the install without the modules, the install SE_CLOUD marks, and the exit 0 where the install fails.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every done_when line on the hook meets a case, the note lines meet the review, and ./RUNME.sh check decides the last
-the boot cases reach the disk and the process through fakeDisk and fakeProc alone
+every done_when line meets a boot case in test/level0/hooks.test.js that fails before the change, or the check line, which the hand answers at tests-green
+the cases reach the disk and the process through the fakes alone, as the earlier tests-red recorded
 
 ## draft-2
 
