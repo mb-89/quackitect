@@ -49,3 +49,13 @@ func TestOverDrivesACatalogWithNoProviderKeys(t *testing.T) {
 		t.Fatalf("t/lines reads %v", got)
 	}
 }
+
+// The seeds differ in length, and the sum counts the last event, so a case reading the wrong input or dropping an event fails. [[spec/design_output/model#the-fake-keeps-a-contract]]
+func TestTheSuiteSeedsTellApart(t *testing.T) {
+	if len(seededWidth) == len(seededText) {
+		t.Fatalf("the width and the text seed the same length, %d", len(seededText))
+	}
+	if eventSum-lastEvent == eventSum {
+		t.Fatal("the sum counts no last event")
+	}
+}

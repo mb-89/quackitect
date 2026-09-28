@@ -9,7 +9,7 @@ import (
 	"quackitect/src/q"
 )
 
-// What a case drives, on the fake and on the real index alike.
+// What a case drives, on the fake and on the real index alike. [[spec/design_output/model#the-fake-keeps-a-contract]]
 type Harness interface {
 	Seed(values map[string]any)
 	Read(name string) any
@@ -19,7 +19,7 @@ type Harness interface {
 	Commits() []map[string]any
 }
 
-// Opens a harness over the catalog a case registers.
+// Opens a harness over the catalog a case registers. [[spec/design_output/model#the-fake-keeps-a-contract]]
 type Opener func(t testing.TB, register func(*q.Catalog)) Harness
 
 type widthOf struct {
@@ -53,26 +53,34 @@ func saves(c *q.Catalog) {
 	})
 }
 
-// Runs every case of the contract against the harness open builds.
+// The values the cases seed and land, and what each reads back. [[spec/design_output/model#the-fake-keeps-a-contract]]
+const (
+	seededWidth = "wide"
+	seededText  = "abc"
+	lastEvent   = 3
+	eventSum    = 1 + 2 + lastEvent
+)
+
+// Runs every case of the contract against the harness open builds. [[spec/design_output/model#the-fake-keeps-a-contract]]
 func Suite(t *testing.T, open Opener) {
 	t.Run("a derived provider reads a seeded config key", func(t *testing.T) {
 		one := open(t, wide)
-		one.Seed(map[string]any{"cfg/width": "wide"})
-		if got := one.Run("t/wide"); got != 4 {
+		one.Seed(map[string]any{"cfg/width": seededWidth})
+		if got := one.Run("t/wide"); got != len(seededWidth) {
 			t.Fatalf("t/wide reads %v", got)
 		}
 	})
 	// [[spec/tickets/files-seed-one-type]]
 	t.Run("a derived provider reads a seeded file", func(t *testing.T) {
 		one := open(t, sized)
-		one.Seed(map[string]any{"files/a.md": q.Content{Hash: "h", Text: "abc"}})
-		if got := one.Run("t/size"); got != 3 {
+		one.Seed(map[string]any{"files/a.md": q.Content{Hash: "h", Text: seededText}})
+		if got := one.Run("t/size"); got != len(seededText) {
 			t.Fatalf("t/size reads %v", got)
 		}
 	})
 	t.Run("a fold reduces the events it lands", func(t *testing.T) {
 		one := open(t, sums)
-		if got := one.Land("t/sum", 1, 2, 3); got != 6 {
+		if got := one.Land("t/sum", 1, 2, lastEvent); got != eventSum {
 			t.Fatalf("t/sum reads %v", got)
 		}
 	})
