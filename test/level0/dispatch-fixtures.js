@@ -125,6 +125,8 @@ export function writing(trunk, { groups = [], standing = [], merged = [] } = {})
 }
 
 export const written = (disk, name) => disk.read(`${WORKTREE}/spec/tickets/${name}.md`);
-export const gitRows = (outside) => ranGit(outside);
+// A row keys its paths with forward slashes, as the fake process does, so a case reads the same on Windows. [[spec/design_output/doors#a-fake-behaves]]
+export const gitRows = (outside) =>
+  ranGit(outside).map((row) => row.replaceAll("\\", "/"));
 export const commits = (outside) =>
   gitRows(outside).filter((row) => /^git -C \S+ commit( |$)/.test(row));
