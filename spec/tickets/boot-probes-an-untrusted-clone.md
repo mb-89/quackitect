@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-cloud-works-its-queue
 parent: sessions-boot-from-the-repo
+record:
+  - step: do
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: bcc5748289f322357a809c4b7d755867ff192d7d
+    hash_after: fd576c9caa2335f5a4a93102c264aae2fddedce7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 40e6f4adecce82b6
+        size: 360
+    def: 96460415736d4305
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ the draft drops the trust claim, and leaves open the question the earlier gate a
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The level zero note already names the probe on a fresh clone with no trust, beside the probe that retires the install line, in its boot hook section. An earlier pass of sessions-boot-from-the-repo wrote it there, so the ask needs no edit, and the boot cases stand as the nearest tests. The check stood red on two list items of the-bridge-outlives-its-starter past the word cap, and each splits in two.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: the probe stands named in the boot hook section, beside the install probe
+the cleanup the check revealed stands in the change: the two long list items split
+the probe stands once, in the boot hook section, and the draft of sessions-boot-from-the-repo points at that section
 
 # Discussion
 
