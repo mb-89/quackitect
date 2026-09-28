@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-owner-stores-the-token, dispatch-writes-the-bundles, the-skills-start-the-workers, groups-land-through-pull-requests]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -138,6 +138,19 @@ record:
         hash: e149bded03171451
         size: 4462
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d81be38d5cd0 · claude-code-remote
+    hash_before: 7f340715b0e16c34d4c57ff0761b85d42369a4e9
+    hash_after: 7f340715b0e16c34d4c57ff0761b85d42369a4e9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 14 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f12745c23d9b6e33
+        size: 4376
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -257,26 +270,33 @@ every done_when line names its test above, and the check line names the check ve
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch-fire.test.js test/contract/dispatch-workflow.test.js test/contract/http.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+`test/level0/dispatch-fire.test.js`,`test/contract/dispatch-workflow.test.js`,`test/contract/http.test.js`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion. A module standing nowhere loads through a guarded import, so its absence reads as an assertion and not a build fault.
+
+The skill's case moves into the contract file beside the workflow. It reads a real file, and a normal test takes the fake doors alone. The fake GitHub in the fire cases keeps the issues and pull requests it opens, so the second run reads what the first one wrote.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case, and the check line waits for tests-green
+the fire cases reach the outside through the fake http door alone, and the contract cases drive the real door and a local server
 
 # gate
 
