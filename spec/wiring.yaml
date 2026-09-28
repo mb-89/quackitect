@@ -10,9 +10,17 @@ instances:
     module: env
   tickets:
     module: tickets
+  queue:
+    module: queue
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
   env.vars/<name>: env/<name>
   tickets.files/<path...>: files/<path...>
   tickets.all: tickets/all
+  tickets.cloud: tickets/cloud
+  queue.rows: tickets/all
+  queue.plan: files/.se/.runtime/plan.json
+  queue.cloud: tickets/cloud
+  queue.stood: built-in
+  queue.minute: clock/minute

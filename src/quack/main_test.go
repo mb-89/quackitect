@@ -170,3 +170,35 @@ func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
 		t.Fatalf("tickets/all reads %s", said)
 	}
 }
+
+// The wiring loads the queue beside the tickets, and the queue answers a place for the open ticket they read. [[spec/tickets/the-queue-becomes-a-module]]
+func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
+	w := q.Wiring{
+		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}},
+		Wires: map[string]string{
+			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud",
+			"queue.rows": "tickets/all", "queue.plan": "files/.se/.runtime/plan.json", "queue.cloud": "tickets/cloud",
+			"queue.stood": q.BuiltIn, "queue.minute": "clock/minute",
+		},
+	}
+	c := q.New()
+	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
+	q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
+	q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	s := q.NewStore(c)
+	text := "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nOne thing.\n"
+	if _, err := s.Commit(0, files, map[string]any{"files/spec/tickets/one.md": q.Content{Hash: "h", Text: text}}); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"tickets/all", "tickets/cloud", "queue/places"} {
+		if err := s.Run(name); err != nil {
+			t.Fatalf("the run of %s answers %v", name, err)
+		}
+	}
+	if said, _ := s.Snapshot().Read("queue/places").(map[string]string); said["one"] != "1" {
+		t.Fatalf("queue/places reads %v", said)
+	}
+}

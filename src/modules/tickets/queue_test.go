@@ -49,9 +49,9 @@ func TestAFrontReadsHeldPersonAndCloud(t *testing.T) {
 func TestTheCloudPortNamesAMarkedGroup(t *testing.T) {
 	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
 	index.Seed(map[string]any{
-		"files/spec/tickets/marked.md": q.Content{Hash: "m", Text: "---\nkind: [[ticket]]\nstate: open\ncloud: true\nprocess: [[spec/processes/group]]\n---\n"},
+		"files/spec/tickets/marked.md":    q.Content{Hash: "m", Text: "---\nkind: [[ticket]]\nstate: open\ncloud: true\nprocess: [[spec/processes/group]]\n---\n"},
 		"files/spec/tickets/its-child.md": q.Content{Hash: "c", Text: "---\nkind: [[ticket]]\nstate: open\ngroup: marked\n---\n"},
-		"files/spec/tickets/free.md": q.Content{Hash: "f", Text: "---\nkind: [[ticket]]\nstate: open\n---\n"},
+		"files/spec/tickets/free.md":      q.Content{Hash: "f", Text: "---\nkind: [[ticket]]\nstate: open\n---\n"},
 	})
 	said, _ := index.Run(CloudPort).([]string)
 	if want := []string{"its-child", "marked"}; !reflect.DeepEqual(said, want) {

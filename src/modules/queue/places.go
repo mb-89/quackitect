@@ -15,12 +15,12 @@ import (
 
 // The words a ticket's front and route carry that the split reads, which src/engine/group.js names and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
 const (
-	closedState = "closed"
-	openState   = "open"
-	draftState  = "draft"
-	noteRoute   = "note"
+	closedState  = "closed"
+	openState    = "open"
+	draftState   = "draft"
+	noteRoute    = "note"
 	trivialRoute = "trivial"
-	bareTrue    = "true"
+	bareTrue     = "true"
 )
 
 // The span of a minute, in the milliseconds the score's clock counts. [[spec/design_output/pull#the-queue-is-a-score]]

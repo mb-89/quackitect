@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-shadow-lands
@@ -157,6 +157,15 @@ record:
         hash: ea07a37ead542a1a
         size: 884
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 4ee2ae57a71500574028eced1f6848b238c67938
+    hash_after: 4ee2ae57a71500574028eced1f6848b238c67938
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -309,14 +318,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/queue src/modules/tickets src/ticket src/quack/main.go spec/wiring.yaml src/imports test/level0/queue-golden.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the queue package, the tickets fields and port it reads, the pure ticket type, the wiring and the golden writer, and src/plan leaves
+every door the change reaches has a fake: the module reaches no door, and its cases run on the fake index
+a comment names the approach the change implements: every file and function links the-queue-becomes-a-module or the pull note section it ports
+every fact the change adds stands in one place: the cloud mark and the words of a front are spelled once in Go, each naming the JavaScript file that owns it
 
 ## tests-green
 

@@ -102,11 +102,11 @@ func seedsOf(t *testing.T, golden queueGolden) map[string]any {
 		values["config/"+key] = strconv.FormatFloat(golden.At.Weights[value], 'f', -1, floatBits)
 	}
 	return map[string]any{
-		RowsPort:     rows,
-		PlanPort:     planText(t, map[string]any{"places": golden.Places, "todos": todos}),
-		CloudPort:    cloud,
-		StoodPort:    golden.At.Stood,
-		MinutePort:   golden.At.Now / msAMinute,
+		RowsPort:       rows,
+		PlanPort:       planText(t, map[string]any{"places": golden.Places, "todos": todos}),
+		CloudPort:      cloud,
+		StoodPort:      golden.At.Stood,
+		MinutePort:     golden.At.Now / msAMinute,
 		q.ResolvedName: values,
 	}
 }
