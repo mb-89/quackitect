@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -150,6 +150,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d81e51f1bb10e · claude-code-remote
+    hash_before: a7709870b228b5715ed0c008a065536bfd66119a
+    hash_after: a7709870b228b5715ed0c008a065536bfd66119a
+    inputs:
+      - name: retro/write
+        hash: 40e09febda3b6319
+        size: 2266
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -270,20 +280,23 @@ the chapter names the box by its role, with no name, address or path
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+no tool, host, right or install was missing in this run
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the ticket door on shell calls, at the first read of the group,the plan hook, which refused a call while the server warmed,the shell write door, on a scratch file for the retro fields,a test race in the index module that failed under the load of the index build on the box
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step stands parked, and no ticket was minted in this run,the handover is the pull request from this branch against main, with auto-merge on
 
 # Discussion
 
