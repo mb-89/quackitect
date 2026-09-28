@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -507,6 +507,21 @@ record:
         hash: e8bdd44da574dc87
         size: 89362
     def: 897ac034247c0bca
+  - step: gate
+    hand: box d7e093d924e2 · claude-code-remote · helper-34
+    hash_before: 6c08c03f9c48e1558342814592bcfb7504fe4f4f
+    hash_after: 6c08c03f9c48e1558342814592bcfb7504fe4f4f
+    inputs:
+      - name: design/draft
+        hash: dd385901fd27601c
+        size: 3263
+      - name: design/tests-red
+        hash: e74c1592149b4bf7
+        size: 665
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: dc4904ab364efa10
 group: the-cloud-works-its-queue
 ---
 
@@ -711,8 +726,7 @@ the boot cases reach the disk and the process through fakeDisk and fakeProc alon
 <!-- the form is verdict -->
 
 accept with points
-- boot-probes-an-untrusted-clone: the draft drops the trust claim, and leaves open the question the earlier gate asked: whether a clone carrying no trust runs a project SessionStart hook at all. The ask says this ticket finds whether a cloud session still needs the trust flag and the mode. Name the probe on a fresh clone in the level zero note, beside the probe that retires the install line.
-- boot-and-bridgehead-install-once: where the manifest stands and node_modules stands nowhere, both boots and the bridgehead START road run src/scripts/install.sh on the same session start. Name which one runs, or a guard keeping the second from running over the first.
+- boot-hook-names-its-span: the SessionStart hook in .claude/settings.json names no timeout, while the START road in level0.js allows STARTING of 180000 ms for the same install.sh on a fresh clone. A hook the client cuts short leaves the install half done, and brand.js writes the manifest last, so the next session boots with no cage again. Name a span on the hook to match STARTING, or add a probe to the boot hook section saying the client waits the install out. The client default span is unchecked here, and the 180000 ms the start road allows backs the doubt.
 
 # implement
 

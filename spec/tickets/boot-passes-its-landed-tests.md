@@ -95,3 +95,5 @@ The road to pass it as owner, from the root of a clone on `work/the-cloud-works-
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+`sessions-boot-from-the-repo` stands past `design/tests-red` with no owner pass. Its evidence reruns the landed boot cases against `370af06b9^`, the tree before the change, where they fail on their own assertion. `.se/scripts/boot-red-before-change.sh` holds the rerun, and the group's retro carries it. So the pass command the ask names needs no run, and the answer takes the evidence the engine already holds.
