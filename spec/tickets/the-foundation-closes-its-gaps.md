@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -257,6 +257,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 7e9449b1e8aabab476023fca8025116b9abae750
+    hash_after: 7e9449b1e8aabab476023fca8025116b9abae750
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
@@ -381,65 +393,72 @@ accept
 <!-- what was done, one line a ticket or a thing -->
 <!-- the form is list -->
 
-- the-config-module-resolves-layers: each key resolves off override, context, environment, local file and default file
-- config-spells-the-env-name: the config module names a key's variable
-- env-layer-reads-its-variables: folded into the resolver's change
-- the-index-meets-fake-modules: the fake module drives the index's own cases
-- failed-start-stops-its-parts: a failed door start stops every part it reached
-- windows-builds-quack-exe: the manager case finds its binary on Windows, and CI stands green on both
-- the model note's run of requests reads as a list, which cleared the push
-- every private note decided, each successor under its group
+- projection-cases-drive-their-verbs: the dump case drives quack dump, and the round trip fails a projection reading no file
+- q-suite-drives-the-door: qtest.Beside runs the contract suite through the door's own scheduler
+- the-manager-declares-its-spans: the manager declares watchdog/beat and watchdog/lease, and re-arms where a commit moves them
+- the dump lands under .se/.dump/, so the watch reads no dump back
+- the round trip seeds a private ticket, which turns CI green on Linux and Windows
+- the commit verb skips a journaled old path standing nowhere
+- a final gate runs the commands of the leaves before it, so a note open at accept waits for the retro
 
 ### well
 
 <!-- what went well, and what made it go well -->
 <!-- the form is list -->
 
-- helpers built the two cross-module changes while the main hand verified vet, tests and the diff
-- a red case written first caught the missing seam before the door change
-- the accept review read Windows CI, which the Linux check alone missed
+- each new case ran red first, in a probe or a bare clone, so each one proves the fault it names
+- the round trip's new rule found two real gaps, the local config layer and the private tickets, where the old one passed on any file
+- a bare clone of the branch reproduced the CI failure word for word before the push
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
 <!-- the form is list -->
 
-- 03:19: the gate minted children with a todo tag, and the push refused them until a manual tag removal
-- 04:26: the reject at accept inserted children-2, which passed empty, and a second reject copied nothing
-- 04:40: a helper spawned with a working item in the plan met a wait, which the handover had warned of
-- 04:42: a named pull as a helper hand met the session's binding, and the child stayed out of reach
-- 03:48: the first implement hand-back named no test in its lint field, and the commit hook refused it
-- 04:25: a closed ticket's run of paragraphs in the model note held the push at warning
-- no owner prompt reached the session
+- 05:23 the dump case read its own dump back through the watch, since .se/dump stood outside the folders the watch stands off
+- 05:24 the round trip found no local config file, since a bare box carries none
+- 05:24 a break of a ticket note passed, since the markdown codec writes any bytes back
+- 05:29 to 05:47 CI failed on four pushes while the local check stood green, since this box carries private tickets and a CI box carries none, and nobody read CI until accept
+- 05:33 the commit hook refused qtest.go with no case of its own in qtest
+- 05:36 the catalog refused a dotted config name
+- 05:41 the import rule refused a module case importing the config module
+- 05:44 the commit verb staged src/watchdog/lease_test.go, a path an earlier rename moved away, and refused the commit
+- 05:55 the accept hand-back refused on retro notes, and a helper met the same one-hand refusal, since a note opens at retro alone
+- the level zero server stopped answering twice mid-turn, and plan answered nothing
+- level zero refused a git stash, a sed -i and three pulls joined behind another command
+- review_branch answered that it gathered nothing
+- no owner prompt reached this run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 <!-- the form is list -->
 
-- the tag and the empty reject: spec/tickets/gate-findings-reach-the-queue
-- the lint field naming no test: spec/tickets/command-fields-take-their-indent carries the indent, and a hand names the red-listed tests in the lint command
-- the spawn with a working item: the handover keeps the rule, and the plan clears its item before each spawn
-- the binding past a named pull: accept with points routes fix children, so a hand works them through the plain pull
-- the model note warning: a design note edit runs the lint on it before the hand-back
+- src/quack/codec_test.go: seed a fixture for each new projection, so the round trip passes on a bare box
+- the handover: read CI on the head after each push, and run the Go cases in a bare clone before a hand-back
+- src/scripts/commit-verb.js: holds the stale-move fix, with its case in test/level0/commit-verb.test.js
+- src/scripts/pull.js: holds the gate fix, with its case in test/level0/pull-accept.test.js
+- src/modules/config/config.go: reads a key's segments as nested members, so a module declares a nested key
+- the handover: run a pull alone, never behind a pipe or a semicolon
+- a ticket for the server and review_branch: the server's drop and the empty gather each want a cause
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The engine's gate paths assume a reviewer mints fixes through the verdict form. Minting by hand fights the queue at each turn: the tag, the binding and the empty children leaf. The verdict form with points is the road, and the reject form belongs to a group whose children leaf still holds open work.
+The local check read the box's own private folder, so it answered for this box and not for CI. The accept deadlock looked like a missing verb at first, and reading the gate's code showed a rule running a later leaf's stale line. The helper route failed because a helper is the same hand to the queue, which the handover row names as a route.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- each successor ticket holds its fact, and the retro points at it
-- the retro adds no number past the commit times
-- the retro writes no file header
-- the errors carry their commit times, and no owner prompt reached the session
-- the retro names roles alone
+- every fact the change adds stands in one place: the gate rule in spec/design_output/pull.md, and the code comments point there
+- every number the change adds carries a name: BeatKey, LeaseKey and the built-in spans stand in manager.go alone
+- every header the change writes says what its file is for, and counts nothing
+- the chapter carries the errors off the transcript with their times, and no owner prompt reached the run
+- the chapter says the role, and names no box path
 
 ## cloud
 
