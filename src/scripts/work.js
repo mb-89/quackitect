@@ -3,21 +3,21 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
-import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   STAMP,
   saysGreen,
   shortOf,
   stampOf,
 } from "../../.claude/skills/level0/lib/runs.js";
+import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { TODO as PARKED } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { USAGE } from "./work-usage.js";
 import {
   askOf,
   CLOSED,
   fieldOf,
   frontOf,
+  GROUP,
   heldIn,
   isGroup,
   stepOf,
@@ -27,8 +27,8 @@ import {
   urgent,
   WORK_BRANCH,
   withEntry,
-  withField,
   withEveryTakeClosed,
+  withField,
   withHashAfter,
   withoutField,
 } from "../engine/group.js";
@@ -49,21 +49,19 @@ import {
   stepPathOf,
   takeable,
 } from "./pull.js";
-import { readyToMerge, review } from "./work-review.js";
 import { serving } from "./serve.js";
-import { freeIn, trigger } from "./work-free.js";
+import { fixRefuses } from "./work-fix.js";
+import { handsStuck, readFree, stuckFirst, trigger } from "./work-free.js";
 import { heldHere, pastHold } from "./work-held.js";
-import { testVerb } from "./work-test.js";
-import { unblock } from "./work-unblock.js";
 import { list } from "./work-list.js";
-import { close, marksTrunk, merge, offTrunk } from "./work-merge.js";
+import { close, filesUp, marks, marksTrunk, merge, offTrunk } from "./work-merge.js";
+import { readyToMerge, review } from "./work-review.js";
 import {
   childrenHere,
   DONE,
   dirty,
   groupStanding,
   ORPHAN,
-  standingAll,
   standingIn,
   standOf,
   sync,
@@ -72,6 +70,9 @@ import {
   waitsOf,
   workBranchHere,
 } from "./work-stands.js";
+import { testVerb } from "./work-test.js";
+import { unblock } from "./work-unblock.js";
+import { USAGE } from "./work-usage.js";
 
 export * from "./work-stands.js";
 
@@ -182,7 +183,7 @@ function openGroup(it, name) {
 }
 
 // The branch opens on a commit of its own, off trunk's tree, because a branch standing where trunk stands reads merged once trunk moves, and the queue then hides it. [[spec/design_output/work#a-merged-branch-closes]]
-function markOff(it, branch) {
+export function markOff(it, branch) {
   const tree = it.git.run(["rev-parse", `origin/${TRUNK}^{tree}`], true);
   if (!tree.ok || !tree.out) return "";
   const said = it.git.run(
@@ -216,8 +217,7 @@ function take(it, name = "") {
   it.git.fetch();
   // [[spec/design_output/work#the-take-writes-the-record]]
   const mine = heldHere(it);
-  const stand = standOf(it);
-  const standing = standingAll(stand);
+  const { stand, standing, trunk, free: all } = readFree(it);
   // A name wins over the hold: a take hands no brief for a branch it does not name. [[spec/design_output/work#the-take-writes-the-record]]
   if (mine) {
     const named = name ? `${WORK_BRANCH}${name}` : mine.branch;
@@ -240,6 +240,9 @@ function take(it, name = "") {
       `${mine.branch} stands ${past}, so its hold drops and the take goes on to ${named}.`,
     );
   }
+  // A stuck hand-over goes first, and a take naming its branch goes to that branch. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+  const stuck = name ? null : stuckFirst(it, stand, standing);
+  if (stuck) return handsStuck(it, stuck, onBranch);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
   // A branch sharing no ancestor with trunk reaches no sync, so the take says which it passes over. [[spec/design_output/work#the-listing-reads-git-once]]
   for (const one of stand.filter((held) => standing.get(held.branch) === ORPHAN)) {
@@ -251,9 +254,7 @@ function take(it, name = "") {
     return 0;
   }
 
-  const free = name
-    ? freeIn(stand, standing).filter((one) => one.branch === `work/${name}`)
-    : freeIn(stand, standing);
+  const free = name ? all.filter((one) => one.branch === `work/${name}`) : all;
   if (name && !free.length) {
     console.error(
       `work/${name} stands at no free ${TODO}. Run ./RUNME.sh branch list to read where it stands.`,
@@ -263,7 +264,9 @@ function take(it, name = "") {
   if (!free.length) {
     console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
     for (const one of open) {
-      console.log(`  ${one.branch} waits for ${waitsOf(one, standing).join(", ")}`);
+      console.log(
+        `  ${one.branch} waits for ${waitsOf(one, standing, trunk).join(", ")}`,
+      );
     }
     return 0;
   }
@@ -418,12 +421,13 @@ function finish(it) {
 
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
-  if (childrenStand(it, name)) return 1;
+  if (fixRefuses(it, it.disk.read(path))) return 1;
 
   const open = retroOpen(it, it.disk.read(path));
   if (open) return retroFirst(name, open);
 
-  return leaves(it, branch, at, path, stopped.says);
+  const moved = filesUp(it, name, it.disk.read(path));
+  return leaves(it, branch, at, path, stopped.says, moved);
 }
 
 // The retro step of a group, which the box writes before it leaves. [[spec/processes/group.yaml]]
@@ -443,22 +447,6 @@ export function retroOpen(it, text) {
     .filter((one) => holdsHere(here, String(one.said.when ?? ""), front).holds)
     .find((one) => !written(one.path));
   return open?.path ?? "";
-}
-
-// A group closes where no ticket naming it stands open, so a box leaving work undone hands the group back and closes nothing. [[spec/design_output/work#a-box-leaves]]
-function childrenStand(it, name) {
-  const children = childrenHere(it, name);
-  const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
-  if (!open.length) return false;
-  console.error(`${name} closes once no ticket naming it stands open:`);
-  for (const one of open) console.error(`  ${waitsAt(it, one, children)}`);
-  console.error(
-    "Close each through the pull, or hand a person's step on with ./RUNME.sh branch unblock.",
-  );
-  console.error(
-    `Or run ./RUNME.sh branch release ${name}, and the group stands open for the next box.`,
-  );
-  return true;
 }
 
 // [[spec/design_output/work#a-box-leaves]]
@@ -506,7 +494,7 @@ export function standsOpen(it, name, path) {
 }
 
 // [[spec/design_output/work#a-box-leaves]]
-function leaves(it, branch, at, path, says) {
+function leaves(it, branch, at, path, says, moved = []) {
   const name = branch.replace(/^work\//, "");
   const after = it.git.run(["rev-parse", "HEAD"], true).out;
 
@@ -521,12 +509,23 @@ function leaves(it, branch, at, path, says) {
   const now = withoutField(shut, PARKED, it.front);
   it.disk.write(path, now);
   it.git.run(["add", at], true);
+  // The pull request carries the close, so the branch drops the cloud marker it took from main. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+  marks(it, name, false);
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
 
   console.log(`${branch} carries ${shortOf(after)}, and ${says}.`);
-  console.log(`${name} stands ${CLOSED}, and every ticket in it is closed.`);
-  console.log(`Run ./RUNME.sh branch merge ${name} from ${TRUNK}.`);
+  if (!moved.length)
+    console.log(`${name} stands ${CLOSED}, and every ticket in it is closed.`);
+  // [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+  else
+    console.log(
+      `${name} stands ${CLOSED}, and hands ${moved.join(", ")} to ${fieldOf(it.disk.read(path), GROUP) || "the top"}.`,
+    );
+  // The work skill opens the pull request, and the merge lands once the check stands green. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+  console.log(
+    `Open the pull request over ${branch} against ${TRUNK}, with auto-merge on, as the work skill says.`,
+  );
   return 0;
 }
 

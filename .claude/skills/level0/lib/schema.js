@@ -55,6 +55,7 @@ export {
   OUTSIDE,
   processHash,
   refersFaults,
+  ROUND,
   slotFaults,
   wanted,
 } from "./schema-route.js";
@@ -300,7 +301,8 @@ export function schemaFaults(tree) {
     if (!path.endsWith(".md")) {
       const governor = governorOf(data, path);
       if (governor) out.push(...checkData(tree.read(path), governor, path, every));
-      else if (governorOf(schemas, path)) out.push(folderFault(path, governorOf(schemas, path)));
+      else if (governorOf(schemas, path))
+        out.push(folderFault(path, governorOf(schemas, path)));
       continue;
     }
     const text = tree.read(path);

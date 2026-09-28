@@ -947,6 +947,35 @@ node itself, so the setup leans on nothing again.
 the editor link, the editor extensions, the language client, Go, the index and
 the language server. Those stay wants, and every rule holds without them.
 
+## The boot hook
+
+A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
+through node. On a cloud box lacking the plugin manifest, it runs
+`src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
+off a cloud box, it runs nothing. A failed install holds no session up. The
+hook's `timeout` waits out `STARTING`, the span the start road allows the same
+install, so the client cuts no install short before the manifest lands.
+
+Where the manifest stands the plugin loads. The start road of
+[[spec/design_output/level0#the-bridgehead-starts-it-too]] then installs the
+modules it finds missing. So one road installs on each session start, and no
+install writes over another.
+
+The client scans the plugins before a session start hook runs, so the session
+running the first install holds no level zero. The next session on the box
+holds it. So every setup line stands:
+
+| the setup line | why it stands |
+|---|---|
+| the install | it lands the cage before the first session, and the hook reaches the next one alone |
+| the trust flag | no project file reaches it |
+| the auto mode | a project file naming it changes nothing |
+
+The probes on a fresh clone with no setup decide what retires:
+
+- whether the first session holds level zero once the hook runs, which retires the install line
+- whether a clone carrying no trust runs a project session start hook at all
+
 ## Where the mode stands
 
 The client takes `permissions.defaultMode` values `auto` and `bypassPermissions`

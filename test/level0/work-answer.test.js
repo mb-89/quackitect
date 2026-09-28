@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { COL, work } from "../../src/scripts/work.js";
 import { compareOutline } from "../../src/scripts/pull-outline.js";
-import { answerOf } from "../../src/scripts/work-answer.js";
+import { answerOf, waitsOnPerson } from "../../src/scripts/work-answer.js";
 import {
   CHILD,
   doorsSaying,
@@ -571,4 +571,12 @@ test("two todos anchored on one row stand in the order the plan writes them", ()
     [place["zeta todo"], place["alpha todo"], place["a-loose-one"]],
     ["1", "2", "3"],
   );
+});
+
+// The queue, the dispatch plan and a fix group's done read a ticket's hand through this one export. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+test("waitsOnPerson reads a ticket at a person's step as a person's, and one at an agent's step as an agent's", () => {
+  const at = (by) =>
+    `---\nkind: [[ticket]]\nstate: open\nstep: ask\nsteps:\n  - name: ask\n    does: asks\n    by: ${by}\n---\n\n# Ask\n\nOne.\n`;
+  assert.equal(waitsOnPerson({ text: at("person") }), true);
+  assert.equal(waitsOnPerson({ text: at("agent") }), false);
 });
