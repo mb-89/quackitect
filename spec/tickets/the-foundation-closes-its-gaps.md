@@ -153,6 +153,25 @@ record:
     hand: the engine
     hash_before: d80b7ae1a0ef1465f25559d6ed4dd9ef81216c29
     hash_after: d80b7ae1a0ef1465f25559d6ed4dd9ef81216c29
+  - step: accept
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: f1cffe8b3384cf782f38d6da5cd811b4a0d8119d
+    hash_after: f1cffe8b3384cf782f38d6da5cd811b4a0d8119d
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-foundation-closes-its-gaps already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 5e9ae3babf8a6830
+        size: 359
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
@@ -253,10 +272,9 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- windows-check-finds-the-quack-exe: the Windows check fails on `TestTheIndexLoadsTheManagerWithNoOtherModule`, since `src/quack/manager_test.go` builds `quack` with no `.exe`
-- v1-start-failure-stops-the-parts: `Serve` in `src/index/door.go` returns on a failed `servesV1` and leaves the beats, the IO modules and the scheduler running
-- the-contract-drives-the-door: the real side of the q suite runs through `qtest.Over`, so no case meets the door's own scheduler
+accept with points
+- windows-builds-quack-exe: the manager case in `src/quack/manager_test.go` builds `quack` with no `.exe`, so the Windows check fails. Name the binary with `.exe` on Windows, as `src/lsp/outside.go` does
+- failed-start-stops-its-parts: the door's start in `src/index/door.go` returns on a failed listen or `/v1` start and leaves the beats, the IO modules and the scheduler running. Run the stop over what the start reached
 
 # retro
 
