@@ -25,10 +25,11 @@ import {
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import { readThrough } from "../bridge/findings.js";
-import { heldIn, TICKETS, WORK_BRANCH } from "../engine/group.js";
+import { heldIn, spanOf, STALE, TICKETS, WORK_BRANCH } from "../engine/group.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
+import { configHere } from "./cli-doors.js";
 import { boxIdHere } from "./pull-hand-of.js";
 
 export const STDIN = 0;
@@ -113,15 +114,25 @@ export function cloudLeavesTrunk() {
   ].join("\n");
 }
 
-// The hand holding a work branch, off its group ticket at the remote tip. [[spec/tickets/one-writer-holds-a-branch]]
-export function heldBy(repo) {
+// The hand holding a work branch, off its group ticket at the remote tip. A tip older than the span holds nothing, so the take frees a stale branch. [[spec/design_output/work#a-stale-group-is-yours]]
+export function heldBy(repo, span = 0, now = 0) {
   return (ref) => {
     const branch = String(ref?.remote ?? "").replace(HEADS, "");
     if (!branch.startsWith(WORK_BRANCH)) return "";
+    if (tipStale(repo, branch, span, now)) return "";
     const group = branch.slice(WORK_BRANCH.length);
     const said = repo.run(["show", `origin/${branch}:${TICKETS}/${group}.md`], true);
     return said.ok ? (heldIn(said.out)?.hand ?? "") : "";
   };
+}
+
+// Whether the remote tip stands older than the span. A tip whose time reads nothing stands fresh. [[spec/design_output/work#a-stale-group-is-yours]]
+export function tipStale(repo, branch, span, now) {
+  if (!span || !now) return false;
+  const said = repo.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
+  const when = Number(String(said.out ?? "").trim());
+  if (!said.ok || !(when > 0)) return false;
+  return Math.floor(now / 1000) - when > span;
 }
 
 // [[spec/tickets/one-writer-holds-a-branch]]
@@ -187,12 +198,13 @@ async function main() {
   const outside = proc();
   const at = join(root, STAMP);
   const stamp = files.exists(at) ? files.read(at) : "";
+  const span = spanOf(await configHere(files).ask("work.staleAfter")) || spanOf(STALE);
   const said = holds(
     refsIn(files.read(STDIN)),
     stamp,
     carriedBy(git(outside, root)),
     inCloud(process.env),
-    heldBy(git(outside, root)),
+    heldBy(git(outside, root), span, Date.now()),
     boxIdHere({ root, method: root, join, disk: files }),
     process.env[ENGINE] === "1",
   );

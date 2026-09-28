@@ -269,6 +269,20 @@ test("the hold reads the group ticket at the remote tip, and a trunk push or an 
   assert.equal(readsHold(fakeRepo([], {}))(work), "");
 });
 
+// [[spec/design_output/work#a-stale-group-is-yours]]
+test("a hold on a tip older than the span holds nothing, and a fresh tip holds its hand", () => {
+  const held = `---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: sync\n    hand: ${HOLDER}\n    hash_before: ${SHA}\n---\n`;
+  const at = (when) => ({
+    run: (args) =>
+      args[0] === "log" ? { ok: true, out: `${when}\n` } : { ok: true, out: held },
+  });
+  const [work] = refsIn(toWork);
+  const now = 100000 * 1000;
+  assert.equal(readsHold(at(100000 - 7200), 3600, now)(work), "");
+  assert.equal(readsHold(at(100000 - 60), 3600, now)(work), HOLDER);
+  assert.equal(readsHold(at(100000 - 7200))(work), HOLDER);
+});
+
 // [[spec/tickets/one-writer-holds-a-branch]]
 test("a box's hold refuses a hand that names no box, and a hold naming no box refuses a box", () => {
   assert.equal(
