@@ -349,6 +349,39 @@ test("a journaled old path the index still holds stages with the new path", asyn
   assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
 });
 
+// A move an earlier commit lands leaves its journal behind, and its old path stands nowhere, so the commit names the new path alone. [[spec/tickets/commit-stages-a-moved-path]]
+test("a journaled old path standing nowhere stays out of the commit", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "M\tsrc/modules/index/lease_test.go\n",
+    },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "src/watchdog", to: "src/modules/index" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "src/modules/index/lease_test.go", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- src/modules/index/lease_test.go`),
+    "the commit names the new path alone",
+  );
+  assert.ok(
+    !ran.some((one) => /^git (add|commit)/.test(one) && one.includes("src/watchdog")),
+    "the old path stays out of the add and the commit",
+  );
+});
+
 // [[spec/design_output/level0#the-cold-probe]]
 test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
   const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);

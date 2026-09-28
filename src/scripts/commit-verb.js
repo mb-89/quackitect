@@ -162,8 +162,10 @@ function movedFrom(it, paths) {
   if (!paths.length) return [];
   const staged = it.git.run(["diff", "--cached", "--name-status", "-M"], true).out;
   const out = [];
+  const named = new Set();
   for (const row of staged.split("\n")) {
     const [how, from, to] = row.split("\t");
+    for (const one of [from, to]) if (one) named.add(one);
     if (/^R/.test(how ?? "") && paths.includes(to) && !paths.includes(from))
       out.push(from);
   }
@@ -177,6 +179,8 @@ function movedFrom(it, paths) {
             : null;
       if (under === null) continue;
       const from = `${one.from}${under}`;
+      // A move an earlier commit already lands leaves its old path nowhere, and git refuses a pathspec matching nothing. [[spec/tickets/commit-stages-a-moved-path]]
+      if (!named.has(from) && !stagable(it, from)) continue;
       if (!paths.includes(from) && !out.includes(from)) out.push(from);
     }
   }
