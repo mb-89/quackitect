@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -173,6 +173,18 @@ record:
         hash: f01d0e05c0bba219
         size: 2745
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-6
+    hash_before: b0d1c74b368279ff0ca4d53063bc3f9e675614f2
+    hash_after: b0d1c74b368279ff0ca4d53063bc3f9e675614f2
+    inputs:
+      - name: design/draft
+        hash: f01d0e05c0bba219
+        size: 2745
+      - name: design/tests-red
+        hash: 61906c0f6f79e944
+        size: 968
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -312,8 +324,11 @@ The store, the book and the dog stand in memory, and the fake module stands in f
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- fake-registrations-carry-a-doc: q.Start runs c.Undescribed, so each out-port, derived seen and action the fake registers carries a q.Doc, or the start refuses with NoDoc; the builder adds it in src/q/qtest/module.go
+- the-reader-hand-holds-its-seen: Register answers the hand of the script's out-port alone, so Hands["reader"] stands empty and the write-refusal case reads a bare hand; Register answers the reader the hand of its derived seen, so the refusal reads a module registering other ports and no w/out
 
 # implement
 
