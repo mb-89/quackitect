@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -215,6 +215,29 @@ record:
         exit: 0
         said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: f0addebd50d2f9a0033d1f4530da10810c098b59
+    hash_after: f0addebd50d2f9a0033d1f4530da10810c098b59
+    answered:
+      - name: tests
+        exit: 0
+        said: "green, src/modules/tickets passes; green, src/modules/files passes; green, src/index passes; green, src/imports passes; "
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: 14217a810eb895d8
+        size: 825
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -430,26 +453,39 @@ The name `tickets/all` stands once, in `src/index/topic.go`, and the wiring file
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+go test ./src/q -run TestAFamily && ./RUNME.sh branch test src/modules/tickets src/modules/files src/index src/imports src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The tickets leave the index and stand as a module under `src/modules/tickets`. The wiring loads it, and its `all` port answers `tickets/all`.
+The module reads the whole `files/` family as one map, which `q` now fills for a map input tagged with a family. It parses each ticket through a markdown codec that writes a file back byte for byte.
+The watch now stamps each file with the time it changed, and seeds the tree once at start. Before this, `files/` stood empty until a file moved, and the work tab would read no ticket after a restart.
+The index keeps no ticket logic. Its tickets method settles the scheduler and reads the store, and a commit of `tickets/all` ticks the changes call.
+`onlyq` lists `src/yaml` beside `q`, which rests on it, so a module reads a ticket's front.
+The red the design step recorded came from another ticket's cases in `src/q`. So the tests command names this ticket's family cases, and the packages it owns.
+A tree with no wiring file answers no ticket now. The private note `driven-trees-answer-no-tickets` parks that for the retro.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft names, and the size list carries each.
+The watch keeps its fake. `FakeWatch` hands the new time as zero, and the seed case runs over `NewFakeWatch`.
+Each new file opens on a header naming this ticket, and each new function carries its pointer.
+The name `tickets/all` stands once, in `src/index/topic.go`, and the wiring file binds it.
 
 # accept
 
