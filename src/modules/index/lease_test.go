@@ -5,6 +5,7 @@ package index
 
 import (
 	"errors"
+	"slices"
 	"testing"
 	"time"
 
@@ -150,5 +151,30 @@ func TestAFaultWithNoErrorRaisesNoPanic(t *testing.T) {
 	}()
 	if _, restarts := dog.Fault("t/part", nil); restarts {
 		t.Fatal("one fault in a window of one raises no alarm")
+	}
+}
+
+// A tick commits the parts whose lease still holds, so a part past its term leaves index/leases. [[spec/tickets/the-config-module-resolves-layers]]
+func TestALeasePastItsTermLeavesIndexLeases(t *testing.T) {
+	s, l, from, _ := manager(t)
+	one, err := begins(from)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(one.stop)
+	one.dog.Hold("t/short", 10*time.Second)
+	one.dog.Hold("t/long", time.Hour)
+	l.now = l.now.Add(5 * time.Second)
+	l.tick(t)
+	if live, _ := s.Snapshot().Read("index/leases").([]string); !slices.Contains(live, "t/short") || !slices.Contains(live, "t/long") {
+		t.Fatalf("index/leases reads %v inside both terms", live)
+	}
+	l.now = l.now.Add(time.Minute)
+	l.tick(t)
+	if live, _ := s.Snapshot().Read("index/leases").([]string); slices.Contains(live, "t/short") || !slices.Contains(live, "t/long") {
+		t.Fatalf("index/leases reads %v past the term of t/short", live)
+	}
+	if live := one.dog.Live(); slices.Contains(live, "t/short") || !slices.Contains(live, "t/long") {
+		t.Fatalf("the dog reads %v live past the term of t/short", live)
 	}
 }

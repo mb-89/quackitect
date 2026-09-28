@@ -127,6 +127,14 @@ func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ..
 	return c.add(foldOf(name, def, step), callerAt(2), opts)
 }
 
+// A fold whose step refuses an event, so the land answers the error and keeps the state. A stub until the-config-module-resolves-layers builds it. [[spec/tickets/the-config-module-resolves-layers]]
+func GuardIn[S, E any](c *Catalog, name string, def S, step func(S, E) (S, error), opts ...Option) Writer {
+	return Writer{}
+}
+
+// Marks a config key the whole project shares, which reads the default file alone. A stub until the-config-module-resolves-layers builds it. [[spec/design_output/model#a-keys-layers]]
+func Shared() Option { return func(*registration) {} }
+
 func callerAt(skip int) string {
 	_, file, line, ok := runtime.Caller(skip)
 	if !ok {

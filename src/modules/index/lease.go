@@ -109,6 +109,9 @@ func (d *Dog) Check() []string {
 	return expired
 }
 
+// The parts whose lease still holds, in order. A stub until the-config-module-resolves-layers builds it. [[spec/design_output/model#a-context-holds-a-lease]]
+func (d *Dog) Live() []string { return nil }
+
 // The wait doubles from the first to the cap, and a run of faults in the window raises an alarm and stops the restarts. [[spec/design_output/model#restarts]]
 func (d *Dog) Fault(part string, err error) (time.Duration, bool) {
 	d.mu.Lock()

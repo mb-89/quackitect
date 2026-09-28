@@ -101,6 +101,32 @@ func TestOneTypeLoadsAsTwoInstancesEachWithItsConfig(t *testing.T) {
 	}
 }
 
+// A key runs off config/values and reads its own entry, or its built-in value where none stands. [[spec/tickets/the-config-module-resolves-layers]]
+func TestAKeyReadsItsEntryOfTheResolvedValues(t *testing.T) {
+	weighed := func(c *Catalog) {
+		CfgIn(c, "weight", 1, Doc("how much a ticket weighs"))
+		DerivedIn(c, "score", 0, func(in weightOf) int { return in.Weight }, Doc("the weight a ticket scores"))
+	}
+	w := Wiring{Instances: []Instance{{"queue", "weighed"}, {"backlog", "weighed"}}}
+	c, faults := Load(w, map[string]func(*Catalog){"weighed": weighed})
+	if len(faults) > 0 {
+		t.Fatalf("the load refuses: %v", faults)
+	}
+	values := GivenIn(c, "config/values", Resolved{}, Doc("the values the config module resolves"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	s := NewStore(c)
+	seed(t, s, values, "config/values", Resolved{"queue/config/weight": "2"})
+	queue, backlog := run(t, s, "queue/config/weight"), run(t, s, "backlog/config/weight")
+	if queue != 2 || backlog != 1 {
+		t.Fatalf("queue/config/weight reads %v off its entry, and backlog/config/weight reads %v off its built-in value", queue, backlog)
+	}
+	if got := run(t, s, "queue/score"); got != 2 {
+		t.Fatalf("queue/score reads %v off queue/config/weight", got)
+	}
+}
+
 func TestAnUnwiredInPortAnswersAFault(t *testing.T) {
 	w := Wiring{Instances: []Instance{{"queue", "counter"}}}
 	_, faults := Load(w, map[string]func(*Catalog){"counter": func(c *Catalog) { counter(c, nil) }})

@@ -206,6 +206,9 @@ func (faults Refused) Error() string {
 	return strings.Join(lines, "\n")
 }
 
+// The value of config/values: each key's resolved JSON literal, by its full name `<instance>/config/<key>`. [[spec/tickets/the-config-module-resolves-layers]]
+type Resolved map[string]string
+
 // A config key by its local name, which the wiring files under `<instance>/config/<key>`. [[spec/design_output/model#config-comes-off-the-registrations]]
 func CfgIn[T any](c *Catalog, key string, def T, opts ...Option) Writer {
 	return c.add(givenOf("config/"+key, def), callerAt(2), opts)

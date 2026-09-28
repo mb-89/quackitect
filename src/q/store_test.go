@@ -4,6 +4,7 @@
 package q
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -253,5 +254,26 @@ func TestAnUntrackedPathReadsTheEmptyContent(t *testing.T) {
 	GivenIn(c, "files/<path...>", Content{})
 	if got := NewStore(c).Snapshot().Read("files/spec/a.md"); got != (Content{}) {
 		t.Fatalf("files/spec/a.md reads %+v", got)
+	}
+}
+
+// A guarded fold's step refuses an event, so the land answers its error and the state stands. [[spec/tickets/the-config-module-resolves-layers]]
+func TestAGuardedFoldRefusesAndKeepsItsState(t *testing.T) {
+	c := New()
+	GuardIn(c, "t/held", 0, func(held, add int) (int, error) {
+		if held+add > 5 {
+			return held, fmt.Errorf("t/held stands at %d, and %d passes five", held, add)
+		}
+		return held + add, nil
+	}, Doc("a sum that stays at five or under"))
+	s := NewStore(c)
+	if err := s.Land("t/held", 3); err != nil {
+		t.Fatalf("the land of 3 answers %v", err)
+	}
+	if err := s.Land("t/held", 4); err == nil || !strings.Contains(err.Error(), "passes five") {
+		t.Fatalf("the land of 4 answers %v, and no refusal", err)
+	}
+	if got := s.Snapshot().Read("t/held"); got != 3 {
+		t.Fatalf("t/held reads %v after the refusal", got)
 	}
 }

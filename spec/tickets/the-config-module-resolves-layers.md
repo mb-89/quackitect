@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -132,6 +132,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 35ad34a273f86697bfdb84872414526dc4ce0fe4
+    hash_after: 35ad34a273f86697bfdb84872414526dc4ce0fe4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: dfe6ac5c2a96ea79
+        size: 6161
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -283,26 +296,35 @@ each done_when line maps to one test: go test and the check each have a line, an
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/config/config_test.go src/q/wiring_test.go src/q/catalog_test.go src/q/store_test.go src/modules/index/lease_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/config/config_test.go
+src/q/wiring_test.go
+src/q/catalog_test.go
+src/q/store_test.go
+src/modules/index/lease_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over stubs: GuardIn and Shared in q, Resolved in wiring.go, Live on the dog, and the change kinds in the config module. The five context and override cases fail in one lands helper, since config/held names no fold yet. config/values falls under the projection family config/<path...> today, so the build registers it by its exact name. No test outside these changes state.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case: six config cases decide the six case lines, and go test and the check stand as commands
+the config cases seed files, env and index/leases through a writer of their own over qtest.Over, and reach no door
 
 # gate
 

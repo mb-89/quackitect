@@ -116,3 +116,19 @@ func TestAKeyOfManySegmentsStandsLast(t *testing.T) {
 		t.Fatalf("the check answers %+v", found)
 	}
 }
+
+type optionalOf struct {
+	N int `q:"t/absent,optional"`
+}
+
+// An input tagged optional passes the check with no writer, and reads its zero value. [[spec/tickets/the-config-module-resolves-layers]]
+func TestAnOptionalInputWithNoWriterPassesTheCheck(t *testing.T) {
+	c := New()
+	DerivedIn(c, "t/m", 0, func(in optionalOf) int { return in.N + 1 }, Doc("one past the absent name"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the check refuses an optional input with no writer: %v", faults)
+	}
+	if got := run(t, NewStore(c), "t/m"); got != 1 {
+		t.Fatalf("t/m reads %v off the zero value of t/absent", got)
+	}
+}
