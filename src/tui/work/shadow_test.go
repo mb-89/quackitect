@@ -20,7 +20,7 @@ func sliced(t *testing.T, mode string, count int) string {
 	if err := os.MkdirAll(config, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	text := `{"migration": {"slices": {"open-tasks": "` + mode + `"}}}`
+	text := `{"migration": {"opentasks": "` + mode + `"}}`
 	if err := os.WriteFile(filepath.Join(config, "level0.json"), []byte(text), 0o644); err != nil {
 		t.Fatal(err)
 	}

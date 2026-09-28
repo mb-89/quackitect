@@ -60,6 +60,43 @@ func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
 	var _ index.Start = starts[0]
 }
 
+// The wiring loads the migration module, and its slice key reads the value the config resolves. [[spec/tickets/open-tasks-run-in-shadow]]
+func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	all, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w := q.Wiring{Wires: all.Wires}
+	for _, one := range all.Instances {
+		if one.Module == "migration" {
+			w.Instances = append(w.Instances, one)
+		}
+	}
+	c := q.New()
+	values := q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	keys := c.Keys()
+	if len(keys) != 1 {
+		t.Fatalf("the wiring loads the keys %+v, and wants the slice alone", keys)
+	}
+	s := q.NewStore(c)
+	if _, err := s.Commit(0, values, map[string]any{q.ResolvedName: q.Resolved{keys[0].Name: `"shadow"`}}); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Run(keys[0].Name); err != nil {
+		t.Fatal(err)
+	}
+	if said := s.Snapshot().Read(keys[0].Name); said != "shadow" {
+		t.Fatalf("%s reads %v, and wants shadow", keys[0].Name, said)
+	}
+}
+
 // The index holds no module's logic, so it imports nothing under src/modules and no src/tickets. [[spec/tickets/tickets-becomes-a-module]]
 func TestTheIndexImportsNoModule(t *testing.T) {
 	cmd := exec.Command("go", "list", "-deps", "./src/index")

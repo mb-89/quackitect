@@ -6,9 +6,9 @@ package migration
 import "quackitect/src/q"
 
 // The key of the open-tasks slice, by its local name. [[spec/tickets/open-tasks-run-in-shadow]]
-const OpenTasksKey = "slices/open-tasks"
+const OpenTasksKey = "opentasks"
 
 // The module type the wiring loads as migration. [[spec/tickets/open-tasks-run-in-shadow]]
 func Registers(c *q.Catalog) q.Writer {
-	return q.Join()
+	return q.CfgIn(c, OpenTasksKey, "old", q.Shared(), q.Doc("the open-tasks slice: old, shadow or new"))
 }

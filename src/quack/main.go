@@ -19,6 +19,7 @@ import (
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/holds"
 	manager "quackitect/src/modules/index"
+	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/tickets"
 	"quackitect/src/modules/work"
@@ -50,9 +51,10 @@ var modules = map[string]ioModule{
 	"env": {env.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
 		return func() {}, env.Start(env.New(), commit)
 	}},
-	"tickets": {registers: tickets.Registers},
-	"queue":   {registers: queue.Places},
-	"work":    {registers: work.Registers},
+	"tickets":   {registers: tickets.Registers},
+	"queue":     {registers: queue.Places},
+	"work":      {registers: work.Registers},
+	"migration": {registers: migration.Registers},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]

@@ -24,3 +24,13 @@ func TestTheSliceKeyReadsTheDefaultFile(t *testing.T) {
 		t.Fatalf("the slice reads %v, and wants shadow", said)
 	}
 }
+
+// The key stands shared, so the default file sets it under the migration block. [[spec/tickets/open-tasks-run-in-shadow]]
+func TestTheSliceKeyStandsShared(t *testing.T) {
+	c := q.New()
+	Registers(c)
+	keys := c.Keys()
+	if len(keys) != 1 || keys[0].Local != OpenTasksKey || !keys[0].Shared {
+		t.Fatalf("the module registers %+v, and wants the shared key %s alone", keys, OpenTasksKey)
+	}
+}

@@ -75,6 +75,27 @@ func TestTheDoorAnswersTheValueOfAName(t *testing.T) {
 	}
 }
 
+// A name nobody registered answers an error, so a reader beside the old path compares nothing. [[spec/tickets/open-tasks-run-in-shadow]]
+func TestTheDoorAnswersNoValueForANameNobodyRegistered(t *testing.T) {
+	root := tree(t)
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, err := posts(standing, []string{"value", "work/open-tasks"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if said.Error == "" {
+		t.Fatalf("value answered %#v for a name nobody registered, and no error", said.Result)
+	}
+}
+
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 	root := tree(t)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
