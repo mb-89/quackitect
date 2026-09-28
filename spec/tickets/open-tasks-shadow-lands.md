@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: split
+step: children
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2shadow
@@ -99,6 +99,18 @@ record:
         exit: 0
         said: work/open-tasks-shadow-lands already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: a22654053c9ba775401451b384e8f1de26007518
+    hash_after: a22654053c9ba775401451b384e8f1de26007518
+    inputs:
+      - name: ask
+        hash: 15f421ce1e8ace06
+        size: 568
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -125,14 +137,25 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/the-queue-becomes-a-module]] standard
+[[spec/tickets/open-tasks-come-from-work]] standard
+[[spec/tickets/queue-reads-when-tickets-came]] trivial
+[[spec/tickets/open-tasks-run-in-shadow]] standard
+[[spec/tickets/fake-tree-runs-the-queue]] trivial
+[[spec/tickets/open-tasks-wired-case-stands]] trivial
+[[spec/tickets/ask-spells-the-slice-key]] trivial
+[[spec/tickets/places-at-runs-the-shadow]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every child is small enough to review whole, and each stands closed
+the children add up to the goal: the queue and work modules, the count, and the shadow with its key and rows
+no child waits on another now, since every one stands closed
 
 # children
 
