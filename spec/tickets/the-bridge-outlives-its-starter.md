@@ -398,5 +398,5 @@ The owner's words: the hook, the bridge, dies all the time on this box. Fix that
 
 A read of the code found two more faults, graded as read:
 
-- plausible, unchecked: a respawn with `detached` alone stays inside the editor's job object on Windows, so closing the editor may kill it too. Closing the editor while a respawned server stands, then asking `/health`, settles it
-- checked in `src/bridge/server.js`: `boxesOf` keys boxes on the raw root, so a `C:` root and a `c:` root build two boxes on one server
+- plausible, unchecked: a respawn with `detached` alone stays inside the editor's job object on Windows. So closing the editor may kill it too. Closing the editor while a respawned server stands, then asking `/health`, settles it
+- checked in `src/bridge/server.js`: `boxesOf` keys boxes on the raw root. So a `C:` root and a `c:` root build two boxes on one server
