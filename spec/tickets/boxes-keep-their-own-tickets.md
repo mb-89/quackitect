@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box d81cb7b9efd7 · claude-code-remote
@@ -100,6 +100,15 @@ record:
         exit: 0
         said: work/boxes-keep-their-own-tickets already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d81e51f1bb10e · claude-code-remote
+    hash_before: 9909536fd4b6fe5230b33c2ebcc4581e11718106
+    hash_after: 9909536fd4b6fe5230b33c2ebcc4581e11718106
+    inputs:
+      - name: ask
+        hash: f64b5acab2b06a3d
+        size: 381
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -124,14 +133,18 @@ A cloud box decides every step itself and records what it weighed. The tickets i
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/a-box-keeps-its-tickets]] trivial,[[spec/tickets/the-dispatch-opens-no-issues]] trivial,[[spec/tickets/the-notes-say-boxes-decide]] trivial,[[spec/tickets/the-backlog-gets-decided]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each child is one trivial change with its own tests, small enough to review whole
+the ask splits into the box keeping its tickets, the dispatch opening no issue, the notes saying the rulings, and the backlog decided; the box deciding every step itself stands in the notes child, so nothing stands outside
+no child waits on another: each touches its own files, so none names depends_on
 
 # children
 
