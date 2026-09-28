@@ -8,14 +8,12 @@ import (
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
-	"quackitect/src/watchdog"
 )
 
 // The catalog Serve builds, with the files, config and clock inputs the IO modules and the config module register. [[spec/design_output/model#the-fake-keeps-a-contract]]
 func inProcess(t testing.TB, register func(*q.Catalog)) qtest.Harness {
 	c := q.New()
 	registersTopics(c)
-	watchdog.Registers(c)
 	inputs := q.Join(
 		q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
 		q.GivenIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),

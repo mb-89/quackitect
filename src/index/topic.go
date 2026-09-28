@@ -4,21 +4,17 @@
 package index
 
 import (
-	"quackitect/src/ops"
 	"quackitect/src/q"
 	"quackitect/src/tickets"
 )
 
 // [[spec/tickets/the-tickets-topic-lands]]
 func registersTopics(catalog *q.Catalog) writers {
-	return writers{
-		tickets: tickets.Registers(catalog),
-		ops:     ops.Registers(catalog),
-	}
+	return writers{tickets: tickets.Registers(catalog)}
 }
 
 // The hands the index commits its topics with, one a registration. [[spec/tickets/commits-name-their-writer]]
-type writers struct{ tickets, ops q.Writer }
+type writers struct{ tickets q.Writer }
 
 // One commit of tickets/all. The note rows carry the private tickets the tracked rows leave out, so tickets/all reads them there. [[spec/tickets/the-tickets-topic-lands]]
 func (one *door) publishes(_ []string) error {

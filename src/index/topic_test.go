@@ -59,7 +59,4 @@ func TestTheTopicsCommitThroughTheirOwnWriters(t *testing.T) {
 	if _, err := store.Commit(0, as.tickets, map[string]any{tickets.AllName: []tickets.Ticket{}}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := store.Commit(0, as.ops, map[string]any{tickets.AllName: []tickets.Ticket{}}); err == nil {
-		t.Fatal("the ops writer commits tickets/all")
-	}
 }

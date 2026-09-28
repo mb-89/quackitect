@@ -15,7 +15,7 @@ func TestABeatAtZeroTakesTheBuiltInSpan(t *testing.T) {
 	if got := spanOf(root, "watchdog.beat", builtInBeat); got != builtInBeat {
 		t.Fatalf("a beat at zero reads %v", got)
 	}
-	if got := spanOf(root, "watchdog.lease", builtInLease); got != 7*time.Second {
+	if got := spanOf(root, "watchdog.lease", builtInBeat); got != 7*time.Second {
 		t.Fatalf("a lease of seven seconds reads %v", got)
 	}
 }

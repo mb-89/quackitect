@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -157,6 +157,15 @@ record:
         hash: 9f2faac845a5d98a
         size: 915
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: ae753b989467f921b161f70113d8fe27c7530a97
+    hash_after: ae753b989467f921b161f70113d8fe27c7530a97
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -281,12 +290,12 @@ src/modules/index/lease.go
 src/modules/index/lease_test.go
 src/modules/index/manager.go
 src/modules/index/manager_test.go
-src/ops/ops.go
-src/ops/call.go
-src/ops/ops_test.go
-src/ops/call_test.go
-src/watchdog/lease.go
-src/watchdog/lease_test.go
+src/modules/index/ops.go
+src/modules/index/call.go
+src/modules/index/ops_test.go
+src/modules/index/call_test.go
+src/modules/index/lease.go
+src/modules/index/lease_test.go
 src/index/door.go
 src/index/beats.go
 src/index/beats_test.go
@@ -370,14 +379,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index src/modules/index src/quack/main.go src/quack/manager_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and the rename verb rewrote the old src/ops and src/watchdog paths in three ticket files, as it rewrites every reach of a moved name
+the manager cases run over q.NewStore with an op table in memory and a work loop stepped by hand, and the root cases run the built binary and an op table in memory
+each file under src/modules/index points at the index manager chapter of the model
+spanOf stands in src/index/beats.go and src/modules/index/manager.go, since neither package may import the other, and the retro weighs a shared home
 
 ## tests-green
 

@@ -8,7 +8,38 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"quackitect/src/index"
 )
+
+// An op table in memory, as the index hands one. [[spec/design_output/model#an-operation-outlives-callers]]
+type heldTable map[string][]byte
+
+func (one heldTable) Save(id string, body []byte) error { one[id] = body; return nil }
+func (one heldTable) Drop(id string) error              { delete(one, id); return nil }
+
+func (one heldTable) All() ([]index.OpRow, error) {
+	out := []index.OpRow{}
+	for id, body := range one {
+		out = append(out, index.OpRow{ID: id, Body: body})
+	}
+	return out, nil
+}
+
+func TestTheManagerReadsTheIndexOpTable(t *testing.T) {
+	table := heldTable{}
+	rows := opRows{table}
+	if err := rows.Save("1", []byte(`{"state":"running"}`)); err != nil {
+		t.Fatal(err)
+	}
+	all, err := rows.All()
+	if err != nil || len(all) != 1 || all[0].ID != "1" || string(all[0].Body) != `{"state":"running"}` {
+		t.Fatalf("the rows read %v, %v", all, err)
+	}
+	if err := rows.Drop("1"); err != nil || len(table) != 0 {
+		t.Fatalf("the drop leaves %v, %v", table, err)
+	}
+}
 
 // The module the manager stands in, and the packages it folds. [[spec/design_output/model#the-index-manager]]
 const managerPackage = "quackitect/src/modules/index"

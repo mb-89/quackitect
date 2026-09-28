@@ -19,9 +19,7 @@ import (
 	"strings"
 	"sync"
 
-	"quackitect/src/ops"
 	"quackitect/src/q"
-	"quackitect/src/watchdog"
 	"sync/atomic"
 	"syscall"
 	"time"
@@ -63,9 +61,7 @@ type answer struct {
 }
 
 type door struct {
-	dog   *watchdog.Dog
 	db    *sql.DB
-	book  *ops.Book
 	v1    net.Listener
 	root  string
 	guard sync.Mutex
@@ -89,6 +85,8 @@ type door struct {
 	// The values modules read. [[spec/tickets/files-topic-reads-the-rows]]
 	store   *q.Store
 	writers writers
+	// The hands the manager gives the work loop, each run on every step. [[spec/design_output/model#a-lease]]
+	steps []func()
 }
 
 // What a changes call answers: the tick the rows stand at. [[spec/design_output/index#the-index-fires-on-change]]
@@ -148,16 +146,15 @@ type Commit func(as q.Writer, values map[string]any) error
 // Starts an IO module over the root, committing what comes in, and answers its stop. [[spec/design_output/model#io-modules-are-modules]]
 type Start func(root string, commit Commit) (stop func(), err error)
 
+// The door with no manager, as a case of the door alone runs it. [[spec/design_output/model#the-index-manager]]
 func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Listener, error) {
-	_, stop, listen, err := opens(root, at, catalog, starts...)
-	return stop, listen, err
+	return ServeManaged(root, at, catalog, nil, starts...)
 }
 
-// Answers the door beside its stop, so a case reads the lease the work loop renews. [[spec/design_output/model#a-lease]]
-func opens(root, at string, catalog *q.Catalog, starts ...Start) (*door, func(), net.Listener, error) {
+// Answers the door beside its stop, so a case reads the steps the work loop runs. [[spec/design_output/model#a-lease]]
+func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
 	topics := registersTopics(catalog)
-	barks := watchdog.Registers(catalog)
-	beat, term := spanOf(root, "watchdog.beat", builtInBeat), spanOf(root, "watchdog.lease", builtInLease)
+	beat := spanOf(root, "watchdog.beat", builtInBeat)
 	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
 	if faults := catalog.Check(); len(faults) > 0 {
 		said := make([]string, 0, len(faults))
@@ -179,21 +176,22 @@ func opens(root, at string, catalog *q.Catalog, starts ...Start) (*door, func(),
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
 	one.store, one.writers = q.NewStore(catalog), topics
-	one.dog = watchdog.New(time.Now, one.store, barks, watchdog.SettingsOf(root))
-	one.dog.Hold(leasePart, term)
 	// The scheduler hears every commit from here on, the IO modules' first ones too. [[spec/design_output/model#the-provider-kinds]]
 	scheduler := q.NewScheduler(one.store, func(run func()) { go run() }, func(name string, err error) {
 		fmt.Fprintln(stderr, "the run of", name, "did not commit:", err)
 	})
-	if err := one.opensBook(); err != nil {
+	managed, err := one.manages(manage)
+	if err != nil {
 		db.Close()
 		return nil, nil, nil, err
 	}
 	stops, err := one.starts(starts)
 	if err != nil {
+		managed()
 		db.Close()
 		return nil, nil, nil, err
 	}
+	stops = append(stops, managed)
 	if err := one.publishes(nil); err != nil {
 		db.Close()
 		return nil, nil, nil, err
@@ -304,7 +302,9 @@ func (one *door) sweeps() {
 	for range one.dirty {
 		time.Sleep(burstSettleDelay)
 		one.guard.Lock()
-		one.dog.Beat(leasePart)
+		for _, hand := range one.steps {
+			hand()
+		}
 		one.settles()
 		one.guard.Unlock()
 	}
@@ -377,7 +377,7 @@ func (one *door) tells(err error) {
 	}
 }
 
-// The sweep on a clock, which catches a change the watch misses, and takes each operation past its window out of the store. [[spec/design_output/index#a-change-moves-its-rows]]
+// The sweep on a clock, which catches a change the watch misses. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) guards() {
 	for range time.Tick(sweepEvery) {
 		one.guard.Lock()
@@ -385,7 +385,6 @@ func (one *door) guards() {
 			one.moved()
 		}
 		one.guard.Unlock()
-		one.sweepsOps()
 	}
 }
 

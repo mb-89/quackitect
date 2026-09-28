@@ -211,7 +211,7 @@ A registration hands back a q.Writer, and Store.Commit takes one. GivenIn, Given
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-src/q/store.go: Store.Run,src/q/store.go: Store.Land,src/watchdog/lease.go: Dog.publish, Registers, New,src/index/ops.go: door.opensBook,src/index/topic.go: door.publishes, registersTopics,src/index/door.go: Serve,src/ops/ops.go: Registers,src/tickets/tickets.go: Registers,src/q/store_test.go, src/q/why_test.go, src/watchdog/lease_test.go, src/tickets/tickets_test.go: every Commit call
+src/q/store.go: Store.Run,src/q/store.go: Store.Land,src/modules/index/lease.go: Dog.publish, Registers, New,src/index/ops.go: door.opensBook,src/index/topic.go: door.publishes, registersTopics,src/index/door.go: Serve,src/modules/index/ops.go: Registers,src/tickets/tickets.go: Registers,src/q/store_test.go, src/q/why_test.go, src/modules/index/lease_test.go, src/tickets/tickets_test.go: every Commit call
 
 ### tests
 
@@ -232,7 +232,7 @@ first
 <!-- every file the approach touches, one a line -->
 <!-- the form is list -->
 
-src/q/q.go,src/q/store.go,src/q/store_test.go,src/q/why_test.go,src/watchdog/lease.go,src/watchdog/lease_test.go,src/ops/ops.go,src/tickets/tickets.go,src/tickets/tickets_test.go,src/index/door.go,src/index/ops.go,src/index/topic.go
+src/q/q.go,src/q/store.go,src/q/store_test.go,src/q/why_test.go,src/modules/index/lease.go,src/modules/index/lease_test.go,src/modules/index/ops.go,src/tickets/tickets.go,src/tickets/tickets_test.go,src/index/door.go,src/index/ops.go,src/index/topic.go
 
 ### checked
 

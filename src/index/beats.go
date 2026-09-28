@@ -1,5 +1,5 @@
-// The index's own lease: a ticker asks the work loop for a step, and the
-// loop beats the lease, so a hung loop lets it expire.
+// The index's own beat: a ticker asks the work loop for a step, and each step
+// runs the hands the manager gives it, so a hung loop renews nothing.
 // [[spec/design_output/model#a-lease]]
 package index
 
@@ -9,12 +9,8 @@ import (
 	"quackitect/src/config"
 )
 
-// The part the index holds its lease under, and the spans a tree setting none takes. [[spec/design_output/model#a-lease]]
-const (
-	leasePart    = "index"
-	builtInBeat  = 5 * time.Second
-	builtInLease = 30 * time.Second
-)
+// The span a tree setting no beat takes. [[spec/design_output/model#a-lease]]
+const builtInBeat = 5 * time.Second
 
 // A key in seconds, or the built-in span where the tree sets none above zero, since a ticker takes no zero. [[spec/design_output/model#a-lease]]
 func spanOf(root, key string, builtIn time.Duration) time.Duration {
@@ -24,7 +20,7 @@ func spanOf(root, key string, builtIn time.Duration) time.Duration {
 	return builtIn
 }
 
-// Each beat asks the work loop for a step, and checks the leases off the loop, so a hung loop renews nothing and its lease expires. [[spec/design_output/model#a-lease]]
+// Each beat asks the work loop for a step, so a hung loop runs no step and the manager's lease expires. [[spec/design_output/model#a-lease]]
 func (one *door) beats(every time.Duration) (stop func()) {
 	ticker, done := time.NewTicker(every), make(chan struct{})
 	go func() {
@@ -37,7 +33,6 @@ func (one *door) beats(every time.Duration) (stop func()) {
 				case one.dirty <- struct{}{}:
 				default:
 				}
-				one.dog.Check()
 			}
 		}
 	}()

@@ -26,7 +26,7 @@ const (
 )
 
 // The command line the composition root runs, with the IO modules it starts in the served index. [[spec/design_output/model#io-modules-are-modules]]
-func Main(starts ...Start) {
+func Main(manage Manage, starts ...Start) {
 	argv := argsOf()[1:]
 	if len(argv) == 0 {
 		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why|dump> [words]\n       se-index call <method> <json params>")
@@ -40,7 +40,7 @@ func Main(starts ...Start) {
 	}
 
 	if argv[0] == "serve" {
-		exits(serves(root, starts))
+		exits(serves(root, manage, starts))
 	}
 	exits(asks(root, argv))
 }
@@ -70,13 +70,13 @@ func rooted(path string) string {
 	return path
 }
 
-func serves(root string, starts []Start) int {
+func serves(root string, manage Manage, starts []Start) int {
 	// A fresh tree holds no runtime folder yet, and the database needs one to open in. [[spec/design_output/index#the-door-owns-the-database]]
 	if err := makeDir(filepath.Join(root, Runtime), 0o755); err != nil {
 		fmt.Fprintln(stderr, "the runtime folder did not stand:", err)
 		return 1
 	}
-	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"), q.Main, starts...)
+	stop, _, err := ServeManaged(root, filepath.Join(root, Runtime, "index.db"), q.Main, manage, starts...)
 	if err != nil {
 		fmt.Fprintln(stderr, "the index door did not stand:", err)
 		return 1

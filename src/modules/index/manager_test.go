@@ -64,6 +64,7 @@ func (h *heldRows) body(id string) []byte {
 type loop struct {
 	now   time.Time
 	hands []func()
+	ticks []func(time.Time)
 }
 
 func (l *loop) outside(t *testing.T, s *q.Store, as q.Writer, rows Rows) Outside {
@@ -71,7 +72,10 @@ func (l *loop) outside(t *testing.T, s *q.Store, as q.Writer, rows Rows) Outside
 		Root: t.TempDir(), Store: s, As: as, Rows: rows,
 		Steps: func(hand func()) { l.hands = append(l.hands, hand) },
 		Now:   func() time.Time { return l.now },
-		Every: func(time.Duration, func(time.Time)) func() { return func() {} },
+		Every: func(_ time.Duration, hand func(time.Time)) func() {
+			l.ticks = append(l.ticks, hand)
+			return func() {}
+		},
 	}
 }
 
@@ -82,6 +86,16 @@ func (l *loop) step(t *testing.T) {
 	}
 	for _, hand := range l.hands {
 		hand()
+	}
+}
+
+func (l *loop) tick(t *testing.T) {
+	t.Helper()
+	if len(l.ticks) == 0 {
+		t.Fatal("the manager takes no tick")
+	}
+	for _, hand := range l.ticks {
+		hand(l.now)
 	}
 }
 
@@ -166,5 +180,43 @@ func TestALeaseAtZeroTakesTheBuiltInTerm(t *testing.T) {
 	l.step(t)
 	if term := fields(t, s.Snapshot().Read("index/health"))["term"]; term != float64(builtInLease) {
 		t.Fatalf("a lease at zero reads the term %v, not %v", term, float64(builtInLease))
+	}
+}
+
+// [[spec/design_output/model#deadlines]]
+func TestATickFailsAnOperationPastItsDeadline(t *testing.T) {
+	s, l, from, _ := manager(t)
+	one, err := begins(from)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(one.stop)
+	id, err := one.book.Start("t/read", nil, "s1", q.Declared{Deadline: time.Minute})
+	if err != nil {
+		t.Fatal(err)
+	}
+	l.now = l.now.Add(2 * time.Minute)
+	l.tick(t)
+	said := fields(t, s.Snapshot().Read(Name(id)))
+	if said["state"] != "failed" || said["error"] != "the deadline passes" {
+		t.Fatalf("%s reads %v after a tick past its deadline", Name(id), said)
+	}
+}
+
+// [[spec/design_output/model#what-stays-how-long]]
+func TestAnOperationPastItsWindowLeavesTheStore(t *testing.T) {
+	t.Setenv("SE_OPS_KEEPFAILED", "60")
+	s, l, from, rows := manager(t)
+	starts(t, from)
+	if held, _ := s.Snapshot().Read("ops/1").(Op); held.ID != "1" {
+		t.Fatalf("ops/1 stands nowhere before its window passes: %#v", held)
+	}
+	l.now = l.now.Add(time.Hour)
+	l.tick(t)
+	if held, _ := s.Snapshot().Read("ops/1").(Op); held.ID == "1" {
+		t.Fatalf("the store holds ops/1 past its window: %#v", held)
+	}
+	if body := rows.body("1"); body != nil {
+		t.Fatalf("the op table holds 1 past its window: %s", body)
 	}
 }

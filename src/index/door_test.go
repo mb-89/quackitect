@@ -6,6 +6,7 @@ package index
 import (
 	"path/filepath"
 	"strconv"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -285,29 +286,27 @@ func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 	t.Fatalf("t/double reads %#v after t/n moves to 3", said.Result)
 }
 
-// The index holds a lease, and the work loop's idle tick renews it. [[spec/design_output/model#a-lease]]
+// The manager's step runs on the work loop, and the loop's idle tick runs it, so the lease it renews stands off the loop. [[spec/design_output/model#a-lease]]
 func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 	root := tree(t)
 	write(t, root, config.Tracked, `{"watchdog":{"beat":1,"lease":5}}`)
-	one, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	var stepped atomic.Int64
+	manage := func(_ string, _ *q.Store, _ OpRows, steps func(func())) (func(), error) {
+		steps(func() { stepped.Add(1) })
+		return func() {}, nil
+	}
+	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer stop()
-	if one.dog == nil {
-		t.Fatal("the index starts no watchdog")
-	}
-	first, held := one.dog.Lease(leasePart)
-	if !held {
-		t.Fatalf("the index holds no lease under %s", leasePart)
-	}
 	for range topicPolls {
-		if later, _ := one.dog.Lease(leasePart); later.Renewed.After(first.Renewed) {
+		if stepped.Load() > 0 {
 			return
 		}
 		time.Sleep(200 * time.Millisecond)
 	}
-	t.Fatalf("the lease of %s stands at %v, and the work loop renews nothing", leasePart, first.Renewed)
+	t.Fatal("the work loop runs no step the manager hands it")
 }
 
 // The door answers the dump text, and the root writes it. [[spec/design_output/model#everything-on-disk-mirrors]]

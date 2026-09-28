@@ -237,7 +237,7 @@ spec/design_output/model.md
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-opened src/q/send.go Deliver, src/ops/call.go Call, src/q/looks.go and the model at an action lists requests, and checked each claim there
+opened src/q/send.go Deliver, src/modules/index/call.go Call, src/q/looks.go and the model at an action lists requests, and checked each claim there
 the callers come off a grep for Presentation and Undescribed, which nothing past the tests and Start reads
 the two looks cases decide the output label and doc line and the refusal line, the note edit decides the design line, and the check decides the last
 

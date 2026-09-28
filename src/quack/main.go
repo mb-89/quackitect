@@ -1,5 +1,5 @@
-// The composition root: it loads the IO modules the wiring names into the
-// catalog, and runs the index with a start for each.
+// The composition root: it loads the index manager and the IO modules the
+// wiring names into the catalog, and runs the index with a start for each.
 // [[spec/design_output/model#io-modules-are-modules]]
 package main
 
@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/modules/clock"
@@ -17,6 +18,7 @@ import (
 	"quackitect/src/modules/env"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/holds"
+	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/queue"
 	"quackitect/src/q"
 )
@@ -111,12 +113,41 @@ func main() {
 		}
 		return
 	}
+	as := manager.Registers(q.Main)
 	starts, err := wired()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	index.Main(starts...)
+	index.Main(manages(as), starts...)
+}
+
+// The index manager's start, over the store and the op table the index hands it, the wall clock, and its writer. [[spec/design_output/model#the-index-manager]]
+func manages(as q.Writer) index.Manage {
+	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (func(), error) {
+		return manager.Start(manager.Outside{
+			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
+			Now: time.Now, Every: clock.New().Every,
+		})
+	}
+}
+
+// The index's op table read as the manager's rows, so neither side names the other's types. [[spec/design_output/model#an-operation-outlives-callers]]
+type opRows struct{ table index.OpRows }
+
+func (one opRows) Save(id string, body []byte) error { return one.table.Save(id, body) }
+func (one opRows) Drop(id string) error              { return one.table.Drop(id) }
+
+func (one opRows) All() ([]manager.Row, error) {
+	all, err := one.table.All()
+	if err != nil {
+		return nil, err
+	}
+	out := make([]manager.Row, 0, len(all))
+	for _, row := range all {
+		out = append(out, manager.Row{ID: row.ID, Body: row.Body})
+	}
+	return out, nil
 }
 
 // The IO module instances of the wiring file, loaded into q.Main. A tree with no wiring file runs none. [[spec/design_output/model#the-wiring-file]]
