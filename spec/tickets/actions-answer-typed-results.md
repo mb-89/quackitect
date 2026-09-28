@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -225,6 +225,15 @@ record:
         hash: dd7e6de56d25c903
         size: 683
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: f8c2215cd7fe4544bb1ac5c457ec88cf9880fc79
+    hash_after: f8c2215cd7fe4544bb1ac5c457ec88cf9880fc79
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -379,17 +388,17 @@ accept
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-go vet ./src/...
+    go vet ./src/...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-The change touches the four files the draft's size list names, and no other.
+The change touches src/q/looks.go alone. The model edit and the registration's out field landed in the first round of this leaf.
 The cases run over a catalog and a wiring in memory, and reach no door.
-The comment on q.Answers names what it declares, and points at the model's options, as the gate asks.
-The model states the caller's answer once, at an action lists requests, and the options table carries the one row for q.Answers.
+The comment on q.Answers points at the model's options, as the first gate asked.
+The second gate names two stale draft lines. Deliver now checks the answer against the declared type, since deliver-checks-the-declared-type closed with it. The draft's answers read the first gate's two points: one closed done, and one closed became actions-answer-over-http.
 
 ## tests-green
 
