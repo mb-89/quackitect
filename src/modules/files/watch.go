@@ -46,17 +46,20 @@ func heard(rel string) bool {
 	return true
 }
 
-// Hands each change as a path and its text, and gone where the file leaves. [[spec/design_output/model#io-modules-and-their-fakes]]
+// Hands each change as a path, its text and the time it changed in nanoseconds, and gone where the file leaves. [[spec/design_output/model#io-modules-and-their-fakes]]
 type Watch interface {
-	Changes(hand func(path, text string, gone bool)) (stop func(), err error)
+	Changes(hand Hand) (stop func(), err error)
 }
+
+// [[spec/tickets/tickets-becomes-a-module]]
+type Hand func(path, text string, changed int64, gone bool)
 
 type watch struct{ root string }
 
 // The real watch under root. [[spec/design_output/model#its-file-carries-its-fake]]
 func NewWatch(root string) Watch { return watch{root} }
 
-func (one watch) Changes(hand func(path, text string, gone bool)) (func(), error) {
+func (one watch) Changes(hand Hand) (func(), error) {
 	eyes, err := fsnotify.NewWatcher()
 	if err != nil {
 		return func() {}, err
@@ -94,7 +97,7 @@ func (one watch) adds(eyes *fsnotify.Watcher, from string) error {
 	})
 }
 
-func (one watch) hears(eyes *fsnotify.Watcher, event fsnotify.Event, hand func(path, text string, gone bool)) {
+func (one watch) hears(eyes *fsnotify.Watcher, event fsnotify.Event, hand Hand) {
 	rel, err := filepath.Rel(one.root, event.Name)
 	if err != nil || strings.HasPrefix(rel, "..") {
 		return
@@ -107,7 +110,7 @@ func (one watch) hears(eyes *fsnotify.Watcher, event fsnotify.Event, hand func(p
 		return
 	}
 	if event.Has(fsnotify.Remove) || event.Has(fsnotify.Rename) {
-		hand(rel, "", true)
+		hand(rel, "", 0, true)
 		return
 	}
 	info, err := os.Stat(event.Name)
@@ -120,23 +123,66 @@ func (one watch) hears(eyes *fsnotify.Watcher, event fsnotify.Event, hand func(p
 	}
 	body, err := os.ReadFile(event.Name)
 	if errors.Is(err, fs.ErrNotExist) {
-		hand(rel, "", true)
+		hand(rel, "", 0, true)
 		return
 	}
 	if err == nil {
-		hand(rel, string(body), false)
+		hand(rel, string(body), info.ModTime().UnixNano(), false)
 	}
+}
+
+// Whether the walk enters a folder: none the watch stands off, and under a dot folder of the private one, a named folder alone. [[spec/tickets/tickets-becomes-a-module]]
+func entered(rel string) bool {
+	parts := strings.Split(rel, "/")
+	for i, part := range parts {
+		if skipped[part] {
+			return false
+		}
+		if i > 0 && parts[i-1] == private && strings.HasPrefix(part, ".") {
+			return named[rel]
+		}
+	}
+	return true
+}
+
+// Hands every file standing under root that a change there reaches, once, so the family holds the tree before its first change. [[spec/tickets/tickets-becomes-a-module]]
+func Standing(root string, hand Hand) error {
+	return filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, _ := filepath.Rel(root, path)
+		rel = filepath.ToSlash(rel)
+		if entry.IsDir() {
+			if rel != "." && !entered(rel) {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if !entry.Type().IsRegular() || !heard(rel) {
+			return nil
+		}
+		info, err := entry.Info()
+		if err != nil {
+			return nil
+		}
+		body, err := os.ReadFile(path)
+		if err == nil {
+			hand(rel, string(body), info.ModTime().UnixNano(), false)
+		}
+		return nil
+	})
 }
 
 // A watch handing the changes a test pushes, or the writes of a FakeDisk it listens on. [[spec/design_output/model#io-modules-and-their-fakes]]
 type FakeWatch struct {
 	mu    sync.Mutex
-	hands map[int]func(path, text string, gone bool)
+	hands map[int]Hand
 	next  int
 }
 
 func NewFakeWatch() *FakeWatch {
-	return &FakeWatch{hands: map[int]func(path, text string, gone bool){}}
+	return &FakeWatch{hands: map[int]Hand{}}
 }
 
 // [[spec/design_output/model#io-modules-and-their-fakes]]
@@ -151,17 +197,17 @@ func (one *FakeWatch) Push(path, text string, gone bool) {
 		return
 	}
 	one.mu.Lock()
-	hands := make([]func(path, text string, gone bool), 0, len(one.hands))
+	hands := make([]Hand, 0, len(one.hands))
 	for _, hand := range one.hands {
 		hands = append(hands, hand)
 	}
 	one.mu.Unlock()
 	for _, hand := range hands {
-		hand(path, text, gone)
+		hand(path, text, 0, gone)
 	}
 }
 
-func (one *FakeWatch) Changes(hand func(path, text string, gone bool)) (func(), error) {
+func (one *FakeWatch) Changes(hand Hand) (func(), error) {
 	one.mu.Lock()
 	defer one.mu.Unlock()
 	at := one.next
@@ -187,11 +233,29 @@ func ContentOf(text string) q.Content {
 
 // Commits each change the watch hands, under the family's local name. A change the store refuses reaches failed. [[spec/design_output/model#io-modules-are-modules]]
 func Start(from Watch, commit func(values map[string]any) error) (stop func(), err error) {
-	return from.Changes(func(path, text string, gone bool) {
+	return from.Changes(func(path, text string, changed int64, gone bool) {
 		value := q.Content{}
 		if !gone {
 			value = ContentOf(text)
+			value.Changed = changed
 		}
 		_ = commit(map[string]any{familyPrefix + path: value})
 	})
+}
+
+// Commits every file standing under root in one commit, then each change, so a reader of the family meets the tree at start. A change landing during the walk and committing before it loses to the walk's older read, until its next change sets it right. [[spec/tickets/tickets-becomes-a-module]]
+func Seeds(root string, from Watch, commit func(values map[string]any) error) (stop func(), err error) {
+	standing := map[string]any{}
+	err = Standing(root, func(path, text string, changed int64, _ bool) {
+		value := ContentOf(text)
+		value.Changed = changed
+		standing[familyPrefix+path] = value
+	})
+	if err != nil {
+		return func() {}, err
+	}
+	if err := commit(standing); err != nil {
+		return func() {}, err
+	}
+	return Start(from, commit)
 }

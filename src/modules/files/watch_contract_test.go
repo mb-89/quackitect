@@ -18,7 +18,7 @@ func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 	t.Run("a write comes back as a change", func(t *testing.T) {
 		disk, watch := open(t)
 		seen := make(chan string, 16)
-		stop, err := watch.Changes(func(path, text string, gone bool) {
+		stop, err := watch.Changes(func(path, text string, _ int64, gone bool) {
 			if path == "a.md" && !gone {
 				select {
 				case seen <- text:
@@ -50,7 +50,7 @@ func watchSuite(t *testing.T, open func(t *testing.T) (Disk, Watch)) {
 			}
 		}
 		seen := make(chan string, 64)
-		stop, err := watch.Changes(func(path, _ string, gone bool) {
+		stop, err := watch.Changes(func(path, _ string, _ int64, gone bool) {
 			if !gone {
 				select {
 				case seen <- path:

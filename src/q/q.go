@@ -59,6 +59,8 @@ type registration struct {
 type Content struct {
 	Hash string `json:"hash"`
 	Text string `json:"text"`
+	// The time the file last changed, in nanoseconds, as the index's file table stores it, so a view sorts by it. [[spec/tickets/tickets-becomes-a-module]]
+	Changed int64 `json:"changed,omitempty"`
 }
 
 type Catalog struct {
@@ -211,6 +213,9 @@ func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration
 		filled := reflect.New(inType).Elem()
 		for _, in := range one.inputs {
 			value := reflect.ValueOf(snap.Read(in.name))
+			if in.family() {
+				value = snap.family(in.name, in.typ)
+			}
 			if value.IsValid() && value.Type().AssignableTo(in.typ) {
 				filled.FieldByName(in.field).Set(value)
 			}
@@ -218,6 +223,11 @@ func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration
 		return fn(filled.Interface().(In))
 	}
 	return one
+}
+
+// An input of a map by path over a family, such as map[string]Content over files/<path...>, reads every value the family holds. [[spec/tickets/tickets-becomes-a-module]]
+func (in input) family() bool {
+	return in.typ.Kind() == reflect.Map && in.typ.Key().Kind() == reflect.String && keyed(in.name)
 }
 
 func foldOf[S, E any](name string, def S, step func(S, E) S) *registration {

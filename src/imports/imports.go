@@ -46,6 +46,9 @@ var (
 // The imports ioonly refuses, per [[spec/design_output/model#the-build-checks-imports]].
 var outside = []string{"os", "os/exec", "net", "net/http"}
 
+// The tree's own readers a module takes beside q, each importing the pure standard library alone, the one q rests on among them. [[spec/tickets/tickets-becomes-a-module]]
+var pureTree = []string{module + "src/yaml"}
+
 // The standard library packages that reach the outside, per [[spec/design_output/model#the-build-checks-imports]].
 var impure = []string{"os", "io/fs", "io/ioutil", "net", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}
 
@@ -249,6 +252,11 @@ func reachesOut(path string) bool {
 func pastQ(path string) bool {
 	if path == module+"src/q" || path == module+"src/q/qtest" || isDoor(path) || isModule(path) {
 		return false
+	}
+	for _, one := range pureTree {
+		if path == one {
+			return false
+		}
 	}
 	first, _, _ := strings.Cut(path, "/")
 	if strings.Contains(first, ".") || strings.HasPrefix(path, module) {

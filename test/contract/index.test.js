@@ -98,6 +98,8 @@ One piece of it.
 ifBuilt("a ticket's standing reads off its group's branch through the ticket", () => {
   const work = files.tempDir("tickets-");
   files.makeDir(join(work, "spec", "tickets"));
+  // The tickets module answers the list, so the tree carries the wiring that loads it. [[spec/tickets/tickets-becomes-a-module]]
+  files.copy(join(root, "spec", "wiring.yaml"), join(work, "spec", "wiring.yaml"));
   for (const [at, text] of [
     ["one-group.md", HELD_GROUP],
     ["a-child.md", child("one-group")],

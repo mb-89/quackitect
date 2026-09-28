@@ -869,7 +869,7 @@ check runs it on Linux and Windows, and reads a package's flag off its
 
 | the analyzer | what it refuses |
 |---|---|
-| `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest` and the pure standard library the analyzer lists. So `os`, `io/fs`, `os/exec`, `net`, `database/sql`, `src/config`, `src/index` and a call to `time.Now` stay out |
+| `onlyq` | an import from a module without the flag, or its tests, past `q`, `q/qtest`, the `src/yaml` reader `q` rests on, and the pure standard library the analyzer lists. So `os`, `io/fs`, `os/exec`, `net`, `database/sql`, `src/config`, `src/index` and a call to `time.Now` stay out |
 | `ioonly` | an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in the core, `src/q`, or a renderer |
 | `fakesuite` | a fake with no contract suite beside it: an IO module's fake, and `q/qtest` |
 | `nomodule` | an import of a package under `src/modules/` from another module, the index core or a renderer |

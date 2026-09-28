@@ -20,6 +20,7 @@ import (
 	"quackitect/src/modules/holds"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/queue"
+	"quackitect/src/modules/tickets"
 	"quackitect/src/q"
 )
 
@@ -32,7 +33,7 @@ const (
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
 var projected = []func(*q.Catalog) q.Writer{config.Registers, queue.Registers, holds.Registers}
 
-// An IO module type: its registration, and the start that runs it under the names its instance binds. [[spec/design_output/model#io-modules-are-modules]]
+// A module type the wiring loads: its registration, and for an IO module the start that runs it under the names its instance binds. A module with no start runs on the scheduler alone. [[spec/tickets/tickets-becomes-a-module]]
 type ioModule struct {
 	registers func(*q.Catalog) q.Writer
 	starts    func(root string, commit func(values map[string]any) error) (func(), error)
@@ -40,7 +41,7 @@ type ioModule struct {
 
 var modules = map[string]ioModule{
 	"watch": {files.Registers, func(root string, commit func(map[string]any) error) (func(), error) {
-		return files.Start(files.NewWatch(root), commit)
+		return files.Seeds(root, files.NewWatch(root), commit)
 	}},
 	"clock": {clock.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
 		return clock.Start(clock.New(), commit), nil
@@ -48,6 +49,7 @@ var modules = map[string]ioModule{
 	"env": {env.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
 		return func() {}, env.Start(env.New(), commit)
 	}},
+	"tickets": {registers: tickets.Registers},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -61,6 +63,10 @@ func projections() []projection {
 	c := q.New()
 	for _, registers := range projected {
 		registers(c)
+	}
+	// A module type the wiring loads projects too, the tickets among them. [[spec/tickets/tickets-becomes-a-module]]
+	for _, module := range modules {
+		module.registers(c)
 	}
 	var out []projection
 	for _, one := range c.Projections() {
@@ -150,7 +156,7 @@ func (one opRows) All() ([]manager.Row, error) {
 	return out, nil
 }
 
-// The IO module instances of the wiring file, loaded into q.Main. A tree with no wiring file runs none. [[spec/design_output/model#the-wiring-file]]
+// The module instances of the wiring file, loaded into q.Main. A tree with no wiring file runs none. [[spec/design_output/model#the-wiring-file]]
 func wired() ([]index.Start, error) {
 	root, err := index.Root()
 	if err != nil {
@@ -201,6 +207,9 @@ func load(w q.Wiring, into *q.Catalog) ([]index.Start, error) {
 	starts := make([]index.Start, 0, len(kept.Instances))
 	for _, one := range kept.Instances {
 		instance, module := one.Name, modules[one.Module]
+		if module.starts == nil {
+			continue
+		}
 		starts = append(starts, func(root string, commit index.Commit) (func(), error) {
 			return module.starts(root, func(values map[string]any) error {
 				bound := make(map[string]any, len(values))

@@ -6,6 +6,7 @@ package q
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 )
@@ -217,6 +218,19 @@ func (one Snapshot) Read(name string) any {
 		return owner.def
 	}
 	return nil
+}
+
+// Every value the family pattern holds, keyed by the path past its fixed segments. [[spec/tickets/tickets-becomes-a-module]]
+func (one Snapshot) family(pattern string, into reflect.Type) reflect.Value {
+	out := reflect.MakeMap(into)
+	prefix := pattern[:strings.Index(pattern, "<")]
+	for name, held := range one.values {
+		value := reflect.ValueOf(held.value)
+		if matches(pattern, name) && value.IsValid() && value.Type().AssignableTo(into.Elem()) {
+			out.SetMapIndex(reflect.ValueOf(strings.TrimPrefix(name, prefix)), value)
+		}
+	}
+	return out
 }
 
 func (one Snapshot) From(name string) int64 { return one.values[name].from }

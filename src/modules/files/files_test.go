@@ -57,6 +57,42 @@ func TestAPushedChangeReachesTheFamily(t *testing.T) {
 	}
 }
 
+// The seed commits every file standing before the first change, with the time it changed, and none under an unnamed runtime folder. [[spec/tickets/tickets-becomes-a-module]]
+func TestTheSeedCommitsTheStandingTreeOnce(t *testing.T) {
+	root := t.TempDir()
+	disk := NewDisk(root)
+	for _, path := range []string{"spec/a.md", ".se/.runtime/plan.json", ".se/.runtime/bin/tool.json", ".git/HEAD"} {
+		if err := disk.Write(path, "said"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := q.New()
+	hand := Registers(c)
+	s := q.NewStore(c)
+	commits := 0
+	stop, err := Seeds(root, NewFakeWatch(), func(values map[string]any) error {
+		commits++
+		_, err := s.Commit(s.Snapshot().Revision, hand, values)
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	read := s.Snapshot()
+	if got, _ := read.Read("files/spec/a.md").(q.Content); got.Text != "said" || got.Changed == 0 || commits != 1 {
+		t.Fatalf("files/spec/a.md reads %+v over %d commits", got, commits)
+	}
+	if got, _ := read.Read("files/.se/.runtime/plan.json").(q.Content); got.Text != "said" {
+		t.Fatalf("the plan reads %+v", got)
+	}
+	for _, path := range []string{"files/.se/.runtime/bin/tool.json", "files/.git/HEAD"} {
+		if got := read.Read(path); got != (q.Content{}) {
+			t.Fatalf("%s reads %+v", path, got)
+		}
+	}
+}
+
 func TestTheDiskRefusesARequestToAnotherModule(t *testing.T) {
 	disk := NewFakeDisk()
 	if _, err := Accept(disk)(q.Request{Module: "git", Verb: "commit"}); err == nil {

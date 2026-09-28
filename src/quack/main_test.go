@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/q"
@@ -72,6 +73,77 @@ func TestTheIndexImportsNoModule(t *testing.T) {
 			t.Fatalf("the index imports %s", one)
 		}
 	}
+}
+
+// The served index answers the tickets the wiring's module reads off the watch, the private ones and one written after the start among them. [[spec/tickets/tickets-becomes-a-module]]
+func TestTheServedIndexAnswersItsTickets(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := t.TempDir()
+	ticket := func(path, ask string) {
+		at := filepath.Join(root, filepath.FromSlash(path))
+		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(at, []byte("---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\n"+ask+"\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	ticket("spec/tickets/grows.md", "It grows.")
+	ticket(".se/tickets/parked.md", "Later.")
+	c := q.New()
+	starts, err := load(w, c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	stop, _, err := index.Serve(root, filepath.Join(t.TempDir(), "index.db"), c, starts...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	t.Setenv("QUACKITECT_ROOT", root)
+	awaits(t, map[string]string{"grows": "It grows.", "parked": "Later."})
+	ticket("spec/tickets/late.md", "Written after the start.")
+	awaits(t, map[string]string{"grows": "It grows.", "parked": "Later.", "late": "Written after the start."})
+}
+
+// The polls a case waits through for the scheduler to commit the tickets. [[spec/tickets/tickets-becomes-a-module]]
+const ticketPolls = 100
+
+// Asks the served index for the tickets until each name reads its Ask. [[spec/tickets/tickets-becomes-a-module]]
+func awaits(t *testing.T, want map[string]string) {
+	t.Helper()
+	var said any
+	for range ticketPolls {
+		read, err := index.Ask("tickets")
+		if err != nil {
+			t.Fatal(err)
+		}
+		said = read
+		rows, _ := read.([]any)
+		names := map[string]string{}
+		for _, one := range rows {
+			row, _ := one.(map[string]any)
+			name, _ := row["name"].(string)
+			says, _ := row["says"].(string)
+			names[name] = says
+		}
+		met := true
+		for name, ask := range want {
+			met = met && names[name] == ask
+		}
+		if met {
+			return
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	t.Fatalf("the tickets read %#v", said)
 }
 
 // The wiring loads the tickets module, which reads files/ in and answers tickets/all out. [[spec/tickets/tickets-becomes-a-module]]

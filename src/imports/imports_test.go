@@ -71,6 +71,16 @@ func TestFaultsNameAModuleImportingOs(t *testing.T) {
 	}
 }
 
+// The yaml reader q rests on passes, and another package of the tree does not. [[spec/tickets/tickets-becomes-a-module]]
+func TestAModuleReadsYamlAsQDoes(t *testing.T) {
+	if said := Faults("quackitect/src/modules/tickets", []string{"quackitect/src/q", "quackitect/src/yaml"}); len(said) != 0 {
+		t.Fatalf("src/yaml reads as past q: %v", said)
+	}
+	if said := Faults("quackitect/src/modules/tickets", []string{"quackitect/src/config"}); len(said) != 1 {
+		t.Fatalf("src/config reads as pure: %v", said)
+	}
+}
+
 func TestAnIOModuleImportingOsPassesOnlyQ(t *testing.T) {
 	if said := FaultsIn("quackitect/src/modules/files", []string{"os", "github.com/fsnotify/fsnotify"}, true); len(said) != 0 {
 		t.Fatalf("the faults read %v", said)

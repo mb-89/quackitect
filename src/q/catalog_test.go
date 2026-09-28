@@ -132,3 +132,27 @@ func TestAnOptionalInputWithNoWriterPassesTheCheck(t *testing.T) {
 		t.Fatalf("t/m reads %v off the zero value of t/absent", got)
 	}
 }
+
+type countsOf struct {
+	Counts map[string]int `q:"files/<path...>"`
+}
+
+// A map over a family takes the family's own type, so a map of another fails the check, and the family map reads no key of another family. [[spec/tickets/tickets-becomes-a-module]]
+func TestAFamilyMapOfAnotherTypeFailsTheCheck(t *testing.T) {
+	c := New()
+	GivenIn(c, "files/<path...>", Content{}, Doc("a file"))
+	DerivedIn(c, "t/counts", 0, func(in countsOf) int { return len(in.Counts) }, Doc("the count"))
+	if found := faultsOf(t, c.Check(), OtherType); len(found) != 1 {
+		t.Fatalf("a map of int over a family of Content reads %v", found)
+	}
+	one := New()
+	hand := GivenIn(one, "files/<path...>", Content{}, Doc("a file"))
+	other := GivenIn(one, "buffers/<path...>", Content{}, Doc("a buffer"))
+	DerivedIn(one, "t/texts", 0, func(in filesOf) int { return len(in.Files) }, Doc("the count of files"))
+	s := NewStore(one)
+	seed(t, s, hand, "files/a.md", Content{Hash: "a"})
+	seed(t, s, other, "buffers/b.md", Content{Hash: "b"})
+	if got := run(t, s, "t/texts"); got != 1 {
+		t.Fatalf("the family map reads %v keys", got)
+	}
+}

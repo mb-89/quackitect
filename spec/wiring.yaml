@@ -8,7 +8,11 @@ instances:
     module: clock
   env:
     module: env
+  tickets:
+    module: tickets
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
   env.vars/<name>: env/<name>
+  tickets.files/<path...>: files/<path...>
+  tickets.all: tickets/all

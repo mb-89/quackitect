@@ -11,7 +11,6 @@ import (
 
 func TestTheCoreWritesNoInputName(t *testing.T) {
 	c := q.New()
-	registersTopics(c)
 	read := q.NewStore(c).Snapshot()
 	for _, name := range []string{"files/a.md", "clock/minute", "env/SE_ROLE"} {
 		if got := read.Read(name); got != nil {

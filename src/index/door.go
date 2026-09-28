@@ -83,8 +83,9 @@ type door struct {
 	wakeLock sync.Mutex
 
 	// The values modules read. [[spec/tickets/files-topic-reads-the-rows]]
-	store   *q.Store
-	writers writers
+	store *q.Store
+	// Waits out every run the scheduler holds, so an answer off a derived name reads the commits before it. [[spec/tickets/tickets-becomes-a-module]]
+	drains func()
 	// The hands the manager gives the work loop, each run on every step. [[spec/design_output/model#a-lease]]
 	steps []func()
 }
@@ -153,7 +154,6 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 
 // Answers the door beside its stop, so a case reads the steps the work loop runs. [[spec/design_output/model#a-lease]]
 func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
-	topics := registersTopics(catalog)
 	beat := spanOf(root, "watchdog.beat", builtInBeat)
 	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
 	if faults := catalog.Check(); len(faults) > 0 {
@@ -175,11 +175,18 @@ func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) 
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
-	one.store, one.writers = q.NewStore(catalog), topics
+	one.store = q.NewStore(catalog)
+	// The tickets move on the scheduler after the rows do, so their commit ticks the changes call too. [[spec/tickets/tickets-becomes-a-module]]
+	one.store.OnCommit(func(values map[string]any) {
+		if _, ok := values[TicketsName]; ok {
+			one.moved()
+		}
+	})
 	// The scheduler hears every commit from here on, the IO modules' first ones too. [[spec/design_output/model#the-provider-kinds]]
 	scheduler := q.NewScheduler(one.store, func(run func()) { go run() }, func(name string, err error) {
 		fmt.Fprintln(stderr, "the run of", name, "did not commit:", err)
 	})
+	one.drains = scheduler.Settle
 	managed, err := one.manages(manage)
 	if err != nil {
 		db.Close()
@@ -192,10 +199,6 @@ func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) 
 		return nil, nil, nil, err
 	}
 	stops = append(stops, managed)
-	if err := one.publishes(nil); err != nil {
-		db.Close()
-		return nil, nil, nil, err
-	}
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, nil, nil, err
@@ -330,7 +333,6 @@ func (one *door) settles() {
 	if len(paths) > 0 {
 		if rows, err := touches(one.db, one.root, paths, one.tracked); err == nil {
 			moved += rows
-			one.tells(one.publishes(paths))
 		} else {
 			one.keeps(paths, false, err)
 		}
@@ -338,7 +340,6 @@ func (one *door) settles() {
 	if retrack {
 		if rows, err := retracks(one.db, one.tracked); err == nil {
 			moved += rows
-			one.tells(one.publishes(nil))
 		} else {
 			one.keeps(nil, true, err)
 		}
@@ -363,18 +364,7 @@ func (one *door) keeps(paths []string, retrack bool, err error) {
 // A sweep reads git's list again, and the door holds what it reads. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) walks() (int, int, error) {
 	one.tracked = trackedIn(one.root)
-	count, moved, err := sweep(one.db, one.root, one.tracked)
-	if err == nil && moved > 0 {
-		one.tells(one.publishes(nil))
-	}
-	return count, moved, err
-}
-
-// A commit that fails says so, and the next settle of that path commits it again. [[spec/tickets/files-topic-reads-the-rows]]
-func (one *door) tells(err error) {
-	if err != nil {
-		fmt.Fprintln(stderr, "the files topic did not commit:", err)
-	}
+	return sweep(one.db, one.root, one.tracked)
 }
 
 // The sweep on a clock, which catches a change the watch misses. [[spec/design_output/index#a-change-moves-its-rows]]
@@ -515,7 +505,14 @@ func (one *door) answers(said call) (any, error) {
 	case "dangling":
 		return Dangling(one.db)
 	case "tickets":
-		return Tickets(one.db)
+		// The tickets module the wiring loads answers the list, and a catalog loading none answers it empty. [[spec/tickets/tickets-becomes-a-module]]
+		if one.drains != nil {
+			one.drains()
+		}
+		if value := one.store.Snapshot().Read(TicketsName); value != nil {
+			return value, nil
+		}
+		return []any{}, nil
 	case "same":
 		return Same(one.db, asked.Path)
 	case "reindex":

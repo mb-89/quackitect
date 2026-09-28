@@ -144,7 +144,7 @@ func inputFaults(one *registration, groups []named) []Fault {
 			faults = append(faults, Fault{Kind: NoName, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s reads %s, which the catalog lacks", in.field, in.name)})
 			continue
 		}
-		if writer := group.regs[0]; writer.typ != in.typ {
+		if writer := group.regs[0]; writer.typ != in.typ && !(in.family() && in.typ.Elem() == writer.typ) {
 			faults = append(faults, Fault{Kind: OtherType, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s at %s is %s, and %s at %s is %s", in.field, in.portOr(), in.typ, in.name, writer.portName(), writer.typ)})
 		}
 	}

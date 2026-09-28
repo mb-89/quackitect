@@ -14,6 +14,9 @@ import (
 	"quackitect/src/q"
 )
 
+// The polls a case waits through for a value the scheduler commits. [[spec/tickets/the-scheduler-runs-providers]]
+const topicPolls = 100
+
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	root := tree(t)
 	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())

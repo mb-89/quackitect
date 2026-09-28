@@ -8,8 +8,10 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"flag"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
@@ -19,7 +21,9 @@ import (
 )
 
 // The golden file, beside the case that reads it. [[spec/tickets/tickets-becomes-a-module]]
-const goldenAt = "../tickets/testdata/tree.golden.json"
+const goldenAt = "testdata/tree.golden.json"
+
+var update = flag.Bool("update", false, "write the golden file again off the tree")
 
 type goldenRow struct {
 	Name      string `json:"name"`
@@ -51,9 +55,13 @@ func TestTreeGolden(t *testing.T) {
 	index := qtest.New(t, func(c *q.Catalog) { tickets.Registers(c) })
 	index.Seed(seeded)
 	list, _ := index.Run(tickets.AllPort).([]tickets.Ticket)
+	if *update {
+		writes(t, list, hashes)
+		return
+	}
 	read, err := os.ReadFile(goldenAt)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("the golden file stands nowhere: run go test ./src/quack -run TestTreeGolden -update")
 	}
 	var rows []goldenRow
 	if err := json.Unmarshal(read, &rows); err != nil {
@@ -78,6 +86,22 @@ func TestTreeGolden(t *testing.T) {
 		}
 	}
 	if compared == 0 {
-		t.Fatalf("no row of the golden file compares over %d tickets", len(list))
+		t.Fatalf("no row of the golden file compares over %d tickets: run go test ./src/quack -run TestTreeGolden -update", len(list))
+	}
+}
+
+// Writes the golden file again, a row a ticket in name order. [[spec/tickets/tickets-becomes-a-module]]
+func writes(t *testing.T, list []tickets.Ticket, hashes map[string]string) {
+	rows := []goldenRow{}
+	for _, one := range list {
+		rows = append(rows, goldenRow{Name: one.Name, Hash: hashes[one.Name], GroupHash: hashes[one.Group], Ask: one.Says, Standing: one.Standing})
+	}
+	sort.Slice(rows, func(a, b int) bool { return rows[a].Name < rows[b].Name })
+	written, err := json.MarshalIndent(rows, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(goldenAt, append(written, '\n'), 0o644); err != nil {
+		t.Fatal(err)
 	}
 }
