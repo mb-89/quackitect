@@ -118,11 +118,26 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-owner-stores-the-token, dispatch-writes-the-bundles, the-skills-start-the-workers, groups-land-through-pull-requests]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d81be38d5cd0 · claude-code-remote
+    hash_before: e1bdc61705fbee1901efe1bdf38ae335f98b4866
+    hash_after: e1bdc61705fbee1901efe1bdf38ae335f98b4866
+    inputs:
+      - name: ask
+        hash: d04a808d7057475e
+        size: 1320
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/tickets/the-owner-stores-the-token]]
+        hash: e149bded03171451
+        size: 4462
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +179,76 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new door and a firing script carry the Action. The table names each part.
+
+| the part | what it does |
+|---|---|
+| `src/doors/http.js` | sends one request through the global fetch, and answers the status, the body and the headers |
+| `src/doors/fake/http.js` | answers from the routes a test registers, keeps each request under `sent`, and throws on a route it lacks |
+| `test/contract/http.test.js` | drives the real door against a local server, and asserts the fake answers the same shape |
+| `src/scripts/cli-doors.js` | builds the door once, as `it.http` |
+| `src/scripts/dispatch-fire.js` | fires the routine, opens the issues and opens the write branch's pull request |
+| `src/scripts/dispatch.js` | takes `--fire`, and answers a promise of the exit code there |
+| `.github/workflows/dispatch.yml` | runs the dispatch on a clock and on a manual start |
+| `.claude/skills/dispatch/SKILL.md` | starts no session, and names the Action |
+
+The fire reads its secrets off `it.env`, and fills `plan.fire`:
+
+- It sends one POST a ready group, then one a stuck hand-over.
+- Each carries the bearer token, the version header the fire page names, and a text naming the branch.
+- It stops at the routine cap, the lower of the two caps the routines page names.
+- The entries past the cap stand under `left`.
+- A refused fire keeps its error message under `refused`.
+- A rate refusal stops the run, and names its `Retry-After`.
+- It opens one issue a question on `GITHUB_TOKEN`, titled after its ticket.
+- An open issue under the label `dispatch-question` carrying that title stops a second one.
+- A pushed or standing write branch gets a pull request on `PULL_TOKEN`, where none stands open.
+- That pull request then takes auto-merge through the GraphQL mutation.
+
+A refused fire exits 1. Without `--fire` the dispatch stays synchronous and unchanged.
+
+The workflow checks out the whole history on `PULL_TOKEN`. So the write branch's push and its pull request start the check. It sets up node and go as the check does, and sets a git author. It runs `./RUNME.sh dispatch --json --fire`, with the secrets in its env. It holds the issue write permission, and one run waits for the one before it.
+
+I assume the merge method MERGE, and a refused mutation names itself in the plan. The fire text stands as context alone, since the routine's saved prompt runs the work skill.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+`src/scripts/cli.js` verbs.dispatch, which calls dispatch and awaits its answer,`test/level0/dispatch.test.js`, which calls dispatch without the flag,`src/scripts/cli-doors.js` doorsHere, which gains the door every verb takes,`.claude/skills/dispatch/SKILL.md`, which the hourly dispatch routine reads,`.github/workflows/dispatch.yml`, which calls the dispatch with the flag
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+`test/contract/dispatch-workflow.test.js`: the dispatch runs on a schedule and on a manual start,`test/contract/dispatch-workflow.test.js`: the dispatch reads the fire secrets and fires,`test/contract/http.test.js`: the real door answers a status and a body,`test/contract/http.test.js`: the fake answers what the real door answers,`test/level0/dispatch-fire.test.js`: the fire runs once a ready group and once a stuck hand-over,`test/level0/dispatch-fire.test.js`: the fire stops at the routine cap, and the rest stand left,`test/level0/dispatch-fire.test.js`: a refused fire prints the reason its envelope gives,`test/level0/dispatch-fire.test.js`: each question opens one issue, and a second run opens none,`test/level0/dispatch-fire.test.js`: the write branch's pull request opens on PULL_TOKEN with auto-merge,`test/level0/dispatch-fire.test.js`: the dispatch skill starts no session, and names the Action
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+`src/doors/http.js`,`src/doors/fake/http.js`,`test/contract/http.test.js`,`src/scripts/cli-doors.js`,`src/scripts/dispatch.js`,`src/scripts/dispatch-fire.js`,`test/level0/dispatch-fire.test.js`,`test/contract/dispatch-workflow.test.js`,`.github/workflows/dispatch.yml`,`.claude/skills/dispatch/SKILL.md`,`spec/design_output/doors.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the dispatch, its writes, the doors root, the command line, the fakes, the check workflow and the fire page stand opened
+the callers list names the verb, the tests, the doors root, the skill and the new workflow
+every done_when line names its test above, and the check line names the check verb
 
 ## tests-red
 
