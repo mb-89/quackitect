@@ -53,7 +53,7 @@ func (one FakeEnv) Variables() map[string]string {
 
 // [[spec/design_output/model#io-modules-are-modules]]
 func Registers(c *q.Catalog) q.Writer {
-	return q.GivenIn(c, Family, "", q.Doc("an SE_ variable, as the index starts"), q.IO())
+	return q.OutIn(c, Family, "", q.Doc("an SE_ variable, as the index starts"), q.IO())
 }
 
 // Commits every variable in one commit, under the family's local name. [[spec/design_output/model#io-modules-are-modules]]

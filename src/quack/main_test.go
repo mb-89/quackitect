@@ -153,7 +153,7 @@ func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
 		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all"},
 	}
 	c := q.New()
-	files := q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
+	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
 	if _, err := load(w, c); err != nil {
 		t.Fatal(err)
 	}

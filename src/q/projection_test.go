@@ -20,7 +20,7 @@ func (linesCodec) Serialize(value []string) ([]byte, error) {
 
 func TestALoadedProjectionParsesItsFile(t *testing.T) {
 	c := New()
-	files := GivenIn(c, "files/<path...>", Content{})
+	files := OutIn(c, "files/<path...>", Content{})
 	ProjectIn(c, "queue", ".se/.runtime/*.txt", Codec[[]string](linesCodec{}), Loaded, []string{})
 	s := NewStore(c)
 	seed(t, s, files, "files/.se/.runtime/plan.txt", Content{Hash: "h", Text: "a\nb\n"})
@@ -35,7 +35,7 @@ func TestALoadedProjectionParsesItsFile(t *testing.T) {
 
 func TestASavedFileRestoresNameByName(t *testing.T) {
 	c := New()
-	hands := Join(GivenIn(c, "t/kept", 0), GivenIn(c, "t/turned", ""), GivenIn(c, "t/new", 7))
+	hands := Join(OutIn(c, "t/kept", 0), OutIn(c, "t/turned", ""), OutIn(c, "t/new", 7))
 	s := NewStore(c)
 	saved := []byte(`{"t/kept": {"type": "int", "value": 3}, "t/turned": {"type": "int", "value": 4}, "t/gone": {"type": "int", "value": 5}}`)
 	refused, err := s.Restore(saved)
@@ -62,8 +62,8 @@ func TestASavedFileRestoresNameByName(t *testing.T) {
 
 func TestADumpNamesEveryNameUnderItsPrefix(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/a", 1)
-	GivenIn(c, "u/b", 2)
+	OutIn(c, "t/a", 1)
+	OutIn(c, "u/b", 2)
 	said, err := NewStore(c).Dump("t/")
 	if err != nil || !strings.Contains(string(said), "t/a") || strings.Contains(string(said), "u/b") {
 		t.Fatalf("the dump of t/ reads %q, %v", said, err)
@@ -73,7 +73,7 @@ func TestADumpNamesEveryNameUnderItsPrefix(t *testing.T) {
 func TestTheCatalogNamesEveryGlobOfAProjection(t *testing.T) {
 	c := New()
 	ProjectIn(c, "config", "a.txt", Codec[[]string](linesCodec{}), Loaded, []string{}, Also("b.txt"))
-	GivenIn(c, "t/n", 0)
+	OutIn(c, "t/n", 0)
 	got := c.Projections()
 	if len(got) != 2 || got[0].Glob != "a.txt" || got[1].Glob != "b.txt" || got[0].Kind != Loaded {
 		t.Fatalf("the catalog names %+v", got)

@@ -15,7 +15,7 @@ type pullIn struct {
 
 func TestAPortCarriesItsLabelIconAndLook(t *testing.T) {
 	c := New()
-	GivenIn(c, "queue/count", 0, Doc("the tickets waiting"), Label("Queue"), Icon("inbox"), Looks(Count))
+	OutIn(c, "queue/count", 0, Doc("the tickets waiting"), Label("Queue"), Icon("inbox"), Looks(Count))
 	got, ok := c.Presentation("queue/count")
 	if !ok || got.Doc != "the tickets waiting" || got.Label != "Queue" || got.Icon != "inbox" || got.Looks != Count {
 		t.Fatalf("queue/count presents %+v, %v", got, ok)

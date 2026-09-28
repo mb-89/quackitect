@@ -45,7 +45,7 @@ func Also(glob string) Option {
 
 // Registers the family `<name>/<path...>`, whose key names a file under glob. A loaded one parses files/<key> when a run names the key. [[spec/design_output/model#everything-on-disk-mirrors]]
 func ProjectIn[T any](c *Catalog, name, glob string, codec Codec[T], kind Mirror, def T, opts ...Option) Writer {
-	one := &registration{name: name + "/<path...>", kind: given, typ: typeOf[T](), def: def, missing: missing(def), mirror: kind, globs: []string{glob}}
+	one := &registration{name: name + "/<path...>", kind: out, typ: typeOf[T](), def: def, missing: missing(def), mirror: kind, globs: []string{glob}}
 	one.trip = func(body []byte) ([]byte, error) {
 		value, err := codec.Parse(body)
 		if err != nil {

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -202,6 +202,15 @@ record:
         hash: 623705f159ea865b
         size: 812
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 2b1fbfd3005184efc01147330fe5b370b77787e9
+    hash_after: 2b1fbfd3005184efc01147330fe5b370b77787e9
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -376,14 +385,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft's size list names, and the sweep reaches every case calling the given form. wave_test.go is one of those cases, so the sweep covers it. The clock, env and files cases each gain a refusal case, which the commit door asks beside a code change.
+The store stands in memory. The fake index gains SeedAs, so a case commits its own out-port as its own writer.
+A comment on OutIn, on the store's new refusal and on SeedAs names the approach, each with a link to this ticket.
+The refusal's wording stands once, in the store's commit, and every comment links to this ticket.
 
 ## tests-green
 

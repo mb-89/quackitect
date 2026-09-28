@@ -37,3 +37,17 @@ func TestAnEnvWithNoVariableCommitsNothing(t *testing.T) {
 		t.Fatalf("the env commits %v, and answers %v", committed, err)
 	}
 }
+
+// Only the env's own writer commits a variable. [[spec/tickets/commits-name-their-writer]]
+func TestAVariableRefusesAnotherWriter(t *testing.T) {
+	c := q.New()
+	Registers(c)
+	other := q.OutIn(c, "t/other", 0)
+	s := q.NewStore(c)
+	if _, err := s.Commit(0, other, map[string]any{"vars/SE_ROLE": "cloud"}); err == nil {
+		t.Fatal("a commit of vars/SE_ROLE as another writer lands")
+	}
+	if got := s.Snapshot().Read("vars/SE_ROLE"); got != "" {
+		t.Fatalf("vars/SE_ROLE reads %v after the refusal", got)
+	}
+}

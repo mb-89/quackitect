@@ -19,9 +19,9 @@ type xAndA struct {
 }
 
 // X feeds A and B, and A feeds B, and seen holds each pair of X and A that B reads. [[spec/design_output/model#one-wave-settles-a-change]]
-func diamond(during func(x int)) func(*q.Catalog) {
+func diamond(x *q.Writer, during func(x int)) func(*q.Catalog) {
 	return func(c *q.Catalog) {
-		q.GivenIn(c, "t/x", 0, q.Doc("X"))
+		*x = q.OutIn(c, "t/x", 0, q.Doc("X"))
 		q.DerivedIn(c, "t/a", 0, func(in xOf) int { during(in.X); return in.X * 2 }, q.Doc("A"))
 		q.DerivedIn(c, "t/b", "", func(in xAndA) string { return seenPair(in.X, in.A) }, q.Doc("B"))
 	}
@@ -37,8 +37,9 @@ func seenPair(x, a int) string {
 
 func TestTheDiamondRunsBOnceAfterA(t *testing.T) {
 	seen = nil
-	index := New(t, diamond(func(int) {}))
-	index.Seed(map[string]any{"t/x": 1})
+	var x q.Writer
+	index := New(t, diamond(&x, func(int) {}))
+	index.SeedAs(x, map[string]any{"t/x": 1})
 	if len(seen) != 1 || seen[0] != "1:2" {
 		t.Fatalf("B reads %v after one change of X", seen)
 	}
@@ -47,14 +48,15 @@ func TestTheDiamondRunsBOnceAfterA(t *testing.T) {
 func TestAChangeDuringAWaveWaitsForTheNext(t *testing.T) {
 	seen = nil
 	var index *Index
+	var x q.Writer
 	moved := false
-	index = New(t, diamond(func(x int) {
-		if x == 1 && !moved {
+	index = New(t, diamond(&x, func(value int) {
+		if value == 1 && !moved {
 			moved = true
-			index.Seed(map[string]any{"t/x": 3})
+			index.SeedAs(x, map[string]any{"t/x": 3})
 		}
 	}))
-	index.Seed(map[string]any{"t/x": 1})
+	index.SeedAs(x, map[string]any{"t/x": 1})
 	if len(seen) != 2 || seen[0] != "1:2" || seen[1] != "3:6" {
 		t.Fatalf("B reads %v over a change during the wave", seen)
 	}

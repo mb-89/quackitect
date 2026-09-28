@@ -23,7 +23,7 @@ func TestEachLayerParsesOffItsFile(t *testing.T) {
 
 func TestAFilePastBothLayersRunsNothing(t *testing.T) {
 	c := q.New()
-	q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
+	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
 	Registers(c)
 	if err := q.NewStore(c).Run("config/spec/other.json"); err == nil {
 		t.Fatal("config/spec/other.json runs")
@@ -54,9 +54,9 @@ func layered(t *testing.T, instance string, register func(*q.Catalog)) *qtest.In
 		t.Fatalf("the load refuses: %v", faults)
 	}
 	inputs := q.Join(
-		q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it")),
-		q.GivenIn(c, "env/<name>", "", q.Doc("an SE_ variable, as the case seeds it")),
-		q.GivenIn(c, "index/leases", []string{}, q.Doc("the parts whose lease holds, as the case seeds them")),
+		q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it")),
+		q.OutIn(c, "env/<name>", "", q.Doc("an SE_ variable, as the case seeds it")),
+		q.OutIn(c, "index/leases", []string{}, q.Doc("the parts whose lease holds, as the case seeds them")),
 	)
 	Registers(c)
 	return qtest.Over(t, c, inputs)

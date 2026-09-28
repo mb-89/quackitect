@@ -22,7 +22,7 @@ func failOn(t *testing.T) func(name string, err error) {
 
 func TestAMovedInputRunsItsProvider(t *testing.T) {
 	c := New()
-	hand := GivenIn(c, "t/n", 0)
+	hand := OutIn(c, "t/n", 0)
 	DerivedIn(c, "t/double", 0, func(in countOf) int { return in.N * 2 })
 	s := NewStore(c)
 	scheduler := NewScheduler(s, spawned, failOn(t))
@@ -35,7 +35,7 @@ func TestAMovedInputRunsItsProvider(t *testing.T) {
 
 func TestTwoMovesDuringARunLeaveOnePendingRunAndNoOverlap(t *testing.T) {
 	c := New()
-	hand := GivenIn(c, "t/n", 0)
+	hand := OutIn(c, "t/n", 0)
 	started := make(chan struct{}, 1)
 	release := make(chan struct{})
 	var held sync.Mutex
@@ -79,7 +79,7 @@ func TestTwoMovesDuringARunLeaveOnePendingRunAndNoOverlap(t *testing.T) {
 
 func TestAMoveAfterStopRunsNothing(t *testing.T) {
 	c := New()
-	hand := GivenIn(c, "t/n", 0)
+	hand := OutIn(c, "t/n", 0)
 	DerivedIn(c, "t/double", 0, func(in countOf) int { return in.N * 2 })
 	s := NewStore(c)
 	scheduler := NewScheduler(s, spawned, failOn(t))
@@ -95,7 +95,7 @@ func TestAMoveAfterStopRunsNothing(t *testing.T) {
 func doubled(t *testing.T) (*Store, Writer, *Scheduler, *int) {
 	t.Helper()
 	c := New()
-	hand := GivenIn(c, "t/n", 0)
+	hand := OutIn(c, "t/n", 0)
 	runs := 0
 	DerivedIn(c, "t/double", 0, func(in countOf) int { runs++; return in.N * 2 })
 	s := NewStore(c)

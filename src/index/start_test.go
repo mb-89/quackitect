@@ -15,8 +15,8 @@ import (
 func TestABrokenCatalogRefusesTheStart(t *testing.T) {
 	root := tree(t)
 	broken := q.New()
-	q.GivenIn(broken, "t/n", 0)
-	q.GivenIn(broken, "t/n", 0)
+	q.OutIn(broken, "t/n", 0)
+	q.OutIn(broken, "t/n", 0)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), broken)
 	if err == nil {
 		stop()

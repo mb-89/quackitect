@@ -301,9 +301,9 @@ func TestIndexNamesNameEachNameItsProviderAndState(t *testing.T) {
 	ix := catalogued(t)
 	rows := rowsRead(t, ix.Read("index/names"))
 	for _, want := range []struct{ name, kind, state string }{
-		{"index/health", "given", "answered"},
+		{"index/health", "out", "answered"},
 		{"t/ask", "action", "default"},
-		{"config/depth", "given", "default"},
+		{"config/depth", "out", "default"},
 	} {
 		row := rowNamed(t, "index/names", rows, want.name)
 		provider := fields(t, row["provider"])

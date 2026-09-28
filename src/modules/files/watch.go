@@ -222,7 +222,7 @@ func (one *FakeWatch) Changes(hand Hand) (func(), error) {
 
 // [[spec/design_output/model#io-modules-are-modules]]
 func Registers(c *q.Catalog) q.Writer {
-	return q.GivenIn(c, Family, q.Content{}, q.Doc("the hash and the text of a tracked file"), q.IO())
+	return q.OutIn(c, Family, q.Content{}, q.Doc("the hash and the text of a tracked file"), q.IO())
 }
 
 // The value a file's text takes, hashed the way the index hashes a file. [[spec/design_output/model#io-modules-are-modules]]

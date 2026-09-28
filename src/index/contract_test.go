@@ -14,9 +14,9 @@ import (
 func inProcess(t testing.TB, register func(*q.Catalog)) qtest.Harness {
 	c := q.New()
 	inputs := q.Join(
-		q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
-		q.GivenIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),
-		q.GivenIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),
+		q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
+		q.OutIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),
+		q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),
 	)
 	register(c)
 	return qtest.Over(t, c, inputs)

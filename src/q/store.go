@@ -70,6 +70,10 @@ func (s *Store) commit(read int64, as Writer, values map[string]any) (int64, []f
 		if one == nil {
 			return 0, nil, fmt.Errorf("the catalog holds no active provider of %s", name)
 		}
+		// Only the writer holding the name's active owner writes it. [[spec/tickets/commits-name-their-writer]]
+		if !as.holds(one) {
+			return 0, nil, fmt.Errorf("%s belongs to %s, and the commit names another writer", name, one.portName())
+		}
 		if got := reflect.TypeOf(value); got == nil || !got.AssignableTo(one.typ) {
 			return 0, nil, fmt.Errorf("%s holds a %s, not a %T", name, one.typ, value)
 		}

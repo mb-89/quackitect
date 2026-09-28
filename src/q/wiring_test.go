@@ -46,7 +46,7 @@ func run(t *testing.T, s *Store, name string) any {
 	return s.Snapshot().Read(name)
 }
 
-var source = func(c *Catalog, hands map[string]Writer) { hands["source"] = GivenIn(c, "all", 0, Doc("every row")) }
+var source = func(c *Catalog, hands map[string]Writer) { hands["source"] = OutIn(c, "all", 0, Doc("every row")) }
 
 var counter = func(c *Catalog, _ map[string]Writer) {
 	DerivedIn(c, "count", 0, func(in rowsOf) int { return in.Rows }, Doc("the rows counted"))
@@ -77,7 +77,7 @@ func TestAPortToPortWireReadsTheWritersName(t *testing.T) {
 }
 
 func TestAnUnwiredOutPortReadsAsInstanceAndPort(t *testing.T) {
-	clock := func(c *Catalog, _ map[string]Writer) { GivenIn(c, "minute", int64(7)) }
+	clock := func(c *Catalog, _ map[string]Writer) { OutIn(c, "minute", int64(7)) }
 	w := Wiring{Instances: []Instance{{"clock", "clock"}}}
 	s, _ := loaded(t, w, map[string]func(*Catalog, map[string]Writer){"clock": clock})
 	if got := s.Snapshot().Read("clock/minute"); got != int64(7) {
@@ -112,7 +112,7 @@ func TestAKeyReadsItsEntryOfTheResolvedValues(t *testing.T) {
 	if len(faults) > 0 {
 		t.Fatalf("the load refuses: %v", faults)
 	}
-	values := GivenIn(c, "config/values", Resolved{}, Doc("the values the config module resolves"))
+	values := OutIn(c, "config/values", Resolved{}, Doc("the values the config module resolves"))
 	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
@@ -158,7 +158,7 @@ func TestReadWiringReadsInstancesAndWires(t *testing.T) {
 }
 
 func TestAFamilyWireKeepsItsNameAndCarriesItsKeys(t *testing.T) {
-	family := func(c *Catalog, hands map[string]Writer) { hands["vars"] = GivenIn(c, "vars/<name>", "") }
+	family := func(c *Catalog, hands map[string]Writer) { hands["vars"] = OutIn(c, "vars/<name>", "") }
 	w := Wiring{Instances: []Instance{{"env", "env"}}, Wires: map[string]string{"env.vars/<name>": "env/<name>"}}
 	s, hands := loaded(t, w, map[string]func(*Catalog, map[string]Writer){"env": family})
 	bound := w.Bound("env", "vars/SE_ROLE")
@@ -186,7 +186,7 @@ func TestARestKeyCarriesEverySegment(t *testing.T) {
 
 func TestTakeJoinsTheLoadedCatalog(t *testing.T) {
 	w := Wiring{Instances: []Instance{{"clock", "clock"}}, Wires: map[string]string{"clock.minute": "clock/minute"}}
-	loadedOne, faults := Load(w, map[string]func(*Catalog){"clock": func(c *Catalog) { GivenIn(c, "minute", int64(0)) }})
+	loadedOne, faults := Load(w, map[string]func(*Catalog){"clock": func(c *Catalog) { OutIn(c, "minute", int64(0)) }})
 	if len(faults) > 0 {
 		t.Fatal(faults)
 	}
@@ -204,7 +204,7 @@ type filesOf struct {
 // A derived input of a map over a family takes every value the store holds under it, keyed by the path. [[spec/tickets/tickets-becomes-a-module]]
 func TestAFamilyInputReadsEveryKey(t *testing.T) {
 	c := New()
-	hand := GivenIn(c, "files/<path...>", Content{}, Doc("a file"))
+	hand := OutIn(c, "files/<path...>", Content{}, Doc("a file"))
 	DerivedIn(c, "t/texts", "", func(in filesOf) string { return in.Files["a.md"].Text + in.Files["b/c.md"].Text }, Doc("the two texts"))
 	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the catalog refuses a family map: %v", faults)

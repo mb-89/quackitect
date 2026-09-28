@@ -102,3 +102,17 @@ func TestTheDiskRefusesARequestToAnotherModule(t *testing.T) {
 		t.Fatal("a refused request wrote a file")
 	}
 }
+
+// Only the watch's own writer commits a file. [[spec/tickets/commits-name-their-writer]]
+func TestAFileRefusesAnotherWriter(t *testing.T) {
+	c := q.New()
+	Registers(c)
+	other := q.OutIn(c, "t/other", 0)
+	s := q.NewStore(c)
+	if _, err := s.Commit(0, other, map[string]any{"files/a.md": ContentOf("a")}); err == nil {
+		t.Fatal("a commit of files/a.md as another writer lands")
+	}
+	if got := s.Snapshot().Read("files/a.md"); got != (q.Content{}) {
+		t.Fatalf("files/a.md reads %v after the refusal", got)
+	}
+}

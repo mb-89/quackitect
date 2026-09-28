@@ -203,7 +203,7 @@ func tickOf(t *testing.T, said answer) int64 {
 func TestTheDoorAnswersWhy(t *testing.T) {
 	root := tree(t)
 	catalog := q.New()
-	q.GivenIn(catalog, "t/n", 0)
+	q.OutIn(catalog, "t/n", 0)
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
 	if err != nil {
 		t.Fatal(err)
@@ -261,7 +261,7 @@ func TestTheDoorRunsAProviderWhenAnIOModuleMovesItsInput(t *testing.T) {
 	}
 	root := tree(t)
 	catalog := q.New()
-	hand := q.GivenIn(catalog, "t/n", 0)
+	hand := q.OutIn(catalog, "t/n", 0)
 	q.DerivedIn(catalog, "t/double", 0, func(in countOf) int { return in.N * 2 })
 	moves := func(_ string, commit Commit) (func(), error) {
 		return func() {}, commit(hand, map[string]any{"t/n": 3})
@@ -316,7 +316,7 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 func TestTheDoorAnswersADumpOfAPrefix(t *testing.T) {
 	root := tree(t)
 	catalog := q.New()
-	q.GivenIn(catalog, "t/n", 4, q.Doc("a count"))
+	q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
 	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), catalog)
 	if err != nil {
 		t.Fatal(err)

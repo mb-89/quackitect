@@ -211,5 +211,5 @@ type Resolved map[string]string
 
 // A config key by its local name, which the wiring files under `<instance>/config/<key>`. [[spec/design_output/model#config-comes-off-the-registrations]]
 func CfgIn[T any](c *Catalog, key string, def T, opts ...Option) Writer {
-	return c.add(givenOf("config/"+key, def), callerAt(2), opts)
+	return c.add(outOf("config/"+key, def), callerAt(2), opts)
 }

@@ -46,3 +46,17 @@ func TestAStoppedClockCommitsNoMinute(t *testing.T) {
 		t.Fatalf("the clock commits %d times, past the one at start", commits)
 	}
 }
+
+// Only the clock's own writer commits the minute. [[spec/tickets/commits-name-their-writer]]
+func TestTheMinuteRefusesAnotherWriter(t *testing.T) {
+	c := q.New()
+	Registers(c)
+	other := q.OutIn(c, "t/other", 0)
+	s := q.NewStore(c)
+	if _, err := s.Commit(0, other, map[string]any{Port: int64(1)}); err == nil {
+		t.Fatalf("a commit of %s as another writer lands", Port)
+	}
+	if got := s.Snapshot().Read(Port); got != int64(0) {
+		t.Fatalf("the minute reads %v after the refusal", got)
+	}
+}

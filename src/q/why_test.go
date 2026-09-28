@@ -22,11 +22,11 @@ type twoIn struct {
 // [[spec/design_output/model#quack-why]]
 func whyCatalog() (*Catalog, int) {
 	c := New()
-	GivenIn(c, "t/n", 0)
+	OutIn(c, "t/n", 0)
 	_, _, line, _ := runtime.Caller(0)
 	DerivedIn(c, "t/two", 0, func(in nOf) int { return in.N * 2 })
 	DerivedIn(c, "t/four", 0, func(in twoIn) int { return in.Two * 2 })
-	GivenIn(c, "f/<id>", "")
+	OutIn(c, "f/<id>", "")
 	return c, line + 1
 }
 
@@ -58,7 +58,7 @@ func TestWhyWalksTheInputsDownToTheGivenNames(t *testing.T) {
 		t.Fatalf("t/four reads %+v", said.Inputs)
 	}
 	down := said.Inputs[0].Why.Inputs
-	if len(down) != 1 || down[0].Why.Name != "t/n" || down[0].Why.Provider.Kind != "given" || len(down[0].Why.Inputs) != 0 {
+	if len(down) != 1 || down[0].Why.Name != "t/n" || down[0].Why.Provider.Kind != "out" || len(down[0].Why.Inputs) != 0 {
 		t.Fatalf("t/two reads %+v", down)
 	}
 }

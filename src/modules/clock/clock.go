@@ -108,7 +108,7 @@ func Minute(at time.Time) int64 { return at.Unix() / secondsAMinute }
 
 // [[spec/design_output/model#io-modules-are-modules]]
 func Registers(c *q.Catalog) q.Writer {
-	return q.GivenIn(c, Port, int64(0), q.Doc("the minute, counted from the Unix epoch"), q.IO())
+	return q.OutIn(c, Port, int64(0), q.Doc("the minute, counted from the Unix epoch"), q.IO())
 }
 
 // Commits the minute at start and at each minute after. [[spec/design_output/model#io-modules-are-modules]]

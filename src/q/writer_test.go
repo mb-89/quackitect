@@ -9,8 +9,8 @@ import (
 
 func TestCommitRefusesANameOfAnotherProvider(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
-	other := GivenIn(c, "t/m", 0)
+	OutIn(c, "t/n", 0)
+	other := OutIn(c, "t/m", 0)
 	s := NewStore(c)
 	if _, err := s.Commit(0, other, map[string]any{"t/n": 1}); err == nil || !strings.Contains(err.Error(), "t/n") {
 		t.Fatalf("a commit of t/n as the provider of t/m answers %v", err)
@@ -22,8 +22,8 @@ func TestCommitRefusesANameOfAnotherProvider(t *testing.T) {
 
 func TestCommitTakesTheOwnersWriter(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
-	m := GivenIn(c, "t/m", 0)
+	n := OutIn(c, "t/n", 0)
+	m := OutIn(c, "t/m", 0)
 	s := NewStore(c)
 	if _, err := s.Commit(0, Join(n, m), map[string]any{"t/n": 1, "t/m": 2}); err != nil {
 		t.Fatal(err)

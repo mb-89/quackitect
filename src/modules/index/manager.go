@@ -45,9 +45,9 @@ type Outside struct {
 // The manager writes ops/<id>, session/alarms and index/health, and carries q.IO(), since it starts and ends processes. [[spec/design_output/model#the-index-manager]]
 func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
-		q.GivenIn(c, "ops/<id>", Op{}, q.Doc("the handle of a longer action, its state and its result"), q.IO()),
-		q.GivenIn(c, AlarmsName, []Alarm{}, q.Doc("the alarms standing, one row a part")),
-		q.GivenIn(c, HealthName, Lease{}, q.Doc("the index's own lease: its part, its last renewal and its term")),
+		q.OutIn(c, "ops/<id>", Op{}, q.Doc("the handle of a longer action, its state and its result"), q.IO()),
+		q.OutIn(c, AlarmsName, []Alarm{}, q.Doc("the alarms standing, one row a part")),
+		q.OutIn(c, HealthName, Lease{}, q.Doc("the index's own lease: its part, its last renewal and its term")),
 	)
 }
 

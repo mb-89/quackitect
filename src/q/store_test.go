@@ -12,7 +12,7 @@ import (
 
 func TestASnapshotReadsOneRevision(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
+	n := OutIn(c, "t/n", 0)
 	s := NewStore(c)
 	first, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1})
 	if err != nil {
@@ -34,7 +34,7 @@ func TestASnapshotReadsOneRevision(t *testing.T) {
 
 func TestANameNobodyWritesReadsItsDefault(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 7)
+	OutIn(c, "t/n", 7)
 	if got := NewStore(c).Snapshot().Read("t/n"); got != 7 {
 		t.Fatalf("the default reads %v", got)
 	}
@@ -42,7 +42,7 @@ func TestANameNobodyWritesReadsItsDefault(t *testing.T) {
 
 func TestARunCommitsTheRevisionItRead(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
+	n := OutIn(c, "t/n", 0)
 	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N * 2 })
 	s := NewStore(c)
 	read, err := s.Commit(0, n, map[string]any{"t/n": 3})
@@ -74,7 +74,7 @@ func TestAFoldReducesEachEvent(t *testing.T) {
 
 func TestAFamilyAnswersEachKey(t *testing.T) {
 	c := New()
-	ops := GivenIn(c, "ops/<id>", "none")
+	ops := OutIn(c, "ops/<id>", "none")
 	s := NewStore(c)
 	if _, err := s.Commit(0, ops, map[string]any{"ops/7": "running"}); err != nil {
 		t.Fatal(err)
@@ -91,7 +91,7 @@ func TestAFamilyAnswersEachKey(t *testing.T) {
 // [[spec/tickets/files-topic-reads-the-rows]]
 func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
 	c := New()
-	files := GivenIn(c, "files/<path...>", "")
+	files := OutIn(c, "files/<path...>", "")
 	s := NewStore(c)
 	if _, err := s.Commit(0, files, map[string]any{"files/spec/deep/One.md": "said"}); err != nil {
 		t.Fatal(err)
@@ -108,7 +108,7 @@ func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
 // [[spec/tickets/files-topic-reads-the-rows]]
 func TestAKeyOfManySegmentsFollowsAKeyOfOne(t *testing.T) {
 	c := New()
-	trees := GivenIn(c, "trees/<tree>/<path...>", 0)
+	trees := OutIn(c, "trees/<tree>/<path...>", 0)
 	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the check answers %+v", faults)
 	}
@@ -126,8 +126,8 @@ func TestAKeyOfManySegmentsFollowsAKeyOfOne(t *testing.T) {
 
 func TestAnActionDeclaresItsDeadlineAndItsWrite(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/pull", 0, Deadline(time.Minute), Writes())
-	GivenIn(c, "t/read", 0)
+	OutIn(c, "t/pull", 0, Deadline(time.Minute), Writes())
+	OutIn(c, "t/read", 0)
 	s := NewStore(c)
 	if got, ok := s.Declared("t/pull"); !ok || got.Deadline != time.Minute || !got.Writes {
 		t.Fatalf("t/pull declares %+v", got)
@@ -142,8 +142,8 @@ func TestAnActionDeclaresItsDeadlineAndItsWrite(t *testing.T) {
 
 func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
-	GivenIn(c, "t/m", 0)
+	n := OutIn(c, "t/n", 0)
+	OutIn(c, "t/m", 0)
 	s := NewStore(c)
 	since := time.Unix(1_700_000_000, 0)
 	if err := s.Stale("t/n", since); err != nil {
@@ -172,7 +172,7 @@ func TestAStaleMarkOnANameNobodyProvidesRefuses(t *testing.T) {
 
 func TestADropRemovesTheValuesItsWriterOwns(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/<id>", 0)
+	n := OutIn(c, "t/<id>", 0)
 	s := NewStore(c)
 	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/a": 1, "t/b": 2}); err != nil {
 		t.Fatal(err)
@@ -192,7 +192,7 @@ func TestADropRemovesTheValuesItsWriterOwns(t *testing.T) {
 
 func TestADropRefusesANameNobodyProvides(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
+	n := OutIn(c, "t/n", 0)
 	s := NewStore(c)
 	if _, err := s.Drop(s.Snapshot().Revision, n, "t/gone"); err == nil {
 		t.Fatal("the drop takes a name nobody provides")
@@ -202,8 +202,8 @@ func TestADropRefusesANameNobodyProvides(t *testing.T) {
 // [[spec/tickets/commits-name-their-writer]]
 func TestADropRefusesANameAnotherWriterOwns(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
-	other := GivenIn(c, "t/m", 0)
+	n := OutIn(c, "t/n", 0)
+	other := OutIn(c, "t/m", 0)
 	s := NewStore(c)
 	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
 		t.Fatal(err)
@@ -219,7 +219,7 @@ func TestADropRefusesANameAnotherWriterOwns(t *testing.T) {
 // [[spec/design_output/model#what-stays-how-long]]
 func TestARefusedDropLeavesEveryValue(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
+	n := OutIn(c, "t/n", 0)
 	s := NewStore(c)
 	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
 		t.Fatal(err)
@@ -236,7 +236,7 @@ func TestARefusedDropLeavesEveryValue(t *testing.T) {
 // [[spec/design_output/model#the-fake-index]]
 func TestAListenerReadsTheSnapshotOfItsCommit(t *testing.T) {
 	c := New()
-	n := GivenIn(c, "t/n", 0)
+	n := OutIn(c, "t/n", 0)
 	s := NewStore(c)
 	var read []any
 	s.OnCommit(func(values map[string]any) { read = append(read, values["t/n"], s.Snapshot().Read("t/n")) })
@@ -251,7 +251,7 @@ func TestAListenerReadsTheSnapshotOfItsCommit(t *testing.T) {
 // [[spec/tickets/files-seed-one-type]]
 func TestAnUntrackedPathReadsTheEmptyContent(t *testing.T) {
 	c := New()
-	GivenIn(c, "files/<path...>", Content{})
+	OutIn(c, "files/<path...>", Content{})
 	if got := NewStore(c).Snapshot().Read("files/spec/a.md"); got != (Content{}) {
 		t.Fatalf("files/spec/a.md reads %+v", got)
 	}

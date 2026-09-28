@@ -15,7 +15,7 @@ import (
 type provider int
 
 const (
-	given provider = iota
+	out provider = iota
 	derived
 	fold
 	action
@@ -105,12 +105,9 @@ func Writes() Option { return func(one *registration) { one.writes = true } }
 // Marks the registration of an IO module, whose package reaches the outside. [[spec/design_output/model#io-modules-are-modules]]
 func IO() Option { return func(one *registration) { one.io = true } }
 
-func Given[T any](name string, def T, opts ...Option) Writer {
-	return Main.add(givenOf(name, def), callerAt(2), opts)
-}
-
-func GivenIn[T any](c *Catalog, name string, def T, opts ...Option) Writer {
-	return c.add(givenOf(name, def), callerAt(2), opts)
+// An out-port a module's start commits, with its built-in value, so what comes in has a writer module like any output. [[spec/tickets/commits-name-their-writer]]
+func OutIn[T any](c *Catalog, name string, def T, opts ...Option) Writer {
+	return c.add(outOf(name, def), callerAt(2), opts)
 }
 
 func Derived[In, Out any](name string, def Out, fn func(In) Out, opts ...Option) Writer {
@@ -192,8 +189,8 @@ func missing(value any) bool {
 	return false
 }
 
-func givenOf[T any](name string, def T) *registration {
-	return &registration{name: name, kind: given, typ: typeOf[T](), def: def, missing: missing(def)}
+func outOf[T any](name string, def T) *registration {
+	return &registration{name: name, kind: out, typ: typeOf[T](), def: def, missing: missing(def)}
 }
 
 // Each field tagged q:"<name>" reads that name off the snapshot. The run reads the registration's inputs, so the name the wiring binds reaches it. [[spec/tickets/the-wiring-file-binds-ports]]

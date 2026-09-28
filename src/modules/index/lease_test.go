@@ -35,8 +35,8 @@ func alarmsIn(store *q.Store) []Alarm {
 func TestAnExpiredLeaseMarksEachNameOfItsPartStale(t *testing.T) {
 	var items, count q.Writer
 	dog, store, now := dogOf(t, DogSettings{}, func(c *q.Catalog) {
-		items = q.GivenIn(c, "w/items/<id>", 0)
-		count = q.GivenIn(c, "w/count", 0)
+		items = q.OutIn(c, "w/items/<id>", 0)
+		count = q.OutIn(c, "w/count", 0)
 	})
 	if _, err := store.Commit(0, items, map[string]any{"w/items/a": 1, "w/items/b": 2}); err != nil {
 		t.Fatal(err)
@@ -112,7 +112,7 @@ func TestAClearedAlarmLeavesSessionAlarms(t *testing.T) {
 }
 
 func TestAHeartbeatRenewsTheLease(t *testing.T) {
-	dog, _, now := dogOf(t, DogSettings{}, func(c *q.Catalog) { q.GivenIn(c, "w/count", 0) })
+	dog, _, now := dogOf(t, DogSettings{}, func(c *q.Catalog) { q.OutIn(c, "w/count", 0) })
 	dog.Hold("w/count", 10*time.Second)
 	now.pass(8 * time.Second)
 	dog.Beat("w/count")

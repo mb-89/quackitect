@@ -21,10 +21,10 @@ func New(t testing.TB, register func(*q.Catalog)) *Index {
 	t.Helper()
 	c := q.New()
 	inputs := q.Join(
-		q.GivenIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
-		q.GivenIn(c, "buffers/<path...>", "", q.Doc("a buffer's text, as the case seeds it")),
-		q.GivenIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),
-		q.GivenIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),
+		q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
+		q.OutIn(c, "buffers/<path...>", "", q.Doc("a buffer's text, as the case seeds it")),
+		q.OutIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),
+		q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute, as the case seeds it")),
 	)
 	register(c)
 	return Over(t, c, inputs)
@@ -44,6 +44,14 @@ func Over(t testing.TB, c *q.Catalog, inputs q.Writer) *Index {
 func (one *Index) Seed(values map[string]any) {
 	one.t.Helper()
 	if _, err := one.store.Commit(one.store.Snapshot().Revision, one.inputs, values); err != nil {
+		one.t.Fatal(err)
+	}
+}
+
+// Commits as the writer a case's own registration hands back, since the store refuses a name past its writer. [[spec/tickets/commits-name-their-writer]]
+func (one *Index) SeedAs(as q.Writer, values map[string]any) {
+	one.t.Helper()
+	if _, err := one.store.Commit(one.store.Snapshot().Revision, as, values); err != nil {
 		one.t.Fatal(err)
 	}
 }
