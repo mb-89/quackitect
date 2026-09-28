@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -531,7 +531,30 @@ record:
         exit: 0
         said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 99c928998cb2efb18896ca7b99905f2f2aec3fc8
+    hash_after: 99c928998cb2efb18896ca7b99905f2f2aec3fc8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: e74c1592149b4bf7
+        size: 665
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: the-cloud-works-its-queue
+reason: done
 ---
 
 # Ask
@@ -767,26 +790,33 @@ the split between the boot and the start road stands once, in the boot hook sect
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A cloud session boots off the repo alone. A SessionStart hook in .claude/settings.json runs src/scripts/boot.js through node, which installs on a cloud box where the plugin manifest stands nowhere. Where the manifest stands, the plugin loads and its start road installs the modules, so no install writes over another. The client scans the plugins before the hook runs, so the setup keeps its install line, its trust flag and its auto mode. The boot hook section of the level zero note names the probes that retire them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the four files the draft names under size
+the change reaches the disk and the process through the disk and proc doors, and the cases take fakeDisk and fakeProc
+boot.js points at [[spec/design_output/level0#the-boot-hook]] and at the design input it implements
+the split between the boot and the start road stands once, in the boot hook section, and boot.js points at it
 
 # accept
 
