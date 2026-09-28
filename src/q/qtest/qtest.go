@@ -50,6 +50,9 @@ func (one *Index) Seed(values map[string]any) {
 
 func (one *Index) Read(name string) any { return one.store.Snapshot().Read(name) }
 
+// The store an IO module starts over, so its case runs over the fake like every module. [[spec/tickets/the-manager-becomes-a-module]]
+func (one *Index) Store() *q.Store { return nil }
+
 func (one *Index) Run(name string) any {
 	one.t.Helper()
 	if err := one.store.Run(name); err != nil {

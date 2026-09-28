@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -182,6 +182,19 @@ record:
       - name: tests
         exit: 0
         said: green, src/modules/index passes; green, src/quack passes
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 98a6123c484b47eb70a8bd40ce7f12af93cf76e8
+    hash_after: 98a6123c484b47eb70a8bd40ce7f12af93cf76e8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/index fails
+    inputs:
+      - name: design/draft
+        hash: f25b09877886653d
+        size: 6541
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -344,7 +357,7 @@ each done_when line names its case: go test, TestTheManagerFoldsOpsAndTheWatchdo
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/modules/index/manager_test.go src/quack/manager_test.go
+./RUNME.sh branch test src/modules/index/manager_test.go src/q/qtest/qtest_test.go
 
 ### red
 
@@ -352,22 +365,22 @@ each done_when line names its case: go test, TestTheManagerFoldsOpsAndTheWatchdo
 <!-- the form is list -->
 
 src/modules/index/manager_test.go
-src/quack/manager_test.go
+src/q/qtest/qtest_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Each case fails on its own assertion over a stub manager.go that registers nothing and starts nothing. The stub alone makes go list show the package, so the fold case stays red on go list -deps of src/quack, which still names src/ops. Three of the four module cases lean on the step hook Start takes. The root case builds quack into a temp folder and asks why of session/alarms, so it holds unchanged through the implement step.
+The rename verb moved the draft hash, so this step runs again after the build. The earlier red cases stand green under that build. One ask line stands unmet: the manager tests over qtest like every IO module. TestTheManagerRunsOverTheFakeIndex and TestTheFakeHandsAnIOModuleItsStore fail on their own assertion, because qtest hands an IO module no store yet. Its stub Store answers nil.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every done_when line meets a failing case: the fold, the load with no other module and the writer of the three names, and go test and the check as commands
-the module cases run over an op table in memory and a work loop stepped by hand, and the root case runs the built binary over a temp root
+every done_when line meets a case: the green cases decide the fold, the load and the writers, and the new red cases decide the ask line on qtest
+the cases run over the fake index and an op table in memory, and reach no door
 
 # gate
 

@@ -13,6 +13,13 @@ func TestTheFakeKeepsTheContract(t *testing.T) {
 	Suite(t, func(t testing.TB, register func(*q.Catalog)) Harness { return New(t, register) })
 }
 
+func TestTheFakeHandsAnIOModuleItsStore(t *testing.T) {
+	ix := New(t, func(c *q.Catalog) { q.GivenIn(c, "t/n", 0, q.Doc("a count")) })
+	if ix.Store() == nil {
+		t.Fatal("the fake hands an IO module no store")
+	}
+}
+
 type linesOf struct {
 	File q.Content `q:"files/a.md"`
 }

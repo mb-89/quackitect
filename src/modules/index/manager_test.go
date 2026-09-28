@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
 )
 
 // An op table in memory, which reads what it saves. [[spec/design_output/model#an-operation-outlives-callers]]
@@ -143,6 +144,21 @@ func TestTheManagerWritesItsNames(t *testing.T) {
 		if where := filepath.ToSlash(said.Provider.Where); !strings.Contains(where, "src/modules/index/manager.go") {
 			t.Fatalf("%s reads its writer at %s", name, where)
 		}
+	}
+}
+
+func TestTheManagerRunsOverTheFakeIndex(t *testing.T) {
+	var as q.Writer
+	ix := qtest.New(t, func(c *q.Catalog) { as = Registers(c) })
+	store := ix.Store()
+	if store == nil {
+		t.Fatal("the fake index hands the manager no store")
+	}
+	l := &loop{now: time.Unix(1000, 0).UTC()}
+	starts(t, l.outside(t, store, as, rowsOf(map[string]string{})))
+	l.step(t)
+	if health := fields(t, ix.Read("index/health")); health["part"] != "index" {
+		t.Fatalf("the fake index reads index/health %v", health)
 	}
 }
 
