@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -194,6 +194,29 @@ record:
         exit: 0
         said: green, src/q/qtest passes; green, src/modules/index passes
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: c9c24baa843f327d220f1e3f7427c1a69ba3d2fd
+    hash_after: c9c24baa843f327d220f1e3f7427c1a69ba3d2fd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q/qtest passes; green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-meets-fake-modules.md:340:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 61906c0f6f79e944
+        size: 968
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -369,26 +392,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/q/qtest/module_test.go src/modules/index/module_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The fake module in `src/q/qtest/module.go` now registers what its script names. Each module registers an output `out`, a derived `seen` reading its in-port, and each scripted action, each with a doc. `Modules` hands each type the writer its registration answers, so the reader holds the writer of `seen` and no writer of the writer's `out`. The index's own cases now drive the wiring passes, the open in-port refusal, a refused write, one snapshot a run, a stale port past a lease, and one writing action at a time over it. No production code changes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q/qtest/module.go alone
+- the fake module reaches no door
+- the file's header points at the model section it implements
+- no fact the change adds stands in a second place
 
 # accept
 
