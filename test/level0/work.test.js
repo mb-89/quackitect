@@ -462,6 +462,38 @@ test("branch take hands out a stuck hand-over first, and prints sync, check and 
   assert.equal(disk.read(on("one-group")), GROUP_NOTE, "the free group waits");
 });
 
+// A take naming its branch goes to that branch, and leaves the stuck hand-over to an unnamed take. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+test("branch take naming a free group passes a stuck hand-over by", () => {
+  const shut = withField(GROUP_NOTE, "state", CLOSED, fakeFront());
+  const { it, outside } = doorsSaying(
+    {
+      ...remoteSaying(
+        [
+          { branch: "work/landing", tip: "tip-landing" },
+          { branch: "work/one-group", tip: "tip-one" },
+        ],
+        {
+          "work/landing:spec/tickets/landing.md": shut,
+          [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+        },
+      ),
+      "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+      "git rev-list --count origin/work/landing..origin/main": { stdout: "2\n" },
+    },
+    { [on("landing")]: shut, [on("one-group")]: GROUP_NOTE },
+  );
+
+  const { said } = heard(() =>
+    work(ROOT, ["take", "one-group"], { ...it, cloud: true }),
+  );
+
+  assert.ok(
+    !ranGit(outside).includes("git switch work/landing"),
+    "the take stays off the stuck branch",
+  );
+  assert.doesNotMatch(said, /You are on work\/landing/);
+});
+
 // A hand-over up to date with main but past work.staleAfter reads stuck by the clock. [[spec/tickets/take-hands-a-stale-handover]]
 test("branch take hands out a hand-over past work.staleAfter, by the clock", () => {
   const shut = withField(GROUP_NOTE, "state", CLOSED, fakeFront());

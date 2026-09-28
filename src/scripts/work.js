@@ -52,6 +52,7 @@ import {
 import { serving } from "./serve.js";
 import { fixRefuses } from "./work-fix.js";
 import { handsStuck, readFree, stuckFirst, trigger } from "./work-free.js";
+import { heldHere, pastHold } from "./work-held.js";
 import { list } from "./work-list.js";
 import { close, filesUp, marks, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import { readyToMerge, review } from "./work-review.js";
@@ -216,18 +217,31 @@ function take(it, name = "") {
   it.git.fetch();
   // [[spec/design_output/work#the-take-writes-the-record]]
   const mine = heldHere(it);
-  if (mine) {
-    console.log(`You already hold ${mine.branch}, so the take hands its ask again.`);
-    if (name && `${WORK_BRANCH}${name}` !== mine.branch) {
-      console.log(
-        `The take names ${WORK_BRANCH}${name}, and one branch a session keeps this box on ${mine.branch}.`,
-      );
-    }
-    brief(mine.branch, mine.name, mine.hand, mine.text);
-    return 0;
-  }
   const { stand, standing, trunk, free: all } = readFree(it);
-  const stuck = stuckFirst(it, stand, standing);
+  // A name wins over the hold: a take hands no brief for a branch it does not name. [[spec/design_output/work#the-take-writes-the-record]]
+  if (mine) {
+    const named = name ? `${WORK_BRANCH}${name}` : mine.branch;
+    if (named === mine.branch) {
+      console.log(`You already hold ${mine.branch}, so the take hands its ask again.`);
+      brief(mine.branch, mine.name, mine.hand, mine.text);
+      return 0;
+    }
+    const past = pastHold(it, mine, stand, standing);
+    if (!past) {
+      console.error(
+        `The take names ${named}, and this box holds ${mine.branch}, which stands in work.`,
+      );
+      console.error(
+        `Hand ${mine.branch} back with ./RUNME.sh branch release, or ./RUNME.sh branch done, then take ${named}.`,
+      );
+      return 1;
+    }
+    console.log(
+      `${mine.branch} stands ${past}, so its hold drops and the take goes on to ${named}.`,
+    );
+  }
+  // A stuck hand-over goes first, and a take naming its branch goes to that branch. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+  const stuck = name ? null : stuckFirst(it, stand, standing);
   if (stuck) return handsStuck(it, stuck, onBranch);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
   // A branch sharing no ancestor with trunk reaches no sync, so the take says which it passes over. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -391,19 +405,7 @@ function brief(branch, name, hand, text) {
   console.log(askOf(text));
 }
 
-// [[spec/design_output/work#the-take-writes-the-record]]
-function heldHere(it) {
-  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
-  if (!branch?.startsWith(WORK_BRANCH)) return null;
-  const name = ticketNamed(branch);
-  const path = it.join(it.root, ticketAt(name));
-  if (!it.disk.exists(path)) return null;
-  const text = it.disk.read(path);
-  const held = heldIn(text);
-  if (!held) return null;
-  const hand = handOf(it);
-  return held.hand === roleOf(hand) ? { branch, name, hand, text } : null;
-}
+// [[spec/design_output/work#the-routine-a-verb-names]]
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
 function finish(it) {

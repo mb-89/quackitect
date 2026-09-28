@@ -97,7 +97,18 @@ boxes reaching for one group mean one of them meets a rejected push and
 takes the next. That box resets the branch to its remote, so its claim leaves
 the box and the next take meets no commit origin lacks. A claim the commit
 refuses leaves the ticket as the take finds it, and the take stops.
-A take on a box that holds its branch hands that ask again, and a sync conflict after the claim still prints the ask.
+A sync conflict after the claim still prints the ask.
+
+The name decides which ask a take hands, through `pastHold` in
+`src/scripts/work-held.js`:
+
+| the take names | the branch this box holds stands | the take |
+|---|---|---|
+| nothing, or the held branch | any | hands the held ask again |
+| another branch | `done`, `merged` or stale | drops the hold, and goes on to the name |
+| another branch | in work | refuses, naming both branches and `./RUNME.sh branch release` |
+
+No take hands the ask of a branch it does not name.
 
 The take reads the group before it writes that entry, through `standsOpen` in
 `src/scripts/work.js`. A group whose open children hold no step a hand can take
