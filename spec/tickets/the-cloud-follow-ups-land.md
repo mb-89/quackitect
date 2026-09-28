@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children-2
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -119,6 +119,10 @@ record:
       - name: sync/sync
         exit: 0
         said: work/the-cloud-follow-ups-land already carries every commit on main.
+  - step: children-2
+    hand: the engine
+    hash_before: 8e878face1f8c58aba336e27f371ee00d7a71b19
+    hash_after: 8e878face1f8c58aba336e27f371ee00d7a71b19
 ---
 
 # Ask
