@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-cloud-works-its-queue
 parent: sessions-boot-from-the-repo
+record:
+  - step: do
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 8865b09018434341fe6e357af533691e8548e2d6
+    hash_after: 55eb3be4a6d996259a53961803c50a82eb0e9afa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:402:1: ListItem: A sentence in a list item holds 20 words, and this one "
+    inputs:
+      - name: ask
+        hash: 22d1135cd6f870ee
+        size: 233
+    def: 96460415736d4305
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ where the manifest stands and node_modules stands nowhere, both boots and the br
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+On a cloud box where the manifest stands and the modules stand nowhere, the plugin loads and its start road installs the modules. The boot hook installed on the same start, so two installs wrote one tree. boots now installs where the manifest stands nowhere alone. There no plugin loads, so no start road runs, and the level zero note says which road owns which case.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: it names the road that runs in each case, and no lock guards one install from another
+the cleanup the change reveals stands in it: the modules entry of the boot needs goes, and the fixture line says the new split
+the split stands once, in the boot hook section of the level zero note, and boot.js points at it
 
 # Discussion
 
