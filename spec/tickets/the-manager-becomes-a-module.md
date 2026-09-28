@@ -172,6 +172,16 @@ record:
   - step: gate
     hand: the engine
     stale: design/draft
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: df255b1e46b5da7b48d92bc85c942a978e81be86
+    hash_after: 66a14de0fe9634cf887b8ed4764176b23cf51a01
+    returns: 1
+    why: the rename verb rewrote the moved paths in design/draft, so the pull marks tests-red stale after implement/change passes. The red cases stand green under that build, so this step writes no failing test. The note rename-stales-a-ticket-draft carries it to the retro.
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/index passes; green, src/quack passes
 ---
 
 # Ask
