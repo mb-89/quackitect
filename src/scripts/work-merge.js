@@ -14,7 +14,7 @@ import {
   withField,
   withoutField,
 } from "../engine/group.js";
-import { addedHere } from "./work-fix.js";
+import { addedHere, onPersonRoute } from "./work-fix.js";
 import {
   baseOnTrunk,
   childrenHere,
@@ -270,14 +270,19 @@ export function freeChildren(it, name, parent = "") {
   return out;
 }
 
-// branch done files each open child, and each open ticket the branch adds with no group, into the group's parent. A top group leaves them loose. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+// branch done leaves the person route loose on main, and files each open child group into the group's parent. [[spec/design_output/work#a-box-leaves]]
 export function filesUp(it, name, text) {
   const parent = fieldOf(text, GROUP);
-  const out = freeChildren(it, name, parent);
+  const out = [];
+  for (const one of childrenHere(it, name)) {
+    if (fieldOf(one.text, "state") === CLOSED) continue;
+    filed(it, one, onPersonRoute(one.text) ? "" : parent);
+    out.push(one.name);
+  }
   if (!parent) return out;
   for (const one of addedHere(it)) {
     if (one.name === name || fieldOf(one.text, GROUP)) continue;
-    if (fieldOf(one.text, "state") === CLOSED) continue;
+    if (fieldOf(one.text, "state") === CLOSED || onPersonRoute(one.text)) continue;
     filed(it, one, parent);
     out.push(one.name);
   }

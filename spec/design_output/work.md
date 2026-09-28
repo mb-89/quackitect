@@ -77,7 +77,7 @@ reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
 | a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/scripts/dispatch-write.js` |
 | a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/scripts/dispatch.js`, written in the dispatch commit |
 | each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/scripts/dispatch.js` |
-| `branch done` files what the group leaves into its parent | `filesUp` in `src/scripts/work-merge.js` |
+| `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/scripts/work-merge.js` |
 
 A group no hand reaches stands open on trunk, on no branch, opens none in
 this run, and waits on nothing.
@@ -261,10 +261,17 @@ is the box saying it leaves. It reads in this order:
 
 | what stands | what `branch done` does |
 |---|---|
+| an open or draft ticket naming the group, off the person route | refuses, and names its pull and the road to the person route |
+| an open ticket the branch adds with no group, off the person route | refuses the same way |
 | a `retro` leaf that applies on this box, unwritten | refuses, names the leaf, and files nothing |
-| an open or draft ticket naming the group | files it into the group's parent, or loose where the group stands at the top, and names it |
-| an open ticket the branch adds with no group | files it into the group's parent, or leaves it loose at the top |
+| a ticket on [[spec/processes/person]], in the group or added with no group | leaves it loose on `main`, past any parent, and names it |
+| an open child group | files it into the group's parent |
 | the rest | closes the group `reason: done` and drops the cloud marker, so the pull request carries the close |
+
+`leftOpen` in `src/scripts/work-fix.js` reads what stands open. The person
+route is the one ticket leaving a group. A ticket the mint writes on a `work/`
+branch names that branch's group, through `joinsGroup` beside it. So a box's own
+question, finding or fix stays in the group until it closes.
 
 A closed ticket stays in the group, as its history. A box that wants the group
 open for the next box runs `branch release`, which leaves it at `todo`.
@@ -284,6 +291,9 @@ on:
 A desk takes no leaf of a work branch, so a person step there waits for the
 cloud box. [[spec/design_output/work#a-desk-works-on-trunk]]
 
+A ticket a cloud box mints joins the group it works, and only work a person
+alone can do stands loose on `main`. [[spec/guidance/cloud/cloud]]
+
 A desk hands a question out through `branch unblock <ticket> <successor>`. The
 verb takes the ticket standing at that step and hands its rest to a ticket
 outside the group:
@@ -292,7 +302,7 @@ outside the group:
 |---|---|
 | the ticket stands open, in this group, at a step `by: person` | the ticket closes `state: closed`, `reason: became`, `successors: [<name>]` |
 | on `main`, the group the ticket's own `group` field names | the same close, since a desk works on `main` |
-| the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
+| the successor stands open, on the person route, and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
 A ticket in no group holds no branch up, so it waits for its person where it
 stands.
@@ -318,25 +328,30 @@ behind them runs on. The verb refuses these:
 - a hand standing on a cloud box, which answers the step itself
 - a ticket standing where a hand can take it
 - a successor standing inside the group it frees
+- a successor off the person route, since a question an agent answers stays in the group
 - a successor nobody holds yet
 
 A desk mints that last one with `./RUNME.sh mint ticket`, and writes what stands
 open into its ask. [[spec/guidance/cloud/cloud]] says why the cloud road differs.
 
-## A successor stands on question
+## A successor is person work
 
-A successor stands on [[spec/processes/question]], and the verb takes it because
-that route opens at a step waiting for a person:
+A successor stands on [[spec/processes/person]], the route of work a person
+alone can do. The verb takes it because that route opens at a step waiting for
+a person:
 
 | the step it opens at | what it gives |
 |---|---|
-| `answer`, under `by: person` | the person answers on their own time |
-| `do`, under `by: anyone` | the hand behind the answer carries it out |
+| `do`, under `by: person` | the person does the work on their own time |
+| `follow`, under `by: anyone` | the hand behind the result carries it into the tree |
+
+A question an agent can answer stands on [[spec/processes/question]], inside
+the group that meets it, and a cloud box answers it there.
 
 A route opening where an agent can work hands the question back to an agent, and
 the verb refuses it. So a desk mints the successor off this route:
 
-    ./RUNME.sh mint ticket spec/tickets/<name>.md --process=question
+    ./RUNME.sh mint ticket spec/tickets/<name>.md --process=person
 
 `test/contract/process.test.js` reads that route off disk and holds it open, and
 `test/level0/unblock.test.js` mints off it and runs the verb.

@@ -68,6 +68,7 @@ import {
 import { voice } from "./voice.js";
 import { cloud, pulling, work } from "./work.js";
 import { dispatch } from "./dispatch.js";
+import { joinsGroup } from "./work-fix.js";
 import { testVerb } from "./work-test.js";
 
 // The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
@@ -494,6 +495,11 @@ function spawnsHere() {
 
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
+// A ticket a box mints on its branch joins the group the box works, and any other note stands as handed. [[spec/tickets/a-box-keeps-its-tickets]]
+export function mintFields(kind, path, fields, branch) {
+  return kind === "ticket" ? joinsGroup(fields, branch, basename(path, ".md")) : fields;
+}
+
 export function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
   const schemas = schemasIn(treeHere());
@@ -538,7 +544,12 @@ export function mint(argv) {
     return 2;
   }
 
-  const fields = handover ? fromHandover(copied.fields) : copied.fields;
+  const said = handover ? fromHandover(copied.fields) : copied.fields;
+  const branch = git(outside, root).run(
+    ["rev-parse", "--abbrev-ref", "HEAD"],
+    true,
+  ).out;
+  const fields = mintFields(kind, path, said, branch);
   const made = mintedNote(schemas, { kind, path, fields }, it.front);
   if (made.why) {
     console.error(made.why);

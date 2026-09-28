@@ -68,8 +68,8 @@ test("done writes hash_after, and closes a group whose every ticket is closed", 
   assert.ok(ranGit(outside).includes("git push origin work/one-group"));
 });
 
-// A top group hands its open tickets on loose, and names each. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
-test("done on a top group hands each open or draft ticket naming it on loose, and names each", () => {
+// A group reaches done once every ticket a box can close stands closed, so an open child stops it. [[spec/design_output/work#a-box-leaves]]
+test("done on a top group refuses while an open or draft child stands, and names the pull of each", () => {
   const took = withEntry(
     GROUP_NOTE,
     {
@@ -89,20 +89,61 @@ test("done on a top group hands each open or draft ticket naming it on loose, an
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
-  assert.equal(code, 0, said);
-  const now = disk.read(on("one-group"));
-  assert.equal(recordIn(now).at(-1).hash_after, SHA, "the box leaves");
-  assert.equal(fieldOf(now, "state"), "closed");
-  for (const one of ["a-child", "a-draft"])
-    assert.equal(fieldOf(disk.read(on(one)), "group"), "", `${one} stands loose`);
-  assert.equal(fieldOf(disk.read(on("shut-one")), "group"), "one-group");
-  assert.match(said, /a-child/);
-  assert.match(said, /a-draft/);
+  assert.equal(code, 1, said);
+  assert.equal(
+    fieldOf(disk.read(on("one-group")), "state"),
+    "open",
+    "the group stays open",
+  );
+  for (const one of ["a-child", "a-draft"]) {
+    assert.equal(
+      fieldOf(disk.read(on(one)), "group"),
+      "one-group",
+      `${one} stays in it`,
+    );
+    assert.match(said, new RegExp(`\\./RUNME\\.sh ticket pull ${one}`));
+  }
   assert.doesNotMatch(said, /shut-one/, "a closed ticket counts nowhere");
-  assert.ok(ranGit(outside).includes("git add spec/tickets/a-child.md"));
+  assert.match(
+    said,
+    /--process=person/,
+    "the verb names the road out for a person's work",
+  );
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git push")),
+    "nothing is pushed",
+  );
 });
 
-test("done hands on a ticket waiting for a helper, and a ticket of another group counts nowhere", () => {
+// Work a person alone can do leaves the group, as a free ticket on main. [[spec/design_output/work#a-box-leaves]]
+test("done on a top group hands a child on the person route loose, and closes", () => {
+  const took = withEntry(
+    GROUP_NOTE,
+    { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
+    fakeFront(),
+  );
+  const { it, disk, outside } = doorsSaying(onBranch("work/one-group"), {
+    [on("one-group")]: withField(took, "step", "children", fakeFront()),
+    [on("a-trial")]: personChild("one-group"),
+    [on("shut-one")]: CHILD("one-group", "closed"),
+    ...green,
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 0, said);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
+  assert.equal(
+    fieldOf(disk.read(on("a-trial")), "group"),
+    "",
+    "the trial stands loose",
+  );
+  assert.equal(fieldOf(disk.read(on("shut-one")), "group"), "one-group");
+  assert.match(said, /a-trial/);
+  assert.ok(ranGit(outside).includes("git add spec/tickets/a-trial.md"));
+});
+
+test("done refuses a ticket waiting for a helper, and a ticket of another group counts nowhere", () => {
   const took = withEntry(
     GROUP_NOTE,
     {
@@ -124,9 +165,9 @@ test("done hands on a ticket waiting for a helper, and a ticket of another group
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
-  assert.equal(code, 0, said);
-  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
-  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "");
+  assert.equal(code, 1, said);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "open");
+  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "one-group");
   assert.equal(fieldOf(disk.read(on("elsewhere")), "group"), "another-group");
   assert.match(said, /a-child/);
   assert.doesNotMatch(said, /elsewhere/, "a ticket of another group counts nowhere");
@@ -252,7 +293,7 @@ test("done refuses while the group's retro stands open, and names the retro step
 test("done names the open retro before it hands a ticket on, and hands none of it on", () => {
   const { it, disk } = doorsSaying(onBranch("work/one-group"), {
     [on("one-group")]: RETRO_GROUP,
-    [on("a-child")]: CHILD("one-group", "open"),
+    [on("a-child")]: personChild("one-group"),
     ...green,
   });
 
@@ -344,12 +385,20 @@ A question for the owner.
 Nothing yet.
 `;
 
-// [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-test("done on a fix group refuses an agent ticket it leaves, and names the mint of a question ticket for it", () => {
+// A ticket on the person route leaves a group loose, and nothing else does. [[spec/design_output/work#a-box-leaves]]
+const personChild = (group) =>
+  CHILD(group, "open")
+    .replace(group ? "" : "group: \n", "")
+    .replace("steps:\n", "process: [[spec/processes/person]]\nsteps:\n")
+    .replace("    does: makes", "    by: person\n    does: makes");
+const loosePersonRoute = personChild("");
+
+// [[spec/design_output/work#a-box-leaves]]
+test("done on a fix group refuses an agent ticket it leaves, and names the pull and the person route for it", () => {
   const { it, disk, outside } = leaving(true, {
     "a-follow-up": looseAgent,
     "b-follow-up": looseAgent,
-    "a-question": loosePerson,
+    "a-trial": loosePersonRoute,
   });
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
@@ -360,43 +409,55 @@ test("done on a fix group refuses an agent ticket it leaves, and names the mint 
     "open",
     "the group stays open",
   );
-  for (const name of ["a-follow-up", "b-follow-up"]) {
-    assert.match(
-      said,
-      new RegExp(
-        `\\./RUNME\\.sh mint ticket spec/tickets/${name}-question\\.md --process=question`,
-      ),
-    );
-    assert.match(
-      said,
-      new RegExp(`\\./RUNME\\.sh ticket pull ${name} --became ${name}-question`),
-    );
-  }
-  assert.doesNotMatch(said, /a-question/, "a person's ticket stands unnamed");
+  for (const name of ["a-follow-up", "b-follow-up"])
+    assert.match(said, new RegExp(`\\./RUNME\\.sh ticket pull ${name}\\b`));
+  assert.match(
+    said,
+    /\.\/RUNME\.sh mint ticket spec\/tickets\/<name>-person\.md --process=person/,
+  );
+  assert.match(said, /\.\/RUNME\.sh ticket pull <name> --became <name>-person/);
+  assert.doesNotMatch(said, /a-trial/, "a person's ticket stands unnamed");
   assert.ok(
     !ranGit(outside).some((one) => one.startsWith("git push")),
     "nothing is pushed",
   );
 });
 
-// [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-test("done on a fix group passes where every ticket it leaves waits on a person", () => {
-  const { it, disk } = leaving(true, { "a-question": loosePerson });
+// [[spec/design_output/work#a-box-leaves]]
+test("done passes where every ticket the group leaves stands on the person route", () => {
+  const { it, disk } = leaving(true, { "a-trial": loosePersonRoute });
 
-  const { code } = heard(() => work(ROOT, ["done"], it));
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
 
-  assert.equal(code, 0);
+  assert.equal(code, 0, said);
   assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
+  assert.equal(
+    fieldOf(disk.read(on("a-trial")), "group"),
+    "",
+    "the trial stands loose",
+  );
 });
 
-// [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-test("done on a feature group hands back an open agent ticket it adds, as it does today", () => {
+// A box answers a question itself, so a ticket at a person step off the person route stops the group. [[spec/guidance/cloud/cloud]]
+test("done refuses a question ticket the branch adds, since the box answers it", () => {
+  const { it, disk } = leaving(false, { "a-question": loosePerson });
+
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
+
+  assert.equal(code, 1, said);
+  assert.match(said, /a-question/);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "open");
+});
+
+// [[spec/design_output/work#a-box-leaves]]
+test("done on a feature group refuses an open agent ticket it adds, as a fix group does", () => {
   const { it, disk } = leaving(false, { "a-follow-up": looseAgent });
 
-  const { code } = heard(() => work(ROOT, ["done"], it));
+  const { code, said } = heard(() => work(ROOT, ["done"], it));
 
-  assert.equal(code, 0);
-  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
+  assert.equal(code, 1, said);
+  assert.match(said, /a-follow-up/);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "open");
 });
 
 // The group leaving names a parent, and the parent stands beside it. [[spec/tickets/groups-hold-groups]]
@@ -407,49 +468,29 @@ function nested(doors) {
   return doors;
 }
 
-// [[spec/tickets/groups-hold-groups]]
-test("branch done files each open child under the parent", () => {
+// A child group's open agent child stops it too, so nothing moves up to the parent unfinished. [[spec/tickets/a-box-keeps-its-tickets]]
+test("branch done on a child group refuses an open child, and files none under the parent", () => {
   const { it, disk } = nested(leaving(false, {}));
   disk.write(on("a-child"), CHILD("one-group", "open"));
-  disk.write(on("a-draft"), CHILD("one-group", "draft"));
   disk.write(on("shut-one"), CHILD("one-group", "closed"));
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
-  assert.equal(code, 0, said);
-  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
-  for (const one of ["a-child", "a-draft"])
-    assert.equal(fieldOf(disk.read(on(one)), "group"), "big-move", `${one} moves up`);
-  assert.equal(fieldOf(disk.read(on("shut-one")), "group"), "one-group");
+  assert.equal(code, 1, said);
+  assert.equal(fieldOf(disk.read(on("one-group")), "state"), "open");
+  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "one-group");
 });
 
-// [[spec/tickets/groups-hold-groups]]
-test("branch done files each added loose ticket under the parent", () => {
-  const { it, disk } = nested(
-    leaving(false, { "a-follow-up": looseAgent, "a-question": loosePerson }),
-  );
-
-  const { code, said } = heard(() => work(ROOT, ["done"], it));
-
-  assert.equal(code, 0, said);
-  for (const one of ["a-follow-up", "a-question"])
-    assert.equal(
-      fieldOf(disk.read(on(one)), "group"),
-      "big-move",
-      `${one} lands under the parent`,
-    );
-});
-
-// [[spec/tickets/groups-hold-groups]]
-test("a top group leaves them loose", () => {
-  const { it, disk } = leaving(false, { "a-follow-up": looseAgent });
-  disk.write(on("a-child"), CHILD("one-group", "open"));
+// Work a person alone can do goes to main loose, past the parent, since no box upstream does it either. [[spec/tickets/a-box-keeps-its-tickets]]
+test("branch done on a child group hands the person route loose, past the parent", () => {
+  const { it, disk } = nested(leaving(false, { "a-trial": loosePersonRoute }));
+  disk.write(on("b-trial"), personChild("one-group"));
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
   assert.equal(code, 0, said);
   assert.equal(fieldOf(disk.read(on("one-group")), "state"), "closed");
-  for (const one of ["a-child", "a-follow-up"])
+  for (const one of ["a-trial", "b-trial"])
     assert.equal(fieldOf(disk.read(on(one)), "group"), "", `${one} stands loose`);
 });
 
@@ -460,7 +501,7 @@ test("branch done closes on the branch alone, files the children and drops the m
     on("one-group"),
     withField(disk.read(on("one-group")), "cloud", "true", fakeFront()),
   );
-  disk.write(on("a-child"), CHILD("one-group", "open"));
+  disk.write(on("a-child"), personChild("one-group"));
 
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
@@ -468,7 +509,7 @@ test("branch done closes on the branch alone, files the children and drops the m
   const now = disk.read(on("one-group"));
   assert.equal(fieldOf(now, "state"), "closed");
   assert.equal(fieldOf(now, "cloud"), "", "the marker drops on the branch");
-  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "big-move");
+  assert.equal(fieldOf(disk.read(on("a-child")), "group"), "");
   const pushes = ranGit(outside).filter((one) => one.startsWith("git push"));
   assert.deepEqual(pushes, ["git push origin work/one-group"], "main takes no push");
   assert.match(

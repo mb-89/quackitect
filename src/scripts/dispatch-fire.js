@@ -1,7 +1,7 @@
 // The Action's fire: one fire of the work routine a ready group and a stuck
-// hand-over, up to the routine cap, one issue a question, and the write
-// branch's pull request on the owner's token. Every request goes through the
-// http door, and the plan carries what came back under fire.
+// hand-over, up to the routine cap, and the write branch's pull request on the
+// owner's token. It opens no issue, because the ticket holds the work. Every
+// request goes through the http door, and the plan carries what came back.
 // [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -10,13 +10,10 @@ import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 export const FIRE_CAP = 30;
 // The version header the fire page names, the one value it takes. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
 export const FIRE_VERSION = "2023-06-01";
-// The label that marks an issue the dispatch opens, so a second run finds it. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
-export const QUESTION_LABEL = "dispatch-question";
 const API = "https://api.github.com";
 const RATE = 429;
 const OK_FROM = 200;
 const OK_TO = 300;
-const PAGE = 100;
 const CUT = 300;
 
 const AUTO_MERGE =
@@ -31,13 +28,11 @@ export async function fire(it, plan) {
     left: [],
     wait: "",
     why: "",
-    issues: { opened: [], standing: [], why: "" },
     pull: { state: "none", url: "", why: "" },
   };
   plan.fire = out;
   const codes = [
     await fires(it, env, branchesOf(plan), out),
-    await issues(it, env, plan.questions ?? [], out.issues),
     await pulled(it, env, plan.write, out.pull),
   ];
   return codes.some(Boolean) ? 1 : 0;
@@ -87,55 +82,6 @@ async function fires(it, env, branches, out) {
       out.wait = String(said.headers?.["retry-after"] ?? "") || "?";
   }
   return out.refused.length ? 1 : 0;
-}
-
-// One issue a question, and an open issue under the label carrying its title stops a second. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
-async function issues(it, env, questions, out) {
-  if (!questions.length) return 0;
-  const hub = hubOf(env, env.GITHUB_TOKEN, "GITHUB_TOKEN");
-  if (hub.why) {
-    out.why = hub.why;
-    return 1;
-  }
-  const listed = await sent(
-    it,
-    `${hub.api}/repos/${hub.repo}/issues?state=open&labels=${QUESTION_LABEL}&per_page=${PAGE}`,
-    { method: "GET", headers: hub.headers },
-  );
-  if (!okOf(listed)) {
-    out.why = `The issue list came back ${listed.status}: ${reasonOf(listed)}`;
-    return 1;
-  }
-  const titles = new Set([readOf(listed)].flat().map((one) => one?.title));
-  for (const one of questions) {
-    const title = titleOf(one.ticket);
-    if (titles.has(title)) {
-      out.standing.push(one.ticket);
-      continue;
-    }
-    const made = await sent(it, `${hub.api}/repos/${hub.repo}/issues`, {
-      method: "POST",
-      headers: hub.headers,
-      body: JSON.stringify({ title, body: bodyOf(one), labels: [QUESTION_LABEL] }),
-    });
-    if (!okOf(made)) {
-      out.why = `The issue for ${one.ticket} came back ${made.status}: ${reasonOf(made)}`;
-      return 1;
-    }
-    titles.add(title);
-    out.opened.push(one.ticket);
-  }
-  return 0;
-}
-
-const titleOf = (ticket) => `The owner answers ${ticket}`;
-
-function bodyOf(one) {
-  return [
-    `\`spec/tickets/${one.ticket}.md\` waits on a person.`,
-    one.group ? `It holds the group \`${one.group}\` open.` : "It stands in no group.",
-    "Answer it on the ticket, and close this issue once the answer lands on main.",
-  ].join("\n\n");
 }
 
 // The write branch's pull request opens on the owner's token, so the check runs on it, and then takes auto-merge. [[spec/tickets/the-owner-stores-the-token]]
@@ -250,10 +196,6 @@ export function fireLines(out) {
   if (out.wait) lines.push(`  the rate window resets in ${out.wait} second(s)`);
   if (out.why) lines.push(`  ${out.why}`);
   if (lines.length === 1) lines.push("  none");
-  lines.push("the issues:");
-  for (const ticket of out.issues.opened) lines.push(`  ${ticket} opened`);
-  for (const ticket of out.issues.standing) lines.push(`  ${ticket} stands open`);
-  if (out.issues.why) lines.push(`  ${out.issues.why}`);
   lines.push(
     `the pull request: ${out.pull.state}${out.pull.url ? `, ${out.pull.url}` : ""}`,
   );

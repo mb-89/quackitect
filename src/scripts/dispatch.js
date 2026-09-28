@@ -3,10 +3,10 @@
 // through dispatch-write.js, and the dry run prints it and writes nothing.
 // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 
-import { CLOSED, fieldOf, GROUP, isGroup } from "../engine/group.js";
+import { agentOpens, CLOSED, DRAFT, fieldOf, GROUP, isGroup } from "../engine/group.js";
 import { fire, fireLines } from "./dispatch-fire.js";
 import { land, opens, opensOf, writeState, writesOf } from "./dispatch-write.js";
-import { waitsOnPerson } from "./work-answer.js";
+import { onPersonRoute } from "./work-fix.js";
 import { freeIn, staleClaim, stuckIn } from "./work-free.js";
 import {
   DONE,
@@ -28,7 +28,7 @@ const PARTS = [
   ["bundles", "loose agent tickets, one fix group per parent"],
   ["opens", "groups on main that open a branch"],
   ["closes", "parent groups whose children all read closed"],
-  ["questions", "tickets waiting on a person"],
+  ["person", "tickets a person alone can do, loose on main"],
 ];
 
 // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
@@ -68,7 +68,7 @@ function planned(it, now) {
     bundles: bundlesOf(read.loose, idle),
     opens: opened,
     closes: closesOf(read, idle),
-    questions: questionsOf(read, standing),
+    person: personOf(read),
   };
   return { plan, read };
 }
@@ -105,7 +105,7 @@ function looseOpen(one, idle) {
 function bundlesOf(loose, idle) {
   const by = new Map();
   for (const one of loose) {
-    if (!looseOpen(one, idle) || waitsOnPerson(one)) continue;
+    if (!looseOpen(one, idle) || leftForPerson(one)) continue;
     const parent = fieldOf(one.text, GROUP);
     by.set(parent, [...(by.get(parent) ?? []), one.name]);
   }
@@ -128,22 +128,22 @@ function closesOf(read, idle) {
     .sort();
 }
 
-// A ticket waiting on a person, on trunk or on a branch still open, with the group it holds open. Every branch carries the whole ticket folder, so a branch answers for its own children alone. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-function questionsOf(read, standing) {
-  const seen = new Map();
-  for (const one of read.loose) seen.set(one.name, one);
-  for (const held of read.stand) {
-    const status = standing.get(held.branch);
-    if (status !== TODO && status !== HELD) continue;
-    for (const one of held.tickets)
-      if (fieldOf(one.text, GROUP) === held.name) seen.set(one.name, one);
-  }
-  return [...seen.values()]
+// A ticket a box leaves on trunk: work a person alone can do, or a draft whose ask no agent opens. A question goes to a box like other open work. [[spec/tickets/the-dispatch-opens-no-issues]]
+function leftForPerson(one) {
+  return (
+    onPersonRoute(one.text) ||
+    (fieldOf(one.text, "state") === DRAFT && !agentOpens(one.text))
+  );
+}
+
+// The open tickets on trunk a person alone can do. The ticket holds the work, so nothing opens an issue for it. [[spec/tickets/the-dispatch-opens-no-issues]]
+function personOf(read) {
+  return read.loose
     .filter(
       (one) =>
         fieldOf(one.text, "state") !== CLOSED &&
         !isGroup(one.text) &&
-        waitsOnPerson(one),
+        onPersonRoute(one.text),
     )
     .map((one) => ({ ticket: one.name, group: fieldOf(one.text, GROUP) || "" }))
     .sort((a, b) => a.ticket.localeCompare(b.ticket));

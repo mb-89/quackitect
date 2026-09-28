@@ -1,6 +1,6 @@
 // The Action's fire: one routine fire a ready group and a stuck hand-over, up
-// to the routine cap, one issue a question, and the write branch's pull request
-// on the owner's token. Every request goes through the fake http door.
+// to the routine cap, and the write branch's pull request on the owner's token.
+// It opens no issue. Every request goes through the fake http door.
 // [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
 
 import assert from "node:assert/strict";
@@ -25,7 +25,6 @@ const ENV = {
   ROUTINE_FIRE_URL: FIRE_URL,
   ROUTINE_FIRE_TOKEN: "fire-token",
   PULL_TOKEN: "pull-token",
-  GITHUB_TOKEN: "action-token",
   GITHUB_REPOSITORY: REPO,
   GITHUB_API_URL: API,
 };
@@ -43,25 +42,12 @@ const json = (status, body, headers = {}) => ({
 const envelope = (status, type, message, headers = {}) =>
   json(status, { type: "error", error: { type, message } }, headers);
 
-// A GitHub that keeps the issues and pull requests it opens, so a second run reads the first one's. [[spec/design_output/doors#a-fake-behaves]]
+// A GitHub that keeps the pull requests it opens, so a second run reads the first one's. [[spec/design_output/doors#a-fake-behaves]]
 function github(routes = {}) {
-  const issues = [];
   const pulls = [];
   return {
-    issues,
     pulls,
     routes: {
-      [`GET ${API}/repos/${REPO}/issues`]: () => json(200, issues),
-      [`POST ${API}/repos/${REPO}/issues`]: (sent) => {
-        const body = JSON.parse(sent.body);
-        const made = {
-          number: issues.length + 1,
-          title: body.title,
-          labels: body.labels,
-        };
-        issues.push(made);
-        return json(201, made);
-      },
       [`GET ${API}/repos/${REPO}/pulls`]: () => json(200, pulls),
       [`POST ${API}/repos/${REPO}/pulls`]: (sent) => {
         const body = JSON.parse(sent.body);
@@ -93,10 +79,10 @@ async function fired(plan, fire = () => json(200, SESSION), extra = {}) {
   return { code, http, hub, plan };
 }
 
-const planOf = (ready = [], stuck = [], questions = [], write) => ({
+const planOf = (ready = [], stuck = [], person = [], write) => ({
   ready: ready.map((group) => ({ group, branch: `work/${group}` })),
   stuck: stuck.map((group) => ({ group, why: "behind main" })),
-  questions,
+  person,
   ...(write ? { write } : {}),
 });
 const fires = (http) => http.sent.filter((one) => one.url === FIRE_URL);
@@ -164,36 +150,22 @@ test("a rate refusal stops the run, and names when the window resets", async () 
   assert.deepEqual(plan.fire.left, ["work/second"]);
 });
 
-test("each question opens one issue, and a second run over them opens none", async () => {
-  const questions = [
-    { ticket: "who-holds-the-key", group: "the-keys" },
+// The ticket holds the work, so the fire opens no issue for it. [[spec/tickets/the-dispatch-opens-no-issues]]
+test("the fire sends nothing to the issues API, whatever the plan leaves for a person", async () => {
+  const person = [
+    { ticket: "who-holds-the-key", group: "" },
     { ticket: "which-door-opens", group: "" },
   ];
-  const hub = github();
-  const first = await fired(planOf([], [], questions), undefined, { hub });
-  assert.equal(first.code, 0);
-  assert.equal(hub.issues.length, 2);
-  const opened = first.http.sent.filter(
-    (one) => one.method === "POST" && one.url.endsWith("/issues"),
+  const { code, http, plan } = await fired(planOf([], [], person));
+  assert.equal(code, 0);
+  assert.deepEqual(
+    http.sent.filter((one) => one.url.includes("/issues")),
+    [],
+    "no request reaches the issues API",
   );
-  assert.equal(opened[0].headers.Authorization, "Bearer action-token");
-  const body = JSON.parse(opened[0].body);
-  assert.match(body.title, /who-holds-the-key/);
-  assert.deepEqual(body.labels, ["dispatch-question"]);
-  assert.match(body.body, /spec\/tickets\/who-holds-the-key\.md/);
-  assert.match(body.body, /the-keys/);
-  assert.deepEqual(first.plan.fire.issues.opened, [
-    "who-holds-the-key",
-    "which-door-opens",
-  ]);
-
-  const second = await fired(planOf([], [], questions), undefined, { hub });
-  assert.equal(hub.issues.length, 2);
-  assert.deepEqual(second.plan.fire.issues.opened, []);
-  assert.deepEqual(second.plan.fire.issues.standing, [
-    "who-holds-the-key",
-    "which-door-opens",
-  ]);
+  assert.equal(plan.fire.issues, undefined, "the fire carries no issues part");
+  const { fireLines } = await loaded("../../src/scripts/dispatch-fire.js");
+  assert.doesNotMatch(fireLines(plan.fire).join("\n"), /issue/);
 });
 
 test("the write branch's pull request opens on PULL_TOKEN, and takes auto-merge", async () => {

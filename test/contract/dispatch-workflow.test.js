@@ -34,11 +34,16 @@ test("the dispatch reads the fire secrets, checks out on PULL_TOKEN, and fires",
   assert.match(text, /ROUTINE_FIRE_URL: \$\{\{ secrets\.ROUTINE_FIRE_URL \}\}/);
   assert.match(text, /ROUTINE_FIRE_TOKEN: \$\{\{ secrets\.ROUTINE_FIRE_TOKEN \}\}/);
   assert.match(text, /PULL_TOKEN: \$\{\{ secrets\.PULL_TOKEN \}\}/);
-  assert.match(text, /GITHUB_TOKEN: \$\{\{ secrets\.GITHUB_TOKEN \}\}/);
   assert.match(text, /token: \$\{\{ secrets\.PULL_TOKEN \}\}/);
   assert.match(text, /fetch-depth: 0/);
-  assert.match(text, /issues: write/);
   assert.match(text, /run: \.\/RUNME\.sh dispatch --json --fire$/m);
+});
+
+// The ticket holds the work, so the Action opens no issue and holds no grant for one. [[spec/tickets/the-dispatch-opens-no-issues]]
+test("the dispatch grants no issue write, and hands the fire no GITHUB_TOKEN", () => {
+  const text = read(WORKFLOW);
+  assert.doesNotMatch(text, /issues:\s*write/);
+  assert.doesNotMatch(text, /GITHUB_TOKEN/);
 });
 
 test("the dispatch skill starts no session, and says the Action does", () => {

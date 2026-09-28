@@ -106,8 +106,11 @@ func TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations(t *testing.T) {
 	if open := b.Open("s1"); len(open) != 2 {
 		t.Fatalf("s1 holds %v open", open)
 	}
+	waited := make(chan []Op)
+	go func() { waited <- b.WaitCaller("s1", patience) }()
+	time.Sleep(slow / 5)
 	close(mine)
-	ended := b.WaitCaller("s1", patience)
+	ended := <-waited
 	if len(ended) != 2 || ended[0].State != Done || ended[1].State != Done || ended[0].Caller != "s1" {
 		t.Fatalf("the wait on s1 answers %+v", ended)
 	}

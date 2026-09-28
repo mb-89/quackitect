@@ -83,7 +83,7 @@ export function fixName(it, main, parent = "") {
 const FIX_ASK = [
   "The loose agent tickets on main land in this fix group, per [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]].",
   "",
-  "A fix group hands back no ticket for an agent. What it leaves goes to a person as a question ticket.",
+  "A fix group closes every ticket it holds. Work a person alone can do leaves it on the person route, loose on main.",
   "",
   "- every ticket naming this group closes through the command it names",
   "- `./RUNME.sh check` exits 0",
