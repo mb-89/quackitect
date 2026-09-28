@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -145,6 +145,18 @@ record:
         hash: 623a41b5929eb16d
         size: 3143
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-3
+    hash_before: 2f218bae082be71d83b6518e1b4bc1cd7cb75d65
+    hash_after: 2f218bae082be71d83b6518e1b4bc1cd7cb75d65
+    inputs:
+      - name: design/draft
+        hash: 623a41b5929eb16d
+        size: 3143
+      - name: design/tests-red
+        hash: 14217a810eb895d8
+        size: 825
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -297,8 +309,14 @@ the family case runs over a catalog in memory, and the golden case seeds the fak
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask, and a red case decides every done_when line: TestTheIndexImportsNoModule, TestTreeGolden through qtest, go test ./... and the check
+- the build registers the markdown codec through q.ProjectIn with q.Loaded over spec/tickets/*.md, and q.Also over .se/tickets/*.md, so all reads the loaded projection the ask names; the draft parses inside the run of all, which leaves the codec out of c.Projections and out of TestEveryCodecRoundTripsItsCommittedFiles, so projections() in src/quack/main.go takes the tickets module too
+- Changed on q.Content reaches the Watch interface, FakeWatch and Start in src/modules/files/watch.go, whose hand carries no mtime, and every Content literal; the callers list names hears and ContentOf alone, and a Content stamped by mtime commits again on a touch that keeps the hash
+- the golden case stands in src/quack/golden_test.go, where the tests list names src/modules/tickets/golden_test.go, and goldenAt reads ../tickets/testdata, which leaves with src/tickets; the build moves the golden file, points goldenAt at it, and drops src/tickets/golden_test.go
+- the stub Ticket in src/modules/tickets/tickets.go carries a subset of the fields; the moved package keeps every field the tickets door method answers today, Progress, Changed, DependsOn and Fails among them
 
 # implement
 
