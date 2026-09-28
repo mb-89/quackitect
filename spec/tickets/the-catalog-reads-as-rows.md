@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-manager-becomes-a-module, ports-declare-their-looks]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 7a1d0f785fc96e6e79d13fd24bbad58fd2366904
+    hash_after: 7a1d0f785fc96e6e79d13fd24bbad58fd2366904
+    inputs:
+      - name: ask
+        hash: 3c601a7e92ad3657
+        size: 656
+      - name: [[spec/design_output/model]]
+        hash: 1717325681c1003e
+        size: 74654
+    def: 7883b3d10633c780
 ---
 
 # Ask
