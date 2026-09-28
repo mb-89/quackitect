@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -269,9 +269,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0878ef82fb1ce22b5c74429c6dfd573714156c2c
+    hash_after: 0878ef82fb1ce22b5c74429c6dfd573714156c2c
+    inputs:
+      - name: retro/write
+        hash: 96ee068a5b4d06af
+        size: 3748
+    def: 4da1ca5da87d5bbc
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -469,28 +479,28 @@ The local check read the box's own private folder, so it answered for this box a
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- nothing: every tool the route asked for stood on the box, and the GitHub tools read the Windows CI run
+- the gh command line: the GitHub connector read the CI runs and their logs in its place, at 05:48
+- a host: the proxy refused a connect to www.google.com twice during a commit, at 05:44, and the commit landed anyway
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 <!-- the form is list -->
 
-- the commit hook refused an implement hand-back whose lint field named no test
-- the push door refused a todo tag on children the gate minted, twice
-- the push waited on a warning in the model note
-- the landing rule refused a pull chained after another command
-- no conflict at sync, and no test failed on this box alone
+- a test that passes on the box alone: the round trip read this box's private tickets and passed, while CI carries none and failed
+- the commit hook asked for a case proving qtest.Beside, at 05:33
+- level zero refused a git stash, a sed -i and three pulls joined behind another command
+- a helper counts as this session's own hand, so it takes no second ticket
+- no conflict at sync, and no cap
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 <!-- the form is list -->
 
-- driven-trees-load-the-tickets waits on the owner's answer at its person step
-- the successors under this group leave it at branch done: projection-cases-drive-their-verbs, the-manager-declares-its-spans, the-q-suite-drives-the-door
+- no person step stands parked
 - no ticket stands minted with no group
-- the handover names the group done and the successors waiting
+- the handover names the note route at accept, the bare-clone run before a hand-back, and the level zero server's drop and review_branch's empty gather as causes nobody has found yet
 
 # Discussion
 
