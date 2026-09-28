@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -200,6 +200,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: ebbd58edd040bf680266c244b75ee9df7968cd83
+    hash_after: ebbd58edd040bf680266c244b75ee9df7968cd83
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: cd64de0d4d23e2c7
+        size: 40
+    def: 1246a42e29e7ae98
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
@@ -322,38 +334,67 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-config-module-resolves-layers: each key resolves off override, context, environment, local file and default file
+- config-spells-the-env-name: the config module names a key's variable
+- env-layer-reads-its-variables: folded into the resolver's change
+- the-index-meets-fake-modules: the fake module drives the index's own cases
+- failed-start-stops-its-parts: a failed door start stops every part it reached
+- windows-builds-quack-exe: the manager case finds its binary on Windows, and CI stands green on both
+- the model note's run of requests reads as a list, which cleared the push
+- every private note decided, each successor under its group
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- helpers built the two cross-module changes while the main hand verified vet, tests and the diff
+- a red case written first caught the missing seam before the door change
+- the accept review read Windows CI, which the Linux check alone missed
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 03:19: the gate minted children with a todo tag, and the push refused them until a manual tag removal
+- 04:26: the reject at accept inserted children-2, which passed empty, and a second reject copied nothing
+- 04:40: a helper spawned with a working item in the plan met a wait, which the handover had warned of
+- 04:42: a named pull as a helper hand met the session's binding, and the child stayed out of reach
+- 03:48: the first implement hand-back named no test in its lint field, and the commit hook refused it
+- 04:25: a closed ticket's run of paragraphs in the model note held the push at warning
+- no owner prompt reached the session
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the tag and the empty reject: spec/tickets/gate-findings-reach-the-queue
+- the lint field naming no test: spec/tickets/command-fields-take-their-indent carries the indent, and a hand names the red-listed tests in the lint command
+- the spawn with a working item: the handover keeps the rule, and the plan clears its item before each spawn
+- the binding past a named pull: accept with points routes fix children, so a hand works them through the plain pull
+- the model note warning: a design note edit runs the lint on it before the hand-back
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The engine's gate paths assume a reviewer mints fixes through the verdict form. Minting by hand fights the queue at each turn: the tag, the binding and the empty children leaf. The verdict form with points is the road, and the reject form belongs to a group whose children leaf still holds open work.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each successor ticket holds its fact, and the retro points at it
+- the retro adds no number past the commit times
+- the retro writes no file header
+- the errors carry their commit times, and no owner prompt reached the session
+- the retro names roles alone
 
 ## cloud
 
