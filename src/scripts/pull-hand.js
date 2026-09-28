@@ -3,7 +3,7 @@
 // [[spec/design_output/pull#the-hand-out]]
 
 import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
-import { entryNamed } from "../../.claude/skills/level0/lib/schema.js";
+import { entryNamed, ROUND } from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -457,7 +457,7 @@ export function excludes(front, leaf, hand) {
   );
   const paths = new Set(under.map((one) => one.path));
   const wrote = entriesOf(front).filter(
-    (one) => paths.has(String(one.step)) && !one.skipped,
+    (one) => paths.has(String(one.step).replace(ROUND, "")) && !one.skipped,
   );
   if (!wrote.length) return "";
   // The record holds the role, so the rule reads the hand as its role too. [[spec/design_output/pull#the-hand-rule]]

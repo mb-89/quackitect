@@ -67,7 +67,7 @@ reason and the line.
 9. Keep a doubt as a note, an ask as a ticket, and a step in hand as a todo. A todo names no work the pull hands out anyway, and a note takes no place in the queue.
 10. Keep a note under `.se/tickets` until the mint moves it. A private ticket stays off git, and one moved by hand lands on git unread.
 11. Put a thing for later on a ticket, and in no memory folder. A memory folder stands on one box, and the retro drains it into the tree.
-12. Name the group a ticket lands in under `group`, and read a group as one branch with children. [[spec/design_output/work]]
+12. Name the group a ticket lands in under `group`, and read a group as one branch with children. Nest a group under a parent for a big move alone. [[spec/design_output/work#a-group-holds-groups]]
 13. Run `./RUNME.sh ticket update <ticket>` after a process file changes, so the leaves ahead take the new route.
 14. Mark a ticket `urgent` where a break stops work until somebody fixes it, and mark no other. A defect that waits stands unmarked, and so does every finding a retro mints.
 15. Open every file, function and verb your step names, and check each claim there before you hand it back. A second review round names an author who skips that check.

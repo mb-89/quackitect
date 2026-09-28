@@ -4,7 +4,9 @@
 package tickets
 
 import (
+	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -139,6 +141,61 @@ func TestATodoNamingARowLightsTheFlag(t *testing.T) {
 		one := Of("spec/tickets/one.md", "one", "---\nkind: [[ticket]]\ntodo: "+said+"\n---\n", 1)
 		if one.Todo != want {
 			t.Errorf("todo %q reads %v", said, one.Todo)
+		}
+	}
+}
+
+// The ticket the JavaScript cases call forPerson and loosePerson, which personStep in src/scripts/work-answer.js reads the same way. [[spec/tickets/groups-hold-groups]]
+const forPerson = `---
+kind: [[ticket]]
+state: open
+step: ask
+steps:
+  - name: ask
+    does: asks the owner a question
+    by: person
+  - name: act
+    does: acts on the answer
+---
+
+# Ask
+
+A question for the owner.
+`
+
+// The row reads person while the ticket stands open and its current step says by: person. [[spec/tickets/groups-hold-groups]]
+func TestPersonReadsTheStepHand(t *testing.T) {
+	cases := map[string]bool{
+		forPerson: true,
+		strings.Replace(forPerson, "state: open", "state: closed", 1): false,
+		strings.Replace(forPerson, "step: ask", "step: act", 1):       false,
+	}
+	for text, want := range cases {
+		row, err := json.Marshal(Of("spec/tickets/a-question.md", "a-question", text, 1))
+		if err != nil {
+			t.Fatal(err)
+		}
+		var said map[string]any
+		if err := json.Unmarshal(row, &said); err != nil {
+			t.Fatal(err)
+		}
+		if got := said["person"] == true; got != want {
+			t.Errorf("person reads %v, and wants %v, over %q", said["person"], want, text)
+		}
+	}
+}
+
+// The step names a leaf under a phase, and the first leaf answers where no step stands. [[spec/tickets/groups-hold-groups]]
+func TestPersonReadsANestedLeaf(t *testing.T) {
+	nested := strings.Replace(forPerson, "  - name: ask\n    does: asks the owner a question\n    by: person\n", "  - name: design\n    steps:\n      - name: ask\n        does: asks the owner a question\n        by: person\n", 1)
+	cases := map[string]bool{
+		strings.Replace(nested, "step: ask", "step: design/ask", 1):  true,
+		strings.Replace(nested, "step: ask\n", "", 1):                true,
+		strings.Replace(nested, "step: ask", "step: design/gone", 1): false,
+	}
+	for text, want := range cases {
+		if got := Of("spec/tickets/a-question.md", "a-question", text, 1).Person; got != want {
+			t.Errorf("person reads %v, and wants %v, over %q", got, want, text)
 		}
 	}
 }

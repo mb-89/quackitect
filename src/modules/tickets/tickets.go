@@ -71,6 +71,8 @@ type Ticket struct {
 	// The tickets this one waits on, and the hand-backs that failed on it, which the queue weighs. [[spec/tickets/the-queue-moves-to-plan]]
 	DependsOn []string `json:"depends_on,omitempty"`
 	Fails     int      `json:"fails,omitempty"`
+	// The ticket stands open, and its current step says by: person. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+	Person bool `json:"person"`
 }
 
 // The notes stand as a loaded projection over the two folders, so the codec's suite round-trips every ticket, and all reads the files through the same codec. [[spec/tickets/tickets-becomes-a-module]]
@@ -138,6 +140,7 @@ func Of(path, name, text string, changed int64) Ticket {
 		DependsOn: dependsOnIn(front),
 		Fails:     failsIn(front),
 	}
+	one.Person = state == openState && personIn(front, one.Step)
 	if one.Route == groupRoute {
 		one.Standing = standingOf(state, front)
 	}
@@ -258,6 +261,36 @@ func failsIn(front *yaml.Doc) int {
 		}
 	}
 	return count
+}
+
+// Whether the leaf the step names says by: person, the first leaf where no step stands, the rule personStep in src/scripts/work-answer.js holds. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+func personIn(front *yaml.Doc, step string) bool {
+	steps := yaml.AsList(front.Get("steps"))
+	var leaf *yaml.Doc
+	path := strings.Split(step, "/")
+	if step == "" {
+		path = nil
+		for len(steps) > 0 {
+			if leaf = yaml.AsDoc(steps[0]); leaf == nil {
+				return false
+			}
+			steps = yaml.AsList(leaf.Get("steps"))
+		}
+	}
+	for _, name := range path {
+		leaf = nil
+		for _, item := range steps {
+			if one := yaml.AsDoc(item); one != nil && word(one.Get("name")) == name {
+				leaf = one
+				break
+			}
+		}
+		if leaf == nil {
+			return false
+		}
+		steps = yaml.AsList(leaf.Get("steps"))
+	}
+	return leaf != nil && word(leaf.Get("by")) == "person"
 }
 
 // The Ask chapter up to the next heading. A fence reads as text, and every comment drops, one over several rows included. [[spec/tickets/the-tickets-topic-lands]]

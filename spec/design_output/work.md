@@ -64,6 +64,24 @@ A group of one ticket is the ordinary case, and a group of many is the same
 shape. The children stand under the group, so the write door refuses an ask
 naming one of them. The ask says what the group adds up to.
 
+## A group holds groups
+
+A child group names its parent under `group`, per
+[[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]. Each rule
+reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
+
+| the rule | where it stands |
+|---|---|
+| a parent is a group some group names | `parentsIn` in `src/engine/group.js` |
+| a child waits on every ancestor's `depends_on` | `waitsIn` in `src/scripts/work-stands.js` |
+| a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/scripts/dispatch-write.js` |
+| a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/scripts/dispatch.js`, written in the dispatch commit |
+| each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/scripts/dispatch.js` |
+| `branch done` files what the group leaves into its parent | `filesUp` in `src/scripts/work-merge.js` |
+
+A group no hand reaches stands open on trunk, on no branch, opens none in
+this run, and waits on nothing.
+
 # The take writes the record
 
 `take` claims a group by writing one entry into the group ticket's `record`:
@@ -238,21 +256,17 @@ the tip, so nothing writes to a branch nobody holds.
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
-is the box saying it leaves. A group closes only when no ticket naming it stands
-open, so the verb refuses in this order:
+is the box saying it leaves. It reads in this order:
 
 | what stands | what `branch done` does |
 |---|---|
-| an open or draft ticket naming the group | refuses, names each ticket and the step it waits at, and frees none |
-| a `retro` leaf that applies on this box, unwritten | refuses, and names the leaf |
-| every ticket at `closed`, and the retro written | closes the group `reason: done`, so `branch merge` takes it |
+| a `retro` leaf that applies on this box, unwritten | refuses, names the leaf, and files nothing |
+| an open or draft ticket naming the group | files it into the group's parent, or loose where the group stands at the top, and names it |
+| an open ticket the branch adds with no group | files it into the group's parent, or leaves it loose at the top |
+| the rest | closes the group `reason: done` and drops the cloud marker, so the pull request carries the close |
 
-A closed ticket stays in the group, as its history. A box that cannot close a
-ticket leaves the group open for the next box, by one of these roads:
-
-- close the ticket through the pull
-- hand a person's step on with `branch unblock`
-- run `branch release`, which leaves the group at `todo`
+A closed ticket stays in the group, as its history. A box that wants the group
+open for the next box runs `branch release`, which leaves it at `todo`.
 
 # A person step leaves
 
@@ -361,11 +375,17 @@ a rejected push and takes the next. For details, see
    group ticket on `main`, and a desk fills its ask.
 2. `./RUNME.sh branch open <name>` pushes `work/<name>` off trunk, standing at
    `todo`.
-3. A session works the branch and pushes to it. A cloud session stops there,
-   because the harness holds `main` shut and a cloud box opens no pull request.
+3. A session works the branch and pushes to it.
 4. That session answers the group's leaves, writes its retro under the ticket's
    retro chapter, then runs `./RUNME.sh branch done`.
-5. `./RUNME.sh branch list --done` names every branch standing at `done`.
+5. The work skill opens a pull request over `work/<name>` against `main`, with
+   auto-merge on. GitHub lands it once the check stands green on Linux and
+   Windows, and `branch merge` refuses a branch a pull request carries. A
+   closed pull keeps its head ref on origin, so `--closed` takes the merge
+   past it.
+6. `./RUNME.sh branch take` hands out a branch at `done` standing behind
+   `main` or stale ahead of a free group, and asks for a sync, the check and a
+   push.
 
 The pull's hand-out says what a branch does next, so no branch carries a copy
 of it. For details, see [[spec/design_output/pull#the-hand-out]].
@@ -576,6 +596,7 @@ A branch meets its dependency once the dependency's ticket stands closed on trun
 |---|---|
 | its ticket on trunk stands at `state: closed` | runs |
 | its branch stands no more | runs |
+| on no branch, its ticket on trunk short of `state: closed`, as a parent stands | waits |
 | `todo`, held, or `done` on its own branch | waits |
 
 A box closes the group's ticket on its branch, and trunk carries it that way
