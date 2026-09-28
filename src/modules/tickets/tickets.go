@@ -101,32 +101,6 @@ func todoAt(said string) string {
 	return said
 }
 
-// The hand the leaf at a step path names, walked down the route's steps a segment at a time, and nothing where the path reaches no leaf. [[spec/design_output/pull#the-queue-is-a-score]]
-func byAt(front *yaml.Doc, step string) string {
-	if step == "" {
-		return ""
-	}
-	steps := yaml.AsList(front.Get("steps"))
-	segments := strings.Split(step, "/")
-	for at, segment := range segments {
-		var found *yaml.Doc
-		for _, item := range steps {
-			if one := yaml.AsDoc(item); one != nil && word(one.Get("name")) == segment {
-				found = one
-				break
-			}
-		}
-		if found == nil {
-			return ""
-		}
-		if at == len(segments)-1 {
-			return word(found.Get("by"))
-		}
-		steps = yaml.AsList(found.Get("steps"))
-	}
-	return ""
-}
-
 // The tickets all answers. [[spec/tickets/the-queue-reads-the-marker]]
 type allIn struct {
 	All []Ticket `q:"all"`
@@ -192,8 +166,8 @@ func Of(path, name, text string, changed int64) Ticket {
 		TodoAt:    todoAt(word(front.Get("todo"))),
 		Cloud:     word(front.Get(cloudMark)) == "true",
 		Held:      heldIn(front),
-		Person:    byAt(front, word(front.Get("step"))) == personHand,
 	}
+	one.Person = state == openState && personIn(front, one.Step)
 	if one.Route == groupRoute {
 		one.Standing = standingOf(state, front)
 	}
@@ -314,6 +288,36 @@ func failsIn(front *yaml.Doc) int {
 		}
 	}
 	return count
+}
+
+// Whether the leaf the step names says by: person, the first leaf where no step stands, the rule personStep in src/scripts/work-answer.js holds. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+func personIn(front *yaml.Doc, step string) bool {
+	steps := yaml.AsList(front.Get("steps"))
+	var leaf *yaml.Doc
+	path := strings.Split(step, "/")
+	if step == "" {
+		path = nil
+		for len(steps) > 0 {
+			if leaf = yaml.AsDoc(steps[0]); leaf == nil {
+				return false
+			}
+			steps = yaml.AsList(leaf.Get("steps"))
+		}
+	}
+	for _, name := range path {
+		leaf = nil
+		for _, item := range steps {
+			if one := yaml.AsDoc(item); one != nil && word(one.Get("name")) == name {
+				leaf = one
+				break
+			}
+		}
+		if leaf == nil {
+			return false
+		}
+		steps = yaml.AsList(leaf.Get("steps"))
+	}
+	return leaf != nil && word(leaf.Get("by")) == personHand
 }
 
 // The Ask chapter up to the next heading. A fence reads as text, and every comment drops, one over several rows included. [[spec/tickets/the-tickets-topic-lands]]

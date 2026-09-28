@@ -7,8 +7,15 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { refsHere, standingIn } from "../../src/scripts/work-stands.js";
-import { remoteSaying } from "./work-doors.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
+import { planOf } from "../../src/scripts/dispatch.js";
+import {
+  refsHere,
+  standingIn,
+  TODO,
+  waitingOn,
+} from "../../src/scripts/work-stands.js";
+import { CHILD, doorsSaying, GROUP_NOTE, remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
 const TAGGED = "---\nkind: [[ticket]]\ntodo: true\n---\n\n# Ask\n\nLater.\n";
@@ -38,6 +45,41 @@ test("a tagged note inside an untracked folder reads as parked, because the stat
     git.ran.map((one) => one.argv.join(" ")),
     ["git status --porcelain -uall"],
   );
+});
+
+// A dependency reads off its group ticket on origin/main alone, so a parent standing on no branch still holds. [[spec/tickets/groups-hold-groups]]
+test("a parent with no branch holds its dependents", () => {
+  const after = GROUP_NOTE.replace("state: open\n", "state: open\ndepends_on: move\n");
+  const { it } = doorsSaying(
+    remoteSaying([{ branch: "work/after", tip: "tip-after", when: 1 }], {
+      "work/after:spec/tickets/after.md": after,
+      "origin/main:spec/tickets/after.md": after,
+      "origin/main:spec/tickets/move.md": GROUP_NOTE,
+      "origin/main:spec/tickets/a-part.md": CHILD("move", "open"),
+    }),
+  );
+  it.clock = fakeClock("2026-01-02T00:00:00.000Z");
+  it.stale = "12h";
+
+  const plan = planOf(it);
+
+  assert.deepEqual(plan.ready, []);
+  assert.deepEqual(plan.waiting, [{ group: "after", waits: ["move"] }]);
+});
+
+// A branch answers first, and trunk answers for a dependency on no branch. [[spec/tickets/groups-hold-groups]]
+test("waitingOn holds on a standing branch or an open ticket on trunk, and on no name trunk lacks", () => {
+  const text = GROUP_NOTE.replace(
+    "state: open\n",
+    "state: open\ndepends_on: [busy, parent, shut, gone]\n",
+  );
+  const standing = new Map([["work/busy", TODO]]);
+  const trunk = new Map([
+    ["parent", GROUP_NOTE],
+    ["shut", GROUP_NOTE.replace("state: open", "state: closed")],
+  ]);
+  assert.deepEqual(waitingOn(text, standing, trunk), ["busy", "parent"]);
+  assert.deepEqual(waitingOn(text, standing), ["busy"], "no trunk read, no parent");
 });
 
 // [[spec/tickets/the-queue-views-agree]]

@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -36,6 +37,45 @@ steps:
             form: list
             says: every file the approach touches, one a line
       - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-2
         does: writes the tests the ask calls for
         tags: ["code", "testing"]
         needs: ["branch test"]
@@ -116,8 +156,405 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: ba948ebe294b8cf89c015a46bc5192726dd02d8b
+    hash_after: ba948ebe294b8cf89c015a46bc5192726dd02d8b
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 1a28c1e2ce1b4bc67660ee241c57b41efbf0dd7b
+    hash_after: 1a28c1e2ce1b4bc67660ee241c57b41efbf0dd7b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 339ee683d0a385a5
+        size: 2318
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: b0653205decb3411bc2de87b943e57db6942b91e
+    hash_after: b0653205decb3411bc2de87b943e57db6942b91e
+    returns: 1
+    why: The install writes the plugin manifest, which git ignores, and the client scans plugins as a session starts. So the session running the first install holds no level zero, and the draft names no road for it. A probe on a fresh clone decides the order.; The draft says the client reads the trust before any hook runs, and neither a probe nor a note line backs it. Name the probe, and whether an untrusted project runs a project SessionStart hook at all.; The stamp holds the install hash and HEAD, and the cases hold the install hash alone. HEAD in the stamp runs the install again after every commit, against the ask's line on returning at once. Drop HEAD, or add the case holding it.; No case holds a matching stamp with a tool gone, as node_modules, running the install.; The draft picks node because sh stands on no Windows desk, then runs sh from boots. RUNME.ps1 runs RUNME.sh through the sh Git ships, so name that road in boots, or what the hook does on win32.
+  - step: design/draft-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: ffc8f1d096ef70bf5994b7be009b24d017cda837
+    hash_after: 35ef1406a4a252f1704d96777cc4f1ec296d25c7
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 2cbf1fed704e447b09efb481309f4dff26d597d9
+    hash_after: 2cbf1fed704e447b09efb481309f4dff26d597d9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 339ee683d0a385a5
+        size: 2318
+    def: 897ac034247c0bca
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_input/the-cloud-runs-itself]]
+  - step: design/draft-2
+    hand: the engine
+    stale: [[spec/design_input/the-cloud-runs-itself]]
+  - step: design/draft
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 3c10717a5e0479c3f16671a73c1322d9b22739ce
+    hash_after: 3c10717a5e0479c3f16671a73c1322d9b22739ce
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 34397260a34420ecf5eafd1817e7f7a8814787d0
+    hash_after: 34397260a34420ecf5eafd1817e7f7a8814787d0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0dbbf5047a23c593
+        size: 3078
+    def: 08e16d07b0de477c
+  - step: design/draft-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: e4bc60a0613a0db4e4610eda1aeb09c352be5420
+    hash_after: e4bc60a0613a0db4e4610eda1aeb09c352be5420
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 22fc99331ec488bc
+        size: 87937
+    def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: d8d01a46a05fdb7fb8d8f2b9f1ce45a9e51cf016
+    hash_after: d8d01a46a05fdb7fb8d8f2b9f1ce45a9e51cf016
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0dbbf5047a23c593
+        size: 3078
+    def: 897ac034247c0bca
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft-2
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: 460a6ec360c4e4e892b528f8e86ce08bcc6c1174
+    hash_after: 460a6ec360c4e4e892b528f8e86ce08bcc6c1174
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 6f01f3b4488cf7dc
+        size: 88120
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: 99b67ed685fd54c5ced80260e9f8dcf62364f05c
+    hash_after: 99b67ed685fd54c5ced80260e9f8dcf62364f05c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 805f822e49c509fa
+        size: 3263
+    def: 08e16d07b0de477c
+  - step: design/draft-2
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: e382d1b58a3c257b53749788cd65e495a192f889
+    hash_after: e382d1b58a3c257b53749788cd65e495a192f889
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 6f01f3b4488cf7dc
+        size: 88120
+    def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: 877985f3da67632d1a2fcf9a7c0ba6b3975bac7d
+    hash_after: 877985f3da67632d1a2fcf9a7c0ba6b3975bac7d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 805f822e49c509fa
+        size: 3263
+    def: 897ac034247c0bca
+  - step: gate
+    hand: box d7e3869061cf · claude-code-remote · helper-19
+    hash_before: 9c98183a76dbedad8afe23c28c4f406183216b26
+    hash_after: 9c98183a76dbedad8afe23c28c4f406183216b26
+    inputs:
+      - name: design/draft
+        hash: 805f822e49c509fa
+        size: 3263
+      - name: design/tests-red
+        hash: 19860dd76f5ba711
+        size: 589
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: d31e827c688de331d8e31abce7191383136b97be
+    hash_after: d31e827c688de331d8e31abce7191383136b97be
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft-2
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: c62f13fc79044197ac4282186a7087f79400f579
+    hash_after: c62f13fc79044197ac4282186a7087f79400f579
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 3411ceaf98287365
+        size: 89123
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: 6ecd34e5cc45121defd2cf852b3163ff4c473f2e
+    hash_after: 3aeb6231569c029b7fdd00366e06cbb3838d8f95
+    returns: 1
+    why: The change landed at implement/change, and its level zero note section staled this draft. tests-red expects a failing assertion, and the boot cases pass now, so no run passes the step. a-rewind-spares-landed-tests owns the fix, and the draft stands as it read.
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 681e1b82306c01034867f4fdeefd20915a973f93
+    hash_after: 681e1b82306c01034867f4fdeefd20915a973f93
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 2b44825ca53911ae
+        size: 3293
+    def: 08e16d07b0de477c
+  - step: design/draft-2
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 04ad0f0471ba43822658e0bd9ec43cb70c3adb95
+    hash_after: 04ad0f0471ba43822658e0bd9ec43cb70c3adb95
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: 3411ceaf98287365
+        size: 89123
+    def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: c3a75a11768e93ed1cc0dac8991db6ab0f1513ba
+    hash_after: c3a75a11768e93ed1cc0dac8991db6ab0f1513ba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 2b44825ca53911ae
+        size: 3293
+    def: 897ac034247c0bca
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft-2
+    hand: the engine
+    stale: [[spec/design_output/level0]]
+  - step: design/draft
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: e86d7ec6f946e70833b2b187d9d6a51602bcb1bd
+    hash_after: e86d7ec6f946e70833b2b187d9d6a51602bcb1bd
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 0d1f2ff1970e76940c260f2555c12497fbebe643
+    hash_after: 0d1f2ff1970e76940c260f2555c12497fbebe643
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: dd385901fd27601c
+        size: 3263
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: 08e16d07b0de477c
+  - step: design/draft-2
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 906ee884edafebddbc64705177fb53a367c85fdd
+    hash_after: 906ee884edafebddbc64705177fb53a367c85fdd
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: bb59a69e91db69b50d57af768d86c0aaeba45699
+    hash_after: bb59a69e91db69b50d57af768d86c0aaeba45699
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: dd385901fd27601c
+        size: 3263
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: 897ac034247c0bca
+  - step: gate
+    hand: box d7e093d924e2 · claude-code-remote · helper-34
+    hash_before: 6c08c03f9c48e1558342814592bcfb7504fe4f4f
+    hash_after: 6c08c03f9c48e1558342814592bcfb7504fe4f4f
+    inputs:
+      - name: design/draft
+        hash: dd385901fd27601c
+        size: 3263
+      - name: design/tests-red
+        hash: e74c1592149b4bf7
+        size: 665
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: e3cd3a940a1cba5ab594138b1cca75bdafd14b1a
+    hash_after: e3cd3a940a1cba5ab594138b1cca75bdafd14b1a
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 99c928998cb2efb18896ca7b99905f2f2aec3fc8
+    hash_after: 99c928998cb2efb18896ca7b99905f2f2aec3fc8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: e74c1592149b4bf7
+        size: 665
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: the-cloud-works-its-queue
-step: design/owner-read
+reason: done
 ---
 
 # Ask
@@ -156,38 +593,46 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/level0#the-boot-hook]] holds the approach, and the change stands landed. `src/scripts/boot.js` runs as the SessionStart hook through node. Off a cloud box, or where the plugin manifest stands, it runs nothing. Otherwise it runs `sh src/scripts/install.sh` through the proc door under `SE_INSTALL_SKIP` set to `INSTALL_SKIP`, and answers 0 always. Where the manifest stands the plugin loads, and the bridgehead start road installs the modules, so no install writes over another. The client scans the plugins before the hook runs, so the setup keeps its install line, its trust flag and its auto mode, and the note names the probes that retire them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+`.claude/settings.json`: `hooks.SessionStart` runs `src/scripts/boot.js`,`src/scripts/boot.js`: `boots` runs `src/scripts/install.sh` through the proc door,`src/scripts/boot.js`: `boots` reads `INSTALL_SKIP` from `.claude/skills/level0/hooks/level0.js`,`.claude/skills/level0/hooks/level0.js`: `START` installs the modules where the manifest stands,`src/scripts/boot.js`: the stub `stampOf` goes, and the `stampOf` of `runs.js` stands untouched,`spec/design_output/level0.md`: the boot hook section names the hook, the road owning each install, and why every setup line stands
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+`test/level0/hooks.test.js`: the project settings carry a SessionStart hook running src/scripts/boot.js,`test/level0/hooks.test.js`: boot runs no install where the manifest and the modules stand,`test/level0/hooks.test.js`: boot runs the install under the skip list where the manifest stands nowhere,`test/level0/hooks.test.js`: boot leaves the install to the bridgehead where the manifest stands and the modules stand nowhere,`test/level0/hooks.test.js`: boot runs nothing off a cloud box,`test/level0/hooks.test.js`: boot runs the install on a box SE_CLOUD marks,`test/level0/hooks.test.js`: boot answers 0 where the install fails
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+the first session: the setup keeps its install line, and the note names the probe that retires it,the trust claim: the approach drops it, and the setup keeps the trust flag and the mode,the stamp and HEAD: no stamp stands, the manifest decides, and the stub `stampOf` goes,a tool gone under a matching stamp: the bridgehead start road installs the modules it finds gone,the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`,the restale off main: the level zero note gains the branch sync free-verb line alone, which the boot leaves untouched,the restale by the boot hook section: the section states this draft, and the draft points at it,the double install boot-and-bridgehead-install-once names: boot installs where the manifest stands nowhere, and the bridgehead owns the modules
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+`.claude/settings.json`,`src/scripts/boot.js`,`test/level0/hooks.test.js`,`spec/design_output/level0.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened the boot hook section of the level zero note, `.claude/settings.json`, `boot.js` and its cases, the `START` road in `level0.js`, and both `stampOf` hits under src
+the callers list names the hook, the install call, the skip list, the start road, the stub going and the note section
+each done_when line meets a case in hooks.test.js or the note section, and the check decides the last
 
 ## tests-red
 
@@ -196,26 +641,112 @@ The source: none.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+sh .se/scripts/boot-red-before-change.sh
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/hooks.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The boot cases answer green on the tip, because the change stands landed at 370af06b9. The script runs them against 370af06b9^, and four fail on their own assertion there. The case where everything stands, the case off a cloud box, and the case leaving the modules to the bridgehead pass there, as negative cases do.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a boot case in test/level0/hooks.test.js that fails before the change, or the check line, which the hand answers at tests-green
+the cases reach the disk and the process through fakeDisk and fakeProc alone
+
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+[[spec/design_output/level0#the-boot-hook]] holds the approach, and the change stands landed. `src/scripts/boot.js` runs as the SessionStart hook through node. Off a cloud box, or where the plugin manifest stands, it runs nothing. Otherwise it runs `sh src/scripts/install.sh` through the proc door under `SE_INSTALL_SKIP` set to `INSTALL_SKIP`, and answers 0 always. Where the manifest stands the plugin loads, and the bridgehead start road installs the modules, so no install writes over another. The client scans the plugins before the hook runs, so the setup keeps its install line, its trust flag and its auto mode, and the note names the probes that retire them.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+`.claude/settings.json`: `hooks.SessionStart` runs `src/scripts/boot.js`,`src/scripts/boot.js`: `boots` runs `src/scripts/install.sh` through the proc door,`src/scripts/boot.js`: `boots` reads `INSTALL_SKIP` from `.claude/skills/level0/hooks/level0.js`,`.claude/skills/level0/hooks/level0.js`: `START` installs the modules where the manifest stands,`src/scripts/boot.js`: the stub `stampOf` goes, and the `stampOf` of `runs.js` stands untouched,`spec/design_output/level0.md`: the boot hook section names the hook, the road owning each install, and why every setup line stands
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+`test/level0/hooks.test.js`: the project settings carry a SessionStart hook running src/scripts/boot.js,`test/level0/hooks.test.js`: boot runs no install where the manifest and the modules stand,`test/level0/hooks.test.js`: boot runs the install under the skip list where the manifest stands nowhere,`test/level0/hooks.test.js`: boot leaves the install to the bridgehead where the manifest stands and the modules stand nowhere,`test/level0/hooks.test.js`: boot runs nothing off a cloud box,`test/level0/hooks.test.js`: boot runs the install on a box SE_CLOUD marks,`test/level0/hooks.test.js`: boot answers 0 where the install fails
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+the first session: the setup keeps its install line, and the note names the probe that retires it,the trust claim: the approach drops it, and the setup keeps the trust flag and the mode,the stamp and HEAD: no stamp stands, the manifest decides, and the stub `stampOf` goes,a tool gone under a matching stamp: the bridgehead start road installs the modules it finds gone,the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`,the restale off main: the level zero note gains the branch sync free-verb line alone, which the boot leaves untouched,the restale by the boot hook section: the section states this draft, and the draft points at it,the double install boot-and-bridgehead-install-once names: boot installs where the manifest stands nowhere, and the bridgehead owns the modules
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+`.claude/settings.json`,`src/scripts/boot.js`,`test/level0/hooks.test.js`,`spec/design_output/level0.md`
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+opened the boot hook section of the level zero note, `.claude/settings.json`, `boot.js` and its cases, the `START` road in `level0.js`, and both `stampOf` hits under src
+the callers list names the hook, the install call, the skip list, the start road, the stub going and the note section
+each done_when line meets a case in hooks.test.js or the note section, and the check decides the last
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+sh .se/scripts/boot-red-before-change.sh
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+test/level0/hooks.test.js
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+The boot cases answer green on the tip, because the change stands landed at 370af06b9. The script runs them against 370af06b9^, and four fail on their own assertion there. The negative cases pass there.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+every done_when line on the hook meets a case that fails before the change, the note lines meet the review, and ./RUNME.sh check decides the last
+the boot cases reach the disk and the process through fakeDisk and fakeProc alone
 
 # gate
 
@@ -224,8 +755,10 @@ The source: none.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- boot-hook-names-its-span: the SessionStart hook in .claude/settings.json names no timeout, while the START road in level0.js allows STARTING of 180000 ms for the same install.sh on a fresh clone. A hook the client cuts short leaves the install half done, and brand.js writes the manifest last, so the next session boots with no cage again. Name a span on the hook to match STARTING, or add a probe to the boot hook section saying the client waits the install out. The client default span is unchecked here, and the 180000 ms the start road allows backs the doubt.
 
 # implement
 
@@ -236,14 +769,19 @@ The source: none.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the four files the draft names under size, and the modules split of boot-and-bridgehead-install-once stays inside them
+the change reaches the disk and the process through the disk and proc doors, and the cases take fakeDisk and fakeProc
+boot.js points at [[spec/design_output/level0#the-boot-hook]] and at the design input it implements
+the split between the boot and the start road stands once, in the boot hook section, and boot.js points at it
 
 ## tests-green
 
@@ -252,26 +790,33 @@ The source: none.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A cloud session boots off the repo alone. A SessionStart hook in .claude/settings.json runs src/scripts/boot.js through node, which installs on a cloud box where the plugin manifest stands nowhere. Where the manifest stands, the plugin loads and its start road installs the modules, so no install writes over another. The client scans the plugins before the hook runs, so the setup keeps its install line, its trust flag and its auto mode. The boot hook section of the level zero note names the probes that retire them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the four files the draft names under size
+the change reaches the disk and the process through the disk and proc doors, and the cases take fakeDisk and fakeProc
+boot.js points at [[spec/design_output/level0#the-boot-hook]] and at the design input it implements
+the split between the boot and the start road stands once, in the boot hook section, and boot.js points at it
 
 # accept
 
@@ -296,3 +841,5 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The change stands landed at `implement/change`, and the check runs green over it. The boot hook section it writes into the level zero note marks the draft stale, and the route walks back to `design/tests-red`. That step expects a failing assertion, and the boot cases pass now, so no run passes it. The ticket waits on [[spec/tickets/a-rewind-spares-landed-tests]], which owns the fix.
