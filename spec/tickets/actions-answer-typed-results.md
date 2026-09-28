@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -164,6 +164,18 @@ record:
         hash: 852cd7cfc77b6b4f
         size: 2056
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-6
+    hash_before: 846530bd0f3f347637506deac8892ae7bb031bca
+    hash_after: 846530bd0f3f347637506deac8892ae7bb031bca
+    inputs:
+      - name: design/draft
+        hash: 852cd7cfc77b6b4f
+        size: 2056
+      - name: design/tests-red
+        hash: 56d43ffa2ce49861
+        size: 501
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -297,8 +309,15 @@ the cases run over a catalog and a wiring in memory, and reach no door
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- surfaces-read-the-output-fields: the MCP tool and the OpenAPI document read Presentation.Out as the action's output schema. This ticket stops at the catalog, and nothing past Start reads Presentation, so the untyped result the ask names stays until a surface reads Out
+- deliver-checks-the-declared-answer: Store.Deliver checks the last answer against the type q.Answers declares, and refuses a mismatch naming the action. The draft assumes no check, so a declared type can drift from what a caller receives
+| in place | what the builder fixes at implement |
+| --- | --- |
+| src/q/looks.go | the q.Answers stub cites the ticket; its comment points at the model's options, as its neighbours do |
+| src/q/q.go | registration gains an out field beside fields, set by q.Answers off fieldsOf |
 
 # implement
 
