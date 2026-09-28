@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -358,6 +358,15 @@ record:
         hash: 19860dd76f5ba711
         size: 589
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: d31e827c688de331d8e31abce7191383136b97be
+    hash_after: d31e827c688de331d8e31abce7191383136b97be
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: the-cloud-works-its-queue
 ---
 
@@ -580,14 +589,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/boot.js spec/design_output/level0.md .claude/settings.json .vale.ini test/level0/hooks.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the four files the draft names, and .vale.ini beside them, because boot.js is a root reading the environment the way the other hook roots do
+boot.js reaches the disk and the process through the doors under src/doors, and the cases drive the fake disk and the fake proc
+the header of boot.js and its catch point at the-cloud-runs-itself and the boot hook section
+the boot hook section in the level zero note owns the setup lines and the probes, and boot.js points at it
 
 ## tests-green
 

@@ -6,6 +6,19 @@
   "env": {
     "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"
   },
+  "$hooks": "THE BOOT. A cloud box lacking the plugin manifest or the modules installs them as a session starts, for the session after it. See spec/design_output/level0.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node $CLAUDE_PROJECT_DIR/src/scripts/boot.js"
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "mcp__level0",

@@ -135,6 +135,16 @@ test("boot runs nothing off a cloud box", () => {
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
+test("boot runs the install on a box SE_CLOUD marks", () => {
+  const { it, proc } = booting(without(MANIFEST), { SE_CLOUD: "1" });
+  assert.equal(boots(it), 0);
+  assert.deepEqual(
+    proc.ran.map((one) => one.argv.join(" ")),
+    [`sh ${INSTALL}`],
+  );
+});
+
+// [[spec/design_input/the-cloud-runs-itself#the-boot]]
 test("boot answers 0 where the install fails", () => {
   const { it, proc } = booting(without(MANIFEST));
   proc.teach(["sh", INSTALL], { exitCode: 1, stderr: "no network" });

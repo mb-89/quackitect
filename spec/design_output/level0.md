@@ -925,6 +925,28 @@ node itself, so the setup leans on nothing again.
 the editor link, the editor extensions, the language client, Go, the index and
 the language server. Those stay wants, and every rule holds without them.
 
+## The boot hook
+
+A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
+through node. On a cloud box lacking the plugin manifest or the modules, it
+runs `src/scripts/install.sh` under `INSTALL_SKIP`. Where both stand, or off a
+cloud box, it runs nothing. A failed install holds no session up.
+
+The client scans the plugins before a session start hook runs, so the session
+running the first install holds no level zero. The next session on the box
+holds it. So every setup line stands:
+
+| the setup line | why it stands |
+|---|---|
+| the install | it lands the cage before the first session, and the hook reaches the next one alone |
+| the trust flag | no project file reaches it |
+| the auto mode | a project file naming it changes nothing |
+
+The probes on a fresh clone with no setup decide what retires:
+
+- whether the first session holds level zero once the hook runs, which retires the install line
+- whether a clone carrying no trust runs a project session start hook at all
+
 ## Where the mode stands
 
 The client takes `permissions.defaultMode` values `auto` and `bypassPermissions`
