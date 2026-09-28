@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-watches-close-cleanly
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 73f34d9bc60b7e39
         size: 233
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d81e857fa7fb · claude-code-remote
+    hash_before: 711340a3069b4dbf15ca31f205a61e2d075d7448
+    hash_after: 711340a3069b4dbf15ca31f205a61e2d075d7448
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/watcher fails
+    inputs:
+      - name: design/draft
+        hash: 05ab375eb6284c9e
+        size: 1847
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -215,26 +228,31 @@ the done_when line meets the fake test in src/watcher, and each watch meets its 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/watcher/watcher_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestAStopReturnsWhileTheHearAdds fails on its own assertion within its first rounds: the fake picks the stop over the add, and the stop hangs on the loop. The files and index tests pass on Linux, because inotify answers Add without the reader; they guard the Windows job, where the hang showed.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the done_when line meets the fake test, red here, and each watch meets a stop test that CI runs on Windows
+the door the tests reach, fsnotify, has a fake with its Windows timing in src/watcher/watcher_test.go
 
 # gate
 
