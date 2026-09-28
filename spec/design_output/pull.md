@@ -676,7 +676,7 @@ A gate carrying `final: true` reads the whole work, and the process closes on it
 |---|---|
 | the hand-out | waits while a ticket naming this one as `parent` or `group` stands open |
 | the hand-out | names the diff since the base, merges and all |
-| the hand-back | runs every command field of the route, and the record keeps each answer |
+| the hand-back | runs every command field of the leaves before the gate, and the record keeps each answer. A leaf past the gate, a retro's among them, runs its own when the route reaches it |
 | the hand-back | reruns a red pass expecting its cases green, because the green pass after it turns those cases green |
 | `accept with points` | mints the fix tickets and leaves the step on the gate, so it waits on them and reads again |
 | a verdict short of accept past `work.failsBeforePerson` | mints a question ticket and closes the process `became` onto it |
