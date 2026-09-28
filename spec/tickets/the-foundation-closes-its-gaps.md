@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -172,6 +172,25 @@ record:
         hash: e122785976621597
         size: 10947
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 72b4ecd447b1a51b86098115de1b34603693beea
+    hash_after: 72b4ecd447b1a51b86098115de1b34603693beea
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-foundation-closes-its-gaps already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 5e9ae3babf8a6830
+        size: 359
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
@@ -272,9 +291,7 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- windows-builds-quack-exe: the manager case in `src/quack/manager_test.go` builds `quack` with no `.exe`, so the Windows check fails. Name the binary with `.exe` on Windows, as `src/lsp/outside.go` does
-- failed-start-stops-its-parts: the door's start in `src/index/door.go` returns on a failed listen or `/v1` start and leaves the beats, the IO modules and the scheduler running. Run the stop over what the start reached
+accept
 
 # retro
 
