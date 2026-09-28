@@ -6,6 +6,7 @@ package main
 import (
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -84,8 +85,16 @@ func quack(t *testing.T, bin, root string, args ...string) (string, error) {
 	return string(said), err
 }
 
+// The binary a build writes, named with .exe on Windows, where exec finds no other. [[spec/tickets/windows-builds-quack-exe]]
+func binaryIn(folder, name string) string {
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	return filepath.Join(folder, name)
+}
+
 func TestTheIndexLoadsTheManagerWithNoOtherModule(t *testing.T) {
-	bin := filepath.Join(t.TempDir(), "quack")
+	bin := binaryIn(t.TempDir(), "quack")
 	build := exec.Command("go", "build", "-o", bin, "./src/quack")
 	build.Dir = filepath.Join("..", "..")
 	if said, err := build.CombinedOutput(); err != nil {
