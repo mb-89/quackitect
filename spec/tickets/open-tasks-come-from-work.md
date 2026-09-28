@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 7c0201f8ee4678b7
         size: 502
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 28fd8494c6b6fe6c16543dc01aded1168a4611d9
+    hash_after: 28fd8494c6b6fe6c16543dc01aded1168a4611d9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/work fails
+    inputs:
+      - name: design/draft
+        hash: a240cf98586639c5
+        size: 2338
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -204,26 +217,32 @@ every done_when line names the test that decides it: go test from the root, Test
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/work/open_tasks_test.go
+src/modules/work/rows_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion: open-tasks reads 0, and rows reads an empty list. The count needs the places alone, since the queue already writes the cloud place for a marked row, so the cloud port feeds the rows alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides: TestOpenTasksReadsAFakeTreeOfTickets reads the out-port over a fake tree, and go test and the check close at tests-green
+every door the tests reach has a fake: the cases reach no door, only the fake index
 
 # gate
 
