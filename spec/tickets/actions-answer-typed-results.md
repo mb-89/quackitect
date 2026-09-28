@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -234,6 +234,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: d4350030cd7b99d4dcf64bc60bd934224770b116
+    hash_after: d4350030cd7b99d4dcf64bc60bd934224770b116
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-meets-fake-modules.md:306:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: dd7e6de56d25c903
+        size: 683
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -407,26 +430,36 @@ The second gate names two stale draft lines. Deliver now checks the answer again
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/q/looks_test.go src/q/send_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+q.Answers declares the type an action's caller receives. It fills the registration's output fields off that type, the way an input type fills the input fields.
+Presentation hands the output fields back as Out, and the start refuses an output field with no doc tag, naming it as an output field.
+The model note says at an action lists requests that the caller receives the last answer, and the options table carries q.Answers.
+Deliver checks the answer against the declared type, from the child deliver-checks-the-declared-type. The surfaces reading Out ride on actions-answer-over-http.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change stays inside the draft's size list, and a note parks the MCP half for the retro.
+The cases run in memory and reach no door.
+The comment on q.Answers points at the model's options.
+The model note states the caller's answer once, and the code comments link to it.
 
 # accept
 
