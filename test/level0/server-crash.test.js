@@ -163,7 +163,11 @@ test("a restart starts the child once the port stops listening, with a connectio
   ]);
   server.ends();
 
-  assert.equal(was, false, "the child starts on a closed listen, and the open connection holds it back not at all");
+  assert.equal(
+    was,
+    false,
+    "the child starts on a closed listen, and the open connection holds it back not at all",
+  );
   assert.equal(server.open, 0);
 });
 
@@ -238,4 +242,14 @@ test("a free port takes no stop", async () => {
 
   assert.equal(await takesOver(6510, ask, async () => {}), false);
   assert.equal(asked.length, 1);
+});
+
+// [[spec/design_output/level0#a-restart-watches-its-child]]
+test("a respawn that falls writing nothing names the serve log", async () => {
+  const it = restarting({ exitCode: 1 });
+  await respawned(it.own, START, () => {}, 0);
+  assert.match(
+    it.rows[0][2],
+    /falls with exit 1: it wrote nothing to \.se\/\.log\/serve\.log/,
+  );
 });

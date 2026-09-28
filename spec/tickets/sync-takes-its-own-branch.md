@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -117,7 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 3d1b5e98078a6929cb1e508ff7820d3ae42580a5
+    hash_after: 3d1b5e98078a6929cb1e508ff7820d3ae42580a5
+    inputs:
+      - name: ask
+        hash: 6badf2fef8cc2c49
+        size: 930
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 0e3084f212ce2189d4f8ad3397be7c47079dd9f2
+    hash_after: 0e3084f212ce2189d4f8ad3397be7c47079dd9f2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 0e65d3bce77dde27
+        size: 2352
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: d07ee270beb53d317101f8f0bebae243043042e2
+    hash_after: d07ee270beb53d317101f8f0bebae243043042e2
+    inputs:
+      - name: design/draft
+        hash: 0e65d3bce77dde27
+        size: 2352
+      - name: design/tests-red
+        hash: 2622c78095a29ba1
+        size: 659
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 3eca6891b818f8681e7c836e61fc8190288e36e4
+    hash_after: 3eca6891b818f8681e7c836e61fc8190288e36e4
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:294:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: c78a561d0a46466c3af331aaf2bf2bf44b3d69f5
+    hash_after: c78a561d0a46466c3af331aaf2bf2bf44b3d69f5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:303:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: design/tests-red
+        hash: 2622c78095a29ba1
+        size: 659
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -160,38 +230,68 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+On a work branch, `sync` takes the remote's copy of the branch in before trunk, through the merge and the settle trunk already uses.
+
+| part | where | what it does |
+|---|---|---|
+| the own read | `ownIn(it, branch)` in `src/scripts/work-stands.js`, new | runs `git fetch origin <branch>`, then `git rev-list --count HEAD..origin/<branch>`, and answers the count, or zero where the remote holds no such branch |
+| the own merge | the same function | where the count stands above zero, runs `git merge origin/<branch> --no-edit -m "<branch>: take origin/<branch> in"`, and on a refusal hands `settles` the branch, `from` as `origin/<branch>`, the count and the message |
+| the order | `sync` | calls `ownIn` first on a work branch, stops on its answer of 1, prints `<branch> took N commit(s) from origin/<branch>.`, then runs the trunk step as it runs now |
+| the note | `spec/design_output/work.md`, where trunk comes in first | names the own step ahead of trunk |
+
+`settles` already names each file a hand must resolve, and settles a ticket front key by key, so a conflict with the remote stops as a trunk conflict does. A plain merge keeps both sides' commits, and rewrites nothing another hand pushed. On `main`, `sync` stands as it is.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/work.js`, the `sync` verb, which reads `sync(it) === 1`
+- `src/scripts/work-stands.js`, `settles`, which the own merge now calls too
+- the group route's `sync` step, which needs `branch sync`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/work-sync.test.js`, sync on a work branch merges a diverged remote branch and keeps both sides
+- `test/level0/work-sync.test.js`, sync on a work branch leaves the branch alone where the remote carries nothing new
+- `test/level0/work-sync.test.js`, a conflict with the remote branch stops and names the files
+
+The done lines and the case deciding each:
+
+- the diverged merge: the first case
+- nothing new: the second case
+- the conflict: the third case
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/work-stands.js`
+- `test/level0/work-sync.test.js`
+- `spec/design_output/work.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `sync`, `settles`, `unmergedIn` and the `sync` verb in `work.js` stand opened, and each reads as the table says
+- a search for `sync(` over `src/scripts` names the callers
+- each done line names the case deciding it
 
 ## tests-red
 
@@ -200,26 +300,31 @@ The source: none.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/work-sync.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/work-sync.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Two cases fail on their own assertion: the diverged merge, and the conflict with the remote branch. The case where the remote carries nothing new passes today, because it guards the side the change leaves alone. The fake git answers an unknown count with nothing, so the older cases read the remote branch as carrying nothing and stand as they are.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the diverged merge and the conflict fail red, and the nothing-new case guards the other side
+- every git call reaches the fake git of work-doors.js
 
 # gate
 
@@ -228,8 +333,9 @@ The source: none.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -240,14 +346,19 @@ The source: none.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `work-stands.js` and `work.md` of the size list
+- every git call runs through `it.git`, which the fake git of the sync cases answers
+- `ownIn` points at `spec/design_output/work#trunk-comes-in-first`
+- the own step stands once, in that section
 
 ## tests-green
 
@@ -256,26 +367,33 @@ The source: none.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-sync.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A box whose branch another hand pushed to met a pull that asks for a rebase, which level zero refuses, and it stopped. `branch sync` on a work branch now merges `origin/<the branch>` first, through `ownIn` in `src/scripts/work-stands.js`, then takes trunk as before. A plain merge keeps both sides, and a conflict stops through the same `settles` the trunk merge uses, naming the files, with trunk waiting.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list alone
+- every git call reaches the fake git
+- the code points at the design note
+- the step stands once
 
 # accept
 

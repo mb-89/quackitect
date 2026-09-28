@@ -9,6 +9,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   carriedBy,
+  heldBy as readsHold,
   holds,
   lintedBy,
   namesIn,
@@ -56,6 +57,86 @@ test("a push to a work branch meets no door, whatever the stamp says", () => {
   assert.deepEqual(holds(refsIn(toWork), stamp({ ok: false })), { code: 0, said: "" });
 });
 
+// [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+test("a cloud box pushing main meets the refusal, whatever the battery says", () => {
+  for (const text of [stamp(), ""]) {
+    const said = holds(refsIn(toTrunk), text, () => [], true);
+    assert.equal(said.code, 1);
+    assert.match(said.said, /its own work branch/);
+    assert.match(said.said, /\.\/RUNME\.sh branch merge/);
+  }
+});
+
+// [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+test("a cloud box pushes its own work branch", () => {
+  assert.deepEqual(
+    holds(refsIn(toWork), stamp(), () => [], true),
+    { code: 0, said: "" },
+  );
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+const HOLDER = "box 0ther1d · session s1 · claude-code-remote";
+const heldBy = (hand) => () => hand;
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a push to a work branch another box holds refuses, and names the holder and main", () => {
+  const said = holds(refsIn(toWork), stamp(), () => [], false, heldBy(HOLDER), "myb0x");
+  assert.equal(said.code, 1);
+  assert.match(said.said, /work\/x/);
+  assert.match(said.said, /box 0ther1d/);
+  assert.match(said.said, /main/);
+  assert.match(said.said, /branch sync/);
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("the holding box pushes its own branch", () => {
+  const said = holds(
+    refsIn(toWork),
+    stamp(),
+    () => [],
+    true,
+    heldBy(HOLDER),
+    "0ther1d",
+  );
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a push to a work branch nobody holds lands", () => {
+  const said = holds(refsIn(toWork), stamp(), () => [], false, heldBy(""), "myb0x");
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/push-gate-needs-the-engine]]
+test("a push with no engine running and a stale stamp lands", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ sha: "ffff" }),
+    () => [],
+    false,
+    () => "",
+    "",
+    false,
+  );
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/push-gate-needs-the-engine]]
+test("a push with the engine running and a stale stamp comes back refused", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ sha: "ffff" }),
+    () => [],
+    false,
+    () => "",
+    "",
+    true,
+  );
+  assert.equal(said.code, 1);
+  assert.match(said.said, /ran against ffff/);
+});
+
 test("a push to trunk on a green stamp lands", () => {
   assert.deepEqual(holds(refsIn(toTrunk), stamp()), { code: 0, said: "" });
 });
@@ -85,8 +166,14 @@ test("a push to trunk over a stamp counting warnings refuses, and names the lint
   assert.equal(said.code, 1);
   assert.match(said.said, /2 warning\(s\) stand in 2 file\(s\)/);
   assert.match(said.said, /RUNME\.sh lint/);
-  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), { code: 0, said: "" });
-  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), {
+    code: 0,
+    said: "",
+  });
+  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), {
+    code: 0,
+    said: "",
+  });
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -106,7 +193,11 @@ test("a push whose delta carries an untagged note lands", () => {
   const carried = () => [{ name: "spec/tickets/slow-lint.md", text: FREE }];
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
   // A warning holds no push, so the door takes no lint. [[spec/design_output/config#the-engine-controls]]
-  assert.equal(holds.length, 2, "the door reads the refs and the stamp, then the delta, and no warnings");
+  assert.equal(
+    holds.length,
+    2,
+    "the door reads the refs and the stamp, then the delta, and no warnings",
+  );
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -165,4 +256,27 @@ test("a push carrying no prose asks Vale nothing", () => {
   const outside = fakeProc();
   assert.deepEqual(lintedBy(outside, "/tree", "vale", fakeDisk())(["a.js"]), []);
   assert.deepEqual(outside.ran, []);
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("the hold reads the group ticket at the remote tip, and a trunk push or an unread ticket reads free", () => {
+  const held = `---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: sync\n    hand: ${HOLDER}\n    hash_before: ${SHA}\n---\n`;
+  const repo = fakeRepo([], { "spec/tickets/x.md": held });
+  const [work] = refsIn(toWork);
+  assert.equal(readsHold(repo)(work), HOLDER);
+  assert.deepEqual(repo.runs.at(-1), ["show", "origin/work/x:spec/tickets/x.md"]);
+  assert.equal(readsHold(repo)(refsIn(toTrunk)[0]), "");
+  assert.equal(readsHold(fakeRepo([], {}))(work), "");
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a box's hold refuses a hand that names no box, and a hold naming no box refuses a box", () => {
+  assert.equal(
+    holds(refsIn(toWork), stamp(), () => [], false, heldBy(HOLDER), "").code,
+    1,
+  );
+  assert.equal(
+    holds(refsIn(toWork), stamp(), () => [], false, heldBy("person"), "myb0x").code,
+    1,
+  );
 });

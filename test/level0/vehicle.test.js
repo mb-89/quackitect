@@ -15,6 +15,7 @@ import {
   portOf,
   registers,
   resolves,
+  rootKey,
   same,
   travels,
 } from "../../.claude/skills/level0/lib/vehicle.js";
@@ -45,6 +46,12 @@ function tree(extra = {}) {
     ...extra,
   });
 }
+
+// [[spec/tickets/box-keys-fold-drive-letters]]
+test("the root key folds a drive letter and its slashes, and keeps a POSIX path's case", () => {
+  assert.equal(rootKey("C:\\work\\tree\\"), "c:/work/tree");
+  assert.equal(rootKey("/home/user/Tree/"), "/home/user/Tree");
+});
 
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 test("a Windows root in either case is one vehicle, so the register keeps one entry and one port", () => {

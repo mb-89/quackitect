@@ -18,8 +18,8 @@ const TEST = /^test\/.*\.js$/;
 const GO_TEST = /^src\/.*_test\.go$/;
 // A path a command line names, cut at a space or a quote. [[spec/design_output/tree#the-rules-over-two-files]]
 const WORD = /[^\s"'`]+/g;
-// A command field holds one line indented four spaces. [[spec/design_output/pull#the-fields-hold-their-forms]]
-const COMMAND_LINE = /^ {4}\S/;
+// A command field holds one line, indented four spaces or bare as the engine writes it now. [[spec/design_output/pull#the-fields-hold-their-forms]]
+const COMMAND_LINE = /^(?: {4}\S|\.\/RUNME\.sh\s)/;
 const SERVER = /^src\/bridge\/[^/]+\.js$/;
 // A line that is a comment or blank, so a hunk adding these alone changes no code. [[spec/design_output/tree#the-rules-over-two-files]]
 const COMMENT = /^\s*(\/\/|\/\*|\*|$)/;
