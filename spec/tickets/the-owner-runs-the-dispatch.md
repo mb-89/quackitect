@@ -102,3 +102,16 @@ gh run view --log | tail -40
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The agent started the dispatch Action once through the GitHub connector, on `main`, as [run 36471796196](https://github.com/mb-89/quackitect/actions/runs/36471796196). It holds, and the owner's order takes the three calls as they stand:
+
+| the ask | what the run shows |
+|---|---|
+| the run fires | the job ends green, and the plan holds no ready group and no stuck hand-over, so it fires no worker |
+| the issues | it opens one issue a question ticket |
+| the write branch | it pushes `claude/dispatch-4140d51` and opens [pull request 26](https://github.com/mb-89/quackitect/pull/26), which merges itself |
+| auto-merge asks for MERGE | holds: pull request 26 lands with no hand |
+| an issue closes by hand | stands, and the cloud guidance now has a box close an issue its ticket carries |
+| the fire text names the branch | stands unproven live, because the run fires nothing |
+
+The answer step waits for the next pull on `main`, which carries this answer into its field. The group [[spec/tickets/the-cloud-follow-ups-land]] closed before the engine could take the step on its branch.
