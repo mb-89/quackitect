@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -172,6 +172,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d81be38d5cd0 · claude-code-remote
+    hash_before: abc0a06b8dccd4a8adaad5231cafd631a32ae178
+    hash_after: a82457725f19d230be1de068e6898f9119c15e4c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 19 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 35d1422fb21984cf
+        size: 908
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -364,26 +387,42 @@ the version, the cap and the label each stand once in the fire script, and the d
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch-fire.test.js test/contract/dispatch-workflow.test.js test/contract/http.test.js test/contract/skills.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A scheduled GitHub Action now runs the dispatch with no model. The workflow at `.github/workflows/dispatch.yml` fires hourly and on a manual start. It runs `./RUNME.sh dispatch --json --fire` off the repo secrets.
+
+The fire flag runs `src/scripts/dispatch-fire.js` after the writes:
+
+- one fire of the work routine a ready group and a stuck hand-over, up to the routine cap
+- the refusal's reason in the plan, and a stop on a rate refusal
+- one issue a question, and none where an open one carries its title
+- the write branch's pull request on `PULL_TOKEN`, with auto-merge on
+
+A new http door carries every request, and its fake answers the tests. The dispatch skill starts no session now, and names the Action.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, the command line's verb line, and the skills contract the old road held
+the http door carries its fake, and its contract case serves through the wire door
+each new file opens with a comment naming the design input's section on firing the workers
+the version, the cap and the label each stand once in the fire script
 
 # accept
 
