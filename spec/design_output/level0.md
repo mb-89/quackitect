@@ -934,8 +934,8 @@ off a cloud box, it runs nothing. A failed install holds no session up. The
 hook's `timeout` waits out `STARTING`, the span the start road allows the same
 install, so the client cuts no install short before the manifest lands.
 
-Where the manifest stands the plugin loads, and the start road of
-[[spec/design_output/level0#the-bridgehead-starts-it-too]] installs the
+Where the manifest stands the plugin loads. The start road of
+[[spec/design_output/level0#the-bridgehead-starts-it-too]] then installs the
 modules it finds missing. So one road installs on each session start, and no
 install writes over another.
 
