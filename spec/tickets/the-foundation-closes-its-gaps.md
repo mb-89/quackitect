@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -229,6 +229,25 @@ record:
     hand: the engine
     hash_before: 7c3140eab24e7d1cab9e5a6c7a0c420b1f974e72
     hash_after: 7c3140eab24e7d1cab9e5a6c7a0c420b1f974e72
+  - step: accept
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 2b8ba7b74fedf7b33aab2e5ce0ae1fb68ff88704
+    hash_after: 91340ae8c3d144e8e1e66e30e348da11eada631c
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-foundation-closes-its-gaps already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 5e9ae3babf8a6830
+        size: 359
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
