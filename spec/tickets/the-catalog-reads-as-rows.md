@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-manager-becomes-a-module, ports-declare-their-looks]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -176,6 +176,18 @@ record:
         hash: b107ab46f5080e28
         size: 3591
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-7
+    hash_before: 689b16cea06c8b723b0f9e1f1dfb651d09753c2c
+    hash_after: 689b16cea06c8b723b0f9e1f1dfb651d09753c2c
+    inputs:
+      - name: design/draft
+        hash: b107ab46f5080e28
+        size: 3591
+      - name: design/tests-red
+        hash: 1998e0e2d5b122f0
+        size: 696
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -325,8 +337,13 @@ the cases run over the fake index and an op table in memory, and reach no door
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach holds against the core as it stands: q.OutIn and the kind "out" stand in why.go, the three names join the writer Registers hands back so Commit takes them, Presentation now carries Out beside Fields, and the three cases fail on their own assertion over qtest.New
+- the builder fixes in place: renews commits index/health first and builds index/names off the snapshot after it, since a row built before that commit reads index/health as default and the names case steps once
+- the builder fixes in place: a NameRow carries no value for the index/ names themselves, since index/names holding its own last value nests one list deeper on every step
+- an ActionRow may carry Presentation.Out beside its input fields at no cost, and the ask asks for the input fields alone
 
 # implement
 
