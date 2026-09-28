@@ -303,7 +303,7 @@ func TestIndexNamesNameEachNameItsProviderAndState(t *testing.T) {
 	for _, want := range []struct{ name, kind, state string }{
 		{"index/health", "out", "answered"},
 		{"t/ask", "action", "default"},
-		{"config/depth", "out", "default"},
+		{"config/depth", "derived", "default"},
 	} {
 		row := rowNamed(t, "index/names", rows, want.name)
 		provider := fields(t, row["provider"])

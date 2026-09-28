@@ -140,6 +140,9 @@ func inputFaults(one *registration, groups []named) []Fault {
 	var faults []Fault
 	for _, in := range one.inputs {
 		group := resolve(groups, in.name)
+		if group == nil && in.optional {
+			continue
+		}
 		if group == nil {
 			faults = append(faults, Fault{Kind: NoName, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s reads %s, which the catalog lacks", in.field, in.name)})
 			continue

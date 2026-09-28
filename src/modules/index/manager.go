@@ -14,6 +14,7 @@ import (
 const (
 	leasePart    = "index"
 	HealthName   = "index/health"
+	LeasesName   = "index/leases"
 	builtInBeat  = 5 * time.Second
 	builtInLease = 30 * time.Second
 )
@@ -42,12 +43,13 @@ type Outside struct {
 	Every func(span time.Duration, hand func(time.Time)) (stop func())
 }
 
-// The manager writes ops/<id>, session/alarms, index/health and the catalog rows, and carries q.IO(), since it starts and ends processes. [[spec/design_output/model#the-index-manager]]
+// The manager writes ops/<id>, session/alarms, index/health, index/leases and the catalog rows, and carries q.IO(), since it starts and ends processes. [[spec/design_output/model#the-index-manager]]
 func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
 		q.OutIn(c, "ops/<id>", Op{}, q.Doc("the handle of a longer action, its state and its result"), q.IO()),
 		q.OutIn(c, AlarmsName, []Alarm{}, q.Doc("the alarms standing, one row a part")),
 		q.OutIn(c, HealthName, Lease{}, q.Doc("the index's own lease: its part, its last renewal and its term")),
+		q.OutIn(c, LeasesName, []string{}, q.Doc("the parts whose lease still holds, which a context of the config module stands on")),
 		q.OutIn(c, NamesName, []NameRow{}, q.Doc("each name, its provider and its state"), q.Looks(q.Rows)),
 		q.OutIn(c, ActionsName, []ActionRow{}, q.Doc("each action, its doc and its input fields"), q.Looks(q.Rows)),
 		q.OutIn(c, DocsName, []DocRow{}, q.Doc("each name, action and key, with its doc"), q.Looks(q.Rows)),
@@ -115,9 +117,10 @@ func (one *managed) renews() {
 	one.commits(map[string]any{NamesName: names})
 }
 
-// A tick off the loop checks the leases, fails each operation past its deadline, and drops each one past its window from the store. [[spec/design_output/model#deadlines]]
+// A tick off the loop checks the leases and commits the live ones, fails each operation past its deadline, and drops each one past its window from the store. [[spec/design_output/model#deadlines]]
 func (one *managed) ticks(time.Time) {
 	one.dog.Check()
+	one.commits(map[string]any{LeasesName: one.dog.Live()})
 	one.book.Expire()
 	var names []string
 	for _, id := range one.book.Sweep() {

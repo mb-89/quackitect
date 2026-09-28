@@ -14,6 +14,9 @@ import (
 
 type provider int
 
+// The mark a q tag carries after its name where the input reads with no writer. [[spec/tickets/the-config-module-resolves-layers]]
+const optionalMark = "optional"
+
 const (
 	out provider = iota
 	derived
@@ -22,10 +25,12 @@ const (
 )
 
 type input struct {
-	field string
-	name  string
-	port  string
-	typ   reflect.Type
+	field    string
+	name     string
+	port     string
+	typ      reflect.Type
+	optional bool
+	absolute bool
 }
 
 type registration struct {
@@ -47,6 +52,8 @@ type registration struct {
 	writes   bool
 	io       bool
 	where    string
+	key      bool
+	shared   bool
 	inputs   []input
 	run      func(Snapshot) any
 	keyed    func(snap Snapshot, name string) (any, error)
@@ -128,13 +135,22 @@ func FoldIn[S, E any](c *Catalog, name string, def S, step func(S, E) S, opts ..
 	return c.add(foldOf(name, def, step), callerAt(2), opts)
 }
 
-// A fold whose step refuses an event, so the land answers the error and keeps the state. A stub until the-config-module-resolves-layers builds it. [[spec/tickets/the-config-module-resolves-layers]]
+// A fold whose step refuses an event, so the land answers the error and keeps the state. [[spec/tickets/the-config-module-resolves-layers]]
 func GuardIn[S, E any](c *Catalog, name string, def S, step func(S, E) (S, error), opts ...Option) Writer {
-	return Writer{}
+	return c.add(guardOf(name, def, step), callerAt(2), opts)
 }
 
-// Marks a config key the whole project shares, which reads the default file alone. A stub until the-config-module-resolves-layers builds it. [[spec/design_output/model#a-keys-layers]]
-func Shared() Option { return func(*registration) {} }
+// Marks a config key the whole project shares, which reads the default file alone. [[spec/design_output/model#a-keys-layers]]
+func Shared() Option { return func(one *registration) { one.shared = true } }
+
+// Marks every input of the registration optional, so each passes the check with no writer and reads its zero value. [[spec/tickets/the-config-module-resolves-layers]]
+func Optional() Option {
+	return func(one *registration) {
+		for i := range one.inputs {
+			one.inputs[i].optional = true
+		}
+	}
+}
 
 func callerAt(skip int) string {
 	_, file, line, ok := runtime.Caller(skip)
@@ -195,7 +211,7 @@ func outOf[T any](name string, def T) *registration {
 	return &registration{name: name, kind: out, typ: typeOf[T](), def: def, missing: missing(def)}
 }
 
-// Each field tagged q:"<name>" reads that name off the snapshot. The run reads the registration's inputs, so the name the wiring binds reaches it. [[spec/tickets/the-wiring-file-binds-ports]]
+// Each field tagged q:"<name>" reads that name off the snapshot, and q:"<name>,optional" reads it where nobody writes it. The run reads the registration's inputs, so the name the wiring binds reaches it. [[spec/tickets/the-wiring-file-binds-ports]]
 func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration {
 	inType := typeOf[In]()
 	var inputs []input
@@ -203,7 +219,8 @@ func derivedOf[In, Out any](name string, def Out, fn func(In) Out) *registration
 		for i := range inType.NumField() {
 			field := inType.Field(i)
 			if read, ok := field.Tag.Lookup("q"); ok {
-				inputs = append(inputs, input{field: field.Name, name: read, typ: field.Type})
+				name, mark, _ := strings.Cut(read, ",")
+				inputs = append(inputs, input{field: field.Name, name: name, typ: field.Type, optional: mark == optionalMark})
 			}
 		}
 	}
@@ -230,6 +247,11 @@ func (in input) family() bool {
 }
 
 func foldOf[S, E any](name string, def S, step func(S, E) S) *registration {
+	return guardOf(name, def, func(state S, event E) (S, error) { return step(state, event), nil })
+}
+
+// A fold whose step answers an error, which the land hands back with the state kept. [[spec/tickets/the-config-module-resolves-layers]]
+func guardOf[S, E any](name string, def S, step func(S, E) (S, error)) *registration {
 	apply := func(state, event any) (any, error) {
 		now, ok := state.(S)
 		if !ok {
@@ -239,7 +261,7 @@ func foldOf[S, E any](name string, def S, step func(S, E) S) *registration {
 		if !ok {
 			return nil, fmt.Errorf("%s takes a %s, not a %T", name, typeOf[E](), event)
 		}
-		return step(now, one), nil
+		return step(now, one)
 	}
 	return &registration{name: name, kind: fold, typ: typeOf[S](), def: def, missing: missing(def), step: apply}
 }

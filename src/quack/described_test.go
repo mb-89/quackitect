@@ -6,6 +6,7 @@ package main
 import (
 	"testing"
 
+	"quackitect/src/modules/config"
 	"quackitect/src/q"
 )
 
@@ -15,6 +16,7 @@ func TestEveryModuleDescribesWhatItExposes(t *testing.T) {
 	for _, one := range modules {
 		one.registers(c)
 	}
+	config.Registers(c)
 	for _, registers := range projected {
 		registers(c)
 	}

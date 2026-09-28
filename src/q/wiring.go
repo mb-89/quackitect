@@ -4,6 +4,7 @@
 package q
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -160,6 +161,7 @@ func bind(w Wiring, instance string, reg *registration, writers map[string]strin
 		in.port = port
 		to, wired := w.Wires[port]
 		switch {
+		case in.absolute:
 		case strings.HasPrefix(in.name, "config/"):
 			in.name = instance + "/" + in.name
 		case !wired:
@@ -209,7 +211,58 @@ func (faults Refused) Error() string {
 // The value of config/values: each key's resolved JSON literal, by its full name `<instance>/config/<key>`. [[spec/tickets/the-config-module-resolves-layers]]
 type Resolved map[string]string
 
-// A config key by its local name, which the wiring files under `<instance>/config/<key>`. [[spec/design_output/model#config-comes-off-the-registrations]]
+// The name the config module resolves every key under, which each key reads whatever instance declares it. [[spec/design_output/model#the-config-module]]
+const ResolvedName = "config/values"
+
+// A config key by its local name, which the wiring files under `<instance>/config/<key>`. It reads its own entry of config/values, and its built-in value where none stands. [[spec/design_output/model#config-comes-off-the-registrations]]
 func CfgIn[T any](c *Catalog, key string, def T, opts ...Option) Writer {
-	return c.add(outOf("config/"+key, def), callerAt(2), opts)
+	one := &registration{
+		name: "config/" + key, kind: derived, typ: typeOf[T](), def: def, missing: missing(def), key: true,
+		inputs: []input{{field: "Values", name: ResolvedName, typ: typeOf[Resolved](), optional: true, absolute: true}},
+	}
+	one.run = func(snap Snapshot) any {
+		values, _ := snap.Read(ResolvedName).(Resolved)
+		literal, ok := values[one.name]
+		if !ok {
+			return def
+		}
+		return decoded(literal, def)
+	}
+	return c.add(one, callerAt(2), opts)
+}
+
+// A literal decodes as JSON, or as the text of a string where it reads as no JSON, as an SE_ variable hands it. A literal of another type answers the built-in value. [[spec/design_output/model#a-keys-layers]]
+func decoded[T any](literal string, def T) T {
+	var value T
+	if json.Unmarshal([]byte(literal), &value) == nil {
+		return value
+	}
+	if text, err := json.Marshal(literal); err == nil && json.Unmarshal(text, &value) == nil {
+		return value
+	}
+	return def
+}
+
+// A key the catalog holds: its full name, the instance declaring it, its local name, and its shared mark. [[spec/design_output/model#config-comes-off-the-registrations]]
+type Key struct {
+	Name     string
+	Instance string
+	Local    string
+	Shared   bool
+}
+
+// Every config key the catalog holds, in catalog order. [[spec/design_output/model#config-comes-off-the-registrations]]
+func (c *Catalog) Keys() []Key {
+	var keys []Key
+	for _, one := range c.all() {
+		if !one.key {
+			continue
+		}
+		local := one.port
+		if local == "" {
+			local = one.name
+		}
+		keys = append(keys, Key{Name: one.name, Instance: one.instance, Local: strings.TrimPrefix(local, "config/"), Shared: one.shared})
+	}
+	return keys
 }

@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -185,6 +185,15 @@ record:
         hash: 852fe43a4ea64b36
         size: 986
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 5ca0d4a145010e853ed9f0a8c996e06ad0f720a7
+    hash_after: 5ca0d4a145010e853ed9f0a8c996e06ad0f720a7
+    answered:
+      - name: lint
+        exit: 0
+        said: green, src/modules/config passes; green, src/q passes; green, src/modules/index passes
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -388,14 +397,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    go vet ./... && ./RUNME.sh branch test src/modules/config/config_test.go src/q/wiring_test.go src/q/catalog_test.go src/q/store_test.go src/modules/index/lease_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files the change touches are the ones the draft's callers list names, less qtest.go and wiring_test.go, which the key's optional input leaves unchanged
+- the change reaches no door: the environment arrives as the env/<name> input, and the leases as index/leases
+- each function carries a pointer at the model section of the approach it implements
+- EnvOf and the file names each stand in one place, and the module's copies point at src/config and folders.js
 
 ## tests-green
 

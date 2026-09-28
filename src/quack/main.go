@@ -31,7 +31,7 @@ const (
 )
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
-var projected = []func(*q.Catalog) q.Writer{config.Registers, queue.Registers, holds.Registers}
+var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers}
 
 // A module type the wiring loads: its registration, and for an IO module the start that runs it under the names its instance binds. A module with no start runs on the scheduler alone. [[spec/tickets/tickets-becomes-a-module]]
 type ioModule struct {
@@ -61,6 +61,7 @@ type projection struct {
 // [[spec/design_output/model#everything-on-disk-mirrors]]
 func projections() []projection {
 	c := q.New()
+	config.Registers(c)
 	for _, registers := range projected {
 		registers(c)
 	}
@@ -125,6 +126,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	// The config module loads always, after the wiring, so it resolves every key the wiring declares. [[spec/design_output/model#the-config-module]]
+	config.Registers(q.Main)
 	index.Main(manages(as), starts...)
 }
 

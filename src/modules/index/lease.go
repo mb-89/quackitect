@@ -109,8 +109,19 @@ func (d *Dog) Check() []string {
 	return expired
 }
 
-// The parts whose lease still holds, in order. A stub until the-config-module-resolves-layers builds it. [[spec/design_output/model#a-context-holds-a-lease]]
-func (d *Dog) Live() []string { return nil }
+// The parts whose lease still holds, in order. [[spec/design_output/model#a-context-holds-a-lease]]
+func (d *Dog) Live() []string {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	now, live := d.now(), []string{}
+	for part, one := range d.leases {
+		if !now.After(one.Renewed.Add(one.Term)) {
+			live = append(live, part)
+		}
+	}
+	sort.Strings(live)
+	return live
+}
 
 // The wait doubles from the first to the cap, and a run of faults in the window raises an alarm and stops the restarts. [[spec/design_output/model#restarts]]
 func (d *Dog) Fault(part string, err error) (time.Duration, bool) {
