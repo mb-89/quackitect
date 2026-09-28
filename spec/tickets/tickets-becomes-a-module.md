@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -206,6 +206,15 @@ record:
         hash: 14217a810eb895d8
         size: 825
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 559d9c0d8bfb8439fd7c94b7d20627a9c1ba52f5
+    hash_after: 559d9c0d8bfb8439fd7c94b7d20627a9c1ba52f5
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -409,10 +418,10 @@ go build ./... && ./RUNME.sh lint
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-The change touches the files the draft names. Past them it touches `src/imports` and the model's import table, since `onlyq` refused `src/yaml`. It also touches `test/contract/index.test.js`, whose tree now carries the wiring.
+The change touches the files the draft names, and the size list carries each.
 The watch keeps its fake. `FakeWatch` hands the new time as zero, and the seed case runs over `NewFakeWatch`.
 Each new file opens on a header naming this ticket, and each new function carries its pointer.
-The name `tickets/all` stands once, in `src/index/topic.go`, and the wiring file binds it. The golden file moved to `src/quack/testdata`.
+The name `tickets/all` stands once, in `src/index/topic.go`, and the wiring file binds it.
 
 ## tests-green
 
