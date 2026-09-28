@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -151,6 +151,19 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: design/draft
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 259dbe503ea2aad63edc7c1b08cc737dab24167c
+    hash_after: 259dbe503ea2aad63edc7c1b08cc737dab24167c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 852cd7cfc77b6b4f
+        size: 2056
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -267,7 +280,7 @@ src/q/looks_test.go
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Both cases fail on their own assertion over the stub. The catalog presents no output fields, and the start answers a store for an output field with no doc tag. The stub q.Answers sets nothing, so the two cases meet it alone.
+The rename verb rewrote a path in this ticket, so this step runs again. Both output cases still fail on their own assertion over the stub q.Answers, which sets nothing.
 
 ### checked
 
