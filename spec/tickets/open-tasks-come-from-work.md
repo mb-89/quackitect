@@ -1,10 +1,19 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -24,35 +33,41 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -60,7 +75,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -74,11 +89,33 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 9d870e3fd3c577a6
-depends_on: [the-queue-becomes-a-module]
+process_hash: 22b42ea1501e8967
 group: open-tasks-shadow-lands
+depends_on: ["the-queue-becomes-a-module"]
 ---
 
 # Ask
@@ -92,6 +129,16 @@ The badge and the header then read one name, `work/open-tasks`. Without it they 
 - `./RUNME.sh check` exits 0
 
 # design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
 
 ## draft
 
@@ -127,18 +174,6 @@ The badge and the header then read one name, `work/open-tasks`. Without it they 
 
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
-
 ## tests-red
 
 <!-- writes the tests the ask calls for -->
@@ -148,6 +183,12 @@ The badge and the header then read one name, `work/open-tasks`. Without it they 
 <!-- the tests you write fail on their own assertion -->
 
 <!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
 
 ### seen
 
@@ -160,6 +201,18 @@ The badge and the header then read one name, `work/open-tasks`. Without it they 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# implement
 
 ## change
 
@@ -204,6 +257,26 @@ The badge and the header then read one name, `work/open-tasks`. Without it they 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
 
 # Discussion
 
