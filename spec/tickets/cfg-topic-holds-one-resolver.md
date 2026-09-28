@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,25 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-topics-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 78991c39811b4cb7f0099b8d4178c044eb49374f
+    hash_after: 15c5954ca6f01e904da27346d4deeb7a58a7b638
+    inputs:
+      - name: ask
+        hash: f39deac4d1dfddea
+        size: 595
+      - name: [[spec/design_output/migration]]
+        hash: cea2b1b9bf4bfda7
+        size: 14154
+      - name: [[spec/tickets/the-config-module-resolves-layers]]
+        hash: e7e0d2f37f54995b
+        size: 22752
+      - name: [[spec/tickets/config-reads-differ-by-reader]]
+        hash: 696f2b2276e4f705
+        size: 2448
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +166,39 @@ One key then answers one value, whoever reads it. [[spec/tickets/config-reads-di
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The old readers keep answering, and the config module runs beside them. `quack config` (src/quack/config.go) lists every leaf key of the default and local files, and resolves each through `Layered` in src/modules/config, which names the layer answering: override, context, the SE_ variable, the local file or the default file, and the default file alone for a key the wiring declares shared. Where `migration.config` reads shadow, `./RUNME.sh config` (readConfig in src/scripts/cli-check.js) runs the index binary's `config` verb, and src/scripts/config-shadow.js compares each key by value and layer. Each key answered apart writes one `shadow` row through the log door, which `./RUNME.sh log --kind shadow` names. A golden file, src/quack/testdata/readers.golden.json, holds every key's value and layer as each reader answers it over one fixture: the default file frozen as it stood, a local file and four variables. The Go test owns the `src/config Where` and config module sections, and the node test owns configOf, whereFrom, asksText and valuesOf. The LSP reader goes through src/config, so its section is the Go one. Weighed: a runtime shadow inside src/config.Value runs the module on every read from every Go caller, so the verb that lists every key carries it instead. Assumed: a frozen fixture beats the live default file, so adding a key elsewhere leaves this golden standing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/cli.js: the config verb calls readConfig,src/scripts/cli-check.js: readConfig calls configShadow,src/config/config.go: Value calls Where, and every Go caller of Value and Count reads through it unchanged,src/lsp/config.go: countAt calls config.Count,src/tui/work/shadow.go: shadowOf calls shadow.On, which calls config.Value,src/modules/config/config.go: resolves calls winning, and Layered calls winning,src/quack/main.go: main calls configs for quack config
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/config_test.go: TestConfigRowsReadEveryLayer,src/quack/config_test.go: TestConfigTextHoldsOneKeyALine,src/quack/config_test.go: TestTheSliceKeysStandShared,src/quack/config_test.go: TestReadersGolden,src/modules/config/config_test.go: TestLayeredNamesTheLayer,src/config/config_test.go: TestWhereNamesTheLayer,test/level0/config-shadow.test.js: a key both readers answer alike makes no row,test/level0/config-shadow.test.js: a key answered apart by value, by layer or by one side alone makes one row each,test/level0/config-shadow.test.js: a wanted key narrows the rows to itself,test/level0/config-shadow.test.js: a row says the key and both answers,test/level0/config-shadow.test.js: what quack config prints parses, and anything else reads as nothing,test/level0/config-shadow.test.js: the JavaScript readers answer what the readers golden file holds,test/level0/config-shadow.test.js: a shadow run writes one shadow row a key the module answers apart,test/level0/config-shadow.test.js: a slice standing old, or a binary standing nowhere, runs nothing,test/contract/cli-check-doors.test.js: the config verb runs the config slice's shadow over the rows it prints
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened every file and function named: configOf, whereFrom, asksText, valuesOf, src/config Value, src/lsp countAt, the module's winning and filed, readConfig, the proc and log doors, and quack's load.
+The callers list names every caller of Where, Layered, winning, readConfig and configs, found by grep over src and .claude.
+go test ./... decides through TestReadersGolden and the unit tests, the golden line through TestReadersGolden and the node golden test, the shadow line through the node row tests and a live run of ./RUNME.sh config with SE_ANSWER_WARN_AT set, and ./RUNME.sh check through the commit verb.
 
 ## tests-red
 
