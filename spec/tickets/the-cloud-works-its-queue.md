@@ -363,10 +363,16 @@ the Windows runner failed two worktree cases the Linux box passes
 spec/tickets/the-owner-runs-the-dispatch: a question, the owner starts the Action once and confirms the agent's calls
 spec/tickets/boxes-open-no-pull: a question, the owner rules whether a cloud box opens its group's pull request
 spec/tickets/list-fields-split-lines: minted with no group, for a fix group
-spec/tickets/a-helper-pulls-past-the-plan: minted with no group, for a fix group
+spec/tickets/helpers-pull-past-plans: minted with no group, for a fix group
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-The rule on name length renames two tickets the retro names. `list-fields-land-one-a-line` stands at `list-fields-split-lines`, and `the-work-branch-opens-no-pull` stands at `boxes-open-no-pull`.
+The rule on name length renames three tickets the retro names:
+
+| the old name | the name now |
+|---|---|
+| `list-fields-land-one-a-line` | `list-fields-split-lines` |
+| `the-work-branch-opens-no-pull` | `boxes-open-no-pull` |
+| `a-helper-pulls-past-the-plan` | `helpers-pull-past-plans` |
