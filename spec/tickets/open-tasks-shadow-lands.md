@@ -85,6 +85,10 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2shadow
 depends_on: [the-foundation-closes-its-gaps]
+record:
+  - step: sync
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: bedc9cefe0d6a773c73bb1be6da6f0892e1e26e0
 ---
 
 # Ask
