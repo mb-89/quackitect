@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box d81cb7b9efd7 · claude-code-remote
@@ -138,6 +138,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d81e51f1bb10e · claude-code-remote
+    hash_before: aeccc114728d240c2f90647d3ae59f9556726590
+    hash_after: aeccc114728d240c2f90647d3ae59f9556726590
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -208,38 +220,48 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+the four children stood closed from the box before, and this box read each against the ask,sync, split and accept passed, with every child test file green and the dispatch plan naming no loose question,the wait test in the index module now starts its wait before the gate opens, so the check stands green
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the child tests and the dry dispatch plan answered the accept gate directly, so the verdict rested on commands,a rerun of the failing test alone pointed at order, and reading the test showed the race
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+22:15 UTC, a shell call naming no ticket met the door and came back refused,22:17 UTC, the plan tool found no server while the server was still building its index, and the hook then refused a call until the plan answered,22:20 UTC, the full check failed on a race in the index wait test, which read the open ops after the gate opened,22:24 UTC, a shell write of the retro fields to a scratch file met the door and came back refused,split came back refused once, since the checked field wanted lines in one string and not a list,accept came back refused once, since a verdict field decides and the pass flag stays off
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the plan tool in the level0 plugin says the server is warming, and waits on it, where the port answers but the event route does not yet,the index wait test takes its snapshot before the gate opens, which this branch lands,the pull hand-back hint names the checklist field as one string with a line an item, and names the verdict field without the pass flag
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The children carried the whole ask already, so the run turned on proving them and on the check. The red check came from a test outside the ask, and the cloud guidance says to green it whatever hand put the fault there. A sleep in a test orders the steps and holds no timing claim, since the ops stay open until the gate opens.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change adds no fact beyond the order in the test, and the retro points at the test in place of repeating it
+the change adds no number beyond a fraction of the slow span the test names already
+the change writes no header
+the badly list carries each error with its time, and no owner prompt came in this run
+the chapter names the box by its role, with no name, address or path
 
 ## cloud
 
