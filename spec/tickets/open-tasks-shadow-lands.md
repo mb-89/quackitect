@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -155,6 +155,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 660bb4d071b9 · claude-code-remote
+    hash_before: e5d0654b5635a0c62450acafdb4997f85835d384
+    hash_after: e5d0654b5635a0c62450acafdb4997f85835d384
+    inputs:
+      - name: retro/write
+        hash: 503db212c28722a3
+        size: 1418
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -292,20 +302,24 @@ the retro names roles and boxes, and carries no path of the box
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+no tool, host or install lacked on this run
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the one-writer door refused two pushes while a dead box held the branch
+one mint test failed once in a full run and passed on the rerun
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step parked, and no ticket minted outside the group
 
 # Discussion
 
