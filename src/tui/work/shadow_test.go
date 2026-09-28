@@ -119,3 +119,41 @@ func TestTheAskAnswersNothingWhereNoDoorStands(t *testing.T) {
 		t.Fatalf("the ask answers %d where no door stands", count)
 	}
 }
+
+// The new slice answers the index's count, and writes no shadow row. [[spec/tickets/the-badge-reads-open-tasks]]
+func TestTheNewSliceAnswersTheIndexCount(t *testing.T) {
+	root := sliced(t, "new", 5)
+	if count := slicedCount(root, 3, shadowAt); count != 5 {
+		t.Fatalf("the new slice answers %d, and wants the index's 5", count)
+	}
+	if rows := rowsIn(t, root); len(rows) != 0 {
+		t.Fatalf("the new slice writes %v", rows)
+	}
+}
+
+// A door answering nowhere leaves the old count standing under the new slice. [[spec/tickets/the-badge-reads-open-tasks]]
+func TestTheNewSliceKeepsTheOldCountWhereNoDoorAnswers(t *testing.T) {
+	root := sliced(t, "new", 5)
+	askOpenTasks = func(string) (int, bool) { return 0, false }
+	if count := slicedCount(root, 3, shadowAt); count != 3 {
+		t.Fatalf("the new slice answers %d with no door, and wants the old 3", count)
+	}
+}
+
+// The badge's verb and the window's header both read Places.Takeable, which PlacesAt fills off the slice. [[spec/tickets/the-badge-reads-open-tasks]]
+func TestTheBadgeAndTheHeaderReadOneValue(t *testing.T) {
+	root := sliced(t, "new", 5)
+	was := runPlaces
+	t.Cleanup(func() { runPlaces = was })
+	runPlaces = func(string) ([]byte, error) {
+		return []byte(`{"loose":[{"name":"free","queue":"1"},{"name":"other","queue":"2"}]}`), nil
+	}
+	places, err := PlacesAt(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tab := &Tab{Places: &places}
+	if places.Takeable != 5 || tab.Label(nil) != "work (5)" {
+		t.Fatalf("the badge reads %d, and the header %q", places.Takeable, tab.Label(nil))
+	}
+}

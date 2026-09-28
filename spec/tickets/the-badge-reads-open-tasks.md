@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: fe2bc1ba0ba3484f
         size: 258
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81edbaa8ed8 · claude-code-remote
+    hash_before: 62fd5688ff505e5d6fd698c9b5c4b8481c25002d
+    hash_after: 62fd5688ff505e5d6fd698c9b5c4b8481c25002d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/work fails
+    inputs:
+      - name: design/draft
+        hash: 3f388022f20d8f55
+        size: 1464
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -196,26 +209,31 @@ a case holds the badge and the header to one value: TestTheBadgeAndTheHeaderRead
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/work
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/tui/work/shadow_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Two of the three tests fail on their own assertion: the new slice answers the old count, and the badge and header read the old count. The no-door test passes already, since the stub keeps the old count, and it stands as the guard for the fallback.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the done_when case meets TestTheBadgeAndTheHeaderReadOneValue, which fails on its assertion
+the index door and the verb both have fakes: askOpenTasks and runPlaces
 
 # gate
 

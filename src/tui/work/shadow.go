@@ -63,3 +63,9 @@ func shadowOf(root string, old int, now time.Time) error {
 	}
 	return appendFile(path, append(row, '\n'))
 }
+
+// The count the slice answers. [[spec/tickets/the-badge-reads-open-tasks]]
+func slicedCount(root string, old int, now time.Time) int {
+	_ = shadowOf(root, old, now)
+	return old
+}
