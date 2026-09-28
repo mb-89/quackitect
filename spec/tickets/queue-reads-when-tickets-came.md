@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: open-tasks-shadow-lands
 parent: the-queue-becomes-a-module
+record:
+  - step: do
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 43eebb682ff636b9d68001fd93d8cb4c4e6a30fa
+    hash_after: f590ec1abcfca831c872a609cf44bf4beaa1d6ae
+reason: became
+successors: [the-queue-reads-git-for-came]
 ---
 
 # Ask
