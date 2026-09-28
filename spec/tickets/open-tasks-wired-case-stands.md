@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: open-tasks-shadow-lands
 parent: open-tasks-come-from-work
+record:
+  - step: do
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 14123d1cd8133164b424c04b7833aea30e3ff1d7
+    hash_after: 14123d1cd8133164b424c04b7833aea30e3ff1d7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/replayed-red-leaf-reads-green.md:18:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: c866c6618b36faa6
+        size: 225
+    def: f8b8918cfe3f920f
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ the draft names TestTheWiredTreeAnswersItsOpenTasks in src/quack/main_test.go, a
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+TestTheWiredTreeAnswersItsOpenTasks stands in src/quack/main_test.go. It reads the real wiring file, loads the tickets, queue and work modules under their bound names, and counts a fake tree to one open task, so a dropped work.tickets, work.places or work.cloud wire turns it red. The case lands with open-tasks-come-from-work, and this ticket adds no code.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: the named case stands and decides the binding
+the cleanup: the unit case claiming the same tree leaves under fake-tree-runs-the-queue
+one place: the fake tree stands in the wired case alone
 
 # Discussion
 
