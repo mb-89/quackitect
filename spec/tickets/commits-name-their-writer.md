@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -177,6 +177,19 @@ record:
         hash: eb315d7a681bc4e4
         size: 74362
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: c269d3805b2cc318112da82eb2d0fa248be42113
+    hash_after: c269d3805b2cc318112da82eb2d0fa248be42113
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 936ed5763f0ade41
+        size: 2786
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -302,29 +315,32 @@ Each done_when line names its case, or `go test` or the check.
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/q
+./RUNME.sh branch test src/q/writer_test.go src/quack/given_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-src/q/writer_test.go,src/index/topic_test.go
+src/q/writer_test.go
+src/quack/given_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-TestCommitRefusesANameOfAnotherProvider, TestCommitRefusesAnInactiveAlternative and TestTheTopicsCommitThroughTheirOwnWriters fail on their assertions, since Commit takes a writer and checks nothing yet. The step carries the Writer plumbing across q, watchdog, tickets, ops and index, since Go refuses a changed signature at build. The surprise: the index commits files and tickets/all in one commit, so a writer holds several registrations, and q.Join merges them.
+`TestCommitRefusesANameOfAnotherProvider` fails, since `Commit` checks no writer yet. `TestNoRegistrationTakesTheGivenForm` names every file calling the given form, the cases among them.
+The grep case stands in a file of its own, and not in the description case's file the draft named. So the red list keeps that passing case inside the check.
+The surprise: the writer cases still register through the given form, so the build sweep moves them too.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the second done_when line meets TestCommitRefusesANameOfAnotherProvider, red on its assertion, and go test plus the check decide the first and the third as commands
-the store stands in memory and reaches no door, so the cases need no fake
+The second and third done_when lines meet a case failing on its assertion, and `go test` and the check decide the rest.
+The store stands in memory and the grep reads the tree, so no door needs a fake.
 
 # gate
 
