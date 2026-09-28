@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -134,6 +134,19 @@ record:
         hash: 696f2b2276e4f705
         size: 2448
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: bf0146d1470812aeddb0e11dcb55da59fc2af794
+    hash_after: bf0146d1470812aeddb0e11dcb55da59fc2af794
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 46b4c7e80f6088a9
+        size: 3733
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -207,26 +220,31 @@ go test ./... decides through TestReadersGolden and the unit tests, the golden l
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/config-shadow.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/config-shadow.test.js,src/quack/config_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The golden test fails on its own assertion: the golden file holds no section for a reader. The Go twin, TestReadersGolden, fails the same way. The code stood before this hand-back, since the first pass ran with the helpers that never built, so this red comes from the golden file standing empty, as it stood before the first write, and the file comes back right after. The surprise sits in the golden itself: the readers answer four keys apart. JavaScript spells SE_ANSWER_WARN_AT where Go spells SE_ANSWER_WARNAT, the module ranks a variable over the local file where every old reader ranks the local file first, two readers keep a variable as text, and every old reader lets the local file set a shared slice key.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Every done_when line meets a red test: go test ./... through TestReadersGolden, the golden line through the node golden test, the shadow line through the shadow run test, and the check through the commit verb.
+Every door the tests reach takes a fake: the shadow run takes fake settings, files, proc and log, and the golden writer reads a fake disk.
 
 # gate
 
