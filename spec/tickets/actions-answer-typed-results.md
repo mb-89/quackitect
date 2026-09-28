@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -213,6 +213,18 @@ record:
         hash: 852cd7cfc77b6b4f
         size: 2056
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-11
+    hash_before: 6d0ce5bd771dff82bd1aaf5185b1390171affb94
+    hash_after: 6d0ce5bd771dff82bd1aaf5185b1390171affb94
+    inputs:
+      - name: design/draft
+        hash: 852cd7cfc77b6b4f
+        size: 2056
+      - name: design/tests-red
+        hash: dd7e6de56d25c903
+        size: 683
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -350,13 +362,11 @@ The cases run over a catalog and a wiring in memory, and reach no door.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- surfaces-read-the-output-fields: the MCP tool and the OpenAPI document read Presentation.Out as the action's output schema. This ticket stops at the catalog, and nothing past Start reads Presentation, so the untyped result the ask names stays until a surface reads Out
-- deliver-checks-the-declared-answer: Store.Deliver checks the last answer against the type q.Answers declares, and refuses a mismatch naming the action. The draft assumes no check, so a declared type can drift from what a caller receives
+accept
 | in place | what the builder fixes at implement |
 | --- | --- |
-| src/q/looks.go | the q.Answers stub cites the ticket; its comment points at the model's options, as its neighbours do |
-| src/q/q.go | registration gains an out field beside fields, set by q.Answers off fieldsOf |
+| src/q/looks.go | q.Answers sets one.out off fieldsOf over Out beside one.answers, Presentation hands Out, and Undescribed faults each output field with no doc tag, saying output field and its name |
+| design/draft | the assumption that Deliver checks no answer stands stale, since deliver-checks-the-declared-type closed with the check in src/q/send.go, and the answers list names the first gate's two points, not first draft |
 
 # implement
 
