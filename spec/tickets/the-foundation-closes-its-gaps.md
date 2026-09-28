@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -221,6 +221,14 @@ record:
         hash: f8095093525e4886
         size: 2723
     def: 4da1ca5da87d5bbc
+  - step: children
+    hand: the engine
+    hash_before: 7c3140eab24e7d1cab9e5a6c7a0c420b1f974e72
+    hash_after: 7c3140eab24e7d1cab9e5a6c7a0c420b1f974e72
+  - step: children-2
+    hand: the engine
+    hash_before: 7c3140eab24e7d1cab9e5a6c7a0c420b1f974e72
+    hash_after: 7c3140eab24e7d1cab9e5a6c7a0c420b1f974e72
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
