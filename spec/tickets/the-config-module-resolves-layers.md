@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -194,6 +194,29 @@ record:
         exit: 0
         said: green, src/modules/config passes; green, src/q passes; green, src/modules/index passes
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: a412901a7f16a946c0ec98a3ed6a597d452d11e9
+    hash_after: a412901a7f16a946c0ec98a3ed6a597d452d11e9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/config passes; green, src/q passes; green, src/modules/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-meets-fake-modules.md:306:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 852fe43a4ea64b36
+        size: 986
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -418,26 +441,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/modules/config/config_test.go src/modules/config/env_test.go src/q/wiring_test.go src/q/catalog_test.go src/q/store_test.go src/modules/index/lease_test.go src/quack/described_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each config key now resolves off its layers. `q.CfgIn` registers a key as a derived name, which reads its own entry of `config/values` and answers its built-in value where none stands. The config module adds the guarded fold `config/held` for contexts and overrides, and the derived `config/values`. That name walks the catalog's keys, and takes the override, then the innermost live context, then the `SE_` variable, then the local file, then the default file. A shared key reads the default file alone. The manager commits `index/leases`, and a context whose holder holds no lease drops out. The environment layer lands here, not in a later ticket, since `env/<name>` reads as one map today. Departures from the draft: an empty `index/leases` reads every holder live, since the manager registers it empty; `qtest.New` provides no `config/values`, because the key's input is optional; an inner context wins by opening last. The eight cases of `the-index-meets-fake-modules` stay red, and that ticket carries them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's callers list names, less qtest.go and wiring_test.go
+- the change reaches no door, since the environment and the leases arrive as inputs
+- each function carries a pointer at the model section it implements
+- EnvOf and both file names stand in one place, and each copy points at its owner
 
 # accept
 
