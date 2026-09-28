@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -190,6 +190,18 @@ record:
         hash: 936ed5763f0ade41
         size: 2786
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-8
+    hash_before: 18a2b46fdeaebdde5126952ed9cc4877cb4f1efe
+    hash_after: 18a2b46fdeaebdde5126952ed9cc4877cb4f1efe
+    inputs:
+      - name: design/draft
+        hash: 936ed5763f0ade41
+        size: 2786
+      - name: design/tests-red
+        hash: 623705f159ea865b
+        size: 812
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -349,8 +361,11 @@ The store stands in memory and the grep reads the tree, so no door needs a fake.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- golden-carries-the-given-ask: `grep -rn GivenIn src` hits src/quack/testdata/tree.golden.json, which holds every ticket's ask with this one's among them, so the third done_when line stays unmet by its own command. The case in src/quack/given_test.go reads .go files alone, so the ask wants `grep -rn --include=*.go GivenIn src`.
+- door-and-lease-commit-callers: the callers list leaves out `starts` in src/index/door.go and `commit` in src/modules/index/lease.go, which pass a writer to `Commit` and meet the new refusal, so their cases run in the build.
 
 # implement
 
