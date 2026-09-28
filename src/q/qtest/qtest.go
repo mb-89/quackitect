@@ -4,6 +4,7 @@
 package qtest
 
 import (
+	"sync"
 	"testing"
 
 	"quackitect/src/q"
@@ -13,6 +14,8 @@ type Index struct {
 	t       testing.TB
 	store   *q.Store
 	inputs  q.Writer
+	settle  func()
+	mu      sync.Mutex
 	commits []map[string]any
 }
 
@@ -36,11 +39,21 @@ func Over(t testing.TB, c *q.Catalog, inputs q.Writer) *Index {
 	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
-	one := &Index{t: t, store: q.NewStore(c), inputs: inputs}
-	one.store.OnCommit(func(values map[string]any) { one.commits = append(one.commits, values) })
+	one := Beside(t, q.NewStore(c), inputs, func() {})
 	// A spawn that runs in place settles a seed's wave before the seed answers. [[spec/design_output/model#one-wave-settles-a-change]]
 	q.NewScheduler(one.store, func(run func()) { run() }, func(name string, err error) {
 		t.Errorf("the run of %s answers %v", name, err)
+	})
+	return one
+}
+
+// Drives a store another hand builds and schedules, the door's among them, and waits out its waves through settle after each write. [[spec/design_output/model#the-fake-keeps-a-contract]]
+func Beside(t testing.TB, store *q.Store, inputs q.Writer, settle func()) *Index {
+	one := &Index{t: t, store: store, inputs: inputs, settle: settle}
+	store.OnCommit(func(values map[string]any) {
+		one.mu.Lock()
+		defer one.mu.Unlock()
+		one.commits = append(one.commits, values)
 	})
 	return one
 }
@@ -50,6 +63,7 @@ func (one *Index) Seed(values map[string]any) {
 	if _, err := one.store.Commit(one.store.Snapshot().Revision, one.inputs, values); err != nil {
 		one.t.Fatal(err)
 	}
+	one.settle()
 }
 
 // Commits as the writer a case's own registration hands back, since the store refuses a name past its writer. [[spec/tickets/commits-name-their-writer]]
@@ -58,6 +72,7 @@ func (one *Index) SeedAs(as q.Writer, values map[string]any) {
 	if _, err := one.store.Commit(one.store.Snapshot().Revision, as, values); err != nil {
 		one.t.Fatal(err)
 	}
+	one.settle()
 }
 
 func (one *Index) Read(name string) any { return one.store.Snapshot().Read(name) }
@@ -70,6 +85,7 @@ func (one *Index) Run(name string) any {
 	if err := one.store.Run(name); err != nil {
 		one.t.Fatal(err)
 	}
+	one.settle()
 	return one.Read(name)
 }
 
@@ -80,6 +96,7 @@ func (one *Index) Land(name string, events ...any) any {
 			one.t.Fatal(err)
 		}
 	}
+	one.settle()
 	return one.Read(name)
 }
 
@@ -107,4 +124,9 @@ func (one *Index) Act(name string, input any, answers ...[]any) []q.Request {
 }
 
 // [[spec/design_output/model#the-fake-index]]
-func (one *Index) Commits() []map[string]any { return one.commits }
+func (one *Index) Commits() []map[string]any {
+	one.settle()
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	return append([]map[string]any(nil), one.commits...)
+}

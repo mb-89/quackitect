@@ -13,6 +13,24 @@ func TestTheFakeKeepsTheContract(t *testing.T) {
 	Suite(t, func(t testing.TB, register func(*q.Catalog)) Harness { return New(t, register) })
 }
 
+// A store whose scheduler spawns each run keeps the contract through Beside, which waits out each wave. [[spec/design_output/model#the-fake-keeps-a-contract]]
+func TestASpawningStoreKeepsTheContractBeside(t *testing.T) {
+	Suite(t, func(t testing.TB, register func(*q.Catalog)) Harness {
+		c := q.New()
+		inputs := q.Join(
+			q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file's hash and text, as the case seeds it")),
+			q.OutIn(c, "cfg/<key...>", "", q.Doc("a config value, as the case seeds it")),
+		)
+		register(c)
+		store := q.NewStore(c)
+		scheduler := q.NewScheduler(store, func(run func()) { go run() }, func(name string, err error) {
+			t.Errorf("the run of %s answers %v", name, err)
+		})
+		t.Cleanup(scheduler.Stop)
+		return Beside(t, store, inputs, scheduler.Settle)
+	})
+}
+
 func TestTheFakeHandsAnIOModuleItsStore(t *testing.T) {
 	ix := New(t, func(c *q.Catalog) { q.OutIn(c, "t/n", 0, q.Doc("a count")) })
 	if ix.Store() == nil {
