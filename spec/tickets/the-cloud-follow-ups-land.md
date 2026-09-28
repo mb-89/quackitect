@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box d81c8e27d9d7 · claude-code-remote
@@ -93,6 +93,15 @@ record:
         exit: 0
         said: work/the-cloud-follow-ups-land took 2 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: 2f43b1ae0a8befcce00889559ceaff1c5cc558dc
+    hash_after: 2f43b1ae0a8befcce00889559ceaff1c5cc558dc
+    inputs:
+      - name: ask
+        hash: ccd35afe8c09c8f0
+        size: 309
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -123,14 +132,20 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/conflicts-drop-the-marker]], trivial
+- [[spec/tickets/boxes-open-no-pull]], question
+- [[spec/tickets/the-owner-runs-the-dispatch]], question
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one answer or one guard with its test, small enough to review whole
+- the three children carry the three rulings of the goal, and nothing stands outside them
+- no child waits on another, so none names depends_on
 
 # children
 
