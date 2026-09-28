@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -162,6 +162,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d81be38d5cd0 · claude-code-remote
+    hash_before: 610360da4ca5c4df323853c8e17e0a475d151a2f
+    hash_after: 3436537eb91e3a36ba6863eec3c6aa09df3d5b9b
+    inputs:
+      - name: retro/write
+        hash: 98e576c8f0e720d7
+        size: 2419
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -331,20 +341,29 @@ the chapter names roles alone
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+the real routine and the GitHub API stand out of this box's reach, so the fire runs over the fake http door alone
+the Windows runner stands out of reach too, so its fault shows on the pushed commit alone
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the push gate held the first push on a warning main brought in, and a cut sentence cleared it
+the second sync met a conflict in the work-stands cases, and the merge keeps both sides
+the Windows runner failed two worktree cases the Linux box passes
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+spec/tickets/the-owner-runs-the-dispatch: a question, the owner starts the Action once and confirms the agent's calls
+spec/tickets/the-work-branch-opens-no-pull: a question, the owner rules whether a cloud box opens its group's pull request
+spec/tickets/list-fields-land-one-a-line: minted with no group, for a fix group
+spec/tickets/a-helper-pulls-past-the-plan: minted with no group, for a fix group
 
 # Discussion
 
