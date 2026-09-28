@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: gate
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +148,9 @@ record:
         hash: ddcc59b153cf41ef
         size: 2046
     def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
 ---
 
 # Ask
