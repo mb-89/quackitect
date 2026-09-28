@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-watches-close-cleanly
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 05ab375eb6284c9e
         size: 1847
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d81e857fa7fb · claude-code-remote · helper-4
+    hash_before: d0312b9877a38cb5eaff679617f16b36d01e2788
+    hash_after: d0312b9877a38cb5eaff679617f16b36d01e2788
+    inputs:
+      - name: design/draft
+        hash: 05ab375eb6284c9e
+        size: 1847
+      - name: design/tests-red
+        hash: 004db41549785bb0
+        size: 604
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -261,8 +273,13 @@ the door the tests reach, fsnotify, has a fake with its Windows timing in src/wa
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: the drain goroutine keeps the reader off a blocked Events send, and Add and Close under one mutex with a closed flag close the gap where Add waits on a reply the reader drops
+- the fake in src/watcher/watcher_test.go holds the Windows reader choices of backend_windows.go: done or input at random on a wakeup, and sendEvent selecting on done; the red test fails on its own assertion
+- the -race clause meets the implement tests evidence, CGO_ENABLED=1 go test -race -count=1 over src/watcher, src/modules/files and src/index, which tests-green records; the check runs Go with cgo off and no -race
+- the implement step holds four conditions: the queue stands unbounded, the drain reads Errors as well as Events, Close drops the mutex before it waits on both goroutines, and the worker calls no hear once the closed flag stands
 
 # implement
 
