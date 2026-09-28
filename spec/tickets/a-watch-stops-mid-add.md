@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-watches-close-cleanly
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d81e857fa7fb · claude-code-remote
+    hash_before: 14b78009f5f7443f4b928f4eeda37787ec4b92bc
+    hash_after: 14b78009f5f7443f4b928f4eeda37787ec4b92bc
+    inputs:
+      - name: ask
+        hash: 73f34d9bc60b7e39
+        size: 233
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -147,38 +156,57 @@ The watch in src/modules/files/watch.go and the one in src/index/watch.go hand a
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new package src/watcher owns the loop both watches share. One goroutine drains the fsnotify Events and Errors into a queue, so the reader never blocks on a send. A second goroutine hands each queued event to the hear function, which adds folders through Watcher.Add. Add and Close take one mutex, and Close sets a closed flag under it before it closes the fsnotify watch, so no Add waits on a reply the reader drops. Close then waits on both goroutines. The loop reads the watch through a seam, so a test hands a fake with the Windows timing: Add waits on a reply, the reader picks done or input at random, and the event send blocks. src/modules/files/watch.go and src/index/watch.go run on the loop, and door.go hands index its Touched method.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/main.go: files.Seeds, over files.NewWatch
+src/index/door.go: open, calling watches and closing the watch in its stop
+src/index/index_test.go: the two tests calling folders
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/watcher/watcher_test.go TestAStopReturnsWhileTheHearAdds
+src/watcher/watcher_test.go TestAStopReturnsOverTheRealWatch
+src/modules/files/watch_stop_test.go TestAStopReturnsWhileFoldersAppear
+src/index/watch_test.go TestTheIndexWatchStopsWhileFoldersAppear
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/watcher/watcher.go
+src/watcher/watcher_test.go
+src/modules/files/watch.go
+src/modules/files/watch_stop_test.go
+src/index/watch.go
+src/index/watch_test.go
+src/index/door.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file named stands opened: both watches, door.go, index_test.go, the imports cage, and backend_windows.go of fsnotify v1.10.1 for AddWith, Close, readEvents and sendEvent
+the callers list names quack's Seeds, the door's open and stop, and the index tests over folders
+the done_when line meets the fake test in src/watcher, and each watch meets its own test of a stop while folders appear
 
 ## tests-red
 
