@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -165,6 +165,18 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: design/draft
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: ef8b3ef5f09b24b2afc9956cde90210df0a808ce
+    hash_after: 9da6acd689b2deeec00ada160b874041c60cc00d
+    inputs:
+      - name: ask
+        hash: 9735ed6d14475923
+        size: 621
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -210,44 +222,76 @@ Keep both keys and commit the merge. record: (the sync rows) and cloud: true are
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-A registration hands back a q.Writer, and Store.Commit takes one. GivenIn, Given, DerivedIn, Derived, FoldIn and Fold return Writer{one *registration}. Commit(read, as Writer, values) refuses each name whose active owner (Store.owner) is not as.one, with the error: <name> belongs to the provider at <owner.where>, not the one at <as.where>. Run and Land commit as Writer{one}, the owner they already resolve. The Registers functions of ops, tickets and watchdog return their Writer; the index door keeps the files, tickets and ops writers on the door struct, and watchdog.New takes its Writer. q.Given stays, per proposal (k) in spec/funnel/the-owner-rules-the-specs, and it gains no caller here. Weighed: a writer token over a string name, because a string any caller spells. Assumed: an inactive alternative of a group (a key picks another) meets the refusal too, since it names no active owner.
+`Commit` refuses each name whose active owner the writer does not hold. The error names the name, its owner's port and place, and says the commit names another writer. `Run`, `Land` and `Restore` already commit as the owner, so they pass.
+`Given` and `GivenIn` leave `src/q`. An IO module writes what comes in the way any module writes its outputs, per the rationale on every part being a module. So `q.OutIn` takes their place: an out-port a module's start commits, with its built-in value.
+The watch, the clock, the env and the manager register their out-ports through `q.OutIn`. The fake index registers its input families through it too, since it stands for those IO modules.
+The provider kind stays one kind, renamed from given to out, so the check, the store and why read it as before.
+Every case calling `GivenIn` takes `OutIn`, by one sweep over `src`.
+A case in the root greps `src` for the two names, so the check holds the third done_when line.
+Weighed: `OutIn` against a flagged fold. A fold wants a step and an event type, and an out-port a start commits needs neither.
+Assumed: the manager's alarms and health are out-ports of the manager, since its start commits them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-src/q/store.go: Store.Run,src/q/store.go: Store.Land,src/modules/index/lease.go: Dog.publish, Registers, New,src/index/ops.go: door.opensBook,src/index/topic.go: door.publishes, registersTopics,src/index/door.go: Serve,src/modules/index/ops.go: Registers,src/tickets/tickets.go: Registers,src/q/store_test.go, src/q/why_test.go, src/modules/index/lease_test.go, src/tickets/tickets_test.go: every Commit call
+src/q/store.go: commit, which refuses a name past the writer
+src/q/q.go: Given and GivenIn, which leave, and OutIn, which comes
+src/q/projection.go: ProjectIn, whose saved kind registers an out
+src/q/why.go: the kind it names
+src/q/qtest/qtest.go: New, which registers the input families
+src/modules/files/watch.go: Registers
+src/modules/clock/clock.go: Registers
+src/modules/env/env.go: Registers
+src/modules/index/manager.go: Registers
+every case under src calling GivenIn, which the sweep moves to OutIn
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-src/q/store_test.go: TestCommitRefusesANameOfAnotherProvider,src/q/store_test.go: TestCommitTakesTheOwnersWriter,src/q/store_test.go: TestCommitRefusesAnInactiveAlternative
+./...: go test ./... from the root
+src/q/writer_test.go: TestCommitRefusesANameOfAnotherProvider
+src/q/writer_test.go: TestCommitTakesTheOwnersWriter
+src/quack/described_test.go: TestNoRegistrationTakesTheGivenForm
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-first
+the ask moved: `q.Given` leaves the core now, where the first draft kept it, so `q.OutIn` takes its place
+the first draft named `src/tickets` and the index topic, which `tickets-becomes-a-module` removed, so the writers stand on the modules
 
 ### size
 
 <!-- every file the approach touches, one a line -->
 <!-- the form is list -->
 
-src/q/q.go,src/q/store.go,src/q/store_test.go,src/q/why_test.go,src/modules/index/lease.go,src/modules/index/lease_test.go,src/modules/index/ops.go,src/tickets/tickets.go,src/tickets/tickets_test.go,src/index/door.go,src/index/ops.go,src/index/topic.go
+src/q/q.go
+src/q/store.go
+src/q/projection.go
+src/q/why.go
+src/q/writer_test.go
+src/q/qtest/qtest.go
+src/modules/files/watch.go
+src/modules/clock/clock.go
+src/modules/env/env.go
+src/modules/index/manager.go
+src/quack/described_test.go
+every case under src calling GivenIn
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-opened q.go, store.go, lease.go, ops.go, tickets.go, door.go, index/ops.go and topic.go, and checked each claim there
-the callers list comes off a grep for Commit( and Registers( over src
-go test ./... decides the first done_when line, TestCommitRefusesANameOfAnotherProvider the second, and ./RUNME.sh check the third
+I opened the store, the registrations, the fake index and each module's `Registers`, and checked each claim there.
+The callers come off a grep for `GivenIn`, `Given(` and `Commit(` over `src`.
+Each done_when line names its case, or `go test` or the check.
 
 ## tests-red
 
