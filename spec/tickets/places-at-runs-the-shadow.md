@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: open-tasks-shadow-lands
 parent: open-tasks-run-in-shadow
+record:
+  - step: do
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 96fe0c6ca4294d01c2f742eec7dd93bb0db256cd
+    hash_after: b9b386ab9afd636b77ee75ebb310ac2bdd37de86
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/work passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/replayed-red-leaf-reads-green.md:18:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 4a2db0fd2288dc9a
+        size: 327
+    def: d47a5887fb2dcccc
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ the red cases call shadowOf directly, and no case holds that PlacesAt in src/tui
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/work
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A case now runs PlacesAt over a fixed places answer, with the index count faked, and reads the shadow row: it carries the count the tab draws. The verb run stands behind a package variable, as the index ask does. The ask names index.AskAt, which the implement step leaves out, since the shadow reaches the door through the client the work tab holds. So the second case holds that client: where no door stands, the ask answers nothing and starts none.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask, and the second case departs from AskAt for the reason the says field gives
+the cleanup: none beyond the package variable
+one place: the shadow row shape stands in src/tui/work/shadow.go alone
 
 # Discussion
 
