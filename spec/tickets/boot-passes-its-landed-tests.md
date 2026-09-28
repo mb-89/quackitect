@@ -61,7 +61,7 @@ record:
 
 # Ask
 
-Does the owner pass `design/tests-red` of [[spec/tickets/sessions-boot-from-the-repo]] as owner, or does that ticket wait on [[spec/tickets/a-rewind-spares-landed-tests]]?
+Does the owner pass `design/tests-red` of [[spec/tickets/sessions-boot-from-the-repo]] as owner? Or does that ticket wait on [[spec/tickets/a-rewind-spares-landed-tests]]?
 
 The boot change stands landed, and the check runs green over it. Its note section staled the draft, and the route walked back to `design/tests-red`. That step expects a failing assertion, and the cases pass now. So no agent passes it, and the engine refuses an edit to its frontmatter.
 
@@ -86,7 +86,7 @@ The road to pass it as owner, from the root of a clone on `work/the-cloud-works-
 <!-- the answer, which the step behind this one reads -->
 <!-- the form is text -->
 
-The box decides that no owner pass is needed, and the owner agrees in chat. sessions-boot-from-the-repo stands closed. Its evidence reruns the landed boot cases against the tree before the change, where they fail on their own assertion.
+The box decides the question needs no owner pass, and the owner agrees in chat. sessions-boot-from-the-repo stands closed. Its evidence reruns the landed boot cases against the tree before the change, where they fail on their own assertion.
 
 # do
 
