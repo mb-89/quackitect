@@ -1,7 +1,7 @@
 // The frontmatter and the links, read with no parser. Both are pure functions
 // over a string, so a case drives them with no disk.
 // [[spec/design_output/index#a-note-and-its-links]]
-package main
+package index
 
 import "strings"
 

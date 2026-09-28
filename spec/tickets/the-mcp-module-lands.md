@@ -295,3 +295,5 @@ Copilot carries no function hooks, so MCP is its road to the index. A new action
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- Each tool also takes its output schema off `Presentation.Out`, the fields `q.Answers` declares for its action. `actions-answer-over-http` carries the same for OpenAPI, and no surface reads it for MCP yet.
