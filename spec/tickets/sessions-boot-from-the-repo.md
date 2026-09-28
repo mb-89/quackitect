@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -522,6 +522,15 @@ record:
         hash: e8bdd44da574dc87
         size: 89362
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: e3cd3a940a1cba5ab594138b1cca75bdafd14b1a
+    hash_after: e3cd3a940a1cba5ab594138b1cca75bdafd14b1a
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 group: the-cloud-works-its-queue
 ---
 
@@ -739,17 +748,17 @@ accept with points
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-./RUNME.sh lint src/scripts/boot.js spec/design_output/level0.md .claude/settings.json .vale.ini test/level0/hooks.test.js
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the change touches the four files the draft names, and .vale.ini beside them, because boot.js is a root reading the environment the way the other hook roots do
-boot.js reaches the disk and the process through the doors under src/doors, and the cases drive the fake disk and the fake proc
-the header of boot.js and its catch point at the-cloud-runs-itself and the boot hook section
-the boot hook section in the level zero note owns the setup lines and the probes, and boot.js points at it
+the change touches the four files the draft names under size, and the modules split of boot-and-bridgehead-install-once stays inside them
+the change reaches the disk and the process through the disk and proc doors, and the cases take fakeDisk and fakeProc
+boot.js points at [[spec/design_output/level0#the-boot-hook]] and at the design input it implements
+the split between the boot and the start road stands once, in the boot hook section, and boot.js points at it
 
 ## tests-green
 
