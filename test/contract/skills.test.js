@@ -1,5 +1,6 @@
 // The skills the cloud routines run: each carries the frontmatter the
-// loader reads, names verbs this tree has, and acts on the dispatch JSON.
+// loader reads, names verbs this tree has, and leaves the dispatch's acts to
+// the Action.
 // [[spec/tickets/the-skills-start-the-workers]]
 
 import assert from "node:assert/strict";
@@ -10,8 +11,6 @@ import { verbs } from "../../src/scripts/cli.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
 const SKILLS = ["dispatch", "work"];
-// The keys `./RUNME.sh dispatch --json` answers, which the dispatch skill acts on. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
-const ACTED = ["ready", "stuck", "questions", "write"];
 
 function skill(name) {
   const at = join(ROOT, ".claude", "skills", name, "SKILL.md");
@@ -51,8 +50,9 @@ test("every verb a skill names stands among the verbs help lists", () => {
   }
 });
 
-test("the dispatch skill reads each key the verb's JSON answers", () => {
+// The Action acts on the plan, so the skill reads the dry run alone. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
+test("the dispatch skill reads the dry run, and leaves every act to the Action", () => {
   const text = skill("dispatch");
-  assert.ok(text.includes("./RUNME.sh dispatch --json"));
-  for (const key of ACTED) assert.ok(text.includes(`\`${key}\``), key);
+  assert.ok(text.includes("./RUNME.sh dispatch --dry"));
+  assert.ok(text.includes(".github/workflows/dispatch.yml"));
 });

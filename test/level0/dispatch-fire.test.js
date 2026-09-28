@@ -5,6 +5,9 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { dispatch } from "../../src/scripts/dispatch.js";
+import { loose, WRITE_BRANCH, writing } from "./dispatch-fixtures.js";
+import { ROOT } from "./work-doors.js";
 
 // Each module stands nowhere until tests-green lands it, so a missing one answers an assertion. [[spec/design_output/pull#a-test-proves-red]]
 async function loaded(path) {
@@ -99,6 +102,8 @@ const planOf = (ready = [], stuck = [], questions = [], write) => ({
 const fires = (http) => http.sent.filter((one) => one.url === FIRE_URL);
 
 test("the fire runs once a ready group and once a stuck hand-over", async () => {
+  const { FIRE_VERSION } = await loaded("../../src/scripts/dispatch-fire.js");
+  assert.equal(FIRE_VERSION, "2023-06-01", "the one version the fire page takes");
   const { code, http, plan } = await fired(planOf(["first"], ["stuck"]));
   assert.equal(code, 0);
   const sent = fires(http);
@@ -106,7 +111,7 @@ test("the fire runs once a ready group and once a stuck hand-over", async () => 
   for (const one of sent) {
     assert.equal(one.method, "POST");
     assert.equal(one.headers.Authorization, "Bearer fire-token");
-    assert.equal(one.headers["anthropic-version"], "2023-06-01");
+    assert.equal(one.headers["anthropic-version"], FIRE_VERSION);
     assert.equal(one.headers["Content-Type"], "application/json");
   }
   assert.match(JSON.parse(sent[0].body).text, /work\/first/);
@@ -228,4 +233,26 @@ test("a run missing the fire secrets fires nothing, says which, and exits 1", as
   assert.equal(fires(http).length, 0);
   assert.match(plan.fire.why, /ROUTINE_FIRE_URL/);
   assert.match(plan.fire.why, /ROUTINE_FIRE_TOKEN/);
+});
+
+test("dispatch --json --fire lands the writes, then prints a plan carrying the fire", async () => {
+  const { fakeHttp } = await loaded("../../src/doors/fake/http.js");
+  const { it } = writing({ "a-loose-one": loose });
+  const hub = github();
+  it.http = fakeHttp({ [`POST ${FIRE_URL}`]: () => json(200, SESSION), ...hub.routes });
+  it.env = ENV;
+  const lines = [];
+  const was = console.log;
+  console.log = (...said) => lines.push(said.join(" "));
+  let code;
+  try {
+    code = await dispatch(ROOT, ["--json", "--fire"], it);
+  } finally {
+    console.log = was;
+  }
+  assert.equal(code, 0);
+  const plan = JSON.parse(lines.at(-1));
+  assert.equal(plan.write.state, "pushed");
+  assert.equal(plan.fire.pull.state, "opened");
+  assert.equal(hub.pulls[0].head.ref, WRITE_BRANCH);
 });

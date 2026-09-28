@@ -4,6 +4,7 @@
 // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
 
 import { CLOSED, fieldOf, GROUP, isGroup } from "../engine/group.js";
+import { fire, fireLines } from "./dispatch-fire.js";
 import { land, opens, opensOf, writeState, writesOf } from "./dispatch-write.js";
 import { waitsOnPerson } from "./work-answer.js";
 import { freeIn, staleClaim, stuckIn } from "./work-free.js";
@@ -155,10 +156,21 @@ export function dispatch(root, argv, doors) {
   // The plan reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch?.();
   const { plan, read } = planned(it, 0);
-  const code = said.includes("--dry") ? 0 : carried(it, plan, read);
+  const dry = said.includes("--dry");
+  const code = dry ? 0 : carried(it, plan, read);
+  // The Action fires after the writes, so the plan it prints carries both. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
+  if (!dry && said.includes("--fire"))
+    return fire(it, plan).then((fired) => {
+      told(plan, said);
+      return code || fired;
+    });
+  told(plan, said);
+  return code;
+}
+
+function told(plan, said) {
   if (said.includes("--json")) console.log(JSON.stringify(plan));
   else for (const line of printed(plan)) console.log(line);
-  return code;
 }
 
 // The writes, where no write branch stands in their way. The plan carries what happened under write. [[spec/design_input/the-cloud-runs-itself#the-writes-ride-a-branch]]
@@ -201,6 +213,7 @@ function printed(plan) {
     );
     if (plan.write.why) out.push(`  ${plan.write.why}`);
   }
+  if (plan.fire) out.push(...fireLines(plan.fire));
   return out;
 }
 

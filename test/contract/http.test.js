@@ -4,16 +4,10 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeHttp } from "../../src/doors/fake/http.js";
+import { http } from "../../src/doors/http.js";
 import { wire } from "../../src/doors/wire.js";
-
-// The door stands nowhere until tests-green lands it, so a missing one answers an assertion. [[spec/design_output/pull#a-test-proves-red]]
-async function loaded(path) {
-  try {
-    return await import(path);
-  } catch {
-    return {};
-  }
-}
+import { it } from "../../src/scripts/cli-doors.js";
 
 const BODY = JSON.stringify({ said: "hello" });
 
@@ -46,8 +40,6 @@ const shaped = (said) => ({
 });
 
 test("the real door sends the method, headers and body, and answers the status, body and headers", async () => {
-  const { http } = await loaded("../../src/doors/http.js");
-  assert.equal(typeof http, "function", "src/doors/http.js exports http");
   const { url, heard, server } = await served((res) => {
     res.writeHead(201, { "Content-Type": "application/json", "Retry-After": "60" });
     res.end(BODY);
@@ -70,9 +62,6 @@ test("the real door sends the method, headers and body, and answers the status, 
 });
 
 test("the fake answers what the real door answers", async () => {
-  const { http } = await loaded("../../src/doors/http.js");
-  const { fakeHttp } = await loaded("../../src/doors/fake/http.js");
-  assert.equal(typeof fakeHttp, "function", "src/doors/fake/http.js exports fakeHttp");
   const { url, server } = await served((res) => {
     res.writeHead(200);
     res.end(BODY);
@@ -90,8 +79,6 @@ test("the fake answers what the real door answers", async () => {
 });
 
 test("the fake keeps each request, reads a route past its query, and throws on a route it lacks", async () => {
-  const { fakeHttp } = await loaded("../../src/doors/fake/http.js");
-  assert.equal(typeof fakeHttp, "function", "src/doors/fake/http.js exports fakeHttp");
   const door = fakeHttp({
     "GET https://x.example/list": (sent) => ({
       status: 200,
@@ -106,4 +93,10 @@ test("the fake keeps each request, reads a route past its query, and throws on a
     door.send("https://x.example/other", { method: "POST" }),
     /POST https:\/\/x\.example\/other/,
   );
+});
+
+// The dispatch fires through the door the command line builds. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
+test("the command line hands every verb the http door", () => {
+  assert.equal(typeof it.http?.send, "function");
+  assert.deepEqual(Object.keys(it.http), Object.keys(http()));
 });

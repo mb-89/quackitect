@@ -9,6 +9,7 @@ import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
+import { http } from "../doors/http.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { front } from "../doors/front.js";
@@ -51,6 +52,8 @@ export async function doorsHere() {
     disk: files,
     clock: time,
     git: git(outside, roots.work),
+    // The dispatch fires the work routine and opens issues through it. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
+    http: http(),
     // [[spec/tickets/go-writes-the-frontmatter]]
     front: front(files, outside, roots.method),
     // The stale read asks the index for the hash of a note. [[spec/design_output/pull#an-input-marks-its-steps]]

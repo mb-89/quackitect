@@ -154,7 +154,7 @@ export const verbs = {
   },
   // [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
   dispatch: {
-    says: "the dispatcher's plan: --dry prints it, and --json prints it as JSON",
+    says: "the dispatcher's plan: --dry prints it, --json prints it as JSON, and --fire fires the workers",
     run: async () => dispatch(it.work, rest, it),
   },
   ticket: {
