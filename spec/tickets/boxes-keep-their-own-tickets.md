@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box d81cb7b9efd7 · claude-code-remote
@@ -91,6 +91,15 @@ record:
   - step: sync
     hand: box d81e51f1bb10e · claude-code-remote
     hash_before: ddae4316b5cfa5f20e0d37f4ba6414fd60616d5c
+  - step: sync
+    hand: box d81e51f1bb10e · claude-code-remote
+    hash_before: 372cc6f4098221524a0be3dd10ea6d13e2416ce5
+    hash_after: 372cc6f4098221524a0be3dd10ea6d13e2416ce5
+    answered:
+      - name: sync
+        exit: 0
+        said: work/boxes-keep-their-own-tickets already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -104,8 +113,9 @@ A cloud box decides every step itself and records what it weighed. The tickets i
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
