@@ -369,3 +369,6 @@ the family case runs over a catalog in memory, and the golden case seeds the fak
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The manager lands first and takes the ops half out of `TestTheTopicsCommitThroughTheirOwnWriters` in `src/index/topic_test.go`. Where this change moves the tickets topic out, the case keeps no half, so the implement step drops it or points it at a topic that stands.
+- The implement step takes the `src/index/topic.go` and `src/quack/main.go` the manager leaves as its base.
