@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: do
     does: makes the change the ask names
@@ -11,6 +11,7 @@ steps:
         says: what you change, and what surprises you
 process: [[spec/processes/question]]
 group: the-foundation-closes-its-gaps
+step: do
 ---
 
 # Ask
