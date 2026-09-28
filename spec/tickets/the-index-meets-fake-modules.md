@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [commits-name-their-writer]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 96ea8711eb32c62c8b2d3bae76e8f7f64bf2a4e9
+    hash_after: 96ea8711eb32c62c8b2d3bae76e8f7f64bf2a4e9
+    inputs:
+      - name: ask
+        hash: 19410b7019023e83
+        size: 834
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +168,65 @@ The index then tests against the contract its modules see. A change to the core 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A scripted fake module stands in src/q/qtest/module.go. A script names an instance, its type, its out-ports with their built-in values, its in-ports, and its actions with their writes flag and the requests each answers.
+Its types map hands q.Start the registration of each type, so the wiring loads fake modules the way it loads real ones. Each out-port registers through q.OutIn, each in-port through a derived provider that echoes it, and each action through q.ActionIn.
+The cases of the q core stand in src/q/qtest/module_test.go, since package q cannot import qtest. They drive q.Start, Store.Commit, Store.Run, Store.OnCommit and Store.Down over the fake.
+The cases of the manager stand in src/modules/index/module_test.go. They drive Call and the Book's writer queue, and the dog's lease, over the same fake.
+Weighed: a scripted module in qtest against ad-hoc types per case, as src/q/start_test.go writes them now. One script keeps every transaction on one contract, so a change to the core shows across the cases at once.
+Assumed: a port holds an int, since the cases read transactions and no value shape. Assumed: the fake module fakes no outside world, so it keeps no contract suite of its own.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/qtest/module.go: Module and its Types, which the new cases call
+src/q/wiring.go: Start, which loads the fake's types, unchanged
+src/modules/index/call.go: Call, which runs the fake's actions, unchanged
+src/modules/index/lease.go: NewDog, which marks the fake's part stale, unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/q/qtest/module_test.go: TestTheWiringResolvesFakeModulesInTwoPasses
+src/q/qtest/module_test.go: TestAnOpenInPortRefusesNamingTheReaderAndTheName
+src/q/qtest/module_test.go: TestAWriteOfAPortTheModuleRegistersNowhereRefuses
+src/q/qtest/module_test.go: TestARunReadsOneSnapshotCommitsAndPushes
+src/q/qtest/module_test.go: TestAFakeModuleRunningNowhereReadsNotProvided
+src/modules/index/module_test.go: TestAnExpiredLeaseMarksTheFakeModulesPortStale
+src/modules/index/module_test.go: TestWritingActionsOfAFakeModuleRunOneAtATime
+src/modules/index/module_test.go: TestAReadAnswersWhileAFakeWriterRuns
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/qtest/module.go
+src/q/qtest/module_test.go
+src/modules/index/module_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened wiring.go for Start and Load, store.go for Commit, Run, OnCommit, Down and Stale, action.go, ops.go for Next, call.go for Call, lease.go for NewDog, and qtest, and checked each claim there.
+The approach changes no production function, so the callers list names the functions the new cases drive.
+Each done_when line names its case in the tests list, and go test and the check decide the first and the last.
 
 ## tests-red
 
