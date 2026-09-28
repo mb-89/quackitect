@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: "spec/tickets/replayed-red-leaf-reads-green.md:18:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 859a11cf9d489f090a68c50672b2b124f27e0d62
+    hash_after: 4a556f887a00667218818344ba08b8aad327882c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s); green, src/index passes; green, src/modules/migration passes; green, src/modules/wor
+      - name: check
+        exit: 0
+        said: "spec/tickets/replayed-red-leaf-reads-green.md:18:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: aa384b16ce1de2a7
+        size: 775
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -311,26 +334,33 @@ one place: the key spelling stands in src/modules/migration and in the default f
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The open-tasks count runs in shadow. The default file sets migration.opentasks to shadow. The work tab keeps the old count, asks the index for work/open-tasks beside it, and writes a shadow row on a mismatch. On this tree ./RUNME.sh log --kind shadow names one: the old count reads 24, and the index reads 18. The shadow first needs the command line to drain its output before it exits, since a pipe cut the places answer at 64 KiB.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the draft files, and src/scripts/cli.js, whose cut output kept the shadow from running on this tree
+every door the change reaches has a fake: askOpenTasks in the shadow cases, and a fake pipe in test/level0/cli-exit.test.js
+a comment names the approach: each new function points at spec/tickets/open-tasks-run-in-shadow
+one place: the key spelling stands in src/modules/migration and the default file, and ask-spells-the-slice-key carries why
 
 # accept
 
