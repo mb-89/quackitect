@@ -107,3 +107,5 @@ Then paste the whole output as the answer. The field list, the line naming the f
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This is work a person alone can do: a run on a desk whose client loads function hooks. So it moves to the person route, per the owner's ruling. [[spec/tickets/desk-probe-reply-trial]] carries the commands, loose on `main`. The box taking this ticket closes it `./RUNME.sh ticket pull a-desk-runs-probe-reply --became desk-probe-reply-trial`.

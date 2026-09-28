@@ -292,3 +292,5 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This ticket waits on nobody. `design/owner-read` holds `when: handed`, and the ask says the source is none, so the next pull skips that step and hands out `design/draft`. The dispatch hands the ticket to a box like other open work.

@@ -21,7 +21,7 @@ function boxOn(cloud) {
 test("a cloud box refuses AskUserQuestion, and the refusal names the question ticket", () => {
   const box = boxOn(true);
   const deny = holdsCloudAsk({ tool: ASK }, box)?.result?.deny ?? "";
-  assert.match(deny, /--process=question/);
+  assert.match(deny, /--process=person/);
   assert.match(deny, /\.\/RUNME\.sh mint ticket/);
   assert.match(deny, /push/);
   assert.match(deny, /spec\/guidance\/cloud\/cloud/);
