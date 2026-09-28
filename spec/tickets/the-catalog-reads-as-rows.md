@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -197,6 +197,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: cdf15c0c1e8be91c6d6374bdc584ecd72aa87060
+    hash_after: cdf15c0c1e8be91c6d6374bdc584ecd72aa87060
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-meets-fake-modules.md:306:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 1998e0e2d5b122f0
+        size: 696
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -384,26 +407,37 @@ The gate's two fixes land: renews commits index/health first and builds the name
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/modules/index/manager_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index manager writes the catalog as rows under index/.
+index/names holds each name with its provider and its state, and the value where the name holds one value. index/actions holds each action with its doc and input fields. index/docs holds each name, action and key with its doc.
+The start commits all three once the book restarts, since the catalog stays fixed. Each step of the work loop commits index/health first and index/names after it, so each state follows what the providers answer.
+The store gains Names and Presentation, which the rows read.
+A row under index/ carries no value, so index/names nests no list of itself.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change stays inside the draft's size list, and a case pins the gate's nesting fix.
+The cases run over the fake index and an op table in memory.
+The comments link the topics in the model and this ticket.
+The three names stand once, as constants in catalog.go.
 
 # accept
 
