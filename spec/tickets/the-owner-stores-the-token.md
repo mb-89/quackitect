@@ -33,7 +33,24 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
-step: answer
+step: do
+todo: true
+record:
+  - step: answer
+    hand: box 1327ac97a972 · claude-code-remote
+    hash_before: 64f0950a790ac159aaf7c710a6f948ce693ce8d5
+    hash_after: 64f0950a790ac159aaf7c710a6f948ce693ce8d5
+    inputs:
+      - name: ask
+        hash: 01e96f354b9f7d30
+        size: 794
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/tickets/an-action-fires-the-workers]]
+        hash: 44f47196af76f1b4
+        size: 9242
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -54,8 +71,9 @@ Say too which token opens the Action's pull requests. A pull request opened on t
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The owner reports the three repo secrets set on mb-89/quackitect. ROUTINE_FIRE_URL and ROUTINE_FIRE_TOKEN hold the work routine API trigger. PULL_TOKEN holds a fine-grained token with contents and pull requests write, and the Action opens its pull requests on it.
 
 # do
 
