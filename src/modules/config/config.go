@@ -147,31 +147,52 @@ func liveIn(holder string, leases []string) bool {
 func resolves(keys []q.Key, in layersIn) q.Resolved {
 	out := q.Resolved{}
 	for _, key := range keys {
-		if literal, ok := winning(key, in); ok {
+		if literal, _, ok := winning(key, in); ok {
 			out[key.Name] = literal
 		}
 	}
 	return out
 }
 
-// The highest layer setting the key: override, the innermost live context, environment, local file, default file. A shared key reads the default file alone. [[spec/design_output/model#a-keys-layers]]
-func winning(key q.Key, in layersIn) (string, bool) {
+// The layers config/values names beside the two files and the variables. [[spec/design_output/model#a-keys-layers]]
+const (
+	OverrideLayer = "override"
+	ContextLayer  = "context"
+)
+
+// The literal and the layer answering a key off both files and the variables, with no context or override open, as the config readers see a tree at rest. [[spec/tickets/cfg-topic-holds-one-resolver]]
+func Layered(key q.Key, tracked, local q.Ordered, env map[string]string) (string, string, bool) {
+	return winning(key, layersIn{Tracked: tracked, Local: local, Env: env})
+}
+
+// The highest layer setting the key, and its name: override, the innermost live context, environment, local file, default file. A shared key reads the default file alone. [[spec/design_output/model#a-keys-layers]]
+func winning(key q.Key, in layersIn) (string, string, bool) {
 	if key.Shared {
-		return filed(in.Tracked, key)
+		return fileLayer(Tracked)(filed(in.Tracked, key))
 	}
 	if literal, ok := in.Held.Overrides[key.Name]; ok {
-		return literal, true
+		return literal, OverrideLayer, true
 	}
 	if literal, ok := contextual(in.Held.Contexts, in.Leases, key.Name); ok {
-		return literal, true
+		return literal, ContextLayer, true
 	}
 	if text, ok := in.Env[EnvOf(dotted(key))]; ok {
-		return literalOfText(text), true
+		return literalOfText(text), EnvOf(dotted(key)), true
 	}
 	if literal, ok := filed(in.Local, key); ok {
-		return literal, true
+		return literal, Local, true
 	}
-	return filed(in.Tracked, key)
+	return fileLayer(Tracked)(filed(in.Tracked, key))
+}
+
+// A file's answer, named by its layer where it holds the key. [[spec/design_output/model#a-keys-layers]]
+func fileLayer(layer string) func(string, bool) (string, string, bool) {
+	return func(literal string, ok bool) (string, string, bool) {
+		if !ok {
+			return "", "", false
+		}
+		return literal, layer, true
+	}
 }
 
 // The value the last opened live context sets for the key, since an inner context opens after the one it nests in. [[spec/design_output/model#a-context-holds-a-lease]]

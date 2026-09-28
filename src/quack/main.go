@@ -118,6 +118,13 @@ func dumps(prefix string) error {
 }
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "config" {
+		if err := configs("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) == dumpArgs && os.Args[1] == "dump" {
 		if err := dumps(os.Args[2]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -253,4 +260,32 @@ func load(w q.Wiring, into *q.Catalog) ([]index.Start, error) {
 		})
 	}
 	return starts, nil
+}
+
+// Prints every key off the config module, over both files under the root, the wiring and the SE_ variables. [[spec/tickets/cfg-topic-holds-one-resolver]]
+func configs(root string) error {
+	read := func(path string) []byte {
+		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		return body
+	}
+	shared, err := sharedKeys(string(read(q.WiringFile)))
+	if err != nil {
+		return err
+	}
+	env := map[string]string{}
+	for _, one := range os.Environ() {
+		if name, value, ok := strings.Cut(one, "="); ok && strings.HasPrefix(name, "SE_") {
+			env[name] = value
+		}
+	}
+	rows, err := configRows(read(config.Tracked), read(config.Local), env, shared)
+	if err != nil {
+		return err
+	}
+	text, err := configText(rows)
+	if err != nil {
+		return err
+	}
+	_, err = os.Stdout.Write(text)
+	return err
 }
