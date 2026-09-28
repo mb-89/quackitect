@@ -234,20 +234,21 @@ and the held ones together, and runs no `git show` by hand:
 
 ## A stale group is yours
 
-There is no lease. A branch somebody holds stays held until a person looks, and
-the age of the tip is the signal:
+A branch has one writer while its box pushes, and the age of the tip on origin
+is the lease. A box pushes after every finished step, so a quiet tip means no box
+works the branch:
 
 | the tip's age | means |
 |---|---|
-| under `work.staleAfter` | a box holds the group, and nothing asks |
-| past it | the group is a person's, and `list` puts it under yours |
+| under `work.staleAfter` | a box holds the group, and the push door refuses every other box |
+| past it | the hold stands stale: the push door lets any box through, `take` and `release` close it, and `list` puts it under yours |
 
 Under yours it carries the answers below, and each is a verb:
 
 | the answer | the verb | what it does |
 |---|---|---|
 | release it | `branch release <name>` | writes `hash_after`, so the group stands at `todo` |
-| take it over | `branch take` | claims it again, with a record entry of its own |
+| take it over | `branch take` | writes `hash_after` onto the stale take, then claims it with a record entry of its own |
 | close it | `branch close <name> --force` | drops the branch, and the work on it |
 
 `work.staleAfter` stands in `spec/config/level0.json`, and the rule derives from

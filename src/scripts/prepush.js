@@ -25,12 +25,15 @@ import {
 } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
 import { readThrough } from "../bridge/findings.js";
-import { heldIn, spanOf, STALE, TICKETS, WORK_BRANCH } from "../engine/group.js";
+import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
+import { heldIn, TICKETS, WORK_BRANCH } from "../engine/group.js";
 import { configHere } from "./cli-doors.js";
 import { boxIdHere } from "./pull-hand-of.js";
+import { rootsHere } from "./vehicle.js";
+import { staleClaim } from "./work-free.js";
 
 export const STDIN = 0;
 export const ZEROS = /^0+$/;
@@ -57,6 +60,7 @@ export function holds(
   heldBy = () => "",
   box = "",
   engine = true,
+  stale = () => false,
 ) {
   // [[spec/design_output/work#a-version-branch-stands]]
   const versions = refs
@@ -64,7 +68,10 @@ export function holds(
       VERSION.test(String(one.remote ?? "").replace(/^refs\/heads\//, "")),
     )
     .filter((one) => ZEROS.test(String(one.sha ?? "")))
-    .map((one) => ({ name: one.remote.replace(/^refs\/heads\//, ""), how: "delete" }));
+    .map((one) => ({
+      name: one.remote.replace(/^refs\/heads\//, ""),
+      how: "delete",
+    }));
   if (versions.length) return { code: 1, said: refusedVersion(versions) };
 
   const trunk = refs.filter((one) => one.remote === `refs/heads/${TRUNK}`);
@@ -85,13 +92,14 @@ export function holds(
     };
   }
 
-  // [[spec/tickets/one-writer-holds-a-branch]]
+  // A hold past work.staleAfter names a box that left, so its branch takes the push. [[spec/tickets/stale-hold-frees-the-branch]]
   for (const one of refs) {
     const branch = String(one.remote ?? "").replace(HEADS, "");
     if (!branch.startsWith(WORK_BRANCH)) continue;
     const hand = String(heldBy(one) ?? "");
     const holder = BOX.exec(hand)?.[1] ?? "";
-    if (hand && holder !== box) return { code: 1, said: heldElsewhere(branch, hand) };
+    if (hand && holder !== box && !stale(one))
+      return { code: 1, said: heldElsewhere(branch, hand) };
   }
 
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -114,25 +122,28 @@ export function cloudLeavesTrunk() {
   ].join("\n");
 }
 
-// The hand holding a work branch, off its group ticket at the remote tip. A tip older than the span holds nothing, so the take frees a stale branch. [[spec/design_output/work#a-stale-group-is-yours]]
-export function heldBy(repo, span = 0, now = 0) {
+// The hand holding a work branch, off its group ticket at the remote tip. [[spec/tickets/one-writer-holds-a-branch]]
+export function heldBy(repo) {
   return (ref) => {
     const branch = String(ref?.remote ?? "").replace(HEADS, "");
     if (!branch.startsWith(WORK_BRANCH)) return "";
-    if (tipStale(repo, branch, span, now)) return "";
     const group = branch.slice(WORK_BRANCH.length);
     const said = repo.run(["show", `origin/${branch}:${TICKETS}/${group}.md`], true);
     return said.ok ? (heldIn(said.out)?.hand ?? "") : "";
   };
 }
 
-// Whether the remote tip stands older than the span. A tip whose time reads nothing stands fresh. [[spec/design_output/work#a-stale-group-is-yours]]
-export function tipStale(repo, branch, span, now) {
-  if (!span || !now) return false;
-  const said = repo.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
-  const when = Number(String(said.out ?? "").trim());
-  if (!said.ok || !(when > 0)) return false;
-  return Math.floor(now / 1000) - when > span;
+// Whether the tip on origin stands older than the span, read the way the list reads a claim. [[spec/tickets/stale-hold-frees-the-branch]]
+export function staleBy(repo, span, now) {
+  return (ref) => {
+    const branch = String(ref?.remote ?? "").replace(HEADS, "");
+    if (!branch.startsWith(WORK_BRANCH)) return false;
+    const said = repo.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
+    if (!said.ok) return false;
+    return staleClaim({ when: Number(String(said.out).trim()) }, now, {
+      stale: span,
+    }).stale;
+  };
 }
 
 // [[spec/tickets/one-writer-holds-a-branch]]
@@ -141,7 +152,19 @@ export function heldElsewhere(branch, hand) {
     `${branch} stands in the hand of ${hand}, and a branch has one writer.`,
     "",
     `Land the change on ${TRUNK}, and the holder takes it in with \`./RUNME.sh branch sync\`.`,
+    "The hold frees itself once the tip stands quiet past work.staleAfter.",
   ].join("\n");
+}
+
+// The span off the config, or the built-in one where the config answers nothing. [[spec/tickets/stale-hold-frees-the-branch]]
+async function spanHere(files, root) {
+  try {
+    return await configHere(files, rootsHere(files, process.env, root)).ask(
+      "work.staleAfter",
+    );
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -198,15 +221,15 @@ async function main() {
   const outside = proc();
   const at = join(root, STAMP);
   const stamp = files.exists(at) ? files.read(at) : "";
-  const span = spanOf(await configHere(files).ask("work.staleAfter")) || spanOf(STALE);
   const said = holds(
     refsIn(files.read(STDIN)),
     stamp,
     carriedBy(git(outside, root)),
     inCloud(process.env),
-    heldBy(git(outside, root), span, Date.now()),
+    heldBy(git(outside, root)),
     boxIdHere({ root, method: root, join, disk: files }),
     process.env[ENGINE] === "1",
+    staleBy(git(outside, root), await spanHere(files, root), clock().now().getTime()),
   );
   if (said.code !== 0) console.error(said.said);
   return said.code;

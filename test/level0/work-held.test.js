@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
-import { withEntry, withField } from "../../src/engine/group.js";
+import { heldIn, recordIn, withEntry, withField } from "../../src/engine/group.js";
 import { work } from "../../src/scripts/work.js";
 import {
   doorsSaying,
@@ -16,9 +16,9 @@ import {
   HAND,
   heard,
   on,
+  ROOT,
   ranGit,
   remoteSaying,
-  ROOT,
   SHA,
 } from "./work-doors.js";
 
@@ -118,4 +118,75 @@ test("a named take refuses while the held branch stands in work, and names both"
   assert.match(said, /\.\/RUNME\.sh branch release/);
   assert.doesNotMatch(said, /The old work/, "no brief for the held branch");
   assert.ok(!ran.some((one) => one.startsWith("git switch")));
+});
+
+// A group another box holds, and a take naming it. [[spec/tickets/stale-hold-frees-the-branch]]
+const HELD_ELSEWHERE = withEntry(
+  GROUP_NOTE,
+  { step: "sync", hand: "box 0ther1d", hash_before: "a1b2c3" },
+  fakeFront(),
+);
+const takingHeld = (when) => {
+  const { it, outside, disk } = doorsSaying(
+    {
+      ...groupRemote(),
+      ...remoteSaying([{ branch: "work/one-group", tip: "aaa", when }], {
+        [`work/one-group:${GROUP_AT}`]: HELD_ELSEWHERE,
+      }),
+      "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+    },
+    { [on("one-group")]: HELD_ELSEWHERE, ...HAND },
+  );
+  const said = heard(() =>
+    work(ROOT, ["take", "one-group"], {
+      ...it,
+      agent: true,
+      cloud: true,
+      clock: fakeClock(NOW),
+      stale: "30m",
+    }),
+  );
+  return { ...said, ran: ranGit(outside), text: disk.read(on("one-group")) };
+};
+
+// [[spec/tickets/stale-hold-frees-the-branch]]
+test("a take over a hold past work.staleAfter closes that hold and writes its own", () => {
+  const { code, said, ran, text } = takingHeld(SECONDS_NOW - 3600);
+  assert.equal(code, 0, said);
+  assert.ok(ran.includes("git switch work/one-group"), said);
+  const rows = recordIn(text);
+  assert.equal(rows.at(0).hand, "box 0ther1d");
+  assert.ok(rows.at(0).hash_after, "the stale hold carries its hash_after");
+  assert.notEqual(heldIn(text).hand, "box 0ther1d", "the take holds it now");
+  assert.ok(
+    ran.some(
+      (one) => one.startsWith("git commit") && one.includes("over from box 0ther1d"),
+    ),
+    ran.join("\n"),
+  );
+});
+
+// [[spec/tickets/stale-hold-frees-the-branch]]
+test("a take over a hold under work.staleAfter refuses, and writes nothing", () => {
+  const { code, said, ran, text } = takingHeld(SECONDS_NOW - 60);
+  assert.equal(code, 1, said);
+  assert.equal(heldIn(text).hand, "box 0ther1d");
+  assert.ok(!ran.some((one) => one.startsWith("git commit")));
+});
+
+// [[spec/tickets/stale-hold-frees-the-branch]]
+test("a release of another box's hold closes it, and the commit names the hand-over", () => {
+  const { it, outside, disk } = doorsSaying(groupRemote(HELD_ELSEWHERE), {
+    [on("one-group")]: HELD_ELSEWHERE,
+    ...HAND,
+  });
+  const { code, said } = heard(() => work(ROOT, ["release"], it));
+  assert.equal(code, 0, said);
+  assert.equal(heldIn(disk.read(on("one-group"))), null);
+  assert.ok(
+    ranGit(outside).some(
+      (one) =>
+        one.startsWith("git commit") && one.includes("frees it from box 0ther1d"),
+    ),
+  );
 });

@@ -281,7 +281,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
-cloud: true
 reason: done
 ---
 

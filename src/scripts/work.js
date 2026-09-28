@@ -18,7 +18,6 @@ import {
   fieldOf,
   frontOf,
   GROUP,
-  heldIn,
   isGroup,
   stepOf,
   TICKETS,
@@ -27,7 +26,6 @@ import {
   urgent,
   WORK_BRANCH,
   withEntry,
-  withEveryTakeClosed,
   withField,
   withHashAfter,
   withoutField,
@@ -51,8 +49,8 @@ import {
 } from "./pull.js";
 import { serving } from "./serve.js";
 import { leftRefuses } from "./work-fix.js";
-import { handsStuck, readFree, stuckFirst, trigger } from "./work-free.js";
-import { heldHere, pastHold } from "./work-held.js";
+import { handsStuck, nowOf, readFree, stuckFirst, trigger } from "./work-free.js";
+import { handedOver, heldHere, letGo, pastHold } from "./work-held.js";
 import { list } from "./work-list.js";
 import { close, filesUp, marks, marksTrunk, merge, offTrunk } from "./work-merge.js";
 import { readyToMerge, review } from "./work-review.js";
@@ -199,7 +197,9 @@ function tell(it, what, code) {
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   // A verb answering zero is the expected road, so it stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
   return it.log
-    .say(code === 0 ? "debug" : "warn", "work", `${what} answered ${code}`, { branch })
+    .say(code === 0 ? "debug" : "warn", "work", `${what} answered ${code}`, {
+      branch,
+    })
     .then(() => code);
 }
 
@@ -217,7 +217,8 @@ function take(it, name = "") {
   it.git.fetch();
   // [[spec/design_output/work#the-take-writes-the-record]]
   const mine = heldHere(it);
-  const { stand, standing, trunk, free: all } = readFree(it);
+  // The clock lets a hold past work.staleAfter read free. [[spec/tickets/stale-hold-frees-the-branch]]
+  const { stand, standing, trunk, free: all } = readFree(it, nowOf(it));
   // A name wins over the hold: a take hands no brief for a branch it does not name. [[spec/design_output/work#the-take-writes-the-record]]
   if (mine) {
     const named = name ? `${WORK_BRANCH}${name}` : mine.branch;
@@ -249,7 +250,7 @@ function take(it, name = "") {
     console.log(`${one.branch} shares no ancestor with trunk, so this take skips it.`);
   }
 
-  if (!open.length) {
+  if (!open.length && !all.length && !name) {
     console.log(`No work branch stands at ${TODO}. Nothing to take.`);
     return 0;
   }
@@ -356,13 +357,18 @@ function claimGroup(it, one) {
 
   // A tracked file holds the role, and git holds who. [[spec/design_output/pull#the-hand-rule]]
   const role = roleOf(hand);
+  const { from, base } = handedOver(was, role, before, it.front);
   it.disk.write(
     path,
-    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }, it.front),
+    withEntry(base, { step: stepOf(was), hand: role, hash_before: before }, it.front),
   );
   it.git.run(["add", at], true);
   const committed = it.git.run(
-    ["commit", "-m", `${one.branch}: ${role} takes it`],
+    [
+      "commit",
+      "-m",
+      `${one.branch}: ${role} ${from ? `takes it over from ${from}` : "takes it"}`,
+    ],
     true,
   );
   // A refused commit puts the ticket back as it stood, so the next move carries a clean tree. [[spec/design_output/work#the-take-writes-the-record]]
@@ -555,27 +561,6 @@ function release(it, name) {
 
   if (!onBranch(it, branch)) return 1;
   return letGo(it, branch, named, here);
-}
-
-// [[spec/design_output/work#a-stale-group-is-yours]]
-function letGo(it, branch, name, here) {
-  const at = ticketAt(name);
-  const path = it.join(it.root, at);
-  const held = heldIn(it.disk.read(path));
-  if (!held) {
-    console.log(`${branch} holds nobody already, so it is free for anybody.`);
-    return 0;
-  }
-
-  const tip = it.git.run(["rev-parse", "HEAD"], true).out;
-  it.disk.write(path, withEveryTakeClosed(it.disk.read(path), tip, it.front));
-  it.git.run(["add", at], true);
-  it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
-  if (!it.git.run(["push", "origin", branch]).ok) return 1;
-  if (here !== branch) it.git.run(["switch", here], true);
-
-  console.log(`${branch} stands at ${TODO} again, and is free for anybody.`);
-  return 0;
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
