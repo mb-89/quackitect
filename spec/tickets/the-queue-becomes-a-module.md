@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 1d735e6e228df8ca397221101b2f02d26a6f3e2b
+    hash_after: 1d735e6e228df8ca397221101b2f02d26a6f3e2b
+    answered:
+      - name: tests
+        exit: 0
+        said: "green, src/imports passes; green, src/modules/queue passes; green, src/modules/tickets passes; green, src/quack passes; "
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-becomes-a-module.md:333:89: Passive: Write in the active voice and name who acts: 'are spelled'."
+    inputs:
+      - name: design/tests-red
+        hash: ea07a37ead542a1a
+        size: 884
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -339,26 +362,33 @@ every fact the change adds stands in one place: the cloud mark and the words of 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The queue becomes the module src/modules/queue. The score and the outline move in from src/plan, and places.go ports placesIn off the tickets, the plan file, the cloud port, the stood times and the minute, with no git. A pure package src/ticket holds the Ticket type, so the wire from tickets/all carries one Go type while no module imports another. The tickets module reads held, person, cloud and the todo anchor, and answers the cloud port. The wiring loads the queue and binds its ports, with stood built-in until queue-reads-when-tickets-came gives it a source. The golden file runs through the fake index, and the red cases stand in golden_test.go and places_test.go under src/modules/queue, and in queue_test.go under src/modules/tickets. The takeable split reads the ticket text alone, and the box hand rules stay out.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the queue package, the tickets fields and port it reads, the pure ticket type, the wiring, the root table and the golden writer
+every door the change reaches has a fake: the module reaches no door, and its cases run on the fake index
+a comment names the approach the change implements: every file and function links the ticket or the pull note section it ports
+every fact the change adds stands in one place: the cloud mark and the words of a front are spelled once in Go, each naming the JavaScript file that owns it
 
 # accept
 
