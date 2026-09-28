@@ -82,11 +82,20 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box d81eeae76310c · claude-code-remote
     hash_before: ad8df81d4bf28669b7d385e4ecda5e18b74f62b1
+  - step: sync
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: 07a102b98d954278f7ab26e6b144f589d46858a7
+    hash_after: 3cc390ce3a4af0bf1d985d6de9d38ad5dd52af95
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-watches-close-cleanly already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -100,8 +109,9 @@ Both Go file watches stop cleanly on every platform: a stop never hangs while th
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
