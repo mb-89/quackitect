@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -491,6 +491,22 @@ record:
         hash: e8bdd44da574dc87
         size: 89362
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: bb59a69e91db69b50d57af768d86c0aaeba45699
+    hash_after: bb59a69e91db69b50d57af768d86c0aaeba45699
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: dd385901fd27601c
+        size: 3263
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: 897ac034247c0bca
 group: the-cloud-works-its-queue
 ---
 
@@ -675,7 +691,7 @@ test/level0/hooks.test.js
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The boot cases answer green on the tip, because the change stands landed at 370af06b9. The script runs them against 370af06b9^, and five fail on their own assertion there. The case where everything stands and the case off a cloud box pass there, as negative cases do.
+The boot cases answer green on the tip, because the change stands landed at 370af06b9. The script runs them against 370af06b9^, and four fail on their own assertion there. The negative cases pass there.
 
 ### checked
 
