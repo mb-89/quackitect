@@ -1,7 +1,17 @@
 ---
 kind: [[ticket]]
 state: open
+step: do
 steps:
+  - name: answer
+    does: answers the question the ask carries
+    by: person
+    to: engine
+    input: ask
+    evidence:
+      - name: answer
+        form: text
+        says: the answer, which the step behind this one reads
   - name: do
     does: makes the change the ask names
     to: retro
@@ -10,8 +20,8 @@ steps:
         form: text
         says: what you change, and what surprises you
 process: [[spec/processes/question]]
+process_hash: d1a6e26348695e24
 group: the-foundation-closes-its-gaps
-step: do
 ---
 
 # Ask
@@ -28,6 +38,16 @@ The owner decides the road:
 
 - a case starts the index over a driven tree, and reads its tickets
 - `./RUNME.sh check` exits 0
+
+# answer
+
+<!-- answers the question the ask carries -->
+
+## answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 # do
 
