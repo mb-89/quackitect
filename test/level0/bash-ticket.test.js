@@ -31,7 +31,7 @@ function box(seed = {}) {
 const denied = (said) => String(said?.result?.deny ?? "");
 const opens = (ticket, what) => `${ticket}: ${what}`;
 
-test("freeOfTicket reads a pull, a mint and a note as free, and every other command as bound", () => {
+test("freeOfTicket reads a take, a sync, a pull, a mint and a note as free, and every other command as bound", () => {
   for (const command of [
     "./RUNME.sh ticket pull",
     "./RUNME.sh ticket pull a-child --pass",
@@ -39,6 +39,10 @@ test("freeOfTicket reads a pull, a mint and a note as free, and every other comm
     './RUNME.sh ticket note a-thought "a line to keep"',
     "./RUNME.sh branch take",
     "./RUNME.sh branch list",
+    "./RUNME.sh branch sync",
+    "cd /home/user/quackitect && ./RUNME.sh branch take",
+    "cd quackitect; ./RUNME.sh ticket pull",
+    "./RUNME.sh branch take 2>&1 | tail -20",
   ]) {
     assert.equal(freeOfTicket(command), true, command);
   }
@@ -47,6 +51,8 @@ test("freeOfTicket reads a pull, a mint and a note as free, and every other comm
     "git commit -m x",
     "./RUNME.sh branch done",
     "./RUNME.sh ticket pull && git commit -m x",
+    "cd /home/user/quackitect && git commit -m x",
+    "cd /home/user/quackitect",
     "",
   ]) {
     assert.equal(freeOfTicket(command), false, command);
@@ -78,6 +84,29 @@ test("a description naming an open ticket passes", async () => {
     ),
   );
   assert.equal(found, "");
+});
+
+// A cold box holds nothing, and writes its first call as agents write them. [[spec/design_output/level0#a-shell-names-its-ticket]]
+test("a box holding nothing takes a branch or a ticket in every form agents write", async () => {
+  for (const command of [
+    "./RUNME.sh branch take",
+    "cd /home/user/quackitect && ./RUNME.sh branch take",
+    "cd quackitect; ./RUNME.sh branch take 2>&1 | tail -40",
+    "pwd && ls && ./RUNME.sh branch list",
+    "/home/user/quackitect/RUNME.sh branch take",
+    "bash ./RUNME.sh branch take",
+    "timeout 600 ./RUNME.sh branch take 2>&1 | head -80",
+    "echo take && ./RUNME.sh ticket pull",
+    "./RUNME.sh ticket pull 2>&1 | grep -v '^$'",
+  ]) {
+    assert.equal(denied(await onBash({ command }, box())), "", command);
+  }
+  for (const command of [
+    "cd /home/user/quackitect && git commit -m x",
+    "./RUNME.sh branch take && git push",
+  ]) {
+    assert.match(denied(await onBash({ command }, box())), /ticket/, command);
+  }
 });
 
 test("a pull, a mint and a note pass with no ticket named", async () => {

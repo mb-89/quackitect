@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+todo: false
+step: decide
 steps:
   - name: decide
     does: says what the note becomes, and closes it
@@ -16,9 +18,15 @@ steps:
       - name: says
         form: text
         says: why, in a line, or what the successor carries
-step: decide
 process: [[spec/processes/note]]
-process_hash: 9d7b26202041cf4d
+process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: 8b3f2feaf2c72af55f0c43dc4c547c3a4827d328
+    hash_after: 8b3f2feaf2c72af55f0c43dc4c547c3a4827d328
+reason: became
+successors: [cfg-topic-holds-one-resolver]
 ---
 
 # Ask
@@ -47,14 +55,16 @@ One key answers a different value depending on the reader. `configOf` in `.claud
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+became
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+cfg-topic-holds-one-resolver moves the readers onto the one resolver the-config-module-resolves-layers builds, and a golden file holds them to one value. The judge row left with the judge.
 
 # Discussion
 

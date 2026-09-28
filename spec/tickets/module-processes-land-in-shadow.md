@@ -75,14 +75,14 @@ steps:
 step: sync
 process: [[spec/processes/group]]
 process_hash: 57b2cccd0445ea9a
-depends_on: [sidebar-switches-over]
+depends_on: [go-cage-switches-over, lsp-door-switches-over, sidebar-switches-over]
 enabled_by: migration.phase9shadow
 cloud: true
 ---
 
 # Ask
 
-Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the deployment. The doors process, and module processes the system places, with watchdogs across the processes. The old path keeps answering, and every mismatch writes a `shadow` row to the session log.
+Phase 9 of [[spec/design_input/the-migration-runs-in-slices#the-phases]], in shadow: the deployment. The IO process, and module processes the system places, with watchdogs across the processes. The old path keeps answering, and every mismatch writes a `shadow` row to the session log. The shadow adds the key `migration/config/slices/processes`, which the `migration` module declares as a shared key in the default file.
 
 Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shadow` names each mismatch for the owner to read.
 

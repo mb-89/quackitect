@@ -49,7 +49,7 @@ reason: done
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-`Snapshot.Stale` stands now. So `GET /v1/values` answers `stale since <time>` beside the value, per [[spec/design_output/watchdogs#a-stale-mark]].
+`Snapshot.Stale` stands now. So `GET /v1/values` answers `stale since <time>` beside the value, per [[spec/design_output/model#a-stale-mark]].
 
 # do
 

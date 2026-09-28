@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,10 +114,108 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: bfd961e3a1a115624ec4e332bf6fce7f032e00f7
+    hash_after: bfd961e3a1a115624ec4e332bf6fce7f032e00f7
+    inputs:
+      - name: ask
+        hash: 1c990e737b4c9045
+        size: 442
+      - name: [[spec/rationales/git-stays-the-archive]]
+        hash: 313be7c0f847c084
+        size: 1574
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: c938df9cee1071e3c8e0a9cab462ece048f70785
+    hash_after: c938df9cee1071e3c8e0a9cab462ece048f70785
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f5a11fbea75be2a5
+        size: 1778
+    def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/rationales/git-stays-the-archive]]
+  - step: design/draft
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 621f88114f824f3e682476ef3069dc071c6d533c
+    hash_after: 621f88114f824f3e682476ef3069dc071c6d533c
+    inputs:
+      - name: ask
+        hash: 1c990e737b4c9045
+        size: 442
+      - name: [[spec/rationales/git-stays-the-archive]]
+        hash: 2bf04f9d82d2183d
+        size: 1605
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 34fe9347b42caff1977dd18824474a48988fd79d
+    hash_after: 34fe9347b42caff1977dd18824474a48988fd79d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 89f623ce88a3da39
+        size: 2316
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 21241447370c588bee379f2eedac7172e058195e
+    hash_after: 21241447370c588bee379f2eedac7172e058195e
+    inputs:
+      - name: design/draft
+        hash: 89f623ce88a3da39
+        size: 2316
+      - name: design/tests-red
+        hash: 93ef7f626e9673f1
+        size: 721
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 2938ed0078921b4f34748bb09793c9af3f241ecd
+    hash_after: 2938ed0078921b4f34748bb09793c9af3f241ecd
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: cbe30051934381f47e7ee405e729edffe36281fa
+    hash_after: cbe30051934381f47e7ee405e729edffe36281fa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: 93ef7f626e9673f1
+        size: 721
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +247,46 @@ The marker exists so the queue reads files alone. Until the queue reads it, ever
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+work-answer.js fills cloudsIn(all): it answers the names the cloud holds off the tickets alone, each group whose ticket carries cloud: true (read by CLOUD_MARK from work-merge.js) and each ticket whose group field names one of them. placesIn sets onCloud to cloudsIn(all), in place of the inline marked set that marked-groups-stay-cloud added and the union with the unmerged branches of read.stand. So a branch with no marker stays on the desk, and a marker with no branch goes to the cloud. read.stand still feeds ticketsIn, since a branch carries its own tickets. Weighed: the marker key lives in work-merge.js, so the reader imports it and spells no second key; the rationale change that staled this draft renames the git door to the git IO module and leaves the marker rows as they stand, so the approach holds. Assumed: a closed ticket leaves the cloud as it does today, and the state check stays beside the set.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/work-answer.js: placesIn, which builds onCloud,src/scripts/work-answer.js: answerOf, which calls placesIn,src/scripts/work-list.js: queueOnly, which reads CLOUD_PLACE off answerOf,src/scripts/ticket-yours.js: queueIn, which reads CLOUD_PLACE,src/tui/work/workplaces.go: countTakeable and Placed, which read the place off the answer,src/plan/golden_test.go: the golden replay, which reads the places placesIn captures,test/level0/work-answer-cloud.test.js: both cases, which plant a marker and keep passing,test/level0/work-marked.test.js: both cases, which plant a marker and keep passing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/queue-cloud.test.js: a marked group with no branch reads as the cloud's, and its child with it,test/level0/queue-cloud.test.js: a group with a branch and no marker reads as the desk's
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first: no review has read this draft; the engine staled it on the rationale change alone
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/scripts/work-answer.js,test/level0/queue-cloud.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened placesIn, cloudsIn, ownTickets, ticketsIn and answerOf in work-answer.js, CLOUD_MARK in work-merge.js, and the readers of CLOUD_PLACE, and checked each claim there
+the callers come off a grep for placesIn and CLOUD_PLACE over src and test, the marker tests among them
+the first two done_when lines meet the two queue-cloud cases, and the check decides the third
 
 ## tests-red
 
@@ -189,26 +295,31 @@ The marker exists so the queue reads files alone. Until the queue reads it, ever
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/queue-cloud.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/queue-cloud.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The marked-group case fails on its assertion, since cloudsIn stands as a stub answering no name. The no-marker case passes already, since it asks for no name, and it holds the desk side once placesIn reads the marker alone. The surprise: the marker read that marked-groups-stay-cloud added sits inline in placesIn, so no case reaches it without the whole answer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets the marked-group case, red on its assertion, the second meets the no-marker case, and the check decides the third
+cloudsIn reads the ticket texts a case plants, so no door stands in the case
 
 # gate
 
@@ -217,8 +328,12 @@ The marker exists so the queue reads files alone. Until the queue reads it, ever
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the second cloudsIn case passes today and takes no branch, so it decided no line: the gate adds a case in test/level0/queue-cloud.test.js calling answerOf with an unmerged branch whose group carries no marker, and it stands red on the branch union until placesIn reads the marker alone.
+- every group standing on a remote work branch with no marker stands closed and merged on main, so the change moves no live group to the desk.
+- the callers list reads as one line joined by commas: the builder reads it as the eight callers it names, and the golden replay in src/plan passes over the places as they stand.
 
 # implement
 
@@ -229,14 +344,19 @@ The marker exists so the queue reads files alone. Until the queue reads it, ever
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/work-answer.js test/level0/queue-cloud.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/scripts/work-answer.js alone, plus the cases in test/level0/queue-cloud.test.js
+the cases run over the door fakes of work-doors.js and a fake clock
+cloudsIn and placesIn carry a comment naming this ticket
+the marker key stands once, as CLOUD_MARK in work-merge.js, and cloudsIn imports it
 
 ## tests-green
 
@@ -245,26 +365,33 @@ The marker exists so the queue reads files alone. Until the queue reads it, ever
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/queue-cloud.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The queue reads a group's place in the cloud off the marker cloud: true on its ticket, and off no git ref. cloudsIn answers each marked group and each ticket naming one, and placesIn takes its cloud set from it. A branch with no marker now stands on the desk, and a marker with no branch stands on the cloud. The cases in work-answer.test.js and work-list.test.js planted a branch with no marker and read it on the cloud, so their group now carries the marker. Every group on a remote work branch with no marker stands closed and merged, so no live group moves.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/scripts/work-answer.js, its cases, and the two fixtures that planted a branch with no marker, which the callers list missed
+the cases run over the door fakes and a fake clock
+cloudsIn, placesIn and both fixtures carry a comment naming this ticket
+the marker key stands once, as CLOUD_MARK in work-merge.js
 
 # accept
 

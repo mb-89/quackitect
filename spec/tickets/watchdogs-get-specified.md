@@ -65,7 +65,7 @@ A part that stops reads as stopped only where every part carries a lease.
 
 ## says
 
-[[spec/design_output/watchdogs]] specifies the watchdogs:
+[[spec/design_output/model#watchdogs]] specifies the watchdogs:
 
 - a lease with its term, renewed as a step of the work loop on `lease.<part>`
 - a deadline a name or action declares, with a default per kind

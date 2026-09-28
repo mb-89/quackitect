@@ -6,7 +6,6 @@
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 
 import {
-  HOLD as OWNED_HOLD,
   HOLDS as OWNED_HOLDS,
   TICKETS,
 } from "../../.claude/skills/level0/lib/folders.js";
@@ -41,7 +40,6 @@ import { askFaults, askRefusal, askWarning, lineRefusal } from "./ticket-ask-lin
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
-export const HOLD = OWNED_HOLD;
 export const NOTE = "note";
 // The flag on a note that waits for a person. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 const TALK = "talk";

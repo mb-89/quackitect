@@ -82,7 +82,7 @@ group: module-processes-switch-over
 
 # Ask
 
-`slices.processes` moves to `new`, and the one process gives way to the split.
+`migration/config/slices/processes` moves to `new`, and the one process gives way to the split.
 
 The model's isolation then holds on every box.
 

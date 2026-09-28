@@ -1,7 +1,7 @@
 // The import rules over planted packages: each refused import carries a want
 // comment, and a clean one carries none. The test writes the packages to a
 // folder of its own, so no fixture stands in the tree.
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 package imports
 
 import (
@@ -13,15 +13,16 @@ import (
 )
 
 var planted = map[string]string{
-	"doors/disk/disk.go":     "package disk\n\nfunc Read() string { return \"\" }\n",
-	"doors/nosy/nosy.go":     "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
-	"modules/leaky/leaky.go": "package leaky\n\nimport \"quackitect/src/doors/disk\" // want `quackitect/src/modules/leaky imports quackitect/src/doors/disk`\n\nfunc Name() string { return disk.Read() }\n",
-	"modules/work/work.go":   "package work\n\nimport \"quackitect/src/modules/names\"\n\nfunc Name() string { return names.Of() }\n",
-	"modules/names/names.go": "package names\n\nfunc Of() string { return \"work\" }\n",
-	"tui/frame/frame.go":     "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
+	"doors/disk/disk.go":       "package disk\n\nfunc Read() string { return \"\" }\n",
+	"doors/nosy/nosy.go":       "package nosy\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/doors/nosy imports quackitect/src/modules/work`\n\nfunc Name() string { return work.Name() }\n",
+	"modules/nosy/nosy.go":     "package nosy\n\nimport \"os\" // want `quackitect/src/modules/nosy imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
+	"modules/work/work.go":     "package work\n\nfunc Name() string { return \"work\" }\n",
+	"modules/names/names.go":   "package names\n\nfunc Of() string { return \"work\" }\n",
+	"modules/greedy/greedy.go": "package greedy\n\nimport \"quackitect/src/modules/names\" // want `quackitect/src/modules/greedy imports quackitect/src/modules/names`\n\nfunc Name() string { return names.Of() }\n",
+	"tui/frame/frame.go":       "package frame\n\nimport \"quackitect/src/modules/work\" // want `quackitect/src/tui/frame imports quackitect/src/modules/work`\n\nfunc Title() string { return work.Name() }\n",
 }
 
-// [[spec/design_output/go-doors#the-build-checks-imports]]
+// [[spec/design_output/model#the-build-checks-imports]]
 func plant(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
@@ -37,20 +38,59 @@ func plant(t *testing.T) string {
 	return dir
 }
 
-func TestAModuleImportingADoorIsNamed(t *testing.T) {
-	analysistest.Run(t, plant(t), NoDoor, "quackitect/src/modules/leaky")
-}
-
 func TestADoorImportingAModuleIsNamed(t *testing.T) {
-	analysistest.Run(t, plant(t), NoName, "quackitect/src/doors/nosy")
+	analysistest.Run(t, plant(t), NoModule, "quackitect/src/doors/nosy")
 }
 
 func TestARendererImportingAModuleIsNamed(t *testing.T) {
-	analysistest.Run(t, plant(t), NoName, "quackitect/src/tui/frame")
+	analysistest.Run(t, plant(t), NoModule, "quackitect/src/tui/frame")
 }
 
-func TestAModuleImportingAModulePasses(t *testing.T) {
-	dir := plant(t)
-	analysistest.Run(t, dir, NoDoor, "quackitect/src/modules/work")
-	analysistest.Run(t, dir, NoName, "quackitect/src/modules/work")
+// [[spec/tickets/the-wiring-file-binds-ports]]
+func TestAModuleTestImportingItsOwnModulePasses(t *testing.T) {
+	if said := Faults("quackitect/src/modules/work_test", []string{"quackitect/src/modules/work"}); len(said) != 0 {
+		t.Fatalf("the faults read %v", said)
+	}
+}
+
+// [[spec/tickets/the-wiring-file-binds-ports]]
+func TestFaultsNameAModuleImportingAModuleOnce(t *testing.T) {
+	if said := Faults("quackitect/src/modules/greedy", []string{"quackitect/src/modules/names"}); len(said) != 1 {
+		t.Fatalf("the faults read %v", said)
+	}
+}
+
+// [[spec/design_output/model#the-build-checks-imports]]
+func TestAModuleImportingOsIsNamed(t *testing.T) {
+	analysistest.Run(t, plant(t), OnlyQ, "quackitect/src/modules/nosy")
+}
+
+func TestFaultsNameAModuleImportingOs(t *testing.T) {
+	if said := Faults("quackitect/src/modules/work", []string{"strings", "quackitect/src/q", "os"}); len(said) != 1 {
+		t.Fatalf("the faults read %v", said)
+	}
+}
+
+// The yaml reader q rests on passes, and another package of the tree does not. [[spec/tickets/tickets-becomes-a-module]]
+func TestAModuleReadsYamlAsQDoes(t *testing.T) {
+	if said := Faults("quackitect/src/modules/tickets", []string{"quackitect/src/q", "quackitect/src/yaml"}); len(said) != 0 {
+		t.Fatalf("src/yaml reads as past q: %v", said)
+	}
+	if said := Faults("quackitect/src/modules/tickets", []string{"quackitect/src/config"}); len(said) != 1 {
+		t.Fatalf("src/config reads as pure: %v", said)
+	}
+}
+
+func TestAnIOModuleImportingOsPassesOnlyQ(t *testing.T) {
+	if said := FaultsIn("quackitect/src/modules/files", []string{"os", "github.com/fsnotify/fsnotify"}, true); len(said) != 0 {
+		t.Fatalf("the faults read %v", said)
+	}
+	if said := FaultsIn("quackitect/src/modules/files", []string{"quackitect/src/modules/names"}, true); len(said) != 1 {
+		t.Fatalf("an IO module importing a module reads %v", said)
+	}
+}
+
+// [[spec/design_output/model#the-build-checks-imports]]
+func TestAModuleImportingAModuleIsNamed(t *testing.T) {
+	analysistest.Run(t, plant(t), NoModule, "quackitect/src/modules/greedy")
 }

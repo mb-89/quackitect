@@ -16,9 +16,10 @@ const PORT = 6510;
 const CLONE_WAIT = 600000;
 const ATTACH_WAIT = 1800000;
 const SERVE_WAIT = 30000;
+// The home folder in the order `homeIn` in src/scripts/editor.js reads it, spelled again here because this hook imports nothing. [[spec/design_output/extension#a-box-names-its-home]]
 const ENV = [
   "console.log(JSON.stringify({",
-  'home: process.env.HOME ?? process.env.USERPROFILE ?? "",',
+  'home: process.env.USERPROFILE || process.env.HOME || "",',
   'vehicle: process.env.SE_VEHICLE ?? "",',
   "work: process.cwd(),",
   "}))",

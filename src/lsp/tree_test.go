@@ -30,7 +30,7 @@ func wholeTree(t *testing.T, over map[string]string) *Tree {
 	t.Helper()
 	files := map[string]string{
 		Settings:  goodSettings,
-		Offered:   `{"recommendations": ["chrischinchilla.vale-vscode", "biomejs.biome"]}`,
+		Offered:   `{"recommendations": ["chrischinchilla.vale-vscode", "biomejs.biome", "bierner.markdown-mermaid"]}`,
 		Install:   goodInstall,
 		ValeIni:   "MinAlertLevel = suggestion\n",
 		EditorIni: "StylesPath = styles\nMinAlertLevel = suggestion\n",
@@ -130,8 +130,17 @@ func TestBiomeRunsTheWindowsBinary(t *testing.T) {
 func TestEveryExtensionStandsOnOffer(t *testing.T) {
 	tree := wholeTree(t, map[string]string{Offered: `{"recommendations": ["someone.else"]}`})
 	found := extensionsOnOffer(tree)
-	if names(found, "ExtensionsOnOffer") != 3 {
+	if names(found, "ExtensionsOnOffer") != 4 {
 		t.Fatalf("a stranger on the list answers %v", found)
+	}
+}
+
+// The notes draw their diagrams in Mermaid, so the preview stands on offer beside Vale and Biome. [[spec/design_output/editor#what-the-editor-runs]]
+func TestTheMermaidPreviewStandsOnOffer(t *testing.T) {
+	tree := wholeTree(t, map[string]string{Offered: `{"recommendations": ["chrischinchilla.vale-vscode", "biomejs.biome"]}`})
+	one := onlyOne(t, extensionsOnOffer(tree), "ExtensionsOnOffer")
+	if !strings.Contains(one.Message, "bierner.markdown-mermaid") {
+		t.Errorf("the message reads %q", one.Message)
 	}
 }
 

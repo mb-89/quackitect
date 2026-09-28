@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: answer
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -17,7 +18,6 @@ steps:
     by: anyone
     to: retro
     input: answer
-    reads: [[spec/guidance/working]]
     needs: ["branch test"]
     checklist: ["the change follows the answer, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
@@ -33,8 +33,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
-process_hash: 1f3006ec4b044a89
-step: answer
+process_hash: d1a6e26348695e24
 ---
 
 # Ask
@@ -111,3 +110,12 @@ Report back under `## answer`:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The agent runs steps 1 to 3 on the owner's Windows desk. Steps 4 to 6 wait on the owner's editor.
+
+| the step | what the desk shows |
+|---|---|
+| `.se/.runtime/bin` | `vale.exe` and `vale-ls.exe` stand as Windows builds, beside `vale` and `vale-ls` as Linux builds |
+| the doctor's `vale` row | `3.20.0`, at `.se/.runtime/bin/vale` |
+| the doctor's `vale-ls` row | `0.5.1`, at `.se/.runtime/bin/vale-ls` |
+| the tracked `vale.valeCLI.path` | `.se/.runtime/bin/vale`, the Linux build on this desk |

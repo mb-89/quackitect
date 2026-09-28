@@ -32,6 +32,7 @@ const HELD_PLACE = "0";
 const HELD = "held";
 import { queued, stoodHere } from "./pull-queue.js";
 import { staleClaim } from "./work-free.js";
+import { CLOUD_MARK } from "./work-merge.js";
 import { readWork, standingAll } from "./work-stands.js";
 
 // [[spec/design_output/work#one-reading-answers-git]]
@@ -115,17 +116,27 @@ function ownTickets(held) {
   );
 }
 
+// The names the cloud holds, off the marker on each group ticket and no git ref. [[spec/tickets/the-queue-reads-the-marker]]
+export function cloudsIn(all) {
+  const marked = new Set(
+    all
+      .filter((one) => fieldOf(one.text, CLOUD_MARK) === "true")
+      .map((one) => one.name),
+  );
+  return new Set(
+    all
+      .filter((one) => marked.has(one.name) || marked.has(fieldOf(one.text, GROUP)))
+      .map((one) => one.name),
+  );
+}
+
 // The order the pull hands out, as an outline place a name. A person's open steps order first and count down, and the agent's takeable ones count up. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function placesIn(it, read, stood) {
   const plan = planHere(it);
   // A sentence todo stands in the queue as a row of its own, placed by its anchor and held by nobody. [[spec/design_output/stop#the-plan]]
   const all = [...ticketsIn(read), ...todoRows(plan)];
-  // A row a standing branch holds belongs to the cloud, so it leaves this box's lists and stands at infinity. [[spec/design_output/pull#the-queue-is-an-outline]]
-  const onCloud = new Set(
-    read.stand
-      .filter((held) => !held.merged)
-      .flatMap((held) => [held.name, ...ownTickets(held).map((one) => one.name)]),
-  );
+  // A row the cloud holds leaves this box's lists and stands at infinity, and the marker alone says which. [[spec/tickets/the-queue-reads-the-marker]]
+  const onCloud = cloudsIn(all);
   // A note waits for its retro, so it takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
   const open = all.filter(
     (one) =>
@@ -140,22 +151,33 @@ export function placesIn(it, read, stood) {
     (one) => Boolean(heldIn(one.text)) || one.name === plan.working,
   );
   const free = open.filter((one) => !inHand.includes(one));
-  const persons = queued(free.filter(waitsOnPerson), all, at);
-  const agents = queued(
-    free.filter((one) => !waitsOnPerson(one) && takeable(it, one, all)),
-    all,
-    at,
-  );
-  const back = queued(
-    free.filter((one) => !waitsOnPerson(one) && !takeable(it, one, all)),
-    all,
-    at,
-  );
-  const out = outlineIn(persons, inHand, [...agents, ...back], all, overridesOf(plan));
+  const lists = {
+    persons: free.filter(waitsOnPerson),
+    agents: free.filter((one) => !waitsOnPerson(one) && takeable(it, one, all)),
+    back: free.filter((one) => !waitsOnPerson(one) && !takeable(it, one, all)),
+  };
+  const persons = queued(lists.persons, all, at);
+  const agents = queued(lists.agents, all, at);
+  const back = queued(lists.back, all, at);
+  const places = overridesOf(plan);
+  const out = outlineIn(persons, inHand, [...agents, ...back], all, places);
   for (const one of all) {
     if (onCloud.has(one.name) && fieldOf(one.text, "state") !== CLOSED)
       out.set(one.name, CLOUD_PLACE);
   }
+  // The capture hears the lists before the sort and the places after, so a golden file holds one real run the Go port replays. [[spec/tickets/the-queue-moves-to-plan]]
+  it.capture?.({
+    ...lists,
+    held: inHand,
+    all,
+    places,
+    at: {
+      now: it.clock ? it.clock.now().getTime() : 0,
+      weights: it.weights ?? {},
+      stood,
+    },
+    answer: out,
+  });
   return out;
 }
 

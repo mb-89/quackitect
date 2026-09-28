@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -74,7 +74,7 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/review
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 9d870e3fd3c577a6
 depends_on: [the-tickets-topic-lands]
@@ -83,6 +83,53 @@ record:
     hand: box d7d70c069f441 · claude-code-remote
     hash_before: 4ea861630244956d5302df5592328b58086c84a7
     hash_after: 4ea861630244956d5302df5592328b58086c84a7
+  - step: design/review
+    hand: person
+    hash_before: 400c37251348d421c9cd8b85a0aff6bc6fd2e105
+    hash_after: 400c37251348d421c9cd8b85a0aff6bc6fd2e105
+    inputs:
+      - name: design/draft
+        hash: 901c79457eef0b11
+        size: 2994
+      - name: [[spec/tickets/open-tasks-come-from-work]]
+        hash: 797f76553282bfa6
+        size: 5566
+    def: 0f8c340e80e8ece6
+  - step: implement/tests-red
+    hand: person
+    hash_before: 1a00aa0fac92da4157519552de22856b26a983e5
+    hash_after: 1a00aa0fac92da4157519552de22856b26a983e5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    def: 06865600120e8b38
+  - step: implement/change
+    hand: person
+    hash_before: fb94c5004ca077e571a464890fadd26d7e45792d
+    hash_after: fb94c5004ca077e571a464890fadd26d7e45792d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: 21d63335f32dfcda
+  - step: implement/tests-green
+    hand: person
+    hash_before: 23dfd253fb4367357f7a17d6925fa9f7e7b69e5f
+    hash_after: f547c5011eb41ab94646c3e7660e74e586b857c7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 17 test(s) pass in 1 file(s); green, src/plan passes; green, src/tickets passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-queue-moves-to-plan.md:240:1: ListItem: A sentence in a list item holds 20 words, and this one holds 25"
+    inputs:
+      - name: implement/tests-red
+        hash: bbc5c60bdd674eca
+        size: 1103
+    def: a27db29c1d1562f2
+reason: done
 ---
 
 # Ask
@@ -177,8 +224,9 @@ The done lines and the test deciding each:
 ### verdict
 
 <!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 # implement
 
@@ -189,20 +237,27 @@ The done lines and the test deciding each:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-answer.test.js src/plan/queue_test.go src/plan/outline_test.go src/plan/golden_test.go src/tickets/tickets_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion over stubs that answer nothing: the queue reads an empty list, the outline an empty map, and every compare reads even. The tickets case reads no waits and no fails, the golden case finds no file, and the capture case hears no run. The approach names a byte compare for a tie. The port folds the case first, because `localeCompare` sorts a capital beside its small letter, and a todo title carries capitals.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names: `src/plan`, `src/tickets`, and `test/level0/work-answer.test.js`
+- the tests reach no door: the Go cases read rows a caller hands in, and the capture case runs over the fake doors in `work-doors.js`
+- a comment in each new file names the ticket the change implements
+- every fact stands once: the row's fields in `src/plan/queue.go`, and the four words in `src/plan/outline.go`
+- the design review passes with no row
 
 ## change
 
@@ -211,14 +266,21 @@ The done lines and the test deciding each:
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh lint src/plan/queue.go src/plan/outline.go src/plan/queue_test.go src/plan/outline_test.go src/plan/golden_test.go src/tickets/tickets.go src/tickets/tickets_test.go src/scripts/work-answer.js test/level0/work-answer.test.js test/level0/queue-golden.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the golden file it writes under `src/plan/testdata`
+- the change reaches no door: the port reads the rows a caller hands in
+- the golden script runs the real doors from the command line alone
+- a comment in each file names the ticket the change implements
+- the weights and the day stand in `src/plan/queue.go`, and the four words in `src/plan/outline.go`
+- the design review passes with no row
 
 ## tests-green
 
@@ -227,26 +289,34 @@ The done lines and the test deciding each:
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/work-answer.test.js src/plan/queue_test.go src/plan/outline_test.go src/plan/golden_test.go src/tickets/tickets_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new Go package `src/plan` ports the queue's score and its outline from `pull-queue.js` and `pull-outline.js`. It reads the rows a caller hands in, and touches no git, no disk and no index. `tickets.Ticket` reads `depends_on` and the failed hand-backs, so a row comes off the one reading. `placesIn` hands an optional capture hook one run. `test/level0/queue-golden.js` writes that run to `src/plan/testdata/queue.golden.json`, and `TestQueueGolden` answers every place the same. A tie folds the case before it compares bytes, as `localeCompare` reads the tree's names.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the golden file under `src/plan/testdata`
+- the port reaches no door, and the golden script runs the real doors from the command line alone
+- a comment in each file names the ticket the change implements
+- the weights and the day stand in `src/plan/queue.go`, and the four words in `src/plan/outline.go`
+- the design review passes with no row
 
 # Discussion
 

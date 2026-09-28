@@ -1,6 +1,6 @@
 // The search and the file question, driven over a tree a case writes.
 // [[spec/guidance/code/testing]]
-package main
+package index
 
 import (
 	"strings"

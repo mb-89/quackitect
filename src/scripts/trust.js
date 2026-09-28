@@ -8,6 +8,7 @@
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { disk } from "../doors/disk.js";
+import { homeIn } from "./editor.js";
 
 export const FLAG = "hasTrustDialogAccepted";
 export const CONFIG = ".claude.json";
@@ -36,14 +37,16 @@ export function accept(files, home, folder) {
   return where;
 }
 
-function main(argv, env) {
-  if (!env.HOME) {
-    console.error("This box names no HOME, so the trust flag has no file.");
+// The home folder comes off the one reader, so a Windows box naming `USERPROFILE` alone lands the flag too. [[spec/design_output/extension#a-box-names-its-home]]
+export function main(argv, env, files = disk()) {
+  const home = homeIn(env);
+  if (!home) {
+    console.error("This box names no home folder, so the trust flag has no file.");
     return 1;
   }
 
   const folder = argv[2] ? resolve(argv[2]) : rootHere();
-  const where = accept(disk(), env.HOME, folder);
+  const where = accept(files, home, folder);
   console.log(`${folder} stands trusted in ${where}. The next session scans plugins.`);
   return 0;
 }

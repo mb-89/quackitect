@@ -46,6 +46,11 @@ relative to the workspace folder:
 | `biome.lsp.bin` | a path per platform | Windows takes `biome.exe`, and the rest take `biome` |
 | `biome.configurationPath` | `spec/config/biome.json` | Biome looks for its config at the root, and this tree holds it under `spec` |
 
+`.vscode/extensions.json` offers the Vale and Biome extensions, and
+`bierner.markdown-mermaid`, which draws the Mermaid diagrams of the design notes
+in the Markdown preview. `EXTENSIONS` in `.claude/skills/level0/lib/servers.js`
+names the list, and the install takes it.
+
 `SettingsNameBinaries`, `EditorDrawsWriteRules`, `BiomeOnWindows` and
 `ExtensionsOnOffer` weigh both files and hold every row above, so the settings
 and `.se/.runtime/bin` move together. `./RUNME.sh lint` runs them, so a drift lands in

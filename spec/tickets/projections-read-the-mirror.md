@@ -1,0 +1,448 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
+      - name: change
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
+step: implement/tests-green
+process: [[spec/processes/standard]]
+process_hash: 22b42ea1501e8967
+group: the-foundation-closes-its-gaps
+depends_on: [io-modules-own-their-names]
+record:
+  - step: design/draft
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: f21b27ff6cb75cde48977ddbd22c65f4d2fc72e1
+    hash_after: f21b27ff6cb75cde48977ddbd22c65f4d2fc72e1
+    inputs:
+      - name: ask
+        hash: 3b3ed3a2827d6a53
+        size: 796
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: d61379a1068636d3ff2368e986bed310d4b6f061
+    hash_after: d61379a1068636d3ff2368e986bed310d4b6f061
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: a55f08634181c2f9
+        size: 4172
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: a4b49f89ab11dfa1d574fe80bb038de51d53e985
+    hash_after: a4b49f89ab11dfa1d574fe80bb038de51d53e985
+    inputs:
+      - name: design/draft
+        hash: a55f08634181c2f9
+        size: 4172
+      - name: design/tests-red
+        hash: ccfd8911c1f05b99
+        size: 1111
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 1fea3a6b9653473a1df1b57beba3910ae6adaefc
+    hash_after: 1fea3a6b9653473a1df1b57beba3910ae6adaefc
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: af1e3560ddbca13ec0759056969481c191ee2256
+    hash_after: af1e3560ddbca13ec0759056969481c191ee2256
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/modules/files passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: ccfd8911c1f05b99
+        size: 1111
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
+---
+
+# Ask
+
+A module declares a projection of `files/` with a glob, a codec and a kind, per [[spec/design_output/model#everything-on-disk-mirrors]]. The kinds `loaded`, `saved` and `dump` stand. The config, the plan and the holds become loaded projections, and each codec keeps one contract suite.
+
+The codec is then the one code knowing a file format. A write goes back one way, through `disk`, so no module writes a file past it.
+
+- `go test ./...` from the root passes
+- each codec's suite round-trips every committed file of its glob, byte for byte
+- a case writes through `disk` with a stale revision, and reads the refusal
+- a case restores a saved file with a removed name, a changed type and a new name
+- a case dumps a prefix with `quack dump`, and nothing reads it back
+- `./RUNME.sh check` exits 0
+
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+The draft takes seven pieces. Each keeps to the model section on mirrors.
+
+1. `src/q/projection.go` adds the kinds as a type `Mirror`, with `Loaded`, `Saved` and `Dump`, since `Kind` names a fault already.
+2. It adds `Codec[T]`, an interface with `Parse` and `Serialize` over bytes.
+3. `ProjectIn[T](c, name, glob, codec, kind, def)` registers a family `<name>/<path...>`. For `Loaded`, the store runs it per key when `files/<key>` moves, and the value is the parse of that file. A path outside the glob answers nothing.
+4. `Store.Run` takes a concrete key of such a family, so a scheduler run and a case reach one file.
+5. `src/q/codec.go` holds `JSON`, an order-keeping JSON codec. It parses into ordered nodes, keeps each number literal, and serializes with two spaces and a closing newline, as the JavaScript writes the files today. It lives in `q`, because `onlyq` lets a module import `q` alone.
+6. `Saved` restores once at start through `Store.Restore(bytes)`, over a JSON map of name to type and value. It skips a name nobody registers, refuses and reports a changed type, and leaves a missing name at its built-in value. `Store.Save(prefix)` answers the bytes, and the saved file stands under `.se/state/`.
+7. `Dump` answers `Store.Dump(prefix)`, and `quack dump <prefix>` writes it under `.se/dump/` through `disk`. No projection covers that folder, so nothing reads it back.
+
+A write goes one way. `files.Write` gains `Read`, the hash of the file its writer read, and `disk` refuses a write where the file hash moves since. The fake disk refuses the same way.
+
+The loaded projections:
+
+- `src/modules/config`: `spec/config/level0.json` and `.se/.runtime/config.json`, as `config/`
+- `src/modules/queue`: `.se/.runtime/plan.json`, as `queue/`
+- `src/modules/holds`: `.se/.runtime/hold/*.json`, as `hold/`
+
+`spec/wiring.yaml` names the three instances, and the watch adds `.se/.runtime` and its hold folder by name, since it stands off dot folders under `.se`.
+
+The round-trip suite stands in `src/quack`, the one package that may read the tree. It runs every codec over every file `git ls-files` names under the glob of each projection it wires, and over the local files where they stand. A module test cannot read the disk.
+
+Assumed: `the-config-module-resolves-layers` builds the resolver over `config/`, and `tickets-becomes-a-module` brings the markdown codec. This ticket builds the JSON codec alone.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+src/q/store.go: Run, which takes a key of a projected family
+src/modules/files/disk.go: Accept and disk.Write, which read the revision
+src/modules/files/watch.go: watch.adds, which adds the runtime folders
+src/quack/main.go: modules and load, which take the three projection modules
+src/index/main.go: asked, which takes the verb dump
+src/index/door.go: the handler that answers dump
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+./...: `go test ./...` from the root
+src/quack/codec_test.go: TestEveryCodecRoundTripsItsCommittedFiles
+src/q/codec_test.go: TestJSONRoundTripsItsEdgeCases
+src/modules/files/files_test.go: TestAStaleWriteIsRefused
+src/q/projection_test.go: TestASavedFileRestoresNameByName
+src/q/projection_test.go: TestALoadedProjectionParsesItsFile
+src/quack/dump_test.go: TestADumpIsReadByNothing
+RUNME.sh: `./RUNME.sh check`
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+src/q/projection.go
+src/q/projection_test.go
+src/q/codec.go
+src/q/codec_test.go
+src/q/store.go
+src/modules/files/disk.go
+src/modules/files/watch.go
+src/modules/files/files_test.go
+src/modules/config/config.go
+src/modules/config/config_test.go
+src/modules/queue/queue.go
+src/modules/queue/queue_test.go
+src/modules/holds/holds.go
+src/modules/holds/holds_test.go
+src/quack/main.go
+src/quack/codec_test.go
+src/quack/dump_test.go
+src/index/main.go
+src/index/door.go
+spec/wiring.yaml
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+I opened `Store.Run`, `Store.owner`, `files.Accept`, `watch.adds`, `load` in `src/quack`, `asked` in the index, and the plan, hold and config files, and checked each claim there
+I grepped the callers of `Run`, `Accept`, `Write` and `load` across `src`, and the list names each the change touches
+each done_when line names its test above, or the command `go test ./...` or `./RUNME.sh check`
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh branch test src/q/codec_test.go src/q/projection_test.go src/modules/files/disk_test.go src/quack/codec_test.go src/quack/dump_test.go
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+src/q/codec_test.go,src/q/projection_test.go,src/modules/files/disk_test.go,src/quack/codec_test.go,src/quack/dump_test.go
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+Every case fails on its own assertion over the stubs. The codec writes nothing back, the projection registers a plain given so its run finds no derived provider, and the restore, the save and the dump answer nothing. The fake disk takes a stale write, the root wires no projection, and the dump path reads empty. The surprise: a module test cannot read the tree, so the round trip over committed files stands in the root, the one package that may.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+each done_when line meets a case: the round trip in `src/quack/codec_test.go`, the stale write in `disk_test.go`, the restore in `projection_test.go`, and the dump in `dump_test.go`, with the commands deciding the rest
+the disk cases run over the fake disk, and the store cases over a catalog in memory, so every door the cases reach has a fake
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+pass
+- the dump case reads dumpPath alone, and the done_when line asks a dump through quack dump: the builder drives the verb in the case, and reads the file under .se/dump/
+- the round trip passes once any projection reads a file, so a projection whose glob meets nothing passes silently: the builder counts reads per projection, and fails a projection with none
+- plan.json and the hold files stand untracked, so a CI box round-trips nothing of the queue and the holds: the builder seeds a fixture of each through the case, or names the gap
+- the draft names TestAStaleWriteIsRefused in files_test.go, and the case stands in disk_test.go, which the size list leaves out: the builder aligns the draft lines
+
+# implement
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+./RUNME.sh lint src/index/door.go src/index/main.go src/modules/files/disk.go src/modules/files/watch.go src/modules/files/watch_contract_test.go src/q/codec.go src/q/projection.go src/q/q.go src/q/store.go src/quack/main.go src/modules/config/config.go src/modules/queue/queue.go src/modules/holds/holds.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+the change touches the files the size list names, past the wiring file, since the root loads the three projection modules beside the watch instead of as wiring instances
+the disk refusal runs over the fake disk, the modules run over the fake index, and the watch rule runs in its contract suite over the fake and the real watch
+each new function carries a pointer at the mirrors chapter of the model
+the files prefix, the config names, the plan and the hold glob each carry a comment naming the file that owns them, since a module imports q alone
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+./RUNME.sh branch test src/q/codec_test.go src/q/projection_test.go src/modules/files/disk_test.go src/quack/codec_test.go src/quack/dump_test.go
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+A module now declares a projection of files/ with a glob, a codec and a kind. A loaded projection runs per file, and parses it through its codec. The JSON codec keeps key order and every literal, and writes a file back byte for byte. The store saves, restores and dumps a prefix, and quack dump writes the dump under .se/dump/ through disk. The disk refuses a write whose file moved since its writer read it. The config, the plan and the holds load as projections beside the watch, and the watch hears the JSON files of the runtime folder and its holds.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+the change touches the files the size list names, past the wiring file, and the two owner comments the check asks
+the disk refusal runs over the fake disk, and the watch rule runs over the fake and the real watch
+each new function carries a pointer at the mirrors chapter of the model
+every runtime name a module spells carries the name of the file owning it on the line above
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

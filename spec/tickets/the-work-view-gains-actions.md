@@ -83,12 +83,13 @@ depends_on: [the-tui-becomes-a-shell]
 
 # Ask
 
-`spec/views/work.base` gains the name it reads and the actions its keys call, and the window draws it off the index.
+`spec/views/work.base` gains the name it reads, its badge `work/open-tasks`, and the actions its keys call. The window draws it off the index, with each label, doc and look off the registrations, and the file writes none.
 
 The work view stops computing what it shows.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - a case draws the work view over a fake `work/rows`
+- a case draws the badge with the label and look the port declares
 - `./RUNME.sh check` exits 0
 
 # design

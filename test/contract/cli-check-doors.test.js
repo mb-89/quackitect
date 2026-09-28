@@ -32,10 +32,18 @@ test("the commit verb's doors carry the client and the pid the cold probe takes"
 // Under `check --errors` the Go run stays quiet, and each failing Go test reaches the error stream. [[spec/tickets/the-verbs-need-no-wrapper]]
 test("the Go part runs quiet under --errors, and names each failing Go test on the error stream", () => {
   const part =
-    /export function goHolds\(quiet = false\)[\s\S]*?\n}\n/.exec(source)?.[0] ?? "";
+    /export function goHolds\(quiet = false, red = \[\]\)[\s\S]*?\n}\n/.exec(
+      source,
+    )?.[0] ?? "";
   assert.match(part, /inherit: !quiet/, "a quiet run keeps its output");
   assert.match(part, /--- FAIL/, "and reads the failing tests off it");
   assert.match(part, /console\.error\(/, "onto the error stream");
+  // [[spec/tickets/go-checks-need-go]]
+  assert.match(
+    part,
+    /goGate\(\{[^}]*\bskip\b[^}]*\}\)/,
+    "and hands the gate the skip of the red tests",
+  );
 });
 
 // One place owns the server's list, and the check's module reads it from there. [[spec/design_output/lsp#a-port-serves-the-list]]

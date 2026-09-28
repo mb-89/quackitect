@@ -31,6 +31,7 @@ Biome holds.
 | `InstallerHoldsTheNames` | `src/scripts/install.sh`, `lib/folders.js` |
 | `SurveyFindsNode` | `.se/.runtime/tools.json`, the node running the sweep |
 | `EveryModuleTested` | a module of the server, and the tests importing it |
+| `NoConflictMarkers` | every text file git holds under `spec`, `src`, `.claude` and `test`. The server holds this one, in `src/lsp/conflict.go`. For details, see [[spec/design_output/work#no-commit-carries-a-marker]] |
 | `EveryPointerResolves` | every pointer a tracked file writes, and the note or chapter it names. The server holds this one, in `src/lsp/pointer.go`. For details, see [[spec/design_output/lsp#every-pointer-resolves]] |
 
 The commit door reads the staged delta with `EveryModuleTested` too, and asks

@@ -6,7 +6,13 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 // The whole module, so the stamp's move out of it holds. [[spec/design_output/work#the-battery-answers-first]]
 import * as check from "../../src/scripts/cli-check.js";
-import { serverHolds, serverLine, serverRead } from "../../src/scripts/cli-check.js";
+import {
+  serverHolds,
+  serverLine,
+  serverRead,
+  skipOf,
+} from "../../src/scripts/cli-check.js";
+import { goTestNames } from "../../src/scripts/cli-go.js";
 import { stamped } from "../../src/scripts/cli-stamp.js";
 
 const WHERE = "http://127.0.0.1:6510/health";
@@ -94,5 +100,51 @@ test("the doctor names a bridge standing down, and one standing up", async () =>
     await serverLine(answers({ ok: true })),
     /^stands at http/,
     "and a bridge answering",
+  );
+});
+
+// A red Go file stands apart as a red JavaScript one does. [[spec/design_output/pull#the-gate]]
+test("the Go run skips every test a red Go file names, and nothing where no Go file stands red", () => {
+  const files = {
+    "src/q/a_test.go":
+      "package q\n\nfunc TestOne(t *testing.T) {}\n\nfunc helper() {}\n\nfunc TestTwo(t *testing.T) {}\n",
+    "src/q/b_test.go": "package q\n\nfunc TestOne(t *testing.T) {}\n",
+  };
+  const read = (path) => files[path];
+  assert.deepEqual(
+    skipOf(["src/q/a_test.go", "src/q/b_test.go", "test/level0/x.test.js"], read),
+    ["-skip", "^(TestOne|TestTwo)$"],
+  );
+  assert.deepEqual(
+    skipOf(["src/q/b_test.go, test/level0/x.test.js,src/q/a_test.go"], read),
+    ["-skip", "^(TestOne|TestTwo)$"],
+    "a ticket's line of red files, commas between",
+  );
+  assert.deepEqual(skipOf(["test/level0/x.test.js"], read), []);
+  assert.deepEqual(
+    skipOf(["src/q/gone_test.go"], () => {
+      throw new Error("gone");
+    }),
+    [],
+  );
+});
+
+// The skip of the check and the named run of the test verb read one list of names. [[spec/design_output/pull#the-test-verb]]
+test("the Go test names read each test function once, in order, and pass over a helper and a file that reads nowhere", () => {
+  const files = {
+    "src/q/a_test.go":
+      "package q\n\nfunc TestTwo(t *testing.T) {}\n\nfunc helper() {}\n\nfunc TestOne(t *testing.T) {}\n",
+    "src/q/b_test.go": "package q\n\nfunc TestOne(t *testing.T) {}\n",
+  };
+  const read = (path) => {
+    if (!(path in files)) throw new Error("gone");
+    return files[path];
+  };
+  assert.deepEqual(
+    goTestNames(
+      ["src/q/a_test.go", "src/q/b_test.go", "src/q/gone_test.go", "src/q/q.go"],
+      read,
+    ),
+    ["TestOne", "TestTwo"],
   );
 });

@@ -82,11 +82,12 @@ group: go-cage-switches-over
 
 # Ask
 
-`slices.cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.
+`migration/config/slices/cage` moves to `new`. While the index stands down, the cage refuses, and the refusal names the alarm. [[spec/rationales/the-cage-refuses-while-down]] names the chapters this rewrites.
 
 A fault then shows on the first call, and gets fixed early.
 
 - a case stops the fake index, and reads a refusal naming `session/alarms`
+- a case lets the index fall while another writer appends to the session log, and reads every row kept. [[spec/tickets/the-hook-log-loses-lines]] shows the loss
 - `./RUNME.sh check` exits 0
 
 # design

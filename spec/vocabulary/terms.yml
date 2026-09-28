@@ -43,7 +43,7 @@ terms:
   - {word: contract, means: "a test that drives the real thing behind a door and checks its fake answers the same"}
   - {word: copilot, means: "the coding agent of a hosted git service that runs as a second surface under the same level zero doors", source: "https://github.com/features/copilot"}
   - {word: desk, means: "a session a person runs by hand outside a cloud box which hands person steps out"}
-  - {word: dispatch, means: "to send a work branch to a copilot worker as a draft pull request"}
+  - {word: dispatch, means: "to hand a ready group to a worker such as a cloud session or a copilot worker"}
   - {word: door, means: "the one place the tree reaches or guards an outside thing and refuses what breaks a rule"}
   - {word: draft, means: "an answer written before it goes out which a tool checks against the voice rules"}
   - {word: editor, means: "the code editor a person works in which draws findings and the ticket drawing as they type"}
@@ -253,6 +253,11 @@ terms:
   - {word: ruleset, means: "the repository settings that name the checks and approvals a change needs before it merges"}
   - {word: truncate, means: "to cut text or a file short at a set length and drop the rest"}
   - {word: vscode, means: "the code editor whose sidebar panel draws this tree", source: "https://code.visualstudio.com"}
+  - {word: cutoff, means: "the point where a wave stops because a value comes out the same as before"}
+  - {word: glitch, means: "a value computed off a mix of new and old inputs that no settled state ever held"}
+  - {word: dataflow, means: "a way to compute where values flow along declared links from the ones that feed them"}
+  - {word: jitter, means: "a spread in how long each cycle of a timed loop takes"}
+  - {word: golem, means: "a Go language library the prose checks use to find the base form of each word in place of wink-nlp", source: "https://github.com/aaaton/golem"}
   - {word: wink-nlp, means: "a language library the tense reader uses to find the base form of each word", source: "https://github.com/winkjs/wink-nlp"}
   - {word: adjective, means: "a word that describes a noun which the tense reader must not mistake for a past verb"}
   - {word: starfish, means: "the retro form that asks what to start and stop and keep and do more and less"}

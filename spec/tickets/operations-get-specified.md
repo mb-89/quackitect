@@ -44,7 +44,7 @@ reason: done
 
 # Ask
 
-A design note specifies operations: the handle `ops/<id>`, its states, the one writer per tree, and what stays for how long. [[spec/design_input/the-index-holds-the-model#operations-carry-a-handle]] asks it.
+A design note specifies operations: the handle `ops/<id>`, its states, the one writer per tree, and what stays for how long. [[spec/design_input/the-index-holds-the-model#a-caller-sets-its-wait]] asks it.
 
 A pull, the check and a retro each run past a hook's patience. A handle keeps the caller free and the hang in sight.
 
@@ -65,7 +65,7 @@ A pull, the check and a retro each run past a hook's patience. A handle keeps th
 
 ## says
 
-[[spec/design_output/operations]] specifies operations. An action declares
+[[spec/design_output/model#operations]] specifies operations. An action declares
 at registration whether it answers at once, `q.Action`, or with a handle,
 `q.Op`. The handle `ops/<id>` is a key under a family the catalog declares
 once, so the index adds no name at runtime.

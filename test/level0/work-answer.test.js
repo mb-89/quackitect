@@ -20,11 +20,13 @@ import {
 } from "./work-doors.js";
 
 const LOOSE = CHILD("one-group", "open").replace("group: one-group\n", "");
+// The marker, and no branch, puts a group on the cloud. [[spec/tickets/the-queue-reads-the-marker]]
+const ON_CLOUD = GROUP_NOTE.replace("state: open\n", "state: open\ncloud: true\n");
 
 const doors = (files = {}) => {
   const said = doorsSaying(
     remoteSaying([{ branch: "work/one-group", tip: "aaa", when: 1767225600 }], {
-      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
       "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
       "origin/main:spec/tickets/a-loose-one.md": LOOSE,
     }),
@@ -66,14 +68,32 @@ test("a ticket on disk that origin lacks still draws a loose row with a place", 
   it.clock = fakeClock("2026-01-01T03:00:00.000Z");
   const said = answerOf(it);
 
-  assert.deepEqual(
-    said.loose.map((held) => held.name).sort(),
-    ["a-disk-only", "a-loose-one"],
-  );
+  assert.deepEqual(said.loose.map((held) => held.name).sort(), [
+    "a-disk-only",
+    "a-loose-one",
+  ]);
   const row = said.loose.find((one) => one.name === "a-disk-only");
   assert.equal(row.state, "open");
   assert.equal(row.step, "do");
   assert.equal("queue" in row, true, "the disk-only row takes a queue place too");
+});
+
+// The capture hears one real run, so a golden file holds what the Go port replays. [[spec/tickets/the-queue-moves-to-plan]]
+test("the capture hears the lists the queue sorts and the places it answers", () => {
+  const { it } = doors();
+  it.clock = fakeClock("2026-01-01T03:00:00.000Z");
+  const caught = [];
+  it.capture = (said) => caught.push(said);
+  const answer = answerOf(it);
+
+  assert.equal(caught.length, 1);
+  const said = caught[0];
+  for (const key of ["persons", "held", "agents", "back", "all"]) {
+    assert.ok(Array.isArray(said[key]), `the capture carries ${key}`);
+  }
+  assert.equal(said.at.now, it.clock.now().getTime());
+  const loose = answer.loose.find((one) => one.name === "a-loose-one");
+  assert.equal(said.answer.get("a-loose-one"), loose.queue);
 });
 
 // The queue rides every answer, so the tab draws each row's place. [[spec/design_output/pull#the-queue-is-a-score]]
@@ -118,7 +138,7 @@ A question for a person.
 test("a person's step takes a negative place ahead of the agent's rows", () => {
   const { it } = doorsSaying(
     remoteSaying([{ branch: "work/one-group", tip: "aaa", when: 1767225600 }], {
-      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
       "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
       "origin/main:spec/tickets/a-loose-one.md": LOOSE,
       "origin/main:spec/tickets/ask-me.md": PERSON,
@@ -151,7 +171,7 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
         { branch: "work/gone-group", tip: "bbb", when: 1767225600, merged: true },
       ],
       {
-        [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+        [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
         "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
         // The standing branch carries a stale open copy of a ticket trunk holds closed, which speaks for nothing. [[spec/design_output/pull#the-queue-is-an-outline]]
         "work/one-group:spec/tickets/its-child.md": CHILD("gone-group", "open"),
@@ -445,7 +465,8 @@ test("a todo anchored at the end or on a ticket stands before every ticket", () 
     .map((one) => Number(one.queue));
   assert.equal(todos.length, 4);
   for (const place of todos) {
-    for (const ticket of tickets) assert.ok(Number(place) < ticket, `todo ${place} before ticket ${ticket}`);
+    for (const ticket of tickets)
+      assert.ok(Number(place) < ticket, `todo ${place} before ticket ${ticket}`);
   }
 });
 
@@ -486,7 +507,7 @@ test("the desk's own copy of a trunk ticket outranks git's, so a todo moves the 
 test("the answer carries a group with no branch, its children, and the whole ask", () => {
   const { it } = doorsSaying(
     remoteSaying([{ branch: "work/one-group", tip: "aaa", when: 1767225600 }], {
-      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
       "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
       "origin/main:spec/tickets/a-loose-one.md": LOOSE,
       "origin/main:spec/tickets/a-loose-group.md": GROUP_NOTE,

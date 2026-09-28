@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { work } from "../../src/scripts/work.js";
-import { mergedHere } from "../../src/scripts/work-stands.js";
+import { landedHere, mergedHere } from "../../src/scripts/work-stands.js";
 import { refsIn } from "../../src/scripts/work-read.js";
 import {
   doorsSaying,
@@ -60,6 +60,18 @@ test("the merged set drops a branch cut on trunk's line, after trunk moves on", 
   });
 
   assert.deepEqual([...mergedHere(it)], ["work/landed"]);
+});
+
+// Trunk's copy of a group's ticket says whether it landed, so no history is read. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+test("a group landed once trunk carries its ticket closed, and a cut or a done branch has not", () => {
+  const { it, outside } = doorsSaying({
+    "git show origin/main:spec/tickets/landed.md": { stdout: "---\nstate: closed\n---\n" },
+    "git show origin/main:spec/tickets/fresh-cut.md": { stdout: "---\nstate: open\n---\n" },
+  });
+
+  const landed = landedHere(it, ["work/landed", "work/fresh-cut", "work/done-only"]);
+  assert.deepEqual([...landed], ["work/landed"]);
+  assert.ok(!ranGit(outside).some((one) => /merge-base|rev-list|--merged/.test(one)));
 });
 
 // [[spec/design_output/work#a-group-is-a-ticket]]

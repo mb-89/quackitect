@@ -1,6 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+todo: false
+step: decide
 steps:
   - name: decide
     does: says what the note becomes, and closes it
@@ -16,9 +18,19 @@ steps:
       - name: says
         form: text
         says: why, in a line, or what the successor carries
-step: decide
 process: [[spec/processes/note]]
-process_hash: 9d7b26202041cf4d
+process_hash: e02a0935ed78eb92
+record:
+  - step: decide
+    hand: box d7a4248a337e5a · claude-code
+    hash_before: a825af619727b32f0fab80a8d1e3c771408b8e33
+    hash_after: a825af619727b32f0fab80a8d1e3c771408b8e33
+    inputs:
+      - name: ask
+        hash: 255a010353a3751b
+        size: 828
+    def: 9e2520e6318baf46
+reason: done
 ---
 
 # Ask
@@ -42,14 +54,16 @@ The fix lands with this note. `vscode.workspace.fs` offers no append, so the edi
 ## outcome
 
 <!-- what the note becomes -->
-
 <!-- the form is choice -->
+
+done
 
 ## says
 
 <!-- why, in a line, or what the successor carries -->
-
 <!-- the form is text -->
+
+The fix stands on main: logbookOf in src/extension/lib/logbook.js appends through the append of fileDoor in src/extension/editor-files.js, and test/level0/logbook.test.js and test/contract/editor-files.test.js hold it.
 
 # Discussion
 

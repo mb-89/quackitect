@@ -66,7 +66,17 @@ func rootHere() (string, error) {
 		}
 		said = here
 	}
-	return filepath.Abs(said)
+	abs, err := filepath.Abs(said)
+	return rooted(abs), err
+}
+
+// The root with its drive letter upper-cased, so an editor under `c:\tree` and a shell under `C:\tree` read one tree. `rooted` in src/index/main.go owns the rule, spelled again here because each server builds as its own package main. [[spec/design_output/index#a-door-comes-back]]
+func rooted(path string) string {
+	path = filepath.Clean(path)
+	if volume := filepath.VolumeName(path); len(volume) == 2 && volume[1] == ':' {
+		return strings.ToUpper(volume) + path[len(volume):]
+	}
+	return path
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -206,7 +216,7 @@ func reaches(root, method string) (answer, error) {
 
 // [[spec/design_output/lsp#the-standing-file]]
 func current(said Standing, root string) bool {
-	if said.Root != "" && said.Root != root {
+	if said.Root != "" && rooted(said.Root) != rooted(root) {
 		return false
 	}
 	return said.Stamp == stampHere()

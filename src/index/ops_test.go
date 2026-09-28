@@ -1,14 +1,12 @@
-// The table op keeps each operation past the door, and the door's start
-// fails every one it finds in flight.
-// [[spec/design_output/operations#an-operation-outlives-callers]]
-package main
+// The table op keeps each operation's body past the door, and drops the row
+// the manager names.
+// [[spec/design_output/model#an-operation-outlives-callers]]
+package index
 
 import (
 	"path/filepath"
-	"strings"
 	"testing"
 
-	"quackitect/src/ops"
 	"quackitect/src/q"
 )
 
@@ -19,7 +17,8 @@ func TestTheOpRowsOutliveTheDoor(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if err := (opKeep{db}).Save(ops.Op{ID: "1-a", Action: "t/pull", State: ops.Running}); err != nil {
+	body := `{"id":"1-a","action":"t/pull","state":"running"}`
+	if err := (opKeep{db}).Save("1-a", []byte(body)); err != nil {
 		t.Fatal(err)
 	}
 	db.Close()
@@ -39,7 +38,7 @@ func TestTheOpRowsOutliveTheDoor(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(all) != 1 || all[0].State != ops.Failed || !strings.Contains(all[0].Error, "restart") {
+	if len(all) != 1 || all[0].ID != "1-a" || string(all[0].Body) != body {
 		t.Fatalf("the table op holds %+v", all)
 	}
 }
@@ -52,7 +51,7 @@ func TestADroppedOpLeavesTheTable(t *testing.T) {
 	defer db.Close()
 	keep := opKeep{db}
 	for _, id := range []string{"1-a", "2-b"} {
-		if err := keep.Save(ops.Op{ID: id, State: ops.Done}); err != nil {
+		if err := keep.Save(id, []byte(`{"state":"done"}`)); err != nil {
 			t.Fatal(err)
 		}
 	}

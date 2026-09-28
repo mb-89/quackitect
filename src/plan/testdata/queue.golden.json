@@ -1,0 +1,6208 @@
+{
+  "persons": [
+    {
+      "name": "a-rewind-spares-landed-tests",
+      "path": "spec/tickets/a-rewind-spares-landed-tests.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "findings-reach-the-owner",
+      "path": "spec/tickets/findings-reach-the-owner.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "holds-leave-with-their-ticket",
+      "path": "spec/tickets/holds-leave-with-their-ticket.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "queue-approach-sentence-split",
+      "path": "spec/tickets/queue-approach-sentence-split.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-names-three-things",
+      "path": "spec/tickets/the-owner-names-three-things.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-shapes-the-editor",
+      "path": "spec/tickets/the-owner-shapes-the-editor.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-process-stays-editable"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-walks-a-process",
+      "path": "spec/tickets/the-owner-walks-a-process.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-engine-holds-the-route"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-reply-probe-runs",
+      "path": "spec/tickets/the-reply-probe-runs.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "vale-ls-on-windows",
+      "path": "spec/tickets/vale-ls-on-windows.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    }
+  ],
+  "held": [
+    {
+      "name": "the-queue-moves-to-plan",
+      "path": "spec/tickets/the-queue-moves-to-plan.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-tickets-topic-lands"
+      ],
+      "fails": 0,
+      "order": 0
+    }
+  ],
+  "agents": [
+    {
+      "name": "a-retro-hand-decides-notes",
+      "path": "spec/tickets/a-retro-hand-decides-notes.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "every-server-stands-and-answers",
+      "path": "spec/tickets/every-server-stands-and-answers.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "rationale-drops-release-row",
+      "path": "spec/tickets/rationale-drops-release-row.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "rename-rewrites-each-link-once",
+      "path": "spec/tickets/rename-rewrites-each-link-once.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-judge-waits-on-true",
+      "path": "spec/tickets/the-judge-waits-on-true.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-mark-library-leaves",
+      "path": "spec/tickets/the-mark-library-leaves.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-queue-views-agree",
+      "path": "spec/tickets/the-queue-views-agree.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-window-held-override-goes",
+      "path": "spec/tickets/the-window-held-override-goes.md",
+      "group": "tui-shell-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-sidebar-paints-first",
+      "path": "spec/tickets/the-sidebar-paints-first.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    }
+  ],
+  "back": [
+    {
+      "name": "open-tasks-come-from-work",
+      "path": "spec/tickets/open-tasks-come-from-work.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-queue-moves-to-plan",
+        "groups-carry-the-cloud-marker"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "open-tasks-run-in-shadow",
+      "path": "spec/tickets/open-tasks-run-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "open-tasks-come-from-work"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-badge-reads-open-tasks",
+      "path": "spec/tickets/the-badge-reads-open-tasks.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "open-tasks-run-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-count-chain-leaves",
+      "path": "spec/tickets/the-count-chain-leaves.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-badge-reads-open-tasks"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "Trace the extension's slow activation",
+      "path": "",
+      "group": "",
+      "todo": "last",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "Work the agent-doable tickets",
+      "path": "",
+      "group": "",
+      "todo": "last",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 1
+    },
+    {
+      "name": "Walk the owner through the tickets that need them",
+      "path": "",
+      "group": "",
+      "todo": "last",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 2
+    },
+    {
+      "name": "Mint the ticket for the sidebar paint",
+      "path": "",
+      "group": "",
+      "todo": "first",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 3
+    }
+  ],
+  "all": [
+    {
+      "name": "cage-rules-replay-session-logs",
+      "path": "spec/tickets/cage-rules-replay-session-logs.md",
+      "group": "go-cage-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-hooks-door-lands"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "copilot-meets-the-hooks-door",
+      "path": "spec/tickets/copilot-meets-the-hooks-door.md",
+      "group": "go-cage-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-hooks-door-lands"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "go-cage-lands-in-shadow",
+      "path": "spec/tickets/go-cage-lands-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "quack-verbs-switch-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hooks-door-lands",
+      "path": "spec/tickets/the-hooks-door-lands.md",
+      "group": "go-cage-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-down-index-refuses-calls",
+      "path": "spec/tickets/a-down-index-refuses-calls.md",
+      "group": "go-cage-switches-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "go-cage-switches-over",
+      "path": "spec/tickets/go-cage-switches-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "go-cage-lands-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-bridge-server-leaves",
+      "path": "spec/tickets/the-bridge-server-leaves.md",
+      "group": "go-cage-switches-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "a-down-index-refuses-calls"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "buffers-feed-the-checks",
+      "path": "spec/tickets/buffers-feed-the-checks.md",
+      "group": "lsp-door-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "lsp-door-lands-in-shadow",
+      "path": "spec/tickets/lsp-door-lands-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "tui-shell-switches-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "lsp-rules-move-to-check",
+      "path": "spec/tickets/lsp-rules-move-to-check.md",
+      "group": "lsp-door-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-lsp-door-lands",
+      "path": "spec/tickets/the-lsp-door-lands.md",
+      "group": "lsp-door-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "lsp-rules-move-to-check"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "lsp-door-switches-over",
+      "path": "spec/tickets/lsp-door-switches-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "lsp-door-lands-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-lsp-server-leaves",
+      "path": "spec/tickets/the-lsp-server-leaves.md",
+      "group": "lsp-door-switches-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "module-processes-land-in-shadow",
+      "path": "spec/tickets/module-processes-land-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "sidebar-switches-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-doors-process-stands",
+      "path": "spec/tickets/the-doors-process-stands.md",
+      "group": "module-processes-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-system-places-modules",
+      "path": "spec/tickets/the-system-places-modules.md",
+      "group": "module-processes-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "watchdogs-span-the-processes",
+      "path": "spec/tickets/watchdogs-span-the-processes.md",
+      "group": "module-processes-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-doors-process-stands"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "module-processes-switch-over",
+      "path": "spec/tickets/module-processes-switch-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "module-processes-land-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-split-deployment-takes-over",
+      "path": "spec/tickets/the-split-deployment-takes-over.md",
+      "group": "module-processes-switch-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "go-prose-checks-stand-alone",
+      "path": "spec/tickets/go-prose-checks-stand-alone.md",
+      "group": "node-leaves-the-boxes",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "install-drops-node",
+      "path": "spec/tickets/install-drops-node.md",
+      "group": "node-leaves-the-boxes",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "go-prose-checks-stand-alone",
+        "the-webview-ships-prebuilt"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "node-leaves-the-boxes",
+      "path": "spec/tickets/node-leaves-the-boxes.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "module-processes-switch-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-webview-ships-prebuilt",
+      "path": "spec/tickets/the-webview-ships-prebuilt.md",
+      "group": "node-leaves-the-boxes",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "pull-verbs-become-actions",
+      "path": "spec/tickets/pull-verbs-become-actions.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "ticket-verbs-become-actions"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "quack-verbs-land-in-shadow",
+      "path": "spec/tickets/quack-verbs-land-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "read-topics-switch-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "retro-verbs-become-actions",
+      "path": "spec/tickets/retro-verbs-become-actions.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "runme-hands-verbs-to-quack"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "runme-hands-verbs-to-quack",
+      "path": "spec/tickets/runme-hands-verbs-to-quack.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-quack-cli-gets-generated"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hook-registers-index-tools",
+      "path": "spec/tickets/the-hook-registers-index-tools.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-quack-cli-gets-generated"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-quack-cli-gets-generated",
+      "path": "spec/tickets/the-quack-cli-gets-generated.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "ticket-verbs-become-actions",
+      "path": "spec/tickets/ticket-verbs-become-actions.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "runme-hands-verbs-to-quack"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "vehicle-verbs-become-actions",
+      "path": "spec/tickets/vehicle-verbs-become-actions.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "runme-hands-verbs-to-quack"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "work-verbs-become-actions",
+      "path": "spec/tickets/work-verbs-become-actions.md",
+      "group": "quack-verbs-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "runme-hands-verbs-to-quack"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "agents-call-quack-directly",
+      "path": "spec/tickets/agents-call-quack-directly.md",
+      "group": "quack-verbs-switch-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "cli-js-leaves",
+      "path": "spec/tickets/cli-js-leaves.md",
+      "group": "quack-verbs-switch-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "agents-call-quack-directly"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "quack-verbs-switch-over",
+      "path": "spec/tickets/quack-verbs-switch-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "quack-verbs-land-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "cfg-topic-holds-one-resolver",
+      "path": "spec/tickets/cfg-topic-holds-one-resolver.md",
+      "group": "read-topics-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "check-names-meet-their-goldens",
+      "path": "spec/tickets/check-names-meet-their-goldens.md",
+      "group": "read-topics-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "prose-checks-run-in-go",
+      "path": "spec/tickets/prose-checks-run-in-go.md",
+      "group": "read-topics-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "read-topics-land-in-shadow",
+      "path": "spec/tickets/read-topics-land-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "open-tasks-switch-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-guidance-topic-lands",
+      "path": "spec/tickets/the-guidance-topic-lands.md",
+      "group": "read-topics-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-log-topic-lands",
+      "path": "spec/tickets/the-log-topic-lands.md",
+      "group": "read-topics-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "read-topics-switch-over",
+      "path": "spec/tickets/read-topics-switch-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "read-topics-land-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "readers-take-the-go-topics",
+      "path": "spec/tickets/readers-take-the-go-topics.md",
+      "group": "read-topics-switch-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-js-twins-leave",
+      "path": "spec/tickets/the-js-twins-leave.md",
+      "group": "read-topics-switch-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "readers-take-the-go-topics"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "sidebar-lands-in-shadow",
+      "path": "spec/tickets/sidebar-lands-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "lsp-door-switches-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-config-schema-gets-generated",
+      "path": "spec/tickets/the-config-schema-gets-generated.md",
+      "group": "sidebar-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-sidebar-renders-generically",
+      "path": "spec/tickets/the-sidebar-renders-generically.md",
+      "group": "sidebar-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "sidebar-switches-over",
+      "path": "spec/tickets/sidebar-switches-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "sidebar-lands-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-extension-reads-no-files",
+      "path": "spec/tickets/the-extension-reads-no-files.md",
+      "group": "sidebar-switches-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-log-becomes-a-view",
+      "path": "spec/tickets/the-log-becomes-a-view.md",
+      "group": "tui-shell-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-tui-becomes-a-shell"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-tui-becomes-a-shell",
+      "path": "spec/tickets/the-tui-becomes-a-shell.md",
+      "group": "tui-shell-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-work-view-gains-actions",
+      "path": "spec/tickets/the-work-view-gains-actions.md",
+      "group": "tui-shell-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-tui-becomes-a-shell"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "tui-shell-lands-in-shadow",
+      "path": "spec/tickets/tui-shell-lands-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "go-cage-switches-over"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-tui-data-paths-leave",
+      "path": "spec/tickets/the-tui-data-paths-leave.md",
+      "group": "tui-shell-switches-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "tui-shell-switches-over",
+      "path": "spec/tickets/tui-shell-switches-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "tui-shell-lands-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-base-file-says-it",
+      "path": "spec/tickets/a-base-file-says-it.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-cell-takes-an-edit",
+      "path": "spec/tickets/a-cell-takes-an-edit.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-check-finds-every-writer",
+      "path": "spec/tickets/a-check-finds-every-writer.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "a-check-finds-restated-facts",
+      "path": "spec/tickets/a-check-finds-restated-facts.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 5,
+      "order": 0
+    },
+    {
+      "name": "a-claim-meets-the-view",
+      "path": "spec/tickets/a-claim-meets-the-view.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "a-claim-reads-its-source",
+      "path": "spec/tickets/a-claim-reads-its-source.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "a-closed-ticket-takes-writes",
+      "path": "spec/tickets/a-closed-ticket-takes-writes.md",
+      "group": "the-servers-and-views-hold",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-cloud-group-asks-nobody",
+      "path": "spec/tickets/a-cloud-group-asks-nobody.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 5,
+      "order": 0
+    },
+    {
+      "name": "a-comment-hunk-is-prose",
+      "path": "spec/tickets/a-comment-hunk-is-prose.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "a-count-meets-the-lint",
+      "path": "spec/tickets/a-count-meets-the-lint.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-desk-pull-pushes-nothing",
+      "path": "spec/tickets/a-desk-pull-pushes-nothing.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-desk-skips-cloud-branches",
+      "path": "spec/tickets/a-desk-skips-cloud-branches.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-done-branch-joins-queue",
+      "path": "spec/tickets/a-done-branch-joins-queue.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-door-holds-file-calls",
+      "path": "spec/tickets/a-door-holds-file-calls.md",
+      "group": "misc",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-door-holds-three-reads",
+      "path": "spec/tickets/a-door-holds-three-reads.md",
+      "group": "misc",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "a-door-proves-once",
+      "path": "spec/tickets/a-door-proves-once.md",
+      "group": "the-battery-earns-its-time",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-gate-asks-a-bless",
+      "path": "spec/tickets/a-gate-asks-a-bless.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "a-gate-names-its-question",
+      "path": "spec/tickets/a-gate-names-its-question.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-gate-reviews-and-fixes",
+      "path": "spec/tickets/a-gate-reviews-and-fixes.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-group-is-a-branch",
+      "path": "spec/tickets/a-group-is-a-branch.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-key-holds-a-group",
+      "path": "spec/tickets/a-key-holds-a-group.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-landing-follows-its-gate",
+      "path": "spec/tickets/a-landing-follows-its-gate.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-late-count-pays-nothing",
+      "path": "spec/tickets/a-late-count-pays-nothing.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-link-click-opens-it",
+      "path": "spec/tickets/a-link-click-opens-it.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-lint-holds-note-rules",
+      "path": "spec/tickets/a-lint-holds-note-rules.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "a-live-clear-reads-handover",
+      "path": "spec/tickets/a-live-clear-reads-handover.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-log-verb-reads-sessions",
+      "path": "spec/tickets/a-log-verb-reads-sessions.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 8,
+      "order": 0
+    },
+    {
+      "name": "a-lone-mark-pairs-wrong",
+      "path": "spec/tickets/a-lone-mark-pairs-wrong.md",
+      "group": "misc",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "a-move-redraws-both-files",
+      "path": "spec/tickets/a-move-redraws-both-files.md",
+      "group": "the-panel-reads-every-change",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-moved-input-marks-steps",
+      "path": "spec/tickets/a-moved-input-marks-steps.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-nested-git-still-lands",
+      "path": "spec/tickets/a-nested-git-still-lands.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-person-reads-the-pull",
+      "path": "spec/tickets/a-person-reads-the-pull.md",
+      "group": "the-person-step-holds",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-person-reads-the-split",
+      "path": "spec/tickets/a-person-reads-the-split.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-pointer-names-its-heading",
+      "path": "spec/tickets/a-pointer-names-its-heading.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-pointer-reaches-a-heading",
+      "path": "spec/tickets/a-pointer-reaches-a-heading.md",
+      "group": "misc",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-pointer-resolves",
+      "path": "spec/tickets/a-pointer-resolves.md",
+      "group": "the-notes-point-true",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-preset-carries-its-sort",
+      "path": "spec/tickets/a-preset-carries-its-sort.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-tree-sorts-several-keys",
+        "the-queue-is-a-score"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-project-adds-vale-rules",
+      "path": "spec/tickets/a-project-adds-vale-rules.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "a-promotion-names-its-fault",
+      "path": "spec/tickets/a-promotion-names-its-fault.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-promotion-ticket-reads-once",
+      "path": "spec/tickets/a-promotion-ticket-reads-once.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-pull-hands-one-step",
+      "path": "spec/tickets/a-pull-hands-one-step.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-question-reaches-its-owner",
+      "path": "spec/tickets/a-question-reaches-its-owner.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-redraw-keeps-open-rows",
+      "path": "spec/tickets/a-redraw-keeps-open-rows.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-rename-reaches-every-note",
+      "path": "spec/tickets/a-rename-reaches-every-note.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 6,
+      "order": 0
+    },
+    {
+      "name": "a-reorder-asks-a-test",
+      "path": "spec/tickets/a-reorder-asks-a-test.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-reply-follows-its-prompt",
+      "path": "spec/tickets/a-reply-follows-its-prompt.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-retro-hand-decides-notes",
+      "path": "spec/tickets/a-retro-hand-decides-notes.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-retro-mints-itself",
+      "path": "spec/tickets/a-retro-mints-itself.md",
+      "group": "the-retro-runs",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-retro-takes-the-box"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-return-asks-another-hand",
+      "path": "spec/tickets/a-return-asks-another-hand.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "a-rewind-spares-landed-tests",
+      "path": "spec/tickets/a-rewind-spares-landed-tests.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-route-closes-answered-asks",
+      "path": "spec/tickets/a-route-closes-answered-asks.md",
+      "group": "the-verbs-answer-their-asks",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-rule-carries-its-side",
+      "path": "spec/tickets/a-rule-carries-its-side.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-runtime-files-stand-apart"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-rule-names-its-failure",
+      "path": "spec/tickets/a-rule-names-its-failure.md",
+      "group": "misc",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-save-fills-the-ticket",
+      "path": "spec/tickets/a-save-fills-the-ticket.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-ticket-answers-the-editor"
+      ],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "a-shell-call-names-its-ticket",
+      "path": "spec/tickets/a-shell-call-names-its-ticket.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-small-ask-stays-small",
+      "path": "spec/tickets/a-small-ask-stays-small.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-split-verb-cuts-files",
+      "path": "spec/tickets/a-split-verb-cuts-files.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "a-stale-claim-comes-back",
+      "path": "spec/tickets/a-stale-claim-comes-back.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-standing-stop-ends-turns",
+      "path": "spec/tickets/a-standing-stop-ends-turns.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-step-changes-hands",
+      "path": "spec/tickets/a-step-changes-hands.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-agent-pulls-a-ticket"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-term-means-itself",
+      "path": "spec/tickets/a-term-means-itself.md",
+      "group": "terms-mean-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "a-term-points-nowhere",
+      "path": "spec/tickets/a-term-points-nowhere.md",
+      "group": "terms-mean-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "a-term-means-itself"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-test-importing-cli-exits",
+      "path": "spec/tickets/a-test-importing-cli-exits.md",
+      "group": "findings",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-vale-case-spawns-once",
+      "path": "spec/tickets/a-vale-case-spawns-once.md",
+      "group": "the-battery-earns-its-time",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "a-write-meets-its-hash",
+      "path": "spec/tickets/a-write-meets-its-hash.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "a-write-needs-a-ticket",
+      "path": "spec/tickets/a-write-needs-a-ticket.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "actions-declare-op-and-writes",
+      "path": "spec/tickets/actions-declare-op-and-writes.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "agent-pulls-ticket",
+      "path": "spec/tickets/agent-pulls-ticket.md",
+      "group": "the-agent-pulls-a-ticket",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "an-answer-stays-under-cap",
+      "path": "spec/tickets/an-answer-stays-under-cap.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "an-empty-queue-hands-cleanup",
+      "path": "spec/tickets/an-empty-queue-hands-cleanup.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "an-engine-takes-bridge-work",
+      "path": "spec/tickets/an-engine-takes-bridge-work.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "an-experiment-ends-decided",
+      "path": "spec/tickets/an-experiment-ends-decided.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 5,
+      "order": 0
+    },
+    {
+      "name": "an-update-keeps-a-route",
+      "path": "spec/tickets/an-update-keeps-a-route.md",
+      "group": "the-ticket-answers-the-editor",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-route-edits-ahead"
+      ],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "answer-mark-loses-its-reader",
+      "path": "spec/tickets/answer-mark-loses-its-reader.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "answers-read-the-last-text",
+      "path": "spec/tickets/answers-read-the-last-text.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "apply-lane-carries-a-hand",
+      "path": "spec/tickets/apply-lane-carries-a-hand.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "ask-reading-names-its-differences",
+      "path": "spec/tickets/ask-reading-names-its-differences.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "battery-ask-names-the-bundle",
+      "path": "spec/tickets/battery-ask-names-the-bundle.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "bless-button-draws-itself",
+      "path": "spec/tickets/bless-button-draws-itself.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "bless-guard-reads-scripts",
+      "path": "spec/tickets/bless-guard-reads-scripts.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "brand-reads-folder",
+      "path": "spec/tickets/brand-reads-folder.md",
+      "group": "the-brand-reads-the-folder",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "bridgehead-imports-vehicle",
+      "path": "spec/tickets/bridgehead-imports-vehicle.md",
+      "group": "the-bridgehead-imports-its-vehicle",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "bridgehead-installs-upstream",
+      "path": "spec/tickets/bridgehead-installs-upstream.md",
+      "group": "the-bridgehead-installs-upstream",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "bridgehead-probe-lands",
+      "path": "spec/tickets/bridgehead-probe-lands.md",
+      "group": "the-bridgehead-imports-its-vehicle",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "budget-fixture-grows-with-work",
+      "path": "spec/tickets/budget-fixture-grows-with-work.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "budget-headroom-on-cloud-boxes",
+      "path": "spec/tickets/budget-headroom-on-cloud-boxes.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "budget-names-the-resolver-call",
+      "path": "spec/tickets/budget-names-the-resolver-call.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "callers-name-both-readers",
+      "path": "spec/tickets/callers-name-both-readers.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "callers-name-work-answer-home",
+      "path": "spec/tickets/callers-name-work-answer-home.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "canary-repeat-ignores-paid-text",
+      "path": "spec/tickets/canary-repeat-ignores-paid-text.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "catalog-holds-name-families",
+      "path": "spec/tickets/catalog-holds-name-families.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "check-prose-reads-a-draft",
+      "path": "spec/tickets/check-prose-reads-a-draft.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "check-reads-provider-keys",
+      "path": "spec/tickets/check-reads-provider-keys.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "ci-runs-a-windows-job",
+      "path": "spec/tickets/ci-runs-a-windows-job.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "close-force-guards-trunk-checkout",
+      "path": "spec/tickets/close-force-guards-trunk-checkout.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "cloud-list-reads-harness",
+      "path": "spec/tickets/cloud-list-reads-harness.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "cloud-note-reaches-every-step",
+      "path": "spec/tickets/cloud-note-reaches-every-step.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "code-has-a-size-ceiling",
+      "path": "spec/tickets/code-has-a-size-ceiling.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "commit-stages-a-moved-path",
+      "path": "spec/tickets/commit-stages-a-moved-path.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "config-reads-differ-by-reader",
+      "path": "spec/tickets/config-reads-differ-by-reader.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "declared-views-get-specified",
+      "path": "spec/tickets/declared-views-get-specified.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "design-rule-links-its-check",
+      "path": "spec/tickets/design-rule-links-its-check.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "disk-door-copies-a-folder",
+      "path": "spec/tickets/disk-door-copies-a-folder.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "doors-get-specified",
+      "path": "spec/tickets/doors-get-specified.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "doors-note-names-every-analyzer",
+      "path": "spec/tickets/doors-note-names-every-analyzer.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "doors-read-what-commands-do",
+      "path": "spec/tickets/doors-read-what-commands-do.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "draft-size-past-ask",
+      "path": "spec/tickets/draft-size-past-ask.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "each-call-meets-its-budget",
+      "path": "spec/tickets/each-call-meets-its-budget.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "each-check-reads-its-signal",
+      "path": "spec/tickets/each-check-reads-its-signal.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "each-fact-keeps-one-owner",
+      "path": "spec/tickets/each-fact-keeps-one-owner.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "each-folder-holds-its-kind",
+      "path": "spec/tickets/each-folder-holds-its-kind.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "each-helper-lands-one-commit",
+      "path": "spec/tickets/each-helper-lands-one-commit.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "each-node-names-its-place",
+      "path": "spec/tickets/each-node-names-its-place.md",
+      "group": "the-ticket-answers-the-editor",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "each-thing-stands-in-place",
+      "path": "spec/tickets/each-thing-stands-in-place.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "edit-door-reads-whole",
+      "path": "spec/tickets/edit-door-reads-whole.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "escalate-inserts-a-person-step",
+      "path": "spec/tickets/escalate-inserts-a-person-step.md",
+      "group": "the-person-step-holds",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-hand-carries-the-session"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "every-landing-takes-a-verb",
+      "path": "spec/tickets/every-landing-takes-a-verb.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "every-road-has-a-caller",
+      "path": "spec/tickets/every-road-has-a-caller.md",
+      "group": "the-servers-and-views-hold",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "every-road-reads-one-config",
+      "path": "spec/tickets/every-road-reads-one-config.md",
+      "group": "misc",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "every-server-stands-and-answers",
+      "path": "spec/tickets/every-server-stands-and-answers.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "files-read-the-closure",
+      "path": "spec/tickets/files-read-the-closure.md",
+      "group": "the-bridgehead-carries-its-closure",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "files-topic-reads-the-rows",
+      "path": "spec/tickets/files-topic-reads-the-rows.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-q-core-holds-names"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "findings-reach-the-owner",
+      "path": "spec/tickets/findings-reach-the-owner.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "findings-reuse-the-note-mint",
+      "path": "spec/tickets/findings-reuse-the-note-mint.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "findings",
+      "path": "spec/tickets/findings.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "first-accept-names-its-base",
+      "path": "spec/tickets/first-accept-names-its-base.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "git-write-tests-outside-ask",
+      "path": "spec/tickets/git-write-tests-outside-ask.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "git-writes-lacking-a-verb",
+      "path": "spec/tickets/git-writes-lacking-a-verb.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "go-code-shares-one-module",
+      "path": "spec/tickets/go-code-shares-one-module.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "go-test-names-the-root",
+      "path": "spec/tickets/go-test-names-the-root.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "go-writes-the-frontmatter",
+      "path": "spec/tickets/go-writes-the-frontmatter.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "group-key-takes-one-spelling",
+      "path": "spec/tickets/group-key-takes-one-spelling.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "groups-carry-the-cloud-marker",
+      "path": "spec/tickets/groups-carry-the-cloud-marker.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "guidance-resolves-by-tags",
+      "path": "spec/tickets/guidance-resolves-by-tags.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "guidance-rides-each-step",
+      "path": "spec/tickets/guidance-rides-each-step.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-engine-holds-the-route"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "guidance-rides-step",
+      "path": "spec/tickets/guidance-rides-step.md",
+      "group": "guidance-rides-the-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "guidance-rides-the-step",
+      "path": "spec/tickets/guidance-rides-the-step.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-agent-pulls-a-ticket"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "handed-condition-in-pull-when",
+      "path": "spec/tickets/handed-condition-in-pull-when.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "handover-mark-has-no-writer",
+      "path": "spec/tickets/handover-mark-has-no-writer.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "helper-mark-drops-at-stop",
+      "path": "spec/tickets/helper-mark-drops-at-stop.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "holds-leave-with-their-ticket",
+      "path": "spec/tickets/holds-leave-with-their-ticket.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "journal-the-rename-verb",
+      "path": "spec/tickets/journal-the-rename-verb.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "judge-cases-turn-it-on",
+      "path": "spec/tickets/judge-cases-turn-it-on.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "judge-cut-clears-the-checks",
+      "path": "spec/tickets/judge-cut-clears-the-checks.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "judge-cut-meets-claude-door",
+      "path": "spec/tickets/judge-cut-meets-claude-door.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "judge-cut-takes-its-helpers",
+      "path": "spec/tickets/judge-cut-takes-its-helpers.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "judge-pointers-leave-other-notes",
+      "path": "spec/tickets/judge-pointers-leave-other-notes.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "judge-quote-proves-its-call",
+      "path": "spec/tickets/judge-quote-proves-its-call.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "level-zero-handover",
+      "path": "spec/tickets/level-zero-handover.md",
+      "group": "level-zero-hands-over",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "level-zero-hands-over",
+      "path": "spec/tickets/level-zero-hands-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-agent-pulls-a-ticket"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "long-line-cuts-by-bytes",
+      "path": "spec/tickets/long-line-cuts-by-bytes.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "merge-deletes-after-the-push",
+      "path": "spec/tickets/merge-deletes-after-the-push.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "meta-rows-open-no-turn",
+      "path": "spec/tickets/meta-rows-open-no-turn.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "migration-names-the-q-package",
+      "path": "spec/tickets/migration-names-the-q-package.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "misc",
+      "path": "spec/tickets/misc.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "one-door-joins-a-path",
+      "path": "spec/tickets/one-door-joins-a-path.md",
+      "group": "misc",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "one-function-answers-the-hand",
+      "path": "spec/tickets/one-function-answers-the-hand.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "one-list-holds-the-warnings",
+      "path": "spec/tickets/one-list-holds-the-warnings.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "one-post-a-tool-call",
+      "path": "spec/tickets/one-post-a-tool-call.md",
+      "group": "the-bridgehead-carries-its-closure",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "one-reader-judges-a-verdict",
+      "path": "spec/tickets/one-reader-judges-a-verdict.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "one-reader-names-the-home",
+      "path": "spec/tickets/one-reader-names-the-home.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "one-reading-proves-one-file",
+      "path": "spec/tickets/one-reading-proves-one-file.md",
+      "group": "the-battery-earns-its-time",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "one-review-a-ticket",
+      "path": "spec/tickets/one-review-a-ticket.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "one-row-for-git-mv",
+      "path": "spec/tickets/one-row-for-git-mv.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "one-urgency-stands",
+      "path": "spec/tickets/one-urgency-stands.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "only-a-read-gates-nothing",
+      "path": "spec/tickets/only-a-read-gates-nothing.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "op-moves-reach-the-log",
+      "path": "spec/tickets/op-moves-reach-the-log.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "open-marker-outlives-refused-push",
+      "path": "spec/tickets/open-marker-outlives-refused-push.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "open-marks-standing-branches",
+      "path": "spec/tickets/open-marks-standing-branches.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "open-tasks-come-from-work",
+      "path": "spec/tickets/open-tasks-come-from-work.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-queue-moves-to-plan",
+        "groups-carry-the-cloud-marker"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "open-tasks-land-in-shadow",
+      "path": "spec/tickets/open-tasks-land-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-foundation-lands-unchanged"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "open-tasks-run-in-shadow",
+      "path": "spec/tickets/open-tasks-run-in-shadow.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "open-tasks-come-from-work"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "open-tasks-switch-over",
+      "path": "spec/tickets/open-tasks-switch-over.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "open-tasks-land-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "operations-and-leases-land",
+      "path": "spec/tickets/operations-and-leases-land.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-q-core-holds-names"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "operations-get-specified",
+      "path": "spec/tickets/operations-get-specified.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "owner-terms-await-question",
+      "path": "spec/tickets/owner-terms-await-question.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "person-step-refuses-an-agent",
+      "path": "spec/tickets/person-step-refuses-an-agent.md",
+      "group": "the-person-step-holds",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-hand-carries-the-session"
+      ],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "private-tickets-reach-tickets-all",
+      "path": "spec/tickets/private-tickets-reach-tickets-all.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "process-case-for-bless",
+      "path": "spec/tickets/process-case-for-bless.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "processes-get-placed",
+      "path": "spec/tickets/processes-get-placed.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "prose-verbs-land-first-try",
+      "path": "spec/tickets/prose-verbs-land-first-try.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "pull-env-meets-the-engine",
+      "path": "spec/tickets/pull-env-meets-the-engine.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "python-writes-pass-the-door",
+      "path": "spec/tickets/python-writes-pass-the-door.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "quack-why-answers-a-name",
+      "path": "spec/tickets/quack-why-answers-a-name.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-q-core-holds-names"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "queue-approach-sentence-split",
+      "path": "spec/tickets/queue-approach-sentence-split.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "rationale-drops-release-row",
+      "path": "spec/tickets/rationale-drops-release-row.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "red-verb-meets-new-sources",
+      "path": "spec/tickets/red-verb-meets-new-sources.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "refusal-cap-inserts-no-person",
+      "path": "spec/tickets/refusal-cap-inserts-no-person.md",
+      "group": "the-person-step-holds",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "refusals-stay-under-cap",
+      "path": "spec/tickets/refusals-stay-under-cap.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "refused-payload-stays-off-disk",
+      "path": "spec/tickets/refused-payload-stays-off-disk.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "release-keeps-local-commits",
+      "path": "spec/tickets/release-keeps-local-commits.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "rename-detection-misses-rewrites",
+      "path": "spec/tickets/rename-detection-misses-rewrites.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "rename-rewrites-each-link-once",
+      "path": "spec/tickets/rename-rewrites-each-link-once.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "rest-line-names-plain-pull",
+      "path": "spec/tickets/rest-line-names-plain-pull.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "retro-65c3028",
+      "path": "spec/tickets/retro-65c3028.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "retro-899accd",
+      "path": "spec/tickets/retro-899accd.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "retro-check-names-the-process",
+      "path": "spec/tickets/retro-check-names-the-process.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "reviewer-reads-no-group-retro",
+      "path": "spec/tickets/reviewer-reads-no-group-retro.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "runtime-half-takes-the-rest",
+      "path": "spec/tickets/runtime-half-takes-the-rest.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "serve-callers-take-the-listener",
+      "path": "spec/tickets/serve-callers-take-the-listener.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "serve-takes-a-catalog-seam",
+      "path": "spec/tickets/serve-takes-a-catalog-seam.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "seven-go-mods-leave",
+      "path": "spec/tickets/seven-go-mods-leave.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "shell-calls-name-their-ticket",
+      "path": "spec/tickets/shell-calls-name-their-ticket.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "shim-resolves-vehicle",
+      "path": "spec/tickets/shim-resolves-vehicle.md",
+      "group": "the-shim-resolves-the-vehicle",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "sidebar-makes-both",
+      "path": "spec/tickets/sidebar-makes-both.md",
+      "group": "the-sidebar-makes-both",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "split-names-its-source",
+      "path": "spec/tickets/split-names-its-source.md",
+      "group": "the-verbs-answer-their-asks",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "split-tests-take-one-module",
+      "path": "spec/tickets/split-tests-take-one-module.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "sqlite-runs-pure-go",
+      "path": "spec/tickets/sqlite-runs-pure-go.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "go-code-shares-one-module"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "stale-fields-reach-test-schema",
+      "path": "spec/tickets/stale-fields-reach-test-schema.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "stale-marks-follow-the-provider",
+      "path": "spec/tickets/stale-marks-follow-the-provider.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "stale-shares-the-bless-hash",
+      "path": "spec/tickets/stale-shares-the-bless-hash.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "start-check-runs-in-serve",
+      "path": "spec/tickets/start-check-runs-in-serve.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "step-changes-hands",
+      "path": "spec/tickets/step-changes-hands.md",
+      "group": "a-step-changes-hands",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "step-rule-names-its-rank",
+      "path": "spec/tickets/step-rule-names-its-rank.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "stub-takes-shape",
+      "path": "spec/tickets/stub-takes-shape.md",
+      "group": "the-stub-takes-shape",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "surfaces-get-specified",
+      "path": "spec/tickets/surfaces-get-specified.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "terms-mean-themselves",
+      "path": "spec/tickets/terms-mean-themselves.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-agent-pulls-a-ticket",
+      "path": "spec/tickets/the-agent-pulls-a-ticket.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "a-process-is-a-route",
+        "a-group-is-a-branch"
+      ],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-answer-door-reads-chat",
+      "path": "spec/tickets/the-answer-door-reads-chat.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-answer-door-reads-notes",
+      "path": "spec/tickets/the-answer-door-reads-notes.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-answer-lands-in-chat",
+      "path": "spec/tickets/the-answer-lands-in-chat.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-badge-reads-open-tasks",
+      "path": "spec/tickets/the-badge-reads-open-tasks.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "open-tasks-run-in-shadow"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-battery-earns-its-time",
+      "path": "spec/tickets/the-battery-earns-its-time.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-battery-flickers-under-load",
+      "path": "spec/tickets/the-battery-flickers-under-load.md",
+      "group": "findings",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-battery-runs-on-fixtures",
+      "path": "spec/tickets/the-battery-runs-on-fixtures.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-binding-reads-the-session",
+      "path": "spec/tickets/the-binding-reads-the-session.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-brand-names-the-plugin",
+      "path": "spec/tickets/the-brand-names-the-plugin.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "the-brand-reads-the-folder",
+      "path": "spec/tickets/the-brand-reads-the-folder.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-bridge-keeps-transport",
+      "path": "spec/tickets/the-bridge-keeps-transport.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-bridge-names-no-maker",
+      "path": "spec/tickets/the-bridge-names-no-maker.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-bridge-says-it-falls",
+      "path": "spec/tickets/the-bridge-says-it-falls.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-bridgehead-carries-its-closure",
+      "path": "spec/tickets/the-bridgehead-carries-its-closure.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-bridgehead-imports-its-vehicle",
+      "path": "spec/tickets/the-bridgehead-imports-its-vehicle.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-bridgehead-installs-upstream",
+      "path": "spec/tickets/the-bridgehead-installs-upstream.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-bridgehead-imports-its-vehicle",
+        "the-stub-takes-shape"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-bridgehead-needs-no-shell",
+      "path": "spec/tickets/the-bridgehead-needs-no-shell.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-brief-verbs-go",
+      "path": "spec/tickets/the-brief-verbs-go.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 9,
+      "order": 0
+    },
+    {
+      "name": "the-callers-drop-ticket-faults",
+      "path": "spec/tickets/the-callers-drop-ticket-faults.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-callers-name-dueHandOut",
+      "path": "spec/tickets/the-callers-name-dueHandOut.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-callers-name-their-files",
+      "path": "spec/tickets/the-callers-name-their-files.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-canary-ends-no-turn",
+      "path": "spec/tickets/the-canary-ends-no-turn.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-canary-pays-once",
+      "path": "spec/tickets/the-canary-pays-once.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-canary-survives-a-restart",
+      "path": "spec/tickets/the-canary-survives-a-restart.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-cell-fill-takes-marks",
+      "path": "spec/tickets/the-cell-fill-takes-marks.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-work-tab-draws"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-check-holds-test-first",
+      "path": "spec/tickets/the-check-holds-test-first.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 5,
+      "order": 0
+    },
+    {
+      "name": "the-check-starts-the-server",
+      "path": "spec/tickets/the-check-starts-the-server.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-clear-keeps-questions",
+      "path": "spec/tickets/the-clear-keeps-questions.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-cloud-box-starts-serving",
+      "path": "spec/tickets/the-cloud-box-starts-serving.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-cloud-setup-installs",
+      "path": "spec/tickets/the-cloud-setup-installs.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-runtime-folder-holds-state"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-cloud-waits-for-owners",
+      "path": "spec/tickets/the-cloud-waits-for-owners.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-colours-stand-in-config",
+      "path": "spec/tickets/the-colours-stand-in-config.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 6,
+      "order": 0
+    },
+    {
+      "name": "the-commit-verb-lints-messages",
+      "path": "spec/tickets/the-commit-verb-lints-messages.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-compiler-leaves-every-caller",
+      "path": "spec/tickets/the-compiler-leaves-every-caller.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-config-declares-work",
+      "path": "spec/tickets/the-config-declares-work.md",
+      "group": "the-ticket-answers-the-editor",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "yours-counts-the-waiting"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-config-folds-at-once",
+      "path": "spec/tickets/the-config-folds-at-once.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-controls-wire-up",
+      "path": "spec/tickets/the-controls-wire-up.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 6,
+      "order": 0
+    },
+    {
+      "name": "the-count-chain-leaves",
+      "path": "spec/tickets/the-count-chain-leaves.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-badge-reads-open-tasks"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-dead-exports-leave",
+      "path": "spec/tickets/the-dead-exports-leave.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-decisions-get-rationales",
+      "path": "spec/tickets/the-decisions-get-rationales.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-desk-findings-wait",
+      "path": "spec/tickets/the-desk-findings-wait.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-doctor-probes-every-hook",
+      "path": "spec/tickets/the-doctor-probes-every-hook.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-door-keeps-its-marks",
+      "path": "spec/tickets/the-door-keeps-its-marks.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-door-passes-ephemeral-holds",
+      "path": "spec/tickets/the-door-passes-ephemeral-holds.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-door-picks-a-hold",
+      "path": "spec/tickets/the-door-picks-a-hold.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-door-reads-restated-data",
+      "path": "spec/tickets/the-door-reads-restated-data.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-door-reads-script-writes",
+      "path": "spec/tickets/the-door-reads-script-writes.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "the-door-refuses-a-revert",
+      "path": "spec/tickets/the-door-refuses-a-revert.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-door-rule-reads-env",
+      "path": "spec/tickets/the-door-rule-reads-env.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 7,
+      "order": 0
+    },
+    {
+      "name": "the-draft-names-its-size",
+      "path": "spec/tickets/the-draft-names-its-size.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-drawing-bundles",
+      "path": "spec/tickets/the-drawing-bundles.md",
+      "group": "the-drawing-draws-a-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-drawing-draws-a-route",
+      "path": "spec/tickets/the-drawing-draws-a-route.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-drawing-draws-read-only",
+      "path": "spec/tickets/the-drawing-draws-read-only.md",
+      "group": "the-drawing-draws-a-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-drawing-bundles"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-drawing-speaks-edits",
+      "path": "spec/tickets/the-drawing-speaks-edits.md",
+      "group": "the-drawing-draws-a-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-ticket-answers-the-editor"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-editor-holds-the-drawing",
+      "path": "spec/tickets/the-editor-holds-the-drawing.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-editor-takes-an-inset",
+      "path": "spec/tickets/the-editor-takes-an-inset.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-engine-holds-the-route",
+      "path": "spec/tickets/the-engine-holds-the-route.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "each-thing-stands-in-place",
+        "the-gates-read-the-state",
+        "the-owners-word-reaches-work",
+        "the-servers-and-views-hold",
+        "the-verbs-land-whole"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-engine-restores-its-fields",
+      "path": "spec/tickets/the-engine-restores-its-fields.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-fake-vscode-resolves",
+      "path": "spec/tickets/the-fake-vscode-resolves.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-fill-answers-on-stdout",
+      "path": "spec/tickets/the-fill-answers-on-stdout.md",
+      "group": "the-ticket-answers-the-editor",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-flags-draw-as-letters",
+      "path": "spec/tickets/the-flags-draw-as-letters.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-work-tab-draws"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-foundation-lands-unchanged",
+      "path": "spec/tickets/the-foundation-lands-unchanged.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-migration-writes-its-specs"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-gates-read-the-state",
+      "path": "spec/tickets/the-gates-read-the-state.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-golden-keys-group-hash",
+      "path": "spec/tickets/the-golden-keys-group-hash.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-group-leaves-at-todo",
+      "path": "spec/tickets/the-group-leaves-at-todo.md",
+      "group": "the-person-step-holds",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hand-carries-a-step",
+      "path": "spec/tickets/the-hand-carries-a-step.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hand-carries-the-session",
+      "path": "spec/tickets/the-hand-carries-the-session.md",
+      "group": "the-hand-carries-a-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-hand-reads-plans-here",
+      "path": "spec/tickets/the-hand-reads-plans-here.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-help-reads-the-cursor",
+      "path": "spec/tickets/the-help-reads-the-cursor.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hook-awaits-the-spawn",
+      "path": "spec/tickets/the-hook-awaits-the-spawn.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hook-log-loses-lines",
+      "path": "spec/tickets/the-hook-log-loses-lines.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hook-protocol-gets-specified",
+      "path": "spec/tickets/the-hook-protocol-gets-specified.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hook-reloads-its-door",
+      "path": "spec/tickets/the-hook-reloads-its-door.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hook-spawns-a-refactorer",
+      "path": "spec/tickets/the-hook-spawns-a-refactorer.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "a-rule-carries-its-side"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-host-runs-the-verbs",
+      "path": "spec/tickets/the-host-runs-the-verbs.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-inset-folds-the-frontmatter",
+        "the-ticket-answers-the-editor",
+        "the-drawing-draws-a-route"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-hover-shows-a-term",
+      "path": "spec/tickets/the-hover-shows-a-term.md",
+      "group": "terms-mean-themselves",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "a-term-means-itself"
+      ],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-icon-counts-drawn-rows",
+      "path": "spec/tickets/the-icon-counts-drawn-rows.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-import-rules-get-checked",
+      "path": "spec/tickets/the-import-rules-get-checked.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "go-code-shares-one-module"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-index-answers-the-queue",
+      "path": "spec/tickets/the-index-answers-the-queue.md",
+      "group": "the-verbs-answer-their-asks",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-index-answers-tickets",
+      "path": "spec/tickets/the-index-answers-tickets.md",
+      "group": "the-work-tab-reads-tickets",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-index-answers-v1",
+      "path": "spec/tickets/the-index-answers-v1.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-q-core-holds-names"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-index-fires-on-change",
+      "path": "spec/tickets/the-index-fires-on-change.md",
+      "group": "the-work-tab-reads-tickets",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-index-model-gets-specified",
+      "path": "spec/tickets/the-index-model-gets-specified.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-inner-protocol-gets-chosen",
+      "path": "spec/tickets/the-inner-protocol-gets-chosen.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-inset-folds-the-frontmatter",
+      "path": "spec/tickets/the-inset-folds-the-frontmatter.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-editor-takes-an-inset",
+        "the-ticket-answers-the-editor",
+        "the-drawing-draws-a-route"
+      ],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-install-fetches-go-modules",
+      "path": "spec/tickets/the-install-fetches-go-modules.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-judge-leaves-the-code",
+      "path": "spec/tickets/the-judge-leaves-the-code.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "every-road-has-a-caller"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-judge-reads-answer-rules",
+      "path": "spec/tickets/the-judge-reads-answer-rules.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "the-judge-reads-every-layer",
+      "path": "spec/tickets/the-judge-reads-every-layer.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-judge-waits-on-true",
+      "path": "spec/tickets/the-judge-waits-on-true.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-last-gate-accepts",
+      "path": "spec/tickets/the-last-gate-accepts.md",
+      "group": "the-engine-holds-the-route",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-layer-reaches-sessions",
+      "path": "spec/tickets/the-layer-reaches-sessions.md",
+      "group": "guidance-rides-the-step",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-links-verb-tries-yaml",
+      "path": "spec/tickets/the-links-verb-tries-yaml.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-listing-opens-git-once",
+      "path": "spec/tickets/the-listing-opens-git-once.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-listing-reads-in-pieces",
+      "path": "spec/tickets/the-listing-reads-in-pieces.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-lsp-folds-drive-letters",
+      "path": "spec/tickets/the-lsp-folds-drive-letters.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-mark-library-leaves",
+      "path": "spec/tickets/the-mark-library-leaves.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-migration-writes-its-specs",
+      "path": "spec/tickets/the-migration-writes-its-specs.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-mouse-reaches-the-window",
+      "path": "spec/tickets/the-mouse-reaches-the-window.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-need-list-lacks-verbs",
+      "path": "spec/tickets/the-need-list-lacks-verbs.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-new-rule-appends",
+      "path": "spec/tickets/the-new-rule-appends.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-notes-point-true",
+      "path": "spec/tickets/the-notes-point-true.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-one-answer-takes-shape",
+      "path": "spec/tickets/the-one-answer-takes-shape.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-open-road-stays-named",
+      "path": "spec/tickets/the-open-road-stays-named.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-hears-first",
+      "path": "spec/tickets/the-owner-hears-first.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-owner-names-three-things",
+      "path": "spec/tickets/the-owner-names-three-things.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-rules-the-migration",
+      "path": "spec/tickets/the-owner-rules-the-migration.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-shapes-the-editor",
+      "path": "spec/tickets/the-owner-shapes-the-editor.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-process-stays-editable"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-tries-the-inset",
+      "path": "spec/tickets/the-owner-tries-the-inset.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-view-decides-done",
+      "path": "spec/tickets/the-owner-view-decides-done.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-walks-a-process",
+      "path": "spec/tickets/the-owner-walks-a-process.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-engine-holds-the-route"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-walks-a-ticket",
+      "path": "spec/tickets/the-owner-walks-a-ticket.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-host-runs-the-verbs",
+        "a-save-fills-the-ticket",
+        "the-work-group-draws-buttons"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owner-walks-the-editor",
+      "path": "spec/tickets/the-owner-walks-the-editor.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owners-word-reaches-work",
+      "path": "spec/tickets/the-owners-word-reaches-work.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-owners-words-travel-verbatim",
+      "path": "spec/tickets/the-owners-words-travel-verbatim.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-panel-draws-every-file",
+      "path": "spec/tickets/the-panel-draws-every-file.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "a-rule-carries-its-side"
+      ],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-panel-lints-on-change",
+      "path": "spec/tickets/the-panel-lints-on-change.md",
+      "group": "the-panel-reads-every-change",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-panel-reads-every-change",
+      "path": "spec/tickets/the-panel-reads-every-change.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-person-step-holds",
+      "path": "spec/tickets/the-person-step-holds.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-private-split-reads-clean",
+      "path": "spec/tickets/the-private-split-reads-clean.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-process-stays-editable",
+      "path": "spec/tickets/the-process-stays-editable.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-engine-holds-the-route"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-pull-names-the-unblock",
+      "path": "spec/tickets/the-pull-names-the-unblock.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-pull-pushes-its-close",
+      "path": "spec/tickets/the-pull-pushes-its-close.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-pull-says-refused-commit",
+      "path": "spec/tickets/the-pull-says-refused-commit.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-pull-splits-by-topic",
+      "path": "spec/tickets/the-pull-splits-by-topic.md",
+      "group": "guidance-rides-the-step",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-pull-takes-the-branch",
+      "path": "spec/tickets/the-pull-takes-the-branch.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-q-core-holds-names",
+      "path": "spec/tickets/the-q-core-holds-names.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "go-code-shares-one-module"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-question-process-gets-tests",
+      "path": "spec/tickets/the-question-process-gets-tests.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-queue-is-a-score",
+      "path": "spec/tickets/the-queue-is-a-score.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "one-urgency-stands"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-queue-moves-to-plan",
+      "path": "spec/tickets/the-queue-moves-to-plan.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-tickets-topic-lands"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-queue-views-agree",
+      "path": "spec/tickets/the-queue-views-agree.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-quoted-pair-stays-paired",
+      "path": "spec/tickets/the-quoted-pair-stays-paired.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-read-tools-answer-first",
+      "path": "spec/tickets/the-read-tools-answer-first.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "the-record-quotes-its-why",
+      "path": "spec/tickets/the-record-quotes-its-why.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-record-why-holds-spans",
+      "path": "spec/tickets/the-record-why-holds-spans.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-reply-probe-runs",
+      "path": "spec/tickets/the-reply-probe-runs.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-respawn-answers-no-server",
+      "path": "spec/tickets/the-respawn-answers-no-server.md",
+      "group": "findings",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-retro-cuts-its-window",
+      "path": "spec/tickets/the-retro-cuts-its-window.md",
+      "group": "the-retro-runs",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-retro-takes-the-box"
+      ],
+      "fails": 5,
+      "order": 0
+    },
+    {
+      "name": "the-retro-finishes-its-asks",
+      "path": "spec/tickets/the-retro-finishes-its-asks.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-retro-holds-the-clear",
+      "path": "spec/tickets/the-retro-holds-the-clear.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-retro-lays-its-leaves",
+      "path": "spec/tickets/the-retro-lays-its-leaves.md",
+      "group": "the-retro-runs",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-retro-takes-the-box"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-retro-reads-cloud-retros",
+      "path": "spec/tickets/the-retro-reads-cloud-retros.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-retro-reads-its-hand",
+      "path": "spec/tickets/the-retro-reads-its-hand.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-retro-reads-the-backlog",
+      "path": "spec/tickets/the-retro-reads-the-backlog.md",
+      "group": "the-process-stays-editable",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-retro-runs",
+      "path": "spec/tickets/the-retro-runs.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-retro-takes-the-box",
+      "path": "spec/tickets/the-retro-takes-the-box.md",
+      "group": "the-retro-runs",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "the-review-lands-overnight",
+      "path": "spec/tickets/the-review-lands-overnight.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-roots-case-reads-globs",
+      "path": "spec/tickets/the-roots-case-reads-globs.md",
+      "group": "the-battery-earns-its-time",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-route-edits-ahead",
+      "path": "spec/tickets/the-route-edits-ahead.md",
+      "group": "the-ticket-answers-the-editor",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-rule-shares-one-slug",
+      "path": "spec/tickets/the-rule-shares-one-slug.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-rules-hold-themselves",
+      "path": "spec/tickets/the-rules-hold-themselves.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-runtime-files-stand-apart",
+      "path": "spec/tickets/the-runtime-files-stand-apart.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-runtime-folder-holds-state",
+      "path": "spec/tickets/the-runtime-folder-holds-state.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-scratchpad-reads-absolute",
+      "path": "spec/tickets/the-scratchpad-reads-absolute.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-second-collect-keeps-lines",
+      "path": "spec/tickets/the-second-collect-keeps-lines.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-server-holds-its-socket",
+      "path": "spec/tickets/the-server-holds-its-socket.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-server-offers-processes",
+      "path": "spec/tickets/the-server-offers-processes.md",
+      "group": "the-ticket-answers-the-editor",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-servers-and-views-hold",
+      "path": "spec/tickets/the-servers-and-views-hold.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-session-file-proves-itself",
+      "path": "spec/tickets/the-session-file-proves-itself.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-session-says-its-cage",
+      "path": "spec/tickets/the-session-says-its-cage.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-shim-resolves-the-vehicle",
+      "path": "spec/tickets/the-shim-resolves-the-vehicle.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-stub-takes-shape"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-sidebar-log-appends",
+      "path": "spec/tickets/the-sidebar-log-appends.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-sidebar-makes-both",
+      "path": "spec/tickets/the-sidebar-makes-both.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-stub-takes-shape"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-small-faults-land",
+      "path": "spec/tickets/the-small-faults-land.md",
+      "group": "each-thing-stands-in-place",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-spawn-answers-a-helper",
+      "path": "spec/tickets/the-spawn-answers-a-helper.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-spawn-reaches-its-guidance",
+      "path": "spec/tickets/the-spawn-reaches-its-guidance.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-spawn-takes-a-step",
+      "path": "spec/tickets/the-spawn-takes-a-step.md",
+      "group": "the-hand-carries-a-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-hand-carries-the-session"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-stamp-counts-every-spawn",
+      "path": "spec/tickets/the-stamp-counts-every-spawn.md",
+      "group": "the-battery-earns-its-time",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-stop-line-loops-forever",
+      "path": "spec/tickets/the-stop-line-loops-forever.md",
+      "group": "findings",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-stop-reads-the-state",
+      "path": "spec/tickets/the-stop-reads-the-state.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-stop-wakes-again",
+      "path": "spec/tickets/the-stop-wakes-again.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-stub-plugin-name",
+      "path": "spec/tickets/the-stub-plugin-name.md",
+      "group": "the-hand-carries-a-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-stub-takes-shape",
+      "path": "spec/tickets/the-stub-takes-shape.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-style-carries-the-top",
+      "path": "spec/tickets/the-style-carries-the-top.md",
+      "group": "guidance-rides-each-step",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-successor-names-a-person",
+      "path": "spec/tickets/the-successor-names-a-person.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-take-marks-the-fields",
+      "path": "spec/tickets/the-take-marks-the-fields.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-take-skips-an-orphan",
+      "path": "spec/tickets/the-take-skips-an-orphan.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 4,
+      "order": 0
+    },
+    {
+      "name": "the-take-walks-past-gates",
+      "path": "spec/tickets/the-take-walks-past-gates.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-talk-prose-leaves-stop",
+      "path": "spec/tickets/the-talk-prose-leaves-stop.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-ticket-answers-the-editor",
+      "path": "spec/tickets/the-ticket-answers-the-editor.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-tickets-topic-lands",
+      "path": "spec/tickets/the-tickets-topic-lands.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-todo-joins-the-queue",
+      "path": "spec/tickets/the-todo-joins-the-queue.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-todo-road-stands-first",
+      "path": "spec/tickets/the-todo-road-stands-first.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-tools-answer-after-restart",
+      "path": "spec/tickets/the-tools-answer-after-restart.md",
+      "group": "the-bridge-keeps-transport",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-tree-draws-its-columns",
+      "path": "spec/tickets/the-tree-draws-its-columns.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-tree-names-its-things",
+      "path": "spec/tickets/the-tree-names-its-things.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-tree-sorts-several-keys",
+      "path": "spec/tickets/the-tree-sorts-several-keys.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-work-tab-draws"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-tree-takes-a-filter",
+      "path": "spec/tickets/the-tree-takes-a-filter.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-unblock-keeps-its-shape",
+      "path": "spec/tickets/the-unblock-keeps-its-shape.md",
+      "group": "the-verbs-take-the-shell",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-unknown-runs-stays-quiet",
+      "path": "spec/tickets/the-unknown-runs-stays-quiet.md",
+      "group": "the-notes-point-true",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-vehicle-case-fakes-install",
+      "path": "spec/tickets/the-vehicle-case-fakes-install.md",
+      "group": "the-battery-earns-its-time",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-answer-their-asks",
+      "path": "spec/tickets/the-verbs-answer-their-asks.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-land-whole",
+      "path": "spec/tickets/the-verbs-land-whole.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-need-no-wrapper",
+      "path": "spec/tickets/the-verbs-need-no-wrapper.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-reach-the-question",
+      "path": "spec/tickets/the-verbs-reach-the-question.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-read-a-group",
+      "path": "spec/tickets/the-verbs-read-a-group.md",
+      "group": "a-group-is-a-branch",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-read-prose-whole",
+      "path": "spec/tickets/the-verbs-read-prose-whole.md",
+      "group": "the-review-lands-overnight",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-read-two-roots",
+      "path": "spec/tickets/the-verbs-read-two-roots.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-shim-resolves-the-vehicle"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-verbs-take-the-shell",
+      "path": "spec/tickets/the-verbs-take-the-shell.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-verdict-guard-reads-tips",
+      "path": "spec/tickets/the-verdict-guard-reads-tips.md",
+      "group": "the-warnings-feed-a-refactorer",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 3,
+      "order": 0
+    },
+    {
+      "name": "the-view-fails-to-implement",
+      "path": "spec/tickets/the-view-fails-to-implement.md",
+      "group": "the-owners-word-reaches-work",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-viewer-draws-the-note",
+      "path": "spec/tickets/the-viewer-draws-the-note.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 1,
+      "order": 0
+    },
+    {
+      "name": "the-viewer-filters-the-talk",
+      "path": "spec/tickets/the-viewer-filters-the-talk.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-warning-has-fallback",
+      "path": "spec/tickets/the-warning-has-fallback.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-warning-keeps-readers",
+      "path": "spec/tickets/the-warning-keeps-readers.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-warnings-feed-a-refactorer",
+      "path": "spec/tickets/the-warnings-feed-a-refactorer.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-window-case-in-level0",
+      "path": "spec/tickets/the-window-case-in-level0.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-window-grows-a-frame",
+      "path": "spec/tickets/the-window-grows-a-frame.md",
+      "group": "the-tree-names-its-things",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-window-held-override-goes",
+      "path": "spec/tickets/the-window-held-override-goes.md",
+      "group": "tui-shell-lands-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-window-keeps-the-binding",
+      "path": "spec/tickets/the-window-keeps-the-binding.md",
+      "group": "the-gates-read-the-state",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-window-splits-by-tab",
+      "path": "spec/tickets/the-window-splits-by-tab.md",
+      "group": "the-notes-point-true",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 10,
+      "order": 0
+    },
+    {
+      "name": "the-work-answer-lands",
+      "path": "spec/tickets/the-work-answer-lands.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-listing-opens-git-once",
+        "the-runtime-folder-holds-state"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-work-editor-draws",
+      "path": "spec/tickets/the-work-editor-draws.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-work-group-draws-buttons",
+      "path": "spec/tickets/the-work-group-draws-buttons.md",
+      "group": "the-editor-holds-the-drawing",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [
+        "the-ticket-answers-the-editor",
+        "a-save-fills-the-ticket"
+      ],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-work-tab-asks-index",
+      "path": "spec/tickets/the-work-tab-asks-index.md",
+      "group": "the-work-tab-reads-tickets",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-work-tab-draws",
+      "path": "spec/tickets/the-work-tab-draws.md",
+      "group": "the-work-editor-draws",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [
+        "the-work-answer-lands"
+      ],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-work-tab-reads-tickets",
+      "path": "spec/tickets/the-work-tab-reads-tickets.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-work-tab-takes-edits",
+      "path": "spec/tickets/the-work-tab-takes-edits.md",
+      "group": "the-work-tab-reads-tickets",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "the-write-door-waits",
+      "path": "spec/tickets/the-write-door-waits.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "ticket-open-lints-the-ask",
+      "path": "spec/tickets/ticket-open-lints-the-ask.md",
+      "group": "",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "tickets-register-in-the-catalog",
+      "path": "spec/tickets/tickets-register-in-the-catalog.md",
+      "group": "open-tasks-land-in-shadow",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "tidy-writes-the-go-line",
+      "path": "spec/tickets/tidy-writes-the-go-line.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "v1-values-read-stale",
+      "path": "spec/tickets/v1-values-read-stale.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "vale-ls-on-windows",
+      "path": "spec/tickets/vale-ls-on-windows.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "vehicles-take-the-window-port",
+      "path": "spec/tickets/vehicles-take-the-window-port.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "verb-line-names-new-refusals",
+      "path": "spec/tickets/verb-line-names-new-refusals.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "verbs-read-two-roots",
+      "path": "spec/tickets/verbs-read-two-roots.md",
+      "group": "the-verbs-read-two-roots",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "voice-rules-skip-the-record",
+      "path": "spec/tickets/voice-rules-skip-the-record.md",
+      "group": "the-rules-hold-themselves",
+      "todo": "",
+      "urgent": true,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "watchdogs-get-specified",
+      "path": "spec/tickets/watchdogs-get-specified.md",
+      "group": "the-migration-writes-its-specs",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "why-reads-the-stale-mark",
+      "path": "spec/tickets/why-reads-the-stale-mark.md",
+      "group": "the-foundation-lands-unchanged",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "window-links-reach-private-tickets",
+      "path": "spec/tickets/window-links-reach-private-tickets.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "wrapper-ask-names-its-files",
+      "path": "spec/tickets/wrapper-ask-names-its-files.md",
+      "group": "the-verbs-land-whole",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "write-marks-leave-the-plugin",
+      "path": "spec/tickets/write-marks-leave-the-plugin.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "yours-counts-the-waiting",
+      "path": "spec/tickets/yours-counts-the-waiting.md",
+      "group": "the-ticket-answers-the-editor",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 2,
+      "order": 0
+    },
+    {
+      "name": "the-sidebar-paints-first",
+      "path": "spec/tickets/the-sidebar-paints-first.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "tests-field-refuses-the-check",
+      "path": ".se/tickets/tests-field-refuses-the-check.md",
+      "group": "",
+      "todo": "",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "Trace the extension's slow activation",
+      "path": "",
+      "group": "",
+      "todo": "last",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 0
+    },
+    {
+      "name": "Work the agent-doable tickets",
+      "path": "",
+      "group": "",
+      "todo": "last",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 1
+    },
+    {
+      "name": "Walk the owner through the tickets that need them",
+      "path": "",
+      "group": "",
+      "todo": "last",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 2
+    },
+    {
+      "name": "Mint the ticket for the sidebar paint",
+      "path": "",
+      "group": "",
+      "todo": "first",
+      "urgent": false,
+      "depends_on": [],
+      "fails": 0,
+      "order": 3
+    }
+  ],
+  "places": {
+    "Pull the-clear-keeps-questions and implement it": "true",
+    "switch god mode off": "true"
+  },
+  "at": {
+    "now": 1790507318694,
+    "weights": {
+      "block": 10,
+      "day": 1,
+      "fail": 5
+    },
+    "stood": {
+      "spec/tickets/commit-stages-a-moved-path.md": 1790499445,
+      "spec/tickets/a-rewind-spares-landed-tests.md": 1790499205,
+      "spec/tickets/retro-check-names-the-process.md": 1790498401,
+      "spec/tickets/rename-rewrites-each-link-once.md": 1790495415,
+      "spec/tickets/stale-fields-reach-test-schema.md": 1790493792,
+      "spec/tickets/stale-shares-the-bless-hash.md": 1790493792,
+      "spec/tickets/cloud-note-reaches-every-step.md": 1790493762,
+      "spec/tickets/bless-button-draws-itself.md": 1790490201,
+      "spec/tickets/bless-guard-reads-scripts.md": 1790490201,
+      "spec/tickets/cloud-list-reads-harness.md": 1790490201,
+      "spec/tickets/process-case-for-bless.md": 1790490201,
+      "spec/tickets/budget-fixture-grows-with-work.md": 1790490112,
+      "spec/tickets/budget-headroom-on-cloud-boxes.md": 1790490112,
+      "spec/tickets/budget-names-the-resolver-call.md": 1790490112,
+      "spec/tickets/long-line-cuts-by-bytes.md": 1790489021,
+      "spec/tickets/refusals-stay-under-cap.md": 1790489021,
+      "spec/tickets/rest-line-names-plain-pull.md": 1790489021,
+      "spec/tickets/the-callers-name-dueHandOut.md": 1790489021,
+      "spec/tickets/a-retro-hand-decides-notes.md": 1790487330,
+      "spec/tickets/write-marks-leave-the-plugin.md": 1790487209,
+      "spec/tickets/a-gate-names-its-question.md": 1790486780,
+      "spec/tickets/first-accept-names-its-base.md": 1790485599,
+      "spec/tickets/holds-leave-with-their-ticket.md": 1790481928,
+      "spec/tickets/queue-approach-sentence-split.md": 1790481380,
+      "spec/tickets/close-force-guards-trunk-checkout.md": 1790479288,
+      "spec/tickets/open-marker-outlives-refused-push.md": 1790479288,
+      "spec/tickets/open-marks-standing-branches.md": 1790479288,
+      "spec/tickets/rationale-drops-release-row.md": 1790479288,
+      "spec/tickets/answer-mark-loses-its-reader.md": 1790478707,
+      "spec/tickets/judge-cut-clears-the-checks.md": 1790478707,
+      "spec/tickets/judge-cut-meets-claude-door.md": 1790478707,
+      "spec/tickets/judge-cut-takes-its-helpers.md": 1790478707,
+      "spec/tickets/judge-pointers-leave-other-notes.md": 1790478707,
+      "spec/tickets/ask-reading-names-its-differences.md": 1790478377,
+      "spec/tickets/go-test-names-the-root.md": 1790478377,
+      "spec/tickets/private-tickets-reach-tickets-all.md": 1790478377,
+      "spec/tickets/the-golden-keys-group-hash.md": 1790478377,
+      "spec/tickets/the-window-held-override-goes.md": 1790478377,
+      "spec/tickets/tickets-register-in-the-catalog.md": 1790478377,
+      "spec/tickets/serve-callers-take-the-listener.md": 1790474139,
+      "spec/tickets/v1-values-read-stale.md": 1790474139,
+      "spec/tickets/doors-note-names-every-analyzer.md": 1790473708,
+      "spec/tickets/the-compiler-leaves-every-caller.md": 1790473100,
+      "spec/tickets/why-reads-the-stale-mark.md": 1790472789,
+      "spec/tickets/wrapper-ask-names-its-files.md": 1790472632,
+      "spec/tickets/actions-declare-op-and-writes.md": 1790471287,
+      "spec/tickets/op-moves-reach-the-log.md": 1790471287,
+      "spec/tickets/stale-marks-follow-the-provider.md": 1790471287,
+      "spec/tickets/catalog-holds-name-families.md": 1790461131,
+      "spec/tickets/check-reads-provider-keys.md": 1790461131,
+      "spec/tickets/migration-names-the-q-package.md": 1790461131,
+      "spec/tickets/serve-takes-a-catalog-seam.md": 1790461131,
+      "spec/tickets/start-check-runs-in-serve.md": 1790461131,
+      "spec/tickets/battery-ask-names-the-bundle.md": 1790461041,
+      "spec/tickets/seven-go-mods-leave.md": 1790459525,
+      "spec/tickets/split-tests-take-one-module.md": 1790459525,
+      "spec/tickets/tidy-writes-the-go-line.md": 1790459525,
+      "spec/tickets/judge-cases-turn-it-on.md": 1790453357,
+      "spec/tickets/judge-quote-proves-its-call.md": 1790453357,
+      "spec/tickets/processes-get-placed.md": 1790451899,
+      "spec/tickets/surfaces-get-specified.md": 1790451879,
+      "spec/tickets/a-key-holds-a-group.md": 1790448556,
+      "spec/tickets/the-listing-reads-in-pieces.md": 1790446779,
+      "spec/tickets/a-down-index-refuses-calls.md": 1790446458,
+      "spec/tickets/agents-call-quack-directly.md": 1790446458,
+      "spec/tickets/buffers-feed-the-checks.md": 1790446458,
+      "spec/tickets/cage-rules-replay-session-logs.md": 1790446458,
+      "spec/tickets/cfg-topic-holds-one-resolver.md": 1790446458,
+      "spec/tickets/check-names-meet-their-goldens.md": 1790446458,
+      "spec/tickets/ci-runs-a-windows-job.md": 1790446458,
+      "spec/tickets/cli-js-leaves.md": 1790446458,
+      "spec/tickets/copilot-meets-the-hooks-door.md": 1790446458,
+      "spec/tickets/declared-views-get-specified.md": 1790446458,
+      "spec/tickets/doors-get-specified.md": 1790446458,
+      "spec/tickets/files-topic-reads-the-rows.md": 1790446458,
+      "spec/tickets/go-cage-lands-in-shadow.md": 1790446458,
+      "spec/tickets/go-cage-switches-over.md": 1790446458,
+      "spec/tickets/go-code-shares-one-module.md": 1790446458,
+      "spec/tickets/go-prose-checks-stand-alone.md": 1790446458,
+      "spec/tickets/go-writes-the-frontmatter.md": 1790446458,
+      "spec/tickets/groups-carry-the-cloud-marker.md": 1790446458,
+      "spec/tickets/install-drops-node.md": 1790446458,
+      "spec/tickets/lsp-door-lands-in-shadow.md": 1790446458,
+      "spec/tickets/lsp-door-switches-over.md": 1790446458,
+      "spec/tickets/lsp-rules-move-to-check.md": 1790446458,
+      "spec/tickets/module-processes-land-in-shadow.md": 1790446458,
+      "spec/tickets/module-processes-switch-over.md": 1790446458,
+      "spec/tickets/node-leaves-the-boxes.md": 1790446458,
+      "spec/tickets/open-tasks-come-from-work.md": 1790446458,
+      "spec/tickets/open-tasks-land-in-shadow.md": 1790446458,
+      "spec/tickets/open-tasks-run-in-shadow.md": 1790446458,
+      "spec/tickets/open-tasks-switch-over.md": 1790446458,
+      "spec/tickets/operations-and-leases-land.md": 1790446458,
+      "spec/tickets/operations-get-specified.md": 1790446458,
+      "spec/tickets/prose-checks-run-in-go.md": 1790446458,
+      "spec/tickets/pull-verbs-become-actions.md": 1790446458,
+      "spec/tickets/quack-verbs-land-in-shadow.md": 1790446458,
+      "spec/tickets/quack-verbs-switch-over.md": 1790446458,
+      "spec/tickets/quack-why-answers-a-name.md": 1790446458,
+      "spec/tickets/read-topics-land-in-shadow.md": 1790446458,
+      "spec/tickets/read-topics-switch-over.md": 1790446458,
+      "spec/tickets/readers-take-the-go-topics.md": 1790446458,
+      "spec/tickets/retro-verbs-become-actions.md": 1790446458,
+      "spec/tickets/runme-hands-verbs-to-quack.md": 1790446458,
+      "spec/tickets/sidebar-lands-in-shadow.md": 1790446458,
+      "spec/tickets/sidebar-switches-over.md": 1790446458,
+      "spec/tickets/sqlite-runs-pure-go.md": 1790446458,
+      "spec/tickets/the-badge-reads-open-tasks.md": 1790446458,
+      "spec/tickets/the-bridge-server-leaves.md": 1790446458,
+      "spec/tickets/the-config-schema-gets-generated.md": 1790446458,
+      "spec/tickets/the-count-chain-leaves.md": 1790446458,
+      "spec/tickets/the-decisions-get-rationales.md": 1790446458,
+      "spec/tickets/the-doors-process-stands.md": 1790446458,
+      "spec/tickets/the-extension-reads-no-files.md": 1790446458,
+      "spec/tickets/the-foundation-lands-unchanged.md": 1790446458,
+      "spec/tickets/the-guidance-topic-lands.md": 1790446458,
+      "spec/tickets/the-hook-protocol-gets-specified.md": 1790446458,
+      "spec/tickets/the-hook-registers-index-tools.md": 1790446458,
+      "spec/tickets/the-hooks-door-lands.md": 1790446458,
+      "spec/tickets/the-import-rules-get-checked.md": 1790446458,
+      "spec/tickets/the-index-answers-v1.md": 1790446458,
+      "spec/tickets/the-index-model-gets-specified.md": 1790446458,
+      "spec/tickets/the-inner-protocol-gets-chosen.md": 1790446458,
+      "spec/tickets/the-js-twins-leave.md": 1790446458,
+      "spec/tickets/the-log-becomes-a-view.md": 1790446458,
+      "spec/tickets/the-log-topic-lands.md": 1790446458,
+      "spec/tickets/the-lsp-door-lands.md": 1790446458,
+      "spec/tickets/the-lsp-server-leaves.md": 1790446458,
+      "spec/tickets/the-migration-writes-its-specs.md": 1790446458,
+      "spec/tickets/the-q-core-holds-names.md": 1790446458,
+      "spec/tickets/the-quack-cli-gets-generated.md": 1790446458,
+      "spec/tickets/the-queue-moves-to-plan.md": 1790446458,
+      "spec/tickets/the-sidebar-renders-generically.md": 1790446458,
+      "spec/tickets/the-split-deployment-takes-over.md": 1790446458,
+      "spec/tickets/the-system-places-modules.md": 1790446458,
+      "spec/tickets/the-tickets-topic-lands.md": 1790446458,
+      "spec/tickets/the-tui-becomes-a-shell.md": 1790446458,
+      "spec/tickets/the-tui-data-paths-leave.md": 1790446458,
+      "spec/tickets/the-webview-ships-prebuilt.md": 1790446458,
+      "spec/tickets/the-work-view-gains-actions.md": 1790446458,
+      "spec/tickets/ticket-verbs-become-actions.md": 1790446458,
+      "spec/tickets/tui-shell-lands-in-shadow.md": 1790446458,
+      "spec/tickets/tui-shell-switches-over.md": 1790446458,
+      "spec/tickets/vehicle-verbs-become-actions.md": 1790446458,
+      "spec/tickets/watchdogs-get-specified.md": 1790446458,
+      "spec/tickets/watchdogs-span-the-processes.md": 1790446458,
+      "spec/tickets/work-verbs-become-actions.md": 1790446458,
+      "spec/tickets/the-take-walks-past-gates.md": 1790446367,
+      "spec/tickets/the-owner-rules-the-migration.md": 1790444810,
+      "spec/tickets/the-hook-log-loses-lines.md": 1790444476,
+      "spec/tickets/the-dead-exports-leave.md": 1790444400,
+      "spec/tickets/vehicles-take-the-window-port.md": 1790444320,
+      "spec/tickets/window-links-reach-private-tickets.md": 1790444239,
+      "spec/tickets/the-need-list-lacks-verbs.md": 1790444158,
+      "spec/tickets/the-lsp-folds-drive-letters.md": 1790444078,
+      "spec/tickets/one-reader-names-the-home.md": 1790443996,
+      "spec/tickets/config-reads-differ-by-reader.md": 1790443917,
+      "spec/tickets/the-sidebar-log-appends.md": 1790443827,
+      "spec/tickets/the-judge-reads-every-layer.md": 1790443673,
+      "spec/tickets/the-owner-names-three-things.md": 1790441223,
+      "spec/tickets/draft-size-past-ask.md": 1790441160,
+      "spec/tickets/handed-condition-in-pull-when.md": 1790441160,
+      "spec/tickets/handover-mark-has-no-writer.md": 1790441160,
+      "spec/tickets/owner-terms-await-question.md": 1790441160,
+      "spec/tickets/the-callers-name-their-files.md": 1790440407,
+      "spec/tickets/the-cloud-waits-for-owners.md": 1790440407,
+      "spec/tickets/the-draft-names-its-size.md": 1790440407,
+      "spec/tickets/the-fake-vscode-resolves.md": 1790440407,
+      "spec/tickets/the-view-fails-to-implement.md": 1790440407,
+      "spec/tickets/the-hook-awaits-the-spawn.md": 1790439688,
+      "spec/tickets/the-new-rule-appends.md": 1790439688,
+      "spec/tickets/a-closed-ticket-takes-writes.md": 1790433945,
+      "spec/tickets/the-judge-waits-on-true.md": 1790433945,
+      "spec/tickets/the-mark-library-leaves.md": 1790433945,
+      "spec/tickets/git-write-tests-outside-ask.md": 1790433739,
+      "spec/tickets/git-writes-lacking-a-verb.md": 1790433739,
+      "spec/tickets/journal-the-rename-verb.md": 1790433739,
+      "spec/tickets/merge-deletes-after-the-push.md": 1790433739,
+      "spec/tickets/one-row-for-git-mv.md": 1790433739,
+      "spec/tickets/red-verb-meets-new-sources.md": 1790433739,
+      "spec/tickets/rename-detection-misses-rewrites.md": 1790433739,
+      "spec/tickets/verb-line-names-new-refusals.md": 1790433739,
+      "spec/tickets/a-nested-git-still-lands.md": 1790432628,
+      "spec/tickets/a-reorder-asks-a-test.md": 1790432628,
+      "spec/tickets/only-a-read-gates-nothing.md": 1790432628,
+      "spec/tickets/pull-env-meets-the-engine.md": 1790432628,
+      "spec/tickets/the-scratchpad-reads-absolute.md": 1790432628,
+      "spec/tickets/vale-ls-on-windows.md": 1790432373,
+      "spec/tickets/the-reply-probe-runs.md": 1790431731,
+      "spec/tickets/the-process-stays-editable.md": 1790431175,
+      "spec/tickets/guidance-rides-each-step.md": 1790431174,
+      "spec/tickets/the-engine-holds-the-route.md": 1790431173,
+      "spec/tickets/findings-reach-the-owner.md": 1790431172,
+      "spec/tickets/the-owner-shapes-the-editor.md": 1790431171,
+      "spec/tickets/the-owner-walks-a-process.md": 1790431170,
+      "spec/tickets/the-retro-reads-the-backlog.md": 1790431169,
+      "spec/tickets/a-gate-asks-a-bless.md": 1790431168,
+      "spec/tickets/a-moved-input-marks-steps.md": 1790431167,
+      "spec/tickets/each-call-meets-its-budget.md": 1790431166,
+      "spec/tickets/an-answer-stays-under-cap.md": 1790431165,
+      "spec/tickets/guidance-resolves-by-tags.md": 1790431164,
+      "spec/tickets/the-style-carries-the-top.md": 1790431163,
+      "spec/tickets/the-judge-leaves-the-code.md": 1790431162,
+      "spec/tickets/the-last-gate-accepts.md": 1790431161,
+      "spec/tickets/a-gate-reviews-and-fixes.md": 1790431160,
+      "spec/tickets/a-pull-hands-one-step.md": 1790431159,
+      "spec/tickets/the-callers-drop-ticket-faults.md": 1790430937,
+      "spec/tickets/the-door-passes-ephemeral-holds.md": 1790430937,
+      "spec/tickets/the-door-picks-a-hold.md": 1790430937,
+      "spec/tickets/the-hand-reads-plans-here.md": 1790430937,
+      "spec/tickets/the-open-road-stays-named.md": 1790430937,
+      "spec/tickets/the-todo-road-stands-first.md": 1790430937,
+      "spec/tickets/helper-mark-drops-at-stop.md": 1790430241,
+      "spec/tickets/step-rule-names-its-rank.md": 1790430241,
+      "spec/tickets/the-talk-prose-leaves-stop.md": 1790430241,
+      "spec/tickets/the-bridge-names-no-maker.md": 1790429552,
+      "spec/tickets/the-retro-reads-its-hand.md": 1790429552,
+      "spec/tickets/the-window-case-in-level0.md": 1790429552,
+      "spec/tickets/the-window-keeps-the-binding.md": 1790429552,
+      "spec/tickets/callers-name-both-readers.md": 1790428976,
+      "spec/tickets/canary-repeat-ignores-paid-text.md": 1790428976,
+      "spec/tickets/meta-rows-open-no-turn.md": 1790428976,
+      "spec/tickets/a-promotion-names-its-fault.md": 1790428275,
+      "spec/tickets/a-promotion-ticket-reads-once.md": 1790428275,
+      "spec/tickets/callers-name-work-answer-home.md": 1790428275,
+      "spec/tickets/the-quoted-pair-stays-paired.md": 1790428275,
+      "spec/tickets/the-second-collect-keeps-lines.md": 1790428275,
+      "spec/tickets/a-late-count-pays-nothing.md": 1790427564,
+      "spec/tickets/the-warning-has-fallback.md": 1790427564,
+      "spec/tickets/the-warning-keeps-readers.md": 1790427564,
+      "spec/tickets/each-thing-stands-in-place.md": 1790419474,
+      "spec/tickets/the-owners-word-reaches-work.md": 1790419471,
+      "spec/tickets/the-verbs-land-whole.md": 1790419469,
+      "spec/tickets/the-servers-and-views-hold.md": 1790419467,
+      "spec/tickets/the-gates-read-the-state.md": 1790419459,
+      "spec/tickets/the-retro-reads-cloud-retros.md": 1790419314,
+      "spec/tickets/the-retro-holds-the-clear.md": 1790419313,
+      "spec/tickets/the-small-faults-land.md": 1790419312,
+      "spec/tickets/the-retro-finishes-its-asks.md": 1790419311,
+      "spec/tickets/a-small-ask-stays-small.md": 1790419309,
+      "spec/tickets/prose-verbs-land-first-try.md": 1790419308,
+      "spec/tickets/each-folder-holds-its-kind.md": 1790419307,
+      "spec/tickets/each-fact-keeps-one-owner.md": 1790419305,
+      "spec/tickets/the-owners-words-travel-verbatim.md": 1790419304,
+      "spec/tickets/the-owner-view-decides-done.md": 1790419303,
+      "spec/tickets/the-battery-runs-on-fixtures.md": 1790419301,
+      "spec/tickets/the-verbs-need-no-wrapper.md": 1790419300,
+      "spec/tickets/doors-read-what-commands-do.md": 1790419299,
+      "spec/tickets/every-landing-takes-a-verb.md": 1790419297,
+      "spec/tickets/every-road-has-a-caller.md": 1790419296,
+      "spec/tickets/the-queue-views-agree.md": 1790419295,
+      "spec/tickets/every-server-stands-and-answers.md": 1790419293,
+      "spec/tickets/the-todo-joins-the-queue.md": 1790419292,
+      "spec/tickets/a-reply-follows-its-prompt.md": 1790419291,
+      "spec/tickets/answers-read-the-last-text.md": 1790419290,
+      "spec/tickets/the-stop-reads-the-state.md": 1790419288,
+      "spec/tickets/retro-65c3028.md": 1790415135,
+      "spec/tickets/the-icon-counts-drawn-rows.md": 1790361716,
+      "spec/tickets/the-take-marks-the-fields.md": 1790360250,
+      "spec/tickets/shell-calls-name-their-ticket.md": 1790358429,
+      "spec/tickets/a-shell-call-names-its-ticket.md": 1790357187,
+      "spec/tickets/the-desk-findings-wait.md": 1790351500,
+      "spec/tickets/the-owner-walks-the-editor.md": 1790348116,
+      "spec/tickets/the-owner-tries-the-inset.md": 1790348114,
+      "spec/tickets/design-rule-links-its-check.md": 1790346549,
+      "spec/tickets/findings-reuse-the-note-mint.md": 1790346549,
+      "spec/tickets/one-review-a-ticket.md": 1790343691,
+      "spec/tickets/a-live-clear-reads-handover.md": 1790336193,
+      "spec/tickets/a-desk-pull-pushes-nothing.md": 1790272803,
+      "spec/tickets/a-cloud-group-asks-nobody.md": 1790272722,
+      "spec/tickets/the-clear-keeps-questions.md": 1790272682,
+      "spec/tickets/an-empty-queue-hands-cleanup.md": 1790268557,
+      "spec/tickets/a-save-fills-the-ticket.md": 1790265879,
+      "spec/tickets/the-host-runs-the-verbs.md": 1790265879,
+      "spec/tickets/the-owner-walks-a-ticket.md": 1790265879,
+      "spec/tickets/the-work-group-draws-buttons.md": 1790265879,
+      "spec/tickets/the-inset-folds-the-frontmatter.md": 1790265756,
+      "spec/tickets/the-fill-answers-on-stdout.md": 1790264651,
+      "spec/tickets/each-node-names-its-place.md": 1790264650,
+      "spec/tickets/the-route-edits-ahead.md": 1790264642,
+      "spec/tickets/an-update-keeps-a-route.md": 1790264634,
+      "spec/tickets/the-config-declares-work.md": 1790264632,
+      "spec/tickets/yours-counts-the-waiting.md": 1790264631,
+      "spec/tickets/the-drawing-speaks-edits.md": 1790263171,
+      "spec/tickets/the-drawing-draws-read-only.md": 1790263170,
+      "spec/tickets/the-drawing-bundles.md": 1790263169,
+      "spec/tickets/the-hover-shows-a-term.md": 1790262340,
+      "spec/tickets/a-term-points-nowhere.md": 1790262339,
+      "spec/tickets/a-term-means-itself.md": 1790262338,
+      "spec/tickets/terms-mean-themselves.md": 1790261035,
+      "spec/tickets/the-drawing-draws-a-route.md": 1790261035,
+      "spec/tickets/the-editor-holds-the-drawing.md": 1790261035,
+      "spec/tickets/the-ticket-answers-the-editor.md": 1790261035,
+      "spec/tickets/a-claim-reads-its-source.md": 1790192665,
+      "spec/tickets/a-count-meets-the-lint.md": 1790192665,
+      "spec/tickets/a-landing-follows-its-gate.md": 1790192665,
+      "spec/tickets/each-check-reads-its-signal.md": 1790192665,
+      "spec/tickets/each-helper-lands-one-commit.md": 1790192665,
+      "spec/tickets/the-binding-reads-the-session.md": 1790192665,
+      "spec/tickets/the-door-keeps-its-marks.md": 1790192665,
+      "spec/tickets/the-door-refuses-a-revert.md": 1790192665,
+      "spec/tickets/the-owner-hears-first.md": 1790192665,
+      "spec/tickets/the-pull-pushes-its-close.md": 1790192665,
+      "spec/tickets/the-verbs-reach-the-question.md": 1790192665,
+      "spec/tickets/the-verbs-read-prose-whole.md": 1790192665,
+      "spec/tickets/retro-899accd.md": 1790189770,
+      "spec/tickets/the-review-lands-overnight.md": 1790189770,
+      "spec/tickets/the-config-folds-at-once.md": 1790188727,
+      "spec/tickets/the-engine-restores-its-fields.md": 1790188727,
+      "spec/tickets/one-reader-judges-a-verdict.md": 1789936037,
+      "spec/tickets/the-links-verb-tries-yaml.md": 1789936037,
+      "spec/tickets/the-door-reads-restated-data.md": 1789928389,
+      "spec/tickets/a-test-importing-cli-exits.md": 1789927899,
+      "spec/tickets/findings.md": 1789927899,
+      "spec/tickets/the-battery-flickers-under-load.md": 1789927899,
+      "spec/tickets/the-respawn-answers-no-server.md": 1789927899,
+      "spec/tickets/the-stop-line-loops-forever.md": 1789927899,
+      "spec/tickets/misc.md": 1789927363,
+      "spec/tickets/the-bridgehead-carries-its-closure.md": 1789925908,
+      "spec/tickets/the-notes-point-true.md": 1789925908,
+      "spec/tickets/the-verbs-answer-their-asks.md": 1789925908,
+      "spec/tickets/the-index-answers-the-queue.md": 1789910183,
+      "spec/tickets/disk-door-copies-a-folder.md": 1789908693,
+      "spec/tickets/the-install-fetches-go-modules.md": 1789908693,
+      "spec/tickets/a-door-proves-once.md": 1789905195,
+      "spec/tickets/a-move-redraws-both-files.md": 1789905195,
+      "spec/tickets/a-vale-case-spawns-once.md": 1789905195,
+      "spec/tickets/one-reading-proves-one-file.md": 1789905195,
+      "spec/tickets/the-battery-earns-its-time.md": 1789905195,
+      "spec/tickets/the-index-answers-tickets.md": 1789905195,
+      "spec/tickets/the-index-fires-on-change.md": 1789905195,
+      "spec/tickets/the-panel-lints-on-change.md": 1789905195,
+      "spec/tickets/the-panel-reads-every-change.md": 1789905195,
+      "spec/tickets/the-roots-case-reads-globs.md": 1789905195,
+      "spec/tickets/the-stamp-counts-every-spawn.md": 1789905195,
+      "spec/tickets/the-vehicle-case-fakes-install.md": 1789905195,
+      "spec/tickets/the-work-tab-asks-index.md": 1789905195,
+      "spec/tickets/the-work-tab-reads-tickets.md": 1789905195,
+      "spec/tickets/the-work-tab-takes-edits.md": 1789905195,
+      "spec/tickets/files-read-the-closure.md": 1789892227,
+      "spec/tickets/one-post-a-tool-call.md": 1789892227,
+      "spec/tickets/split-names-its-source.md": 1789892227,
+      "spec/tickets/a-pointer-resolves.md": 1789880492,
+      "spec/tickets/the-unknown-runs-stays-quiet.md": 1789880492,
+      "spec/tickets/a-door-holds-three-reads.md": 1789879701,
+      "spec/tickets/a-lone-mark-pairs-wrong.md": 1789879701,
+      "spec/tickets/a-pointer-reaches-a-heading.md": 1789879701,
+      "spec/tickets/every-road-reads-one-config.md": 1789879701,
+      "spec/tickets/one-door-joins-a-path.md": 1789879701,
+      "spec/tickets/the-window-splits-by-tab.md": 1789874794,
+      "spec/tickets/a-rule-names-its-failure.md": 1789868484,
+      "spec/tickets/the-bridge-keeps-transport.md": 1789853941,
+      "spec/tickets/the-rules-hold-themselves.md": 1789853941,
+      "spec/tickets/the-tree-names-its-things.md": 1789853941,
+      "spec/tickets/the-verbs-take-the-shell.md": 1789853941,
+      "spec/tickets/a-check-finds-every-writer.md": 1789852975,
+      "spec/tickets/a-check-finds-restated-facts.md": 1789852975,
+      "spec/tickets/a-claim-meets-the-view.md": 1789852975,
+      "spec/tickets/a-lint-holds-note-rules.md": 1789852975,
+      "spec/tickets/a-log-verb-reads-sessions.md": 1789852975,
+      "spec/tickets/a-question-reaches-its-owner.md": 1789852975,
+      "spec/tickets/a-rename-reaches-every-note.md": 1789852975,
+      "spec/tickets/a-split-verb-cuts-files.md": 1789852975,
+      "spec/tickets/a-standing-stop-ends-turns.md": 1789852975,
+      "spec/tickets/an-engine-takes-bridge-work.md": 1789852975,
+      "spec/tickets/an-experiment-ends-decided.md": 1789852975,
+      "spec/tickets/check-prose-reads-a-draft.md": 1789852975,
+      "spec/tickets/the-canary-pays-once.md": 1789852975,
+      "spec/tickets/the-check-holds-test-first.md": 1789852975,
+      "spec/tickets/the-commit-verb-lints-messages.md": 1789852975,
+      "spec/tickets/the-doctor-probes-every-hook.md": 1789852975,
+      "spec/tickets/the-door-reads-script-writes.md": 1789852975,
+      "spec/tickets/the-door-rule-reads-env.md": 1789852975,
+      "spec/tickets/the-read-tools-answer-first.md": 1789852975,
+      "spec/tickets/the-tools-answer-after-restart.md": 1789852975,
+      "spec/tickets/group-key-takes-one-spelling.md": 1789770573,
+      "spec/tickets/runtime-half-takes-the-rest.md": 1789770573,
+      "spec/tickets/the-verdict-guard-reads-tips.md": 1789757305,
+      "spec/tickets/the-spawn-reaches-its-guidance.md": 1789755755,
+      "spec/tickets/one-list-holds-the-warnings.md": 1789755037,
+      "spec/tickets/the-private-split-reads-clean.md": 1789754430,
+      "spec/tickets/the-one-answer-takes-shape.md": 1789752970,
+      "spec/tickets/one-function-answers-the-hand.md": 1789752188,
+      "spec/tickets/release-keeps-local-commits.md": 1789745991,
+      "spec/tickets/the-retro-lays-its-leaves.md": 1789745150,
+      "spec/tickets/a-retro-mints-itself.md": 1789744222,
+      "spec/tickets/the-retro-cuts-its-window.md": 1789744222,
+      "spec/tickets/the-retro-takes-the-box.md": 1789744222,
+      "spec/tickets/a-return-asks-another-hand.md": 1789744214,
+      "spec/tickets/the-retro-runs.md": 1789743875,
+      "spec/tickets/apply-lane-carries-a-hand.md": 1789742668,
+      "spec/tickets/the-rule-shares-one-slug.md": 1789742412,
+      "spec/tickets/a-pointer-names-its-heading.md": 1789739971,
+      "spec/tickets/a-rule-carries-its-side.md": 1789739971,
+      "spec/tickets/a-write-meets-its-hash.md": 1789739971,
+      "spec/tickets/the-hook-spawns-a-refactorer.md": 1789739971,
+      "spec/tickets/the-panel-draws-every-file.md": 1789739971,
+      "spec/tickets/the-runtime-files-stand-apart.md": 1789739971,
+      "spec/tickets/the-warnings-feed-a-refactorer.md": 1789739971,
+      "spec/tickets/a-project-adds-vale-rules.md": 1789739364,
+      "spec/tickets/the-pull-names-the-unblock.md": 1789736002,
+      "spec/tickets/the-question-process-gets-tests.md": 1789736002,
+      "spec/tickets/the-unblock-keeps-its-shape.md": 1789736002,
+      "spec/tickets/a-person-reads-the-split.md": 1789735972,
+      "spec/tickets/the-layer-reaches-sessions.md": 1789665549,
+      "spec/tickets/the-pull-splits-by-topic.md": 1789665549,
+      "spec/tickets/the-runtime-folder-holds-state.md": 1789660894,
+      "spec/tickets/a-preset-carries-its-sort.md": 1789660488,
+      "spec/tickets/one-urgency-stands.md": 1789660488,
+      "spec/tickets/the-canary-survives-a-restart.md": 1789660488,
+      "spec/tickets/the-cell-fill-takes-marks.md": 1789660488,
+      "spec/tickets/the-listing-opens-git-once.md": 1789660488,
+      "spec/tickets/the-work-editor-draws.md": 1789660488,
+      "spec/tickets/the-colours-stand-in-config.md": 1789658838,
+      "spec/tickets/the-cloud-setup-installs.md": 1789658165,
+      "spec/tickets/the-session-says-its-cage.md": 1789658165,
+      "spec/tickets/a-stale-claim-comes-back.md": 1789656326,
+      "spec/tickets/voice-rules-skip-the-record.md": 1789646499,
+      "spec/tickets/the-record-why-holds-spans.md": 1789645939,
+      "spec/tickets/the-spawn-answers-a-helper.md": 1789645790,
+      "spec/tickets/the-session-file-proves-itself.md": 1789645065,
+      "spec/tickets/the-take-skips-an-orphan.md": 1789644885,
+      "spec/tickets/the-brand-names-the-plugin.md": 1789644694,
+      "spec/tickets/the-successor-names-a-person.md": 1789639456,
+      "spec/tickets/the-server-holds-its-socket.md": 1789638925,
+      "spec/tickets/the-bridgehead-needs-no-shell.md": 1789637718,
+      "spec/tickets/a-cell-takes-an-edit.md": 1789587236,
+      "spec/tickets/a-base-file-says-it.md": 1789587059,
+      "spec/tickets/the-tree-takes-a-filter.md": 1789586572,
+      "spec/tickets/the-tree-draws-its-columns.md": 1789586418,
+      "spec/tickets/the-help-reads-the-cursor.md": 1789586184,
+      "spec/tickets/the-window-grows-a-frame.md": 1789585888,
+      "spec/tickets/a-link-click-opens-it.md": 1789585007,
+      "spec/tickets/the-mouse-reaches-the-window.md": 1789585007,
+      "spec/tickets/the-check-starts-the-server.md": 1789578919,
+      "spec/tickets/the-judge-reads-answer-rules.md": 1789572049,
+      "spec/tickets/the-answer-door-reads-notes.md": 1789571967,
+      "spec/tickets/the-brief-verbs-go.md": 1789571967,
+      "spec/tickets/the-controls-wire-up.md": 1789571967,
+      "spec/tickets/the-viewer-draws-the-note.md": 1789571967,
+      "spec/tickets/a-done-branch-joins-queue.md": 1789568139,
+      "spec/tickets/the-viewer-filters-the-talk.md": 1789568139,
+      "spec/tickets/the-hand-carries-a-step.md": 1789567158,
+      "spec/tickets/the-person-step-holds.md": 1789567158,
+      "spec/tickets/code-has-a-size-ceiling.md": 1789554709,
+      "spec/tickets/python-writes-pass-the-door.md": 1789554709,
+      "spec/tickets/reviewer-reads-no-group-retro.md": 1789554709,
+      "spec/tickets/the-answer-lands-in-chat.md": 1789554709,
+      "spec/tickets/the-canary-ends-no-turn.md": 1789554709,
+      "spec/tickets/the-pull-takes-the-branch.md": 1789554709,
+      "spec/tickets/the-stop-wakes-again.md": 1789554709,
+      "spec/tickets/the-cloud-box-starts-serving.md": 1789551032,
+      "spec/tickets/the-pull-says-refused-commit.md": 1789551032,
+      "spec/tickets/the-record-quotes-its-why.md": 1789551032,
+      "spec/tickets/ticket-open-lints-the-ask.md": 1789551032,
+      "spec/tickets/escalate-inserts-a-person-step.md": 1789547720,
+      "spec/tickets/the-group-leaves-at-todo.md": 1789547720,
+      "spec/tickets/the-hand-carries-the-session.md": 1789547720,
+      "spec/tickets/the-spawn-takes-a-step.md": 1789547720,
+      "spec/tickets/edit-door-reads-whole.md": 1789319066,
+      "spec/tickets/the-stub-plugin-name.md": 1789319066,
+      "spec/tickets/bridgehead-probe-lands.md": 1789318479,
+      "spec/tickets/a-person-reads-the-pull.md": 1789316713,
+      "spec/tickets/brand-reads-folder.md": 1789315847,
+      "spec/tickets/the-brand-reads-the-folder.md": 1789315847,
+      "spec/tickets/sidebar-makes-both.md": 1789315841,
+      "spec/tickets/the-sidebar-makes-both.md": 1789315841,
+      "spec/tickets/bridgehead-installs-upstream.md": 1789315835,
+      "spec/tickets/the-bridgehead-installs-upstream.md": 1789315835,
+      "spec/tickets/the-verbs-read-two-roots.md": 1789315830,
+      "spec/tickets/verbs-read-two-roots.md": 1789315830,
+      "spec/tickets/shim-resolves-vehicle.md": 1789315824,
+      "spec/tickets/the-shim-resolves-the-vehicle.md": 1789315824,
+      "spec/tickets/stub-takes-shape.md": 1789315818,
+      "spec/tickets/the-stub-takes-shape.md": 1789315818,
+      "spec/tickets/bridgehead-imports-vehicle.md": 1789315812,
+      "spec/tickets/the-bridgehead-imports-its-vehicle.md": 1789315812,
+      "spec/tickets/the-hook-reloads-its-door.md": 1789313621,
+      "spec/tickets/agent-pulls-ticket.md": 1789299258,
+      "spec/tickets/the-agent-pulls-a-ticket.md": 1789299258,
+      "spec/tickets/level-zero-handover.md": 1789299252,
+      "spec/tickets/level-zero-hands-over.md": 1789299252,
+      "spec/tickets/guidance-rides-step.md": 1789299245,
+      "spec/tickets/guidance-rides-the-step.md": 1789299245,
+      "spec/tickets/a-step-changes-hands.md": 1789299238,
+      "spec/tickets/step-changes-hands.md": 1789299238,
+      "spec/tickets/a-group-is-a-branch.md": 1789242332,
+      "spec/tickets/the-verbs-read-a-group.md": 1789242332
+    }
+  },
+  "answer": {
+    "a-rewind-spares-landed-tests": "-9",
+    "findings-reach-the-owner": "-8",
+    "holds-leave-with-their-ticket": "-7",
+    "queue-approach-sentence-split": "-6",
+    "the-owner-names-three-things": "-5",
+    "the-owner-shapes-the-editor": "-4",
+    "the-owner-walks-a-process": "-3",
+    "the-reply-probe-runs": "-2",
+    "vale-ls-on-windows": "-1",
+    "the-queue-moves-to-plan": "0",
+    "Mint the ticket for the sidebar paint": "1",
+    "Trace the extension's slow activation": "2",
+    "Work the agent-doable tickets": "3",
+    "Walk the owner through the tickets that need them": "4",
+    "rationale-drops-release-row": "5",
+    "every-server-stands-and-answers": "6",
+    "the-queue-views-agree": "7",
+    "a-retro-hand-decides-notes": "8",
+    "rename-rewrites-each-link-once": "9",
+    "the-judge-waits-on-true": "10",
+    "the-mark-library-leaves": "11",
+    "the-sidebar-paints-first": "12",
+    "tui-shell-lands-in-shadow": "∞",
+    "the-window-held-override-goes": "13.1",
+    "open-tasks-come-from-work": "14",
+    "open-tasks-run-in-shadow": "15",
+    "the-badge-reads-open-tasks": "16",
+    "the-count-chain-leaves": "17",
+    "cage-rules-replay-session-logs": "∞",
+    "copilot-meets-the-hooks-door": "∞",
+    "go-cage-lands-in-shadow": "∞",
+    "the-hooks-door-lands": "∞",
+    "a-down-index-refuses-calls": "∞",
+    "go-cage-switches-over": "∞",
+    "the-bridge-server-leaves": "∞",
+    "buffers-feed-the-checks": "∞",
+    "lsp-door-lands-in-shadow": "∞",
+    "lsp-rules-move-to-check": "∞",
+    "the-lsp-door-lands": "∞",
+    "lsp-door-switches-over": "∞",
+    "the-lsp-server-leaves": "∞",
+    "module-processes-land-in-shadow": "∞",
+    "the-doors-process-stands": "∞",
+    "the-system-places-modules": "∞",
+    "watchdogs-span-the-processes": "∞",
+    "module-processes-switch-over": "∞",
+    "the-split-deployment-takes-over": "∞",
+    "go-prose-checks-stand-alone": "∞",
+    "install-drops-node": "∞",
+    "node-leaves-the-boxes": "∞",
+    "the-webview-ships-prebuilt": "∞",
+    "pull-verbs-become-actions": "∞",
+    "quack-verbs-land-in-shadow": "∞",
+    "retro-verbs-become-actions": "∞",
+    "runme-hands-verbs-to-quack": "∞",
+    "the-hook-registers-index-tools": "∞",
+    "the-quack-cli-gets-generated": "∞",
+    "ticket-verbs-become-actions": "∞",
+    "vehicle-verbs-become-actions": "∞",
+    "work-verbs-become-actions": "∞",
+    "agents-call-quack-directly": "∞",
+    "cli-js-leaves": "∞",
+    "quack-verbs-switch-over": "∞",
+    "cfg-topic-holds-one-resolver": "∞",
+    "check-names-meet-their-goldens": "∞",
+    "prose-checks-run-in-go": "∞",
+    "read-topics-land-in-shadow": "∞",
+    "the-guidance-topic-lands": "∞",
+    "the-log-topic-lands": "∞",
+    "read-topics-switch-over": "∞",
+    "readers-take-the-go-topics": "∞",
+    "the-js-twins-leave": "∞",
+    "sidebar-lands-in-shadow": "∞",
+    "the-config-schema-gets-generated": "∞",
+    "the-sidebar-renders-generically": "∞",
+    "sidebar-switches-over": "∞",
+    "the-extension-reads-no-files": "∞",
+    "the-log-becomes-a-view": "∞",
+    "the-tui-becomes-a-shell": "∞",
+    "the-work-view-gains-actions": "∞",
+    "the-tui-data-paths-leave": "∞",
+    "tui-shell-switches-over": "∞"
+  }
+}

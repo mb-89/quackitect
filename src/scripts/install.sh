@@ -316,7 +316,7 @@ index_here() {
 # [[spec/design_output/index#the-compiler-it-needs]]
 get_index() {
   say "  building the index"
-  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/quack) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here
@@ -483,7 +483,7 @@ why() {
     drawing) say "drawing: the modules the route drawing takes, bundled into the one script a webview loads" ;;
     browser) say "browser: the chromium the drawing's test drives" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
-    editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
+    editor-extensions) say "editor-extensions: the Vale, Biome and Mermaid extensions the tracked settings point at" ;;
     git-hooks) say "git-hooks: the pre-commit and pre-push doors, so a commit by hand meets the privacy check and a push to main meets the battery" ;;
   esac
 }

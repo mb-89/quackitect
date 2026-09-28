@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -23,10 +24,16 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-step: do
 process: [[spec/processes/trivial]]
-process_hash: 05e53b89dab63152
+process_hash: 2b5ab398855a1aba
 parent: every-road-has-a-caller
+record:
+  - step: do
+    hand: box d6f05e3a585030 · claude-code
+    hash_before: 8a35e04867b8bec04a384ed584f2cf5af2a7a948
+    hash_after: 8a35e04867b8bec04a384ed584f2cf5af2a7a948
+    why: the-judge-leaves-the-code answers this ask
+reason: answered
 ---
 
 # Ask

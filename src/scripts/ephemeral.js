@@ -10,6 +10,7 @@ import {
   HOLDS,
   RETRO,
 } from "../../.claude/skills/level0/lib/folders.js";
+import { stillHeld } from "../engine/named.js";
 
 export const WRITE = "handover";
 export const CLEAR = "clear";
@@ -100,8 +101,18 @@ export function handoverFault(disk, root) {
   return "";
 }
 
-// Every hold on the box, read off the folder, one a hand. [[spec/design_output/pull#the-hand-and-the-hold]]
+// Every hold on the box whose ticket stands, read off the folder, one a hand. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function holdsIn(disk, root) {
+  return holdFiles(disk, root).filter(({ held }) => stillHeld(disk, root, held));
+}
+
+// The pull alone removes a hold file, and only one whose ticket reads closed. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function dropsClosedHolds(disk, root) {
+  for (const { at, held } of holdFiles(disk, root))
+    if (!stillHeld(disk, root, held)) disk.remove(at);
+}
+
+function holdFiles(disk, root) {
   const folder = join(root, ...HOLDS.split("/"));
   let rows = [];
   try {

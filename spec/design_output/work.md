@@ -153,6 +153,7 @@ A flag asks for that one reading in place of the rows.
 | the paths | `cat-file --batch` | the ticket names each tip carries |
 | the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
+| the trunk tip | `rev-parse`, once a listing | the commit a base short of it reads `behind` against |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
 and the routine's trigger fetch on their own, because each acts on the remote.
@@ -392,8 +393,54 @@ after the first reading.
 # Trunk comes in first
 
 `branch sync` merges `origin/main` into the branch. `branch take` runs it, so a
-routine pays nothing to remember it. A conflict then stops the take, while the
+routine pays nothing to remember it. On a work branch it first merges
+`origin/<the branch>`, so a commit another hand pushes there comes in, and both
+sides stand. A conflict there stops the sync, and trunk waits for it. A conflict then stops the take, while the
 work it costs still sits ahead.
+
+On `main`, `branch sync` merges `origin/main` into the desk's `main`. So a desk
+committing on `main` pushes after another box pushes first.
+
+## A conflicted front resolves itself
+
+A group ticket conflicts on nearly every sync. The branch appends to `record`,
+and `main` adds a key such as `cloud` or `depends_on`. So `branch sync` reads
+each unmerged ticket under `spec/tickets` through its stages, the base, the
+branch and `main`, and `mergedFront` in `src/engine/front-merge.js` merges
+the front key by key:
+
+| what the two sides do to a key | what the merge takes |
+|---|---|
+| the same thing, or one side alone changes it | that side |
+| both append entries to `record` | the base's entries, then the branch's, then `main`'s |
+| both change it apart | nothing, and the ticket waits for a hand |
+
+The text past the front merges whole the same way, and a change on both sides
+leaves the ticket for a hand. The sync writes and stages each ticket it merges.
+Where nothing waits for a hand, it commits the merge with its own message.
+
+Where a file waits, the sync names each one, and the merge stands open. A
+ticket `main` deletes while the branch changes it waits too, and the sync says
+`main` retires it. The write door lets a hand write each unmerged ticket until
+the merge commits. For details, see [[spec/design_output/pull#a-merge-opens-the-ticket]].
+`./RUNME.sh commit` then lands the merge.
+
+## No commit carries a marker
+
+A merge conflict leaves marker lines in a file, and a verb staging the whole
+tree stages them as resolved. A step verb running past a stopped sync
+commits them into the merge. So each commit road reads the marks in `.claude/skills/level0/lib/markers.js`:
+
+| the road | what it refuses |
+|---|---|
+| a step verb's landing, in `src/scripts/pull-landed.js` | any path git lists unmerged, before it writes, and a marker the index carries, before it commits |
+| `./RUNME.sh commit` | an unmerged file carrying a marker on disk, before the tests run, and a marker the index carries |
+| the pre-commit hook | a marker line the staged delta adds |
+| the sweep, as `NoConflictMarkers` in `src/lsp/conflict.go` | a marker in a tracked file under `spec`, `src`, `.claude` or `test` |
+
+An opener line marks alone. A split line or a closer marks past an opener, so
+a heading's underline reads as prose. Each refusal names the files, and says to
+resolve the merge first.
 
 ## Trunk comes in last too
 
@@ -512,11 +559,17 @@ them, in the order the score sets. [[spec/tickets/the-queue-is-a-score]]
 
 ## A dependency waits for trunk
 
-A branch meets its dependency once trunk holds the branch it names, or once that
-branch goes because somebody merges and closes it. `done` alone holds the
-dependent, because `done` waits on the merge, which a box off the cloud runs.
-So a chain of work runs
-itself in order, and each link starts from the one before it.
+A branch meets its dependency once the dependency's ticket stands closed on trunk:
+
+| the dependency | the dependent |
+|---|---|
+| its ticket on trunk stands at `state: closed` | runs |
+| its branch stands no more | runs |
+| `todo`, held, or `done` on its own branch | waits |
+
+A box closes the group's ticket on its branch, and trunk carries it that way
+after the merge alone. So the read looks at trunk's copy of one file, and reads no
+history. A shallow clone reads the same answer as a full one.
 
 `take` merges trunk in. A dependent taken before its dependency lands starts
 from a trunk carrying none of that work. It then builds that work a second time.
@@ -695,6 +748,10 @@ it and the next pull hands it out. A closed ticket keeps its `group`, because th
 pair is the history of one group and what it holds.
 
 # A merged branch closes
+
+`branch merge` closes the branch it lands. Once the check passes on the merge
+commit, it pushes trunk and runs the close. So trunk on origin holds the whole
+branch before the branch goes. A refused push leaves the branch standing.
 
 `branch close [name]` deletes a branch git says is inside `main`, here and on
 origin. Naming no branch closes every one of them. It reaches the kinds below:

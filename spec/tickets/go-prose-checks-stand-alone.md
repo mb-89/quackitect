@@ -86,7 +86,7 @@ The Go prose checks become the only copy, and wink leaves the tree.
 
 The prose checks were the last reason Node runs at runtime.
 
-- - `go test ./...` from the root passes
+- `go test ./...` from the root passes
 - `git grep -n wink -- package.json` answers nothing
 - `./RUNME.sh check` exits 0
 
