@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change the ask names
@@ -12,6 +12,13 @@ steps:
 process: [[spec/processes/standard]]
 group: the-foundation-closes-its-gaps
 step: do
+record:
+  - step: do
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 1e00f651539923bd392b016d06f632d2526fe847
+    hash_after: 666670680fcbbbf2659fe0bf2a8d31f859a6d88f
+    def: 56deac2301e48d9e
+reason: done
 ---
 
 # Ask
@@ -37,8 +44,9 @@ Without it, a broken dump or a projection reading the wrong file passes the chec
 ## change
 
 <!-- what you change, and what surprises you -->
-
 <!-- the form is text -->
+
+src/quack/dump_test.go gains TestQuackDumpWritesWhatTheIndexAnswers: it serves a temp tree, runs dumps, and reads the file it lands against the index answer. src/quack/codec_test.go fails a projection reading no file, and seeds the plan, the hold and the local config from src/quack/testdata. TestABrokenFileFailsItsRoundTrip breaks each projection file and reads the round trip fail on it. Surprise one: the markdown codec writes any bytes back, so a break passes there, and the case holds that apart. Surprise two: the watch read .se/dump back into files/, so each dump of files/ carried the one before it. The dump now lands under .se/.dump/, a dot folder the watch stands off. Surprise three: the local config layer is a loaded projection too, and a bare box carries no file for it.
 
 # Discussion
 
