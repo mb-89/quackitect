@@ -27,8 +27,8 @@ type valueOut struct {
 }
 
 // [[spec/design_output/model#surfaces]]
-func (one *door) servesV1() (net.Listener, *http.Server, error) {
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
+func (one *door) servesV1(listens func(network, address string) (net.Listener, error)) (net.Listener, *http.Server, error) {
+	listen, err := listens("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, nil, err
 	}

@@ -154,6 +154,11 @@ func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Li
 
 // Answers the door beside its stop, so a case reads the steps the work loop runs. [[spec/design_output/model#a-lease]]
 func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
+	return opensOn(net.Listen, root, at, catalog, manage, starts...)
+}
+
+// The door's start over the listen it takes, so a case fails a port. [[spec/design_output/index#the-door-owns-the-database]]
+func opensOn(listens func(network, address string) (net.Listener, error), root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
 	beat := spanOf(root, "watchdog.beat", builtInBeat)
 	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
 	if faults := catalog.Check(); len(faults) > 0 {
@@ -167,10 +172,18 @@ func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) 
 	if err != nil {
 		return nil, nil, nil, err
 	}
+	// A start that fails stops every part it reached, newest first. [[spec/design_output/index#the-door-owns-the-database]]
+	undo := []func(){func() { db.Close() }}
+	failed := func(err error) (*door, func(), net.Listener, error) {
+		for i := len(undo) - 1; i >= 0; i-- {
+			undo[i]()
+		}
+		return nil, nil, nil, err
+	}
 	// The door comes up on a sweep against the rows it finds, so a restart rewrites what moved while it stood down. [[spec/design_output/index#a-change-moves-its-rows]]
 	tracked := trackedIn(root)
 	if _, _, err := sweep(db, root, tracked); err != nil {
-		return nil, nil, nil, err
+		return failed(err)
 	}
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
@@ -187,21 +200,21 @@ func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) 
 		fmt.Fprintln(stderr, "the run of", name, "did not commit:", err)
 	})
 	one.drains = scheduler.Settle
+	undo = append(undo, scheduler.Stop)
 	managed, err := one.manages(manage)
 	if err != nil {
-		db.Close()
-		return nil, nil, nil, err
+		return failed(err)
 	}
+	undo = append(undo, managed)
 	stops, err := one.starts(starts)
 	if err != nil {
-		managed()
-		db.Close()
-		return nil, nil, nil, err
+		return failed(err)
 	}
+	undo = append(undo, stops...)
 	stops = append(stops, managed)
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
+	listen, err := listens("tcp", "127.0.0.1:0")
 	if err != nil {
-		return nil, nil, nil, err
+		return failed(err)
 	}
 
 	mux := http.NewServeMux()
@@ -212,12 +225,11 @@ func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) 
 	go one.guards()
 	beats := one.beats(beat)
 	go server.Serve(listen)
+	undo = append(undo, func() { server.Close() }, beats)
 	// The old API keeps its port, and /v1 stands on a port of its own. [[spec/design_output/model#surfaces]]
-	v1, served, err := one.servesV1()
+	v1, served, err := one.servesV1(listens)
 	if err != nil {
-		server.Close()
-		db.Close()
-		return nil, nil, nil, err
+		return failed(err)
 	}
 	one.v1 = v1
 
