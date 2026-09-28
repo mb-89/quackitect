@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: e8fb0f5840caed496aabed6c764cadcc528f2384
+    hash_after: e8fb0f5840caed496aabed6c764cadcc528f2384
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/work passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/replayed-red-leaf-reads-green.md:18:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 6e37467f93b35ec7
+        size: 676
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -308,26 +331,33 @@ every fact the change adds stands in one place: the cloud place and the row word
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work module stands in src/modules/work with two out-ports. rows answers one row a ticket, in the shape the work tab reads today, with its place, its flags and the cloud mark, and one row a placed todo no ticket carries. open-tasks counts every placed row off the cloud, the count the tab header and the sidebar button read off the verb today. The wiring loads the work instance over tickets/all, the queue places and tickets/cloud, with no git. The wired case in src/quack/main_test.go runs a fake tree of tickets through tickets, the queue and work, and reads work/open-tasks, which answers both gate points. The question ticket takes a five-word name the check demands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the work package, the wiring, the root table and its wired case
+every door the change reaches has a fake: the module reaches no door, and its cases run on the fake index
+a comment names the approach the change implements: every file and function links the ticket or the note section it ports
+every fact the change adds stands in one place: the cloud place and the row words are spelled once in the work package, each naming the file that owns it
 
 # accept
 
