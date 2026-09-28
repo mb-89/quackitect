@@ -9,8 +9,7 @@ import (
 // [[spec/tickets/a-watch-stops-mid-add]]
 func TestFoldersAppearUntilQuitAndAQuickStopPasses(t *testing.T) {
 	root := t.TempDir()
-	quit := make(chan struct{})
-	Appearing(root, quit)
+	stop := Appearing(root)
 	deadline := time.Now().Add(Hung)
 	for {
 		entries, err := os.ReadDir(root)
@@ -22,5 +21,5 @@ func TestFoldersAppearUntilQuitAndAQuickStopPasses(t *testing.T) {
 		}
 		time.Sleep(time.Millisecond)
 	}
-	Returns(t, func() error { close(quit); return nil })
+	Returns(t, func() error { stop(); return nil })
 }

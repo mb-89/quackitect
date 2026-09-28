@@ -141,10 +141,9 @@ func TestAStopReturnsOverTheRealWatch(t *testing.T) {
 		if err := eyes.Add(root); err != nil {
 			t.Fatal(err)
 		}
-		quit := make(chan struct{})
-		watchertest.Appearing(root, quit)
+		stop := watchertest.Appearing(root)
 		time.Sleep(5 * time.Millisecond)
 		watchertest.Returns(t, eyes.Close)
-		close(quit)
+		stop()
 	}
 }
