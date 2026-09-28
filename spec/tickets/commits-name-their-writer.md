@@ -244,7 +244,7 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 
 - `go test ./...` from the root passes
 - a case commits a name as another instance, and reads the refusal
-- `q.Given` and `q.GivenIn` stand nowhere under `src`, which `grep -rn GivenIn src` shows
+- `q.Given` and `q.GivenIn` stand nowhere under `src`, which `grep -rn --include=*.go GivenIn src` shows
 - `./RUNME.sh check` exits 0
 
 # design
