@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -34,7 +34,7 @@ steps:
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 step: do
-todo: true
+todo: false
 record:
   - step: answer
     hand: box 1327ac97a972 · claude-code-remote
@@ -51,6 +51,23 @@ record:
         hash: 44f47196af76f1b4
         size: 9242
     def: 2280015d497a3abd
+  - step: do
+    hand: box 1327ac97a972 · claude-code-remote
+    hash_before: 5512510e2582b7488d4e8baa071eeee7a916835a
+    hash_after: 5512510e2582b7488d4e8baa071eeee7a916835a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: b282942251a8ef42
+        size: 275
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -82,26 +99,32 @@ The owner reports the three repo secrets set on mb-89/quackitect. ROUTINE_FIRE_U
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer changes no code here. The owner set the secrets on GitHub, and an-action-fires-the-workers reads them and opens its pull requests on PULL_TOKEN.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the answer asks for no change on this ticket, and an-action-fires-the-workers carries it out
+the answer reveals no cleanup
+the answer adds no fact beyond the secret names, which an-action-fires-the-workers holds
 
 # Discussion
 
