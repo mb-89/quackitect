@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -195,6 +195,18 @@ record:
         hash: f25b09877886653d
         size: 6541
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-9
+    hash_before: cbde4b69ab772d2d1ded17baa221eb1f3f973414
+    hash_after: cbde4b69ab772d2d1ded17baa221eb1f3f973414
+    inputs:
+      - name: design/draft
+        hash: f25b09877886653d
+        size: 6541
+      - name: design/tests-red
+        hash: 19d6902ff3d8808d
+        size: 803
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -392,12 +404,8 @@ the cases run over the fake index and an op table in memory, and reach no door
 <!-- the form is verdict -->
 
 accept with points
-- manager-waits-on-tickets-module: depends_on omits tickets-becomes-a-module, though the approach takes its topic.go as the base, and both edit src/index/topic.go, src/index/topic_test.go and src/quack/main.go
-- topic-test-loses-both-halves: once both land, TestTheTopicsCommitThroughTheirOwnWriters keeps neither its tickets half nor its ops half, so the implement step drops it or points it at a topic that stands
-- qtest-hands-a-store: the manager cases run over q.NewStore as the clock cases do, since qtest.Index keeps its store unexported, and the ask's qtest line waits on qtest handing an IO module its store
-- index-writes-past-health: the ask names index/ as a registered output, and the approach writes index/health alone
-- draft-test-list-drifts: the draft names the root cases in src/quack/main_test.go and TestAnOperationPastItsWindowLeavesTheStore in manager_test.go, while the red cases stand in src/quack/manager_test.go and no red file holds the window case
-- tick-expiry-takes-a-case: the tick calls Expire, which nothing calls today, so the change adds behaviour past the move and needs a case of its own
+- draft-names-the-qtest-store: the draft still assumes the manager cases run over q.NewStore and departs from the qtest line, and its size omits src/q/qtest/qtest.go and qtest_test.go, which the new red cases make the build touch: Index.Store answers one.store
+- qtest-shares-a-red-package: src/q/qtest holds the red wave_test.go of one-wave-settles-a-change beside this ticket's qtest_test.go, so go test ./... and the check wait on that ticket, which depends_on leaves out
 
 # implement
 
