@@ -118,11 +118,23 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-manager-becomes-a-module, ports-declare-their-looks]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 23d8976c0f7d607851a160dca7f0f67f67757e5b
+    hash_after: 23d8976c0f7d607851a160dca7f0f67f67757e5b
+    inputs:
+      - name: ask
+        hash: 3c601a7e92ad3657
+        size: 656
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -159,38 +171,78 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One, q gains two methods on Store in src/q/store.go: Names() lists each group name in catalog order.
+Presentation(name) answers the active owner's Presentation, the way Catalog.Presentation does.
+Two, Registers gives three more names with q.Doc and q.Looks(q.Rows): index/names, index/actions and index/docs.
+Each takes an empty slice as its default, since Check refuses a nil default.
+Three, a new file src/modules/index/catalog.go holds three row types: NameRow, ActionRow and DocRow.
+NameRow holds name, provider (q.Provider off Store.Why), state (Why.State) and value, the value only for a name that is not a family pattern.
+ActionRow holds each name whose provider kind is action, with its doc and its fields. An action keeps its input fields and no input type, so the fields stand for the type.
+DocRow holds every name with its doc, and a kind of name, action or key.
+A key is a name under config/ or <instance>/config/.
+Four, begins commits all three after Restart, in one commit, since the catalog stays fixed once the store starts.
+Five, renews commits index/names again beside index/health on each step, so the state follows what providers answer.
+Weighed: a once-at-start commit of index/names, which leaves every state stale after the first provider commits.
+Weighed: an Outside.Catalog field, which widens index.Manage and main.go for a list the store already holds.
+Weighed: a Doc field on Why, which changes the JSON of quack why for a need of the manager alone.
+The cost is a rewrite of index/names on every step, which already commits index/health.
+Assumed: the row keeps a state word off Why, and answered reads as that state.
+Assumed: index/names lists registered names and family patterns, and no concrete key under a family.
+Assumed: the new code imports q and sort alone, so the onlyq import rule holds.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/store.go: Store, gains Names and Presentation
+src/modules/index/manager.go: Registers, registers index/names, index/actions and index/docs
+src/modules/index/manager.go: begins, commits the three catalog rows after Restart
+src/modules/index/manager.go: renews, commits index/names beside index/health
+src/modules/index/catalog.go: namesOf, actionsOf, docsOf, new builders over the store
+src/quack/main.go: main, calls Registers(q.Main) with no change
+src/quack/main.go: manages, calls Start with no change
+src/index/ops.go: the manage call, with no change
+src/modules/index/manager_test.go: manager and TestTheManagerRunsOverTheFakeIndex, call Registers with no change
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/index/manager_test.go: TestIndexNamesNameEachNameItsProviderAndState
+src/modules/index/manager_test.go: TestIndexActionsNameEachActionWithItsDocAndFields
+src/modules/index/manager_test.go: TestIndexDocsNameEachNameActionAndKeyWithItsDoc
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/store.go
+src/q/store_test.go
+src/modules/index/manager.go
+src/modules/index/catalog.go
+src/modules/index/manager_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened manager.go, manager_test.go, looks.go, q.go, store.go, why.go, qtest.go, action.go, check.go, wiring.go, imports.go, src/quack/main.go and the model on the topics and the registry tabs, and checked each claim there
+the callers list comes off greps for Registers, Start, Outside, the modules/index import, NewStore, Presentation and Why, and a grep showing no Store or Catalog listing method exists
+each test starts the manager over qtest.New with an action carrying doc-tagged fields and a config key, and reads one row topic, one test a done_when line, and the check decides the last
 
 ## tests-red
 
