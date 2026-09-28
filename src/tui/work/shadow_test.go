@@ -94,3 +94,28 @@ func TestTheOldSliceAsksNothing(t *testing.T) {
 		t.Fatalf("the old slice writes %v", rows)
 	}
 }
+
+// PlacesAt hands the shadow the count the tab draws. [[spec/tickets/places-at-runs-the-shadow]]
+func TestPlacesAtHandsTheShadowTheCountTheTabDraws(t *testing.T) {
+	root := sliced(t, "shadow", 5)
+	was := runPlaces
+	t.Cleanup(func() { runPlaces = was })
+	runPlaces = func(string) ([]byte, error) {
+		return []byte(`{"loose":[{"name":"free","queue":"1"},{"name":"other","queue":"2"}]}`), nil
+	}
+	places, err := PlacesAt(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rows := rowsIn(t, root)
+	if places.Takeable != 2 || len(rows) != 1 || rows[0]["old"] != 2.0 || rows[0]["new"] != 5.0 {
+		t.Fatalf("the tab draws %d, and the shadow writes %v", places.Takeable, rows)
+	}
+}
+
+// A door standing nowhere answers no count, and the ask starts none. [[spec/tickets/places-at-runs-the-shadow]]
+func TestTheAskAnswersNothingWhereNoDoorStands(t *testing.T) {
+	if count, answered := askOpenTasks(t.TempDir()); answered {
+		t.Fatalf("the ask answers %d where no door stands", count)
+	}
+}
