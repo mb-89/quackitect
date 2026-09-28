@@ -42,12 +42,15 @@ type Outside struct {
 	Every func(span time.Duration, hand func(time.Time)) (stop func())
 }
 
-// The manager writes ops/<id>, session/alarms and index/health, and carries q.IO(), since it starts and ends processes. [[spec/design_output/model#the-index-manager]]
+// The manager writes ops/<id>, session/alarms, index/health and the catalog rows, and carries q.IO(), since it starts and ends processes. [[spec/design_output/model#the-index-manager]]
 func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
 		q.OutIn(c, "ops/<id>", Op{}, q.Doc("the handle of a longer action, its state and its result"), q.IO()),
 		q.OutIn(c, AlarmsName, []Alarm{}, q.Doc("the alarms standing, one row a part")),
 		q.OutIn(c, HealthName, Lease{}, q.Doc("the index's own lease: its part, its last renewal and its term")),
+		q.OutIn(c, NamesName, []NameRow{}, q.Doc("each name, its provider and its state"), q.Looks(q.Rows)),
+		q.OutIn(c, ActionsName, []ActionRow{}, q.Doc("each action, its doc and its input fields"), q.Looks(q.Rows)),
+		q.OutIn(c, DocsName, []DocRow{}, q.Doc("each name, action and key, with its doc"), q.Looks(q.Rows)),
 	)
 }
 
@@ -79,6 +82,9 @@ func begins(from Outside) (*managed, error) {
 	if err := book.Restart(); err != nil {
 		return nil, err
 	}
+	// The catalog stays fixed once the store starts, so its rows commit once. [[spec/tickets/the-catalog-reads-as-rows]]
+	names, actions, docs := catalogOf(from.Store)
+	one.commits(map[string]any{NamesName: names, ActionsName: actions, DocsName: docs})
 	one.dog.Hold(leasePart, spanOf(from.Root, "watchdog.lease", builtInLease))
 	from.Steps(one.renews)
 	one.stop = from.Every(spanOf(from.Root, "watchdog.beat", builtInBeat), one.ticks)
@@ -104,6 +110,9 @@ func (one *managed) renews() {
 	if lease, held := one.dog.Lease(leasePart); held {
 		one.commits(map[string]any{HealthName: lease})
 	}
+	// The names read the states after the health commit, so index/health reads answered. [[spec/tickets/the-catalog-reads-as-rows]]
+	names, _, _ := catalogOf(one.from.Store)
+	one.commits(map[string]any{NamesName: names})
 }
 
 // A tick off the loop checks the leases, fails each operation past its deadline, and drops each one past its window from the store. [[spec/design_output/model#deadlines]]

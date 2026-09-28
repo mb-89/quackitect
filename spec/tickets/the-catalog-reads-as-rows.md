@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-manager-becomes-a-module, ports-declare-their-looks]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -188,6 +188,15 @@ record:
         hash: 1998e0e2d5b122f0
         size: 696
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 77c0d8dcfc628bd35497a6ecf53c2b8c560184bd
+    hash_after: 77c0d8dcfc628bd35497a6ecf53c2b8c560184bd
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -354,14 +363,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    go vet ./src/...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change stays inside the draft's size list: the store's two methods sit in looks.go beside the catalog's own Presentation, so one function builds a presentation for both.
+The manager's cases run over the fake index and an op table in memory, and reach no door.
+The comments on the rows, the start's commit and the step's commit name the approach, with links to this ticket and the topics in the model.
+The gate's two fixes land: renews commits index/health first and builds the names after it, and no row under index/ carries a value, so index/names nests nothing.
 
 ## tests-green
 

@@ -350,3 +350,17 @@ func TestIndexDocsNameEachNameActionAndKeyWithItsDoc(t *testing.T) {
 		}
 	}
 }
+
+// A row under index/ carries no value, so index/names holds no copy of itself however many steps run. [[spec/tickets/the-catalog-reads-as-rows]]
+func TestIndexNamesNestsNoListOfItself(t *testing.T) {
+	var as q.Writer
+	ix := qtest.New(t, func(c *q.Catalog) { as = Registers(c) })
+	l := &loop{now: time.Unix(1000, 0).UTC()}
+	starts(t, l.outside(t, ix.Store(), as, rowsOf(map[string]string{})))
+	l.step(t)
+	l.step(t)
+	row := rowNamed(t, NamesName, rowsRead(t, ix.Read(NamesName)), NamesName)
+	if _, held := row["value"]; held {
+		t.Fatalf("index/names carries a value of itself after two steps: %v", row["value"])
+	}
+}

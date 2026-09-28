@@ -77,10 +77,32 @@ func Answers[Out any]() Option {
 func (c *Catalog) Presentation(name string) (Presentation, bool) {
 	for _, one := range c.all() {
 		if one.name == name {
-			return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Looks: one.looks, Fields: one.fields, Out: one.out}, true
+			return one.presentation(), true
 		}
 	}
 	return Presentation{}, false
+}
+
+func (one *registration) presentation() Presentation {
+	return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Looks: one.looks, Fields: one.fields, Out: one.out}
+}
+
+// The presentation of the name's active owner, which the catalog rows read. [[spec/tickets/the-catalog-reads-as-rows]]
+func (s *Store) Presentation(name string) (Presentation, bool) {
+	one := s.owner(name)
+	if one == nil {
+		return Presentation{}, false
+	}
+	return one.presentation(), true
+}
+
+// Every name the catalog holds, a family by its pattern, in catalog order. [[spec/tickets/the-catalog-reads-as-rows]]
+func (s *Store) Names() []string {
+	out := make([]string, 0, len(s.groups))
+	for _, group := range s.groups {
+		out = append(out, group.name)
+	}
+	return out
 }
 
 // A fault for each registration with no doc, and each action field, input or output, with no doc tag. [[spec/design_output/model#a-module-is-one-file]]

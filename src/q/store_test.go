@@ -277,3 +277,20 @@ func TestAGuardedFoldRefusesAndKeepsItsState(t *testing.T) {
 		t.Fatalf("t/held reads %v after the refusal", got)
 	}
 }
+
+// The store lists each name in catalog order, a family by its pattern, and hands the presentation of its active owner. [[spec/tickets/the-catalog-reads-as-rows]]
+func TestAStoreNamesEachNameAndItsPresentation(t *testing.T) {
+	c := New()
+	OutIn(c, "t/n", 0, Doc("a count"), Label("Count"))
+	OutIn(c, "t/items/<id>", 0, Doc("an item"))
+	s := NewStore(c)
+	if got := s.Names(); len(got) != 2 || got[0] != "t/n" || got[1] != "t/items/<id>" {
+		t.Fatalf("the store names %v", got)
+	}
+	if said, ok := s.Presentation("t/n"); !ok || said.Doc != "a count" || said.Label != "Count" {
+		t.Fatalf("t/n presents %+v, %v", said, ok)
+	}
+	if _, ok := s.Presentation("t/none"); ok {
+		t.Fatal("a name nobody provides presents itself")
+	}
+}
