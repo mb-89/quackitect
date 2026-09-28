@@ -10,6 +10,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/shadow"
 )
 
 // A root whose default file sets the slice, and the index count a fake answers. [[spec/tickets/open-tasks-run-in-shadow]]
@@ -20,7 +22,7 @@ func sliced(t *testing.T, mode string, count int) string {
 	if err := os.MkdirAll(config, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	text := `{"migration": {"opentasks": "` + mode + `"}}`
+	text := `{"migration": {"` + openTasksKey + `": "` + mode + `"}}`
 	if err := os.WriteFile(filepath.Join(config, "level0.json"), []byte(text), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +39,7 @@ func sliced(t *testing.T, mode string, count int) string {
 
 func rowsIn(t *testing.T, root string) []map[string]any {
 	t.Helper()
-	text, err := os.ReadFile(filepath.Join(root, ".se", ".log", "session.jsonl"))
+	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(shadow.LogAt)))
 	if os.IsNotExist(err) {
 		return nil
 	}
