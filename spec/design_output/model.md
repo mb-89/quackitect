@@ -463,17 +463,17 @@ module that accepts it, the verb, the arguments and its undo:
 A hand-back writes, stages, commits and runs the check, and `then` reads the
 check's answer before the push.
 
-The index runs the requests. The module's action answers the list as its
-commit, and the index sends each request, in order, to the IO module that
-accepts it. It holds the writer queue of
-[[spec/design_output/model#one-writer-per-tree]]. A module names a request,
-and reaches no IO module itself.
+The index runs the requests:
 
-A request that fails stops the list. The index runs the undo of every request
-before it, newest first, and the action fails with the reason.
-
-The caller receives the answer of the last request. `q.Answers` declares its
-type, and its fields carry `label` and `doc` tags, as an input's fields do.
+- The module's action answers the list as its commit, and the index sends each
+  request, in order, to the IO module that accepts it. It holds the writer
+  queue of [[spec/design_output/model#one-writer-per-tree]]. A module names a
+  request, and reaches no IO module itself.
+- A request that fails stops the list. The index runs the undo of every
+  request before it, newest first, and the action fails with the reason.
+- The caller receives the answer of the last request. `q.Answers` declares
+  its type, and its fields carry `label` and `doc` tags, as an input's fields
+  do.
 
 ## The index resolves in passes
 
