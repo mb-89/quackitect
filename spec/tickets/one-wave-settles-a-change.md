@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -194,6 +194,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 2f3b33427bc16a8c82cdff7cd6ad3cba16204fe5
+    hash_after: 2f3b33427bc16a8c82cdff7cd6ad3cba16204fe5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/q/qtest passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-meets-fake-modules.md:306:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: e03fc55117ad3930
+        size: 792
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -376,26 +399,39 @@ The gate's second point holds: Settle and Stop stand, and the door calls them as
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/q/scheduler_test.go src/q/qtest/wave_test.go src/q/qtest/qtest_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The scheduler settles each change as one wave.
+At start each derived provider takes a height, one past the highest among the owners of its inputs. An owner's run list is built on its first move and kept after.
+A commit from outside names the values whose JSON form moves, so an equal commit starts nothing. A commit during a wave joins the next one.
+A wave runs lowest height first, over the snapshot it started from plus the values it settles. A provider whose inputs all stand still clears. The wave commits quietly and pushes once.
+An unwatched provider with no watched provider below it stays pending, and Scheduler.Read runs its pending upstream and then it. Why names such a value pending since r, with the revision.
+The fake index builds a scheduler whose spawn runs in place, so a seed settles its wave before it answers. The suite's commits case reads the seed and the wave.
+go test over the root still shows the red cases of the config, catalog and fake-module tickets, whose red lists hold their files.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change stays inside the draft's size list and the gate's added suite.go, plus one case in qtest_test.go for the fake's own wave.
+Everything stands in memory, and no door takes part.
+The comments link the wave chapter of the model.
+The wave's rules stand once, in that chapter, and the code points at it.
 
 # accept
 
