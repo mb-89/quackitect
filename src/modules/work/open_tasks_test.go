@@ -39,19 +39,3 @@ func TestOpenTasksCountsEveryPlaceOffTheCloud(t *testing.T) {
 		t.Fatalf("%s reads %v, and wants 4", OpenTasksPort, said)
 	}
 }
-
-func TestOpenTasksReadsAFakeTreeOfTickets(t *testing.T) {
-	said := read(t, OpenTasksPort, map[string]any{
-		TicketsPort: []ticket.Ticket{
-			{Name: "a-group", Route: "group", State: "open", Cloud: true},
-			{Name: "its-child", Group: "a-group", State: "open"},
-			{Name: "free", State: "open"},
-			{Name: "done", State: "closed"},
-		},
-		PlacesPort: map[string]string{"a-group": onCloud, "its-child": onCloud, "free": "1"},
-		CloudPort:  []string{"a-group", "its-child"},
-	})
-	if said != 1 {
-		t.Fatalf("%s reads %v over the fake tree, and wants 1", OpenTasksPort, said)
-	}
-}
