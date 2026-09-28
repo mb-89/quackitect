@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -146,6 +146,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: 3aa34d266202f653665ce27f8cbb0e84aff131b7
+    hash_after: 3aa34d266202f653665ce27f8cbb0e84aff131b7
+    inputs:
+      - name: retro/write
+        hash: 15933d3d3a3b1c25
+        size: 2798
+      - name: [[spec/tickets/a-watch-stops-mid-add]]
+        hash: 2d2faad79d1fbca1
+        size: 15460
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -283,20 +296,29 @@ the chapter names roles alone, and no path or address of the box
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+23:20 the proxy refused www.google.com during the check, and nothing in the run waited on it
+no Windows box, so the Windows hang shows through the fake alone until CI runs the job
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the trunk guard: branch open pushes main, so the box branched by the dispatcher road instead
+the one-writer hook at 23:19, after the restart dropped box.json
+the tested-delta hook, twice, until the test files stood named beside the code
+the sync took main in with no conflict
+ExtensionsOnOffer failed on this box alone, off a stale se-lsp binary
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step parked, and no ticket minted outside the group
+the owner-read step of the child stood skipped, since the ask came off no handover
 
 # Discussion
 
