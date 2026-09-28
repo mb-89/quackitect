@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -346,6 +346,18 @@ record:
         hash: 805f822e49c509fa
         size: 3263
     def: 897ac034247c0bca
+  - step: gate
+    hand: box d7e3869061cf · claude-code-remote · helper-19
+    hash_before: 9c98183a76dbedad8afe23c28c4f406183216b26
+    hash_after: 9c98183a76dbedad8afe23c28c4f406183216b26
+    inputs:
+      - name: design/draft
+        hash: 805f822e49c509fa
+        size: 3263
+      - name: design/tests-red
+        hash: 19860dd76f5ba711
+        size: 589
+    def: dc4904ab364efa10
 group: the-cloud-works-its-queue
 ---
 
@@ -555,12 +567,9 @@ the boot cases reach the disk and the process through fakeDisk and fakeProc alon
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- The install writes the plugin manifest, which git ignores, and the client scans plugins as a session starts. So the session running the first install holds no level zero, and the draft names no road for it. A probe on a fresh clone decides the order.
-- The draft says the client reads the trust before any hook runs, and neither a probe nor a note line backs it. Name the probe, and whether an untrusted project runs a project SessionStart hook at all.
-- The stamp holds the install hash and HEAD, and the cases hold the install hash alone. HEAD in the stamp runs the install again after every commit, against the ask's line on returning at once. Drop HEAD, or add the case holding it.
-- No case holds a matching stamp with a tool gone, as node_modules, running the install.
-- The draft picks node because sh stands on no Windows desk, then runs sh from boots. RUNME.ps1 runs RUNME.sh through the sh Git ships, so name that road in boots, or what the hook does on win32.
+accept with points
+- boot-probes-an-untrusted-clone: the draft drops the trust claim, and leaves open the question the earlier gate asked: whether a clone carrying no trust runs a project SessionStart hook at all. The ask says this ticket finds whether a cloud session still needs the trust flag and the mode. Name the probe on a fresh clone in the level zero note, beside the probe that retires the install line.
+- boot-and-bridgehead-install-once: where the manifest stands and node_modules stands nowhere, both boots and the bridgehead START road run src/scripts/install.sh on the same session start. Name which one runs, or a guard keeping the second from running over the first.
 
 # implement
 
