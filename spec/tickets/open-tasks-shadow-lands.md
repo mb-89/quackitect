@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/write
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2shadow
@@ -143,6 +143,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 660bb4d071b9 · claude-code-remote
+    hash_before: fbbb0760edcc69509c777a023593fcc41566271c
+    hash_after: fbbb0760edcc69509c777a023593fcc41566271c
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -222,38 +234,56 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+the queue stands as a module under src/modules/queue, with its golden
+work/open-tasks stands as a module, wired in spec/wiring.yaml
+the shadow compares the new open tasks with the old count, and logs each mismatch
+the migration module declares the openTasks slice key
+eight child tickets close through their commands
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the golden file pins the queue's output, so the module move shows no drift
+small child tickets let one box close eight of them in an evening
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+two boxes stopped mid-group, and a dead box's hold locked the branch
+a plain push refreshed the dead hold, so the branch stayed locked for another half hour
+one test in test/contract/cli-mint.test.js failed once in a full run, then passed alone and on the rerun
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+a stale hold moves only by a take, which the fix on claude/a-stale-hold-moves-by-a-take lands
+the flaky mint test gets a look before it fails a landing
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The shadow log holds no mismatch yet, since nothing has run the new path against real traffic. The switch group reads it before it flips phase 2.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the retro adds no fact, and points at the tickets and files that hold them
+the retro adds no number beyond the count of children
+the retro writes no file header
+the owner prompted nothing on this run, and the one error is the refused push the retro names
+the retro names roles and boxes, and carries no path of the box
 
 ## cloud
 
