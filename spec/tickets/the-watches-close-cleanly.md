@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box d81eeae76310c · claude-code-remote
@@ -109,6 +109,22 @@ record:
     hand: the engine
     hash_before: dcfa4cac7c0966b2fc1bed5c672bda5a5acfc1aa
     hash_after: dcfa4cac7c0966b2fc1bed5c672bda5a5acfc1aa
+  - step: accept
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: e2a79e7833be24aa39b51b7de053b3f21e8fce5e
+    hash_after: 13ef50e4b2e713141f198b34a7cc1e2bbc41c608
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-watches-close-cleanly already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: e8f36ade961e44bb
+        size: 356
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -155,8 +171,13 @@ the group holds one child, so nothing waits on another
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- both watches stand on src/watcher, whose Add and Close share a lock and a closed flag, and whose drain keeps the reader off a blocked send
+- the fake with the Windows timing ran red on the old loop and runs green now, and each watch carries a stop test, green under -race
+- the accept read found the folder helper racing the temp folder cleanup, and the commit before this verdict fixes it in the diff
+- the check answers green on the tip
 
 # retro
 
