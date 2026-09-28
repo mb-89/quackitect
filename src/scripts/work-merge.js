@@ -128,7 +128,14 @@ export function merge(it, name, argv) {
 
   const was = it.git.run(["rev-parse", "HEAD"], true).out;
   if (!it.git.run(["merge", "--no-ff", "--no-edit", `origin/${branch}`]).ok) {
+    // The resolving commit takes the branch out of the cloud as the clean merge does, so it carries the dropped marker. [[spec/tickets/conflicts-drop-the-marker]]
+    const held = conflicted(it, ticketAt(name));
+    if (!held) marks(it, name, false);
     console.error(`${branch} conflicts. Resolve it, commit, then run branch close.`);
+    if (held)
+      console.error(
+        `Drop ${CLOUD_MARK}: true from ${ticketAt(name)} as you resolve it.`,
+      );
     return 1;
   }
 
@@ -162,6 +169,14 @@ export function merge(it, name, argv) {
   if (close(it, name, []))
     console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
   return 0;
+}
+
+// A staged write of a conflicted file marks it resolved, so the marker waits for the person's resolution there. [[spec/tickets/conflicts-drop-the-marker]]
+function conflicted(it, at) {
+  return it.git
+    .run(["diff", "--name-only", "--diff-filter=U"], true)
+    .out.split("\n")
+    .includes(at);
 }
 
 // The number of the pull request whose head stands at the branch tip, or nothing. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
