@@ -20,6 +20,7 @@ import {
   FIX_NAME,
   FROM,
   forPerson,
+  forPersonRoute,
   gitRows,
   HOUR,
   held,
@@ -75,15 +76,20 @@ test("a hold past work.staleAfter reads ready, and a fresh hold reads held", () 
   assert.deepEqual(names(plan.held), ["worked"]);
 });
 
-test("the loose agent tickets stand in the bundle, and a ticket for a person under the questions alone", () => {
+// A box answers a question like any open work, and the person route alone waits for the owner. [[spec/tickets/the-dispatch-opens-no-issues]]
+test("a loose question joins the bundle beside the agent tickets, and the person route stands under the person part alone", () => {
   const { it } = planned([], {
     "a-loose-one": loose,
     "a-closed-one": CHILD("", "closed").replace("group: \n", ""),
     "a-question": forPerson,
+    "a-trial": forPersonRoute,
   });
   const plan = planOf(it);
-  assert.deepEqual(plan.bundles, [{ parent: "", tickets: ["a-loose-one"] }]);
-  assert.deepEqual(plan.questions, [{ ticket: "a-question", group: "" }]);
+  assert.deepEqual(plan.bundles, [
+    { parent: "", tickets: ["a-loose-one", "a-question"] },
+  ]);
+  assert.deepEqual(plan.person, [{ ticket: "a-trial", group: "" }]);
+  assert.equal(plan.questions, undefined, "the plan names no questions part");
 });
 
 test("a group at done whose branch stands behind origin/main reads as a stuck hand-over", () => {
@@ -207,7 +213,7 @@ test("a child reads off its own group's branch, and another branch's older copy 
   );
   it.clock = fakeClock(FROM);
   it.stale = "12h";
-  assert.deepEqual(planOf(it).questions, []);
+  assert.deepEqual(planOf(it).person, []);
 });
 
 test("the run writes one fix group carrying fix: true, holding the loose agent tickets", () => {
@@ -284,17 +290,18 @@ test("a merged claude/dispatch branch stops nothing", () => {
   assert.equal(commits(outside).length, 1);
 });
 
-test("the run leaves a ticket for a person loose, and names it under the questions", () => {
-  const { it, disk } = writing({ "a-loose-one": loose, "a-question": forPerson });
+// [[spec/tickets/the-dispatch-opens-no-issues]]
+test("the run leaves a ticket on the person route loose, and names it under the person part", () => {
+  const { it, disk } = writing({ "a-loose-one": loose, "a-trial": forPersonRoute });
   const said = heard(() => dispatch(ROOT, ["--json"], it));
   assert.equal(said.code, 0);
   assert.equal(
-    disk.exists(`${WORKTREE}/spec/tickets/a-question.md`),
+    disk.exists(`${WORKTREE}/spec/tickets/a-trial.md`),
     false,
-    "the question stays as main holds it",
+    "the trial stays as main holds it",
   );
   const plan = JSON.parse(said.said);
-  assert.deepEqual(plan.questions, [{ ticket: "a-question", group: "" }]);
+  assert.deepEqual(plan.person, [{ ticket: "a-trial", group: "" }]);
 });
 
 test("the run opens work/<name> for a ready group on main with no branch, and leaves a group with a branch alone", () => {

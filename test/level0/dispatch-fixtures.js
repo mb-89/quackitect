@@ -34,6 +34,29 @@ export const done = withField(
   fakeFront(),
 );
 export const loose = CHILD("", "open").replace("group: \n", "");
+// Work a person alone can do, which the dispatch leaves loose for the owner. [[spec/processes/person.yaml]]
+export const forPersonRoute = `---
+kind: [[ticket]]
+state: open
+step: do
+process: [[spec/processes/person]]
+steps:
+  - name: do
+    does: runs the trial on the owner's machine
+    by: person
+---
+
+# Ask
+
+A trial on the owner's machine.
+
+# do
+
+# Discussion
+
+Nothing yet.
+`;
+
 export const forPerson = `---
 kind: [[ticket]]
 state: open
