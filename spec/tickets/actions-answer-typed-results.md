@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -176,6 +176,15 @@ record:
         hash: 56d43ffa2ce49861
         size: 501
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: c236be70b2a13db9f1ad19a36b5125f24c0d3e7e
+    hash_after: c236be70b2a13db9f1ad19a36b5125f24c0d3e7e
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -328,14 +337,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the four files the draft's size list names, and no other.
+The cases run over a catalog and a wiring in memory, and reach no door.
+The comment on q.Answers names what it declares, and points at the model's options, as the gate asks.
+The model states the caller's answer once, at an action lists requests, and the options table carries the one row for q.Answers.
 
 ## tests-green
 

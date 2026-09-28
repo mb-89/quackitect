@@ -52,6 +52,15 @@ func TestAnActionOutputCarriesItsLabelAndDoc(t *testing.T) {
 	}
 }
 
+// An action that declares no answer presents no output, and its start meets no output fault. [[spec/design_output/model#the-options]]
+func TestAnActionWithNoDeclaredAnswerPresentsNoOutput(t *testing.T) {
+	c := New()
+	ActionIn(c, "pull", func(pullIn) []Request { return nil }, Doc("pulls a ticket"))
+	if got, _ := c.Presentation("pull"); got.Out != nil {
+		t.Fatalf("pull presents the output %+v with no q.Answers", got.Out)
+	}
+}
+
 func TestTheStartRefusesAnOutputFieldWithNoDocTag(t *testing.T) {
 	types := map[string]func(*Catalog){"puller": func(c *Catalog) {
 		ActionIn(c, "pull", func(string) []Request { return nil }, Doc("pulls a ticket"), Answers[pulled]())

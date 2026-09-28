@@ -41,6 +41,7 @@ type registration struct {
 	icon     string
 	looks    Look
 	fields   []Field
+	out      []Field
 	deadline time.Duration
 	writes   bool
 	io       bool

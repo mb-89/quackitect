@@ -65,20 +65,22 @@ type Presentation struct {
 	Out    []Field
 }
 
-// The type an action's last request answers, which its caller receives. [[spec/tickets/actions-answer-typed-results]]
-func Answers[Out any]() Option { return func(one *registration) {} }
+// The type an action's last request answers, which its caller receives. [[spec/design_output/model#the-options]]
+func Answers[Out any]() Option {
+	return func(one *registration) { one.out = fieldsOf(typeOf[Out]()) }
+}
 
 // [[spec/design_output/model#the-options]]
 func (c *Catalog) Presentation(name string) (Presentation, bool) {
 	for _, one := range c.all() {
 		if one.name == name {
-			return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Looks: one.looks, Fields: one.fields}, true
+			return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Looks: one.looks, Fields: one.fields, Out: one.out}, true
 		}
 	}
 	return Presentation{}, false
 }
 
-// A fault for each registration with no doc, and each action field with no doc tag. [[spec/design_output/model#a-module-is-one-file]]
+// A fault for each registration with no doc, and each action field, input or output, with no doc tag. [[spec/design_output/model#a-module-is-one-file]]
 func (c *Catalog) Undescribed() []Fault {
 	var faults []Fault
 	for _, one := range c.all() {
@@ -88,6 +90,11 @@ func (c *Catalog) Undescribed() []Fault {
 		for _, field := range one.fields {
 			if field.Doc == "" {
 				faults = append(faults, Fault{Kind: NoDoc, Name: one.portName(), Where: []string{one.where}, Says: fmt.Sprintf("field %s carries no doc tag", field.Name)})
+			}
+		}
+		for _, field := range one.out {
+			if field.Doc == "" {
+				faults = append(faults, Fault{Kind: NoDoc, Name: one.portName(), Where: []string{one.where}, Says: fmt.Sprintf("output field %s carries no doc tag", field.Name)})
 			}
 		}
 	}

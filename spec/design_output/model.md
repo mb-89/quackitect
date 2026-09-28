@@ -472,6 +472,9 @@ and reaches no IO module itself.
 A request that fails stops the list. The index runs the undo of every request
 before it, newest first, and the action fails with the reason.
 
+The caller receives the answer of the last request. `q.Answers` declares its
+type, and its fields carry `label` and `doc` tags, as an input's fields do.
+
 ## The index resolves in passes
 
 Modules load in any order, so a wire names a port no instance registers yet.
@@ -1344,6 +1347,7 @@ A registration takes options beside its function:
 | `q.Icon` | a proposed icon, which a view uses or leaves out | the renderers |
 | `q.Looks` | the kind of value, such as `q.Count`, `q.Rows` or `q.State`, so a renderer knows how to draw it | the renderers |
 | `q.Deadline` | how long a run takes at most | the watchdog |
+| `q.Answers` | the type an action's caller receives, whose fields carry `label` and `doc` tags | every surface, as the action's output |
 | `q.Cfg` | a config key the module reads, with its type, built-in value and help | the config module, and every list of keys, per [[spec/design_output/model#config-comes-off-the-registrations]] |
 
 ## What each surface gets
