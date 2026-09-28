@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box d81eeae76310c · claude-code-remote
@@ -96,6 +96,15 @@ record:
         exit: 0
         said: work/the-watches-close-cleanly already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: c6e83026ceacad9af1743f4017bc4454643ce9e3
+    hash_after: c6e83026ceacad9af1743f4017bc4454643ce9e3
+    inputs:
+      - name: ask
+        hash: e8f36ade961e44bb
+        size: 356
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -120,14 +129,18 @@ Both Go file watches stop cleanly on every platform: a stop never hangs while th
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/a-watch-stops-mid-add]] standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the one child changes two watches and one shared package, small enough to review whole
+the child covers the whole goal: both watches, the race run, and the check
+the group holds one child, so nothing waits on another
 
 # children
 
