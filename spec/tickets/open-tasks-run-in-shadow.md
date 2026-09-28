@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-shadow-lands
 depends_on: ["open-tasks-come-from-work"]
+record:
+  - step: design/draft
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: ef65ffdb1c10e0a99d8637d57b8b2831ad47be1e
+    hash_after: ef65ffdb1c10e0a99d8637d57b8b2831ad47be1e
+    inputs:
+      - name: ask
+        hash: 81fa1b40004bfbb4
+        size: 377
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,48 @@ The owner judges the switch off these rows. Without them the go rests on hope.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A migration module, src/modules/migration/migration.go, declares the shared key slices/open-tasks, built-in old, and the wiring loads the instance migration, so the key stands as migration/config/slices/open-tasks. The catalog takes lowercase segments alone and refuses openTasks, so the key spells the slice open-tasks, the name its port carries. The default file spec/config/level0.json sets migration.slices.open-tasks to shadow, and the schema adds the slices block with the three values. The index answers a new method value, the settled value of one name, and index.AskAt asks the index standing over a root. PlacesAt in src/tui/work/workplaces.go answers the old count as it does today, and both the tab header and the sidebar count read it. Beside it, src/tui/work/shadow.go reads the key off the default file. Under shadow it asks the index for work/open-tasks, and where the index answers a number other than the old count, it appends a row of kind shadow to .se/.log/session.jsonl, naming the slice, the old count and the new one. Under old it asks nothing, under new it still answers the old count until the switch group moves the readers, and an index standing down writes no row, since no new count stands to compare.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/tui/work/workplaces.go: PlacesAt, which the tab and countSaid in src/tui/main.go call
+src/index/answers.go: answers, the method switch
+src/index/main.go: Ask, beside which AskAt stands
+src/quack/main.go: modules, the table the wiring loads types from
+spec/wiring.yaml: the instances
+spec/config/level0.json and spec/config/level0.schema.json: the migration block
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/tui/work/shadow_test.go: TestAShadowMismatchWritesAShadowRow
+src/tui/work/shadow_test.go: TestAMatchUnderShadowWritesNothing
+src/tui/work/shadow_test.go: TestTheOldSliceAsksNothing
+src/modules/migration/migration_test.go: TestTheSliceKeyReadsTheDefaultFile
+src/index/door_test.go: TestTheDoorAnswersTheValueOfAName
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file, function and verb the approach names stands opened, and each claim checked there: read PlacesAt, countSaid, the index answers switch and Ask, the config module filed and winning, log.js rowOf and the session log rows
+the callers list names every caller of what the approach changes: PlacesAt feeds the tab and the sidebar count, and the rest is new
+every done_when line names the test that decides it: TestAShadowMismatchWritesAShadowRow plants the mismatch, the hand runs ./RUNME.sh log --kind shadow over the row it writes, and the check closes at tests-green
 
 ## tests-red
 
