@@ -15,7 +15,7 @@ group: the-engine-fixes-its-faults
 
 # Ask
 
-A change to a ticket's draft after `implement/change` passes marks `tests-red` and the gate stale, and the replay asks the red cases to fail over code that already passes them. Two roads reach it:
+A change to a ticket's draft after `implement/change` passes marks `tests-red` and the gate stale. The replay then asks the red cases to fail over code that already passes them. Two roads reach it:
 
 - an edit to a design note the ask names, inside the implement leaf
 - the rename verb rewriting a moved path inside the draft's lists

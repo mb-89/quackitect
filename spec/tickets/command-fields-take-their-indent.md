@@ -15,7 +15,9 @@ group: the-engine-fixes-its-faults
 
 # Ask
 
-`carriedIn` in `.claude/skills/level0/lib/tested.js` reads a test off a command line indented four spaces. A hand-back passing a command field with no indent writes it bare, so the commit hook finds no carried test, and it refuses code whose test the ticket names.
+- `carriedIn` in `.claude/skills/level0/lib/tested.js` reads a test off a command line indented four spaces
+- a hand-back passing a command field with no indent writes it bare
+- the commit hook then finds no carried test, and refuses code whose test the ticket names
 
 The hand-back writes a command field in the indented form itself, whatever indent the hand passes.
 

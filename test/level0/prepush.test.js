@@ -14,6 +14,7 @@ import {
   namesIn,
   rangeOf,
   heldBy as readsHold,
+  heldAtTip,
   refsIn,
   staleBy,
 } from "../../src/scripts/prepush.js";
@@ -122,9 +123,10 @@ test("the holding box pushes its own branch", () => {
   assert.deepEqual(said, { code: 0, said: "" });
 });
 
-// [[spec/tickets/stale-hold-frees-the-branch]]
-test("a push to a work branch another box holds past work.staleAfter lands", () => {
-  const said = holds(
+// The hold the pushed tip carries: the take writes this box, a plain push keeps the holder, and a release writes nobody. [[spec/tickets/stale-hold-moves-by-take]]
+const TAKER = "box myb0x · session s2 · claude-code-remote";
+const pushedOver = (stale, atTip) =>
+  holds(
     refsIn(toWork),
     stamp(),
     () => [],
@@ -132,25 +134,47 @@ test("a push to a work branch another box holds past work.staleAfter lands", () 
     heldBy(HOLDER),
     "myb0x",
     true,
-    () => true,
+    () => stale,
+    () => atTip,
   );
-  assert.deepEqual(said, { code: 0, said: "" });
-});
 
-// [[spec/tickets/stale-hold-frees-the-branch]]
-test("a push to a work branch another box holds under work.staleAfter refuses", () => {
-  const said = holds(
-    refsIn(toWork),
-    stamp(),
-    () => [],
-    true,
-    heldBy(HOLDER),
-    "myb0x",
-    true,
-    () => false,
-  );
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a plain push onto a stale hold refuses, and names the take", () => {
+  const said = pushedOver(true, HOLDER);
   assert.equal(said.code, 1);
   assert.match(said.said, /box 0ther1d/);
+  assert.match(said.said, /\.\/RUNME\.sh branch take x/);
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a take or a release onto a stale hold lands", () => {
+  assert.deepEqual(pushedOver(true, TAKER), { code: 0, said: "" });
+  assert.deepEqual(pushedOver(true, ""), { code: 0, said: "" });
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a stale hold whose tip reads nothing refuses", () => {
+  assert.equal(pushedOver(true, null).code, 1);
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a fresh hold refuses a plain push and a take alike", () => {
+  for (const atTip of [HOLDER, TAKER, ""]) {
+    const said = pushedOver(false, atTip);
+    assert.equal(said.code, 1);
+    assert.match(said.said, /box 0ther1d/);
+  }
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("the tip reader reads the group ticket at the pushed sha, and null where it reads nothing", () => {
+  const held = `---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: sync\n    hand: ${TAKER}\n    hash_before: ${SHA}\n---\n`;
+  const [work] = refsIn(toWork);
+  const repo = fakeRepo([], { "spec/tickets/x.md": held });
+  assert.equal(heldAtTip(repo)(work), TAKER);
+  assert.deepEqual(repo.runs.at(-1), ["show", `${SHA}:spec/tickets/x.md`]);
+  assert.equal(heldAtTip(fakeRepo([], { "spec/tickets/x.md": FREE }))(work), "");
+  assert.equal(heldAtTip(fakeRepo([], {}))(work), null);
 });
 
 // The age of the tip on origin against the span, read the way the list reads it. [[spec/tickets/stale-hold-frees-the-branch]]

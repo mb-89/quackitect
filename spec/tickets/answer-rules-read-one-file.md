@@ -15,7 +15,9 @@ group: the-engine-fixes-its-faults
 
 # Ask
 
-The section `[*answer.md]` in `.vale.ini` holds the chat-answer rules over any file whose name ends that way. `ANSWER` in `.claude/skills/level0/lib/voice.js` names the one file level zero reads, `answer.md`. A ticket named `deliver-checks-the-declared-answer` failed the check under those rules, and took a new name.
+- the section `[*answer.md]` in `.vale.ini` holds the chat-answer rules over any file whose name ends that way
+- `ANSWER` in `.claude/skills/level0/lib/voice.js` names the one file level zero reads, `answer.md`
+- a ticket named `deliver-checks-the-declared-answer` failed the check under those rules, and took a new name
 
 The section's glob reaches the file `ANSWER` names alone.
 

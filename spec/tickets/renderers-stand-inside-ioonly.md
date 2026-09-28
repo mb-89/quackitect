@@ -26,7 +26,7 @@ Each renderer reads what it draws off the index, and the analyzer holds `src/tui
 
 A renderer then draws the same frame on every box, and its tests need no outside.
 
-Without it, a renderer can read a file or a process the index never sees, and the check stays green.
+Without it, a renderer can read a file or a process outside the index, and the check stays green.
 
 - `isCore` holds the renderers, and `go vet` with the analyzers passes over the tree
 - a case adds an `os` import to a renderer, and reads the analyzer refuse it

@@ -241,7 +241,7 @@ works the branch:
 | the tip's age | means |
 |---|---|
 | under `work.staleAfter` | a box holds the group, and the push door refuses every other box |
-| past it | the hold stands stale: the push door lets any box through, `take` and `release` close it, and `list` puts it under yours |
+| past it | the hold stands stale: the push door lets through a push whose tip moves the hold, which `take` and `release` write, and refuses a plain push. `list` puts it under yours |
 
 Under yours it carries the answers below, and each is a verb:
 

@@ -126,10 +126,11 @@ const HELD_ELSEWHERE = withEntry(
   { step: "sync", hand: "box 0ther1d", hash_before: "a1b2c3" },
   fakeFront(),
 );
-const takingHeld = (when) => {
+const takingHeld = (when, more = {}) => {
   const { it, outside, disk } = doorsSaying(
     {
       ...groupRemote(),
+      ...more,
       ...remoteSaying([{ branch: "work/one-group", tip: "aaa", when }], {
         [`work/one-group:${GROUP_AT}`]: HELD_ELSEWHERE,
       }),
@@ -164,6 +165,20 @@ test("a take over a hold past work.staleAfter closes that hold and writes its ow
     ),
     ran.join("\n"),
   );
+});
+
+// The claim lands first, so the push door meets the moved hold, and main comes in after it. [[spec/tickets/stale-hold-moves-by-take]]
+test("a take over a stale hold behind main pushes the claim, then takes main in", () => {
+  const { code, said, ran } = takingHeld(SECONDS_NOW - 3600, {
+    "git rev-list --count HEAD..origin/main": { stdout: "3\n" },
+  });
+  assert.equal(code, 0, said);
+  const pushed = ran.findIndex((one) =>
+    one.startsWith("git push origin work/one-group"),
+  );
+  const merged = ran.findIndex((one) => one.startsWith("git merge origin/main"));
+  assert.ok(pushed >= 0, ran.join("\n"));
+  assert.ok(merged > pushed, ran.join("\n"));
 });
 
 // [[spec/tickets/stale-hold-frees-the-branch]]
