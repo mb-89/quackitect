@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-switch-lands
+record:
+  - step: design/draft
+    hand: box d81edbaa8ed8 · claude-code-remote
+    hash_before: 2f3ff16a50e29d31a84ecbab8d17aee2f406e55c
+    hash_after: 2f3ff16a50e29d31a84ecbab8d17aee2f406e55c
+    inputs:
+      - name: ask
+        hash: fe2bc1ba0ba3484f
+        size: 258
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -145,32 +155,39 @@ The two numbers stop disagreeing. One commit on the key rolls it back.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`PlacesAt` in src/tui/work/workplaces.go stops calling `shadowOf` direct, and calls a new `slicedCount(root, old, now)` in src/tui/work/shadow.go. It reads `migration.opentasks`: under `new` it answers the index's `work/open-tasks` through `askOpenTasks`, and keeps the old count where no door answers; under `shadow` it runs `shadowOf` and answers the old count; under `old` it answers the old count. `PlacesAt` writes the answer into `Places.Takeable`, which the window's header (`Tab.Label`) and the badge's verb (`countSaid`, behind `./RUNME.sh tui work --count`) both read, so the two numbers come off one function. `migration.opentasks` moves to `new` in spec/config/level0.json. One commit on that key puts the old count back.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/tui/main.go countSaid,src/tui/work/work.go PlacesCmd, then Tab.Label,src/tui/work/workplaces.go PlacesAt
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/tui/work/shadow_test.go TestTheNewSliceAnswersTheIndexCount,src/tui/work/shadow_test.go TestTheNewSliceKeepsTheOldCountWhereNoDoorAnswers,src/tui/work/shadow_test.go TestTheBadgeAndTheHeaderReadOneValue
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+PlacesAt, shadowOf, askOpenTasks, Tab.Label and countSaid stand opened, and each reads Places.Takeable as the approach says
+the callers list names countSaid, PlacesCmd and PlacesAt, every reader of PlacesAt
+a case holds the badge and the header to one value: TestTheBadgeAndTheHeaderReadOneValue; the check line: ./RUNME.sh check
 
 ## tests-red
 
