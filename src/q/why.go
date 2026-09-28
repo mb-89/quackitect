@@ -63,6 +63,11 @@ func (s *Store) why(snap Snapshot, name string, seen map[string]bool) Why {
 	if since, ok := snap.Stale(name); ok {
 		said.State, said.Since = "stale", &since
 	}
+	if s.pending != nil {
+		if at, ok := s.pending(name); ok {
+			said.State, said.Pending = "pending", at
+		}
+	}
 	if snap.NotProvided(name) {
 		said.State, said.Since = "not provided", nil
 	}
@@ -96,6 +101,10 @@ func (said Why) lines(indent string) []string {
 	state := said.State
 	if said.Since != nil {
 		state += " since " + said.Since.Format(time.RFC3339)
+	}
+	// A value a wave holds names the revision it waits from. [[spec/design_output/model#one-wave-settles-a-change]]
+	if said.State == "pending" {
+		state += fmt.Sprintf(" since r%d", said.Pending)
 	}
 	out := []string{fmt.Sprintf("%s%s = %v, %s, %s at %s", indent, said.Name, said.Value, state, said.Provider.Kind, said.Provider.Where)}
 	for _, in := range said.Inputs {

@@ -38,6 +38,10 @@ func Over(t testing.TB, c *q.Catalog, inputs q.Writer) *Index {
 	}
 	one := &Index{t: t, store: q.NewStore(c), inputs: inputs}
 	one.store.OnCommit(func(values map[string]any) { one.commits = append(one.commits, values) })
+	// A spawn that runs in place settles a seed's wave before the seed answers. [[spec/design_output/model#one-wave-settles-a-change]]
+	q.NewScheduler(one.store, func(run func()) { run() }, func(name string, err error) {
+		t.Errorf("the run of %s answers %v", name, err)
+	})
 	return one
 }
 

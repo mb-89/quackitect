@@ -38,6 +38,20 @@ func TestADerivedProviderReadsASeededFile(t *testing.T) {
 	}
 }
 
+// The fake settles a seed's wave in place, so a provider below reads the seed with no run by hand, and one push carries it. [[spec/design_output/model#one-wave-settles-a-change]]
+func TestASeedSettlesItsWaveBeforeItAnswers(t *testing.T) {
+	fake := New(t, func(c *q.Catalog) {
+		q.DerivedIn(c, "t/lines", 0, func(in linesOf) int { return strings.Count(in.File.Text, "\n") })
+	})
+	fake.Seed(map[string]any{"files/a.md": q.Content{Hash: "h", Text: "one\ntwo\n"}})
+	if got := fake.Read("t/lines"); got != 2 {
+		t.Fatalf("t/lines reads %v once the seed answers", got)
+	}
+	if said := fake.Commits(); len(said) != 2 || said[1]["t/lines"] != 2 {
+		t.Fatalf("the commits read %v", said)
+	}
+}
+
 // Over drives a catalog another hand fills, and asks for no provider key, since the wiring file picks a module in place of a key. [[spec/tickets/the-wiring-file-binds-ports]]
 func TestOverDrivesACatalogWithNoProviderKeys(t *testing.T) {
 	c := q.New()

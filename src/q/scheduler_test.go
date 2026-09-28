@@ -3,6 +3,8 @@
 package q
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -117,10 +119,16 @@ func TestAnEqualCommitRunsNothingBelow(t *testing.T) {
 	s, hand, scheduler, runs := doubled(t)
 	seed(t, s, hand, "t/n", 3)
 	scheduler.Settle()
+	pushed := 0
+	s.OnCommit(func(values map[string]any) {
+		if _, ok := values["t/double"]; ok {
+			pushed++
+		}
+	})
 	seed(t, s, hand, "t/n", 3)
 	scheduler.Settle()
-	if *runs != 1 {
-		t.Fatalf("t/double runs %d times over two equal commits", *runs)
+	if *runs != 1 || pushed != 0 {
+		t.Fatalf("t/double runs %d times and pushes %d times over two equal commits", *runs, pushed)
 	}
 }
 
@@ -146,5 +154,8 @@ func TestWhyNamesAPendingValue(t *testing.T) {
 	said, err := s.Why("t/double")
 	if err != nil || said.State != "pending" || said.Pending != at {
 		t.Fatalf("why t/double answers %s at %d, %v", said.State, said.Pending, err)
+	}
+	if want := fmt.Sprintf("pending since r%d", at); !strings.Contains(said.Text, want) {
+		t.Fatalf("why t/double reads %q, with no %q", said.Text, want)
 	}
 }

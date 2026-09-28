@@ -91,10 +91,9 @@ func Suite(t *testing.T, open Opener) {
 			t.Fatalf("the action answers %+v", asked)
 		}
 	})
-	t.Run("commits read every commit of the run", func(t *testing.T) {
+	t.Run("commits read the seed and the wave it settles", func(t *testing.T) {
 		one := open(t, wide)
 		one.Seed(map[string]any{"cfg/width": "ab"})
-		one.Run("t/wide")
 		said := one.Commits()
 		if len(said) != 2 || said[0]["cfg/width"] != "ab" || said[1]["t/wide"] != 2 {
 			t.Fatalf("the commits read %v", said)

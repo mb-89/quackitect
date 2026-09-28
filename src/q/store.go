@@ -4,6 +4,8 @@
 package q
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -26,6 +28,8 @@ type Store struct {
 	stale    map[*registration]time.Time
 	down     map[*registration]bool
 	heard    []func(values map[string]any)
+	moves    []func(names []string)
+	pending  func(name string) (int64, bool)
 }
 
 type Snapshot struct {
@@ -56,11 +60,91 @@ func (s *Store) Snapshot() Snapshot {
 
 // [[spec/design_output/model#snapshots-and-revisions]]
 func (s *Store) Commit(read int64, as Writer, values map[string]any) (int64, error) {
+	before := s.Snapshot()
 	revision, heard, err := s.commit(read, as, values)
 	for _, hand := range heard {
 		hand(values)
 	}
+	// A name whose JSON form stays starts no wave, so an equal commit runs nothing below it. [[spec/design_output/model#one-wave-settles-a-change]]
+	if err == nil {
+		if moved := movedIn(before, values); len(moved) > 0 {
+			for _, hand := range s.moving() {
+				hand(moved)
+			}
+		}
+	}
 	return revision, err
+}
+
+// The names of values whose JSON form differs from what the snapshot reads. [[spec/design_output/model#one-wave-settles-a-change]]
+func movedIn(before Snapshot, values map[string]any) []string {
+	var moved []string
+	for name, value := range values {
+		if !same(before.Read(name), value) {
+			moved = append(moved, name)
+		}
+	}
+	return moved
+}
+
+func same(a, b any) bool {
+	left, err := json.Marshal(a)
+	if err != nil {
+		return reflect.DeepEqual(a, b)
+	}
+	right, err := json.Marshal(b)
+	if err != nil {
+		return reflect.DeepEqual(a, b)
+	}
+	return bytes.Equal(left, right)
+}
+
+func (s *Store) moving() []func(names []string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.moves
+}
+
+// The scheduler hears the names a commit from outside moves. [[spec/design_output/model#one-wave-settles-a-change]]
+func (s *Store) onMove(fn func(names []string)) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.moves = append(s.moves, fn)
+}
+
+// Runs a derived provider over the wave's view, and commits where its value moves, with no hand heard. [[spec/design_output/model#one-wave-settles-a-change]]
+func (s *Store) settle(name string, view Snapshot) (any, bool, error) {
+	one := s.owner(name)
+	if one == nil || one.kind != derived || one.run == nil {
+		return nil, false, fmt.Errorf("%s names no derived provider", name)
+	}
+	value := one.run(view)
+	if same(view.Read(name), value) {
+		return value, false, nil
+	}
+	_, _, err := s.commit(view.Revision, Writer{[]*registration{one}}, map[string]any{name: value})
+	return value, err == nil, err
+}
+
+// Hands a wave's values to every hand that listens, once. [[spec/design_output/model#one-wave-settles-a-change]]
+func (s *Store) push(values map[string]any) {
+	s.mu.Lock()
+	heard := s.heard
+	s.mu.Unlock()
+	for _, hand := range heard {
+		hand(values)
+	}
+}
+
+// The view a wave reads: this snapshot, with one value the wave settled over it. [[spec/design_output/model#one-wave-settles-a-change]]
+func (one Snapshot) with(name string, value any) Snapshot {
+	next := make(map[string]cell, len(one.values)+1)
+	for held, at := range one.values {
+		next[held] = at
+	}
+	next[name] = cell{value: value, from: one.Revision}
+	one.values = next
+	return one
 }
 
 // The hands hear a commit after the lock lets go, so a hand reading a snapshot waits on nothing. [[spec/design_output/model#the-fake-index]]

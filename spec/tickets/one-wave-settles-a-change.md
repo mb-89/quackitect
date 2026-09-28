@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -185,6 +185,15 @@ record:
         hash: e03fc55117ad3930
         size: 792
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0dddfe42af05bc349445f8ea12f9717fbb9369e3
+    hash_after: 0dddfe42af05bc349445f8ea12f9717fbb9369e3
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -346,14 +355,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    go vet ./src/...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change stays inside the draft's size list, and the gate's first point adds src/q/qtest/suite.go, whose case now reads the seed and the wave it settles.
+The store, the scheduler and the fake index stand in memory, and go test with the race detector over src/q reads no race.
+The scheduler's comments name the wave, the early cutoff, the view a wave reads and the demand, each with a link to the wave chapter of the model.
+The gate's second point holds: Settle and Stop stand, and the door calls them as before. The third and fourth points land in the equal-commit case, which counts the pushes, and in the why case, which reads the text.
 
 ## tests-green
 
