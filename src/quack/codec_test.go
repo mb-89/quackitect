@@ -20,10 +20,11 @@ import (
 
 const treeRoot = "../.."
 
-// The fixtures the case seeds where a box carries no plan, no hold and no local config, keyed by the path each stands at. [[spec/design_output/model#everything-on-disk-mirrors]]
+// The fixtures the case seeds where a box carries no plan, no hold, no local config and no private ticket, keyed by the path each stands at. [[spec/design_output/model#everything-on-disk-mirrors]]
 var seeds = map[string]string{
-	queue.Plan:   "testdata/plan.json",
-	config.Local: "testdata/config.json",
+	queue.Plan:              "testdata/plan.json",
+	config.Local:            "testdata/config.json",
+	".se/tickets/seeded.md": "testdata/ticket.txt",
 	strings.Replace(holds.Glob, "*", "seeded", 1): "testdata/hold.json",
 }
 
