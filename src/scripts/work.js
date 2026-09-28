@@ -50,7 +50,7 @@ import {
   takeable,
 } from "./pull.js";
 import { serving } from "./serve.js";
-import { fixRefuses } from "./work-fix.js";
+import { leftRefuses } from "./work-fix.js";
 import { handsStuck, readFree, stuckFirst, trigger } from "./work-free.js";
 import { heldHere, pastHold } from "./work-held.js";
 import { list } from "./work-list.js";
@@ -421,7 +421,7 @@ function finish(it) {
 
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
-  if (fixRefuses(it, it.disk.read(path))) return 1;
+  if (leftRefuses(it, name)) return 1;
 
   const open = retroOpen(it, it.disk.read(path));
   if (open) return retroFirst(name, open);

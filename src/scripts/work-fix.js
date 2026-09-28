@@ -1,6 +1,7 @@
-// A fix group hands back no ticket for an agent. What it leaves goes out as a
-// question ticket for a person, so a chain of follow-ups ends at the owner.
-// [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+// A group reaches done once every ticket a box can close stands closed. Work a
+// person alone can do stands on the person route, and that alone leaves the
+// group loose on main. A ticket a box mints on its branch joins its group.
+// [[spec/design_output/work#a-box-leaves]]
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
@@ -11,24 +12,39 @@ import {
   NOTE_END,
   TICKETS,
   ticketNamed,
+  WORK_BRANCH,
 } from "../engine/group.js";
-import { waitsOnPerson } from "./work-answer.js";
+import { childrenHere } from "./work-stands.js";
 
 // The field a group ticket carries where it is a fix group. [[spec/schemas/ticket.schema.yaml]]
 export const FIX = "fix";
+// The route of work a person alone can do. [[spec/processes/person.yaml]]
+export const PERSON = "person";
 
-// The agent tickets a fix group's branch adds and leaves standing, or none where the group is a feature group. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-export function fixLeaves(it, text) {
-  if (String(fieldOf(text, FIX)) !== "true") return [];
-  return addedHere(it)
+// Whether a ticket stands on the person route, in either spelling of its process. [[spec/design_output/work#a-box-leaves]]
+export function onPersonRoute(text) {
+  return personProcess(fieldOf(text, "process"));
+}
+
+function personProcess(said) {
+  const process = String(said ?? "").replace(/^\[\[|\]\]$/g, "");
+  return process === PERSON || process.endsWith(`/${PERSON}`);
+}
+
+// The tickets a group leaves open that a box can close: each open or draft child, and each open ticket the branch adds with no group. [[spec/design_output/work#a-box-leaves]]
+export function leftOpen(it, name) {
+  const added = addedHere(it).filter(
+    (one) => one.name !== name && !fieldOf(one.text, GROUP),
+  );
+  const names = [...childrenHere(it, name), ...added]
     .filter(
       (one) =>
         fieldOf(one.text, "state") !== CLOSED &&
-        !fieldOf(one.text, GROUP) &&
         !isGroup(one.text) &&
-        !waitsOnPerson(one),
+        !onPersonRoute(one.text),
     )
     .map((one) => one.name);
+  return [...new Set(names)].sort();
 }
 
 // The tickets this branch adds over trunk, as the disk holds them. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
@@ -46,21 +62,29 @@ export function addedHere(it) {
     .map((one) => ({ name: one.name, text: it.disk.read(one.path) }));
 }
 
-// Whether done stops on a fix group, naming each ticket and the two lines turning it into a question. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
-export function fixRefuses(it, text) {
-  const left = fixLeaves(it, text);
+// Whether done stops, naming each ticket left open, its pull, and the road out for a person's work. [[spec/design_output/work#a-box-leaves]]
+export function leftRefuses(it, name) {
+  const left = leftOpen(it, name);
   if (!left.length) return false;
   console.error(
-    "A fix group hands back no ticket for an agent, and this branch leaves these:",
+    `${name} reaches done once every ticket a box can close stands closed, and these stand open:`,
   );
-  for (const name of left) {
-    console.error(
-      `  ${name}: ./RUNME.sh mint ticket ${TICKETS}/${name}-question.md --process=question`,
-    );
-    console.error(`  then ./RUNME.sh ticket pull ${name} --became ${name}-question`);
-  }
+  for (const one of left) console.error(`  ${one}: ./RUNME.sh ticket pull ${one}`);
   console.error(
-    "Turn each into a question ticket for a person, then run ./RUNME.sh branch done.",
+    "Close each one. Work a person alone can do moves to the person route, and leaves the group loose on main:",
+  );
+  console.error(
+    `  ./RUNME.sh mint ticket ${TICKETS}/<name>-person.md --process=${PERSON}, then ./RUNME.sh ticket pull <name> --became <name>-person`,
   );
   return true;
+}
+
+// A ticket the mint writes on a work branch names the branch's group, past a named group, the person route and the group itself. [[spec/tickets/a-box-keeps-its-tickets]]
+export function joinsGroup(fields, branch, name) {
+  const said = String(branch ?? "");
+  if (!said.startsWith(WORK_BRANCH) || fields[GROUP]) return fields;
+  const group = said.slice(WORK_BRANCH.length);
+  if (group === name) return fields;
+  if (personProcess(fields.process)) return fields;
+  return { ...fields, [GROUP]: group };
 }
