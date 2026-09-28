@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -34,7 +34,7 @@ steps:
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 step: do
-todo: true
+todo: false
 record:
   - step: answer
     hand: box 1327ac97a972 · claude-code-remote
@@ -75,6 +75,23 @@ record:
         hash: a63fe78443cd598c
         size: 20553
     def: 2280015d497a3abd
+  - step: do
+    hand: box 1327ac97a972 · claude-code-remote
+    hash_before: e6632206ed725d24c104aa8c936a22a322b32646
+    hash_after: e6632206ed725d24c104aa8c936a22a322b32646
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-outlives-its-starter.md:327:275: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: dfa6b1ab763940c6
+        size: 252
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -113,26 +130,32 @@ The box decides the question needs no owner pass, and the owner agrees in chat. 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/hooks.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer changes no code. sessions-boot-from-the-repo stands closed, and its boot cases in test/level0/hooks.test.js run green. So the question closes and nothing waits on it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the answer asks for no change, and the says line gives the reason
+the answer reveals no cleanup
+the answer adds no fact, and the ticket it names holds the evidence
 
 # Discussion
 
