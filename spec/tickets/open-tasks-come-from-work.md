@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: a240cf98586639c5
         size: 2338
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d81c1a402acf · claude-code-remote · helper-3
+    hash_before: 3539e268ecc4dd956e5daa759d944fa01d1fba82
+    hash_after: 3539e268ecc4dd956e5daa759d944fa01d1fba82
+    inputs:
+      - name: design/draft
+        hash: a240cf98586639c5
+        size: 2338
+      - name: design/tests-red
+        hash: 6e37467f93b35ec7
+        size: 676
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -251,8 +263,11 @@ every door the tests reach has a fake: the cases reach no door, only the fake in
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- open-tasks-wired-case-stands: the draft names TestTheWiredTreeAnswersItsOpenTasks in src/quack/main_test.go, and no such case stands, so no red test decides that the wiring binds work.tickets, work.places and work.cloud; the builder writes it at implement
+- fake-tree-runs-the-queue: TestOpenTasksReadsAFakeTreeOfTickets seeds the places by hand, and open-tasks reads the places alone, so its tickets reach no port the count reads; the wired case over a fake tree of tickets decides the done_when line, not the unit case
 
 # implement
 
