@@ -388,6 +388,16 @@ record:
         hash: 3411ceaf98287365
         size: 89123
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e3869061cf · claude-code-remote
+    hash_before: 6ecd34e5cc45121defd2cf852b3163ff4c473f2e
+    hash_after: 3aeb6231569c029b7fdd00366e06cbb3838d8f95
+    returns: 1
+    why: The change landed at implement/change, and its level zero note section staled this draft. tests-red expects a failing assertion, and the boot cases pass now, so no run passes the step. a-rewind-spares-landed-tests owns the fix, and the draft stands as it read.
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
 group: the-cloud-works-its-queue
 ---
 
