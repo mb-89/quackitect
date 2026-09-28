@@ -20,8 +20,29 @@ type Module struct {
 	Acts  []Act
 }
 
-// Registers what the script names, and answers the writer of its out-port. A stub until tests-green builds it. [[spec/tickets/the-index-meets-fake-modules]]
-func (one Module) Register(c *q.Catalog) q.Writer { return q.Writer{} }
+// The in-port `in` the derived `seen` reads. [[spec/design_output/model#the-index-meets-fake-modules]]
+type seenOf struct {
+	In int `q:"in"`
+}
+
+// Registers what the script names, each with its q.Doc, and answers the writer of its out-port and its `seen`. [[spec/design_output/model#the-index-meets-fake-modules]]
+func (one Module) Register(c *q.Catalog) q.Writer {
+	var hands []q.Writer
+	if one.Out {
+		hands = append(hands, q.OutIn(c, "out", 0, q.Doc("the value the script's writer commits")))
+	}
+	if one.Reads {
+		hands = append(hands, q.DerivedIn(c, "seen", 0, func(in seenOf) int { return in.In }, q.Doc("the in-port, echoed")))
+	}
+	for _, act := range one.Acts {
+		opts := []q.Option{q.Doc("an action the script names")}
+		if act.Writes {
+			opts = append(opts, q.Writes())
+		}
+		q.ActionIn(c, act.Name, func(string) []q.Request { return append([]q.Request(nil), act.Requests...) }, opts...)
+	}
+	return q.Join(hands...)
+}
 
 // The types a wiring loads, and the writer each type's out-port hands back. [[spec/design_output/model#the-index-meets-fake-modules]]
 type Fakes struct {
@@ -33,7 +54,7 @@ type Fakes struct {
 func Modules(scripts ...Module) *Fakes {
 	fakes := &Fakes{Hands: map[string]q.Writer{}, types: map[string]func(*q.Catalog){}}
 	for _, one := range scripts {
-		fakes.types[one.Type] = func(*q.Catalog) {}
+		fakes.types[one.Type] = func(c *q.Catalog) { fakes.Hands[one.Type] = one.Register(c) }
 	}
 	return fakes
 }

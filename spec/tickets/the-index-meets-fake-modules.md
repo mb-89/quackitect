@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -185,6 +185,15 @@ record:
         hash: 61906c0f6f79e944
         size: 968
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 435505e00df89daa7ed844c70f5e0006632dac4d
+    hash_after: 435505e00df89daa7ed844c70f5e0006632dac4d
+    answered:
+      - name: lint
+        exit: 0
+        said: green, src/q/qtest passes; green, src/modules/index passes
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -339,14 +348,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    go vet ./... && ./RUNME.sh branch test src/q/qtest/module_test.go src/modules/index/module_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q/qtest/module.go alone, the file the draft names
+- the fake module is itself the fake, and it reaches no door
+- the file's header points at the model section the fake module implements
+- every registration carries its doc once, and the fake adds no fact another file holds
 
 ## tests-green
 
