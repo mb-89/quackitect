@@ -36,6 +36,15 @@ func (one *door) answers(said call) (any, error) {
 			return value, nil
 		}
 		return nil, errorOf("no name called " + asked.Name)
+	case "value":
+		// A reader beside the old path compares the settled value, so the scheduler drains first. [[spec/tickets/open-tasks-run-in-shadow]]
+		if one.drains != nil {
+			one.drains()
+		}
+		if value := one.store.Snapshot().Read(asked.Name); value != nil {
+			return value, nil
+		}
+		return nil, errorOf("no name called " + asked.Name)
 	case "texts":
 		return Texts(one.db, asked.Paths)
 	case "hashes":

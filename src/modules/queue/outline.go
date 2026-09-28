@@ -2,7 +2,7 @@
 // the left takes one number, a ticket under it a sub-number, and a person's row
 // a negative number that sorts first.
 // [[spec/tickets/the-queue-moves-to-plan]]
-package plan
+package queue
 
 import (
 	"math"

@@ -1,7 +1,7 @@
 // The score orders a list: the mark first, then what waits under a row, then
 // the plan's own order, then the name.
 // [[spec/tickets/the-queue-moves-to-plan]]
-package plan
+package queue
 
 import (
 	"reflect"

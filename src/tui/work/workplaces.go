@@ -180,11 +180,17 @@ func PlacesAt(root string) (Places, error) {
 	if err != nil {
 		return Places{}, err
 	}
-	return PlacesIn(said)
+	places, err := PlacesIn(said)
+	if err != nil {
+		return Places{}, err
+	}
+	// The shadow writes a row beside the count, and its failure leaves the count standing. [[spec/tickets/open-tasks-run-in-shadow]]
+	_ = shadowOf(root, places.Takeable, time.Now())
+	return places, nil
 }
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
-func runPlaces(root string) ([]byte, error) {
+var runPlaces = func(root string) ([]byte, error) {
 	if _, err := statOf(filepath.Join(root, filepath.FromSlash(placesVerb[0]))); err != nil {
 		return nil, err
 	}

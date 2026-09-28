@@ -214,7 +214,7 @@ func asked(argv []string) (string, json.RawMessage) {
 			}
 		case "links":
 			params["target"] = argv[1]
-		case "why", "dump":
+		case "why", "dump", "value":
 			params["name"] = argv[1]
 		case "same":
 			params["path"] = argv[1]

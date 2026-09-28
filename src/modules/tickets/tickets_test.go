@@ -92,7 +92,7 @@ func TestOfReadsTheFront(t *testing.T) {
 	want := Ticket{
 		Name: "grows", Path: "spec/tickets/grows.md", State: "open", Step: "children",
 		Route: "group", Urgent: true, Standing: StandingHeld,
-		Says: "Two tickets that land as one.", Changed: 7,
+		Says: "Two tickets that land as one.", Changed: 7, Held: true,
 	}
 	if !reflect.DeepEqual(said, want) {
 		t.Fatalf("the ticket reads %#v", said)

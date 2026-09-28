@@ -2,7 +2,7 @@
 // stands at zero, the rest count up, and a todo moves a row before the one it
 // names.
 // [[spec/tickets/the-queue-moves-to-plan]]
-package plan
+package queue
 
 import (
 	"reflect"

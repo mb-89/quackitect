@@ -253,6 +253,11 @@ export const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
 export const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
 export const rest = argv.slice(argv.indexOf(verb) + 1);
 
+// A verb's exit waits for its output to drain, so a reader on a pipe gets every byte. [[spec/tickets/open-tasks-run-in-shadow]]
+export function exitsDrained(code, out, exit) {
+  out.write("", () => exit(code));
+}
+
 // [[spec/design_output/doors#a-script-guards-its-main]]
 if (runsHere(import.meta.url, process.argv)) {
   if (verb === "help" || !verbs[verb]) {
@@ -263,7 +268,11 @@ if (runsHere(import.meta.url, process.argv)) {
     }
     process.exit(verb === "help" ? 0 : 2);
   }
-  process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
+  exitsDrained(
+    (await verbs[verb].run(where.length ? where : ["."])) ?? 0,
+    process.stdout,
+    process.exit,
+  );
 }
 
 // [[spec/design_output/vehicle#what-a-vehicle-needs]]

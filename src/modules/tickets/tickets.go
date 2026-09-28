@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"quackitect/src/q"
+	"quackitect/src/ticket"
 	"quackitect/src/yaml"
 )
 
@@ -20,6 +21,7 @@ const (
 	FilesPort = "files/<path...>"
 	NotesPort = "notes"
 	AllPort   = "all"
+	CloudPort = "cloud"
 )
 
 // The kind a ticket's front names, bare or as a link. [[spec/design_output/index#the-index-answers-the-tickets]]
@@ -53,33 +55,55 @@ var folders = []string{"spec/tickets/", ".se/tickets/"}
 
 var heading = regexp.MustCompile(`^#{1,6}(\s|$)`)
 
-type Ticket struct {
-	Name     string `json:"name"`
-	Path     string `json:"path"`
-	State    string `json:"state"`
-	Step     string `json:"step"`
-	Route    string `json:"route"`
-	Group    string `json:"group"`
-	Urgent   bool   `json:"urgent"`
-	Todo     bool   `json:"todo"`
-	Standing string `json:"standing"`
-	Says     string `json:"says"`
-	// The leaves the record passes over the leaves the route holds, as done/all. [[spec/design_output/index#the-index-answers-the-tickets]]
-	Progress string `json:"progress"`
-	// The time the file last changed, off the file table, so a view sorts the newest done ticket first. [[spec/design_output/index#the-index-answers-the-tickets]]
-	Changed int64 `json:"changed"`
-	// The tickets this one waits on, and the hand-backs that failed on it, which the queue weighs. [[spec/tickets/the-queue-moves-to-plan]]
-	DependsOn []string `json:"depends_on,omitempty"`
-	Fails     int      `json:"fails,omitempty"`
-	// The ticket stands open, and its current step says by: person. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
-	Person bool `json:"person"`
-}
+// The type stands in a pure package, so a reader wired to all shares it. [[spec/tickets/the-queue-becomes-a-module]]
+type Ticket = ticket.Ticket
 
 // The notes stand as a loaded projection over the two folders, so the codec's suite round-trips every ticket, and all reads the files through the same codec. [[spec/tickets/tickets-becomes-a-module]]
 func Registers(c *q.Catalog) q.Writer {
 	notes := q.ProjectIn(c, NotesPort, folders[0]+"*"+noteExt, Markdown, q.Loaded, Note{}, q.Also(folders[1]+"*"+noteExt), q.Doc("a ticket file, as its front and its body"))
 	all := q.DerivedIn(c, AllPort, []Ticket{}, allOf, q.Doc("every ticket under the two ticket folders, with its Ask and its standing"))
-	return q.Join(notes, all)
+	cloud := q.DerivedIn(c, CloudPort, []string{}, cloudOf, q.Doc("the tickets the cloud holds: every group carrying the mark, and every ticket naming one"))
+	return q.Join(notes, all, cloud)
+}
+
+// Every ticket the cloud holds, by name: a group carrying the mark, and every ticket naming one, the rule cloudsIn in src/scripts/work-answer.js holds. [[spec/tickets/the-queue-reads-the-marker]]
+func cloudOf(in allIn) []string {
+	marked := map[string]bool{}
+	for _, one := range in.All {
+		if one.Cloud {
+			marked[one.Name] = true
+		}
+	}
+	out := []string{}
+	for _, one := range in.All {
+		if marked[one.Name] || marked[one.Group] {
+			out = append(out, one.Name)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// The key a group's front carries where the cloud holds it, which CLOUD_MARK in src/scripts/work-merge.js names and a Go module spells again. [[spec/tickets/the-queue-reads-the-marker]]
+const cloudMark = "cloud"
+
+// The hand a leaf names where a person takes it. [[spec/design_output/pull#the-queue-is-a-score]]
+const personHand = "person"
+
+// The anchor a todo names: nothing where the front reads none or false, first for a bare true, and the word itself otherwise, the rule todoOf in src/engine/group.js holds. [[spec/design_output/pull#a-todo-forces-a-place]]
+func todoAt(said string) string {
+	switch said {
+	case "", "false":
+		return ""
+	case "true":
+		return "first"
+	}
+	return said
+}
+
+// The tickets all answers. [[spec/tickets/the-queue-reads-the-marker]]
+type allIn struct {
+	All []Ticket `q:"all"`
 }
 
 // Every file the module reads, keyed by its path. [[spec/tickets/tickets-becomes-a-module]]
@@ -139,6 +163,9 @@ func Of(path, name, text string, changed int64) Ticket {
 		Changed:   changed,
 		DependsOn: dependsOnIn(front),
 		Fails:     failsIn(front),
+		TodoAt:    todoAt(word(front.Get("todo"))),
+		Cloud:     word(front.Get(cloudMark)) == "true",
+		Held:      heldIn(front),
 	}
 	one.Person = state == openState && personIn(front, one.Step)
 	if one.Route == groupRoute {
@@ -290,7 +317,7 @@ func personIn(front *yaml.Doc, step string) bool {
 		}
 		steps = yaml.AsList(leaf.Get("steps"))
 	}
-	return leaf != nil && word(leaf.Get("by")) == "person"
+	return leaf != nil && word(leaf.Get("by")) == personHand
 }
 
 // The Ask chapter up to the next heading. A fence reads as text, and every comment drops, one over several rows included. [[spec/tickets/the-tickets-topic-lands]]

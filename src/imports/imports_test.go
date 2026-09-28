@@ -81,6 +81,13 @@ func TestAModuleReadsYamlAsQDoes(t *testing.T) {
 	}
 }
 
+// The ticket type a wire between two modules carries passes, as the yaml reader does. [[spec/tickets/the-queue-becomes-a-module]]
+func TestAModuleReadsTheTicketType(t *testing.T) {
+	if said := Faults("quackitect/src/modules/queue", []string{"quackitect/src/q", "quackitect/src/ticket"}); len(said) != 0 {
+		t.Fatalf("src/ticket reads as past q: %v", said)
+	}
+}
+
 func TestAnIOModuleImportingOsPassesOnlyQ(t *testing.T) {
 	if said := FaultsIn("quackitect/src/modules/files", []string{"os", "github.com/fsnotify/fsnotify"}, true); len(said) != 0 {
 		t.Fatalf("the faults read %v", said)

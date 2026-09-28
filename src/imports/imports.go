@@ -47,7 +47,7 @@ var (
 var outside = []string{"os", "os/exec", "net", "net/http"}
 
 // The tree's own readers a module takes beside q, each importing the pure standard library alone, the one q rests on among them. [[spec/tickets/tickets-becomes-a-module]]
-var pureTree = []string{module + "src/yaml"}
+var pureTree = []string{module + "src/yaml", module + "src/ticket"}
 
 // The standard library packages that reach the outside, per [[spec/design_output/model#the-build-checks-imports]].
 var impure = []string{"os", "io/fs", "io/ioutil", "net", "database/sql", "syscall", "unsafe", "plugin", "log/syslog", "runtime/cgo"}

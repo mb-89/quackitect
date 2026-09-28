@@ -3,7 +3,7 @@
 // stands and how often a hand failed on it. A caller hands the rows in, so the
 // order reads no git and no file.
 // [[spec/tickets/the-queue-moves-to-plan]]
-package plan
+package queue
 
 import (
 	"sort"
