@@ -66,7 +66,7 @@ test("an edit to a file nobody wrote yet reads as the new text alone", () => {
   assert.equal(wholeAfter(e, { path: PATH, text: "b" }, disk), "b");
 });
 
-// The session start brings the manifest and the modules to a cloud box lacking either, for its next session. [[spec/design_input/the-cloud-runs-itself#the-boot]]
+// The session start brings the manifest to a cloud box lacking it, and the bridgehead the manifest loads brings the modules. [[spec/design_input/the-cloud-runs-itself#the-boot]]
 const BOOT_ROOT = "/tree";
 const INSTALL = `${BOOT_ROOT}/src/scripts/install.sh`;
 const MANIFEST = `${BOOT_ROOT}/.claude/skills/level0/.claude-plugin/plugin.json`;
@@ -118,13 +118,10 @@ test("boot runs the install under the skip list where the manifest stands nowher
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
-test("boot runs the install where the modules stand nowhere", () => {
+test("boot leaves the install to the bridgehead where the manifest stands and the modules stand nowhere", () => {
   const { it, proc } = booting(without(MODULE));
   assert.equal(boots(it), 0);
-  assert.deepEqual(
-    proc.ran.map((one) => one.argv.join(" ")),
-    [`sh ${INSTALL}`],
-  );
+  assert.deepEqual(proc.ran, []);
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]

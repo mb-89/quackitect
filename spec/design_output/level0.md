@@ -928,9 +928,14 @@ the language server. Those stay wants, and every rule holds without them.
 ## The boot hook
 
 A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
-through node. On a cloud box lacking the plugin manifest or the modules, it
-runs `src/scripts/install.sh` under `INSTALL_SKIP`. Where both stand, or off a
-cloud box, it runs nothing. A failed install holds no session up.
+through node. On a cloud box lacking the plugin manifest, it runs
+`src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
+off a cloud box, it runs nothing. A failed install holds no session up.
+
+Where the manifest stands the plugin loads, and the start road of
+[[spec/design_output/level0#the-bridgehead-starts-it-too]] installs the
+modules it finds missing. So one road installs on each session start, and no
+install writes over another.
 
 The client scans the plugins before a session start hook runs, so the session
 running the first install holds no level zero. The next session on the box
