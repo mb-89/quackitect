@@ -82,18 +82,27 @@ func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
 		t.Fatal(err)
 	}
 	keys := c.Keys()
-	if len(keys) != 1 {
-		t.Fatalf("the wiring loads the keys %+v, and wants the slice alone", keys)
+	if len(keys) == 0 {
+		t.Fatal("the wiring loads no slice key")
+	}
+	resolved := q.Resolved{}
+	for _, one := range keys {
+		if one.Instance != "migration" || !one.Shared {
+			t.Fatalf("the wiring loads %+v, and wants a shared slice key of migration", one)
+		}
+		resolved[one.Name] = `"shadow"`
 	}
 	s := q.NewStore(c)
-	if _, err := s.Commit(0, values, map[string]any{q.ResolvedName: q.Resolved{keys[0].Name: `"shadow"`}}); err != nil {
+	if _, err := s.Commit(0, values, map[string]any{q.ResolvedName: resolved}); err != nil {
 		t.Fatal(err)
 	}
-	if err := s.Run(keys[0].Name); err != nil {
-		t.Fatal(err)
-	}
-	if said := s.Snapshot().Read(keys[0].Name); said != "shadow" {
-		t.Fatalf("%s reads %v, and wants shadow", keys[0].Name, said)
+	for _, one := range keys {
+		if err := s.Run(one.Name); err != nil {
+			t.Fatal(err)
+		}
+		if said := s.Snapshot().Read(one.Name); said != "shadow" {
+			t.Fatalf("%s reads %v, and wants shadow", one.Name, said)
+		}
 	}
 }
 
