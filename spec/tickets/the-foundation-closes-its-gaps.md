@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: split
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase1gaps
@@ -114,6 +114,15 @@ record:
   - step: sync
     hand: box d7e2ac6b84cc · claude-code-remote
     hash_before: 72467a84ce3bfb196565f0d1163da5dc251dfe8d
+  - step: sync
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: cbac70314783c41297a29143fcd74ba6dbd57a71
+    hash_after: cbac70314783c41297a29143fcd74ba6dbd57a71
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-foundation-closes-its-gaps already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -129,8 +138,9 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
