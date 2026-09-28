@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
@@ -173,6 +173,18 @@ record:
         hash: dfe6ac5c2a96ea79
         size: 6161
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-6
+    hash_before: ead86e5949ea71e8509aae7250949e580c9e1071
+    hash_after: ead86e5949ea71e8509aae7250949e580c9e1071
+    inputs:
+      - name: design/draft
+        hash: dfe6ac5c2a96ea79
+        size: 6161
+      - name: design/tests-red
+        hash: 852fe43a4ea64b36
+        size: 986
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -361,8 +373,11 @@ the config cases seed files, env and index/leases through a writer of their own 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- env-layer-reads-its-variables: the draft's assumption that the environment layer waits on a family-map input is stale, since tickets-becomes-a-module stands closed and input.family in src/q/q.go reads map[string]T over a family such as env/<name>. Build the environment layer in this change, and add a case to src/modules/config/config_test.go where an env/SE_ value beats the local file. TestASharedKeyReadsTheDefaultFileAlone seeds env yet passes with no environment layer at all, so no case decides the layer the ask names.
+- config-spells-the-env-name: step Seventeen reads the variable src/config.EnvOf names, and the onlyq analyzer keeps src/config out of a module. The config module spells the SE_ name itself, with a pointer at EnvOf, the way config.go already spells Tracked and Local.
 
 # implement
 
