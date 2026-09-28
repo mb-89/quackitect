@@ -9,7 +9,12 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { planOf } from "../../src/scripts/dispatch.js";
-import { standingIn, TODO, waitingOn } from "../../src/scripts/work-stands.js";
+import {
+  refsHere,
+  standingIn,
+  TODO,
+  waitingOn,
+} from "../../src/scripts/work-stands.js";
 import { CHILD, doorsSaying, GROUP_NOTE, remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
@@ -75,4 +80,24 @@ test("waitingOn holds on a standing branch or an open ticket on trunk, and on no
   ]);
   assert.deepEqual(waitingOn(text, standing, trunk), ["busy", "parent"]);
   assert.deepEqual(waitingOn(text, standing), ["busy"], "no trunk read, no parent");
+});
+
+// [[spec/tickets/the-queue-views-agree]]
+test("a ref whose base stands short of the trunk tip reads behind, and one with no trunk tip reads level", () => {
+  const refs = (more) =>
+    refsHere({
+      git: fakeGit(
+        {
+          ...remoteSaying([{ branch: "work/one-group", tip: "aaa", base: "older" }]),
+          ...more,
+        },
+        ROOT,
+      ),
+    });
+
+  const [behind] = refs({});
+  assert.equal(behind.behind, true);
+  assert.equal(behind.orphan, false);
+  const [level] = refs({ "git rev-parse origin/main": { exitCode: 1 } });
+  assert.equal(level.behind, false);
 });

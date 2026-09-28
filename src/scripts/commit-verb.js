@@ -162,11 +162,15 @@ function movedFrom(it, paths) {
   if (!paths.length) return [];
   const staged = it.git.run(["diff", "--cached", "--name-status", "-M"], true).out;
   const out = [];
+  const touched = new Set();
   for (const row of staged.split("\n")) {
     const [how, from, to] = row.split("\t");
+    touched.add(from);
     if (/^R/.test(how ?? "") && paths.includes(to) && !paths.includes(from))
       out.push(from);
   }
+  // A journaled old path joins where the staged delta names it or git still holds it, so a move that landed long ago adds no pathspec git refuses. [[spec/tickets/commit-skips-landed-moves]]
+  const stands = (from) => touched.has(from) || stagable(it, from);
   for (const one of journaledMoves(it)) {
     for (const path of paths) {
       const under =
@@ -177,7 +181,7 @@ function movedFrom(it, paths) {
             : null;
       if (under === null) continue;
       const from = `${one.from}${under}`;
-      if (!paths.includes(from) && !out.includes(from)) out.push(from);
+      if (!paths.includes(from) && !out.includes(from) && stands(from)) out.push(from);
     }
   }
   return out;

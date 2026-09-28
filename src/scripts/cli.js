@@ -55,6 +55,7 @@ import { pullArgvOf } from "./pull-tool.js";
 import { renaming, renamingText } from "./rename.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
+import { detachedStart } from "./serve.js";
 import { ticket } from "./ticket.js";
 import {
   detach,
@@ -391,8 +392,14 @@ export function theStub(argv) {
   return 0;
 }
 
-export function serveBridge(argv) {
+// Without the debugger the server stands detached, so the verb returns and the server stays. [[spec/design_output/level0#a-desk-serve-returns]]
+export async function serveBridge(argv, doors = { ...it, root }) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
+  if (!inspect.length) {
+    const { code, said } = await detachedStart(doors);
+    console.log(said);
+    return code;
+  }
   const server = join(root, "src", "bridge", "server.js");
   return outside.run([process.execPath, ...inspect, server, root], {
     cwd: root,

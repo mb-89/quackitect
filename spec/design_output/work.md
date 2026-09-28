@@ -171,6 +171,7 @@ A flag asks for that one reading in place of the rows.
 | the paths | `cat-file --batch` | the ticket names each tip carries |
 | the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
+| the trunk tip | `rev-parse`, once a listing | the commit a base short of it reads `behind` against |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
 and the routine's trigger fetch on their own, because each acts on the remote.
@@ -412,7 +413,9 @@ after the first reading.
 # Trunk comes in first
 
 `branch sync` merges `origin/main` into the branch. `branch take` runs it, so a
-routine pays nothing to remember it. A conflict then stops the take, while the
+routine pays nothing to remember it. On a work branch it first merges
+`origin/<the branch>`, so a commit another hand pushes there comes in, and both
+sides stand. A conflict there stops the sync, and trunk waits for it. A conflict then stops the take, while the
 work it costs still sits ahead.
 
 On `main`, `branch sync` merges `origin/main` into the desk's `main`. So a desk

@@ -85,6 +85,8 @@ export async function doorsHere() {
     ...handDoors(process.env),
     node: process.execPath,
     pid: process.pid,
+    // The register splits its folders by the platform's separator. [[spec/tickets/serve-probes-the-register-port]]
+    windows: process.platform === "win32",
     // The retro's collect reads the transcripts and the memory under home, and the scratchpads under temp. [[spec/guidance/retro/collect]]
     home: homeIn(process.env),
     temp: process.env.TEMP || process.env.TMP || process.env.TMPDIR || "",
