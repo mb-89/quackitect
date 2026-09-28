@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -50,12 +50,48 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+      - name: tests-red-2
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-2
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -63,7 +99,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate"]
+    input: ["design/draft", "gate", "design/draft-2"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -75,7 +111,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: design/tests-red
+        input: ["design/tests-red", "design/tests-red-2"]
         to: retro
         evidence:
           - name: tests
@@ -114,7 +150,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: open-tasks-switch-lands
 record:
   - step: design/draft
     hand: box d81edbaa8ed8 · claude-code-remote
@@ -138,6 +173,13 @@ record:
         hash: 3f388022f20d8f55
         size: 1464
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d81edbaa8ed8 · claude-code-remote · helper-4
+    hash_before: c26808e7bb6e449df0d80336b50c68992098e77e
+    hash_after: c26808e7bb6e449df0d80336b50c68992098e77e
+    returns: 1
+    why: "the approach leaves out the three parts the owner moves here under Discussion, though that entry says the draft takes them in: a sidebar redraw after a burst of writes to a ticket folder, the plan file or the hold folder, in src/extension/sidebar.js; a case in test/level0/sidebar.test.js holding a ticket write changing the badge; and the owner's before-and-after compare with no window reload; src/extension/sidebar.js watches only SCHEMA, TRACKED, LOCAL and BLESS, so the badge keeps its old number after a ticket moves while the work tab reads fresh places; the two numbers still disagree, and the ask's goal stays unmet; design/tests-red holds no red case for the redraw, so no failing test decides that part; the draft names the redraw and its case in test/level0/sidebar.test.js, and tests-red writes that case red; the callers list names no caller in src/extension; add sidebar.js counted and its watches list; form, rides to the build: TestTheBadgeAndTheHeaderReadOneValue reads Places.Takeable as the badge; a case on countSaid in src/tui holds the badge's own verb; checked and holding: slicedCount, shadowOf, askOpenTasks, PlacesAt, Tab.Label and countSaid read as the draft says; migration.opentasks takes new under the schema enum; openTasksOf in src/modules/work counts what countTakeable counts; two of the three new tests fail on their own assertion, reading 3 and 2 where they want 5"
+group: open-tasks-switch-lands
 ---
 
 # Ask
@@ -235,6 +277,68 @@ Two of the three tests fail on their own assertion: the new slice answers the ol
 the done_when case meets TestTheBadgeAndTheHeaderReadOneValue, which fails on its assertion
 the index door and the verb both have fakes: askOpenTasks and runPlaces
 
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -242,8 +346,15 @@ the index door and the verb both have fakes: askOpenTasks and runPlaces
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- the approach leaves out the three parts the owner moves here under Discussion, though that entry says the draft takes them in: a sidebar redraw after a burst of writes to a ticket folder, the plan file or the hold folder, in src/extension/sidebar.js; a case in test/level0/sidebar.test.js holding a ticket write changing the badge; and the owner's before-and-after compare with no window reload
+- src/extension/sidebar.js watches only SCHEMA, TRACKED, LOCAL and BLESS, so the badge keeps its old number after a ticket moves while the work tab reads fresh places; the two numbers still disagree, and the ask's goal stays unmet
+- design/tests-red holds no red case for the redraw, so no failing test decides that part; the draft names the redraw and its case in test/level0/sidebar.test.js, and tests-red writes that case red
+- the callers list names no caller in src/extension; add sidebar.js counted and its watches list
+- form, rides to the build: TestTheBadgeAndTheHeaderReadOneValue reads Places.Takeable as the badge; a case on countSaid in src/tui holds the badge's own verb
+- checked and holding: slicedCount, shadowOf, askOpenTasks, PlacesAt, Tab.Label and countSaid read as the draft says; migration.opentasks takes new under the schema enum; openTasksOf in src/modules/work counts what countTakeable counts; two of the three new tests fail on their own assertion, reading 3 and 2 where they want 5
 
 # implement
 
