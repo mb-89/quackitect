@@ -34,9 +34,9 @@ group: the-cloud-follow-ups-land
 
 The gain is a trunk that names no group standing in the cloud once its branch comes in, whichever path the merge takes.
 
-Without it a closed group keeps `cloud: true` on trunk, as the-foundation-closes-its-gaps does, and every reader of the marker takes the group for one a box still works.
+Without it a closed group keeps `cloud: true` on trunk, as the-foundation-closes-its-gaps does. Every reader of the marker then takes the group for one a box still works.
 
-- a merge that conflicts drops the marker from the group ticket in the working tree, and stages it, so the resolving commit carries it
+- a merge that conflicts drops the marker from the group ticket, and stages it for the resolving commit
 - the stale marker on the-foundation-closes-its-gaps drops
 - `./RUNME.sh test test/level0/work-cloud-marker.test.js` is green
 

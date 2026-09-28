@@ -86,7 +86,11 @@ process_hash: 5d4a884bfb2491ff
 
 # Ask
 
-The cloud's hand-over follows the owner's rulings. A box opens its group's pull request with auto-merge on, the dispatch Action runs live on the repo, and a merge that conflicts still takes its group out of the cloud.
+The cloud's hand-over follows the owner's rulings:
+
+- a box opens its group's pull request, with auto-merge on
+- the dispatch Action runs live on the repo
+- a merge that conflicts still takes its group out of the cloud
 
 Done when every child closes through the command it names, and `./RUNME.sh check` passes.
 
