@@ -3,8 +3,8 @@
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
-import { createServer } from "node:http";
 import { test } from "node:test";
+import { wire } from "../../src/doors/wire.js";
 
 // The door stands nowhere until tests-green lands it, so a missing one answers an assertion. [[spec/design_output/pull#a-test-proves-red]]
 async function loaded(path) {
@@ -19,17 +19,23 @@ const BODY = JSON.stringify({ said: "hello" });
 
 async function served(answer) {
   const heard = [];
-  const server = createServer((req, res) => {
-    let body = "";
-    req.on("data", (part) => {
-      body += part;
-    });
-    req.on("end", () => {
-      heard.push({ method: req.method, url: req.url, headers: req.headers, body });
-      answer(res);
-    });
+  let server;
+  await new Promise((done) => {
+    server = wire().listen(
+      0,
+      (req, res) => {
+        let body = "";
+        req.on("data", (part) => {
+          body += part;
+        });
+        req.on("end", () => {
+          heard.push({ method: req.method, url: req.url, headers: req.headers, body });
+          answer(res);
+        });
+      },
+      done,
+    );
   });
-  await new Promise((done) => server.listen(0, "127.0.0.1", done));
   return { url: `http://127.0.0.1:${server.address().port}/fire`, heard, server };
 }
 

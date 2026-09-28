@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-owner-stores-the-token, dispatch-writes-the-bundles, the-skills-start-the-workers, groups-land-through-pull-requests]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -163,6 +163,15 @@ record:
         hash: 35d1422fb21984cf
         size: 908
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d81be38d5cd0 · claude-code-remote
+    hash_before: 6e31066d19d414308703aef2835a7a7bbf10f820
+    hash_after: 6e31066d19d414308703aef2835a7a7bbf10f820
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -334,14 +343,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/doors/http.js src/doors/fake/http.js src/scripts/dispatch-fire.js src/scripts/dispatch.js src/scripts/cli-doors.js src/scripts/cli.js spec/design_output/doors.md .claude/skills/dispatch/SKILL.md test/level0/dispatch-fire.test.js test/contract/dispatch-workflow.test.js test/contract/http.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and the command line's line for the verb besides
+the http door carries its fake, and the contract case serves through the wire door
+each new file opens with a comment naming the design input's section on firing the workers
+the version, the cap and the label each stand once in the fire script, and the doors note carries one row for the door
 
 ## tests-green
 
