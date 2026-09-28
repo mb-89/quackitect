@@ -33,7 +33,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
-step: answer
+step: do
 todo: true
 record:
   - step: answer
@@ -60,6 +60,21 @@ record:
   - step: answer
     hand: the engine
     stale: ask
+  - step: answer
+    hand: box 1327ac97a972 · claude-code-remote
+    hash_before: c37aef1331aa561837bc76520eaa12376691da9f
+    hash_after: c37aef1331aa561837bc76520eaa12376691da9f
+    inputs:
+      - name: ask
+        hash: 86ed41d0f943ffec
+        size: 1297
+      - name: [[spec/tickets/sessions-boot-from-the-repo]]
+        hash: 53882550d875ff45
+        size: 36217
+      - name: [[spec/tickets/a-rewind-spares-landed-tests]]
+        hash: a63fe78443cd598c
+        size: 20553
+    def: 2280015d497a3abd
 ---
 
 # Ask
