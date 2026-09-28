@@ -94,6 +94,16 @@ The line it runs is the bridgehead's own, imported from the hook. So one text
 starts the server on both roads, and one table names what each code says. The
 stub's bridgehead keeps a copy, because that file imports nothing at all.
 
+## A desk serve returns
+
+`./RUNME.sh serve` probes the same port. Where nothing answers, it starts the
+server detached through the proc door's `respawn`, watches it for the window a
+restart takes, and returns. The server stays when the shell closes, and a
+second run finds it standing and starts nothing. A start that falls inside the
+window names the line it writes to `.se/.log/serve.log`. With `--inspect` the
+verb holds the server as its own child, because the debugger holds it.
+`detachedStart` in `src/scripts/serve.js` holds it.
+
 ## The bridgehead starts it too
 
 The take verb reaches a cloud box that pulls work. A cloud session opening on
@@ -717,6 +727,18 @@ asks for the canary, and reads the log that run leaves:
 The numbers come out of the standing block alone. So an answer carrying them
 proves the block stands in front of the model past the compaction.
 
+`./RUNME.sh probe reply` runs the client headless on the prompt
+`REPLY_PROBE.opens` in `.claude/skills/level0/lib/guidance.js` names:
+
+1. The prompt's marker arms the bridgehead at `prompt.submit`.
+2. The next `tool.call` writes one `probe.reply` row, whose detail holds the
+   event's short fields.
+3. `readsReply` in `src/scripts/probe-reply.js` names each field carrying the
+   line the prompt asks for, and reads whether the answer quotes the warning
+   as the prompt's first line.
+4. The verb answers green where the row stands, and red where the client
+   loads no function hooks.
+
 ## What the probe reads
 
 `readsCompaction` in `src/scripts/probe.js` is a pure function over log rows:
@@ -1250,7 +1272,7 @@ the answer paying it says what the agent does next and the work goes on.
 These roads stay open, because this session's own debt reaches past them:
 
 - a subagent carries a canary of its own, so `e.agentId` passes
-- `AskUserQuestion` is the road to the owner, so `reachesTheOwner` passes
+- `AskUserQuestion` is the road to the owner, so `reachesTheOwner` passes. A cloud box meets [[spec/design_output/level0#the-cloud-ask-door]] instead
 - `godPasses` wraps the door, so the binding at `god` passes the refusal
 
 The probe after a compaction pays nothing. It reads the canary through
@@ -1397,7 +1419,8 @@ writes the reply meets a refusal, writes the reply, and calls again.
 An ask pressed while a prompt stands unpaid waits for the pay, so the first
 call still meets the gate. A call with nothing new comes back refused. The
 refusal quotes the last text seen and its length, so a stale read and a wrong
-reply read apart. `AskUserQuestion` and the report tool pass the hold.
+reply read apart. `AskUserQuestion` and the report tool pass the hold. A cloud
+box meets [[spec/design_output/level0#the-cloud-ask-door]] first.
 
 Each refusal writes a `gate` line at `debug`, because the agent reads the
 refusal itself.
@@ -1497,7 +1520,8 @@ asserts each line of them.
 - A helper's call. A subagent's `tool.call` carries `agentId`, and a helper owes
   the owner no readback.
 - `AskUserQuestion`, which reaches the owner itself. A door refusing it stops a
-  session from asking the one thing it needs.
+  session from asking the one thing it needs. A cloud box is the exception, as
+  [[spec/design_output/level0#the-cloud-ask-door]] says.
 
 `answer.enabled` in `spec/config/level0.json` turns the door off, the way the tooth
 turns off. A rule nobody can turn off stops the tree on the day it
@@ -1506,6 +1530,14 @@ reads something wrongly.
 The door sits inside the write door's own `tool.call` hook, after the log line
 and before the linting. The engine refuses a second `tool.call` hook carrying no
 matcher, so one hook holds both.
+
+## The cloud ask door
+
+Nobody sits beside a cloud box, so an `AskUserQuestion` there meets nobody. `holdsCloudAsk` in `src/bridge/cloud-ask.js` refuses it where `cloudHere` holds. The refusal names the question ticket and the push, and points at [[spec/guidance/cloud/cloud]].
+
+- `onToolCall` in `src/bridge/server.js` reads it after the owner's hold and before the grace.
+- A helper's call meets it too, since nobody sits beside a helper on a cloud box either.
+- A desk asks as it always does.
 
 ## Guidance a variable switches on
 

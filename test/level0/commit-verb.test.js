@@ -349,6 +349,38 @@ test("a journaled old path the index still holds stages with the new path", asyn
   assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
 });
 
+// A rename that landed long ago leaves its old path nowhere, and git refuses a pathspec matching nothing. [[spec/tickets/commit-skips-landed-moves]]
+test("a journaled old path standing nowhere stays out of the commit", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": { stdout: "M\tspec/tickets/new-name.md\n" },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "spec/tickets/old-name.md", to: "spec/tickets/new-name.md" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- spec/tickets/new-name.md`),
+    ran.join("\n"),
+  );
+  const lands = ran.filter((one) => /^git (add|commit) /.test(one));
+  assert.ok(
+    !lands.some((one) => one.includes("old-name")),
+    "the old path joins no pathspec",
+  );
+});
+
 // [[spec/design_output/level0#the-cold-probe]]
 test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
   const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);

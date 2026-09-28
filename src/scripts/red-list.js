@@ -24,14 +24,20 @@ export function expectedRed(tickets) {
       (held) => held.leaf && held.name === RED,
     );
     for (const leaf of leaves) {
-      for (const row of chapterOf(one.text, leaf.path).fields.get(FIELD) ?? []) {
-        const file = String(row)
-          .replace(/^[-*]\s+/, "")
-          .replaceAll("`", "")
-          .trim();
-        if (file) out.add(file);
-      }
+      for (const file of redListOf(one.text, leaf.path)) out.add(file);
     }
   }
   return [...out].sort();
+}
+
+// The files one red leaf names under its red field. [[spec/design_output/pull#kept-red-leaves]]
+export function redListOf(text, path) {
+  return (chapterOf(text, path).fields.get(FIELD) ?? [])
+    .map((row) =>
+      String(row)
+        .replace(/^[-*]\s+/, "")
+        .replaceAll("`", "")
+        .trim(),
+    )
+    .filter(Boolean);
 }

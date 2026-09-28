@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { resolve } from "node:path";
 import { testArgv } from "../../src/scripts/cli.js";
-import { expectedRed } from "../../src/scripts/red-list.js";
+import { expectedRed, redListOf } from "../../src/scripts/red-list.js";
 
 const TICKET = (record) => `---
 kind: [[ticket]]
@@ -80,4 +80,15 @@ test("the check's run names every test file but the red ones, and the globs wher
     testArgv(at).some((one) => one.includes("*")),
     "no red list runs the globs",
   );
+});
+
+// [[spec/tickets/kept-red-reads-red-list]]
+test("one leaf's red list reads each row as a bare path, and a leaf with no list reads empty", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# implement\n\n## tests-red\n\n### red\n\n- `test/level0/a.test.js`\n* test/level0/b.test.js\n\n## change\n";
+  assert.deepEqual(redListOf(text, "implement/tests-red"), [
+    "test/level0/a.test.js",
+    "test/level0/b.test.js",
+  ]);
+  assert.deepEqual(redListOf(text, "implement/change"), []);
 });
