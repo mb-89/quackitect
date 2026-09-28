@@ -86,6 +86,23 @@ test("a named Go folder alone runs its packages, and reads no branch", () => {
 });
 
 // [[spec/design_output/pull#the-test-verb]]
+test("a named Go test file runs the cases it declares alone", () => {
+  const RUN = "go test -run ^(TestA|TestB)$ ./src/q/";
+  const it = tree({ [RUN]: { exitCode: 0 } });
+  it.disk = fakeDisk({
+    [`${ROOT}/go.mod`]: MOD,
+    [`${ROOT}/src/q/a_test.go`]:
+      "package q\n\nfunc TestB(t *testing.T) {}\n\nfunc TestA(t *testing.T) {}\n",
+  });
+
+  const { code, said } = quiet(() => testVerb(it, ["test", "src/q/a_test.go"], {}));
+
+  assert.equal(code, 0, said);
+  assert.equal(said, "green, src/q passes");
+  assert.deepEqual(it.proc.ran[0].argv, RUN.split(" "));
+});
+
+// [[spec/design_output/pull#the-test-verb]]
 test("a folder names itself, and a Go test names the folder holding it", () => {
   const it = tree({});
   assert.deepEqual(goPackagesOf(["src/index"], it), ["src/index"]);

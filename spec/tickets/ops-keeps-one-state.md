@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,10 +114,80 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
+record:
+  - step: design/draft
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: cbbadaceb9cc703f01a71bbc8a99c707174c9e42
+    hash_after: cbbadaceb9cc703f01a71bbc8a99c707174c9e42
+    inputs:
+      - name: ask
+        hash: e94a1934ce8cfdff
+        size: 434
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: 1a9d52edf886b618ed81fff8e9d957114ac15d8b
+    hash_after: 1a9d52edf886b618ed81fff8e9d957114ac15d8b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: c8c85f5e2d46f43b
+        size: 2000
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: b6deae09f99bb6469af254dbe4a31302f4928cbf
+    hash_after: b6deae09f99bb6469af254dbe4a31302f4928cbf
+    inputs:
+      - name: design/draft
+        hash: c8c85f5e2d46f43b
+        size: 2000
+      - name: design/tests-red
+        hash: e0793d011fade350
+        size: 979
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 2057cdb90078bc9d572053e3dab054f509690477
+    hash_after: 2057cdb90078bc9d572053e3dab054f509690477
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: c3586c7b68e6ce15e541c6dc7a7cbb92a243da67
+    hash_after: bb235c6e16329079e8de4f92dd213b9557044faf
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: e0793d011fade350
+        size: 979
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,46 @@ The store grows with every operation today, and two places hold one operation's 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Three pieces, per spec/design_output/model#what-stays-how-long. One: src/q/store.go gains Store.Drop(read, as, names), which removes the values the writer owns in one revision and refuses a name another writer owns, the way Commit refuses it. Two: src/index/ops.go gains door.sweepsOps, which runs book.Sweep and drops ops/<id> of every operation the sweep answers, through the ops writer. Three: the guard loop in src/index/door.go calls sweepsOps on each tick, so a window that passes takes the operation out of the book, the table and the store together. Weighed: a drop verb on the store over a nil value through Commit, since Commit refuses a nil and a value of the wrong type alike, and a drop names its intent. Assumed: Book.Sweep keeps its windows off ops.SettingsOf, the keys ops.keepDone and ops.keepFailed stand as they are, and the guard tick is fine grained enough for a window measured in minutes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/door.go: door.guards, which calls sweepsOps each tick,src/index/ops.go: door.opensBook, which opens the book sweepsOps reads,src/ops/ops.go: Book.Sweep, whose answer sweepsOps reads,src/q/store.go: Store.Commit, the sibling Drop follows
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/store_test.go: TestADropRemovesTheValuesItsWriterOwns,src/q/store_test.go: TestADropRefusesANameAnotherWriterOwns,src/index/ops_test.go: TestAnOperationPastItsWindowLeavesTheStore
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/store.go,src/q/store_test.go,src/index/ops.go,src/index/ops_test.go,src/index/door.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened spec/design_output/model at what stays how long, src/ops/ops.go Sweep and Registers, src/index/ops.go opensBook, src/index/door.go guards and src/q/store.go Commit, and checked each claim there
+the callers come off a grep for Sweep, OnMove and Commit over src, which shows Sweep runs in tests alone today
+each done_when line names its test: TestAnOperationPastItsWindowLeavesTheStore decides the case, and go test and the check decide the first and last as commands
 
 ## tests-red
 
@@ -189,26 +267,31 @@ The store grows with every operation today, and two places hold one operation's 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/store_test.go src/index/ops_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/store_test.go,src/index/ops_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The drop case keeps both values, since the Drop stub removes nothing. The refusal case takes a name nobody provides. The index case finds the ended operation still in the book past its window, since sweepsOps runs no sweep. The surprise: Commit checks the owner of a name and never compares it with the writer that commits, so the refusal case asks for a name nobody provides, the way Commit refuses, in place of a name another writer owns. The index test builds a door with no database, over a memory keep and a clock the case moves.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a case: TestAnOperationPastItsWindowLeavesTheStore ends an operation past its window and reads the store, and go test and the check decide the rest as commands
+the index case keeps the book in memory and moves its own clock, so it opens no database and no port
 
 # gate
 
@@ -217,8 +300,10 @@ The store grows with every operation today, and two places hold one operation's 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- a-drop-refuses-another-writer: once commits-name-their-writer lands, Store.Drop refuses a name another writer owns, the way Commit then does, with a case beside TestADropRefusesANameNobodyProvides
 
 # implement
 
@@ -229,14 +314,19 @@ The store grows with every operation today, and two places hold one operation's 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/store.go src/index/ops.go src/index/door.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/q/store.go, src/index/ops.go and src/index/door.go, all three on the size list, and their tests
+the change reaches no new door: Drop runs in memory, and the index cases run over a memory keep and a clock the case moves
+each function the change fills points at spec/design_output/model#what-stays-how-long, and the guards header names the sweep
+the windows stay in ops.SettingsOf alone, and sweepsOps reads what Book.Sweep answers
 
 ## tests-green
 
@@ -245,26 +335,33 @@ The store grows with every operation today, and two places hold one operation's 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/store_test.go src/index/ops_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The store drops a name in one revision: Store.Drop removes the values its writer names, and refuses the whole drop where one name has no provider. The index guard tick now runs sweepsOps, which takes every operation Book.Sweep answers past its window out of the store too, so the book, its table and the store let go of an ended operation together, and the store stops growing with every operation. On the way, branch test gives a named Go test file the -run of its own cases, because src/q and src/index hold other tickets red cases, and a whole-package run answers none of them green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/q/store.go, src/index/ops.go and src/index/door.go and their tests, and the branch test verb this leaf needs
+the cases run over a memory keep and a moved clock, and no door stands unfaked
+the changed functions point at spec/design_output/model#what-stays-how-long
+the windows stand in ops.SettingsOf alone, and the Go test names in cli-go.js alone
 
 # accept
 

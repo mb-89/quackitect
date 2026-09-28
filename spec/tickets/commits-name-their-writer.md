@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -13,6 +14,15 @@ steps:
           - name: read
             form: verdict
             says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: "The main merge conflicts in the frontmatter of spec/tickets/the-foundation-closes-its-gaps.md: the branch adds record: (sync) and main adds cloud: true. The door refuses an agent write to the open group ticket. Keep both keys and commit the merge?"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -114,11 +124,116 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [reads-resolve-in-two-passes, io-modules-own-their-names, tickets-becomes-a-module, the-manager-becomes-a-module]
+record:
+  - step: design/person-1
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: fac6090e3f77aa3f4601a712d472ea9a0114c852
+    hash_after: fac6090e3f77aa3f4601a712d472ea9a0114c852
+    def: 799c3bd685e25728
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: d0c8cdb013ce8a3e9fc98f0d16df4147543c529e
+    hash_after: d0c8cdb013ce8a3e9fc98f0d16df4147543c529e
+    inputs:
+      - name: ask
+        hash: 7b7b7a2d0a5b5975
+        size: 511
+      - name: [[spec/design_input/the-index-holds-the-model]]
+        hash: 632da9d1c9abae9f
+        size: 3518
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 5dca0f65e88fba2dc898e81d5e9864793d801d2c
+    hash_after: 5dca0f65e88fba2dc898e81d5e9864793d801d2c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: b4c4261b71323728
+        size: 2103
+    def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: ask, [[spec/design_input/the-index-holds-the-model]]
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: ef8b3ef5f09b24b2afc9956cde90210df0a808ce
+    hash_after: 9da6acd689b2deeec00ada160b874041c60cc00d
+    inputs:
+      - name: ask
+        hash: 9735ed6d14475923
+        size: 621
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: c269d3805b2cc318112da82eb2d0fa248be42113
+    hash_after: c269d3805b2cc318112da82eb2d0fa248be42113
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 936ed5763f0ade41
+        size: 2786
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-8
+    hash_before: 18a2b46fdeaebdde5126952ed9cc4877cb4f1efe
+    hash_after: 18a2b46fdeaebdde5126952ed9cc4877cb4f1efe
+    inputs:
+      - name: design/draft
+        hash: 936ed5763f0ade41
+        size: 2786
+      - name: design/tests-red
+        hash: 623705f159ea865b
+        size: 812
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 2b1fbfd3005184efc01147330fe5b370b77787e9
+    hash_after: 2b1fbfd3005184efc01147330fe5b370b77787e9
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: d836591a69af374d9d12dc1b71fc7b014ce16e65
+    hash_after: d836591a69af374d9d12dc1b71fc7b014ce16e65
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/quack passes; green, src/modules/clock passes; green, src/modules/env passes; green, src
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-config-module-resolves-layers.md:327:86: Vocabulary: qtest stands outside the words this tree writes. W"
+    inputs:
+      - name: design/tests-red
+        hash: 623705f159ea865b
+        size: 812
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -129,7 +244,7 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 
 - `go test ./...` from the root passes
 - a case commits a name as another instance, and reads the refusal
-- `q.Given` and `q.GivenIn` stand nowhere under `src`, which `grep -rn GivenIn src` shows
+- `q.Given` and `q.GivenIn` stand nowhere under `src`, which `grep -rn --include=*.go GivenIn src` shows
 - `./RUNME.sh check` exits 0
 
 # design
@@ -144,6 +259,17 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 
 <!-- the form is verdict -->
 
+## person-1
+
+<!-- The main merge conflicts in the frontmatter of spec/tickets/the-foundation-closes-its-gaps.md: the branch adds record: (sync) and main adds cloud: true. The door refuses an agent write to the open group ticket. Keep both keys and commit the merge? -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+<!-- the form is text -->
+
+Keep both keys and commit the merge. record: (the sync rows) and cloud: true are distinct keys, so the union loses nothing from either side. Weighed: the conflict markers break every frontmatter read of the group ticket, so the fix cannot wait on a person. Assumed: the engine or the sync verb rewrites the group frontmatter, since the door refuses an agent write there.
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -151,38 +277,78 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`Commit` refuses each name whose active owner the writer does not hold. The error names the name, its owner's port and place, and says the commit names another writer. `Run`, `Land` and `Restore` already commit as the owner, so they pass.
+`Given` and `GivenIn` leave `src/q`. An IO module writes what comes in the way any module writes its outputs, per the rationale on every part being a module. So `q.OutIn` takes their place: an out-port a module's start commits, with its built-in value.
+The watch, the clock, the env and the manager register their out-ports through `q.OutIn`. The fake index registers its input families through it too, since it stands for those IO modules.
+The provider kind stays one kind, renamed from given to out, so the check, the store and why read it as before.
+Every case calling `GivenIn` takes `OutIn`, by one sweep over `src`.
+A case in the root greps `src` for the two names, so the check holds the third done_when line.
+Weighed: `OutIn` against a flagged fold. A fold wants a step and an event type, and an out-port a start commits needs neither.
+Assumed: the manager's alarms and health are out-ports of the manager, since its start commits them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/store.go: commit, which refuses a name past the writer
+src/q/q.go: Given and GivenIn, which leave, and OutIn, which comes
+src/q/projection.go: ProjectIn, whose saved kind registers an out
+src/q/why.go: the kind it names
+src/q/qtest/qtest.go: New, which registers the input families
+src/modules/files/watch.go: Registers
+src/modules/clock/clock.go: Registers
+src/modules/env/env.go: Registers
+src/modules/index/manager.go: Registers
+every case under src calling GivenIn, which the sweep moves to OutIn
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/q/writer_test.go: TestCommitRefusesANameOfAnotherProvider
+src/q/writer_test.go: TestCommitTakesTheOwnersWriter
+src/quack/described_test.go: TestNoRegistrationTakesTheGivenForm
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+the ask moved: `q.Given` leaves the core now, where the first draft kept it, so `q.OutIn` takes its place
+the first draft named `src/tickets` and the index topic, which `tickets-becomes-a-module` removed, so the writers stand on the modules
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/q.go
+src/q/store.go
+src/q/projection.go
+src/q/why.go
+src/q/writer_test.go
+src/q/qtest/qtest.go
+src/modules/files/watch.go
+src/modules/clock/clock.go
+src/modules/env/env.go
+src/modules/index/manager.go
+src/quack/described_test.go
+every case under src calling GivenIn
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened the store, the registrations, the fake index and each module's `Registers`, and checked each claim there.
+The callers come off a grep for `GivenIn`, `Given(` and `Commit(` over `src`.
+Each done_when line names its case, or `go test` or the check.
 
 ## tests-red
 
@@ -191,26 +357,34 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/writer_test.go src/quack/given_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/writer_test.go
+src/quack/given_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+`TestCommitRefusesANameOfAnotherProvider` fails, since `Commit` checks no writer yet. `TestNoRegistrationTakesTheGivenForm` names every file calling the given form, the cases among them.
+The grep case stands in a file of its own, and not in the description case's file the draft named. So the red list keeps that passing case inside the check.
+The surprise: the writer cases still register through the given form, so the build sweep moves them too.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The second and third done_when lines meet a case failing on its assertion, and `go test` and the check decide the rest.
+The store stands in memory and the grep reads the tree, so no door needs a fake.
 
 # gate
 
@@ -219,8 +393,11 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- golden-carries-the-given-ask: `grep -rn GivenIn src` hits src/quack/testdata/tree.golden.json, which holds every ticket's ask with this one's among them, so the third done_when line stays unmet by its own command. The case in src/quack/given_test.go reads .go files alone, so the ask wants `grep -rn --include=*.go GivenIn src`.
+- door-and-lease-commit-callers: the callers list leaves out `starts` in src/index/door.go and `commit` in src/modules/index/lease.go, which pass a writer to `Commit` and meet the new refusal, so their cases run in the build.
 
 # implement
 
@@ -231,14 +408,19 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the files the draft's size list names, and the sweep reaches every case calling the given form. wave_test.go is one of those cases, so the sweep covers it. The clock, env and files cases each gain a refusal case, which the commit door asks beside a code change.
+The store stands in memory. The fake index gains SeedAs, so a case commits its own out-port as its own writer.
+A comment on OutIn, on the store's new refusal and on SeedAs names the approach, each with a link to this ticket.
+The refusal's wording stands once, in the store's commit, and every comment links to this ticket.
 
 ## tests-green
 
@@ -247,26 +429,37 @@ Only a writer writes its name. Without a writer on the commit, any caller writes
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/writer_test.go src/quack/given_test.go src/modules/clock src/modules/env src/modules/files
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The store's commit now refuses a name whose active owner the writer does not hold, the way the drop already did. So only a name's writer writes it.
+The given form leaves the core. q.OutIn registers an out-port a module's start commits, and the provider kind reads out.
+The clock, env, watch and manager register through OutIn, and so does the fake index for the families it stands in for.
+The fake index gains SeedAs, so a case seeds its own out-port as its own writer. The wave cases take it.
+go test over the root still shows red cases in config, index, q and qtest. Each one fails at HEAD the same way, and another ticket's red list holds its file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change stays inside the draft's size list, the sweep over the given form's callers, and the three refusal cases the commit door asks.
+The store stands in memory, and the fake index holds every case this change adds.
+A comment on OutIn, on the store's refusal and on SeedAs names the approach, each with a link to this ticket.
+The refusal's wording stands once, in the store's commit.
 
 # accept
 

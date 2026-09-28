@@ -1,7 +1,7 @@
 // The search the agent runs, answered out of the rows. Every text file keeps
 // its whole body here, so a pattern meets the tree in one warm process.
 // [[spec/design_output/index#the-search-reads-the-rows]]
-package main
+package index
 
 import (
 	"database/sql"
