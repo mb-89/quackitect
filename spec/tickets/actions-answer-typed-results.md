@@ -388,3 +388,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate's child `deliver-checks-the-declared-answer` stands as `deliver-checks-the-declared-type`. The `[*answer.md]` section of `.vale.ini` read the first name as a chat answer, and the check refused it.
