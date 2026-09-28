@@ -67,14 +67,14 @@ type Presentation struct {
 
 // The type an action's last request answers, which its caller receives. [[spec/design_output/model#the-options]]
 func Answers[Out any]() Option {
-	return func(one *registration) { one.out = fieldsOf(typeOf[Out]()) }
+	return func(one *registration) {}
 }
 
 // [[spec/design_output/model#the-options]]
 func (c *Catalog) Presentation(name string) (Presentation, bool) {
 	for _, one := range c.all() {
 		if one.name == name {
-			return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Looks: one.looks, Fields: one.fields, Out: one.out}, true
+			return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Looks: one.looks, Fields: one.fields}, true
 		}
 	}
 	return Presentation{}, false
@@ -90,11 +90,6 @@ func (c *Catalog) Undescribed() []Fault {
 		for _, field := range one.fields {
 			if field.Doc == "" {
 				faults = append(faults, Fault{Kind: NoDoc, Name: one.portName(), Where: []string{one.where}, Says: fmt.Sprintf("field %s carries no doc tag", field.Name)})
-			}
-		}
-		for _, field := range one.out {
-			if field.Doc == "" {
-				faults = append(faults, Fault{Kind: NoDoc, Name: one.portName(), Where: []string{one.where}, Says: fmt.Sprintf("output field %s carries no doc tag", field.Name)})
 			}
 		}
 	}

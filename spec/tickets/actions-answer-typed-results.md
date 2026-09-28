@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -200,6 +200,19 @@ record:
         hash: 1717325681c1003e
         size: 74654
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: a3cc1c28ecb8c9c40ec620be9fe15d3bb5e37dbc
+    hash_after: a3cc1c28ecb8c9c40ec620be9fe15d3bb5e37dbc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: 852cd7cfc77b6b4f
+        size: 2056
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -302,7 +315,7 @@ the two looks cases decide the output label and doc line and the refusal line, t
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/q/looks_test.go
+    ./RUNME.sh branch test src/q/looks_test.go
 
 ### red
 
@@ -316,15 +329,17 @@ src/q/looks_test.go
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The rename verb rewrote a path in this ticket, so this step runs again. Both output cases still fail on their own assertion over the stub q.Answers, which sets nothing.
+The model edit at implement marked this leaf stale, so the route runs it again.
+The replay takes the code of q.Answers, Presentation.Out and the output fault back out, and both output cases fail on their own assertion once more. Implement puts the code back.
+The case for an action with no q.Answers passes either way, since it reads the absence of output.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the output case and the refusal case decide the second and third lines, the note edit at implement decides the first, and the check decides the last
-the cases run over a catalog and a wiring in memory, and reach no door
+The output case and the refusal case decide the second and third lines, the model edit decides the first, and the check decides the last.
+The cases run over a catalog and a wiring in memory, and reach no door.
 
 # gate
 
