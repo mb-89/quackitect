@@ -86,3 +86,15 @@ The owner decides how a finding reaches the owner: as a question ticket, as a no
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A box decides this, under the owner's rulings of the day. The answer for the `answer` step:
+
+| the finding | the road |
+|---|---|
+| work a box can do | a ticket in the group the box works, closing before the group reaches done |
+| work a person alone can do | a ticket on [[spec/processes/person]], loose on `main`, with every command in its ask |
+| a doubt with no work in it yet | a note, which the retro decides |
+
+No finding opens a GitHub issue. A finding carries three fields: the failure it names, the evidence as a command and its output, and what it leaves unchecked.
+
+What I weighed: the owner's ruling "If a box opens a ticket that it can solve itself, it assigns it to its own group". The owner also ruled "We have a ticket system for that". Rule 9 of the tickets chapter keeps a doubt as a note and an ask as a ticket. The Findings chapter of [[spec/design_input/level-two]] asks for the road and the fields alone. The box taking this ticket writes the answer, and the `do` step carries it into that chapter.
