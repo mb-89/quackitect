@@ -1,6 +1,6 @@
 // The routes this tree ships, read off disk. A fixture says what a route does,
 // and this case says the shipped file still carries it.
-// [[spec/design_output/work#a-successor-stands-on-question]]
+// [[spec/design_output/work#a-successor-is-person-work]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
@@ -26,13 +26,27 @@ const files = disk();
 const routeOf = (name) =>
   readYaml(files.read(join(root, "spec", "processes", `${name}.yaml`)));
 
-// A desk mints a successor off this route, and `branch unblock` refuses one opening where an agent works. [[spec/design_output/work#a-successor-stands-on-question]]
+// A question opens at the step a cloud box answers itself. [[spec/guidance/cloud/cloud]]
 test("the question route opens at a step waiting for a person", () => {
   const front = routeOf("question");
   const path = stepPathOf(front);
 
   assert.equal(path, "answer", "the route opens at its answer step");
   assert.equal(leafOf(front, path)?.by, "person", "and that step waits for a person");
+});
+
+// A desk mints a successor off this route, and `branch unblock` refuses one opening where an agent works. [[spec/design_output/work#a-successor-is-person-work]]
+test("the person route opens at a step a person does, and an agent carries the result on", () => {
+  const front = routeOf("person");
+  const path = stepPathOf(front);
+
+  assert.equal(path, "do", "the route opens at the person's step");
+  assert.equal(leafOf(front, path)?.by, "person", "and that step waits for a person");
+  assert.equal(
+    leafOf(front, "follow")?.by,
+    "anyone",
+    "the step behind it takes any hand",
+  );
 });
 
 // A standard ticket meets one review, on its design, and goes on to the code. [[spec/tickets/one-review-a-ticket]]

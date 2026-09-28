@@ -136,10 +136,16 @@ func Placed(t *tree.Tree, p Places) {
 		}
 	})
 	// A sentence todo the tree lacks lands as a row of its own, at the left, with no path and no link. [[spec/design_output/stop#the-plan]]
+	// A todo the index nests under its group stands already, so every nested row counts. [[spec/tickets/the-queue-views-agree]]
 	standing := map[string]bool{}
-	for _, one := range t.Items {
-		standing[one.Name] = true
+	var mark func([]tree.Item)
+	mark = func(items []tree.Item) {
+		for _, one := range items {
+			standing[one.Name] = true
+			mark(one.Kids)
+		}
 	}
+	mark(t.Items)
 	added := []tree.Item{}
 	for _, row := range p.Rows {
 		if standing[row.Name] {
@@ -174,11 +180,17 @@ func PlacesAt(root string) (Places, error) {
 	if err != nil {
 		return Places{}, err
 	}
-	return PlacesIn(said)
+	places, err := PlacesIn(said)
+	if err != nil {
+		return Places{}, err
+	}
+	// The shadow writes a row beside the count, and its failure leaves the count standing. [[spec/tickets/open-tasks-run-in-shadow]]
+	_ = shadowOf(root, places.Takeable, time.Now())
+	return places, nil
 }
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
-func runPlaces(root string) ([]byte, error) {
+var runPlaces = func(root string) ([]byte, error) {
 	if _, err := statOf(filepath.Join(root, filepath.FromSlash(placesVerb[0]))); err != nil {
 		return nil, err
 	}

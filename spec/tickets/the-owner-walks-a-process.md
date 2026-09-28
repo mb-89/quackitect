@@ -87,3 +87,5 @@ The owner walks one standard process in the editor, from the mint to its final a
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This is work a person alone can do: the owner's eyes on the owner's editor. So it moves to the person route, per the owner's ruling. [[spec/tickets/owner-walks-process-trial]] carries the commands, loose on `main`. The box taking this ticket closes it `./RUNME.sh ticket pull the-owner-walks-a-process --became owner-walks-process-trial`.

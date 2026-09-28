@@ -88,6 +88,27 @@ export function isGroup(text) {
   return Boolean(text) && fieldOf(text, "process").split("/").pop() === GROUP;
 }
 
+// The group tickets over this one, nearest first, walked up `group` through the texts by name. A loop stops the walk. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function ancestorsOf(text, texts) {
+  const out = [];
+  const seen = new Set();
+  let name = fieldOf(text, GROUP);
+  while (name && !seen.has(name) && isGroup(texts.get(name))) {
+    seen.add(name);
+    out.push({ name, text: texts.get(name) });
+    name = fieldOf(texts.get(name), GROUP);
+  }
+  return out;
+}
+
+// The groups some group names under `group`, which reach no worker. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function parentsIn(texts) {
+  const out = new Set();
+  for (const text of texts)
+    if (isGroup(text) && fieldOf(text, GROUP)) out.add(fieldOf(text, GROUP));
+  return out;
+}
+
 // [[spec/design_output/work#the-take-writes-the-record]]
 export function recordIn(text) {
   return [frontOf(text).record ?? []]

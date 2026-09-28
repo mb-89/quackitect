@@ -92,3 +92,13 @@ The question comes from `owner-terms-await-question`, a finding on `the-owners-w
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A box decides this, under the owner's ruling that a cloud box decides every step itself. The answer for the `answer` step:
+
+| the thing | the word |
+|---|---|
+| the button in the sidebar opening the work editor | the work button |
+| the tab of the window `./RUNME.sh tui` opens | the work tab |
+| the brackets on that tab | the count |
+
+What I weighed: the tree already writes these words, and `spec/vocabulary/terms.yml` carries sidebar. No transcript line quotes the owner naming them otherwise. A wrong word costs one line of the terms file, so it undoes cheaply. The box taking this ticket writes the table as the answer, and the `do` step lands the terms.

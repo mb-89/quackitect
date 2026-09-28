@@ -1,0 +1,11 @@
+{
+  "working": "a-seeded-ticket",
+  "todos": [
+    {
+      "title": "a seeded todo",
+      "details": "the round trip reads it",
+      "todo": "true",
+      "made": "2026-01-01T00:00:00.000Z"
+    }
+  ]
+}

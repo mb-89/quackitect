@@ -4,23 +4,21 @@
 // [[spec/design_output/extension#the-hook-button]]
 
 const vscode = require("vscode");
-const { spawn } = require("node:child_process");
-const { readFileSync, realpathSync } = require("node:fs");
+const { mkdirSync, readFileSync, realpathSync } = require("node:fs");
 const http = require("node:http");
-const { join } = require("node:path");
+const { dirname, join } = require("node:path");
 
 const SERVER = "src/bridge/server.js";
 // The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this module loads as CommonJS and imports no lib.
 const PORT = 6510;
 const OK = 200;
 const WIRE_WAIT = 500;
-const KILL_AFTER = 300;
 const LAUNCH = "the server";
 const PAUSES = "decide";
 // The file every server start writes a line to, a respawn and a start by hand alike. [[spec/design_output/extension#the-light-follows-the-server]]
 const SERVE_LOG = ".se/.log/serve.log";
-// The span a respawn takes to stand on the port, before the light asks again. [[spec/design_output/extension#the-light-follows-the-server]]
-const RESPAWN_GRACE = 1500;
+// The window a start watches before it takes the server as standing, the span a restart watches its child. [[spec/design_output/level0#a-restart-watches-its-child]]
+const START_WAIT = 3000;
 
 // [[spec/design_output/extension#the-hook-button]]
 function processDoor(context, folder) {
@@ -34,7 +32,7 @@ function processDoor(context, folder) {
   const rechecks = async () => {
     for (const key of followed) {
       const held = processes.get(key);
-      if (held?.session !== undefined || held?.child) continue;
+      if (held?.session !== undefined || held?.starting) continue;
       const port = held?.port ?? (await settled(context, folder.uri.fsPath))?.port;
       if (!port) continue;
       const alive = await healthOverTheWire(port).catch(() => false);
@@ -107,25 +105,23 @@ function processDoor(context, folder) {
         if (held) held.session = vscode.debug.activeDebugSession;
         return;
       }
-      const child = spawn(
-        process.execPath,
-        [program, vehicle.method, "--port", String(vehicle.port)],
-        {
-          cwd: vehicle.method,
-          stdio: "ignore",
-          windowsHide: true,
-        },
+      // The server starts detached and outlives the window, so a reload adopts it again. [[spec/design_output/extension#the-hook-button]]
+      const held = { how: "on", adopted: true, starting: true, port: vehicle.port };
+      processes.set(key, held);
+      changed();
+      const out = join(vehicle.method, ...SERVE_LOG.split("/"));
+      mkdirSync(dirname(out), { recursive: true });
+      const born = await (await procDoor(context)).respawn(
+        [process.execPath, program, vehicle.method, "--port", String(vehicle.port)],
+        { cwd: vehicle.method, out, waitMs: START_WAIT },
       );
-      processes.set(key, { how, child, port: vehicle.port });
-      child.on("exit", () => {
-        if (processes.get(key)?.child === child) {
-          processes.delete(key);
-          changed();
-          // A restart ends this child and stands a new server on the port, so the light asks again. [[spec/design_output/extension#the-light-follows-the-server]]
-          setTimeout(() => rechecks().catch(() => {}), RESPAWN_GRACE);
-        }
-      });
-      context.subscriptions.push({ dispose: () => child.kill() });
+      held.starting = false;
+      if (born.fell && processes.get(key) === held) {
+        processes.delete(key);
+        vscode.window.showWarningMessage(
+          `the server falls with exit ${born.exitCode}, and ${SERVE_LOG} says why`,
+        );
+      }
       changed();
     },
 
@@ -133,9 +129,8 @@ function processDoor(context, folder) {
       const held = processes.get(key);
       if (!held) return;
       processes.delete(key);
-      if (held.child || held.adopted) {
+      if (held.adopted) {
         await stopOverTheWire(held.port ?? PORT).catch(() => {});
-        if (held.child) setTimeout(() => held.child.kill(), KILL_AFTER);
       } else {
         await vscode.debug.stopDebugging(held.session ?? undefined);
       }
@@ -144,9 +139,19 @@ function processDoor(context, folder) {
   };
 }
 
+function homeOf(context) {
+  return join(realpathSync.native(context.extensionPath), "..", "..");
+}
+
+// The proc door's detached start, the one a restart takes. [[spec/design_output/level0#a-restart-watches-its-child]]
+async function procDoor(context) {
+  const door = join(homeOf(context), "src", "doors", "proc.js");
+  return (await import(vscode.Uri.file(door).toString())).proc();
+}
+
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 async function settled(context, work) {
-  const home = join(realpathSync.native(context.extensionPath), "..", "..");
+  const home = homeOf(context);
   try {
     const bridge = await import(
       vscode.Uri.file(join(home, "src", "bridge", "vehicle.js")).toString()

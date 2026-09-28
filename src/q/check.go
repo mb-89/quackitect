@@ -14,12 +14,11 @@ type Kind string
 const (
 	Twice     Kind = "a name registered twice"
 	NoDefault Kind = "a name with no default"
-	TwoActive Kind = "two providers active"
-	NoAlt     Kind = "a key picking no registered alt"
 	NoName    Kind = "an input naming no name"
 	OtherType Kind = "an input of another type"
 	Cycle     Kind = "a cycle among derived names"
 	BadName   Kind = "a name of other than lowercase segments"
+	NoDoc     Kind = "a name or a field with no description"
 )
 
 type Fault struct {
@@ -37,8 +36,6 @@ var (
 	segment = regexp.MustCompile(`^([a-z0-9][a-z0-9-]*|<[a-z0-9][a-z0-9-]*>)$`)
 	rest    = regexp.MustCompile(`^<[a-z0-9][a-z0-9-]*\.\.\.>$`)
 )
-
-func providerKey(name string) string { return "providers." + name }
 
 // A key taking the rest of the name stands last, after a segment of its own. [[spec/tickets/files-topic-reads-the-rows]]
 func wellNamed(name string) bool {
@@ -72,31 +69,6 @@ func byName(regs []*registration) []named {
 	return order
 }
 
-// The key providers.<name> picks an alt, and with the key empty the plain registration stands. [[spec/design_output/model#the-provider-kinds]]
-func pick(group named, keys map[string]string) (*registration, *Fault) {
-	if chosen := keys[providerKey(group.name)]; chosen != "" {
-		for _, one := range group.regs {
-			if one.alt == chosen {
-				return one, nil
-			}
-		}
-		return nil, &Fault{Kind: NoAlt, Name: group.name, Where: placesOf(group.regs), Says: fmt.Sprintf("%s names %q", providerKey(group.name), chosen)}
-	}
-	if len(group.regs) == 1 {
-		return group.regs[0], nil
-	}
-	var plain []*registration
-	for _, one := range group.regs {
-		if one.alt == "" {
-			plain = append(plain, one)
-		}
-	}
-	if len(plain) >= 1 {
-		return plain[0], nil
-	}
-	return nil, &Fault{Kind: TwoActive, Name: group.name, Where: placesOf(group.regs), Says: fmt.Sprintf("%s picks none of them", providerKey(group.name))}
-}
-
 func placesOf(regs []*registration) []string {
 	places := make([]string, 0, len(regs))
 	for _, one := range regs {
@@ -105,25 +77,19 @@ func placesOf(regs []*registration) []string {
 	return places
 }
 
+// A name takes one writer, since an alternative calculation is another module type in the wiring. [[spec/tickets/the-wiring-file-binds-ports]]
 func twice(group named) []Fault {
-	byAlt := map[string][]*registration{}
-	var alts []string
+	if len(group.regs) < 2 {
+		return nil
+	}
+	ports := make([]string, 0, len(group.regs))
 	for _, one := range group.regs {
-		if _, ok := byAlt[one.alt]; !ok {
-			alts = append(alts, one.alt)
-		}
-		byAlt[one.alt] = append(byAlt[one.alt], one)
+		ports = append(ports, one.portName())
 	}
-	var faults []Fault
-	for _, alt := range alts {
-		if regs := byAlt[alt]; len(regs) > 1 {
-			faults = append(faults, Fault{Kind: Twice, Name: group.name, Where: placesOf(regs), Says: fmt.Sprintf("alt %q stands %d times", alt, len(regs))})
-		}
-	}
-	return faults
+	return []Fault{{Kind: Twice, Name: group.name, Where: placesOf(group.regs), Says: fmt.Sprintf("it stands %d times, written by %s", len(group.regs), strings.Join(ports, " and "))}}
 }
 
-func (c *Catalog) Check(keys map[string]string) []Fault {
+func (c *Catalog) Check() []Fault {
 	regs := c.all()
 	var faults []Fault
 	for _, one := range regs {
@@ -135,15 +101,9 @@ func (c *Catalog) Check(keys map[string]string) []Fault {
 		}
 	}
 	groups := byName(regs)
-	active := map[string]*registration{}
+	active := activeOf(groups)
 	for _, group := range groups {
 		faults = append(faults, twice(group)...)
-		chosen, fault := pick(group, keys)
-		if fault != nil {
-			faults = append(faults, *fault)
-			continue
-		}
-		active[group.name] = chosen
 	}
 	for _, group := range groups {
 		if one := active[group.name]; one != nil {
@@ -151,6 +111,15 @@ func (c *Catalog) Check(keys map[string]string) []Fault {
 		}
 	}
 	return append(faults, cycles(groups, active)...)
+}
+
+// The first registration of each name stands, and Check names every other as Twice. [[spec/tickets/the-wiring-file-binds-ports]]
+func activeOf(groups []named) map[string]*registration {
+	active := make(map[string]*registration, len(groups))
+	for _, group := range groups {
+		active[group.name] = group.regs[0]
+	}
+	return active
 }
 
 func resolve(groups []named, name string) *named {
@@ -171,15 +140,25 @@ func inputFaults(one *registration, groups []named) []Fault {
 	var faults []Fault
 	for _, in := range one.inputs {
 		group := resolve(groups, in.name)
+		if group == nil && in.optional {
+			continue
+		}
 		if group == nil {
 			faults = append(faults, Fault{Kind: NoName, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s reads %s, which the catalog lacks", in.field, in.name)})
 			continue
 		}
-		if held := group.regs[0].typ; held != in.typ {
-			faults = append(faults, Fault{Kind: OtherType, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s is %s, and %s is %s", in.field, in.typ, in.name, held)})
+		if writer := group.regs[0]; writer.typ != in.typ && !(in.family() && in.typ.Elem() == writer.typ) {
+			faults = append(faults, Fault{Kind: OtherType, Name: one.name, Where: []string{one.where}, Says: fmt.Sprintf("field %s at %s is %s, and %s at %s is %s", in.field, in.portOr(), in.typ, in.name, writer.portName(), writer.typ)})
 		}
 	}
 	return faults
+}
+
+func (in input) portOr() string {
+	if in.port == "" {
+		return in.name
+	}
+	return in.port
 }
 
 func cycles(groups []named, active map[string]*registration) []Fault {

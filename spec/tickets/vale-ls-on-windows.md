@@ -119,3 +119,5 @@ The agent runs steps 1 to 3 on the owner's Windows desk. Steps 4 to 6 wait on th
 | the doctor's `vale` row | `3.20.0`, at `.se/.runtime/bin/vale` |
 | the doctor's `vale-ls` row | `0.5.1`, at `.se/.runtime/bin/vale-ls` |
 | the tracked `vale.valeCLI.path` | `.se/.runtime/bin/vale`, the Linux build on this desk |
+
+Steps 4 to 6 are work a person alone can do: the owner's editor on Windows. So they move to the person route, per the owner's ruling. [[spec/tickets/vale-ls-windows-trial]] carries them, loose on `main`. The box taking this ticket closes it `./RUNME.sh ticket pull vale-ls-on-windows --became vale-ls-windows-trial`.

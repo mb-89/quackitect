@@ -62,6 +62,7 @@ terms:
   - {word: funnel, means: "a note that holds an open question the owner weighs with the options and what each costs"}
   - {word: gate, means: "the end of turn check that scores an answer and asks for a rewrite past a limit"}
   - {word: git, means: "the version control program that records commits and branches of this tree", source: "https://git-scm.com"}
+  - {word: github, means: "the host that carries origin and lands a pull request once its check stands green", source: "https://github.com"}
   - {word: glob, means: "a file name pattern with wildcards that names a family of files"}
   - {word: god mode, means: "the binding that lets every refusal and hold through and leaves only a debug line"}
   - {word: grammar, means: "the rules for how a sentence may be built such as which tenses and modals it may use"}

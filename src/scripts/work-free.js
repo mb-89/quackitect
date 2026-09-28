@@ -3,8 +3,10 @@
 // nothing, so the claim goes stale and the branch comes back to the queue.
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
-import { aged, STALE, spanOf } from "../engine/group.js";
-import { MS, ROUTINE, standingAll, standOf, TODO, waitsOf } from "./work.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { aged, parentsIn, STALE, spanOf } from "../engine/group.js";
+import { DONE, MS, ROUTINE, standingAll, TODO, waitsOf } from "./work.js";
+import { readWork, trunkOf } from "./work-stands.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
 export function tipAge(one, now) {
@@ -27,13 +29,57 @@ export function staleClaim(one, now, it) {
   };
 }
 
-// A branch stands free where nobody claims it, and where the claim on it goes stale. [[spec/design_output/work#a-stale-group-is-yours]]
-export function freeIn(stand, standing, it = null, now = 0) {
+// A branch stands free where nobody claims it, and where the claim on it goes stale. A parent's children reach workers, and the parent reaches none. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function freeIn(stand, standing, it = null, now = 0, trunk = new Map()) {
+  const parents = parentsIn([...stand.map((one) => one.ticket), ...trunk.values()]);
   return stand
     .filter(
       (one) => standing.get(one.branch) === TODO || staleHere(it, now, one, standing),
     )
-    .filter((one) => !waitsOf(one, standing).length);
+    .filter((one) => !parents.has(one.name))
+    .filter((one) => !waitsOf(one, standing, trunk).length);
+}
+
+// The branches free off one read of the refs and main, so a parent standing on main alone holds its child. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
+export function readFree(it, now = 0) {
+  const read = readWork(it, true);
+  const standing = standingAll(read.stand);
+  const trunk = trunkOf(read.loose);
+  const free = freeIn(read.stand, standing, it, now, trunk);
+  return { stand: read.stand, standing, trunk, free };
+}
+
+// A group at done still standing on origin carries no merge yet: behind trunk it needs a sync, and past the span it stays red. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+export function stuckIn(it, one, at) {
+  const said = it.git.run(
+    ["rev-list", "--count", `origin/${one.branch}..origin/${TRUNK}`],
+    true,
+  );
+  if (Number(String(said.out ?? "").trim()) > 0) return "behind";
+  return staleClaim(one, at, it).stale ? "stale" : "";
+}
+
+export function nowOf(it) {
+  return it.clock ? it.clock.now().getTime() : 0;
+}
+
+// The first stuck hand-over, which the take hands out ahead of a free group. A hand-over past work.staleAfter reads stuck by the clock. [[spec/tickets/take-hands-a-stale-handover]]
+export function stuckFirst(it, stand, standing, at = nowOf(it)) {
+  for (const one of stand.filter((held) => standing.get(held.branch) === DONE)) {
+    const why = stuckIn(it, one, at);
+    if (why) return { one, why };
+  }
+  return null;
+}
+
+// The take moves onto a stuck branch and writes no record, because the group stands closed. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+export function handsStuck(it, stuck, onBranch) {
+  if (!onBranch(it, stuck.one.branch)) return 1;
+  console.log(`You are on ${stuck.one.branch}, whose hand-over stands ${stuck.why}.`);
+  console.log(
+    "Run ./RUNME.sh branch sync, then ./RUNME.sh check, then push the branch, and its pull request lands.",
+  );
+  return 0;
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
@@ -56,9 +102,8 @@ export function freeNow(tickets, merged = new Set()) {
 export function trigger(it) {
   // The trigger reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
   it.git.fetch();
-  const stand = standOf(it);
-  const now = it.clock ? it.clock.now().getTime() : 0;
-  const free = freeIn(stand, standingAll(stand), it, now).map((one) => one.branch);
+  const now = nowOf(it);
+  const free = readFree(it, now).free.map((one) => one.branch);
 
   console.log(
     `${ROUTINE.name} runs ./RUNME.sh ticket pull on a cloud box, and the engine takes a branch there.`,

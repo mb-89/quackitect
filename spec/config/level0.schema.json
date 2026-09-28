@@ -476,6 +476,15 @@
         "comment": {
           "type": "string"
         },
+        "opentasks": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The open-tasks count: old answers alone, shadow runs the index's count beside it and logs a mismatch, new answers the index's."
+        },
         "phase0": {
           "type": "boolean",
           "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud."
@@ -647,6 +656,16 @@
           "unit": "seconds",
           "help": "The span the faults of an alarm fall inside."
         },
+        "beat": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span between two beats of the index's work loop."
+        },
+        "lease": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The term a lease runs without a beat before its part reads stale."
+        },
         "deadlineDerived": {
           "type": "number",
           "unit": "seconds",
@@ -660,12 +679,7 @@
         "deadlineAction": {
           "type": "number",
           "unit": "seconds",
-          "help": "The span an action answers within."
-        },
-        "deadlineOp": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span an operation ends within."
+          "help": "The span an action's operation ends within."
         }
       }
     }

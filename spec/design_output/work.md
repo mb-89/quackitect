@@ -64,6 +64,24 @@ A group of one ticket is the ordinary case, and a group of many is the same
 shape. The children stand under the group, so the write door refuses an ask
 naming one of them. The ask says what the group adds up to.
 
+## A group holds groups
+
+A child group names its parent under `group`, per
+[[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]. Each rule
+reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
+
+| the rule | where it stands |
+|---|---|
+| a parent is a group some group names | `parentsIn` in `src/engine/group.js` |
+| a child waits on every ancestor's `depends_on` | `waitsIn` in `src/scripts/work-stands.js` |
+| a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/scripts/dispatch-write.js` |
+| a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/scripts/dispatch.js`, written in the dispatch commit |
+| each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/scripts/dispatch.js` |
+| `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/scripts/work-merge.js` |
+
+A group no hand reaches stands open on trunk, on no branch, opens none in
+this run, and waits on nothing.
+
 # The take writes the record
 
 `take` claims a group by writing one entry into the group ticket's `record`:
@@ -79,7 +97,18 @@ boxes reaching for one group mean one of them meets a rejected push and
 takes the next. That box resets the branch to its remote, so its claim leaves
 the box and the next take meets no commit origin lacks. A claim the commit
 refuses leaves the ticket as the take finds it, and the take stops.
-A take on a box that holds its branch hands that ask again, and a sync conflict after the claim still prints the ask.
+A sync conflict after the claim still prints the ask.
+
+The name decides which ask a take hands, through `pastHold` in
+`src/scripts/work-held.js`:
+
+| the take names | the branch this box holds stands | the take |
+|---|---|---|
+| nothing, or the held branch | any | hands the held ask again |
+| another branch | `done`, `merged` or stale | drops the hold, and goes on to the name |
+| another branch | in work | refuses, naming both branches and `./RUNME.sh branch release` |
+
+No take hands the ask of a branch it does not name.
 
 The take reads the group before it writes that entry, through `standsOpen` in
 `src/scripts/work.js`. A group whose open children hold no step a hand can take
@@ -153,6 +182,7 @@ A flag asks for that one reading in place of the rows.
 | the paths | `cat-file --batch` | the ticket names each tip carries |
 | the contents | `cat-file --batch`, in pieces of `BATCH_ASKS` from `src/doors/git.js`, because one answer past the process door's buffer throws | every ticket the paths name, on every work branch |
 | the base | `merge-base`, once a branch | what trunk and that branch share |
+| the trunk tip | `rev-parse`, once a listing | the commit a base short of it reads `behind` against |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
 and the routine's trigger fetch on their own, because each acts on the remote.
@@ -204,20 +234,21 @@ and the held ones together, and runs no `git show` by hand:
 
 ## A stale group is yours
 
-There is no lease. A branch somebody holds stays held until a person looks, and
-the age of the tip is the signal:
+A branch has one writer while its box pushes, and the age of the tip on origin
+is the lease. A box pushes after every finished step, so a quiet tip means no box
+works the branch:
 
 | the tip's age | means |
 |---|---|
-| under `work.staleAfter` | a box holds the group, and nothing asks |
-| past it | the group is a person's, and `list` puts it under yours |
+| under `work.staleAfter` | a box holds the group, and the push door refuses every other box |
+| past it | the hold stands stale: the push door lets through a push whose tip moves the hold, which `take` and `release` write, and refuses a plain push. `list` puts it under yours |
 
 Under yours it carries the answers below, and each is a verb:
 
 | the answer | the verb | what it does |
 |---|---|---|
 | release it | `branch release <name>` | writes `hash_after`, so the group stands at `todo` |
-| take it over | `branch take` | claims it again, with a record entry of its own |
+| take it over | `branch take` | writes `hash_after` onto the stale take, then claims it with a record entry of its own |
 | close it | `branch close <name> --force` | drops the branch, and the work on it |
 
 `work.staleAfter` stands in `spec/config/level0.json`, and the rule derives from
@@ -226,21 +257,24 @@ the tip, so nothing writes to a branch nobody holds.
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
-is the box saying it leaves. A group closes only when no ticket naming it stands
-open, so the verb refuses in this order:
+is the box saying it leaves. It reads in this order:
 
 | what stands | what `branch done` does |
 |---|---|
-| an open or draft ticket naming the group | refuses, names each ticket and the step it waits at, and frees none |
-| a `retro` leaf that applies on this box, unwritten | refuses, and names the leaf |
-| every ticket at `closed`, and the retro written | closes the group `reason: done`, so `branch merge` takes it |
+| an open or draft ticket naming the group, off the person route | refuses, and names its pull and the road to the person route |
+| an open ticket the branch adds with no group, off the person route | refuses the same way |
+| a `retro` leaf that applies on this box, unwritten | refuses, names the leaf, and files nothing |
+| a ticket on [[spec/processes/person]], in the group or added with no group | leaves it loose on `main`, past any parent, and names it |
+| an open child group | files it into the group's parent |
+| the rest | closes the group `reason: done` and drops the cloud marker, so the pull request carries the close |
 
-A closed ticket stays in the group, as its history. A box that cannot close a
-ticket leaves the group open for the next box, by one of these roads:
+`leftOpen` in `src/scripts/work-fix.js` reads what stands open. The person
+route is the one ticket leaving a group. A ticket the mint writes on a `work/`
+branch names that branch's group, through `joinsGroup` beside it. So a box's own
+question, finding or fix stays in the group until it closes.
 
-- close the ticket through the pull
-- hand a person's step on with `branch unblock`
-- run `branch release`, which leaves the group at `todo`
+A closed ticket stays in the group, as its history. A box that wants the group
+open for the next box runs `branch release`, which leaves it at `todo`.
 
 # A person step leaves
 
@@ -257,6 +291,9 @@ on:
 A desk takes no leaf of a work branch, so a person step there waits for the
 cloud box. [[spec/design_output/work#a-desk-works-on-trunk]]
 
+A ticket a cloud box mints joins the group it works, and only work a person
+alone can do stands loose on `main`. [[spec/guidance/cloud/cloud]]
+
 A desk hands a question out through `branch unblock <ticket> <successor>`. The
 verb takes the ticket standing at that step and hands its rest to a ticket
 outside the group:
@@ -265,7 +302,7 @@ outside the group:
 |---|---|
 | the ticket stands open, in this group, at a step `by: person` | the ticket closes `state: closed`, `reason: became`, `successors: [<name>]` |
 | on `main`, the group the ticket's own `group` field names | the same close, since a desk works on `main` |
-| the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
+| the successor stands open, on the person route, and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
 A ticket in no group holds no branch up, so it waits for its person where it
 stands.
@@ -291,25 +328,30 @@ behind them runs on. The verb refuses these:
 - a hand standing on a cloud box, which answers the step itself
 - a ticket standing where a hand can take it
 - a successor standing inside the group it frees
+- a successor off the person route, since a question an agent answers stays in the group
 - a successor nobody holds yet
 
 A desk mints that last one with `./RUNME.sh mint ticket`, and writes what stands
 open into its ask. [[spec/guidance/cloud/cloud]] says why the cloud road differs.
 
-## A successor stands on question
+## A successor is person work
 
-A successor stands on [[spec/processes/question]], and the verb takes it because
-that route opens at a step waiting for a person:
+A successor stands on [[spec/processes/person]], the route of work a person
+alone can do. The verb takes it because that route opens at a step waiting for
+a person:
 
 | the step it opens at | what it gives |
 |---|---|
-| `answer`, under `by: person` | the person answers on their own time |
-| `do`, under `by: anyone` | the hand behind the answer carries it out |
+| `do`, under `by: person` | the person does the work on their own time |
+| `follow`, under `by: anyone` | the hand behind the result carries it into the tree |
+
+A question an agent can answer stands on [[spec/processes/question]], inside
+the group that meets it, and a cloud box answers it there.
 
 A route opening where an agent can work hands the question back to an agent, and
 the verb refuses it. So a desk mints the successor off this route:
 
-    ./RUNME.sh mint ticket spec/tickets/<name>.md --process=question
+    ./RUNME.sh mint ticket spec/tickets/<name>.md --process=person
 
 `test/contract/process.test.js` reads that route off disk and holds it open, and
 `test/level0/unblock.test.js` mints off it and runs the verb.
@@ -349,11 +391,17 @@ a rejected push and takes the next. For details, see
    group ticket on `main`, and a desk fills its ask.
 2. `./RUNME.sh branch open <name>` pushes `work/<name>` off trunk, standing at
    `todo`.
-3. A session works the branch and pushes to it. A cloud session stops there,
-   because the harness holds `main` shut and a cloud box opens no pull request.
+3. A session works the branch and pushes to it.
 4. That session answers the group's leaves, writes its retro under the ticket's
    retro chapter, then runs `./RUNME.sh branch done`.
-5. `./RUNME.sh branch list --done` names every branch standing at `done`.
+5. The work skill opens a pull request over `work/<name>` against `main`, with
+   auto-merge on. GitHub lands it once the check stands green on Linux and
+   Windows, and `branch merge` refuses a branch a pull request carries. A
+   closed pull keeps its head ref on origin, so `--closed` takes the merge
+   past it.
+6. `./RUNME.sh branch take` hands out a branch at `done` standing behind
+   `main` or stale ahead of a free group, and asks for a sync, the check and a
+   push.
 
 The pull's hand-out says what a branch does next, so no branch carries a copy
 of it. For details, see [[spec/design_output/pull#the-hand-out]].
@@ -392,7 +440,9 @@ after the first reading.
 # Trunk comes in first
 
 `branch sync` merges `origin/main` into the branch. `branch take` runs it, so a
-routine pays nothing to remember it. A conflict then stops the take, while the
+routine pays nothing to remember it. On a work branch it first merges
+`origin/<the branch>`, so a commit another hand pushes there comes in, and both
+sides stand. A conflict there stops the sync, and trunk waits for it. A conflict then stops the take, while the
 work it costs still sits ahead.
 
 On `main`, `branch sync` merges `origin/main` into the desk's `main`. So a desk
@@ -562,6 +612,7 @@ A branch meets its dependency once the dependency's ticket stands closed on trun
 |---|---|
 | its ticket on trunk stands at `state: closed` | runs |
 | its branch stands no more | runs |
+| on no branch, its ticket on trunk short of `state: closed`, as a parent stands | waits |
 | `todo`, held, or `done` on its own branch | waits |
 
 A box closes the group's ticket on its branch, and trunk carries it that way
