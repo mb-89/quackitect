@@ -20,9 +20,6 @@ import (
 //go:embed testdata/queue.golden.json
 var goldenFile []byte
 
-// The span of a minute, in the milliseconds the golden clock counts. [[spec/tickets/the-queue-becomes-a-module]]
-const msAMinute = 60 * msASecond
-
 type queueGolden struct {
 	Persons []Row             `json:"persons"`
 	Held    []Row             `json:"held"`
@@ -77,7 +74,7 @@ func seedsOf(t *testing.T, golden queueGolden) map[string]any {
 			open[one.Name] = true
 		}
 	}
-	person, held, cloud := setOf(golden.Persons), setOf(golden.Held), []string{}
+	person, held, cloud := listedIn(golden.Persons), listedIn(golden.Held), []string{}
 	for name, place := range golden.Answer {
 		if place == CloudPlace {
 			open[name] = true
@@ -114,7 +111,7 @@ func seedsOf(t *testing.T, golden queueGolden) map[string]any {
 	}
 }
 
-func setOf(list []Row) map[string]bool {
+func listedIn(list []Row) map[string]bool {
 	out := map[string]bool{}
 	for _, one := range list {
 		out[one.Name] = true

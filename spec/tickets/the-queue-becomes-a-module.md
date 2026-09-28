@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-shadow-lands
@@ -145,6 +145,18 @@ record:
         hash: bde2cab92a460de6
         size: 3857
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d81c1a402acf · claude-code-remote · helper-3
+    hash_before: 1079a91211ae90f78db57053fbc09c9cc4f3aabd
+    hash_after: 1079a91211ae90f78db57053fbc09c9cc4f3aabd
+    inputs:
+      - name: design/draft
+        hash: bde2cab92a460de6
+        size: 3857
+      - name: design/tests-red
+        hash: ea07a37ead542a1a
+        size: 884
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -283,8 +295,10 @@ every door the tests reach has a fake: the cases reach no door, only the fake in
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- queue-reads-when-tickets-came: stood binds built-in empty in the wiring, so weight/day reads zero in the live tree while the golden case seeds stood; the queue needs a source for when each ticket came in that reads no git ref
 
 # implement
 

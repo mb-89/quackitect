@@ -66,9 +66,65 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(notes, all, cloud)
 }
 
-// Every ticket the cloud holds, in path order. [[spec/tickets/the-queue-reads-the-marker]]
+// Every ticket the cloud holds, by name: a group carrying the mark, and every ticket naming one, the rule cloudsIn in src/scripts/work-answer.js holds. [[spec/tickets/the-queue-reads-the-marker]]
 func cloudOf(in allIn) []string {
-	return []string{}
+	marked := map[string]bool{}
+	for _, one := range in.All {
+		if one.Cloud {
+			marked[one.Name] = true
+		}
+	}
+	out := []string{}
+	for _, one := range in.All {
+		if marked[one.Name] || marked[one.Group] {
+			out = append(out, one.Name)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// The key a group's front carries where the cloud holds it, which CLOUD_MARK in src/scripts/work-merge.js names and a Go module spells again. [[spec/tickets/the-queue-reads-the-marker]]
+const cloudMark = "cloud"
+
+// The hand a leaf names where a person takes it. [[spec/design_output/pull#the-queue-is-a-score]]
+const personHand = "person"
+
+// The anchor a todo names: nothing where the front reads none or false, first for a bare true, and the word itself otherwise, the rule todoOf in src/engine/group.js holds. [[spec/design_output/pull#a-todo-forces-a-place]]
+func todoAt(said string) string {
+	switch said {
+	case "", "false":
+		return ""
+	case "true":
+		return "first"
+	}
+	return said
+}
+
+// The hand the leaf at a step path names, walked down the route's steps a segment at a time, and nothing where the path reaches no leaf. [[spec/design_output/pull#the-queue-is-a-score]]
+func byAt(front *yaml.Doc, step string) string {
+	if step == "" {
+		return ""
+	}
+	steps := yaml.AsList(front.Get("steps"))
+	segments := strings.Split(step, "/")
+	for at, segment := range segments {
+		var found *yaml.Doc
+		for _, item := range steps {
+			if one := yaml.AsDoc(item); one != nil && word(one.Get("name")) == segment {
+				found = one
+				break
+			}
+		}
+		if found == nil {
+			return ""
+		}
+		if at == len(segments)-1 {
+			return word(found.Get("by"))
+		}
+		steps = yaml.AsList(found.Get("steps"))
+	}
+	return ""
 }
 
 // The tickets all answers. [[spec/tickets/the-queue-reads-the-marker]]
@@ -133,6 +189,10 @@ func Of(path, name, text string, changed int64) Ticket {
 		Changed:   changed,
 		DependsOn: dependsOnIn(front),
 		Fails:     failsIn(front),
+		TodoAt:    todoAt(word(front.Get("todo"))),
+		Cloud:     word(front.Get(cloudMark)) == "true",
+		Held:      heldIn(front),
+		Person:    byAt(front, word(front.Get("step"))) == personHand,
 	}
 	if one.Route == groupRoute {
 		one.Standing = standingOf(state, front)
