@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/cloud
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -212,6 +212,15 @@ record:
         hash: cd64de0d4d23e2c7
         size: 40
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: f1e921a2a7cebc11b684914d8b39a3f216c3e864
+    hash_after: f1e921a2a7cebc11b684914d8b39a3f216c3e864
+    inputs:
+      - name: retro/write
+        hash: f8095093525e4886
+        size: 2723
+    def: 4da1ca5da87d5bbc
 depends_on: ["the-foundation-lands-unchanged"]
 enabled_by: migration.phase1gaps
 cloud: true
@@ -403,20 +412,30 @@ The engine's gate paths assume a reviewer mints fixes through the verdict form. 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool the route asked for stood on the box, and the GitHub tools read the Windows CI run
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit hook refused an implement hand-back whose lint field named no test
+- the push door refused a todo tag on children the gate minted, twice
+- the push waited on a warning in the model note
+- the landing rule refused a pull chained after another command
+- no conflict at sync, and no test failed on this box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- driven-trees-load-the-tickets waits on the owner's answer at its person step
+- the successors under this group leave it at branch done: projection-cases-drive-their-verbs, the-manager-declares-its-spans, the-q-suite-drives-the-door
+- no ticket stands minted with no group
+- the handover names the group done and the successors waiting
 
 # Discussion
 
