@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [ports-declare-their-looks]
-step: implement/tests-green
+step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -185,6 +185,9 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/model]]
 ---
 
 # Ask
