@@ -83,7 +83,6 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 step: retro/cloud
-cloud: true
 record:
   - step: sync
     hand: box d7e093d924e2 · claude-code-remote
@@ -165,7 +164,7 @@ record:
   - step: retro/cloud
     hand: box d81be38d5cd0 · claude-code-remote
     hash_before: 610360da4ca5c4df323853c8e17e0a475d151a2f
-    hash_after: 3436537eb91e3a36ba6863eec3c6aa09df3d5b9b
+    hash_after: 0e5b25f49fc26f78f0249d0d6e6d9fc77c91662f
     inputs:
       - name: retro/write
         hash: 98e576c8f0e720d7
