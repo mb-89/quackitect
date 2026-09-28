@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -151,6 +151,21 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: 3ee4f0537bcceec779ff1d481222eb9bd21f7c2b
+    hash_after: 3ee4f0537bcceec779ff1d481222eb9bd21f7c2b
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+      - name: children-2
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 173248322297533c
 ---
 
 # Ask
@@ -231,38 +246,57 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- conflicts-drop-the-marker: branch merge drops the cloud marker on its conflict path, and names it where the group ticket itself conflicts
+- the stale marker on the-foundation-closes-its-gaps drops, through the engine's marks function
+- boxes-open-no-pull: the work skill names the auto-merge method MERGE, and AGENTS.md says the box's pull request merges itself
+- the dispatch Action ran once by hand, as run 36471796196, and its write branch merged itself as pull request 27's sibling 26
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the red test came first and failed for the reason expected, so the fix stayed one guard
+- the dispatch run answered every call of its ticket in one read of its log
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 19:25 the first push met a red check, because the two minted tickets broke the prose rules
+- 19:40 the check refused a person's step waiting inside the open group, so boxes-open-no-pull could not pass while the dispatch question waited beside it
+- 19:45 the pull holds one leaf a hand and a queue-bound session takes no ticket by name, so the two questions could not run side by side
+- 19:52 level zero refused the shell script that filed a ticket into the group through the engine writer, so the dispatch question stayed loose
+- the ask of boxes-open-no-pull read an older AGENTS.md, which main had already changed
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the engine: a verb that files a standing ticket into a group, so a box adopts a question without a script
+- the check: GroupAsksNobody reads a person step the box holds or queues next as taken, so two question children run in one group
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The owner ruled both questions before the run, so the answer steps carry the owner's word rather than the agent's call. Scripts under .se/scripts: unmark.mjs, adopt.mjs and unfile.mjs, each one call into the engine's own writer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands once: the merge method stands in the work skill alone
+- the change adds no number
+- the change writes no header
+- the chapter carries the run's errors with their times
+- the chapter names roles, and no box path
 
 ## cloud
 
