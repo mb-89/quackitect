@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 5560bb486339a576
         size: 2570
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d81c1a402acf · claude-code-remote · helper-3
+    hash_before: cc7cf902ac1287fe463ed5114f23223906bb6e25
+    hash_after: cc7cf902ac1287fe463ed5114f23223906bb6e25
+    inputs:
+      - name: design/draft
+        hash: 5560bb486339a576
+        size: 2570
+      - name: design/tests-red
+        hash: aa384b16ce1de2a7
+        size: 775
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -254,8 +266,11 @@ every door the tests reach has a fake: the index count stands behind a fake the 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- ask-spells-the-slice-key: the ask names migration/config/slices/openTasks, and the catalog refuses a segment other than lowercase (src/q/check.go, segment and BadName), so the draft spells it open-tasks; the ask and the owner-read step still carry the owner's spelling, so the owner confirms open-tasks there
+- places-at-runs-the-shadow: the red cases call shadowOf directly, and no case holds that PlacesAt in src/tui/work/workplaces.go calls it with the old count, nor that askOpenTasks reaches index.AskAt; the implement step adds a case over PlacesAt with the fake set, so the done_when line rests on a test beside the hand's run of ./RUNME.sh log --kind shadow
 
 # implement
 
