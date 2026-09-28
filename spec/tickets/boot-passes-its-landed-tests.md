@@ -33,7 +33,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
-step: do
+step: answer
 todo: true
 record:
   - step: answer
@@ -57,6 +57,9 @@ record:
     hash_after: cf959123b46ee7e1cc26e2ca3b4496134bd8c0ac
     returns: 1
     why: "the hand-back met refused 5 times: tests under do expects green, and ./RUNME.sh lint spec/tickets/boot-passes-its-landed-tests.md spec/tickets/the-cloud-works-its-queue.md answers spec/tickets/boot-passes-its-landed-tests.md:83:36: Passive: Write in the active voice and name who acts: 'is needed'."
+  - step: answer
+    hand: the engine
+    stale: ask
 ---
 
 # Ask
