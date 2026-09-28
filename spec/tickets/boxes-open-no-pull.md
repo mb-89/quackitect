@@ -48,6 +48,19 @@ record:
         hash: 7b2d07e7792d5e73
         size: 15971
     def: 2280015d497a3abd
+  - step: do
+    hand: box d81c8e27d9d7 · claude-code-remote
+    hash_before: 11a75d442afd73d290a42c4a7b6ca7dd679acc7f
+    hash_after: d08bae06a7cb74dc27746152f0892165a0ee8047
+    returns: 1
+    why: the check stays red while the-owner-runs-the-dispatch waits at answer inside the same group, so this do leaf waits for that answer
+    answered:
+      - name: tests
+        exit: 1
+        said: "spec/tickets/the-owner-runs-the-dispatch.md:1:1: GroupAsksNobody: the-owner-runs-the-dispatch stands at answer, a step a"
+      - name: check
+        exit: 1
+        said: "spec/tickets/the-owner-runs-the-dispatch.md:1:1: GroupAsksNobody: the-owner-runs-the-dispatch stands at answer, a step a"
 ---
 
 # Ask
@@ -78,26 +91,32 @@ The owner rules that a cloud box opens its group's pull request from work/<group
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work skill owns how a box hands its group over: it opens the pull request from work/<group> against main and turns auto-merge on with the merge method MERGE, so the owner merges nothing by hand. AGENTS.md already let a cloud session open that pull request, and now says it merges itself, pointing at the work skill for the rest.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the answer: a cloud box opens its pull request with auto-merge on, MERGE
+- the cleanup the change reveals: the ask read an older AGENTS.md, and main already carried the cloud exception
+- every fact stands once: the merge method stands in the work skill, and AGENTS.md points at it
 
 # Discussion
 
