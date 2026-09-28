@@ -291,6 +291,9 @@ on:
 A desk takes no leaf of a work branch, so a person step there waits for the
 cloud box. [[spec/design_output/work#a-desk-works-on-trunk]]
 
+A ticket a cloud box mints joins the group it works, and only work a person
+alone can do stands loose on `main`. [[spec/guidance/cloud/cloud]]
+
 A desk hands a question out through `branch unblock <ticket> <successor>`. The
 verb takes the ticket standing at that step and hands its rest to a ticket
 outside the group:
