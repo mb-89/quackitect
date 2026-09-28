@@ -202,3 +202,49 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 		t.Fatalf("queue/places reads %v", said)
 	}
 }
+
+// The wiring loads tickets, the queue and the work module, and work/open-tasks counts a fake tree of tickets: a marked group and its child stand on the cloud, a closed ticket takes no place, and the free one counts. [[spec/tickets/open-tasks-come-from-work]]
+func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	all, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w := q.Wiring{Wires: all.Wires}
+	for _, one := range all.Instances {
+		if one.Module == "tickets" || one.Module == "queue" || one.Module == "work" {
+			w.Instances = append(w.Instances, one)
+		}
+	}
+	c := q.New()
+	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
+	q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
+	q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	s := q.NewStore(c)
+	ticket := func(front string) q.Content {
+		return q.Content{Hash: front, Text: "---\nkind: [[ticket]]\n" + front + "---\n\n# Ask\n\nA thing.\n"}
+	}
+	tree := map[string]any{
+		"files/spec/tickets/a-group.md":   ticket("state: open\ncloud: true\nprocess: [[spec/processes/group]]\n"),
+		"files/spec/tickets/its-child.md": ticket("state: open\ngroup: a-group\n"),
+		"files/spec/tickets/free.md":      ticket("state: open\n"),
+		"files/spec/tickets/done.md":      ticket("state: closed\n"),
+	}
+	if _, err := s.Commit(0, files, tree); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"tickets/all", "tickets/cloud", "queue/places", "work/open-tasks"} {
+		if err := s.Run(name); err != nil {
+			t.Fatalf("the run of %s answers %v", name, err)
+		}
+	}
+	if said := s.Snapshot().Read("work/open-tasks"); said != 1 {
+		t.Fatalf("work/open-tasks reads %v over the fake tree, and wants 1", said)
+	}
+}

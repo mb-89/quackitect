@@ -5,6 +5,8 @@
 package work
 
 import (
+	"sort"
+
 	"quackitect/src/q"
 	"quackitect/src/ticket"
 )
@@ -49,7 +51,71 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(rows, open)
 }
 
-// [[spec/tickets/open-tasks-come-from-work]]
+// The words a row reads, which src/scripts/work-answer.js names and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+const (
+	groupKind   = "group"
+	ticketKind  = "ticket"
+	todoKind    = "todo"
+	heldPlace   = "0"
+	heldState   = "held"
+	openState   = "open"
+	closedState = "closed"
+)
+
+// One row a ticket in the order the tickets come, then one a placed name no ticket carries, in name order. [[spec/design_output/work#one-reading-answers-git]]
 func rowsOf(in rowsIn) []Row {
-	return []Row{}
+	cloud := map[string]bool{}
+	for _, one := range in.Cloud {
+		cloud[one] = true
+	}
+	state := map[string]string{}
+	for _, one := range in.Tickets {
+		state[one.Name] = one.State
+	}
+	out := []Row{}
+	for _, one := range in.Tickets {
+		out = append(out, rowOf(one, in.Places[one.Name], cloud[one.Name], waits(one, state)))
+	}
+	loose := []string{}
+	for name := range in.Places {
+		if _, stands := state[name]; !stands {
+			loose = append(loose, name)
+		}
+	}
+	sort.Strings(loose)
+	for _, name := range loose {
+		out = append(out, Row{Name: name, Kind: todoKind, State: stateAt(openState, in.Places[name]), Held: in.Places[name] == heldPlace, Todo: true, Queue: in.Places[name]})
+	}
+	return out
+}
+
+// A ticket's row, the way rowOfTicket draws it. [[spec/design_output/work#one-reading-answers-git]]
+func rowOf(one ticket.Ticket, place string, cloud, waits bool) Row {
+	kind := ticketKind
+	if one.Route == groupKind {
+		kind = groupKind
+	}
+	return Row{
+		Name: one.Name, Kind: kind, State: stateAt(one.State, place), Step: one.Step, Progress: one.Progress,
+		Group: one.Group, Urgent: one.Urgent, Person: one.Person, Held: one.Held, Waits: waits,
+		Todo: one.Todo, Says: one.Says, Queue: place, Cloud: cloud,
+	}
+}
+
+// A row at zero stands in hand, so its state reads held whatever its front says. [[spec/design_output/pull#the-queue-is-an-outline]]
+func stateAt(state, place string) string {
+	if place == heldPlace {
+		return heldState
+	}
+	return state
+}
+
+// A ticket waiting on one still open carries the flag saying so. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func waits(one ticket.Ticket, state map[string]string) bool {
+	for _, dep := range one.DependsOn {
+		if state[dep] == openState {
+			return true
+		}
+	}
+	return false
 }

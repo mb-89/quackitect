@@ -21,6 +21,7 @@ import (
 	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/tickets"
+	"quackitect/src/modules/work"
 	"quackitect/src/q"
 )
 
@@ -51,6 +52,7 @@ var modules = map[string]ioModule{
 	}},
 	"tickets": {registers: tickets.Registers},
 	"queue":   {registers: queue.Places},
+	"work":    {registers: work.Registers},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]

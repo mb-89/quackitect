@@ -50,3 +50,19 @@ func TestAPlacedTodoStandsAsARow(t *testing.T) {
 		t.Fatalf("the todo reads %+v, and the rows %v", todo, rows)
 	}
 }
+
+func TestAClosedWaitRaisesNoFlagAndATodoAtZeroStandsHeld(t *testing.T) {
+	rows := rowsBy(t, map[string]any{
+		TicketsPort: []ticket.Ticket{{Name: "done", State: "closed"}, {Name: "next", State: "open", DependsOn: []string{"done", "gone"}}},
+		PlacesPort:  map[string]string{"next": "1", "the work in hand": "0"},
+	})
+	if rows["next"].Waits {
+		t.Errorf("a ticket waiting on a closed one and a missing one reads %+v", rows["next"])
+	}
+	if todo := rows["the work in hand"]; todo.State != "held" || !todo.Held {
+		t.Errorf("the todo at zero reads %+v", todo)
+	}
+	if rows["done"].Queue != "" {
+		t.Errorf("a closed ticket takes no place, and reads %+v", rows["done"])
+	}
+}

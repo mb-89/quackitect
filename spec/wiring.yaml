@@ -12,6 +12,8 @@ instances:
     module: tickets
   queue:
     module: queue
+  work:
+    module: work
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
@@ -24,3 +26,6 @@ wires:
   queue.cloud: tickets/cloud
   queue.stood: built-in
   queue.minute: clock/minute
+  work.tickets: tickets/all
+  work.places: queue.places
+  work.cloud: tickets/cloud
