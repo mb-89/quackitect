@@ -19,7 +19,7 @@ const TEXTS = 4;
 // The transcript rows the answer door reads past the prompt's own row. [[spec/tickets/a-reply-follows-its-prompt]]
 const ROWS = 64;
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const STARTING = 180_000;
+export const STARTING = 180_000;
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
 export const INSTALL_SKIP =
   "editor-link editor-extensions editor-client go index se-lsp";

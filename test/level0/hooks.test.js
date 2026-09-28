@@ -10,7 +10,7 @@ import { test } from "node:test";
 import { wholeAfter } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
+import { INSTALL_SKIP, STARTING } from "../../.claude/skills/level0/hooks/level0.js";
 import { boots } from "../../src/scripts/boot.js";
 
 const PATH = "/tree/spec/vocabulary/terms.yml";
@@ -97,6 +97,21 @@ test("the project settings carry a SessionStart hook running src/scripts/boot.js
     commands.some((one) => /^node \S*src\/scripts\/boot\.js\S*$/.test(one)),
     `a SessionStart hook runs node over src/scripts/boot.js, and these stand: ${JSON.stringify(commands)}`,
   );
+});
+
+// The hook takes its span in seconds, and the start road in milliseconds. [[spec/design_output/level0#the-boot-hook]]
+test("the boot hook waits out the span the start road allows the same install", () => {
+  const spans = (settings.hooks?.SessionStart ?? []).flatMap((one) =>
+    (one.hooks ?? [])
+      .filter((hook) => /src\/scripts\/boot\.js/.test(String(hook.command ?? "")))
+      .map((hook) => Number(hook.timeout ?? 0) * 1000),
+  );
+  assert.ok(spans.length > 0, "a SessionStart hook runs src/scripts/boot.js");
+  for (const span of spans)
+    assert.ok(
+      span >= STARTING,
+      `the boot hook waits ${span} ms, and the start road allows ${STARTING}`,
+    );
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]

@@ -930,7 +930,9 @@ the language server. Those stay wants, and every rule holds without them.
 A `SessionStart` hook in `.claude/settings.json` runs `src/scripts/boot.js`
 through node. On a cloud box lacking the plugin manifest, it runs
 `src/scripts/install.sh` under `INSTALL_SKIP`. Where the manifest stands, or
-off a cloud box, it runs nothing. A failed install holds no session up.
+off a cloud box, it runs nothing. A failed install holds no session up. The
+hook's `timeout` waits out `STARTING`, the span the start road allows the same
+install, so the client cuts no install short before the manifest lands.
 
 Where the manifest stands the plugin loads, and the start road of
 [[spec/design_output/level0#the-bridgehead-starts-it-too]] installs the
