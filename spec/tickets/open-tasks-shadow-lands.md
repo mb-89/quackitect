@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: split
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2shadow
@@ -90,6 +90,15 @@ record:
   - step: sync
     hand: box d81c1a402acf · claude-code-remote
     hash_before: bedc9cefe0d6a773c73bb1be6da6f0892e1e26e0
+  - step: sync
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: f301ccd48ba9022c2cd8c2c4cca32f7e871a6a10
+    hash_after: 1bbabaec73701c2eefbf9fc02aa363fbb1b59d1d
+    answered:
+      - name: sync
+        exit: 0
+        said: work/open-tasks-shadow-lands already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -105,8 +114,9 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
