@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -476,6 +476,21 @@ record:
         hash: e8bdd44da574dc87
         size: 89362
     def: 08e16d07b0de477c
+  - step: design/draft-2
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 906ee884edafebddbc64705177fb53a367c85fdd
+    hash_after: 906ee884edafebddbc64705177fb53a367c85fdd
+    inputs:
+      - name: ask
+        hash: 91423e85b718fbc5
+        size: 1092
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+      - name: [[spec/design_output/level0]]
+        hash: e8bdd44da574dc87
+        size: 89362
+    def: 2fcb4abe3d77d8a2
 group: the-cloud-works-its-queue
 ---
 
@@ -598,28 +613,28 @@ the cases reach the disk and the process through fakeDisk and fakeProc alone
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-[[spec/design_output/level0#the-boot-hook]] holds the approach, and the change stands landed at 370af06b9. `src/scripts/boot.js` runs as the SessionStart hook through node. Off a cloud box, or where the manifest and `node_modules` both stand, it runs nothing. Otherwise it runs `sh src/scripts/install.sh` through the proc door under `SE_INSTALL_SKIP` set to `INSTALL_SKIP`, and answers 0 always. The client scans the plugins before the hook runs, so the setup keeps its install line, its trust flag and its auto mode, and the note names the probes that retire them.
+[[spec/design_output/level0#the-boot-hook]] holds the approach, and the change stands landed. `src/scripts/boot.js` runs as the SessionStart hook through node. Off a cloud box, or where the plugin manifest stands, it runs nothing. Otherwise it runs `sh src/scripts/install.sh` through the proc door under `SE_INSTALL_SKIP` set to `INSTALL_SKIP`, and answers 0 always. Where the manifest stands the plugin loads, and the bridgehead start road installs the modules, so no install writes over another. The client scans the plugins before the hook runs, so the setup keeps its install line, its trust flag and its auto mode, and the note names the probes that retire them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-`.claude/settings.json`: `hooks.SessionStart` runs `src/scripts/boot.js`,`src/scripts/boot.js`: `boots` runs `src/scripts/install.sh` through the proc door,`src/scripts/boot.js`: `boots` reads `INSTALL_SKIP` from `.claude/skills/level0/hooks/level0.js`,`src/scripts/boot.js`: the stub `stampOf` goes, and the `stampOf` of `runs.js` stands untouched,`spec/design_output/level0.md`: the boot hook section names the hook, and says why every setup line stands
+`.claude/settings.json`: `hooks.SessionStart` runs `src/scripts/boot.js`,`src/scripts/boot.js`: `boots` runs `src/scripts/install.sh` through the proc door,`src/scripts/boot.js`: `boots` reads `INSTALL_SKIP` from `.claude/skills/level0/hooks/level0.js`,`.claude/skills/level0/hooks/level0.js`: `START` installs the modules where the manifest stands,`src/scripts/boot.js`: the stub `stampOf` goes, and the `stampOf` of `runs.js` stands untouched,`spec/design_output/level0.md`: the boot hook section names the hook, the road owning each install, and why every setup line stands
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-`test/level0/hooks.test.js`: the project settings carry a SessionStart hook running src/scripts/boot.js,`test/level0/hooks.test.js`: boot runs no install where the manifest and the modules stand,`test/level0/hooks.test.js`: boot runs the install under the skip list where the manifest stands nowhere,`test/level0/hooks.test.js`: boot runs the install where the modules stand nowhere,`test/level0/hooks.test.js`: boot runs nothing off a cloud box,`test/level0/hooks.test.js`: boot runs the install on a box SE_CLOUD marks,`test/level0/hooks.test.js`: boot answers 0 where the install fails
+`test/level0/hooks.test.js`: the project settings carry a SessionStart hook running src/scripts/boot.js,`test/level0/hooks.test.js`: boot runs no install where the manifest and the modules stand,`test/level0/hooks.test.js`: boot runs the install under the skip list where the manifest stands nowhere,`test/level0/hooks.test.js`: boot leaves the install to the bridgehead where the manifest stands and the modules stand nowhere,`test/level0/hooks.test.js`: boot runs nothing off a cloud box,`test/level0/hooks.test.js`: boot runs the install on a box SE_CLOUD marks,`test/level0/hooks.test.js`: boot answers 0 where the install fails
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-the first session: the setup keeps its install line, and the note names the probe that retires it,the trust claim: the approach drops it, and the setup keeps the trust flag and the mode,the stamp and HEAD: no stamp stands, the manifest and the modules decide, and the stub `stampOf` goes,a tool gone under a matching stamp: a case holds the modules gone,the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`,the restale off main: the level zero note gains the branch sync free-verb line alone, which the boot leaves untouched,the restale by the boot hook section: the section states this draft, and the draft now points at it
+the first session: the setup keeps its install line, and the note names the probe that retires it,the trust claim: the approach drops it, and the setup keeps the trust flag and the mode,the stamp and HEAD: no stamp stands, the manifest decides, and the stub `stampOf` goes,a tool gone under a matching stamp: the bridgehead start road installs the modules it finds gone,the Windows road: boot runs off a cloud box nowhere, so a desk keeps `RUNME`,the restale off main: the level zero note gains the branch sync free-verb line alone, which the boot leaves untouched,the restale by the boot hook section: the section states this draft, and the draft points at it,the double install boot-and-bridgehead-install-once names: boot installs where the manifest stands nowhere, and the bridgehead owns the modules
 
 ### size
 
@@ -633,8 +648,8 @@ the first session: the setup keeps its install line, and the note names the prob
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-opened the boot hook section of the level zero note, `.claude/settings.json`, `boot.js` and its cases, and both `stampOf` hits under src
-the callers list names the hook, the install call, the skip list, the stub going and the note section
+opened the boot hook section of the level zero note, `.claude/settings.json`, `boot.js` and its cases, the `START` road in `level0.js`, and both `stampOf` hits under src
+the callers list names the hook, the install call, the skip list, the start road, the stub going and the note section
 each done_when line meets a case in hooks.test.js or the note section, and the check decides the last
 
 ## tests-red-2
