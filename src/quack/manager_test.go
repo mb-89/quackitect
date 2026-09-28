@@ -4,6 +4,7 @@
 package main
 
 import (
+	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -11,6 +12,7 @@ import (
 	"testing"
 
 	"quackitect/src/index"
+	"quackitect/src/q"
 )
 
 // An op table in memory, as the index hands one. [[spec/design_output/model#an-operation-outlives-callers]]
@@ -75,7 +77,7 @@ func TestTheManagerFoldsOpsAndTheWatchdog(t *testing.T) {
 	}
 }
 
-// The built root, run over a root with no wiring file, so the index it spawns loads no module past the manager. [[spec/design_output/model#the-index-manager]]
+// The built root, run over a root, as the door spawns it. [[spec/design_output/model#the-index-manager]]
 func quack(t *testing.T, bin, root string, args ...string) (string, error) {
 	t.Helper()
 	cmd := exec.Command(bin, args...)
@@ -93,13 +95,21 @@ func binaryIn(folder, name string) string {
 	return filepath.Join(folder, name)
 }
 
-func TestTheIndexLoadsTheManagerWithNoOtherModule(t *testing.T) {
-	bin := binaryIn(t.TempDir(), "quack")
+// The root built into a folder, as the install builds it. [[spec/design_output/model#the-wiring-file]]
+func built(t *testing.T, folder string) string {
+	t.Helper()
+	bin := binaryIn(folder, "quack")
 	build := exec.Command("go", "build", "-o", bin, "./src/quack")
 	build.Dir = filepath.Join("..", "..")
 	if said, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("the root does not build: %v\n%s", err, said)
 	}
+	return bin
+}
+
+// A binary standing outside any vehicle, over a tree with no wiring file, reaches no wiring at all. [[spec/design_output/model#the-index-manager]]
+func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
+	bin := built(t, t.TempDir())
 	root := t.TempDir()
 	said, err := quack(t, bin, root, "why", "session/alarms")
 	t.Cleanup(func() { quack(t, bin, root, "call", "stop") })
@@ -111,5 +121,31 @@ func TestTheIndexLoadsTheManagerWithNoOtherModule(t *testing.T) {
 	}
 	if said, err := quack(t, bin, root, "why", "clock/minute"); err == nil {
 		t.Fatalf("the index loads a module past the manager: %s", said)
+	}
+}
+
+// A driven tree carries no wiring file, so the index loads the wiring of the vehicle whose runtime folder holds the binary. [[spec/design_output/model#the-wiring-file]]
+func TestATreeWithNoWiringLoadsTheVehicleWiring(t *testing.T) {
+	vehicle := t.TempDir()
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	at := filepath.Join(vehicle, filepath.FromSlash(q.WiringFile))
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(at, text, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	bin := built(t, filepath.Join(vehicle, filepath.FromSlash(index.Runtime), "bin"))
+	root := t.TempDir()
+	said, err := quack(t, bin, root, "why", "tickets/all")
+	t.Cleanup(func() { quack(t, bin, root, "call", "stop") })
+	if err != nil {
+		t.Fatalf("quack why tickets/all answers %v: %s", err, said)
+	}
+	if !strings.Contains(filepath.ToSlash(said), "src/modules/tickets") {
+		t.Fatalf("the index reads no tickets module loaded: %s", said)
 	}
 }

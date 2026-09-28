@@ -440,3 +440,5 @@ The engine's gate paths assume a reviewer mints fixes through the verdict form. 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- Two successors the retro names took shorter names, since a ticket name holds five words: `a-replayed-red-leaf-reads-green` stands as [[spec/tickets/replayed-red-leaf-reads-green]], and `the-q-suite-drives-the-door` as [[spec/tickets/q-suite-drives-the-door]].

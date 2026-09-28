@@ -159,24 +159,48 @@ func (one opRows) All() ([]manager.Row, error) {
 	return out, nil
 }
 
-// The module instances of the wiring file, loaded into q.Main. A tree with no wiring file runs none. [[spec/design_output/model#the-wiring-file]]
+// The module instances of the wiring file, loaded into q.Main. A tree with no wiring file loads its vehicle's, and where neither stands the index runs none. [[spec/design_output/model#the-wiring-file]]
 func wired() ([]index.Start, error) {
 	root, err := index.Root()
 	if err != nil {
 		return nil, err
 	}
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(q.WiringFile)))
-	if errors.Is(err, fs.ErrNotExist) {
-		return nil, nil
-	}
-	if err != nil {
+	text, err := wiringOf(root, vehicleOf(os.Executable()))
+	if text == "" || err != nil {
 		return nil, err
 	}
-	w, err := q.ReadWiring(string(text))
+	w, err := q.ReadWiring(text)
 	if err != nil {
 		return nil, err
 	}
 	return load(w, q.Main)
+}
+
+// The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]
+func wiringOf(roots ...string) (string, error) {
+	for _, root := range roots {
+		if root == "" {
+			continue
+		}
+		text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(q.WiringFile)))
+		if errors.Is(err, fs.ErrNotExist) {
+			continue
+		}
+		return string(text), err
+	}
+	return "", nil
+}
+
+// The vehicle folder a binary stands in: the install builds it into the vehicle's runtime bin folder, and a binary anywhere else stands in none. [[spec/design_output/model#the-wiring-file]]
+func vehicleOf(exe string, err error) string {
+	if err != nil {
+		return ""
+	}
+	bin := filepath.Dir(exe)
+	if !strings.HasSuffix(filepath.ToSlash(bin), "/"+index.Runtime+"/bin") {
+		return ""
+	}
+	return filepath.Dir(filepath.Dir(filepath.Dir(bin)))
 }
 
 // Loads each IO module instance into into, and answers a start committing its local names under the names the wiring binds. [[spec/design_output/model#the-wiring-file]]

@@ -141,7 +141,9 @@ reads a key like any other input, per
 ## The wiring file
 
 `spec/wiring.yaml` is the one place that knows the global layout, and the index
-reads it at start. It lists the instances to load, and binds each port:
+reads it at start. A project a vehicle drives carries no wiring file. It loads
+the file of the vehicle whose runtime folder holds the index binary, per
+[[spec/design_output/vehicle#a-vehicle-and-its-project]]. The file lists the instances to load, and binds each port:
 
 | the part | what it holds |
 |---|---|
