@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 cloud: true
 record:
   - step: sync
@@ -96,6 +96,15 @@ record:
   - step: sync
     hand: box d7e3869061cf · claude-code-remote
     hash_before: 967e687d393df6ca053b3ccbf9f6e0b08fede631
+  - step: sync
+    hand: box d7e093d924e2 · claude-code-remote
+    hash_before: 6d7763876fdefd613947175ddc968b651f5e226f
+    hash_after: 6d7763876fdefd613947175ddc968b651f5e226f
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-cloud-works-its-queue already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -113,8 +122,9 @@ Done when every child closes through the command it names, and `./RUNME.sh check
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
