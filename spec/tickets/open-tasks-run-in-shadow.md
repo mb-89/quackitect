@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: aa384b16ce1de2a7
         size: 775
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: 5358703b2f73d27b5749b40c56e7cf64902b78f0
+    hash_after: f063a282cda83d2bde49240930dbce8a47c5f277
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/replayed-red-leaf-reads-green.md:18:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -281,14 +290,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, less src/index/main.go: the shadow reaches the door through postIndex in src/tui/work, so no AskAt stands
+every door the change reaches has a fake: askOpenTasks stands as the fake the shadow cases set, and appendFile sits in the package door beside readFile
+a comment names the approach: each new function points at spec/tickets/open-tasks-run-in-shadow
+one place: the key spelling stands in src/modules/migration and in the default file, and the child ticket ask-spells-the-slice-key carries why
 
 ## tests-green
 
