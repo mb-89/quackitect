@@ -15,11 +15,13 @@ import (
 	"reflect"
 	"regexp"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
 
 	"quackitect/src/config"
+	"quackitect/src/modules/check"
 )
 
 var twinsUpdate = flag.Bool("twins", false, "write the twin golden files again off the tree")
@@ -185,7 +187,17 @@ func TestTwinGoldens(t *testing.T) {
 		t.Fatalf("the JavaScript twins read as no JSON: %v", err)
 	}
 
+	// The check module owns the list of twins, so a twin the JavaScript side drops or adds fails here. [[spec/tickets/twin-goldens-walk-every-twin]]
 	for twin := range jsSide {
+		if !slices.Contains(check.Twins, twin) {
+			t.Errorf("the JavaScript side prints %s, a twin check.Twins leaves out", twin)
+		}
+	}
+	for _, twin := range check.Twins {
+		if _, ok := jsSide[twin]; !ok {
+			t.Errorf("the JavaScript side prints no %s twin, which check.Twins names", twin)
+			continue
+		}
 		said := twinGolden{JavaScript: aloneIn(jsSide[twin], goSide[twin]), Go: aloneIn(goSide[twin], jsSide[twin])}
 		at := filepath.Join(twinsAt, twin+".golden.json")
 		if *twinsUpdate {
