@@ -1,0 +1,2 @@
+{"post":{"event":"tool.call","e":{"tool":"Read","file_path":"/tree/README.md","session_id":"s1"},"root":"/tree"},"answer":{"effects":[{"kind":"pass"}]}}
+{"post":{"event":"prompt.submit","e":{"text":"carry on","session_id":"s1"},"root":"/tree"},"answer":{"effects":[{"kind":"pass"}]}}

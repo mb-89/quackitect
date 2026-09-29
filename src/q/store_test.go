@@ -294,3 +294,20 @@ func TestAStoreNamesEachNameAndItsPresentation(t *testing.T) {
 		t.Fatal("a name nobody provides presents itself")
 	}
 }
+
+// [[spec/tickets/the-hooks-door-lands]]
+func TestFoldsAnswerEveryFoldUnderThePrefixSorted(t *testing.T) {
+	c := New()
+	keep := func(n, _ int) int { return n }
+	FoldIn(c, "session/<id>/b", 0, keep)
+	FoldIn(c, "session/<id>/a", 0, keep)
+	FoldIn(c, "other/<id>", 0, keep)
+	OutIn(c, "session/<id>/events", 0)
+	got := NewStore(c).Folds("session/<id>/")
+	if strings.Join(got, " ") != "session/<id>/a session/<id>/b" {
+		t.Fatalf("the folds read %v, and want the two folds under session/<id>/, sorted", got)
+	}
+	if none := NewStore(c).Folds("log/"); none == nil || len(none) != 0 {
+		t.Fatalf("a prefix no fold opens on reads %#v, and wants an empty list", none)
+	}
+}

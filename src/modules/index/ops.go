@@ -219,6 +219,20 @@ func (b *Book) Sweep() []string {
 	return gone
 }
 
+// Every operation the session starts, in or out of flight, by id. [[spec/tickets/the-hooks-door-lands]]
+func (b *Book) Of(caller string) []Op {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	out := []Op{}
+	for _, one := range b.ops {
+		if one.Caller == caller {
+			out = append(out, *one)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
+	return out
+}
+
 func (b *Book) inFlight() []*Op {
 	out := []*Op{}
 	for _, one := range b.ops {

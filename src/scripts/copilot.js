@@ -19,6 +19,7 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { session } from "../doors/session.js";
+import { shadowsHook } from "./copilot-shadow.js";
 import { assemble } from "./styles.js";
 import { rootsHere } from "./vehicle.js";
 
@@ -41,6 +42,8 @@ let currentEvent = { surface, event: name, retry: false };
 const it = {
   root,
   work: roots.work,
+  // The tracked config stands under the root, where the config reader looks for it. [[spec/tickets/copilot-shadow-carries-method]]
+  method: root,
   styles: () => assemble(files, roots).config,
   disk: files,
   proc: outside,
@@ -100,6 +103,7 @@ try {
       },
     };
     const result = await handle(event, it);
+    shadowsHook(it, name, input, result);
     await book.say(
       result.deny || result.block || result.failed ? "warn" : "info",
       "copilot",

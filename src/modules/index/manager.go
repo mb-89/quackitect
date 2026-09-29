@@ -87,9 +87,25 @@ func Start(from Outside) (stop func(), err error) {
 
 // Starts the manager, and answers its stop beside the call an action takes through it. [[spec/tickets/actions-answer-over-http]]
 func Serves(from Outside) (stop func(), call func(name string, input any, caller string, wait time.Duration) (Answer, error), err error) {
-	one, err := begins(from)
+	served, err := Serving(from)
 	if err != nil {
 		return nil, nil, err
+	}
+	return served.Stop, served.Call, nil
+}
+
+// What a start answers: its stop, the call an action takes through it, and every operation of a caller. [[spec/tickets/the-hooks-door-lands]]
+type Served struct {
+	Stop func()
+	Call func(name string, input any, caller string, wait time.Duration) (Answer, error)
+	Of   func(caller string) []Op
+}
+
+// Starts the manager, and answers the book's reads beside its stop and its call, so the hooks IO module tells a session of its operations. [[spec/tickets/the-hooks-door-lands]]
+func Serving(from Outside) (Served, error) {
+	one, err := begins(from)
+	if err != nil {
+		return Served{}, err
 	}
 	accept := from.Accept
 	if accept == nil {
@@ -97,9 +113,9 @@ func Serves(from Outside) (stop func(), call func(name string, input any, caller
 			return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
 		}
 	}
-	return one.stops, func(name string, input any, caller string, wait time.Duration) (Answer, error) {
+	return Served{Stop: one.stops, Of: one.book.Of, Call: func(name string, input any, caller string, wait time.Duration) (Answer, error) {
 		return Call(one.book, from.Store, name, input, caller, wait, accept)
-	}, nil
+	}}, nil
 }
 
 // Opens the book over the rows and fails what a restart leaves in flight, holds the index's lease, hands the work loop its step, and ticks at the beat. [[spec/design_output/model#the-index-manager]]
