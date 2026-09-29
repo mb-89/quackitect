@@ -355,3 +355,5 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's line naming src/tui/log/view_test.go for TestTheLogBaseFileDeclaresTheLogView is wrong: the case stands in src/tui/tree/base_test.go. Read every reach of that name there. [[spec/tickets/log-draft-test-path-wrong]]
