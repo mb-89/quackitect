@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-topics-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 490e7f6afd139b70b96a067206d75f874d53d1f1
+    hash_after: a368a2e53e9252534bb3f74613595fdbaff6dca5
+    inputs:
+      - name: ask
+        hash: a2d542f562e78107
+        size: 342
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,39 @@ The prose checks are the last reason Node runs at runtime.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A Go package src/prose holds the three vetoes src/bridge/prose.js and src/engine/tense.js run on wink, per the golem row of spec/design_output/migration.md. (1) The past veto: a word reads past unless it is its own lemma, its -s, -es, -ies or -ing form, the rule isPast in src/engine/tense.js holds. (2) The length veto: the longest sentence of a span, with a code span and a link blanked to one word each, counting every token carrying a letter or a digit, the way longest counts every tag outside PUNCT, SYM and SPACE. (3) The outside veto: a Vocabulary finding falls where the word's lemma stands in the domain words. The lemma comes from github.com/aaaton/golem/v4 with its English dictionary, and an exception list embedded beside the package, src/prose/lemmas.yml, names the forms where golem and wink part and wink reads right. The domain words come off the paragraph schema's core, terms and swaps paths, read with src/yaml the way wordsOf in .claude/skills/level0/lib/vocabulary.js reads them. A new verb quack prose reads one JSON request on stdin, a list of documents each with its text, its Vale findings and a mode (all, or past for the check's tense-only road), and prints the findings it keeps. The Node side stays the answer. Where migration.prose reads shadow, a new src/bridge/prose-shadow.js runs quack prose once a call, and writes one shadow row per finding the two keep apart, naming the file, the line, the rule, the word and which side keeps it, the way shadowRun in src/scripts/config-shadow.js does for the config slice. readsProse calls it once a draft, and readThrough in src/bridge/findings.js calls it once over every finding of a check run, so the check pays one process. A missing binary or an answer no reader takes writes nothing. Assumed, and decided here: golem over a ported tagger, because the design output names golem and the three vetoes need a lemma and a token count, no part of speech.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/bridge/prose.js readsProse, which gains the shadow call,src/bridge/write.js proseFaults, through readsProse,src/bridge/bash.js the commit message read, through readsProse,src/bridge/answer-read.js the answer read, through readsProse,src/bridge/findings.js readThrough, which gains the shadow call,src/bridge/findings.js findingsOver, through readThrough,src/quack/main.go the verb dispatch, which gains prose,go.mod, which gains golem and its English dictionary
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/prose/prose_test.go TestPastReadsTheTenseTable,src/prose/prose_test.go TestLongestCountsCodeAndLinkAsOneWord,src/prose/prose_test.go TestOutsideFallsOnAListedLemma,src/prose/prose_test.go TestExceptionListOverridesGolem,src/quack/prose_test.go TestProseKeepsWhatTheVetoesLeave,test/level0/prose-shadow.test.js a finding the two keep apart writes one shadow row,test/level0/prose-shadow.test.js the slice at old runs no quack,test/level0/prose-shadow.test.js a missing binary writes nothing
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft, no earlier review
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file, function and verb the approach names stands opened: tense.js isPast and withoutFalsePast, prose.js readsProse, longest, withoutFalseOutside and wordsHere, findings.js readThrough, config-shadow.js shadowRun, migration.go ProseKey, shadow.go Write, quack main.go, and golem v4 reachable through the Go proxy
+the callers list names every caller a grep finds of readsProse, withoutFalsePast and readThrough outside the tests
+go test ./... passes: the src/prose and src/quack tests; log --kind shadow names each finding apart: prose-shadow.test.js; check exits 0: ./RUNME.sh check
 
 ## tests-red
 
