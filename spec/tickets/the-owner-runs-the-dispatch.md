@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -48,6 +48,23 @@ record:
         hash: a795442dd876e60f
         size: 19293
     def: 2280015d497a3abd
+  - step: do
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: d3a0de9c89c59509cb0cf63772e635314bb4b960
+    hash_after: d3a0de9c89c59509cb0cf63772e635314bb4b960
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 43 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: 641a8890c502519c
+        size: 963
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -105,26 +122,32 @@ Weighed: the run log and the merged pull requests on main. Assumed: the later di
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/dispatch.test.js test/level0/dispatch-fire.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer turns one call, and the tree already carries that turn: the dispatch skill opens no GitHub issue, and rule 8 of the cloud guidance has a box close any issue its ticket carries. The other two calls stand as the Action runs them. So no file moves, and the dispatch tests pass.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the answer: each call stands where the tree already writes it
+- the answer reveals no cleanup
+- each call stands once: the issue rule in the cloud guidance and the dispatch skill, the merge method in the work skill
 
 # Discussion
 
