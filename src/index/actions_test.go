@@ -5,15 +5,17 @@ package index
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
-	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 )
 
@@ -37,27 +39,41 @@ type postedOut struct {
 	Gone     *float64 `json:"gone"`
 }
 
-// The op table in memory, read as the manager's rows. [[spec/design_output/model#an-operation-outlives-callers]]
-type heldRows struct{ table OpRows }
-
-func (one heldRows) Save(id string, body []byte) error { return one.table.Save(id, body) }
-func (one heldRows) Drop(id string) error              { return one.table.Drop(id) }
-
-func (one heldRows) All() ([]manager.Row, error) {
-	all, err := one.table.All()
-	out := make([]manager.Row, 0, len(all))
-	for _, row := range all {
-		out = append(out, manager.Row{ID: row.ID, Body: row.Body})
+// A fake manager: its call runs the action through accept, commits the operation under ops/<id> once it ends, and answers within the wait. The index imports no module, so the real manager's own cases stand beside it. [[spec/design_output/model#the-index-meets-fake-modules]]
+func fakeManager(ops q.Writer, accept func(q.Request) (any, error)) Manage {
+	return func(_ string, store *q.Store, _ OpRows, _ func(func())) (Managed, error) {
+		var ids atomic.Int64
+		call := func(name string, input any, _ string, wait time.Duration) (Called, error) {
+			id, started := strconv.FormatInt(ids.Add(1), 10), time.Now()
+			ended := make(chan Called, 1)
+			go func() {
+				said, err := store.Deliver(name, input, accept, nil)
+				one := Called{Result: said, Handle: id}
+				state := "done"
+				if err != nil {
+					one.Error, state = err.Error(), "failed"
+				}
+				store.Commit(store.Snapshot().Revision, ops, map[string]any{"ops/" + id: map[string]any{"state": state, "result": said}})
+				ended <- one
+			}()
+			select {
+			case one := <-ended:
+				one.Gone = time.Since(started)
+				return one, nil
+			case <-time.After(wait):
+				return Called{Running: true, Handle: id, Gone: time.Since(started)}, nil
+			}
+		}
+		return Managed{Stop: func() {}, Call: call}, nil
 	}
-	return out, err
 }
 
-// A door with the manager over the fake action t/add, whose accept answers once hold closes, and the default wait the case seeds. [[spec/tickets/actions-answer-over-http]]
+// A door with the fake manager over the fake action t/add, whose accept answers once hold closes, and the default wait the case seeds. [[spec/tickets/actions-answer-over-http]]
 func standingActions(t *testing.T, wait int, hold <-chan struct{}) Standing {
 	t.Helper()
 	root := tree(t)
 	c := q.New()
-	as := manager.Registers(c)
+	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
 	q.OutIn(c, WaitName, wait, q.Doc("the default wait, as the case seeds it"))
 	q.ActionIn(c, "t/add", func(in addIn) []q.Request {
 		return []q.Request{{Module: "t", Verb: "add", Args: in, NoUndo: "a sum writes nothing"}}
@@ -65,19 +81,12 @@ func standingActions(t *testing.T, wait int, hold <-chan struct{}) Standing {
 	accept := func(asked q.Request) (any, error) {
 		<-hold
 		in, _ := asked.Args.(addIn)
+		if in.A < 0 {
+			return nil, errors.New("t adds no negative term")
+		}
 		return addOut{Sum: in.A + in.B}, nil
 	}
-	manage := func(root string, store *q.Store, rows OpRows, steps func(func())) (Managed, error) {
-		stop, call, err := manager.Serves(manager.Outside{
-			Root: root, Store: store, As: as, Rows: heldRows{rows}, Steps: steps, Now: time.Now, Accept: accept,
-			Every: func(time.Duration, func(time.Time)) func() { return func() {} },
-		})
-		return Managed{Stop: stop, Call: func(name string, input any, caller string, wait time.Duration) (Called, error) {
-			said, err := call(name, input, caller, wait)
-			return Called(said), err
-		}}, err
-	}
-	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, manage)
+	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -196,5 +205,19 @@ func TestTheOpenAPIEntryReadsTheAnswerFields(t *testing.T) {
 	schema := string(entry.Responses["200"].Content["application/json"].Schema)
 	if !strings.Contains(schema, `"title":"Sum"`) || !strings.Contains(schema, `"description":"the two terms added"`) {
 		t.Fatalf("the 200 schema reads %s", schema)
+	}
+}
+
+// A body the input type refuses reads 400, and a module refusing a request reads 422 with its reason. [[spec/tickets/action-refusals-meet-cases]]
+func TestARefusedPostAnswersItsProblem(t *testing.T) {
+	hold := make(chan struct{})
+	close(hold)
+	standing := standingActions(t, 0, hold)
+	if said, body := postV1(t, standing, "/v1/actions/t/add", "wait=5", `{"a":"two"}`); said.StatusCode != http.StatusBadRequest {
+		t.Fatalf("a body the input refuses answers %d: %s", said.StatusCode, body)
+	}
+	said, body := postV1(t, standing, "/v1/actions/t/add", "wait=5", `{"a":-1,"b":1}`)
+	if said.StatusCode != http.StatusUnprocessableEntity || !strings.Contains(string(body), "t adds no negative term") {
+		t.Fatalf("a refusing module answers %d: %s", said.StatusCode, body)
 	}
 }
