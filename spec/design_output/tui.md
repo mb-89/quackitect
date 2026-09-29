@@ -29,7 +29,8 @@ one tab reads them all. These packages part it, and every import runs down:
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
 | `src/tui/log` | the log tab: its records, its tailer, its columns, its details and the said style | the frame and the draw packages |
 | `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | the frame, the tree and the draw packages, and `src/yaml` for the ticket schema |
-| `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language |
+| `src/tui/registry` | the registry tabs `index`, `cli` and `help`, and the catalog door they read through, with its fake and its `/v1` road | the frame and the draw packages |
+| `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language, and `src/index` for the base of `/v1` |
 
 A tab owns its own rows and its own state, so the frame reads no record and
 no ticket tree. The `Tab` interface in `src/tui/frame/tabs.go` names what the

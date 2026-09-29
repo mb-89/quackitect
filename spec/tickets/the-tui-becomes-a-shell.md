@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -168,6 +168,15 @@ record:
         hash: 04353381cefa7404
         size: 5426
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: c38601e62f2740776f4436da74949816d8d40c8e
+    hash_after: c38601e62f2740776f4436da74949816d8d40c8e
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -325,14 +334,19 @@ accept. Weighed: the approach names files and functions that stand (src/tui/main
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files touched: src/tui/registry, src/tui/main.go, src/tui/layout_test.go and spec/design_output/tui.md, which name the new package in the import table the layout test reads
+- the catalog door has Fake, and one contract suite runs over Fake and V1
+- comments in each file name the registry tabs chapter of the model note
+- column widths stand as constants in tab.go, and the import table stands in tui.md alone
 
 ## tests-green
 

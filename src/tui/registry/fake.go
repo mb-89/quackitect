@@ -4,7 +4,10 @@
 
 package registry
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // [[spec/design_output/model#the-registry-tabs]]
 type Fake struct {
@@ -12,4 +15,14 @@ type Fake struct {
 	Err    error
 }
 
-func (f Fake) Read(_ string) (json.RawMessage, error) { return nil, nil }
+// The value the case seeded under the name, and an error for a name it left out, as the /v1 door answers. [[spec/design_output/model#the-fake-keeps-a-contract]]
+func (f Fake) Read(name string) (json.RawMessage, error) {
+	if f.Err != nil {
+		return nil, f.Err
+	}
+	value, found := f.Values[name]
+	if !found {
+		return nil, fmt.Errorf("no provider answers %s", name)
+	}
+	return json.Marshal(value)
+}

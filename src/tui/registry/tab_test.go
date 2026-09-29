@@ -128,3 +128,22 @@ func TestATabTakesOnlyItsOwnFetch(t *testing.T) {
 		t.Fatalf("the index tab holds %d rows, not %d", len(index.All), len(fakeNames))
 	}
 }
+
+// The filter line narrows the rows, and the cursor moves inside what stays. [[spec/design_output/model#the-registry-tabs]]
+func TestTheFilterLineNarrowsTheRowsAndTheCursorMovesInThem(t *testing.T) {
+	tab := Index(Fake{Values: map[string]any{NamesName: fakeNames}})
+	m := drawn(t, tab, frame.PaneShut)
+	if err := tab.Narrow(&m, "name: config"); err != nil {
+		t.Fatal(err)
+	}
+	if len(tab.View) != 1 || tab.Selected(&m) != "config/depth" {
+		t.Fatalf("the filter keeps %d rows with %q selected, not config/depth alone", len(tab.View), tab.Selected(&m))
+	}
+	if err := tab.Narrow(&m, ""); err != nil {
+		t.Fatal(err)
+	}
+	tab.Move(&m, 1)
+	if tab.Selected(&m) != "config/depth" {
+		t.Fatalf("one step down selects %q, not config/depth", tab.Selected(&m))
+	}
+}
