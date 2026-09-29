@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 10e8f3f31103d0e75c4ba9d681e4ded41e77b84f
+    hash_after: 10e8f3f31103d0e75c4ba9d681e4ded41e77b84f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s); green, src/modules/index passes; green, src/tui/work passes
+      - name: check
+        exit: 0
+        said: "src/quack/main.go:192:42: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
+    inputs:
+      - name: design/tests-red
+        hash: e867491ef5ef53a1
+        size: 1174
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -336,26 +359,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-views.test.js src/modules/index src/tui/work
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The sidebar draws one section for each base file under `spec/views`, below the groups it drew before. Each badge, button and form reads its label, doc and icon off the catalog the index answers at `/v1`. A new index door reads the two catalog rows and posts an action when a view button is pressed. Where no index stands, each section draws its base names alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays inside the files the approach names, plus the click script and the size golden
+- the index door has a contract case, and the sidebar cases fake it
+- every new function links the views chapter or this ticket
+- the keys stand once in the model, and the new chapter points there
 
 # accept
 
