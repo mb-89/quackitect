@@ -143,3 +143,9 @@ test("valuesOf lays the built-ins under the files", () => {
   assert.deepEqual(values.get("stop.hold"), { value: "off", layer: "built-in" });
   assert.deepEqual(values.get("stop.mostInARow"), { value: 5, layer: TRACKED });
 });
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("valuesOf with no schema reads the two files alone", () => {
+  const values = valuesOf({ stop: { mostInARow: 5 } }, {});
+  assert.deepEqual([...values.keys()], ["stop.mostInARow"]);
+});

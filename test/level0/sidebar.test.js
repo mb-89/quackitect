@@ -272,6 +272,15 @@ test("one press moves one rung, and a press after the burst moves back", async (
   assert.equal(local(door).stop.hold, "off");
 });
 
+// A press moves from the built-in where no file sets the key, so a press off finish moves back to rest. [[spec/tickets/the-config-schema-gets-generated]]
+test("a press moves from the built-in", async () => {
+  const built = structuredClone(schema);
+  built.properties.stop.properties.hold.default = "finish";
+  const door = doorOf({ [SCHEMA]: JSON.stringify(built), [TRACKED]: "{}" });
+  await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
+  assert.equal(local(door).stop.hold, "off");
+});
+
 // [[spec/design_output/extension#a-press-writes-a-line]]
 test("a press, a run and an edit each write a sidebar line naming what moved", async () => {
   const door = doorOf();

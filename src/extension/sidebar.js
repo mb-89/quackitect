@@ -47,7 +47,7 @@ function sidebarOf(door) {
   };
   const valueNow = async (key) => {
     const said = await readAll();
-    return valuesOf(said.tracked, said.local).get(key)?.value;
+    return valuesOf(said.tracked, said.local, said.schema).get(key)?.value;
   };
   const logbook = logbookOf(door, async () => (await valueNow("log.level")) ?? "info");
   const held = new Map();
@@ -85,7 +85,7 @@ function sidebarOf(door) {
     if (!one) return undefined;
     const ran = pressed(held.get(key) ?? fresh(), door.now(), {
       options: one.options,
-      value: valuesOf(said.tracked, said.local).get(key)?.value,
+      value: valuesOf(said.tracked, said.local, said.schema).get(key)?.value,
       gesture: one.gesture,
     });
     held.set(key, ran.state);
@@ -99,14 +99,14 @@ function sidebarOf(door) {
     // [[spec/design_output/extension#the-status-bar-says-it]]
     async states() {
       const said = await readAll();
-      return statesOf(valuesOf(said.tracked, said.local));
+      return statesOf(valuesOf(said.tracked, said.local, said.schema));
     },
     watches: [SCHEMA, TRACKED, LOCAL, BLESS],
     counts: COUNTS,
 
     async html() {
       const said = await readAll();
-      const values = valuesOf(said.tracked, said.local);
+      const values = valuesOf(said.tracked, said.local, said.schema);
       const groups = litBy(groupsIn(said.schema, values), door.processes?.() ?? {});
       return panelHtml({
         groups: await counted(door, groups),

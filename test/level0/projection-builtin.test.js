@@ -46,3 +46,14 @@ test("a key at its built-in keeps its command", () => {
   );
   assert.ok(drawn.has(".claude/commands/se-config-stop-enabled-true.md"));
 });
+
+test("a key the file sets takes its command at the file's value", () => {
+  const drawn = writesOf(
+    ENTRY,
+    new Map([
+      [SOURCE, JSON.stringify({ stop: { enabled: false } })],
+      [SCHEMA, JSON.stringify(SAID)],
+    ]),
+  );
+  assert.ok(drawn.has(".claude/commands/se-config-stop-enabled-false.md"));
+});

@@ -71,3 +71,16 @@ test("asks answers the built-in where no file sets the key", () => {
   assert.equal(asksText({ ...box, env: {} }, "log.level"), "info");
   assert.deepEqual(whereFrom(box, "names.words"), { value: 4, layer: "built-in" });
 });
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("a file beats the built-in, and a key the schema leaves out reads nothing", () => {
+  const box = boxOf({
+    "/method/spec/config/level0.schema.json":
+      '{"properties":{"names":{"properties":{"words":{"type":"number","default":4}}}}}',
+    [`/method/${TRACKED}`]: '{"names":{"words":5}}',
+  });
+
+  assert.deepEqual(whereFrom(box, "names.words"), { value: 5, layer: TRACKED });
+  assert.equal(asks(box, "names.none"), undefined);
+  assert.deepEqual(whereFrom(box, "names.none"), { value: undefined, layer: "" });
+});
