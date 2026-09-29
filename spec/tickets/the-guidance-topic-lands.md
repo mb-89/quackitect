@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: 87436c6106fbe7fb
         size: 278
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 9d92310f14dce1273190564aec8ad88a9fbc9be6
+    hash_after: 9d92310f14dce1273190564aec8ad88a9fbc9be6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 501499ab2049eff5
+        size: 3483
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -209,26 +222,34 @@ go test ./... passes: the module and golden Go tests; the golden holds both read
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/guidance src/quack test/level0/guidance-golden.test.js test/level0/guidance-shadow.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/guidance/guidance_test.go
+- src/quack/guidance_test.go
+- test/level0/guidance-golden.test.js
+- test/level0/guidance-shadow.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The module answers each leaf's notes with the envs a note binds, and the reader filters them by its own env through Notes. So the module reads files alone, and no env port joins the wiring, which the draft named. The golden reads the live tree on a box binding no env, the way a desk reads it. The guards for a slice at old and a missing binary pass on the stub, since the stub writes nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a red test: go test over the module and quack, the golden in TestGuidanceGoldenHoldsTheModule, TestGuidanceGoldenOldMeetsNew and guidance-golden.test.js, and the check at tests-green
+the module cases seed files/ through qtest, and the shadow cases fake the quack process, the settings, the files and the log
 
 # gate
 

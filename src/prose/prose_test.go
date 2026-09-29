@@ -63,9 +63,9 @@ func TestExceptionListOverridesGolem(t *testing.T) {
 
 func TestLongestCountsCodeAndLinkAsOneWord(t *testing.T) {
 	cases := map[string]int{
-		"The door reads the file.":                          5,
-		"The `one/two/three.js` door reads the file.":       6,
-		"The [[spec/one#two]] door reads the file.":         6,
+		"The door reads the file.":                           5,
+		"The `one/two/three.js` door reads the file.":        6,
+		"The [[spec/one#two]] door reads the file.":          6,
 		"The door reads. The door reads the whole file now.": 7,
 	}
 	for text, want := range cases {
