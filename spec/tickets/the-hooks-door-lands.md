@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 2ff0f3e165e9281424304cd522bbecee45a5941f
+    hash_after: 2ff0f3e165e9281424304cd522bbecee45a5941f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s); green, src/modules/hooks passes; green, src/modules/session passes; green, src/q pas
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 29670034f5135614
+        size: 1196
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -341,26 +364,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks src/modules/session src/q src/modules/index src/quack test/level0/cage-shadow.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks IO module stands under src/modules/hooks with q.IO(). Each post of the hook protocol becomes a q.Event under session/<id>/events, and lands on every fold under session/<id>/, which the session module holds: the fill and the last event. A tool call naming an index_ tool runs its action through the manager, within the wait the call sets or the key hooks/config/wait, a second. An operation that ends past its call reaches the next post of its session once, and classic.Stop names each one still running and lets the stop through. Listen serves POST /hook on loopback behind a token, and writes the port and the token to the runtime standing file. The listener stands in the index process beside the manager until the IO process holds every listener. Replay drives the door off a JSONL recording under test/replay/hooks. The bridge keeps answering. While migration.cage reads shadow, it posts each event and its own decision to the hooks port and awaits nothing. The default file sets cage to shadow. The comparison of the two decisions lands in cage-rules-replay-session-logs. The event time comes off the clock IO module through the composition, and an action whose input declares its own wait keeps it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and the answered findings add the token, the clock and the wait field
+- every door the change reaches has a fake: the manager call and book, the fake http door, and the replay
+- a comment on each function points at the ticket or the model section it implements
+- the port file, the slice key and the wait key each stand in one place, and the bridge takes the runtime folder off its owner
 
 # accept
 
