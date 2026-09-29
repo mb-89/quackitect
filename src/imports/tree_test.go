@@ -29,6 +29,9 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 		for _, fault := range FaultsIn(one.PkgPath, imported, CarriesIO(one.Syntax)) {
 			t.Error(fault)
 		}
+		for _, fault := range RendererFaults(one.PkgPath, one.Fset, one.Syntax) {
+			t.Error(fault)
+		}
 		for _, fault := range SuiteFaults(one.PkgPath, one.Fset, one.Syntax) {
 			t.Error(fault)
 		}

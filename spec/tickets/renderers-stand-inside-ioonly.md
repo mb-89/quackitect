@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: do
     does: makes the change the ask names
@@ -11,6 +11,14 @@ steps:
         says: what you change, and what surprises you
 process: [[spec/processes/standard]]
 group: tui-shell-lands-in-shadow
+step: do
+record:
+  - step: do
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: b729c476537f3ab0132a45d670d5e19126a253ce
+    hash_after: b729c476537f3ab0132a45d670d5e19126a253ce
+    def: 56deac2301e48d9e
+reason: done
 ---
 
 # Ask
@@ -39,8 +47,9 @@ Without it, a renderer can read a file or a process outside the index, and the c
 ## change
 
 <!-- what you change, and what surprises you -->
-
 <!-- the form is text -->
+
+The ioonly analyzer now holds every package under src/tui through a second rule, drawOnly, beside the core rule: a renderer imports no os, os/exec, net or net/http outside its door.go, and its tests stand apart. The tree test reads the same rule through RendererFaults. The two net/http reaches that stood outside a door moved into work/door.go (postJSON) and a new registry/door.go (get), each with a test. A planted renderer case in the analyzer test names an os import beside the door and spares the door. It surprised me that the rule reads files and not packages, because the door.go files import os inside the same package.
 
 # Discussion
 

@@ -263,6 +263,7 @@ func catalogued(t *testing.T) *qtest.Index {
 		as = Registers(c)
 		q.ActionIn(c, "t/ask", func(askIn) []q.Request { return nil }, q.Doc("asks about a ticket"))
 		q.CfgIn(c, "depth", 3, q.Doc("how deep the ask reads"))
+		q.OutIn(c, "t/badge", 0, q.Doc("a count a renderer badges"), q.Label("Tickets"), q.Looks(q.Count))
 	})
 	l := &loop{now: time.Unix(1000, 0).UTC()}
 	starts(t, l.outside(t, ix.Store(), as, rowsOf(map[string]string{})))
@@ -420,5 +421,23 @@ func TestServingAnswersEveryOperationOfACaller(t *testing.T) {
 	}
 	if ops := served.Of("s2"); len(ops) != 0 {
 		t.Fatalf("the book answers %+v for s2, and wants none", ops)
+	}
+}
+
+// The row carries what the registration declares for a renderer. [[spec/tickets/the-work-view-gains-actions]]
+func TestANameRowCarriesItsLabelAndLook(t *testing.T) {
+	ix := catalogued(t)
+	row := rowNamed(t, "index/names", rowsRead(t, ix.Read("index/names")), "t/badge")
+	if row["label"] != "Tickets" || row["looks"] != "count" {
+		t.Fatalf("index/names reads t/badge with label %v and looks %v, and wants Tickets and count", row["label"], row["looks"])
+	}
+}
+
+// A registration declaring no label leaves the row's label empty. [[spec/tickets/the-work-view-gains-actions]]
+func TestANameRowWithNoLabelCarriesNone(t *testing.T) {
+	ix := catalogued(t)
+	row := rowNamed(t, "index/names", rowsRead(t, ix.Read("index/names")), "config/depth")
+	if _, held := row["label"]; held {
+		t.Fatalf("index/names reads config/depth with label %v, and it declares none", row["label"])
 	}
 }

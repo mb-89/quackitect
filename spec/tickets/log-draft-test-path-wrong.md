@@ -1,15 +1,14 @@
 ---
 kind: [[ticket]]
 state: closed
-step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
-    from: the-tickets-topic-lands/design/review
+    from: the-log-becomes-a-view/gate
     by: anyone
     to: retro
     input: ask
-    reads: [[spec/guidance/working]]
+    tags: ["code", "testing"]
     needs: ["branch test"]
     checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
@@ -24,27 +23,30 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
+point: gate
+todo: false
+step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tui-shell-lands-in-shadow
-parent: the-tickets-topic-lands
+parent: the-log-becomes-a-view
 record:
   - step: do
-    hand: box d856db450bd7 · claude-code-remote
-    hash_before: 80a65d4a997a812f23b3e974ddb2b14209c895b6
-    hash_after: 80a65d4a997a812f23b3e974ddb2b14209c895b6
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 8c5f979fb6f9cb96aa7c813086b5d380847664bd
+    hash_after: 8c5f979fb6f9cb96aa7c813086b5d380847664bd
     answered:
       - name: tests
         exit: 0
-        said: green, src/tui/work passes
+        said: green, src/tui/tree passes
       - name: check
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     inputs:
       - name: ask
-        hash: 0c7d250b2d9dce29
-        size: 176
-    def: b9df9de658bcf6e8
+        hash: 675d97af378969b7
+        size: 133
+    def: 8a94143eab7e05cb
 reason: done
 ---
 
@@ -54,7 +56,7 @@ reason: done
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-`Placed` in `src/tui/work/workplaces.go` reads held off the queue place whatever the index answers, a held reading the approach leaves standing against the ask's one held rule.
+the draft lists TestTheLogBaseFileDeclaresTheLogView under src/tui/log/view_test.go, and the case stands in src/tui/tree/base_test.go
 
 # do
 
@@ -65,7 +67,7 @@ reason: done
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-./RUNME.sh branch test src/tui/work
+./RUNME.sh test src/tui/tree/base_test.go
 
 ## check
 
@@ -79,19 +81,17 @@ reason: done
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The window stops reading held off the queue place. A ticket at place zero keeps the state the index answers, since the held rule stands in the tickets module alone. A todo row the index lacks still reads held at place zero.
+The draft of the-log-becomes-a-view named src/tui/log/view_test.go for TestTheLogBaseFileDeclaresTheLogView, and the case stands in src/tui/tree/base_test.go. The parent Discussion now carries the correction, since the open parent refuses an edit to its draft chapter.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches workplaces.go and its test alone, both in the ask
-- the index answer stands as the one reading of held, and the comment points at this ticket
-- no door is reached, so no fake is owed
+- the change follows the ask: the correct path stands in the parent Discussion
+- no cleanup showed: no code moves
+- the fact stands once, in src/tui/tree/base_test.go, and the Discussion points at it
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-The tickets topic leaves this reading to the window phase. The row at the queue's in-hand place is the one this box works now, and the window reshapes `Placed` there. [[spec/tickets/the-tickets-topic-lands]]

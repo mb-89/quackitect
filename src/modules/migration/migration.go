@@ -20,6 +20,9 @@ const (
 // The key of the verbs slice, the road ./RUNME.sh hands a verb down, by its local name. [[spec/tickets/runme-hands-verbs-to-quack]]
 const VerbsKey = "verbs"
 
+// The key of the window slice, the reads the window makes off the index, by its local name. [[spec/tickets/the-log-becomes-a-view]]
+const WindowKey = "window"
+
 // The key of the cage slice, the road a hook event takes to the hooks IO module, by its local name. [[spec/tickets/the-hooks-door-lands]]
 const CageKey = "cage"
 
@@ -36,6 +39,7 @@ var slices = []struct{ key, mode, doc string }{
 	{ProseKey, "old", "the prose slice, the prose checks in Go beside wink: old, shadow or new"},
 	{VerbsKey, "old", "the verbs slice, the road ./RUNME.sh hands a verb down: old, shadow or new"},
 	{CageKey, "old", "the cage slice, the road a hook event takes to the hooks IO module: old, shadow or new"},
+	{WindowKey, "old", "the window slice, the rows and the badges the window reads off the index: old, shadow or new"},
 	{LspKey, "old", "the lsp slice, the LSP's rules the check module answers beside it: old, shadow or new"},
 }
 

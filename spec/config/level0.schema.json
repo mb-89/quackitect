@@ -527,6 +527,15 @@
           ],
           "help": "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's."
         },
+        "window": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's."
+        },
         "lsp": {
           "type": "string",
           "enum": [

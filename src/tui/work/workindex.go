@@ -6,11 +6,9 @@
 package work
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"path/filepath"
 	"time"
 )
@@ -75,14 +73,12 @@ func postIndex(root, method string, params any) (json.RawMessage, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := &http.Client{Timeout: indexCallWait}
-	got, err := client.Post(fmt.Sprintf("http://127.0.0.1:%d/", port), "application/json", bytes.NewReader(body))
+	got, err := postJSON(fmt.Sprintf("http://127.0.0.1:%d/", port), body, indexCallWait)
 	if err != nil {
 		return nil, err
 	}
-	defer got.Body.Close()
 	var out indexAnswer
-	if err := json.NewDecoder(got.Body).Decode(&out); err != nil {
+	if err := json.Unmarshal(got, &out); err != nil {
 		return nil, err
 	}
 	if out.Error != "" {
