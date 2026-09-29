@@ -184,10 +184,35 @@ func PlacesAt(root string) (Places, error) {
 	if err != nil {
 		return Places{}, err
 	}
+	// The queue column reads the places the index answers, the ones its count reads. [[spec/tickets/queue-column-reads-the-index]]
+	if queue, answered := askQueuePlaces(root); answered {
+		places.Queue = queue
+		for name, place := range queue {
+			if place == cloudPlace {
+				places.Cloud[name] = true
+			}
+		}
+	}
 	// The slice answers the count the badge and the header read, and the shadow writes its row beside it. [[spec/tickets/the-badge-reads-open-tasks]]
 	places.Takeable = slicedCount(root, places.Takeable, time.Now())
 	return places, nil
 }
+
+// The index's queue, as a place a name, and whether a door answered it. A door standing nowhere answers nothing, and starts nothing. [[spec/tickets/queue-column-reads-the-index]]
+var askQueuePlaces = func(root string) (map[string]string, bool) {
+	said, err := postIndex(root, "value", map[string]string{"name": queuePlacesName})
+	if err != nil {
+		return nil, false
+	}
+	var queue map[string]string
+	if json.Unmarshal(said, &queue) != nil || queue == nil {
+		return nil, false
+	}
+	return queue, true
+}
+
+// The index name the queue module answers its places under. [[spec/tickets/queue-column-reads-the-index]]
+const queuePlacesName = "queue/places"
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
 var runPlaces = func(root string) ([]byte, error) {
