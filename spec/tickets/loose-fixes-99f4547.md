@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -161,7 +161,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 6f5f7f99c8d67168fe47b092d62c02f66e5608e6
+    hash_after: 6f5f7f99c8d67168fe47b092d62c02f66e5608e6
+    inputs:
+      - name: retro/write
+        hash: c90a2b7483d61cd3
+        size: 2316
+    def: 4da1ca5da87d5bbc
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -319,20 +329,26 @@ The merge and the twin golden cost the most time: the check failed on a line cou
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 04:22 the level0 server stood down, so the plan tool answered nothing until serve started
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 04:18 a conflict with main in src/scripts/red-list.js and its test
+- 04:19 the twin golden failed on a line count this branch moved
+- 04:20 the hook refusing git add and a chained ticket pull
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- the-editor-edits-a-process stands a draft at a person step, loose on main as its source rules
+- no person step parked, and no other ticket minted with no group
 
 # Discussion
 
