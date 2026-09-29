@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 55a013c777fc0271
         size: 2974
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8509c02d5db · claude-code-remote · helper-3
+    hash_before: 0518114efe0fad7bbeafbe16a90c70a0da66fa8a
+    hash_after: 0518114efe0fad7bbeafbe16a90c70a0da66fa8a
+    inputs:
+      - name: design/draft
+        hash: 55a013c777fc0271
+        size: 2974
+      - name: design/tests-red
+        hash: aa79d154b7d0d7f6
+        size: 738
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -267,8 +279,12 @@ The branch verb list stands empty, the queue twin answers usage, the wiring load
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the builder adds a `branch` row to the ports table under Discussion on quack-verbs-switch-over, naming every verb past `list --queue` over `src/scripts/work.js`. The draft says a line there names it, and none stands.
+- the builder checks `yoursOf` against `queueOnly` on a row the cloud holds: `yoursOf` skips a row carrying `Cloud`, and `queueOnly` skips the cloud place alone, so the shadow log names any row the two part on.
+- the draft's tests list names src/quack/verbs_test.go for TestATwinKeysOnThreeWords, and the case stands in src/quack/twins_test.go, as the tests-red seen field says.
 
 # implement
 
