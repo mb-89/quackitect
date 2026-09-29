@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: 9de9b5cda8ead242
         size: 4603
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856f55387d6 · claude-code-remote · helper-3
+    hash_before: cac9e155c6e4652a161aa67a1dcf583ee95f4315
+    hash_after: cac9e155c6e4652a161aa67a1dcf583ee95f4315
+    inputs:
+      - name: design/draft
+        hash: 9de9b5cda8ead242
+        size: 4603
+      - name: design/tests-red
+        hash: a71a921ad58c8fb8
+        size: 701
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -260,8 +272,13 @@ Seven cases fail on their own assertion: the helper answers null, the readers st
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- readers-name-one-mode-source: the tests read the mode off it.slices, the approach names no such field and says each reader asks its key, and the itOf fixture also carries config.ask and the prose case plants migration.prose in the tracked file; readsNew in src/scripts/quack-topic.js takes one source, it.slices as the tests read it, and every reader asks readsNew alone
+- handed-meets-its-own-case: the approach names a case for stepNotes and handed, and topic-readers.test.js holds none for handed in src/scripts/pull-hand.js; a case runs handed over the fake quack guidance answer
+- read-text-meets-its-case: readsText in src/bridge/findings.js moves to quack prose per the approach, and no case in topic-readers.test.js decides it
+- read-config-meets-its-case: the config case tests configRowsOf alone, and no case runs readConfig in src/scripts/cli-check.js with migration.config at new; a case runs readConfig and reads the rows quack config answers
 
 # implement
 
