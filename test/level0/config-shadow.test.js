@@ -25,6 +25,7 @@ import {
 import {
   answeredOf,
   mismatchesOf,
+  RUN_TIMEOUT_MS,
   saidOf,
   shadowRun,
 } from "../../src/scripts/config-shadow.js";
@@ -133,6 +134,18 @@ test("a shadow run writes one shadow row a key the module answers apart", async 
   assert.match(line, /^config in shadow: a\.x/);
   assert.equal(more.slice, "config");
   assert.equal(more.key, "a.x");
+});
+
+test("a binary that fails to run writes nothing, and the run carries a timeout", async () => {
+  const { doors, said } = doorsOf("shadow", "{}");
+  let init = null;
+  doors.proc.run = (_argv, given) => {
+    init = given;
+    throw new Error("spawn EACCES");
+  };
+  assert.deepEqual(await shadowRun(doors, ROWS), []);
+  assert.deepEqual(said, []);
+  assert.equal(init.timeoutMs, RUN_TIMEOUT_MS);
 });
 
 test("a slice standing old, or a binary standing nowhere, runs nothing", async () => {

@@ -8,6 +8,9 @@ export const SLICE = "config";
 export const KEY = "migration.config";
 export const SHADOW = "shadow";
 
+// How long the shadow waits on `quack config`, in milliseconds, so a stuck binary holds the config verb no longer. [[spec/tickets/config-shadow-catches-its-faults]]
+export const RUN_TIMEOUT_MS = 10000;
+
 // Every key the two readers answer apart, by value or by layer, in name order. A key one side answers alone differs too. [[spec/tickets/cfg-topic-holds-one-resolver]]
 export function mismatchesOf(rows, answered, wanted = null) {
   const old = new Map(rows.map((one) => [one.key, one]));
@@ -53,7 +56,16 @@ export function answeredOf(text) {
 export async function shadowRun(doors, rows, wanted = null) {
   if ((await doors.settings.ask(KEY)) !== SHADOW) return [];
   if (!doors.files.exists(doors.binary)) return [];
-  const ran = doors.proc.run([doors.binary, "config"], { cwd: doors.root });
+  // A binary that stands but fails to run leaves the old answer alone, as the other shadows do. [[spec/tickets/config-shadow-catches-its-faults]]
+  let ran;
+  try {
+    ran = doors.proc.run([doors.binary, "config"], {
+      cwd: doors.root,
+      timeoutMs: RUN_TIMEOUT_MS,
+    });
+  } catch {
+    return [];
+  }
   const answered = ran.exitCode === 0 ? answeredOf(ran.stdout) : null;
   if (!answered) return [];
   const found = mismatchesOf(rows, answered, wanted);
