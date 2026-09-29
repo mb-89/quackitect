@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: 1e27277f7647141a
         size: 231
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: 11f16cd7d97b7e45f8ad014e77123b002b9dc094
+    hash_after: 11f16cd7d97b7e45f8ad014e77123b002b9dc094
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 9de9b5cda8ead242
+        size: 4603
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -214,26 +227,31 @@ Five keys move from shadow to new in spec/config/level0.json: migration.config, 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/topic-readers.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/topic-readers.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Seven cases fail on their own assertion: the helper answers null, the readers stay on the old path, and the tracked keys read shadow. The old-path fallback case passes, as it should. The guidance case may need its fixture bent when the change lands, since notesSaid reads more than the fake carries.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: the readers case has one red case a reader, and the keys case reads the tracked file
+- every door the tests reach has a fake: fakeDisk, fakeProc, fakeClock and fakeLog stand in for the tree, quack, the clock and the log
 
 # gate
 
