@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -112,6 +112,10 @@ record:
         hash: e122785976621597
         size: 10947
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 80a236d8cd567e599067dc331251b45d5a25e5a2
+    hash_after: 80a236d8cd567e599067dc331251b45d5a25e5a2
 depends_on: ["open-tasks-shadow-lands", "read-topics-land-in-shadow"]
 enabled_by: migration.phase4shadow
 cloud: true
