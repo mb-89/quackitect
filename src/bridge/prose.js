@@ -11,7 +11,7 @@ import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js"
 import { withContext, withoutFalsePast } from "../engine/tense.js";
 import { asksText } from "./config.js";
 import { ALL, quackAt, shadowProse } from "./prose-shadow.js";
-import { keptOf, readsNew } from "../scripts/quack-topic.js";
+import { answerOf, keptOf, readsNew } from "../scripts/quack-topic.js";
 import { proseFaults } from "./write.js";
 
 const nlp = winkNLP(model);
@@ -75,8 +75,9 @@ const said = (text) => ({ result: { result: text } });
 
 export function readsProse(box, text, found) {
   // The Go vetoes answer where the prose slice reads new. [[spec/tickets/readers-take-the-go-topics]]
-  const gone = readsNew(box, "prose") ? keptOf(box, text, found, ALL) : null;
-  if (gone) return withContext(text, gone);
+  if (readsNew(box, "prose")) {
+    return withContext(text, answerOf(keptOf(box, text, found, ALL), "prose"));
+  }
   const caps = capsOf(box);
   let kept = withoutFalsePast(text, found);
   kept = withoutFalseLength(text, kept, caps);

@@ -19,7 +19,12 @@ import { guidance } from "../../src/scripts/guidance-verb.js";
 import { handed } from "../../src/scripts/pull-hand.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import { logVerb } from "../../src/scripts/log-verb.js";
-import { configRowsOf, readsNew, topicOf } from "../../src/scripts/quack-topic.js";
+import {
+  configRowsOf,
+  notesOf,
+  readsNew,
+  topicOf,
+} from "../../src/scripts/quack-topic.js";
 
 const ROOT = "/tree";
 const QUACK = join(ROOT, BIN);
@@ -77,10 +82,10 @@ test("readsNew holds where the slice reads new, and nowhere else", () => {
   assert.equal(readsNew(itOf("old", {}, {}), "log"), false);
 });
 
-test("configRowsOf reads the module's map as rows in key order, values as their literals stand", () => {
+test("configRowsOf reads the module's map as rows in key order, values as quack config prints them", () => {
   const rows = configRowsOf({
-    "b.two": { value: '"x"', layer: "local" },
-    "a.one": { value: "3", layer: "tracked" },
+    "b.two": { value: "x", layer: "local" },
+    "a.one": { value: 3, layer: "tracked" },
   });
   assert.deepEqual(rows, [
     { key: "a.one", value: 3, layer: "tracked" },
@@ -103,16 +108,39 @@ test("the log verb prints the rows quack log answers where the log slice reads n
   assert.doesNotMatch(out, /the old file says/);
 });
 
-test("the log verb keeps the old rows where quack log answers nothing", async () => {
+// A topic answering nothing is a fault on a new slice, and no reader falls back to its old path. [[spec/tickets/topic-fallback-leaves-the-readers]]
+test("every reader on a new slice faults where its topic answers nothing, naming the topic", async () => {
   const held = `${JSON.stringify({ at: AT, level: "info", kind: "tool", said: "the old file says" })}\n`;
-  const it = itOf(
-    "new",
-    { [join(ROOT, SESSION)]: held },
-    {
-      [`${QUACK} log`]: { exitCode: 1 },
-    },
+  const it = itOf("new", { [join(ROOT, SESSION)]: held }, {});
+  const set = { rule: "Voice.Other", line: 1, column: 10, said: "set", file: "n.md" };
+  await assert.rejects(
+    () => printed(() => logVerb(it, [])),
+    /quack log answers nothing/,
   );
-  assert.match(await printed(() => logVerb(it, [])), /the old file says/);
+  await assert.rejects(
+    () => printed(() => readConfig([], it)),
+    /quack config answers nothing/,
+  );
+  assert.throws(
+    () => readsProse(it, "the door set the write\n", [set]),
+    /quack prose answers nothing/,
+  );
+  assert.throws(
+    () => readsText(it, "n.md", "the door set the write\n", [set]),
+    /quack prose answers nothing/,
+  );
+  assert.throws(
+    () => notesOf(it, "standard:draft", () => ["old"]),
+    /quack guidance answers nothing/,
+  );
+});
+
+test("a leaf the guidance topic names no notes for reads no notes", () => {
+  const it = itOf("new", {}, { [`${QUACK} guidance`]: { stdout: "{}" } });
+  assert.deepEqual(
+    notesOf(it, "standard:draft", () => ["old"]),
+    [],
+  );
 });
 
 test("the guidance verb prints the notes quack guidance answers for a step where the slice reads new", async () => {
@@ -211,7 +239,7 @@ test("readConfig prints the rows quack config answers where the config slice rea
     {},
     {
       [`${QUACK} config`]: {
-        stdout: JSON.stringify({ "a.one": { value: '"from go"', layer: "tracked" } }),
+        stdout: JSON.stringify({ "a.one": { value: "from go", layer: "tracked" } }),
       },
     },
   );

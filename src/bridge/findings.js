@@ -21,7 +21,7 @@ import {
   RULE as GRID,
   lineOf,
 } from "../extension/lib/grid.js";
-import { keptOf, readsNew } from "../scripts/quack-topic.js";
+import { answerOf, keptOf, readsNew } from "../scripts/quack-topic.js";
 import { assemble } from "../scripts/styles.js";
 import { PAST, quackAt, shadowProse } from "./prose-shadow.js";
 
@@ -198,9 +198,9 @@ export function valeArgvOf(it) {
 // One file's reading past Vale: the tense reader over Vale's rows, then every marker naming no reason. The lint and the pull both read a file here. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export function readsText(it, file, text, rows, docs) {
   // The Go vetoes answer where the prose slice reads new. [[spec/tickets/readers-take-the-go-topics]]
-  const kept =
-    (readsNew(it, "prose") && keptOf(it, text, rows, PAST)) ||
-    withoutFalsePast(text, rows);
+  const kept = readsNew(it, "prose")
+    ? answerOf(keptOf(it, text, rows, PAST), "prose")
+    : withoutFalsePast(text, rows);
   docs?.push({ file: showOf(it, file), text, found: rows, kept });
   return [
     ...kept.map((one) => from(one, FROM.vale)),

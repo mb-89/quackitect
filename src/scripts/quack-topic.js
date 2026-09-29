@@ -1,6 +1,6 @@
 // The Go topics a reader asks: `quack <topic>` under the method root, and the
 // slice's mode a caller reads off its doors. A reader takes the topic where its
-// slice reads new, and stays on its old path where the topic answers nothing.
+// slice reads new, and a topic answering nothing there is a fault.
 // [[spec/tickets/readers-take-the-go-topics]]
 
 import { join } from "node:path";
@@ -64,17 +64,13 @@ export function topicOf(it, argv, stdin) {
 // The rows the config verb prints, off the map `quack config` answers, in key order. [[spec/tickets/cfg-topic-holds-one-resolver]]
 export function configRowsOf(answered) {
   if (!answered || typeof answered !== "object" || Array.isArray(answered)) return null;
-  try {
-    return Object.keys(answered)
-      .sort()
-      .map((key) => ({
-        key,
-        value: JSON.parse(answered[key].value),
-        layer: String(answered[key].layer ?? ""),
-      }));
-  } catch {
-    return null;
-  }
+  return Object.keys(answered)
+    .sort()
+    .map((key) => ({
+      key,
+      value: answered[key]?.value,
+      layer: String(answered[key]?.layer ?? ""),
+    }));
 }
 
 // The rows the log verb filters, off the rows `quack log` answers: a broken line stays out, as the old reader drops it, and a row's extra fields ride beside its own. [[spec/tickets/the-log-topic-lands]]
@@ -85,13 +81,21 @@ export function logRowsOf(answered) {
     .map(({ extra, broken, ...own }) => ({ ...(extra ?? {}), ...own }));
 }
 
-// One leaf's notes, off `quack guidance` where the slice reads new and the topic names the leaf, else what the old reader answers. [[spec/tickets/the-guidance-topic-lands]]
-export function notesOf(it, leaf, old) {
-  if (readsNew(it, "guidance")) {
-    const said = topicOf(it, ["guidance"])?.[leaf];
-    if (Array.isArray(said)) return said.map(String);
+// A reader on a new slice takes its topic's answer, and a topic answering nothing is a fault. [[spec/tickets/topic-fallback-leaves-the-readers]]
+export function answerOf(said, topic) {
+  if (said === null || said === undefined) {
+    throw new Error(
+      `quack ${topic} answers nothing a reader takes. Run ./RUNME.sh doctor.`,
+    );
   }
-  return old();
+  return said;
+}
+
+// One leaf's notes, off `quack guidance` where the slice reads new, else what the old reader answers. [[spec/tickets/the-guidance-topic-lands]]
+export function notesOf(it, leaf, old) {
+  if (!readsNew(it, "guidance")) return old();
+  const said = answerOf(topicOf(it, ["guidance"]), "guidance")[leaf];
+  return Array.isArray(said) ? said.map(String) : [];
 }
 
 // The name of the process a ticket names, as the guidance module keys its leaves. [[spec/tickets/the-guidance-topic-lands]]

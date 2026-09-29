@@ -53,7 +53,7 @@ import { goEnvOf, goGate, goTestNames } from "./cli-go.js";
 import { hookRows, hooksNamed } from "./cli-hooks.js";
 import { namesIn, show, walk } from "./cli-read.js";
 import { shadowRun } from "./config-shadow.js";
-import { configRowsOf, readsNew, topicOf } from "./quack-topic.js";
+import { answerOf, configRowsOf, readsNew, topicOf } from "./quack-topic.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { lspProbe } from "./lsp-probe.js";
 import { HOOKS } from "./precommit.js";
@@ -166,10 +166,10 @@ export async function readConfig(argv, here = it) {
     return 0;
   }
 
-  // The rows come off quack config where the config slice reads new, and off the resolver where the topic answers nothing. [[spec/tickets/readers-take-the-go-topics]]
-  const rows =
-    (readsNew(here, "config") && configRowsOf(topicOf(here, ["config"]))) ||
-    (await settings.all());
+  // The rows come off quack config where the config slice reads new. [[spec/tickets/topic-fallback-leaves-the-readers]]
+  const rows = readsNew(here, "config")
+    ? answerOf(configRowsOf(topicOf(here, ["config"])), "config")
+    : await settings.all();
   const wanted = key ? rows.filter((one) => one.key === key) : rows;
   if (key && !wanted.length) {
     console.error(`No layer answers ${key}. Run ./RUNME.sh config to see every key.`);
