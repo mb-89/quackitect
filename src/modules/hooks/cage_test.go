@@ -50,17 +50,19 @@ func TestPostsOfSkipsShadowAndOtherRows(t *testing.T) {
 
 func TestDecisionOfReadsTheBridgesAnswer(t *testing.T) {
 	for _, one := range []struct {
+		event  string
 		answer any
 		want   string
 	}{
-		{map[string]any{"pass": true}, PassWord},
-		{nil, PassWord},
-		{map[string]any{"result": map[string]any{"deny": "no"}}, RefuseWord},
-		{map[string]any{"result": map[string]any{"block": "wait"}}, BlockWord},
-		{map[string]any{"needs": "reply"}, HoldWord},
+		{toolEvent, map[string]any{"pass": true}, PassWord},
+		{toolEvent, nil, PassWord},
+		{toolEvent, map[string]any{"result": map[string]any{"deny": "no"}}, RefuseWord},
+		{toolEvent, map[string]any{"result": map[string]any{"block": "reply first"}}, RefuseWord},
+		{stopEvent, map[string]any{"result": map[string]any{"block": "wait"}}, BlockWord},
+		{stopEvent, map[string]any{"needs": "reply"}, HoldWord},
 	} {
-		if got := OldDecisionOf(one.answer); got != one.want {
-			t.Errorf("OldDecisionOf(%v) reads %q, want %q", one.answer, got, one.want)
+		if got := OldDecisionOf(one.event, one.answer); got != one.want {
+			t.Errorf("OldDecisionOf(%s, %v) reads %q, want %q", one.event, one.answer, got, one.want)
 		}
 	}
 }

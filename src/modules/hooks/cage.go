@@ -83,8 +83,8 @@ func PostsOf(text string) ([]Recorded, error) {
 	return out, lines.Err()
 }
 
-// The bridge's answer as one decision word, the way letsThrough in src/bridge/server.js reads it. [[spec/tickets/cage-rules-replay-session-logs]]
-func OldDecisionOf(answer any) string {
+// The bridge's answer to an event as one decision word, the way letsThrough in src/bridge/server.js reads it. A block outside the Stop reaches the harness as the call's result, and so refuses it. [[spec/tickets/cage-tool-block-reads-refuse]]
+func OldDecisionOf(event string, answer any) string {
 	fields, _ := answer.(map[string]any)
 	if truthy(fields["needs"]) {
 		return HoldWord
@@ -93,8 +93,11 @@ func OldDecisionOf(answer any) string {
 	if _, ok := result["deny"]; ok {
 		return RefuseWord
 	}
-	if _, ok := result["block"]; ok {
+	if _, ok := result["block"]; ok && event == stopEvent {
 		return BlockWord
+	}
+	if _, ok := result["block"]; ok {
+		return RefuseWord
 	}
 	return PassWord
 }
@@ -127,7 +130,7 @@ func (d *Door) ReplayLog(text string, say func(row map[string]any) error) ([]Apa
 		if err != nil {
 			return nil, fmt.Errorf("line %d of the log: %w", one.Line, err)
 		}
-		old, now := OldDecisionOf(one.Post.Old), NewDecisionOf(one.Post, said)
+		old, now := OldDecisionOf(one.Post.Event, one.Post.Old), NewDecisionOf(one.Post, said)
 		if old == now {
 			continue
 		}
