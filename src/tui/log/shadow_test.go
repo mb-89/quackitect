@@ -65,6 +65,28 @@ func TestTheShadowNamesEachRowTheTailAndTheIndexReadApart(t *testing.T) {
 	}
 }
 
+// The log view draws off the file under spec/views over fake rows. [[spec/design_output/model#the-log-is-a-view]]
+func TestTheLogViewDrawsOverAFakeLogRows(t *testing.T) {
+	t.Parallel()
+	base, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "views", "log.base"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	grid, err := ViewOver(string(base), []Row{rowA, rowB})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if grid.Len() != 2 {
+		t.Fatalf("the log view holds %d rows, and wants 2", grid.Len())
+	}
+	drawn := grid.Header(120) + "\n" + grid.Rows(120, 10)
+	for _, want := range []string{"said", "hello", "broke"} {
+		if !strings.Contains(drawn, want) {
+			t.Fatalf("the log view over fake rows draws no %q:\n%s", want, drawn)
+		}
+	}
+}
+
 // A tail one side holds alone is the log growing between the two reads. [[spec/design_output/model#the-log-is-a-view]]
 func TestAGrowingTailIsNoMismatch(t *testing.T) {
 	t.Parallel()
