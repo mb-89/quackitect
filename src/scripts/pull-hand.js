@@ -32,6 +32,7 @@ import { keptRed } from "./pull-kept.js";
 import { dueHandOut } from "./ephemeral-pull.js";
 import { noteRows, readsFor, readsOf } from "./guidance-hand.js";
 import { processNameOf, shadowLeaf } from "./guidance-shadow.js";
+import { shadowNeeds } from "./needs-shadow.js";
 import { workAnswer } from "./pull-chapter.js";
 import { printPart } from "./pull-cap.js";
 import { acceptWaits } from "./pull-accept.js";
@@ -476,6 +477,8 @@ export function handed(it, who, one, leaf) {
   noteRows(it, leaf.path, reads);
   // The hand-out reads its notes now, and the shadow row lands behind it. [[spec/tickets/the-guidance-topic-lands]]
   shadowLeaf(it, `${processNameOf(one.text)}:${leaf.path}`, notes);
+  // The leaf's needs meet the registry's actions behind the hand-out. [[spec/tickets/pull-verbs-become-actions]]
+  shadowNeeds(it, leaf.needs);
   const hold = {
     ticket: one.name,
     path: one.path,

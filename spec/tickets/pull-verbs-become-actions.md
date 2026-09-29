@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -154,6 +154,15 @@ record:
         hash: 079b49b2aba3501b
         size: 692
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 9abf28ed992f4bdb3529f818f640fd7a2368f6a9
+    hash_after: 9abf28ed992f4bdb3529f818f640fd7a2368f6a9
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -294,14 +303,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/needs-shadow.js src/scripts/pull-hand.js test/level0/needs-shadow.test.js test/level0/needs-shadow-wiring.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches needs-shadow.js, pull-hand.js and their cases, which the draft names, and the BRANCH edit left for branch-list-reads-work-table
+- the cases read fake doors: settings, a stand-in quack, a fake disk and a fake log
+- each new function carries a comment naming this ticket
+- the slice key and the action name stand once in needs-shadow.js, and the old table stays in pull-route.js
 
 ## tests-green
 
@@ -363,6 +377,6 @@ The draft's callers list names `pull-hand.js` once, and the implement step reads
 | `admits` in `src/scripts/pull-hand.js` | names the needs this box lacks, and refuses the hand-out |
 | `WORK_VERBS` in `src/scripts/work.js` | owns the branch verbs `VERBS` reads, since `branch-list-reads-work-table` took `BRANCH` away |
 
-The shadow call rides `admits`, beside `shadowLeaf`, so it runs once a hand-out.
+The shadow call rides `handed`, beside `shadowLeaf`, so it runs once a hand-out.
 
 The line on `branch open` meets a fake registry here, and the live index in `TestTheWiringLoadsTheBranchTopic` in `src/quack/twins_test.go`. That case stands red until `work-verbs-become-actions` closes, so this ticket's implement step goes after that one.

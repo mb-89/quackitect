@@ -50,14 +50,14 @@ test("the registry's actions answer branch open for a need naming it", () => {
 
 test("a need the two tables answer apart writes one shadow row", async () => {
   const doors = doorsOf({ names: ["branch/sync", "branch/test"] });
-  const found = await needsShadow(doors, ["branch sync", "branch new"]);
+  const found = await needsShadow(doors, ["branch sync", "branch open"]);
   assert.deepEqual(doors.ran, [["/tree/quack", "get", "index/actions"]]);
   assert.equal(found.length, 1);
   assert.equal(doors.said.length, 1);
   const row = doors.said[0];
   assert.equal(row.kind, SHADOW);
   assert.equal(row.fields.slice, SLICE);
-  assert.equal(row.fields.need, "branch new");
+  assert.equal(row.fields.need, "branch open");
 });
 
 test("a slice standing at old runs no quack and writes no row", async () => {
