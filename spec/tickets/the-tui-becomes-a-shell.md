@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,28 @@ record:
         hash: 7a8a87d4dd91f5b6
         size: 376
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d85514b1a910b · claude-code-remote
+    hash_before: 22b9e2bc25d42fdf976f80753e5d235a04c7d3bb
+    hash_after: 22b9e2bc25d42fdf976f80753e5d235a04c7d3bb
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/registry fails
+    inputs:
+      - name: design/draft
+        hash: 44af430987b84e61
+        size: 4553
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/the-work-view-gains-actions]]
+        hash: e037af28d323c289
+        size: 5675
+      - name: [[spec/tickets/the-log-becomes-a-view]]
+        hash: 04353381cefa7404
+        size: 5426
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -234,26 +256,33 @@ Assumptions, each for the hand at the merge:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/registry src/tui
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/registry/catalog_test.go
+- src/tui/registry/tab_test.go
+- src/tui/window_test.go TestTheStripNamesTheRegistryTabsAfterTheViews
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its assertion over a stub that compiles. The frame hands each arrival to every tab, so the fetch message names its tab, and a case holds that. The catalog door is one read a name, so one contract suite runs over the fake and over the /v1 door against an httptest server answering the index's shape. The surprise: frame.New draws its footer off Tabs[0].Marks, so a window of one registry tab needs Marks to answer its own order, which the stub leaves empty.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the index case is TestTheIndexTabDrawsTheFakeCatalog, the help case TestTheHelpTabReadsEachDocAsTheRegistrationGivesIt over a qtest catalog carrying q.Doc; go test ./... and ./RUNME.sh check close at tests-green
+- the one door, Catalog, has Fake, and TestTheFakeCatalogKeepsTheContract with TestTheV1CatalogKeepsTheContract hold it to the real /v1 read
 
 # gate
 
