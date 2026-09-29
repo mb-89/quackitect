@@ -74,3 +74,28 @@ Left undone, every window read stops the index, the window reads nothing, and th
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+**The live run.** The window built as `./RUNME.sh tui` builds it, at
+`.se/.runtime/bin/logview` beside `se-index`, drawn in a pseudo-terminal at
+120x40 by a driver under `.se/scripts`. The index stood before every run.
+
+| start | log the window reads | index pid before, after | window rows |
+|---|---|---|---|
+| `23:23:01` | a seeded copy under `.se/.log/old` | 7326, 7326 | none: the window's root reads three folders up, so the config it read stood at `.se` and the mode read old |
+| `23:23:43` | a seeded copy at `.se/.log/seed.jsonl`, its first row apart from `log/rows` | 7326, 7326 | one, at `23:23:48.888`, naming the seeded first row on the tail against the index's |
+| `23:25:33` | the session log itself | 7326, 7326 | none, and none owed: the tail and `log/rows` read one file |
+
+The index stays up, and the window's compare reaches `/v1` and writes its row.
+The phase 6 path now runs on this tree.
+
+**Where the ask departs.** The ask asks that `./RUNME.sh log --kind shadow`
+gain window rows after the run, and on this tree no honest run can meet it:
+
+- `migration.log` stands at new, so the verb reads `quack log`, which reads `.se/.log/session.jsonl` alone
+- `log/rows` reads that same file, and follows an edit to it at once, which a trial here showed
+- the window writes a shadow row into the log it reads. A row reaches the verb only where the window reads the session log.
+- there, the two readers must read the log apart, and they map every field alike. A seed there reads equal on both sides.
+
+The seeded copy carries the proof, and the verb criterion waits on the coordinator's reading of the phase 6 shadow. The run forced no mismatch into the live log.
+
+For the coordinator: `phase6=window-reaches-the-index(1 seeded row, 0 rows over the live log)`, with `migration.phase6switch` left as it stands.
