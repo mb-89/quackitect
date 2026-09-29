@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-topics-switch-over
+record:
+  - step: design/draft
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: f9a44ed6933a199f4a3522febbcc72da82727d57
+    hash_after: f9a44ed6933a199f4a3522febbcc72da82727d57
+    inputs:
+      - name: ask
+        hash: 1e27277f7647141a
+        size: 231
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -145,32 +155,57 @@ The readers then agree by construction. One commit per key rolls one back.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Five keys move from shadow to new in spec/config/level0.json: migration.config, migration.log, migration.guidance, migration.prose, migration.check. One helper, topicOf in src/scripts/quack-topic.js, runs `quack <topic>` under the method root over the caller's own doors (proc.run, files, join) and returns the parsed JSON, or null where the binary stands missing, exits non-zero or prints what no reader takes. Each reader asks its key; where it reads new, the reader takes the answer off topicOf and drops its own path, and where topicOf answers null the reader falls back to the old path for this ticket, since the-js-twins-leave then removes that fallback with the twins. config: readConfig in src/scripts/cli-check.js builds its rows from `quack config` (key, value literal, layer), and the write path stays on settings.write. log: logVerb in src/scripts/log-verb.js filters the rows `quack log` prints instead of rowsIn. guidance: readsFor callers in src/scripts/guidance-verb.js (stepNotes) and src/scripts/pull-hand.js (handed) take the notes off `quack guidance`, keyed leaf as <process>:<path>. prose: readsProse in src/bridge/prose.js and readsText in src/bridge/findings.js take the kept findings off `quack prose` (wink still finds, and the Go vetoes replace withoutFalsePast, withoutFalseLength and withoutFalseOutside). check: no reader of a check/ name stands, because the module's names hold empty lists until phase 7 moves the rules in; the key moves to new and nothing reads it, and the JavaScript check twins under src/scripts stay as the only rules, so the group's done line reads over the twins whose Go side answers (config, log, guidance, prose). Weighed: leaving the check twins for phase 7 against deleting them, which would empty the check verb; the Go names answer nothing yet. Weighed: a hard error on a missing binary against the fallback; the fallback keeps this commit safe on a box whose binary lags, and the second ticket makes the error hard. Assumed: the quack binary stands under the method root on every box the check runs on, as the shadow already assumes. One commit per key rolls one back, so the change lands as one commit a key, and the tracked key moves last in each.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/cli.js: the config case calls readConfig
+- src/scripts/cli-check.js: readConfig calls settings.all and configShadow
+- src/scripts/log-verb.js: logVerb calls rowsIn and shadowLog
+- src/scripts/guidance-verb.js: stepNotes calls readsFor and shadowLeaf
+- src/scripts/pull-hand.js: handed calls readsFor, shadowLeaf and shadowNeeds
+- src/bridge/prose.js: readsProse calls the three withoutFalse vetoes and shadowDraft
+- src/bridge/bash.js: the reading of a command calls readsProse
+- src/bridge/write.js: the write door calls readsProse
+- src/bridge/answer-read.js: the answer reader calls readsProse
+- src/bridge/findings.js: readsText calls withoutFalsePast, and shadowOver runs the past veto shadow
+- spec/config/level0.json: the five migration keys
+- spec/config/level0.schema.json: the enum of each key
+- src/quack/config_test.go: the shared-key list names the five keys
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/topic-readers.test.js: topicOf answers the parsed JSON of a run, and null on a missing binary, a non-zero exit and broken JSON
+- test/level0/topic-readers.test.js: readConfig prints the rows quack config answers where migration.config reads new
+- test/level0/topic-readers.test.js: logVerb prints the rows quack log answers, narrowed by its flags, where migration.log reads new
+- test/level0/topic-readers.test.js: stepNotes and handed take the notes off quack guidance where migration.guidance reads new
+- test/level0/topic-readers.test.js: readsProse keeps what quack prose keeps where migration.prose reads new
+- test/level0/topic-readers.test.js: every reader falls back on the old path where topicOf answers null
+- test/level0/topic-readers.test.js: spec/config/level0.json reads new for the five keys
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: cli-check.js readConfig and configShadow, log-verb.js logVerb, guidance-verb.js stepNotes, pull-hand.js handed, prose.js readsProse, findings.js readsText and shadowDoorsOf, the five shadow files, src/quack config.go log.go prose.go, src/modules/check/check.go
+- the callers list names the readers and the three doors calling readsProse, found by a search for each name
+- every done_when line names its test: the readers case reads each key's readers off the Go topic in topic-readers.test.js, and ./RUNME.sh check decides the exit
 
 ## tests-red
 
