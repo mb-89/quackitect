@@ -39,3 +39,41 @@ The phase-6 shadow now runs. Since [[spec/tickets/window-keeps-the-index]], the 
 - `./RUNME.sh config` reads `migration.phase6switch true`
 - the window over the session log writes no window row, while the index holds one pid
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test src/modules/migration src/index src/tui
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The coordinator ran on main at 0b964e4, with the window at shadow. First it started se-index, which stood at pid 2514. Then it ran the window twice in a pseudo-terminal over the session log. No window row was stamped after the run began, and the index held pid 2514 throughout. A seeded copy of the log, with its first row changed, then made the window write one window-in-shadow row. So the compare runs and reads apart where the rows differ. The earlier fault, where each window read stopped the index, closed in pull request 55. So migration.phase6switch turns true.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: one key in spec/config/level0.json
+- the cleanup it reveals: none past pull request 55
+- every fact stands once: the run lives on this ticket and the pull request
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
