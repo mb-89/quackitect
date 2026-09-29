@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -141,6 +141,21 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85821f54410d · claude-code-remote · helper-3
+    hash_before: f3c8acd87d86d664e3dbd2fd6e06ed00c09ca76b
+    hash_after: f3c8acd87d86d664e3dbd2fd6e06ed00c09ca76b
+    inputs:
+      - name: design/draft
+        hash: a96c231c20daddb8
+        size: 5334
+      - name: design/tests-red
+        hash: e867491ef5ef53a1
+        size: 1174
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -276,8 +291,11 @@ The five sidebar cases fail on their assertions against the stub in `src/extensi
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- base-actions-get-registered: The base files call work/pull, work/place, tickets/flip-urgent and tickets/set-field. No module under src/modules registers them, so each view button draws its bare name and no icon.
+- draws-json-yields-to-views: The sibling moved the pull button's help and icon into spec/config/draws.json, which the draft predates. Once work/pull registers them too, the icon stands in two places until the widget grid retires.
 
 # implement
 
