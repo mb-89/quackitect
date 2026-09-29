@@ -116,12 +116,21 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 4c78004d4e84c6736984f92cdde87e5f584bb79a
+    hash_after: 4c78004d4e84c6736984f92cdde87e5f584bb79a
+    inputs:
+      - name: ask
+        hash: 1f514ff46886bda3
+        size: 690
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -159,38 +168,46 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+minted (src/scripts/pull-writes.js:112) tags a gate point with `todo: true` and adds a `point: gate` front field beside it. taggedIn in .claude/skills/level0/lib/todo.js skips a note whose front carries `point: gate`, so the push door (src/scripts/prepush.js:109) lets the point through and its tag stays on origin. taggedFirst and the queue keep reading the tag, so a box pulling origin sees the points first. Assumption: a point tagged on origin ranks first on every box, which is the gain the ask names. Cost: a hand untagging a point with `ticket todo --off` clears the tag and the field stays harmless.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/prepush.js: the push check loop over refs, calling taggedIn,src/scripts/pull-writes.js: minted, the one writer of a gate point,src/scripts/pull.js: line 476, the caller of minted,src/scripts/pull-hand.js: taggedFirst, reads the tag and stays unchanged,src/scripts/work-stands.js: isTagged reader, stays unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-gate.test.js: a gate pass with points lands its push,test/level0/pull-gate.test.js: the points stand first in the queue after the push,test/level0/prepush.test.js: a tagged note carrying point gate passes the door, and a bare tagged note stays refused
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first on a first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/scripts/pull-writes.js,src/scripts/prepush.js,test/level0/pull-gate.test.js,test/level0/prepush.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: prepush.js:109, todo.js taggedIn and pull-writes.js:112 were read, and the point field is my addition
+- the callers list names every caller: drawn from a grep of minted, taggedIn, taggedFirst and isTagged
+- every done_when line names the test that decides it: each maps to a case in pull-gate.test.js, and check exits 0 through ./RUNME.sh check
 
 ## tests-red
 
