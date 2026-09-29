@@ -76,3 +76,11 @@ func TestTheSweepReadsTheVariableOverTheTrackedFile(t *testing.T) {
 		t.Fatalf("the sweep answers %+v, and wants the variable over the tracked file, as src/config reads it", found)
 	}
 }
+
+// A cap no file sets reads the schema's default, as src/config reads it. [[spec/tickets/the-config-schema-gets-generated]]
+func TestCountReadsTheBuiltIn(t *testing.T) {
+	texts := Texts{"spec/config/level0.schema.json": `{"properties": {"names": {"properties": {"words": {"type": "number", "default": 7}}}}}`}
+	if said := countOf(texts, nil, wordsKey); said != 7 {
+		t.Fatalf("the count answers %d, and wants the default 7", said)
+	}
+}

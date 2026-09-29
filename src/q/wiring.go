@@ -249,6 +249,13 @@ type Key struct {
 	Instance string
 	Local    string
 	Shared   bool
+	Doc      string
+	Unit     string
+	Enum     []string
+	// The JSON type the schema names, off the Go type of the built-in value. [[spec/tickets/the-config-schema-gets-generated]]
+	Type string
+	// The built-in value as a JSON literal. [[spec/tickets/the-config-schema-gets-generated]]
+	Default string
 }
 
 // Every config key the catalog holds, in catalog order. [[spec/design_output/model#config-comes-off-the-registrations]]

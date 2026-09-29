@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,22 @@ record:
         hash: bf860f6851f1211e
         size: 611
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 8fdd5630834127dd01a5c522d39744c7f62b72fc
+    hash_after: 8fdd5630834127dd01a5c522d39744c7f62b72fc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: baa2b39c4d52bd5e
+        size: 7485
+      - name: [[spec/tickets/the-sidebar-renders-generically]]
+        hash: dabdc9f8eb9f93af
+        size: 5597
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -245,26 +261,38 @@ What I weigh and assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/config.test.js test/level0/config-door.test.js test/level0/widgets.test.js test/level0/projection-builtin.test.js src/q src/quack src/config src/modules/check
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/q/keys_test.go
+- src/quack/schema_test.go
+- src/config/config_test.go
+- src/modules/check/sweep_test.go
+- test/level0/config.test.js
+- test/level0/config-door.test.js
+- test/level0/widgets.test.js
+- test/level0/projection-builtin.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion. The Go cases compile against stubs: `q.Unit` and `q.Enum` set nothing, the new `Key` fields stand empty, and `schemaText` answers nothing. `catalogOf` and `dottedOf` already stand whole, since the cases need them to read the catalog. What surprises me: `TestDefaultFileHoldsNoBuiltIn` passed at first, because an empty built-in matches no literal. So it now fails a declared key with no built-in as well. The manager's `watchdog.beat` and `watchdog.lease` read under their section name, with no instance, which is how the file holds them. The projection case stands in a file of its own, because `test/level0/projection.test.js` sits at the file ceiling.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the go test line rides `./RUNME.sh check`, which runs the Go folders; the regeneration line meets `TestSchemaStandsAsGenerated`; the built-in line meets `TestDefaultFileHoldsNoBuiltIn`; the check line is a checkpoint the hand answers at tests-green, since no red test decides the whole check
+- the tests reach the disk alone: the Go cases write a temp root or read the tree read-only, and the JavaScript cases take `fakeDisk` from `src/doors/fake`
 
 # gate
 

@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { LOCAL, TRACKED } from "../../.claude/skills/level0/lib/config.js";
-import { asks, asksText, writes } from "../../src/bridge/config.js";
+import { asks, asksText, whereFrom, writes } from "../../src/bridge/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const boxOf = (seed) => ({
@@ -52,6 +52,22 @@ test("a text key reads the local file, then the environment, then the tracked fi
     asksText({ ...boxOf({ ...tracked, ...local }), env: envOf("error") }, "log.level"),
     "debug",
   );
-  assert.equal(asksText({ ...boxOf(tracked), env: envOf("error") }, "log.level"), "error");
+  assert.equal(
+    asksText({ ...boxOf(tracked), env: envOf("error") }, "log.level"),
+    "error",
+  );
   assert.equal(asksText({ ...boxOf(tracked), env: envOf("") }, "log.level"), "warn");
+});
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("asks answers the built-in where no file sets the key", () => {
+  const box = boxOf({
+    "/method/spec/config/level0.schema.json":
+      '{"properties":{"names":{"properties":{"words":{"type":"number","default":4}}},"log":{"properties":{"level":{"type":"string","default":"info"}}}}}',
+    [`/method/${TRACKED}`]: "{}",
+  });
+
+  assert.equal(asks(box, "names.words"), 4);
+  assert.equal(asksText({ ...box, env: {} }, "log.level"), "info");
+  assert.deepEqual(whereFrom(box, "names.words"), { value: 4, layer: "built-in" });
 });

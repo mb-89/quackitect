@@ -160,3 +160,22 @@ func TestWhereNamesTheLayer(t *testing.T) {
 		t.Fatalf("names.none reads off %q", layer)
 	}
 }
+
+// A key no file sets answers the schema's default, under the layer built-in. [[spec/tickets/the-config-schema-gets-generated]]
+func TestWhereAnswersTheBuiltIn(t *testing.T) {
+	root := rootWith(t, map[string]string{
+		Tracked:                          `{}`,
+		"spec/config/level0.schema.json": `{"properties": {"names": {"properties": {"words": {"type": "number", "default": 4}}}}}`,
+	})
+
+	said, layer, held := Where(root, "names.words")
+	if !held || layer != "built-in" {
+		t.Fatalf("the reader answers the layer %q, held %v, and wants built-in", layer, held)
+	}
+	if whole, ok := said.(float64); !ok || int(whole) != 4 {
+		t.Fatalf("the reader answers %v, and wants the default 4", said)
+	}
+	if said := Count(root, "names.words"); said != 4 {
+		t.Fatalf("the count answers %d, and wants the default 4", said)
+	}
+}

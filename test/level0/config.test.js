@@ -228,3 +228,19 @@ test("the config names no judge key", async () => {
   assert.equal(config.judge, undefined, "the tracked config names no judge");
   assert.equal(schema.properties.judge, undefined, "the schema declares no judge");
 });
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("a key no file sets resolves to its built-in", async () => {
+  const schema = structuredClone(SCHEMA);
+  schema.properties.stop.properties.hold = { type: "string", default: "off" };
+  schema.properties.log.properties.level.default = "warn";
+  const { it } = resolver({
+    "spec/config/level0.schema.json": JSON.stringify(schema),
+    "spec/config/level0.json": JSON.stringify({ log: { level: "info" } }),
+  });
+
+  assert.equal(await it.ask("stop.hold"), "off");
+  assert.equal(await it.layerOf("stop.hold"), "built-in");
+  assert.equal(await it.ask("log.level"), "info", "a file beats the built-in");
+  assert.equal(await it.layerOf("log.level"), TRACKED);
+});
