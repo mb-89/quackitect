@@ -1,5 +1,5 @@
 ---
-description: "config / grace / finish: sets grace.finish to what you type."
+description: "config / grace / finish: sets grace.finish to what you type. The calls the finish hold lets pass before it stops hard."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

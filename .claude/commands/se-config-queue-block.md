@@ -1,5 +1,5 @@
 ---
-description: "config / queue / block: sets queue.block to what you type. The score a ticket takes for each one waiting under it, down the whole chain."
+description: "config / queue / block: sets queue.block to what you type. the score a ticket takes for each ticket its chain holds up"
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

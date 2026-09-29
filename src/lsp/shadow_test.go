@@ -5,7 +5,11 @@ package main
 
 import (
 	"errors"
+	"os"
+	"path/filepath"
 	"testing"
+
+	"quackitect/src/config"
 )
 
 func rowsOf(t *testing.T, mode string, old, now []Finding) []map[string]any {
@@ -58,5 +62,23 @@ func TestTheShadowWritesNothingUnderOld(t *testing.T) {
 	})
 	if !asked {
 		t.Fatal("the shadow asks the new road nothing under shadow")
+	}
+}
+
+// The slice reads its built-in where the default file sets none. [[spec/tickets/the-config-schema-gets-generated]]
+func TestTheSliceModeReadsItsBuiltIn(t *testing.T) {
+	root := t.TempDir()
+	schema := `{"properties": {"migration": {"properties": {"lsp": {"type": "string", "default": "old"}}}}}`
+	for path, text := range map[string]string{config.Schema: schema, config.Tracked: `{}`} {
+		at := filepath.Join(root, filepath.FromSlash(path))
+		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if mode := lspMode(root); mode != "old" {
+		t.Fatalf("the slice reads %q, and wants its built-in old", mode)
 	}
 }

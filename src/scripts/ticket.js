@@ -35,6 +35,7 @@ import { COMMENT } from "./pull-route.js";
 import { baseOf, driftOf } from "./ticket-drift.js";
 import { filled } from "./ticket-fill.js";
 import { reachedOf, routed } from "./ticket-route.js";
+import { place, set, urgent } from "./ticket-edit.js";
 import { yours } from "./ticket-yours.js";
 import { askFaults, askRefusal, askWarning, lineRefusal } from "./ticket-ask-lint.js";
 
@@ -61,6 +62,9 @@ export function ticket(root, argv, doors) {
     fill,
     yours: (it, _name, argv) => yours(it, argv),
     bless: (it, name) => bless(it, name ? ticketAt(it, name) : null, name),
+    place,
+    urgent: (it, name) => urgent(it, name ? ticketAt(it, name) : null, name),
+    set: (it, name, argv) => set(it, name ? ticketAt(it, name) : null, name, argv),
   };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
@@ -90,6 +94,13 @@ export function ticket(root, argv, doors) {
     );
     console.log(
       "  fill <path>         write the route a saved ticket's process names, or print it under --stdout",
+    );
+    console.log(
+      "  place <ticket> <n>  place the ticket at 1 to 9 in its queue level, and the same place again clears it",
+    );
+    console.log("  urgent <ticket>     flip the ticket's urgent mark");
+    console.log(
+      "  set <ticket> <field> <value>  write one field of the ticket's front, as the schema takes it",
     );
     console.log(
       `                      note takes --${TALK} where a person decides it, and --${TODO} to park it`,

@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	oldconfig "quackitect/src/config"
+	"quackitect/src/q"
 )
 
 // The golden file and its fixture, beside the case that reads them. [[spec/tickets/cfg-topic-holds-one-resolver]]
@@ -32,14 +33,17 @@ func TestConfigRowsReadEveryLayer(t *testing.T) {
 	tracked := []byte(`{"comment": "c", "a": {"comment": "c", "x": 1, "y": {"z": true}}, "m": {"s": "old"}}`)
 	local := []byte(`{"a": {"x": 2}, "m": {"s": "new"}}`)
 	env := map[string]string{"SE_A_X": "3"}
-	rows, err := configRows(tracked, local, env, map[string]bool{"m.s": true})
+	declared := sharedOf("m.s")
+	declared["d.most-in-a-row"] = q.Key{Name: "d/config/most-in-a-row", Instance: "d", Local: "most-in-a-row", Default: `5`}
+	rows, err := configRows(tracked, local, env, declared)
 	if err != nil {
 		t.Fatal(err)
 	}
 	want := map[string]configRow{
-		"a.x":   {Value: json.RawMessage(`3`), Layer: "SE_A_X"},
-		"a.y.z": {Value: json.RawMessage(`true`), Layer: oldconfig.Tracked},
-		"m.s":   {Value: json.RawMessage(`"old"`), Layer: oldconfig.Tracked},
+		"a.x":             {Value: json.RawMessage(`3`), Layer: "SE_A_X"},
+		"a.y.z":           {Value: json.RawMessage(`true`), Layer: oldconfig.Tracked},
+		"m.s":             {Value: json.RawMessage(`"old"`), Layer: oldconfig.Tracked},
+		"d.most-in-a-row": {Value: json.RawMessage(`5`), Layer: oldconfig.BuiltIn},
 	}
 	if !reflect.DeepEqual(rows, want) {
 		t.Fatalf("the rows read %v, and want %v", rows, want)
@@ -70,15 +74,26 @@ func TestTheSliceKeysStandShared(t *testing.T) {
 	if err != nil {
 		t.Skip("no wiring file stands here")
 	}
-	shared, err := sharedKeys(string(text))
+	shared, err := declaredKeys(string(text))
 	if err != nil {
 		t.Fatal(err)
 	}
 	for _, key := range []string{"migration.opentasks", "migration.config"} {
-		if !shared[key] {
+		if !shared[key].Shared {
 			t.Fatalf("%s stands unshared in %v", key, shared)
 		}
 	}
+}
+
+// Shared keys by their dotted names, with no built-in, as a case declares them. [[spec/tickets/the-config-schema-gets-generated]]
+func sharedOf(dotted ...string) map[string]q.Key {
+	out := map[string]q.Key{}
+	for _, one := range dotted {
+		key := keyOfDotted(one)
+		key.Shared = true
+		out[one] = key
+	}
+	return out
 }
 
 // One reader's answer for a key: its value and the layer naming where it comes from. [[spec/tickets/cfg-topic-holds-one-resolver]]
@@ -127,7 +142,7 @@ func readersRoot(t *testing.T) (string, []byte, []byte, map[string]string) {
 // The Go readers' sections: the old reader and the config module, each over every key the fixture holds. [[spec/tickets/cfg-topic-holds-one-resolver]]
 func goReaders(t *testing.T) map[string]map[string]readerRow {
 	root, tracked, local, env := readersRoot(t)
-	shared := map[string]bool{"migration.opentasks": true, "migration.config": true, "migration.log": true, "migration.guidance": true, "migration.check": true, "migration.prose": true}
+	shared := sharedOf("migration.opentasks", "migration.config", "migration.log", "migration.guidance", "migration.check", "migration.prose")
 	rows, err := configRows(tracked, local, env, shared)
 	if err != nil {
 		t.Fatal(err)

@@ -176,8 +176,8 @@ func winning(key q.Key, in layersIn) (string, string, bool) {
 	if literal, ok := contextual(in.Held.Contexts, in.Leases, key.Name); ok {
 		return literal, ContextLayer, true
 	}
-	if text, ok := in.Env[EnvOf(dotted(key))]; ok {
-		return literalOfText(text), EnvOf(dotted(key)), true
+	if text, ok := in.Env[EnvOf(key.Dotted())]; ok {
+		return literalOfText(text), EnvOf(key.Dotted()), true
 	}
 	if literal, ok := filed(in.Local, key); ok {
 		return literal, Local, true
@@ -206,15 +206,6 @@ func contextual(contexts []Context, leases []string, name string) (string, bool)
 	return "", false
 }
 
-// The key as src/config names it, `<instance>.<key>` with a dot between its segments, which EnvOf turns into its variable. [[spec/design_output/config#the-go-reader]]
-func dotted(key q.Key) string {
-	local := strings.ReplaceAll(key.Local, "/", ".")
-	if key.Instance == "" {
-		return local
-	}
-	return key.Instance + "." + local
-}
-
 // A variable's text stands as its JSON literal where it reads as JSON, and as a JSON string otherwise. [[spec/design_output/model#a-keys-layers]]
 func literalOfText(text string) string {
 	if json.Valid([]byte(text)) {
@@ -226,12 +217,8 @@ func literalOfText(text string) string {
 
 // The literal a layer file sets for the key, under its instance and then each segment of its key, as src/config reads a dotted key. [[spec/design_output/model#config-comes-off-the-registrations]]
 func filed(file q.Ordered, key q.Key) (string, bool) {
-	path := strings.Split(key.Local, "/")
-	if key.Instance != "" {
-		path = append([]string{key.Instance}, path...)
-	}
 	value, ok := file, true
-	for _, name := range path {
+	for _, name := range key.Path() {
 		if value, ok = member(value, name); !ok {
 			return "", false
 		}

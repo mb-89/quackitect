@@ -1,5 +1,5 @@
 ---
-description: "config / migration / check: sets migration.check to new. The check slice, switched over in phase 3. The check names answer an empty list until phase 7 moves the rules in."
+description: "config / migration / check: sets migration.check to new. The check twins, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

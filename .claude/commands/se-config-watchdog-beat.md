@@ -1,5 +1,5 @@
 ---
-description: "config / watchdog / beat: sets watchdog.beat to what you type. The span between two beats of the index's work loop."
+description: "config / watchdog / beat: sets watchdog.beat to what you type. the seconds between two ticks of the manager"
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

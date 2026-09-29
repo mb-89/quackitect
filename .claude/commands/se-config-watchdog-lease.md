@@ -1,5 +1,5 @@
 ---
-description: "config / watchdog / lease: sets watchdog.lease to what you type. The term a lease runs without a beat before its part reads stale."
+description: "config / watchdog / lease: sets watchdog.lease to what you type. the seconds the index's own lease holds past a renewal"
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

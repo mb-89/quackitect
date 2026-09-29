@@ -652,6 +652,23 @@ refusal takes the warning colour. The whole answer stands in the output
 channel `quackitect`. Then the buttons draw again, and a change under
 `.se/.runtime/hold` draws them too.
 
+## The views section
+
+The sidebar draws one section for each base file under `spec/views`, below the
+groups. The base file names what shows. The catalog says how each thing reads.
+For the keys, see [[spec/design_output/model#views]].
+
+| part | reads off |
+|---|---|
+| the badge and its icon | the `index/names` row of the name under `badge` |
+| a button's label, doc and icon | the `index/actions` row of its action |
+| a form's fields | the input fields of that row, where the button carries `edits: form` |
+
+The index door in `src/extension/editor-index.js` reads both rows over `/v1`,
+at the port the index's standing file names. A click posts the kind `call`, and
+the door posts the action with the fields of its row. Where no index stands,
+each section draws its base names alone, and the groups above stand whole.
+
 ## The child names no harness
 
 The pull tells an agent from a person by the environment. An editor a Claude

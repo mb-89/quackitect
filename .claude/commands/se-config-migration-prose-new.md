@@ -1,5 +1,5 @@
 ---
-description: "config / migration / prose: sets migration.prose to new. The prose slice, switched over in phase 3. The prose readers take the findings the Go checks keep."
+description: "config / migration / prose: sets migration.prose to new. The prose checks, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

@@ -2,125 +2,19 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "level zero",
   "type": "object",
-  "required": [
-    "stop",
-    "answer",
-    "log",
-    "names",
-    "ask"
-  ],
   "properties": {
-    "comment": {
-      "type": "string"
-    },
-    "answer": {
-      "type": "object",
-      "required": [
-        "enabled",
-        "warnAt",
-        "ceiling"
-      ],
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "enabled": {
-          "type": "boolean",
-          "help": "The door holding the owner's prompt first. false takes it out."
-        },
-        "warnAt": {
-          "type": "number",
-          "unit": "findings a thousand words",
-          "help": "The score where the gate starts writing a warn line to the log."
-        },
-        "ceiling": {
-          "type": "number",
-          "unit": "findings a thousand words",
-          "help": "The score where the gate names the band rewrite in its log line."
-        },
-        "words": {
-          "type": "number",
-          "unit": "words",
-          "help": "The words an answer holds outside its code and tables."
-        }
-      }
-    },
-    "helper": {
-      "type": "object",
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "find": {
-          "type": "string",
-          "enum": [
-            "haiku",
-            "sonnet",
-            "opus"
-          ],
-          "help": "The model a helper runs on that finds, lists, reads and reports."
-        },
-        "change": {
-          "type": "string",
-          "enum": [
-            "haiku",
-            "sonnet",
-            "opus"
-          ],
-          "help": "The model a helper runs on that makes a scoped change with its test, or reviews against a list."
-        },
-        "decide": {
-          "type": "string",
-          "enum": [
-            "haiku",
-            "sonnet",
-            "opus"
-          ],
-          "help": "The model a helper runs on that takes a design, an unknown cause, or a verdict the owner reads."
-        }
-      }
-    },
-    "context": {
-      "type": "object",
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "handoverAt": {
-          "type": "number",
-          "unit": "tokens",
-          "help": "The context past which the next pull after the ticket in hand hands the handover, the clear and the read of the handover. 0 switches it off."
-        }
-      }
-    },
     "stop": {
       "type": "object",
-      "required": [
-        "enabled",
-        "mostInARow",
-        "hold"
-      ],
       "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "enabled": {
-          "type": "boolean",
-          "help": "The tooth. false ends every turn where the agent asks to end it."
-        },
-        "mostInARow": {
-          "type": "number",
-          "unit": "turns",
-          "help": "The turns the tooth carries one after another before it lets go."
-        },
         "hold": {
           "type": "string",
+          "default": "off",
+          "help": "What the session does when it reaches the end of a turn.",
           "enum": [
             "off",
             "finish",
             "stop"
           ],
-          "help": "What the session does when it reaches the end of a turn.",
           "widget": "toggle",
           "gesture": 5,
           "icon": "✋🤖",
@@ -129,26 +23,32 @@
           "column": 2,
           "rowSpan": 1,
           "colSpan": 1
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "help": "The tooth. false ends every turn where the agent asks to end it."
+        },
+        "mostInARow": {
+          "type": "number",
+          "default": 3,
+          "help": "The turns the tooth carries one after another before it lets go.",
+          "unit": "turns"
         }
       }
     },
     "ask": {
       "type": "object",
-      "required": [
-        "wanted"
-      ],
       "properties": {
-        "comment": {
-          "type": "string"
-        },
         "wanted": {
           "type": "string",
+          "default": "quiet",
+          "help": "What the owner wants said at the end of this turn.",
           "enum": [
             "quiet",
             "short",
             "full"
           ],
-          "help": "What the owner wants said at the end of this turn.",
           "widget": "toggle",
           "gesture": 5,
           "icon": "❓🤖",
@@ -163,9 +63,6 @@
     "bridge": {
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
-        },
         "hook": {
           "help": "The hook: start the server behind the bridgehead, and click again to kill it. Shift and click starts it under the debugger, paused at the return of decide.",
           "widget": "process",
@@ -183,24 +80,7 @@
     },
     "log": {
       "type": "object",
-      "required": [
-        "level"
-      ],
       "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "level": {
-          "type": "string",
-          "enum": [
-            "debug",
-            "info",
-            "warn",
-            "error",
-            "fatal"
-          ],
-          "help": "The level this box writes at. info writes every line a door says, and debug writes what the hooks see too."
-        },
         "open": {
           "help": "Open the window, on its log tab, in a terminal beside the editor.",
           "widget": "action",
@@ -219,119 +99,24 @@
             "q leave"
           ],
           "runs": "./RUNME.sh tui"
-        }
-      }
-    },
-    "code": {
-      "type": "object",
-      "required": [
-        "functionLines",
-        "fileLines"
-      ],
-      "properties": {
-        "comment": {
-          "type": "string"
         },
-        "functionLines": {
-          "type": "number",
-          "unit": "lines",
-          "help": "The lines a function holds at most. The write door refuses a write that grows past it."
-        },
-        "fileLines": {
-          "type": "number",
-          "unit": "lines",
-          "help": "The lines a file holds at most. The write door refuses a write that grows past it."
-        }
-      }
-    },
-    "battery": {
-      "type": "object",
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "runs": {
-          "type": "number",
-          "unit": "runs",
-          "help": "The check's runs the stamp keeps at one commit. A retro reads each part's median over them."
-        }
-      }
-    },
-    "names": {
-      "type": "object",
-      "required": [
-        "words"
-      ],
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "words": {
-          "type": "number",
-          "unit": "words",
-          "help": "The words a file, a folder and a branch name each hold at most."
-        }
-      }
-    },
-    "wait": {
-      "type": "object",
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "most": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span the wait tool holds at most before it returns with no signal."
-        },
-        "quiet": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span a file stands unchanged before the wait reads it as quiet."
+        "level": {
+          "type": "string",
+          "default": "info",
+          "help": "The level this box writes at. info writes every line a door says, and debug writes what the hooks see too.",
+          "enum": [
+            "debug",
+            "info",
+            "warn",
+            "error",
+            "fatal"
+          ]
         }
       }
     },
     "work": {
-      "comment": "Level one. The knobs the work verbs read over a group and its tickets, and the work group's buttons the sidebar draws.",
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "staleAfter": {
-          "type": "string",
-          "unit": "a span, as 90m, 12h or 3d",
-          "help": "The age of a held group's tip that puts it under yours."
-        },
-        "failsBeforePerson": {
-          "type": "number",
-          "unit": "returns",
-          "help": "The times a step fails back before the pull puts a person step in, asking the reason."
-        },
-        "refusalsBeforeFail": {
-          "type": "number",
-          "unit": "refusals",
-          "help": "The times one hand-back meets refused before the pull fails the leaf back with the findings."
-        },
-        "stepsBeforeSplit": {
-          "type": "number",
-          "unit": "steps",
-          "help": "The person steps a ticket carries before the pull refuses another and asks for a split."
-        },
-        "personSigns": {
-          "type": "boolean",
-          "help": "The stronger door on a person's hand. Switched on, a person's hand-back on a tracked ticket meets a signed tip."
-        },
-        "retroReaders": {
-          "type": "number",
-          "unit": "hands",
-          "help": "The hands a retro's collect spawns, each taking the next chapter until none stands."
-        },
-        "retroCap": {
-          "type": "number",
-          "unit": "tickets",
-          "help": "The tickets a retro's improve step mints, so the list holds what gets done."
-        },
         "editor": {
           "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the number in the work tab's brackets.",
           "widget": "action",
@@ -361,35 +146,53 @@
           "column": 2,
           "asks": "name",
           "opens": "spec/tickets/<name>.md"
-        }
-      }
-    },
-    "restated": {
-      "comment": "The runs the restated rules refuse, where one place says again what another holds.",
-      "type": "object",
-      "properties": {
-        "comment": {
-          "type": "string"
         },
-        "pointer": {
+        "failsBeforePerson": {
           "type": "number",
-          "unit": "words",
-          "help": "The run a heading shares with the heading its pointer names before the rule draws."
+          "default": 2,
+          "help": "The times a step fails back before the pull puts a person step in, asking the reason.",
+          "unit": "returns"
         },
-        "rule": {
+        "personSigns": {
+          "type": "boolean",
+          "default": false,
+          "help": "The stronger door on a person's hand. Switched on, a person's hand-back on a tracked ticket meets a signed tip."
+        },
+        "refusalsBeforeFail": {
           "type": "number",
-          "unit": "words",
-          "help": "The run two rule lines of two guidance notes share before the rule draws."
+          "default": 5,
+          "help": "The times one hand-back meets refused before the pull fails the leaf back with the findings.",
+          "unit": "refusals"
+        },
+        "retroCap": {
+          "type": "number",
+          "default": 8,
+          "help": "The tickets a retro's improve step mints, so the list holds what gets done.",
+          "unit": "tickets"
+        },
+        "retroReaders": {
+          "type": "number",
+          "default": 4,
+          "help": "The hands a retro's collect spawns, each taking the next chapter until none stands.",
+          "unit": "hands"
+        },
+        "staleAfter": {
+          "type": "string",
+          "default": "30m",
+          "help": "The age of a held group's tip that puts it under yours.",
+          "unit": "a span, as 90m, 12h or 3d"
+        },
+        "stepsBeforeSplit": {
+          "type": "number",
+          "default": 3,
+          "help": "The person steps a ticket carries before the pull refuses another and asks for a split.",
+          "unit": "steps"
         }
       }
     },
     "engine": {
-      "comment": "Level one. The buttons that make a vehicle and a stub, and where the session takes its work from.",
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
-        },
         "vehicle": {
           "help": "Make a vehicle: a copy of this tree that works on itself, in the folder the press asks for.",
           "widget": "action",
@@ -416,12 +219,13 @@
         },
         "binding": {
           "type": "string",
+          "default": "queue",
+          "help": "Where the session takes its work from. The chapter The engine controls, under spec/design_output/config.md, says what each value means.",
           "enum": [
             "queue",
             "unbound",
             "god"
           ],
-          "help": "Where the session takes its work from. The chapter The engine controls, under spec/design_output/config.md, says what each value means.",
           "widget": "toggle",
           "gesture": 5,
           "icon": "❌🔗🤖",
@@ -433,322 +237,562 @@
         }
       }
     },
-    "migration": {
+    "answer": {
       "type": "object",
-      "required": [
-        "phase0",
-        "phase1",
-        "phase1gaps",
-        "phase2shadow",
-        "phase2switch",
-        "phase3shadow",
-        "phase3switch",
-        "phase4shadow",
-        "phase4switch",
-        "phase5shadow",
-        "phase5switch",
-        "phase6shadow",
-        "phase6switch",
-        "phase7shadow",
-        "phase7switch",
-        "phase8shadow",
-        "phase8switch",
-        "phase9shadow",
-        "phase9switch",
-        "phase10"
-      ],
       "properties": {
-        "comment": {
-          "type": "string"
+        "ceiling": {
+          "type": "number",
+          "default": 15,
+          "help": "The score where the gate names the band rewrite in its log line.",
+          "unit": "findings a thousand words"
         },
-        "opentasks": {
-          "type": "string",
-          "enum": [
-            "new"
-          ],
-          "help": "The open-tasks slice's record, switched over in phase 2. The badge, the work tab's brackets and its queue column read the index."
-        },
-        "config": {
-          "type": "string",
-          "enum": [
-            "new"
-          ],
-          "help": "The config readers' slice, switched over in phase 3. The config verb reads the config module."
-        },
-        "log": {
-          "type": "string",
-          "enum": [
-            "new"
-          ],
-          "help": "The session log's slice, switched over in phase 3. The log verb reads the log topic."
-        },
-        "guidance": {
-          "type": "string",
-          "enum": [
-            "new"
-          ],
-          "help": "The guidance slice, switched over in phase 3. The rules a step reads come off the guidance topic."
-        },
-        "check": {
-          "type": "string",
-          "enum": [
-            "new"
-          ],
-          "help": "The check slice, switched over in phase 3. The check names answer an empty list until phase 7 moves the rules in."
-        },
-        "prose": {
-          "type": "string",
-          "enum": [
-            "new"
-          ],
-          "help": "The prose slice, switched over in phase 3. The prose readers take the findings the Go checks keep."
-        },
-        "cage": {
-          "type": "string",
-          "enum": [
-            "old",
-            "shadow",
-            "new"
-          ],
-          "help": "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's."
-        },
-        "window": {
-          "type": "string",
-          "enum": [
-            "old",
-            "shadow",
-            "new"
-          ],
-          "help": "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's."
-        },
-        "lsp": {
-          "type": "string",
-          "enum": [
-            "old",
-            "shadow",
-            "new"
-          ],
-          "help": "The LSP's rules: old answers on the LSP's own sweep alone, shadow runs the check module's sweep beside it and logs each finding apart, new answers the module's."
-        },
-        "phase0": {
+        "enabled": {
           "type": "boolean",
-          "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud."
+          "default": true,
+          "help": "The door holding the owner's prompt first. false takes it out."
         },
-        "phase1": {
-          "type": "boolean",
-          "help": "Phase 1, the foundation. true in the tracked file on main lets a cloud box take the-foundation-lands-unchanged. A write on this box turns nothing on in the cloud."
+        "warnAt": {
+          "type": "number",
+          "default": 5,
+          "help": "The score where the gate starts writing a warn line to the log.",
+          "unit": "findings a thousand words"
         },
-        "phase1gaps": {
-          "type": "boolean",
-          "help": "Phase 1, its gaps. true in the tracked file on main lets a cloud box take the-foundation-closes-its-gaps. A write on this box turns nothing on in the cloud."
-        },
-        "phase2shadow": {
-          "type": "boolean",
-          "help": "Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-shadow-lands. A write on this box turns nothing on in the cloud."
-        },
-        "phase2switch": {
-          "type": "boolean",
-          "help": "Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-lands. A write on this box turns nothing on in the cloud."
-        },
-        "phase3shadow": {
-          "type": "boolean",
-          "help": "Phase 3 in shadow. true in the tracked file on main lets a cloud box take read-topics-land-in-shadow. A write on this box turns nothing on in the cloud."
-        },
-        "phase3switch": {
-          "type": "boolean",
-          "help": "Phase 3 switched over. true in the tracked file on main lets a cloud box take read-topics-switch-over. A write on this box turns nothing on in the cloud."
-        },
-        "phase4shadow": {
-          "type": "boolean",
-          "help": "Phase 4 in shadow. true in the tracked file on main lets a cloud box take quack-verbs-land-in-shadow. A write on this box turns nothing on in the cloud."
-        },
-        "phase4switch": {
-          "type": "boolean",
-          "help": "Phase 4 switched over. true in the tracked file on main lets a cloud box take quack-verbs-switch-over. A write on this box turns nothing on in the cloud."
-        },
-        "phase5shadow": {
-          "type": "boolean",
-          "help": "Phase 5 in shadow. true in the tracked file on main lets a cloud box take go-cage-lands-in-shadow. A write on this box turns nothing on in the cloud."
-        },
-        "phase5switch": {
-          "type": "boolean",
-          "help": "Phase 5 switched over. true in the tracked file on main lets a cloud box take go-cage-switches-over. A write on this box turns nothing on in the cloud."
-        },
-        "phase6shadow": {
-          "type": "boolean",
-          "help": "Phase 6 in shadow. true in the tracked file on main lets a cloud box take tui-shell-lands-in-shadow. A write on this box turns nothing on in the cloud."
-        },
-        "phase6switch": {
-          "type": "boolean",
-          "help": "Phase 6 switched over. true in the tracked file on main lets a cloud box take tui-shell-switches-over. A write on this box turns nothing on in the cloud."
-        },
-        "phase7shadow": {
-          "type": "boolean",
-          "help": "Phase 7 in shadow. true in the tracked file on main lets a cloud box take lsp-door-lands-in-shadow. A write on this box turns nothing on in the cloud."
-        },
-        "phase7switch": {
-          "type": "boolean",
-          "help": "Phase 7 switched over. true in the tracked file on main lets a cloud box take lsp-door-switches-over. A write on this box turns nothing on in the cloud."
-        },
-        "phase8shadow": {
-          "type": "boolean",
-          "help": "Phase 8 in shadow. true in the tracked file on main lets a cloud box take sidebar-lands-in-shadow. A write on this box turns nothing on in the cloud."
-        },
-        "phase8switch": {
-          "type": "boolean",
-          "help": "Phase 8 switched over. true in the tracked file on main lets a cloud box take sidebar-switches-over. A write on this box turns nothing on in the cloud."
-        },
-        "phase9shadow": {
-          "type": "boolean",
-          "help": "Phase 9 in shadow. true in the tracked file on main lets a cloud box take module-processes-land-in-shadow. A write on this box turns nothing on in the cloud."
-        },
-        "phase9switch": {
-          "type": "boolean",
-          "help": "Phase 9 switched over. true in the tracked file on main lets a cloud box take module-processes-switch-over. A write on this box turns nothing on in the cloud."
-        },
-        "phase10": {
-          "type": "boolean",
-          "help": "Phase 10, Node leaving the boxes. true in the tracked file on main lets a cloud box take node-leaves-the-boxes. A write on this box turns nothing on in the cloud."
+        "words": {
+          "type": "number",
+          "default": 150,
+          "help": "The words an answer holds outside its code and tables.",
+          "unit": "words"
         }
       }
     },
-    "pull": {
+    "battery": {
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "cap": {
+        "runs": {
           "type": "number",
-          "unit": "bytes",
-          "help": "The size up to which one tool answer reaches the model whole. Past it, the client hands back a preview."
-        },
-        "margin": {
-          "type": "number",
-          "unit": "bytes",
-          "help": "The room the pull keeps free below the cap. A hand-out past cap less margin splits, and the next pull on the step prints the rest."
+          "default": 5,
+          "help": "The check's runs the stamp keeps at one commit. A retro reads each part's median over them.",
+          "unit": "runs"
         }
       }
     },
     "budget": {
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
+        "handBack": {
+          "type": "number",
+          "default": 1000,
+          "help": "The median time a hand-back takes to land over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond.",
+          "unit": "milliseconds"
         },
         "pull": {
           "type": "number",
-          "unit": "milliseconds",
-          "help": "The median time the pull takes to hand out a leaf over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond."
-        },
-        "handBack": {
-          "type": "number",
-          "unit": "milliseconds",
-          "help": "The median time a hand-back takes to land over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond."
+          "default": 1000,
+          "help": "The median time the pull takes to hand out a leaf over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond.",
+          "unit": "milliseconds"
         },
         "resolver": {
           "type": "number",
-          "unit": "milliseconds",
-          "help": "The median time the guidance resolver takes over many notes, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond."
+          "default": 10,
+          "help": "The median time the guidance resolver takes over many notes, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond.",
+          "unit": "milliseconds"
         },
         "stale": {
           "type": "number",
-          "unit": "milliseconds",
-          "help": "The median time the query for stale steps takes to read, hash and compare the notes a hold names, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond."
+          "default": 10,
+          "help": "The median time the query for stale steps takes to read, hash and compare the notes a hold names, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond.",
+          "unit": "milliseconds"
+        }
+      }
+    },
+    "code": {
+      "type": "object",
+      "properties": {
+        "fileLines": {
+          "type": "number",
+          "default": 600,
+          "help": "The lines a file holds at most. The write door refuses a write that grows past it.",
+          "unit": "lines"
+        },
+        "functionLines": {
+          "type": "number",
+          "default": 150,
+          "help": "The lines a function holds at most. The write door refuses a write that grows past it.",
+          "unit": "lines"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "handoverAt": {
+          "type": "number",
+          "default": 300000,
+          "help": "The context past which the next pull after the ticket in hand hands the handover, the clear and the read of the handover. 0 switches it off.",
+          "unit": "tokens"
+        }
+      }
+    },
+    "grace": {
+      "type": "object",
+      "properties": {
+        "finish": {
+          "type": "number",
+          "default": 10,
+          "help": "The calls the finish hold lets pass before it stops hard.",
+          "unit": "calls"
+        },
+        "update": {
+          "type": "number",
+          "default": 5,
+          "help": "The calls the engine lets pass after the owner asks for an update, before the ask refuses them.",
+          "unit": "calls"
+        }
+      }
+    },
+    "helper": {
+      "type": "object",
+      "properties": {
+        "change": {
+          "type": "string",
+          "default": "opus",
+          "help": "The model a helper runs on that makes a scoped change with its test, or reviews against a list.",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ]
+        },
+        "decide": {
+          "type": "string",
+          "default": "opus",
+          "help": "The model a helper runs on that takes a design, an unknown cause, or a verdict the owner reads.",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ]
+        },
+        "find": {
+          "type": "string",
+          "default": "haiku",
+          "help": "The model a helper runs on that finds, lists, reads and reports.",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ]
+        }
+      }
+    },
+    "hooks": {
+      "type": "object",
+      "properties": {
+        "wait": {
+          "type": "number",
+          "default": 1,
+          "help": "the seconds an agent's call waits on its action, where the call sets none"
+        }
+      }
+    },
+    "http": {
+      "type": "object",
+      "properties": {
+        "wait": {
+          "type": "number",
+          "default": 0,
+          "help": "the seconds a call over /v1 waits on its action, where the request sends no Prefer: wait=N"
+        }
+      }
+    },
+    "mcp": {
+      "type": "object",
+      "properties": {
+        "wait": {
+          "type": "number",
+          "default": 1,
+          "help": "the seconds a tool call over MCP waits on its action, where the call sets none"
+        }
+      }
+    },
+    "migration": {
+      "type": "object",
+      "properties": {
+        "cage": {
+          "type": "string",
+          "default": "old",
+          "help": "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's.",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ]
+        },
+        "check": {
+          "type": "string",
+          "default": "new",
+          "help": "The check twins, switched over in phase 4.",
+          "enum": [
+            "new"
+          ]
+        },
+        "config": {
+          "type": "string",
+          "default": "new",
+          "help": "The config readers, switched over in phase 4.",
+          "enum": [
+            "new"
+          ]
+        },
+        "guidance": {
+          "type": "string",
+          "default": "new",
+          "help": "The rules a step reads, switched over in phase 4.",
+          "enum": [
+            "new"
+          ]
+        },
+        "log": {
+          "type": "string",
+          "default": "new",
+          "help": "The session log rows, switched over in phase 4.",
+          "enum": [
+            "new"
+          ]
+        },
+        "lsp": {
+          "type": "string",
+          "default": "old",
+          "help": "The LSP's rules: old answers on the LSP's own sweep alone, shadow runs the check module's sweep beside it and logs each finding apart, new answers the module's.",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ]
+        },
+        "opentasks": {
+          "type": "string",
+          "default": "new",
+          "help": "The open-tasks slice's record, switched over in phase 2. The badge, the work tab's brackets and its queue column read the index.",
+          "enum": [
+            "new"
+          ]
+        },
+        "phase0": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud."
+        },
+        "phase1": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 1, the foundation. true in the tracked file on main lets a cloud box take the-foundation-lands-unchanged. A write on this box turns nothing on in the cloud."
+        },
+        "phase10": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 10, Node leaving the boxes. true in the tracked file on main lets a cloud box take node-leaves-the-boxes. A write on this box turns nothing on in the cloud."
+        },
+        "phase1gaps": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 1, its gaps. true in the tracked file on main lets a cloud box take the-foundation-closes-its-gaps. A write on this box turns nothing on in the cloud."
+        },
+        "phase2shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 2 in shadow. true in the tracked file on main lets a cloud box take open-tasks-shadow-lands. A write on this box turns nothing on in the cloud."
+        },
+        "phase2switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 2 switched over. true in the tracked file on main lets a cloud box take open-tasks-switch-lands. A write on this box turns nothing on in the cloud."
+        },
+        "phase3shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 3 in shadow. true in the tracked file on main lets a cloud box take read-topics-land-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase3switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 3 switched over. true in the tracked file on main lets a cloud box take read-topics-switch-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase4shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 4 in shadow. true in the tracked file on main lets a cloud box take quack-verbs-land-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase4switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 4 switched over. true in the tracked file on main lets a cloud box take quack-verbs-switch-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase5shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 5 in shadow. true in the tracked file on main lets a cloud box take go-cage-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase5switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 5 switched over. true in the tracked file on main lets a cloud box take go-cage-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase6shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 6 in shadow. true in the tracked file on main lets a cloud box take tui-shell-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase6switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 6 switched over. true in the tracked file on main lets a cloud box take tui-shell-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase7shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 7 in shadow. true in the tracked file on main lets a cloud box take lsp-door-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase7switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 7 switched over. true in the tracked file on main lets a cloud box take lsp-door-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase8shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 8 in shadow. true in the tracked file on main lets a cloud box take sidebar-lands-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase8switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 8 switched over. true in the tracked file on main lets a cloud box take sidebar-switches-over. A write on this box turns nothing on in the cloud."
+        },
+        "phase9shadow": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 9 in shadow. true in the tracked file on main lets a cloud box take module-processes-land-in-shadow. A write on this box turns nothing on in the cloud."
+        },
+        "phase9switch": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 9 switched over. true in the tracked file on main lets a cloud box take module-processes-switch-over. A write on this box turns nothing on in the cloud."
+        },
+        "prose": {
+          "type": "string",
+          "default": "new",
+          "help": "The prose checks, switched over in phase 4.",
+          "enum": [
+            "new"
+          ]
+        },
+        "sidebar": {
+          "type": "string",
+          "default": "old",
+          "help": "The sidebar: old draws its own groups alone, shadow weighs the views section against them and logs each pair apart, new draws the views section.",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ]
+        },
+        "verbs": {
+          "type": "string",
+          "default": "old",
+          "help": "The road ./RUNME.sh hands a verb down: old answers alone, shadow runs quack beside it and logs a mismatch, new answers quack's.",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ]
+        },
+        "window": {
+          "type": "string",
+          "default": "old",
+          "help": "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's.",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ]
+        }
+      }
+    },
+    "names": {
+      "type": "object",
+      "properties": {
+        "words": {
+          "type": "number",
+          "default": 5,
+          "help": "The words a file, a folder and a branch name each hold at most.",
+          "unit": "words"
         }
       }
     },
     "ops": {
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
-        },
         "keepDone": {
           "type": "number",
-          "unit": "seconds",
-          "help": "The span a done or cancelled operation stays under ops. Zero keeps it."
+          "default": 3600,
+          "help": "The span a done or cancelled operation stays under ops. Zero keeps it.",
+          "unit": "seconds"
         },
         "keepFailed": {
           "type": "number",
-          "unit": "seconds",
-          "help": "The span a failed operation stays under ops. Zero keeps it."
+          "default": 86400,
+          "help": "The span a failed operation stays under ops. Zero keeps it.",
+          "unit": "seconds"
+        }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "properties": {
+        "everyCalls": {
+          "type": "number",
+          "default": 10,
+          "help": "The calls between two asks of the engine's three questions.",
+          "unit": "calls"
+        },
+        "grace": {
+          "type": "number",
+          "default": 6,
+          "help": "The calls that pass after the ask, before every call waits on the plan's answer.",
+          "unit": "calls"
+        },
+        "mostOpen": {
+          "type": "number",
+          "default": 5,
+          "help": "The todos the plan holds open, past which the third question stays away.",
+          "unit": "todos"
+        }
+      }
+    },
+    "pull": {
+      "type": "object",
+      "properties": {
+        "cap": {
+          "type": "number",
+          "default": 48823,
+          "help": "The size up to which one tool answer reaches the model whole. Past it, the client hands back a preview.",
+          "unit": "bytes"
+        },
+        "margin": {
+          "type": "number",
+          "default": 4000,
+          "help": "The room the pull keeps free below the cap. A hand-out past cap less margin splits, and the next pull on the step prints the rest.",
+          "unit": "bytes"
         }
       }
     },
     "queue": {
-      "comment": "Level one. The weights of the queue's score, which the pull and the Go queue read alike.",
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
-        },
         "block": {
           "type": "number",
-          "unit": "score",
-          "help": "The score a ticket takes for each one waiting under it, down the whole chain."
+          "default": 10,
+          "help": "the score a ticket takes for each ticket its chain holds up"
         },
         "day": {
           "type": "number",
-          "unit": "score",
-          "help": "The score a ticket takes for each day it stands."
+          "default": 1,
+          "help": "the score a ticket takes for each whole day it stands"
         },
         "fail": {
           "type": "number",
-          "unit": "score",
-          "help": "The score a ticket takes for each hand-back that comes back refused."
+          "default": 5,
+          "help": "the score a ticket takes for each hand-back that failed on it"
+        }
+      }
+    },
+    "restated": {
+      "type": "object",
+      "properties": {
+        "pointer": {
+          "type": "number",
+          "default": 4,
+          "help": "The run a heading shares with the heading its pointer names before the rule draws.",
+          "unit": "words"
+        },
+        "rule": {
+          "type": "number",
+          "default": 6,
+          "help": "The run two rule lines of two guidance notes share before the rule draws.",
+          "unit": "words"
+        }
+      }
+    },
+    "wait": {
+      "type": "object",
+      "properties": {
+        "most": {
+          "type": "number",
+          "default": 600,
+          "help": "The span the wait tool holds at most before it returns with no signal.",
+          "unit": "seconds"
+        },
+        "quiet": {
+          "type": "number",
+          "default": 30,
+          "help": "The span a file stands unchanged before the wait reads it as quiet.",
+          "unit": "seconds"
         }
       }
     },
     "watchdog": {
       "type": "object",
       "properties": {
-        "comment": {
-          "type": "string"
+        "backoffCap": {
+          "type": "number",
+          "default": 60,
+          "help": "The longest wait before a restart.",
+          "unit": "seconds"
         },
         "backoffFirst": {
           "type": "number",
-          "unit": "seconds",
-          "help": "The wait before the first restart of a part."
-        },
-        "backoffCap": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The longest wait before a restart."
-        },
-        "faults": {
-          "type": "number",
-          "help": "The faults inside the window that raise an alarm and stop the restarts."
-        },
-        "window": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span the faults of an alarm fall inside."
+          "default": 1,
+          "help": "The wait before the first restart of a part.",
+          "unit": "seconds"
         },
         "beat": {
           "type": "number",
-          "unit": "seconds",
-          "help": "The span between two beats of the index's work loop."
-        },
-        "lease": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The term a lease runs without a beat before its part reads stale."
-        },
-        "deadlineDerived": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span a derived provider with a pending input commits within."
-        },
-        "deadlineFold": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span a fold with a pending event commits within."
+          "default": 5,
+          "help": "the seconds between two ticks of the manager"
         },
         "deadlineAction": {
           "type": "number",
-          "unit": "seconds",
-          "help": "The span an action's operation ends within."
+          "default": 600,
+          "help": "The span an action's operation ends within.",
+          "unit": "seconds"
+        },
+        "deadlineDerived": {
+          "type": "number",
+          "default": 30,
+          "help": "The span a derived provider with a pending input commits within.",
+          "unit": "seconds"
+        },
+        "deadlineFold": {
+          "type": "number",
+          "default": 30,
+          "help": "The span a fold with a pending event commits within.",
+          "unit": "seconds"
+        },
+        "faults": {
+          "type": "number",
+          "default": 5,
+          "help": "The faults inside the window that raise an alarm and stop the restarts."
+        },
+        "lease": {
+          "type": "number",
+          "default": 30,
+          "help": "the seconds the index's own lease holds past a renewal"
+        },
+        "window": {
+          "type": "number",
+          "default": 300,
+          "help": "The span the faults of an alarm fall inside.",
+          "unit": "seconds"
         }
       }
     }
