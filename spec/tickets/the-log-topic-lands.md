@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: fdf5bd20b28244f6
         size: 3409
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: cef089f05632fbbd75b8718eec39f05e747e661b
+    hash_after: cef089f05632fbbd75b8718eec39f05e747e661b
+    inputs:
+      - name: design/draft
+        hash: fdf5bd20b28244f6
+        size: 3409
+      - name: design/tests-red
+        hash: 6ab122a4f31cfc75
+        size: 1046
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -260,8 +272,11 @@ the module cases seed the session port through qtest, and the shadow cases fake 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- log-shadow-wiring-gets-tests: test/level0/log-shadow.test.js calls logShadow alone, so the log verb in src/scripts/log-verb.js can drop the call while every case passes; add a case that runs the verb over fake doors and reads the shadow row off the fake log
+- log-shadow-reads-unfiltered-rows: the log verb narrows its rows by span, level, kind and count, and quack log answers every row, so the shadow compares the rows before any filter, else each row a filter drops reads apart
 
 # implement
 
