@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: answer
+step: do
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -35,6 +35,16 @@ steps:
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 55f7204b6504333fe367763866c115b537b420bc
+    hash_after: 55f7204b6504333fe367763866c115b537b420bc
+    inputs:
+      - name: ask
+        hash: b834eb0422123511
+        size: 606
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -59,8 +69,9 @@ The question comes from `owner-terms-await-question`, a finding on `the-owners-w
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The button in the sidebar: the work editor button. The tab of the window ./RUNME.sh tui opens: the work tab. The brackets on that tab: the brackets, which hold the count. Weighed: the design input the owner signs writes these words already. the-agent-pulls-tickets writes the work editor, which a button in the sidebar opens. the-editor-draws-the-ticket writes the work editor button, which opens the work tab. the-migration-runs-in-slices writes the work tab brackets. No transcript on this box quotes the owner naming them otherwise. Assumed: the design input carries the owner words, and a wrong word costs one line of the terms file to undo.
 
 # do
 
