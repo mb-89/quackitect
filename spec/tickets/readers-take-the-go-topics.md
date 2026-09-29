@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: bf1f779b19598e55cd25b4c4da23b13c7d94ecad
+    hash_after: bf1f779b19598e55cd25b4c4da23b13c7d94ecad
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: a71a921ad58c8fb8
+        size: 701
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/topic-readers.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Five migration keys read new in spec/config/level0.json: config, log, guidance, check and prose. Each reader asks readsNew in src/scripts/quack-topic.js, and takes the answer of its Go topic: readConfig, the log verb, the guidance verb, the pull's hand-out, its work answer and its step reads, readsProse and readsText. A topic answering nothing leaves the reader on its old path until the twins leave in the next ticket. The check key reads new with no reader, since the check module's names hold empty lists until phase 7. Every case stands in test/level0/topic-readers.test.js.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the readers, their doors, the keys and the cases beside them
+- every door the change reaches has a fake: the cases run over fakeDisk, fakeProc, fakeClock and fakeLog
+- a comment names the approach the change implements: each reader carries a line naming the topic it takes
+- every fact stands in one place: the helper owns the topic call, and the twins point at it
 
 # accept
 
