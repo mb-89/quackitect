@@ -38,3 +38,41 @@ The fake door in test/level0/sidebar-views.test.js imports a bare path, which No
 
 - `./RUNME.sh test test/level0/sidebar-views.test.js` is green
 - `check (windows-latest)` passes on the pull request
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+node --test test/level0/sidebar-views.test.js
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+Pull request 53 failed on Windows alone. The fake door imported a drive path, and Node reads a drive letter as a URL scheme. The fake now builds a file URL, as the real door in src/extension/editor-files.js does.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: two lines in one test file
+- the cleanup it reveals: none
+- every fact stands once: the reason stands on the real door, and this ticket points at it
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
