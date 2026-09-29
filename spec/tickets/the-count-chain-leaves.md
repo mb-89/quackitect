@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: open-tasks-switch-lands
 depends_on: ["the-badge-reads-open-tasks"]
+record:
+  - step: design/draft
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 97b02f9f8be3021ba15362eb766d8c91dfd3dc3a
+    hash_after: 97b02f9f8be3021ba15362eb766d8c91dfd3dc3a
+    inputs:
+      - name: ask
+        hash: fd1d73f001a22d7b
+        size: 318
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,67 @@ Four processes a redraw leave the box. Without the delete the old path drifts be
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The badge asks the index itself, and the window counts nothing of its own.
+
+| part | today | after |
+|---|---|---|
+| the badge line | `counts: ./RUNME.sh tui work --count` in spec/config/level0.schema.json | `counts: ./RUNME.sh index call value {"name":"work/open-tasks"}`, which `asksIndex` hands to `se-index` |
+| the badge read | `countIn` in src/extension/lib/work.js reads `{count}` | it reads a bare integer as well |
+| the node verb | `counted` and `COUNT` in src/scripts/tui.js | they leave |
+| the viewer flag | `--count`, `countSaid` and `placesAt` in src/tui/main.go | they leave |
+| the window's own count | `countTakeable` in src/tui/work/workplaces.go | it leaves, and `PlacesAt` asks `work/open-tasks` through `askIndex` |
+| the old path behind the key | `slicedCount`, `shadowOf` and the shadow row in src/tui/work/shadow.go | the file leaves |
+
+A door answering nothing leaves `Places.Counted` false, and `Tab.Label` draws `work` with no brackets. `askIndex` starts a door where none stands, so a live tree answers.
+
+A redraw spawns node and `se-index`, where it spawned node, the viewer, node again and the index. The key `migration.opentasks` stays at `new` as the slice's record, and the migration module keeps owning it.
+
+spec/design_output/tui.md, chapter the work tab, says the badge reads the index, and names the new line.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/extension/sidebar.js counted, through countIn
+- spec/config/level0.schema.json the editor action's counts line
+- src/scripts/tui.js the tui verb, which calls counted
+- src/tui/main.go main, which calls countSaid
+- src/tui/work/work.go PlacesCmd and Tab.Label
+- src/tui/work/workplaces.go PlacesAt
+- src/modules/work/open_tasks.go its header, which names countTakeable
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/work-strings.test.js the count reads a bare integer as well as a count object
+- src/tui/work/shadow_test.go leaves with shadow.go, and its cases move to workplaces_test.go
+- src/tui/work/workplaces_test.go TestPlacesAtReadsTheIndexCount
+- src/tui/work/workplaces_test.go TestTheLabelDrawsNoCountWhereNoDoorAnswers
+- src/tui/count_test.go, src/tui/workcount_test.go and test/level0/tui-count.test.js leave with the chain
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
+- the design input table places the chain's exit in the actions switch, beside cli.js
+- the ask moves it here, and the badge still asks through cli.js, so the actions switch keeps that last hop
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: countIn and lineArgvOf in work.js, asksVerb in editor-lens.js, asksIndex in cli-read.js, counted in tui.js, countSaid in main.go, PlacesAt and countTakeable in workplaces.go, askIndex in workindex.go, Tab.Label in work.go
+- ran: ./RUNME.sh index call value with the name answers the index count
+- callers: every reader of Takeable, countSaid and counted stands in the list
+- done_when: the grep line finds no count chain once the flag and its callers leave, and ./RUNME.sh check decides the rest
 
 ## tests-red
 
