@@ -99,6 +99,7 @@ record:
   - step: sync
     hand: box d8572d2183d7 · claude-code-remote
     hash_before: 6e2afbfda2ef0a3f4503e18983101c11bece3b43
+    hash_after: d09aa20e1e708c4afa42b7680d732d8341071e6f
   - step: sync
     hand: box d8572d2183d7 · claude-code-remote
     hash_before: 7a3a351fa4a08395fb0955025703baa11e561c2c
@@ -175,7 +176,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["read-topics-land-in-shadow", "quack-verbs-land-in-shadow"]
 enabled_by: migration.phase7shadow
-cloud: true
 reason: done
 ---
 
