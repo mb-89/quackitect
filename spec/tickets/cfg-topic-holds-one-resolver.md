@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -147,6 +147,18 @@ record:
         hash: 46b4c7e80f6088a9
         size: 3733
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: f425ea9e2b8a1d2a4da605598ef0088662a87117
+    hash_after: f425ea9e2b8a1d2a4da605598ef0088662a87117
+    inputs:
+      - name: design/draft
+        hash: 46b4c7e80f6088a9
+        size: 3733
+      - name: design/tests-red
+        hash: 2b9e5ed65e24e46d
+        size: 1223
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -253,8 +265,9 @@ Every door the tests reach takes a fake: the shadow run takes fake settings, fil
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the approach runs the module beside the old readers through quack config, and each done_when line meets a test (TestReadersGolden, the node golden and shadow-run tests, the commit check). Weighed: both red files pass already since the golden stands whole again, which tests-green reads as done; the four keys the golden holds apart are the mismatches the shadow exists to show the owner.
 
 # implement
 
