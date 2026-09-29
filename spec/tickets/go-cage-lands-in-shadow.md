@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box d855c2347910b · claude-code-remote
     hash_before: bdba06cfdd68b2bf7da535935e0a1e1b9a46de25
+  - step: sync
+    hand: box d855c2347910b · claude-code-remote
+    hash_before: 2997f9106d1820eaa8534ade2e786cf5f698cfde
+    hash_after: 2997f9106d1820eaa8534ade2e786cf5f698cfde
+    answered:
+      - name: sync
+        exit: 0
+        said: work/go-cage-lands-in-shadow already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["quack-verbs-land-in-shadow"]
 enabled_by: migration.phase5shadow
 cloud: true
@@ -113,8 +122,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
