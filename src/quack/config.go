@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 
+	oldconfig "quackitect/src/config"
 	"quackitect/src/modules/config"
 	"quackitect/src/q"
 )
@@ -22,8 +23,8 @@ type configRow struct {
 	Layer string          `json:"layer"`
 }
 
-// Every leaf key either file holds, dotted, and the answer the config module resolves for each. A key the catalog shares reads the default file alone. [[spec/tickets/cfg-topic-holds-one-resolver]]
-func configRows(tracked, local []byte, env map[string]string, shared map[string]bool) (map[string]configRow, error) {
+// Every leaf key either file holds and every key the catalog declares, dotted, and the answer the config module resolves for each. A key the catalog shares reads the default file alone, and a declared key no layer sets reads its built-in. [[spec/tickets/the-config-schema-gets-generated]]
+func configRows(tracked, local []byte, env map[string]string, declared map[string]q.Key) (map[string]configRow, error) {
 	files := make([]q.Ordered, 0, 2)
 	for _, body := range [][]byte{tracked, local} {
 		parsed := q.Ordered{}
@@ -39,11 +40,19 @@ func configRows(tracked, local []byte, env map[string]string, shared map[string]
 	for _, file := range files {
 		leavesOf(file, "", keys)
 	}
+	for dotted := range declared {
+		keys[dotted] = true
+	}
 	out := map[string]configRow{}
 	for dotted := range keys {
-		key := keyOfDotted(dotted, shared[dotted])
+		key, ok := declared[dotted]
+		if !ok {
+			key = keyOfDotted(dotted)
+		}
 		if literal, layer, ok := config.Layered(key, files[0], files[1], env); ok {
 			out[dotted] = configRow{Value: json.RawMessage(literal), Layer: layer}
+		} else if key.Default != "" {
+			out[dotted] = configRow{Value: json.RawMessage(key.Default), Layer: oldconfig.BuiltIn}
 		}
 	}
 	return out, nil
@@ -69,28 +78,26 @@ func leavesOf(value q.Ordered, at string, into map[string]bool) {
 	}
 }
 
-// A dotted key as the catalog names it: its first segment the instance, the rest its local name. [[spec/design_output/model#config-comes-off-the-registrations]]
-func keyOfDotted(dotted string, shared bool) q.Key {
-	instance, local, _ := strings.Cut(dotted, ".")
-	local = strings.ReplaceAll(local, ".", "/")
-	return q.Key{Name: instance + "/config/" + local, Instance: instance, Local: local, Shared: shared}
+// A dotted key as the catalog names it: its first segment the instance, the rest its local name, each segment in kebab case. [[spec/design_output/model#config-comes-off-the-registrations]]
+func keyOfDotted(dotted string) q.Key {
+	instance, rest, _ := strings.Cut(dotted, ".")
+	segments := strings.Split(rest, ".")
+	for i, one := range segments {
+		segments[i] = q.Kebab(one)
+	}
+	local := strings.Join(segments, "/")
+	return q.Key{Name: instance + "/config/" + local, Instance: instance, Local: local}
 }
 
-// The dotted names of the keys the modules the wiring loads declare shared. [[spec/design_output/model#config-comes-off-the-registrations]]
-func sharedKeys(wiring string) (map[string]bool, error) {
-	all, err := q.ReadWiring(wiring)
+// Every key the modules the wiring loads declare, by its dotted name. [[spec/tickets/the-config-schema-gets-generated]]
+func declaredKeys(wiring string) (map[string]q.Key, error) {
+	c, err := wiredCatalog(wiring)
 	if err != nil {
 		return nil, err
 	}
-	c := q.New()
-	if _, err := load(all, c); err != nil {
-		return nil, err
-	}
-	out := map[string]bool{}
+	out := map[string]q.Key{}
 	for _, key := range c.Keys() {
-		if key.Shared {
-			out[key.Dotted()] = true
-		}
+		out[key.Dotted()] = key
 	}
 	return out, nil
 }

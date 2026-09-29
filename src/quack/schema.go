@@ -29,7 +29,12 @@ func catalogOf(root string) (*q.Catalog, error) {
 	if err != nil {
 		return nil, err
 	}
-	all, err := q.ReadWiring(string(text))
+	return wiredCatalog(string(text))
+}
+
+// The catalog the wiring's text loads, with the manager beside it. [[spec/tickets/the-config-schema-gets-generated]]
+func wiredCatalog(text string) (*q.Catalog, error) {
+	all, err := q.ReadWiring(text)
 	if err != nil {
 		return nil, err
 	}

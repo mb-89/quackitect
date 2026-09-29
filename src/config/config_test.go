@@ -179,3 +179,18 @@ func TestWhereAnswersTheBuiltIn(t *testing.T) {
 		t.Fatalf("the count answers %d, and wants the default 4", said)
 	}
 }
+
+// A shared key reads the default file over its built-in, and no local file. [[spec/tickets/the-config-schema-gets-generated]]
+func TestSharedReadsTheDefaultFileThenTheBuiltIn(t *testing.T) {
+	root := rootWith(t, map[string]string{
+		Tracked: `{"migration": {"lsp": "shadow"}}`,
+		Local:   `{"migration": {"lsp": "new", "log": "new"}}`,
+		Schema:  `{"properties": {"migration": {"properties": {"lsp": {"default": "old"}, "log": {"default": "old"}}}}}`,
+	})
+	if said, _ := Shared(root, "migration.lsp"); said != "shadow" {
+		t.Fatalf("the lsp slice reads %v, and wants shadow", said)
+	}
+	if said, _ := Shared(root, "migration.log"); said != "old" {
+		t.Fatalf("the log slice reads %v, and wants its built-in old", said)
+	}
+}

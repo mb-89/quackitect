@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 
+	"quackitect/src/config"
 	"quackitect/src/q"
 )
 
@@ -57,9 +58,13 @@ func sweepOf(in sweepIn) []Finding {
 	return CheckerOver(tree, countOf(texts, in.Env, pointerKey), countOf(texts, in.Env, ruleKey)).Sweep()
 }
 
-// A count off the layers: the local file beats the variable, and the variable beats the tracked file, as src/config reads them. [[spec/design_output/config#the-resolver-holds-the-layers]]
+// A count off the layers: the local file beats the variable, the variable beats the tracked file, and the tracked file beats the schema's default, as src/config reads them. [[spec/design_output/config#the-resolver-holds-the-layers]]
 func countOf(texts Texts, env map[string]string, key string) int {
 	var said any
+	var schema map[string]any
+	if json.Unmarshal([]byte(texts[config.Schema]), &schema) == nil {
+		said, _ = config.DefaultIn(schema, key)
+	}
 	if held, found := valueAt(texts[trackedConfig], key); found {
 		said = held
 	}

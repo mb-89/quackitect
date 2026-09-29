@@ -541,7 +541,7 @@ func configAt(root string) (map[string]configRow, error) {
 		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 		return body
 	}
-	shared, err := sharedKeys(string(read(q.WiringFile)))
+	declared, err := declaredKeys(string(read(q.WiringFile)))
 	if err != nil {
 		return nil, err
 	}
@@ -551,7 +551,7 @@ func configAt(root string) (map[string]configRow, error) {
 			env[name] = value
 		}
 	}
-	return configRows(read(config.Tracked), read(config.Local), env, shared)
+	return configRows(read(config.Tracked), read(config.Local), env, declared)
 }
 
 // Reads one prose request on stdin, and prints what the Go vetoes keep over the caps and the domain words the tree names. [[spec/tickets/prose-checks-run-in-go]]
