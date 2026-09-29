@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-lands-in-shadow
 depends_on: ["the-tui-becomes-a-shell"]
+record:
+  - step: design/draft
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 0c2433d538594cf7099e5a0c5eba3743c7e5f9cb
+    hash_after: 0c2433d538594cf7099e5a0c5eba3743c7e5f9cb
+    inputs:
+      - name: ask
+        hash: ba3b442f05fd963f
+        size: 456
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -148,32 +158,64 @@ The work view stops computing what it shows.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The work view becomes a declared view, in shadow: the tab keeps drawing off the verb and the tickets answer, and the rows and the badge the index holds stand beside them.
+
+| the part | where | what it does |
+|---|---|---|
+| the declaration | spec/views/work.base | gains the top-level keys reads work/rows, badge work/open-tasks, and the four actions of the views chapter, in block style. The file writes no label, doc or look |
+| the port | src/modules/work/open_tasks.go and rows.go Registers | work/open-tasks declares q.Label work and q.Looks q.Count, and work/rows declares q.Looks q.Rows, so the registration owns what the badge wears |
+| the catalog | src/modules/index/catalog.go NameRow | gains label, icon and looks off the presentation, so a renderer reads them off index/names |
+| the badge | src/tui/work/shadow.go BadgeOf | draws the label and the count off the index/names rows, the way the strip draws work (N) |
+| the rows | src/tui/work/shadow.go ViewOver | builds the tree off a work/rows answer and the base file, so a case draws the view over fake rows |
+| the compare | src/tui/work/shadow.go Apart and Check | names each row the tab and work/rows read apart on name, state and queue, and the badge the strip and the index read apart, then writes one shadow row a pair |
+| the write | src/tui/frame/shadow.go WriteShadow | appends one shadow row to the session log. The log tab and the work tab share it, so the file call stands once in the frame's door |
+| the window | src/tui/main.go newModelOver | hands the work tab the catalog and the mode off migration.window |
+
+Assumptions for the hand at the merge: the model note names work/place, tickets/flip-urgent and tickets/set-field, and the catalog holds none of them today, so the file declares them as the note says and the actions shadow lands them. The tab keeps its own keys under shadow. The log ticket's approach named its write in log/door.go, and this ticket moves it into the frame, which both tabs reach.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go Load: reads work.base through tree.ReadBase
+- src/tui/work/work.go Label: draws the strip's count
+- src/tui/main.go newModelOver: builds the work tab
+- src/modules/index/catalog.go catalogOf: builds every NameRow
+- src/tui/log/shadow.go Check: the write moves to frame.WriteShadow
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/work/shadow_test.go TestTheWorkViewDrawsOverAFakeWorkRows
+- src/tui/work/shadow_test.go TestTheBadgeDrawsTheLabelAndLookThePortDeclares
+- src/tui/work/shadow_test.go TestTheShadowNamesEachWorkRowTheTabAndTheIndexReadApart
+- src/tui/work/shadow_test.go TestTheShadowNamesABadgeTheTwoPathsDrawApart
+- src/tui/work/shadow_test.go TestTheWorkShadowWritesNoRowUnderOld
+- src/tui/frame/shadow_test.go TestAShadowRowStandsInTheLogWithItsSlice
+- src/tui/tree/base_test.go TestTheWorkBaseFileDeclaresItsRowsBadgeAndActions
+- src/modules/work/open_tasks_test.go TestTheOpenTasksPortDeclaresItsLabelAndLook
+- src/modules/index/catalog_test.go TestANameRowCarriesItsLabelAndLook
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first, on a first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: work.base, work/work.go, workplaces.go, modules/work/rows.go and open_tasks.go, index/catalog.go, q/looks.go, wiring.yaml and the views chapter of the model note
+- the callers list names each reader of the base file, the strip's label, the constructor and the row builder
+- the ask's fake work/rows case is TestTheWorkViewDrawsOverAFakeWorkRows and its badge case is TestTheBadgeDrawsTheLabelAndLookThePortDeclares, and go test with the check close it
 
 ## tests-red
 
