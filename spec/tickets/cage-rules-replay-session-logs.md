@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8535e12fc10e · claude-code-remote · helper-5
+    hash_before: fe900a1f260bd766e1a5464faa315d3e90bae2c6
+    hash_after: fe900a1f260bd766e1a5464faa315d3e90bae2c6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 807824f8506bfb0a
+        size: 1047
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -315,26 +338,33 @@ Each comment points at `src/doors/log.js` and `src/scripts/log-shadow.js` as the
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks src/modules/hooks/cage_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The cage now replays a session log recorded at debug through the hooks door, so a ported rule shows every decision it changes. `cage.go` reads each hook row back into the post the bridge saw, with the answer the bridge gave. It drives that post through `Door.Hook`, and reads one decision word off each side: pass, refuse, block or hold. Each row where the two words differ becomes one shadow row, the shape `src/scripts/log-shadow.js` writes, so the log verb names it. The recorded logs under `test/replay/cage` stand beside their golden shadow rows, and a port shrinks that golden file. Two gate points stay open as their own tickets: the block answer on a tool call, and the hold that no door effect answers yet.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change writes `src/modules/hooks/cage.go` alone, and leaves the test and the recorded logs as they stand.
+The replay reaches the outside through `Door.Hook` and the fakes the test already builds, and `ShadowTo` writes into a temporary folder in its test.
+The file header and every exported name link the ticket, the approach the change implements.
+The row kinds, the slice, the level and the stamp layout stand once as constants at the top of `cage.go`, and the shared names come from `hooks.go`.
 
 # accept
 
