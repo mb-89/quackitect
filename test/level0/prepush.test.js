@@ -281,6 +281,21 @@ test("a push whose delta carries a tagged note refuses, and names the file", () 
   assert.match(said.said, /ticket todo <name> --off/);
 });
 
+// [[spec/design_output/pull#the-gate]]
+test("a push whose delta carries a tagged gate point lands, and a bare tag still refuses", () => {
+  const point = TAGGED.replace("todo: true", "todo: true\npoint: gate");
+  const landing = () => [{ name: "spec/tickets/cut-the-line.md", text: point }];
+  assert.deepEqual(holds(refsIn(toWork), "", landing), { code: 0, said: "" });
+  const mixed = () => [
+    { name: "spec/tickets/cut-the-line.md", text: point },
+    { name: "spec/tickets/slow-lint.md", text: TAGGED },
+  ];
+  const said = holds(refsIn(toWork), "", mixed);
+  assert.equal(said.code, 1);
+  assert.match(said.said, /slow-lint\.md/);
+  assert.doesNotMatch(said.said, /cut-the-line/);
+});
+
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 test("a push whose delta carries an untagged note lands", () => {
   const carried = () => [{ name: "spec/tickets/slow-lint.md", text: FREE }];

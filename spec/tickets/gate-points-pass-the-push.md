@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -131,6 +131,19 @@ record:
         hash: 1f514ff46886bda3
         size: 690
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 8cbb1a3bd3e4382d45ee7e6b247d4cb9b21e31e6
+    hash_after: 8cbb1a3bd3e4382d45ee7e6b247d4cb9b21e31e6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 3217cd1df5ef706b
+        size: 1828
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -216,26 +229,31 @@ src/scripts/pull-writes.js,src/scripts/prepush.js,test/level0/pull-gate.test.js,
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/prepush.test.js test/level0/pull-gate.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/prepush.test.js,test/level0/pull-gate.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Two new cases fail on their own assertions: the push door returns code 1 on a tagged point, and the minted point carries no point field. The existing cases in both files stay green. Surprise: the gate case can read the ticket text alone, so it needs no new fake.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: the push lands in prepush.test.js, the first-in-queue tag in pull-gate.test.js, and check exits 0 stays for the green leaf
+- every door the tests reach has a fake: the fake disk and fake repo already stand in both files
 
 # gate
 

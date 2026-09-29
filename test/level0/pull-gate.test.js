@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fieldOf, frontOf } from "../../src/engine/group.js";
+import { isTagged, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
 import { handFaults } from "../../src/scripts/pull-chapter.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import { toolArgv } from "../../src/scripts/pull-tool.js";
@@ -179,6 +180,23 @@ test("accept with points mints an open fix ticket a point, at the front", () => 
   assert.equal(fieldOf(child, "todo"), "true", "at the front of the queue");
   assert.equal(fieldOf(child, "parent"), "a-child");
   assert.equal(fieldOf(child, "process"), "spec/processes/trivial");
+});
+
+// [[spec/design_output/pull#the-gate]]
+test("a gate point stands tagged first in the queue, and the push door passes it", () => {
+  const { back, disk } = gated(
+    "accept with points\n- cut-the-long-line: the list runs long",
+  );
+
+  assert.equal(back.code, 0, back.said);
+  const child = disk.read(at("spec/tickets/cut-the-long-line.md"));
+  assert.equal(fieldOf(child, "point"), "gate", "the door reads the point field");
+  assert.ok(isTagged(child), "the queue still reads the tag");
+  assert.deepEqual(
+    taggedIn([{ name: "spec/tickets/cut-the-long-line.md", text: child }]),
+    [],
+    "the push door leaves the point alone",
+  );
 });
 
 // [[spec/design_output/pull#the-gate]]
