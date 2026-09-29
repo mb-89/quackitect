@@ -23,6 +23,13 @@ func retroNotes(v1 func() (string, error)) twin {
 	}
 }
 
+// branch list --queue off work/yours over the base v1 answers: each placed row off the cloud, place then name then step. [[spec/tickets/work-verbs-become-actions]]
+func branchQueue(v1 func() (string, error)) twin {
+	return func(argv []string, _ bool, out, errs io.Writer) int {
+		return exitUsage
+	}
+}
+
 // The node module: runs cli.js under the root with the request's words, and answers its output. [[spec/tickets/ticket-verbs-become-actions]]
 func nodeAccept(root string) func(q.Request) (any, error) {
 	return func(q.Request) (any, error) { return nil, nil }

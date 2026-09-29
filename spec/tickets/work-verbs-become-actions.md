@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 4e14549deb9b42c2
         size: 332
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: c3d3976c933bc9822bd0f533c13bebc94fd56af4
+    hash_after: c3d3976c933bc9822bd0f533c13bebc94fd56af4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/verbs fails
+    inputs:
+      - name: design/draft
+        hash: 55a013c777fc0271
+        size: 2974
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +233,32 @@ What I assume: `Topic`, `nodeAccept` and the port `work/yours` land under `ticke
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/verbs/verbs_test.go src/quack/twins_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/verbs/verbs_test.go
+- src/quack/twins_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The branch verb list stands empty, the queue twin answers usage, the wiring loads no branch topic, and the road keys two words alone. Each fails on its own assertion. The three-word case stands in twins_test.go, beside the draft's verbs_test.go, so the road's own tests stay under the check while this ticket stands red.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- go test meets every new Go case, the shadow line meets the twin and the three-word key on the road, and the check meets the check verb
+- the twin reads a door over a seeded work/yours, and the road case runs over the fake road
 
 # gate
 
