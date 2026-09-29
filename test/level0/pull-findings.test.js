@@ -191,6 +191,11 @@ test("a pass with findings the form refuses keeps the hold, writes no child, and
       names: "one-two-three-four-five-six",
     },
     {
+      why: "a link in the name's place",
+      rows: `pass with findings\n${first}\n- [[spec/tickets/a-link]]: a line`,
+      names: "[[spec/tickets/a-link]]",
+    },
+    {
       why: "a name a ticket takes",
       rows: `pass with findings\n${first}\n- a-taken-one: a line`,
       names: "a-taken-one",

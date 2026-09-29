@@ -1,6 +1,5 @@
 // The count the badge and the work tab's header read: every placed row off
-// the cloud, the count countTakeable in src/tui/work/workplaces.go answers off
-// the verb today.
+// the cloud.
 // [[spec/tickets/open-tasks-come-from-work]]
 package work
 

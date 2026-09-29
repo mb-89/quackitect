@@ -38,14 +38,6 @@ func TestTheAnswerReadsAsPlacesAndTheGroupsOnACloud(t *testing.T) {
 	if _, held := said.Queue["unplaced"]; held {
 		t.Fatal("a row the pull places nowhere carries no place")
 	}
-	// The count reads the placed rows past the cloud's. [[spec/design_output/tui#the-work-tab]]
-	if said.Takeable != 3 {
-		t.Fatalf("three rows stand up for taking, and the count reads %d", said.Takeable)
-	}
-	cloud, _ := work.PlacesIn([]byte(`{"branches":[{"name":"held-group","queue":"∞","tickets":[{"name":"its-child","queue":"∞"}]}],"loose":[{"name":"free","queue":"1"}]}`))
-	if cloud.Takeable != 1 {
-		t.Fatalf("the cloud's rows count nowhere, and the count reads %d", cloud.Takeable)
-	}
 	// A merged branch stands for a group off the cloud, so it lights no letter. [[spec/design_output/work#a-row-per-group]]
 	if !said.Cloud["one-group"] || said.Cloud["gone-group"] {
 		t.Fatalf("a group holding a branch stands on the cloud, and the flags read %v", said.Cloud)
@@ -72,13 +64,14 @@ func TestThePlacesLandOverTheTreeAndALaterTreeTakesThemAgain(t *testing.T) {
 	t.Parallel()
 	m := press(workWindow(t, 3), "2")
 	places, _ := work.PlacesIn([]byte(answerSaid))
+	places.Takeable, places.Counted = 3, true
 	out, _ := m.Update(work.PlacesMsg{Places: places})
 	m = out.(frame.Model)
 	rows := theWork(m).Tree.Rows(120, 8)
 	if !strings.Contains(rows, "one-group") || theWork(m).Tree.Items[0].Keys[work.QueueKey] != "2" {
 		t.Fatalf("the group carries its place, and the rows read:\n%s", rows)
 	}
-	// The strip counts the rows this box takes behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+	// The strip draws the count the index answers behind the tab's name. [[spec/tickets/the-count-chain-leaves]]
 	if !strings.Contains(m.RenderStrip(), "work (3)") {
 		t.Fatalf("the strip counts the takeable rows, and reads %q", m.RenderStrip())
 	}

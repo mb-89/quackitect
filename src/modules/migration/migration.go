@@ -10,5 +10,5 @@ const OpenTasksKey = "opentasks"
 
 // The module type the wiring loads as migration. [[spec/tickets/open-tasks-run-in-shadow]]
 func Registers(c *q.Catalog) q.Writer {
-	return q.CfgIn(c, OpenTasksKey, "old", q.Shared(), q.Doc("the open-tasks slice: old, shadow or new"))
+	return q.CfgIn(c, OpenTasksKey, "new", q.Shared(), q.Doc("the open-tasks slice, switched over to new"))
 }
