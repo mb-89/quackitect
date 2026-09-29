@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -116,6 +116,25 @@ record:
     hand: the engine
     hash_before: 80a236d8cd567e599067dc331251b45d5a25e5a2
     hash_after: 80a236d8cd567e599067dc331251b45d5a25e5a2
+  - step: accept
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 936f65ec851eb6d0ea7130ca596be23c368b53db
+    hash_after: 936f65ec851eb6d0ea7130ca596be23c368b53db
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/quack-verbs-land-in-shadow already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: b473a38aee98cc88
+        size: 613
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["open-tasks-shadow-lands", "read-topics-land-in-shadow"]
 enabled_by: migration.phase4shadow
 cloud: true
@@ -193,8 +212,12 @@ each standard child names the one it waits on under depends_on, back to actions-
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- migration.verbs reads shadow off the tracked spec/config/level0.json, and migration.go declares the key with its default, so the new path runs in shadow on main once this merges
+- the ticket, retro, pull, vehicle, stub and branch topics stand as actions in src/modules/verbs, the generated quack and its road stand in src/quack, and the tool list stands in src/index/tools.go
+- ./RUNME.sh log --kind shadow names the need rows where cli.js and the registry part, and ./RUNME.sh check exits 0
 
 # retro
 
