@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: b7ef17b730c092d9e2644216a86a452083839f6b
     hash_after: b7ef17b730c092d9e2644216a86a452083839f6b
+  - step: accept
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 18ffcbfca6748e880d735759904cd1dafbc56ced
+    hash_after: bc3378e88579704cbcc2c9d4e0d28a3a11c88686
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/read-topics-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: bf36b714071714b6
+        size: 330
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["read-topics-land-in-shadow"]
 enabled_by: migration.phase3switch
 cloud: true
@@ -179,8 +198,9 @@ Done when no JavaScript twin of a Go check stands.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. A helper read the diff since the last verdict and named three gaps. The log verb's doors and the lint's doors carried no slices, so both readers stayed on the old path, and no case held the real door builders. The gate fixed all three in its own diff: both builders now hand the slices and the method root, and a case holds each. Weighed: the done line reads over the Go topics, and the check twins leave with phase 7, as the group's Discussion says. The twins are gone, nothing imports one, and every reader on a new slice takes its topic or faults. The check answers green.
 
 # retro
 
