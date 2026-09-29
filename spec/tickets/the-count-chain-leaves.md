@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 6f9111b5692fa790
         size: 698
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: bdebaa0cab64b7ca1e2d00f5393dcd2ca4be6996
+    hash_after: bdebaa0cab64b7ca1e2d00f5393dcd2ca4be6996
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -303,14 +312,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the ones the draft names, and the three standing tests the gate names, which the children carry
+- fakes: askOpenTasks and askQueuePlaces for the index, runPlaces for the verb, and the answers table for the badge line
+- comments: countIn, askOpenTasks, Counted and the grep case point at their tickets
+- one place: openTasksName and queuePlacesName name each index name once, and tui.md states the chain in one table
 
 ## tests-green
 

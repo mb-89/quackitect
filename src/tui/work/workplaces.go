@@ -29,8 +29,9 @@ type Places struct {
 	Queue map[string]string
 	Cloud map[string]bool
 	Todo  map[string]bool
-	// The rows this box takes: every placed row past the cloud's, which the strip counts behind the tab's name and the sidebar's button draws. [[spec/design_output/tui#the-work-tab]]
+	// The rows this box takes, as the index counts them, and whether a door answered. The tab draws the count behind its name where one did. [[spec/tickets/the-count-chain-leaves]]
 	Takeable int
+	Counted  bool
 	// The plan's own todos, which the index holds nowhere, so the tab adds them as rows. [[spec/design_output/stop#the-plan]]
 	Rows []answerRow
 }
@@ -98,7 +99,6 @@ func PlacesIn(said []byte) (Places, error) {
 			out.Rows = append(out.Rows, one)
 		}
 	}
-	out.Takeable = out.countTakeable()
 	return out, nil
 }
 
@@ -108,17 +108,6 @@ func (p Places) place(one answerRow) {
 		p.Queue[one.Name] = one.Queue
 	}
 	p.Todo[one.Name] = one.Todo
-}
-
-// The rows this box takes: placed, and off the cloud. [[spec/design_output/tui#the-work-tab]]
-func (p Places) countTakeable() int {
-	n := 0
-	for _, place := range p.Queue {
-		if place != cloudPlace {
-			n++
-		}
-	}
-	return n
 }
 
 // The places laid over the tree's items, so the queue column and the cloud letter read them. [[spec/design_output/tui#the-work-tab]]
@@ -193,14 +182,14 @@ func PlacesAt(root string) (Places, error) {
 			}
 		}
 	}
-	// The slice answers the count the badge and the header read, and the shadow writes its row beside it. [[spec/tickets/the-badge-reads-open-tasks]]
-	places.Takeable = slicedCount(root, places.Takeable, time.Now())
+	// The count reads the index alone, since the window counts nothing of its own. [[spec/tickets/the-count-chain-leaves]]
+	places.Takeable, places.Counted = askOpenTasks(root)
 	return places, nil
 }
 
 // The index's queue, as a place a name, and whether a door answered it. A door standing nowhere answers nothing, and starts nothing. [[spec/tickets/queue-column-reads-the-index]]
 var askQueuePlaces = func(root string) (map[string]string, bool) {
-	said, err := postIndex(root, "value", map[string]string{"name": queuePlacesName})
+	said, err := askIndex(root, "value", map[string]string{"name": queuePlacesName})
 	if err != nil {
 		return nil, false
 	}
@@ -213,6 +202,22 @@ var askQueuePlaces = func(root string) (map[string]string, bool) {
 
 // The index name the queue module answers its places under. [[spec/tickets/queue-column-reads-the-index]]
 const queuePlacesName = "queue/places"
+
+// The index name the work module counts the open tasks under. [[spec/tickets/the-count-chain-leaves]]
+const openTasksName = "work/open-tasks"
+
+// The index's count, and whether a door answered it. A door standing nowhere gets started once. [[spec/tickets/open-tasks-fake-moves-over]]
+var askOpenTasks = func(root string) (int, bool) {
+	said, err := askIndex(root, "value", map[string]string{"name": openTasksName})
+	if err != nil {
+		return 0, false
+	}
+	var count int
+	if json.Unmarshal(said, &count) != nil {
+		return 0, false
+	}
+	return count, true
+}
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
 var runPlaces = func(root string) ([]byte, error) {

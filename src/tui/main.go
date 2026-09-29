@@ -32,24 +32,13 @@ func main() {
 	floor := flag.String("floor", "", "with --frame: the floor to stand at, as debug, info, warn, error or fatal")
 	mouse := flag.Bool("mouse", true, "take the mouse, which costs the terminal's own text selection")
 	tab := flag.String("tab", "", "the tab the window opens on, as log or work")
-	count := flag.Bool("count", false, "print the number the work tab carries in its brackets, as JSON, and exit")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		fmt.Fprintln(stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false --tab log|work] [--count] <session.jsonl>")
+		fmt.Fprintln(stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false --tab log|work] <session.jsonl>")
 		exits(2)
 	}
 	path := flag.Arg(0)
 
-	// [[spec/design_output/tui#the-work-tab]]
-	if *count {
-		said, err := countSaid(path)
-		if err != nil {
-			fmt.Fprintln(stderr, err)
-			exits(1)
-		}
-		fmt.Println(said)
-		return
-	}
 	// The colours stand in the config, and the window reads them once. [[spec/design_output/tui#colours]]
 	draw.LoadColours(work.Root(path))
 
@@ -72,18 +61,6 @@ func main() {
 		fmt.Fprintln(stderr, err)
 		exits(1)
 	}
-}
-
-// The places the badge's verb reads, which a case hands its own. [[spec/tickets/the-badge-reads-open-tasks]]
-var placesAt = work.PlacesAt
-
-// The count the sidebar's button draws: the number the work tab carries in its brackets, off the places the tab reads. [[spec/design_output/tui#the-work-tab]]
-func countSaid(path string) (string, error) {
-	places, err := placesAt(work.Root(path))
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("{\"count\":%d}", places.Takeable), nil
 }
 
 // The window, with its door open for as long as it stands. A port already held means a window already stands, so this one hands its tab over and ends. [[spec/design_output/tui#a-second-launch-hands-over]]

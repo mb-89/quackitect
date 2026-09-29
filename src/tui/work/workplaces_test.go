@@ -29,9 +29,6 @@ func TestARowPlacedOnTheCloudLightsTheLetter(t *testing.T) {
 	if !marked.Cloud["marked-group"] || !marked.Cloud["its-child"] || !marked.Cloud["bare-group"] || marked.Cloud["free"] {
 		t.Fatalf("a row the queue places on the cloud lights the letter, and the flags read %v", marked.Cloud)
 	}
-	if marked.Takeable != 1 {
-		t.Fatalf("the cloud's rows count nowhere, and the count reads %d", marked.Takeable)
-	}
 }
 
 // A todo nested two rows down stands already, so it takes no row at the left. [[spec/tickets/the-queue-views-agree]]
