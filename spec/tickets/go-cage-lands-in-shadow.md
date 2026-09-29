@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d855c2347910b · claude-code-remote
+    hash_before: 1df7551fbfac71461cc66b7f0a4979a97a556489
+    hash_after: 1df7551fbfac71461cc66b7f0a4979a97a556489
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["quack-verbs-land-in-shadow"]
 enabled_by: migration.phase5shadow
 cloud: true
@@ -239,38 +251,61 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- copilot-meets-the-hooks-door passes tests-green, and the hook verb's argument count takes a name
+- the group passes sync, split and accept
+- the Copilot shadow waits on the hook verb within a short span of its own, in 049d4ccef
+- cage-rules-port-before-switch opens in the switch group, carrying the rule port the shadow waits on
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the child's route stood recorded, so the box resumed at tests-green with no rework
+- a helper reviewed the whole diff with fresh eyes, and found the blocking shadow call
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 15:20 UTC: a Bash call named no ticket in its description, and level zero refused it
+- 15:23 UTC and 15:40 UTC: a landing verb followed a gate joined by a semicolon or a pipe, and level zero refused it
+- 15:25 UTC: the tests-green hand-back carried no checked lines, and the pull refused it
+- 15:30 UTC: a foreground helper call and a bare stop line met refusals, and the turn held open
+- 15:39 UTC: the accept verdict named a fixed point and a ticket in another group, and the pull refused both
+- no owner prompt turned the run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the working guidance in spec/guidance/working holds the ticket-in-description rule, so read it before the first call
+- the LandingFollowsItsGate refusal names the fix: run the landing alone, with no pipe before it
+- the pull prints the checklist beside the fields, so read it before the first hand-back
+- the stop tool, mcp__level0__stop, ends a turn, and mcp__level0__wait waits on a helper
+- a gate verdict point mints a child, so a fixed point goes under Discussion and the verdict reads accept
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The review point on porting the rules weighed most. The group's done line holds without a port, since the shadow runs and names each mismatch. The port has to land before the key moves to new, so it rides with the switch group. I assume the switch group's owner reads its new child before it switches.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the shadow wait stands once, as SHADOW_WAIT in copilot-shadow.js, and the test reads the export
+- the hook argument count and the shadow wait each carry a name at the top of their module
+- the copilot-shadow.js header says what the file does, and counts nothing
+- the badly list carries each refusal of the run with its time, and no owner prompt came
+- the chapter names roles alone, and no box name, address or path
 
 ## cloud
 
