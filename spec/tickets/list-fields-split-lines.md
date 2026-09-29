@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -144,6 +144,18 @@ record:
         hash: 9ef7c2e96a66b47f
         size: 1411
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 15a6e864a69047ac7ec040015fed14e3330e68ee
+    hash_after: 15a6e864a69047ac7ec040015fed14e3330e68ee
+    inputs:
+      - name: design/draft
+        hash: 9ef7c2e96a66b47f
+        size: 1411
+      - name: design/tests-red
+        hash: d30bab38f96a35c2
+        size: 589
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -264,8 +276,9 @@ The array case fails on its own assertion: the red field lands as one comma-join
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
