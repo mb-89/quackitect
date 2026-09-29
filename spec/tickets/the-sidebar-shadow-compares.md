@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     hand: box d85821f54410d · claude-code-remote
@@ -128,6 +128,15 @@ record:
         hash: eecebd8b5f500ddc
         size: 630
     def: dfe8a19a676f7573
+  - step: design/draft
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 4ac3362d2168bc43594de43675cede76e3c13fb4
+    hash_after: 4ac3362d2168bc43594de43675cede76e3c13fb4
+    inputs:
+      - name: ask
+        hash: eecebd8b5f500ddc
+        size: 630
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,74 @@ pass: the ask carries the group brief, the shadow row on each mismatch and the s
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The migration module declares the slice `sidebar`, built-in old, beside `window`. While it reads shadow, each draw of the sidebar weighs the old groups against the views section, and writes a `shadow` row for each pair that reads apart.
+
+| pair | old side | new side |
+|---|---|---|
+| a badge | the count of the cell whose `counts` names a value | the badge value off `index/names` for that name |
+| a button | the help and icon of the cell `work.pull` | the doc and icon of the action `work/pull` |
+
+A cell key pairs with the action whose name swaps its dot for a slash.
+
+| part | file | what changes |
+|---|---|---|
+| the slice | `src/modules/migration/migration.go`, `slices` | the key `sidebar`, built-in old, with the three modes |
+| the compare | `src/extension/lib/views-shadow.js`, new, `apartOf(groups, views, names)` | one line a pair that reads apart, and none where the pairs agree |
+| the rows | `src/extension/sidebar.js`, `html` | under shadow, each new line writes one row through the logbook: kind `shadow`, slice `sidebar` |
+
+What I weigh and assume:
+- The key follows its siblings as `migration.sidebar`, so it reads `migration/config/sidebar`. The brief's `slices/` segment names no key standing today.
+- A line told once stays quiet for the session, as `tell` in `src/tui/work/shadow.go` keeps it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/extension/sidebar.js`, `html`, which draws both paths and calls the compare
+- `src/modules/migration/migration.go`, `Registers`, which reads `slices`
+- `spec/config/level0.schema.json`, which `quack schema --write` writes off the declaration
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/modules/migration/migration_test.go`, `TestTheSidebarSliceStandsBuiltInOld`
+- `test/level0/views-shadow.test.js`, `a badge the two paths count apart reads as one line`
+- `test/level0/views-shadow.test.js`, `a button whose help and icon agree reads no line`
+- `test/level0/sidebar-views.test.js`, `under shadow a mismatch writes one shadow row, and under old none`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft, so no earlier review names a finding
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/modules/migration/migration.go`
+- `src/modules/migration/migration_test.go`
+- `src/extension/lib/views-shadow.js`
+- `src/extension/sidebar.js`
+- `test/level0/views-shadow.test.js`
+- `test/level0/sidebar-views.test.js`
+- `spec/config/level0.schema.json`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened, among them `shadow.go`, `migration.go`, `sidebar.js` and the logbook
+- the callers come off a search for `slices`, `html` and `WriteShadow`
+- each done line meets a test: the slice case, the row case, and the check
 
 ## tests-red
 
