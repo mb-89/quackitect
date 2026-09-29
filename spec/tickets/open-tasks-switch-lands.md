@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -155,6 +155,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: d94308fc386b6fd73844a6af68a7112877476d1b
+    hash_after: d94308fc386b6fd73844a6af68a7112877476d1b
+    inputs:
+      - name: retro/write
+        hash: 061fe493942b94b5
+        size: 2593
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -301,20 +311,28 @@ roles: the chapter names the box and the reviewer, and no person or path of the 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+nothing: every tool, host and right the run asked for answered
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the sync took main in with no conflict
+the description hook and LandingFollowsItsGate refused calls, as the badly list names
+the commit door refused a change whose paired test stood unchanged
+no test failed on this box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step stands parked
+no ticket stands minted outside the group
+the handover says the group stands at done, and the pull request carries it to main with auto-merge on
 
 # Discussion
 
