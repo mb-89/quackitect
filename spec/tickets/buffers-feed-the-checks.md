@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -171,6 +171,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 4da2e691a42af58b2a7002b84cbdbde6b591ae0c
+    hash_after: 4da2e691a42af58b2a7002b84cbdbde6b591ae0c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 784c865b5c7ba256
+        size: 661
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -321,26 +344,33 @@ go vet ./src/modules/check
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check module sweep takes a second input, `buffers/<path...>`, optional, each value the unsaved text of one path. Before it sweeps, it lays each buffer over its file with `Tree.Holds`, the overlay the LSP keeps for an open editor. So a rule reads the buffer where one stands open, and the file otherwise. A buffer over a path the files lack adds no path. The index refuses an in-port no wire reaches, optional or not, so the wiring binds the buffers to their built-in value until the next ticket lands the writer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `sweep.go`, the case, and one wire
+- the change reaches no door, and the fake index takes the buffers as seeds
+- a comment beside the loop names the overlay the approach lays
+- the port name stands once, in `sweep.go`
 
 # accept
 

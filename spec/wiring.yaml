@@ -49,6 +49,7 @@ wires:
   guidance.files/<path...>: files/<path...>
   check.files/<path...>: files/<path...>
   check.env/<name>: env/<name>
+  check.buffers/<path...>: built-in
   log.session: files/.se/.log/session.jsonl
   tickets.all: tickets/all
   tickets.cloud: tickets/cloud
