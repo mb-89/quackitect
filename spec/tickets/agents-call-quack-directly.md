@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: 24b00f762b44efa4
         size: 3548
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85989c4d4d5 · claude-code-remote · helper-3
+    hash_before: 1d48fbba6454933daf4cec3eae13cbc4b6ad5135
+    hash_after: 87ebcadc1711d6672f1b1a98ffc5ba565302c8af
+    inputs:
+      - name: design/draft
+        hash: 24b00f762b44efa4
+        size: 3548
+      - name: design/tests-red
+        hash: 54b3812c97580c07
+        size: 892
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -265,8 +277,14 @@ Every new test fails on its own assertion: the tree verb hands verb lint in plac
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- verbline-spares-blocking-verbs: verbLine sends the agent to index_verb_tui, but tui opens a window and serve never returns, and nodeAccept in src/quack/twins.go runs cli.js through CombinedOutput with no terminal; the line names check, branch and doctor, and keeps tui and serve off the tools it recommends
+- runme-road-reads-verbs-new: test/contract/runme-road.test.js asserts migration.verbs reads shadow in spec/config/level0.json, a caller the draft misses; it breaks ./RUNME.sh check once the key moves to new, and the builder fixes it in place
+- cage-comments-drop-needs-shadow: src/modules/hooks/cage.go names src/scripts/needs-shadow.js in two comments as the owner of the shadow row's fields; the pointer dangles once the file goes, so it points at cage.go's own row or the log note
+- describe-reaches-the-tool-list: onDescribe in src/bridge/bash.js takes the event alone, and verbLine(tools) needs the tool list; the draft names no road from the list registersIndexTools reads to the bridge
+- verb-outputs-name-index-tools: the hand-back lines and refusals under src/scripts, pull-chapter.js and ephemeral.js among them, still tell the agent to run ./RUNME.sh; the approach steers the two description surfaces alone, so the ask's shell out to no ./RUNME.sh verb stands half met
 
 # implement
 
