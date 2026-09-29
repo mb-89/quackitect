@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: cc3ddddf3d021714
         size: 318
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 1ca035076a7e70d9056233ba42100449a8da6a12
+    hash_after: 1ca035076a7e70d9056233ba42100449a8da6a12
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/verbs fails
+    inputs:
+      - name: design/draft
+        hash: 587cd1370cbcd7a4
+        size: 2962
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +233,33 @@ What I weigh: the writes reach the schema mint, the front writer, the process ro
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/verbs/verbs_test.go src/modules/work/rows_test.go src/quack/twins_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/verbs/verbs_test.go
+- src/modules/work/rows_test.go
+- src/quack/twins_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The topic registers no action, the yours port holds no row, the twin answers usage, and the root accepts no node request. Each fails on its own assertion. What surprises: no module registers an action yet, so the verbs module stands as the first the tool list carries.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- go test meets every new Go case, the shadow line meets the twin the road runs beside cli.js, and the check meets the check verb
+- the twin reads a door over a seeded catalog, and the node case runs a stand-in cli.js under a temp root
 
 # gate
 

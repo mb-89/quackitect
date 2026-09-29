@@ -66,3 +66,28 @@ func TestAClosedWaitRaisesNoFlagAndATodoAtZeroStandsHeld(t *testing.T) {
 		t.Errorf("a closed ticket takes no place, and reads %+v", rows["done"])
 	}
 }
+
+func TestYoursHoldsThePlacedRowsOffTheCloudInOutlineOrder(t *testing.T) {
+	said, _ := read(t, YoursPort, map[string]any{
+		TicketsPort: []ticket.Ticket{
+			{Name: "second", Path: "spec/tickets/second.md", State: "open", Step: "do", Person: true},
+			{Name: "first", Path: "spec/tickets/first.md", State: "open", Step: "design/draft"},
+			{Name: "unplaced", Path: "spec/tickets/unplaced.md", State: "open"},
+			{Name: "marked", Path: "spec/tickets/marked.md", State: "open"},
+		},
+		PlacesPort: map[string]string{"second": "1.2", "first": "-1", "marked": onCloud},
+		CloudPort:  []string{"marked"},
+	}).([]YoursRow)
+	want := []YoursRow{
+		{Ticket: "first", Path: "spec/tickets/first.md", Step: "design/draft", Queue: "-1", State: "open"},
+		{Ticket: "second", Path: "spec/tickets/second.md", Step: "do", Queue: "1.2", State: "open", Person: true},
+	}
+	if len(said) != len(want) {
+		t.Fatalf("yours holds %+v, and wants %+v", said, want)
+	}
+	for i := range want {
+		if said[i] != want[i] {
+			t.Fatalf("yours holds %+v, and wants %+v", said, want)
+		}
+	}
+}
