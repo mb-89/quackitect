@@ -31,6 +31,13 @@ const (
 // The name spec/wiring.yaml binds the work module's yours port under. [[spec/tickets/ticket-verbs-become-actions]]
 const yoursName = "work/" + work.YoursPort
 
+// The columns and the empty line queueOnly in src/scripts/work-list.js prints. [[spec/tickets/work-verbs-become-actions]]
+const (
+	queuePlaceWidth = 6
+	queueNameWidth  = 34
+	noQueue         = "No ticket stands in the queue."
+)
+
 // ticket yours off work/yours over the base v1 answers, one JSON object as ticket-yours.js prints it. [[spec/tickets/ticket-verbs-become-actions]]
 func ticketYours(v1 func() (string, error)) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
@@ -119,8 +126,27 @@ func retroNotes(v1 func() (string, error)) twin {
 
 // branch list --queue off work/yours over the base v1 answers: each placed row off the cloud, place then name then step. [[spec/tickets/work-verbs-become-actions]]
 func branchQueue(v1 func() (string, error)) twin {
-	return func(argv []string, _ bool, out, errs io.Writer) int {
-		return exitUsage
+	return func(_ []string, _ bool, out, errs io.Writer) int {
+		base, err := v1()
+		if err != nil {
+			fmt.Fprintln(errs, err)
+			return exitFailed
+		}
+		var said struct {
+			Value []work.YoursRow `json:"value"`
+		}
+		if err := reads(base+"/values/"+yoursName, &said); err != nil {
+			fmt.Fprintln(errs, err)
+			return exitFailed
+		}
+		if len(said.Value) == 0 {
+			fmt.Fprintln(out, noQueue)
+			return 0
+		}
+		for _, one := range said.Value {
+			fmt.Fprintf(out, "%*s  %-*s %s\n", queuePlaceWidth, one.Queue, queueNameWidth, one.Ticket, one.Step)
+		}
+		return 0
 	}
 }
 

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: aa79d154b7d0d7f6
         size: 738
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: bedb3db2e8be1c9a21584ace943b091ba5a1db53
+    hash_after: bedb3db2e8be1c9a21584ace943b091ba5a1db53
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -295,14 +304,21 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/verbs/branch.go spec/wiring.yaml src/quack/main.go src/quack/verbs.go src/quack/twins.go spec/tickets/quack-verbs-switch-over.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the branch verbs, the wiring in spec/wiring.yaml and main.go, the twin road in verbs.go and twins.go, and the ports table the gate verdict asks for, and nothing else
+the twin reaches work/yours over V1, which the yoursTree case seeds through a real index on a temp root, as ticket yours does
+every new line points at spec/tickets/work-verbs-become-actions, whose approach the change implements
+the column widths and the empty line stand once as constants in twins.go, pointing at queueOnly; the branch ports stand once in the switch-over table
+verdict point 2: yoursOf drops a row carrying Cloud where queueOnly drops the cloud place alone; the twin keeps yoursOf, so the shadow log names any such row, which the ask wants
+verdict point 3: TestATwinKeysOnThreeWords stands in src/quack/twins_test.go, which the tests-green list names
 
 ## tests-green
 

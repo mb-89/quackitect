@@ -32,6 +32,8 @@ instances:
     module: vehicle
   stub:
     module: stub
+  branch:
+    module: branch
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute

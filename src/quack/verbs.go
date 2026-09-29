@@ -30,7 +30,7 @@ const (
 	verbsSlice  = migration.VerbsKey
 	logStamp    = "2006-01-02T15:04:05.000Z"
 	answerCap   = 2000
-	twinWordsAt = 2
+	twinWordsAt = 3
 )
 
 // Where a verb goes: to cli.js, to quack, or to both with the old answer standing. [[spec/tickets/runme-hands-verbs-to-quack]]
@@ -51,6 +51,8 @@ var twinVerbs = map[string]twin{
 	"ticket yours": ticketYours(index.V1),
 	// [[spec/tickets/retro-verbs-become-actions]]
 	"retro notes": retroNotes(index.V1),
+	// [[spec/tickets/work-verbs-become-actions]]
+	"branch list --queue": branchQueue(index.V1),
 }
 
 // What the road reaches: the mode, cli.js writing its standard output into out, a verb quack answers alone, the twins, the session log and the caller's streams. [[spec/tickets/runme-hands-verbs-to-quack]]
@@ -71,7 +73,7 @@ func aloneOf(argv []string, table map[string]bool) bool {
 	return len(argv) > 0 && table[argv[0]] && !cliJsKeeps[argv[0]] && !strings.HasPrefix(argv[0], "-")
 }
 
-// The twin the verb's words name, two words before one, and its key. [[spec/tickets/runme-hands-verbs-to-quack]]
+// The twin the verb's words name, the most words first, and its key. [[spec/tickets/runme-hands-verbs-to-quack]]
 func twinOf(argv []string, twins map[string]twin) (string, twin) {
 	for words := min(len(argv), twinWordsAt); words > 0; words-- {
 		key := strings.Join(argv[:words], " ")

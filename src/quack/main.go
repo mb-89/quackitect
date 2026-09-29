@@ -71,6 +71,8 @@ var modules = map[string]ioModule{
 	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
 	"vehicle": {registers: verbsmodule.Topic("vehicle", verbsmodule.VehicleVerbs)},
 	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
+	// [[spec/tickets/work-verbs-become-actions]]
+	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]

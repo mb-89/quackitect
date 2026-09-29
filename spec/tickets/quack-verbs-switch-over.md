@@ -200,3 +200,4 @@ The native ports this group owes, since each action below runs its verb through 
 | `stub` | into, with its git and its shim | `theStub` in `src/scripts/cli.js` |
 | `ticket` | every verb past `yours`, which a twin answers already | `src/scripts/ticket.js` |
 | `retro` | every verb past `notes`, which a twin answers already | `src/scripts/retro.js` |
+| `branch` | every verb past `list --queue`, which a twin answers already | `WORK_VERBS` in `src/scripts/work.js` |
