@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 97d6fe8eb4e57cec26d14762eff9fcbb999d55bf
+    hash_after: 97d6fe8eb4e57cec26d14762eff9fcbb999d55bf
+    inputs:
+      - name: ask
+        hash: 2e3ecc9883d2c715
+        size: 641
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,82 @@ view: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Four actions register in `src/modules/verbs/actions.go`, each with a label, an icon and a doc. Each hands its words to the node module, as `Topic` does.
+
+| action | input | runs |
+|---|---|---|
+| `work/pull` | none | `ticket yours --next` |
+| `work/place` | name, n | `ticket place <name> <n>` |
+| `tickets/flip-urgent` | name | `ticket urgent <name>` |
+| `tickets/set-field` | name, field, value | `ticket set <name> <field> <value>` |
+
+The three verbs land in `src/scripts/ticket-edit.js`, beside the table in `src/scripts/ticket.js`.
+
+- `place` reads the siblings off `answerOf`, finds the anchor by the rule `placeAt` holds, and writes `places` in the plan file.
+- `urgent` writes the urgent mark at its other value, through `withField`.
+- `set` writes one field, and refuses a field the schema marks `x-engine`.
+
+The actions join the `work` and `tickets` instances in `src/quack/main.go`, as the settings sections join theirs.
+
+What I weigh and assume:
+- A shared case file holds the place rule. `src/tui/work/testdata/places.json` feeds the Go case and the JavaScript case alike.
+- The pull entry of `spec/config/draws.json` keeps its help and icon. The widget grid reads them through the schema until it retires.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/quack/main.go`, the `modules` table and its `init`, which join the actions to two instances
+- `src/scripts/ticket.js`, `ticket`, whose table gains three verbs
+- `src/modules/verbs/ticket.go`, `TicketVerbs`, which gains the three usage lines
+- `src/extension/lib/views.js`, `viewsOf`, which reads the new rows unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/modules/verbs/actions_test.go`, `TestTheViewActionsRegisterWithLabelAndIcon`
+- `src/modules/verbs/actions_test.go`, `TestEachViewActionRunsItsTicketVerb`
+- `test/level0/ticket-edit.test.js`, `place writes the anchor the work tab writes, over the shared cases`
+- `test/level0/ticket-edit.test.js`, `urgent writes the mark at its other value`
+- `test/level0/ticket-edit.test.js`, `set writes one field and refuses a field the engine owns`
+- `src/tui/work/workplace_test.go`, `TestPlaceAtReadsTheSharedCases`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft, so no earlier review names a finding
+- `draws-json-yields-to-views` became this ticket. Its cut waits for the grid to retire, since the grid reads draws.json.
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/modules/verbs/actions.go`
+- `src/modules/verbs/actions_test.go`
+- `src/modules/verbs/ticket.go`
+- `src/quack/main.go`
+- `src/scripts/ticket.js`
+- `src/scripts/ticket-edit.js`
+- `test/level0/ticket-edit.test.js`
+- `src/tui/work/testdata/places.json`
+- `src/tui/work/workplace_test.go`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened, among them `workplace.go`, `workedit.go`, `verbs.go` and `work-answer.js`
+- the callers come off a search for `Topic`, `TicketVerbs` and the verb table
+- each done line meets a test: the two Go cases, the three verb cases, and the check
 
 ## tests-red
 
