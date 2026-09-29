@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -163,6 +163,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 7c218d55d2a361d0ec668f3146831a05a4d7b2b1
+    hash_after: 7c218d55d2a361d0ec668f3146831a05a4d7b2b1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 079b49b2aba3501b
+        size: 692
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -324,26 +347,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/needs-shadow.test.js test/level0/needs-shadow-wiring.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull already stands as the action ticket/pull, with no deadline, so a hook waits on it within its own wait. Each hand-out now runs the leaf needs in shadow: quack get index/actions answers the registry, and a need it and the table in pull-route.js answer apart writes one shadow row. The registry answers alone once quack-verbs-switch-over flips the verbs slice.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches needs-shadow.js, pull-hand.js and their cases
+- every case reads fake doors
+- each new function names this ticket
+- the slice key and the action name stand once in needs-shadow.js
 
 # accept
 
