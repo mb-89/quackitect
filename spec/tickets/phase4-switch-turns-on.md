@@ -41,3 +41,41 @@ While the switch reads false, `branch take` passes that group over.
 - `./RUNME.sh config` reads `migration.phase4switch true spec/config/level0.json`
 - `./RUNME.sh log --kind shadow` names no verbs row after two runs of the shadowed verbs with work branches standing
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test src/modules/migration src/quack src/modules/work
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The coordinator ran ticket yours, ticket yours --next, branch list, branch list --queue, retro notes, config, log and ticket todo twice on main at b1bb5b6. Twenty-seven work branches stood on origin. The shadow log named no verbs row stamped after the run began. Earlier runs on this tree wrote rows for ticket yours and branch list --queue, so the shadow writes where the paths part. The fixes in pull requests 44, 50 and 51 closed those. So migration.phase4switch turns true, and a box may take quack-verbs-switch-over.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: one key in spec/config/level0.json
+- the cleanup it reveals: none past the three fixes already landed
+- every fact stands once: the run lives on this ticket and the pull request
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
