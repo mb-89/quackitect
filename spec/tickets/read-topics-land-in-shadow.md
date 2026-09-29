@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -135,6 +135,25 @@ record:
         hash: e122785976621597
         size: 10947
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 03fea7a04e38646faf56212b755e434cebe8a77e
+    hash_after: 7d2b7806b6d57f18426bd945545c0005dc00a2eb
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/read-topics-land-in-shadow already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 7b2f4813dd22d30b
+        size: 598
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["open-tasks-shadow-lands"]
 enabled_by: migration.phase3shadow
 cloud: true
@@ -203,10 +222,7 @@ Each fix ticket names its parent, and the topics wait on none of each other.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- config-shadow-catches-its-faults: src/scripts/config-shadow.js runs proc.run with no try and no timeout, and the proc door throws where the binary stands but fails to run, so ./RUNME.sh config prints its rows and then dies on a stack trace; catch the fault as the log, guidance and prose shadows do, and pass a timeout
-- prose-shadow-spawns-off-thread: readsProse in src/bridge/prose.js fires the shadow unawaited, but its spawn runs sync on the bridge server, so every read carrying a Vale finding waits on quack prose; start the process through proc.start, and move quackAt inside the try
-- unused-shadow-package-leaves: nothing imports src/shadow since main dropped src/tui/work/shadow.go, since every shadow writes through the log door; take the package out
+accept
 
 # retro
 
