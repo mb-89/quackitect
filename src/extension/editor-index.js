@@ -5,7 +5,7 @@
 const { readFileSync } = require("node:fs");
 const { join } = require("node:path");
 
-// The file standingPath in src/index/door.go writes, held again here because this module loads as CommonJS. [[spec/design_output/model#surfaces]]
+// A copy of inRun("index.json") out of .claude/skills/level0/lib/folders.js, the file standingPath in src/index/door.go writes, because the extension loads CommonJS and that module is ESM. [[spec/design_output/model#surfaces]]
 const STANDING = [".se", ".runtime", "index.json"];
 
 // [[spec/design_output/extension#the-views-section]]
