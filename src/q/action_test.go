@@ -63,3 +63,12 @@ func TestAnActionAnswersItsTypes(t *testing.T) {
 		t.Fatal("a name no action holds answers its types")
 	}
 }
+
+// An action taking a string decodes it off a JSON string. [[spec/tickets/actions-answer-over-http]]
+func TestAStringInputDecodesOffAJSONString(t *testing.T) {
+	c := New()
+	ActionIn(c, "t/read", func(string) []Request { return nil })
+	if got, err := NewStore(c).Input("t/read", []byte(`"a.md"`)); err != nil || got != "a.md" {
+		t.Fatalf("the body decodes into %#v, %v", got, err)
+	}
+}

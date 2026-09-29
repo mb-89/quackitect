@@ -4,6 +4,8 @@
 package q
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"reflect"
 )
@@ -48,7 +50,17 @@ func (s *Store) Types(name string) (in, out reflect.Type, ok bool) {
 
 // Decodes a JSON body into the input type the action takes, and an empty body into its zero value. [[spec/tickets/actions-answer-over-http]]
 func (s *Store) Input(name string, body []byte) (any, error) {
-	return nil, fmt.Errorf("%s decodes no input yet", name)
+	one := s.owner(name)
+	if one == nil || one.kind != action {
+		return nil, fmt.Errorf("%s names no action", name)
+	}
+	into := reflect.New(one.takes)
+	if len(bytes.TrimSpace(body)) > 0 {
+		if err := json.Unmarshal(body, into.Interface()); err != nil {
+			return nil, fmt.Errorf("%s takes a %s: %w", name, one.takes, err)
+		}
+	}
+	return into.Elem().Interface(), nil
 }
 
 // [[spec/design_output/model#an-action-lists-requests]]

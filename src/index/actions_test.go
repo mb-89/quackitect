@@ -238,3 +238,22 @@ func TestAPreferHeaderAppliesItsWaitAmongOthers(t *testing.T) {
 		t.Fatalf("the post applies the preference %q", applied)
 	}
 }
+
+// A door with no manager calls nothing, so /v1 serves no action. [[spec/tickets/actions-answer-over-http]]
+func TestADoorWithNoManagerServesNoAction(t *testing.T) {
+	root := tree(t)
+	c := q.New()
+	q.ActionIn(c, "t/add", func(in addIn) []q.Request { return nil }, q.Doc("adds two terms"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(stop)
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if said, body := postV1(t, standing, "/v1/actions/t/add", "wait=5", `{}`); said.StatusCode != http.StatusNotFound {
+		t.Fatalf("a door with no manager answers %d: %s", said.StatusCode, body)
+	}
+}
