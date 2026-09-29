@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 807824f8506bfb0a
         size: 1047
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8535e12fc10e · claude-code-remote · helper-5
+    hash_before: 6d1a51cd4c86416dd44a62621f9449c64a906a63
+    hash_after: 6d1a51cd4c86416dd44a62621f9449c64a906a63
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -284,14 +293,20 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/hooks/cage.go src/modules/hooks/cage_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change writes `src/modules/hooks/cage.go` alone, over its stub, and leaves the test and the recorded logs as they stand.
+The replay reaches the outside through `Door.Hook` and the fakes the test already builds, and `ShadowTo` writes into a temporary folder in its test.
+The file header and every exported name link the ticket, the approach the change implements.
+The row kinds, the slice, the level and the stamp layout stand once as constants at the top of `cage.go`.
+Each comment points at `src/doors/log.js` and `src/scripts/log-shadow.js` as the owners of the row shapes, and the shared names come from `hooks.go`.
 
 ## tests-green
 
