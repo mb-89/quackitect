@@ -207,7 +207,7 @@ func TestStepFallsToTheFirstLeaf(t *testing.T) {
 		strings.Replace(forPerson, "step: ask\n", "", 1):        "ask",
 		strings.Replace(nested, "step: ask\n", "", 1):           "design/ask",
 		strings.Replace(forPerson, "step: ask", "step: act", 1): "act",
-		"---\nkind: [[ticket]]\nstate: open\n---\n":            "",
+		"---\nkind: [[ticket]]\nstate: open\n---\n":             "",
 	}
 	for text, want := range cases {
 		if got := Of("spec/tickets/a-question.md", "a-question", text, 1).Step; got != want {
