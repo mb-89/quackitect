@@ -96,9 +96,25 @@ func TestV1ReadsAStaleName(t *testing.T) {
 	if err := store.Stale("t/n", since); err != nil {
 		t.Fatal(err)
 	}
-	said, err := valueOf(store, "t/n")
+	said, err := valueOf(store, nil, "t/n")
 	if err != nil || said.Body.Name != "t/n" || said.Body.Stale == nil || !said.Body.Stale.Equal(since) {
 		t.Fatalf("the value reads %+v, %v", said, err)
+	}
+}
+
+// A door fresh from its start holds a derived value at its default until the scheduler settles, so the route settles first. [[spec/tickets/fix-verbs-shadow-yours]]
+func TestV1SettlesBeforeItReads(t *testing.T) {
+	c := q.New()
+	hand := q.OutIn(c, "t/n", 0)
+	store := q.NewStore(c)
+	settle := func() {
+		if _, err := store.Commit(store.Snapshot().Revision, hand, map[string]any{"t/n": 7}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	said, err := valueOf(store, settle, "t/n")
+	if err != nil || said.Body.Value != 7 {
+		t.Fatalf("the value reads %+v, %v, and wants 7 once the wave settles", said, err)
 	}
 }
 
