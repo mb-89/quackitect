@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,27 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d856e248e31998 · claude-code-remote
+    hash_before: 425b3ad721abe16d4a3c96b2d19166a653de4368
+    hash_after: 3c33fae04cd2fc38fabb927b62d2abbae5f77d24
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/migration passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 12e775d1e4b29fe9
+        size: 616
+      - name: [[spec/tickets/read-topics-switch-over]]
+        hash: 476bf861982c1130
+        size: 5700
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
