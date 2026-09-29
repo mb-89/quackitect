@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 92c91396a234d448
         size: 3211
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8509c02d5db · claude-code-remote · helper-3
+    hash_before: 554d9175f14155e93b2835f05376e64f54a0d1ad
+    hash_after: 554d9175f14155e93b2835f05376e64f54a0d1ad
+    inputs:
+      - name: design/draft
+        hash: 92c91396a234d448
+        size: 3211
+      - name: design/tests-red
+        hash: 29425e5241068bd8
+        size: 756
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -266,8 +278,11 @@ The retro verb list stands empty, the topic declares no collect, the wiring load
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- retro-notes-twin-joins-road: no red test holds retro notes in twinVerbs in src/quack/verbs.go, so the shadow done_when line passes with the twin left off the road; a case in src/quack/verbs_test.go asserts twinVerbs keys retro notes
+- retro-usage-names-every-verb: the usage in src/scripts/retro.js prints no audit line and joins backlog and mint on one line, so the draft reads no usage doc for audit; the usage prints one line a verb
 
 # implement
 
