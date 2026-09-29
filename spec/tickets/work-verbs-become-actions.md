@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: c5fa3041565bda2ece059f1edb1ff93bc5848e8d
+    hash_after: c5fa3041565bda2ece059f1edb1ff93bc5848e8d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/verbs passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:321:18: Vocabulary: testatwinkeysonthreewords stands outside the words this tr"
+    inputs:
+      - name: design/tests-red
+        hash: aa79d154b7d0d7f6
+        size: 738
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -327,26 +350,33 @@ verdict point 3: TestATwinKeysOnThreeWords stands in src/quack/twins_test.go, wh
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/verbs/verbs_test.go src/quack/twins_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every branch verb stands as an action of the branch topic, and the wiring loads that topic, so an agent calls branch/take and the rest through the index while cli.js answers them. branch list --queue gets a Go twin that reads work/yours over V1 and prints the queue as queueOnly in work-list.js does. The road now keys a twin on up to three words, so branch list alone still runs cli.js. A run of branch list --queue on this tree prints the queue and adds no shadow row. The earlier shadow rows on the need branch test predate this wiring, which now declares the branch actions the needs table reads.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the branch verbs, the wiring, the twin road and the ports table the verdict asks for, and nothing else
+the twin reaches work/yours over V1, and the cases seed it through a real index on a temp root
+every new line points at this ticket, whose approach the change implements
+the queue columns stand once as constants in twins.go, and the branch ports once in the switch-over table
 
 # accept
 
