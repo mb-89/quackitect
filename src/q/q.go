@@ -42,6 +42,8 @@ type registration struct {
 	def      any
 	missing  bool
 	doc      string
+	unit     string
+	enum     []string
 	label    string
 	icon     string
 	looks    Look
@@ -110,10 +112,10 @@ func Doc(text string) Option             { return func(one *registration) { one.
 func Deadline(span time.Duration) Option { return func(one *registration) { one.deadline = span } }
 
 // The unit a config key counts in, which the schema names beside its help. [[spec/tickets/the-config-schema-gets-generated]]
-func Unit(text string) Option { return func(one *registration) {} }
+func Unit(text string) Option { return func(one *registration) { one.unit = text } }
 
 // The values a config key takes alone, which the schema names as its enum. [[spec/tickets/the-config-schema-gets-generated]]
-func Enum(values ...string) Option { return func(one *registration) {} }
+func Enum(values ...string) Option { return func(one *registration) { one.enum = values } }
 
 // An action declares its writes, and every call of it takes a record and a wait. [[spec/design_output/model#a-caller-sets-its-wait]]
 func Writes() Option { return func(one *registration) { one.writes = true } }

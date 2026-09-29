@@ -30,6 +30,7 @@ import (
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/session"
+	"quackitect/src/modules/settings"
 	"quackitect/src/modules/tickets"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
@@ -85,6 +86,25 @@ var modules = map[string]ioModule{
 	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
 	// [[spec/tickets/work-verbs-become-actions]]
 	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
+}
+
+// A settings section loads as a module type of its own name, and a module of that name takes the section's keys beside its own. [[spec/tickets/the-config-schema-gets-generated]]
+func init() {
+	for _, section := range settings.Sections() {
+		keys := settings.Of(section)
+		own, ok := modules[section]
+		if !ok {
+			modules[section] = ioModule{registers: keys}
+			continue
+		}
+		registers := own.registers
+		own.registers = func(c *q.Catalog) q.Writer {
+			first := registers(c)
+			keys(c)
+			return first
+		}
+		modules[section] = own
+	}
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]

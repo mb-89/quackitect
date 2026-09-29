@@ -7,7 +7,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strings"
 
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
@@ -39,13 +38,7 @@ func catalogOf(root string) (*q.Catalog, error) {
 }
 
 // The dotted name a file holds a key under: its instance, then its local name. A key no instance loads reads its first segment as its section. [[spec/tickets/the-config-schema-gets-generated]]
-func dottedOf(key q.Key) string {
-	local := strings.ReplaceAll(key.Local, "/", ".")
-	if key.Instance == "" {
-		return local
-	}
-	return key.Instance + "." + local
-}
+func dottedOf(key q.Key) string { return key.Dotted() }
 
 // The schema's text, as the verb writes it. [[spec/tickets/the-config-schema-gets-generated]]
 func schemaText(root string) ([]byte, error) {

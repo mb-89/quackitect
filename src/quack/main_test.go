@@ -83,7 +83,12 @@ func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
 	if _, err := load(w, c); err != nil {
 		t.Fatal(err)
 	}
-	keys := c.Keys()
+	var keys []q.Key
+	for _, one := range c.Keys() {
+		if one.Type == "string" {
+			keys = append(keys, one)
+		}
+	}
 	if len(keys) == 0 {
 		t.Fatal("the wiring loads no slice key")
 	}

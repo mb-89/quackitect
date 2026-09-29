@@ -89,7 +89,7 @@ func sharedKeys(wiring string) (map[string]bool, error) {
 	out := map[string]bool{}
 	for _, key := range c.Keys() {
 		if key.Shared {
-			out[key.Instance+"."+strings.ReplaceAll(key.Local, "/", ".")] = true
+			out[key.Dotted()] = true
 		}
 	}
 	return out, nil

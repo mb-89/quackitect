@@ -25,3 +25,13 @@ func TestKeysCarryDocUnitEnumAndDefault(t *testing.T) {
 		t.Fatalf("the keys read %+v, and want %+v", got, want)
 	}
 }
+
+func TestAKeyPathTakesEachSegmentInCamelCase(t *testing.T) {
+	key := Key{Instance: "stop", Local: "most-in-a-row/hand-back"}
+	if got := key.Dotted(); got != "stop.mostInARow.handBack" {
+		t.Fatalf("the key reads %s, and wants stop.mostInARow.handBack", got)
+	}
+	if got := Kebab("mostInARow"); got != "most-in-a-row" {
+		t.Fatalf("the member reads %s, and wants most-in-a-row", got)
+	}
+}

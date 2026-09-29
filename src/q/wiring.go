@@ -6,6 +6,7 @@ package q
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"quackitect/src/yaml"
@@ -269,7 +270,65 @@ func (c *Catalog) Keys() []Key {
 		if local == "" {
 			local = one.name
 		}
-		keys = append(keys, Key{Name: one.name, Instance: one.instance, Local: strings.TrimPrefix(local, "config/"), Shared: one.shared})
+		builtIn, _ := json.Marshal(one.def)
+		keys = append(keys, Key{
+			Name: one.name, Instance: one.instance, Local: strings.TrimPrefix(local, "config/"), Shared: one.shared,
+			Doc: one.doc, Unit: one.unit, Enum: one.enum, Type: jsonType(one.typ), Default: string(builtIn),
+		})
 	}
 	return keys
+}
+
+// The JSON type a schema names for a Go type. [[spec/tickets/the-config-schema-gets-generated]]
+func jsonType(typ reflect.Type) string {
+	switch typ.Kind() {
+	case reflect.String:
+		return "string"
+	case reflect.Bool:
+		return "boolean"
+	case reflect.Slice, reflect.Array:
+		return "array"
+	case reflect.Map, reflect.Struct:
+		return "object"
+	default:
+		return "number"
+	}
+}
+
+// The members a file holds the key under: its instance, then each segment of its local name in camel case, since the catalog admits lowercase segments alone. [[spec/tickets/the-config-schema-gets-generated]]
+func (k Key) Path() []string {
+	var path []string
+	if k.Instance != "" {
+		path = append(path, k.Instance)
+	}
+	for _, segment := range strings.Split(k.Local, "/") {
+		path = append(path, camel(segment))
+	}
+	return path
+}
+
+// The key as a file and src/config name it, its path joined by dots. [[spec/tickets/the-config-schema-gets-generated]]
+func (k Key) Dotted() string { return strings.Join(k.Path(), ".") }
+
+func camel(segment string) string {
+	words := strings.Split(segment, "-")
+	for i := 1; i < len(words); i++ {
+		if words[i] != "" {
+			words[i] = strings.ToUpper(words[i][:1]) + words[i][1:]
+		}
+	}
+	return strings.Join(words, "")
+}
+
+// The local segment a file's camel-case member stands for. [[spec/tickets/the-config-schema-gets-generated]]
+func Kebab(member string) string {
+	var out strings.Builder
+	for _, r := range member {
+		if r >= 'A' && r <= 'Z' {
+			out.WriteByte('-')
+			r += 'a' - 'A'
+		}
+		out.WriteRune(r)
+	}
+	return out.String()
 }
