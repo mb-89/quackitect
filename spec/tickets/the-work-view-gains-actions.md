@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: e56748f8e250f7e35d56cf7b335c9cd2f5940a1b
+    hash_after: e56748f8e250f7e35d56cf7b335c9cd2f5940a1b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes; green, src/modules/work passes; green, src/modules/index passes; green, src/modules/migration pas
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: cd03e20b564a0228
+        size: 961
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui src/modules/work src/modules/index src/modules/migration
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work view and the log view become declared views in shadow. The base files name what they read, their badge and their actions, and the base reader carries those keys. A shared shadow writer in the frame appends one shadow row a mismatch. The log tab compares the tail to log/rows, and the work tab compares its rows and its badge to work/rows and the label and look the open-tasks port declares. The index names carry each label, icon and look. A new window slice, at shadow in the default file, gates it, and a pair already told stands once in the log. The old path keeps drawing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files touched: the view base files, the base reader, the frame shadow writer and its door, the log and work shadows and their tabs, the work module labels, the catalog row, the window slice with its config key and projections, and main.go
+- every door reached has a fake: the shadow source has fakeSource, and the file write stands in the frame door
+- comments name the approach in each new file
+- the shadow row write stands once in frame.WriteShadow, and the import table stands in tui.md alone
 
 # accept
 
