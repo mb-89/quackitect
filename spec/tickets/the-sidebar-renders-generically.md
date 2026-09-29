@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -156,6 +156,15 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: c458b9ee4f9f4ceea3f1bc7dd75ecfd0902162f6
+    hash_after: 9b2d304fc365010c7fa6473f90157d187296931d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -306,14 +315,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/extension src/modules/index test/contract/editor-index.test.js spec/design_output/extension.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, plus the click script, which sends the call kind, and the size golden, which records the note length
+- the one new door, the index door, has a contract case against a real server through the wire door, and the sidebar cases hand a fake of it
+- every new function carries a link to the views section chapter or to this ticket
+- the keys stand once in the model views chapter, and the new chapter points at it
 
 ## tests-green
 
