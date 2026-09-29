@@ -2,7 +2,7 @@
 // frontmatter key holding the note, and every marked item there wants a
 // chapter of its number here.
 // [[spec/design_output/lsp#a-marked-rule-wants-argument]]
-package main
+package check
 
 import (
 	"fmt"

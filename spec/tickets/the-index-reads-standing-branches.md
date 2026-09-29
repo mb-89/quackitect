@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
-state: closed
-step: implement/tests-green
+state: draft
 steps:
   - name: design
     steps:
@@ -33,6 +32,9 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
       - name: tests-red
         does: writes the tests the ask calls for
         tags: ["code", "testing"]
@@ -114,97 +116,26 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: lsp-door-lands-in-shadow
-record:
-  - step: design/draft
-    hand: box 5c8055bbc025 · claude-code-remote
-    hash_before: daa6e9463d6beefdfe9a9b5fa42ec6443cfbf78f
-    hash_after: daa6e9463d6beefdfe9a9b5fa42ec6443cfbf78f
-    inputs:
-      - name: ask
-        hash: ed1f5fec9ced9579
-        size: 308
-    def: 71651f49796eeda4
-  - step: design/tests-red
-    hand: box 5c8055bbc025 · claude-code-remote
-    hash_before: bb83998dbb6d53378c1c42488e41321db4428214
-    hash_after: bb83998dbb6d53378c1c42488e41321db4428214
-    answered:
-      - name: tests
-        exit: 1
-        said: assertion, a test of src/modules/check fails
-    inputs:
-      - name: design/draft
-        hash: 5c34c24b4d80a416
-        size: 1724
-      - name: [[spec/design_output/model]]
-        hash: 3e2cd8b099700681
-        size: 74868
-      - name: [[spec/tickets/the-lsp-door-lands]]
-        hash: 9077ecae87856252
-        size: 5609
-    def: 08e16d07b0de477c
-  - step: gate
-    hand: box d856596c7410d · claude-code-remote
-    hash_before: 9448fdfc1a4feeb2413bf51e913142733d68d3a4
-    hash_after: b95ad82f84846c952bf0b7039f4e92a328aca6c8
-    inputs:
-      - name: design/draft
-        hash: 5c34c24b4d80a416
-        size: 1724
-      - name: design/tests-red
-        hash: 784c865b5c7ba256
-        size: 661
-      - name: [[spec/design_output/model]]
-        hash: 3e2cd8b099700681
-        size: 74868
-      - name: [[spec/tickets/the-lsp-door-lands]]
-        hash: 9077ecae87856252
-        size: 5609
-    def: dc4904ab364efa10
-  - step: implement/change
-    hand: box d856596c7410d · claude-code-remote
-    hash_before: dc036d9918b7012b492fd82b059c5f3376923b21
-    hash_after: dc036d9918b7012b492fd82b059c5f3376923b21
-    answered:
-      - name: lint
-        exit: 0
-        said: ""
-    def: f150b8c0dc20fe45
-  - step: implement/tests-green
-    hand: box d856596c7410d · claude-code-remote
-    hash_before: 4da2e691a42af58b2a7002b84cbdbde6b591ae0c
-    hash_after: 4da2e691a42af58b2a7002b84cbdbde6b591ae0c
-    answered:
-      - name: tests
-        exit: 0
-        said: green, src/modules/check passes
-      - name: check
-        exit: 0
-        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
-    inputs:
-      - name: design/tests-red
-        hash: 784c865b5c7ba256
-        size: 661
-    def: ec253787263043a7
-  - step: accept
-    skipped: true
-    why: the delivery's acceptance reads this ticket
-  - step: view
-    skipped: true
-    why: the ask names no view the owner reads
-reason: done
 ---
 
 # Ask
 
-A `buffers/` input the `lsp` IO module writes carries unsaved editor text, and a check reads the buffer where one stands open.
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+<!-- breaks, as text: what breaks if it is never done -->
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+<!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
+<!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
 
-The editor checks what a person types, before a save.
+The index gains a port that names the standing branches under `work/` on origin, with each branch's copy of its group ticket. The work module then draws the branch row without a state and leaves out trunk tickets naming that group, as `answerOf` in src/scripts/work-answer.js does. Gain: `ticket yours` and `branch list --queue` answer as cli.js does while a work branch stands, so the shadow log stays empty and the switch can turn on. Breaks: while a work branch stands with later trunk children, the new path draws the group closed and its children, and the shadow log names the verb again. The cause and the weighing stand on [[spec/tickets/fix-verbs-shadow-yours-2]].
 
-- `go test ./...` from the root passes
-- a case opens a fake buffer and reads the finding off it
-- `./RUNME.sh check` exits 0
+- a case in src/modules/work holds a standing branch of a closed group with two later trunk children, and the queue draws the branch row with an empty state and no child
+- a case holds the same tickets with no branch, and the queue draws the group and both children
+- `./RUNME.sh test src/modules/work src/quack` is green
+- `./RUNME.sh ticket yours` writes no row to `./RUNME.sh log --kind shadow` while a work branch stands
+
+view: none
+
+from: none
 
 # design
 
@@ -225,50 +156,38 @@ The editor checks what a person types, before a save.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
 <!-- the form is text -->
-
-The check module's `sweep` takes a second input, `buffers/<path...>`, optional, each value the unsaved text of one path. Before it sweeps, the module lays every buffer over its file with `Tree.Holds`, the overlay the LSP already keeps for an open editor. So a check reads the buffer where one stands open, and the file otherwise, as [[spec/design_output/model#the-topics-and-their-writers]] says.
-
-| the part | what it does |
-|---|---|
-| `src/modules/check/sweep.go`, the input struct | gains `Buffers map[string]string` under `buffers/<path...>,optional` |
-| the sweep | calls `Holds` for each buffer before `Sweep`, so the rules read one overlay on both paths |
-| a buffer over a path the files lack | adds no path, as `Holds` keeps it on the LSP side |
-
-The `lsp` IO module writes the name, and [[spec/tickets/the-lsp-door-lands]] adds the writer and its wire. Until then the input stands optional, and the index takes a reader of a name nobody writes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-<!-- the form is list -->
 
-- src/modules/check/sweep.go: the sweep's input and its run
-- src/modules/check/tree.go: Tree.Holds, which the sweep calls
-- src/lsp/lsp.go: didOpen and didChange, which call Holds today and keep calling it
+<!-- the form is list -->
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-<!-- the form is list -->
 
-- src/modules/check/buffers_test.go: TestABufferStandsOverItsFile
-- src/modules/check/buffers_test.go: TestAPathWithNoBufferReadsItsFile
+<!-- the form is list -->
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
 <!-- the form is list -->
 
-- first
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- every file named stands opened: tree.go for Holds and Paths, lsp.go for the calls, the model note for the topic
-- the callers list names the sweep, the overlay it calls, and the LSP's own calls into the same overlay
-- go test ./... meets both cases, the fake buffer case meets TestABufferStandsOverItsFile, and the check runs over the module
+<!-- the form is checklist -->
 
 ## tests-red
 
@@ -277,31 +196,26 @@ The `lsp` IO module writes the name, and [[spec/tickets/the-lsp-door-lands]] add
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-<!-- the form is command -->
 
-./RUNME.sh test src/modules/check
+<!-- the form is command -->
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-<!-- the form is list -->
 
-- src/modules/check/buffers_test.go
+<!-- the form is list -->
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-<!-- the form is text -->
 
-Both cases fail on their own assertion, since the sweep stands nowhere yet and reads an empty list. The seed takes a `buffers/` name no registration declares, so the fake index holds a name before its reader: the reader lands with `lsp-rules-move-to-check`, and these cases turn green on its sweep plus the overlay.
+<!-- the form is text -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- every done_when line meets a red case: the fake buffer case is `TestABufferStandsOverItsFile`, and go test and the check run over the module
-- the tests reach no door: the fake index takes the files and the buffers as seeds
+<!-- the form is checklist -->
 
 # gate
 
@@ -310,9 +224,8 @@ Both cases fail on their own assertion, since the sweep stands nowhere yet and r
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-<!-- the form is verdict -->
 
-accept
+<!-- the form is verdict -->
 
 # implement
 
@@ -323,19 +236,14 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-<!-- the form is command -->
 
-go vet ./src/modules/check
+<!-- the form is command -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- the change touches `sweep.go` and the case alone
-- the change reaches no door, and the fake index takes the buffers as seeds
-- a comment beside the loop names the overlay the approach lays
-- the port name stands once, in `sweep.go`
+<!-- the form is checklist -->
 
 ## tests-green
 
@@ -344,33 +252,26 @@ go vet ./src/modules/check
 ### tests
 
 <!-- the same tests pass -->
-<!-- the form is command -->
 
-./RUNME.sh test src/modules/check
+<!-- the form is command -->
 
 ### check
 
 <!-- the check is green on the commit -->
-<!-- the form is command -->
 
-./RUNME.sh check
+<!-- the form is command -->
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-<!-- the form is text -->
 
-The check module sweep takes a second input, `buffers/<path...>`, optional, each value the unsaved text of one path. Before it sweeps, it lays each buffer over its file with `Tree.Holds`, the overlay the LSP keeps for an open editor. So a rule reads the buffer where one stands open, and the file otherwise. A buffer over a path the files lack adds no path. The index refuses an in-port no wire reaches, optional or not, so the wiring binds the buffers to their built-in value until the next ticket lands the writer.
+<!-- the form is text -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- the change touches `sweep.go`, the case, and one wire
-- the change reaches no door, and the fake index takes the buffers as seeds
-- a comment beside the loop names the overlay the approach lays
-- the port name stands once, in `sweep.go`
+<!-- the form is checklist -->
 
 # accept
 
@@ -395,5 +296,3 @@ The check module sweep takes a second input, `buffers/<path...>`, optional, each
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-The draft's third caller reads wrong: the LSP calls `Holds` from `draws` in `src/lsp/panel.go`, on an open and a change, and `src/lsp/lsp.go` calls it nowhere.

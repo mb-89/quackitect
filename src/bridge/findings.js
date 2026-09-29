@@ -89,7 +89,7 @@ export async function findingsOver(it, asked) {
   return { found, fault: "" };
 }
 
-// A closed ticket is history, and no rule reads it, the way isHistory in src/lsp/history.go reads it. [[spec/design_output/lsp#a-closed-ticket-is-history]]
+// A closed ticket is history, and no rule reads it, the way isHistory in src/modules/check/history.go reads it. [[spec/design_output/lsp#a-closed-ticket-is-history]]
 // A closed ticket stands as history, so neither the check nor the write door reads it against the schema. [[spec/tickets/a-closed-ticket-takes-writes]]
 export function standsClosed(text) {
   const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""))?.[1] ?? "";

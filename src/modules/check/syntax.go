@@ -2,7 +2,7 @@
 // build or a test finds it. Biome draws the same for JavaScript, so this stands
 // beside it for the kinds nothing else in the editor parses.
 // [[spec/design_output/lsp]]
-package main
+package check
 
 import (
 	"encoding/json"

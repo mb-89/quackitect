@@ -163,11 +163,12 @@ steps:
 A question for the owner.
 `
 
-// The row reads person while the ticket stands open and its current step says by: person. [[spec/tickets/groups-hold-groups]]
+// The row reads person while its current step says by: person, whatever the state, as personStep in src/scripts/work-answer.js does. [[spec/tickets/groups-hold-groups]]
 func TestPersonReadsTheStepHand(t *testing.T) {
 	cases := map[string]bool{
 		forPerson: true,
-		strings.Replace(forPerson, "state: open", "state: closed", 1): false,
+		strings.Replace(forPerson, "state: open", "state: closed", 1): true,
+		strings.Replace(forPerson, "state: open", "state: draft", 1):  true,
 		strings.Replace(forPerson, "step: ask", "step: act", 1):       false,
 	}
 	for text, want := range cases {
@@ -196,6 +197,22 @@ func TestPersonReadsANestedLeaf(t *testing.T) {
 	for text, want := range cases {
 		if got := Of("spec/tickets/a-question.md", "a-question", text, 1).Person; got != want {
 			t.Errorf("person reads %v, and wants %v, over %q", got, want, text)
+		}
+	}
+}
+
+// A ticket carrying no step reads the first leaf of its steps, as stepOf in src/engine/group.js does. [[spec/tickets/fix-verbs-shadow-yours]]
+func TestStepFallsToTheFirstLeaf(t *testing.T) {
+	nested := strings.Replace(forPerson, "  - name: ask\n    does: asks the owner a question\n    by: person\n", "  - name: design\n    steps:\n      - name: ask\n        by: person\n", 1)
+	cases := map[string]string{
+		strings.Replace(forPerson, "step: ask\n", "", 1):        "ask",
+		strings.Replace(nested, "step: ask\n", "", 1):           "design/ask",
+		strings.Replace(forPerson, "step: ask", "step: act", 1): "act",
+		"---\nkind: [[ticket]]\nstate: open\n---\n":             "",
+	}
+	for text, want := range cases {
+		if got := Of("spec/tickets/a-question.md", "a-question", text, 1).Step; got != want {
+			t.Errorf("step reads %q, and wants %q, over %q", got, want, text)
 		}
 	}
 }

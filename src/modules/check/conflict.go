@@ -1,7 +1,7 @@
 // The sweep's rule over conflict markers: a merge's marks in a tracked file
 // draw an error, so no marker reaches a push unheard.
 // [[spec/design_output/work#no-commit-carries-a-marker]]
-package main
+package check
 
 import (
 	"regexp"

@@ -318,7 +318,7 @@ A question rides the frontmatter on one line, so it carries its own lines as
 A semicolon whitespace follows cuts one question from the next. So a word
 carrying a semicolon stays whole.
 
-`GroupAsksNobody` in `src/lsp/group.go` holds an open group to no child at a
+`GroupAsksNobody` in `src/modules/check/group.go` holds an open group to no child at a
 person step, so `./RUNME.sh check` names each one until it leaves.
 
 So `branch done` meets no open child, the group closes, and one push carries the
@@ -483,7 +483,7 @@ commits them into the merge. So each commit road reads the marks in `.claude/ski
 | a step verb's landing, in `src/scripts/pull-landed.js` | any path git lists unmerged, before it writes, and a marker the index carries, before it commits |
 | `./RUNME.sh commit` | an unmerged file carrying a marker on disk, before the tests run, and a marker the index carries |
 | the pre-commit hook | a marker line the staged delta adds |
-| the sweep, as `NoConflictMarkers` in `src/lsp/conflict.go` | a marker in a tracked file under `spec`, `src`, `.claude` or `test` |
+| the sweep, as `NoConflictMarkers` in `src/modules/check/conflict.go` | a marker in a tracked file under `spec`, `src`, `.claude` or `test` |
 
 An opener line marks alone. A split line or a closer marks past an opener, so
 a heading's underline reads as prose. Each refusal names the files, and says to

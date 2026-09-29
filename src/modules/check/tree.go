@@ -2,13 +2,12 @@
 // the same code over a folder it writes itself, and the editor drives it over
 // the buffer a person is typing into.
 // [[spec/design_output/tree#the-tree-handed-in]]
-package main
+package check
 
 import (
 	"quackitect/src/yaml"
 
 	"encoding/json"
-	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -24,11 +23,11 @@ type Box struct {
 
 type Tree struct {
 	Root string
-	// The disk the tree reads through, so a case hands it a memory one. [[spec/tickets/a-door-holds-file-calls]]
-	disk  Disk
-	Words int
-	Node  string
-	Box   Box
+	// The files the tree reads through, so a case hands it a memory one and the LSP its disk. [[spec/tickets/lsp-rules-move-to-check]]
+	source Source
+	Words  int
+	Node   string
+	Box    Box
 	// The tool survey, a runtime file the index walks past, read once at the start the way the node is. [[spec/design_output/lsp#the-server-reads-the-index]]
 	Survey string
 
@@ -58,19 +57,13 @@ func (one *Tree) Restated(pass func() []Finding) []Finding {
 	return found
 }
 
-// The binary's tree, over the index. A fresh tree walks the index again first, so the check reads the disk as it stands. [[spec/design_output/lsp#the-server-reads-the-index]]
-func treeAt(root string, fresh bool) (*Tree, error) {
-	disk, err := overIndex(root, indexAt(root), fresh)
-	if err != nil {
-		return nil, err
-	}
-	return treeOver(root, disk), nil
+// [[spec/tickets/lsp-rules-move-to-check]]
+func TreeOver(root string, source Source) *Tree {
+	return &Tree{Root: root, source: source, overlay: map[string]string{}, parses: map[string]parse{}}
 }
 
-// [[spec/tickets/a-door-holds-file-calls]]
-func treeOver(root string, disk Disk) *Tree {
-	return &Tree{Root: root, disk: disk, overlay: map[string]string{}, parses: map[string]parse{}}
-}
+// The files the tree reads through, which the LSP asks for the index behind them. [[spec/tickets/lsp-rules-move-to-check]]
+func (one *Tree) Source() Source { return one.source }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Tree) Holds(path, text string) {
@@ -119,27 +112,19 @@ func (one *Tree) Read(path string) string {
 	if open {
 		return text
 	}
-	read, err := one.disk.ReadFile(filepath.Join(one.Root, filepath.FromSlash(said)))
-	if err != nil {
-		return ""
-	}
-	return string(read)
+	read, _ := one.source.Read(said)
+	return read
 }
 
 func (one *Tree) Exists(path string) bool {
-	_, err := one.disk.Stat(filepath.Join(one.Root, filepath.FromSlash(path)))
-	return err == nil
+	return one.source.Exists(slashed(path))
 }
 
 func (one *Tree) Names(folder, end string) []string {
-	found, err := one.disk.ReadDir(filepath.Join(one.Root, filepath.FromSlash(folder)))
-	if err != nil {
-		return nil
-	}
 	out := []string{}
-	for _, entry := range found {
-		if !entry.IsDir() && strings.HasSuffix(entry.Name(), end) {
-			out = append(out, entry.Name())
+	for _, name := range one.source.Names(slashed(folder)) {
+		if strings.HasSuffix(name, end) {
+			out = append(out, name)
 		}
 	}
 	sort.Strings(out)
@@ -155,14 +140,10 @@ func (one *Tree) Paths() []string {
 	}
 
 	out := []string{}
-	if list, ok := one.disk.(interface{ tracked() []string }); ok {
-		for _, path := range list.tracked() {
-			if !isDraft(path) {
-				out = append(out, path)
-			}
+	for _, path := range one.source.Paths() {
+		if !isDraft(path) {
+			out = append(out, path)
 		}
-	} else {
-		out = diskHolds(one.disk, one.Root)
 	}
 	one.held = out
 	return out
@@ -170,8 +151,7 @@ func (one *Tree) Paths() []string {
 
 // Whether a path names a folder of the tree. [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Tree) Folder(path string) bool {
-	said, err := one.disk.Stat(filepath.Join(one.Root, filepath.FromSlash(path)))
-	return err == nil && said.IsDir()
+	return one.source.Folder(slashed(path))
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]

@@ -2,7 +2,7 @@
 // the note it names. A pointer at a heading the note lacks draws, so a reader
 // follows no pointer into a note with no answer.
 // [[spec/design_output/lsp#a-pointer-reaches-a-heading]]
-package main
+package check
 
 import "quackitect/src/yaml"
 

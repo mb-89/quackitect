@@ -1,7 +1,7 @@
 // Each note's parse, kept by the text it came from, so a keystroke re-parses
 // the note it changes and reads every other one from what it holds.
 // [[spec/design_output/lsp#a-change-reads-one-note]]
-package main
+package check
 
 import (
 	"strings"

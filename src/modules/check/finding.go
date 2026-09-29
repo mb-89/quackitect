@@ -1,7 +1,7 @@
 // The one shape every door prints. A check answers findings, and the command
 // line, the write door and the editor each read this and nothing else.
 // [[spec/design_output/tree#what-a-rule-answers]]
-package main
+package check
 
 import "sort"
 

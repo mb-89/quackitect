@@ -1,7 +1,7 @@
 // A closed ticket is history: it records the tree at its close, and no rule
 // reads it, so a note or a name that leaves later holds nothing up.
 // [[spec/design_output/lsp#a-closed-ticket-is-history]]
-package main
+package check
 
 import (
 	"strings"

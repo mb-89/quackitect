@@ -1,7 +1,7 @@
 // The one checker every front asks. The command line, the port and the editor
 // each hand it a path or nothing, and each reads back the same findings.
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
-package main
+package check
 
 import (
 	"strings"
@@ -12,22 +12,11 @@ type Checker struct {
 	// The runs the restated rules refuse, off the config. [[spec/design_output/lsp#a-second-copy-draws]]
 	pointer int
 	rule    int
-	// The tools the checker runs beside its own rules, or none where a case hands in none. [[spec/design_output/lsp#the-server-runs-the-tools]]
-	outside *Outside
 }
 
-// The checker over the index. A fresh one walks the index again first, which the check asks for and the editor does not. [[spec/design_output/lsp#the-server-reads-the-index]]
-func checkerAt(root string, fresh bool) (*Checker, error) {
-	tree, err := treeAt(root, fresh)
-	if err != nil {
-		return nil, err
-	}
-	tree.Words = wordsHere(root)
-	tree.Node = nodeHere()
-	tree.Survey = surveyHere(root)
-	tree.Box = boxHere(root)
-	pointer, rule := restatedHere(root)
-	return &Checker{tree: tree, pointer: pointer, rule: rule, outside: outsideAt(root)}, nil
+// The checker over a tree, with the runs the restated rules refuse. [[spec/tickets/lsp-rules-move-to-check]]
+func CheckerOver(tree *Tree, pointer, rule int) *Checker {
+	return &Checker{tree: tree, pointer: pointer, rule: rule}
 }
 
 // [[spec/design_output/tree#the-rules-over-two-files]]
@@ -126,33 +115,3 @@ func (one *Checker) Sweep() []Finding {
 }
 
 func (one *Checker) Tree() *Tree { return one.tree }
-
-// The whole list every front reads: this server's own rules, and the tools beside them. [[spec/design_output/lsp#one-checker-every-front-asks]]
-func (one *Checker) Whole() []Finding {
-	return sorted(append(one.Sweep(), one.OutsideSweep()...))
-}
-
-// The list over the paths named, each a file or a folder: this server's rules over every file, and the tools over the paths. [[spec/design_output/lsp#one-checker-every-front-asks]]
-func (one *Checker) Reads(where []string) []Finding {
-	found := []Finding{}
-	for _, path := range pathsUnder(one.tree, where) {
-		found = append(found, one.Over(path)...)
-	}
-	return sorted(append(found, one.OutsideOver(where)...))
-}
-
-// The tools over the whole tree, or nothing where the checker holds none. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func (one *Checker) OutsideSweep() []Finding {
-	if one.outside == nil {
-		return nil
-	}
-	return pastHistory(one.tree, one.outside.Sweep(one.tree))
-}
-
-// The tools over the paths named, or nothing where the checker holds none. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func (one *Checker) OutsideOver(where []string) []Finding {
-	if one.outside == nil || len(where) == 0 {
-		return nil
-	}
-	return pastHistory(one.tree, one.outside.Over(one.tree, where))
-}

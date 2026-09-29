@@ -31,8 +31,8 @@ Biome holds.
 | `InstallerHoldsTheNames` | `src/scripts/install.sh`, `lib/folders.js` |
 | `SurveyFindsNode` | `.se/.runtime/tools.json`, the node running the sweep |
 | `EveryModuleTested` | a module of the server, and the tests importing it |
-| `NoConflictMarkers` | every text file git holds under `spec`, `src`, `.claude` and `test`. The server holds this one, in `src/lsp/conflict.go`. For details, see [[spec/design_output/work#no-commit-carries-a-marker]] |
-| `EveryPointerResolves` | every pointer a tracked file writes, and the note or chapter it names. The server holds this one, in `src/lsp/pointer.go`. For details, see [[spec/design_output/lsp#every-pointer-resolves]] |
+| `NoConflictMarkers` | every text file git holds under `spec`, `src`, `.claude` and `test`. The server holds this one, in `src/modules/check/conflict.go`. For details, see [[spec/design_output/work#no-commit-carries-a-marker]] |
+| `EveryPointerResolves` | every pointer a tracked file writes, and the note or chapter it names. The server holds this one, in `src/modules/check/pointer.go`. For details, see [[spec/design_output/lsp#every-pointer-resolves]] |
 
 The commit door reads the staged delta with `EveryModuleTested` too, and asks
 for a test beside each source file the delta changes. It reads each file's
@@ -82,7 +82,7 @@ door in this tree already answers:
 `line()` in `lib/refuse.js` prints one. `pathInScript` in `lib/scripts.js`
 answers the same shape.
 
-`sorted` in `src/lsp/finding.go` puts every list in one order: the file, the
+`sorted` in `src/modules/check/finding.go` puts every list in one order: the file, the
 line, then the rule.
 
 A finding names a file that stands on disk, so the panel opens it. A rule with

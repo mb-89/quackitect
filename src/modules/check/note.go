@@ -2,7 +2,7 @@
 // each chapter holds. A fence parks everything inside it, so a heading in a
 // code block names no chapter.
 // [[spec/design_output/schema#what-a-note-reads-as]]
-package main
+package check
 
 import (
 	"quackitect/src/yaml"
