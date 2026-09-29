@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: 23771a1a8dd8d40c5901cbc32b91eef23c5c5b80
     hash_after: 23771a1a8dd8d40c5901cbc32b91eef23c5c5b80
+  - step: accept
+    hand: box d855c2347910b · claude-code-remote
+    hash_before: 4c2372e4fde3e0bfe41bd1370a6d2a63e7d55414
+    hash_after: c06c8ed0348bf095b1772e91dc98509c0fe9d402
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/go-cage-lands-in-shadow already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 2570a20dc71168fd
+        size: 568
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["quack-verbs-land-in-shadow"]
 enabled_by: migration.phase5shadow
 cloud: true
@@ -187,8 +206,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -267,3 +287,8 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The accept review names two points:
+
+- The Copilot shadow holds the hook reply for up to the verb's wait on the door. `049d4ccef` bounds it with a short wait of its own.
+- No cage rule ports yet, so the shadow names every bridge refusal. The done line of this group holds, since the shadow runs and names each mismatch. The port has to land before the key moves to `new`, so [[spec/tickets/cage-rules-port-before-switch]] carries it in the switch group.
