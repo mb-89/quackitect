@@ -5,6 +5,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"strconv"
@@ -13,9 +14,12 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
+	"quackitect/src/config"
+	"quackitect/src/index"
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/log"
+	"quackitect/src/tui/registry"
 	"quackitect/src/tui/work"
 )
 
@@ -96,9 +100,40 @@ func windowOpts(mouse bool) []tea.ProgramOption {
 	return opts
 }
 
-// The window over the log tab and the work tab, in that order, so the log is the first tab. [[spec/design_output/tui#the-packages-the-window-holds]]
+// The window over the log tab and the work tab, then the registry tabs, so the log is the first tab. The registry tabs read the index over /v1. [[spec/design_output/model#the-registry-tabs]]
 func newModel(path string, zone *time.Location) frame.Model {
-	return frame.New(path, zone, []frame.Tab{log.New(path, zone), work.New(path)})
+	return newModelOver(path, zone, indexCatalog{})
+}
+
+// The window over the catalog handed in, so a case hands the fake. [[spec/design_output/model#the-registry-tabs]]
+func newModelOver(path string, zone *time.Location, catalog registry.Catalog) frame.Model {
+	mode := windowMode(work.Root(path))
+	logTab := log.New(path, zone)
+	logTab.Shadow = &log.Shadow{From: catalog, Mode: mode, Now: time.Now}
+	workTab := work.New(path)
+	workTab.Shadow = &work.Shadow{From: catalog, Mode: mode, Now: time.Now}
+	return frame.New(path, zone, []frame.Tab{logTab, workTab,
+		registry.Index(catalog), registry.Cli(catalog), registry.Help(catalog)})
+}
+
+// The mode the config names for the window slice, and nothing where it names none. [[spec/tickets/the-log-becomes-a-view]]
+func windowMode(root string) func() string {
+	return func() string {
+		said, _ := config.Value(root, "migration.window")
+		mode, _ := said.(string)
+		return mode
+	}
+}
+
+// The real catalog: each read finds the base of /v1 on the door standing over the root, so a restart of the index reaches the next read. [[spec/design_output/model#surfaces]]
+type indexCatalog struct{}
+
+func (indexCatalog) Read(name string) (json.RawMessage, error) {
+	base, err := index.V1()
+	if err != nil {
+		return nil, err
+	}
+	return registry.V1{Base: base}.Read(name)
 }
 
 // The log tab the window holds first, which the frame draws its footer off. [[spec/design_output/tui#the-packages-the-window-holds]]

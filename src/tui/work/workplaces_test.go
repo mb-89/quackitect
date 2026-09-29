@@ -83,3 +83,13 @@ func TestTheLabelDrawsNoCountWhereNoDoorAnswers(t *testing.T) {
 		t.Fatalf("the header reads %q with no door, and wants work alone", label)
 	}
 }
+
+// A ticket at place zero keeps the state the index answers, since the held rule stands in the tickets module alone. [[spec/tickets/the-window-held-override-goes]]
+func TestARowInHandKeepsTheStateTheIndexAnswers(t *testing.T) {
+	t.Parallel()
+	grid := &tree.Tree{Items: []tree.Item{{Name: "in-hand", Keys: map[string]string{"state": "open"}}}}
+	Placed(grid, Places{Queue: map[string]string{"in-hand": "0"}, Cloud: map[string]bool{}, Todo: map[string]bool{}})
+	if said := grid.Items[0].Keys["state"]; said != "open" {
+		t.Fatalf("the row at place zero reads state %q, and the index answers open", said)
+	}
+}

@@ -16,8 +16,20 @@ import (
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const ColumnWide = 20
 
+// One action a view declares: its trigger, then its effect. [[spec/design_output/model#a-view-declares-actions]]
+type Action struct {
+	Key, Button, Arg     string
+	Calls, Edits, Writes string
+	Jumps, Cycles        string
+}
+
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 type View struct {
+	// What the view reads, the badge beside its title, whether new rows land at the end, and its actions. [[spec/design_output/model#a-view-reads-names]]
+	Reads     string
+	Badge     string
+	Follow    bool
+	Actions   []Action
 	Name      string
 	Cols      []Column
 	Nests     bool
@@ -81,6 +93,10 @@ func viewOf(at int, said, whole *yaml.Doc) (View, error) {
 		cols = append(cols, Column{Name: headOf(key), Key: key, Wide: room[key]})
 	}
 	return View{
+		Reads:     yaml.AsString(whole.Get("reads")),
+		Badge:     yaml.AsString(whole.Get("badge")),
+		Follow:    yaml.AsBool(whole.Get("follow")),
+		Actions:   actionsOf(whole),
 		Name:      name,
 		Cols:      cols,
 		Nests:     nestsBy(said, whole) != "",
@@ -91,6 +107,23 @@ func viewOf(at int, said, whole *yaml.Doc) (View, error) {
 		Presets:   presetsOf(said, whole),
 		Flags:     flagsIn(said, whole),
 	}, nil
+}
+
+// The actions the file declares, each with its trigger and its effect. [[spec/design_output/model#a-view-declares-actions]]
+func actionsOf(whole *yaml.Doc) []Action {
+	var out []Action
+	for _, each := range yaml.Flat(whole.Get("actions")) {
+		one := yaml.AsDoc(each)
+		if one == nil {
+			continue
+		}
+		out = append(out, Action{
+			Key: yaml.AsString(one.Get("key")), Button: yaml.AsString(one.Get("button")), Arg: yaml.AsString(one.Get("arg")),
+			Calls: yaml.AsString(one.Get("calls")), Edits: yaml.AsString(one.Get("edits")), Writes: yaml.AsString(one.Get("writes")),
+			Jumps: yaml.AsString(one.Get("jumps")), Cycles: yaml.AsString(one.Get("cycles")),
+		})
+	}
+	return out
 }
 
 // The letters the flags column draws, in the fixed places the file names. [[spec/design_output/tree-view#a-flag-draws-a-letter]]

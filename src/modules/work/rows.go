@@ -74,8 +74,8 @@ type rowsIn struct {
 
 // The module type the wiring loads as work. [[spec/tickets/open-tasks-come-from-work]]
 func Registers(c *q.Catalog) q.Writer {
-	rows := q.DerivedIn(c, RowsPort, []Row{}, rowsOf, q.Doc("every ticket and every placed todo, with its place in the queue and its flags"))
-	open := q.DerivedIn(c, OpenTasksPort, 0, openTasksOf, q.Doc("the rows this box can take: every placed row off the cloud"))
+	rows := q.DerivedIn(c, RowsPort, []Row{}, rowsOf, q.Doc("every ticket and every placed todo, with its place in the queue and its flags"), q.Looks(q.Rows))
+	open := q.DerivedIn(c, OpenTasksPort, 0, openTasksOf, q.Doc("the rows this box can take: every placed row off the cloud"), q.Label("work"), q.Looks(q.Count))
 	yours := q.DerivedIn(c, YoursPort, []YoursRow{}, yoursOf, q.Doc("the rows ticket yours prints: every placed row off the cloud, in outline order, each with its path"))
 	return q.Join(rows, open, yours)
 }

@@ -112,6 +112,7 @@
     "prose": "shadow",
     "verbs": "shadow",
     "cage": "shadow",
+    "window": "shadow",
     "lsp": "shadow"
   },
   "pull": {
