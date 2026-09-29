@@ -4,6 +4,7 @@
 package index
 
 import (
+	"os"
 	"path/filepath"
 	"strconv"
 	"sync/atomic"
@@ -148,16 +149,18 @@ func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
 	root := t.TempDir()
 
-	if stands(Standing{Root: root, Stamp: stampHere()}, root) != true {
+	self, _ := os.Executable()
+
+	if stands(Standing{Root: root, Stamp: stampOf(self), Bin: self}, root) != true {
 		t.Fatal("this build talks to its own door")
 	}
-	if stands(Standing{Root: root, Stamp: "another build"}, root) {
-		t.Fatal("a door from another build stands aside for this one")
+	if stands(Standing{Root: root, Stamp: "another build", Bin: self}, root) {
+		t.Fatal("a door whose build moved on disk stands aside")
 	}
-	if stands(Standing{Root: "/somewhere/else", Stamp: stampHere()}, root) {
+	if stands(Standing{Root: "/somewhere/else", Stamp: stampOf(self), Bin: self}, root) {
 		t.Fatal("a door over another tree answers about that tree")
 	}
-	if stampHere() == "" {
+	if stampOf(self) == "" {
 		t.Fatal("a build with no stamp leaves every door looking stale")
 	}
 }
