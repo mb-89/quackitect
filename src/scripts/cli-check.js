@@ -81,7 +81,8 @@ export function tuiDoors() {
     show,
     // The log verb reads a span against now, and a door answers the clock. [[spec/guidance/code/testing]]
     clock: it.clock,
-    // The log verb runs quack under the method root. [[spec/tickets/readers-take-the-go-topics]]
+    // The log verb reads its slice's mode, and runs quack under the method root. [[spec/tickets/readers-take-the-go-topics]]
+    slices: it.slices,
     method: it.method,
   };
 }
