@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -91,6 +91,15 @@ record:
   - step: sync
     hand: box d84d03dd63d7 · claude-code-remote
     hash_before: e99769296735d5f353089c188891f11836d7eec9
+  - step: sync
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 1934b628fe319c78c2b5d2bd46649bd828e0985e
+    hash_after: b9b802480087f0505de3206d483eadcdf79bbd49
+    answered:
+      - name: sync
+        exit: 0
+        said: work/read-topics-land-in-shadow already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["open-tasks-shadow-lands"]
 enabled_by: migration.phase3shadow
 cloud: true
@@ -109,8 +118,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
