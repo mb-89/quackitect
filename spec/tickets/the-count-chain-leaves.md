@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 072bbb3da08a3156d7a2c3ed953b8efc8854ca18
+    hash_after: e6f0c32441f7a34398eb10ce5581f1bb1bdc848a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 15 test(s) pass in 3 file(s); green, src/tui/work passes; green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 6f9111b5692fa790
+        size: 698
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -333,26 +356,44 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-strings.test.js test/level0/sidebar-work.test.js test/level0/tui-verb.test.js src/tui/work src/tui
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The count chain left the tree:
+
+- the tui verb holds no count road
+- the viewer holds no count flag
+- the window counts nothing of its own
+- shadow.go and its old path are gone
+
+The sidebar badge runs ./RUNME.sh index call value for work/open-tasks, and countIn reads the bare count the index answers. A redraw spawns node and the index, where it spawned four processes.
+
+The work tab reads the count and the queue column off the index through askIndex, which starts a door where none stands. With no door the brackets leave the tab.
+
+On this tree the header, the column and the badge line each read 25.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the ones the draft names, and the standing tests the gate names
+- fakes: askOpenTasks, askQueuePlaces, runPlaces and the badge answers table
+- comments: each new piece points at its ticket
+- one place: each index name stands once in workplaces.go
 
 # accept
 
