@@ -33,3 +33,14 @@ func TestProseKeepsWhatTheVetoesLeave(t *testing.T) {
 		t.Fatalf("the answer reads %+v, and wants %+v", got, want)
 	}
 }
+
+func TestTheProseSchemaNamesTheCapsAndTheLists(t *testing.T) {
+	schema := "layers:\n  sentence:\n    words:\n      max: 25\n      listItem: 20\n  vocabulary:\n    core: spec/words/core.yml\n"
+	caps, paths := proseSchema([]byte(schema))
+	if caps.Sentence != 25 || caps.ListItem != 20 {
+		t.Fatalf("the caps read %+v, and want 25 and 20", caps)
+	}
+	if want := [3]string{"spec/words/core.yml", termsList, swapsList}; paths != want {
+		t.Fatalf("the lists read %v, and want %v", paths, want)
+	}
+}

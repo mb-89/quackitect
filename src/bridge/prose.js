@@ -9,6 +9,8 @@ import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { withContext, withoutFalsePast } from "../engine/tense.js";
+import { asksText } from "./config.js";
+import { ALL, quackAt, shadowProse } from "./prose-shadow.js";
 import { proseFaults } from "./write.js";
 
 const nlp = winkNLP(model);
@@ -58,7 +60,8 @@ function proseSpec() {
 export async function readsDraft(ask, box) {
   const where = String(ask?.path ?? "");
   const text = ask?.text;
-  if (!where) return said("This call names no path, and the rules read the kind a path names.");
+  if (!where)
+    return said("This call names no path, and the rules read the kind a path names.");
   if (typeof text !== "string") {
     return said("This call carries no text, so there is no draft to read.");
   }
@@ -81,7 +84,28 @@ export function readsProse(box, text, found) {
       `the prose reader lets ${found.length - kept.length} finding(s) stand`,
     );
   }
+  // The door reads its answer now, and the shadow row lands behind it. [[spec/tickets/prose-shadow-hooks-reads-text]]
+  shadowDraft(box, text, found, kept);
   return withContext(text, kept);
+}
+
+// One quack process reads the draft beside wink, and a fault there leaves the answer as it stands. [[spec/tickets/prose-shadow-hooks-reads-text]]
+async function shadowDraft(box, text, found, kept) {
+  if (!box?.proc?.run || !box.log?.say || !box.disk) return;
+  const doors = {
+    settings: { ask: async (key) => asksText(box, key) },
+    files: box.disk,
+    proc: box.proc,
+    log: box.log,
+    root: box.method,
+    binary: quackAt(box.disk, join, box.method),
+  };
+  const file = String(found?.[0]?.file ?? "");
+  try {
+    await shadowProse(doors, [{ file, text, found: found ?? [] }], [kept], ALL);
+  } catch {
+    return;
+  }
 }
 
 export function withoutFalseLength(text, found, caps) {

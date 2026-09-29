@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -24,6 +25,7 @@ import (
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/tickets"
 	"quackitect/src/modules/work"
+	"quackitect/src/prose"
 	"quackitect/src/q"
 )
 
@@ -122,6 +124,13 @@ func dumps(prefix string) error {
 func main() {
 	if len(os.Args) == 2 && os.Args[1] == "config" {
 		if err := configs("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) == 2 && os.Args[1] == "prose" {
+		if err := proses("."); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
@@ -285,6 +294,26 @@ func configs(root string) error {
 		return err
 	}
 	text, err := configText(rows)
+	if err != nil {
+		return err
+	}
+	_, err = os.Stdout.Write(text)
+	return err
+}
+
+// Reads one prose request on stdin, and prints what the Go vetoes keep over the caps and the domain words the tree names. [[spec/tickets/prose-checks-run-in-go]]
+func proses(root string) error {
+	read := func(path string) string {
+		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		return string(body)
+	}
+	caps, paths := proseSchema([]byte(read(paragraphSchema)))
+	words := prose.Words(read(paths[0]), read(paths[1]), read(paths[2]))
+	ask, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return err
+	}
+	text, err := proseAnswer(ask, words, caps)
 	if err != nil {
 		return err
 	}
