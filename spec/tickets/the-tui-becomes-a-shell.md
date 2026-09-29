@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -177,6 +177,29 @@ record:
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: e4eac977ea47ce0a629eb45770cee39c25e56ea6
+    hash_after: e4eac977ea47ce0a629eb45770cee39c25e56ea6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/registry passes; green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 91bcad980dd148b8
+        size: 1066
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -355,26 +378,33 @@ accept. Weighed: the approach names files and functions that stand (src/tui/main
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/registry src/tui
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The window gains the index, cli and help tabs after the log and work tabs. Each reads the index catalog through one door, with a fake for cases and a /v1 road for the window, and draws a table with a filter line and a detail pane. The frame stays as it stands. The layout test and the chapter list the new package.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the registry package, main.go, and the layout test with its chapter, which name the package
+- the catalog door has a fake and one contract suite over the fake and V1
+- comments name the registry tabs chapter
+- widths stand once as constants, and the import table stands in tui.md alone
 
 # accept
 
