@@ -364,3 +364,5 @@ The draft's callers list names `pull-hand.js` once, and the implement step reads
 | `WORK_VERBS` in `src/scripts/work.js` | owns the branch verbs `VERBS` reads, since `branch-list-reads-work-table` took `BRANCH` away |
 
 The shadow call rides `admits`, beside `shadowLeaf`, so it runs once a hand-out.
+
+The line on `branch open` meets a fake registry here, and the live index in `TestTheWiringLoadsTheBranchTopic` in `src/quack/twins_test.go`. That case stands red until `work-verbs-become-actions` closes, so this ticket's implement step goes after that one.

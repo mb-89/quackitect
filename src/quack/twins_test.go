@@ -180,8 +180,11 @@ func TestTheWiringLoadsTheBranchTopic(t *testing.T) {
 	if _, err := load(w, c); err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := q.NewStore(c).Declared("branch/take"); !ok {
-		t.Fatal("the wiring declares no branch/take")
+	// The live index answers branch/open, which a step names under needs. [[spec/tickets/needs-wait-on-branch-topic]]
+	for _, name := range []string{"branch/take", "branch/open"} {
+		if _, ok := q.NewStore(c).Declared(name); !ok {
+			t.Fatalf("the wiring declares no %s", name)
+		}
 	}
 }
 
