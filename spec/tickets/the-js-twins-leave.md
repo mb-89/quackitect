@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,19 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-topics-switch-over
 depends_on: ["readers-take-the-go-topics"]
+record:
+  - step: design/draft
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: 3ccde63fd25bd8305e34835de15f380d756ccb28
+    hash_after: 3ccde63fd25bd8305e34835de15f380d756ccb28
+    inputs:
+      - name: ask
+        hash: 9ccacd0d11dbb476
+        size: 292
+      - name: [[spec/design_output/migration]]
+        hash: cea2b1b9bf4bfda7
+        size: 14154
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +159,50 @@ A twin left standing drifts from its Go copy again.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The comparison twins leave: src/scripts/config-shadow.js, src/scripts/log-shadow.js, src/scripts/guidance-shadow.js and src/bridge/prose-shadow.js, with the seven test files beside them (config-shadow, log-shadow, log-shadow-wiring, guidance-shadow, guidance-shadow-wiring, prose-shadow and prose-shadow-wiring under test/level0). Their wiring leaves the readers: configShadow and its import in cli-check.js, shadowLog in log-verb.js, shadowLeaf in guidance-verb.js and pull-hand.js, shadowDraft and shadowOver with their imports in bridge/prose.js and bridge/findings.js. The two names the twins owned that a reader still uses move to the file that keeps them: ALL and PAST go to src/scripts/quack-topic.js, and quackAt and processNameOf already stand there, so the re-exports go. shadowDoorsOf in findings.js stays, since needs-shadow.js of the verbs slice reads it. The five keys drop old and shadow from their enum in spec/config/level0.schema.json, as phase 2 did for opentasks, and the projected se-config-migration commands for those values follow through ./RUNME.sh project. A contract test, test/contract/twins-left.test.js, decides the done line: no removed file stands, and no source under src, test or .claude imports one. Weighed: the old-path readers (settings.all in the config verb, rowsIn in the log verb, readsFor in guidance, the wink vetoes in engine/tense.js and the check twins in lib) stay for now. Each still serves a caller outside this slice: the hooks and the cage (phase 5), the verbs (phase 4) and the LSP's check verb (phase 7), and the check module's names hold empty lists until phase 7 moves the rules in. Removing them would break callers no test here fakes. So the group's done line reads over the comparison twins, and the old-path readers leave with the last caller of each, recorded in the retro as the improve line. Assumed: the quack binary stands wherever a reader runs, so a topic answering null is a fault, and the fallback carries it until then.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/cli-check.js: readConfig calls configShadow, which calls shadowRun of config-shadow.js
+- src/scripts/log-verb.js: logVerb calls shadowLog of log-shadow.js
+- src/scripts/guidance-verb.js: stepNotes calls shadowLeaf of guidance-shadow.js
+- src/scripts/pull-hand.js: handed calls shadowLeaf, and imports processNameOf from guidance-shadow.js
+- src/bridge/prose.js: readsProse calls shadowDraft, which calls shadowProse and quackAt of prose-shadow.js
+- src/bridge/findings.js: findingsOver and voiceOver call shadowOver, which calls shadowProse of prose-shadow.js
+- src/scripts/needs-shadow.js: shadowNeeds calls shadowDoorsOf of findings.js, which calls quackAt
+- src/scripts/quack-topic.js: quackAt and processNameOf, which the twins re-export
+- spec/config/level0.schema.json: the enum of each of the five keys
+- test/contract/cli-check-doors.test.js: the case reading configShadow in readConfig
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/twins-left.test.js: no removed twin file stands
+- test/contract/twins-left.test.js: no file under src, test or .claude imports a removed twin
+- test/contract/twins-left.test.js: the five keys take new alone in the schema enum
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: the four twins, cli-check.js readConfig, log-verb.js logVerb, guidance-verb.js stepNotes, pull-hand.js handed, prose.js readsProse, findings.js shadowOver and shadowDoorsOf, needs-shadow.js
+- the callers list names every caller, from a search for each twin's file name and each exported name
+- every done_when line names its test: twins-left.test.js decides the import line, and ./RUNME.sh check decides the exit
 
 ## tests-red
 
