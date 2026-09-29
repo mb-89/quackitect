@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 81afc62807a38a092221e855433c4523bf73dee6
+    hash_after: 81afc62807a38a092221e855433c4523bf73dee6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s); green, src/quack passes; green, src/modules/verbs passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 29425e5241068bd8
+        size: 756
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ RetroVerbs owns the verb list, twinVerbs owns the road, and the tests read both 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/retro_twins_test.go src/modules/verbs/retro_test.go test/level0/retro-usage.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each retro verb stands as an action over the node module in src/modules/verbs/retro.go, and RetroVerbs lists them. retro notes runs as a Go twin beside cli.js on the shadow road, reading tickets/all off the index. The retro usage in src/scripts/retro.js prints one line a verb. The retro cases now stand in src/quack/retro_twins_test.go, apart from the branch and vehicle cases, which stay red until their own gates pass.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the retro verbs, their twin, the usage and their tests, as the ask names them
+the twin reads the index through the V1 door, and notesTree stands up a real index over a seeded tickets/all
+each Go file opens on a header naming the ticket its approach answers
+RetroVerbs owns the verb list, twinVerbs owns the road, and the tests read both in place
 
 # accept
 
