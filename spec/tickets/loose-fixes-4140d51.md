@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -88,6 +88,7 @@ record:
   - step: sync
     hand: box d84ce7ff23d8 · claude-code-remote
     hash_before: f5e429651e5110315ee42723c4e059ab70ee87ea
+step: sync
 ---
 
 # Ask
@@ -218,3 +219,5 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- take-honours-the-name: the box passes `do` on the work main already carries, and redoes nothing. It weighs three facts. Commit 008c2a7b8 stands on `origin/main` and adds `src/scripts/work-held.js` with `pastHold`. `test/level0/work-held.test.js` holds both cases the ask names. One takes a name over a done hold, and one meets a refusal naming both branches. `./RUNME.sh branch test test/level0/work-held.test.js` answers green on this branch. It assumes the ticket's `says` evidence still describes main. No later commit on those files changes the take's order.
