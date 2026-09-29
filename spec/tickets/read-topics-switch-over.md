@@ -203,3 +203,5 @@ Done when no JavaScript twin of a Go check stands.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The done line reads over the Go topics: the config, log, guidance and prose comparison twins leave here. The JavaScript twins of the Go checks leave with phase 7, since every check name answers an empty list until then. [[spec/tickets/check-twins-leave-phase-seven]]

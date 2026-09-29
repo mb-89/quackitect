@@ -3,6 +3,7 @@
 // slice reads new, and stays on its old path where the topic answers nothing.
 // [[spec/tickets/readers-take-the-go-topics]]
 
+import { join } from "node:path";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { fieldOf } from "../engine/group.js";
 
@@ -47,7 +48,7 @@ export function keptOf(it, text, found, mode) {
 // The parsed JSON `quack` prints for the topic, or null where the binary stands missing, exits non-zero or prints what no reader takes. [[spec/tickets/readers-take-the-go-topics]]
 export function topicOf(it, argv, stdin) {
   const root = it.method ?? it.root;
-  const binary = quackAt(it.disk, it.join, root);
+  const binary = quackAt(it.disk, it.join ?? join, root);
   if (!it.disk.exists(binary)) return null;
   try {
     const ran = it.proc.run([binary, ...argv], {

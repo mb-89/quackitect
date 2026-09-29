@@ -1,5 +1,5 @@
 // The comparison twins of the read-only topics leave the tree, and nothing
-// imports one. The five keys take new alone.
+// imports one. Every topic key takes new alone.
 // [[spec/tickets/the-js-twins-leave]]
 
 import assert from "node:assert/strict";

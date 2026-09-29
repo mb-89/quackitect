@@ -156,6 +156,19 @@ test("readsProse keeps the findings quack prose keeps where the prose slice read
   assert.deepEqual(kept, [], "Go drops the finding the old vetoes keep");
 });
 
+// The write door's box carries no join, and the reader still finds quack. [[spec/tickets/check-twins-leave-phase-seven]]
+test("readsProse finds quack over a box carrying no join, as the write door's box stands", () => {
+  const set = { rule: "Voice.Other", line: 1, column: 10, said: "set", file: "n.md" };
+  const { join: _, ...box } = itOf(
+    "new",
+    {},
+    {
+      [`${QUACK} prose`]: { stdout: JSON.stringify({ docs: [{ kept: [] }] }) },
+    },
+  );
+  assert.deepEqual(readsProse(box, "the door set the write\n", [set]), []);
+});
+
 test("the pull hand-out takes the notes quack guidance answers for its leaf where the slice reads new", async () => {
   const ticket = `---\nkind: [[ticket]]\nprocess: [[spec/processes/standard]]\nsteps:\n  - name: draft\n    tags: ["code"]\n---\n\n# Ask\n\nthe ask\n`;
   const note = (word) =>
