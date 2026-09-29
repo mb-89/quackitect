@@ -187,7 +187,7 @@ test("a list field handed back as an array lands on the ticket one item a line",
   assert.equal(put.why, undefined);
   assert.match(
     put.text,
-    /### red\n\ntest\/level0\/a\.test\.js\ntest\/level0\/b\.test\.js\n/,
+    /### red\n\n- test\/level0\/a\.test\.js\n- test\/level0\/b\.test\.js\n/,
   );
 });
 

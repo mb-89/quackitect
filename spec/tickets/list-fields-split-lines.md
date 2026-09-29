@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+step: implement/tests-green
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -156,6 +156,15 @@ record:
         hash: d30bab38f96a35c2
         size: 589
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: dcba88dc2c81d144730ee98403cff474bed5d647
+    hash_after: dcba88dc2c81d144730ee98403cff474bed5d647
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint test/level0/pull-fields.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches test/level0/pull-fields.test.js alone, since main already carries the formatted change in src/scripts/pull-format.js
+- the change reaches no door: withPayload and expectedRed read text alone
+- the comment in formatted on main names the approach, and the case links this ticket
+- the bullet form stands once, in formatted and its test in pull-format.test.js, and this case reads it
 
 ## tests-green
 
