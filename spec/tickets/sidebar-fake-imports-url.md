@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d856e248e31998 · claude-code-remote
+    hash_before: 30644949d047a5630acd5105ae6d52297a54d8df
+    hash_after: 30644949d047a5630acd5105ae6d52297a54d8df
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/lsp-door-switches-over.md:195:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 71b9712ed4fc4d12
+        size: 372
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
