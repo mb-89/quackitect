@@ -91,6 +91,7 @@ record:
   - step: sync
     hand: box d8509c02d5db · claude-code-remote
     hash_before: 6505cc599a68905dfdcabca8361234038b7e8d69
+    hash_after: 3e5f82bc383c3fa469711cefb81dc42112316815
   - step: sync
     hand: box d8509c02d5db · claude-code-remote
     hash_before: 5bda54b4d1382e08c465479276ec1a3b15379399
@@ -167,7 +168,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["open-tasks-shadow-lands", "read-topics-land-in-shadow"]
 enabled_by: migration.phase4shadow
-cloud: true
 reason: done
 ---
 
