@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -144,6 +144,18 @@ record:
         hash: 3217cd1df5ef706b
         size: 1828
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 2cc357fa6591fb43bd339dcb40affb89f458b61c
+    hash_after: 2cc357fa6591fb43bd339dcb40affb89f458b61c
+    inputs:
+      - name: design/draft
+        hash: 3217cd1df5ef706b
+        size: 1828
+      - name: design/tests-red
+        hash: 5efa799e33716409
+        size: 712
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -262,8 +274,11 @@ Two new cases fail on their own assertions: the push door returns code 1 on a ta
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask, and a red case decides each line: the push door case in prepush.test.js, and the queue tag case in pull-gate.test.js. The builder fixes two gaps in place. The ticket schema holds additionalProperties false on the front, so it admits the point field first. The size list names prepush.js, and the approach changes taggedIn in .claude/skills/level0/lib/todo.js.
 
 # implement
 
