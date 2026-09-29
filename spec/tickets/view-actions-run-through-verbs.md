@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 940a479820d0af61
         size: 2892
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85821f54410d · claude-code-remote · helper-4
+    hash_before: 04911c798c6a4d19d7e9ebc54c21322fbfd6582d
+    hash_after: 04911c798c6a4d19d7e9ebc54c21322fbfd6582d
+    inputs:
+      - name: design/draft
+        hash: 940a479820d0af61
+        size: 2892
+      - name: design/tests-red
+        hash: 883d13c9e60c0a79
+        size: 809
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -295,8 +307,13 @@ The four verb cases fail on their assertions against the stub in `ticket-edit.js
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- urgent-off-drops-the-mark: The urgent case in `test/level0/ticket-edit.test.js` wants `urgent: false` after the second flip. The tab drops the field there, since `WithField` in `src/tui/work/workedit.go` drops a flag standing off. Make the case want the field gone, so the verb writes what the tab writes.
+- set-weighs-values-too: The tab weighs a value against the schema's enum and type through `Weighs` in `src/tui/work/workedit.go`. The draft's set refuses the engine fields alone. Make set weigh the value the same way, with a case for a refused value.
+- draft-size-names-workplace: The size list leaves out `src/tui/work/workplace.go`, which tests-red changed to pull out `PlaceValue`. The tests list names `TestPlaceAtReadsTheSharedCases`, and the file holds `TestPlaceValueReadsTheSharedCases`.
+- draws-pull-icon-stands-once: The Discussion says the pull entry of `spec/config/draws.json` drops its help and icon. The approach keeps them until the grid retires, so the icon stands in two places and no ticket carries the cut. Carry the cut on this child.
 
 # implement
 
