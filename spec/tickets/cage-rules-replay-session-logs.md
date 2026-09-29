@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-lands-in-shadow
 depends_on: ["the-hooks-door-lands"]
+record:
+  - step: design/draft
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: bd4435294e9bbe6ece6361576bb10358aeeaca12
+    hash_after: bd4435294e9bbe6ece6361576bb10358aeeaca12
+    inputs:
+      - name: ask
+        hash: a804d3c07693ee2e
+        size: 415
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,52 @@ A rule ported with no replay changes what the cage refuses, and nobody sees it.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One new file, src/modules/hooks/cage.go, holds the harness, and Door.Hook stays as it stands.
+
+1. PostsOf(rows []log.Row) []Post rebuilds a Post from each row of kind hook that src/doors/log.js event writes at debug: Event from Extra[event], E from the e field of Text, Old from the JSON of Extra[answer]. A row of any other kind, a shadow row among them, reads as no post.
+2. DecisionOf reads one word off either side. The bridge's answer reads hold where it carries needs, refuse on result.deny, block on result.block, and pass otherwise, as letsThrough in src/bridge/server.js reads it. The door's answer reads block on a block effect, refuse on a result effect answering a tool that names no action, and pass otherwise.
+3. ReplayLog(door, text, say) drives each post through door.Hook in log order and compares the two words. Each pair read apart becomes an Apart {line, event, tool, old, new}, and say writes it as one shadow row: level info, kind shadow, slice cage, the shape src/scripts/log-shadow.js writes, so ./RUNME.sh log --kind shadow names it.
+4. ShadowTo(path) answers a say appending that row to a session log file.
+5. Recorded logs stand under test/replay/cage/<name>.jsonl, rows copied off a debug session log. Beside each, <name>.shadow.jsonl holds the shadow rows the replay writes today. A ported rule shrinks that file, so the diff of the port shows every decision it changes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/cage_test.go TestReplayLogAnswersEveryRecordedLog calls ReplayLog and ShadowTo
+- src/modules/hooks/cage_test.go the unit tests call PostsOf and DecisionOf
+- no caller outside the tests: Door.Hook, Replay, answersEvent in src/bridge/server.js and event in src/doors/log.js stand unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/cage_test.go TestPostsOfRebuildsEveryHookRow
+- src/modules/hooks/cage_test.go TestPostsOfSkipsShadowAndOtherRows
+- src/modules/hooks/cage_test.go TestDecisionOfReadsTheBridgesAnswer
+- src/modules/hooks/cage_test.go TestDecisionOfReadsTheDoorsAnswer
+- src/modules/hooks/cage_test.go TestReplayLogWritesAShadowRowForEachDifference
+- src/modules/hooks/cage_test.go TestReplayLogAnswersEveryRecordedLog
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Opened src/modules/hooks/hooks.go (Door.Hook, Replay, Post.Old), src/bridge/server.js (answersEvent, letsThrough), src/bridge/cage-shadow.js, src/doors/log.js (event, fieldsOf), src/modules/log/log.go (RowsOf, Row) and src/scripts/log-shadow.js (the shadow row), and each claim holds there.
+The callers list names the tests alone, since the change adds functions and changes none.
+go test ./... is decided by the whole suite with cage_test.go in it; the replay of every recorded log by TestReplayLogAnswersEveryRecordedLog; each difference writing a shadow row by TestReplayLogWritesAShadowRowForEachDifference; ./RUNME.sh check exits 0 by the check run at tests-green.
 
 ## tests-red
 
