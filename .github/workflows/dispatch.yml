@@ -1,0 +1,51 @@
+# The dispatch with no model: it computes the plan, lands its writes, and fires
+# the work routine once a ready group and a stuck hand-over. It opens no issue,
+# because the ticket holds the work. [[spec/tickets/the-dispatch-opens-no-issues]]
+name: dispatch
+# The clock fires hourly and no faster, so one run's fires stay under the routine cap.
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One run waits for the one before it, so two runs fire no group twice.
+concurrency:
+  group: dispatch
+  cancel-in-progress: false
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      # The write branch's push and its pull request ride the owner's token, so the check runs on them. [[spec/tickets/the-owner-stores-the-token]]
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PULL_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: go.sum
+
+      - uses: actions/cache@v4
+        with:
+          path: .se/bin
+          key: se-bin-${{ runner.os }}-vale3.20.0-biome2.5.12
+
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - env:
+          ROUTINE_FIRE_URL: ${{ secrets.ROUTINE_FIRE_URL }}
+          ROUTINE_FIRE_TOKEN: ${{ secrets.ROUTINE_FIRE_TOKEN }}
+          PULL_TOKEN: ${{ secrets.PULL_TOKEN }}
+        run: ./RUNME.sh dispatch --json --fire

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -118,7 +118,110 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-cloud-works-its-queue
 depends_on: [the-skills-start-the-workers, groups-hold-groups]
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: c1e6be7fe17b7d12eec357b5ca71cd8aceb2bd88
+    hash_after: c1e6be7fe17b7d12eec357b5ca71cd8aceb2bd88
+    inputs:
+      - name: ask
+        hash: 349760fba59859ea
+        size: 1911
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 5a2557d24d86ab34
+        size: 13510
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: ce4c9b7a3dad50f68331a9b0d4602eebe5e680d0
+    hash_after: ce4c9b7a3dad50f68331a9b0d4602eebe5e680d0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 90735f2272a798bc
+        size: 3526
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2326ed644e · claude-code-remote · helper-4
+    hash_before: ddc4218d9ec5d09755c47414596ca9b0a5808206
+    hash_after: ddc4218d9ec5d09755c47414596ca9b0a5808206
+    inputs:
+      - name: design/draft
+        hash: 90735f2272a798bc
+        size: 3526
+      - name: design/tests-red
+        hash: 446e87edebf6c435
+        size: 880
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 009fd86566be5df1f2b866c8056dc76997cb8054
+    hash_after: 009fd86566be5df1f2b866c8056dc76997cb8054
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/work.js:67:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_input/the-cloud-runs-itself]]
+  - step: design/draft
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 945005faa0fef80b635225f910e186ac2feafa90
+    hash_after: 945005faa0fef80b635225f910e186ac2feafa90
+    inputs:
+      - name: ask
+        hash: 349760fba59859ea
+        size: 1911
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: 7883b3d10633c780
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 74e21337bbe2e41252c4e747fa16e15eb3bd8499
+    hash_after: 74e21337bbe2e41252c4e747fa16e15eb3bd8499
+    returns: 1
+    why: the hand takes it back
+  - step: implement/change
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 32669a9a0607f7a02a864178e9763db5a005f69f
+    hash_after: 32669a9a0607f7a02a864178e9763db5a005f69f
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/work.js:67:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2326ed644e · claude-code-remote
+    hash_before: 9eb8c50a490358750ebe289322adaef20984f137
+    hash_after: 9eb8c50a490358750ebe289322adaef20984f137
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 51 test(s) pass in 4 file(s)
+      - name: check
+        exit: 0
+        said: "test/level0/dispatch.test.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 609. Split it by topic."
+    inputs:
+      - name: design/tests-red
+        hash: 446e87edebf6c435
+        size: 880
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -167,38 +270,74 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A worker lands its group through a pull request, and the verbs keep main untouched. Each part reuses a function standing already.
+
+1. The close. `leaves` in `src/scripts/work.js` drops the cloud marker on the branch copy through `marks(it, name, false)` from `src/scripts/work-merge.js`, in the same commit as the close. `ready` refuses a branch behind main, so the branch copy carries the marker main wrote. The filing of open children stands from groups-hold-groups. The verb pushes the branch alone.
+2. The skills. `.claude/skills/work/SKILL.md` ends on the pull request with auto-merge on, and `.claude/skills/dispatch/SKILL.md` opens its write branch the same way. Both stand from the-skills-start-the-workers, so this ticket checks them and adds nothing.
+3. The workflow. `.github/workflows/check.yml` takes `pull_request` on `main` beside `push`, and `test/contract/check-workflow.test.js` reads both triggers.
+4. The take. `stuckWhy` moves from `src/scripts/dispatch.js` into `src/scripts/work-free.js` as `stuckIn`, and the dispatch imports it. `take` in `src/scripts/work.js` reads each branch at done first. Where `stuckIn` answers behind or stale, it moves onto that branch through `onBranch`, and prints the ask: run `./RUNME.sh branch sync`, then `./RUNME.sh check`, then push. It writes no record, because the group stands closed.
+5. The refusal. `merge` in `src/scripts/work-merge.js` reads `git ls-remote origin refs/pull/*/head` once. Where a row carries the tip of `origin/work/<name>`, it refuses and names the pull request by its number.
+6. The notes. `spec/design_output/work.md` gives the round trip its pull request step. `AGENTS.md` and rule 13 of `spec/guidance/cloud/cloud.md` say the work skill opens the pull request. `spec/funnel/work-lands-through-pull-requests.md` leaves.
+
+I assume two boxes taking one stuck branch at once cost a duplicate sync and nothing more, because a sync is idempotent. A claim on a closed group reopens it, so the take writes none.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/work.js leaves: drops the marker
+- src/scripts/work.js take: hands a stuck branch first
+- src/scripts/dispatch.js planned: imports stuckIn in place of stuckWhy
+- src/scripts/work-merge.js merge: reads the pull refs
+- src/scripts/work-merge.js marks: called by leaves
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/work-done.test.js: branch done closes on the branch alone, files the children and drops the marker
+- test/contract/check-workflow.test.js: the check runs on a push and on a pull request against main
+- test/level0/work.test.js: branch take hands out a stuck hand-over first, and prints sync, check and push
+- test/level0/work-merge-cloud.test.js: branch merge refuses a branch a pull request carries, and names it
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/work.js
+- src/scripts/work-free.js
+- src/scripts/dispatch.js
+- src/scripts/work-merge.js
+- .github/workflows/check.yml
+- spec/design_output/work.md
+- AGENTS.md
+- spec/guidance/cloud/cloud.md
+- spec/funnel/work-lands-through-pull-requests.md
+- test/level0/work-done.test.js
+- test/contract/check-workflow.test.js
+- test/level0/work.test.js
+- test/level0/work-merge-cloud.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened leaves, ready and take in work.js, marks and merge in work-merge.js, stuckWhy in dispatch.js, check.yml and both skills
+- the callers list names every caller of stuckWhy, marks, leaves, take and merge
+- each done_when line maps to a case in the tests list, the skill lines stand met, and the notes and the check stand as checkpoints
 
 ## tests-red
 
@@ -207,26 +346,38 @@ The source: none.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-done.test.js test/contract/check-workflow.test.js test/level0/work.test.js test/level0/work-merge-cloud.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/work-done.test.js
+- test/contract/check-workflow.test.js
+- test/level0/work.test.js
+- test/level0/work-merge-cloud.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion, and every earlier case in the four files passes.
+
+- the done case reads the marker still standing on the branch
+- the merge case reads the merge going ahead over a branch a pull request carries
+- the take case reads the take claiming the free group before the stuck one
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line on code meets a failing case, and the skill lines, the notes and the check stand as checkpoints
+- git and the disk take the fakes the earlier cases use, and the workflow case reads the real file under test/contract
 
 # gate
 
@@ -235,8 +386,14 @@ The source: none.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- done-points-at-the-pull: leaves in src/scripts/work.js ends on "Run ./RUNME.sh branch merge <name> from main", and the approach leaves that line; point it at the pull request the work skill opens
+- take-hands-a-stale-handover: the take case covers a branch behind main alone; add a case whose tip stands past work.staleAfter, and hand stuckIn a clock time, since take calls readFree(it) with no now
+- merge-reads-open-pulls: refs/pull/<n>/head stays on origin after a pull request closes unmerged, so the refusal holds a closed pull's branch until a new commit; give the refusal a road past a closed pull
+- agents-keeps-the-desk-rule: AGENTS.md says a session opens no pull request; the edit keeps that for a desk and names the work skill as the one road opening one, so the two lines agree
+- take-case-asserts-the-switch: the take case's /push/ match passes on any line naming push; assert the switch onto work/landing and the full push line
 
 # implement
 
@@ -247,14 +404,19 @@ The source: none.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/work.js src/scripts/work-free.js src/scripts/work-merge.js src/scripts/dispatch.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, and two more: the design input drops its line on the funnel note, and the take case gains the assertions a point asks for
+- the change reaches git through the git door alone, which the fake process answers in every case
+- each new function carries a comment naming the hand-over it implements
+- one function in work-free.js answers a stuck hand-over for the dispatch and the take
 
 ## tests-green
 
@@ -263,26 +425,33 @@ The source: none.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-done.test.js test/contract/check-workflow.test.js test/level0/work.test.js test/level0/work-merge-cloud.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A group now lands through a pull request. The branch done verb writes the close on the work branch alone. It closes the group ticket, moves every open child to the parent or leaves it loose, and drops the cloud marker, and main stays untouched. The work skill and the dispatch skill then open a pull request against main with auto-merge on, and the check workflow runs on that pull request. The take verb hands out a stuck hand-over first, one standing behind main or past its stale age, with the ask to sync, check and push. The merge verb refuses a branch that an open pull request carries, so a desk merge never races the pull request.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the green run reaches the size list's files, the design input line and the take case alone
+- every case reaches git and the disk through the fakes the earlier cases use
+- each new function keeps the comment naming the hand-over it implements
+- one function in work-free.js answers a stuck hand-over, and the notes point at it
 
 # accept
 

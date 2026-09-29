@@ -30,6 +30,8 @@ flags:
   - letter: T
     key: todo
     tone: bad
+  - letter: P
+    key: person
 groups:
   - name: queue
     pressed: true

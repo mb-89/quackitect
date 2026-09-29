@@ -1,7 +1,7 @@
 // One running index answers a name over /v1 and over the old API, a name the
 // catalog lacks as a problem, and its OpenAPI document.
 // [[spec/design_output/model#surfaces]]
-package main
+package index
 
 import (
 	"encoding/json"
@@ -20,7 +20,12 @@ import (
 func standingV1(t *testing.T) Standing {
 	t.Helper()
 	root := tree(t)
-	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), q.New())
+	c := q.New()
+	hand := q.OutIn(c, "files/<path...>", q.Content{})
+	file := func(_ string, commit Commit) (func(), error) {
+		return func() {}, commit(hand, map[string]any{"files/spec/one.md": q.Content{Hash: "one", Text: "one"}})
+	}
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"), c, file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,8 +90,8 @@ func TestV1WritesItsOpenAPIDocument(t *testing.T) {
 // The value carries its stale mark. [[spec/design_output/model#a-stale-mark]]
 func TestV1ReadsAStaleName(t *testing.T) {
 	c := q.New()
-	q.GivenIn(c, "t/n", 0)
-	store := q.NewStore(c, nil)
+	q.OutIn(c, "t/n", 0)
+	store := q.NewStore(c)
 	since := time.Unix(1_700_000_000, 0)
 	if err := store.Stale("t/n", since); err != nil {
 		t.Fatal(err)
@@ -101,5 +106,15 @@ func TestV1DrawsItsDocs(t *testing.T) {
 	said, body := getV1(t, standingV1(t), "/v1/docs")
 	if said.StatusCode != http.StatusOK || !strings.Contains(string(body), "openapi") {
 		t.Fatalf("the docs answer %d: %.200s", said.StatusCode, body)
+	}
+}
+
+// V1 answers the base of the door standing over the root. [[spec/tickets/the-quack-cli-gets-generated]]
+func TestV1AnswersTheBaseOfTheStandingDoor(t *testing.T) {
+	standing := standingV1(t)
+	t.Setenv("QUACKITECT_ROOT", standing.Root)
+	base, err := V1()
+	if want := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1); err != nil || base != want {
+		t.Fatalf("V1 answers %q, %v, not %q", base, err, want)
 	}
 }

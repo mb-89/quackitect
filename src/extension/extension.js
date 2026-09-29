@@ -8,6 +8,7 @@ const { fieldMarksOf } = require("./lib/fields.js");
 const { COMMAND, ticketLensOf } = require("./lib/lens.js");
 const { serverAsk } = require("./lib/lsp.js");
 const { FLIP, routeHostOf } = require("./lib/route-host.js");
+const { BURST, settled, timer } = require("./lib/settle.js");
 const { toastsOf } = require("./lib/states.js");
 
 const VIEW = "quackitect.sidebar";
@@ -81,6 +82,8 @@ async function activate(context, given) {
     page.onMessage((message) => sidebar.took(message));
     await sidebar.opened(door.pid());
     await draw();
+    // A ticket move, a plan todo or a hold draws the badge again once its burst settles. [[spec/tickets/the-badge-reads-open-tasks]]
+    door.watch(sidebar.counts, settled(draw, BURST, door.later ?? timer));
     door.watch(sidebar.watches, draw);
     // [[spec/design_output/extension#the-hook-button]]
     door.onProcess?.(draw);

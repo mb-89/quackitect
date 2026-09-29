@@ -1,0 +1,53 @@
+# The instances the index loads, and the wire binding each port to a name.
+# io-modules-own-their-names wires the first instances.
+# [[spec/design_output/model#the-wiring-file]]
+instances:
+  watch:
+    module: watch
+  clock:
+    module: clock
+  env:
+    module: env
+  tickets:
+    module: tickets
+  queue:
+    module: queue
+  work:
+    module: work
+  migration:
+    module: migration
+  check:
+    module: check
+  guidance:
+    module: guidance
+  log:
+    module: log
+  http:
+    module: http
+  ticket:
+    module: ticket
+  retro:
+    module: retro
+  vehicle:
+    module: vehicle
+  stub:
+    module: stub
+  branch:
+    module: branch
+wires:
+  watch.files/<path...>: files/<path...>
+  clock.minute: clock/minute
+  env.vars/<name>: env/<name>
+  tickets.files/<path...>: files/<path...>
+  guidance.files/<path...>: files/<path...>
+  log.session: files/.se/.log/session.jsonl
+  tickets.all: tickets/all
+  tickets.cloud: tickets/cloud
+  queue.rows: tickets/all
+  queue.plan: files/.se/.runtime/plan.json
+  queue.cloud: tickets/cloud
+  queue.stood: built-in
+  queue.minute: clock/minute
+  work.tickets: tickets/all
+  work.places: queue.places
+  work.cloud: tickets/cloud

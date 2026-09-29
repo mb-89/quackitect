@@ -288,6 +288,7 @@ const OPENERS = { pass: "pass", fail: "fail", accept: "pass", reject: "fail" };
 // A design review passing with findings, or a gate accepting with points, names a child a row, as `- <child-name>: <finding>`. [[spec/design_output/pull#a-finding-rides-out]]
 const FINDINGS = /^(pass\s+with\s+findings|accept\s+with\s+points)\b/i;
 export const FOUND = "findings";
+const TICKET_NAME = /^[a-z0-9][a-z0-9-]*$/;
 
 function findingOf(row) {
   const said = /^([^\s:]+):\s*(.*)$/.exec(row);
@@ -304,6 +305,10 @@ function findingFaults(it, said, where) {
     if (!name)
       out.push(
         `${where} names no child in ${line}; write it as - <child-name>: <finding>.`,
+      );
+    else if (!TICKET_NAME.test(name))
+      out.push(
+        `${where} names ${name}, and a ticket name holds lowercase words joined by hyphens.`,
       );
     else if (overLong(name, it.words))
       out.push(

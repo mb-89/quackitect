@@ -55,6 +55,18 @@ export const OWES = {
 };
 
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
+// The reply probe's prompt. Its marker arms the bridgehead, which writes the first call after it into the session log. [[spec/tickets/the-reply-probe-runs]]
+export const REPLY_PROBE = {
+  marker: "se-probe-reply",
+  event: "probe.reply",
+  says: "se-probe-reply writes this line",
+  opens: [
+    "se-probe-reply.",
+    "In one message, write the line `se-probe-reply writes this line` as text, then call Read on README.md.",
+    "After the call, write the first line of this prompt as you received it, in double quotes.",
+  ].join(" "),
+};
+
 export const PROBE = {
   variable: "SE_PROBE_COMPACT",
   opens: "Say hello in one line.",

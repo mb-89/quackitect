@@ -1,17 +1,29 @@
 // The watch that holds the rows level with the tree. It names each path it
 // hears, and the door moves those rows alone once a burst settles.
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
-package main
+package index
 
 import (
 	"io/fs"
 	"path/filepath"
 
 	"github.com/fsnotify/fsnotify"
+
+	"quackitect/src/watcher"
 )
 
-func watches(root string, one *door) (*fsnotify.Watcher, error) {
-	eyes, err := fsnotify.NewWatcher()
+// The watcher's loop adds a folder while the door's stop runs, and its Close returns. [[spec/tickets/a-watch-stops-mid-add]]
+func watches(root string, one *door) (*watcher.Watcher, error) {
+	eyes, err := watcher.New(func(eyes *watcher.Watcher, said fsnotify.Event) {
+		if said.Op&fsnotify.Create != 0 {
+			if info, err := statOf(said.Name); err == nil && info.IsDir() {
+				folders(root, said.Name, eyes)
+			}
+		}
+		if rel, ok := relOf(root, said.Name); ok {
+			one.Touched(rel)
+		}
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -27,33 +39,13 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 	if makeDir(runtime, 0o755) == nil {
 		eyes.Add(runtime)
 	}
-
-	go func() {
-		for {
-			select {
-			case said, open := <-eyes.Events:
-				if !open {
-					return
-				}
-				if said.Op&fsnotify.Create != 0 {
-					if info, err := statOf(said.Name); err == nil && info.IsDir() {
-						folders(root, said.Name, eyes)
-					}
-				}
-				if rel, ok := relOf(root, said.Name); ok {
-					one.Touched(rel)
-				}
-			case _, open := <-eyes.Errors:
-				if !open {
-					return
-				}
-			}
-		}
-	}()
 	return eyes, nil
 }
 
-func folders(root, from string, eyes *fsnotify.Watcher) error {
+// What folders adds to: the door's watcher, or a bare fsnotify watch in a test. [[spec/tickets/a-watch-stops-mid-add]]
+type adder interface{ Add(path string) error }
+
+func folders(root, from string, eyes adder) error {
 	return filepath.Walk(from, func(abs string, info fs.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
 			return nil

@@ -342,8 +342,9 @@ the keys that program needs, and the declaration carries them beside the
 
 The hook stands before the log in the agent control, and it is a `process`
 widget: a button for a program the extension itself runs. A click starts the
-server behind the bridgehead as a child of the extension, and a click on a
-running one kills it. Shift and click starts it under the editor's debugger,
+server behind the bridgehead detached, through the proc door's `respawn`. A
+click on a running one stops it over the wire. The server outlives the
+window, and the next window adopts it. Shift and click starts it under the editor's debugger,
 through the launch config the declaration names. The light says which: dark
 for nothing, green for the server, amber for the server under the debugger.
 
@@ -361,14 +362,13 @@ server. For details, see
 
 ## The light follows the server
 
-A server restarts itself when its code moves, and the child the button starts
-ends there. A person or an agent starts one by hand too. So the light reads the
-server, and no child alone:
+A server restarts itself when its code moves, and a person or an agent starts
+one by hand too. So the light reads the server, and no start alone:
 
 | what happens | what the light does |
 |---|---|
 | a line lands in `.se/.log/serve.log`, which every start writes | asks `/health`, takes a server that answers, and drops an adopted one that answers nothing |
-| the button's own child ends | goes dark, and asks again after the respawn's grace |
+| the button's own start falls inside its window | goes dark, and a warning names the log |
 | a debug session ends | goes dark, the way the debugger says |
 
 `rechecks` in `src/extension/editor-process.js` holds it, and one watch on the

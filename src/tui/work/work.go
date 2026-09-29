@@ -49,7 +49,7 @@ func (*Tab) Name() string { return "work" }
 
 // The rows this box takes stand behind the name, once the verb answers. [[spec/design_output/tui#the-work-tab]]
 func (t *Tab) Label(_ *frame.Model) string {
-	if t.Places != nil {
+	if t.Places != nil && t.Places.Counted {
 		return fmt.Sprintf("work (%d)", t.Places.Takeable)
 	}
 	return "work"
