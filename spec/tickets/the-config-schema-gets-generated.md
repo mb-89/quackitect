@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -194,6 +194,15 @@ record:
         hash: ecdfa10dc707c2ae
         size: 15191
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 24747e345ce91236743ffb4aa1e1758dd8c1d42a
+    hash_after: 9968d31f1606eddff4006cfef4893d93322ac5ac
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/main.go:192:42: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -374,14 +383,23 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && ./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's table names, plus what the gate and the check reached: src/modules/settings for the declarations, spec/wiring.yaml for the section instances, src/config Shared for the shared slice read, the size golden for the schema's new length, three new slash commands the projection writes, and the tests reading the default file whole, which now read it over the built-ins through underBuiltIns
+- the change reaches no new door: the Go readers read the schema through the same file reads they held, the check module walks the schema text it already takes, and the JavaScript cases take fakeDisk
+- each changed function carries a comment naming the-config-schema-gets-generated or the design_output chapter it implements
+- each key's built-in, help, unit and options stand once, in its Go declaration; the schema and the slash commands come off it, the default file holds the migration block's values alone, and spec/design_output/config.md points at the generator instead of listing keys
+- the gate's configRows point: quack config lays each declared key's built-in under the files, with the layer built-in, and the catalog now loads the manager beside the wiring there
+- the gate's test list point: the projection case stands in test/level0/projection-builtin.test.js, which the tests-red record already names
+- the drawn sections stand first in the schema in draws.json's order, so the sidebar keeps its group order; the draft said name order, and name order moves the engine group above the work group
+- go test ./... fails on src/modules/index TestActionRowsCarryLabelAndIcon alone, the red test of the-sidebar-renders-generically, which its own implement step turns green
 
 ## tests-green
 
