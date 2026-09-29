@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
 group: loose-fixes-99f4547
+record:
+  - step: do
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 1008c8da753be30fbd933e5d1bf7ed202ccdcf1b
+    hash_after: 1008c8da753be30fbd933e5d1bf7ed202ccdcf1b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 55a118ea4d6696c2
+        size: 606
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -46,35 +64,21 @@ Without it, the push door refuses every push to a branch no box works. That cove
 
 ## tests
 
-    ./RUNME.sh branch test test/level0/prepush.test.js test/level0/work-held.test.js
+./RUNME.sh test test/level0/prepush.test.js test/level0/work-held.test.js
 
 ## check
 
-    ./RUNME.sh check
+./RUNME.sh check
 
 ## says
 
-A hold now lasts while its box pushes. `staleBy` in `src/scripts/prepush.js`
-reads the time of the tip on origin, and `staleClaim` weighs it against
-`work.staleAfter`, the same reading `branch list` and `branch take` use. Past the
-span the push door lets any box through, and under it the door refuses as
-before.
-
-`branch take` now passes the clock to `readFree`, so a stale hold reads free. A
-take over it writes `hash_after` onto the stale take before its own entry, and
-the commit names the box it takes over from. `branch release` closes every open
-take as before, and its commit names the hand-over where another box held it.
-`handedOver` and `letGo` stand in `src/scripts/work-held.js`, beside the hold.
-
-`work.staleAfter` drops to `30m`, because a box pushes after every finished
-step. The chapter on a stale group in `spec/design_output/work.md` names the
-tip's age as the lease.
+The work landed on main through PR 29, commit 645be27b3, before this group took the ticket, and this branch carries main. A hold whose tip stands quiet past work.staleAfter frees its branch, so a fresh box takes it over. The prepush and work-held tests pass, and work.staleAfter answers 30m. So this step passes on that evidence, and redoes nothing.
 
 ## checked
 
-- the change follows the ask. The ticket and the branch carry five words, because both doors cap a name there
-- the cleanup it reveals: `letGo` moves out of `work.js`, which stood past its line ceiling
-- the span stands in `spec/config/level0.json` alone, and the door reads it through the config
+- the change stands on main as the ask names it, and nothing departs
+- the verification reveals no cleanup
+- the stale span stands once, as work.staleAfter in spec/config/level0.json
 
 # Discussion
 
