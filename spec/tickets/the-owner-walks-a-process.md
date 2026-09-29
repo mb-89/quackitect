@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: answer
 steps:
   - name: answer
@@ -35,6 +35,14 @@ steps:
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 depends_on: ["the-engine-holds-the-route"]
+group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: dc5998ad9a55a7a8e9ade08584f8ff05fdb93151
+    hash_after: dc5998ad9a55a7a8e9ade08584f8ff05fdb93151
+reason: became
+successors: [owner-walks-process-trial]
 ---
 
 # Ask
@@ -87,3 +95,5 @@ The owner walks one standard process in the editor, from the mint to its final a
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This is work a person alone can do: the owner's eyes on the owner's editor. So it moves to the person route, per the owner's ruling. [[spec/tickets/owner-walks-process-trial]] carries the commands, loose on `main`. The box taking this ticket closes it `./RUNME.sh ticket pull the-owner-walks-a-process --became owner-walks-process-trial`.

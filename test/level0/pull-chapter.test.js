@@ -9,6 +9,7 @@ import { frontOf } from "../../src/engine/group.js";
 import {
   BEFORE_CLEAR,
   chapterOf,
+  formFault,
   verdictIn,
   voiceFaults,
   workAnswer,
@@ -78,6 +79,18 @@ test("chapterOf reads the fields under a step's chapter, and a missing one stand
 test("a verdict's table rows ride one piece, and a plain row between two tables keeps them apart", () => {
   const said = verdictIn(["fail", "| a |", "| b |", "- after", "| c |"]);
   assert.equal(said.reason, "| a |\\n| b |; after; | c |");
+});
+
+// A point names the child the gate mints, so the form refuses a link in the name's place. [[spec/design_output/pull#a-finding-rides-out]]
+test("a gate point opening with a link is refused as no ticket name", () => {
+  const { it } = doors({}, {}, { root: ROOT });
+  const rows = ["accept with points", "- [[spec/tickets/a-link]]: a line"];
+  assert.deepEqual(
+    formFault(it, { form: "verdict" }, rows, "verdict under gate", {}, null),
+    [
+      "verdict under gate names [[spec/tickets/a-link]], and a ticket name holds lowercase words joined by hyphens.",
+    ],
+  );
 });
 
 // A ticket carrying a draft step and a gate after it. [[spec/tickets/a-gate-names-its-question]]

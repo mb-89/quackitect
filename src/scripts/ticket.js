@@ -196,7 +196,7 @@ function longWords(text) {
 }
 
 // The first words of a name, as many as the cap holds, joined by a hyphen. [[spec/tickets/prose-verbs-land-first-try]]
-function cutTo(name, most) {
+export function cutTo(name, most) {
   if (!overLong(name, most)) return name;
   return name
     .split(/[-_.]+/)

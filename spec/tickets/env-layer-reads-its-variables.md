@@ -1,0 +1,78 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: do
+    does: makes the change, with the test that covers it
+    from: the-config-module-resolves-layers/gate
+    by: anyone
+    to: retro
+    input: ask
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    evidence:
+      - name: tests
+        form: command
+        expects: green
+        says: the tests that cover the change, or the check where it touches no code
+      - name: check
+        form: command
+        expects: 0
+        says: the check is green on the commit
+      - name: says
+        form: text
+        says: what changes and why, for a reader who was not there
+step: do
+process: [[spec/processes/trivial]]
+process_hash: 2b5ab398855a1aba
+group: the-foundation-closes-its-gaps
+parent: the-config-module-resolves-layers
+record:
+  - step: do
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 8e9612176e79955ba0349e8542c572f56768b816
+    hash_after: 8e9612176e79955ba0349e8542c572f56768b816
+reason: became
+successors: [the-config-module-resolves-layers]
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+<!-- breaks, as text: what breaks if it is never done -->
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+
+the draft's assumption that the environment layer waits on a family-map input is stale, since tickets-becomes-a-module stands closed and input.family in src/q/q.go reads map[string]T over a family such as env/<name>. Build the environment layer in this change, and add a case to src/modules/config/config_test.go where an env/SE_ value beats the local file. TestASharedKeyReadsTheDefaultFileAlone seeds env yet passes with no environment layer at all, so no case decides the layer the ask names.
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+
+<!-- the form is command -->
+
+## check
+
+<!-- the check is green on the commit -->
+
+<!-- the form is command -->
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+
+<!-- the form is text -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

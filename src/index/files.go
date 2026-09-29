@@ -2,7 +2,7 @@
 // whether git tracks it, and the text of the paths it names. A reader holds
 // what it pulled, and asks again for the paths whose hash moved.
 // [[spec/design_output/index#a-reader-takes-the-tree]]
-package main
+package index
 
 import (
 	"database/sql"

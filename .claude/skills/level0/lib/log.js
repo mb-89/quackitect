@@ -9,6 +9,24 @@ export const FOLDER = LOG;
 export const SESSION = `${FOLDER}/session.jsonl`;
 // The file the server writes its own output to, on the start road and on a restart alike. [[spec/design_output/level0#a-restart-watches-its-child]]
 export const SERVE = `${FOLDER}/serve.log`;
+
+// What a start appended to the log, less what the log held before it. [[spec/design_output/level0#a-restart-watches-its-child]]
+export function wroteSince(was, now) {
+  return (now.startsWith(was) ? now.slice(was.length) : now).trim();
+}
+
+// The line naming the fault, out of what a start wrote: the first naming an error, else the last. [[spec/design_output/level0#a-restart-watches-its-child]]
+export function reasonIn(wrote) {
+  const lines = wrote
+    .split("\n")
+    .map((one) => one.trim())
+    .filter(Boolean);
+  return (
+    lines.find((one) => /error/i.test(one)) ??
+    lines.at(-1) ??
+    `it wrote nothing to ${SERVE}`
+  );
+}
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";
 // A stamp answers milliseconds, and a span answers seconds, so a reader crossing the two multiplies by this. [[spec/design_output/log#one-verb-reads-the-log]]

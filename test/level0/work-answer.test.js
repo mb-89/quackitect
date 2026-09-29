@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { COL, work } from "../../src/scripts/work.js";
 import { compareOutline } from "../../src/scripts/pull-outline.js";
-import { answerOf } from "../../src/scripts/work-answer.js";
+import { answerOf, waitsOnPerson } from "../../src/scripts/work-answer.js";
 import {
   CHILD,
   doorsSaying,
@@ -20,11 +20,13 @@ import {
 } from "./work-doors.js";
 
 const LOOSE = CHILD("one-group", "open").replace("group: one-group\n", "");
+// The marker, and no branch, puts a group on the cloud. [[spec/tickets/the-queue-reads-the-marker]]
+const ON_CLOUD = GROUP_NOTE.replace("state: open\n", "state: open\ncloud: true\n");
 
 const doors = (files = {}) => {
   const said = doorsSaying(
     remoteSaying([{ branch: "work/one-group", tip: "aaa", when: 1767225600 }], {
-      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
       "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
       "origin/main:spec/tickets/a-loose-one.md": LOOSE,
     }),
@@ -136,7 +138,7 @@ A question for a person.
 test("a person's step takes a negative place ahead of the agent's rows", () => {
   const { it } = doorsSaying(
     remoteSaying([{ branch: "work/one-group", tip: "aaa", when: 1767225600 }], {
-      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
       "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
       "origin/main:spec/tickets/a-loose-one.md": LOOSE,
       "origin/main:spec/tickets/ask-me.md": PERSON,
@@ -169,7 +171,7 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
         { branch: "work/gone-group", tip: "bbb", when: 1767225600, merged: true },
       ],
       {
-        [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+        [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
         "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
         // The standing branch carries a stale open copy of a ticket trunk holds closed, which speaks for nothing. [[spec/design_output/pull#the-queue-is-an-outline]]
         "work/one-group:spec/tickets/its-child.md": CHILD("gone-group", "open"),
@@ -505,7 +507,7 @@ test("the desk's own copy of a trunk ticket outranks git's, so a todo moves the 
 test("the answer carries a group with no branch, its children, and the whole ask", () => {
   const { it } = doorsSaying(
     remoteSaying([{ branch: "work/one-group", tip: "aaa", when: 1767225600 }], {
-      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      [`work/one-group:${GROUP_AT}`]: ON_CLOUD,
       "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
       "origin/main:spec/tickets/a-loose-one.md": LOOSE,
       "origin/main:spec/tickets/a-loose-group.md": GROUP_NOTE,
@@ -569,4 +571,12 @@ test("two todos anchored on one row stand in the order the plan writes them", ()
     [place["zeta todo"], place["alpha todo"], place["a-loose-one"]],
     ["1", "2", "3"],
   );
+});
+
+// The queue, the dispatch plan and a fix group's done read a ticket's hand through this one export. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+test("waitsOnPerson reads a ticket at a person's step as a person's, and one at an agent's step as an agent's", () => {
+  const at = (by) =>
+    `---\nkind: [[ticket]]\nstate: open\nstep: ask\nsteps:\n  - name: ask\n    does: asks\n    by: ${by}\n---\n\n# Ask\n\nOne.\n`;
+  assert.equal(waitsOnPerson({ text: at("person") }), true);
+  assert.equal(waitsOnPerson({ text: at("agent") }), false);
 });

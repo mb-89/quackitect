@@ -13,6 +13,7 @@ import {
   rowsIn,
   within,
 } from "./log-read.js";
+import { shadowLog } from "./log-shadow.js";
 
 const USAGE = [
   "Usage: ./RUNME.sh log [flags]\n",
@@ -24,7 +25,8 @@ const USAGE = [
   "  --count         one row a kind, over the rows the filters keep",
 ];
 
-export function logVerb(it, argv) {
+// [[spec/design_output/log#one-verb-reads-the-log]]
+export async function logVerb(it, argv) {
   const said = argv ?? [];
   if (said.includes("--help")) {
     for (const row of USAGE) console.log(row);
@@ -41,6 +43,8 @@ export function logVerb(it, argv) {
   const rows = narrowed(rowsIn(it, paths), said, now);
   const shown = said.includes("--count") ? countsOf(rows) : rows.map(asRow);
   for (const one of shown) console.log(one);
+  // The verb prints its answer first, and the shadow reads the rows before any flag narrows them. [[spec/tickets/log-shadow-reads-unfiltered-rows]]
+  await shadowLog(it);
   return 0;
 }
 

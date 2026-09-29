@@ -24,6 +24,7 @@ import {
   standing,
 } from "./pull-doors.js";
 import { pulling } from "../../src/scripts/work.js";
+import { PLANS } from "../../.claude/skills/level0/lib/runs.js";
 import { CHILD, ROOT } from "./work-doors.js";
 
 const at = (rel) => join(ROOT, ...rel.split("/"));
@@ -172,4 +173,58 @@ test("handed records in the hold the notes a tagged leaf resolves", () => {
     hold.reads.map((one) => one.name),
     ["spec/guidance/code/code"],
   );
+});
+
+// The review waits on a hand other than the drafter's, so a helper takes it while the plan works the ticket. [[spec/tickets/helpers-pull-past-plans]]
+const REVIEWING = PULL_CHILD(
+  "open",
+  "design/review",
+  "record:\n  - step: design/draft\n    hand: box d462e994b4cef\n",
+);
+const planWorks = (working) => ({
+  [PULL_AT(PLANS)]: JSON.stringify({ working }),
+});
+
+// [[spec/tickets/helpers-pull-past-plans]]
+test("a helper's pull takes the step of the ticket the plan works, plain or named, under the queue", () => {
+  const plain = doors(
+    standing(REVIEWING, undefined, planWorks("a-child")),
+    {},
+    { binding: "queue" },
+  );
+  const took = heard(() => pulling(PULL_ROOT, ["pull", "--as", "helper-1"], plain.it));
+  assert.match(
+    took.said,
+    /a-child at design\/review/,
+    "the plain helper pull hands the review",
+  );
+
+  const named = doors(
+    standing(REVIEWING, undefined, planWorks("a-child")),
+    {},
+    { binding: "queue" },
+  );
+  const asked = heard(() =>
+    pulling(PULL_ROOT, ["pull", "a-child", "--as", "helper-1"], named.it),
+  );
+  assert.notEqual(asked.code, 2, asked.said);
+  assert.match(
+    asked.said,
+    /a-child at design\/review/,
+    "the named helper pull hands the review",
+  );
+});
+
+// [[spec/tickets/helpers-pull-past-plans]]
+test("a helper's named pull of a ticket outside the plan stays behind the queue", () => {
+  const bound = doors(
+    standing(REVIEWING, undefined, planWorks("another-one")),
+    {},
+    { binding: "queue" },
+  );
+  const shut = heard(() =>
+    pulling(PULL_ROOT, ["pull", "a-child", "--as", "helper-1"], bound.it),
+  );
+  assert.equal(shut.code, 2);
+  assert.match(shut.said, /a-child stands behind the queue/);
 });

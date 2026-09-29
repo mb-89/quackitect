@@ -22,4 +22,8 @@ if [ "$#" -eq 0 ]; then
   exit 1
 fi
 
+# The binary picks the road off the verbs slice, and cli.js answers where no binary stands. [[spec/tickets/runme-hands-verbs-to-quack]]
+bin="$here/.se/.runtime/bin/se-index"
+[ -x "$bin.exe" ] && bin="$bin.exe"
+[ -x "$bin" ] && exec "$bin" verb "$here/src/scripts/cli.js" "$@"
 exec node "$here/src/scripts/cli.js" "$@"

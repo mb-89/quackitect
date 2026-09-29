@@ -1,7 +1,7 @@
 // The index answers /v1 through Huma, on a port of its own beside the old
 // API, with openapi.json and the docs.
 // [[spec/design_output/model#surfaces]]
-package main
+package index
 
 import (
 	"context"
@@ -27,8 +27,8 @@ type valueOut struct {
 }
 
 // [[spec/design_output/model#surfaces]]
-func (one *door) servesV1() (net.Listener, *http.Server, error) {
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
+func (one *door) servesV1(listens func(network, address string) (net.Listener, error)) (net.Listener, *http.Server, error) {
+	listen, err := listens("tcp", "127.0.0.1:0")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -44,6 +44,8 @@ func (one *door) servesV1() (net.Listener, *http.Server, error) {
 	}) (*valueOut, error) {
 		return valueOf(one.store, in.Name)
 	})
+	one.servesActions(api)
+	one.servesTools(api)
 	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
 	go server.Serve(listen)
 	return listen, server, nil
