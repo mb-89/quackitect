@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -154,6 +154,15 @@ record:
         hash: 0dba4234b02ec5d7
         size: 856
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: d0ebb78e690f982b265ede5e57f36be54e060d68
+    hash_after: d0ebb78e690f982b265ede5e57f36be54e060d68
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/cli.go src/quack/main.go src/index/main.go src/index/v1_test.go src/quack/main_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the index main, the new cli file in quack, the quack main and its case, as the draft names and quack-main-routes-the-tree adds
+- the tree reaches the index over HTTP alone, and the cases drive it against a real door over fake actions
+- each function names the ticket it implements in its link
+- each constant stands once at the top of the cli file, and the verbs main hands the tree stand in one map
 
 ## tests-green
 

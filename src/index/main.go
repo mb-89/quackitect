@@ -50,7 +50,21 @@ func Root() (string, error) { return rootHere() }
 
 // The base of /v1 on the door standing over the root, which it starts where none answers, so a client reaches the index the way every other client does. [[spec/tickets/the-quack-cli-gets-generated]]
 func V1() (string, error) {
-	return "", errorOf("the door answers no /v1 base yet")
+	root, err := rootHere()
+	if err != nil {
+		return "", err
+	}
+	if _, err := reaches(root, []string{"standing"}); err != nil {
+		return "", err
+	}
+	standing, err := standingOf(root)
+	if err != nil {
+		return "", err
+	}
+	if standing.V1 == 0 {
+		return "", errorOf("the standing door names no /v1 port")
+	}
+	return fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1), nil
 }
 
 func rootHere() (string, error) {

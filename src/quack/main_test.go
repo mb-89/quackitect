@@ -358,3 +358,20 @@ func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
 		t.Fatalf("the wiring declares no %s", index.WaitName)
 	}
 }
+
+// Main hands help, --help, run and get to the tree over the base V1 answers, and every other verb to the index. [[spec/tickets/quack-main-routes-the-tree]]
+func TestMainHandsTheTreeVerbsToCliOverV1(t *testing.T) {
+	base := standingTree(t)
+	v1 := func() (string, error) { return base, nil }
+	for _, argv := range [][]string{{"help"}, {"--help"}, {"run", "t/add", "--a", "1"}, {"get", "t/n"}} {
+		var out, errs strings.Builder
+		if !cliVerbs[argv[0]] || routes(&out, &errs, v1, argv) != 0 || out.Len() == 0 {
+			t.Fatalf("main hands %v to the tree: %s%s", argv, out.String(), errs.String())
+		}
+	}
+	for _, verb := range []string{"serve", "find", "standing"} {
+		if cliVerbs[verb] {
+			t.Fatalf("main hands %s to the tree, not the index", verb)
+		}
+	}
+}

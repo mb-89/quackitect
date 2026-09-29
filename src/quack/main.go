@@ -163,6 +163,9 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && cliVerbs[os.Args[1]] {
+		os.Exit(routes(os.Stdout, os.Stderr, index.V1, os.Args[1:]))
+	}
 	as := manager.Registers(q.Main)
 	starts, err := wired()
 	if err != nil {
