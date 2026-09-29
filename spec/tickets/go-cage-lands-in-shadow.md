@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/go-cage-lands-in-shadow already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d855c2347910b · claude-code-remote
+    hash_before: 544a8f3bd5f402673a88a08c93c3201488a72d31
+    hash_after: 544a8f3bd5f402673a88a08c93c3201488a72d31
+    inputs:
+      - name: ask
+        hash: 2570a20dc71168fd
+        size: 568
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["quack-verbs-land-in-shadow"]
 enabled_by: migration.phase5shadow
 cloud: true
@@ -133,14 +145,34 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/cage-hold-lacks-door-effect]], trivial
+- [[spec/tickets/cage-rules-replay-session-logs]], standard
+- [[spec/tickets/cage-slice-past-the-ask]], trivial
+- [[spec/tickets/cage-tool-block-reads-refuse]], trivial
+- [[spec/tickets/copilot-config-names-mcp]], trivial
+- [[spec/tickets/copilot-meets-the-hooks-door]], standard
+- [[spec/tickets/copilot-shadow-carries-method]], trivial
+- [[spec/tickets/hooked-of-caller-missed]], trivial
+- [[spec/tickets/hooks-at-reads-clock-module]], trivial
+- [[spec/tickets/hooks-draft-matches-red-tests]], trivial
+- [[spec/tickets/hooks-listen-case-fails-assertion]], trivial
+- [[spec/tickets/hooks-listener-joins-io-process]], trivial
+- [[spec/tickets/hooks-standing-file-names-token]], trivial
+- [[spec/tickets/hooks-wait-leaves-tool-input]], trivial
+- [[spec/tickets/the-hooks-door-lands]], standard
+- [[spec/tickets/the-mcp-module-lands]], standard
+- [[spec/tickets/tool-surface-moves-into-q]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is one door, one module or a one-line fix, small enough to review whole
+- the hooks door with its folds, the rules replay, the mcp module and Copilot cover the ask, and the migration module declares the cage key
+- copilot-meets-the-hooks-door names the hooks door and the mcp module under depends_on
 
 # children
 
