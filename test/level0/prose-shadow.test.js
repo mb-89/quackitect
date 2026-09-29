@@ -79,3 +79,10 @@ test("a missing binary writes nothing", async () => {
   assert.deepEqual(await shadowProse(doors, DOCS, [[WROTE]], "past"), []);
   assert.equal(doors.ran.length, 0);
 });
+
+// [[spec/tickets/readers-take-the-go-topics]]
+test("quackAt keeps naming the binary, which quack-topic.js now owns", async () => {
+  const { quackAt } = await import("../../src/bridge/prose-shadow.js");
+  const { quackAt: owned } = await import("../../src/scripts/quack-topic.js");
+  assert.equal(quackAt, owned);
+});

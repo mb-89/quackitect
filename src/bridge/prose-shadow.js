@@ -3,7 +3,7 @@
 // one shadow row, which ./RUNME.sh log --kind shadow names.
 // [[spec/tickets/prose-checks-run-in-go]]
 
-import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import { quackAt } from "../scripts/quack-topic.js";
 
 // The slice, its key under migration, and the mode that runs the new path beside the old one. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
 export const SLICE = "prose";
@@ -73,10 +73,7 @@ function answeredOf(text, count) {
 }
 
 // The quack binary under a root, the way the index door finds it: the bare name, else its .exe. [[spec/design_output/index#the-door-owns-the-database]]
-export function quackAt(files, join, root) {
-  const bare = join(root, BIN);
-  return [bare, `${bare}.exe`].find((one) => files.exists(one)) ?? bare;
-}
+export { quackAt };
 
 // Where the slice reads shadow, runs `quack prose` once over the documents and writes a row for each finding kept apart. A missing binary or an answer no reader takes writes nothing. [[spec/tickets/prose-checks-run-in-go]]
 export async function shadowProse(doors, docs, wink, mode) {

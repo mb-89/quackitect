@@ -4,7 +4,7 @@
 // [[spec/tickets/the-guidance-topic-lands]]
 
 import { shadowDoorsOf } from "../bridge/findings.js";
-import { fieldOf } from "../engine/group.js";
+import { processNameOf } from "./quack-topic.js";
 
 // The slice, its key under migration, and the mode that runs the new path beside the old one. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
 export const SLICE = "guidance";
@@ -67,11 +67,4 @@ export async function shadowLeaf(it, leaf, notes) {
   }
 }
 
-// The name of the process a ticket names, as the guidance module keys its leaves. [[spec/tickets/the-guidance-topic-lands]]
-export function processNameOf(text) {
-  return String(fieldOf(text, "process") ?? "")
-    .trim()
-    .replace(/^\[\[|\]\]$/g, "")
-    .split("/")
-    .pop();
-}
+export { processNameOf };

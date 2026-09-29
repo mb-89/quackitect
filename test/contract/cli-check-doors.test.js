@@ -112,7 +112,9 @@ test("apply.js imports its siblings alone", () => {
 // The config verb hands every row it prints to the config slice's shadow, over the verb's own doors. [[spec/tickets/cfg-topic-holds-one-resolver]]
 test("the config verb runs the config slice's shadow over the rows it prints", () => {
   const verb =
-    /export async function readConfig\(argv\)[\s\S]*?\n}\n/.exec(source)?.[0] ?? "";
+    /export async function readConfig\(argv, here = it\)[\s\S]*?\n}\n/.exec(
+      source,
+    )?.[0] ?? "";
   assert.match(verb, /await configShadow\(rows, key \? new Set\(\[key\]\) : null\)/);
   const shadow =
     /function configShadow\(rows, wanted\)[\s\S]*?\n}\n/.exec(source)?.[0] ?? "";

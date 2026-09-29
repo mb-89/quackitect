@@ -14,6 +14,7 @@ import {
   within,
 } from "./log-read.js";
 import { shadowLog } from "./log-shadow.js";
+import { logRowsOf, readsNew, topicOf } from "./quack-topic.js";
 
 const USAGE = [
   "Usage: ./RUNME.sh log [flags]\n",
@@ -40,7 +41,9 @@ export async function logVerb(it, argv) {
     return 0;
   }
 
-  const rows = narrowed(rowsIn(it, paths), said, now);
+  // The rows come off quack log where the log slice reads new, and off the files where the topic answers nothing. [[spec/tickets/readers-take-the-go-topics]]
+  const held = readsNew(it, "log") ? logRowsOf(topicOf(it, ["log"])) : null;
+  const rows = narrowed(held ?? rowsIn(it, paths), said, now);
   const shown = said.includes("--count") ? countsOf(rows) : rows.map(asRow);
   for (const one of shown) console.log(one);
   // The verb prints its answer first, and the shadow reads the rows before any flag narrows them. [[spec/tickets/log-shadow-reads-unfiltered-rows]]

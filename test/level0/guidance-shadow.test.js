@@ -76,3 +76,14 @@ test("a missing binary writes nothing", async () => {
   assert.deepEqual(await guidanceShadow(doors, { [DRAFT]: [] }), []);
   assert.equal(doors.ran.length, 0);
 });
+
+// [[spec/tickets/readers-take-the-go-topics]]
+test("processNameOf keeps naming the process, which quack-topic.js now owns", async () => {
+  const { processNameOf } = await import("../../src/scripts/guidance-shadow.js");
+  const owned = await import("../../src/scripts/quack-topic.js");
+  assert.equal(processNameOf, owned.processNameOf);
+  assert.equal(
+    processNameOf("---\nprocess: [[spec/processes/standard]]\n---\n"),
+    "standard",
+  );
+});
