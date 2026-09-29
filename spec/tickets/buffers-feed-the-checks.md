@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -144,6 +144,24 @@ record:
         hash: 9077ecae87856252
         size: 5609
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 9448fdfc1a4feeb2413bf51e913142733d68d3a4
+    hash_after: b95ad82f84846c952bf0b7039f4e92a328aca6c8
+    inputs:
+      - name: design/draft
+        hash: 5c34c24b4d80a416
+        size: 1724
+      - name: design/tests-red
+        hash: 784c865b5c7ba256
+        size: 661
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/the-lsp-door-lands]]
+        hash: 9077ecae87856252
+        size: 5609
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -260,8 +278,9 @@ Both cases fail on their own assertion, since the sweep stands nowhere yet and r
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
