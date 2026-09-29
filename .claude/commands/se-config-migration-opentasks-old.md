@@ -1,5 +1,5 @@
 ---
-description: "config / migration / opentasks: sets migration.opentasks to old. The open-tasks count: old answers alone, shadow runs the index's count beside it and logs a mismatch, new answers the index's."
+description: "config / migration / opentasks: sets migration.opentasks to old. The open-tasks slice's record. The badge, the work tab's brackets and its queue column read the index, and old and shadow reach no reader since phase 2 switched over."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
