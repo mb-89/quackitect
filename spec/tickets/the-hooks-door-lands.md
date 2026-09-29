@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-lands-in-shadow
+record:
+  - step: design/draft
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 2a25bcd4c35b0dd43a1af7601f93f33807e8ed73
+    hash_after: 2a25bcd4c35b0dd43a1af7601f93f33807e8ed73
+    inputs:
+      - name: ask
+        hash: 4b7bc5b678c5a5fe
+        size: 736
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -150,32 +160,67 @@ Every cage rule after this one runs on it.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The hooks IO module lands beside the bridge, which keeps answering.
+
+1. `src/q/event.go` declares `q.Event` (seq, at, kind, harness, hand, fields) and `q.Hand`, per the model's chapter The events of a session. `Store.Folds(prefix)` in `src/q/store.go` answers the fold names a prefix reaches.
+2. `src/modules/hooks/hooks.go` is one file: `Registers` declares the out-port `events/<id>` with `q.IO()` and the config key `wait`, a second. `Door.Hook(post)` stamps the event, commits it, lands it on every `session/<id>/` fold, and answers effects. An `index_` tool call runs its action through the manager's call, with the post's wait or the key's. An operation of the session that ends after its call answers rides the next post as an `after` block, once. A Stop names each operation still running, with its fraction and time, and passes. `Listen` serves `POST /hook` on loopback and writes `.se/.runtime/hooks.json`. `Replay` is the inbound fake: it drives the door off a JSONL recording under `test/replay/hooks` and answers each difference.
+3. `src/modules/session/session.go` holds the folds `<id>/fill` and `<id>/last`, which the instance `session` binds under `session/`.
+4. `manager.Served` answers the session's operations beside the stop and the call, and `Serves` wraps it.
+5. `src/quack/main.go` loads `hooks` and `session`, and starts the door beside the manager with the hooks instance's writer. `spec/wiring.yaml` wires `hooks.events/<id>` to `session/<id>/events`.
+6. The migration module adds the slice `cage`, built-in `old`, and `spec/config/level0.json` sets it to `shadow`, with its schema entry.
+7. In `answersEvent`, the bridge posts the event and its own decision to the hooks port while the key reads `shadow`. It awaits nothing, and a failure passes. Decisions meet as shadow rows in cage-rules-replay-session-logs.
+
+I assume the session id rides `e.session.id`, `e.sessionId` or `e.session_id`, the spellings `pull.js` reads.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go main: loads the hooks and session module types, and hands the hooks writer to manages
+- src/quack/main.go manages: starts the hooks door over manager.Served
+- src/quack/main.go load and wired: answer the writer of each instance
+- src/modules/index/manager.go Serves: wraps the new Served
+- src/modules/index/manager_test.go and call_test.go: call Serves, unchanged
+- src/modules/migration/migration.go Registers: the cage slice joins its table
+- src/modules/migration/migration_test.go: reads every slice key
+- src/q/store.go Folds: called by src/modules/hooks/hooks.go Door.Hook
+- src/bridge/server.js answersEvent: forwards the shadow copy
+- src/bridge/server.js boxOf: carries the http door
+- test/level0/*.test.js cases calling answersEvent and boxOf
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks_test.go TestReplayWritesTheEvents
+- src/modules/hooks/hooks_test.go TestTheDoorRunsOverQtest
+- src/modules/hooks/hooks_test.go TestACallTakesTheDefaultWait
+- src/modules/hooks/hooks_test.go TestAnEndedOperationReachesTheNextTurn
+- src/modules/hooks/hooks_test.go TestTheStopNamesRunningOperations
+- src/modules/session/session_test.go TestTheFoldsReadTheEvents
+- src/q/store_test.go TestFoldsUnderAPrefix
+- src/modules/index/manager_test.go TestServedAnswersTheSessionOps
+- test/level0/cage-shadow.test.js the bridge posts the event beside its answer in shadow
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: q.go, store.go Land, action.go, send.go, qtest.go, manager.go Serves, call.go, ops.go, quack main.go manages/load/wired, wiring.go Bound, migration.go, level0.json, server.js answersEvent/boxOf, doors/http.js, level0.js post body, pull.js session spellings
+- the callers list names the Go and JavaScript callers of each changed function, found by grep
+- go test ./... decides by the whole suite; the replay line by TestReplayWritesTheEvents; qtest by TestTheDoorRunsOverQtest; the default wait by TestACallTakesTheDefaultWait; the next turn by TestAnEndedOperationReachesTheNextTurn; the Stop by TestTheStopNamesRunningOperations; ./RUNME.sh check by the check itself
 
 ## tests-red
 
