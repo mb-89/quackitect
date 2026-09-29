@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 3ee6509b247fc56f
         size: 193
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: bbc8a9f98841e6efbe0e66084bfac8c4fe55110b
+    hash_after: bbc8a9f98841e6efbe0e66084bfac8c4fe55110b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: c4355428f77acdd7
+        size: 4472
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,35 @@ Weighed and refused: one JavaScript dispatcher under a new name, since it keeps 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/cli-leaves.test.js
+- test/level0/verb-line.test.js
+- test/level0/verb-run.test.js
+- src/modules/verbs/tree_test.go
+- src/quack/programs_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new test fails on its own assertion. cli.js stands, sources name it, and no program folder stands. A verb program reads as no verb root, verbArgv answers nothing, and Commands lists nothing. The usage reads empty. Surprise: the bash test stood at the file ceiling, so the verb cases moved to a file of their own first.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red test: cli-leaves.test.js decides the file, and ./RUNME.sh check decides the rest
+- the contract test drives the real disk door, and the Go cases touch no outside
 
 # gate
 

@@ -446,27 +446,6 @@ test("the description names the verbs, and answers the same string twice", () =>
   );
 });
 
-// The index lists each verb as a tool, so the description names the tools and sends the agent there first. [[spec/tickets/agents-call-quack-directly]]
-test("the description names the index tools where the index lists them", () => {
-  const tools = [
-    "index_verb_check",
-    "index_branch_done",
-    "index_verb_tui",
-    "index_verb_doctor",
-  ].map((name) => ({ name }));
-  const said = verbLine(tools);
-  for (const name of ["index_verb_check", "index_branch_<verb>", "index_verb_doctor"]) {
-    assert.ok(said.includes(`mcp__level0__${name}`), `the line names ${name}: ${said}`);
-  }
-  assert.ok(
-    !said.includes("index_verb_tui"),
-    "a tool holding a terminal stays off the line",
-  );
-  assert.doesNotMatch(said, /\.\/RUNME\.sh/);
-  assert.match(said, /Reach for the tool before the shell\./);
-  assert.equal(verbLine([]), verbLine(), "an empty list keeps the verb line");
-});
-
 // A landing waits on its gate, so a chain running it whatever the gate answers comes back refused. [[spec/design_output/bash#a-landing-follows-its-gate]]
 test("a landing after a semicolon, a newline, a double bar or an ampersand refuses, and a double ampersand passes", () => {
   for (const command of [

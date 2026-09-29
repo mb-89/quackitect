@@ -44,3 +44,20 @@ func TestNoTreeVerbNamesATopic(t *testing.T) {
 		}
 	}
 }
+
+// The tree verbs read as the table less its topics, so one table holds every verb. [[spec/tickets/cli-js-leaves]]
+func TestTreeVerbsReadAsCommandsLessTheTopics(t *testing.T) {
+	topics := map[string]bool{"ticket": true, "retro": true, "branch": true, "vehicle": true, "stub": true}
+	var want, got []string
+	for _, one := range Commands {
+		if !topics[one.Name] {
+			want = append(want, one.Name)
+		}
+	}
+	for _, one := range TreeVerbs {
+		got = append(got, one.Name)
+	}
+	if len(Commands) != len(TreeVerbs)+len(topics) || !reflect.DeepEqual(got, want) {
+		t.Fatalf("the tree verbs read %v, and the table less its topics reads %v", got, want)
+	}
+}

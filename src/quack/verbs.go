@@ -128,6 +128,12 @@ func verbs(d verbDoors, argv []string) int {
 	return d.old(d.out)
 }
 
+// The argv of a verb's program under the scripts folder. [[spec/tickets/cli-js-leaves]]
+func programOf(scripts string, argv []string) []string { return nil }
+
+// The usage quack prints for help and for a verb it knows nowhere. [[spec/tickets/cli-js-leaves]]
+func usageText() string { return "" }
+
 func capped(text string) string {
 	if len(text) <= answerCap {
 		return text

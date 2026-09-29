@@ -8,6 +8,9 @@ import "quackitect/src/q"
 // The topic the tree verbs stand under, which names no word of their own. [[spec/tickets/agents-call-quack-directly]]
 const TreeTopic = "verb"
 
+// Every verb in help order with its usage line, the topics among them. [[spec/tickets/cli-js-leaves]]
+var Commands = []Verb{}
+
 // Every verb cli.js answers outside a topic, with its usage line as its doc. [[spec/tickets/agents-call-quack-directly]]
 var TreeVerbs = []Verb{
 	{Name: "check", Doc: "the tests, the doors, the server, then the rules over the tree"},
