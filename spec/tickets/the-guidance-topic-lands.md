@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: 501499ab2049eff5
         size: 3483
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 1b4a7446b765741ac10a5f1e4d7c94ca57bb5c3a
+    hash_after: 1b4a7446b765741ac10a5f1e4d7c94ca57bb5c3a
+    inputs:
+      - name: design/draft
+        hash: 501499ab2049eff5
+        size: 3483
+      - name: design/tests-red
+        hash: 993919719f37e3d2
+        size: 1042
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -258,8 +270,12 @@ the module cases seed files/ through qtest, and the shadow cases fake the quack 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- guidance-shadow-wiring-tested: the draft wires guidanceShadow into stepNotes in src/scripts/guidance-verb.js and into the pull hand-out in src/scripts/pull-hand.js, and no test drives either caller, since test/level0/guidance-shadow.test.js calls guidanceShadow alone; add a case per caller that reads the shadow row off the fake log
+- guidance-draft-matches-tests-red: the draft tests list leaves out TestGuidanceGoldenOldMeetsNew and the case a missing binary writes nothing, and its approach names an env port where tests-red carries each note env on Read.Env and filters it in Notes; write the answer under Discussion
+- guidance-module-cases-cover-edges: guidanceText lets a work root stand over the method root notes, and namesUnder drops a note whose name opens with an underscore, and no module case covers either while the golden reads this tree alone
 
 # implement
 
