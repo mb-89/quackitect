@@ -26,6 +26,7 @@ const (
 	hookKind    = "hook"
 	shadowKind  = "shadow"
 	blockKind   = "block"
+	rowsKind    = "rows"
 	cageSlice   = "cage"
 	shadowLevel = "info"
 	stampLayout = "2006-01-02T15:04:05.000Z07:00"
@@ -98,11 +99,14 @@ func OldDecisionOf(answer any) string {
 	return PassWord
 }
 
-// The door's answer to a post as one decision word: a result answering a tool that names no action refuses it. [[spec/tickets/cage-rules-replay-session-logs]]
+// The door's answer to a post as one decision word: a result answering a tool that names no action refuses it, and the rows effect holds, since the answer gate reads the rows it asks back for. [[spec/design_output/model#an-effect-asks-back]]
 func NewDecisionOf(post Post, said Answer) string {
 	for _, one := range said.Effects {
 		if one.Kind == blockKind {
 			return BlockWord
+		}
+		if one.Kind == rowsKind {
+			return HoldWord
 		}
 		if one.Kind == resultKind && !strings.HasPrefix(textOf(post.E, "tool"), toolPrefix) {
 			return RefuseWord

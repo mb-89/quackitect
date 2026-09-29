@@ -77,6 +77,7 @@ func TestDecisionOfReadsTheDoorsAnswer(t *testing.T) {
 		{bash, Answer{Effects: []Effect{{Kind: resultKind, Text: "no"}}}, RefuseWord},
 		{index, Answer{Effects: []Effect{{Kind: resultKind, Result: "done"}}}, PassWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: "block", Text: "wait"}}}, BlockWord},
+		{prompt(), Answer{Effects: []Effect{{Kind: "rows"}}}, HoldWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: passKind}, {Kind: afterKind, Text: "ends"}}}, PassWord},
 	} {
 		if got := NewDecisionOf(one.post, one.said); got != one.want {
