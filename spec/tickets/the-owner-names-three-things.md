@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: do
 steps:
   - name: answer
@@ -45,6 +45,23 @@ record:
         hash: b834eb0422123511
         size: 606
     def: 2280015d497a3abd
+  - step: do
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 58bb1f20101326f7fed4a54d62935c5c2491c691
+    hash_after: 58bb1f20101326f7fed4a54d62935c5c2491c691
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: dcb2e9a6b91d6352
+        size: 657
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -80,26 +97,32 @@ The button in the sidebar: the work editor button. The tab of the window ./RUNME
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/vocabulary.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The terms file gains the owner words for the three things the work view shows: work editor, work tab and brackets. A later note writing of the button, the tab or the count now finds each word in the dictionary.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the three terms follow the answer
+the change reveals no cleanup
+each word stands once, in the terms file
 
 # Discussion
 
