@@ -199,6 +199,7 @@ export function addsIn(command) {
 const TICKET_FREE = [
   ["branch", "take"],
   ["branch", "list"],
+  ["branch", "sync"],
   ["ticket", "pull"],
   ["mint", "ticket"],
   ["ticket", "note"],

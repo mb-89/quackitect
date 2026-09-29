@@ -8,7 +8,7 @@
   },
   "work": {
     "comment": "The knobs the work verbs read. For a stale group, see spec/design_output/work.md.",
-    "staleAfter": "12h",
+    "staleAfter": "30m",
     "failsBeforePerson": 2,
     "refusalsBeforeFail": 5,
     "stepsBeforeSplit": 3,
@@ -88,7 +88,7 @@
     "phase1": true,
     "phase1gaps": true,
     "phase2shadow": true,
-    "phase2switch": false,
+    "phase2switch": true,
     "phase3shadow": true,
     "phase3switch": false,
     "phase4shadow": true,
@@ -103,7 +103,13 @@
     "phase8switch": false,
     "phase9shadow": true,
     "phase9switch": false,
-    "phase10": false
+    "phase10": false,
+    "opentasks": "new",
+    "config": "shadow",
+    "log": "shadow",
+    "guidance": "shadow",
+    "check": "shadow",
+    "prose": "shadow"
   },
   "pull": {
     "comment": "The size cap. One tool answer reaches the model whole up to cap, in bytes, and the pull keeps each part margin below it. spec/design_input/level-two.md, chapter The size cap, holds the measure.",
@@ -128,9 +134,10 @@
     "backoffCap": 60,
     "faults": 5,
     "window": 300,
+    "beat": 5,
+    "lease": 30,
     "deadlineDerived": 30,
     "deadlineFold": 30,
-    "deadlineAction": 30,
-    "deadlineOp": 600
+    "deadlineAction": 600
   }
 }

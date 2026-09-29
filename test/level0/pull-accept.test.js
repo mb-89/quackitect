@@ -184,7 +184,44 @@ test("a rerun names the diff since its last verdict, and runs every command", ()
   heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
   assert.ok(
     ranGit(made.outside).some((one) => one.includes("./RUNME.sh lint")),
-    "the hand-back runs every command field of the route",
+    "the hand-back runs every command field of the leaves before the gate",
+  );
+});
+
+// A group's second round meets the command its last retro wrote, which drains only at the retro past the gate. [[spec/design_output/pull#the-final-acceptance]]
+test("a final gate leaves the command of a leaf past it to that leaf", () => {
+  const made = doors(
+    standing(
+      filled(
+        FINAL()
+          .replace(
+            "group: one-group\n",
+            "  - name: retro\n    steps:\n      - name: notes\n        does: decides every note\n        evidence:\n          - name: drained\n            form: command\n            expects: 0\n            says: the notes drain\ngroup: one-group\n",
+          )
+          .replace(
+            "# Discussion\n",
+            "# retro\n\n## notes\n\n### drained\n\n./RUNME.sh retro notes\n\n# Discussion\n",
+          ),
+        "## verdict",
+        "accept",
+      ),
+    ),
+    {
+      "sh -c ./RUNME.sh retro notes": { stdout: "1 note(s) stand open\n", exitCode: 1 },
+    },
+  );
+  heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+  const back = heard(() => pulling(ROOT, ["pull", "a-child"], made.it));
+
+  assert.doesNotMatch(back.said, /refused/, "the gate takes the verdict");
+  const ran = ranGit(made.outside);
+  assert.ok(
+    ran.some((one) => one.includes("./RUNME.sh lint")),
+    "the leaf before the gate runs",
+  );
+  assert.ok(
+    !ran.some((one) => one.includes("retro notes")),
+    "the leaf past the gate waits",
   );
 });
 

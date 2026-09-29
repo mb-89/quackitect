@@ -291,3 +291,5 @@ An action then answers over HTTP the way it answers on the command line, and a s
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The ticket `surfaces-read-the-output-fields` closes `became` onto this one. The OpenAPI entry of `POST /v1/actions/<name>` takes its response schema off `Presentation.Out`, the fields `q.Answers` declares. A case reads a field's `label` and `doc` there. An action with no `q.Answers` keeps an untyped result.

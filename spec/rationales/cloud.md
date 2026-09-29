@@ -194,3 +194,15 @@ pushing a minute later leaves the box behind while it reports itself current.
 Two earlier sessions answered that they were up to date and were wrong. So the
 box states the commit and the reader decides, which takes the judgement off the
 agent.
+
+## 16. Questions stay with the box
+
+The owner rules that a cloud box waits for nobody. A ticket the
+box can close joins its own group, so the group reaches done only once the box
+has answered its own questions. Before this rule, a box sent such tickets
+loose to `main`, and each one then waited on a person.
+
+Only work a person alone can do leaves the group, as a free ticket on `main`.
+The dispatch once turned every waiting ticket into a GitHub issue, and opened
+17 at once. The ticket already holds the question, so a second record buries
+it. So no box opens an issue.
