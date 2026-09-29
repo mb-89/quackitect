@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-switch-over
 parent: cli-js-leaves
+record:
+  - step: do
+    hand: box d85a88bc0dd4 · claude-code-remote
+    hash_before: 31794cf34e247b5da222da349317333cb2412685
+    hash_after: 31794cf34e247b5da222da349317333cb2412685
+reason: became
+successors: [cli-js-leaves]
 ---
 
 # Ask
