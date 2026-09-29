@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -96,6 +96,18 @@ record:
         exit: 0
         said: work/sidebar-lands-in-shadow already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 62b80a66051601a6b37eb2794f69850befa55bca
+    hash_after: 91e91057da4140b45d6445cbe84c2a0f283f3493
+    inputs:
+      - name: ask
+        hash: 44916162433af90b
+        size: 559
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["tui-shell-lands-in-shadow"]
 enabled_by: migration.phase8shadow
 cloud: true
@@ -125,14 +137,21 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-config-schema-gets-generated]], standard
+- [[spec/tickets/the-sidebar-renders-generically]], standard
+- [[spec/tickets/view-actions-run-through-verbs]], standard
+- [[spec/tickets/the-sidebar-shadow-compares]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child reviews whole: the schema, the renderer, the actions, then the compare
+- the four add up to the goal: a generated schema, a generic sidebar, and its shadow with the slice key
+- the compare reads what the renderer draws, and the renderer stands closed, so no child waits on an open one
 
 # children
 
