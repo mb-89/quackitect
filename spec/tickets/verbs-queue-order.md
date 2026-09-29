@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,6 +25,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
+step: do
 ---
 
 # Ask
@@ -55,11 +56,15 @@ Left undone, `ticket yours` and `branch list --queue` write a shadow row on ever
 
 <!-- the form is command -->
 
+./RUNME.sh test src/quack src/modules/queue src/modules/git test/contract/one-config.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -67,11 +72,30 @@ Left undone, `ticket yours` and `branch list --queue` write a shadow row on ever
 
 <!-- the form is text -->
 
+The Go queue replays a captured cli.js run place for place, so the order rule matches. The inputs differ on the served index:
+
+| input | cli.js | served Go queue before | now |
+|---|---|---|---|
+| weights | `work.*Score` | `queue.*`, which no file set | `queue.block`, `queue.day` and `queue.fail`, read by both |
+| weights, served | the file | 0, since the served index reads no loaded projection | built-ins holding the file's values |
+| ages | the git log over `spec/tickets` | `built-in`, an empty map | `git/stood`, off the same log |
+
+The block weight carries the order here, since tickets depend on the-editor and loose-fixes. The served ages keyed on HEAD alone missed a fetch that fills in a shallow clone, so the key takes the shallow file too. After a run of the four verbs, `./RUNME.sh log --kind shadow` names no row stamped past the start:
+
+- `ticket yours`
+- `ticket yours --next`
+- `branch list --queue`
+- `retro notes`
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the served queue orders as cli.js does, and the verbs shadow stays quiet
+- the cleanup it reveals: the empty served config stays with index-reads-loaded-projections, and each built-in weight points there
+- every fact stands once: the file owns each weight, and the built-ins stand until that ticket lands
 
 # Discussion
 
