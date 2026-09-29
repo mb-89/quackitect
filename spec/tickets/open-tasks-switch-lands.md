@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: split
+step: children
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2switch
@@ -99,6 +99,18 @@ record:
         exit: 0
         said: work/open-tasks-switch-lands already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 67758709e551733352b7107138c179a29a49fc93
+    hash_after: 67758709e551733352b7107138c179a29a49fc93
+    inputs:
+      - name: ask
+        hash: 84879e30408c4c2c
+        size: 395
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -125,14 +137,25 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/the-badge-reads-open-tasks]], standard
+[[spec/tickets/the-count-chain-leaves]], standard
+[[spec/tickets/queue-column-reads-the-index]], trivial
+[[spec/tickets/red-list-reads-inserted-leaves]], trivial
+[[spec/tickets/count-grep-misses-the-scripts]], trivial
+[[spec/tickets/count-tests-miss-the-chain]], trivial
+[[spec/tickets/open-tasks-fake-moves-over]], trivial
+[[spec/tickets/opentasks-help-names-dead-modes]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+size: every child closed through one review each
+goal: the badge, the brackets and the queue column read the index, and the count chain left the tree, so the goal stands inside the children
+order: every child stands closed, so no child waits on another
 
 # children
 
