@@ -10,6 +10,10 @@ import { fieldOf } from "../engine/group.js";
 // The slice a reader asks, and the mode that answers off the Go topic. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
 const NEW = "new";
 
+// The modes a prose request reads: every veto, or the past veto alone, as src/prose names them. [[spec/tickets/prose-checks-run-in-go]]
+export const ALL = "all";
+export const PAST = "past";
+
 // The quack binary under a root, the way the index door finds it: the bare name, else its .exe. [[spec/design_output/index#the-door-owns-the-database]]
 export function quackAt(files, join, root) {
   const bare = join(root, BIN);

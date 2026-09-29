@@ -31,7 +31,6 @@ import { childrenSay } from "./pull-children.js";
 import { keptRed } from "./pull-kept.js";
 import { dueHandOut } from "./ephemeral-pull.js";
 import { noteRows, readsFor, readsOf } from "./guidance-hand.js";
-import { shadowLeaf } from "./guidance-shadow.js";
 import { notesOf, processNameOf } from "./quack-topic.js";
 import { shadowNeeds } from "./needs-shadow.js";
 import { workAnswer } from "./pull-chapter.js";
@@ -477,8 +476,6 @@ export function handed(it, who, one, leaf) {
   const notes = notesOf(it, at, () => readsFor(it, leaf));
   const reads = readsOf(it, notes);
   noteRows(it, leaf.path, reads);
-  // The hand-out reads its notes now, and the shadow row lands behind it. [[spec/tickets/the-guidance-topic-lands]]
-  shadowLeaf(it, at, notes);
   // The leaf's needs meet the registry's actions behind the hand-out. [[spec/tickets/pull-verbs-become-actions]]
   shadowNeeds(it, leaf.needs);
   const hold = {

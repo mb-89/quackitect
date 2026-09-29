@@ -112,9 +112,6 @@ export async function findingsDoors() {
     root,
     vale: bin,
     biome: biomeFor(files, root, readTools(files, root)),
-    // The prose shadow reads the slice's mode and writes its rows here. [[spec/tickets/prose-shadow-hooks-reads-text]]
-    config: it.config,
-    log: it.log,
     // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
     ceilings: {
       function: await it.config.ask("code.functionLines"),

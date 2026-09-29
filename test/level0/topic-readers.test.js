@@ -135,6 +135,31 @@ test("every reader on a new slice faults where its topic answers nothing, naming
   );
 });
 
+// The comparison twins leave, so a reader runs its topic once, whatever mode a config still names. [[spec/tickets/twins-leave-misses-some-callers]]
+test("each reader runs quack once, and no shadow runs beside it", async () => {
+  const set = { rule: "Voice.Other", line: 1, column: 10, said: "set", file: "n.md" };
+  const held = `${JSON.stringify({ at: AT, level: "info", kind: "tool", said: "a row" })}\n`;
+  const it = {
+    ...itOf(
+      "new",
+      { [join(ROOT, SESSION)]: held },
+      {
+        [`${QUACK} prose`]: { stdout: JSON.stringify({ docs: [{ kept: [] }] }) },
+        [`${QUACK} log`]: { stdout: "[]" },
+      },
+    ),
+    config: { ask: async () => "shadow" },
+  };
+  readsProse(it, "the door set the write\n", [set]);
+  readsText(it, "n.md", "the door set the write\n", [set]);
+  await printed(() => logVerb(it, []));
+  await new Promise((done) => setImmediate(done));
+  assert.deepEqual(
+    it.proc.ran.map((one) => one.argv.slice(1).join(" ")),
+    ["prose", "prose", "log"],
+  );
+});
+
 test("a leaf the guidance topic names no notes for reads no notes", () => {
   const it = itOf("new", {}, { [`${QUACK} guidance`]: { stdout: "{}" } });
   assert.deepEqual(

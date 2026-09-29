@@ -5,7 +5,6 @@
 import { dirname, join, resolve, sep } from "node:path";
 import { CONFIG_DIR } from "../../.claude/skills/level0/lib/code.js";
 import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
-import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
@@ -52,7 +51,6 @@ import { FIX_USAGE, fixFlags } from "./cli-fix.js";
 import { goEnvOf, goGate, goTestNames } from "./cli-go.js";
 import { hookRows, hooksNamed } from "./cli-hooks.js";
 import { namesIn, show, walk } from "./cli-read.js";
-import { shadowRun } from "./config-shadow.js";
 import { answerOf, configRowsOf, readsNew, topicOf } from "./quack-topic.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { lspProbe } from "./lsp-probe.js";
@@ -83,9 +81,7 @@ export function tuiDoors() {
     show,
     // The log verb reads a span against now, and a door answers the clock. [[spec/guidance/code/testing]]
     clock: it.clock,
-    // The log slice in shadow reads its mode, runs quack under the method root, and writes its rows through the log door. [[spec/tickets/log-shadow-wiring-gets-tests]]
-    config: it.config,
-    log: it.log,
+    // The log verb runs quack under the method root. [[spec/tickets/readers-take-the-go-topics]]
     method: it.method,
   };
 }
@@ -180,7 +176,6 @@ export async function readConfig(argv, here = it) {
       `${one.key.padEnd(COL.key)} ${String(one.value).padEnd(COL.value)} ${one.layer}`,
     );
   }
-  await configShadow(rows, key ? new Set([key]) : null);
   if (key) return 0;
 
   for (const fault of await settings.faults()) {
@@ -189,22 +184,6 @@ export async function readConfig(argv, here = it) {
   console.log("");
   console.log(`Write one: ./RUNME.sh config <key> <value>, which lands in ${LOCAL}.`);
   return 0;
-}
-
-// The config slice's shadow over the verb's own doors. [[spec/tickets/cfg-topic-holds-one-resolver]]
-function configShadow(rows, wanted) {
-  return shadowRun(
-    {
-      settings,
-      files,
-      proc: outside,
-      log: it.log,
-      root,
-      binary: join(root, `${INDEX_BIN}${process.platform === "win32" ? ".exe" : ""}`),
-    },
-    rows,
-    wanted,
-  );
 }
 
 // A flag the fixer knows nothing of refuses before a write. [[spec/tickets/the-small-faults-land]]

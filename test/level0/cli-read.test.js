@@ -11,13 +11,6 @@ import {
   warningsStood,
 } from "../../src/scripts/cli-read.js";
 
-// The prose shadow reads its slice through the config and writes its rows through the log. [[spec/tickets/prose-shadow-hooks-reads-text]]
-test("the check's own reading hands the prose shadow the config and the log", async () => {
-  const doors = await findingsDoors();
-  assert.equal(typeof doors.config.ask, "function");
-  assert.equal(typeof doors.log.say, "function");
-});
-
 // A warning lands under every door, and the stamp carries the list. [[spec/design_output/config#the-engine-controls]]
 test("the warnings stand as a list, empty before any lint, and the version reads as text", () => {
   assert.deepEqual(

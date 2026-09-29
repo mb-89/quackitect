@@ -14,7 +14,6 @@ import {
   PROCESSES,
   readsFor,
 } from "./guidance-hand.js";
-import { shadowLeaf } from "./guidance-shadow.js";
 import { notesOf } from "./quack-topic.js";
 import { leafOf } from "./pull-route.js";
 
@@ -63,8 +62,6 @@ function stepNotes(it, step, env) {
   }
   // The notes come off quack guidance where the guidance slice reads new. [[spec/tickets/readers-take-the-go-topics]]
   const notes = notesOf(it, `${name}:${path}`, () => readsFor(it, leaf, env));
-  // The verb reads its answer now, and the shadow row lands behind it. [[spec/tickets/the-guidance-topic-lands]]
-  shadowLeaf(it, `${name}:${path}`, notes);
   return said(it, notes);
 }
 
