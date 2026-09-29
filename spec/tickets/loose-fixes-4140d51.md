@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -153,7 +153,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 13edb800fdd876d8bc5eed5853092dc55b8025c7
+    hash_after: 13edb800fdd876d8bc5eed5853092dc55b8025c7
+    inputs:
+      - name: retro/write
+        hash: 5cf6c1e6ef86c8a7
+        size: 1633
+    def: 4da1ca5da87d5bbc
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -294,20 +304,26 @@ The child needed no code. The work was reading the engine's doors, and each refu
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the box lacked nothing: every tool the take installed ran, and the proxy refused no host
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 00:33 the git door refused a raw push, and the verbs pushed in its place
+- 00:37 the sync met no conflict, since the branch carried main
+- the named test and the check ran green on the box
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked, and the box mints no ticket
+- five prose warnings stand on open tickets other hands hold
 
 # Discussion
 
