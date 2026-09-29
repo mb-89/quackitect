@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: 09300e00ea9ba763
         size: 1172
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 277d0ce03a8de3de65aa9faa5b3e58904aa4454b
+    hash_after: 277d0ce03a8de3de65aa9faa5b3e58904aa4454b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -271,14 +280,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/check src/scripts/check-twins.js src/lsp/twins_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the check module, the twin walk and its goldens, and the wiring that loads the module, and nothing past them.
+The node case runs over a fake disk and a fake git, and the parsers read captured tool output.
+The headers of src/modules/check/check.go and src/scripts/check-twins.js name the approach.
+The twin list stands in check.Twins, and src/scripts/check-twins.js spells it again since a script imports no Go, as its comment says.
 
 ## tests-green
 
