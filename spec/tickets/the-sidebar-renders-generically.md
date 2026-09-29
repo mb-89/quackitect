@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
+record:
+  - step: design/draft
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 1569981adfaf811abf71dca91a6a83e66af2f576
+    hash_after: f89e10364c5f402039d01fadafbc5e92d771a691
+    inputs:
+      - name: ask
+        hash: 069459d1fd027aa4
+        size: 418
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,68 @@ A new value then shows in the sidebar with no extension change.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The sidebar draws a section for each base file under `spec/views`, below the groups it draws today. Every text in that section comes off the catalog the index answers at `/v1`: the badge off the `index/names` row of the name under `badge`, and each button and form off the `index/actions` row of the action it calls. The base file names what shows, and the registration says how it reads.
+
+| part | file | what changes |
+|---|---|---|
+| the action rows | `src/modules/index/catalog.go`, `ActionRow`, `catalogOf` | carry the `label` and `icon` the registration declares, as `NameRow` does |
+| the index door | `src/extension/editor-index.js`, new, `indexDoor(root)` | `values(name)` reads `/v1/values/<name>`, and `calls(name, input)` posts `/v1/actions/<name>`. The port comes off `.se/.runtime/index.json`, as `standingOf` in `src/index/main.go` reads it. It answers nothing where no index stands. `activate` in `src/extension/extension.js` hands it in as `door.index` |
+| the badge | `src/extension/lib/views.js`, new, `badgeOf(names, name)` | the rule `BadgeOf` in `src/tui/work/shadow.go` holds: the label, and `label (value)` where the look is `count` |
+| the views | `src/extension/lib/views.js`, `viewsOf(bases, catalog)` | one section a base file: its title off the file name, its badge and icon off the row of `badge`, and one button for each action carrying `button`. A button takes the label, doc and icon of the action it `calls`, and its own name where the registration gives no label |
+| the forms | `src/extension/lib/views.js`, `formOf(action)` | an action carrying `edits: form` draws a form, one field a row, with the label and doc of each input field |
+| the panel | `src/extension/lib/panel.js`, `panelHtml` | draws the `views` sections below the groups, and writes no text of its own into them |
+| the sidebar | `src/extension/sidebar.js`, `html`, `took`, `watches` | reads each base file through `door.list` and `door.read`, parses it with `readYaml` out of `.claude/skills/level0/lib/schema-yaml.js` through `door.imports`, and reads the two rows through `door.index`. A message of the kind `call` calls its action through `door.index.calls`. The watch adds `spec/views/*.base` |
+| the note | `spec/design_output/extension.md` | a chapter on the views section, pointing at [[spec/design_output/model#views]] for the keys |
+
+The group's shadow compare, the slice key and the `shadow` rows, stands outside this ticket. The group's split mints it as a child of its own, since it reads what this ticket draws.
+
+What I weigh and assume:
+- The index door over the verb road. The model's surfaces name `/v1` for every client, and a spawn a draw costs what the switch-over removes.
+- A shared case file over two tests written apart. `src/tui/work/testdata/badges.json` holds the rows and the text each draws, and the Go case and the JavaScript case read the same file. So the badge reads alike by construction, with no index running.
+- An index standing down draws each view with its base names alone, and the sidebar that draws today stays whole.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/modules/index/manager.go`, the start that writes `index/actions` off `catalogOf`
+- `src/tui/registry/tab.go`, the `cli` tab, which reads the action rows by their `fields` member and takes the new members unread
+- `src/extension/extension.js`, `activate`, which builds the door `sidebarOf` takes
+- `src/extension/sidebar.js`, `sidebarOf`, called from `activate` and from `test/level0/sidebar.test.js` and `test/level0/sidebar-work.test.js`
+- `src/extension/lib/panel.js`, `panelHtml`, called from `sidebarOf().html` and from `test/level0/panel.test.js`
+- `src/tui/work/shadow.go`, `BadgeOf`, which the shared case file holds, called from `Shadow.Check`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/sidebar-views.test.js`, `the sidebar draws every base file over a fake catalog`
+- `test/level0/sidebar-views.test.js`, `a badge reads as the window draws it, over the shared cases`
+- `test/level0/sidebar-views.test.js`, `a button takes its label, doc and icon off the registration, and the base file writes none`
+- `test/level0/sidebar-views.test.js`, `a form draws one field a row off the action's input`
+- `test/level0/sidebar-views.test.js`, `a click on a view button calls its action through the index door`
+- `src/tui/work/badge_test.go`, `TestBadgeOfReadsTheSharedCases`
+- `src/modules/index/catalog_test.go`, `TestActionRowsCarryLabelAndIcon`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft, so no earlier review names a finding
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: `sidebar.js` with `html`, `took` and `watches`, `widgets.js`, `panel.js` by its export, `editor-files.js`, `editor-lens.js`, `extension.js` by its door, `catalog.go` with `ActionRow` and `catalogOf`, `shadow.go` with `BadgeOf`, `registry/v1.go`, `index/main.go` with `V1` and `standingOf`, `spec/views/work.base` and `log.base`, and the model's views chapters
+- the callers list comes off a search for `ActionRow`, `catalogOf`, `sidebarOf`, `panelHtml` and `BadgeOf` across `src` and `test`
+- the first done line meets `the sidebar draws every base file over a fake catalog`; the second meets `a badge reads as the window draws it, over the shared cases` beside `TestBadgeOfReadsTheSharedCases`; the check line meets `./RUNME.sh check` before the hand-back
 
 ## tests-red
 
