@@ -5,8 +5,11 @@ package index
 
 import (
 	"encoding/json"
+	"flag"
 	"net/http"
+	"os"
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"quackitect/src/q"
@@ -27,8 +30,13 @@ type listedTool struct {
 	} `json:"inputSchema"`
 }
 
-// The tools a door over t/add and t/echo lists. [[spec/tickets/the-hook-registers-index-tools]]
-func listedTools(t *testing.T) map[string]listedTool {
+// The golden file test/level0/index-tools.test.js reads as the list se-index tools prints. [[spec/tickets/tool-list-shape-held-once]]
+const toolsGoldenAt = "testdata/tools.golden.json"
+
+var update = flag.Bool("update", false, "write the golden file again off the index")
+
+// The body /v1/tools answers over a door holding t/add and t/echo. [[spec/tickets/the-hook-registers-index-tools]]
+func toolsBody(t *testing.T) []byte {
 	t.Helper()
 	root := tree(t)
 	c := q.New()
@@ -50,9 +58,19 @@ func listedTools(t *testing.T) map[string]listedTool {
 		t.Fatal(err)
 	}
 	said, body := getV1(t, standing, "/v1/tools")
-	var list []listedTool
-	if said.StatusCode != http.StatusOK || json.Unmarshal(body, &list) != nil {
+	if said.StatusCode != http.StatusOK {
 		t.Fatalf("/v1/tools answers %d: %.300s", said.StatusCode, body)
+	}
+	return body
+}
+
+// The tools a door over t/add and t/echo lists, by name. [[spec/tickets/the-hook-registers-index-tools]]
+func listedTools(t *testing.T) map[string]listedTool {
+	t.Helper()
+	body := toolsBody(t)
+	var list []listedTool
+	if err := json.Unmarshal(body, &list); err != nil {
+		t.Fatalf("/v1/tools answers %.300s: %v", body, err)
 	}
 	out := map[string]listedTool{}
 	for _, one := range list {
@@ -75,5 +93,32 @@ func TestABareInputRidesAsOneProperty(t *testing.T) {
 	echo, ok := listedTools(t)["index_t_echo"]
 	if !ok || !echo.Bare || echo.InputSchema.Type != "object" || echo.InputSchema.Properties["input"].Type != "string" {
 		t.Fatalf("the list holds %+v for t/echo", echo)
+	}
+}
+
+// The list /v1/tools generates reads as the golden file, so the hook's case holds the one shape the index answers. [[spec/tickets/tool-list-shape-held-once]]
+func TestTheToolListReadsAsItsGoldenFile(t *testing.T) {
+	var said, held any
+	if err := json.Unmarshal(toolsBody(t), &said); err != nil {
+		t.Fatal(err)
+	}
+	if *update {
+		body, err := json.MarshalIndent(said, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(toolsGoldenAt, append(body, '\n'), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	body, err := os.ReadFile(toolsGoldenAt)
+	if err != nil {
+		t.Fatalf("%v: run go test ./src/index -run TestTheToolListReadsAsItsGoldenFile -update", err)
+	}
+	if err := json.Unmarshal(body, &held); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(said, held) {
+		t.Fatalf("/v1/tools lists %v, and %s holds %v", said, toolsGoldenAt, held)
 	}
 }

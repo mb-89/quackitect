@@ -356,3 +356,4 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 - `src/quack/verbs.go` `aloneOf` stands among the callers. It keeps each verb `cliJsKeeps` names on the road to cli.js, tools and act among them. For details, see [[spec/tickets/quack-tools-spares-runme-tools]].
+- `src/index/testdata/tools.golden.json` holds the list by hand until `/v1/tools` answers. Once it answers, run `go test ./src/index -run TestTheToolListReadsAsItsGoldenFile -update` where the generated shape departs. For details, see [[spec/tickets/tool-list-shape-held-once]].

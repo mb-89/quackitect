@@ -11,25 +11,9 @@ import {
   registersIndexTools,
 } from "../../.claude/skills/level0/lib/index-tools.js";
 import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
+import LIST from "../../src/index/testdata/tools.golden.json" with { type: "json" };
 
 const BIN = "/method/.se/.runtime/bin/se-index";
-
-// The list `se-index tools` prints, as the index generates it. [[spec/tickets/the-hook-registers-index-tools]]
-const LIST = [
-  {
-    name: "index_t_add",
-    description: "adds two terms",
-    inputSchema: { type: "object", properties: { a: { type: "integer" } } },
-    action: "t/add",
-  },
-  {
-    name: "index_t_echo",
-    description: "echoes its input",
-    inputSchema: { type: "object", properties: { input: { type: "string" } } },
-    action: "t/echo",
-    bare: true,
-  },
-];
 
 // A hook engine whose binary prints the list, or answers what the case hands it. [[spec/tickets/the-hook-registers-index-tools]]
 function engine(answer = { stdout: JSON.stringify(LIST), exitCode: 0 }) {
