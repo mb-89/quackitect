@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 34b5900ad33525a31a70d0f743f5d5dffde9b8fe
+    hash_after: 34b5900ad33525a31a70d0f743f5d5dffde9b8fe
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 3 file(s); green, src/modules/guidance passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 993919719f37e3d2
+        size: 1042
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -316,26 +339,33 @@ The folder names stand once, as guidance.Guidance and guidance.Processes.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/guidance-shadow.test.js test/level0/guidance-shadow-wiring.test.js test/level0/guidance-golden.test.js src/modules/guidance
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The guidance topic lands in shadow. The guidance module resolves every leaf the processes name to the notes it reads, off the folder tags, the frontmatter tags and the env a note names, and quack guidance prints them keyed process:path. Where migration.guidance reads shadow, stepNotes and the pull hand-out run quack guidance and write one shadow row a leaf the two readers answer apart, which ./RUNME.sh log --kind shadow names. The golden holds both answers for every leaf of this tree, and they agree today. TestGuidanceGoldenOldMeetsNew in src/quack passes under go test -run Guidance, while that folder also holds the log ticket red test.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the guidance readers alone.
+The shadow and wiring cases meet fake doors.
+The module header names the approach.
+The folder names stand once in the module.
 
 # accept
 
