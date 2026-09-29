@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: d469d84a5fa315bf
         size: 923
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: 078fa90f6853d0c8ae97696ab88c6e729dee52ff
+    hash_after: 078fa90f6853d0c8ae97696ab88c6e729dee52ff
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: ef1962777dcbd748
+        size: 4357
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -255,26 +268,32 @@ every done_when line names the test that decides it: the first line meets the fo
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/q/scheduler_test.go
+- src/modules/config/config_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three scheduler cases read the family's default, an empty list, after the file lands, and the derived reader reads 0. The config case reads the key's default 0 where the tracked file says 3, so the migration row of the ask fails the same way. The out-of-glob case passes before the change, since it guards the default the fix keeps. No surprise: the failures match the draft's cause, a keyed family standing outside the scheduler's graph.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides: the first line meets the three scheduler cases and the config case, the curl line stays a checkpoint at tests-green against a running index, and the check line meets the check at tests-green
+every door the tests reach has a fake: the scheduler cases reach the store alone, and the config case runs over the fake index in q/qtest, seeding files/ as the case
 
 # gate
 

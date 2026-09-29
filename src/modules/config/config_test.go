@@ -218,3 +218,12 @@ func TestLayeredNamesTheLayer(t *testing.T) {
 		t.Fatal("a key no layer sets reads as set")
 	}
 }
+
+// The tracked file reaches a shared key through the waves alone, with no run a case names. [[spec/tickets/index-reads-loaded-projections]]
+func TestValuesReadTheTrackedFile(t *testing.T) {
+	ix := layered(t, "migration", switched)
+	ix.Seed(files(`{"migration": {"switch": 3}}`, `{}`))
+	if got := ix.Read("migration/config/switch"); got != 3 {
+		t.Fatalf("migration/config/switch reads %v, where the tracked file says 3", got)
+	}
+}

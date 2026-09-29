@@ -159,3 +159,62 @@ func TestWhyNamesAPendingValue(t *testing.T) {
 		t.Fatalf("why t/double reads %q, with no %q", said.Text, want)
 	}
 }
+
+// A loaded family a case registers over files/, beside the plan it parses. [[spec/tickets/index-reads-loaded-projections]]
+func loadedPlan(t *testing.T) (*Store, *Scheduler, Writer) {
+	t.Helper()
+	c := New()
+	files := OutIn(c, "files/<path...>", Content{})
+	ProjectIn(c, "queue", ".se/.runtime/*.txt", Codec[[]string](linesCodec{}), Loaded, []string{})
+	s := NewStore(c)
+	return s, NewScheduler(s, spawned, failOn(t)), files
+}
+
+func TestALoadedProjectionReadsASeededFile(t *testing.T) {
+	s, scheduler, files := loadedPlan(t)
+	seed(t, s, files, "files/.se/.runtime/plan.txt", Content{Hash: "h", Text: "a\nb\n"})
+	scheduler.Settle()
+	got, _ := s.Snapshot().Read("queue/.se/.runtime/plan.txt").([]string)
+	if len(got) != 2 || got[0] != "a" || got[1] != "b" {
+		t.Fatalf("queue/.se/.runtime/plan.txt reads %v after its file lands", got)
+	}
+}
+
+func TestALoadedProjectionFollowsAFileChange(t *testing.T) {
+	s, scheduler, files := loadedPlan(t)
+	seed(t, s, files, "files/.se/.runtime/plan.txt", Content{Hash: "h", Text: "a\n"})
+	scheduler.Settle()
+	seed(t, s, files, "files/.se/.runtime/plan.txt", Content{Hash: "i", Text: "c\n"})
+	scheduler.Settle()
+	got, _ := s.Snapshot().Read("queue/.se/.runtime/plan.txt").([]string)
+	if len(got) != 1 || got[0] != "c" {
+		t.Fatalf("queue/.se/.runtime/plan.txt reads %v after its file changes to c", got)
+	}
+}
+
+type planIn struct {
+	Plan []string `q:"queue/.se/.runtime/plan.txt"`
+}
+
+func TestALoadedProjectionFeedsADerivedReader(t *testing.T) {
+	c := New()
+	files := OutIn(c, "files/<path...>", Content{})
+	ProjectIn(c, "queue", ".se/.runtime/*.txt", Codec[[]string](linesCodec{}), Loaded, []string{})
+	DerivedIn(c, "t/todos", 0, func(in planIn) int { return len(in.Plan) })
+	s := NewStore(c)
+	scheduler := NewScheduler(s, spawned, failOn(t))
+	seed(t, s, files, "files/.se/.runtime/plan.txt", Content{Hash: "h", Text: "a\nb\nc\n"})
+	scheduler.Settle()
+	if got := s.Snapshot().Read("t/todos"); got != 3 {
+		t.Fatalf("t/todos reads %v after a plan of three lines lands", got)
+	}
+}
+
+func TestAKeyOutsideTheGlobsRunsNothing(t *testing.T) {
+	s, scheduler, files := loadedPlan(t)
+	seed(t, s, files, "files/.se/.runtime/plan.json", Content{Hash: "h", Text: "a\n"})
+	scheduler.Settle()
+	if got, _ := s.Snapshot().Read("queue/.se/.runtime/plan.json").([]string); len(got) != 0 {
+		t.Fatalf("queue/.se/.runtime/plan.json reads %v, a key no glob covers", got)
+	}
+}
