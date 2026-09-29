@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -203,6 +203,29 @@ record:
         exit: 0
         said: "src/quack/main.go:192:42: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 10839752357784d7d3763441d0f18da6110eb178
+    hash_after: 10839752357784d7d3763441d0f18da6110eb178
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 39 test(s) pass in 4 file(s); green, src/q passes; green, src/quack passes; green, src/config passes; green, src/
+      - name: check
+        exit: 0
+        said: "src/quack/main.go:192:42: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
+    inputs:
+      - name: design/tests-red
+        hash: f196c5e02ca2a87c
+        size: 1628
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -408,26 +431,37 @@ go build ./... && ./RUNME.sh lint
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/config.test.js test/level0/config-door.test.js test/level0/widgets.test.js test/level0/projection-builtin.test.js src/q src/quack src/config src/modules/check
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every key the tree reads now has a Go declaration with its built-in value, its help, its unit and its options. The settings module declares the sections no module owns, and the migration module declares every phase switch as false. The command `go run ./src/quack schema --write` writes the schema off those declarations. It lays `spec/config/draws.json` over the entries the sidebar draws.
+
+Every reader answers the schema's `default` where no file sets a key, under the layer `built-in`. So the default file keeps the migration block alone, and no reader changes what it answers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change stays inside the config readers, the declarations and the tests reading the default file.
+- No new door: each reader reads the schema through the file reads it held.
+- Each changed function names this ticket or its design chapter.
+- Each key's facts stand once, in its Go declaration.
+- The design note points at the generator, and lists no key.
+- The whole Go tree passes but one case, the red test of the sidebar ticket in this group.
 
 # accept
 
