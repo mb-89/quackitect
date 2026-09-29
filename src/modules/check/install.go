@@ -1,7 +1,7 @@
 // What the install script says it installs, and what the Vale settings draw.
 // Both rules read one file as text, because the shape each holds is a line.
 // [[spec/design_output/tools#what-the-survey-names]]
-package main
+package check
 
 import (
 	"quackitect/src/yaml"

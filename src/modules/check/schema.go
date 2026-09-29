@@ -2,7 +2,7 @@
 // kind of note holds, this reads it, and the checker weighs a note against it.
 // The caller hands the tree in, so a test drives both over a fake one.
 // [[spec/design_output/schema#the-reader-and-the-checker]]
-package main
+package check
 
 import (
 	"quackitect/src/yaml"

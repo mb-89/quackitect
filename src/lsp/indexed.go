@@ -27,9 +27,6 @@ const indexBinAt = ".se/.runtime/bin/se-index"
 // A call waits past the changes wait the door holds, so a held call answers before the client lets go. [[spec/design_output/index#the-index-fires-on-change]]
 const indexCallWait = 40 * time.Second
 
-// A tree the index holds nowhere, as a case's tree is. [[spec/design_output/lsp#the-server-reads-the-index]]
-var errNoIndex = errors.New("this tree reads no index")
-
 // One question to the index door, as a function, so a case hands in a door of its own. [[spec/design_output/lsp#the-server-reads-the-index]]
 type indexAsk func(method string, params any) (json.RawMessage, error)
 
@@ -79,6 +76,39 @@ func postIndex(root, method string, params any) (json.RawMessage, error) {
 		return nil, errors.New(said.Error)
 	}
 	return said.Result, nil
+}
+
+// The name the check module answers its sweep under, as the wiring loads it. [[spec/tickets/lsp-rules-move-to-check]]
+const sweepName = "check/sweep"
+
+// The check module's sweep, read off the index's /v1 port the standing file names. [[spec/tickets/lsp-rules-move-to-check]]
+func sweepOffIndex(root string) ([]Finding, error) {
+	standing, err := readFile(filepath.Join(root, filepath.FromSlash(indexStandingAt)))
+	if err != nil {
+		return nil, err
+	}
+	var at struct {
+		V1 int `json:"v1"`
+	}
+	if err := json.Unmarshal(standing, &at); err != nil || at.V1 == 0 {
+		return nil, errors.New("the standing file names no /v1 port")
+	}
+	client := &http.Client{Timeout: indexCallWait}
+	got, err := client.Get(fmt.Sprintf("http://127.0.0.1:%d/v1/values/%s", at.V1, sweepName))
+	if err != nil {
+		return nil, err
+	}
+	defer got.Body.Close()
+	if got.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("/v1 answers %s for %s", got.Status, sweepName)
+	}
+	var said struct {
+		Value []Finding `json:"value"`
+	}
+	if err := json.NewDecoder(got.Body).Decode(&said); err != nil {
+		return nil, err
+	}
+	return said.Value, nil
 }
 
 // What the server holds of one file: its hash, whether git tracks it, and its text. [[spec/design_output/lsp#the-server-reads-the-index]]
@@ -191,32 +221,6 @@ func (one *indexDisk) changes(since int64) (int64, error) {
 		return since, err
 	}
 	return said.Tick, nil
-}
-
-// The files the index moves since the last pull, and the ones it drops. A tree off the index moves nothing. [[spec/design_output/lsp#the-panel-follows-the-index]]
-func (one *Tree) Pulls() (moved, gone []string, err error) {
-	from, ok := one.disk.(interface {
-		pulls() ([]string, []string, error)
-	})
-	if !ok {
-		return nil, nil, nil
-	}
-	moved, gone, err = from.pulls()
-	if len(moved)+len(gone) > 0 {
-		one.Forgets()
-	}
-	return moved, gone, err
-}
-
-// The index's tick past the one named. A tree off the index answers errNoIndex, so no follower waits on it. [[spec/design_output/lsp#the-panel-follows-the-index]]
-func (one *Tree) Changes(since int64) (int64, error) {
-	from, ok := one.disk.(interface {
-		changes(int64) (int64, error)
-	})
-	if !ok {
-		return since, errNoIndex
-	}
-	return from.changes(since)
 }
 
 // The paths git tracks, which every rule reads. [[spec/design_output/tree#the-tree-handed-in]]

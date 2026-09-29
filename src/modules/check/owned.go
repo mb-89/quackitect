@@ -2,10 +2,9 @@
 // index holds. A person's edit there stands, and the next pull writes over it,
 // so the panel hints and refuses nothing. hint in finding.go owns the level.
 // [[spec/design_output/lsp#an-engine-field-warns]]
-package main
+package check
 
 import (
-	"path/filepath"
 	"strings"
 
 	"quackitect/src/yaml"
@@ -81,9 +80,5 @@ func blockOf(rows []string, front Front, key string) string {
 
 // The file under the buffer, as the disk the tree reads holds it, and whether one stands. [[spec/design_output/lsp#an-engine-field-warns]]
 func (one *Tree) OnDisk(path string) (string, bool) {
-	read, err := one.disk.ReadFile(filepath.Join(one.Root, filepath.FromSlash(slashed(path))))
-	if err != nil {
-		return "", false
-	}
-	return string(read), true
+	return one.source.Read(slashed(path))
 }

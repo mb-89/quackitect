@@ -15,7 +15,7 @@ import (
 	"quackitect/src/tui/tree"
 )
 
-// The survey's file, whose folder .claude/skills/level0/lib/folders.js owns and whose name src/lsp/tree.go spells too, because a Go module imports no JavaScript. [[spec/design_output/tools#what-the-survey-writes]]
+// The survey's file, whose folder .claude/skills/level0/lib/folders.js owns and whose name src/modules/check/tree.go spells too, because a Go module imports no JavaScript. [[spec/design_output/tools#what-the-survey-writes]]
 const toolsAt = ".se/.runtime/tools.json"
 
 // The verb answering the places, off the command line every verb rides. [[spec/design_output/work#one-reading-answers-git]]

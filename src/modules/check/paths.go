@@ -1,7 +1,7 @@
 // The path a rule scopes on. A caller hands an absolute path, and every rule
 // reads the path the repo root holds.
 // [[spec/design_output/level0#the-path-a-rule-reads]]
-package main
+package check
 
 import (
 	"regexp"

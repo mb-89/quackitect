@@ -1,7 +1,7 @@
 // The box names the owner, and nothing private travels. Every check reads
 // strings alone, so a caller hands the names in.
 // [[spec/design_output/private#the-box-names-the-owner]]
-package main
+package check
 
 import (
 	"regexp"
@@ -45,23 +45,4 @@ func homeNames(home string) bool {
 		return false
 	}
 	return namesAPerson(parts[len(parts)-1])
-}
-
-// [[spec/design_output/private#the-box-names-the-owner]]
-func boxHere(root string) Box {
-	first := func(names ...string) string {
-		for _, one := range names {
-			if said := envOf(one); said != "" {
-				return said
-			}
-		}
-		return ""
-	}
-	asked := func(key string) string { return gitSays(root, key) }
-	return Box{
-		User:  first("USER", "USERNAME", "LOGNAME"),
-		Home:  first("HOME", "USERPROFILE"),
-		Name:  asked("user.name"),
-		Email: asked("user.email"),
-	}
 }

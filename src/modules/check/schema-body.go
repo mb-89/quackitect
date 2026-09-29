@@ -2,7 +2,7 @@
 // order it names them in, and the sections standing under a numbered one. The
 // frontmatter's own checker stands in schema.go beside this file.
 // [[spec/design_output/schema#a-finding-names-the-section]]
-package main
+package check
 
 import (
 	"quackitect/src/yaml"

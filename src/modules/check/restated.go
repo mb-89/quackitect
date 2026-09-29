@@ -1,7 +1,7 @@
 // The facts a note restates. One measure answers both rules: the longest run of
 // words the places share, over the notes a pointer ties together.
 // [[spec/design_output/lsp#a-second-copy-draws]]
-package main
+package check
 
 import (
 	"quackitect/src/yaml"
