@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: d8cc82510dcf859ec3e3f3a5a6a01a56836a41a2
     hash_after: d8cc82510dcf859ec3e3f3a5a6a01a56836a41a2
+  - step: accept
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 33409f835457bfdf903d00c30eec0b0903d58f42
+    hash_after: 33409f835457bfdf903d00c30eec0b0903d58f42
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/tui-shell-lands-in-shadow already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 8bd6c6dca29679f2
+        size: 576
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["quack-verbs-land-in-shadow", "read-topics-land-in-shadow"]
 enabled_by: migration.phase6shadow
 cloud: true
@@ -174,8 +193,10 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+The log view stands as a declared view over log/rows with a draw case, the work view and the index and cli tabs stand in shadow, the window key stands in the default file, and the renderers hold to their door files under the import rule. The check answers green on the pushed commit.
 
 # retro
 
