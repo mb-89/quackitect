@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 883d13c9e60c0a79
         size: 809
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 482c4393013028812c3dc5ea8dd03c19b0c62c24
+    hash_after: accb445cfc3836c87e6c0840d8ade902402bf93d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -324,14 +333,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/verbs src/scripts/ticket-edit.js src/scripts/ticket.js src/quack/actions_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays in the draft files, plus a wiring case beside main.go
+- the verbs run over the fake disk and fake git, and no new door stands
+- each new function links this ticket or the note section it follows
+- the place and weigh rules name their Go owners, and the shared cases hold both
 
 ## tests-green
 
