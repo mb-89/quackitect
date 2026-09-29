@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -48,6 +48,23 @@ record:
         hash: 040649aa2de41581
         size: 2275
     def: 2280015d497a3abd
+  - step: do
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 120e068c5d54c5054e577fedc8446a1b00ae65ac
+    hash_after: ba424a29c2d6729466af057a89b787bc4c6a48e7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/queue passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: 38ee286a219d69e1
+        size: 643
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -78,26 +95,32 @@ Weighed: a front field for the time costs a write on every mint and drifts from 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/queue
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer keeps the wiring, so no code moves. The queue note in spec/design_output/pull.md now says the queue module wires its stood port built-in, so its day term scores zero until a git IO module answers that port.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the answer: the wiring stays, and the note states it
+- the change reveals no cleanup
+- the fact stands once, in the queue note, and it links this ticket
 
 # Discussion
 
