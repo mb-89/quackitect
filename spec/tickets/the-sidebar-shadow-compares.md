@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     hand: box d85821f54410d · claude-code-remote
@@ -150,6 +150,18 @@ record:
         hash: f9fe69c7c1ba8cd3
         size: 2597
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85821f54410d · claude-code-remote · helper-4
+    hash_before: fbc38f72d540a5c6925c88dd76d2035eb703a826
+    hash_after: fbc38f72d540a5c6925c88dd76d2035eb703a826
+    inputs:
+      - name: design/draft
+        hash: f9fe69c7c1ba8cd3
+        size: 2597
+      - name: design/tests-red
+        hash: 06813455cd75e77a
+        size: 858
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -297,8 +309,16 @@ The slice case fails, since no slice names the sidebar. The two compare cases fa
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: the slice beside window in src/modules/migration/migration.go, the compare in src/extension/lib/views-shadow.js, and the rows through the logbook in src/extension/sidebar.js html, whose rowOf in .claude/skills/level0/lib/log.js carries kind shadow and slice sidebar as frame.WriteShadow writes them
+- each done_when line meets a test: TestTheSidebarSliceStandsBuiltInOld the first, the shadow case in test/level0/sidebar-views.test.js the second, and the check a checkpoint at tests-green; all three cases fail on their own assertion today, and the agreeing pair passes
+- the key reads migration/config/sidebar, beside its siblings, where the ask names migration/config/slices/sidebar; the draft names the call, and the test seeds migration.sidebar, so it stands
+- the compare takes groups, bases and catalog as the red test calls it, where the draft names views and names; the builder follows the test
+- size leaves out the three tracked projections .claude/commands/se-config-migration-sidebar-old.md, -shadow.md and -new.md, which the new slice writes as its siblings carry; the builder runs ./RUNME.sh project beside quack schema --write
+- the shadow case reads the real spec/config/level0.schema.json, so it greens only once quack schema --write lands the key
+- the work.pull cell and the pull action in src/modules/verbs/actions.go agree on help and icon today, so the button pair writes no row in the tree as it stands
 
 # implement
 
