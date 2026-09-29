@@ -59,3 +59,13 @@ func TestTheSliceKeyStandsShared(t *testing.T) {
 		}
 	}
 }
+
+// The window slice stands among the slices, built in as old, so a box with no tracked mode keeps the window's own reads. [[spec/tickets/the-log-becomes-a-view]]
+func TestTheWindowSliceStandsAmongTheSlicesBuiltInAsOld(t *testing.T) {
+	for _, one := range slices {
+		if one.key == WindowKey && one.mode == "old" {
+			return
+		}
+	}
+	t.Fatalf("the slices read %+v, and want window built in as old", slices)
+}

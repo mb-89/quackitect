@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: f268653c1878cc1f
         size: 207
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 7a3e0009fe5f3395cd3549decd01673bdf42c88f
+    hash_after: 7a3e0009fe5f3395cd3549decd01673bdf42c88f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/tree fails
+    inputs:
+      - name: design/draft
+        hash: bfcb45d8ba9abd2a
+        size: 3090
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +233,33 @@ Assumptions for the hand at the merge: the old tail stays the drawn path under s
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/tree src/tui/log src/modules/migration
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/tree/base_test.go
+- src/tui/log/shadow_test.go
+- src/modules/migration/migration_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its assertion over stubs that compile. The two cases that pass on a stub are the no-mismatch ones, since an empty compare names nothing, and the case that pins a shadow row out of the compare, which the implementation holds. The catalog source needs no new fake, since a case hands the compare its own rows.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask case draws the log view over fake rows: the shadow cases run over a fake source and the base case reads spec/views/log.base, and go test and the check close it at tests-green
+- the one door, Source, has the fake in shadow_test.go, and the /v1 road stands in registry, whose contract suite already holds it
 
 # gate
 

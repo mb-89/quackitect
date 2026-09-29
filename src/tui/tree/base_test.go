@@ -5,6 +5,8 @@
 package tree
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -138,5 +140,61 @@ func TestAViewOffTheFileDrawsAsATree(t *testing.T) {
 	}
 	if view.Len() != 2 {
 		t.Fatalf("the view nests, and %d rows stand", view.Len())
+	}
+}
+
+const declaredBase = `reads: log/rows
+badge: work/open-tasks
+follow: true
+actions:
+  - key: E
+    jumps: "level: error"
+  - key: p
+    arg: digit
+    calls: work/place
+  - button: pull
+    calls: work/pull
+views:
+  - type: table
+    name: session log
+    order:
+      - at
+      - said
+`
+
+// A base file names the name it reads, its badge, whether it follows, and its actions. [[spec/design_output/model#a-view-reads-names]]
+func TestABaseFileNamesWhatItReadsItsBadgeAndItsActions(t *testing.T) {
+	views, err := ReadBase(declaredBase)
+	if err != nil {
+		t.Fatal(err)
+	}
+	one := views[0]
+	if one.Reads != "log/rows" || one.Badge != "work/open-tasks" || !one.Follow {
+		t.Fatalf("the view reads %q with badge %q follow %v", one.Reads, one.Badge, one.Follow)
+	}
+	want := []Action{{Key: "E", Jumps: "level: error"}, {Key: "p", Arg: "digit", Calls: "work/place"}, {Button: "pull", Calls: "work/pull"}}
+	if len(one.Actions) != len(want) {
+		t.Fatalf("the view holds %d actions, and wants %d", len(one.Actions), len(want))
+	}
+	for at := range want {
+		if one.Actions[at] != want[at] {
+			t.Fatalf("action %d reads %+v, and wants %+v", at+1, one.Actions[at], want[at])
+		}
+	}
+}
+
+// The file under spec/views declares the log. [[spec/design_output/model#the-log-is-a-view]]
+func TestTheLogBaseFileDeclaresTheLogView(t *testing.T) {
+	body, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "views", "log.base"))
+	if err != nil {
+		t.Fatalf("the log view stands in no file: %v", err)
+	}
+	views, err := ReadBase(string(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	one := views[0]
+	if one.Reads != "log/rows" || !one.Follow || len(one.Actions) != 2 {
+		t.Fatalf("the log view reads %q follow %v with %d actions", one.Reads, one.Follow, len(one.Actions))
 	}
 }

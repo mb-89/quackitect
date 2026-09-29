@@ -16,8 +16,20 @@ import (
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const ColumnWide = 20
 
+// One action a view declares: its trigger, then its effect. [[spec/design_output/model#a-view-declares-actions]]
+type Action struct {
+	Key, Button, Arg     string
+	Calls, Edits, Writes string
+	Jumps, Cycles        string
+}
+
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 type View struct {
+	// What the view reads, the badge beside its title, whether new rows land at the end, and its actions. [[spec/design_output/model#a-view-reads-names]]
+	Reads     string
+	Badge     string
+	Follow    bool
+	Actions   []Action
 	Name      string
 	Cols      []Column
 	Nests     bool

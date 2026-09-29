@@ -20,6 +20,9 @@ const (
 // The key of the verbs slice, the road ./RUNME.sh hands a verb down, by its local name. [[spec/tickets/runme-hands-verbs-to-quack]]
 const VerbsKey = "verbs"
 
+// The key of the window slice, the reads the window makes off the index, by its local name. [[spec/tickets/the-log-becomes-a-view]]
+const WindowKey = "window"
+
 // The key of the cage slice, the road a hook event takes to the hooks IO module, by its local name. [[spec/tickets/the-hooks-door-lands]]
 const CageKey = "cage"
 
