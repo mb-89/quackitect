@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: 5bd1b3f69468c7ec
         size: 4133
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8535e12fc10e · claude-code-remote · helper-3
+    hash_before: 64a6d438d76b59d677219c91a8117305ad166bcb
+    hash_after: 64a6d438d76b59d677219c91a8117305ad166bcb
+    inputs:
+      - name: design/draft
+        hash: 5bd1b3f69468c7ec
+        size: 4133
+      - name: design/tests-red
+        hash: 29670034f5135614
+        size: 1196
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -279,8 +291,16 @@ Every Go case fails on its own assertion over stubs, and the listen case fails r
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- hooks-draft-matches-red-tests: the draft names manager.Served, Serves and test names the red tests lack; the red tests stub Book.Of in src/modules/index/call.go (ops_test.go TestOfAnswersEveryOperationOfTheCaller) and carry other hooks, session and store test names, so the builder follows the red tests, and the callers list adds call.go Book.Of and src/bridge/cage-shadow.js shadowsCage, which server.js answersEvent calls
+- hooks-standing-file-names-token: model The hook protocol says the standing file names the port and the token; Listen writes and the listen case reads the port alone, so any local process posts to /hook
+- hooks-at-reads-clock-module: model The events of a session takes at off the clock IO module; the door reads Outside.Now, a clock of its own
+- hooks-wait-leaves-tool-input: the call's wait rides the tool input's wait key, which clashes with an action carrying a wait field of its own; strip it before the call, or carry it beside the input
+- hooks-listener-joins-io-process: the draft starts the listen in quack main beside the manager, and the model's IO process chapter places inbound listeners in quack io; name the interim in the approach
+- hooks-listen-case-fails-assertion: TestTheListenAnswersAPostAndStandsItsPort stands red on a t.Fatal over a missing file, not its own assertion
+- cage-slice-past-the-ask: the migration slice cage, migration_test.go, spec/config/level0.json and its schema entry lie past the ask's files; the shadow line of the ask carries them, so they ride with the build
 
 # implement
 
