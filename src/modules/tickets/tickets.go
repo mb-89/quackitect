@@ -153,7 +153,7 @@ func Of(path, name, text string, changed int64) Ticket {
 		Name:      name,
 		Path:      path,
 		State:     state,
-		Step:      word(front.Get("step")),
+		Step:      stepIn(front),
 		Route:     routeOf(word(front.Get("process"))),
 		Group:     linkName(word(front.Get("group"))),
 		Urgent:    word(front.Get("urgent")) == "true",
@@ -288,6 +288,23 @@ func failsIn(front *yaml.Doc) int {
 		}
 	}
 	return count
+}
+
+// The step the front names, and the first leaf of its steps where none stands, as stepOf in src/engine/group.js reads it. [[spec/tickets/fix-verbs-shadow-yours]]
+func stepIn(front *yaml.Doc) string {
+	if said := word(front.Get("step")); said != "" {
+		return said
+	}
+	var path []string
+	for steps := yaml.AsList(front.Get("steps")); len(steps) > 0; {
+		leaf := yaml.AsDoc(steps[0])
+		if leaf == nil || word(leaf.Get("name")) == "" {
+			break
+		}
+		path = append(path, word(leaf.Get("name")))
+		steps = yaml.AsList(leaf.Get("steps"))
+	}
+	return strings.Join(path, "/")
 }
 
 // Whether the leaf the step names says by: person, the first leaf where no step stands, the rule personStep in src/scripts/work-answer.js holds. [[spec/design_input/the-cloud-runs-itself#groups-hold-groups]]
