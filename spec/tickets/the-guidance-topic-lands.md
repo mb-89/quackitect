@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: 993919719f37e3d2
         size: 1042
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: b7d8afac8cb8dff43fd60fd9868a9bd51dda9e4f
+    hash_after: b7d8afac8cb8dff43fd60fd9868a9bd51dda9e4f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -286,14 +295,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/guidance src/quack/guidance.go src/scripts/guidance-shadow.js src/scripts/guidance-verb.js src/scripts/pull-hand.js src/scripts/guidance-golden.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the guidance module, quack guidance, the shadow and its callers, the golden and the wiring the draft names, and nothing past them.
+The shadow and wiring cases meet fake settings, proc and log, and the module cases seed files through qtest.
+The headers of src/modules/guidance/guidance.go and src/scripts/guidance-shadow.js name the approach.
+The folder names stand once, as guidance.Guidance and guidance.Processes.
 
 ## tests-green
 
