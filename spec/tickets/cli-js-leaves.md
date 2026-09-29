@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: c4355428f77acdd7
         size: 4472
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85a88bc0dd4 · claude-code-remote
+    hash_before: 2f9b96cc77d4796d33668dc8a4f43312f432d328
+    hash_after: 2f9b96cc77d4796d33668dc8a4f43312f432d328
+    inputs:
+      - name: design/draft
+        hash: c4355428f77acdd7
+        size: 4472
+      - name: design/tests-red
+        hash: 30e9911a371b1eed
+        size: 752
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -276,8 +288,10 @@ Each new test fails on its own assertion. cli.js stands, sources name it, and no
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- cli-callers-the-draft-misses: the callers list leaves out every site naming cli.js past the spawns: the NoUndo strings and comments in src/modules/verbs/verbs.go, the heads of src/modules/verbs/ticket.go, vehicle.go and tree.go, the comments in src/quack/verbs.go and twins.go, src/modules/queue/places.go, src/scripts/cli-stamp.js and .claude/skills/level0/lib/index-tools.js; the contract case no source names cli.js holds each, and the builder rewrites each in place to name the program or verb-run.js
 
 # implement
 
