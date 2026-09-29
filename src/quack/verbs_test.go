@@ -148,3 +148,14 @@ func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
 		t.Fatalf("the root reads %q, and wants new", said)
 	}
 }
+
+// A verb the twin table leaves out runs cli.js alone in shadow, and the log holds no row for it. [[spec/tickets/vehicle-verbs-become-actions]]
+func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
+	doors, out, rows := roadOver("shadow", "old\n", twinVerbs)
+	for _, argv := range [][]string{{"vehicle", "here"}, {"stub", "into", "elsewhere"}} {
+		out.Reset()
+		if code := verbs(doors, argv); code != 0 || out.String() != "old\n" || len(*rows) != 0 {
+			t.Fatalf("%v answers %d, %q, rows %v", argv, code, out.String(), *rows)
+		}
+	}
+}

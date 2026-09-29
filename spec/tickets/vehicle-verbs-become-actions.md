@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 7566b997b4508ad5
         size: 302
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 63ff59e85fd106c28c1da3717289587485b737c7
+    hash_after: 63ff59e85fd106c28c1da3717289587485b737c7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/verbs fails
+    inputs:
+      - name: design/draft
+        hash: 5d91f54bb2d59460
+        size: 2602
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -216,26 +229,32 @@ What I assume: `Topic` and `nodeAccept` land under `ticket-verbs-become-actions`
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/verbs/verbs_test.go src/quack/twins_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/verbs/verbs_test.go
+- src/quack/twins_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The vehicle and stub verb lists stand empty, and the wiring loads neither topic. Each fails on its own assertion. The road case with no twin passes already, and guards the twin table from here on. What surprises: vehicle here writes the identity file, so even the plainest verb writes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- go test meets every new Go case, the shadow line meets the road case with no twin, and the check meets the check verb
+- the topic and wiring cases run over a fresh catalog, and the road case runs over the fake road
 
 # gate
 
