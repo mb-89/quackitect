@@ -387,7 +387,7 @@ accept with points
 
 The implement step carries two points of the gate:
 
-- `set` weighs the value against the schema's enum and type, as `Weighs` in `src/tui/work/workedit.go` does, with a case for a refused value.
+- `set` weighs the value against the schema's enum and type, as `Weighs` in `src/tui/work/workedit.go` does. A case reads a refused value.
 - `urgent` drops the mark where it turns false, as the tab's write does, and the red case reads that.
 
 The draft corrects two lines, since the engine holds its evidence. The size list also takes `src/tui/work/workplace.go`, which tests-red changes to pull out `PlaceValue`. The Go case on the place rule is `TestPlaceValueReadsTheSharedCases`.
