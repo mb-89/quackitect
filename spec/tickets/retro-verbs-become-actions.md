@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
 depends_on: ["runme-hands-verbs-to-quack"]
+record:
+  - step: design/draft
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 343952bc8f1f6a119f0e77f3fe06635c27c8d4e9
+    hash_after: 343952bc8f1f6a119f0e77f3fe06635c27c8d4e9
+    inputs:
+      - name: ask
+        hash: 2ccf2c410d2366a6
+        size: 309
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,60 @@ A retro collect runs long, and the wait keeps its caller free.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each `retro` verb stands as an action through `verbs.Topic`, the module type `ticket-verbs-become-actions` lays down, and `retro notes` gets a native twin in shadow. The rest keep the engine `cli.js` runs, through the `node` module.
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the verbs | a new `src/modules/verbs/retro.go`, `RetroVerbs` | lists every verb `retro` in `src/scripts/retro.js` answers, each with the line its usage prints as its doc |
+| the actions | `Topic` in `src/modules/verbs/verbs.go` | registers each verb with `q.Writes` and no `q.Deadline`, so a long collect never fails on a deadline, and each call answers within the wait its caller sets through `index.Call` |
+| the wiring | `spec/wiring.yaml` and `modules` in `src/quack/main.go` | loads the instance `retro` of the module type `retro` |
+| the twin | `src/quack/twins.go`, `retroNotes` | reads `tickets/all` over V1, keeps each row under `.se/tickets/` whose state reads other than closed, and prints the two answers `notes` in `retro.js` prints, with its exit |
+| the road | `twinVerbs` in `src/quack/verbs.go` | takes `retroNotes` under `retro notes`, so shadow logs each answer the two disagree on |
+
+What I weigh: the wait stands already. `index.Call` answers `still running` with the handle past the wait, and a test of `src/modules/index` holds it. So this ticket adds no wait of its own, and declares no deadline on a verb whose length it cannot know. `retro notes` is the one read the index holds whole. Every other verb reads the retro's input folder or writes the tree, and its native port belongs to `quack-verbs-switch-over`, where a line under Discussion names it.
+
+What I assume: `Topic` and `nodeAccept` land under `ticket-verbs-become-actions` first, which `depends_on` carries through `runme-hands-verbs-to-quack`. A read verb declaring `q.Writes` queues behind a running collect, and one writer per tree takes that cost for a verb over `cli.js`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go: modules, which loads the retro instance
+- spec/wiring.yaml: the instances, which gain retro
+- src/modules/verbs/verbs.go: Topic, which each retro verb reaches
+- src/quack/verbs.go: twinVerbs, which takes retro notes
+- src/quack/twins.go: nodeAccept, which runs each retro action through cli.js
+- src/scripts/retro.js: retro, which the node module runs and this ticket leaves unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/verbs/verbs_test.go: TestEveryRetroVerbStandsAsAnAction
+- src/modules/verbs/verbs_test.go: TestARetroActionWritesAndDeclaresNoDeadline
+- src/quack/twins_test.go: TestRetroNotesPrintsTheOpenNotesAsCliJsDoes
+- src/quack/twins_test.go: TestRetroNotesPassesWhereNoNoteStandsOpen
+- src/quack/main_test.go: TestTheWiringLoadsTheRetroTopic
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- retro.js, retro-collect.js, ticket.js, verbs.go, twins.go, main.go, call.go, ops.go, q.go, tickets.go and the wiring stand opened, and each claim checked there
+- the callers list names the root, the wiring, the topic, the road, the node module and the engine it runs
+- go test from the root meets every Go case, the shadow line meets the road's shadow case through retroNotes, and the check meets the check verb
 
 ## tests-red
 
