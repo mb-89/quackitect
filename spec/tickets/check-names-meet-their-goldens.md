@@ -331,3 +331,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The flag that writes the twin goldens again is `-twins`, as src/lsp/twins_test.go declares it: `go test ./src/lsp -run TestTwinGoldens -twins`. The draft's `-update` reads as `-twins`.
