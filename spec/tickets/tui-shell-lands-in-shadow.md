@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -160,9 +160,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 4ba8e1a09e444a4065d589213436083f4d25e734
+    hash_after: 4ba8e1a09e444a4065d589213436083f4d25e734
+    inputs:
+      - name: retro/write
+        hash: 76428fd724a7568c
+        size: 2046
+    def: 4da1ca5da87d5bbc
 depends_on: ["quack-verbs-land-in-shadow", "read-topics-land-in-shadow"]
 enabled_by: migration.phase6shadow
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -298,20 +308,26 @@ The stale hold cost nothing once the merge was clean. The renderer rule reads fi
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- No tool lacked: the box ran every verb and test it needed
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- Start: a merge conflict at sync in the config, the schema and the migration module, resolved by keeping both keys
+- The check red on the size golden after the merge, refreshed by the twins test flag
+- The queue holding the pull while the plan named the ticket in hand
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- No person step parked and no ticket minted outside the group
+- The handover says the group stands at done, and the merge coordinator flips the window switch key
 
 # Discussion
 
