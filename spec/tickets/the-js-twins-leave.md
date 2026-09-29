@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -154,6 +154,15 @@ record:
         hash: bef6251a63abb67c
         size: 538
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: a68107325611710730f66c8a76c796329bea2d7a
+    hash_after: 5d021e20afeff079325ee6bb62cb144b60a8d37a
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/cli-read.test.js:8:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -285,14 +294,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the twins, their tests, their wiring, the schema's five keys and their projection, plus the faults the children name
+- every door the change reaches has a fake: the readers run over the fake disk, process and log in topic-readers.test.js
+- a comment names the approach: each reader's line points at readers-take-the-go-topics or topic-fallback-leaves-the-readers
+- every fact stands in one place: the prose modes live in quack-topic.js, and the readers import them there
 
 ## tests-green
 
