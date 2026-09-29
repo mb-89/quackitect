@@ -120,3 +120,13 @@ test("one leaf's red list reads a comma-joined row as each file it names", () =>
     "test/level0/b.test.js",
   ]);
 });
+
+// [[spec/design_output/pull#kept-red-leaves]]
+test("a red row joined by commas reads one path each", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# design\n\n## tests-red\n\n### red\n\nsrc/one/one_test.go,test/level0/a.test.js\n";
+  assert.deepEqual(redListOf(text, "design/tests-red"), [
+    "src/one/one_test.go",
+    "test/level0/a.test.js",
+  ]);
+});

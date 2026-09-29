@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/check"
 	"quackitect/src/q"
 )
 
@@ -82,18 +83,55 @@ func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
 		t.Fatal(err)
 	}
 	keys := c.Keys()
-	if len(keys) != 1 {
-		t.Fatalf("the wiring loads the keys %+v, and wants the slice alone", keys)
+	if len(keys) == 0 {
+		t.Fatal("the wiring loads no slice key")
+	}
+	resolved := q.Resolved{}
+	for _, one := range keys {
+		if one.Instance != "migration" || !one.Shared {
+			t.Fatalf("the wiring loads %+v, and wants a shared slice key of migration", one)
+		}
+		resolved[one.Name] = `"shadow"`
 	}
 	s := q.NewStore(c)
-	if _, err := s.Commit(0, values, map[string]any{q.ResolvedName: q.Resolved{keys[0].Name: `"shadow"`}}); err != nil {
+	if _, err := s.Commit(0, values, map[string]any{q.ResolvedName: resolved}); err != nil {
 		t.Fatal(err)
 	}
-	if err := s.Run(keys[0].Name); err != nil {
+	for _, one := range keys {
+		if err := s.Run(one.Name); err != nil {
+			t.Fatal(err)
+		}
+		if said := s.Snapshot().Read(one.Name); said != "shadow" {
+			t.Fatalf("%s reads %v, and wants shadow", one.Name, said)
+		}
+	}
+}
+
+// The wiring loads the check module, and every check/ name reads its empty list off the wired tree. [[spec/tickets/check-module-joins-the-wiring]]
+func TestTheWiredTreeAnswersEveryCheckName(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
 		t.Fatal(err)
 	}
-	if said := s.Snapshot().Read(keys[0].Name); said != "shadow" {
-		t.Fatalf("%s reads %v, and wants shadow", keys[0].Name, said)
+	all, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w := q.Wiring{Wires: all.Wires}
+	for _, one := range all.Instances {
+		if one.Module == "check" {
+			w.Instances = append(w.Instances, one)
+		}
+	}
+	c := q.New()
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	read := q.NewStore(c).Snapshot()
+	for _, twin := range check.Twins {
+		if said, ok := read.Read(check.Prefix + twin).([]check.Finding); !ok || len(said) != 0 {
+			t.Fatalf("%s%s reads %v off the wired tree, and wants an empty list", check.Prefix, twin, said)
+		}
 	}
 }
 
