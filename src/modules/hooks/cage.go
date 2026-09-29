@@ -11,6 +11,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"quackitect/src/q/tool"
 )
 
 // The decision words both sides read as. [[spec/tickets/cage-rules-replay-session-logs]]
@@ -111,7 +113,7 @@ func NewDecisionOf(post Post, said Answer) string {
 		if one.Kind == rowsKind {
 			return HoldWord
 		}
-		if one.Kind == resultKind && !strings.HasPrefix(textOf(post.E, "tool"), toolPrefix) {
+		if one.Kind == resultKind && !strings.HasPrefix(textOf(post.E, "tool"), tool.Prefix) {
 			return RefuseWord
 		}
 	}

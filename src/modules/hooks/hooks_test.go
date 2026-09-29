@@ -16,6 +16,7 @@ import (
 
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
+	"quackitect/src/q/tool"
 )
 
 const recording = "../../../test/replay/hooks/one-tool-call.jsonl"
@@ -187,6 +188,20 @@ func TestAnOperationEndingAfterItsCallReachesTheNextTurn(t *testing.T) {
 	again := hooks(t, one.door, prompt())
 	if said := texts(again, "after"); strings.Contains(said, "pulled") {
 		t.Fatalf("the turn after reads %+v, and wants the result told once", again)
+	}
+}
+
+// The call past its wait and the Stop both answer the shared still running line, which the mcp module answers too. [[spec/tickets/tool-surface-moves-into-q]]
+func TestTheRunningLinesAreTheSharedOne(t *testing.T) {
+	c := &calls{said: Called{Running: true, Handle: "h1", Fraction: 0.4, Gone: time.Second}}
+	b := &book{ops: []Op{{Handle: "h1", Action: "work/pull", State: "running", Fraction: 0.4, Gone: time.Second}}}
+	one := doorOver(t, c, b)
+	want := tool.Running("work/pull", 0.4, time.Second, "h1")
+	if said := texts(hooks(t, one.door, toolCall(nil)), "result"); !strings.HasPrefix(said, want) {
+		t.Fatalf("the call answers %q, and wants it to open on %q", said, want)
+	}
+	if told := texts(hooks(t, one.door, Post{Event: "classic.Stop", E: map[string]any{"session_id": "s1"}}), "after"); !strings.Contains(told, want) {
+		t.Fatalf("the stop reads %q, and wants %q", told, want)
 	}
 }
 

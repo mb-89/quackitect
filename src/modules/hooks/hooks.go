@@ -16,12 +16,12 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strings"
 	"sync"
 	"time"
 
 	"quackitect/src/q"
+	"quackitect/src/q/tool"
 )
 
 // The local names the module declares: its out-port, and its default wait in seconds. [[spec/design_output/model#a-caller-sets-its-wait]]
@@ -42,9 +42,6 @@ const (
 	afterKind      = "after"
 	resultKind     = "result"
 	builtInHarness = "claude-code"
-	toolPrefix     = "index_"
-	waitArg        = "wait"
-	bareArg        = "input"
 	sessionKey     = "<id>"
 	foldsUnder     = "session/<id>/"
 	noSession      = "unknown"
@@ -214,12 +211,12 @@ func (d *Door) now() time.Time {
 
 // The action a tool of /v1/tools names, called within the call's wait or the key's, and its result or the line saying it still runs. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
-	action, ok := d.actionOf(textOf(e, "tool"))
+	action, ok := tool.Action(d.from.Store, textOf(e, "tool"))
 	if !ok || d.from.Call == nil {
 		return Effect{}, false, nil
 	}
 	args, _ := e["input"].(map[string]any)
-	input, err := d.inputOf(action, args)
+	input, err := tool.Input(d.from.Store, action, args)
 	if err != nil {
 		return Effect{Kind: resultKind, Text: err.Error()}, true, nil
 	}
@@ -228,7 +225,7 @@ func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
 		return Effect{}, true, err
 	}
 	if said.Running {
-		text := fmt.Sprintf("%s still running: %s, handle %s. Its result reaches your next turn.", action, progressOf(said.Fraction, said.Gone), said.Handle)
+		text := tool.Running(action, said.Fraction, said.Gone, said.Handle) + ". Its result reaches your next turn."
 		return Effect{Kind: resultKind, Text: text}, true, nil
 	}
 	d.tells(said.Handle)
@@ -244,66 +241,9 @@ func (d *Door) tells(handle string) {
 	d.told[handle] = true
 }
 
-// The action whose tool name the post names, as /v1/tools spells it. [[spec/tickets/the-hook-registers-index-tools]]
-func (d *Door) actionOf(tool string) (string, bool) {
-	if !strings.HasPrefix(tool, toolPrefix) {
-		return "", false
-	}
-	for _, name := range d.from.Store.Names() {
-		if _, _, ok := d.from.Store.Types(name); ok && toolPrefix+strings.ReplaceAll(name, "/", "_") == tool {
-			return name, true
-		}
-	}
-	return "", false
-}
-
-// The input past the wait argument, which an input declaring its own wait keeps, or the bare input a tool carries under its one property. [[spec/tickets/hooks-wait-leaves-tool-input]]
-func (d *Door) inputOf(action string, args map[string]any) (any, error) {
-	in, _, _ := d.from.Store.Types(action)
-	kept := map[string]any{}
-	for key, value := range args {
-		if key != waitArg || declares(in, waitArg) {
-			kept[key] = value
-		}
-	}
-	body, err := json.Marshal(kept)
-	if err != nil {
-		return nil, err
-	}
-	input, err := d.from.Store.Input(action, body)
-	if bare, ok := kept[bareArg]; err != nil && ok && len(kept) == 1 {
-		if body, err = json.Marshal(bare); err != nil {
-			return nil, err
-		}
-		return d.from.Store.Input(action, body)
-	}
-	return input, err
-}
-
-// Whether the input type carries a field its JSON names so. [[spec/tickets/hooks-wait-leaves-tool-input]]
-func declares(in reflect.Type, key string) bool {
-	if in == nil || in.Kind() != reflect.Struct {
-		return false
-	}
-	for i := range in.NumField() {
-		field := in.Field(i)
-		name, _, _ := strings.Cut(field.Tag.Get("json"), ",")
-		if name == key || (name == "" && strings.EqualFold(field.Name, key)) {
-			return true
-		}
-	}
-	return false
-}
-
 // The wait the call sets, or the one its key reads, or the built-in second. [[spec/design_output/model#a-caller-sets-its-wait]]
 func (d *Door) waitOf(args map[string]any) time.Duration {
-	if seconds, ok := numberOf(args[waitArg]); ok && seconds >= 0 {
-		return time.Duration(seconds * float64(time.Second))
-	}
-	if seconds, ok := d.from.Store.Snapshot().Read(d.from.Bound("config/" + WaitKey)).(int); ok && seconds >= 0 {
-		return time.Duration(seconds) * time.Second
-	}
-	return defaultWait * time.Second
+	return tool.Wait(args, d.from.Store.Snapshot().Read(d.from.Bound("config/"+WaitKey)), defaultWait*time.Second)
 }
 
 // Every operation of the session that ends untold, once, with its result or its reason. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -333,7 +273,7 @@ func (d *Door) running(session string) string {
 	var lines []string
 	for _, one := range d.from.Ops(session) {
 		if open(one) {
-			lines = append(lines, fmt.Sprintf("%s still running: %s, handle %s", one.Action, progressOf(one.Fraction, one.Gone), one.Handle))
+			lines = append(lines, tool.Running(one.Action, one.Fraction, one.Gone, one.Handle))
 		}
 	}
 	if len(lines) == 0 {
@@ -343,10 +283,6 @@ func (d *Door) running(session string) string {
 }
 
 func open(one Op) bool { return one.State == "queued" || one.State == "running" }
-
-func progressOf(fraction float64, gone time.Duration) string {
-	return fmt.Sprintf("%.0f%% done after %s", fraction*percent, gone)
-}
 
 // The session id where the post or its event names one, in every spelling the harnesses send. [[spec/design_output/pull#the-hand-and-the-hold]]
 func sessionOf(post Post) string {
@@ -404,21 +340,6 @@ func textOfValue(value any) string {
 		return fmt.Sprint(value)
 	}
 	return string(body)
-}
-
-func numberOf(value any) (float64, bool) {
-	switch one := value.(type) {
-	case float64:
-		return one, true
-	case int:
-		return float64(one), true
-	case int64:
-		return float64(one), true
-	case json.Number:
-		n, err := one.Float64()
-		return n, err == nil
-	}
-	return 0, false
 }
 
 // What the standing file holds: the port, and the token a post carries. [[spec/tickets/hooks-standing-file-names-token]]
