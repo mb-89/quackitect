@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -144,6 +144,18 @@ record:
         hash: 8b7dbb366e81581b
         size: 1713
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 0c885861943ae3eb4f26d9dc0c2e806c3bcdc165
+    hash_after: 0c885861943ae3eb4f26d9dc0c2e806c3bcdc165
+    inputs:
+      - name: design/draft
+        hash: 8b7dbb366e81581b
+        size: 1713
+      - name: design/tests-red
+        hash: 5ff9005e4f6c534d
+        size: 683
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -265,8 +277,9 @@ Both cases fail on their own assertions. The plain helper pull meets the working
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
