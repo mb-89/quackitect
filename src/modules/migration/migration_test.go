@@ -1,6 +1,6 @@
-// The slice key reads old where nothing sets it, and the value the default
+// The slice key reads new where nothing sets it, and the value the default
 // file resolves to otherwise.
-// [[spec/tickets/open-tasks-run-in-shadow]]
+// [[spec/tickets/opentasks-enum-keeps-dead-values]]
 package migration
 
 import (
@@ -16,12 +16,12 @@ func TestTheSliceKeyReadsTheDefaultFile(t *testing.T) {
 		values = q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values, as the case seeds them"))
 		Registers(c)
 	})
-	if said := index.Run("config/" + OpenTasksKey); said != "old" {
-		t.Fatalf("the slice reads %v with nothing set, and wants old", said)
+	if said := index.Run("config/" + OpenTasksKey); said != "new" {
+		t.Fatalf("the slice reads %v with nothing set, and wants new", said)
 	}
-	index.SeedAs(values, map[string]any{q.ResolvedName: q.Resolved{"config/" + OpenTasksKey: `"shadow"`}})
-	if said := index.Run("config/" + OpenTasksKey); said != "shadow" {
-		t.Fatalf("the slice reads %v, and wants shadow", said)
+	index.SeedAs(values, map[string]any{q.ResolvedName: q.Resolved{"config/" + OpenTasksKey: `"a-seeded-value"`}})
+	if said := index.Run("config/" + OpenTasksKey); said != "a-seeded-value" {
+		t.Fatalf("the slice reads %v, and wants a-seeded-value", said)
 	}
 }
 

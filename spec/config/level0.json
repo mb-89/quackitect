@@ -104,7 +104,7 @@
     "phase9shadow": true,
     "phase9switch": false,
     "phase10": false,
-    "opentasks": "shadow",
+    "opentasks": "new",
     "config": "shadow",
     "log": "shadow",
     "guidance": "shadow",

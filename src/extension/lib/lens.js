@@ -278,6 +278,7 @@ function ticketLensOf(door) {
 module.exports = {
   CLI,
   COMMAND,
+  FOLDERS,
   HARNESS,
   HOLDS,
   HOLD_WATCHES,
