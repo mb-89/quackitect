@@ -30,7 +30,7 @@ func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
 	if faults := c.Check(); len(faults) > 0 {
 		t.Fatal(faults)
 	}
-	hook := hookedOf(w, hands)
+	hook := hookedOf(w, hands, hooksModule)
 	if !hook.on || hook.bound("events/s1") != "session/s1/events" || hook.bound("config/wait") != "hooks/config/wait" {
 		t.Fatalf("the hooks instance binds events/s1 to %q, and wants session/s1/events", hook.bound("events/s1"))
 	}

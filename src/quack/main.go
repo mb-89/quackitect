@@ -203,10 +203,10 @@ type hooked struct {
 	bound func(local string) string
 }
 
-// [[spec/tickets/the-hooks-door-lands]]
-func hookedOf(w q.Wiring, hands map[string]q.Writer) hooked {
+// The first instance of the module type the wiring loads, so the mcp module reads its own the way the hooks door does. [[spec/tickets/hooked-of-caller-missed]]
+func hookedOf(w q.Wiring, hands map[string]q.Writer, module string) hooked {
 	for _, one := range w.Instances {
-		if one.Module == hooksModule {
+		if one.Module == module {
 			name := one.Name
 			return hooked{on: true, as: hands[name], bound: func(local string) string { return w.Bound(name, local) }}
 		}
@@ -325,7 +325,7 @@ func wired() ([]index.Start, hooked, error) {
 		return nil, hooked{}, err
 	}
 	starts, hands, err := loaded(w, q.Main)
-	return starts, hookedOf(w, hands), err
+	return starts, hookedOf(w, hands, hooksModule), err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]
