@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process_hash: 2b5ab398855a1aba
 group: open-tasks-switch-lands
 group: open-tasks-switch-lands
 step: do
+record:
+  - step: do
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: e206dfab0ea888d33c1a92bb5813d44cbbbedd56
+    hash_after: e206dfab0ea888d33c1a92bb5813d44cbbbedd56
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: da7a03913c54e00f
+        size: 562
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ Without it, `expectedRed` in `src/scripts/red-list.js` reads the leaf named `tes
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/red-list.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check sets aside the tests an open ticket names red between its red and green steps. It read the leaf named tests-red alone. A gate reject inserts a second round, tests-red-2, and that list read nothing, so the check went red on a ticket standing where red is expected. expectedRed in src/scripts/red-list.js now reads every leaf named tests-red or tests-red with a round number. A case in test/level0/red-list.test.js holds a tests-red-2 list to the red list.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: one pattern in expectedRed, and the case first, red on its own assertion
+- the cleanup it reveals: a helper spawned for a gate meets the parent plan todo and the queue binding, and a note parks it
+- every fact stands once: the pattern builds on RED, and names no second spelling
 
 # Discussion
 
