@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -169,6 +169,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8572d2183d7 · claude-code-remote
+    hash_before: 398b3338013dac828e9824ca2f5b3997350631c0
+    hash_after: 398b3338013dac828e9824ca2f5b3997350631c0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: d9e334be86a85ddb
+        size: 927
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -336,26 +359,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp src/quack/lsp_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The lsp IO module now answers an editor: didOpen and didChange commit the unsaved text under buffers/<path> and publish the sweep rows for that path as diagnostics, with byte columns turned to UTF-16 units. didClose empties the buffer and publishes none. A listener on loopback takes a token line, then LSP frames, and republishes when a commit moves a published diagnostic. quack lsp starts the index, reads the standing file, and relays stdio whole. The wiring adds the lsp instance and binds check.buffers to buffers/. The editor still runs on se-lsp until the switch ticket.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches only the lsp module, the quack verb and the wiring the approach names
+- the listener and the relay run over real loopback ports, and the sweep is a fake that reads the store
+- each function points at the design section it implements
+- the frame and token words stand once in lsp.go
 
 # accept
 
