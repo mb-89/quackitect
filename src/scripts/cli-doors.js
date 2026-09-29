@@ -15,12 +15,10 @@ import { proc } from "../doors/proc.js";
 import { front } from "../doors/front.js";
 import { index } from "../doors/index.js";
 import { homeIn } from "./editor.js";
+import { SLICES } from "../bridge/config.js";
 import { handDoors } from "./pull-hand-of.js";
 import { readTools, whereIs } from "../engine/tools.js";
 import { rootsHere } from "./vehicle.js";
-
-// The slices whose readers take a Go topic where the slice reads new. [[spec/tickets/readers-take-the-go-topics]]
-const SLICES = ["config", "log", "guidance", "check", "prose"];
 
 export const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 

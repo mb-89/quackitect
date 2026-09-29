@@ -4,7 +4,6 @@
 // [[spec/tickets/readers-take-the-go-topics]]
 
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
-import { asksText } from "../bridge/config.js";
 import { fieldOf } from "../engine/group.js";
 
 // The slice a reader asks, and the mode that answers off the Go topic. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
@@ -16,14 +15,9 @@ export function quackAt(files, join, root) {
   return [bare, `${bare}.exe`].find((one) => files.exists(one)) ?? bare;
 }
 
-// Whether the slice reads new on the caller's doors: the modes its startup read, else the tracked and local files a bridge box holds. [[spec/tickets/readers-name-one-mode-source]]
+// Whether the slice reads new on the caller's doors, which hold the modes under slices. [[spec/tickets/readers-name-one-mode-source]]
 export function readsNew(it, slice) {
-  if (it?.slices?.[slice] !== undefined) return it.slices[slice] === NEW;
-  try {
-    return asksText(it, `migration.${slice}`) === NEW;
-  } catch {
-    return false;
-  }
+  return it?.slices?.[slice] === NEW;
 }
 
 // Vale's findings as Go names them, and the key two lists of them meet on. [[spec/tickets/prose-checks-run-in-go]]

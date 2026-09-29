@@ -8,7 +8,6 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { readsProse } from "../../src/bridge/prose.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -40,7 +39,6 @@ function itOf(mode, files, answers) {
     clock: fakeClock(),
     names: () => [],
     slices: Object.fromEntries(FIVE.map((one) => [one, mode])),
-    config: { ask: async () => mode },
     log: fakeLog(),
   };
 }
@@ -149,7 +147,7 @@ test("readsProse keeps the findings quack prose keeps where the prose slice read
   };
   const box = itOf(
     "new",
-    { [join(ROOT, TRACKED)]: JSON.stringify({ migration: { prose: "new" } }) },
+    {},
     {
       [`${QUACK} prose`]: { stdout: JSON.stringify({ docs: [{ kept: [] }] }) },
     },
