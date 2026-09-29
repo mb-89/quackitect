@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: answer
+step: do
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -36,6 +36,19 @@ process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 depends_on: ["the-process-stays-editable"]
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 1399b4e4820f6c5cf9d5d105c2babe66530e3582
+    hash_after: 1399b4e4820f6c5cf9d5d105c2babe66530e3582
+    inputs:
+      - name: ask
+        hash: 2666e23e7826c6d7
+        size: 446
+      - name: [[spec/design_input/level-two]]
+        hash: 8dddb2221fafbe09
+        size: 15813
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -54,8 +67,13 @@ The owner decides how the editor draws and edits a process file: the steps, the 
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The editor draws a process file with the drawing a ticket takes, off the graph ./RUNME.sh graph answers. A person edits there the steps, their order, on_fail, by and when: every row the-editor-draws-the-ticket names in The drawing takes an edit, save the pointer. A gate draws as a marked node, and its question and final edit as leaf fields.
+
+The tags draw as labels on a node, and edit as a leaf field. The bless stays ./RUNME.sh ticket bless on a ticket, since a process file holds no verdict. A change reaches the open tickets through ./RUNME.sh ticket update.
+
+Weighed: the design input already rules the drawing and the rows it edits, and leaves how far to a desk trial. Assumed: the trial stays with the editor ticket the do step mints, so a wrong call costs one ticket edit before code lands.
 
 # do
 
