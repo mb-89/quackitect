@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -164,9 +164,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d8572d2183d7 · claude-code-remote
+    hash_before: cfe29390434e249e9a9623cff17f7e6104ffc144
+    hash_after: cfe29390434e249e9a9623cff17f7e6104ffc144
+    inputs:
+      - name: retro/write
+        hash: 73778df32298ca01
+        size: 2103
+    def: 4da1ca5da87d5bbc
 depends_on: ["read-topics-land-in-shadow", "quack-verbs-land-in-shadow"]
 enabled_by: migration.phase7shadow
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -302,20 +312,27 @@ The design put a drop where the store offers only a commit of an empty text, so 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the review server behind the review tool answered nothing, at the accept step
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the landing guard refused a chained pull, twice
+- the write door refused a write naming no ticket, once
+- a stale hold on the branch, taken by name at the start
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the handover: the editor stays on the old server until the switch group runs
 
 # Discussion
 
