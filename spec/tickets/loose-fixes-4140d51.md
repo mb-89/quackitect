@@ -88,7 +88,16 @@ record:
   - step: sync
     hand: box d84ce7ff23d8 · claude-code-remote
     hash_before: f5e429651e5110315ee42723c4e059ab70ee87ea
-step: sync
+  - step: sync
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 8d423ed8256a532a6fb342d9dc413e34107af0f0
+    hash_after: 8d423ed8256a532a6fb342d9dc413e34107af0f0
+    answered:
+      - name: sync
+        exit: 0
+        said: work/loose-fixes-4140d51 already carries every commit on main.
+    def: 8a9850a81227554b
+step: split
 ---
 
 # Ask
@@ -111,8 +120,9 @@ The source: none.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
