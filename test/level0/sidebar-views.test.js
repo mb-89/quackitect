@@ -7,8 +7,10 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { badgeOf, formOf, viewsOf } from "../../src/extension/lib/views.js";
-import { sidebarOf } from "../../src/extension/sidebar.js";
+import { TRACKED } from "../../src/extension/lib/widgets.js";
+import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import cases from "../../src/tui/work/testdata/badges.json" with { type: "json" };
 
 const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -123,4 +125,42 @@ test("a click on a view button calls its action through the index door", async (
   const door = doorOf();
   await sidebarOf(door).took({ kind: "call", calls: "work/pull", input: {} });
   assert.deepEqual(door.called, [{ name: "work/pull", input: {} }]);
+});
+
+// A door seeded with the real schema and the slice at a mode, whose old count reads 2 while the catalog reads 3. [[spec/tickets/the-sidebar-shadow-compares]]
+function shadowDoorOf(mode) {
+  const files = fakeDisk({
+    [SCHEMA]: JSON.stringify(schema),
+    [TRACKED]: JSON.stringify({ migration: { sidebar: mode } }),
+    "spec/views/work.base": BASE,
+  });
+  const appended = [];
+  return {
+    ...doorOf(),
+    appended,
+    read: async (path) => (files.exists(path) ? files.read(path) : ""),
+    append: async (_path, text) => appended.push(text),
+    now: () => 0,
+    asksVerb: async () => ({ code: 0, out: "2\n", err: "" }),
+  };
+}
+
+const shadowRows = (door) =>
+  door.appended
+    .join("")
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => JSON.parse(line))
+    .filter((row) => row.kind === "shadow");
+
+test("under shadow a mismatch writes a shadow row naming the slice, and under old none", async () => {
+  const shadow = shadowDoorOf("shadow");
+  await sidebarOf(shadow).html();
+  const rows = shadowRows(shadow);
+  assert.ok(rows.length > 0, "a mismatch writes a row");
+  assert.ok(rows.every((row) => row.slice === "sidebar"));
+
+  const old = shadowDoorOf("old");
+  await sidebarOf(old).html();
+  assert.deepEqual(shadowRows(old), []);
 });

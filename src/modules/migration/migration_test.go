@@ -86,6 +86,16 @@ func TestTheWindowSliceStandsAmongTheSlicesBuiltInAsOld(t *testing.T) {
 	t.Fatalf("the slices read %+v, and want window built in as old", slices)
 }
 
+// The sidebar's slice stands beside the window's, built in as old, with the three modes. [[spec/tickets/the-sidebar-shadow-compares]]
+func TestTheSidebarSliceStandsBuiltInOld(t *testing.T) {
+	for _, one := range slices {
+		if one.key == "sidebar" && one.mode == "old" && strings.Join(one.enum, ", ") == "old, shadow, new" && one.doc != "" {
+			return
+		}
+	}
+	t.Fatalf("the slices read %+v, and want sidebar built in as old", slices)
+}
+
 // The window slice names its three modes as its options. [[spec/tickets/the-config-schema-gets-generated]]
 func TestTheWindowSliceDocNamesItsModes(t *testing.T) {
 	for _, one := range slices {

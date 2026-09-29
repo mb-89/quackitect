@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     hand: box d85821f54410d · claude-code-remote
@@ -137,6 +137,19 @@ record:
         hash: eecebd8b5f500ddc
         size: 630
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: a2b28af8f5ccde36d5e372655891f9bc16ced713
+    hash_after: a2b28af8f5ccde36d5e372655891f9bc16ced713
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f9fe69c7c1ba8cd3
+        size: 2597
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -249,26 +262,33 @@ What I weigh and assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/views-shadow.test.js test/level0/sidebar-views.test.js src/modules/migration
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/views-shadow.test.js
+- test/level0/sidebar-views.test.js
+- src/modules/migration/migration_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The slice case fails, since no slice names the sidebar. The two compare cases fail against the stub, and the case where the pairs agree passes at once. The sidebar case fails on its first assertion, since no row reads shadow. What surprises me: the compare takes the base files and the catalog, the reads the sidebar holds at a draw, in place of the drawn views the draft names.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the slice case, the second the sidebar case, and the check is a checkpoint at tests-green
+- the cases run over the fake disk and a fake index door, and the Go case over the slice list
 
 # gate
 
