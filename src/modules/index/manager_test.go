@@ -261,7 +261,7 @@ func catalogued(t *testing.T) *qtest.Index {
 	var as q.Writer
 	ix := qtest.New(t, func(c *q.Catalog) {
 		as = Registers(c)
-		q.ActionIn(c, "t/ask", func(askIn) []q.Request { return nil }, q.Doc("asks about a ticket"))
+		q.ActionIn(c, "t/ask", func(askIn) []q.Request { return nil }, q.Doc("asks about a ticket"), q.Label("Ask"), q.Icon("❓"))
 		q.CfgIn(c, "depth", 3, q.Doc("how deep the ask reads"))
 		q.OutIn(c, "t/badge", 0, q.Doc("a count a renderer badges"), q.Label("Tickets"), q.Looks(q.Count))
 	})

@@ -10,6 +10,7 @@ const { fileDoor } = require("./editor-files.js");
 const { lensDoor } = require("./editor-lens.js");
 const { insetDoor } = require("./editor-inset.js");
 const { fieldDoor } = require("./editor-fields.js");
+const { indexDoor } = require("./editor-index.js");
 const { clientOf } = require("./lib/lsp.js");
 
 const NAME = "quackitect";
@@ -34,6 +35,7 @@ function editorDoor(context) {
     ...lensDoor(context, folder),
     ...insetDoor(context, folder),
     ...fieldDoor(context, folder),
+    index: indexDoor(folder?.uri?.fsPath ?? ""),
 
     holds: () => Boolean(folder),
     root: () => folder?.uri?.fsPath ?? "",

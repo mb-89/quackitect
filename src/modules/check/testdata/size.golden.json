@@ -5,7 +5,7 @@
       "file": "spec/config/level0.schema.json",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 757. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 801. Split it by topic."
     },
     {
       "file": "spec/config/styles/VoiceParagraph/Vocabulary.yml",
@@ -23,7 +23,7 @@
       "file": "spec/design_output/extension.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 697. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 714. Split it by topic."
     },
     {
       "file": "spec/design_output/level0.md",

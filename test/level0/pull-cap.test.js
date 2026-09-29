@@ -4,7 +4,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import said from "../../spec/config/level0.json" with { type: "json" };
+import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
+import file from "../../spec/config/level0.json" with { type: "json" };
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { partOf } from "../../src/scripts/pull-cap.js";
 import { stillHeld } from "../../src/scripts/pull-route.js";
@@ -17,6 +18,7 @@ const RULES = Array.from(
   (_, i) => `${i + 1}. Rule ${i + 1} says what the hand does next.`,
 ).join("\n");
 const LONG = `---\nkind: [[guidance]]\n---\n\n# Actionables\n\n${RULES}\n`;
+const said = underBuiltIns(schema, file);
 const CAP = { bytes: 1200, margin: 200 };
 const bytes = (text) => Buffer.byteLength(text, "utf8");
 

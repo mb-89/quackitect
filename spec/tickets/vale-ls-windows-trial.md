@@ -38,7 +38,7 @@ step: do
 
 # Ask
 
-The owner finishes the Vale trial on the Windows desk: steps 4 to 6 of [[spec/tickets/vale-ls-on-windows]], whose Discussion holds steps 1 to 3. It needs the owner's editor on Windows, so no box can do it. That ticket closes into this one.
+The owner finishes the Vale trial on the Windows desk. That is steps 4 to 6 of [[spec/tickets/vale-ls-on-windows]], whose Discussion holds steps 1 to 3. It needs the owner's editor on Windows, so no box can do it. That ticket closes into this one.
 
 The owner runs, in Git Bash at the tree's root:
 

@@ -1,5 +1,5 @@
 ---
-description: "config / migration / config: sets migration.config to new. The config readers' slice, switched over in phase 3. The config verb reads the config module."
+description: "config / migration / config: sets migration.config to new. The config readers, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

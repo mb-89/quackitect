@@ -47,3 +47,9 @@ func actions(verbs []Verb, before func(verb string) []string) func(*q.Catalog) q
 		return q.Join(hands...)
 	}
 }
+
+// The one request a verb lists: the node module runs the topic, the verb and its words through cli.js. [[spec/tickets/ticket-verbs-become-actions]]
+func nodeRun(topic, verb string, words ...string) []q.Request {
+	args := append([]string{topic, verb}, words...)
+	return []q.Request{{Module: NodeModule, Verb: NodeRun, Args: args, NoUndo: fmt.Sprintf("%s %s runs through cli.js, which keeps no undo", topic, verb)}}
+}

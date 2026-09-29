@@ -9,6 +9,8 @@ const { panelHtml } = require("./lib/panel.js");
 const { newestIn, rowsIn } = require("./lib/rows.js");
 const { FOLDERS, HOLD_WATCHES, ticketLensOf } = require("./lib/lens.js");
 const { opened } = require("./lib/session.js");
+const { viewsOf } = require("./lib/views.js");
+const { apartOf } = require("./lib/views-shadow.js");
 const { statesOf } = require("./lib/states.js");
 const { asType, parsed, withValue } = require("./lib/values.js");
 const {
@@ -35,6 +37,12 @@ const BLESS = ".se/.runtime/bless.json";
 const PLAN = ".se/.runtime/plan.json";
 // The files a ticket move, a plan todo or a hold writes, whose burst draws the badge again. [[spec/tickets/the-badge-reads-open-tasks]]
 const COUNTS = [...FOLDERS.map((folder) => `${folder}/*.md`), PLAN, ...HOLD_WATCHES];
+// The folder of the base files, and the reader they parse through. [[spec/design_output/extension#the-views-section]]
+const VIEWS = "spec/views";
+const YAML = ".claude/skills/level0/lib/schema-yaml.js";
+const CATALOG = ["index/names", "index/actions"];
+// The config key of the sidebar's migration slice. [[spec/tickets/the-sidebar-shadow-compares]]
+const SLICE = "migration.sidebar";
 
 function sidebarOf(door) {
   const readAll = async () => {
@@ -47,10 +55,12 @@ function sidebarOf(door) {
   };
   const valueNow = async (key) => {
     const said = await readAll();
-    return valuesOf(said.tracked, said.local).get(key)?.value;
+    return valuesOf(said.tracked, said.local, said.schema).get(key)?.value;
   };
   const logbook = logbookOf(door, async () => (await valueNow("log.level")) ?? "info");
   const held = new Map();
+  // The shadow lines told this session, each once. [[spec/tickets/the-sidebar-shadow-compares]]
+  const told = new Set();
 
   const set = async (key, value, how) => {
     const schema = parsed(await door.read(SCHEMA));
@@ -85,7 +95,7 @@ function sidebarOf(door) {
     if (!one) return undefined;
     const ran = pressed(held.get(key) ?? fresh(), door.now(), {
       options: one.options,
-      value: valuesOf(said.tracked, said.local).get(key)?.value,
+      value: valuesOf(said.tracked, said.local, said.schema).get(key)?.value,
       gesture: one.gesture,
     });
     held.set(key, ran.state);
@@ -99,21 +109,29 @@ function sidebarOf(door) {
     // [[spec/design_output/extension#the-status-bar-says-it]]
     async states() {
       const said = await readAll();
-      return statesOf(valuesOf(said.tracked, said.local));
+      return statesOf(valuesOf(said.tracked, said.local, said.schema));
     },
-    watches: [SCHEMA, TRACKED, LOCAL, BLESS],
+    watches: [SCHEMA, TRACKED, LOCAL, BLESS, `${VIEWS}/*.base`],
     counts: COUNTS,
 
     async html() {
       const said = await readAll();
-      const values = valuesOf(said.tracked, said.local);
-      const groups = litBy(groupsIn(said.schema, values), door.processes?.() ?? {});
+      const values = valuesOf(said.tracked, said.local, said.schema);
+      const groups = await counted(
+        door,
+        litBy(groupsIn(said.schema, values), door.processes?.() ?? {}),
+      );
+      const bases = await basesIn(door);
+      const catalog = await catalogOf(door);
+      if (values.get(SLICE)?.value === "shadow")
+        await tells(logbook, told, apartOf(groups, bases, catalog));
       return panelHtml({
-        groups: await counted(door, groups),
+        groups,
         tree: treeIn(said.schema, [
           { path: TRACKED, said: said.tracked },
           { path: LOCAL, said: said.local },
         ]),
+        views: viewsOf(bases, catalog),
         bless: parsed(await door.read(BLESS))?.agent === true,
         script: door.scriptUri(),
         source: door.source(),
@@ -137,6 +155,9 @@ function sidebarOf(door) {
         );
         return door.runs(runs);
       }
+      // [[spec/design_output/extension#the-views-section]]
+      if (message?.kind === "call" && message.calls)
+        return door.index?.calls(String(message.calls), message.input ?? {});
       if (message?.kind === "show") return shows(door, String(message.reads ?? ""));
       // [[spec/design_output/extension#the-hook-button]]
       if (message?.kind === "hook" && message.key) {
@@ -182,6 +203,36 @@ async function counted(door, groups) {
     }
   }
   return groups;
+}
+
+// Under shadow, each pair the two paths draw apart writes one row, once a session. [[spec/tickets/the-sidebar-shadow-compares]]
+async function tells(logbook, told, lines) {
+  for (const line of lines) {
+    if (told.has(line)) continue;
+    told.add(line);
+    await logbook.say("info", "shadow", line, { slice: "sidebar" });
+  }
+}
+
+// Every base file under spec/views, parsed, and none where the door lists no folder. [[spec/design_output/extension#the-views-section]]
+async function basesIn(door) {
+  if (!door.list || !door.imports) return [];
+  const files = (await door.list(VIEWS)).filter((one) => one.endsWith(".base"));
+  if (!files.length) return [];
+  const { readYaml } = await door.imports(YAML);
+  return Promise.all(
+    files.map(async (file) => ({
+      name: file.replace(/\.base$/, ""),
+      said: readYaml(await door.read(`${VIEWS}/${file}`)),
+    })),
+  );
+}
+
+// The two catalog rows off the index door, and none where no index stands. [[spec/design_output/extension#the-views-section]]
+async function catalogOf(door) {
+  if (!door.index) return {};
+  const rows = await Promise.all(CATALOG.map((name) => door.index.values(name)));
+  return Object.fromEntries(CATALOG.map((name, at) => [name, rows[at]]));
 }
 
 // Pull for me takes the ticket the queue names, through the road the ticket's buttons run. [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]

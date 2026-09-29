@@ -13,7 +13,7 @@ import (
 
 // [[spec/tickets/ticket-verbs-each-pinned]]
 func TestEveryTicketVerbStandsInTheList(t *testing.T) {
-	want := []string{"pull", "note", "update", "open", "todo", "route", "yours", "fill", "bless"}
+	want := []string{"pull", "note", "update", "open", "todo", "route", "yours", "fill", "bless", "place", "urgent", "set"}
 	var names []string
 	for _, one := range TicketVerbs {
 		names = append(names, one.Name)

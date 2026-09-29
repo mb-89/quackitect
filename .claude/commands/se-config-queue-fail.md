@@ -1,5 +1,5 @@
 ---
-description: "config / queue / fail: sets queue.fail to what you type. The score a ticket takes for each hand-back that comes back refused."
+description: "config / queue / fail: sets queue.fail to what you type. the score a ticket takes for each hand-back that failed on it"
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

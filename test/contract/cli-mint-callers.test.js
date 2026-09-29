@@ -8,6 +8,7 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
 import { TOOLS } from "../../src/bridge/tools.js";
 import { disk } from "../../src/doors/disk.js";
 import { handOut } from "../../src/scripts/pull-hand.js";
@@ -54,7 +55,10 @@ test("the checker exports no mint, so the mint imports it with no cycle", () => 
 });
 
 test("each schema module stands under the file ceiling the config names", () => {
-  const config = JSON.parse(files.read(join(root, "spec", "config", "level0.json")));
+  const config = underBuiltIns(
+    JSON.parse(files.read(join(root, "spec", "config", "level0.schema.json"))),
+    JSON.parse(files.read(join(root, "spec", "config", "level0.json"))),
+  );
   const ceiling = Number(config.code.fileLines);
   const over = files
     .list(LIB)

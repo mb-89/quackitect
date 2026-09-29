@@ -31,6 +31,7 @@ import (
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/session"
+	"quackitect/src/modules/settings"
 	"quackitect/src/modules/tickets"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
@@ -43,6 +44,7 @@ const (
 	dumpFolder = ".se/.dump/"
 	dumpArgs   = 3
 	hookArgs   = 3
+	schemaArgs = 3
 )
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -68,9 +70,9 @@ var modules = map[string]ioModule{
 	"git": {git.Registers, func(root string, commit func(map[string]any) error) (func(), error) {
 		return git.Start(git.New(root), clock.New().Every, commit), nil
 	}},
-	"tickets":   {registers: tickets.Registers},
+	"tickets":   {registers: withActions(tickets.Registers, verbsmodule.TicketsActions)},
 	"queue":     {registers: queue.Places},
-	"work":      {registers: work.Registers},
+	"work":      {registers: withActions(work.Registers, verbsmodule.WorkActions)},
 	"migration": {registers: migration.Registers},
 	"check":     {registers: check.Registers},
 	"guidance":  {registers: guidance.Registers},
@@ -92,6 +94,30 @@ var modules = map[string]ioModule{
 	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
 	// [[spec/tickets/agents-call-quack-directly]]
 	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
+}
+
+// A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
+func withActions(own, actions func(*q.Catalog) q.Writer) func(*q.Catalog) q.Writer {
+	return func(c *q.Catalog) q.Writer { return q.Join(own(c), actions(c)) }
+}
+
+// A settings section loads as a module type of its own name, and a module of that name takes the section's keys beside its own. [[spec/tickets/the-config-schema-gets-generated]]
+func init() {
+	for _, section := range settings.Sections() {
+		keys := settings.Of(section)
+		own, ok := modules[section]
+		if !ok {
+			modules[section] = ioModule{registers: keys}
+			continue
+		}
+		registers := own.registers
+		own.registers = func(c *q.Catalog) q.Writer {
+			first := registers(c)
+			keys(c)
+			return first
+		}
+		modules[section] = own
+	}
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -155,6 +181,8 @@ func dumps(prefix string) error {
 }
 
 func main() {
+	// This binary is the index, so a verb that finds no door starts this one. [[spec/design_output/index#a-door-comes-back]]
+	index.Serving()
 	if len(os.Args) == hookArgs && os.Args[1] == "hook" {
 		os.Exit(hookVerb(".", os.Args[2], os.Stdin, os.Stdout))
 	}
@@ -170,6 +198,13 @@ func main() {
 	}
 	if len(os.Args) == 2 && os.Args[1] == "config" {
 		if err := configs("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) >= 2 && os.Args[1] == "schema" {
+		if err := schemas(".", len(os.Args) == schemaArgs && os.Args[2] == "--write"); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
@@ -521,7 +556,7 @@ func configAt(root string) (map[string]configRow, error) {
 		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
 		return body
 	}
-	shared, err := sharedKeys(string(read(q.WiringFile)))
+	declared, err := declaredKeys(string(read(q.WiringFile)))
 	if err != nil {
 		return nil, err
 	}
@@ -531,7 +566,7 @@ func configAt(root string) (map[string]configRow, error) {
 			env[name] = value
 		}
 	}
-	return configRows(read(config.Tracked), read(config.Local), env, shared)
+	return configRows(read(config.Tracked), read(config.Local), env, declared)
 }
 
 // Reads one prose request on stdin, and prints what the Go vetoes keep over the caps and the domain words the tree names. [[spec/tickets/prose-checks-run-in-go]]

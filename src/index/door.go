@@ -15,6 +15,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -45,6 +46,8 @@ type Standing struct {
 	Pid   int    `json:"pid"`
 	Root  string `json:"root"`
 	Stamp string `json:"stamp"`
+	// The binary that stands the door, whose stamp a caller reads on disk. [[spec/design_output/index#a-door-comes-back]]
+	Bin string `json:"bin,omitempty"`
 }
 
 type call struct {
@@ -100,21 +103,19 @@ func standingPath(root string) string {
 	return filepath.Join(root, Runtime, "index.json")
 }
 
-// The command line asks for a door, and this spawns the resident where none stands. [[spec/design_output/doors#a-door-reads-the-outside]]
+// The command line asks for a door, and this spawns the tree's index where none stands, whatever build the caller runs. [[spec/design_output/index#a-door-comes-back]]
 func starts(root string) error {
-	self, err := os.Executable()
+	self, err := executableOf()
 	if err != nil {
 		return err
 	}
-
-	one := exec.Command(self, "serve")
-	one.Dir = root
-	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
-	one.Stdout, one.Stderr = nil, nil
-	if err := one.Start(); err != nil {
+	bin := serverOf(self, root)
+	if _, err := statOf(bin); err != nil {
+		return fmt.Errorf("no index binary stands at %s, and ./RUNME.sh builds one: %w", bin, err)
+	}
+	if err := spawns(bin, root); err != nil {
 		return err
 	}
-	go one.Wait()
 
 	for waited := 0; waited < startPolls; waited++ {
 		if _, err := standingOf(root); err == nil {
@@ -123,6 +124,46 @@ func starts(root string) error {
 		time.Sleep(startPollPause)
 	}
 	return errorOf("the door took longer than thirty seconds to stand")
+}
+
+// The index binary the tree builds, whose folder .claude/skills/level0/lib/folders.js owns and whose name lib/index.js owns. [[spec/design_output/index#a-door-comes-back]]
+func indexBinary(root string) string {
+	name := "se-index"
+	if runtime.GOOS == "windows" {
+		name += ".exe"
+	}
+	return filepath.Join(root, filepath.FromSlash(Runtime), "bin", name)
+}
+
+// Whether this process is the index, which Main says, and the composition root before any verb. [[spec/design_output/index#a-door-comes-back]]
+var serving atomic.Bool
+
+// Marks this process as the index, so a start it makes runs itself. [[spec/design_output/index#a-door-comes-back]]
+func Serving() { serving.Store(true) }
+
+// The binary a start runs: the index itself, and for a client the index beside it, else the tree's own. [[spec/design_output/index#a-door-comes-back]]
+func serverOf(self, root string) string {
+	if serving.Load() {
+		return self
+	}
+	beside := filepath.Join(filepath.Dir(self), filepath.Base(indexBinary(root)))
+	if _, err := statOf(beside); err == nil {
+		return beside
+	}
+	return indexBinary(root)
+}
+
+// Runs the binary with serve over the root, and a case swaps it for a fake process. [[spec/design_output/index#a-door-comes-back]]
+var spawns = func(bin, root string) error {
+	one := exec.Command(bin, "serve")
+	one.Dir = root
+	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
+	one.Stdout, one.Stderr = nil, nil
+	if err := one.Start(); err != nil {
+		return err
+	}
+	go one.Wait()
+	return nil
 }
 
 // The paths git tracks under the root. A root git holds nowhere tracks every file the walk reads, the way a reader of a bare folder reads it whole. [[spec/design_output/index#the-rows-the-walk-writes]]
@@ -280,12 +321,14 @@ func (one *door) stands(listen net.Listener) error {
 	if err := os.MkdirAll(filepath.Dir(standingPath(one.root)), 0o755); err != nil {
 		return err
 	}
+	self, _ := os.Executable()
 	said, err := json.Marshal(Standing{
 		Port:  listen.Addr().(*net.TCPAddr).Port,
 		V1:    one.v1.Addr().(*net.TCPAddr).Port,
 		Pid:   os.Getpid(),
 		Root:  one.root,
-		Stamp: stampHere(),
+		Stamp: stampOf(self),
+		Bin:   self,
 	})
 	if err != nil {
 		return err
@@ -459,13 +502,9 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 	writes(w, answer{Result: result, ID: said.ID})
 }
 
-// [[spec/design_output/index#a-door-comes-back]]
-func stampHere() string {
-	self, err := os.Executable()
-	if err != nil {
-		return ""
-	}
-	said, err := os.Stat(self)
+// The build's time and size, which a rebuild moves. [[spec/design_output/index#a-door-comes-back]]
+func stampOf(bin string) string {
+	said, err := os.Stat(bin)
 	if err != nil {
 		return ""
 	}

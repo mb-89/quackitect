@@ -1,5 +1,5 @@
 ---
-description: "config / queue / day: sets queue.day to what you type. The score a ticket takes for each day it stands."
+description: "config / queue / day: sets queue.day to what you type. the score a ticket takes for each whole day it stands"
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

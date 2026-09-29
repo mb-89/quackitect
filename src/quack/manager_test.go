@@ -163,6 +163,17 @@ func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
 	}
 }
 
+// A tree verb reaches /v1 before the index's own command line runs, and starts this binary where no door stands. [[spec/design_output/index#a-door-comes-back]]
+func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
+	bin := built(t, t.TempDir())
+	root := t.TempDir()
+	said, err := quack(t, bin, root, "help")
+	t.Cleanup(func() { quack(t, bin, root, "call", "stop") })
+	if err != nil {
+		t.Fatalf("quack help over a root with no door answers %v: %s", err, said)
+	}
+}
+
 // A driven tree carries no wiring file, so the index loads the wiring of the vehicle whose runtime folder holds the binary. [[spec/design_output/model#the-wiring-file]]
 func TestATreeWithNoWiringLoadsTheVehicleWiring(t *testing.T) {
 	vehicle := t.TempDir()
