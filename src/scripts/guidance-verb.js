@@ -14,6 +14,7 @@ import {
   PROCESSES,
   readsFor,
 } from "./guidance-hand.js";
+import { notesOf } from "./quack-topic.js";
 import { leafOf } from "./pull-route.js";
 
 const STEP = "--step";
@@ -59,7 +60,9 @@ function stepNotes(it, step, env) {
     console.error(`${name} names no step ${path}, or names one holding steps.`);
     return 1;
   }
-  return said(it, readsFor(it, leaf, env));
+  // The notes come off quack guidance where the guidance slice reads new. [[spec/tickets/readers-take-the-go-topics]]
+  const notes = notesOf(it, `${name}:${path}`, () => readsFor(it, leaf, env));
+  return said(it, notes);
 }
 
 function stepIn(argv) {

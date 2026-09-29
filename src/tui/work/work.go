@@ -40,6 +40,8 @@ type Tab struct {
 	Places *Places
 	// The place chord stands open, and the next key closes it. [[spec/design_output/tui#the-work-tab-takes-edits]]
 	Placing bool
+	// The compare beside the tab, which the window hands the catalog. [[spec/tickets/the-work-view-gains-actions]]
+	Shadow *Shadow
 }
 
 // The tab over the tree whose log stands at that path. [[spec/design_output/tui#the-work-tab]]
@@ -49,7 +51,7 @@ func (*Tab) Name() string { return "work" }
 
 // The rows this box takes stand behind the name, once the verb answers. [[spec/design_output/tui#the-work-tab]]
 func (t *Tab) Label(_ *frame.Model) string {
-	if t.Places != nil {
+	if t.Places != nil && t.Places.Counted {
 		return fmt.Sprintf("work (%d)", t.Places.Takeable)
 	}
 	return "work"
@@ -114,7 +116,7 @@ func (t *Tab) Update(m *frame.Model, msg tea.Msg) (bool, tea.Cmd) {
 			t.Tree.Filtering(m.SourceOf(m.TabNamed("work") - 1))
 			m.LoadPane()
 		}
-		return true, nil
+		return true, t.check()
 	case tea.KeyMsg:
 		if m.Open != m.TabNamed("work")-1 {
 			return false, nil
@@ -167,6 +169,7 @@ func (t *Tab) takes(m *frame.Model, msg Msg) tea.Cmd {
 		m.LoadPane()
 	}
 	t.Tick = msg.Tick
+	next = append(next, t.check())
 	return tea.Batch(append(next, Cmd(t.Path, t.Tick))...)
 }
 

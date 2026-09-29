@@ -54,7 +54,7 @@ ifVale(
       reads: at(READS, MODULE),
       argv: at(ARGV, MODULE),
       platform: at(PLATFORM, MODULE),
-      spawn: at(SPAWN, "src/lsp/check.go"),
+      spawn: at(SPAWN, "src/lsp/checker.go"),
       node: at(NODE, EXTENSION),
     },
     (said) => {
@@ -72,7 +72,7 @@ const off = (path) => ruleAt(sections, `VoiceVale.${RULE}`, path) === "NO";
 
 test("the config holds the rule over a module and a Go file", () => {
   assert.equal(off(MODULE), false, MODULE);
-  assert.equal(off("src/lsp/check.go"), false, "src/lsp/check.go");
+  assert.equal(off("src/lsp/checker.go"), false, "src/lsp/checker.go");
   assert.equal(ruleAt(sections, `VoiceVale.${GUARD}`, EXTENSION), "YES", EXTENSION);
 });
 
@@ -122,7 +122,7 @@ ifVale(
   "the rule refuses a Go import of os outside the package's door, and a module past a root reading the pid, the version or the exec path",
   proves(
     {
-      os: at(OS, "src/lsp/tree.go"),
+      os: at(OS, "src/lsp/shadow.go"),
       signal: at(OS_SIGNAL, "src/index/main.go"),
       swap: at(OS, "src/engine/swap/swap.go"),
       pid: at(PID, "src/scripts/vehicle.js"),

@@ -332,21 +332,6 @@
           "unit": "tickets",
           "help": "The tickets a retro's improve step mints, so the list holds what gets done."
         },
-        "blockScore": {
-          "type": "number",
-          "unit": "score",
-          "help": "The score a ticket takes for each one waiting under it, down the whole chain."
-        },
-        "dayScore": {
-          "type": "number",
-          "unit": "score",
-          "help": "The score a ticket takes for each day it stands."
-        },
-        "failScore": {
-          "type": "number",
-          "unit": "score",
-          "help": "The score a ticket takes for each hand-back that comes back refused."
-        },
         "editor": {
           "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the number in the work tab's brackets.",
           "widget": "action",
@@ -355,7 +340,7 @@
           "row": 0,
           "column": 0,
           "runs": "./RUNME.sh tui work",
-          "counts": "./RUNME.sh tui work --count"
+          "counts": "./RUNME.sh index call value {\"name\":\"work/open-tasks\"}"
         },
         "pull": {
           "help": "Take the ticket waiting on you first, and open it.",
@@ -475,6 +460,75 @@
       "properties": {
         "comment": {
           "type": "string"
+        },
+        "opentasks": {
+          "type": "string",
+          "enum": [
+            "new"
+          ],
+          "help": "The open-tasks slice's record, switched over in phase 2. The badge, the work tab's brackets and its queue column read the index."
+        },
+        "config": {
+          "type": "string",
+          "enum": [
+            "new"
+          ],
+          "help": "The config readers' slice, switched over in phase 3. The config verb reads the config module."
+        },
+        "log": {
+          "type": "string",
+          "enum": [
+            "new"
+          ],
+          "help": "The session log's slice, switched over in phase 3. The log verb reads the log topic."
+        },
+        "guidance": {
+          "type": "string",
+          "enum": [
+            "new"
+          ],
+          "help": "The guidance slice, switched over in phase 3. The rules a step reads come off the guidance topic."
+        },
+        "check": {
+          "type": "string",
+          "enum": [
+            "new"
+          ],
+          "help": "The check slice, switched over in phase 3. The check names answer an empty list until phase 7 moves the rules in."
+        },
+        "prose": {
+          "type": "string",
+          "enum": [
+            "new"
+          ],
+          "help": "The prose slice, switched over in phase 3. The prose readers take the findings the Go checks keep."
+        },
+        "cage": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's."
+        },
+        "window": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's."
+        },
+        "lsp": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The LSP's rules: old answers on the LSP's own sweep alone, shadow runs the check module's sweep beside it and logs each finding apart, new answers the module's."
         },
         "phase0": {
           "type": "boolean",
@@ -622,6 +676,30 @@
         }
       }
     },
+    "queue": {
+      "comment": "Level one. The weights of the queue's score, which the pull and the Go queue read alike.",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "block": {
+          "type": "number",
+          "unit": "score",
+          "help": "The score a ticket takes for each one waiting under it, down the whole chain."
+        },
+        "day": {
+          "type": "number",
+          "unit": "score",
+          "help": "The score a ticket takes for each day it stands."
+        },
+        "fail": {
+          "type": "number",
+          "unit": "score",
+          "help": "The score a ticket takes for each hand-back that comes back refused."
+        }
+      }
+    },
     "watchdog": {
       "type": "object",
       "properties": {
@@ -647,6 +725,16 @@
           "unit": "seconds",
           "help": "The span the faults of an alarm fall inside."
         },
+        "beat": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span between two beats of the index's work loop."
+        },
+        "lease": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The term a lease runs without a beat before its part reads stale."
+        },
         "deadlineDerived": {
           "type": "number",
           "unit": "seconds",
@@ -660,12 +748,7 @@
         "deadlineAction": {
           "type": "number",
           "unit": "seconds",
-          "help": "The span an action answers within."
-        },
-        "deadlineOp": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span an operation ends within."
+          "help": "The span an action's operation ends within."
         }
       }
     }

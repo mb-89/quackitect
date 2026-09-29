@@ -108,6 +108,17 @@ test("every verb the Bash description names stands in the command line", () => {
   }
 });
 
+// The count chain left the tree: no verb, viewer or badge line spells the count flag, so the badge asks the index. [[spec/tickets/count-grep-misses-the-scripts]]
+test("no count chain stands in the verb, the viewer or the badge line", () => {
+  for (const path of [
+    join(SCRIPTS, "tui.js"),
+    join(root, "src", "tui", "main.go"),
+    join(root, SCHEMA),
+  ]) {
+    assert.doesNotMatch(files.read(path), /--count\b/, path);
+  }
+});
+
 // [[spec/design_output/tree#the-rules-over-two-files]]
 // The lint's sweep holds every other rule over this tree, so this case reads these alone. [[spec/design_output/tree#the-rules-over-two-files]]
 test("this tree breaks none of the rules the sweep leaves out", () => {
@@ -402,7 +413,9 @@ test("every forced copy of the session file says what the hand module says", () 
 // [[spec/design_output/level0#a-name-meets-the-cap]]
 test("a tracked name past the cap is refused", () => {
   const long = Array.from({ length: words + 1 }, (_, i) => `word${i}`).join("-");
-  const found = nameHoldsTheWords(fakeTree({}, [`src/${long}.js`]));
+  const found = nameHoldsTheWords(
+    fakeTree({ [`src/${long}.js`]: "export {};\n" }, [`src/${long}.js`]),
+  );
 
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "NameHoldsTheWords");

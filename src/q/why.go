@@ -14,6 +14,7 @@ type Why struct {
 	Value    any        `json:"value"`
 	State    string     `json:"state"`
 	Since    *time.Time `json:"since,omitempty"`
+	Pending  int64      `json:"pending,omitempty"`
 	Provider Provider   `json:"provider"`
 	Inputs   []WhyInput `json:"inputs,omitempty"`
 	Readers  []string   `json:"readers,omitempty"`
@@ -23,7 +24,6 @@ type Why struct {
 type Provider struct {
 	Name  string `json:"name"`
 	Kind  string `json:"kind"`
-	Alt   string `json:"alt,omitempty"`
 	Where string `json:"where"`
 }
 
@@ -32,7 +32,7 @@ type WhyInput struct {
 	Why   Why    `json:"why"`
 }
 
-var kinds = map[provider]string{given: "given", derived: "derived", fold: "fold"}
+var kinds = map[provider]string{out: "out", derived: "derived", fold: "fold", action: "action"}
 
 func (s *Store) Why(name string) (Why, error) {
 	if s.owner(name) == nil {
@@ -54,7 +54,7 @@ func (s *Store) why(snap Snapshot, name string, seen map[string]bool) Why {
 		Name:     name,
 		Value:    snap.Read(name),
 		State:    "default",
-		Provider: Provider{Name: one.name, Kind: kinds[one.kind], Alt: one.alt, Where: one.where},
+		Provider: Provider{Name: one.name, Kind: kinds[one.kind], Where: one.where},
 		Readers:  s.readersOf(one),
 	}
 	if _, ok := snap.values[name]; ok {
@@ -62,6 +62,14 @@ func (s *Store) why(snap Snapshot, name string, seen map[string]bool) Why {
 	}
 	if since, ok := snap.Stale(name); ok {
 		said.State, said.Since = "stale", &since
+	}
+	if s.pending != nil {
+		if at, ok := s.pending(name); ok {
+			said.State, said.Pending = "pending", at
+		}
+	}
+	if snap.NotProvided(name) {
+		said.State, said.Since = "not provided", nil
 	}
 	if seen[one.name] {
 		return said
@@ -93,6 +101,10 @@ func (said Why) lines(indent string) []string {
 	state := said.State
 	if said.Since != nil {
 		state += " since " + said.Since.Format(time.RFC3339)
+	}
+	// A value a wave holds names the revision it waits from. [[spec/design_output/model#one-wave-settles-a-change]]
+	if said.State == "pending" {
+		state += fmt.Sprintf(" since r%d", said.Pending)
 	}
 	out := []string{fmt.Sprintf("%s%s = %v, %s, %s at %s", indent, said.Name, said.Value, state, said.Provider.Kind, said.Provider.Where)}
 	for _, in := range said.Inputs {

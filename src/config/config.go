@@ -25,18 +25,24 @@ func EnvOf(key string) string {
 
 // The local file beats the environment, and the environment beats the tracked one. [[spec/design_output/config#the-resolver-holds-the-layers]]
 func Value(root, key string) (any, bool) {
+	out, _, held := Where(root, key)
+	return out, held
+}
+
+// The value and the layer answering it: a file's path, or the variable's name. [[spec/tickets/cfg-topic-holds-one-resolver]]
+func Where(root, key string) (any, string, bool) {
 	var out any
-	held := false
+	layer := ""
 	if said, found := valueIn(read(root, Tracked), key); found {
-		out, held = said, true
+		out, layer = said, Tracked
 	}
 	if said := strings.TrimSpace(envOf(EnvOf(key))); said != "" {
-		out, held = said, true
+		out, layer = said, EnvOf(key)
 	}
 	if said, found := valueIn(read(root, Local), key); found {
-		out, held = said, true
+		out, layer = said, Local
 	}
-	return out, held
+	return out, layer, layer != ""
 }
 
 // The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#the-go-reader]]

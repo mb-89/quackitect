@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+reason: dropped
 step: design/draft
 steps:
   - name: design

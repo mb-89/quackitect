@@ -58,6 +58,18 @@ export function handOf(it) {
   return parts.join(" · ");
 }
 
+// The id this box carries, a read alone, so a push names its box with no write. [[spec/tickets/one-writer-holds-a-branch]]
+export function boxIdHere(it) {
+  for (const [root, path] of [
+    [it.root, BOX],
+    [it.method ?? it.root, IDENTITY],
+  ]) {
+    const id = parsed(readIf(it, root, path))?.id;
+    if (id) return String(id);
+  }
+  return "";
+}
+
 // A tracked file holds no person's name, so the record takes the role off the hand. [[spec/design_output/pull#the-hand-rule]]
 export function roleOf(hand) {
   const said = String(hand ?? "").trim();
@@ -76,13 +88,8 @@ function named(role, who) {
 
 // The box file stands under the work root, and the identity under the method root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]
 function boxOf(it) {
-  for (const [root, path] of [
-    [it.root, BOX],
-    [it.method ?? it.root, IDENTITY],
-  ]) {
-    const id = parsed(readIf(it, root, path))?.id;
-    if (id) return id;
-  }
+  const here = boxIdHere(it);
+  if (here) return here;
   const id = it.random
     ? it.random()
     : hashOf(`${it.clock ? it.clock.stamp() : ""} ${it.root}`).slice(0, BOX_ID);

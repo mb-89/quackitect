@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -80,12 +80,91 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2shadow
 depends_on: [the-foundation-closes-its-gaps]
 cloud: true
+record:
+  - step: sync
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: bedc9cefe0d6a773c73bb1be6da6f0892e1e26e0
+  - step: sync
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: f301ccd48ba9022c2cd8c2c4cca32f7e871a6a10
+    hash_after: 1bbabaec73701c2eefbf9fc02aa363fbb1b59d1d
+    answered:
+      - name: sync
+        exit: 0
+        said: work/open-tasks-shadow-lands already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box d81c1a402acf · claude-code-remote
+    hash_before: a22654053c9ba775401451b384e8f1de26007518
+    hash_after: a22654053c9ba775401451b384e8f1de26007518
+    inputs:
+      - name: ask
+        hash: 15f421ce1e8ace06
+        size: 568
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 949b2b59df5f1b933bfcaf5c18d9b5178d20a002
+    hash_after: 949b2b59df5f1b933bfcaf5c18d9b5178d20a002
+  - step: accept
+    hand: box d7a458cc59ec7 · claude-code-remote
+    hash_before: b3c4cbe30207d8a5b443e0ab1a592868a7f1495f
+    hash_after: b3c4cbe30207d8a5b443e0ab1a592868a7f1495f
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/open-tasks-shadow-lands already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 15f421ce1e8ace06
+        size: 568
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 660bb4d071b9 · claude-code-remote
+    hash_before: d01a157bf73274d6d24c3588a9e277ca201486a2
+    hash_after: d01a157bf73274d6d24c3588a9e277ca201486a2
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 660bb4d071b9 · claude-code-remote
+    hash_before: fbbb0760edcc69509c777a023593fcc41566271c
+    hash_after: fbbb0760edcc69509c777a023593fcc41566271c
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 660bb4d071b9 · claude-code-remote
+    hash_before: e5d0654b5635a0c62450acafdb4997f85835d384
+    hash_after: e5d0654b5635a0c62450acafdb4997f85835d384
+    inputs:
+      - name: retro/write
+        hash: 503db212c28722a3
+        size: 1418
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -101,8 +180,9 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -111,14 +191,25 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/the-queue-becomes-a-module]] standard
+[[spec/tickets/open-tasks-come-from-work]] standard
+[[spec/tickets/queue-reads-when-tickets-came]] trivial
+[[spec/tickets/open-tasks-run-in-shadow]] standard
+[[spec/tickets/fake-tree-runs-the-queue]] trivial
+[[spec/tickets/open-tasks-wired-case-stands]] trivial
+[[spec/tickets/ask-spells-the-slice-key]] trivial
+[[spec/tickets/places-at-runs-the-shadow]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every child is small enough to review whole, and each stands closed
+the children add up to the goal: the queue and work modules, the count, and the shadow with its key and rows
+no child waits on another now, since every one stands closed
 
 # children
 
@@ -129,8 +220,9 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -141,8 +233,9 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -151,38 +244,56 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+the queue stands as a module under src/modules/queue, with its golden
+work/open-tasks stands as a module, wired in spec/wiring.yaml
+the shadow compares the new open tasks with the old count, and logs each mismatch
+the migration module declares the openTasks slice key
+eight child tickets close through their commands
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the golden file pins the queue's output, so the module move shows no drift
+small child tickets let one box close eight of them in an evening
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+two boxes stopped mid-group, and a dead box's hold locked the branch
+a plain push refreshed the dead hold, so the branch stayed locked for another half hour
+one test in test/contract/cli-mint.test.js failed once in a full run, then passed alone and on the rerun
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+a stale hold moves only by a take, which the fix on claude/a-stale-hold-moves-by-a-take lands
+the flaky mint test gets a look before it fails a landing
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The shadow log holds no mismatch yet, since nothing has run the new path against real traffic. The switch group reads it before it flips phase 2.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the retro adds no fact, and points at the tickets and files that hold them
+the retro adds no number beyond the count of children
+the retro writes no file header
+the owner prompted nothing on this run, and the one error is the refused push the retro names
+the retro names roles and boxes, and carries no path of the box
 
 ## cloud
 
@@ -191,20 +302,24 @@ Done when every child closes through the command it names, and `./RUNME.sh log -
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+no tool, host or install lacked on this run
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the one-writer door refused two pushes while a dead box held the branch
+one mint test failed once in a full run and passed on the rerun
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step parked, and no ticket minted outside the group
 
 # Discussion
 

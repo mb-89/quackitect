@@ -181,3 +181,20 @@ ifVale(
     },
   ),
 );
+
+// A fix group carries fix: true, and the ticket schema takes it as a boolean alone. [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]]
+test("the ticket schema takes fix as a boolean, and refuses any other value", () => {
+  const ticket = schemas.get("ticket");
+  const minted = mintNote(ticket, {}, fakeFront());
+  const carrying = (value) => minted.replace("\n---\n", `\nfix: ${value}\n---\n`);
+  const naming = (text) =>
+    checkNote(text, ticket, "spec/tickets/one.md", schemas).filter((one) =>
+      /\bfix\b/.test(`${one.rule} ${one.message ?? one.said ?? ""}`),
+    );
+  assert.deepEqual(naming(carrying("true")), [], "fix: true stands clean");
+  assert.notDeepEqual(
+    naming(carrying("sometimes")),
+    [],
+    "a word in place of a boolean refuses",
+  );
+});

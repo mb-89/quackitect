@@ -90,22 +90,7 @@ export async function readingFor(where, served) {
     };
 
   // [[spec/design_output/lsp]]
-  const got = await findingsOver(
-    {
-      disk: files,
-      proc: outside,
-      join,
-      root,
-      vale: bin,
-      biome: biomeFor(files, root, readTools(files, root)),
-      // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
-      ceilings: {
-        function: await it.config.ask("code.functionLines"),
-        file: await it.config.ask("code.fileLines"),
-      },
-    },
-    where,
-  );
+  const got = await findingsOver(await findingsDoors(), where);
   if (got.fault) return { found: [], fault: got.fault };
   const found = got.found;
 
@@ -116,6 +101,26 @@ export async function readingFor(where, served) {
     found.push(...schemaFaults(tree));
   }
   return { found: pastHistory({ disk: files, join, root }, found), fault: "" };
+}
+
+// The doors the command line's own reading runs on. [[spec/design_output/lsp]]
+export async function findingsDoors() {
+  return {
+    disk: files,
+    proc: outside,
+    join,
+    root,
+    vale: bin,
+    biome: biomeFor(files, root, readTools(files, root)),
+    // The prose reader reads its slice's mode, and runs quack under the method root. [[spec/tickets/readers-take-the-go-topics]]
+    slices: it.slices,
+    method: it.method,
+    // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
+    ceilings: {
+      function: await it.config.ask("code.functionLines"),
+      file: await it.config.ask("code.fileLines"),
+    },
+  };
 }
 
 export async function lint(where) {

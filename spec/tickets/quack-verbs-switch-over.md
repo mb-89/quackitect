@@ -195,3 +195,13 @@ Done when agents call `quack` and no `./RUNME.sh` verb, and `cli.js` leaves the 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The native ports this group owes, since each action below runs its verb through `cli.js` over the `node` module until its port lands:
+
+| the topic | what ports | where the old code stands |
+|---|---|---|
+| `vehicle` | every verb `theVehicle` answers, over the register and the identity file | `theVehicle` in `src/scripts/cli.js` |
+| `stub` | into, with its git and its shim | `theStub` in `src/scripts/cli.js` |
+| `ticket` | every verb past `yours`, which a twin answers already | `src/scripts/ticket.js` |
+| `retro` | every verb past `notes`, which a twin answers already | `src/scripts/retro.js` |
+| `branch` | every verb past `list --queue`, which a twin answers already | `WORK_VERBS` in `src/scripts/work.js` |

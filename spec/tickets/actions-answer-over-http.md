@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,10 +114,80 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: a4ec036db54d2595060023635a05ff2d17e6a389
+    hash_after: a4ec036db54d2595060023635a05ff2d17e6a389
+    inputs:
+      - name: ask
+        hash: 210de2d83f01697a
+        size: 700
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 5ba4f45baf5f11b7de7ca47edc1ae418844fda25
+    hash_after: 5ba4f45baf5f11b7de7ca47edc1ae418844fda25
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: faa1a587698ca718
+        size: 4110
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84fcad60110c · claude-code-remote · helper-3
+    hash_before: 6f558326fc5e69544c9301f7f43f7f91d1228cc8
+    hash_after: 6f558326fc5e69544c9301f7f43f7f91d1228cc8
+    inputs:
+      - name: design/draft
+        hash: faa1a587698ca718
+        size: 4110
+      - name: design/tests-red
+        hash: 5851393963daace7
+        size: 961
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 26fba09807e06973c72fc25feb26a6e61d75046d
+    hash_after: 26fba09807e06973c72fc25feb26a6e61d75046d
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 423279a58bd3256c89745d48e3a7ed181d48a277
+    hash_after: 423279a58bd3256c89745d48e3a7ed181d48a277
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/index passes; green, src/modules/index passes; green, src/modules/http passes; green, sr
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 5851393963daace7
+        size: 961
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -151,38 +221,95 @@ An action then answers over HTTP the way it answers on the command line, and a s
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The door serves one Huma operation an action, off the store's names, and the index manager runs each call.
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the input type | `actionOf` and a new `Store.Input` in `src/q/action.go` | the registration keeps its input type, and `Input(name, body)` decodes a JSON body into it, an empty body into the zero value |
+| the types | a new `Store.Types` in `src/q/action.go` | answers an action's input type and the type `q.Answers` declares, so a surface builds its schema |
+| the call seam | `Manage` in `src/index/ops.go` | answers `Managed`: the stop, and a `Call` taking a name, an input, a caller and a wait |
+| the manager | `Start` and `begins` in `src/modules/index/manager.go` | `Serves` answers the stop and the call. `Outside` gains `Accept`, which a nil refuses every request through |
+| the route | `servesV1` in `src/index/v1.go`, and a new `src/index/actions.go` | `POST /v1/actions/<name>` a action: `RawBody` with the request schema off the input type, the `200` schema off the answer type with each `Out` field's label as its title and its doc as its description, and a `202` schema |
+| the wait | `waitOf` in `src/index/actions.go` | reads `wait=N` off `Prefer` per RFC 7240, and answers `Preference-Applied`. With no `Prefer` it reads `http/config/wait` off the store |
+| the key | a new `src/modules/http/http.go`, `spec/wiring.yaml`, `modules` in `src/quack/main.go` | the `http` module type registers `wait`, in seconds, built in at none, and the wiring loads it as `http` |
+
+The answers:
+
+- the action ends within the wait: `200`, the result, the handle path and the time gone by
+- the wait runs out: `202`, `running`, the fraction done, the time gone by, and the handle path `/v1/values/ops/<id>`, which `GET` reads
+- the action fails: `422`, with the reason the refusing module gives
+- a body the input type refuses: `400`
+
+The caller stands as `http`. The root's `Accept` routes a request to `disk` through `files.Accept`, and refuses every other module, since no action stands yet.
+
+I assume the default key takes the instance prefix the wiring gives, as `migration/config/slices/verbs` does, so the door reads the name `http/config/wait`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/ops.go: Manage, door.manages, ServeManaged
+- src/index/door.go: opensOn, which takes the call off the manager and hands it to servesV1
+- src/index/v1.go: servesV1
+- src/quack/main.go: manages, main, modules
+- src/modules/index/manager.go: Start, begins, Outside
+- src/modules/index/call.go: Call, which the manager's call wraps
+- src/q/action.go: actionOf, ActionIn, Action
+- src/index/failed_start_test.go: the manage stub
+- src/index/door_test.go: the manage stub
+- src/quack/manager_test.go: TestAnOverrideSetsTheSpanTheManagerTicksAt, over manager.Start
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/actions_test.go: TestAnActionAnswersItsResultWithinTheWait
+- src/index/actions_test.go: TestAWaitOfNoneAnswersAcceptedWithTheHandle
+- src/index/actions_test.go: TestNoPreferReadsTheDefaultWaitOffItsKey
+- src/index/actions_test.go: TestTheOpenAPIEntryReadsTheAnswerFields
+- src/q/action_test.go: TestAnActionDecodesItsInputOffJSON
+- src/modules/http/http_test.go: TestTheWaitKeyStandsUnderTheInstance
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/q/action.go
+- src/q/action_test.go
+- src/index/ops.go
+- src/index/door.go
+- src/index/v1.go
+- src/index/actions.go
+- src/index/actions_test.go
+- src/index/failed_start_test.go
+- src/index/door_test.go
+- src/modules/index/manager.go
+- src/modules/http/http.go
+- src/modules/http/http_test.go
+- src/quack/main.go
+- src/quack/testdata/tree.golden.json
+- spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened: action.go, looks.go, store.go, send.go, call.go, manager.go, ops.go, door.go, v1.go, quack/main.go, and Huma's Register over RawBody and preset responses
+- the callers list names every caller of Manage, manager.Start and actionOf a grep finds
+- each done_when line names its case: wait=5 in the first, wait=0 in the second, no Prefer in the third, and go test and the check in tests-green
 
 ## tests-red
 
@@ -191,26 +318,36 @@ An action then answers over HTTP the way it answers on the command line, and a s
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q src/index
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/q/action_test.go
+- src/index/actions_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- `Store.Input` answers no decode yet, so the JSON case fails on its own assertion
+- `servesActions` registers nothing yet, so each post reads `404` and the OpenAPI document holds no `/actions/t/add`
+- the manager seam, the `http` module and its wiring land whole in this step, since the cases reach the route through them. The module case passes, and the rest of `go test ./...` stays green
+- what surprises the hand: an op ends at the state `done`, and the case first read `finished`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches q's action registration, the manager's start, the door's seam, the http module, the wiring and the root, as the draft names
+- the index cases drive the real manager over a fake action and its accept, and the q case runs against the store alone
+- each file carries a pointer at the ticket or the chapter on the wait
 
 # gate
 
@@ -219,8 +356,12 @@ An action then answers over HTTP the way it answers on the command line, and a s
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- wait-key-meets-its-wiring: the no-Prefer case seeds http/config/wait itself through q.OutIn, and src/modules/http/http_test.go holds TestTheWaitKeyReadsNoneByDefault over config/wait, not the TestTheWaitKeyStandsUnderTheInstance the draft names; so no case ties the door's WaitName to the name the wiring binds the http module's key under. Add a case over the wiring's instance, or derive WaitName off httpmodule.WaitKey
+- action-refusals-meet-cases: the 400 for a body the input type refuses and the 422 for a refusing module carry no case in src/index/actions_test.go
+- gone-names-its-unit: Called.Gone encodes a time.Duration as nanoseconds; name the unit in the 202 schema or answer seconds, as the wait reads
 
 # implement
 
@@ -231,14 +372,19 @@ An action then answers over HTTP the way it answers on the command line, and a s
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names and no other, the test files among them
+- the only door the change reaches is the manager call, and the index cases run it through a fake manager over a fake accept
+- each new function carries a comment naming the chapter on the wait or this ticket
+- the wait name stands once as index.WaitName, the local key once as http.WaitKey, and a root case ties the two
 
 ## tests-green
 
@@ -247,26 +393,33 @@ An action then answers over HTTP the way it answers on the command line, and a s
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q src/index src/modules/index src/modules/http src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every action now answers over HTTP. The door registers POST /v1/actions/<name> for each action the store holds, with a request schema off its input type and a 200 schema off the type q.Answers declares, each field titled by its label. A post waits as long as Prefer: wait=N asks, or the http module key http/config/wait where it asks nothing. It answers 200 with the result, or 202 with the fraction done, the seconds gone by and the handle path /v1/values/ops/<id>. The manager answers its call beside its stop, and the root hands it an accept routing disk requests to the files module.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names and no other, the test files among them
+- the only door the change reaches is the manager call, and the index cases run it through a fake manager over a fake accept
+- each new function carries a comment naming the chapter on the wait or this ticket
+- the wait name stands once as index.WaitName, the local key once as http.WaitKey, and a root case ties the two
 
 # accept
 
@@ -291,3 +444,5 @@ An action then answers over HTTP the way it answers on the command line, and a s
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The ticket `surfaces-read-the-output-fields` closes `became` onto this one. The OpenAPI entry of `POST /v1/actions/<name>` takes its response schema off `Presentation.Out`, the fields `q.Answers` declares. A case reads a field's `label` and `doc` there. An action with no `q.Answers` keeps an untyped result.

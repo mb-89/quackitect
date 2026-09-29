@@ -19,6 +19,7 @@ import { excludes, handRule, ticketsHere } from "./pull-hand.js";
 import { PERSON, roleOf } from "./pull-hand-of.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
+import { notesOf, processNameOf } from "./quack-topic.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
 const NO_COMMAND = 127;
@@ -55,7 +56,13 @@ export function workAnswer(it, one, leaf) {
   }
   if (leaf.asks) rows.push("", `Asks: ${leaf.asks}`);
 
-  rows.push(...notesSaid(it, readsFor(it, leaf)));
+  const key = `${processNameOf(one.text)}:${leaf.path}`;
+  rows.push(
+    ...notesSaid(
+      it,
+      notesOf(it, key, () => readsFor(it, leaf)),
+    ),
+  );
 
   rows.push("");
   if (leaf.evidence.some((field) => field.form === "verdict")) {
@@ -288,6 +295,7 @@ const OPENERS = { pass: "pass", fail: "fail", accept: "pass", reject: "fail" };
 // A design review passing with findings, or a gate accepting with points, names a child a row, as `- <child-name>: <finding>`. [[spec/design_output/pull#a-finding-rides-out]]
 const FINDINGS = /^(pass\s+with\s+findings|accept\s+with\s+points)\b/i;
 export const FOUND = "findings";
+const TICKET_NAME = /^[a-z0-9][a-z0-9-]*$/;
 
 function findingOf(row) {
   const said = /^([^\s:]+):\s*(.*)$/.exec(row);
@@ -304,6 +312,10 @@ function findingFaults(it, said, where) {
     if (!name)
       out.push(
         `${where} names no child in ${line}; write it as - <child-name>: <finding>.`,
+      );
+    else if (!TICKET_NAME.test(name))
+      out.push(
+        `${where} names ${name}, and a ticket name holds lowercase words joined by hyphens.`,
       );
     else if (overLong(name, it.words))
       out.push(

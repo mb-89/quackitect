@@ -1,7 +1,11 @@
 # The rules over this tree, run by a machine with no stake in the answer.
 # A session says the check passes; this says whether it does.
 name: check
-on: push
+# A pull request against main runs the check GitHub's auto-merge waits on. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+on:
+  push:
+  pull_request:
+    branches: [main]
 
 jobs:
   check:

@@ -224,6 +224,9 @@ frontmatter:
     successors:
       type: [array, string]
       description: the tickets this one became
+    point:
+      type: string
+      description: the gate whose verdict minted this ticket
     todo:
       type: boolean
       description: the tag a hand puts on a note
