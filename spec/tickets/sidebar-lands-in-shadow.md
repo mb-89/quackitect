@@ -196,6 +196,8 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 
 <!-- what anybody adds, at any time, on this ticket -->
 
+The switch-over that retires the widget grid carries one cut. The `pull` entry of `spec/config/draws.json` drops its help and icon, since `work/pull` registers both. Until then the grid draws its pull button off that entry, so both stand.
+
 The owner's word on the sidebar, for the split:
 
 - the plugin opens as a dumb little adapter
