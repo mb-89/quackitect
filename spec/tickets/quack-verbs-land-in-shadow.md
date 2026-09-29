@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -91,6 +91,15 @@ record:
   - step: sync
     hand: box d8509c02d5db · claude-code-remote
     hash_before: 6505cc599a68905dfdcabca8361234038b7e8d69
+  - step: sync
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 5bda54b4d1382e08c465479276ec1a3b15379399
+    hash_after: 5bda54b4d1382e08c465479276ec1a3b15379399
+    answered:
+      - name: sync
+        exit: 0
+        said: work/quack-verbs-land-in-shadow already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["open-tasks-shadow-lands", "read-topics-land-in-shadow"]
 enabled_by: migration.phase4shadow
 cloud: true
@@ -109,8 +118,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
