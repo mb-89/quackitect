@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-switch-over
 parent: agents-call-quack-directly
+record:
+  - step: do
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: 816f6ccddef08a314ecb9da28230b96927253b7e
+    hash_after: 816f6ccddef08a314ecb9da28230b96927253b7e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/verbline-spares-blocking-verbs.md:41:97: Vocabulary: nodeaccept stands outside the words this tree writes. "
+    inputs:
+      - name: ask
+        hash: 31f3ce842ad24ddf
+        size: 206
+    def: fb0b796fd802391d
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ src/modules/hooks/cage.go names src/scripts/needs-shadow.js in two comments as t
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Two comments in cage.go named needs-shadow.js as the owner of the shadow row, and that file leaves with the verbs switch. Both now point at the design input chapter on how a slice moves, which defines the row.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: both comments point at the row owner
+- no cleanup beyond the two comments shows
+- the row stands defined in the design input alone, and the comments point there
 
 # Discussion
 
