@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/tests-green
+step: accept
 record:
   - step: design/owner-read
     skipped: true
@@ -167,6 +167,22 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d857b1c19ed5 · claude-code-remote
+    hash_before: 9f9821103ad5b158fc1800748c1c6a1688225ce2
+    hash_after: 9f9821103ad5b158fc1800748c1c6a1688225ce2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/git passes; green, src/modules/tickets passes; green, src/modules/work passes; green, src/quack passe
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: a7a51b4ff7583ad2
+        size: 1371
+    def: ec253787263043a7
 ---
 
 # Ask
@@ -359,26 +375,46 @@ The approach answers the ask, with the two corrections `design/tests-red` names 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/git src/modules/tickets src/modules/work src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index now reads the work branches standing on origin, so `ticket yours` and `branch list --queue` answer as cli.js does while a branch stands.
+
+- A new IO module `git` reads each `work/` branch on origin. It answers the ticket files on the tip and trunk's copy of the group ticket, on the port `git/tips`.
+- The module reads the refs again every five seconds, and reads the files only where a ref moves.
+- The tickets module folds the tips into `tickets/branched`. An unmerged branch speaks for its group and the tickets naming it, and the folders speak for the rest.
+- A branch reads merged where trunk carries its group ticket closed, as cli.js reads it.
+- `tickets/branches` hands the work module each branch, and the work draws one row for it with no state.
+- A trunk ticket under a branch group draws no row, as in cli.js.
+- The queue and the cloud read `tickets/branched`. The cloud had to, because a child on a marked group's tip alone stands on the cloud in cli.js.
+- `tickets/all` stays as it stands, so the tickets topic and the retro twin read what they read before.
+
+Both verbs ran at 19:27 against the rebuilt index while this branch and others stood, and `./RUNME.sh log --kind shadow` holds no row after it.
+
+One gap stays outside this ask. On a work branch the new path reads the working tree, and cli.js reads trunk from origin. A ticket minted on trunk after the last sync reads apart until the next `branch sync`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files, plus the old test wirings the new ports force
+- the git door has `FakeGit`, held to a real clone by `TestGitKeepsItsContract`
+- each new function points at this ticket or the design output it ports
+- the refs and the ticket folder stand once in `src/modules/git/git.go`, and the merged rule once in `merged`
 
 # accept
 

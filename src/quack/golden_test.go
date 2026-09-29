@@ -16,9 +16,9 @@ import (
 	"testing"
 
 	"quackitect/src/modules/tickets"
-	"quackitect/src/ticket"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
+	"quackitect/src/ticket"
 )
 
 // The golden file, beside the case that reads it. [[spec/tickets/tickets-becomes-a-module]]
