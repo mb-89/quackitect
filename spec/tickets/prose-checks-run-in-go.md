@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: 9b19e9c0eab11f4a
         size: 3582
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 86c7458f5e03e324a8de5e2a4eb751ad8f28e8ef
+    hash_after: 86c7458f5e03e324a8de5e2a4eb751ad8f28e8ef
+    inputs:
+      - name: design/draft
+        hash: 9b19e9c0eab11f4a
+        size: 3582
+      - name: design/tests-red
+        hash: 2016b703e694ec8c
+        size: 840
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -243,8 +255,12 @@ the one door the tests reach, the quack process, has a fake in doorsOf, beside t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- prose-shadow-hooks-reads-text: findingsOver in src/bridge/findings.js reads each walked file through readsText, and readThrough reads only the rows the walk passes over, so a shadow hooked on readThrough misses most findings of a check run; hook it once over what findingsOver and voiceOver read
+- prose-shadow-wiring-gets-tests: the rows test shadowProse alone, so an unwired shadow passes every test while log --kind shadow stays empty; add a case per caller that reads the shadow row off the fake log
+- lsp-past-veto-reads-go: pastReads in src/lsp/outside.go runs node with tenseScript for the past veto, a node use the ask covers, and the approach and its callers leave it out; name it as the reader that drops node when the slice reads new
 
 # implement
 
