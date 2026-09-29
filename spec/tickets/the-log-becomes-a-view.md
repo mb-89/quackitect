@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: b2c76ad4a79c0e5d
         size: 865
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 6f2668a6c6f2196bee19902aeeaf5a05809a4dfa
+    hash_after: 6f2668a6c6f2196bee19902aeeaf5a05809a4dfa
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -295,14 +304,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the log view, its base file and the layout row
+- every door the change reaches has a fake: the tests seed rows through fakeSource
+- a comment names the approach: each new function points at the model chapter
+- every fact stands in one place: the import row stands in the tui chapter
 
 ## tests-green
 
