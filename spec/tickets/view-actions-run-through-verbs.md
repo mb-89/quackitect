@@ -291,3 +291,5 @@ view: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+`draws-json-yields-to-views` became this ticket. Once `work/pull` registers its help and icon, the `pull` entry of `spec/config/draws.json` drops the two, so the icon stands in one place. The draft names that cut under its approach.
