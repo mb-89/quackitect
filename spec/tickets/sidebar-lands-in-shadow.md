@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -140,6 +140,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: d9c416ee44b57d40ac51ac99decf0413d4e969d6
+    hash_after: d9c416ee44b57d40ac51ac99decf0413d4e969d6
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["tui-shell-lands-in-shadow"]
 enabled_by: migration.phase8shadow
 cloud: true
@@ -223,38 +235,59 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-sidebar-shadow-compares: the slice sidebar, the compare apartOf, and one shadow row a pair apart, gated by a second hand
+- the tracked default file sets the sidebar slice to shadow, found at the group's accept
+- the size golden takes the schema's new line count
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the red tests from the design phase named the compare's arguments, so the build followed them and passed on its first run
+- the handover named the twin golden fix, so the red check cleared in one step
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 22:03 a shell call naming no ticket in its description came back refused
+- 22:08 the gate helper's commit came back refused, because this hand's uncommitted build stood in the same tree and migration.go carried no changed test
+- 22:12 the change step's commit came back refused on the same rule, until a case for the sidebar key stood beside it
+- 22:14 the check stood red on TestTwinGoldens, because the schema's line count moved
+- 22:15 a test run piped through tail and joined to a landing came back refused
+- 22:18 the accept found the tracked default file missing the sidebar mode, so the shadow never ran on main
+- no owner prompt turned the run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the spawn prompt the pull prints for a gate: tell the spawning hand to keep its tree clean until the gate lands, since the gate commits the whole tree
+- the draft checklist of the standard process: name the tracked default file, the projections and the goldens a new config key moves, so the size list carries them
+- the migration phase design input: name the line in spec/config/level0.json that sets a slice to shadow as part of every shadow phase
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The build ran ahead of the gate while the helper read it, which saved time but blocked the gate's commit. A clean tree while a helper lands a step costs less than taking the build off and replaying it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands once: the slice in migration.go, the compare in views-shadow.js
+- the change adds no number
+- the new header says what views-shadow.js is for, and counts nothing
+- the badly list carries each error with its time, and no owner prompt turned the run
+- the chapter names roles alone
 
 ## cloud
 
