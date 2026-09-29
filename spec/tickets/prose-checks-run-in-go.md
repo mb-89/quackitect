@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: bf60006c68136a36a8984687675158a14a498fb3
+    hash_after: bf60006c68136a36a8984687675158a14a498fb3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 2 file(s); green, src/prose passes
+      - name: check
+        exit: 0
+        said: "src/scripts/guidance-shadow.js:12:1: CodeComment: Code carries no comment here. Write a header of at most five lines at "
+    inputs:
+      - name: design/tests-red
+        hash: 2016b703e694ec8c
+        size: 840
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -301,26 +324,33 @@ The exception list stands once, in src/prose/lemmas.yml, and the domain words st
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/prose-shadow.test.js test/level0/prose-shadow-wiring.test.js src/prose
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The prose checks now run in Go beside wink. src/prose holds the past, length and outside vetoes, with golem and an embedded exception list for the lemma, and quack prose answers a request of documents with the findings the vetoes keep. Where migration.prose reads shadow, readsProse, findingsOver and voiceOver run quack prose once each and write one shadow row a finding the two sides keep apart, which ./RUNME.sh log --kind shadow names. The first live run shows PastTense rows alone, on participles such as detached and retired. TestProseKeepsWhatTheVetoesLeave in src/quack passes under go test -run Prose, while that folder also holds the sibling tickets red tests.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the prose package, quack prose, the shadow and its callers, and go.mod.
+The shadow and wiring cases meet fake settings, proc and log.
+The prose package headers name the approach.
+The exception list stands once, in src/prose/lemmas.yml.
 
 # accept
 
