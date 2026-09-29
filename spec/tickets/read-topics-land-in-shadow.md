@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -175,9 +175,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: fd57ba77fdf3c606bc98c100f5ac69424dbe1ba4
+    hash_after: fd57ba77fdf3c606bc98c100f5ac69424dbe1ba4
+    inputs:
+      - name: retro/write
+        hash: a9748d0bc7b387eb
+        size: 2212
+    def: 4da1ca5da87d5bbc
 depends_on: ["open-tasks-shadow-lands"]
 enabled_by: migration.phase3shadow
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -327,20 +337,26 @@ The review had failed since the front writer moved to Go, and every group since 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 03:1x: the level0 server stood down, and a start by hand brought it back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the branch review answered red on the mint contract test on every run, because its fresh worktree carried no se-front, and review-builds-its-front fixes it
+- a hook refused a git stash, a shell write over a source file, and a commit joined to a test with a semicolon
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked
+- every ticket this window minted stands in this group
+- the handover names the pull request into main as the step that waits
 
 # Discussion
 
