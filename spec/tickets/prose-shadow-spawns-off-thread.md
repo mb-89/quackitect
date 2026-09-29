@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -23,12 +23,30 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: read-topics-land-in-shadow
 parent: read-topics-land-in-shadow
+record:
+  - step: do
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 5ee6c5dc0b8ef453d3b3e5502c6e6d83f521b7de
+    hash_after: 5ee6c5dc0b8ef453d3b3e5502c6e6d83f521b7de
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 7a1656cb20541a0c
+        size: 237
+    def: fdd86be60f49a659
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ readsProse in src/bridge/prose.js fires the shadow unawaited, but its spawn runs
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/prose-shadow-wiring.test.js test/level0/prose-shadow.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The draft shadow in readsProse now starts quack prose through the proc door start, so the bridge server answers other hooks while the shadow runs, where before a sync spawn held its event loop on every read carrying a Vale finding. It builds its doors inside the try, so a box naming no method writes nothing and rejects nothing.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change follows the ask: start where the door has it, and quackAt inside the try.
+The change reveals no cleanup.
+The start stands in the proc door, and the shadow reaches it there.
 
 # Discussion
 

@@ -92,16 +92,20 @@ export function readsProse(box, text, found) {
 // One quack process reads the draft beside wink, and a fault there leaves the answer as it stands. [[spec/tickets/prose-shadow-hooks-reads-text]]
 async function shadowDraft(box, text, found, kept) {
   if (!box?.proc?.run || !box.log?.say || !box.disk) return;
-  const doors = {
-    settings: { ask: async (key) => asksText(box, key) },
-    files: box.disk,
-    proc: box.proc,
-    log: box.log,
-    root: box.method,
-    binary: quackAt(box.disk, join, box.method),
-  };
   const file = String(found?.[0]?.file ?? "");
   try {
+    // The server answers others while quack runs, so the shadow starts it where the door can. [[spec/tickets/prose-shadow-spawns-off-thread]]
+    const started = box.proc.start
+      ? { run: (argv, init) => box.proc.start(argv, init) }
+      : box.proc;
+    const doors = {
+      settings: { ask: async (key) => asksText(box, key) },
+      files: box.disk,
+      proc: started,
+      log: box.log,
+      root: box.method,
+      binary: quackAt(box.disk, join, box.method),
+    };
     await shadowProse(doors, [{ file, text, found: found ?? [] }], [kept], ALL);
   } catch {
     return;

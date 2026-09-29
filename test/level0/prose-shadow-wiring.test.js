@@ -106,3 +106,25 @@ for (const [mode, rows] of [
     assert.equal(shadowRows(it.log).length, rows);
   });
 }
+
+test("readsProse starts quack with the event loop free, and runs it on no sync spawn", async () => {
+  const box = boxOf(SHADOW);
+  const started = [];
+  const start = box.proc.start.bind(box.proc);
+  box.proc.start = (argv, init) => {
+    started.push(argv[1]);
+    return start(argv, init);
+  };
+  readsProse(box, TEXT, [{ ...SET, file: FILE }]);
+  await settled();
+  assert.deepEqual(started, ["prose"]);
+  assert.equal(shadowRows(box.log).length, 1);
+});
+
+test("readsProse on a box naming no method writes no row, and rejects nothing", async () => {
+  const box = boxOf(SHADOW);
+  box.method = undefined;
+  readsProse(box, TEXT, [{ ...SET, file: FILE }]);
+  await settled();
+  assert.equal(shadowRows(box.log).length, 0);
+});
