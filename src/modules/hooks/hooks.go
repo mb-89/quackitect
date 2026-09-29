@@ -175,7 +175,9 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	if told != "" {
 		effects = append(effects, Effect{Kind: afterKind, Text: told})
 	}
-	return Answer{Effects: effects}, nil
+	said := Answer{Effects: effects}
+	d.shadows(post, said)
+	return said, nil
 }
 
 // Commits the event at the session's next place, and lands it on every fold over the session. [[spec/design_output/model#the-events-of-a-session]]

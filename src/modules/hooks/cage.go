@@ -128,7 +128,9 @@ func (d *Door) ReplayLog(text string, say func(row map[string]any) error) ([]Apa
 	}
 	var out []Apart
 	for _, one := range posts {
-		said, err := d.Hook(one.Post)
+		live := one.Post
+		live.Old = nil
+		said, err := d.Hook(live)
 		if err != nil {
 			return nil, fmt.Errorf("line %d of the log: %w", one.Line, err)
 		}
@@ -145,6 +147,20 @@ func (d *Door) ReplayLog(text string, say func(row map[string]any) error) ([]Apa
 	return out, nil
 }
 
+// A live post carrying the old path's answer, which the door decides apart, hands its shadow row to Shadow. A failing write leaves the answer standing, since the shadow disturbs no hook. [[spec/tickets/copilot-meets-the-hooks-door]]
+func (d *Door) shadows(post Post, said Answer) {
+	if post.Old == nil || d.from.Shadow == nil {
+		return
+	}
+	old, now := OldDecisionOf(post.Event, post.Old), NewDecisionOf(post, said)
+	if old == now {
+		return
+	}
+	row := d.ShadowRowOf(Apart{Event: post.Event, Tool: textOf(post.E, "tool"), Old: old, New: now})
+	row["harness"] = harnessOf(post)
+	_ = d.from.Shadow(row)
+}
+
 // The shadow row an Apart writes, on the fields src/scripts/log-shadow.js writes, so ./RUNME.sh log --kind shadow names it. [[spec/tickets/cage-rules-replay-session-logs]]
 func (d *Door) ShadowRowOf(one Apart) map[string]any {
 	aim := strings.TrimSpace(one.Event + " " + one.Tool)
@@ -159,6 +175,12 @@ func (d *Door) ShadowRowOf(one Apart) map[string]any {
 		"event": one.Event,
 		"old":   one.Old,
 		"new":   one.New,
+	}
+	// A live post stands on no line of a log. [[spec/tickets/copilot-meets-the-hooks-door]]
+	if one.Line == 0 {
+		row["said"] = fmt.Sprintf("%s in shadow: %s reads %s on the old path, and %s off the door", cageSlice, aim, one.Old, one.New)
+		delete(row, "line")
+		delete(row, "stamp")
 	}
 	if one.Tool != "" {
 		row["tool"] = one.Tool

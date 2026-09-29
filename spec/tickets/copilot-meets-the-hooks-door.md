@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: a83cb8e7d18bb295
         size: 994
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85490c97110e · claude-code-remote
+    hash_before: de9891281c8b48474497901c5b83d193206b83eb
+    hash_after: de9891281c8b48474497901c5b83d193206b83eb
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/main.go:147:21: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -290,14 +299,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/hook.go src/quack/main.go src/modules/hooks/hooks.go src/modules/hooks/cage.go src/scripts/copilot-shadow.js src/scripts/copilot.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and none past them
+- the doors the change reaches have fakes: the process door through fakeProc, the disk through fakeDisk, and the hooks listen, which the reach case drives for real
+- the head of src/quack/hook.go and of src/scripts/copilot-shadow.js names the approach, and each function links the ticket
+- every fact stands once: the session log path in sessionLog, the standing file in hooks.StandingFile, the decision words in cage.go
 
 ## tests-green
 

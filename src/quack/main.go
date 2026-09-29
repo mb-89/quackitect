@@ -144,6 +144,9 @@ func dumps(prefix string) error {
 }
 
 func main() {
+	if len(os.Args) == 3 && os.Args[1] == "hook" {
+		os.Exit(hookVerb(".", os.Args[2], os.Stdin, os.Stdout))
+	}
 	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
 		os.Exit(verbRoad(os.Args[2], os.Args[3:]))
 	}
@@ -300,6 +303,8 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 			return hooks.Called(said), err
 		},
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
+		// [[spec/tickets/copilot-meets-the-hooks-door]]
+		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
 	})
 	return hooks.Listen(root, door)
 }
