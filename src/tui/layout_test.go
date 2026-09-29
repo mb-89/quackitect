@@ -20,7 +20,7 @@ var layout = map[string][]string{
 	"draw":     {},
 	"tree":     {"draw"},
 	"frame":    {"draw", "tree"},
-	"log":      {"frame", "draw"},
+	"log":      {"frame", "tree", "draw"},
 	"work":     {"frame", "tree", "draw"},
 	"registry": {"frame", "draw"},
 	".":        {"frame", "log", "work", "registry", "draw"},
