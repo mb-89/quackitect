@@ -117,7 +117,17 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: design/owner-read
+step: design/draft
+record:
+  - step: design/owner-read
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 48956a6421ee6e14f592483bcb1ee3567a91647d
+    hash_after: 48956a6421ee6e14f592483bcb1ee3567a91647d
+    inputs:
+      - name: ask
+        hash: eecebd8b5f500ddc
+        size: 630
+    def: dfe8a19a676f7573
 ---
 
 # Ask
@@ -143,8 +153,9 @@ view: none
 ### read
 
 <!-- pass where the ask says what the owner said, or fail with the owner's words -->
-
 <!-- the form is verdict -->
+
+pass: the ask carries the group brief, the shadow row on each mismatch and the slice key `migration/config/slices/sidebar`, in the brief's words
 
 ## draft
 
