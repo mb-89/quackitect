@@ -39,7 +39,7 @@ func Value(root, key string) (any, bool) {
 func Where(root, key string) (any, string, bool) {
 	var out any
 	layer := ""
-	if said, found := DefaultIn(read(root, Schema), key); found {
+	if said, found := defaultIn(read(root, Schema), key); found {
 		out, layer = said, BuiltIn
 	}
 	if said, found := valueIn(read(root, Tracked), key); found {
@@ -59,7 +59,7 @@ func Shared(root, key string) (any, bool) {
 	if said, found := valueIn(read(root, Tracked), key); found {
 		return said, true
 	}
-	return DefaultIn(read(root, Schema), key)
+	return defaultIn(read(root, Schema), key)
 }
 
 // The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#the-go-reader]]
@@ -133,7 +133,7 @@ func read(root, path string) map[string]any {
 }
 
 // The default a schema names for a dotted key, under each segment's properties. [[spec/tickets/the-config-schema-gets-generated]]
-func DefaultIn(schema map[string]any, key string) (any, bool) {
+func defaultIn(schema map[string]any, key string) (any, bool) {
 	var here any = schema
 	for _, part := range strings.Split(key, ".") {
 		step, _ := here.(map[string]any)

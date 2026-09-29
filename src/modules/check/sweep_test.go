@@ -88,6 +88,13 @@ func TestTheTrackedFileBeatsTheBuiltIn(t *testing.T) {
 	}
 }
 
+func TestAKeyNoLayerNamesCountsNothing(t *testing.T) {
+	texts := Texts{schemaConfig: `{"properties": {"names": {"properties": {}}}}`}
+	if said := countOf(texts, nil, wordsKey); said != 0 {
+		t.Fatalf("the count answers %d, and wants 0", said)
+	}
+}
+
 func TestCountReadsTheBuiltIn(t *testing.T) {
 	texts := Texts{"spec/config/level0.schema.json": `{"properties": {"names": {"properties": {"words": {"type": "number", "default": 7}}}}}`}
 	if said := countOf(texts, nil, wordsKey); said != 7 {

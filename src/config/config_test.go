@@ -194,3 +194,13 @@ func TestSharedReadsTheDefaultFileThenTheBuiltIn(t *testing.T) {
 		t.Fatalf("the log slice reads %v, and wants its built-in old", said)
 	}
 }
+
+// A key the schema leaves out, or names with no default, holds no built-in. [[spec/tickets/the-config-schema-gets-generated]]
+func TestDefaultInHoldsNothingTheSchemaLeavesOut(t *testing.T) {
+	schema := map[string]any{"properties": map[string]any{"names": map[string]any{"properties": map[string]any{"words": map[string]any{"type": "number"}}}}}
+	for _, key := range []string{"names.words", "names.none", "none.words"} {
+		if said, ok := defaultIn(schema, key); ok {
+			t.Fatalf("%s holds the built-in %v, and wants none", key, said)
+		}
+	}
+}

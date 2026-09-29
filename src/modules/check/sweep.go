@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"quackitect/src/config"
 	"quackitect/src/q"
 )
 
@@ -25,6 +24,7 @@ const (
 // The two config files and the keys the rules count by, which src/config names for the LSP. src/config reads the disk, so this module spells them again. [[spec/design_output/config#the-resolver-holds-the-layers]]
 const (
 	trackedConfig = "spec/config/level0.json"
+	schemaConfig  = "spec/config/level0.schema.json"
 	localConfig   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
 	wordsKey      = "names.words"
 	pointerKey    = "restated.pointer"
@@ -60,11 +60,7 @@ func sweepOf(in sweepIn) []Finding {
 
 // A count off the layers: the local file beats the variable, the variable beats the tracked file, and the tracked file beats the schema's default, as src/config reads them. [[spec/design_output/config#the-resolver-holds-the-layers]]
 func countOf(texts Texts, env map[string]string, key string) int {
-	var said any
-	var schema map[string]any
-	if json.Unmarshal([]byte(texts[config.Schema]), &schema) == nil {
-		said, _ = config.DefaultIn(schema, key)
-	}
+	said, _ := valueAt(texts[schemaConfig], "properties."+strings.ReplaceAll(key, ".", ".properties.")+".default")
 	if held, found := valueAt(texts[trackedConfig], key); found {
 		said = held
 	}
