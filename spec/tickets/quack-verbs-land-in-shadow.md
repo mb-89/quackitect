@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -156,9 +156,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: eb4741b2e48abff602bd1a565c8cff02cf822481
+    hash_after: eb4741b2e48abff602bd1a565c8cff02cf822481
+    inputs:
+      - name: retro/write
+        hash: 4994eac8234d1839
+        size: 2985
+    def: 4da1ca5da87d5bbc
 depends_on: ["open-tasks-shadow-lands", "read-topics-land-in-shadow"]
 enabled_by: migration.phase4shadow
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -327,20 +337,27 @@ the chapter names roles and repository files, and no box path
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+none: every tool, host and right this window reached answered
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the context cap cleared the conversation at the start, and the handover carried the work across
+the write hook refused a Bash call naming no ticket, and the next call named it
+the plan hook refused calls until the plan named the work in hand
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step parks
+no ticket stands minted with no group: index-reads-loaded-projections names quack-verbs-switch-over
+the handover names the branch done and its pull request against main
 
 # Discussion
 
