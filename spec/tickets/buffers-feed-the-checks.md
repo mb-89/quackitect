@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,25 @@ record:
         hash: ed1f5fec9ced9579
         size: 308
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 5c8055bbc025 · claude-code-remote
+    hash_before: bb83998dbb6d53378c1c42488e41321db4428214
+    hash_after: bb83998dbb6d53378c1c42488e41321db4428214
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: 5c34c24b4d80a416
+        size: 1724
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/the-lsp-door-lands]]
+        hash: 9077ecae87856252
+        size: 5609
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -208,26 +227,31 @@ The `lsp` IO module writes the name, and [[spec/tickets/the-lsp-door-lands]] add
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/check/buffers_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion, since the sweep stands nowhere yet and reads an empty list. The seed takes a `buffers/` name no registration declares, so the fake index holds a name before its reader: the reader lands with `lsp-rules-move-to-check`, and these cases turn green on its sweep plus the overlay.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a red case: the fake buffer case is `TestABufferStandsOverItsFile`, and go test and the check run over the module
+- the tests reach no door: the fake index takes the files and the buffers as seeds
 
 # gate
 
@@ -308,3 +332,5 @@ The `lsp` IO module writes the name, and [[spec/tickets/the-lsp-door-lands]] add
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's third caller reads wrong: the LSP calls `Holds` from `draws` in `src/lsp/panel.go`, on an open and a change, and `src/lsp/lsp.go` calls it nowhere.
