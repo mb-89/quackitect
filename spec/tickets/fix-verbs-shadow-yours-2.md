@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: loose-fixes-a906d84
 step: do
+record:
+  - step: do
+    hand: box d85ab822b1d7 · claude-code-remote
+    hash_before: 4be87f8b4b7a8b8c7b068911846ed665981dac41
+    hash_after: 4be87f8b4b7a8b8c7b068911846ed665981dac41
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/fix-verbs-shadow-yours-2.md:38:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 08b9d88566cc31cd
+        size: 528
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -48,7 +66,6 @@ The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
 
 ./RUNME.sh test src/quack
@@ -56,7 +73,6 @@ The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
 ./RUNME.sh check
@@ -64,7 +80,6 @@ The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
 No code changes. The split does not reproduce on this tree, and the cause stands below.
@@ -79,11 +94,11 @@ No code changes. The split does not reproduce on this tree, and the cause stands
 - I took the second and minted the follow-up ticket the-index-reads-standing-branches. This ticket claims no fix.
 - I wrote no test that fails first. The fault needs a standing remote branch, and the git write door refuses a scratch remote.
 - Assumption: the prose shadow rows stand outside the verbs slice.
+- Recheck on this box: the four verbs exit 0 and `./RUNME.sh log --kind shadow` answers no row; the follow-up ticket the-index-reads-standing-branches stands closed on trunk.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
 - the change follows the ask: the fix needs a branch input, so the follow-up ticket carries it

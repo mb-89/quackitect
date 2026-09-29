@@ -127,7 +127,7 @@ group: quack-verbs-switch-over
 <!-- view, as text: the view the owner reads the change in and the number there, in the owner's words, or none -->
 <!-- from, as text: handover where the ask comes off a handover line, so the owner reads it first, or none -->
 
-The index answers a loaded projection off the file the watch holds, so an agent reads the config, the plan and a ticket through the index.
+The index answers a loaded projection off the file the watch holds. An agent then reads the config, the plan and a ticket through the index.
 
 The index now answers each loaded projection with its default, where the watch holds the file:
 
