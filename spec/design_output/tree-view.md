@@ -160,6 +160,7 @@ its marks:
 | U | the ticket carries the urgent mark | bad |
 | C | the group holds a branch on the cloud, and its tickets inherit it | plain, because the cloud is neither good nor bad |
 | T | a todo forces its place, which [[spec/design_output/pull#a-todo-forces-a-place]] reads | bad |
+| P | a ticket for a person stands open in the row or anywhere under it, which `withKids` in `src/tui/work/workitems.go` lifts up the nest | plain, because the owner's turn is neither good nor bad |
 
 The letters hold fixed places, so nothing shifts as one lights. The keys stay
 ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`

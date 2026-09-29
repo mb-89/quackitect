@@ -3,7 +3,7 @@
 // [[spec/design_output/pull#the-hand-out]]
 
 import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
-import { entryNamed } from "../../.claude/skills/level0/lib/schema.js";
+import { entryNamed, ROUND } from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
@@ -27,8 +27,12 @@ import {
   withField,
 } from "../engine/group.js";
 import { isDue } from "./ephemeral.js";
+import { childrenSay } from "./pull-children.js";
+import { keptRed } from "./pull-kept.js";
 import { dueHandOut } from "./ephemeral-pull.js";
 import { noteRows, readsFor, readsOf } from "./guidance-hand.js";
+import { processNameOf, shadowLeaf } from "./guidance-shadow.js";
+import { shadowNeeds } from "./needs-shadow.js";
 import { workAnswer } from "./pull-chapter.js";
 import { printPart } from "./pull-cap.js";
 import { acceptWaits } from "./pull-accept.js";
@@ -329,6 +333,8 @@ export function advanced(it, one, all) {
     }
 
     const when = holdsHere(it, leaf.when, front, text);
+    // [[spec/design_output/pull#kept-red-leaves]]
+    const kept = when.holds ? keptRed(it, text, leaf, one.name) : null;
     if (!when.holds) {
       text = withEntry(
         text,
@@ -336,6 +342,9 @@ export function advanced(it, one, all) {
         it.front,
       );
       changes.push(`skips ${leaf.path}`);
+    } else if (kept) {
+      text = withEntry(text, kept, it.front);
+      changes.push(`keeps ${leaf.path}`);
     } else if (leaf.by === "children") {
       const said = childrenSay(all, one.name);
       if (said.dropped.length) {
@@ -403,22 +412,6 @@ export function advanced(it, one, all) {
   return { why: "loops in its route" };
 }
 
-// [[spec/design_output/pull#children-before-their-group]]
-export function childrenSay(all, name) {
-  const mine = all.filter((one) => !one.private && fieldOf(one.text, GROUP) === name);
-  const open = mine
-    .filter((one) => fieldOf(one.text, "state") !== CLOSED)
-    .map((one) => one.name);
-  const dropped = mine
-    .filter(
-      (one) =>
-        fieldOf(one.text, "state") === CLOSED &&
-        fieldOf(one.text, "reason") === "dropped",
-    )
-    .map((one) => one.name);
-  return { open, dropped, all: mine.map((one) => one.name) };
-}
-
 // [[spec/design_output/pull#the-hand-rule]]
 export function admits(it, who, one, leaf, all) {
   const rule = handRule(it, one.front, all, who.group, who.oneStep);
@@ -466,7 +459,7 @@ export function excludes(front, leaf, hand) {
   );
   const paths = new Set(under.map((one) => one.path));
   const wrote = entriesOf(front).filter(
-    (one) => paths.has(String(one.step)) && !one.skipped,
+    (one) => paths.has(String(one.step).replace(ROUND, "")) && !one.skipped,
   );
   if (!wrote.length) return "";
   // The record holds the role, so the rule reads the hand as its role too. [[spec/design_output/pull#the-hand-rule]]
@@ -479,8 +472,13 @@ export function excludes(front, leaf, hand) {
 // [[spec/design_output/pull#the-work-answer]]
 export function handed(it, who, one, leaf) {
   const hash = one.private ? "" : tipOf(it);
-  const reads = readsOf(it, readsFor(it, leaf));
+  const notes = readsFor(it, leaf);
+  const reads = readsOf(it, notes);
   noteRows(it, leaf.path, reads);
+  // The hand-out reads its notes now, and the shadow row lands behind it. [[spec/tickets/the-guidance-topic-lands]]
+  shadowLeaf(it, `${processNameOf(one.text)}:${leaf.path}`, notes);
+  // The leaf's needs meet the registry's actions behind the hand-out. [[spec/tickets/pull-verbs-become-actions]]
+  shadowNeeds(it, leaf.needs);
   const hold = {
     ticket: one.name,
     path: one.path,

@@ -10,6 +10,8 @@ import { walkOf } from "./pull-route.js";
 const RED = "tests-red";
 const GREEN = "tests-green";
 const FIELD = "red";
+// A reject inserts a round of its own, as tests-red-2, and its list stands red as the first round's does. [[spec/tickets/red-list-reads-inserted-leaves]]
+const RED_LEAF = new RegExp(`^${RED}(-\\d+)?$`);
 
 // [[spec/design_output/pull#the-gate]]
 export function expectedRed(tickets) {
@@ -21,17 +23,24 @@ export function expectedRed(tickets) {
       .map((entry) => String(entry.step).split("/").at(-1));
     if (!passed.includes(RED) || passed.includes(GREEN)) continue;
     const leaves = walkOf(frontOf(one.text)).filter(
-      (held) => held.leaf && held.name === RED,
+      (held) => held.leaf && RED_LEAF.test(held.name),
     );
     for (const leaf of leaves) {
-      for (const row of chapterOf(one.text, leaf.path).fields.get(FIELD) ?? []) {
-        const file = String(row)
-          .replace(/^[-*]\s+/, "")
-          .replaceAll("`", "")
-          .trim();
-        if (file) out.add(file);
-      }
+      for (const file of redListOf(one.text, leaf.path)) out.add(file);
     }
   }
   return [...out].sort();
+}
+
+// The files one red leaf names under its red field. [[spec/design_output/pull#kept-red-leaves]]
+export function redListOf(text, path) {
+  // A row a list payload wrote before formatted took arrays holds its paths joined by commas. [[spec/design_output/pull#kept-red-leaves]]
+  return (chapterOf(text, path).fields.get(FIELD) ?? [])
+    .flatMap((row) =>
+      String(row)
+        .replace(/^[-*]\s+/, "")
+        .split(","),
+    )
+    .map((one) => one.replaceAll("`", "").trim())
+    .filter(Boolean);
 }

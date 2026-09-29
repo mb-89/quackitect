@@ -5,6 +5,7 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { patchSpec, replaceSpec } from "../lib/apply.js";
+import { REPLY_PROBE } from "../lib/guidance.js";
 import { SERVE, SESSION } from "../lib/log.js";
 import { findSpec } from "../lib/search.js";
 import { undoSpec } from "../lib/undo.js";
@@ -19,7 +20,7 @@ const TEXTS = 4;
 // The transcript rows the answer door reads past the prompt's own row. [[spec/tickets/a-reply-follows-its-prompt]]
 const ROWS = 64;
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const STARTING = 180_000;
+export const STARTING = 180_000;
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
 export const INSTALL_SKIP =
   "editor-link editor-extensions editor-client go index se-lsp";
@@ -140,6 +141,7 @@ export function register(on, options) {
   answered = false;
   held = 0;
   armed = false;
+  probing = false;
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -162,6 +164,7 @@ async function sessionHeld($) {
 async function seen($, e, next) {
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
+  await probes($, event, e);
   if (event === "session.start") await opens($, e);
   const answer = reading(event, e)
     ? await reads($, event, e, next)
@@ -597,6 +600,24 @@ async function starts($) {
   // A warning says the road stood down, so the first prompt carries the cage block. An info says a server starts, and the session reads the rules off it. [[spec/design_output/level0#a-session-says-its-cage]]
   if (level === "warn") cage = { code, detail };
   await wrote($, { level, said, event: "session.start", detail });
+}
+
+// The reply probe's marker arms the next call of the session, which lands in the log as the event carries it. [[spec/tickets/the-reply-probe-runs]]
+let probing = false;
+
+async function probes($, event, e) {
+  if (event === "prompt.submit") {
+    probing = String(e?.text ?? "").includes(REPLY_PROBE.marker);
+    return;
+  }
+  if (event !== "tool.call" || !probing || e?.agentId) return;
+  probing = false;
+  await wrote($, {
+    level: "info",
+    said: REPLY_PROBE.event,
+    event,
+    detail: JSON.stringify(slim(e)),
+  });
 }
 
 // One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]

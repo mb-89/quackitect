@@ -6,6 +6,9 @@ import { hashText } from "./hash.js";
 import { fault, show } from "./schema-fault.js";
 import { readYaml } from "./schema-yaml.js";
 
+// The suffix a gate's reject names each copy with, `<leaf>-<round>`. [[spec/design_output/pull#the-gate]]
+export const ROUND = /-\d+$/;
+
 // [[spec/design_output/schema#keywords-that-name-a-step]]
 export function refersFaults(key, value, rule, held, at, line) {
   const earlier = rule["x-earlier"];
@@ -208,7 +211,7 @@ function handedOn(walk, leaf) {
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
 function readIn(walk, readers, at, leaf, field) {
-  const mine = new Set(ancestryOf(leaf));
+  const mine = new Set([...ancestryOf(leaf), String(leaf.path).replace(ROUND, "")]);
   return readers.some(({ one, at: seat, tokens }) => {
     if (seat <= at || mine.has(one.path)) return false;
     return tokens.some(

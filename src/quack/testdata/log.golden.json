@@ -1,0 +1,103 @@
+{
+  ".claude/skills/level0/lib/log.js asRow": [
+    "03:04:05.000 info  tool   reads the file",
+    "03:04:06.000 warn  tool   runs the check\n             tool=Bash n=3",
+    "03:04:07.000 undefined undefined the write lands\n             door=write",
+    "03:04:08.000 loud  vale   a level nobody knows",
+    "03:04:09.000 info  reply  one line\n- a list item"
+  ],
+  "src/extension/lib/rows.js rowOf": [
+    "03:04:05.000 info  tool   reads the file",
+    "03:04:06.000 warn  tool   runs the check\n             tool=Bash n=3",
+    "03:04:07.000              the write lands\n             door=write",
+    "03:04:08.000 loud  vale   a level nobody knows",
+    "03:04:09.000 info  reply  one line\n- a list item",
+    "not json at all"
+  ],
+  "src/modules/log": [
+    {
+      "at": "2026-01-02T03:04:05.000Z",
+      "level": "info",
+      "kind": "tool",
+      "said": "reads the file"
+    },
+    {
+      "at": "2026-01-02T03:04:06.000Z",
+      "level": "warn",
+      "kind": "tool",
+      "said": "runs the check",
+      "extra": {
+        "n": "3",
+        "tool": "Bash"
+      }
+    },
+    {
+      "at": "2026-01-02T03:04:07.000Z",
+      "level": "info",
+      "kind": "write",
+      "said": "the write lands"
+    },
+    {
+      "at": "2026-01-02T03:04:08.000Z",
+      "level": "info",
+      "kind": "vale",
+      "said": "a level nobody knows"
+    },
+    {
+      "at": "2026-01-02T03:04:09.000Z",
+      "level": "info",
+      "kind": "reply",
+      "said": "one line\n- a list item"
+    },
+    {
+      "at": "",
+      "level": "error",
+      "kind": "unparsed",
+      "said": "not json at all",
+      "broken": true
+    }
+  ],
+  "src/tui/log ParseRecord": [
+    {
+      "level": "info",
+      "kind": "tool",
+      "said": "reads the file",
+      "rank": 1
+    },
+    {
+      "level": "warn",
+      "kind": "tool",
+      "said": "runs the check",
+      "extra": {
+        "n": "3",
+        "tool": "Bash"
+      },
+      "rank": 2
+    },
+    {
+      "level": "info",
+      "kind": "write",
+      "said": "the write lands",
+      "rank": 1
+    },
+    {
+      "level": "loud",
+      "kind": "vale",
+      "said": "a level nobody knows",
+      "rank": 1
+    },
+    {
+      "level": "info",
+      "kind": "reply",
+      "said": "one line\n- a list item",
+      "rank": 1
+    },
+    {
+      "level": "error",
+      "kind": "unparsed",
+      "said": "not json at all",
+      "broken": true,
+      "rank": 3
+    }
+  ]
+}

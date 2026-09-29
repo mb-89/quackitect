@@ -43,6 +43,69 @@ test("sync on a work branch takes main in as before", () => {
   assert.match(said, /work\/one-group took 2 commit\(s\) from main/);
 });
 
+// [[spec/tickets/sync-takes-its-own-branch]]
+const OWN =
+  "git merge origin/work/one-group --no-edit -m work/one-group: take origin/work/one-group in";
+const OWN_AHEAD = (count) => ({
+  "git rev-list --count HEAD..origin/work/one-group": { stdout: `${count}\n` },
+});
+
+// [[spec/tickets/sync-takes-its-own-branch]]
+test("sync on a work branch merges a diverged remote branch and keeps both sides", () => {
+  const { it, outside } = doorsSaying({
+    ...onBranch("work/one-group"),
+    ...BEHIND,
+    ...OWN_AHEAD(3),
+  });
+  const { code, said } = heard(() => sync(it));
+  assert.equal(code, 0, said);
+  const ran = ranGit(outside);
+  assert.ok(ran.includes(OWN), ran.join("\n"));
+  assert.ok(
+    ran.indexOf(OWN) <
+      ran.indexOf("git merge origin/main --no-edit -m work/one-group: take main in"),
+    "the remote branch comes in before trunk",
+  );
+  assert.ok(
+    !ran.some((one) => /rebase|reset|push --force/.test(one)),
+    "no side is rewritten",
+  );
+  assert.match(said, /work\/one-group took 3 commit\(s\) from origin\/work\/one-group/);
+  assert.match(said, /work\/one-group took 2 commit\(s\) from main/);
+});
+
+// [[spec/tickets/sync-takes-its-own-branch]]
+test("sync on a work branch leaves the branch alone where the remote carries nothing new", () => {
+  const { it, outside } = doorsSaying({
+    ...onBranch("work/one-group"),
+    ...BEHIND,
+    ...OWN_AHEAD(0),
+  });
+  const { code, said } = heard(() => sync(it));
+  assert.equal(code, 0, said);
+  assert.ok(!ranGit(outside).includes(OWN));
+});
+
+// [[spec/tickets/sync-takes-its-own-branch]]
+test("a conflict with the remote branch stops and names the files", () => {
+  const { it, outside } = doorsSaying({
+    ...onBranch("work/one-group"),
+    ...BEHIND,
+    ...OWN_AHEAD(1),
+    [OWN]: { exitCode: 1 },
+  });
+  const { code, said } = heard(() => sync(it));
+  assert.equal(code, 1, said);
+  assert.match(said, /origin\/work\/one-group conflicts with work\/one-group/);
+  assert.match(said, /git status names the files/);
+  assert.ok(
+    !ranGit(outside).includes(
+      "git merge origin/main --no-edit -m work/one-group: take main in",
+    ),
+    "trunk waits for the conflict",
+  );
+});
+
 test("sync on any other branch refuses, and names where it runs", () => {
   const { it } = doorsSaying(onBranch("claude/a-thing"));
   const { code, said } = heard(() => sync(it));

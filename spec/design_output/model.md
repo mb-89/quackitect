@@ -141,7 +141,9 @@ reads a key like any other input, per
 ## The wiring file
 
 `spec/wiring.yaml` is the one place that knows the global layout, and the index
-reads it at start. It lists the instances to load, and binds each port:
+reads it at start. A project a vehicle drives carries no wiring file. It loads
+the file of the vehicle whose runtime folder holds the index binary, per
+[[spec/design_output/vehicle#a-vehicle-and-its-project]]. The file lists the instances to load, and binds each port:
 
 | the part | what it holds |
 |---|---|
@@ -463,14 +465,17 @@ module that accepts it, the verb, the arguments and its undo:
 A hand-back writes, stages, commits and runs the check, and `then` reads the
 check's answer before the push.
 
-The index runs the requests. The module's action answers the list as its
-commit, and the index sends each request, in order, to the IO module that
-accepts it. It holds the writer queue of
-[[spec/design_output/model#one-writer-per-tree]]. A module names a request,
-and reaches no IO module itself.
+The index runs the requests:
 
-A request that fails stops the list. The index runs the undo of every request
-before it, newest first, and the action fails with the reason.
+- The module's action answers the list as its commit, and the index sends each
+  request, in order, to the IO module that accepts it. It holds the writer
+  queue of [[spec/design_output/model#one-writer-per-tree]]. A module names a
+  request, and reaches no IO module itself.
+- A request that fails stops the list. The index runs the undo of every
+  request before it, newest first, and the action fails with the reason.
+- The caller receives the answer of the last request. `q.Answers` declares
+  its type, and its fields carry `label` and `doc` tags, as an input's fields
+  do.
 
 ## The index resolves in passes
 
@@ -1344,6 +1349,7 @@ A registration takes options beside its function:
 | `q.Icon` | a proposed icon, which a view uses or leaves out | the renderers |
 | `q.Looks` | the kind of value, such as `q.Count`, `q.Rows` or `q.State`, so a renderer knows how to draw it | the renderers |
 | `q.Deadline` | how long a run takes at most | the watchdog |
+| `q.Answers` | the type an action's caller receives, whose fields carry `label` and `doc` tags | every surface, as the action's output |
 | `q.Cfg` | a config key the module reads, with its type, built-in value and help | the config module, and every list of keys, per [[spec/design_output/model#config-comes-off-the-registrations]] |
 
 ## What each surface gets

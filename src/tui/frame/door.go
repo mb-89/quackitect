@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -72,4 +73,17 @@ func TellPort(port int, tab string) bool {
 	}
 	defer answer.Body.Close()
 	return answer.StatusCode == http.StatusOK
+}
+
+// Adds bytes to the end of the file at path, which the shadow row of a mismatch reaches the session log through. [[spec/design_output/doors#a-door-reads-the-outside]]
+func appendFile(path string, data []byte) error {
+	one, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0o644)
+	if err != nil {
+		return err
+	}
+	if _, err := one.Write(data); err != nil {
+		_ = one.Close()
+		return err
+	}
+	return one.Close()
 }

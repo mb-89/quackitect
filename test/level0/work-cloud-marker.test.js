@@ -114,6 +114,45 @@ test("branch merge drops the marker on the merge commit", () => {
   assert.ok(ranGit(outside).includes("git commit --amend --no-edit"));
 });
 
+test("a merge that conflicts drops the marker, and stages it for the resolving commit", () => {
+  const { it, outside, disk } = doorsSaying(
+    merging({ "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 1 } }),
+    { [on("one-group")]: MARKED },
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 1);
+  assert.match(said, /conflicts/);
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "");
+  const ran = ranGit(outside);
+  assert.ok(ran.includes(`git add ${GROUP_AT}`), ran.join("\n"));
+  assert.ok(!ran.includes("git commit --amend --no-edit"));
+});
+
+test("a merge conflicting on the group ticket leaves it unstaged for the person's resolution", () => {
+  const { it, outside, disk } = doorsSaying(
+    merging({
+      "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 1 },
+      "git diff --name-only --diff-filter=U": { stdout: `${GROUP_AT}\n` },
+    }),
+    { [on("one-group")]: MARKED },
+  );
+  it.node = "node";
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["merge", "one-group"], { ...it, cloud: false }),
+  );
+
+  assert.equal(code, 1);
+  assert.match(said, new RegExp(`Drop cloud: true from ${GROUP_AT}`));
+  assert.equal(fieldOf(disk.read(on("one-group")), CLOUD_MARK), "true");
+  assert.ok(!ranGit(outside).includes(`git add ${GROUP_AT}`));
+});
+
 const closing = (extra = {}) => ({
   ...onBranch("main"),
   "git rev-list --count origin/main..main": { stdout: "0\n" },

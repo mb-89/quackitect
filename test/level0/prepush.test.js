@@ -13,7 +13,10 @@ import {
   lintedBy,
   namesIn,
   rangeOf,
+  heldBy as readsHold,
+  heldAtTip,
   refsIn,
+  staleBy,
 } from "../../src/scripts/prepush.js";
 
 const SHA = "a1b2c3d4e5f6a7b8";
@@ -41,19 +44,190 @@ function fakeRepo(names, texts) {
 }
 
 function stamp(over = {}) {
-  return JSON.stringify({ sha: SHA, ok: true, clean: true, at: "now", ...over });
+  return JSON.stringify({
+    sha: SHA,
+    ok: true,
+    clean: true,
+    at: "now",
+    ...over,
+  });
 }
 
 test("git's lines read as refs, and a blank line reads as nothing", () => {
   assert.deepEqual(refsIn(`${toTrunk}\n${toWork}`), [
-    { local: "refs/heads/main", sha: SHA, remote: "refs/heads/main", was: ZEROS },
-    { local: "refs/heads/work/x", sha: SHA, remote: "refs/heads/work/x", was: ZEROS },
+    {
+      local: "refs/heads/main",
+      sha: SHA,
+      remote: "refs/heads/main",
+      was: ZEROS,
+    },
+    {
+      local: "refs/heads/work/x",
+      sha: SHA,
+      remote: "refs/heads/work/x",
+      was: ZEROS,
+    },
   ]);
 });
 
 test("a push to a work branch meets no door, whatever the stamp says", () => {
   assert.deepEqual(holds(refsIn(toWork), ""), { code: 0, said: "" });
-  assert.deepEqual(holds(refsIn(toWork), stamp({ ok: false })), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), stamp({ ok: false })), {
+    code: 0,
+    said: "",
+  });
+});
+
+// [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+test("a cloud box pushing main meets the refusal, whatever the battery says", () => {
+  for (const text of [stamp(), ""]) {
+    const said = holds(refsIn(toTrunk), text, () => [], true);
+    assert.equal(said.code, 1);
+    assert.match(said.said, /its own work branch/);
+    assert.match(said.said, /\.\/RUNME\.sh branch merge/);
+  }
+});
+
+// [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+test("a cloud box pushes its own work branch", () => {
+  assert.deepEqual(
+    holds(refsIn(toWork), stamp(), () => [], true),
+    { code: 0, said: "" },
+  );
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+const HOLDER = "box 0ther1d · session s1 · claude-code-remote";
+const heldBy = (hand) => () => hand;
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a push to a work branch another box holds refuses, and names the holder and main", () => {
+  const said = holds(refsIn(toWork), stamp(), () => [], false, heldBy(HOLDER), "myb0x");
+  assert.equal(said.code, 1);
+  assert.match(said.said, /work\/x/);
+  assert.match(said.said, /box 0ther1d/);
+  assert.match(said.said, /main/);
+  assert.match(said.said, /branch sync/);
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("the holding box pushes its own branch", () => {
+  const said = holds(
+    refsIn(toWork),
+    stamp(),
+    () => [],
+    true,
+    heldBy(HOLDER),
+    "0ther1d",
+  );
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// The hold the pushed tip carries: the take writes this box, a plain push keeps the holder, and a release writes nobody. [[spec/tickets/stale-hold-moves-by-take]]
+const TAKER = "box myb0x · session s2 · claude-code-remote";
+const pushedOver = (stale, atTip) =>
+  holds(
+    refsIn(toWork),
+    stamp(),
+    () => [],
+    true,
+    heldBy(HOLDER),
+    "myb0x",
+    true,
+    () => stale,
+    () => atTip,
+  );
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a plain push onto a stale hold refuses, and names the take", () => {
+  const said = pushedOver(true, HOLDER);
+  assert.equal(said.code, 1);
+  assert.match(said.said, /box 0ther1d/);
+  assert.match(said.said, /\.\/RUNME\.sh branch take x/);
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a take or a release onto a stale hold lands", () => {
+  assert.deepEqual(pushedOver(true, TAKER), { code: 0, said: "" });
+  assert.deepEqual(pushedOver(true, ""), { code: 0, said: "" });
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a stale hold whose tip reads nothing refuses", () => {
+  assert.equal(pushedOver(true, null).code, 1);
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("a fresh hold refuses a plain push and a take alike", () => {
+  for (const atTip of [HOLDER, TAKER, ""]) {
+    const said = pushedOver(false, atTip);
+    assert.equal(said.code, 1);
+    assert.match(said.said, /box 0ther1d/);
+  }
+});
+
+// [[spec/tickets/stale-hold-moves-by-take]]
+test("the tip reader reads the group ticket at the pushed sha, and null where it reads nothing", () => {
+  const held = `---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: sync\n    hand: ${TAKER}\n    hash_before: ${SHA}\n---\n`;
+  const [work] = refsIn(toWork);
+  const repo = fakeRepo([], { "spec/tickets/x.md": held });
+  assert.equal(heldAtTip(repo)(work), TAKER);
+  assert.deepEqual(repo.runs.at(-1), ["show", `${SHA}:spec/tickets/x.md`]);
+  assert.equal(heldAtTip(fakeRepo([], { "spec/tickets/x.md": FREE }))(work), "");
+  assert.equal(heldAtTip(fakeRepo([], {}))(work), null);
+});
+
+// The age of the tip on origin against the span, read the way the list reads it. [[spec/tickets/stale-hold-frees-the-branch]]
+test("the stale reader reads the origin tip's time against the span", () => {
+  const now = Date.parse("2026-01-01T12:00:00.000Z");
+  const at = (ago) => ({
+    run: (args) =>
+      args.join(" ") === "log -1 --format=%ct origin/work/x"
+        ? { ok: true, out: String(Math.floor(now / 1000) - ago) }
+        : { ok: false, out: "" },
+  });
+  const ref = refsIn(toWork)[0];
+  assert.equal(staleBy(at(31 * 60), "30m", now)(ref), true);
+  assert.equal(staleBy(at(29 * 60), "30m", now)(ref), false);
+  assert.equal(
+    staleBy({ run: () => ({ ok: false, out: "" }) }, "30m", now)(ref),
+    false,
+  );
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a push to a work branch nobody holds lands", () => {
+  const said = holds(refsIn(toWork), stamp(), () => [], false, heldBy(""), "myb0x");
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/push-gate-needs-the-engine]]
+test("a push with no engine running and a stale stamp lands", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ sha: "ffff" }),
+    () => [],
+    false,
+    () => "",
+    "",
+    false,
+  );
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+// [[spec/tickets/push-gate-needs-the-engine]]
+test("a push with the engine running and a stale stamp comes back refused", () => {
+  const said = holds(
+    refsIn(toTrunk),
+    stamp({ sha: "ffff" }),
+    () => [],
+    false,
+    () => "",
+    "",
+    true,
+  );
+  assert.equal(said.code, 1);
+  assert.match(said.said, /ran against ffff/);
 });
 
 test("a push to trunk on a green stamp lands", () => {
@@ -85,8 +259,14 @@ test("a push to trunk over a stamp counting warnings refuses, and names the lint
   assert.equal(said.code, 1);
   assert.match(said.said, /2 warning\(s\) stand in 2 file\(s\)/);
   assert.match(said.said, /RUNME\.sh lint/);
-  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), { code: 0, said: "" });
-  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), {
+    code: 0,
+    said: "",
+  });
+  assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), {
+    code: 0,
+    said: "",
+  });
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -101,12 +281,31 @@ test("a push whose delta carries a tagged note refuses, and names the file", () 
   assert.match(said.said, /ticket todo <name> --off/);
 });
 
+// [[spec/design_output/pull#the-gate]]
+test("a push whose delta carries a tagged gate point lands, and a bare tag still refuses", () => {
+  const point = TAGGED.replace("todo: true", "todo: true\npoint: gate");
+  const landing = () => [{ name: "spec/tickets/cut-the-line.md", text: point }];
+  assert.deepEqual(holds(refsIn(toWork), "", landing), { code: 0, said: "" });
+  const mixed = () => [
+    { name: "spec/tickets/cut-the-line.md", text: point },
+    { name: "spec/tickets/slow-lint.md", text: TAGGED },
+  ];
+  const said = holds(refsIn(toWork), "", mixed);
+  assert.equal(said.code, 1);
+  assert.match(said.said, /slow-lint\.md/);
+  assert.doesNotMatch(said.said, /cut-the-line/);
+});
+
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 test("a push whose delta carries an untagged note lands", () => {
   const carried = () => [{ name: "spec/tickets/slow-lint.md", text: FREE }];
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
   // A warning holds no push, so the door takes no lint. [[spec/design_output/config#the-engine-controls]]
-  assert.equal(holds.length, 2, "the door reads the refs and the stamp, then the delta, and no warnings");
+  assert.equal(
+    holds.length,
+    2,
+    "the door reads the refs and the stamp, then the delta, and no warnings",
+  );
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -165,4 +364,27 @@ test("a push carrying no prose asks Vale nothing", () => {
   const outside = fakeProc();
   assert.deepEqual(lintedBy(outside, "/tree", "vale", fakeDisk())(["a.js"]), []);
   assert.deepEqual(outside.ran, []);
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("the hold reads the group ticket at the remote tip, and a trunk push or an unread ticket reads free", () => {
+  const held = `---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: sync\n    hand: ${HOLDER}\n    hash_before: ${SHA}\n---\n`;
+  const repo = fakeRepo([], { "spec/tickets/x.md": held });
+  const [work] = refsIn(toWork);
+  assert.equal(readsHold(repo)(work), HOLDER);
+  assert.deepEqual(repo.runs.at(-1), ["show", "origin/work/x:spec/tickets/x.md"]);
+  assert.equal(readsHold(repo)(refsIn(toTrunk)[0]), "");
+  assert.equal(readsHold(fakeRepo([], {}))(work), "");
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("a box's hold refuses a hand that names no box, and a hold naming no box refuses a box", () => {
+  assert.equal(
+    holds(refsIn(toWork), stamp(), () => [], false, heldBy(HOLDER), "").code,
+    1,
+  );
+  assert.equal(
+    holds(refsIn(toWork), stamp(), () => [], false, heldBy("person"), "myb0x").code,
+    1,
+  );
 });

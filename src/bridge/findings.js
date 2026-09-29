@@ -22,6 +22,7 @@ import {
   lineOf,
 } from "../extension/lib/grid.js";
 import { assemble } from "../scripts/styles.js";
+import { PAST, quackAt, shadowProse } from "./prose-shadow.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
@@ -57,15 +58,20 @@ export async function findingsOver(it, asked) {
     rows.set(file, [...(rows.get(file) ?? []), one]);
   }
   const found = [];
+  const docs = [];
   // The pull reads its ticket through readsText too, so both name one list. [[spec/design_output/pull#the-voice-reads-the-evidence]]
   for (const file of walkOver(it, where)) {
     const shown = showOf(it, file);
-    found.push(...readsText(it, shown, it.disk.read(file), rows.get(shown) ?? []));
+    found.push(
+      ...readsText(it, shown, it.disk.read(file), rows.get(shown) ?? [], docs),
+    );
     rows.delete(shown);
   }
   // Vale reads a file the walk passes, and the tense reader alone reads its rows. [[spec/design_output/level0#the-tense-reader]]
-  const rest = readThrough(it, [...rows.values()].flat());
+  const rest = readThrough(it, [...rows.values()].flat(), docs);
   found.push(...rest.map((one) => from(one, FROM.vale)));
+  // One quack process reads every document of the run. [[spec/tickets/prose-shadow-hooks-reads-text]]
+  await shadowOver(it, docs);
   // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
   for (const file of walkOver(it, where, SIZED)) {
     for (const one of codeFaults(it.disk.read(file), showOf(it, file), it.ceilings)) {
@@ -82,7 +88,7 @@ export async function findingsOver(it, asked) {
   return { found, fault: "" };
 }
 
-// A closed ticket is history, and no rule reads it, the way isHistory in src/lsp/history.go reads it. [[spec/design_output/lsp#a-closed-ticket-is-history]]
+// A closed ticket is history, and no rule reads it, the way isHistory in src/modules/check/history.go reads it. [[spec/design_output/lsp#a-closed-ticket-is-history]]
 // A closed ticket stands as history, so neither the check nor the write door reads it against the schema. [[spec/tickets/a-closed-ticket-takes-writes]]
 export function standsClosed(text) {
   const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""))?.[1] ?? "";
@@ -146,9 +152,41 @@ export function voiceOver(it, path, text, span = {}) {
   if (faultIn(ran.stdout)) return [];
   const first = span.first ?? 1;
   const last = span.last ?? Number.POSITIVE_INFINITY;
-  return readsText(it, path, text, fromJson(ran.stdout)).filter(
+  const docs = [];
+  const found = readsText(it, path, text, fromJson(ran.stdout), docs).filter(
     (fault) => REFUSES.has(fault.severity) && fault.line >= first && fault.line <= last,
   );
+  // The verb reads its answer now, and the shadow row lands behind it. [[spec/tickets/prose-shadow-hooks-reads-text]]
+  shadowOver(it, docs);
+  return found;
+}
+
+// The doors the prose shadow takes off a caller's own: its config, its log and its processes. A caller naming no config or no log runs no shadow. [[spec/tickets/prose-shadow-hooks-reads-text]]
+export function shadowDoorsOf(it) {
+  if (!it?.config?.ask || !it?.log?.say || !it?.proc?.run) return null;
+  const root = it.method ?? it.root;
+  return {
+    settings: it.config,
+    files: it.disk,
+    proc: it.proc,
+    log: it.log,
+    root,
+    binary: quackAt(it.disk, it.join, root),
+  };
+}
+
+// The past veto's documents meet Go's in shadow, and a fault there leaves the reading as it stands. [[spec/tickets/prose-shadow-hooks-reads-text]]
+async function shadowOver(it, docs) {
+  try {
+    await shadowProse(
+      shadowDoorsOf(it),
+      docs,
+      docs.map((one) => one.kept),
+      PAST,
+    );
+  } catch {
+    return;
+  }
 }
 
 // The Vale call the lint and the pull share, on the config the assembly writes. A caller adds the paths or the stdin path. [[spec/design_output/pull#the-voice-reads-the-evidence]]
@@ -157,9 +195,11 @@ export function valeArgvOf(it) {
 }
 
 // One file's reading past Vale: the tense reader over Vale's rows, then every marker naming no reason. The lint and the pull both read a file here. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-export function readsText(it, file, text, rows) {
+export function readsText(it, file, text, rows, docs) {
+  const kept = withoutFalsePast(text, rows);
+  docs?.push({ file: showOf(it, file), text, found: rows, kept });
   return [
-    ...withoutFalsePast(text, rows).map((one) => from(one, FROM.vale)),
+    ...kept.map((one) => from(one, FROM.vale)),
     ...unreasoned(text).map((one) =>
       from({ ...one, file: showOf(it, file) }, FROM.tree),
     ),
@@ -217,7 +257,7 @@ export function showOf(it, file) {
 }
 
 // [[spec/design_output/level0#the-tense-reader]]
-export function readThrough(it, found) {
+export function readThrough(it, found, docs) {
   const byFile = new Map();
   for (const one of found) {
     byFile.set(one.file, [...(byFile.get(one.file) ?? []), one]);
@@ -228,7 +268,9 @@ export function readThrough(it, found) {
     try {
       text = it.disk.read(it.join(it.root, file));
     } catch {}
-    kept.push(...withoutFalsePast(text, list));
+    const past = withoutFalsePast(text, list);
+    docs?.push({ file, text, found: list, kept: past });
+    kept.push(...past);
   }
   return kept;
 }

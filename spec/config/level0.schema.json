@@ -355,7 +355,7 @@
           "row": 0,
           "column": 0,
           "runs": "./RUNME.sh tui work",
-          "counts": "./RUNME.sh tui work --count"
+          "counts": "./RUNME.sh index call value {\"name\":\"work/open-tasks\"}"
         },
         "pull": {
           "help": "Take the ticket waiting on you first, and open it.",
@@ -475,6 +475,85 @@
       "properties": {
         "comment": {
           "type": "string"
+        },
+        "opentasks": {
+          "type": "string",
+          "enum": [
+            "new"
+          ],
+          "help": "The open-tasks slice's record, switched over in phase 2. The badge, the work tab's brackets and its queue column read the index."
+        },
+        "config": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The config readers: old answers alone, shadow runs the config module beside them and logs a mismatch, new answers the module's."
+        },
+        "log": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The session log rows: old answers alone, shadow runs the log topic beside it and logs a mismatch, new answers the topic's."
+        },
+        "guidance": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The rules a step reads: old answers alone, shadow runs the guidance topic beside it and logs a mismatch, new answers the topic's."
+        },
+        "check": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The check twins: old answers alone, shadow runs the check names beside it and logs a mismatch, new answers the names'."
+        },
+        "prose": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The prose checks: old answers on wink alone, shadow runs the Go checks beside it and logs a mismatch, new answers the Go checks'."
+        },
+        "cage": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's."
+        },
+        "window": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's."
+        },
+        "lsp": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The LSP's rules: old answers on the LSP's own sweep alone, shadow runs the check module's sweep beside it and logs each finding apart, new answers the module's."
         },
         "phase0": {
           "type": "boolean",
@@ -647,6 +726,16 @@
           "unit": "seconds",
           "help": "The span the faults of an alarm fall inside."
         },
+        "beat": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The span between two beats of the index's work loop."
+        },
+        "lease": {
+          "type": "number",
+          "unit": "seconds",
+          "help": "The term a lease runs without a beat before its part reads stale."
+        },
         "deadlineDerived": {
           "type": "number",
           "unit": "seconds",
@@ -660,12 +749,7 @@
         "deadlineAction": {
           "type": "number",
           "unit": "seconds",
-          "help": "The span an action answers within."
-        },
-        "deadlineOp": {
-          "type": "number",
-          "unit": "seconds",
-          "help": "The span an operation ends within."
+          "help": "The span an action's operation ends within."
         }
       }
     }

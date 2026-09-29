@@ -205,4 +205,6 @@ The readers then agree by construction. One commit per key rolls one back.
 
 # Discussion
 
+The prose slice has one more reader: `pastReads` in src/lsp/outside.go runs node for the past veto. It takes the Go past veto in src/prose once the slice reads new. [[spec/tickets/prose-checks-run-in-go]]
+
 <!-- what anybody adds, at any time, on this ticket -->

@@ -1,8 +1,7 @@
-# A question only a person answers, standing on a ticket of its own. `branch
-# unblock` hands a group's person step here, so the group closes and the box
-# leaves. The person answers on their own time, and the step behind the answer
-# carries it out.
-# [[spec/design_output/work#a-person-step-leaves]]
+# A question standing on a ticket of its own, inside the group that meets it.
+# A cloud box answers it itself and records what it weighs, and a desk hands it
+# to the owner. Work a person alone can do stands on the person route instead.
+# [[spec/design_output/work#a-successor-is-person-work]]
 for: a question only a person answers, and the work the answer opens
 ask:
   - name: question

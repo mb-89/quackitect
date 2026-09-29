@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,11 +114,81 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [io-modules-own-their-names]
+record:
+  - step: design/draft
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 4dce973c740021fb08485246d93cfcaa32b0bf5f
+    hash_after: 4dce973c740021fb08485246d93cfcaa32b0bf5f
+    inputs:
+      - name: ask
+        hash: 32dff8229e6ea3bf
+        size: 741
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 88bcb0ee1ddb6c486fe341b923ce29372467a3c9
+    hash_after: 88bcb0ee1ddb6c486fe341b923ce29372467a3c9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: 5c3d72c7578d0e01
+        size: 2340
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: a3a981c96dfcbb08baa7e3557a5e5744d67b2d07
+    hash_after: a3a981c96dfcbb08baa7e3557a5e5744d67b2d07
+    inputs:
+      - name: design/draft
+        hash: 5c3d72c7578d0e01
+        size: 2340
+      - name: design/tests-red
+        hash: bce2b59d1790ecde
+        size: 795
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 7890d331bbc6842ae9a4d71ea1bffa00ede5339f
+    hash_after: 7890d331bbc6842ae9a4d71ea1bffa00ede5339f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0374043c302ff9aee1f19df90e3e82148ab62fb2
+    hash_after: 0374043c302ff9aee1f19df90e3e82148ab62fb2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: bce2b59d1790ecde
+        size: 795
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -153,38 +223,67 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The analyzers in `src/imports/imports.go` become the four the model names, and the tree test runs all four.
+
+1. `nodoor` leaves, with its rule and its case. `noname` stands nowhere in the code, so nothing leaves for it.
+2. `onlyq` keeps the flag cut `io-modules-own-their-names` lands: `CarriesIO` reads a `q.IO()` call, and `FaultsIn` passes a flagged package. It refuses a call to `time.Now` in a module without the flag too, which a new check over the syntax finds.
+3. `ioonly` is new. It refuses an import of `os`, `os/exec`, `net` or `net/http`, and a call to `time.Now`, in `src/q` and in a renderer. `src/index` stands outside it, as the model says.
+4. `fakesuite` is new. A package declaring a type or function named `Fake` and more needs a file ending `_contract_test.go` beside it, and `q/qtest` needs its `suite.go`. It reads the file names of the package, so the tree test loads them.
+5. `nomodule` stands as it is.
+
+A call check reads the syntax, so `Faults` keeps the import rules and a new `CallFaults(from, files)` answers the call rules. The tree test runs both over every package.
+
+The Vale rules `DoorsOnly`, `FakeDoorsInTest` and `OutsideInDoors` leave the Go code. A `[*.go]` section in `.vale.ini` switches them off, and the per-file sections the IO modules and the root took leave.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/imports/tree_test.go: TestTheTreeHoldsTheImportRules, which runs every analyzer
+src/imports/imports_test.go: the planted cases, which take the new analyzers
+.vale.ini: the Go sections of the three Vale rules
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: `go test ./...` from the root
+src/imports/imports_test.go: TestAModuleImportingOsIsNamed, which stands
+src/imports/imports_test.go: TestAnIOModuleImportingOsIsNamedByNone
+src/imports/imports_test.go: TestAFakeWithNoSuiteIsNamed
+src/imports/imports_test.go: TestAModuleImportingAModuleIsNamed, which stands
+src/imports/imports_test.go: TestTheCoreImportingOsIsNamed
+RUNME.sh: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/imports/imports.go
+src/imports/imports_test.go
+src/imports/tree_test.go
+.vale.ini
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened `imports.go`, its tests, the tree test and `.vale.ini`, and checked each claim there, `noname` among them
+I grepped every user of the analyzers across `src`, and the list names each
+each done_when line names its test above, or a command
 
 ## tests-red
 
@@ -193,26 +292,31 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/analyzers_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/imports/analyzers_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion: the stub analyzers report the package as unbuilt, so the planted IO module draws diagnostics and the want lines find none. The surprise: a contract test file beside a module makes the harness build the generated `disk.test` main, and `onlyq` and `nomodule` name it. The implement skips a package whose path ends in `.test`, as the tree test does.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a case: the IO module over every analyzer, the fake with no suite, and the core importing os each in `analyzers_test.go`, and the module cases standing in `imports_test.go`
+the cases plant their packages in a folder of the test, so they reach no door
 
 # gate
 
@@ -221,8 +325,12 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the draft names TestAnIOModuleImportingOsIsNamedByNone, TestAFakeWithNoSuiteIsNamed and TestTheCoreImportingOsIsNamed in imports_test.go, and they stand in analyzers_test.go: the builder aligns the draft lines
+- the approach adds a call rule for time.Now to onlyq and ioonly, and no case plants a call: the builder plants one for each, or leaves the call rule out
+- the ask holds q/qtest to fakesuite through its suite.go, and no case plants qtest without it: the builder plants that case
 
 # implement
 
@@ -233,14 +341,19 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/imports/imports.go src/imports/imports_test.go src/imports/tree_test.go src/imports/analyzers_test.go .vale.ini
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the analyzers, their tests, the tree test and the Vale file, the size list's files
+the analyzers read planted packages in a folder of the test, and the tree test reads the tree, so no door stands unfaked
+imports.go opens on a header naming the four analyzers, and each new function points at the import chapter of the model
+the refused imports stand once in outside, and the file names of a suite once in the constants block. The time.Now call rule stays out, and ioonly holds src/q, with a note on the renderers
 
 ## tests-green
 
@@ -249,26 +362,33 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/analyzers_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The import analyzers are now the four the model names. onlyq lets a module carrying q.IO() pass, ioonly keeps os, os/exec, net and net/http out of src/q, fakesuite names a fake with no contract suite in its folder and q/qtest with no suite.go, and nomodule stands. nodoor leaves. Every analyzer skips the generated test main. The Vale door rules stand off the modules, the core and the root, which the analyzers hold, and keep holding every other Go folder.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the analyzers, their tests, the tree test and the Vale file
+the analyzers read planted packages, and the tree test the tree, so no door stands unfaked
+the header names the four analyzers, and the one os import carries its reason
+the refused imports and the suite file names each stand once, in imports.go
 
 # accept
 
@@ -293,3 +413,5 @@ A module without the flag then reaches the outside nowhere. A fake with no contr
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+`io-modules-own-their-names` lands the `q.IO()` option and a first cut of the flag in `onlyq`: `CarriesIO` and `FaultsIn` in `src/imports/imports.go`. This ticket takes them further for `ioonly` and `fakesuite`, and drops the Vale sections the IO module files take in `.vale.ini`.
