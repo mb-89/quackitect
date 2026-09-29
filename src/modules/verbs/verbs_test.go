@@ -10,13 +10,11 @@ import (
 	"quackitect/src/q"
 )
 
-var ticketVerbs = []Verb{{Name: "note", Doc: "write a private ticket"}, {Name: "todo", Doc: "park it for the next pull"}}
-
 func TestEachVerbOfATopicStandsAsAnAction(t *testing.T) {
 	c := q.New()
-	Topic("ticket", ticketVerbs)(c)
+	Topic("ticket", TicketVerbs)(c)
 	store := q.NewStore(c)
-	for _, one := range ticketVerbs {
+	for _, one := range TicketVerbs {
 		if in, _, ok := store.Types(one.Name); !ok || in != reflect.TypeFor[Words]() {
 			t.Fatalf("the catalog holds no action %s taking Words", one.Name)
 		}
@@ -28,7 +26,7 @@ func TestEachVerbOfATopicStandsAsAnAction(t *testing.T) {
 
 func TestAnActionHandsItsWordsToTheNodeModule(t *testing.T) {
 	c := q.New()
-	Topic("ticket", ticketVerbs)(c)
+	Topic("ticket", TicketVerbs)(c)
 	said, err := q.NewStore(c).Act("note", Words{Args: []string{"slow-lint", "a line"}})
 	if err != nil || len(said) != 1 {
 		t.Fatalf("the action lists %+v, %v", said, err)

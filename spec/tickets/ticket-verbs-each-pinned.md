@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: ticket-verbs-become-actions
+record:
+  - step: do
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: be7206e4796402ae9aa20c585060d4472fc53908
+    hash_after: be7206e4796402ae9aa20c585060d4472fc53908
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/verbs passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: ac5c1d86e6778afa
+        size: 312
+    def: f5aad7e4e0747ffe
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ src/modules/verbs/verbs_test.go seeds note and todo alone. No test pins that eve
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/verbs/ticket_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The ticket topic seeded two verbs in its red test, so nothing pinned the rest. TicketVerbs in src/modules/verbs/ticket.go now lists all nine verbs the ticket command answers, bless among them, each with its usage line as its doc. A green test pins the list, and the red topic cases run over it, so the implement step registers every verb.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and adds bless, which ticket.js answers beside the eight the ask names
+- the seeded list in the red test leaves, and the red cases read the one list
+- the verbs stand once in ticket.go, and each test reads them from there
 
 # Discussion
 
