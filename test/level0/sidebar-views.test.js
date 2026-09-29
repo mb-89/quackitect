@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { badgeOf, formOf, viewsOf } from "../../src/extension/lib/views.js";
@@ -59,7 +59,7 @@ function doorOf() {
     write: async (path, text) => files.write(path, text),
     append: async (path, text) => files.append(path, text),
     list: async (folder) => (folder === "spec/views" ? ["work.base"] : []),
-    imports: (path) => import(join(ROOT, path)),
+    imports: (path) => import(pathToFileURL(join(ROOT, path)).href),
     index: {
       values: async (name) => CATALOG[name],
       calls: async (name, input) => {
