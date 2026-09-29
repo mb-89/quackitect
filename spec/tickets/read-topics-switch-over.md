@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -160,9 +160,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 369f1fb580447d1ee06aa7b97b5d694ef78d01fa
+    hash_after: 369f1fb580447d1ee06aa7b97b5d694ef78d01fa
+    inputs:
+      - name: retro/write
+        hash: 49b368531ff8023d
+        size: 2603
+    def: 4da1ca5da87d5bbc
 depends_on: ["read-topics-land-in-shadow"]
 enabled_by: migration.phase3switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -305,20 +315,28 @@ The last box stopped on Vale findings in prose it never pushed, so this box wrot
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 19:10 UTC onward: the level-zero server fell away after each check, and a restart brought it back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a hold still fresh at the take, until it went stale
+- a conflict at sync on the size golden, written again by its own test
+- the git write guard, which sent the staging through the commit verb
+- the commit door's test-beside rule, met with a case on the readers
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked
+- the box minted no ticket outside the group
+- the flip of migration.phase3switch stays with the merge coordinator
 
 # Discussion
 
