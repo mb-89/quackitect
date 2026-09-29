@@ -90,7 +90,7 @@
     "phase2shadow": true,
     "phase2switch": true,
     "phase3shadow": true,
-    "phase3switch": false,
+    "phase3switch": true,
     "phase4shadow": true,
     "phase4switch": false,
     "phase5shadow": true,
