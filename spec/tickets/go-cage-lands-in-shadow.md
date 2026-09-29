@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -160,9 +160,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d855c2347910b · claude-code-remote
+    hash_before: 830ccc4fc5bd6a597fae0d07084a719e3fc72228
+    hash_after: 830ccc4fc5bd6a597fae0d07084a719e3fc72228
+    inputs:
+      - name: retro/write
+        hash: 94f1db94290a337b
+        size: 2337
+    def: 4da1ca5da87d5bbc
 depends_on: ["quack-verbs-land-in-shadow"]
 enabled_by: migration.phase5shadow
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -314,20 +324,25 @@ The review point on porting the rules weighed most. The group's done line holds 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool, host and right the run asked for answered
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the level-zero hooks: the ticket-in-description guard, LandingFollowsItsGate, the plan grace and the stop hook
+- no conflict at sync, since the branch carried every commit on main
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted without a group
+- cage-rules-port-before-switch waits in the switch group at design/owner-read
 
 # Discussion
 
