@@ -105,7 +105,19 @@ record:
         exit: 0
         said: work/loose-fixes-99f4547 already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 6b14da7de3d613222e6b6ec79a0b5112a6c23952
+    hash_after: 6b14da7de3d613222e6b6ec79a0b5112a6c23952
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -139,14 +151,32 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/a-desk-runs-probe-reply]] (question)
+- [[spec/tickets/boxes-keep-their-questions]] (trivial)
+- [[spec/tickets/done-skips-added-drafts]] (trivial)
+- [[spec/tickets/findings-reach-the-owner]] (question)
+- [[spec/tickets/gate-points-pass-the-push]] (standard)
+- [[spec/tickets/helpers-pull-past-plans]] (standard)
+- [[spec/tickets/list-fields-split-lines]] (standard)
+- [[spec/tickets/queue-reads-git-for-came]] (question)
+- [[spec/tickets/stale-hold-frees-the-branch]] (trivial)
+- [[spec/tickets/stale-hold-moves-by-take]] (trivial)
+- [[spec/tickets/the-owner-names-three-things]] (question)
+- [[spec/tickets/the-owner-runs-the-dispatch]] (question)
+- [[spec/tickets/the-owner-shapes-the-editor]] (question)
+- [[spec/tickets/the-owner-walks-a-process]] (question)
+- [[spec/tickets/vale-ls-on-windows]] (question)
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one loose agent ticket or a finding this branch minted, small enough to review whole
+- the children are the loose agent tickets the dispatch bundled, plus the done fix this branch met, so the goal stands inside them
+- no child waits on another, so none names depends_on
 
 # children
 
