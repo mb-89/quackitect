@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 91127a9904ac8c51
         size: 2942
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d81f28f032e0 · claude-code-remote · helper-3
+    hash_before: 2bb420e11c96ac2f824daf070845cc854041a4a9
+    hash_after: 2bb420e11c96ac2f824daf070845cc854041a4a9
+    inputs:
+      - name: design/draft
+        hash: 91127a9904ac8c51
+        size: 2942
+      - name: design/tests-red
+        hash: 6f9111b5692fa790
+        size: 698
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -274,8 +286,13 @@ With no config in the case root the slice reads old, so the header counts its ow
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- count-tests-miss-the-chain: test/level0/sidebar-work.test.js pins tui work --count, so the new counts line breaks it. src/tui/workplaces_test.go and src/tui/work/workplaces_test.go assert Takeable off PlacesIn. Neither list names them, so rewrite them in the build.
+- open-tasks-fake-moves-over: the red cases fake askOpenTasks, which lives in shadow.go. The design deletes that file. Move askOpenTasks beside PlacesAt, and back it with askIndex.
+- opentasks-help-names-dead-modes: the migration.opentasks help in level0.schema.json still describes old and shadow. After the delete no reader acts on them, so rewrite the help.
+- count-grep-misses-the-scripts: the done_when grep skips src/scripts/tui.js, which holds counted and COUNT. It also hits a playwright-core line under node_modules. Widen it to src/scripts, and exclude node_modules.
 
 # implement
 
