@@ -7,12 +7,13 @@ package registry
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"time"
 )
 
-const readWithin = 5 * time.Second
+const (
+	readWithin = 5 * time.Second
+	statusBad  = 400
+)
 
 // The index at that /v1 base. [[spec/design_output/model#surfaces]]
 type V1 struct {
@@ -21,23 +22,18 @@ type V1 struct {
 
 // The value the name holds, or the problem's detail where the index answers one. [[spec/design_output/model#surfaces]]
 func (v V1) Read(name string) (json.RawMessage, error) {
-	said, err := (&http.Client{Timeout: readWithin}).Get(v.Base + "/values/" + name)
+	code, status, body, err := get(v.Base+"/values/"+name, readWithin)
 	if err != nil {
 		return nil, err
 	}
-	defer said.Body.Close()
-	body, err := io.ReadAll(said.Body)
-	if err != nil {
-		return nil, err
-	}
-	if said.StatusCode >= http.StatusBadRequest {
+	if code >= statusBad {
 		var problem struct {
 			Detail string `json:"detail"`
 		}
 		if json.Unmarshal(body, &problem) == nil && problem.Detail != "" {
 			return nil, fmt.Errorf("%s", problem.Detail)
 		}
-		return nil, fmt.Errorf("the index answers %s", said.Status)
+		return nil, fmt.Errorf("the index answers %s", status)
 	}
 	var value struct {
 		Value json.RawMessage `json:"value"`
