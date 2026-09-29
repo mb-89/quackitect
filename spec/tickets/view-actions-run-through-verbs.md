@@ -385,4 +385,6 @@ accept with points
 
 <!-- what anybody adds, at any time, on this ticket -->
 
+The draft corrects two lines, since the engine holds its evidence. The size list also takes `src/tui/work/workplace.go`, which tests-red changes to pull out `PlaceValue`. The Go case on the place rule is `TestPlaceValueReadsTheSharedCases`.
+
 `draws-json-yields-to-views` became this ticket. Once `work/pull` registers its help and icon, the `pull` entry of `spec/config/draws.json` drops the two, so the icon stands in one place. The draft names that cut under its approach.
