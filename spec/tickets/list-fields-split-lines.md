@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -131,6 +131,19 @@ record:
         hash: 05e7db43ad340a67
         size: 581
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 6b48ecec417a46a47c63750b51a1d7dd7712a2b1
+    hash_after: 6b48ecec417a46a47c63750b51a1d7dd7712a2b1
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 9ef7c2e96a66b47f
+        size: 1411
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -218,26 +231,31 @@ test/level0/pull-fields.test.js
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-fields.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/pull-fields.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The array case fails on its own assertion: the red field lands as one comma-joined line. The expectedRed case passes already, because this group split comma-joined red rows in redListOf to green the check. It stays as the guard on the reader side.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the array case decides the first done_when line and fails, the expectedRed case decides the second, and the check stays for tests-green
+- withPayload and expectedRed read text alone, so the cases reach no door
 
 # gate
 
