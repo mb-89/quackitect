@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 6ed3948a7e420447
         size: 2582
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8509c02d5db · claude-code-remote · helper-3
+    hash_before: 8e91b09fb67b5610fc2bf0c9ac75b0883a66ac82
+    hash_after: 8e91b09fb67b5610fc2bf0c9ac75b0883a66ac82
+    inputs:
+      - name: design/draft
+        hash: 6ed3948a7e420447
+        size: 2582
+      - name: design/tests-red
+        hash: 3f0e505ff5287f29
+        size: 865
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -267,8 +279,11 @@ The door answers 404 at the tools route, the command tree answers usage for tool
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- quack-tools-spares-runme-tools: tools and act joining cliVerbs make aloneOf in src/quack/verbs.go true for them, so roadOf sends ./RUNME.sh tools to quack under every mode and the tools verb of src/scripts/cli.js, which writes .se/.runtime/tools.json, stops answering; keep both verbs out of aloneOf and name verbs.go aloneOf among the callers
+- tool-list-shape-held-once: test/level0/index-tools.test.js reads a hand-written list whose fields match listedTool in src/index/tools_test.go today, and no case holds the two to the one shape the index generates
 
 # implement
 
