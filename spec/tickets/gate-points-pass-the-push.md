@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 1a321013618316a52fbc38ac120aa58c898a7236
+    hash_after: 1a321013618316a52fbc38ac120aa58c898a7236
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 41 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 5efa799e33716409
+        size: 712
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ The approach answers the ask, and a red case decides each line: the push door ca
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/prepush.test.js test/level0/pull-gate.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A gate passing with points now pushes at once. minted writes point: gate beside the todo tag on each point, and taggedIn in todo.js leaves a gate point out, so the push door lets it through. The tag still stands on origin, so every box pulls the points first. The ticket schema admits point, with gate its one value.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask needs, plus the schema the gate named
+- no door: the change reads and writes ticket text alone
+- a comment names the approach in todo.js
+- the point field stands once, in todo.js
 
 # accept
 
