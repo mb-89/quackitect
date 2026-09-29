@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -142,6 +142,18 @@ record:
         hash: f3b5d686ac3a0cbe
         size: 3706
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856f55387d6 · claude-code-remote · helper-3
+    hash_before: 46e3cb4ccd27f3c23d795f9765bbdca4a0664786
+    hash_after: 46e3cb4ccd27f3c23d795f9765bbdca4a0664786
+    inputs:
+      - name: design/draft
+        hash: f3b5d686ac3a0cbe
+        size: 3706
+      - name: design/tests-red
+        hash: bef6251a63abb67c
+        size: 538
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -257,8 +269,12 @@ All three cases fail on their own assertion: the four twin files stand, the tree
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- check-twins-leave-phase-seven: the ask names the twins row of the migration note (tree, schema, size, magic, names, paths, private, slug, the Vale and Biome parsers), and the group's done line reads no JavaScript twin of a Go check stands, yet the approach removes the four comparison twins alone. The code backs the scoping: bridge/write.js, bridge/bash.js, precommit.js, cli-check.js and bridge/findings.js import the lib check twins, and every check/ name in src/modules/check/check.go holds an empty list until phase 7. No ticket owns their leave, so this child carries it to phase 7 and moves the group's done line to match.
+- topic-fallback-leaves-the-readers: readers-take-the-go-topics hands the old-path fallback to this ticket to remove, and the approach keeps it on the assumption that the quack binary stands everywhere. This child removes the fallback once that holds, and makes a topic answering null a fault.
+- twins-leave-misses-some-callers: the builder fixes these in place. test/level0/check-server.test.js holds a case on the log verb's shadow doors. src/modules/hooks/cage.go names src/scripts/log-shadow.js as the owner of the shadow row in two comments. src/scripts/cli-read.js carries the prose shadow's config and log. The help text of the five keys in spec/config/level0.schema.json still names old and shadow. The callers list says pull-hand.js imports processNameOf from guidance-shadow.js, but it already imports it from quack-topic.js.
 
 # implement
 
