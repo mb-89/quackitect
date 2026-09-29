@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tui-shell-lands-in-shadow
 parent: the-work-view-gains-actions
+record:
+  - step: do
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 6ba5f5a8125cdfdd72d0015abd43f8acc520f318
+    hash_after: 6ba5f5a8125cdfdd72d0015abd43f8acc520f318
+    why: the-log-becomes-a-view answers this ask
+reason: answered
 ---
 
 # Ask
