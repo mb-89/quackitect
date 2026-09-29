@@ -25,6 +25,7 @@ import {
 import { cutRefusal, printPart } from "./pull-cap.js";
 import { agentOf, BOX, handOf, roleOf } from "./pull-hand-of.js";
 import { notesOf, processNameOf } from "./quack-topic.js";
+import { callOf } from "./tool-call.js";
 import { WORK_VERBS } from "./work.js";
 
 export const HOLDS = OWNED_HOLDS;
@@ -92,19 +93,17 @@ export function stillHeld(it, held) {
   const now = readsOf(it, stepReads(it, held));
   const why = handsAgain(held, now);
   if (why) writeHold(it, held.hand, { ...held, reads: now });
-  const again = `  Read them whole with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`;
+  const as = asOf(it, held) ? ["--as", asOf(it, held)] : [];
+  const again = `  Read them whole with ${callOf("branch", "guidance", as)}.`;
   const rows = [
     `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
-    `Hand it back: ./RUNME.sh ticket pull ${held.ticket}${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""} --pass, or --fail "why".`,
+    `Hand it back: ${callOf("ticket", "pull", [held.ticket, ...as, "--pass"])}, or --fail "why" in place of --pass.`,
     ...(why
       ? notesSaid(
           it,
           now.map((one) => one.name),
         )
-      : [
-          "",
-          `Read them again with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`,
-        ]),
+      : ["", `Read them again with ${callOf("branch", "guidance", as)}.`]),
   ];
   // A refusal reprinting the notes stays under the cap too. [[spec/design_input/level-two#the-size-cap]]
   console.error(

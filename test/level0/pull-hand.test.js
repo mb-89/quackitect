@@ -147,7 +147,7 @@ test("handed prints the whole hand-out and writes a hold with no rest where no c
   const { it, disk } = doors(standing());
   const { code, said } = heard(() => pulling(PULL_ROOT, ["pull"], it));
   assert.equal(code, 0);
-  assert.match(said, /ticket pull a-child --pass/);
+  assert.match(said, /index_ticket_pull with args \["a-child","--pass"/);
   assert.doesNotMatch(said, /for the rest/);
   const hold = JSON.parse(disk.read(HOLD));
   assert.equal(hold.step, "design/draft");

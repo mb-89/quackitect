@@ -7,6 +7,7 @@ import { onDesk } from "../../.claude/skills/level0/lib/cloud.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { checkNote } from "../../.claude/skills/level0/lib/schema.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { callOf } from "./tool-call.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
@@ -103,7 +104,7 @@ export function pull(it, argv) {
       `ticket pull runs on ${TRUNK} or a work branch, and this is ${branch}.`,
     );
     console.error(
-      `Run ./RUNME.sh ticket pull from ${TRUNK}, which hands out work there.`,
+      `Call ${callOf("ticket", "pull")} from ${TRUNK}, which hands out work there.`,
     );
     return 2;
   }
@@ -153,7 +154,7 @@ export function pull(it, argv) {
       `${wanted} stands behind the queue, because this session binds to it.`,
     );
     console.error(
-      "Run ./RUNME.sh ticket pull with no name, and take what it hands you.",
+      `Call ${callOf("ticket", "pull")} with no name, and take what it hands you.`,
     );
     return 2;
   }
@@ -190,7 +191,7 @@ function closedGroup(it, group) {
 function groupDone(group) {
   say(DONE, [
     `${group} stands closed, so work/${group} takes no more work.`,
-    `Run ./RUNME.sh branch done, then ./RUNME.sh ticket pull from ${TRUNK}.`,
+    `Call ${callOf("branch", "done")}, then ${callOf("ticket", "pull")} from ${TRUNK}.`,
   ]);
   return 0;
 }
@@ -341,7 +342,7 @@ export function handBack(it, who, name, verdict) {
   const held = who.held;
   if (!held) {
     say(REFUSED, [
-      "nothing stands in your hand. Run ./RUNME.sh ticket pull to take a leaf.",
+      `nothing stands in your hand. Call ${callOf("ticket", "pull")} to take a leaf.`,
     ]);
     return 1;
   }
