@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d85a88b3d2d5 · claude-code-remote
+    hash_before: 27ee56d535159d91805e2096f1196a2de6dd98de
+    hash_after: 27ee56d535159d91805e2096f1196a2de6dd98de
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/lsp-door-switches-over.md:195:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 5a98d8706cce7ddf
+        size: 779
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ Left undone, every window read stops the index, the window reads nothing, and th
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index src/quack
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A caller from another build, the window among them, now keeps the door the index stands. The standing file names the build that stands the door under `bin`, and `stands` reads that build's stamp on disk. So a caller from another build stops no fresh door. A start from a client runs the index beside it, else the tree's `se-index`, and never the caller with `serve`. The index alone runs itself, which `Serving` in `Main` marks. A rebuilt index still leaves its old door stale, and `src/index/reach_test.go` holds each case.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the window reaches the live index and leaves it standing, as the live run under Discussion shows. The verb criterion departs, and the discussion says why.
+- the cleanup: `stampHere` goes, `stampOf` reads any build, and the spawn is one function a case fakes.
+- one place: the comment on `indexBinary` names `folders.js` and `lib/index.js` as the owners of its path.
 
 # Discussion
 
