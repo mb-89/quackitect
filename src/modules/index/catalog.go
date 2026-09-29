@@ -22,6 +22,10 @@ type NameRow struct {
 	Provider q.Provider `json:"provider"`
 	State    string     `json:"state"`
 	Value    any        `json:"value,omitempty"`
+	// What the registration declares for a renderer: its label, its icon and its look. [[spec/tickets/the-work-view-gains-actions]]
+	Label string `json:"label,omitempty"`
+	Icon  string `json:"icon,omitempty"`
+	Looks string `json:"looks,omitempty"`
 }
 
 // An action, its doc, and its input fields, which stand for its input type. [[spec/tickets/the-catalog-reads-as-rows]]

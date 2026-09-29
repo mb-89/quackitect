@@ -6,14 +6,13 @@
 package log
 
 import (
-	"encoding/json"
 	"time"
+
+	"quackitect/src/tui/frame"
 )
 
 // The one read the index's catalog answers, which the registry tabs read through too. [[spec/design_output/model#the-registry-tabs]]
-type Source interface {
-	Read(name string) (json.RawMessage, error)
-}
+type Source = frame.Source
 
 // One row of log/rows, on the fields the compare reads. [[spec/design_output/model#the-log-is-a-view]]
 type Row struct {

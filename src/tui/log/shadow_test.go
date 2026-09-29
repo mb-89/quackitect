@@ -12,6 +12,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/tui/frame"
 )
 
 // A source answering the rows a case hands it. [[spec/design_output/model#the-log-is-a-view]]
@@ -145,5 +147,15 @@ func TestASourceThatFailsAnswersItsReason(t *testing.T) {
 	sh := &Shadow{From: fakeSource{err: gone}, Mode: func() string { return "shadow" }, Now: func() time.Time { return stamp }}
 	if err := sh.Check(path, recordsOf(lineA)); !errors.Is(err, gone) {
 		t.Fatalf("the check answers %v, and wants the source's reason", err)
+	}
+}
+
+// The log's source and the frame's are one type, so the window hands one catalog to every shadow. [[spec/tickets/the-work-view-gains-actions]]
+func TestTheLogSourceIsTheFrameSource(t *testing.T) {
+	t.Parallel()
+	var shared frame.Source = fakeSource{}
+	var mine Source = shared
+	if mine == nil {
+		t.Fatal("the log source drops the frame's")
 	}
 }

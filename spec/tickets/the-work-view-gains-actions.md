@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: ba3b442f05fd963f
         size: 456
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 5ee956e005f1ccc682dcfee40fa1c324e27d77d7
+    hash_after: 5ee956e005f1ccc682dcfee40fa1c324e27d77d7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/work fails
+    inputs:
+      - name: design/draft
+        hash: 0bf85019502e2423
+        size: 3555
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -224,26 +237,35 @@ Assumptions for the hand at the merge: the model note names work/place, tickets/
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/work src/tui/frame src/tui/tree src/modules/work src/modules/index
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/work/shadow_test.go
+- src/tui/frame/shadow_test.go
+- src/tui/tree/base_test.go
+- src/modules/work/open_tasks_test.go
+- src/modules/index/manager_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its assertion over stubs that compile, except the no-row-under-old case, which passes on a stub that writes nothing. The frame writer stands empty, so the shared write stands red once for the log tab and the work tab. I added a badge port to the catalogued fixture, so the names row can carry a label and a look.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask fake rows case is TestTheWorkViewDrawsOverAFakeWorkRows and its badge case is TestTheBadgeDrawsTheLabelAndLookThePortDeclares; go test and the check close them at tests-green
+- the one door, Source, has the fake in shadow_test.go, and the /v1 road stands in the registry package under its contract suite
 
 # gate
 

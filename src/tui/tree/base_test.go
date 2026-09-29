@@ -198,3 +198,33 @@ func TestTheLogBaseFileDeclaresTheLogView(t *testing.T) {
 		t.Fatalf("the log view reads %q follow %v with %d actions", one.Reads, one.Follow, len(one.Actions))
 	}
 }
+
+// The work view names its rows, its badge and its four actions, and writes no label, doc or look. [[spec/tickets/the-work-view-gains-actions]]
+func TestTheWorkBaseFileDeclaresItsRowsBadgeAndActions(t *testing.T) {
+	body, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "views", "work.base"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	views, err := ReadBase(string(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	one := views[0]
+	if one.Reads != "work/rows" || one.Badge != "work/open-tasks" {
+		t.Fatalf("the work view reads %q with badge %q", one.Reads, one.Badge)
+	}
+	want := []Action{
+		{Key: "p", Arg: "digit", Calls: "work/place"},
+		{Key: "u", Calls: "tickets/flip-urgent"},
+		{Key: "enter", Edits: "cell", Writes: "tickets/set-field"},
+		{Button: "pull", Calls: "work/pull"},
+	}
+	if len(one.Actions) != len(want) {
+		t.Fatalf("the work view holds %d actions, and wants %d", len(one.Actions), len(want))
+	}
+	for at := range want {
+		if one.Actions[at] != want[at] {
+			t.Fatalf("action %d reads %+v, and wants %+v", at+1, one.Actions[at], want[at])
+		}
+	}
+}

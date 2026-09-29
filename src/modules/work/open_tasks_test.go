@@ -39,3 +39,12 @@ func TestOpenTasksCountsEveryPlaceOffTheCloud(t *testing.T) {
 		t.Fatalf("%s reads %v, and wants 4", OpenTasksPort, said)
 	}
 }
+
+// The port owns the label and the look the badge wears, so no renderer spells them. [[spec/tickets/the-work-view-gains-actions]]
+func TestTheOpenTasksPortDeclaresItsLabelAndLook(t *testing.T) {
+	index := qtest.New(t, func(c *q.Catalog) { fed(c) })
+	looks, found := index.Store().Presentation(OpenTasksPort)
+	if !found || looks.Label != "work" || looks.Looks != q.Count {
+		t.Fatalf("%s declares label %q and look %q, and wants work and count", OpenTasksPort, looks.Label, looks.Looks)
+	}
+}
