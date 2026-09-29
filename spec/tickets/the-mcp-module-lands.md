@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-lands-in-shadow
@@ -132,6 +132,19 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 006e3b874404405f4090a64baf0cf6c413215710
+    hash_after: 006e3b874404405f4090a64baf0cf6c413215710
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/mcp fails
+    inputs:
+      - name: design/draft
+        hash: 7d3074c95701cd20
+        size: 3605
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -240,26 +253,32 @@ I assume the manager's call and its session id stand as the hooks door takes the
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/mcp src/quack/mcp_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/mcp/mcp_test.go
+- src/quack/mcp_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion over the stub. The replay case fails on the line it wants named, since the stub answers every line as matching. The recording holds initialize, the initialized notification, a tools/call and a call naming no tool, and the tools/list line comes off the built module, read before it stands, because a Huma schema written by hand guesses its form.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the replay TestTheInboundFakeReplaysAnMCPSession, the new action TestANewActionListsANewToolWithNoChangeHere, the doc TestAToolsDescriptionIsItsActionsDoc, the default wait TestACallWithNoWaitTakesTheSecondOffItsKey, the wait argument TestAWaitArgumentSetsTheCallsWait, the slow tool TestASlowToolAnswersStillRunning, and go test and the check as commands
+- the doors the tests reach are the manager call, faked in the case, and the loopback listen, which the listen case drives for real
 
 # gate
 
