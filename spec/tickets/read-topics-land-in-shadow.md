@@ -91,6 +91,7 @@ record:
   - step: sync
     hand: box d84d03dd63d7 · claude-code-remote
     hash_before: e99769296735d5f353089c188891f11836d7eec9
+    hash_after: 8284daf4b773f14546ee517cabbc7c75459b22ec
   - step: sync
     hand: box d84d03dd63d7 · claude-code-remote
     hash_before: 1934b628fe319c78c2b5d2bd46649bd828e0985e
@@ -186,7 +187,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["open-tasks-shadow-lands"]
 enabled_by: migration.phase3shadow
-cloud: true
 reason: done
 ---
 
