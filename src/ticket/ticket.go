@@ -29,3 +29,24 @@ type Ticket struct {
 	Held   bool `json:"held,omitempty"`
 	Person bool `json:"person,omitempty"`
 }
+
+// A work branch standing on origin as the git module reads it: its group's name, trunk's copy of that group's ticket, and every ticket file on its tip. [[spec/tickets/the-index-reads-standing-branches]]
+type Tip struct {
+	Name  string `json:"name"`
+	Trunk string `json:"trunk"`
+	Files []File `json:"files"`
+}
+
+// A ticket file off a git tree. [[spec/tickets/the-index-reads-standing-branches]]
+type File struct {
+	Path string `json:"path"`
+	Text string `json:"text"`
+}
+
+// A standing branch as the work draws it: merged where trunk reads its group closed, the tip's copy of its group ticket, and the tip's tickets naming that group. [[spec/tickets/the-index-reads-standing-branches]]
+type Branch struct {
+	Name     string   `json:"name"`
+	Merged   bool     `json:"merged"`
+	Ticket   Ticket   `json:"ticket"`
+	Children []Ticket `json:"children"`
+}

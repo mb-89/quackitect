@@ -88,7 +88,7 @@ func ticketTree() map[string]any {
 
 func allSeeded(t *testing.T) map[string]Ticket {
 	t.Helper()
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
+	index := qtest.New(t, func(c *q.Catalog) { withTips(c) })
 	index.Seed(ticketTree())
 	said, ok := index.Run(AllPort).([]Ticket)
 	if !ok {
@@ -102,7 +102,7 @@ func allSeeded(t *testing.T) map[string]Ticket {
 }
 
 func TestAllStandsUnderItsLocalPort(t *testing.T) {
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
+	index := qtest.New(t, func(c *q.Catalog) { withTips(c) })
 	if got, ok := index.Run(AllPort).([]Ticket); !ok || len(got) != 0 {
 		t.Fatalf("%s reads %#v with no file", AllPort, index.Read(AllPort))
 	}
