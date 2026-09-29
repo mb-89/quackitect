@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -152,6 +152,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d8572d2183d7 · claude-code-remote
+    hash_before: 4d08c9cfe6016614c1563cc42607db22aaf1046c
+    hash_after: 4d08c9cfe6016614c1563cc42607db22aaf1046c
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["read-topics-land-in-shadow", "quack-verbs-land-in-shadow"]
 enabled_by: migration.phase7shadow
 cloud: true
@@ -231,38 +243,57 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the lsp IO module answers initialize and shutdown, commits buffers on open and change, publishes diagnostics, and republishes when the sweep moves
+- the listener stands behind a token on loopback, and quack lsp relays stdio to it whole
+- the wiring adds the lsp instance and binds the check buffers to it
+- the sweep skips an empty buffer, so a closed file reads as it does on disk
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the recorded session and the fake index made each case a plain Go test
+- the gate named the range, close, relay and sweep-decode points before the code, so the build met none of them late
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- a write through the plain Edit tool was refused for naming no ticket, and the level zero patch tool answered where the write door needed it, at the start of the run
+- a shell pipeline ending in tail masked its exit code and the landing guard refused it, twice, at the start of the run
+- the review_branch tool answered that no server ran, so the accept read the diff by hand, at the accept step
+- the first accept read missed that a closed buffer commits empty text, which shadowed its file in the sweep, until the accept caught it
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the work skill names the patch tool for a write and runs each gate command alone, since the guard refuses a chained landing
+- the design draft for a module that drops a name lists what the reader of that name does with the empty value
+- the accept reads each done_when line against the caller of the value it writes
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The design put a drop where the store offers only a commit of an empty text, so the reader of the buffers input had to treat empty as absent. I chose that over a store drop because the drop needs a catalog write the module lacks. I left a door-level compare against the old server out, and the rule rows already name each mismatch.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands once in the module, and the ticket points at it
+- each constant carries a name at the top of its module
+- each new file opens on a header saying what it is for
+- the errors of the run stand with the step they met
+- the chapter names roles alone
 
 ## cloud
 
