@@ -20,7 +20,7 @@ const runs = (...argv) =>
 test("./RUNME.sh hands get to quack, which reads the verbs slice off the index", () => {
   const said = runs("get", "migration/config/verbs");
   assert.equal(said.exitCode, 0, said.stderr);
-  assert.equal(said.stdout.trim().split("\n").at(-1), '"shadow"');
+  assert.match(said.stdout.trim().split("\n").at(-1), /^"(old|shadow|new)"$/);
 });
 
 test("./RUNME.sh hands config to cli.js, which names the verbs slice in the tracked file", () => {

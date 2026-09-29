@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 4b57014bfa8d25e3
         size: 871
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 1da18563501a066222f2540617403dd7630ae003
+    hash_after: 1da18563501a066222f2540617403dd7630ae003
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -300,14 +309,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/verbs.go src/quack/main.go src/modules/migration/migration.go src/quack/verbs_test.go src/modules/migration/migration_test.go test/contract/runme-road.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the entry, the quack root, the new road file, the migration slices and the tracked mode, as the draft names, and the two gate points fold in
+- the road reaches cli.js, the tree, the twins and the session log through the functions its doors carry, and the cases hand fakes for each
+- each function links the ticket it implements
+- the verbs key stands once in the migration module, and the road reads it through that constant
 
 ## tests-green
 
