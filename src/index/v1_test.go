@@ -108,3 +108,13 @@ func TestV1DrawsItsDocs(t *testing.T) {
 		t.Fatalf("the docs answer %d: %.200s", said.StatusCode, body)
 	}
 }
+
+// V1 answers the base of the door standing over the root. [[spec/tickets/the-quack-cli-gets-generated]]
+func TestV1AnswersTheBaseOfTheStandingDoor(t *testing.T) {
+	standing := standingV1(t)
+	t.Setenv("QUACKITECT_ROOT", standing.Root)
+	base, err := V1()
+	if want := fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1); err != nil || base != want {
+		t.Fatalf("V1 answers %q, %v, not %q", base, err, want)
+	}
+}

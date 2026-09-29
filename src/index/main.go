@@ -48,6 +48,11 @@ func Main(manage Manage, starts ...Start) {
 // The root every verb works in, which the composition root reads its wiring off. [[spec/design_output/index#a-door-comes-back]]
 func Root() (string, error) { return rootHere() }
 
+// The base of /v1 on the door standing over the root, which it starts where none answers, so a client reaches the index the way every other client does. [[spec/tickets/the-quack-cli-gets-generated]]
+func V1() (string, error) {
+	return "", errorOf("the door answers no /v1 base yet")
+}
+
 func rootHere() (string, error) {
 	said := envOf("QUACKITECT_ROOT")
 	if said == "" {

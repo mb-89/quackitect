@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -129,6 +129,19 @@ record:
         hash: 5f2da8fccb387d1f
         size: 23680
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 22c6633665f51a927bfef50a786880f67020a879
+    hash_after: 22c6633665f51a927bfef50a786880f67020a879
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: f3d4d510dd589bd1
+        size: 2747
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +236,36 @@ I assume `quack` with no verb keeps running the index as today, since `RUNME.sh`
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack src/index
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/cli_test.go
+- src/index/v1_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- `cli` answers 2 for every command yet, so each case fails on its own assertion
+- `V1` answers no base yet, so its case reads the empty string
+- the cases run a real door with the real manager over two fake actions, since quack is the composition root and may import both
+- what surprises the hand: the catalog rows carry no field type, so a flag value reads as JSON where it parses and as a string otherwise
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the index's main, a new cli file in quack, and their cases, as the draft names
+- the cases drive the door over fake actions and a fake accept, and read the base off the standing file the door writes
+- each file carries a pointer at this ticket or at the design input chapter it answers
 
 # gate
 
