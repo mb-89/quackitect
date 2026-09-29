@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: the-quack-cli-gets-generated
+record:
+  - step: do
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: c532bc59211da87c92432e3dfbeb41075f7d0e24
+    hash_after: c532bc59211da87c92432e3dfbeb41075f7d0e24
+reason: became
+successors: [the-quack-cli-gets-generated]
 ---
 
 # Ask

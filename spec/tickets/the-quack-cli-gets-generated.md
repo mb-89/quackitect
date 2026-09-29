@@ -363,3 +363,4 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 - cli-draft-lists-every-case: tests-green names `TestRunPostsItsFlagsAsTheInput` beside the five the draft lists. `cli_test.go` holds it, and the draft list leaves it out.
+- quack-main-routes-the-tree: implement adds a case in `main_test.go`. It reads main hand help, run and get to the command tree. The route calls `index.V1`, which this ticket adds, so the case lands with it.
