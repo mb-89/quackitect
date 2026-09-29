@@ -354,3 +354,13 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's callers list names `pull-hand.js` once, and the implement step reads these rows in its place:
+
+| the caller | what it does with a need |
+|---|---|
+| `takeable` in `src/scripts/pull-hand.js` | skips a leaf whose needs `holdsVerb` refuses |
+| `admits` in `src/scripts/pull-hand.js` | names the needs this box lacks, and refuses the hand-out |
+| `WORK_VERBS` in `src/scripts/work.js` | owns the branch verbs `VERBS` reads, since `branch-list-reads-work-table` took `BRANCH` away |
+
+The shadow call rides `admits`, beside `shadowLeaf`, so it runs once a hand-out.

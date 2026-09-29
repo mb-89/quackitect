@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: pull-verbs-become-actions
+record:
+  - step: do
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: f117b517098b19c70bc337b4b6c3940116b950af
+    hash_after: f117b517098b19c70bc337b4b6c3940116b950af
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: fa76b29ef26ac28b
+        size: 194
+    def: 894320b5dd55a1cb
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the callers list names pull-hand.js once, but holdsVerb answers there at two sit
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/branch-needs.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull ticket named pull-hand.js once among its callers, where holdsVerb answers in two functions. A table under its Discussion names takeable and admits, and names WORK_VERBS as the owner of the branch verbs. The engine owns the draft fields, so the correction stands where the implement step reads it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and lands under Discussion since the door keeps the draft fields to the engine
+- the table also names the table that replaced BRANCH, which the earlier fix revealed
+- each caller stands once in the table, and the file owns the code
 
 # Discussion
 
