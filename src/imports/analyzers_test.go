@@ -18,6 +18,9 @@ var flagged = map[string]string{
 	"modules/disk/disk.go":               "package disk\n\nimport (\n\t\"os\"\n\n\t\"quackitect/src/q\"\n)\n\nvar flag = q.IO()\n\nfunc Read() ([]byte, error) { return os.ReadFile(\"a\") }\n\ntype FakeDisk struct{}\n",
 	"modules/disk/disk_contract_test.go": "package disk\n",
 	"q/qtest/qtest.go":                   "package qtest // want `quackitect/src/q/qtest keeps no suite.go beside its fake`\n\ntype Index struct{}\n",
+	"tui/paint/paint.go":                 "package paint\n\nimport \"os\" // want `quackitect/src/tui/paint imports os`\n\nfunc Name() string { return os.Getenv(\"NAME\") }\n",
+	"tui/paint/door.go":                  "package paint\n\nimport \"os\"\n\nfunc Read() ([]byte, error) { return os.ReadFile(\"a\") }\n",
+	"tui/paint/paint_test.go":            "package paint\n\nimport \"os\"\n\nvar _ = os.Args\n",
 	"modules/lonely/lonely.go":           "package lonely\n\ntype FakeThing struct{} // want `quackitect/src/modules/lonely declares FakeThing with no contract suite beside it`\n",
 }
 
@@ -48,6 +51,11 @@ func TestAFakeWithNoSuiteIsNamed(t *testing.T) {
 
 func TestTheCoreImportingOsIsNamed(t *testing.T) {
 	analysistest.Run(t, plantFlagged(t), IOOnly, "quackitect/src/q/clock")
+}
+
+// A renderer reaches the outside through its door.go alone, and its tests stand apart. [[spec/design_output/model#the-build-checks-imports]]
+func TestARendererReachingOutBesideItsDoorIsNamed(t *testing.T) {
+	analysistest.Run(t, plantFlagged(t), IOOnly, "quackitect/src/tui/paint")
 }
 
 func TestQtestWithNoSuiteIsNamed(t *testing.T) {

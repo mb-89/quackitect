@@ -115,10 +115,7 @@ func Placed(t *tree.Tree, p Places) {
 	t.Amend(func(one *tree.Item) {
 		one.Keys[QueueKey] = p.Queue[one.Name]
 		one.Keys[CloudKey] = flagOf(p.Cloud[one.Name])
-		// A row at zero stands in hand, so its state reads held whatever the index says. [[spec/design_output/pull#the-queue-is-an-outline]]
-		if p.Queue[one.Name] == heldPlace {
-			one.Keys["state"] = HeldState
-		}
+		// The state stays what the index answers, since the held rule stands in the tickets module alone. [[spec/tickets/the-window-held-override-goes]]
 		// The todo letter reads the verb's answer, which folds the override on this box into the front's tag. [[spec/design_output/pull#a-todo-forces-a-place]]
 		if said, held := p.Todo[one.Name]; held {
 			one.Keys[TodoKey] = flagOf(said)

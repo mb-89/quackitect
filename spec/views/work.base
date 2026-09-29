@@ -1,3 +1,16 @@
+reads: work/rows
+badge: work/open-tasks
+actions:
+  - key: p
+    arg: digit
+    calls: work/place
+  - key: u
+    calls: tickets/flip-urgent
+  - key: enter
+    edits: cell
+    writes: tickets/set-field
+  - button: pull
+    calls: work/pull
 properties:
   name:
     opensNote: true

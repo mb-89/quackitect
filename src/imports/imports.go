@@ -35,12 +35,14 @@ type rule struct {
 	says     string
 	past     func(from, to string) bool
 	flagged  bool
+	spare    func(pkg, file string) bool
 }
 
 var (
 	noModule = rule{from: seesModules, to: isModule, says: "a module, a door, the index or a renderer imports no other module", past: ownModule}
 	onlyQ    = rule{from: isModule, to: pastQ, says: "a module imports q, q/qtest and the pure standard library alone", flagged: true}
 	ioOnly   = rule{from: isCore, to: reachesOut, says: "the core imports no os, os/exec, net or net/http"}
+	drawOnly = rule{from: isRenderer, to: reachesOut, says: "a renderer imports no os, os/exec, net or net/http outside its door.go", spare: beside}
 )
 
 // The imports ioonly refuses, per [[spec/design_output/model#the-build-checks-imports]].
@@ -61,8 +63,31 @@ var OnlyQ = &analysis.Analyzer{
 // [[spec/design_output/model#the-build-checks-imports]]
 var IOOnly = &analysis.Analyzer{
 	Name: "ioonly",
-	Doc:  "the core imports no os, os/exec, net or net/http",
-	Run:  ioOnly.run,
+	Doc:  "the core imports no os, os/exec, net or net/http, and a renderer none outside its door.go",
+	Run: func(pass *analysis.Pass) (any, error) {
+		if _, err := ioOnly.run(pass); err != nil {
+			return nil, err
+		}
+		return drawOnly.run(pass)
+	},
+}
+
+// The faults of a renderer package's files, which the tree test reads beside the analyzer. [[spec/design_output/model#the-build-checks-imports]]
+func RendererFaults(pkg string, fset *token.FileSet, files []*ast.File) []string {
+	out := []string{}
+	for _, file := range files {
+		if drawOnly.spare(pkg, fset.File(file.Pos()).Name()) {
+			continue
+		}
+		for _, spec := range file.Imports {
+			if path, err := strconv.Unquote(spec.Path.Value); err == nil {
+				if fault := drawOnly.fault(pkg, path); fault != "" {
+					out = append(out, fault)
+				}
+			}
+		}
+	}
+	return out
 }
 
 // [[spec/design_output/model#the-build-checks-imports]]
@@ -195,6 +220,9 @@ func (one rule) run(pass *analysis.Pass) (any, error) {
 		return nil, nil
 	}
 	for _, file := range pass.Files {
+		if one.spare != nil && one.spare(pass.Pkg.Path(), pass.Fset.File(file.Pos()).Name()) {
+			continue
+		}
 		for _, spec := range file.Imports {
 			path, err := strconv.Unquote(spec.Path.Value)
 			if err != nil {
@@ -236,8 +264,17 @@ func under(path, folder string) bool {
 func isModule(path string) bool { return under(path, "src/modules") }
 func isDoor(path string) bool   { return under(path, "src/doors") }
 
-// The core ioonly holds. The model names the renderers too, and src/tui/frame reaches the outside today, so they wait. [[spec/design_output/model#the-build-checks-imports]]
+// The core ioonly holds. [[spec/design_output/model#the-build-checks-imports]]
 func isCore(path string) bool { return under(path, "src/q") }
+
+// The window's packages, which reach the outside through a door.go alone. [[spec/design_output/model#the-build-checks-imports]]
+func isRenderer(path string) bool { return under(path, "src/tui") }
+
+// A renderer's door and its tests stand beside the rule. [[spec/design_output/model#the-build-checks-imports]]
+func beside(_, file string) bool {
+	name := filepath.Base(file)
+	return name == "door.go" || strings.HasSuffix(name, testFile)
+}
 
 func reachesOut(path string) bool {
 	for _, one := range outside {
