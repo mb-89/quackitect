@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,21 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856596c7410d · claude-code-remote · helper-3
+    hash_before: 27923a8c295b1e7269f8fdb922c8553579de212f
+    hash_after: 27923a8c295b1e7269f8fdb922c8553579de212f
+    inputs:
+      - name: design/draft
+        hash: ef3db5004de93f2f
+        size: 2729
+      - name: design/tests-red
+        hash: d9e334be86a85ddb
+        size: 927
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -270,8 +285,17 @@ Four module cases and the relay case fail on their own assertion: the replay mee
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach answers the ask: the lsp.go registration, Server.Handle, Listen, Replay, quack lsp in src/quack/lsp.go, and the lsp instance in spec/wiring.yaml and src/quack/main.go match the design output's section on the editor starting quack lsp. The listener copies mcp.Listen and hooks.Listen, which both stand on a loopback port with a token.
+- Each done_when line has a decider: TestTheReplayAnswersTheRecordedSession replays test/replay/lsp/one-session.jsonl, and ./RUNME.sh test src/modules/lsp src/quack/lsp_test.go shows four module cases and the relay case failing on their own assertions. The close case passes against the stub, as seen says. ./RUNME.sh check exits 0 is a command the implement leaf answers.
+- To fix in place, the diagnostic range: the recording wants end character 21, the end of the row, which follows drawsAs and unitsTo in src/lsp (UTF-16 units, per spec/design_output/lsp#a-finding-is-a-diagnostic). The approach does not name that mapping. Port it into the module, because src/lsp leaves with the-lsp-server-leaves.
+- To fix in place, the close: the recording answers didClose with empty diagnostics. Have the close clear the path, and skip the sweep read the approach table names for all three.
+- To fix in place, the relay: TestQuackLspRelaysTheStreamWhole has its peer read to EOF, so relays half-closes the connection (CloseWrite) at stdin's end, and only then drains the reply to stdout.
+- To fix in place, the sweep read: check/sweep holds []check.Finding as the store keeps it. Outside.Sweep in quack decodes it into lsp.Finding, and Handle keeps the rows whose file is that path.
+- To fix in place, the untested parts: the republish when check/sweep moves, and the quack lsp verb route (the standing file, the dial, the token), have no red case. Add a case for each at tests-green.
+- To fix in place, a caller the list misses: test/contract/index.test.js copies spec/wiring.yaml, so the new lsp instance opens its listener in that fixture too. Run the contract test at tests-green.
 
 # implement
 
