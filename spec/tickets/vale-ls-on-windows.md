@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: answer
 steps:
   - name: answer
@@ -35,6 +35,13 @@ steps:
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: a2fc3cce647853ae7d4afeecdfb615a01317b7d8
+    hash_after: a2fc3cce647853ae7d4afeecdfb615a01317b7d8
+reason: became
+successors: [vale-ls-windows-trial]
 ---
 
 # Ask
