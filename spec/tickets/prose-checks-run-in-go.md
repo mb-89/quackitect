@@ -331,3 +331,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The callers leave out one node road: `pastReads` in src/lsp/outside.go runs node with `tenseScript` for the past veto. It reads the same `readsAsPast` the shadow compares, so this phase leaves it standing. When the prose slice reads new, `pastReads` calls the Go past veto in src/prose, and the LSP runs node for prose no more.
