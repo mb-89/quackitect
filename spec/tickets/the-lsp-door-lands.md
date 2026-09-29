@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,19 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-lands-in-shadow
 depends_on: ["lsp-rules-move-to-check"]
+record:
+  - step: design/draft
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: c7ca9c4a10a0e57dafaef053ad4fda4b9f5e7971
+    hash_after: c7ca9c4a10a0e57dafaef053ad4fda4b9f5e7971
+    inputs:
+      - name: ask
+        hash: 415572d86f0f8025
+        size: 391
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +160,58 @@ The editor then reaches the one model.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The `lsp` IO module lands as [[spec/design_output/model#the-editor-starts-quack-lsp]] says, and the editor stays on `se-lsp` until `lsp-door-switches-over` points it at `quack lsp`.
+
+| the part | lands in | what it does |
+|---|---|---|
+| the registration | `src/modules/lsp/lsp.go` | the out-port family `buffers/<path...>` with `q.IO()` |
+| the server | `Server.Handle` in the same file | answers `initialize` and `shutdown`. On `didOpen` and `didChange` it commits `buffers/<path>` through the store, on `didClose` it drops it, and each of the three answers `publishDiagnostics` for that path off the sweep |
+| the sweep read | `Outside.Sweep`, a function `quack` hands in | reads `check/sweep` as the wiring binds it, so the module imports no other module |
+| the listener | `Listen` in the same file | a loopback port behind a token, written to `.se/.runtime/lsp.json`. A connection sends the token line first, then LSP frames |
+| the inbound fake | `Replay` in the same file | drives the server off a recording under `test/replay/lsp`, one message and its replies a line |
+| the command | `src/quack/lsp.go` | `quack lsp` makes the index stand, reads the standing file, dials, sends the token line, and relays stdin and stdout whole |
+| the wiring | `spec/wiring.yaml` and `src/quack/main.go` | the instance `lsp`, its out-port bound to `buffers/<path...>`, the check module's buffers wired to it, and the listener opened beside the hooks door and the mcp server |
+
+The sweep settles in a wave after the commit, so the listener also publishes again for every open path when a commit moves `check/sweep`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go: main, which routes the `lsp` verb
+- src/quack/main.go: modules, doors and listens, which load the instance and open its listener
+- spec/wiring.yaml: the instance and its wires, where `check.buffers/<path...>` stops reading its built-in value
+- src/modules/check/sweep.go: sweepOf, whose buffers input now has a writer
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/lsp_test.go: TestTheReplayAnswersTheRecordedSession
+- src/modules/lsp/lsp_test.go: TestAnOpenBufferWritesItsName
+- src/modules/lsp/lsp_test.go: TestAClosedBufferDropsItsName
+- src/modules/lsp/lsp_test.go: TestAConnectionWithoutTheTokenReadsNothing
+- src/quack/lsp_test.go: TestQuackLspRelaysTheStreamWhole
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: the model chapters, the mcp and hooks modules, the store, the wiring and the quack start
+- the callers list names the verb route, the module table, the listener start, the wiring and the one input the new writer feeds
+- `go test ./...` meets every case, the replay case meets the recorded session line, and the check runs over the new package
 
 ## tests-red
 
