@@ -26,7 +26,8 @@ func TestTheRoadHandsEachVerbByItsMode(t *testing.T) {
 		argv []string
 		want road
 	}{
-		{"old", []string{"get", "t/n"}, toNode},
+		{"old", []string{"get", "t/n"}, toQuack},
+		{"old", []string{"run", "t/add"}, toQuack},
 		{"old", []string{"ticket", "yours"}, toNode},
 		{"old", []string{"config"}, toNode},
 		{"", []string{"ticket", "yours"}, toNode},
