@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box d857c176ced7 · claude-code-remote
     hash_before: 44d6fc076e9a256554192e329f1dfec8377e177d
+  - step: sync
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 48e1294af73914448d0fb73bb4149e7679420e03
+    hash_after: 5149e7697e0a24d898f39f419f7a24914100127b
+    answered:
+      - name: sync
+        exit: 0
+        said: work/read-topics-switch-over already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["read-topics-land-in-shadow"]
 enabled_by: migration.phase3switch
 cloud: true
@@ -113,8 +122,9 @@ Done when no JavaScript twin of a Go check stands.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
