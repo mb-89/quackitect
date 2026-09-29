@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
 import { findingsOver } from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
@@ -110,9 +111,12 @@ ifVale("a rule a project alone carries refuses on every road", async () => {
 // A second fail sends the ticket to a person, so the knob names the person. [[spec/tickets/one-review-a-ticket]]
 test("the doors read work.failsBeforePerson into the fail cap, and the config names no failsBeforeWait", async () => {
   const { it } = await import("../../src/scripts/cli-doors.js");
-  const config = JSON.parse(files.read(join(method, "spec", "config", "level0.json")));
   const schema = JSON.parse(
     files.read(join(method, "spec", "config", "level0.schema.json")),
+  );
+  const config = underBuiltIns(
+    schema,
+    JSON.parse(files.read(join(method, "spec", "config", "level0.json"))),
   );
 
   assert.equal(config.work.failsBeforeWait, undefined, "the old key leaves the config");
@@ -141,9 +145,12 @@ test("the doors read work.failsBeforePerson into the fail cap, and the config na
 // The score's weights stand under queue, where the Go queue reads them too, so both paths order alike. [[spec/tickets/verbs-queue-order]]
 test("the doors read the score weights off queue, and work names none", async () => {
   const { it } = await import("../../src/scripts/cli-doors.js");
-  const config = JSON.parse(files.read(join(method, "spec", "config", "level0.json")));
   const schema = JSON.parse(
     files.read(join(method, "spec", "config", "level0.schema.json")),
+  );
+  const config = underBuiltIns(
+    schema,
+    JSON.parse(files.read(join(method, "spec", "config", "level0.json"))),
   );
 
   for (const old of ["blockScore", "dayScore", "failScore"]) {

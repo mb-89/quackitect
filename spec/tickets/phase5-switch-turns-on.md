@@ -62,8 +62,8 @@ The phase-5 switch opens [[spec/tickets/go-cage-switches-over]] and moves no sli
 
 While the switch reads false, the group cannot start, and the port that would clean the shadow never runs.
 
-- `./RUNME.sh config` reads `migration.phase5switch true spec/config/level0.json`
-- `./RUNME.sh config` reads `migration.cage shadow spec/config/level0.json`
+- `./RUNME.sh config` reads `migration.phase5switch true`
+- `./RUNME.sh config` reads `migration.cage shadow`
 - `./RUNME.sh check` exits 0
 
 # do

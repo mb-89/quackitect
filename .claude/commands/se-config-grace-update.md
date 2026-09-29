@@ -1,5 +1,5 @@
 ---
-description: "config / grace / update: sets grace.update to what you type."
+description: "config / grace / update: sets grace.update to what you type. The calls the engine lets pass after the owner asks for an update, before the ask refuses them."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

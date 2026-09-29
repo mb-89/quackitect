@@ -19,6 +19,9 @@ export const GOD = "god";
 
 const SAID = "comment";
 
+// The layer a key reads where no file sets it: the schema's default. [[spec/design_output/config#the-layers]]
+export const BUILT_IN = "built-in";
+
 // [[spec/design_output/config#a-key-names-a-path]]
 export function flatten(said, at = "") {
   const out = new Map();
@@ -75,18 +78,38 @@ export function keysOf(schema) {
   const sections = schema?.properties ?? {};
   for (const [section, said] of Object.entries(sections)) {
     if (section === SAID || said?.type !== "object") continue;
-    const wanted = schema.required?.includes(section);
     for (const [leaf, one] of Object.entries(said.properties ?? {})) {
       if (leaf === SAID) continue;
       out.push({
         key: `${section}.${leaf}`,
         type: one?.type,
         options: Array.isArray(one?.enum) ? [...one.enum] : undefined,
-        required: Boolean(wanted && said.required?.includes(leaf)),
       });
     }
   }
   return out;
+}
+
+// Each key's built-in value, the schema's default, by its dotted name. [[spec/design_output/config#the-layers]]
+export function builtInsOf(schema, at = "") {
+  const out = new Map();
+  for (const [name, one] of Object.entries(schema?.properties ?? {})) {
+    if (name === SAID || !one || typeof one !== "object") continue;
+    const key = at ? `${at}.${name}` : name;
+    if (one.type === "object" && one.properties) {
+      for (const [under, value] of builtInsOf(one, key)) out.set(under, value);
+      continue;
+    }
+    if ("default" in one) out.set(key, one.default);
+  }
+  return out;
+}
+
+// A file laid over the built-ins, as a nested object, so a reader of the whole file meets every key. [[spec/tickets/the-config-schema-gets-generated]]
+export function underBuiltIns(schema, said) {
+  let out = {};
+  for (const [key, value] of builtInsOf(schema)) out = deeply(out, nest(key, value));
+  return deeply(out, said ?? {});
 }
 
 export function typeOf(schema, key) {
@@ -106,10 +129,7 @@ export function coerce(said, type) {
 export function faultsIn(schema, said) {
   const faults = [];
   for (const one of keysOf(schema)) {
-    if (!said.has(one.key)) {
-      if (one.required) faults.push(`${one.key} is missing`);
-      continue;
-    }
+    if (!said.has(one.key)) continue;
     const kind = typeof said.get(one.key);
     if (one.type && kind !== one.type) {
       faults.push(`${one.key} carries a ${kind}, and the schema says ${one.type}`);
@@ -168,8 +188,10 @@ export function configOf(it) {
   };
 
   const seen = async () => {
-    const { layers, env } = await base();
+    const { schema, layers, env } = await base();
     const said = new Map();
+    for (const [key, value] of builtInsOf(schema))
+      said.set(key, { value, layer: BUILT_IN });
     for (const [at, one] of layers) {
       for (const [key, value] of one) said.set(key, { value, layer: at });
     }

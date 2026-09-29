@@ -44,6 +44,40 @@ instances:
     module: mcp
   lsp:
     module: lsp
+  answer:
+    module: answer
+  ask:
+    module: ask
+  battery:
+    module: battery
+  budget:
+    module: budget
+  code:
+    module: code
+  context:
+    module: context
+  engine:
+    module: engine
+  grace:
+    module: grace
+  helper:
+    module: helper
+  names:
+    module: names
+  ops:
+    module: ops
+  plan:
+    module: plan
+  pull:
+    module: pull
+  restated:
+    module: restated
+  stop:
+    module: stop
+  wait:
+    module: wait
+  watchdog:
+    module: watchdog
 wires:
   hooks.events/<id>: session/<id>/events
   watch.files/<path...>: files/<path...>

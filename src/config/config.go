@@ -17,6 +17,12 @@ const (
 	Local   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
 )
 
+// The schema the declarations write, whose default answers a key no file sets, under the layer BuiltIn. [[spec/tickets/the-config-schema-gets-generated]]
+const (
+	Schema  = "spec/config/level0.schema.json"
+	BuiltIn = "built-in"
+)
+
 // [[spec/design_output/config#the-go-reader]]
 func EnvOf(key string) string {
 	said := strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))
@@ -33,6 +39,9 @@ func Value(root, key string) (any, bool) {
 func Where(root, key string) (any, string, bool) {
 	var out any
 	layer := ""
+	if said, found := defaultIn(read(root, Schema), key); found {
+		out, layer = said, BuiltIn
+	}
 	if said, found := valueIn(read(root, Tracked), key); found {
 		out, layer = said, Tracked
 	}
@@ -43,6 +52,14 @@ func Where(root, key string) (any, string, bool) {
 		out, layer = said, Local
 	}
 	return out, layer, layer != ""
+}
+
+// A shared key's value: the default file's, and its built-in where the file sets none, since no box sets a shared key for itself. [[spec/tickets/the-config-schema-gets-generated]]
+func Shared(root, key string) (any, bool) {
+	if said, found := valueIn(read(root, Tracked), key); found {
+		return said, true
+	}
+	return defaultIn(read(root, Schema), key)
 }
 
 // The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#the-go-reader]]
@@ -113,6 +130,21 @@ func read(root, path string) map[string]any {
 		return nil
 	}
 	return said
+}
+
+// The default a schema names for a dotted key, under each segment's properties. [[spec/tickets/the-config-schema-gets-generated]]
+func defaultIn(schema map[string]any, key string) (any, bool) {
+	var here any = schema
+	for _, part := range strings.Split(key, ".") {
+		step, _ := here.(map[string]any)
+		properties, _ := step["properties"].(map[string]any)
+		if here = properties[part]; here == nil {
+			return nil, false
+		}
+	}
+	entry, _ := here.(map[string]any)
+	said, ok := entry["default"]
+	return said, ok
 }
 
 func valueIn(said map[string]any, key string) (any, bool) {

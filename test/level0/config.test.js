@@ -13,6 +13,7 @@ import {
   keysOf,
   LOCAL,
   TRACKED,
+  underBuiltIns,
   varOf,
 } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -154,11 +155,12 @@ test("every key stands beside its value and its layer", async () => {
   ]);
 });
 
-test("the schema refuses a tracked file missing a field", async () => {
+// A missing key reads its built-in, so the schema refuses no file for it. [[spec/tickets/the-config-schema-gets-generated]]
+test("the schema passes a tracked file missing a field", async () => {
   const missing = { stop: { enabled: true }, log: { level: "info" } };
   const { it } = resolver({ "spec/config/level0.json": JSON.stringify(missing) });
 
-  assert.deepEqual(await it.faults(), ["stop.mostInARow is missing"]);
+  assert.deepEqual(await it.faults(), []);
 });
 
 test("the schema refuses a field carrying another type", async () => {
@@ -227,4 +229,35 @@ test("the config names no judge key", async () => {
   });
   assert.equal(config.judge, undefined, "the tracked config names no judge");
   assert.equal(schema.properties.judge, undefined, "the schema declares no judge");
+});
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("a key no file sets resolves to its built-in", async () => {
+  const schema = structuredClone(SCHEMA);
+  schema.properties.stop.properties.hold = { type: "string", default: "off" };
+  schema.properties.log.properties.level.default = "warn";
+  const { it } = resolver({
+    "spec/config/level0.schema.json": JSON.stringify(schema),
+    "spec/config/level0.json": JSON.stringify({ log: { level: "info" } }),
+  });
+
+  assert.equal(await it.ask("stop.hold"), "off");
+  assert.equal(await it.layerOf("stop.hold"), "built-in");
+  assert.equal(await it.ask("log.level"), "info", "a file beats the built-in");
+  assert.equal(await it.layerOf("log.level"), TRACKED);
+});
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("underBuiltIns lays a file over the built-ins as one object", () => {
+  const schema = {
+    properties: {
+      stop: {
+        type: "object",
+        properties: { hold: { default: "off" }, most: { default: 3 } },
+      },
+    },
+  };
+  assert.deepEqual(underBuiltIns(schema, { stop: { most: 5 } }), {
+    stop: { hold: "off", most: 5 },
+  });
 });

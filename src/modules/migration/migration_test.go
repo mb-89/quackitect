@@ -61,10 +61,15 @@ func TestTheSliceKeyStandsShared(t *testing.T) {
 	c := q.New()
 	Registers(c)
 	keys := c.Keys()
-	if len(keys) != len(slices) {
-		t.Fatalf("the module registers %+v, and wants one key a slice", keys)
+	if len(keys) != len(phases)+len(slices) {
+		t.Fatalf("the module registers %+v, and wants one key a phase and one a slice", keys)
 	}
-	for i, one := range keys {
+	for i, one := range keys[:len(phases)] {
+		if one.Local != phases[i].key || !one.Shared || one.Default != "false" {
+			t.Fatalf("the module registers %+v, and wants the shared switch %s built in as false", one, phases[i].key)
+		}
+	}
+	for i, one := range keys[len(phases):] {
 		if one.Local != slices[i].key || !one.Shared {
 			t.Fatalf("the module registers %+v, and wants the shared key %s", one, slices[i].key)
 		}
@@ -81,10 +86,31 @@ func TestTheWindowSliceStandsAmongTheSlicesBuiltInAsOld(t *testing.T) {
 	t.Fatalf("the slices read %+v, and want window built in as old", slices)
 }
 
-// The window slice names its three modes in its doc. [[spec/tickets/the-log-becomes-a-view]]
+// The sidebar's slice stands beside the window's, built in as old, with the three modes. [[spec/tickets/the-sidebar-shadow-compares]]
+func TestTheSidebarSliceStandsBuiltInOld(t *testing.T) {
+	for _, one := range slices {
+		if one.key == "sidebar" && one.mode == "old" && strings.Join(one.enum, ", ") == "old, shadow, new" && one.doc != "" {
+			return
+		}
+	}
+	t.Fatalf("the slices read %+v, and want sidebar built in as old", slices)
+}
+
+// The sidebar key reads old off the index with nothing set, so a box with no tracked mode draws the old groups alone. [[spec/tickets/the-sidebar-shadow-compares]]
+func TestTheSidebarKeyReadsOldWithNothingSet(t *testing.T) {
+	index := qtest.New(t, func(c *q.Catalog) {
+		q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values, as the case seeds them"))
+		Registers(c)
+	})
+	if said := index.Run("config/" + SidebarKey); said != "old" {
+		t.Fatalf("the sidebar slice reads %v with nothing set, and wants old", said)
+	}
+}
+
+// The window slice names its three modes as its options. [[spec/tickets/the-config-schema-gets-generated]]
 func TestTheWindowSliceDocNamesItsModes(t *testing.T) {
 	for _, one := range slices {
-		if one.key == WindowKey && one.doc != "" && strings.Contains(one.doc, "old, shadow or new") {
+		if one.key == WindowKey && one.doc != "" && strings.Join(one.enum, ", ") == "old, shadow, new" {
 			return
 		}
 	}

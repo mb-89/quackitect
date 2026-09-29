@@ -11,6 +11,8 @@ const TRACKED = "spec/config/level0.json";
 const MACHINERY = ["session"];
 // The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-layers]]
 const LOCAL = ".se/.runtime/config.json";
+// The layer of a key no file sets, owned by BUILT_IN in .claude/skills/level0/lib/config.js and spelled again here because the extension imports its own folder alone. [[spec/design_output/config#the-layers]]
+const BUILT_IN = "built-in";
 
 function entriesIn(schema) {
   const out = [];
@@ -129,8 +131,12 @@ function sectionsOf(said, known) {
 }
 
 // [[spec/design_output/extension#the-view-holds-nothing]]
-function valuesOf(tracked, local) {
+// The built-ins stand under the two files, off each entry's default. [[spec/tickets/the-config-schema-gets-generated]]
+function valuesOf(tracked, local, schema) {
   const out = new Map();
+  for (const one of entriesIn(schema)) {
+    if ("default" in one) out.set(one.key, { value: one.default, layer: BUILT_IN });
+  }
   for (const [key, value] of flat(tracked)) out.set(key, { value, layer: TRACKED });
   for (const [key, value] of flat(local)) out.set(key, { value, layer: LOCAL });
   return out;

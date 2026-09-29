@@ -1,5 +1,5 @@
 ---
-description: "config / migration / guidance: sets migration.guidance to new. The guidance slice, switched over in phase 3. The rules a step reads come off the guidance topic."
+description: "config / migration / guidance: sets migration.guidance to new. The rules a step reads, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

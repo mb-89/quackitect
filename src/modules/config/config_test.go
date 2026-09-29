@@ -218,3 +218,18 @@ func TestLayeredNamesTheLayer(t *testing.T) {
 		t.Fatal("a key no layer sets reads as set")
 	}
 }
+
+// A kebab-case local name reads its camel-case member of the file. [[spec/tickets/the-config-schema-gets-generated]]
+func TestAKebabKeyReadsItsCamelCaseMember(t *testing.T) {
+	tracked, err := q.JSON.Parse([]byte(`{"stop": {"mostInARow": 4}}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	key := q.Key{Name: "stop/config/most-in-a-row", Instance: "stop", Local: "most-in-a-row"}
+	if value, layer, ok := Layered(key, tracked, q.Ordered{}, map[string]string{EnvOf("stop.mostInARow"): "5"}); !ok || value != "5" || layer != EnvOf("stop.mostInARow") {
+		t.Fatalf("the key reads %s off %s, and wants 5 off its variable", value, layer)
+	}
+	if value, _, ok := Layered(key, tracked, q.Ordered{}, nil); !ok || value != "4" {
+		t.Fatalf("the key reads %s, and wants 4 off the file", value)
+	}
+}

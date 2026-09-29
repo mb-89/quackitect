@@ -23,9 +23,11 @@ const (
 // The rules reading the box, which the index reads no part of: no user, no git identity, no node. [[spec/tickets/lsp-rules-move-to-check]]
 var boxRules = map[string]bool{"NothingPrivateTravels": true, "SurveyFindsNode": true}
 
-// The lsp slice's mode, off the default file alone, since the migration module shares the key. [[spec/design_output/model#config-comes-off-the-registrations]]
+// The lsp slice's mode, off the default file and then its built-in, since the migration module shares the key. [[spec/tickets/the-config-schema-gets-generated]]
 func lspMode(root string) string {
-	return config.Map(root, config.Tracked, "migration")[lspSlice]
+	said, _ := config.Shared(root, "migration."+lspSlice)
+	mode, _ := said.(string)
+	return mode
 }
 
 // Under shadow, one row for each finding the old sweep and the new hold apart, the old side's first. A fault on the new road writes nothing. [[spec/tickets/lsp-rules-move-to-check]]
