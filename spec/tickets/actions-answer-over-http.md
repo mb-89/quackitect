@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
@@ -156,6 +156,15 @@ record:
         hash: 5851393963daace7
         size: 961
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 26fba09807e06973c72fc25feb26a6e61d75046d
+    hash_after: 26fba09807e06973c72fc25feb26a6e61d75046d
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -340,14 +349,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./...
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names and no other, the test files among them
+- the only door the change reaches is the manager call, and the index cases run it through a fake manager over a fake accept
+- each new function carries a comment naming the chapter on the wait or this ticket
+- the wait name stands once as index.WaitName, the local key once as http.WaitKey, and a root case ties the two
 
 ## tests-green
 

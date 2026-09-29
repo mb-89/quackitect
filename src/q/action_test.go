@@ -2,7 +2,10 @@
 // [[spec/design_output/model#an-action-lists-requests]]
 package q
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
 
 func TestAnActionAnswersItsRequests(t *testing.T) {
 	c := New()
@@ -43,5 +46,20 @@ func TestAnActionDecodesItsInputOffJSON(t *testing.T) {
 	}
 	if _, err := s.Input("t/none", nil); err == nil {
 		t.Fatal("a name the catalog lacks decodes an input")
+	}
+}
+
+// An action answers its input type and the type q.Answers declares, and a name no action holds answers none. [[spec/tickets/actions-answer-over-http]]
+func TestAnActionAnswersItsTypes(t *testing.T) {
+	c := New()
+	ActionIn(c, "t/count", func(string) []Request { return nil }, Answers[int]())
+	OutIn(c, "t/n", 0)
+	s := NewStore(c)
+	in, out, ok := s.Types("t/count")
+	if !ok || in.Kind() != reflect.String || out.Kind() != reflect.Int {
+		t.Fatalf("t/count answers %v, %v, %v", in, out, ok)
+	}
+	if _, _, ok := s.Types("t/n"); ok {
+		t.Fatal("a name no action holds answers its types")
 	}
 }

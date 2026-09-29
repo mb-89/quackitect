@@ -225,3 +225,16 @@ func TestARefusedPostAnswersItsProblem(t *testing.T) {
 		t.Fatalf("a refusing module answers %d: %s", said.StatusCode, body)
 	}
 }
+
+// A Prefer header holding two preferences applies the wait among them, per RFC 7240. [[spec/design_output/model#a-caller-sets-its-wait]]
+func TestAPreferHeaderAppliesItsWaitAmongOthers(t *testing.T) {
+	hold := make(chan struct{})
+	close(hold)
+	said, body := postV1(t, standingActions(t, 0, hold), "/v1/actions/t/add", "respond-async, wait=5", `{"a":2,"b":2}`)
+	if out := postedOf(t, body); said.StatusCode != http.StatusOK || out.Result == nil || out.Result.Sum != 4 {
+		t.Fatalf("the post answers %d: %s", said.StatusCode, body)
+	}
+	if applied := said.Header.Get("Preference-Applied"); applied != "wait=5" {
+		t.Fatalf("the post applies the preference %q", applied)
+	}
+}
