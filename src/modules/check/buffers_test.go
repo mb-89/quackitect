@@ -51,3 +51,10 @@ func TestABufferOverNoFileAddsNoPath(t *testing.T) {
 		t.Fatalf("the sweep answers %+v, and wants no path the files lack", found)
 	}
 }
+
+func TestAClosedBufferLeavesItsFileRead(t *testing.T) {
+	found := sweepHeld(t, map[string]string{"spec/a.md": deadNote}, map[string]string{"spec/a.md": ""})
+	if !holdsRule(found, "EveryPointerResolves", "spec/a.md") {
+		t.Fatalf("the sweep answers %+v, and wants the dead pointer the file holds on disk", found)
+	}
+}

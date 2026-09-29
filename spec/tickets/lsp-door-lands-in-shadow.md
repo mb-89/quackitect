@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -124,6 +124,25 @@ record:
     hand: the engine
     hash_before: b3ec55b1664a25e24656568d93b6051be475b086
     hash_after: b3ec55b1664a25e24656568d93b6051be475b086
+  - step: accept
+    hand: box d8572d2183d7 · claude-code-remote
+    hash_before: 5a630a947c26f53f7e94ba805f8a928957bd3dc8
+    hash_after: 5a630a947c26f53f7e94ba805f8a928957bd3dc8
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/lsp-door-lands-in-shadow already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 103d386a888107c8
+        size: 559
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["read-topics-land-in-shadow", "quack-verbs-land-in-shadow"]
 enabled_by: migration.phase7shadow
 cloud: true
@@ -177,8 +196,11 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The children add up to the goal: the rules answer in the check module with shadow rows, the buffers feed the sweep, and the lsp door answers a recorded session.
+- Fixed in place: a closed buffer stands as empty text and shadowed its file in the sweep, so the sweep skips an empty buffer, with a test.
 
 # retro
 

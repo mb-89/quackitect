@@ -47,8 +47,11 @@ func sweepOf(in sweepIn) []Finding {
 	}
 	tree := TreeOver("", texts)
 	// A buffer stands over its file, as the LSP's overlay holds an open editor's text, and adds no path. [[spec/tickets/buffers-feed-the-checks]]
+	// A closed buffer stands as the empty text, and its file reads as it does on disk. [[spec/tickets/lsp-door-lands-in-shadow]]
 	for at, text := range in.Buffers {
-		tree.Holds(at, text)
+		if text != "" {
+			tree.Holds(at, text)
+		}
 	}
 	tree.Words = countOf(texts, in.Env, wordsKey)
 	return CheckerOver(tree, countOf(texts, in.Env, pointerKey), countOf(texts, in.Env, ruleKey)).Sweep()
