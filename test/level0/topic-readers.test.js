@@ -160,6 +160,14 @@ test("each reader runs quack once, and no shadow runs beside it", async () => {
   );
 });
 
+// An old slice reads the old vetoes alone, and no shadow runs beside them. [[spec/tickets/read-topics-switch-over]]
+test("readsProse on an old slice keeps what the old vetoes keep, and runs no quack", () => {
+  const set = { rule: "Voice.Other", line: 1, column: 10, said: "set", file: "n.md" };
+  const box = { ...itOf("old", {}, {}), config: { ask: async () => "shadow" } };
+  assert.equal(readsProse(box, "the door set the write\n", [set]).length, 1);
+  assert.deepEqual(box.proc.ran, []);
+});
+
 test("a leaf the guidance topic names no notes for reads no notes", () => {
   const it = itOf("new", {}, { [`${QUACK} guidance`]: { stdout: "{}" } });
   assert.deepEqual(

@@ -9,7 +9,6 @@ import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { withContext, withoutFalsePast } from "../engine/tense.js";
-import { asksText } from "./config.js";
 import { ALL, answerOf, keptOf, readsNew } from "../scripts/quack-topic.js";
 import { proseFaults } from "./write.js";
 
