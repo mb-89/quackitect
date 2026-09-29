@@ -7,6 +7,7 @@ package work
 import (
 	"sort"
 
+	"quackitect/src/modules/queue"
 	"quackitect/src/q"
 	"quackitect/src/ticket"
 )
@@ -33,7 +34,19 @@ type YoursRow struct {
 
 // Every placed row off the cloud, in outline order, each with its path. [[spec/tickets/ticket-verbs-become-actions]]
 func yoursOf(in rowsIn) []YoursRow {
-	return []YoursRow{}
+	paths := map[string]string{}
+	for _, one := range in.Tickets {
+		paths[one.Name] = one.Path
+	}
+	out := []YoursRow{}
+	for _, one := range rowsOf(in) {
+		if one.Queue == "" || one.Queue == cloudPlace || one.Cloud {
+			continue
+		}
+		out = append(out, YoursRow{Ticket: one.Name, Path: paths[one.Name], Step: one.Step, Queue: one.Queue, State: one.State, Person: one.Person})
+	}
+	sort.SliceStable(out, func(a, b int) bool { return queue.Compare(out[a].Queue, out[b].Queue) < 0 })
+	return out
 }
 
 // A row as the work tab reads it. [[spec/design_output/tui#the-work-tab]]

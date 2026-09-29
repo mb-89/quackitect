@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 36714828de8c510c
         size: 755
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 15d9e084125d177cf1e8f144e89a5d48a06ebf9c
+    hash_after: 15d9e084125d177cf1e8f144e89a5d48a06ebf9c
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -295,14 +304,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && ./RUNME.sh lint src/quack/twins.go src/quack/ticket_twins_test.go src/quack/main.go src/quack/verbs.go src/modules/verbs/verbs.go src/modules/verbs/ticket.go src/modules/verbs/ticket_test.go src/modules/work/rows.go spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and moves this ticket's red cases into ticket_test.go and ticket_twins_test.go, since the shared red files carry the retro, vehicle and branch cases
+- the node module case runs a stand-in cli.js under a temp root, and the twin reads a door over a seeded catalog
+- each new function carries a comment naming this ticket
+- the verbs stand once in ticket.go, the yours name once in twins.go off the port constant, and the cloud place reads the one constant in open_tasks.go
 
 ## tests-green
 

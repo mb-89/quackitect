@@ -46,7 +46,10 @@ const (
 type twin func(argv []string, dry bool, out, errs io.Writer) int
 
 // The twins each topic ports, keyed by the verb's words. [[spec/tickets/runme-hands-verbs-to-quack]]
-var twinVerbs = map[string]twin{}
+var twinVerbs = map[string]twin{
+	// [[spec/tickets/ticket-verbs-become-actions]]
+	"ticket yours": ticketYours(index.V1),
+}
 
 // What the road reaches: the mode, cli.js writing its standard output into out, a verb quack answers alone, the twins, the session log and the caller's streams. [[spec/tickets/runme-hands-verbs-to-quack]]
 type verbDoors struct {

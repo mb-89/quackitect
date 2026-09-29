@@ -1,6 +1,6 @@
-// Each verb of a topic stands as an action, and hands its words to the node
-// module under the topic and the verb.
-// [[spec/tickets/ticket-verbs-become-actions]]
+// The retro, vehicle, stub and branch verbs each stand as an action of their
+// topic, as the ticket verbs do.
+// [[spec/tickets/retro-verbs-become-actions]]
 package verbs
 
 import (
@@ -9,33 +9,6 @@ import (
 
 	"quackitect/src/q"
 )
-
-func TestEachVerbOfATopicStandsAsAnAction(t *testing.T) {
-	c := q.New()
-	Topic("ticket", TicketVerbs)(c)
-	store := q.NewStore(c)
-	for _, one := range TicketVerbs {
-		if in, _, ok := store.Types(one.Name); !ok || in != reflect.TypeFor[Words]() {
-			t.Fatalf("the catalog holds no action %s taking Words", one.Name)
-		}
-		if looks, _ := store.Presentation(one.Name); looks.Doc != one.Doc {
-			t.Fatalf("the action %s reads the doc %q", one.Name, looks.Doc)
-		}
-	}
-}
-
-func TestAnActionHandsItsWordsToTheNodeModule(t *testing.T) {
-	c := q.New()
-	Topic("ticket", TicketVerbs)(c)
-	said, err := q.NewStore(c).Act("note", Words{Args: []string{"slow-lint", "a line"}})
-	if err != nil || len(said) != 1 {
-		t.Fatalf("the action lists %+v, %v", said, err)
-	}
-	one := said[0]
-	if one.Module != NodeModule || one.Verb != NodeRun || !reflect.DeepEqual(one.Args, []string{"ticket", "note", "slow-lint", "a line"}) || one.NoUndo == "" {
-		t.Fatalf("the request reads %+v", one)
-	}
-}
 
 // Every verb retro.js answers stands as an action of the retro topic, with its doc. [[spec/tickets/retro-verbs-become-actions]]
 func TestEveryRetroVerbStandsAsAnAction(t *testing.T) {

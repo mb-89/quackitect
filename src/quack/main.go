@@ -27,6 +27,7 @@ import (
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/tickets"
+	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
 	"quackitect/src/prose"
 	"quackitect/src/q"
@@ -65,6 +66,8 @@ var modules = map[string]ioModule{
 	"guidance":  {registers: guidance.Registers},
 	"log":       {registers: logmodule.Registers},
 	"http":      {registers: httpmodule.Registers},
+	// [[spec/tickets/ticket-verbs-become-actions]]
+	"ticket": {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -200,9 +203,14 @@ func manages(as q.Writer) index.Manage {
 // The IO modules that answer a request an action lists: disk over the root, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
 func accepts(root string) func(q.Request) (any, error) {
 	disk := files.Accept(files.NewDisk(root))
+	node := nodeAccept(root)
 	return func(asked q.Request) (any, error) {
 		if asked.Module == files.DiskModule {
 			return disk(asked)
+		}
+		// [[spec/tickets/ticket-verbs-become-actions]]
+		if asked.Module == verbsmodule.NodeModule && asked.Verb == verbsmodule.NodeRun {
+			return node(asked)
 		}
 		return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
 	}

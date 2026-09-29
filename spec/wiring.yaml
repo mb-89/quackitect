@@ -24,6 +24,8 @@ instances:
     module: log
   http:
     module: http
+  ticket:
+    module: ticket
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
