@@ -95,6 +95,7 @@ record:
   - step: sync
     hand: box d857c176ced7 · claude-code-remote
     hash_before: 44d6fc076e9a256554192e329f1dfec8377e177d
+    hash_after: 6b5882ac6bed5f089dbc19a04255b668d90924dc
   - step: sync
     hand: box d857c176ced7 · claude-code-remote
     hash_before: 48e1294af73914448d0fb73bb4149e7679420e03
@@ -171,7 +172,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["read-topics-land-in-shadow"]
 enabled_by: migration.phase3switch
-cloud: true
 reason: done
 ---
 
