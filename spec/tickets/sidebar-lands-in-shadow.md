@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -152,9 +152,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 6be53dbf19b303672237e310b1bdc19d5645bd35
+    hash_after: 6be53dbf19b303672237e310b1bdc19d5645bd35
+    inputs:
+      - name: retro/write
+        hash: 438552e973c9dc44
+        size: 2159
+    def: 4da1ca5da87d5bbc
 depends_on: ["tui-shell-lands-in-shadow"]
 enabled_by: migration.phase8shadow
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -296,20 +306,26 @@ The build ran ahead of the gate while the helper read it, which saved time but b
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool, host and install the run asked for stood ready
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit hook refused a code change with no changed test beside it, twice
+- the landing guard refused a test run piped through tail and joined to a landing
+- the twin golden stood red on the box after the schema grew
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
+- the handover says the group stands at done, and the branch goes back through branch done
 
 # Discussion
 
