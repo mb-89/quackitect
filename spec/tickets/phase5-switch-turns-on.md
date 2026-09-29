@@ -41,3 +41,41 @@ While the switch reads false, the group cannot start, and the port that would cl
 - `./RUNME.sh config` reads `migration.phase5switch true spec/config/level0.json`
 - `./RUNME.sh config` reads `migration.cage shadow spec/config/level0.json`
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test src/modules/migration src/modules/hooks
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+A cloud box ran a spread of tool work against this tree with the cage at shadow. The hooks door stood and took the posts. The shadow log named five rows. In each, the bridge refused and the Go door passed, and every pass read alike. That is the gap cage-rules-port-before-switch names, since no rule stands ported yet. The phase switch opens the group and moves no key. The group ports the rules and moves the cage slice to new only once the shadow reads clean. So the switch turns true, and the cage stays at shadow. The run stands on the branch claude/shadow-evidence-5-6.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: one key in spec/config/level0.json, and the cage key stands
+- the cleanup it reveals: the port stands as its own ticket in the group
+- every fact stands once: the rows stand on the evidence branch, and this ticket points at it
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
