@@ -42,14 +42,9 @@ func TestAChildTakesItsGroupsNumber(t *testing.T) {
 	}
 }
 
-func TestPlacesCompareAsNumbers(t *testing.T) {
-	before := [][2]string{{"-2", "1"}, {"1.2", "1.10"}, {"1", "1.1"}, {"3", CloudPlace}, {"0", "0.1"}}
-	for _, pair := range before {
-		if Compare(pair[0], pair[1]) >= 0 || Compare(pair[1], pair[0]) <= 0 {
-			t.Errorf("%s stands before %s", pair[0], pair[1])
-		}
-	}
-	if Compare("2.1", "2.1") != 0 || Compare(CloudPlace, CloudPlace) != 0 {
-		t.Errorf("a place compares even with itself")
+// The queue's compare is the ticket package's, and the cloud's place stands past every number. [[spec/tickets/ticket-verbs-become-actions]]
+func TestCompareStandsTheCloudLast(t *testing.T) {
+	if Compare("1.10", CloudPlace) >= 0 || Compare(CloudPlace, "-2") <= 0 || Compare(CloudPlace, CloudPlace) != 0 {
+		t.Errorf("the cloud's place %s stands among the numbers", CloudPlace)
 	}
 }

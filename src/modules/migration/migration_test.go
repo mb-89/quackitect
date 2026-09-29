@@ -25,6 +25,16 @@ func TestTheSliceKeyReadsTheDefaultFile(t *testing.T) {
 	}
 }
 
+// The verbs slice stands among the slices, built in as old, so a box with no tracked mode keeps every verb on cli.js. [[spec/tickets/runme-hands-verbs-to-quack]]
+func TestTheVerbsSliceStandsSharedAndOld(t *testing.T) {
+	for _, one := range slices {
+		if one.key == "verbs" && one.mode == "old" {
+			return
+		}
+	}
+	t.Fatalf("the slices read %+v, and want verbs built in as old", slices)
+}
+
 // The key stands shared, so the default file sets it under the migration block. [[spec/tickets/open-tasks-run-in-shadow]]
 func TestTheSliceKeyStandsShared(t *testing.T) {
 	c := q.New()

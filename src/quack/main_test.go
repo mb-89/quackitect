@@ -14,6 +14,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/files"
 	"quackitect/src/q"
 )
 
@@ -321,5 +322,56 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 	}
 	if said := s.Snapshot().Read("work/open-tasks"); said != 1 {
 		t.Fatalf("work/open-tasks reads %v over the fake tree, and wants 1", said)
+	}
+}
+
+// The root hands a request to disk through the files module, and refuses one to any other module by its name. [[spec/tickets/actions-answer-over-http]]
+func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
+	root := t.TempDir()
+	accept := accepts(root)
+	if _, err := accept(q.Request{Module: files.DiskModule, Verb: "write", Args: files.Write{Path: "a.md", Text: "one"}}); err != nil {
+		t.Fatal(err)
+	}
+	if body, err := os.ReadFile(filepath.Join(root, "a.md")); err != nil || string(body) != "one" {
+		t.Fatalf("disk writes %q, %v", body, err)
+	}
+	if _, err := accept(q.Request{Module: "git", Verb: "commit"}); err == nil || !strings.Contains(err.Error(), "git.commit") {
+		t.Fatalf("a request to git answers %v", err)
+	}
+}
+
+// The wiring's http instance declares its wait under the name the door reads, so a layer setting the key reaches every post with no Prefer. [[spec/tickets/wait-key-meets-its-wiring]]
+func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := q.New()
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := q.NewStore(c).Declared(index.WaitName); !ok {
+		t.Fatalf("the wiring declares no %s", index.WaitName)
+	}
+}
+
+// Main hands help, --help, run and get to the tree over the base V1 answers, and every other verb to the index. [[spec/tickets/quack-main-routes-the-tree]]
+func TestMainHandsTheTreeVerbsToCliOverV1(t *testing.T) {
+	base := standingTree(t)
+	v1 := func() (string, error) { return base, nil }
+	for _, argv := range [][]string{{"help"}, {"--help"}, {"run", "t/add", "--a", "1"}, {"get", "t/n"}} {
+		var out, errs strings.Builder
+		if !cliVerbs[argv[0]] || routes(&out, &errs, v1, argv) != 0 || out.Len() == 0 {
+			t.Fatalf("main hands %v to the tree: %s%s", argv, out.String(), errs.String())
+		}
+	}
+	for _, verb := range []string{"serve", "find", "standing"} {
+		if cliVerbs[verb] {
+			t.Fatalf("main hands %s to the tree, not the index", verb)
+		}
 	}
 }

@@ -7,12 +7,32 @@ package index
 import (
 	"database/sql"
 	"net"
+	"time"
 
 	"quackitect/src/q"
 )
 
-// Starts the index manager over the store, the op table and a step of the work loop, and answers its stop. [[spec/design_output/model#the-index-manager]]
-type Manage func(root string, store *q.Store, rows OpRows, steps func(hand func())) (stop func(), err error)
+// Starts the index manager over the store, the op table and a step of the work loop, and answers its stop and its call. [[spec/design_output/model#the-index-manager]]
+type Manage func(root string, store *q.Store, rows OpRows, steps func(hand func())) (Managed, error)
+
+// What the manager's start answers: its stop, and the call an action takes through it. [[spec/tickets/actions-answer-over-http]]
+type Managed struct {
+	Stop func()
+	Call Call
+}
+
+// Calls an action within the wait its caller sets. [[spec/design_output/model#a-caller-sets-its-wait]]
+type Call func(name string, input any, caller string, wait time.Duration) (Called, error)
+
+// The result within the wait, or the operation still running past it, field for field as the manager answers it. [[spec/design_output/model#a-caller-sets-its-wait]]
+type Called struct {
+	Result   any           `json:"result,omitempty"`
+	Error    string        `json:"error,omitempty"`
+	Running  bool          `json:"running"`
+	Handle   string        `json:"handle"`
+	Fraction float64       `json:"fraction"`
+	Gone     time.Duration `json:"gone"`
+}
 
 // [[spec/design_output/model#the-index-manager]]
 func ServeManaged(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (func(), net.Listener, error) {
@@ -20,10 +40,10 @@ func ServeManaged(root, at string, catalog *q.Catalog, manage Manage, starts ...
 	return stop, listen, err
 }
 
-// The manager starts over the op table and the store, and each hand it gives joins the work loop's step. A door with no manager stops nothing. [[spec/design_output/model#the-index-manager]]
-func (one *door) manages(manage Manage) (func(), error) {
+// The manager starts over the op table and the store, and each hand it gives joins the work loop's step. A door with no manager stops nothing and calls nothing. [[spec/design_output/model#the-index-manager]]
+func (one *door) manages(manage Manage) (Managed, error) {
 	if manage == nil {
-		return func() {}, nil
+		return Managed{Stop: func() {}}, nil
 	}
 	return manage(one.root, one.store, opKeep{one.db}, func(hand func()) { one.steps = append(one.steps, hand) })
 }

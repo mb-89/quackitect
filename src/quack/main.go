@@ -21,11 +21,13 @@ import (
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
+	httpmodule "quackitect/src/modules/http"
 	manager "quackitect/src/modules/index"
 	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/tickets"
+	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
 	"quackitect/src/prose"
 	"quackitect/src/q"
@@ -63,6 +65,14 @@ var modules = map[string]ioModule{
 	"check":     {registers: check.Registers},
 	"guidance":  {registers: guidance.Registers},
 	"log":       {registers: logmodule.Registers},
+	"http":      {registers: httpmodule.Registers},
+	// [[spec/tickets/ticket-verbs-become-actions]]
+	"ticket":  {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
+	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
+	"vehicle": {registers: verbsmodule.Topic("vehicle", verbsmodule.VehicleVerbs)},
+	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
+	// [[spec/tickets/work-verbs-become-actions]]
+	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -126,6 +136,9 @@ func dumps(prefix string) error {
 }
 
 func main() {
+	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
+		os.Exit(verbRoad(os.Args[2], os.Args[3:]))
+	}
 	if len(os.Args) == 2 && os.Args[1] == "config" {
 		if err := configs("."); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -161,6 +174,9 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) > 1 && cliVerbs[os.Args[1]] {
+		os.Exit(routes(os.Stdout, os.Stderr, index.V1, os.Args[1:]))
+	}
 	as := manager.Registers(q.Main)
 	starts, err := wired()
 	if err != nil {
@@ -172,13 +188,36 @@ func main() {
 	index.Main(manages(as), starts...)
 }
 
-// The index manager's start, over the store and the op table the index hands it, the wall clock, and its writer. [[spec/design_output/model#the-index-manager]]
+// The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept. [[spec/design_output/model#the-index-manager]]
 func manages(as q.Writer) index.Manage {
-	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (func(), error) {
-		return manager.Start(manager.Outside{
+	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
+		stop, call, err := manager.Serves(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
-			Now: time.Now, Every: clock.New().Every,
+			Now: time.Now, Every: clock.New().Every, Accept: accepts(root),
 		})
+		if err != nil {
+			return index.Managed{}, err
+		}
+		return index.Managed{Stop: stop, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+			said, err := call(name, input, caller, wait)
+			return index.Called(said), err
+		}}, nil
+	}
+}
+
+// The IO modules that answer a request an action lists: disk over the root, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
+func accepts(root string) func(q.Request) (any, error) {
+	disk := files.Accept(files.NewDisk(root))
+	node := nodeAccept(root)
+	return func(asked q.Request) (any, error) {
+		if asked.Module == files.DiskModule {
+			return disk(asked)
+		}
+		// [[spec/tickets/ticket-verbs-become-actions]]
+		if asked.Module == verbsmodule.NodeModule && asked.Verb == verbsmodule.NodeRun {
+			return node(asked)
+		}
+		return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
 	}
 }
 
@@ -293,21 +332,7 @@ func load(w q.Wiring, into *q.Catalog) ([]index.Start, error) {
 
 // Prints every key off the config module, over both files under the root, the wiring and the SE_ variables. [[spec/tickets/cfg-topic-holds-one-resolver]]
 func configs(root string) error {
-	read := func(path string) []byte {
-		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-		return body
-	}
-	shared, err := sharedKeys(string(read(q.WiringFile)))
-	if err != nil {
-		return err
-	}
-	env := map[string]string{}
-	for _, one := range os.Environ() {
-		if name, value, ok := strings.Cut(one, "="); ok && strings.HasPrefix(name, "SE_") {
-			env[name] = value
-		}
-	}
-	rows, err := configRows(read(config.Tracked), read(config.Local), env, shared)
+	rows, err := configAt(root)
 	if err != nil {
 		return err
 	}
@@ -317,6 +342,25 @@ func configs(root string) error {
 	}
 	_, err = os.Stdout.Write(text)
 	return err
+}
+
+// Every key both config files under the root hold, resolved over the wiring's shared keys and the SE_ variables. [[spec/tickets/cfg-topic-holds-one-resolver]]
+func configAt(root string) (map[string]configRow, error) {
+	read := func(path string) []byte {
+		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		return body
+	}
+	shared, err := sharedKeys(string(read(q.WiringFile)))
+	if err != nil {
+		return nil, err
+	}
+	env := map[string]string{}
+	for _, one := range os.Environ() {
+		if name, value, ok := strings.Cut(one, "="); ok && strings.HasPrefix(name, "SE_") {
+			env[name] = value
+		}
+	}
+	return configRows(read(config.Tracked), read(config.Local), env, shared)
 }
 
 // Reads one prose request on stdin, and prints what the Go vetoes keep over the caps and the domain words the tree names. [[spec/tickets/prose-checks-run-in-go]]

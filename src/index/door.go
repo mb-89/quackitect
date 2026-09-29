@@ -87,6 +87,8 @@ type door struct {
 	drains func()
 	// The hands the manager gives the work loop, each run on every step. [[spec/design_output/model#a-lease]]
 	steps []func()
+	// The manager's call, which /v1 hands each action it serves. [[spec/tickets/actions-answer-over-http]]
+	call Call
 }
 
 // What a changes call answers: the tick the rows stand at. [[spec/design_output/index#the-index-fires-on-change]]
@@ -204,13 +206,14 @@ func opensOn(listens func(network, address string) (net.Listener, error), root, 
 	if err != nil {
 		return failed(err)
 	}
-	undo = append(undo, managed)
+	undo = append(undo, managed.Stop)
+	one.call = managed.Call
 	stops, err := one.starts(starts)
 	if err != nil {
 		return failed(err)
 	}
 	undo = append(undo, stops...)
-	stops = append(stops, managed)
+	stops = append(stops, managed.Stop)
 	listen, err := listens("tcp", "127.0.0.1:0")
 	if err != nil {
 		return failed(err)

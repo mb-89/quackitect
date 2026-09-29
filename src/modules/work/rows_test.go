@@ -66,3 +66,39 @@ func TestAClosedWaitRaisesNoFlagAndATodoAtZeroStandsHeld(t *testing.T) {
 		t.Errorf("a closed ticket takes no place, and reads %+v", rows["done"])
 	}
 }
+
+func TestYoursHoldsThePlacedRowsOffTheCloudInOutlineOrder(t *testing.T) {
+	said, _ := read(t, YoursPort, map[string]any{
+		TicketsPort: []ticket.Ticket{
+			{Name: "second", Path: "spec/tickets/second.md", State: "open", Step: "do", Person: true},
+			{Name: "first", Path: "spec/tickets/first.md", State: "open", Step: "design/draft"},
+			{Name: "unplaced", Path: "spec/tickets/unplaced.md", State: "open"},
+			{Name: "marked", Path: "spec/tickets/marked.md", State: "open"},
+		},
+		PlacesPort: map[string]string{"second": "1.2", "first": "-1", "marked": onCloud},
+		CloudPort:  []string{"marked"},
+	}).([]YoursRow)
+	want := []YoursRow{
+		{Ticket: "first", Path: "spec/tickets/first.md", Step: "design/draft", Queue: "-1", State: "open"},
+		{Ticket: "second", Path: "spec/tickets/second.md", Step: "do", Queue: "1.2", State: "open", Person: true},
+	}
+	if len(said) != len(want) {
+		t.Fatalf("yours holds %+v, and wants %+v", said, want)
+	}
+	for i := range want {
+		if said[i] != want[i] {
+			t.Fatalf("yours holds %+v, and wants %+v", said, want)
+		}
+	}
+}
+
+// A placed todo no ticket carries joins yours with no path, and 1.10 stands after 1.2. [[spec/tickets/ticket-verbs-become-actions]]
+func TestYoursKeepsALooseTodoInOutlineOrder(t *testing.T) {
+	said, _ := read(t, YoursPort, map[string]any{
+		TicketsPort: []ticket.Ticket{{Name: "later", Path: "spec/tickets/later.md", State: "open"}},
+		PlacesPort:  map[string]string{"later": "1.10", "a-todo": "1.2"},
+	}).([]YoursRow)
+	if len(said) != 2 || said[0].Ticket != "a-todo" || said[0].Path != "" || said[1].Ticket != "later" {
+		t.Fatalf("yours holds %+v", said)
+	}
+}

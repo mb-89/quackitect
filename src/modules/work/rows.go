@@ -18,7 +18,35 @@ const (
 	CloudPort     = "cloud"
 	RowsPort      = "rows"
 	OpenTasksPort = "open-tasks"
+	YoursPort     = "yours"
 )
+
+// A row of the queue as ticket yours prints it. [[spec/tickets/ticket-verbs-become-actions]]
+type YoursRow struct {
+	Ticket string `json:"ticket"`
+	Path   string `json:"path"`
+	Step   string `json:"step"`
+	Queue  string `json:"queue"`
+	State  string `json:"state"`
+	Person bool   `json:"person"`
+}
+
+// Every placed row off the cloud, in outline order, each with its path. [[spec/tickets/ticket-verbs-become-actions]]
+func yoursOf(in rowsIn) []YoursRow {
+	paths := map[string]string{}
+	for _, one := range in.Tickets {
+		paths[one.Name] = one.Path
+	}
+	out := []YoursRow{}
+	for _, one := range rowsOf(in) {
+		if one.Queue == "" || one.Queue == cloudPlace || one.Cloud {
+			continue
+		}
+		out = append(out, YoursRow{Ticket: one.Name, Path: paths[one.Name], Step: one.Step, Queue: one.Queue, State: one.State, Person: one.Person})
+	}
+	sort.SliceStable(out, func(a, b int) bool { return ticket.ComparePlaces(out[a].Queue, out[b].Queue) < 0 })
+	return out
+}
 
 // A row as the work tab reads it. [[spec/design_output/tui#the-work-tab]]
 type Row struct {
@@ -48,7 +76,8 @@ type rowsIn struct {
 func Registers(c *q.Catalog) q.Writer {
 	rows := q.DerivedIn(c, RowsPort, []Row{}, rowsOf, q.Doc("every ticket and every placed todo, with its place in the queue and its flags"))
 	open := q.DerivedIn(c, OpenTasksPort, 0, openTasksOf, q.Doc("the rows this box can take: every placed row off the cloud"))
-	return q.Join(rows, open)
+	yours := q.DerivedIn(c, YoursPort, []YoursRow{}, yoursOf, q.Doc("the rows ticket yours prints: every placed row off the cloud, in outline order, each with its path"))
+	return q.Join(rows, open, yours)
 }
 
 // The words a row reads, which src/scripts/work-answer.js names and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
