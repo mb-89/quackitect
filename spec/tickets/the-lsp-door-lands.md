@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -129,6 +129,22 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: c2df81bbfb75d36ba982db870ea76b276dea1949
+    hash_after: c2df81bbfb75d36ba982db870ea76b276dea1949
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/lsp fails
+    inputs:
+      - name: design/draft
+        hash: ef3db5004de93f2f
+        size: 2729
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +236,32 @@ The sweep settles in a wave after the commit, so the listener also publishes aga
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp src/quack/lsp_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/lsp_test.go
+- src/quack/lsp_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four module cases and the relay case fail on their own assertion: the replay meets the stub, the open buffer reads nothing, the listener stands nowhere, and the relay sends nothing. The close case passes against the stub, since a stub writing nothing leaves nothing to drop, and it guards the drop once the build writes. The fake index declares `buffers/` itself for a module that reads them, so the writer drives its own catalog through `qtest.Over`, as the config cases do.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a red case: the replay case meets the recorded session, the module and relay cases meet `go test ./...`, and the check runs over both packages
+- the tests reach two doors, the listener and the relay, and each case holds its own loopback port and its own fake sweep
 
 # gate
 
