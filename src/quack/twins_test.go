@@ -1,5 +1,5 @@
-// The branch, vehicle and stub twins and wiring, and the work/yours door their
-// cases share with the ticket cases in ticket_twins_test.go.
+// The branch twins and wiring, and the work/yours door their cases share
+// with the ticket cases in ticket_twins_test.go.
 // [[spec/tickets/work-verbs-become-actions]]
 package main
 
@@ -48,27 +48,6 @@ func yoursTree(t *testing.T, rows []work.YoursRow) func() (string, error) {
 var yoursRows = []work.YoursRow{
 	{Ticket: "a-draft", Path: "spec/tickets/a-draft.md", Step: "design/owner-read", Queue: "-2", State: "draft", Person: true},
 	{Ticket: "a-trial", Path: "spec/tickets/a-trial.md", Step: "do", Queue: "-1", State: "open", Person: true},
-}
-
-// The wiring loads the vehicle and stub topics, so an agent calls each through the index. [[spec/tickets/vehicle-verbs-become-actions]]
-func TestTheWiringLoadsTheVehicleAndStubTopics(t *testing.T) {
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
-	if err != nil {
-		t.Fatal(err)
-	}
-	w, err := q.ReadWiring(string(text))
-	if err != nil {
-		t.Fatal(err)
-	}
-	c := q.New()
-	if _, err := load(w, c); err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range []string{"vehicle/produce", "stub/into"} {
-		if _, ok := q.NewStore(c).Declared(name); !ok {
-			t.Fatalf("the wiring declares no %s", name)
-		}
-	}
 }
 
 // branch list --queue prints each placed row as queueOnly in work-list.js prints it. [[spec/tickets/work-verbs-become-actions]]

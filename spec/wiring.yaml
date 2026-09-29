@@ -28,6 +28,10 @@ instances:
     module: ticket
   retro:
     module: retro
+  vehicle:
+    module: vehicle
+  stub:
+    module: stub
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
