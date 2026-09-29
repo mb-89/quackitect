@@ -355,3 +355,10 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's lists read two things wrong, and the implement step takes these in their place:
+
+| the draft says | the tree holds |
+|---|---|
+| the caller `src/index/tools.go` | `servesActions` in `src/index/actions.go`, which posts one route an action. The tool list belongs to `the-hook-registers-index-tools` |
+| `TestTheRootRunsANodeVerbThroughCliJs` in `src/quack/main_test.go` | the same test in `src/quack/twins_test.go` |

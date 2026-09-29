@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: ticket-verbs-become-actions
+record:
+  - step: do
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 8cbd19db97491fec847903321b8e5c412b702a01
+    hash_after: 8cbd19db97491fec847903321b8e5c412b702a01
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 984ccf1943b1699e
+        size: 530
+    def: f5aad7e4e0747ffe
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the callers list names src/index/tools.go, which stands absent from the tree. No
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/index
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The draft of ticket-verbs-become-actions named a caller file absent from the tree, and put one test in the wrong file. A table under its Discussion now names servesActions in src/index/actions.go as the caller. It hands the tool list to the-hook-registers-index-tools, and moves the test to src/quack/twins_test.go. The engine owns the draft fields, so the correction stands where the implement step reads it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and lands under Discussion because the door keeps the draft fields to the engine
+- the cleanup stands whole in the one table
+- the table names each file once, and points at the sibling ticket for the tool list
 
 # Discussion
 
