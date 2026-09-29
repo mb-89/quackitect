@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 587cd1370cbcd7a4
         size: 2962
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8509c02d5db · claude-code-remote · helper-3
+    hash_before: bb8c9b346f082eea4c32c65efc1026cc21cd551e
+    hash_after: bb8c9b346f082eea4c32c65efc1026cc21cd551e
+    inputs:
+      - name: design/draft
+        hash: 587cd1370cbcd7a4
+        size: 2962
+      - name: design/tests-red
+        hash: 36714828de8c510c
+        size: 755
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -268,8 +280,11 @@ The topic registers no action, the yours port holds no row, the twin answers usa
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- ticket-draft-real-callers: the callers list names src/index/tools.go, which stands absent from the tree. No file serves /v1/tools yet: src/index/tools_test.go stands red under the-hook-registers-index-tools, so the tool list is that sibling's work and a go test ./... green waits on it. Name src/index/actions.go servesActions, which posts one route an action, as the caller here, and name the tool list as the sibling's. The tests list also puts TestTheRootRunsANodeVerbThroughCliJs under src/quack/main_test.go, where it stands in src/quack/twins_test.go.
+- ticket-verbs-each-pinned: src/modules/verbs/verbs_test.go seeds note and todo alone. No test pins that every verb cli.js answers under ticket (pull, note, update, open, todo, route, yours, fill) stands as an action with its doc, as TestEveryRetroVerbStandsAsAnAction does for retro, so the approach's 'each ticket verb' meets no red test.
 
 # implement
 
