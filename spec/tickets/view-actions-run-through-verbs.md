@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 375137d13327734b061e0c609226dbbe6007b4f4
+    hash_after: 375137d13327734b061e0c609226dbbe6007b4f4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s); green, src/modules/verbs passes; green, src/tui/work passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "src/quack/main.go:197:42: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
+    inputs:
+      - name: design/tests-red
+        hash: 883d13c9e60c0a79
+        size: 809
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -354,26 +377,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/ticket-edit.test.js src/modules/verbs src/tui/work src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work view names four actions, and each now registers with a label, an icon and a doc. Each runs a ticket verb through the node module. `place` writes the anchor the work tab writes, off one shared rule. `urgent` flips the mark and drops it at false. `set` writes one field, and refuses a value the schema refuses or a field the engine owns.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays in the draft files, plus a wiring case beside main.go
+- the verbs run over the fake disk and fake git, and no new door stands
+- each new function links this ticket or the note section it follows
+- the place and weigh rules name their Go owners, and the shared cases hold both
 
 # accept
 
