@@ -9,6 +9,7 @@ const { panelHtml } = require("./lib/panel.js");
 const { newestIn, rowsIn } = require("./lib/rows.js");
 const { FOLDERS, HOLD_WATCHES, ticketLensOf } = require("./lib/lens.js");
 const { opened } = require("./lib/session.js");
+const { viewsOf } = require("./lib/views.js");
 const { statesOf } = require("./lib/states.js");
 const { asType, parsed, withValue } = require("./lib/values.js");
 const {
@@ -35,6 +36,10 @@ const BLESS = ".se/.runtime/bless.json";
 const PLAN = ".se/.runtime/plan.json";
 // The files a ticket move, a plan todo or a hold writes, whose burst draws the badge again. [[spec/tickets/the-badge-reads-open-tasks]]
 const COUNTS = [...FOLDERS.map((folder) => `${folder}/*.md`), PLAN, ...HOLD_WATCHES];
+// The folder of the base files, and the reader they parse through. [[spec/design_output/extension#the-views-section]]
+const VIEWS = "spec/views";
+const YAML = ".claude/skills/level0/lib/schema-yaml.js";
+const CATALOG = ["index/names", "index/actions"];
 
 function sidebarOf(door) {
   const readAll = async () => {
@@ -101,7 +106,7 @@ function sidebarOf(door) {
       const said = await readAll();
       return statesOf(valuesOf(said.tracked, said.local, said.schema));
     },
-    watches: [SCHEMA, TRACKED, LOCAL, BLESS],
+    watches: [SCHEMA, TRACKED, LOCAL, BLESS, `${VIEWS}/*.base`],
     counts: COUNTS,
 
     async html() {
@@ -114,6 +119,7 @@ function sidebarOf(door) {
           { path: TRACKED, said: said.tracked },
           { path: LOCAL, said: said.local },
         ]),
+        views: viewsOf(await basesIn(door), await catalogOf(door)),
         bless: parsed(await door.read(BLESS))?.agent === true,
         script: door.scriptUri(),
         source: door.source(),
@@ -137,6 +143,9 @@ function sidebarOf(door) {
         );
         return door.runs(runs);
       }
+      // [[spec/design_output/extension#the-views-section]]
+      if (message?.kind === "call" && message.calls)
+        return door.index?.calls(String(message.calls), message.input ?? {});
       if (message?.kind === "show") return shows(door, String(message.reads ?? ""));
       // [[spec/design_output/extension#the-hook-button]]
       if (message?.kind === "hook" && message.key) {
@@ -182,6 +191,27 @@ async function counted(door, groups) {
     }
   }
   return groups;
+}
+
+// Every base file under spec/views, parsed, and none where the door lists no folder. [[spec/design_output/extension#the-views-section]]
+async function basesIn(door) {
+  if (!door.list || !door.imports) return [];
+  const files = (await door.list(VIEWS)).filter((one) => one.endsWith(".base"));
+  if (!files.length) return [];
+  const { readYaml } = await door.imports(YAML);
+  return Promise.all(
+    files.map(async (file) => ({
+      name: file.replace(/\.base$/, ""),
+      said: readYaml(await door.read(`${VIEWS}/${file}`)),
+    })),
+  );
+}
+
+// The two catalog rows off the index door, and none where no index stands. [[spec/design_output/extension#the-views-section]]
+async function catalogOf(door) {
+  if (!door.index) return {};
+  const rows = await Promise.all(CATALOG.map((name) => door.index.values(name)));
+  return Object.fromEntries(CATALOG.map((name, at) => [name, rows[at]]));
 }
 
 // Pull for me takes the ticket the queue names, through the road the ticket's buttons run. [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]

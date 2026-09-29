@@ -33,6 +33,9 @@ type ActionRow struct {
 	Name   string    `json:"name"`
 	Doc    string    `json:"doc"`
 	Fields []q.Field `json:"fields"`
+	// What the registration declares for a renderer, as NameRow carries it. [[spec/tickets/the-sidebar-renders-generically]]
+	Label string `json:"label,omitempty"`
+	Icon  string `json:"icon,omitempty"`
 }
 
 // A name, an action or a key, with its doc. [[spec/tickets/the-catalog-reads-as-rows]]
@@ -61,7 +64,7 @@ func catalogOf(store *q.Store) ([]NameRow, []ActionRow, []DocRow) {
 		switch {
 		case why.Provider.Kind == "action":
 			kind = "action"
-			actions = append(actions, ActionRow{Name: name, Doc: looks.Doc, Fields: looks.Fields})
+			actions = append(actions, ActionRow{Name: name, Doc: looks.Doc, Fields: looks.Fields, Label: looks.Label, Icon: looks.Icon})
 		case strings.HasPrefix(name, "config/") || strings.Contains(name, "/config/"):
 			kind = "key"
 		}

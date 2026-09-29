@@ -23,6 +23,7 @@ function panelHtml(model) {
     '<div class="top">',
     ...groups.map((one) => section(one)),
     "</div>",
+    ...(model?.views ?? []).map((one) => viewSection(one)),
     blessButton(Boolean(model?.bless)),
     tree(model),
     `<script type="module" nonce="${nonce}" src="${escaped(model?.script ?? "")}"></script>`,
@@ -58,6 +59,33 @@ function section(group) {
     "</div>",
     "</details>",
   ].join("\n");
+}
+
+// A section off a base file, every text of it off the registrations. [[spec/design_output/extension#the-views-section]]
+function viewSection(view) {
+  return [
+    `<details class="section view" data-section="${escaped(view.name)}" open>`,
+    `<summary>${escaped([view.icon, view.badge || view.name].filter(Boolean).join(" "))}</summary>`,
+    '<div class="view-actions">',
+    ...(view.buttons ?? []).map((one) => viewButton(one)),
+    "</div>",
+    "</details>",
+  ].join("\n");
+}
+
+function viewButton(one) {
+  const fields = (one.form?.fields ?? []).map(
+    (field) =>
+      `<label title="${escaped(field.doc)}">${escaped(field.label)}<input class="field" data-field="${escaped(field.key)}"></label>`,
+  );
+  return [
+    '<div class="call-row">',
+    ...fields,
+    `<button class="call" data-calls="${escaped(one.calls)}" title="${escaped(one.doc)}">`,
+    `<span class="mark">${escaped(markOf(one.icon))}</span> ${escaped(one.label)}`,
+    "</button>",
+    "</div>",
+  ].join("");
 }
 
 // The button that lets an agent at this desk bless a gate, drawn off no schema entry. [[spec/design_output/pull#the-bless]]

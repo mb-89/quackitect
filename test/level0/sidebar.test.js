@@ -460,6 +460,7 @@ test("the view opening draws the page once, and the watcher draws it again", asy
     TRACKED,
     LOCAL,
     BLESS_FILE,
+    "spec/views/*.base",
   ]);
 
   door.files.write(LOCAL, JSON.stringify({ stop: { hold: "finish" } }));

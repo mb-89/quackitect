@@ -3,7 +3,35 @@
 // [[spec/tickets/the-sidebar-renders-generically]]
 package index
 
-import "testing"
+import (
+	"encoding/json"
+	"strings"
+	"testing"
+
+	"quackitect/src/q"
+	"quackitect/src/q/qtest"
+)
+
+func TestAnActionRegisteringNoLabelWritesNoLabel(t *testing.T) {
+	ix := qtest.New(t, func(c *q.Catalog) {
+		q.ActionIn(c, "t/bare", func(askIn) []q.Request { return nil }, q.Doc("asks nothing"))
+	})
+	_, actions, _ := catalogOf(ix.Store())
+	for _, row := range actions {
+		if row.Name != "t/bare" {
+			continue
+		}
+		text, err := json.Marshal(row)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if strings.Contains(string(text), `"label"`) || strings.Contains(string(text), `"icon"`) {
+			t.Fatalf("t/bare registers no label and no icon, and its row writes %s", text)
+		}
+		return
+	}
+	t.Fatal("index/actions holds no row for t/bare")
+}
 
 func TestActionRowsCarryLabelAndIcon(t *testing.T) {
 	ix := catalogued(t)
