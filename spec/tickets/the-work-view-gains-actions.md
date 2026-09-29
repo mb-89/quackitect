@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 0bf85019502e2423
         size: 3555
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856db450bd7 · claude-code-remote · helper-3
+    hash_before: b2093b6d197dc1283db477a460381534530104f4
+    hash_after: b2093b6d197dc1283db477a460381534530104f4
+    inputs:
+      - name: design/draft
+        hash: 0bf85019502e2423
+        size: 3555
+      - name: design/tests-red
+        hash: cd03e20b564a0228
+        size: 961
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -274,8 +286,11 @@ Every new case fails on its assertion over stubs that compile, except the no-row
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- work-view-awaits-log-parse: depends_on names only the-tui-becomes-a-shell, while TestTheWorkBaseFileDeclaresItsRowsBadgeAndActions rests on tree.ReadBase filling Reads, Badge and Actions, which the-log-becomes-a-view lands and which reads empty today; name that ticket under depends_on so implement waits on it
+- fake-rows-case-panics-red: TestTheWorkViewDrawsOverAFakeWorkRows panics in tree.Header on the empty tree the ViewOver stub hands back, so it fails on no assertion of its own and stops the rest of src/tui/work; give the stub the base file columns so the case fails on its want
 
 # implement
 
