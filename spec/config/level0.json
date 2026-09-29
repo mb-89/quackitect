@@ -88,7 +88,7 @@
     "phase1": true,
     "phase1gaps": true,
     "phase2shadow": true,
-    "phase2switch": false,
+    "phase2switch": true,
     "phase3shadow": true,
     "phase3switch": false,
     "phase4shadow": true,

@@ -82,69 +82,63 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-fix: true
+step: retro/cloud
 record:
   - step: sync
-    hand: box d84ce7ff23d8 · claude-code-remote
-    hash_before: f5e429651e5110315ee42723c4e059ab70ee87ea
-    hash_after: 85c37df258d74338cfcc4c91874bea3723553738
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: ad8df81d4bf28669b7d385e4ecda5e18b74f62b1
+    hash_after: f821af70a9eb2bb3f94797bb79225c314d1b0d1f
   - step: sync
-    hand: box d84ce7ff23d8 · claude-code-remote
-    hash_before: 8d423ed8256a532a6fb342d9dc413e34107af0f0
-    hash_after: 8d423ed8256a532a6fb342d9dc413e34107af0f0
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: 07a102b98d954278f7ab26e6b144f589d46858a7
+    hash_after: 3cc390ce3a4af0bf1d985d6de9d38ad5dd52af95
     answered:
       - name: sync
         exit: 0
-        said: work/loose-fixes-4140d51 already carries every commit on main.
+        said: work/the-watches-close-cleanly already carries every commit on main.
     def: 8a9850a81227554b
   - step: split
-    hand: box d84ce7ff23d8 · claude-code-remote
-    hash_before: aee81ffed8cc12d914e651cf1a946da6ff2d2815
-    hash_after: aee81ffed8cc12d914e651cf1a946da6ff2d2815
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: c6e83026ceacad9af1743f4017bc4454643ce9e3
+    hash_after: c6e83026ceacad9af1743f4017bc4454643ce9e3
     inputs:
       - name: ask
-        hash: 514ac4d454e0004c
-        size: 371
-      - name: [[spec/design_input/the-cloud-runs-itself]]
-        hash: 591680bf2c6fc6d6
-        size: 13376
+        hash: e8f36ade961e44bb
+        size: 356
     def: cb8f90bc86fc7d39
   - step: children
     hand: the engine
-    hash_before: 69fc23f0a1e23973f89874bfdbe45962c950a34b
-    hash_after: 69fc23f0a1e23973f89874bfdbe45962c950a34b
+    hash_before: dcfa4cac7c0966b2fc1bed5c672bda5a5acfc1aa
+    hash_after: dcfa4cac7c0966b2fc1bed5c672bda5a5acfc1aa
   - step: accept
-    hand: box d84ce7ff23d8 · claude-code-remote
-    hash_before: 83718dc38c2cd4fa8b6f402913b359cde33ec4f3
-    hash_after: 83718dc38c2cd4fa8b6f402913b359cde33ec4f3
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: e2a79e7833be24aa39b51b7de053b3f21e8fce5e
+    hash_after: 13ef50e4b2e713141f198b34a7cc1e2bbc41c608
     answered:
       - name: sync/sync
         exit: 0
-        said: work/loose-fixes-4140d51 already carries every commit on main.
+        said: work/the-watches-close-cleanly already carries every commit on main.
     inputs:
       - name: ask
-        hash: 514ac4d454e0004c
-        size: 371
+        hash: e8f36ade961e44bb
+        size: 356
       - name: children
         hash: 811c9dc59e3779b9
         size: 0
-      - name: [[spec/design_input/the-cloud-runs-itself]]
-        hash: 591680bf2c6fc6d6
-        size: 13376
     def: 07c43ae7253713ec
   - step: retro/notes
-    hand: box d84ce7ff23d8 · claude-code-remote
-    hash_before: 980425de8377e06c59c760cb4ee62cc0140aacca
-    hash_after: 980425de8377e06c59c760cb4ee62cc0140aacca
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: db77093242d7d94fe231c3d02030272fe6cd1c41
+    hash_after: db77093242d7d94fe231c3d02030272fe6cd1c41
     answered:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
   - step: retro/write
-    hand: box d84ce7ff23d8 · claude-code-remote
-    hash_before: 1e49f2481ea444977ad86b8efdab34f29eb90bf8
-    hash_after: 1e49f2481ea444977ad86b8efdab34f29eb90bf8
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: 98719cbffb6a18e06c8261846cea5696f518c9b6
+    hash_after: 98719cbffb6a18e06c8261846cea5696f518c9b6
     inputs:
       - name: children
         hash: 811c9dc59e3779b9
@@ -154,30 +148,23 @@ record:
         size: 36
     def: 1246a42e29e7ae98
   - step: retro/cloud
-    hand: box d84ce7ff23d8 · claude-code-remote
-    hash_before: 13edb800fdd876d8bc5eed5853092dc55b8025c7
-    hash_after: 13edb800fdd876d8bc5eed5853092dc55b8025c7
+    hand: box d81eeae76310c · claude-code-remote
+    hash_before: 3aa34d266202f653665ce27f8cbb0e84aff131b7
+    hash_after: 3aa34d266202f653665ce27f8cbb0e84aff131b7
     inputs:
       - name: retro/write
-        hash: 5cf6c1e6ef86c8a7
-        size: 1633
+        hash: 15933d3d3a3b1c25
+        size: 2798
+      - name: [[spec/tickets/a-watch-stops-mid-add]]
+        hash: 2d2faad79d1fbca1
+        size: 15460
     def: 4da1ca5da87d5bbc
-step: retro/cloud
 reason: done
 ---
 
 # Ask
 
-The loose agent tickets on main land in this fix group, per [[spec/design_input/the-cloud-runs-itself#feature-groups-and-fix-groups]].
-
-A fix group hands back no ticket for an agent. What it leaves goes to a person as a question ticket.
-
-- every ticket naming this group closes through the command it names
-- `./RUNME.sh check` exits 0
-
-The view: none.
-
-The source: none.
+Both Go file watches stop cleanly on every platform: a stop never hangs while the watch adds a folder. On Windows, fsnotify's Add waits on a reply the reader drops once Close lands, so check (windows-latest) times out at random. Done when both watches hand a stop back while folders keep appearing, under a test run with -race, and ./RUNME.sh check passes.
 
 # sync
 
@@ -199,16 +186,16 @@ The source: none.
 <!-- every child as a link, one a line, with its process -->
 <!-- the form is list -->
 
-- [[spec/tickets/take-honours-the-name]], process trivial, closed done on the work PR #7 landed on main
+[[spec/tickets/a-watch-stops-mid-add]] standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the one child is a single scoped change, small enough to review whole
-- the goal is the loose agent tickets on main, and take-honours-the-name is the only ticket naming this group
-- no child waits on another, so no depends_on stands
+the one child changes two watches and one shared package, small enough to review whole
+the child covers the whole goal: both watches, the race run, and the check
+the group holds one child, so nothing waits on another
 
 # children
 
@@ -222,8 +209,10 @@ The source: none.
 <!-- the form is verdict -->
 
 accept
-The one child, take-honours-the-name, closes done. Its work stands on main in commit 008c2a7b8, and its named test answers green here.
-./RUNME.sh check exits 0 on this branch. Six prose warnings stand, five on tickets other hands hold, and the door refuses a write to them.
+- both watches stand on src/watcher, whose Add and Close share a lock and a closed flag, and whose drain keeps the reader off a blocked send
+- the fake with the Windows timing ran red on the old loop and runs green now, and each watch carries a stop test, green under -race
+- the accept read found the folder helper racing the temp folder cleanup, and the commit before this verdict fixes it in the diff
+- the check answers green on the tip
 
 # retro
 
@@ -247,55 +236,59 @@ The one child, take-honours-the-name, closes done. Its work stands on main in co
 <!-- what was done, one line a ticket or a thing -->
 <!-- the form is list -->
 
-- take-honours-the-name closes done on the work main already carries, verified by its named test
-- the group passes sync, split, children and accept, and the check exits 0
+[[spec/tickets/a-watch-stops-mid-add]]: both Go watches stand on src/watcher, whose stop returns while the loop adds a folder
+src/watcher/watchertest: the stop helpers the three stop tests share, and Appearing waits on its last folder
+the parked note pull-named-todo-meets-queue, decided and dropped into the improve list below
 
 ### well
 
 <!-- what went well, and what made it go well -->
 <!-- the form is list -->
 
-- the dispatch prompt named the landed commit, so the box verified and redid nothing
-- the pull printed each field it wanted, so every step passed on one try but split
+the fsnotify source in the module cache confirmed the cause before any code, so the design took one draft
+a fake with the Windows timing turned a Windows-only hang into a red test on every platform
+the gate helper named four conditions the implementation then held, and the race run stayed green
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
 <!-- the form is list -->
 
-- 00:33 the first shell call named no ticket, and the door refused it
-- 00:33 a raw git push met the door, which wants the push verb
-- 00:36 a plan todo named the group, and the pull then handed nothing out
-- 00:37 the group stood draft, and the pull refused it by name until the open verb ran
-- 00:38 split refused a JSON list for its checklist, which wants lines in one string
-- 00:40 the door refused prose fixes on tickets other hands hold, so their warnings stand
+22:49 every shell call came back refused until the plan named a todo, since no ticket stood yet on a fresh box
+22:53 branch open refused a dirty tree, and it pushes main through marksTrunk, which the dispatch prompt forbids, so the box branched by hand on the dispatcher's road
+23:05 the gate helper looped on the pull: the plan's working field named the ticket, and the pull read it as a todo in hand
+23:10 the container restarted mid-gate, and the helper's report came back only through its output file
+23:16 the check went red on ExtensionsOnOffer: the language server stood built from main before the fast-forward
+23:19 the push door named another box: the take wrote box.json, the restart removed it, and identity.json carried another id
+the only owner prompt stood at the session start: the dispatch task naming the hang, its run and its cause
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 <!-- the form is list -->
 
-- the work skill names `./RUNME.sh ticket open` for a draft group, before the first pull
-- the pull hand-back hint shows a checklist field as lines in one string
-- the retro of the next box reads this list before its first call
+src/scripts/pull.js: let a named pull of the working todo past the queue gate, so a helper pulls while the plan names the ticket
+src/scripts/work.js openGroup: a cloud box opens a group branch without the trunk push, as dispatch-write.js opens does
+src/scripts/pull-hand-of.js boxIdHere: read one id for the box, so the take and the push door name the same hand after a restart
+the install step: rebuild se-lsp when its source moves past the binary, so a fast-forward leaves no stale rule behind
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The child needed no code. The work was reading the engine's doors, and each refusal named its fix. The warnings on other open tickets stay with their hands, because the door gives their fields to the engine alone.
+The cause stood verified in the prompt, so the risk sat in the design: a plain lock across Add deadlocks where the reader blocks on the unbuffered Events send. Draining into an unbounded queue answers both traps at once. The route asked for a red test, and a random race gives a flaky one, so the fake took the reader's choices from backend_windows.go and made the hang certain in a few rounds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the retro adds no fact standing elsewhere, and points at the tickets it names
-- the retro adds no number past the times of the run
-- the change writes no file header
-- the badly list carries each error of the run with its time, and no owner prompt came
-- the chapter names the box by its role alone
+the loop stands once in src/watcher, and both watches call it
+the numbers the change adds carry names: Hung and depth in watchertest
+the headers of watcher.go and watchertest.go say what each file is for
+the badly list carries the run's errors with their times, and the one owner prompt
+the chapter names roles alone, and no path or address of the box
 
 ## cloud
 
@@ -306,27 +299,28 @@ The child needed no code. The work was reading the engine's doors, and each refu
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 <!-- the form is list -->
 
-- the box lacked nothing: every tool the take installed ran, and the proxy refused no host
+23:20 the proxy refused www.google.com during the check, and nothing in the run waited on it
+no Windows box, so the Windows hang shows through the fake alone until CI runs the job
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 <!-- the form is list -->
 
-- 00:33 the git door refused a raw push, and the verbs pushed in its place
-- 00:37 the sync met no conflict, since the branch carried main
-- the named test and the check ran green on the box
+the trunk guard: branch open pushes main, so the box branched by the dispatcher road instead
+the one-writer hook at 23:19, after the restart dropped box.json
+the tested-delta hook, twice, until the test files stood named beside the code
+the sync took main in with no conflict
+ExtensionsOnOffer failed on this box alone, off a stale se-lsp binary
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 <!-- the form is list -->
 
-- no person step stands parked, and the box mints no ticket
-- five prose warnings stand on open tickets other hands hold
+no person step parked, and no ticket minted outside the group
+the owner-read step of the child stood skipped, since the ask came off no handover
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-- take-honours-the-name: the box passes `do` on the work main already carries, and redoes nothing. It weighs three facts. Commit 008c2a7b8 stands on `origin/main` and adds `src/scripts/work-held.js` with `pastHold`. `test/level0/work-held.test.js` holds both cases the ask names. One takes a name over a done hold, and one meets a refusal naming both branches. `./RUNME.sh branch test test/level0/work-held.test.js` answers green on this branch. It assumes the ticket's `says` evidence still describes main. No later commit on those files changes the take's order.

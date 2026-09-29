@@ -20,11 +20,10 @@ import (
 	"sync"
 
 	"quackitect/src/q"
+	"quackitect/src/watcher"
 	"sync/atomic"
 	"syscall"
 	"time"
-
-	"github.com/fsnotify/fsnotify"
 )
 
 const (
@@ -66,7 +65,7 @@ type door struct {
 	root  string
 	guard sync.Mutex
 	dirty chan struct{}
-	eyes  *fsnotify.Watcher
+	eyes  *watcher.Watcher
 
 	pending atomic.Bool
 	// The paths the watch names since the last settle, whether git's own index moved, and whether the plan moved. [[spec/design_output/index#a-change-moves-its-rows]]

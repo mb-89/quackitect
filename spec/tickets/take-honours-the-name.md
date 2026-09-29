@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,28 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: loose-fixes-4140d51
+step: do
+record:
+  - step: do
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 9fd261fcabc3fbb1a3a99360b8e00b2c7ff88653
+    hash_after: 9fd261fcabc3fbb1a3a99360b8e00b2c7ff88653
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: c99e302809f354ec
+        size: 990
+      - name: [[spec/design_output/work]]
+        hash: 8c9ad0df03f072da
+        size: 40393
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -60,11 +82,11 @@ Done when:
 
 ## tests
 
-    ./RUNME.sh branch test test/level0/work-held.test.js
+./RUNME.sh branch test test/level0/work-held.test.js
 
 ## check
 
-    ./RUNME.sh check
+./RUNME.sh check
 
 ## says
 
