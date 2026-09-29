@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: 4b7bc5b678c5a5fe
         size: 736
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 934c404143020d0f22c7fd1c57ce248ae799ad54
+    hash_after: 934c404143020d0f22c7fd1c57ce248ae799ad54
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 5bd1b3f69468c7ec
+        size: 4133
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,35 @@ I assume the session id rides `e.session.id`, `e.sessionId` or `e.session_id`, t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks src/modules/session src/q src/modules/index test/level0/cage-shadow.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks_test.go
+- src/modules/session/session_test.go
+- src/q/store_test.go
+- src/modules/index/ops_test.go
+- test/level0/cage-shadow.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every Go case fails on its own assertion over stubs, and the listen case fails reading the standing file the stub never writes. branch test ran the JavaScript case alone, so the Go folders ran through go test directly. Two JavaScript cases pass on the stub already, the post-nothing case and the refusal case, since a stub that posts nothing holds both; the shadow case carries the red.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the replay line TestTheInboundFakeReplaysARecordingOverQtest, qtest and the inbound fake the same case, the default wait TestACallTakesTheDefaultWaitOffItsKey, the next turn TestAnOperationEndingAfterItsCallReachesTheNextTurn, the Stop TestTheStopNamesEveryOperationStillRunning; go test ./... and the check stand as commands
+- the door the tests reach is the manager call and book, faked in the case, and the http door, faked by src/doors/fake/http.js
 
 # gate
 

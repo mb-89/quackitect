@@ -225,3 +225,20 @@ func TestRegistersHandsTheWriterOfItsFamily(t *testing.T) {
 		t.Fatalf("%s reads %#v", Name("7"), held)
 	}
 }
+
+// [[spec/tickets/the-hooks-door-lands]]
+func TestOfAnswersEveryOperationOfTheCaller(t *testing.T) {
+	b, _, _ := bookOf(t)
+	first, _ := b.Start("work/pull", nil, "s1", q.Declared{})
+	if _, err := b.Start("work/pull", nil, "s2", q.Declared{}); err != nil {
+		t.Fatal(err)
+	}
+	second, _ := b.Start("ticket/yours", nil, "s1", q.Declared{})
+	if err := b.Finish(first, "pulled"); err != nil {
+		t.Fatal(err)
+	}
+	got := b.Of("s1")
+	if len(got) != 2 || got[0].ID != first || got[0].State != Done || got[1].ID != second {
+		t.Fatalf("the book answers %+v, and wants both operations of s1 by id, the ended one among them", got)
+	}
+}
