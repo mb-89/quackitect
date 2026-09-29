@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: c1e32399db246db7
         size: 273
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: 04b92b7ea39f9eca5278e95e7ca2de9cf0a43e5e
+    hash_after: 04b92b7ea39f9eca5278e95e7ca2de9cf0a43e5e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 24b00f762b44efa4
+        size: 3548
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -215,26 +228,35 @@ Assumed: the shadow ran clean, since the owner set `phase4switch` true on main a
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/verbs/tree_test.go
+- src/modules/migration/migration_test.go
+- src/quack/verb_tools_test.go
+- test/level0/tools-door.test.js
+- test/level0/bash.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new test fails on its own assertion: the tree verb hands verb lint in place of lint, the tree verbs list nothing, the verbs slice reads old, and the tool list lacks every top-level verb from check to rename. Surprise: branch test reports the JavaScript reds and none of the Go ones, so the Go reds come off go test run by hand over the verbs, migration and quack packages.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red test: TestEveryVerbStandsAmongTheTools decides the tools, and ./RUNME.sh check decides the rest once green
+- the tests reach the node module through q.Catalog with no outside, and the process door through fakeProc, so each door has its fake
 
 # gate
 
