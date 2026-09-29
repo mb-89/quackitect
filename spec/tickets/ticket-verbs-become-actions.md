@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
 depends_on: ["runme-hands-verbs-to-quack"]
+record:
+  - step: design/draft
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 8d267257d3291dc05c57c93c21982676964028a1
+    hash_after: 8d267257d3291dc05c57c93c21982676964028a1
+    inputs:
+      - name: ask
+        hash: cc3ddddf3d021714
+        size: 318
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,61 @@ An agent calls the index, and parses no standard output.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each `ticket` verb stands as an action, and a read the index already holds gets a native twin in shadow. The writes keep the engine `cli.js` runs, behind an IO module, until the switch-over ports them.
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the actions | a new `src/modules/verbs/verbs.go`, `Topic` | registers one action a verb of a topic, `ticket/note` for `ticket note`, taking the words past the verb as `args`. Each lists one request to the `node` module |
+| the node module | `accepts` in `src/quack/main.go`, over a new `nodeAccept` | runs `node cli.js <topic> <verb> <args>` under the root, and answers its output, or fails with it where the exit reads past 0 |
+| the wiring | `spec/wiring.yaml` and `modules` in `main.go` | loads the instance `ticket` of the module type `ticket` |
+| the read | a new port `yours` in `src/modules/work/rows.go` | derives the rows `ticket yours` prints: every placed row off the cloud, in outline order, each with its path |
+| the twin | a new `src/quack/twins.go`, `ticketYours` | reads `work/yours` over V1 and prints the JSON `ticket yours` prints, `--next` among it. The road table takes it under `ticket yours` |
+
+An agent then calls `ticket/<verb>` through the index, within its wait, and the tool list carries each one.
+
+What I weigh: the writes reach the schema mint, the front writer, the process routes, the Vale lint of an Ask and the holds. A native port of each is the engine itself. So this ticket stands their actions over the old engine, and a line under the switch-over group's Discussion names each native port it owes. The shadow rows come from the reads, where two answers can differ.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go: modules, which loads the ticket instance
+- src/quack/main.go: accepts, which answers the node module
+- spec/wiring.yaml: the instances, which gain ticket
+- src/modules/work/rows.go: Registers, which adds the yours port
+- src/quack/verbs.go: twinVerbs, which takes ticket yours
+- src/index/tools.go: the tool list, which reads each new action off the registry
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/verbs/verbs_test.go: TestEachVerbOfATopicStandsAsAnAction
+- src/modules/verbs/verbs_test.go: TestAnActionHandsItsWordsToTheNodeModule
+- src/modules/work/rows_test.go: TestYoursHoldsThePlacedRowsOffTheCloudInOutlineOrder
+- src/quack/twins_test.go: TestTicketYoursPrintsTheRowsAsCliJsDoes
+- src/quack/twins_test.go: TestTicketYoursNextNamesTheFirstOpenPersonRow
+- src/quack/main_test.go: TestTheRootRunsANodeVerbThroughCliJs
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- ticket.js, ticket-yours.js, work-answer.js, rows.go, outline.go, tickets.go, action.go, main.go and the wiring stand opened, and each claim checked there
+- the callers list names the root, the wiring, the work module, the road and the tool list
+- go test from the root meets every Go case, the shadow line meets the road's shadow cases through the twin, and the check meets the check verb
 
 ## tests-red
 
