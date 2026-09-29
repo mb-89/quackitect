@@ -114,11 +114,24 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-lands-in-shadow
 depends_on: [the-hooks-door-lands]
+record:
+  - step: design/draft
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 95101a01765698f1ce48b79ee4440c1c346962cb
+    hash_after: 95101a01765698f1ce48b79ee4440c1c346962cb
+    inputs:
+      - name: ask
+        hash: c47e15bb2c1c3ff9
+        size: 1323
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +168,70 @@ Copilot carries no function hooks, so MCP is its road to the index. A new action
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The mcp IO module stands under src/modules/mcp, one file.
+
+1. Registers declares the key wait, a second, with q.IO(). It keeps no tool list of its own.
+2. New(Outside) reads the store's actions at start. Each becomes a tool: its name spells the action the way /v1/tools does, index_ and each slash an underscore, so one action carries one tool name on every surface. Its description is the action's q.Doc off Store.Presentation. Its input schema comes off Store.Types through a Huma registry, with the reference resolved, a bare input wrapped as the one property input, and the property wait added.
+3. Server.Handle(session, body) answers one JSON-RPC message of MCP over streamable HTTP: initialize names the server and its tools capability and hands a session id, a notification answers nothing, ping answers empty, tools/list answers the tools, and tools/call runs the action through the manager's call within the wait the arguments set or the key's. A call ending within its wait answers its result as text. A call running past it answers still running, with the fraction done, the time gone by and the handle. A failing call answers isError.
+4. Listen serves POST /mcp on loopback behind a token, and writes the port and the token to the runtime file mcp.json, the way the hooks door does.
+5. Replay is the inbound fake: it drives Handle off a JSONL recording under test/replay/mcp, one request and its response a line, and answers each difference.
+6. src/quack/main.go loads the module type mcp, and starts its listener beside the hooks door over the same manager. spec/wiring.yaml names the instance.
+
+I assume the manager's call and its session id stand as the hooks door takes them. The schema code stands beside the one in src/index/tools.go, because the index core imports no module and a module imports no index core.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go manages and listens: start the mcp listener beside the hooks door
+- src/quack/main.go hookedOf: reads an instance of a module type, now taking the type
+- src/quack/main.go the modules table: names mcp
+- spec/wiring.yaml: names the instance mcp
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/mcp/mcp_test.go TestTheInboundFakeReplaysAnMCPSession
+- src/modules/mcp/mcp_test.go TestANewActionListsANewToolWithNoChangeHere
+- src/modules/mcp/mcp_test.go TestAToolsDescriptionIsItsActionsDoc
+- src/modules/mcp/mcp_test.go TestACallWithNoWaitTakesTheSecondOffItsKey
+- src/modules/mcp/mcp_test.go TestAWaitArgumentSetsTheCallsWait
+- src/modules/mcp/mcp_test.go TestASlowToolAnswersStillRunning
+- src/modules/mcp/mcp_test.go TestTheListenAnswersAPostBehindItsToken
+- src/quack/mcp_test.go TestTheWiringLoadsTheMCPModule
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/mcp/mcp.go
+- src/modules/mcp/mcp_test.go
+- test/replay/mcp/one-session.jsonl
+- src/quack/main.go
+- src/quack/mcp_test.go
+- spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened: the model chapters on surfaces, operations and the inbound fake, src/index/tools.go, src/index/actions.go, src/modules/hooks/hooks.go, src/quack/main.go and go.mod, which holds Huma and no MCP library
+- the callers list names every caller of the composition it changes, found by grep
+- each done_when line names its test: the replay TestTheInboundFakeReplaysAnMCPSession, the new action TestANewActionListsANewToolWithNoChangeHere, the doc TestAToolsDescriptionIsItsActionsDoc, the default wait TestACallWithNoWaitTakesTheSecondOffItsKey, the wait argument TestAWaitArgumentSetsTheCallsWait, the slow tool TestASlowToolAnswersStillRunning, and go test and the check as commands
 
 ## tests-red
 
