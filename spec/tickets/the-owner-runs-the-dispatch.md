@@ -33,8 +33,21 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
-step: answer
+step: do
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 22dce2f11f2a7f243a7a6a4cfc18a10e81586738
+    hash_after: 22dce2f11f2a7f243a7a6a4cfc18a10e81586738
+    inputs:
+      - name: ask
+        hash: 01df03a0e68cf73d
+        size: 921
+      - name: [[spec/tickets/an-action-fires-the-workers]]
+        hash: a795442dd876e60f
+        size: 19293
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -69,8 +82,21 @@ gh run view --log | tail -40
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The dispatch Action ran once by hand on main, as run 36471796196, and holds.
+
+- the run fires: the job ends green, and the plan held no ready group and no stuck hand-over, so it fired no worker
+- the issues: that run opened one issue a question ticket, and the dispatch now opens none, as its skill says
+- the write branch: it pushed claude/dispatch-4140d51 and opened pull request 26, which merged itself
+
+The calls:
+
+- auto-merge asks for MERGE: confirmed, since pull request 26 and the later dispatch pull requests land with no hand
+- an issue a question closes by hand: turned, since the dispatch opens no issue, and a box closes any issue its ticket carries, per rule 8 of the cloud guidance
+- the fire text names the branch: stands, unproven live, because the run fired no worker
+
+Weighed: the run log and the merged pull requests on main. Assumed: the later dispatch runs, such as pull request 37, count as further live runs of the same Action.
 
 # do
 
