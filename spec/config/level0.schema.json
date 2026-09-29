@@ -586,6 +586,16 @@
             "new"
           ]
         },
+        "sidebar": {
+          "type": "string",
+          "default": "old",
+          "help": "The sidebar: old draws its own groups alone, shadow weighs the views section against them and logs each pair apart, new draws the views section.",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ]
+        },
         "verbs": {
           "type": "string",
           "default": "old",

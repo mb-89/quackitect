@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -171,6 +171,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: f3e6e65e9007957077058a38214a1627292630d6
+    hash_after: f3e6e65e9007957077058a38214a1627292630d6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 2 file(s); green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "src/quack/main.go:202:42: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
+    inputs:
+      - name: design/tests-red
+        hash: 06813455cd75e77a
+        size: 858
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -359,26 +382,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/views-shadow.test.js test/level0/sidebar-views.test.js src/modules/migration
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The migration module declares the slice sidebar, built-in old, with the three modes. While it reads shadow, each draw of the sidebar weighs the old groups against the views section. apartOf in src/extension/lib/views-shadow.js pairs a badge count with its value off index/names, and a button cell with its action off index/actions. Each pair that reads apart writes one shadow row naming the slice sidebar, once a session. So the owner reads every mismatch before the old sidebar retires.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the three config projections and the size golden the schema moves
+- the sidebar case runs over the fake disk and a fake index door
+- each new function points at this ticket
+- the slice key stands once in migration.go
 
 # accept
 
