@@ -32,6 +32,6 @@ test("the retro usage prints one line a verb, audit among them", () => {
   } finally {
     console.log = log;
   }
-  const named = lines.map((one) => one.match(/^  (\S+)/)?.[1]).filter(Boolean);
+  const named = lines.map((one) => one.match(/^ {2}(\S+)/)?.[1]).filter(Boolean);
   assert.deepEqual([...named].sort(), [...VERBS].sort());
 });

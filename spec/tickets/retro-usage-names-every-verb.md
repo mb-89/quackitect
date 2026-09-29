@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: retro-verbs-become-actions
+record:
+  - step: do
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 50b227afe861b21e357092d6302dd02728d7e030
+    hash_after: 50b227afe861b21e357092d6302dd02728d7e030
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: f1d1855241ba3f34
+        size: 170
+    def: f77f3daa2180b2fe
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the usage in src/scripts/retro.js prints no audit line and joins backlog and min
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/retro-usage.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The retro usage in src/scripts/retro.js prints one line a verb, audit among them, so a draft reading the usage finds every verb. The test in test/level0/retro-usage.test.js reads the printed verbs against the list RetroVerbs names in src/modules/verbs/retro.go. Its regex now spells the two-space indent as a count, which clears the Biome warning.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: one usage line a verb, audit among them
+the regex fix Biome named rides this change
+the verb list stands in RetroVerbs, and the test cites it in place of a second list
 
 # Discussion
 
