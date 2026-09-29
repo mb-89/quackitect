@@ -132,11 +132,7 @@ function checkOn(it, at) {
   stamps(it.disk, where, brandOf(it.root));
   // The check mints through se-front, and the install alone builds it, so the branch's own lands in the worktree's bin. [[spec/design_output/review#a-worktree-runs-the-check]]
   const go = pathOf(surveyOf(said), "go") || "go";
-  const front = it.join(
-    where,
-    BIN,
-    `se-front${process.platform === "win32" ? ".exe" : ""}`,
-  );
+  const front = it.join(where, BIN, `se-front${it.windows ? ".exe" : ""}`);
   it.proc.run([go, "build", "-o", front, `./${BUILDS["se-front"]}`], { cwd: where });
   const borrowed = BORROWED.filter((rel) => it.disk.exists(it.join(it.root, rel)));
   for (const rel of borrowed) {

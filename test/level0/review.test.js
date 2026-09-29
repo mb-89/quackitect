@@ -242,6 +242,16 @@ test("the worktree builds the branch's own se-front into its bin, in the worktre
   assert.ok(build < check, "the build runs before the check");
 });
 
+// [[spec/tickets/review-builds-its-front]]
+test("a windows box builds se-front.exe, the name the front door tries there", () => {
+  const exe = `go build -o ${join(AT, BIN, "se-front.exe")} ./src/front/cmd`;
+  const { it, outside } = doorsSaying(standing({ [exe]: { exitCode: 0 } }));
+
+  heard(() => work(ROOT, ["review", NAME, "--json"], { ...it, windows: true }));
+
+  assert.ok(ranGit(outside).includes(exe), "the build names the windows binary");
+});
+
 test("a red check comes back with the rows the runner refused", () => {
   const { it } = doorsSaying(
     standing({
