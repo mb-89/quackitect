@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -179,6 +179,21 @@ record:
         hash: ecdfa10dc707c2ae
         size: 15191
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85821f54410d · claude-code-remote · helper-7
+    hash_before: 6e398c66f482cc20343a9a1387cf9d3b65bd0ebe
+    hash_after: 6e398c66f482cc20343a9a1387cf9d3b65bd0ebe
+    inputs:
+      - name: design/draft
+        hash: baa2b39c4d52bd5e
+        size: 7485
+      - name: design/tests-red
+        hash: f196c5e02ca2a87c
+        size: 1628
+      - name: [[spec/tickets/the-sidebar-renders-generically]]
+        hash: ecdfa10dc707c2ae
+        size: 15191
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -339,8 +354,16 @@ Every new case fails on its own assertion. The Go cases compile against stubs: `
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach answers the ask, and the eight red files fail on their own assertion.
+- The regeneration line meets TestSchemaStandsAsGenerated, and the built-in line meets TestDefaultFileHoldsNoBuiltIn.
+- The go test line rides the Go cases, and the check line stands a checkpoint at tests-green.
+- Missed caller: src/quack/config.go configRows lists only keys the files hold.
+- configAt feeds quack config and modeOf in src/quack/verbs.go, so ./RUNME.sh config drops every built-in key.
+- Lay the catalog's Default under the files there, with the layer built-in.
+- The draft's tests list names test/level0/projection.test.js, and the red case stands in projection-builtin.test.js.
 
 # implement
 
