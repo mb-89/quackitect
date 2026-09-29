@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 139c60f71eff12b820bce4882bf59318c7ee9bc0
+    hash_after: 139c60f71eff12b820bce4882bf59318c7ee9bc0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 5ff9005e4f6c534d
+        size: 683
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -320,26 +343,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-hand.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A helper spawned with --as now takes a step of the ticket the plan works. Before, the pull waited on the working todo, and a named pull met the queue guard, so a gate helper looped. The pull reads the working item once: a helper skips the wait, one naming nothing asks for the working item, and the queue guard passes a helper whose name equals it. A helper naming another ticket still stands behind the queue.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/scripts/pull.js and the red cases in test/level0/pull-hand.test.js, both on the size list
+- the change reaches no new door: inHand reads the disk door the fake in the tests stands for
+- a comment above wanted names the approach and links the ticket
+- the working item stands read once in pull, and the rule stays in the ticket the comment links
 
 # accept
 
