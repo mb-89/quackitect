@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/read-topics-switch-over already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: cd93579b85142499c5f765070b0aad17cbae5db9
+    hash_after: cd93579b85142499c5f765070b0aad17cbae5db9
+    inputs:
+      - name: ask
+        hash: bf36b714071714b6
+        size: 330
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["read-topics-land-in-shadow"]
 enabled_by: migration.phase3switch
 cloud: true
@@ -133,14 +145,26 @@ Done when no JavaScript twin of a Go check stands.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/readers-take-the-go-topics]], standard
+- [[spec/tickets/the-js-twins-leave]], standard
+- [[spec/tickets/readers-name-one-mode-source]], trivial
+- [[spec/tickets/handed-meets-its-own-case]], trivial
+- [[spec/tickets/read-text-meets-its-case]], trivial
+- [[spec/tickets/read-config-meets-its-case]], trivial
+- [[spec/tickets/check-twins-leave-phase-seven]], trivial
+- [[spec/tickets/topic-fallback-leaves-the-readers]], trivial
+- [[spec/tickets/twins-leave-misses-some-callers]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: each trivial child touches a handful of files
+- the children add up to the goal: the readers take the Go topics, and the comparison twins leave; the check twins leave with phase 7
+- the-js-twins-leave names readers-take-the-go-topics under depends_on, and the gate's children hang off their parent
 
 # children
 
