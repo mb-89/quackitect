@@ -78,6 +78,10 @@ process_hash: 57b2cccd0445ea9a
 depends_on: [read-topics-land-in-shadow, quack-verbs-land-in-shadow]
 enabled_by: migration.phase7shadow
 cloud: true
+record:
+  - step: sync
+    hand: box d853f6d2d710b · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
 ---
 
 # Ask
