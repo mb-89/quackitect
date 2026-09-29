@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -141,6 +141,9 @@ record:
         hash: dabdc9f8eb9f93af
         size: 5597
     def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/tickets/the-sidebar-renders-generically]]
 ---
 
 # Ask
