@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 1f9cc0d8499fe67dbf765ca9c976c6334189d7b9
+    hash_after: 1f9cc0d8499fe67dbf765ca9c976c6334189d7b9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/verbs passes; green, src/modules/work passes; green, src/quack passes; green, src/ticket passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 36714828de8c510c
+        size: 755
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -325,26 +348,33 @@ go build ./... && ./RUNME.sh lint src/quack/twins.go src/quack/ticket_twins_test
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/verbs/ticket_test.go src/modules/work/rows_test.go src/quack/ticket_twins_test.go src/ticket/place_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each ticket verb now stands as an action of the index. It hands its words to the node module, which runs cli.js under the root and answers its output. ticket yours gains a Go twin reading work/yours over V1, and the road runs it beside cli.js in shadow. The outline compare moves into the ticket package, since a module imports no other module, and its cases move with it. The ticket cases moved into their own files, because the shared red files carry the retro, vehicle and branch cases.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the compare move the import rule asks for
+- the node case runs a stand-in cli.js, and the twin reads a door over a seeded catalog
+- each new function carries a comment naming this ticket or the outline section
+- the compare stands once in src/ticket/place.go, and queue.Compare hands off to it
 
 # accept
 

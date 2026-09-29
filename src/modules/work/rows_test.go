@@ -91,3 +91,14 @@ func TestYoursHoldsThePlacedRowsOffTheCloudInOutlineOrder(t *testing.T) {
 		}
 	}
 }
+
+// A placed todo no ticket carries joins yours with no path, and 1.10 stands after 1.2. [[spec/tickets/ticket-verbs-become-actions]]
+func TestYoursKeepsALooseTodoInOutlineOrder(t *testing.T) {
+	said, _ := read(t, YoursPort, map[string]any{
+		TicketsPort: []ticket.Ticket{{Name: "later", Path: "spec/tickets/later.md", State: "open"}},
+		PlacesPort:  map[string]string{"later": "1.10", "a-todo": "1.2"},
+	}).([]YoursRow)
+	if len(said) != 2 || said[0].Ticket != "a-todo" || said[0].Path != "" || said[1].Ticket != "later" {
+		t.Fatalf("yours holds %+v", said)
+	}
+}

@@ -7,7 +7,6 @@ package work
 import (
 	"sort"
 
-	"quackitect/src/modules/queue"
 	"quackitect/src/q"
 	"quackitect/src/ticket"
 )
@@ -45,7 +44,7 @@ func yoursOf(in rowsIn) []YoursRow {
 		}
 		out = append(out, YoursRow{Ticket: one.Name, Path: paths[one.Name], Step: one.Step, Queue: one.Queue, State: one.State, Person: one.Person})
 	}
-	sort.SliceStable(out, func(a, b int) bool { return queue.Compare(out[a].Queue, out[b].Queue) < 0 })
+	sort.SliceStable(out, func(a, b int) bool { return ticket.ComparePlaces(out[a].Queue, out[b].Queue) < 0 })
 	return out
 }
 
