@@ -179,6 +179,8 @@ func dumps(prefix string) error {
 }
 
 func main() {
+	// This binary is the index, so a verb that finds no door starts this one. [[spec/design_output/index#a-door-comes-back]]
+	index.Serving()
 	if len(os.Args) == hookArgs && os.Args[1] == "hook" {
 		os.Exit(hookVerb(".", os.Args[2], os.Stdin, os.Stdout))
 	}

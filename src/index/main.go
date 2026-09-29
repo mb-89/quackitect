@@ -27,6 +27,7 @@ const (
 
 // The command line the composition root runs, with the IO modules it starts in the served index. [[spec/design_output/model#io-modules-are-modules]]
 func Main(manage Manage, starts ...Start) {
+	Serving()
 	argv := argsOf()[1:]
 	if len(argv) == 0 {
 		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why|dump> [words]\n       se-index call <method> <json params>")
@@ -169,12 +170,17 @@ func reaches(root string, argv []string) (answer, error) {
 	return answer{}, errorOf("the index door does not answer, and one would not start")
 }
 
-// [[spec/design_output/index#a-door-comes-back]]
+// A door stands while the build that stands it lies unchanged on disk, whatever build the caller runs. [[spec/design_output/index#a-door-comes-back]]
 func stands(said Standing, root string) bool {
 	if said.Root != "" && rooted(said.Root) != rooted(root) {
 		return false
 	}
-	return said.Stamp == stampHere()
+	bin := said.Bin
+	if bin == "" {
+		self, _ := executableOf()
+		bin = serverOf(self, root)
+	}
+	return said.Stamp != "" && said.Stamp == stampOf(bin)
 }
 
 func standingOf(root string) (Standing, error) {
