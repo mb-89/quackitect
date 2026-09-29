@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -129,6 +129,19 @@ record:
         hash: 64d6c843b10759d8
         size: 2071
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 5bd8144377a489776c196566b2d7231c0bd683d2
+    hash_after: 5bd8144377a489776c196566b2d7231c0bd683d2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 99a930a70f1b4180
+        size: 2813
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +233,31 @@ What I assume: the branch topic lands under `work-verbs-become-actions`, so a li
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/needs-shadow.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/needs-shadow.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The registry table stands empty, the shadow writes no row, and BRANCH still lists new. Each fails on its own assertion. The case at old passes already, and guards the slice. What surprises: holdsVerb takes a table as its second word already, so the registry table plugs in with no change to it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the shadow line meets the row case, the branch open line meets the registry case, go test meets the Go side unchanged, and the check meets the check verb
+- the cases read fake doors: a settings door, a stand-in quack answering action rows, and a log door
 
 # gate
 
