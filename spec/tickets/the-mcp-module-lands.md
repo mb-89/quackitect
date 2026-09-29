@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: implement/change
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-lands-in-shadow
@@ -157,6 +157,15 @@ record:
         hash: 09e30bdebd78c5de
         size: 1065
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85490c97110e · claude-code-remote
+    hash_before: 79a60676941b7ea26e1da63ef4c70df323893401
+    hash_after: d6c53f1b8933443c060ad1f05528e04aca6d29ff
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -314,14 +323,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/mcp src/quack/main.go spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and src/q/tool through the gate point that moved the shared piece there
+- the door the change reaches, the loopback listen, stands driven for real in the listen case, and Replay is the inbound fake over a recording
+- the head of src/modules/mcp/mcp.go names the approach, and each function links its section
+- every fact stands once: the tool name, schema, wait and running line come from src/q/tool, and the standing file path stands in the module alone
 
 ## tests-green
 
