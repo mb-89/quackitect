@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process_hash: 2b5ab398855a1aba
 group: open-tasks-switch-lands
 parent: open-tasks-switch-lands
 step: do
+record:
+  - step: do
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 81ce58a468a6f3361504971e72964ca997c2be3d
+    hash_after: 81ce58a468a6f3361504971e72964ca997c2be3d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 45 test(s) pass in 2 file(s); green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: fd06f155015d133c
+        size: 260
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ The opentasks key still offers old and shadow, and the migration module register
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/migration test/level0/config.test.js test/level0/projection.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The accept of open-tasks-switch-lands found the old and shadow values still offered after phase 2 switched over. The schema enum now holds new alone, the migration module registers new as its default, and the projection removes the two commands that set old and shadow. The module test wants new with nothing set.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: new stands alone in the enum and the module
+the cleanup: the two projected commands leave with the values
+one place: the schema owns the enum, and the projection follows it
 
 # Discussion
 
