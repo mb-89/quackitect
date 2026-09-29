@@ -31,6 +31,8 @@ const {
 const SCHEMA = "spec/config/level0.schema.json";
 // A copy of inRun("bless.json") out of .claude/skills/level0/lib/folders.js, which BLESS_FILE in src/scripts/pull-bless.js names, because the extension loads CommonJS and those modules are ESM. [[spec/design_output/pull#the-bless]]
 const BLESS = ".se/.runtime/bless.json";
+// The files a ticket move, a plan todo or a hold writes, whose burst draws the badge again. [[spec/tickets/the-badge-reads-open-tasks]]
+const COUNTS = [];
 
 function sidebarOf(door) {
   const readAll = async () => {
@@ -98,6 +100,7 @@ function sidebarOf(door) {
       return statesOf(valuesOf(said.tracked, said.local));
     },
     watches: [SCHEMA, TRACKED, LOCAL, BLESS],
+    counts: COUNTS,
 
     async html() {
       const said = await readAll();
@@ -217,4 +220,4 @@ async function shows(door, folder) {
   return door.says(rowsIn(await door.read(`${folder}/${name}`)));
 }
 
-module.exports = { SCHEMA, sidebarOf };
+module.exports = { COUNTS, SCHEMA, sidebarOf };

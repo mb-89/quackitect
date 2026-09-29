@@ -74,9 +74,12 @@ func main() {
 	}
 }
 
+// The places the badge's verb reads, which a case hands its own. [[spec/tickets/the-badge-reads-open-tasks]]
+var placesAt = work.PlacesAt
+
 // The count the sidebar's button draws: the number the work tab carries in its brackets, off the places the tab reads. [[spec/design_output/tui#the-work-tab]]
 func countSaid(path string) (string, error) {
-	places, err := work.PlacesAt(work.Root(path))
+	places, err := placesAt(work.Root(path))
 	if err != nil {
 		return "", err
 	}

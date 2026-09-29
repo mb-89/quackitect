@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -188,6 +188,19 @@ record:
         hash: fe2bc1ba0ba3484f
         size: 258
     def: a3dfd8c60d853590
+  - step: design/tests-red-2
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: fc54fcd9fb59c9f4a761e8eff5fd721132437709
+    hash_after: fc54fcd9fb59c9f4a761e8eff5fd721132437709
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft-2
+        hash: 4ff8057cc2e3969d
+        size: 3593
+    def: 9c7cd4dd4a2dadb8
 group: open-tasks-switch-lands
 ---
 
@@ -352,26 +365,35 @@ The owner's before-and-after compare stands at the view step: the badge and the 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/settle.test.js test/level0/sidebar.test.js src/tui/work
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/work/shadow_test.go
+- test/level0/settle.test.js
+- test/level0/sidebar.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four cases fail on their own assertion. The settle case runs its work at once where it wants one run after the burst. The sidebar case finds no watch on the ticket folders. The two slice cases read the old count where they want the index's.
+
+The badge verb case in src/tui/count_test.go passes already. countSaid reads Takeable today, and the case guards that the badge and the header keep reading one field.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: TestTheBadgeAndTheHeaderReadOneValue fails on its assertion, and the sidebar case holds the badge's redraw after a ticket write
+- fakes: askOpenTasks and runPlaces for the index and the verb, placesAt for the badge verb, and door.later for the timer
 
 # gate
 
