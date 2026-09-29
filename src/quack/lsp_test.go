@@ -5,11 +5,16 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"net"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/modules/lsp"
 )
 
 func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
@@ -50,5 +55,45 @@ func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
 	}
 	if out.String() != frame {
 		t.Fatalf("the editor reads %q, and wants the reply frame whole", out.String())
+	}
+}
+
+func TestQuackLspDialsThePortTheStandingFileNames(t *testing.T) {
+	listen, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listen.Close()
+	root := t.TempDir()
+	standing := filepath.Join(root, filepath.FromSlash(lsp.StandingFile))
+	os.MkdirAll(filepath.Dir(standing), 0o755)
+	body, _ := json.Marshal(lsp.Standing{Port: listen.Addr().(*net.TCPAddr).Port, Token: "tok"})
+	os.WriteFile(standing, body, 0o600)
+	heard := make(chan string, 1)
+	go func() {
+		conn, err := listen.Accept()
+		if err != nil {
+			heard <- ""
+			return
+		}
+		defer conn.Close()
+		read, _ := io.ReadAll(conn)
+		heard <- string(read)
+	}()
+	started := false
+	var out bytes.Buffer
+	if err := lsps(root, func() error { started = true; return nil }, strings.NewReader("{}"), &out); err != nil {
+		t.Fatal(err)
+	}
+	if !started {
+		t.Fatal("the verb starts no index")
+	}
+	select {
+	case said := <-heard:
+		if said != "tok\n{}" {
+			t.Fatalf("the IO module hears %q, and wants the token line, then the input", said)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the IO module hears nothing")
 	}
 }

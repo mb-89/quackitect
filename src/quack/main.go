@@ -25,6 +25,7 @@ import (
 	httpmodule "quackitect/src/modules/http"
 	manager "quackitect/src/modules/index"
 	logmodule "quackitect/src/modules/log"
+	"quackitect/src/modules/lsp"
 	"quackitect/src/modules/mcp"
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
@@ -75,6 +76,8 @@ var modules = map[string]ioModule{
 	"session":   {registers: session.Registers},
 	// [[spec/tickets/the-mcp-module-lands]]
 	mcpModule: {registers: mcp.Registers},
+	// [[spec/tickets/the-lsp-door-lands]]
+	lspModule: {registers: lsp.Registers},
 	// [[spec/tickets/ticket-verbs-become-actions]]
 	"ticket":  {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
 	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
@@ -148,6 +151,13 @@ func main() {
 	if len(os.Args) == hookArgs && os.Args[1] == "hook" {
 		os.Exit(hookVerb(".", os.Args[2], os.Stdin, os.Stdout))
 	}
+	if len(os.Args) == 2 && os.Args[1] == "lsp" {
+		if err := lspVerb(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
 		os.Exit(verbRoad(os.Args[2], os.Args[3:]))
 	}
@@ -206,9 +216,15 @@ const hooksModule = "hooks"
 // The module type the wiring loads as mcp, whose listener starts beside the hooks door. [[spec/tickets/the-mcp-module-lands]]
 const mcpModule = "mcp"
 
-// The instances whose listeners the manager's start opens: the hooks door, and the mcp server. [[spec/tickets/the-mcp-module-lands]]
+// The module type the wiring loads as lsp, whose listener starts beside the hooks door. [[spec/tickets/the-lsp-door-lands]]
+const lspModule = "lsp"
+
+// The name the check module's sweep stands under, which the lsp listener reads. [[spec/tickets/the-lsp-door-lands]]
+const sweepName = "check/sweep"
+
+// The instances whose listeners the manager's start opens: the hooks door, the mcp server, and the lsp listener. [[spec/tickets/the-lsp-door-lands]]
 type doors struct {
-	hooks, mcp hooked
+	hooks, mcp, lsp hooked
 }
 
 // The hooks instance the wiring loads: its writer, and the name each local name binds to. No instance leaves on false. [[spec/tickets/the-hooks-door-lands]]
@@ -277,7 +293,26 @@ func listens(root string, store *q.Store, open doors, served manager.Served) (fu
 		}
 		halts = append(halts, halt)
 	}
+	if one := open.lsp; one.on {
+		halt, err := listensLSP(root, store, one)
+		if err != nil {
+			for _, halt := range halts {
+				halt()
+			}
+			return nil, err
+		}
+		halts = append(halts, halt)
+	}
 	return stop, nil
+}
+
+// Opens the lsp listener over the store, reading the check module's sweep at each publish. [[spec/tickets/the-lsp-door-lands]]
+func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
+	server := lsp.New(lsp.Outside{
+		Root: root, Store: store, As: one.as, Bound: one.bound,
+		Sweep: func() any { return store.Snapshot().Read(sweepName) },
+	})
+	return lsp.Listen(root, server)
 }
 
 // Opens the mcp server over the manager's call, so a harness with no function hooks reaches every action. [[spec/tickets/the-mcp-module-lands]]
@@ -376,7 +411,7 @@ func wired() ([]index.Start, doors, error) {
 		return nil, doors{}, err
 	}
 	starts, hands, err := loaded(w, q.Main)
-	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule)}, err
+	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule)}, err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]

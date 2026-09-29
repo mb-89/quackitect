@@ -134,3 +134,21 @@ func TestAConnectionWithoutTheTokenReadsNothing(t *testing.T) {
 		t.Fatalf("a connection with the token reads %q, and wants the initialize reply", said)
 	}
 }
+
+func TestARepublishNamesAnOpenPathWhoseDiagnosticsMoved(t *testing.T) {
+	server, _ := serverOver(t)
+	uri := "file:///tree/spec/a.md"
+	server.Handle(opened(uri, "# A\n"))
+	uris := map[string]string{"spec/a.md": uri}
+	if said := server.Republish(uris); len(said) != 0 {
+		t.Fatalf("a republish over an unmoved sweep answers %d bodies, and wants none", len(said))
+	}
+	server.from.Store.Commit(server.from.Store.Snapshot().Revision, server.from.As, map[string]any{"buffers/spec/a.md": "See [[spec/nowhere]].\n"})
+	server.mu.Lock()
+	server.open["spec/a.md"] = "See [[spec/nowhere]].\n"
+	server.mu.Unlock()
+	said := server.Republish(uris)
+	if len(said) != 1 || !strings.Contains(string(said[0]), "EveryPointerResolves") {
+		t.Fatalf("a republish over a moved sweep answers %q, and wants the finding", said)
+	}
+}

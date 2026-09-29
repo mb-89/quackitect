@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -160,6 +160,15 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8572d2183d7 · claude-code-remote
+    hash_before: ab12efbbf1b1a766f47680c689f84e015220a5d2
+    hash_after: ab12efbbf1b1a766f47680c689f84e015220a5d2
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -306,14 +315,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/lsp src/quack
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/modules/lsp, src/quack and spec/wiring.yaml, the files the approach names
+- the listener and the relay meet a real loopback port in their tests, with a fake sweep
+- a comment on each function points at the design output section it implements
+- the sync rule and the frame words stand once, in lsp.go, and the design note is pointed at
 
 ## tests-green
 
