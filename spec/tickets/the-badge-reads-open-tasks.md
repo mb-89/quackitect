@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -179,6 +179,15 @@ record:
     hash_after: c26808e7bb6e449df0d80336b50c68992098e77e
     returns: 1
     why: "the approach leaves out the three parts the owner moves here under Discussion, though that entry says the draft takes them in: a sidebar redraw after a burst of writes to a ticket folder, the plan file or the hold folder, in src/extension/sidebar.js; a case in test/level0/sidebar.test.js holding a ticket write changing the badge; and the owner's before-and-after compare with no window reload; src/extension/sidebar.js watches only SCHEMA, TRACKED, LOCAL and BLESS, so the badge keeps its old number after a ticket moves while the work tab reads fresh places; the two numbers still disagree, and the ask's goal stays unmet; design/tests-red holds no red case for the redraw, so no failing test decides that part; the draft names the redraw and its case in test/level0/sidebar.test.js, and tests-red writes that case red; the callers list names no caller in src/extension; add sidebar.js counted and its watches list; form, rides to the build: TestTheBadgeAndTheHeaderReadOneValue reads Places.Takeable as the badge; a case on countSaid in src/tui holds the badge's own verb; checked and holding: slicedCount, shadowOf, askOpenTasks, PlacesAt, Tab.Label and countSaid read as the draft says; migration.opentasks takes new under the schema enum; openTasksOf in src/modules/work counts what countTakeable counts; two of the three new tests fail on their own assertion, reading 3 and 2 where they want 5"
+  - step: design/draft-2
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 2522528b8b1c597b27edda9728c6360c5258a68f
+    hash_after: 2522528b8b1c597b27edda9728c6360c5258a68f
+    inputs:
+      - name: ask
+        hash: fe2bc1ba0ba3484f
+        size: 258
+    def: a3dfd8c60d853590
 group: open-tasks-switch-lands
 ---
 
@@ -284,32 +293,57 @@ the index door and the verb both have fakes: askOpenTasks and runPlaces
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The count takes the approach of draft: `PlacesAt` in src/tui/work/workplaces.go calls `slicedCount(root, old, now)` in src/tui/work/shadow.go. Under `new` it answers the index's `work/open-tasks` through `askOpenTasks`, and keeps the old count where no door answers. Under `shadow` it runs `shadowOf` and answers the old count, and under `old` it answers the old count. `Places.Takeable` carries the answer, and the header (`Tab.Label`) and the badge's verb (`countSaid`, behind `./RUNME.sh tui work --count`) both read it. `countSaid` in src/tui/main.go reads `PlacesAt` through a package variable `placesAt`, so a case holds the badge's own verb to `Takeable`. `migration.opentasks` moves to `new` in spec/config/level0.json, and one commit on that key puts the old count back.
+
+The redraw closes the gap the gate names. src/extension/sidebar.js exports `COUNTS`: `spec/tickets/*.md`, `.se/tickets/*.md`, `.se/.runtime/plan.json` and `.se/.runtime/hold/*.json`. The sidebar answers them as `counts`, beside `watches`. src/extension/lib/settle.js holds `settled(run, span, later)`, which runs `run` once, `span` after the last call of a burst. `later` is the timer handed in, so a test drives it without a clock, and `timer` there wraps setTimeout for the editor. src/extension/extension.js watches `sidebar.counts` with `settled(draw, BURST, door.later ?? timer)` once the view opens. A ticket moving, a todo landing in the plan, or a hold changing then draws the badge again off the verb, with no window reload.
+
+The owner's before-and-after compare stands at the view step: the badge and the work header read one number before a ticket write and after it, with no reload.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/main.go countSaid
+- src/tui/work/work.go PlacesCmd, then Tab.Label
+- src/tui/work/workplaces.go PlacesAt
+- src/extension/extension.js activate, the view's watch on sidebar.counts
+- src/extension/sidebar.js counted, and the counts list beside watches
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/work/shadow_test.go TestTheNewSliceAnswersTheIndexCount
+- src/tui/work/shadow_test.go TestTheNewSliceKeepsTheOldCountWhereNoDoorAnswers
+- src/tui/work/shadow_test.go TestTheBadgeAndTheHeaderReadOneValue
+- src/tui/count_test.go TestTheBadgeVerbSaysTheTakeableCount
+- test/level0/sidebar.test.js a ticket write draws the badge again once its burst settles
+- test/level0/settle.test.js a burst of calls runs once, a span after the last
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the approach leaves out the redraw: the second paragraph takes it in, with its watches in src/extension/sidebar.js
+- sidebar.js watches only config files: COUNTS adds the ticket folders, the plan file and the hold folder
+- no red case for the redraw: tests-red-2 writes the sidebar and settle cases red
+- the callers list names no caller in src/extension: it names extension.js and sidebar.js
+- the badge case reads Places.Takeable: TestTheBadgeVerbSaysTheTakeableCount in src/tui/count_test.go holds countSaid, the badge's own verb
+- the owner's compare: the view step reads it
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: PlacesAt, slicedCount, shadowOf, askOpenTasks in src/tui/work, Tab.Label in work.go, countSaid in src/tui/main.go, sidebarOf, watches and counted in src/extension/sidebar.js, the view's watch in src/extension/extension.js, HOLDS and TICKETS in folders.js, PLANS in runs.js
+- the callers list names countSaid, PlacesCmd, PlacesAt, the view's watch in extension.js and sidebar.js
+- done_when: TestTheBadgeAndTheHeaderReadOneValue and TestTheBadgeVerbSaysTheTakeableCount hold the badge and the header to one value, and ./RUNME.sh check decides the rest
 
 ## tests-red-2
 
