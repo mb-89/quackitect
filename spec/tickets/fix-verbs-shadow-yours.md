@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d8571371c5d9 · claude-code-remote
+    hash_before: b94d07cfa9407f4911731d9a01200bb691a0111b
+    hash_after: b94d07cfa9407f4911731d9a01200bb691a0111b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/modules/tickets passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: e555f2142edfd5fd
+        size: 851
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -56,20 +74,25 @@ With both fixed, the switch turns on, and the verbs that stand behind it answer 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Three faults made ticket yours answer apart from cli.js. The tickets module read only the step line, where stepOf falls to the first leaf of steps, so a draft answered an empty step: Of now falls to the first leaf, and TestStepFallsToTheFirstLeaf failed before the fix. The tickets module read person only on an open ticket, where personStep reads the step hand whatever the state, so a draft at a person step answered false: Of now reads the hand alone. The v1 values route read the snapshot before the scheduler settled, so the first read after the index started answered the empty default: valueOf now settles first, as the door value call does, and TestV1SettlesBeforeItReads holds it. I restarted the index, drove ticket yours, ticket yours --next, retro notes and branch list --queue, and the shadow log named no new row. Assumption: the prose shadow rows on the ticket ask stand outside the verbs slice.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: three fixes with tests, no phase switch flipped
+- the cleanup it reveals: the prose shadow row on this ticket ask is a note for the prose slice
+- every fact stands once: the run lives on this ticket
 
 # Discussion
 
