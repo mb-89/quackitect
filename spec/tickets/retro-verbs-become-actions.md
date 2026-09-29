@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 2ccf2c410d2366a6
         size: 309
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: a85bca891398b27dab5234d9e4384c2183945647
+    hash_after: a85bca891398b27dab5234d9e4384c2183945647
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/verbs fails
+    inputs:
+      - name: design/draft
+        hash: 92c91396a234d448
+        size: 3211
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -219,26 +232,32 @@ What I assume: `Topic` and `nodeAccept` land under `ticket-verbs-become-actions`
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/verbs/verbs_test.go src/quack/twins_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/verbs/verbs_test.go
+- src/quack/twins_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The retro verb list stands empty, the topic declares no collect, the wiring loads no retro instance, and the notes twin answers usage. Each fails on its own assertion. What surprises: both red files stand red already under ticket-verbs-become-actions, so this ticket adds no file to the list the check leaves out.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- go test meets every new Go case, the shadow line meets the notes twin the road runs beside cli.js, and the check meets the check verb
+- the twin reads a door over a seeded catalog of tickets/all, and the topic and wiring cases run over a fresh catalog
 
 # gate
 

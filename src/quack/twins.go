@@ -16,6 +16,13 @@ func ticketYours(v1 func() (string, error)) twin {
 	}
 }
 
+// retro notes off tickets/all over the base v1 answers: every note under .se/tickets standing open. [[spec/tickets/retro-verbs-become-actions]]
+func retroNotes(v1 func() (string, error)) twin {
+	return func(argv []string, _ bool, out, errs io.Writer) int {
+		return exitUsage
+	}
+}
+
 // The node module: runs cli.js under the root with the request's words, and answers its output. [[spec/tickets/ticket-verbs-become-actions]]
 func nodeAccept(root string) func(q.Request) (any, error) {
 	return func(q.Request) (any, error) { return nil, nil }
