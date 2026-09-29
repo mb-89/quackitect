@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
 depends_on: ["the-quack-cli-gets-generated"]
+record:
+  - step: design/draft
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: d7cd6e3b9ccd71296609436f59b49c314efc7917
+    hash_after: d7cd6e3b9ccd71296609436f59b49c314efc7917
+    inputs:
+      - name: ask
+        hash: 77d4d7d4493d36a8
+        size: 267
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,61 @@ A tool then costs one action, and every harness picks it up.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The index generates the tool list off the registry, and the hook reaches it through the binary, the way the pull reaches `cli.js`.
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the list | a new `src/index/tools.go`, served at `GET /v1/tools` | answers one tool an action: its name, its `q.Doc` as the description, and its input schema off the Huma registry, with the reference resolved |
+| the name | `toolName` in `tools.go` | `index_` and the action with each slash an underscore, so a tool reads apart from the tools the bridge serves |
+| a bare input | `tools.go` | an action taking no struct carries its input as the one property `input`, since a tool takes an object |
+| the command | `quack tools` and `quack act <action> <json>` in `src/quack/cli.go` | prints the list, and posts the JSON as the input, follows the call, and prints the result |
+| the hook | a new `.claude/skills/level0/lib/index-tools.js`, which `pull-tool.js` calls | at the session start, runs `se-index tools` under the method root and registers each tool beside the pull and the read tools. A call of a tool it holds runs `se-index act` and answers what it prints |
+
+A box whose binary stands nowhere or answers nothing registers no index tool, and the tools it registers today stand as before.
+
+The verbs slice decides nothing here: a tool reaches an action, and no verb of `cli.js` twins it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/pull-tool.js: register, whose session start registers the list
+- .claude/skills/level0/hooks/pull-tool.js: a new tool call handler for the index tools
+- src/index/v1.go: servesV1, which serves the list
+- src/quack/cli.go: cli, which answers tools and act
+- src/quack/cli.go: cliVerbs, which main reads
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/tools_test.go: TestV1ListsEachActionAsATool
+- src/index/tools_test.go: TestABareInputRidesAsOneProperty
+- src/quack/cli_test.go: TestToolsPrintsTheListTheIndexGenerates
+- src/quack/cli_test.go: TestActPostsItsJSONAndPrintsTheResult
+- test/level0/index-tools.test.js: the hook reads the generated list and registers each tool
+- test/level0/index-tools.test.js: a call of an index tool runs act with its input
+- test/level0/index-tools.test.js: a binary that answers nothing registers no tool
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- pull-tool.js, level0.js, v1.go, actions.go, catalog.go and cli.go stand opened, and each claim checked there
+- the callers list names the hook, the door and the command tree
+- the list case names index-tools.test.js under test/level0, and the check names the check verb
 
 ## tests-red
 
