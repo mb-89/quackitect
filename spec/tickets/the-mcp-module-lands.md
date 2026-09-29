@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d85490c97110e · claude-code-remote
+    hash_before: 425e24e5de4f3d964a987693f83850b8105dc5fd
+    hash_after: 425e24e5de4f3d964a987693f83850b8105dc5fd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/mcp passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 09e30bdebd78c5de
+        size: 1065
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -344,26 +367,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/mcp src/quack/mcp_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The mcp IO module under src/modules/mcp lists one tool for each action the store holds, read at each ask, so a new action lists with no change here. A tool takes its name, its doc and its input schema off src/q/tool, the surface the index and the hooks door share, and adds the wait argument. Handle answers the JSON-RPC of the protocol: initialize, ping, tools/list and tools/call, with a call past its wait answering still running and a failing call answering isError. Listen serves POST /mcp on loopback behind a token and writes mcp.json the way the hooks door writes hooks.json. Replay drives Handle off a recording under test/replay/mcp. The wiring names the instance, and src/quack starts its listener beside the hooks door over the same manager, so Copilot reaches every action with no function hooks.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and src/q/tool through the gate point that moved the shared piece there
+- the loopback listen stands driven for real in the listen case, and Replay is the inbound fake the recording drives
+- the head of src/modules/mcp/mcp.go names the approach, and each function links its section
+- every fact stands once: the tool surface lives in src/q/tool, and the standing file path in the module alone
 
 # accept
 
