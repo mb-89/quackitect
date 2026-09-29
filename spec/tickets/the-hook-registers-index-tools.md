@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 19a8de86412d999c5a75c36374bd44204e2b7980
+    hash_after: 19a8de86412d999c5a75c36374bd44204e2b7980
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s); green, src/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 3f0e505ff5287f29
+        size: 865
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -324,26 +347,33 @@ the runtime folder comes from folders.js, the hook spells the tool prefix once a
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/index/tools_test.go src/quack/cli_test.go test/level0/index-tools.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index serves GET /v1/tools: one tool an action, named index_ and the action with each slash an underscore, described by its q.Doc, with its input schema off the registry and the reference resolved. An input short of an object rides as the one property input, marked bare. quack tools prints that list, and quack act <action> [<json>] posts the JSON and follows the call to its result. At the session start the hook runs se-index tools under the method root and registers each tool beside the pull and the read tools, and a call of one runs se-index act. A binary that stands nowhere or answers nothing registers no index tool. src/index/testdata/tools.golden.json holds the list the index generates, which the hook case reads. Against the live index the list names every action, each name within the tool name pattern.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the list, the door, the command tree and the hook the draft names, and the two points files alone
+the hook reads the process and tool doors the engine fakes in its case, and the Go cases stand a door over fake actions
+each new file opens on a header naming the approach, and each function links the ticket
+the runtime folder comes from folders.js, and the golden file holds the list shape once
 
 # accept
 

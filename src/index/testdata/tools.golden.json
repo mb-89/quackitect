@@ -4,16 +4,23 @@
     "bare": false,
     "description": "adds two terms",
     "inputSchema": {
+      "additionalProperties": false,
       "properties": {
         "a": {
           "description": "the first term",
+          "format": "int64",
           "type": "integer"
         },
         "b": {
           "description": "the second term",
+          "format": "int64",
           "type": "integer"
         }
       },
+      "required": [
+        "a",
+        "b"
+      ],
       "type": "object"
     },
     "name": "index_t_add"
@@ -28,6 +35,9 @@
           "type": "string"
         }
       },
+      "required": [
+        "input"
+      ],
       "type": "object"
     },
     "name": "index_t_echo"
