@@ -1,5 +1,5 @@
 ---
-description: "config / migration / config: sets migration.config to new. The config readers: old answers alone, shadow runs the config module beside them and logs a mismatch, new answers the module's."
+description: "config / migration / config: sets migration.config to new. The config readers' slice, switched over in phase 3. The config verb reads the config module."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
