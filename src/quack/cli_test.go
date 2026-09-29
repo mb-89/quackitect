@@ -134,3 +134,17 @@ func TestGetPrintsTheValueOfAName(t *testing.T) {
 		t.Fatalf("quack get t/n answers %d: %s%s", code, out, errs)
 	}
 }
+
+func TestToolsPrintsTheListTheIndexGenerates(t *testing.T) {
+	code, out, errs := ran(standingTree(t), "tools")
+	if code != 0 || !strings.Contains(out, `"index_t_add"`) || !strings.Contains(out, "adds two terms") {
+		t.Fatalf("quack tools answers %d: %s%s", code, out, errs)
+	}
+}
+
+func TestActPostsItsJSONAndPrintsTheResult(t *testing.T) {
+	code, out, errs := ran(standingTree(t), "act", "t/add", `{"a":2,"b":3}`)
+	if code != 0 || !strings.Contains(out, `"sum": 5`) {
+		t.Fatalf("quack act t/add answers %d: %s%s", code, out, errs)
+	}
+}

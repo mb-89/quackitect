@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 77d4d7d4493d36a8
         size: 267
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: e0617b8db07c27e40eee172e57fe7aa89503fb17
+    hash_after: e0617b8db07c27e40eee172e57fe7aa89503fb17
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 6ed3948a7e420447
+        size: 2582
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -219,26 +232,33 @@ The verbs slice decides nothing here: a tool reaches an action, and no verb of `
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/tools_test.go src/quack/cli_test.go test/level0/index-tools.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/tools_test.go
+- src/quack/cli_test.go
+- test/level0/index-tools.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The door answers 404 at the tools route, the command tree answers usage for tools and act, and the stub hook registers nothing and finds no binary. The case where the binary answers nothing passes against the stub already, as it should. What surprises: the hook reaches the outside through the process, the file and the tool doors alone, so the binary is its one road to the index.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the list case under test/level0 reads a generated list and asserts each tool registered beside the pull, and the check meets the check verb
+- the hook cases hand a fake process and a fake tool door, and the Go cases stand a door over fake actions
 
 # gate
 
