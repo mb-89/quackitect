@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: go-cage-lands-in-shadow
 parent: the-hooks-door-lands
+record:
+  - step: do
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 463806b4ce95e33d1cc9d7ba150d826821144b71
+    hash_after: 463806b4ce95e33d1cc9d7ba150d826821144b71
+    why: the-hooks-door-lands answers this ask
+reason: answered
 ---
 
 # Ask
