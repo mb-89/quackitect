@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: open-tasks-switch-lands
 parent: the-count-chain-leaves
+record:
+  - step: do
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: e8041818162f2aa99ef0a72f40a998704ccac1e7
+    hash_after: e8041818162f2aa99ef0a72f40a998704ccac1e7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 45 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: f74d098d30fce01a
+        size: 144
+    def: afe0d22bb9adb010
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ the migration.opentasks help in level0.schema.json still describes old and shado
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/config.test.js test/level0/projection.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The migration.opentasks help in spec/config/level0.schema.json names the key as the record of the open tasks slice. It says the badge, the work tab's brackets and its queue column read the index, and that the old and shadow values reach no reader since phase 2 switched over.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: the help describes what a reader acts on
+the cleanup: the enum keeps old and shadow as the record, and the help says so
+one place: the schema owns the help, and the projections follow it
 
 # Discussion
 
