@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-lands-in-shadow
 depends_on: ["the-tui-becomes-a-shell"]
+record:
+  - step: design/draft
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 4cc966896e72c57a75ad2523d805434c6d9be563
+    hash_after: 4cc966896e72c57a75ad2523d805434c6d9be563
+    inputs:
+      - name: ask
+        hash: f268653c1878cc1f
+        size: 207
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,61 @@ The log view then reads the rows one owner holds.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The log becomes a declared view, in shadow: the tailed rows keep drawing, and the rows the index holds under log/rows stand beside them.
+
+| the part | where | what it does |
+|---|---|---|
+| the declaration | spec/views/log.base | reads log/rows, follow true, the actions E (jumps to level: error) and alt+l (cycles floor), and one table view over at, level, kind and said |
+| the reader | src/tui/tree/base.go ReadBase | View gains Reads, Badge, Follow and Actions, read off the file's top-level keys, so the work view reuses them |
+| the compare | src/tui/log/shadow.go | Shadow holds a Source (the one Read the registry catalog has), a Mode func and a Say func. Apart(old, rows) names each row the tail and log/rows read apart, on at, level, kind and said, and a tail one side holds alone is the log growing |
+| the tab | src/tui/log/tab.go Update | on LinesMsg, a shadow in shadow mode runs the compare in a command and writes one shadow row a mismatch |
+| the write | src/tui/log/door.go | appendLine adds a row to the session log, the one file call the compare makes |
+| the slice | src/modules/migration/migration.go | a window slice, built in as old, which the default file sets to shadow and the group's last ticket switches |
+| the window | src/tui/main.go newModelOver | hands the log tab the catalog and a mode read off the config key migration.window |
+
+Assumptions for the hand at the merge: the old tail stays the drawn path under shadow, since the ask says the window keeps answering the old way. A shadow row never counts in the compare, so no row breeds another, as log-shadow.js does. The mode reads through the config package in the window's root, so log imports no config.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/tree/base.go viewOf: builds every View, so the new keys ride there
+- src/tui/work/work.go New: reads work.base through tree.ReadBase
+- src/tui/main.go newModelOver: builds the log tab
+- src/tui/log/tab.go New and Update: the tab the shadow hangs on
+- src/modules/migration/migration.go Registers: the slices list gains one
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/tree/base_test.go TestABaseFileNamesWhatItReadsItsBadgeAndItsActions
+- src/tui/log/shadow_test.go TestTheShadowNamesEachRowTheTailAndTheIndexReadApart
+- src/tui/log/shadow_test.go TestAShadowRowNeverCountsInTheCompare
+- src/tui/log/shadow_test.go TestTheLogTabWritesAShadowRowOnAMismatchInShadow
+- src/tui/log/shadow_test.go TestTheLogTabWritesNoRowUnderOld
+- src/tui/log/view_test.go TestTheLogBaseFileDeclaresTheLogView
+- src/modules/migration/migration_test.go TestTheWindowSliceStandsAmongTheSlicesBuiltInAsOld
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first, on a first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: tree/base.go, log/tab.go, log/door.go, log/record.go, main.go, migration.go, scripts/log-shadow.js and the views chapter of the model note
+- the callers list names each caller of ReadBase and the tab constructor
+- the ask's case draws the log view over fake rows: TestTheLogTabWritesAShadowRowOnAMismatchInShadow and TestTheLogBaseFileDeclaresTheLogView decide it, and go test ./... with the check close it
 
 ## tests-red
 
