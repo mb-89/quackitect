@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 825fda2631eb19d3
         size: 2947
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8509c02d5db · claude-code-remote · helper-3
+    hash_before: 74de70c88887d416445747b232ea9a3a1046f067
+    hash_after: 74de70c88887d416445747b232ea9a3a1046f067
+    inputs:
+      - name: design/draft
+        hash: 825fda2631eb19d3
+        size: 2947
+      - name: design/tests-red
+        hash: 4b57014bfa8d25e3
+        size: 871
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -273,8 +285,11 @@ The road cases fail on their assertions against a stub that hands every verb to 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- quack-alone-verbs-skip-mode: get and run stand in quack alone, and cli.js only refuses them, so the road hands them to quack under every mode as the ask says of a verb quack knows. The road case under old for get flips from toNode to toQuack.
+- verb-road-keeps-the-terminal: the road runs cli.js as a child where RUNME.sh execs it today, so it hands the child stdin, forwards SIGINT and SIGTERM, and answers the exit code of the child, and tui and a Ctrl-C behave as under exec. A case over the old door decides it.
 
 # implement
 
