@@ -35,6 +35,16 @@ func TestTheVerbsSliceStandsSharedAndOld(t *testing.T) {
 	t.Fatalf("the slices read %+v, and want verbs built in as old", slices)
 }
 
+// The cage slice stands among the slices, built in as old, so a box with no tracked mode keeps the bridge alone. [[spec/tickets/the-hooks-door-lands]]
+func TestTheCageSliceStandsSharedAndOld(t *testing.T) {
+	for _, one := range slices {
+		if one.key == CageKey && one.mode == "old" {
+			return
+		}
+	}
+	t.Fatalf("the slices read %+v, and want cage built in as old", slices)
+}
+
 // The key stands shared, so the default file sets it under the migration block. [[spec/tickets/open-tasks-run-in-shadow]]
 func TestTheSliceKeyStandsShared(t *testing.T) {
 	c := q.New()

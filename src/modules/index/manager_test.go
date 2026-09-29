@@ -406,3 +406,19 @@ func TestServesCallsAnActionThroughItsAccept(t *testing.T) {
 		}
 	}
 }
+
+// The start answers the book's reads beside its call, so the hooks door reads a session's operations. [[spec/tickets/the-hooks-door-lands]]
+func TestServingAnswersEveryOperationOfACaller(t *testing.T) {
+	_, _, from, _ := manager(t)
+	served, err := Serving(from)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(served.Stop)
+	if ops := served.Of("s1"); len(ops) != 1 || ops[0].ID != "1" || ops[0].State != Failed {
+		t.Fatalf("the book answers %+v for s1, and wants the one operation the restart fails", ops)
+	}
+	if ops := served.Of("s2"); len(ops) != 0 {
+		t.Fatalf("the book answers %+v for s2, and wants none", ops)
+	}
+}

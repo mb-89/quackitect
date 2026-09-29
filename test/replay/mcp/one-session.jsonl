@@ -1,0 +1,4 @@
+{"session":"m1","request":{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"copilot","version":"1.0"}}},"response":{"id":1,"jsonrpc":"2.0","result":{"capabilities":{"tools":{"listChanged":false}},"protocolVersion":"2025-06-18","serverInfo":{"name":"quackitect","version":"1.0.0"}}}}
+{"session":"m1","request":{"jsonrpc":"2.0","method":"notifications/initialized"},"response":null}
+{"session":"m1","request":{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"index_work_pull","arguments":{"ticket":"t1"}}},"response":{"id":2,"jsonrpc":"2.0","result":{"content":[{"text":"\"pulled t1\"","type":"text"}],"isError":false}}}
+{"session":"m1","request":{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"index_no_such","arguments":{}}},"response":{"error":{"code":-32602,"message":"index_no_such names no tool"},"id":3,"jsonrpc":"2.0"}}
