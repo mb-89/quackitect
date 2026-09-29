@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
 depends_on: ["agents-call-quack-directly"]
+record:
+  - step: design/draft
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: 9975b2726c344971398f6cac5af0b9aca56414db
+    hash_after: 9975b2726c344971398f6cac5af0b9aca56414db
+    inputs:
+      - name: ask
+        hash: 3ee6509b247fc56f
+        size: 193
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,68 @@ Two roads to a verb drift apart again.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Go holds the one verb table, and each verb's JavaScript body runs as a program of its own until its port lands.
+
+1. The table. `src/modules/verbs/tree.go` holds `Commands`, every verb in help order with its usage line, the topic verbs among them. `TreeVerbs` reads as `Commands` less the topics. `quack help`, and `quack verb` meeting no verb, print the usage off `Commands`, as `cli.js` prints it today.
+2. The programs. `src/scripts/verbs/<verb>.js` holds one program a verb, each a few lines over a shared runner, `src/scripts/verb-run.js`. The runner reads the words past the verb, guards its main, and exits drained, as the foot of `cli.js` does. The bodies `cli.js` holds move by topic: the check, test and tally helpers to `src/scripts/check-verb.js`, theVehicle and theStub to `src/scripts/vehicle-verb.js`, mint, mintFields and drawing to `src/scripts/mint-verb.js`, renameHere to `src/scripts/rename.js`, and serveBridge to `src/scripts/serve.js`.
+3. The road. `quack verb <scripts> <verb> ...` runs `node <scripts>/verbs/<verb>.js ...` where no twin answers. The shadow branch of `src/quack/verbs.go` and its log row leave, since the slice stands at new. The node module in `src/quack/twins.go` runs the same program. `RUNME.sh` hands the binary `src/scripts`, and names install.sh where no binary stands. `install.sh` runs the tools program.
+4. The spawns. `verbArgv` in `verb-run.js` answers the argv of a verb program, and every JavaScript spawn of `cli.js` calls it: commit-verb.js, work-merge.js, work-review.js, bridge review.js and engine retro mint.js. The hook's pull-tool.js and the extension's lens.js import their own folder alone, so each spells the programs folder again with a comment naming the owner. `placesVerb` in `src/tui/work/workplaces.go` names the branch program.
+4. The cage. `VERB_ROOTS` in `lib/bash.js` reads a verb program path as a verb root, naming its verb off the file name, so the ticket-free and landing rules keep reading `node src/scripts/verbs/branch.js done`.
+5. The cases. Each test importing a body off `cli.js` imports it off its new file. Each test reading the `verbs` export or the source reads the programs folder, or the file the body moved to.
+
+Weighed and refused: one JavaScript dispatcher under a new name, since it keeps the second table the ask removes; and a Go port of every verb, which phases 5 to 10 carry. Assumed: the quack binary stands wherever a verb runs, since install.sh builds it before any verb.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- RUNME.sh: the verb road and its no-binary fallback
+- src/scripts/install.sh: the tools run at its foot
+- src/quack/verbs.go: verbRoad, verbs, roadOf and oldDoor
+- src/quack/twins.go: nodeAccept
+- src/quack/main.go: the help verbs in cliVerbs, through cli.go
+- src/tui/work/workplaces.go: placesVerb
+- src/scripts/commit-verb.js: the test and check spawns
+- src/scripts/work-merge.js: the check --errors spawn
+- src/scripts/work-review.js: the check spawn
+- src/bridge/review.js: the branch review spawn
+- src/engine/retro/mint.js: the argv it mints through
+- .claude/skills/level0/hooks/pull-tool.js: CLI_SCRIPT
+- src/extension/lib/lens.js: CLI
+- .claude/skills/level0/lib/bash.js: VERB_ROOTS, read by freeVerbIn and landingOf
+- test/level0 and test/contract: every case importing verbs, testArgv, serveBridge, exitsDrained, renameHere, mintFields or theVehicle off cli.js, or reading its source
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/cli-leaves.test.js: cli.js stands nowhere, and no source under src, test or .claude imports or spawns it
+- test/contract/cli-leaves.test.js: every verb Go's table lists stands as a program under src/scripts/verbs, and no program stands past the table
+- src/quack/verbs_test.go: a verb with no twin runs its program under the scripts folder
+- src/quack/verbs_test.go: help and an unknown verb print the usage off Commands
+- src/modules/verbs/tree_test.go: TreeVerbs reads as Commands less the topics
+- test/level0/verb-run.test.js: verbArgv answers node, the program and the words
+- test/level0/bash.test.js: a verb program path reads as a verb root
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function named stands opened: cli.js whole, verbs.go, twins.go, workplaces.go, RUNME.sh, install.sh, each spawn site and VERB_ROOTS
+- the callers come off a grep for cli.js over the tree, less the tickets and the rationales
+- each done_when line names its decider: cli-leaves.test.js for the file, and ./RUNME.sh check for the rest
 
 ## tests-red
 
