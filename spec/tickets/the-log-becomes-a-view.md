@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 9d815d85fa8e69454b69aafd7634661be241cb66
+    hash_after: 9d815d85fa8e69454b69aafd7634661be241cb66
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: b2c76ad4a79c0e5d
+        size: 865
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -325,26 +348,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The log view stands as a declared view in spec/views/log.base, drawn by ViewOver in src/tui/log over log/rows, and the shadow compare writes one shadow row per mismatch. The gate points closed: a draw case over fake rows, and the corrected test path in the Discussion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out
+- every door the change reaches has a fake
+- a comment names the approach each function implements
+- each fact stands once, and the tui chapter holds the import row
 
 # accept
 
