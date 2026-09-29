@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: a804d3c07693ee2e
         size: 415
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 7cf3ca3409c49ba6ac1246e42532fc1bdb32b118
+    hash_after: 7cf3ca3409c49ba6ac1246e42532fc1bdb32b118
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 104a8279f653155f
+        size: 2877
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -211,26 +224,31 @@ go test ./... is decided by the whole suite with cage_test.go in it; the replay 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new test fails on its assertion against the stub, and every standing hooks test passes. The draft read the rows through log.RowsOf, but no module imports another, so cage.go parses the hook rows itself: at, kind, event, answer, and the e under text. The recorded log copies the row shape src/doors/log.js event writes, since no box here holds a debug log. The PostsOf test names a Recorded type carrying the line and the stamp beside the post, and ShadowTo gets a test of its own, TestShadowToAppendsOneLineARow, past the draft's list.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Every done_when line meets a red test: go test ./... through the package, the replay of every recorded log through TestReplayLogAnswersEveryRecordedLog, each difference through TestReplayLogWritesAShadowRowForEachDifference; ./RUNME.sh check stays a checkpoint of tests-green.
+The door's outside world stands on the fakes doorOver already builds, and ShadowTo writes under t.TempDir alone.
 
 # gate
 
