@@ -51,7 +51,7 @@ func catalogOf(store *q.Store) ([]NameRow, []ActionRow, []DocRow) {
 			continue
 		}
 		looks, _ := store.Presentation(name)
-		row := NameRow{Name: name, Provider: why.Provider, State: why.State}
+		row := NameRow{Name: name, Provider: why.Provider, State: why.State, Label: looks.Label, Icon: looks.Icon, Looks: string(looks.Looks)}
 		// A family and the catalog's own rows carry no value, so index/names nests no list of itself. [[spec/tickets/the-catalog-reads-as-rows]]
 		if !strings.Contains(name, "<") && !strings.HasPrefix(name, "index/") {
 			row.Value = why.Value

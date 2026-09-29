@@ -151,3 +151,38 @@ func TestTheViewOverDrawsTheColumnsOfTheBaseFile(t *testing.T) {
 		t.Fatalf("the header draws %q, and wants the name and queue columns", head)
 	}
 }
+
+// The tab starts no compare before the queue has landed, or with no shadow. [[spec/tickets/the-work-view-gains-actions]]
+func TestTheWorkTabRunsNoCompareBeforeTheQueueLands(t *testing.T) {
+	t.Parallel()
+	tab := New(filepath.Join(t.TempDir(), "session.jsonl"))
+	tab.Shadow = shadowOf("shadow")
+	tab.Tree = tree.NewTree(nil, nil, false)
+	if tab.check() != nil {
+		t.Fatal("a tab with no queue starts a compare")
+	}
+	tab.Places = &Places{Counted: true}
+	if tab.check() == nil {
+		t.Fatal("a tab with its queue starts no compare")
+	}
+	tab.Shadow = nil
+	if tab.check() != nil {
+		t.Fatal("a tab with no shadow starts a compare")
+	}
+}
+
+// A pair told once stands once in the log. [[spec/tickets/the-work-view-gains-actions]]
+func TestAWorkPairToldOnceStandsOnceInTheLog(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join(t.TempDir(), "session.jsonl")
+	sh := shadowOf("shadow")
+	for range 3 {
+		if err := sh.Check(path, itemsAt("open", "9"), "work (5)"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	body, _ := os.ReadFile(path)
+	if lines := strings.Count(string(body), "\n"); lines != 2 {
+		t.Fatalf("the log holds %d lines after three compares, and wants the two mismatches once", lines)
+	}
+}

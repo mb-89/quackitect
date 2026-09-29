@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: cd03e20b564a0228
         size: 961
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 9aa5afdf1b35b20013ba66a7eee0e52390bfb0c4
+    hash_after: 9aa5afdf1b35b20013ba66a7eee0e52390bfb0c4
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files touched: the view base files, the base reader, the frame shadow writer and its door, the log and work shadows and their tabs, the work module labels, the catalog row, the window slice with its config key and projections, and main.go; each serves the ask or the log view it rests on
+- every door reached has a fake: the shadow source has fakeSource, and the file write stands in the frame door
+- comments name the approach in each new file
+- the shadow row write stands once in frame.WriteShadow, and the import table stands in tui.md alone
 
 ## tests-green
 

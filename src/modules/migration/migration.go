@@ -36,6 +36,7 @@ var slices = []struct{ key, mode, doc string }{
 	{ProseKey, "old", "the prose slice, the prose checks in Go beside wink: old, shadow or new"},
 	{VerbsKey, "old", "the verbs slice, the road ./RUNME.sh hands a verb down: old, shadow or new"},
 	{CageKey, "old", "the cage slice, the road a hook event takes to the hooks IO module: old, shadow or new"},
+	{WindowKey, "old", "the window slice, the rows and the badges the window reads off the index: old, shadow or new"},
 }
 
 // The module type the wiring loads as migration. It returns the first key's writer, which no caller reads. [[spec/tickets/open-tasks-run-in-shadow]]

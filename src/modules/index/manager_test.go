@@ -432,3 +432,12 @@ func TestANameRowCarriesItsLabelAndLook(t *testing.T) {
 		t.Fatalf("index/names reads t/badge with label %v and looks %v, and wants Tickets and count", row["label"], row["looks"])
 	}
 }
+
+// A registration declaring no label leaves the row's label empty. [[spec/tickets/the-work-view-gains-actions]]
+func TestANameRowWithNoLabelCarriesNone(t *testing.T) {
+	ix := catalogued(t)
+	row := rowNamed(t, "index/names", rowsRead(t, ix.Read("index/names")), "config/depth")
+	if _, held := row["label"]; held {
+		t.Fatalf("index/names reads config/depth with label %v, and it declares none", row["label"])
+	}
+}

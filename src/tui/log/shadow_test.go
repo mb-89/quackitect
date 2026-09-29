@@ -159,3 +159,37 @@ func TestTheLogSourceIsTheFrameSource(t *testing.T) {
 		t.Fatal("the log source drops the frame's")
 	}
 }
+
+// A pair told once stands once in the log, however many times the compare runs. [[spec/design_output/model#the-log-is-a-view]]
+func TestAPairToldOnceStandsOnceInTheLog(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join(t.TempDir(), "session.jsonl")
+	if err := os.WriteFile(path, []byte(lineA+"\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	differs := rowA
+	differs.Said = "hello elsewhere"
+	sh := shadowOf("shadow", []Row{differs})
+	for range 3 {
+		if err := sh.Check(path, recordsOf(lineA)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	body, _ := os.ReadFile(path)
+	if lines := strings.Count(string(body), "\n"); lines != 2 {
+		t.Fatalf("the log holds %d lines after three compares, and wants 2", lines)
+	}
+}
+
+// The row a mismatch writes wakes no compare of its own. [[spec/design_output/model#the-log-is-a-view]]
+func TestTheTabRunsNoCompareForShadowRowsAlone(t *testing.T) {
+	t.Parallel()
+	tab := New(filepath.Join(t.TempDir(), "session.jsonl"), time.UTC)
+	tab.Shadow = shadowOf("shadow", nil)
+	if tab.check(recordsOf(`{"kind":"shadow","said":"a mismatch"}`)) != nil {
+		t.Fatal("a shadow row alone starts a compare")
+	}
+	if tab.check(recordsOf(lineA)) == nil {
+		t.Fatal("a counted row starts no compare")
+	}
+}

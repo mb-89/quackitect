@@ -48,3 +48,11 @@ func TestTheOpenTasksPortDeclaresItsLabelAndLook(t *testing.T) {
 		t.Fatalf("%s declares label %q and look %q, and wants work and count", OpenTasksPort, looks.Label, looks.Looks)
 	}
 }
+
+// The rows port declares the rows look, so a renderer draws a list off it. [[spec/tickets/the-work-view-gains-actions]]
+func TestTheRowsPortDeclaresTheRowsLook(t *testing.T) {
+	index := qtest.New(t, func(c *q.Catalog) { fed(c) })
+	if looks, found := index.Store().Presentation(RowsPort); !found || looks.Looks != q.Rows {
+		t.Fatalf("%s declares look %q, and wants rows", RowsPort, looks.Looks)
+	}
+}

@@ -37,3 +37,15 @@ func TestAShadowRowStandsInTheLogWithItsSlice(t *testing.T) {
 		t.Fatalf("the shadow row reads %v", row)
 	}
 }
+
+// A log that stands nowhere yet takes the row, so the first mismatch loses nothing. [[spec/design_output/model#the-log-is-a-view]]
+func TestAShadowRowCreatesTheLogWhereNoneStands(t *testing.T) {
+	t.Parallel()
+	path := filepath.Join(t.TempDir(), "session.jsonl")
+	if err := WriteShadow(path, time.Now(), "window", "a row"); err != nil {
+		t.Fatal(err)
+	}
+	if body, _ := os.ReadFile(path); !strings.Contains(string(body), `"kind":"shadow"`) {
+		t.Fatalf("the new log holds %q", body)
+	}
+}

@@ -111,7 +111,8 @@
     "check": "shadow",
     "prose": "shadow",
     "verbs": "shadow",
-    "cage": "shadow"
+    "cage": "shadow",
+    "window": "shadow"
   },
   "pull": {
     "comment": "The size cap. One tool answer reaches the model whole up to cap, in bytes, and the pull keeps each part margin below it. spec/design_input/level-two.md, chapter The size cap, holds the measure.",

@@ -228,3 +228,14 @@ func TestTheWorkBaseFileDeclaresItsRowsBadgeAndActions(t *testing.T) {
 		}
 	}
 }
+
+// A base file naming no actions holds none, and its view follows nothing. [[spec/design_output/model#a-view-declares-actions]]
+func TestABaseFileNamingNoActionsHoldsNone(t *testing.T) {
+	views, err := ReadBase(workBase)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if one := views[0]; one.Reads != "" || one.Badge != "" || one.Follow || len(one.Actions) != 0 {
+		t.Fatalf("the view reads %q badge %q follow %v with %d actions", one.Reads, one.Badge, one.Follow, len(one.Actions))
+	}
+}

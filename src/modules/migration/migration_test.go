@@ -4,6 +4,7 @@
 package migration
 
 import (
+	"strings"
 	"testing"
 
 	"quackitect/src/q"
@@ -68,4 +69,14 @@ func TestTheWindowSliceStandsAmongTheSlicesBuiltInAsOld(t *testing.T) {
 		}
 	}
 	t.Fatalf("the slices read %+v, and want window built in as old", slices)
+}
+
+// The window slice names its three modes in its doc. [[spec/tickets/the-log-becomes-a-view]]
+func TestTheWindowSliceDocNamesItsModes(t *testing.T) {
+	for _, one := range slices {
+		if one.key == WindowKey && one.doc != "" && strings.Contains(one.doc, "old, shadow or new") {
+			return
+		}
+	}
+	t.Fatal("the window slice names no modes in its doc")
 }
