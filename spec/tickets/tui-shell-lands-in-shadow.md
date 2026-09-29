@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/tui-shell-lands-in-shadow already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 830a58b65484cbd9dc440335ed67f3345117d2d2
+    hash_after: 1daa1991e2631bbcc467a0f19cb81a63d2868cbc
+    inputs:
+      - name: ask
+        hash: 8bd6c6dca29679f2
+        size: 576
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["quack-verbs-land-in-shadow", "read-topics-land-in-shadow"]
 enabled_by: migration.phase6shadow
 cloud: true
@@ -133,14 +145,21 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-log-becomes-a-view]] standard, closed
+- [[spec/tickets/log-draft-test-path-wrong]] trivial, closed
+- [[spec/tickets/log-view-draw-case-missing]] trivial, closed
+- [[spec/tickets/renderers-stand-inside-ioonly]] standard, the change stands pushed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole
+- the children add up to the goal: the window in shadow, the log view, and the renderers held to their doors
+- no child waits on another
 
 # children
 
