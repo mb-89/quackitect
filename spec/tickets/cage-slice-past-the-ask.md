@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: go-cage-lands-in-shadow
 parent: the-hooks-door-lands
+record:
+  - step: do
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: 2b463b6990d632d62fc53ab35bb8f4740e652b55
+    hash_after: 2b463b6990d632d62fc53ab35bb8f4740e652b55
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/migration passes; green, src/modules/config passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: e447a8a42daab8ab
+        size: 184
+    def: 63d61555f665ba51
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the migration slice cage, migration_test.go, spec/config/level0.json and its sch
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/migration src/modules/config
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The migration module declares the slice cage, built in as old, and the default file sets it to shadow with its schema entry. The ask of the-hooks-door-lands names the key in its group, so the key rides with the build that reads it. The size golden takes the schema line count the new entry moves.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask of go-cage-lands-in-shadow, which names migration/config/slices/cage as a shared key in the default file
+- the cleanup it reveals is in the change: the hooks standing file names the owner of its folder, and the size golden takes the new count
+- the mode stands in the default file alone, and the doc of the key points at the ticket
 
 # Discussion
 

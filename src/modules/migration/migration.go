@@ -20,6 +20,9 @@ const (
 // The key of the verbs slice, the road ./RUNME.sh hands a verb down, by its local name. [[spec/tickets/runme-hands-verbs-to-quack]]
 const VerbsKey = "verbs"
 
+// The key of the cage slice, the road a hook event takes to the hooks IO module, by its local name. [[spec/tickets/the-hooks-door-lands]]
+const CageKey = "cage"
+
 // Every slice this module switches, its built-in mode, and what each covers. The open-tasks slice stands switched over to new. [[spec/tickets/read-topics-land-in-shadow]]
 var slices = []struct{ key, mode, doc string }{
 	{OpenTasksKey, "new", "the open-tasks slice, switched over to new"},
@@ -29,6 +32,7 @@ var slices = []struct{ key, mode, doc string }{
 	{CheckKey, "old", "the check slice, the check/ names and their twins: old, shadow or new"},
 	{ProseKey, "old", "the prose slice, the prose checks in Go beside wink: old, shadow or new"},
 	{VerbsKey, "old", "the verbs slice, the road ./RUNME.sh hands a verb down: old, shadow or new"},
+	{CageKey, "old", "the cage slice, the road a hook event takes to the hooks IO module: old, shadow or new"},
 }
 
 // The module type the wiring loads as migration. It returns the first key's writer, which no caller reads. [[spec/tickets/open-tasks-run-in-shadow]]

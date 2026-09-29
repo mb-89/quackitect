@@ -17,7 +17,7 @@ const (
 	defaultWait = 1
 )
 
-// The file the listen writes its port to, under the root, which the bridge reads in shadow. [[spec/tickets/the-hooks-door-lands]]
+// The file the listen writes its port to, under the root, which the bridge reads in shadow. .claude/skills/level0/lib/folders.js owns the folder, and a module spells it again. [[spec/tickets/the-hooks-door-lands]]
 const StandingFile = ".se/.runtime/hooks.json"
 
 // One post of the hook protocol. Old carries the bridge's own decision, in shadow. [[spec/design_output/model#a-post-and-its-answer]]
