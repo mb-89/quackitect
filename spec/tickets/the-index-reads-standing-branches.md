@@ -116,11 +116,23 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d857a7e738d8 · claude-code-remote
+    hash_before: 9135a44e2f2a41f2fd54416269553d5424ff8538
+    hash_after: 9135a44e2f2a41f2fd54416269553d5424ff8538
+    inputs:
+      - name: ask
+        hash: b8802faa10e9f7d7
+        size: 1122
+      - name: [[spec/tickets/fix-verbs-shadow-yours-2]]
+        hash: f1cff362e5646752
+        size: 3915
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +173,69 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Decision: a new outbound IO module git (src/modules/git) reads what standing work/ branches carry on origin and writes it on the out-port standing; the wiring binds tickets.standing to git.standing. Weighed and refused: (a) drop trunk children of a group in the work module alone, because the standing branch copy is unread, so places and children drift from cli.js; (b) read git inside the work module, because the module reads no git and a fake could not stand in for it. The git module holds an interface Git with Standing(), a real one running git, and a FakeGit holding branches in memory, with one contract suite over both (testing rule 12 and 13), so no test needs a scratch remote the write door would refuse. A standing branch is one row of ticket.Standing: branch name, whether trunk already merged it, and the text of each ticket file under spec/tickets on its tip. The tickets module folds it into all the way ticketsIn in src/scripts/work-answer.js does: an unmerged branch speaks for its group ticket and the tickets naming that group, its copy wins over trunk by name, and each such ticket carries Branch and Here (stands in the working tree). The queue module then places rows off the same list, so places agree with cli.js. The work module draws the branch group row with an empty state, and leaves out every trunk-only ticket that is a standing branch group (merged included) or names one, as answerOf does; those tickets still take a place, as in cli.js. yoursOf prints an empty path for a ticket not standing in the working tree. Assumption: the port is read at start and again each minute of clock/minute, and merged means a tip off the first-parent line of origin/main, the rule mergedHere holds.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/tickets/tickets.go: allOf, cloudOf, Registers
+- src/modules/queue/places.go: placesOf reads tickets/all
+- src/modules/work/rows.go: rowsOf, rowOf, yoursOf, openTasksOf
+- src/quack/twins.go: the yours and queue twins read work/yours
+- src/quack/main.go: the module table and wired() start the new module
+- spec/wiring.yaml: the git instance and tickets.standing wire
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/work/rows_test.go: TestAStandingBranchDrawsItsRowWithNoStateAndDropsTrunkChildren
+- src/modules/work/rows_test.go: TestTheSameTicketsWithNoBranchDrawTheGroupAndBothChildren
+- src/modules/tickets/tickets_test.go: TestAStandingBranchCopyWinsOverTrunkByName
+- src/modules/tickets/tickets_test.go: TestAMergedBranchSpeaksForNothing
+- src/modules/git/git_test.go: TestFakeGitAnswersStandingBranches
+- src/modules/git/git_contract_test.go: the contract suite runs over FakeGit and a scratch repository
+- src/quack/ticket_twins_test.go: TestTicketYoursAgreesWithACliJsRowSetWhileABranchStands
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first on a first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/ticket/ticket.go
+- src/modules/git/git.go
+- src/modules/git/git_test.go
+- src/modules/git/git_contract_test.go
+- src/modules/tickets/tickets.go
+- src/modules/tickets/tickets_test.go
+- src/modules/queue/places.go
+- src/modules/work/rows.go
+- src/modules/work/rows_test.go
+- src/quack/main.go
+- src/quack/ticket_twins_test.go
+- src/quack/testdata/tree.golden.json
+- spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: answerOf, ticketsIn, ownTickets, readWork, mergedHere, allOf, cloudOf, placesOf, rowsOf, yoursOf, clock.Start and env.Start were read
+- callers: every reader of tickets/all found by search, and the twins read work/yours only
+- done_when: each of the four lines meets a test above, and the last meets the shadow log run by hand at the end
 
 ## tests-red
 
