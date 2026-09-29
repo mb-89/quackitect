@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
+record:
+  - step: design/draft
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 8243e1a7de64ad98a30f1457dc029d825df823d3
+    hash_after: 8243e1a7de64ad98a30f1457dc029d825df823d3
+    inputs:
+      - name: ask
+        hash: bf860f6851f1211e
+        size: 611
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,86 @@ The schema then says what the code declares. It waits for this phase, because th
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Every key the tree reads gets a Go declaration, the schema comes off the catalog, and each reader road takes the built-in value off the schema's `default` where no file sets the key. So the default file drops every key at its built-in value, and no reader changes behaviour.
+
+| part | file | what changes |
+|---|---|---|
+| the options | `src/q/q.go`, `src/q/wiring.go` | `q.Unit(text)` and `q.Enum(values...)` join `q.Doc`. `Key` gains `Doc`, `Unit`, `Enum`, `Type`, the JSON type off the Go type, and `Default`, the built-in as a JSON literal |
+| the declarations | `src/modules/settings/settings.go`, new | a table of sections, each key with its built-in, doc, unit and enum. Each built-in is the value the default file holds today, and each doc is the schema's `help` today. `settings.Of(section)` registers one section's keys |
+| the loading | `src/quack/main.go`, `modules`; `spec/wiring.yaml` | a section with no module loads as an instance of its own name, of the type `settings.Of(section)`. The `work` and `log` instances join their section's keys to their own registration. The manager's `watchdog/beat` and `watchdog/lease` stay where they stand |
+| the migration switches | `src/modules/migration/migration.go` | declares every `phaseN` key as shared, built-in `false`, beside the slice keys |
+| the generator | `src/quack/schema.go`, new; `quack schema` and `quack schema --write` | loads the wiring into a catalog, writes one object a section and one member a key: `type`, `default`, `help` off the doc, `unit`, `enum`. It then lays the drawing members of `spec/config/draws.json` over each entry, sections and members in name order. It writes no `required` and no `comment` member |
+| the drawing | `spec/config/draws.json`, new | the members the sidebar draws today, taken as they stand: `widget`, `icon`, `group`, `row`, `column`, the spans, `runs`, `gesture`, `asks` and the rest, and the entries that name no key, such as `bridge.hook`. [[spec/tickets/the-sidebar-renders-generically]] moves them onto the base files |
+| the default file | `spec/config/level0.json` | keeps the `migration` block's values off their built-ins, and nothing else. Every `comment` member goes, since the doc carries the help |
+| the JavaScript resolver | `.claude/skills/level0/lib/config.js`, `configOf`, `faultsIn` | a new export `builtInsOf(schema)` reads each `default`, and `configOf` answers it as the lowest layer, named `built-in`. `faultsIn` names a wrong type alone, since a missing key reads its built-in |
+| the door's reads | `src/bridge/config.js`, `asks`, `whereFrom`, `asksText` | read the schema at the method root, and answer its `default` last, with the layer `built-in` |
+| the sidebar | `src/extension/lib/widgets.js`, `valuesOf` | takes the schema third, and lays the built-ins under the two files |
+| the slash commands | `.claude/skills/level0/lib/projection.js` | writes a command for every declared key, reading the built-in where the file holds none |
+| the Go reader | `src/config/config.go`, `Where` | answers the schema's `default` last, with the layer `built-in`, so `Count`, `Value` and every Go importer read it |
+| the LSP slice | `src/lsp/shadow.go` | reads `migration.lsp` through `config.Value`, so the built-in `old` answers |
+| the check module | `src/modules/check/sweep.go`, `countOf` | reads the schema's `default` off `files/` last |
+| the note | `spec/design_output/config.md`, the layers and the schema chapters | the built-in layer stands under the tracked file, the schema comes off the declarations, and `quack schema --write` writes it |
+
+`src/scripts/work-stands.js` reads a switch off `main` as `=== true`. A switch the owner turns on differs from its built-in `false`, so it stays in the file, and that read stands unchanged.
+
+What I weigh and assume:
+- A table in one Go package over a module a section. Nineteen modules declaring keys and nothing else scatter one file's worth of knowledge. The sections become instances all the same, so the file keys by instance and then by key.
+- A drawing overlay beside the schema, so the old sidebar keeps drawing through this phase. The next child moves it off, and the file leaves at the switch-over.
+- The slice key follows the code's form, `migration/config/<slice>`, which every slice before this one takes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/modules/config/config.go`, `Registers`, which resolves over `c.Keys()`
+- `src/quack/config.go`, `sharedKeys`, over `c.Keys()`
+- `src/quack/main.go`, `modules` and `load`, which take the new module types
+- `.claude/skills/level0/lib/config.js`, `configOf`, called from `src/scripts/cli-doors.js`, `src/bridge/findings.js` and `src/scripts/config-golden.js`, `readersOf`
+- `.claude/skills/level0/lib/config.js`, `faultsIn`, called inside `configOf().faults`
+- `src/bridge/config.js`, `asks`, called from `src/bridge/code.js`, `bash.js`, `plan.js`, `handover.js`, `agent.js`, `server.js`, `guidance.js`, `wait.js`, `stop.js`, `answer-read.js` and `ask.js`
+- `src/bridge/config.js`, `asksText`, called from `src/scripts/copilot-shadow.js`, `src/bridge/cage-shadow.js`, `prose.js`, `server.js` and `src/scripts/config-golden.js`
+- `src/bridge/config.js`, `whereFrom`, called from `src/bridge/binding.js` and `src/scripts/config-golden.js`
+- `src/extension/lib/widgets.js`, `valuesOf`, called four times in `src/extension/sidebar.js`, `sidebarOf`, and in `src/scripts/config-golden.js`, `readersOf`
+- `.claude/skills/level0/lib/projection.js`, the config entry's loop, run by `./RUNME.sh project`
+- `src/config/config.go`, `Where` through `Count` and `Value`: `src/modules/index/lease.go`, `src/modules/index/ops.go`, `src/lsp/config.go`, `src/index/beats.go`, `src/tui/main.go`
+- `src/lsp/shadow.go`, the slice read, which moves off `config.Map` onto `config.Value`
+- `src/modules/check/sweep.go`, `countOf`, called from `sweepOf`
+- `src/modules/migration/migration.go`, `Registers`, loaded by the wiring as `migration`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/q/keys_test.go`, `TestKeysCarryDocUnitEnumAndDefault`
+- `src/quack/schema_test.go`, `TestSchemaStandsAsGenerated`, which decides the regeneration line
+- `src/quack/schema_test.go`, `TestDefaultFileHoldsNoBuiltIn`, which decides the built-in line
+- `src/quack/schema_test.go`, `TestEveryTrackedKeyIsDeclared`
+- `src/config/config_test.go`, `TestWhereAnswersTheBuiltIn`
+- `src/modules/check/sweep_test.go`, `TestCountReadsTheBuiltIn`
+- `test/level0/config.test.js`, `a key no file sets resolves to its built-in`
+- `test/level0/config-door.test.js`, `asks answers the built-in where no file sets the key`
+- `test/level0/widgets.test.js`, `valuesOf lays the built-ins under the files`
+- `test/level0/projection.test.js`, `a key at its built-in keeps its command`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft, so no earlier review names a finding
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: `q.go`, `wiring.go` with `CfgIn` and `Keys`, `quack/main.go`, `quack/config.go`, `migration.go`, `modules/config/config.go`, `src/config/config.go`, `lib/config.js` with `configOf`, `bridge/config.js`, `widgets.js`, `projection.js`, `sweep.go`, `work-stands.js` and `lsp/shadow.go`
+- the callers list comes off a search for each changed function across `src` and `.claude`
+- `go test ./...` passing rides `./RUNME.sh check`; the regeneration line rides `TestSchemaStandsAsGenerated`; the built-in line rides `TestDefaultFileHoldsNoBuiltIn`; `./RUNME.sh check` exits 0 on the branch before the hand-back
 
 ## tests-red
 
