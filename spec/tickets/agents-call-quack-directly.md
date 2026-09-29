@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: 7698f081db4046b9f274d0836be4311e1cea489d
+    hash_after: 7698f081db4046b9f274d0836be4311e1cea489d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 131 test(s) pass in 11 file(s); green, src/modules/migration passes; green, src/modules/verbs passes; green, src/
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 54b3812c97580c07
+        size: 892
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -325,26 +348,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs slice stands at new. Every verb the command line answers now stands as an index tool: the topics as before, and every other verb under the new verb topic, which spec/wiring.yaml loads. The session reads those tools in its standing text and in the Bash description, and the pull hands its next call as a tool. The needs shadow left with the slice, and its doors in findings.js with it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files, plus the gate findings each as its own ticket in the group
+- every door stands behind q.Request or fakeProc in the tests
+- each new file opens with a comment naming its ticket
+- each fact stands once: the tool prefix in lib/index-tools.js, the verb docs in tree.go
 
 # accept
 
