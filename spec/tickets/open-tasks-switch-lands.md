@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: split
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2switch
@@ -90,6 +90,15 @@ record:
   - step: sync
     hand: box d81f28f032e0 · claude-code-remote
     hash_before: f65c54b8d6a7627d7168ca85c1bd562e0d0de680
+  - step: sync
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: ecda1a149e9935c878ad39edbc0c1eb6fa50c174
+    hash_after: bb01c094539f1d0fd6154752766ce3bce8b727c8
+    answered:
+      - name: sync
+        exit: 0
+        said: work/open-tasks-switch-lands already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -105,8 +114,9 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
