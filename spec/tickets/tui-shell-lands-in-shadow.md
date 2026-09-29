@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box d857a59424d7 · claude-code-remote
     hash_before: 76a7b2d37fb90c3677c90d5862c04a6c60ef7e3e
+  - step: sync
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 4735c402648b4b31432d3b81662952c5b09079f3
+    hash_after: 4735c402648b4b31432d3b81662952c5b09079f3
+    answered:
+      - name: sync
+        exit: 0
+        said: work/tui-shell-lands-in-shadow already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["quack-verbs-land-in-shadow", "read-topics-land-in-shadow"]
 enabled_by: migration.phase6shadow
 cloud: true
@@ -113,8 +122,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
