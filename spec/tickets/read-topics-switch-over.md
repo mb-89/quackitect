@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 6cfc8cfc78b18c1c7585aa694728c7d082d86af1
+    hash_after: 6cfc8cfc78b18c1c7585aa694728c7d082d86af1
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["read-topics-land-in-shadow"]
 enabled_by: migration.phase3switch
 cloud: true
@@ -231,38 +243,60 @@ accept. A helper read the diff since the last verdict and named three gaps. The 
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- check-twins-leave-phase-seven: the group's Discussion narrows the done line to the Go topics, and the phase 7 switch carries the check twins
+- topic-fallback-leaves-the-readers: a reader on a new slice takes its topic or faults, and the config rows read the values quack prints
+- twins-leave-misses-some-callers: the gate's callers change, and the twins' wiring leaves
+- the-js-twins-leave: the four comparison twins and their seven test files leave, and the five keys take new alone
+- the accept gate: the log verb's and the lint's doors carry the slices
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- A fault stood out once the fallback left: the config topic's values read twice, hidden behind the old path
+- A helper read the diff at the gate and found two door builders with no slices, which no case covered
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 18:52 UTC: the take found the hold fresh, so the box waited until the hold went stale
+- 19:13 UTC: every note write threw, since the topic helper read a join the write door's box never carries
+- 19:28 UTC: the commit verb refused a staged deletion, since the tree read a path git tracks and the disk no longer holds
+- 19:40 UTC: the ticket pass staged the modified files alone, and left the deletions and the projection loose
+- the server fell away after each check, and the level-zero tools answered nothing until a restart
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the topic helper takes the join of node:path where the doors carry none, and a case holds it
+- the tree's paths leave out a file the disk no longer holds, and a case holds it
+- a ticket pass stages deletions as the commit verb does: a finding for the engine, which owns the pass
+- the old-path readers leave with the last caller of each, in the phases that own those callers
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The last box stopped on Vale findings in prose it never pushed, so this box wrote that step fresh. Once the check ran, the one finding at error was a header that counted keys. The deeper stop was the write door itself: it threw on every note write, so each Discussion line failed until the topic helper found its join. The remaining findings sit at warning, and the hand-backs land over them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in one place: each line points at the ticket owning it
+- the change adds no number
+- every header the change writes says what its file is for: the contract test's header counts nothing now
+- the chapter carries the run's errors with their times, and the owner sent no prompt during the run
+- the chapter names roles alone, with no name, address or box path; the scripts under the private scripts folder hold the hand-back fields alone
 
 ## cloud
 
