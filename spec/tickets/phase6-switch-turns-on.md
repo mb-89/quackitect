@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,30 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d856e248e31998 · claude-code-remote
+    hash_before: ed498697311adec3ecc3dd716076808c544a7b58
+    hash_after: ed498697311adec3ecc3dd716076808c544a7b58
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/migration passes; green, src/index passes; green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/phase6-switch-turns-on.md:66:206: Passive: Write in the active voice and name who acts: 'was stamped'."
+    inputs:
+      - name: ask
+        hash: cf2e585db6f06faa
+        size: 508
+      - name: [[spec/tickets/window-keeps-the-index]]
+        hash: c83dcf3bbd831877
+        size: 5903
+      - name: [[spec/tickets/tui-shell-switches-over]]
+        hash: c2403f886d123276
+        size: 5755
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
