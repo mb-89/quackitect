@@ -162,11 +162,11 @@ func TestTwinGoldens(t *testing.T) {
 	all := strings.Fields(string(listed))
 	tree := treeOver(root, trackedDisk{list: all})
 	tree.Words = config.Count(root, "names.words")
-	vale, err := os.ReadFile(filepath.Join(twinsAt, "vale.out.txt"))
+	vale, err := os.ReadFile(filepath.Join(twinsAt, "vale.out"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	biome, err := os.ReadFile(filepath.Join(twinsAt, "biome.out.txt"))
+	biome, err := os.ReadFile(filepath.Join(twinsAt, "biome.out"))
 	if err != nil {
 		t.Fatal(err)
 	}

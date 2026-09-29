@@ -31,8 +31,8 @@ if (process.argv[1]?.endsWith("check-twins.js")) {
       file: Number(await settings.ask("code.fileLines")),
       function: Number(await settings.ask("code.functionLines")),
     },
-    vale: String(doors.disk.read(join(TESTDATA, "vale.out.txt"))),
-    biome: String(doors.disk.read(join(TESTDATA, "biome.out.txt"))),
+    vale: String(doors.disk.read(join(TESTDATA, "vale.out"))),
+    biome: String(doors.disk.read(join(TESTDATA, "biome.out"))),
   });
   process.stdout.write(`${JSON.stringify(said)}\n`);
 }
