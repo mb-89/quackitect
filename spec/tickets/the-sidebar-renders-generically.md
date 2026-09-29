@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,22 @@ record:
         hash: 069459d1fd027aa4
         size: 418
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 1bb90c6590392a3f578dc971a6a39444b7668c9d
+    hash_after: 1bb90c6590392a3f578dc971a6a39444b7668c9d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: a96c231c20daddb8
+        size: 5334
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +242,32 @@ What I weigh and assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-views.test.js src/modules/index src/tui/work
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/sidebar-views.test.js
+- src/modules/index/catalog_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The five sidebar cases fail on their assertions against the stub in `src/extension/lib/views.js`, and `TestActionRowsCarryLabelAndIcon` fails since the action rows carry no label. `TestBadgeOfReadsTheSharedCases` passes at once, and that is its job: it holds the window's side of the shared cases, so the file stays out of the red list. What surprises me: `sidebarOf().html()` draws over a door carrying no schema and no tracked file, so the views section can join the panel with no change to what the sidebar reads today.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets `the sidebar draws every base file over a fake catalog`; the second meets `a badge reads as the window draws it, over the shared cases` beside `TestBadgeOfReadsTheSharedCases`; the check line is a checkpoint the hand answers at tests-green
+- the one door the tests reach is the index door, and the cases hand a fake of it on the door object, as the sidebar's own tests fake the editor. The Go cases run against `q/qtest`
 
 # gate
 
