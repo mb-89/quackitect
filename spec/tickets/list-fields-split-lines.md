@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 44dbbefede9e761a3d305965406fc5a41034dfd2
+    hash_after: 44dbbefede9e761a3d305965406fc5a41034dfd2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: d30bab38f96a35c2
+        size: 589
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-fields.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A list field handed back as a JSON array lands one item a line, as a bullet row, and expectedRed names each file of a red list handed back that way. The formatted change landed on main first, under the-guidance-topic-lands, so this ticket brings its cases onto main's bullet form and keeps them as the guard on both sides: the write and the red list reader.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches test/level0/pull-fields.test.js alone, since main carries the formatted change
+- the change reaches no door: withPayload and expectedRed read text alone
+- the comment in formatted on main names the approach, and the cases link this ticket
+- the bullet form stands once, in formatted and its test, and these cases read it
 
 # accept
 
