@@ -39,7 +39,7 @@ import { asksForUpdate } from "./ask.js";
 import { onBash, onDescribe, onPowerShell } from "./bash.js";
 import { bindingLine } from "./binding.js";
 import { dropsAll, dropsMoved } from "./caches.js";
-import { asks, asksText } from "./config.js";
+import { asks, asksText, LOG_LEVEL, slicesOf } from "./config.js";
 import { holdsCloudAsk } from "./cloud-ask.js";
 import { holdsGrace } from "./grace.js";
 import {
@@ -108,7 +108,6 @@ const TAKEOVER_TRIES = 50;
 // The window the old server watches the new one for, past the takeover and the listen. [[spec/design_output/level0#a-restart-watches-its-child]]
 const RESPAWN_WAIT = 3000;
 const PASS = { pass: true };
-const LOG_LEVEL = "log.level";
 // The characters one event carries at most, twice what the bridgehead sends before it slims one. [[spec/design_output/level0#a-door-that-throws-passes]]
 const BODY_CAP = 8_000_000;
 
@@ -340,6 +339,7 @@ export function boxOf(method, work = method, doors = {}) {
     awake: doors.awake ?? awake(),
     http: doors.http,
     log: doors.log,
+    slices: slicesOf(() => box),
   };
   if (box.log) return box;
   // The box writes at the level its config names, read again at each event, so a change reaches the next line. [[spec/design_output/log#what-a-box-writes]]

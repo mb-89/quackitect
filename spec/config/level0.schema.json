@@ -486,47 +486,37 @@
         "config": {
           "type": "string",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ],
-          "help": "The config readers: old answers alone, shadow runs the config module beside them and logs a mismatch, new answers the module's."
+          "help": "The config readers' slice, switched over in phase 3. The config verb reads the config module."
         },
         "log": {
           "type": "string",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ],
-          "help": "The session log rows: old answers alone, shadow runs the log topic beside it and logs a mismatch, new answers the topic's."
+          "help": "The session log's slice, switched over in phase 3. The log verb reads the log topic."
         },
         "guidance": {
           "type": "string",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ],
-          "help": "The rules a step reads: old answers alone, shadow runs the guidance topic beside it and logs a mismatch, new answers the topic's."
+          "help": "The guidance slice, switched over in phase 3. The rules a step reads come off the guidance topic."
         },
         "check": {
           "type": "string",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ],
-          "help": "The check twins: old answers alone, shadow runs the check names beside it and logs a mismatch, new answers the names'."
+          "help": "The check slice, switched over in phase 3. The check names answer an empty list until phase 7 moves the rules in."
         },
         "prose": {
           "type": "string",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ],
-          "help": "The prose checks: old answers on wink alone, shadow runs the Go checks beside it and logs a mismatch, new answers the Go checks'."
+          "help": "The prose slice, switched over in phase 3. The prose readers take the findings the Go checks keep."
         },
         "cage": {
           "type": "string",

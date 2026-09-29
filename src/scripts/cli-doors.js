@@ -15,6 +15,7 @@ import { proc } from "../doors/proc.js";
 import { front } from "../doors/front.js";
 import { index } from "../doors/index.js";
 import { homeIn } from "./editor.js";
+import { SLICES } from "../bridge/config.js";
 import { handDoors } from "./pull-hand-of.js";
 import { readTools, whereIs } from "../engine/tools.js";
 import { rootsHere } from "./vehicle.js";
@@ -63,6 +64,12 @@ export async function doorsHere() {
       level: await said.ask("log.level"),
     }),
     config: said,
+    // The mode each migration slice reads, taken once at startup so a sync reader asks no door. [[spec/tickets/readers-name-one-mode-source]]
+    slices: Object.fromEntries(
+      await Promise.all(
+        SLICES.map(async (one) => [one, await said.ask(`migration.${one}`)]),
+      ),
+    ),
     method: roots.method,
     work: roots.work,
     words: await said.ask("names.words"),

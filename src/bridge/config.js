@@ -50,3 +50,21 @@ function parsed(disk, at) {
     return null;
   }
 }
+
+// The slices whose readers take a Go topic where the slice reads new. [[spec/tickets/readers-take-the-go-topics]]
+export const SLICES = ["config", "log", "guidance", "check", "prose"];
+
+// The modes a box holds, each read off the config again at the ask, so a change reaches the next reader. The box builds after this reads it, so the box comes as a function. [[spec/tickets/readers-name-one-mode-source]]
+export function slicesOf(boxAt) {
+  const out = {};
+  for (const slice of SLICES) {
+    Object.defineProperty(out, slice, {
+      enumerable: true,
+      get: () => asksText(boxAt(), `migration.${slice}`),
+    });
+  }
+  return out;
+}
+
+// The key a box's log level reads, again at each event. [[spec/design_output/log#what-a-box-writes]]
+export const LOG_LEVEL = "log.level";

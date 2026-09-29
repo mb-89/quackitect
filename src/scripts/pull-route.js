@@ -24,6 +24,7 @@ import {
 } from "./guidance-hand.js";
 import { cutRefusal, printPart } from "./pull-cap.js";
 import { agentOf, BOX, handOf, roleOf } from "./pull-hand-of.js";
+import { notesOf, processNameOf } from "./quack-topic.js";
 import { WORK_VERBS } from "./work.js";
 
 export const HOLDS = OWNED_HOLDS;
@@ -112,11 +113,14 @@ export function stillHeld(it, held) {
   return 1;
 }
 
+// The step's notes come off quack guidance where the guidance slice reads new. [[spec/tickets/readers-take-the-go-topics]]
 export function stepReads(it, held) {
   const at = it.join(it.root, ...String(held.path ?? "").split("/"));
   if (!held.path || !it.disk.exists(at))
     return (held.reads ?? []).map((one) => one.name);
-  return readsFor(it, leafOf(frontOf(it.disk.read(at)), held.step));
+  const text = it.disk.read(at);
+  const key = `${processNameOf(text)}:${held.step}`;
+  return notesOf(it, key, () => readsFor(it, leafOf(frontOf(text), held.step)));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]

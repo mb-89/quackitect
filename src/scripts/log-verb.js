@@ -13,7 +13,7 @@ import {
   rowsIn,
   within,
 } from "./log-read.js";
-import { shadowLog } from "./log-shadow.js";
+import { answerOf, logRowsOf, readsNew, topicOf } from "./quack-topic.js";
 
 const USAGE = [
   "Usage: ./RUNME.sh log [flags]\n",
@@ -40,11 +40,13 @@ export async function logVerb(it, argv) {
     return 0;
   }
 
-  const rows = narrowed(rowsIn(it, paths), said, now);
+  // The rows come off quack log where the log slice reads new. [[spec/tickets/topic-fallback-leaves-the-readers]]
+  const held = readsNew(it, "log")
+    ? answerOf(logRowsOf(topicOf(it, ["log"])), "log")
+    : rowsIn(it, paths);
+  const rows = narrowed(held, said, now);
   const shown = said.includes("--count") ? countsOf(rows) : rows.map(asRow);
   for (const one of shown) console.log(one);
-  // The verb prints its answer first, and the shadow reads the rows before any flag narrows them. [[spec/tickets/log-shadow-reads-unfiltered-rows]]
-  await shadowLog(it);
   return 0;
 }
 
