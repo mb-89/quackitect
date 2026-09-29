@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: 4b2bf176b63e20be
         size: 3663
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 659763b656de24f80cf4c7da7513223354c5db79
+    hash_after: 659763b656de24f80cf4c7da7513223354c5db79
+    inputs:
+      - name: design/draft
+        hash: 4b2bf176b63e20be
+        size: 3663
+      - name: design/tests-red
+        hash: f547f05bfa96d6f2
+        size: 1015
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -271,8 +283,9 @@ Six cases fail on their own assertion: both sweep cases read an empty list, the 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
