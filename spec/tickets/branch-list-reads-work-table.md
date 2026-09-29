@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: pull-verbs-become-actions
+record:
+  - step: do
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: a68452ede8484870e3a52f7514c35f230488e4db
+    hash_after: a68452ede8484870e3a52f7514c35f230488e4db
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 20 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 915711da7cd4d8f5
+        size: 236
+    def: 894320b5dd55a1cb
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the draft edits BRANCH by hand to match the doing table in work.js, which leaves
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/branch-needs.test.js test/level0/pull-steps.test.js test/level0/pull-push.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The branch verbs a step names under needs now read the table work answers, WORK_VERBS in src/scripts/work.js, and BRANCH leaves pull-route.js. VERBS reads the table through a getter when a need asks, since work.js imports the pull and a read at load meets the table unbuilt. A case holds every verb of the table to the needs check, open and unblock among them, and new answers no more. The BRANCH case leaves the red file of pull-verbs-become-actions, since this case takes its place.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: one table owns the names, and a case holds the needs check to it
+- the BRANCH case in the red needs file leaves, since the new case covers it
+- the names stand once, in WORK_VERBS, and the pull reads them there
 
 # Discussion
 

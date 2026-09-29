@@ -74,29 +74,32 @@ import { USAGE } from "./work-usage.js";
 
 export * from "./work-stands.js";
 
+// The verbs work answers, which the pull reads as the branch verbs a step names under needs. [[spec/tickets/branch-list-reads-work-table]]
+export const WORK_VERBS = {
+  open: openGroup,
+  take,
+  sync,
+  done: finish,
+  release,
+  merge,
+  close,
+  read,
+  review,
+  list,
+  // [[spec/design_output/pull#a-person-step-goes-in]]
+  escalate: (it, _name, argv) => escalate(it, argv),
+  // [[spec/design_output/pull#the-work-answer]]
+  guidance: (it, _name, argv) => guidance(it, (argv ?? []).slice(1), it.env ?? {}),
+  // [[spec/design_output/work#a-person-step-leaves]]
+  unblock,
+  test: (it, _name, argv) => testVerb(it, argv),
+};
+
 export function work(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = {
-    open: openGroup,
-    take,
-    sync,
-    done: finish,
-    release,
-    merge,
-    close,
-    read,
-    review,
-    list,
-    // [[spec/design_output/pull#a-person-step-goes-in]]
-    escalate: (it, _name, argv) => escalate(it, argv),
-    // [[spec/design_output/pull#the-work-answer]]
-    guidance: (it, _name, argv) => guidance(it, (argv ?? []).slice(1), it.env ?? {}),
-    // [[spec/design_output/work#a-person-step-leaves]]
-    unblock,
-    test: (it, _name, argv) => testVerb(it, argv),
-  };
+  const doing = WORK_VERBS;
   if (doing[what] && LOUD.includes(what)) {
     return tell(it, what, doing[what](it, name, argv));
   }

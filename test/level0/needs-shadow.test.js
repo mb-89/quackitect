@@ -11,7 +11,7 @@ import {
   SHADOW,
   SLICE,
 } from "../../src/scripts/needs-shadow.js";
-import { BRANCH, holdsVerb } from "../../src/scripts/pull-route.js";
+import { holdsVerb } from "../../src/scripts/pull-route.js";
 
 // Fake doors: a slice mode, a binary standing, and a quack answering the action rows it holds. [[spec/tickets/pull-verbs-become-actions]]
 function doorsOf({ mode = SHADOW, names = [] } = {}) {
@@ -65,10 +65,4 @@ test("a slice standing at old runs no quack and writes no row", async () => {
   assert.deepEqual(await needsShadow(doors, ["branch sync"]), []);
   assert.deepEqual(doors.ran, []);
   assert.deepEqual(doors.said, []);
-});
-
-test("BRANCH holds open and unblock, and lacks new", () => {
-  assert.ok(BRANCH.includes("open"));
-  assert.ok(BRANCH.includes("unblock"));
-  assert.ok(!BRANCH.includes("new"));
 });
