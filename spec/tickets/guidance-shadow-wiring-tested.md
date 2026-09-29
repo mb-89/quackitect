@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -23,12 +23,30 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: read-topics-land-in-shadow
 parent: the-guidance-topic-lands
+record:
+  - step: do
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 2f41f3b5576db02c30a21ae1cfa794fe3bb8aea6
+    hash_after: 2f41f3b5576db02c30a21ae1cfa794fe3bb8aea6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 3c297458786fb77e
+        size: 302
+    def: 6662140e6eca978b
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ the draft wires guidanceShadow into stepNotes in src/scripts/guidance-verb.js an
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/guidance-shadow-wiring.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+test/level0/guidance-shadow-wiring.test.js drives each caller of the guidance shadow, stepNotes and the pull hand-out, over fake doors, and reads one shadow row off the fake log where migration.guidance reads shadow, and none where it reads old. An unwired caller now fails a case. The file landed with guidance-draft-matches-tests-red.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change follows the ask: one case a caller, each reading the row off the fake log.
+The change reveals no cleanup.
+The fake doors stand once, in the test file.
 
 # Discussion
 
