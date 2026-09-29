@@ -16,3 +16,10 @@ func TestPlacesCompareAsNumbers(t *testing.T) {
 		t.Errorf("a place compares even with itself")
 	}
 }
+
+// A segment the parse reads as no number stands past the widest number it reads. [[spec/design_output/pull#the-queue-is-an-outline]]
+func TestAWordSegmentStandsPastEveryNumber(t *testing.T) {
+	if ComparePlaces("1.1e300", "1.later") >= 0 || ComparePlaces("1.later", "1.later") != 0 {
+		t.Errorf("a word segment stands among the numbers")
+	}
+}

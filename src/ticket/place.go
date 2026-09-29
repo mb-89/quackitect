@@ -9,6 +9,9 @@ import (
 	"strings"
 )
 
+// The width a segment parses at. [[spec/design_output/pull#the-queue-is-an-outline]]
+const floatBits = 64
+
 // Two places compare segment by segment as numbers, so -2 stands before 1, and 1.2 before 1.10. [[spec/design_output/pull#the-queue-is-an-outline]]
 func ComparePlaces(left, right string) int {
 	a, b := segmentsOf(left), segmentsOf(right)
@@ -36,7 +39,7 @@ func segmentsOf(said string) []float64 {
 			out = append(out, 0)
 			continue
 		}
-		value, err := strconv.ParseFloat(bare, 64)
+		value, err := strconv.ParseFloat(bare, floatBits)
 		if err != nil || math.IsNaN(value) {
 			value = math.Inf(1)
 		}
