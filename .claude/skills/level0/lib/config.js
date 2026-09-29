@@ -105,6 +105,13 @@ export function builtInsOf(schema, at = "") {
   return out;
 }
 
+// A file laid over the built-ins, as a nested object, so a reader of the whole file meets every key. [[spec/tickets/the-config-schema-gets-generated]]
+export function underBuiltIns(schema, said) {
+  let out = {};
+  for (const [key, value] of builtInsOf(schema)) out = deeply(out, nest(key, value));
+  return deeply(out, said ?? {});
+}
+
 export function typeOf(schema, key) {
   return keysOf(schema).find((one) => one.key === key)?.type;
 }

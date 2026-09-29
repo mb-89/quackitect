@@ -4,8 +4,12 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import said from "../../spec/config/level0.json" with { type: "json" };
+import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
+import file from "../../spec/config/level0.json" with { type: "json" };
+import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { it } from "../../src/scripts/cli-doors.js";
+
+const said = underBuiltIns(schema, file);
 
 // [[spec/design_input/level-two#the-size-cap]]
 test("the doors carry the cap and its margin the config names", () => {

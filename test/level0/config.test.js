@@ -13,6 +13,7 @@ import {
   keysOf,
   LOCAL,
   TRACKED,
+  underBuiltIns,
   varOf,
 } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -244,4 +245,19 @@ test("a key no file sets resolves to its built-in", async () => {
   assert.equal(await it.layerOf("stop.hold"), "built-in");
   assert.equal(await it.ask("log.level"), "info", "a file beats the built-in");
   assert.equal(await it.layerOf("log.level"), TRACKED);
+});
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("underBuiltIns lays a file over the built-ins as one object", () => {
+  const schema = {
+    properties: {
+      stop: {
+        type: "object",
+        properties: { hold: { default: "off" }, most: { default: 3 } },
+      },
+    },
+  };
+  assert.deepEqual(underBuiltIns(schema, { stop: { most: 5 } }), {
+    stop: { hold: "off", most: 5 },
+  });
 });
