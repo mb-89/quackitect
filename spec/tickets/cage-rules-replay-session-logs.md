@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 104a8279f653155f
         size: 2877
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8535e12fc10e · claude-code-remote · helper-3
+    hash_before: e8146ad18d54b05e86c6422183b4fc16a31e4e31
+    hash_after: e8146ad18d54b05e86c6422183b4fc16a31e4e31
+    inputs:
+      - name: design/draft
+        hash: 104a8279f653155f
+        size: 2877
+      - name: design/tests-red
+        hash: 807824f8506bfb0a
+        size: 1047
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -257,8 +269,11 @@ The door's outside world stands on the fakes doorOver already builds, and Shadow
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- cage-tool-block-reads-refuse: OldDecisionOf reads `result.block` as block on every event, but on `tool.call` the hook module returns `answer.result`, so the bridge refuses the call there, as `holdsForAnswer` in src/bridge/answer.js answers it. The door answers that call with a `result` effect, which NewDecisionOf reads as refuse, so the row never agrees. Pass the event to OldDecisionOf, read `result.block` as refuse outside `classic.Stop`, and add a `tool.call` row to TestDecisionOfReadsTheBridgesAnswer.
+- cage-hold-lacks-door-effect: the bridge answer `needs: reply` reads as hold, and no effect under spec/design_output/model#the-effects answers a hold, so NewDecisionOf never reads hold. The `classic.Stop` row of test/replay/cage/one-refusal.shadow.jsonl stands until the protocol names the effect a hold ports to.
 
 # implement
 
