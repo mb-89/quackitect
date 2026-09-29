@@ -361,3 +361,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- cli-draft-lists-every-case: tests-green names `TestRunPostsItsFlagsAsTheInput` beside the five the draft lists. `cli_test.go` holds it, and the draft list leaves it out.

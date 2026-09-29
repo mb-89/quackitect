@@ -203,6 +203,7 @@ terms:
   - {word: openste, means: "an open seed list of simple technical english words that the core word list builds on"}
   - {word: participle, means: "the verb form ending in ed or ing that the grammar rules read to find tense"}
   - {word: placeholder, means: "the stand-in text mint writes for a field left out which the checker names until someone fills it"}
+  - {word: quack, means: "the one binary this tree builds which serves the index and answers the verbs on the command line"}
   - {word: quackitect, means: "this tree as a whole which holds the method and the tools that check and draw it"}
   - {word: redraw, means: "to draw the whole panel again from the state after a click or a change on disk"}
   - {word: regex, means: "a text pattern that finds and replaces matching words across the files a glob reaches"}
