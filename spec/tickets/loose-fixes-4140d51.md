@@ -141,7 +141,19 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
-step: retro/write
+  - step: retro/write
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 1e49f2481ea444977ad86b8efdab34f29eb90bf8
+    hash_after: 1e49f2481ea444977ad86b8efdab34f29eb90bf8
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+step: retro/cloud
 ---
 
 # Ask
@@ -223,38 +235,57 @@ The one child, take-honours-the-name, closes done. Its work stands on main in co
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- take-honours-the-name closes done on the work main already carries, verified by its named test
+- the group passes sync, split, children and accept, and the check exits 0
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the dispatch prompt named the landed commit, so the box verified and redid nothing
+- the pull printed each field it wanted, so every step passed on one try but split
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 00:33 the first shell call named no ticket, and the door refused it
+- 00:33 a raw git push met the door, which wants the push verb
+- 00:36 a plan todo named the group, and the pull then handed nothing out
+- 00:37 the group stood draft, and the pull refused it by name until the open verb ran
+- 00:38 split refused a JSON list for its checklist, which wants lines in one string
+- 00:40 the door refused prose fixes on tickets other hands hold, so their warnings stand
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the work skill names `./RUNME.sh ticket open` for a draft group, before the first pull
+- the pull hand-back hint shows a checklist field as lines in one string
+- the retro of the next box reads this list before its first call
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The child needed no code. The work was reading the engine's doors, and each refusal named its fix. The warnings on other open tickets stay with their hands, because the door gives their fields to the engine alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the retro adds no fact standing elsewhere, and points at the tickets it names
+- the retro adds no number past the times of the run
+- the change writes no file header
+- the badly list carries each error of the run with its time, and no owner prompt came
+- the chapter names the box by its role alone
 
 ## cloud
 
