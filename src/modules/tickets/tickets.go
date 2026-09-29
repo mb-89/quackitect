@@ -22,6 +22,10 @@ const (
 	NotesPort = "notes"
 	AllPort   = "all"
 	CloudPort = "cloud"
+	// The standing work branches in, every ticket as the work reads it with a branch's copy winning, and the branches as the work draws them. [[spec/tickets/the-index-reads-standing-branches]]
+	TipsPort     = "tips"
+	BranchedPort = "branched"
+	BranchesPort = "branches"
 )
 
 // The kind a ticket's front names, bare or as a link. [[spec/design_output/index#the-index-answers-the-tickets]]
@@ -63,7 +67,25 @@ func Registers(c *q.Catalog) q.Writer {
 	notes := q.ProjectIn(c, NotesPort, folders[0]+"*"+noteExt, Markdown, q.Loaded, Note{}, q.Also(folders[1]+"*"+noteExt), q.Doc("a ticket file, as its front and its body"))
 	all := q.DerivedIn(c, AllPort, []Ticket{}, allOf, q.Doc("every ticket under the two ticket folders, with its Ask and its standing"))
 	cloud := q.DerivedIn(c, CloudPort, []string{}, cloudOf, q.Doc("the tickets the cloud holds: every group carrying the mark, and every ticket naming one"))
-	return q.Join(notes, all, cloud)
+	branched := q.DerivedIn(c, BranchedPort, []Ticket{}, branchedOf, q.Doc("every ticket as the work reads it: a standing branch's copy of its group and the tickets naming it, then the rest off the folders"))
+	branches := q.DerivedIn(c, BranchesPort, []ticket.Branch{}, branchesOf, q.Doc("every standing work branch as the work draws it, with its group's copy and its children off the tip"))
+	return q.Join(notes, all, cloud, branched, branches)
+}
+
+// What the branch reading takes: the tickets off the folders, and the tips the git module reads. [[spec/tickets/the-index-reads-standing-branches]]
+type tipsIn struct {
+	All  []Ticket     `q:"all"`
+	Tips []ticket.Tip `q:"tips"`
+}
+
+// [[spec/tickets/the-index-reads-standing-branches]]
+func branchedOf(in tipsIn) []Ticket {
+	return in.All
+}
+
+// [[spec/tickets/the-index-reads-standing-branches]]
+func branchesOf(in tipsIn) []ticket.Branch {
+	return []ticket.Branch{}
 }
 
 // Every ticket the cloud holds, by name: a group carrying the mark, and every ticket naming one, the rule cloudsIn in src/scripts/work-answer.js holds. [[spec/tickets/the-queue-reads-the-marker]]

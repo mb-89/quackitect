@@ -16,7 +16,13 @@ import (
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/files"
 	"quackitect/src/q"
+	"quackitect/src/ticket"
 )
+
+// The git module's tips, which a case wiring the tickets module and no git feeds empty. [[spec/tickets/the-index-reads-standing-branches]]
+const tipsName = "git/tips"
+
+func noTips(c *q.Catalog) { q.OutIn(c, tipsName, []ticket.Tip{}, q.Doc("the tips, empty")) }
 
 func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
@@ -226,10 +232,11 @@ func awaits(t *testing.T, want map[string]string) {
 func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}},
-		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all"},
+		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.tips": tipsName},
 	}
 	c := q.New()
 	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
+	noTips(c)
 	if _, err := load(w, c); err != nil {
 		t.Fatal(err)
 	}
@@ -252,7 +259,7 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}},
 		Wires: map[string]string{
-			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud",
+			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud", "tickets.tips": tipsName,
 			"queue.rows": "tickets/all", "queue.plan": "files/.se/.runtime/plan.json", "queue.cloud": "tickets/cloud",
 			"queue.stood": q.BuiltIn, "queue.minute": "clock/minute",
 		},
@@ -261,6 +268,7 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
 	q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
 	q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	noTips(c)
 	if _, err := load(w, c); err != nil {
 		t.Fatal(err)
 	}
@@ -299,23 +307,24 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
 	q.OutIn(c, "clock/minute", int64(0), q.Doc("the minute"))
 	q.OutIn(c, q.ResolvedName, q.Resolved{}, q.Doc("the config values"))
+	noTips(c)
 	if _, err := load(w, c); err != nil {
 		t.Fatal(err)
 	}
 	s := q.NewStore(c)
-	ticket := func(front string) q.Content {
+	ticketOf := func(front string) q.Content {
 		return q.Content{Hash: front, Text: "---\nkind: [[ticket]]\n" + front + "---\n\n# Ask\n\nA thing.\n"}
 	}
 	tree := map[string]any{
-		"files/spec/tickets/a-group.md":   ticket("state: open\ncloud: true\nprocess: [[spec/processes/group]]\n"),
-		"files/spec/tickets/its-child.md": ticket("state: open\ngroup: a-group\n"),
-		"files/spec/tickets/free.md":      ticket("state: open\n"),
-		"files/spec/tickets/done.md":      ticket("state: closed\n"),
+		"files/spec/tickets/a-group.md":   ticketOf("state: open\ncloud: true\nprocess: [[spec/processes/group]]\n"),
+		"files/spec/tickets/its-child.md": ticketOf("state: open\ngroup: a-group\n"),
+		"files/spec/tickets/free.md":      ticketOf("state: open\n"),
+		"files/spec/tickets/done.md":      ticketOf("state: closed\n"),
 	}
 	if _, err := s.Commit(0, files, tree); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"tickets/all", "tickets/cloud", "queue/places", "work/open-tasks"} {
+	for _, name := range []string{"tickets/all", "tickets/cloud", "tickets/branched", "tickets/branches", "queue/places", "work/open-tasks"} {
 		if err := s.Run(name); err != nil {
 			t.Fatalf("the run of %s answers %v", name, err)
 		}

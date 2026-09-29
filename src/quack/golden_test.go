@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"quackitect/src/modules/tickets"
+	"quackitect/src/ticket"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 )
@@ -52,7 +53,10 @@ func TestTreeGolden(t *testing.T) {
 		hashes[strings.TrimSuffix(filepath.Base(one), ".md")] = shortHash(string(read))
 		seeded["files/spec/tickets/"+filepath.Base(one)] = q.Content{Hash: shortHash(string(read)), Text: string(read)}
 	}
-	index := qtest.New(t, func(c *q.Catalog) { tickets.Registers(c) })
+	index := qtest.New(t, func(c *q.Catalog) {
+		q.OutIn(c, tickets.TipsPort, []ticket.Tip{}, q.Doc("no tip, since the golden file reads trunk alone"))
+		tickets.Registers(c)
+	})
 	index.Seed(seeded)
 	list, _ := index.Run(tickets.AllPort).([]tickets.Ticket)
 	if *update {

@@ -16,6 +16,7 @@ const (
 	TicketsPort   = "tickets"
 	PlacesPort    = "places"
 	CloudPort     = "cloud"
+	BranchesPort  = "branches"
 	RowsPort      = "rows"
 	OpenTasksPort = "open-tasks"
 	YoursPort     = "yours"
@@ -70,6 +71,8 @@ type rowsIn struct {
 	Tickets []ticket.Ticket   `q:"tickets"`
 	Places  map[string]string `q:"places"`
 	Cloud   []string          `q:"cloud"`
+	// The standing work branches, each drawn as one row of its own. [[spec/tickets/the-index-reads-standing-branches]]
+	Branches []ticket.Branch `q:"branches"`
 }
 
 // The module type the wiring loads as work. [[spec/tickets/open-tasks-come-from-work]]

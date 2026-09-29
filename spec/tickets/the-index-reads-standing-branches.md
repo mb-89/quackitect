@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -133,6 +133,19 @@ record:
         hash: f1cff362e5646752
         size: 3915
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d857b1c19ed5 · claude-code-remote
+    hash_before: f3b30f83fca548c861196a097be8c2f9a42a595f
+    hash_after: f3b30f83fca548c861196a097be8c2f9a42a595f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/git fails
+    inputs:
+      - name: design/draft
+        hash: 7d1eb474d5c70bf4
+        size: 3599
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -244,26 +257,43 @@ Decision: a new outbound IO module git (src/modules/git) reads what standing wor
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/git src/modules/tickets src/modules/work
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/git/git_test.go
+- src/modules/git/git_contract_test.go
+- src/modules/tickets/branches_test.go
+- src/modules/work/branches_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion over stubs. The no-branch case passes already and stays as the guard.
+
+Two findings correct the draft:
+
+- cli.js reads a branch merged where trunk carries its group ticket closed, as `landedHere` answers. The first-parent rule of `mergedHere` plays no part. So a tip carries trunk's copy of its group ticket, and the tickets module decides merged.
+- `tickets/all` also feeds the tickets topic and the retro twin. So the fold lands on a new port `tickets/branched`, which the queue and work read.
+
+The wiring moved in this leaf, because an input no writer feeds refuses the whole catalog. Quack stands green over the stubs. The type takes the name `ticket.Tip`, since `Standing` already names a field of `ticket.Ticket`.
+
+A branch whose ticket runs no group route reads no standing. So `branch take` refuses it by name, and the box switched onto the branch and pulled there.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every `done_when` line meets a failing test, and the shadow line is a checkpoint run by hand at `tests-green`
+- the git door has a fake, and `TestGitKeepsItsContract` holds it to a real clone
 
 # gate
 
