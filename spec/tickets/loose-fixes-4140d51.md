@@ -132,7 +132,16 @@ record:
         hash: 591680bf2c6fc6d6
         size: 13376
     def: 07c43ae7253713ec
-step: retro/notes
+  - step: retro/notes
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 980425de8377e06c59c760cb4ee62cc0140aacca
+    hash_after: 980425de8377e06c59c760cb4ee62cc0140aacca
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+step: retro/write
 ---
 
 # Ask
@@ -203,8 +212,9 @@ The one child, take-honours-the-name, closes done. Its work stands on main in co
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
