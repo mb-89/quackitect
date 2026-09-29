@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: bfcb45d8ba9abd2a
         size: 3090
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856db450bd7 · claude-code-remote · helper-3
+    hash_before: 583ccacc8fd01bbc20b629c163eefb50537acdda
+    hash_after: 583ccacc8fd01bbc20b629c163eefb50537acdda
+    inputs:
+      - name: design/draft
+        hash: bfcb45d8ba9abd2a
+        size: 3090
+      - name: design/tests-red
+        hash: b2c76ad4a79c0e5d
+        size: 865
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -268,8 +280,11 @@ Each new case fails on its assertion over stubs that compile. The two cases that
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- log-view-draw-case-missing: no case draws the log view over fake rows, as the ask's second done_when line names; the shadow cases compare and write rows, and TestTheLogBaseFileDeclaresTheLogView reads the file alone. Add a case beside TestTheWorkViewDrawsOverAFakeWorkRows that builds the log view off spec/views/log.base over fake log/rows and asserts the drawn rows
+- log-draft-test-path-wrong: the draft lists TestTheLogBaseFileDeclaresTheLogView under src/tui/log/view_test.go, and the case stands in src/tui/tree/base_test.go
 
 # implement
 
