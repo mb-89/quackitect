@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 122cff0c191ded55e62c513493a9866a66597225
+    hash_after: 122cff0c191ded55e62c513493a9866a66597225
+    answered:
+      - name: tests
+        exit: 0
+        said: "green, 11 test(s) pass in 3 file(s); green, src/modules/log passes; green, src/modules/files passes; green, src/tui/log "
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 6ab122a4f31cfc75
+        size: 1046
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -317,26 +340,33 @@ The ladder stands once, in src/modules/log/log.go.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/log src/modules/files src/tui/log src/quack test/level0/log-golden.test.js test/level0/log-shadow.test.js test/level0/log-shadow-wiring.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The log topic lands in shadow. The log module holds the ladder once, under log/ladder, and reads the session log the watch now mirrors into log/rows, one row a line, with a torn line kept as a row at error. quack log prints the rows. Where migration.log reads shadow, the log verb runs quack log once after it prints, compares the whole session log before any filter, and writes one shadow row a row the two readers read apart, which ./RUNME.sh log --kind shadow names. The golden holds each reader off one fixture, and shows where they part today: an unknown level, a reply across two lines, a door row with no kind, and a torn line.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the log readers alone.
+The shadow and wiring cases meet fake doors.
+The module header names the approach.
+The ladder stands once in the module.
 
 # accept
 
