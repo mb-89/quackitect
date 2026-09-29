@@ -500,3 +500,12 @@ accept
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+What the box that finished this learned, for the next retro:
+
+| finding | what it costs | where it stands |
+|---|---|---|
+| `branch take <name>` refuses a branch whose ticket runs the standard route, because such a branch reads no standing | a box sent to that branch by name meets a refusal, and switched onto it by hand | `freeIn` in `src/scripts/work-free.js` |
+| a plan naming the ticket as its work holds the plain pull at wait, and a pull by name refuses behind the queue | the box finished a throwaway todo to clear the field before each pull | `pull` in `src/scripts/pull.js` |
+| the plan tool takes no empty value for the work in hand | the same throwaway todo | the plan door |
+| the fix verb runs biome alone, so a Go file past `gofmt` takes a hand edit | one extra round of the check | `./RUNME.sh fix` |
