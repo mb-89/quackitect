@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -127,5 +128,23 @@ func TestTheOldDoorForwardsASignalToTheChild(t *testing.T) {
 	}()
 	if code := old(&out); code != 7 || !strings.Contains(out.String(), "caught") {
 		t.Fatalf("the child ends %d with %q, and wants 7 after the trap", code, out.String())
+	}
+}
+
+// The mode reads the verbs key off the tracked file under the root, and none where the file sets none. [[spec/tickets/runme-hands-verbs-to-quack]]
+func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
+	root := t.TempDir()
+	if said := modeOf(root); said != "" {
+		t.Fatalf("a bare root reads %q", said)
+	}
+	at := filepath.Join(root, "spec", "config")
+	if err := os.MkdirAll(at, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"migration": {"verbs": "new"}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if said := modeOf(root); said != "new" {
+		t.Fatalf("the root reads %q, and wants new", said)
 	}
 }

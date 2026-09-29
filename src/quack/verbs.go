@@ -106,8 +106,8 @@ func verbs(d verbDoors, argv []string) int {
 		if old.String() != now.String() || code != nowCode {
 			row := map[string]any{
 				"level": "info", "kind": shadowKind, "slice": verbsSlice, "verb": key,
-				"said":  fmt.Sprintf("%s in shadow: %s answers apart from cli.js", verbsSlice, key),
-				"old":   capped(old.String()), "new": capped(now.String()), "oldExit": code, "newExit": nowCode,
+				"said": fmt.Sprintf("%s in shadow: %s answers apart from cli.js", verbsSlice, key),
+				"old":  capped(old.String()), "new": capped(now.String()), "oldExit": code, "newExit": nowCode,
 			}
 			if err := d.log(row); err != nil {
 				fmt.Fprintln(d.errs, err)

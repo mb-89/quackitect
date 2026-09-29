@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 74ec273fceac3b9416159abbbb0a78d0ef20e8ab
+    hash_after: 74ec273fceac3b9416159abbbb0a78d0ef20e8ab
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s); green, src/quack passes; green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 4b57014bfa8d25e3
+        size: 871
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -330,26 +353,41 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/verbs_test.go src/modules/migration/migration_test.go test/contract/runme-road.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`./RUNME.sh` now execs the binary as `se-index verb`, which picks the road off the verbs slice, `migration.verbs`. The tracked file sets it to shadow.
+
+- a verb quack answers alone, `run` and `get`, takes quack under every mode
+- a verb with a Go twin runs beside cli.js in shadow, where the old answer stands, and a mismatch appends a `shadow` row to the session log. Under new the twin answers alone
+- every other verb runs cli.js as a child holding the terminal, its signals and its exit code
+
+The twin table starts empty, and each topic ticket adds its rows. Where no binary stands, the entry runs cli.js as before.
+
+The index resolves every config key off its built-in value, since no wire feeds the config module the tracked file. So the ported verb case reads a mode off the index and asserts none in particular, and the road reads its mode off the files itself. A private note carries the gap to the retro.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the entry, the quack root, the road file, the migration slices and the tracked mode alone
+- the road reaches cli.js, the tree, the twins and the log through functions its doors carry, and the cases hand fakes
+- each function links the ticket it implements, and the entry points at the ticket
+- the key stands once in the migration module, and the road reads it through that constant
 
 # accept
 
