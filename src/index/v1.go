@@ -45,6 +45,7 @@ func (one *door) servesV1(listens func(network, address string) (net.Listener, e
 		return valueOf(one.store, in.Name)
 	})
 	one.servesActions(api)
+	one.servesTools(api)
 	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
 	go server.Serve(listen)
 	return listen, server, nil

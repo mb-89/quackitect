@@ -23,13 +23,15 @@ const (
 	exitUsage    = 2
 	actionsPath  = "/values/index/actions"
 	detachFlag   = "detach"
+	toolsPath    = "/tools"
+	actWords     = 3
 )
 
 // The states an operation ends in. [[spec/design_output/model#the-states]]
 var ended = map[string]bool{"done": true, "failed": true, "cancelled": true}
 
 // The verbs the tree answers, which main hands it. [[spec/tickets/the-quack-cli-gets-generated]]
-var cliVerbs = map[string]bool{"help": true, "--help": true, "-h": true, "run": true, "get": true}
+var cliVerbs = map[string]bool{"help": true, "--help": true, "-h": true, "run": true, "get": true, "tools": true, "act": true}
 
 // One row of index/actions: the action, its q.Doc and its input fields. [[spec/tickets/the-catalog-reads-as-rows]]
 type actionRow struct {
@@ -83,6 +85,10 @@ func cli(out, errs io.Writer, base string, argv []string) int {
 		return runs(out, errs, base, argv[1], argv[2:])
 	case argv[0] == "get" && len(argv) == 2:
 		err = gets(out, base, argv[1])
+	case argv[0] == "tools" && len(argv) == 1:
+		err = lists(out, base)
+	case argv[0] == "act" && len(argv) > 1 && len(argv) <= actWords:
+		return acts(out, errs, base, argv[1:])
 	case argv[0] == "help" || argv[0] == "--help" || argv[0] == "-h":
 		err = helps(out, base)
 	default:
@@ -96,7 +102,7 @@ func cli(out, errs io.Writer, base string, argv []string) int {
 }
 
 func usage(errs io.Writer) int {
-	fmt.Fprintln(errs, "usage: quack --help | run <action> [--<field> <value>...] [--detach] | get <name>")
+	fmt.Fprintln(errs, "usage: quack --help | run <action> [--<field> <value>...] [--detach] | get <name> | tools | act <action> [<json>]")
 	return exitUsage
 }
 
@@ -162,12 +168,39 @@ func runs(out, errs io.Writer, base, name string, args []string) int {
 		fmt.Fprintln(errs, err)
 		return exitUsage
 	}
+	return calls(out, errs, base, name, body, *detach)
+}
+
+// Prints the tool list the index generates, one tool an action. [[spec/tickets/the-hook-registers-index-tools]]
+func lists(out io.Writer, base string) error {
+	var said any
+	if err := reads(base+toolsPath, &said); err != nil {
+		return err
+	}
+	return prints(out, said)
+}
+
+// Posts the JSON past the action's name as its input, an empty object where none stands, and follows the call to its end. [[spec/tickets/the-hook-registers-index-tools]]
+func acts(out, errs io.Writer, base string, args []string) int {
+	body := []byte("{}")
+	if len(args) > 1 {
+		body = []byte(args[1])
+	}
+	if !json.Valid(body) {
+		fmt.Fprintf(errs, "quack act %s reads no JSON in %s\n", args[0], body)
+		return exitUsage
+	}
+	return calls(out, errs, base, args[0], body, false)
+}
+
+// Posts the body to the action, and prints its result once the call ends, or its handle at once where it detaches. [[spec/tickets/the-quack-cli-gets-generated]]
+func calls(out, errs io.Writer, base, name string, body []byte, detach bool) int {
 	prefer := followPrefer
-	if *detach {
+	if detach {
 		prefer = detachPrefer
 	}
 	said, err := posts(base+"/actions/"+name, prefer, body)
-	if err == nil && *detach {
+	if err == nil && detach {
 		fmt.Fprintln(out, said.Handle)
 		return 0
 	}

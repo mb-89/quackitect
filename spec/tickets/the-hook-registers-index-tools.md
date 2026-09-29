@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 3f0e505ff5287f29
         size: 865
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 195f9f0faff2945f62154aebf250aa5bd8895b30
+    hash_after: 195f9f0faff2945f62154aebf250aa5bd8895b30
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -294,14 +303,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index/tools.go src/index/v1.go src/quack/cli.go .claude/skills/level0/lib/index-tools.js .claude/skills/level0/hooks/pull-tool.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the list, the door, the command tree and the hook the draft names, and the two points files alone
+the hook reads the process and tool doors the engine fakes in its case, and the Go cases stand a door over fake actions
+each new file opens on a header naming the approach, and each function links the ticket
+the runtime folder comes from folders.js, the hook spells the tool prefix once as INDEX_TOOL beside tools.go, and SERVED stands beside the copy in level0.js, which imports nothing by design
 
 ## tests-green
 
