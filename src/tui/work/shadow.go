@@ -52,7 +52,11 @@ type Shadow struct {
 
 // The view drawn off the base file and the rows work/rows answers, with no verb and no ticket file read. [[spec/tickets/the-work-view-gains-actions]]
 func ViewOver(base string, rows []IndexRow) (*tree.Tree, error) {
-	return tree.NewTree(nil, nil, false), nil
+	views, err := tree.ReadBase(base)
+	if err != nil {
+		return nil, err
+	}
+	return tree.NewTree(views[0].Cols, nil, views[0].Nests), nil
 }
 
 // The badge drawn off the label and the look the port declares and the count it holds. [[spec/tickets/the-work-view-gains-actions]]

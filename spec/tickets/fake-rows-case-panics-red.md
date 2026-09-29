@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tui-shell-lands-in-shadow
 parent: the-work-view-gains-actions
+record:
+  - step: do
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 086dd415d8c643749ecd7aa865f5462e9d1173b2
+    hash_after: 086dd415d8c643749ecd7aa865f5462e9d1173b2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/registry passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-view-awaits-log-parse.md:41:118: Vocabulary: readbase stands outside the words this tree writes. Write"
+    inputs:
+      - name: ask
+        hash: 9981dd6e08752741
+        size: 248
+    def: cf945a4d0451086e
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ TestTheWorkViewDrawsOverAFakeWorkRows panics in tree.Header on the empty tree th
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/registry
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The ViewOver stub reads the base file and hands back a tree with its columns, so the fake rows case reaches its own assertion in place of panicking in the header of an empty tree, and the rest of src/tui/work runs. A case holds the header columns.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the stub in shadow.go and its test alone
+- no door is touched
+- the stub holds no fact stated elsewhere
 
 # Discussion
 

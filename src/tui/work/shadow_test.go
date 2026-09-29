@@ -135,3 +135,19 @@ func TestTheWorkShadowWritesNoRowUnderOld(t *testing.T) {
 		t.Fatalf("the log grew under old: %s", body)
 	}
 }
+
+// The view draws the columns the base file names, whatever rows it holds. [[spec/tickets/fake-rows-case-panics-red]]
+func TestTheViewOverDrawsTheColumnsOfTheBaseFile(t *testing.T) {
+	t.Parallel()
+	base, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "views", "work.base"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	grid, err := ViewOver(string(base), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if head := grid.Header(120); !strings.Contains(head, "name") || !strings.Contains(head, "queue") {
+		t.Fatalf("the header draws %q, and wants the name and queue columns", head)
+	}
+}
