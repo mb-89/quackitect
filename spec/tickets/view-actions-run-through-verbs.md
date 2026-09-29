@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 2e3ecc9883d2c715
         size: 641
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: f9a2cb98faf846ea8553adb93693569b39731794
+    hash_after: f9a2cb98faf846ea8553adb93693569b39731794
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 940a479820d0af61
+        size: 2892
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -248,26 +261,32 @@ What I weigh and assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/ticket-edit.test.js src/modules/verbs src/tui/work
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/ticket-edit.test.js
+- src/modules/verbs/actions_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The four verb cases fail on their assertions against the stub in `ticket-edit.js`, and the two action cases fail since no action registers. `TestPlaceValueReadsTheSharedCases` passes at once. It holds the window side of the shared cases, so its file stays out of the red list. What surprises me: the rule pulls out of `placeAt` whole, and the window place tests pass unchanged over it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the two action cases, the second meets the three verb cases, and the check is a checkpoint at tests-green
+- the verb cases run over the fake disk and fake git, and the Go cases over a bare catalog
 
 # gate
 
