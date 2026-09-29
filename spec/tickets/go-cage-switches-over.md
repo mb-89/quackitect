@@ -191,3 +191,5 @@ Done when the bridge server leaves the tree.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- Copilot reaches the actions through the `mcp` IO module. Its listener takes a fresh port and token at each start, so no static config names it. The switch-over adds a stdio verb to `se-index` that reads `.se/.runtime/mcp.json` and relays each message. `copilot-setup` then writes that verb into the MCP config Copilot reads. [[spec/tickets/copilot-config-names-mcp]]
