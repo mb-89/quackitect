@@ -87,6 +87,7 @@ record:
   - step: sync
     hand: box d85821f54410d · claude-code-remote
     hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
+    hash_after: 660822557b19c369af7f3dc6fe36f94bca4223fa
   - step: sync
     hand: box d85821f54410d · claude-code-remote
     hash_before: 697f0a11125c5aa45d90e1645e62c77d904193b8
@@ -163,7 +164,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["tui-shell-lands-in-shadow"]
 enabled_by: migration.phase8shadow
-cloud: true
 reason: done
 ---
 
