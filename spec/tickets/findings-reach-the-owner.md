@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: do
 steps:
   - name: answer
@@ -48,6 +48,23 @@ record:
         hash: b8bf73d993bb8909
         size: 15501
     def: 2280015d497a3abd
+  - step: do
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: eb1436e20cc75da22f10f3a8fd535d965b4c55c1
+    hash_after: eb1436e20cc75da22f10f3a8fd535d965b4c55c1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: 1791c9ab47c3dd52
+        size: 808
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -77,26 +94,32 @@ A finding reaches the owner by the road its work takes. Work a box can do become
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/folders.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Findings chapter of the level-two design input now names the road a finding takes and the three fields it carries, in place of the line leaving that to a later session. The attack step of a gate reads its finding shape from there. The change touches prose alone, so the folders test over the design input and the check cover it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the answer word for word
+the change reveals no cleanup
+the road and the fields stand in the Findings chapter alone, and the ticket answer points there
 
 # Discussion
 
