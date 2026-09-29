@@ -83,6 +83,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 fix: true
+cloud: true
 ---
 
 # Ask
