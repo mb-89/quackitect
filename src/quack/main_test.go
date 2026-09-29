@@ -339,3 +339,22 @@ func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
 		t.Fatalf("a request to git answers %v", err)
 	}
 }
+
+// The wiring's http instance declares its wait under the name the door reads, so a layer setting the key reaches every post with no Prefer. [[spec/tickets/wait-key-meets-its-wiring]]
+func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := q.New()
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := q.NewStore(c).Declared(index.WaitName); !ok {
+		t.Fatalf("the wiring declares no %s", index.WaitName)
+	}
+}

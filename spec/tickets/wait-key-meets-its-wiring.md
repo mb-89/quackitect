@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: actions-answer-over-http
+record:
+  - step: do
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 7ca286dd1b95ae690c3705594d0a3fb38db77fee
+    hash_after: 7ca286dd1b95ae690c3705594d0a3fb38db77fee
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/wait-key-meets-its-wiring.md:41:387: Vocabulary: waitkey stands outside the words this tree writes. Write a"
+    inputs:
+      - name: ask
+        hash: e7d26da4d686eb02
+        size: 393
+    def: 545a0133c6b1cae7
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the no-Prefer case seeds http/config/wait itself through q.OutIn, and src/module
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The root loads the tracked wiring and reads that its http instance declares index.WaitName. The index imports no module, so the root holds the case tying the door to the name the wiring binds.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change takes the first road the ask offers: a case over the wiring instance
+- the change reveals no cleanup: the case reads the wiring the way the case above it does
+- the name stands once, as index.WaitName, and the case reads it there
 
 # Discussion
 
