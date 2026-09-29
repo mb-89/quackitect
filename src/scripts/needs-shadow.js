@@ -1,6 +1,6 @@
 // The needs of a leaf in shadow: the table cli.js keeps stands, and the
 // registry's actions off `quack get index/actions` answer beside it. Each need
-// the two answer apart becomes one shadow row.
+// the tables answer apart becomes one shadow row.
 // [[spec/tickets/pull-verbs-become-actions]]
 
 // The slice, its key under migration, and the mode that runs the new path beside the old one. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]

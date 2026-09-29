@@ -1,5 +1,5 @@
 // The needs of a leaf in shadow: the registry's actions answer a need beside
-// the table cli.js keeps, and a need the two answer apart makes one row.
+// the table cli.js keeps, and a need the tables answer apart makes one row.
 // [[spec/tickets/pull-verbs-become-actions]]
 
 import assert from "node:assert/strict";
