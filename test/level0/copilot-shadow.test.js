@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { shadowsHook } from "../../src/scripts/copilot-shadow.js";
+import { SHADOW_WAIT, shadowsHook } from "../../src/scripts/copilot-shadow.js";
 
 const ROOT = "/tree";
 const TRACKED = join(ROOT, "spec", "config", "level0.json");
@@ -49,4 +49,10 @@ test("a hook verb that throws leaves copilot's answer standing", () => {
   });
   assert.doesNotThrow(() => shadowsHook(it, "PreToolUse", { session_id: "s1" }, {}));
   assert.equal(it.proc.ran.length, 1);
+});
+
+test("copilot's shadow waits on the hook verb no longer than its own short wait", () => {
+  const it = itOf("shadow");
+  shadowsHook(it, "PreToolUse", { session_id: "s1" }, {});
+  assert.equal(it.proc.ran[0].init.timeoutMs, SHADOW_WAIT);
 });
