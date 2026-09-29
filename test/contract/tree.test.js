@@ -459,12 +459,14 @@ test("the editor draws the schema over the config, with no extension", () => {
 });
 
 // [[spec/design_output/config#the-schema-says-the-type]]
-test("the schema passes the config this tree ships, and refuses one short a field", async () => {
+test("the schema passes the config this tree ships, and refuses a field of the wrong type", async () => {
   assert.deepEqual(await settings.faults(), []);
 
-  const short = flatten(read(TRACKED));
-  short.delete("stop.mostInARow");
-  assert.deepEqual(faultsIn(read(SCHEMA), short), ["stop.mostInARow is missing"]);
+  const wrong = flatten(read(TRACKED));
+  wrong.set("stop.mostInARow", "three");
+  assert.deepEqual(faultsIn(read(SCHEMA), wrong), [
+    "stop.mostInARow carries a string, and the schema says number",
+  ]);
 });
 
 // [[spec/design_output/stop#the-mechanical-checks]]

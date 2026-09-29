@@ -54,6 +54,25 @@ func TestEveryTrackedKeyIsDeclared(t *testing.T) {
 	}
 }
 
+// The sections the drawing names stand first, in its order, so the sidebar meets its groups as it drew them. [[spec/tickets/the-config-schema-gets-generated]]
+func TestDrawnSectionsStandFirst(t *testing.T) {
+	text, err := schemaText(treeRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	schema, err := q.JSON.Parse(text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sections := schema.Fields[len(schema.Fields)-1].Keys
+	want := []string{"stop", "ask", "bridge", "log", "work", "engine", "answer"}
+	for i, name := range want {
+		if i >= len(sections) || sections[i] != name {
+			t.Fatalf("the sections read %v, and want %v first", sections, want)
+		}
+	}
+}
+
 // Every key the tree declares, by its dotted name. [[spec/tickets/the-config-schema-gets-generated]]
 func declared(t *testing.T) map[string]q.Key {
 	t.Helper()

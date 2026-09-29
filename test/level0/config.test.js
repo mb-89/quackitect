@@ -154,11 +154,12 @@ test("every key stands beside its value and its layer", async () => {
   ]);
 });
 
-test("the schema refuses a tracked file missing a field", async () => {
+// A missing key reads its built-in, so the schema refuses no file for it. [[spec/tickets/the-config-schema-gets-generated]]
+test("the schema passes a tracked file missing a field", async () => {
   const missing = { stop: { enabled: true }, log: { level: "info" } };
   const { it } = resolver({ "spec/config/level0.json": JSON.stringify(missing) });
 
-  assert.deepEqual(await it.faults(), ["stop.mostInARow is missing"]);
+  assert.deepEqual(await it.faults(), []);
 });
 
 test("the schema refuses a field carrying another type", async () => {

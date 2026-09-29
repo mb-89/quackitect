@@ -1,0 +1,130 @@
+{
+  "stop": {
+    "hold": {
+      "widget": "toggle",
+      "gesture": 5,
+      "icon": "✋🤖",
+      "group": "agent control",
+      "row": 0,
+      "column": 2,
+      "rowSpan": 1,
+      "colSpan": 1
+    }
+  },
+  "ask": {
+    "wanted": {
+      "widget": "toggle",
+      "gesture": 5,
+      "icon": "❓🤖",
+      "group": "agent control",
+      "row": 0,
+      "column": 3,
+      "rowSpan": 1,
+      "colSpan": 1
+    }
+  },
+  "bridge": {
+    "hook": {
+      "help": "The hook: start the server behind the bridgehead, and click again to kill it. Shift and click starts it under the debugger, paused at the return of decide.",
+      "widget": "process",
+      "icon": "🎣",
+      "group": "agent control",
+      "row": 0,
+      "column": 0,
+      "rowSpan": 1,
+      "colSpan": 1,
+      "runs": "src/bridge/server.js",
+      "launch": "the server",
+      "pauses": "decide"
+    }
+  },
+  "log": {
+    "open": {
+      "help": "Open the window, on its log tab, in a terminal beside the editor.",
+      "widget": "action",
+      "icon": "📜",
+      "group": "agent control",
+      "row": 0,
+      "column": 1,
+      "rowSpan": 1,
+      "colSpan": 1,
+      "keys": [
+        "w s move up and down the log",
+        "enter open the details, and enter again closes them",
+        "up down scroll the details",
+        "pgup pgdown step a whole window",
+        "home the first line, end the newest, and it follows",
+        "q leave"
+      ],
+      "runs": "./RUNME.sh tui"
+    }
+  },
+  "work": {
+    "editor": {
+      "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the number in the work tab's brackets.",
+      "widget": "action",
+      "icon": "💼",
+      "group": "work",
+      "row": 0,
+      "column": 0,
+      "runs": "./RUNME.sh tui work",
+      "counts": "./RUNME.sh index call value {\"name\":\"work/open-tasks\"}"
+    },
+    "pull": {
+      "help": "Take the ticket waiting on you first, and open it.",
+      "widget": "action",
+      "icon": "📥",
+      "group": "work",
+      "row": 0,
+      "column": 1,
+      "runs": "./RUNME.sh ticket yours --next",
+      "pulls": true
+    },
+    "new": {
+      "help": "Open a new ticket under the name the press asks for, with a process to pick.",
+      "widget": "action",
+      "icon": "📝",
+      "group": "work",
+      "row": 0,
+      "column": 2,
+      "asks": "name",
+      "opens": "spec/tickets/<name>.md"
+    }
+  },
+  "engine": {
+    "vehicle": {
+      "help": "Make a vehicle: a copy of this tree that works on itself, in the folder the press asks for.",
+      "widget": "action",
+      "icon": "🚚",
+      "group": "engine",
+      "row": 0,
+      "column": 0,
+      "rowSpan": 1,
+      "colSpan": 1,
+      "asks": "folder",
+      "runs": "./RUNME.sh vehicle into <folder>"
+    },
+    "stub": {
+      "help": "Make a stub: a bare project this vehicle drives, in the folder the press asks for.",
+      "widget": "action",
+      "icon": "🌱",
+      "group": "engine",
+      "row": 0,
+      "column": 1,
+      "rowSpan": 1,
+      "colSpan": 1,
+      "asks": "folder",
+      "runs": "./RUNME.sh stub into <folder>"
+    },
+    "binding": {
+      "widget": "toggle",
+      "gesture": 5,
+      "icon": "❌🔗🤖",
+      "group": "agent control",
+      "row": 0,
+      "column": 4,
+      "rowSpan": 1,
+      "colSpan": 1
+    }
+  }
+}

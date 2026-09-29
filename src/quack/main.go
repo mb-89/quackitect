@@ -188,6 +188,13 @@ func main() {
 		}
 		return
 	}
+	if len(os.Args) >= 2 && os.Args[1] == "schema" {
+		if err := schemas(".", len(os.Args) == 3 && os.Args[2] == "--write"); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) == 2 && os.Args[1] == "guidance" {
 		if err := guidances("."); err != nil {
 			fmt.Fprintln(os.Stderr, err)
