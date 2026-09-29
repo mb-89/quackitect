@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: a71a921ad58c8fb8
         size: 701
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: 8d8c2716f539e1c5efaa44c22794f35a2812b02b
+    hash_after: 8d8c2716f539e1c5efaa44c22794f35a2812b02b
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the readers, their doors, the five keys and the cases beside them; server.js and config.js in the bridge carry the modes a box holds
+- every door the change reaches has a fake: fakeDisk, fakeProc, fakeClock and fakeLog stand under every case
+- a comment names the approach the change implements: quack-topic.js opens on the topic helper, and each reader names the ticket beside its call
+- every fact stands in one place: SLICES and slicesOf in the bridge config, quackAt and processNameOf in quack-topic.js, and the twins re-export them. One departure: the keys moved in one commit with the readers and not one commit a key, since the readers share one helper. The rollback is one revert of the five keys in spec/config/level0.json.
 
 ## tests-green
 
