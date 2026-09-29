@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: read-topics-switch-over
 parent: readers-take-the-go-topics
+record:
+  - step: do
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: f15f8f321855ea750f03473a97c9d2d6d5e64f80
+    hash_after: f15f8f321855ea750f03473a97c9d2d6d5e64f80
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 8d195b7012581870
+        size: 190
+    def: 0582d525609d7fdb
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the config case tests configRowsOf alone, and no case runs readConfig in src/scr
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/topic-readers.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+test/level0/topic-readers.test.js holds a case that runs readConfig with migration.config at new over a fake quack config answer, and reads the row it prints. readConfig takes its doors as a second argument for it, defaulting to the verb's own.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: readConfig runs over the fake answer and the row reads as quack gave it
+- the cleanup the change reveals stands in the group's first change, since the same commit moved the readers
+- every fact stands in one place: the case reads the topic through quack-topic.js
 
 # Discussion
 
