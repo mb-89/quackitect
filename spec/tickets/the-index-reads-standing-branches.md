@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -146,6 +146,18 @@ record:
         hash: 7d1eb474d5c70bf4
         size: 3599
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d857b1c19ed5 · claude-code-remote
+    hash_before: d7294d2b09d26290bd3321a3747c7fec4e6e6a33
+    hash_after: d7294d2b09d26290bd3321a3747c7fec4e6e6a33
+    inputs:
+      - name: design/draft
+        hash: 7d1eb474d5c70bf4
+        size: 3599
+      - name: design/tests-red
+        hash: a7a51b4ff7583ad2
+        size: 1371
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -302,8 +314,11 @@ A branch whose ticket runs no group route reads no standing. So `branch take` re
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask, with the two corrections `design/tests-red` names under seen. A red test decides each command line of `done_when`. The shadow line stays a checkpoint by hand at `tests-green`. The size list misses test files alone, which the new ports force, so no fix ticket follows.
 
 # implement
 
