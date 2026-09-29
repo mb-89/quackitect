@@ -167,7 +167,7 @@ func Of(path, name, text string, changed int64) Ticket {
 		Cloud:     word(front.Get(cloudMark)) == "true",
 		Held:      heldIn(front),
 	}
-	one.Person = state == openState && personIn(front, one.Step)
+	one.Person = personIn(front, one.Step)
 	if one.Route == groupRoute {
 		one.Standing = standingOf(state, front)
 	}

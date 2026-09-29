@@ -163,11 +163,12 @@ steps:
 A question for the owner.
 `
 
-// The row reads person while the ticket stands open and its current step says by: person. [[spec/tickets/groups-hold-groups]]
+// The row reads person while its current step says by: person, whatever the state, as personStep in src/scripts/work-answer.js does. [[spec/tickets/groups-hold-groups]]
 func TestPersonReadsTheStepHand(t *testing.T) {
 	cases := map[string]bool{
 		forPerson: true,
-		strings.Replace(forPerson, "state: open", "state: closed", 1): false,
+		strings.Replace(forPerson, "state: open", "state: closed", 1): true,
+		strings.Replace(forPerson, "state: open", "state: draft", 1):  true,
 		strings.Replace(forPerson, "step: ask", "step: act", 1):       false,
 	}
 	for text, want := range cases {
