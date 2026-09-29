@@ -24,6 +24,7 @@ const (
 	CloudPort = "cloud"
 	// The standing work branches in, every ticket as the work reads it with a branch's copy winning, and the branches as the work draws them. [[spec/tickets/the-index-reads-standing-branches]]
 	TipsPort     = "tips"
+	TrunkPort    = "trunk"
 	BranchedPort = "branched"
 	BranchesPort = "branches"
 )
@@ -74,8 +75,9 @@ func Registers(c *q.Catalog) q.Writer {
 
 // What the branch reading takes: the tickets off the folders, and the tips the git module reads. [[spec/tickets/the-index-reads-standing-branches]]
 type tipsIn struct {
-	All  []Ticket     `q:"all"`
-	Tips []ticket.Tip `q:"tips"`
+	All   []Ticket      `q:"all"`
+	Tips  []ticket.Tip  `q:"tips"`
+	Trunk []ticket.File `q:"trunk"`
 }
 
 // Every ticket the work names, each once: an unmerged branch speaks for its own tickets first, then the folders speak for the rest, as ticketsIn in src/scripts/work-answer.js reads them. A branch's copy keeps the working tree's path, and one standing on the branch alone carries none. [[spec/design_output/work#one-reading-answers-git]]
@@ -103,6 +105,17 @@ func branchedOf(in tipsIn) []Ticket {
 		if !seen[one.Name] {
 			out = append(out, one)
 		}
+	}
+	// A ticket trunk holds on origin and the working tree lacks joins with no path, as answerOf reads trunk and adds the working tree. [[spec/tickets/index-reads-trunk-off-origin]]
+	for _, file := range in.Trunk {
+		name := strings.TrimSuffix(path.Base(file.Path), noteExt)
+		if _, stands := here[name]; stands || seen[name] {
+			continue
+		}
+		seen[name] = true
+		one := Of(file.Path, name, file.Text, 0)
+		one.Path = ""
+		out = append(out, one)
 	}
 	return All(out)
 }

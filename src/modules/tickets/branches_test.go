@@ -38,17 +38,26 @@ func branchTree() (map[string]any, []ticket.Tip) {
 
 // The module over a tips port the case feeds, as the wiring binds it to the git module. [[spec/design_output/model#the-fake-index]]
 func withTips(c *q.Catalog) q.Writer {
-	hand := q.OutIn(c, TipsPort, []ticket.Tip{}, q.Doc("the tips, as the case seeds them"))
+	hand := q.Join(
+		q.OutIn(c, TipsPort, []ticket.Tip{}, q.Doc("the tips, as the case seeds them")),
+		q.OutIn(c, TrunkPort, []ticket.File{}, q.Doc("trunk's ticket files, as the case seeds them")),
+	)
 	Registers(c)
 	return hand
 }
 
 func tipsRead(t *testing.T, port string, files map[string]any, tips []ticket.Tip) any {
 	t.Helper()
+	return gitRead(t, port, files, tips, []ticket.File{})
+}
+
+// What a port answers over the files, the tips and trunk's ticket files a case seeds. [[spec/tickets/index-reads-trunk-off-origin]]
+func gitRead(t *testing.T, port string, files map[string]any, tips []ticket.Tip, trunk []ticket.File) any {
+	t.Helper()
 	var hand q.Writer
 	index := qtest.New(t, func(c *q.Catalog) { hand = withTips(c) })
 	index.Seed(files)
-	index.SeedAs(hand, map[string]any{TipsPort: tips})
+	index.SeedAs(hand, map[string]any{TipsPort: tips, TrunkPort: trunk})
 	return index.Run(port)
 }
 
@@ -136,5 +145,25 @@ func TestTheCloudReadsATipChildOfAMarkedGroup(t *testing.T) {
 	said, _ := tipsRead(t, CloudPort, files, tips).([]string)
 	if len(said) != 2 || said[0] != "own-child" || said[1] != "the-group" {
 		t.Fatalf("the marked group and its child on the tip stand on the cloud, and the cloud reads %v", said)
+	}
+}
+
+// A ticket trunk holds and the working tree lacks joins with no path, and the working tree's copy wins where both hold one, as answerOf reads trunk off origin. [[spec/tickets/index-reads-trunk-off-origin]]
+func TestATrunkTicketTheWorkingTreeLacksJoinsWithNoPath(t *testing.T) {
+	files := map[string]any{"files/spec/tickets/on-disk.md": file("---\nkind: ticket\nstate: open\nstep: here\n---\n\n# Ask\n\nOn disk.\n")}
+	trunk := []ticket.File{
+		{Path: "spec/tickets/on-disk.md", Text: "---\nkind: ticket\nstate: open\nstep: there\n---\n\n# Ask\n\nOn trunk.\n"},
+		{Path: "spec/tickets/minted-later.md", Text: "---\nkind: ticket\nstate: draft\nstep: do\n---\n\n# Ask\n\nMinted on trunk.\n"},
+	}
+	said, _ := gitRead(t, BranchedPort, files, []ticket.Tip{}, trunk).([]Ticket)
+	rows := map[string]Ticket{}
+	for _, one := range said {
+		rows[one.Name] = one
+	}
+	if rows["on-disk"].Step != "here" {
+		t.Errorf("the working tree's copy wins, and on-disk reads %+v", rows["on-disk"])
+	}
+	if later := rows["minted-later"]; later.State != "draft" || later.Path != "" {
+		t.Errorf("a ticket trunk alone holds joins with no path, and reads %+v", later)
 	}
 }

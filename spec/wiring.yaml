@@ -57,7 +57,9 @@ wires:
   check.buffers/<path...>: buffers/<path...>
   log.session: files/.se/.log/session.jsonl
   git.tips: git/tips
+  git.trunk: git/trunk
   tickets.tips: git/tips
+  tickets.trunk: git/trunk
   tickets.all: tickets/all
   tickets.cloud: tickets/cloud
   tickets.branched: tickets/branched

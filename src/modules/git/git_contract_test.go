@@ -54,6 +54,14 @@ func gitSuite(t *testing.T, one Git, hands remote) {
 	if said := tips(); !reflect.DeepEqual(said, want) {
 		t.Fatalf("the remote answers %+v, and wants %+v", said, want)
 	}
+	hands.land(map[string]string{"spec/tickets/nested/deep.md": "no ticket\n", "spec/other.md": "outside\n"})
+	trunk, err := one.Trunk()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if wantTrunk := []ticket.File{{Path: "spec/tickets/the-group.md", Text: "trunk's copy\n"}}; !reflect.DeepEqual(trunk, wantTrunk) {
+		t.Fatalf("trunk answers %+v, and wants %+v", trunk, wantTrunk)
+	}
 	hands.drop("another")
 	if said := tips(); len(said) != 1 || said[0].Name != "the-group" {
 		t.Fatalf("a deleted branch leaves, and the remote answers %+v", said)

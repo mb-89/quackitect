@@ -55,6 +55,7 @@ func TestTreeGolden(t *testing.T) {
 	}
 	index := qtest.New(t, func(c *q.Catalog) {
 		q.OutIn(c, tickets.TipsPort, []ticket.Tip{}, q.Doc("no tip, since the golden file reads trunk alone"))
+		q.OutIn(c, tickets.TrunkPort, []ticket.File{}, q.Doc("no trunk off origin, since the golden file reads the folder"))
 		tickets.Registers(c)
 	})
 	index.Seed(seeded)

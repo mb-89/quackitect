@@ -19,8 +19,11 @@ import (
 	"quackitect/src/ticket"
 )
 
-// The out-port, by its local name. [[spec/design_output/model#the-wiring-file]]
-const Port = "tips"
+// The out-ports, by their local names. [[spec/design_output/model#the-wiring-file]]
+const (
+	Port      = "tips"
+	TrunkPort = "trunk"
+)
 
 // The folder a public ticket stands directly under, and the ending it carries, which TICKETS in src/engine/group.js names and a Go module spells again. [[spec/tickets/the-index-reads-standing-branches]]
 const (
@@ -47,13 +50,16 @@ const span = 5 * time.Second
 // [[spec/design_output/model#io-modules-and-their-fakes]]
 type Git interface {
 	Tips() ([]ticket.Tip, error)
+	Trunk() ([]ticket.File, error)
 }
 
 // The refs as the last read found them, and the tips read off them, so a read over unmoved refs spawns one git. [[spec/tickets/the-index-reads-standing-branches]]
 type repo struct {
-	root string
-	refs string
-	last []ticket.Tip
+	root    string
+	refs    string
+	last    []ticket.Tip
+	trunkAt string
+	trunk   []ticket.File
 }
 
 // The real reader over the repository at root. [[spec/design_output/model#its-file-carries-its-fake]]
@@ -80,6 +86,24 @@ func (one *repo) Tips() ([]ticket.Tip, error) {
 	return out, nil
 }
 
+// Trunk's ticket files, read again where trunk moves, and none where no fetch left trunk behind. [[spec/tickets/index-reads-trunk-off-origin]]
+func (one *repo) Trunk() ([]ticket.File, error) {
+	said, err := one.run(nil, "rev-parse", "--verify", "--quiet", trunkRef)
+	if err != nil {
+		return []ticket.File{}, nil
+	}
+	commit := strings.TrimSpace(said)
+	if one.trunk != nil && commit == one.trunkAt {
+		return one.trunk, nil
+	}
+	files, _, err := one.filesAt(commit, nil)
+	if err != nil {
+		return nil, err
+	}
+	one.trunkAt, one.trunk = commit, files
+	return files, nil
+}
+
 // Trunk's commit, and each work branch as its name and its commit, in the order git lists them. [[spec/tickets/the-index-reads-standing-branches]]
 func headsIn(refs string) (string, [][2]string) {
 	trunk := ""
@@ -100,33 +124,48 @@ func headsIn(refs string) (string, [][2]string) {
 
 // One branch's ticket files and trunk's copy of its group ticket, read in one batch. [[spec/design_output/work#the-listing-reads-git-once]]
 func (one *repo) tipAt(name, commit, trunk string) (ticket.Tip, error) {
-	tip := ticket.Tip{Name: name, Files: []ticket.File{}}
+	var more []string
+	if trunk != "" {
+		more = []string{trunk + ":" + ticketAt(name)}
+	}
+	files, extra, err := one.filesAt(commit, more)
+	if err != nil {
+		return ticket.Tip{}, err
+	}
+	tip := ticket.Tip{Name: name, Files: files}
+	if trunk != "" {
+		tip.Trunk = extra[0]
+	}
+	return tip, nil
+}
+
+// The ticket files a commit holds directly under the ticket folder, and the text of each further ask, read in one batch. [[spec/design_output/work#the-listing-reads-git-once]]
+func (one *repo) filesAt(commit string, more []string) ([]ticket.File, []string, error) {
+	files := []ticket.File{}
 	listing, err := one.run(nil, "ls-tree", "--name-only", commit, ticketsFolder)
 	if err != nil {
-		return tip, err
+		return nil, nil, err
 	}
 	asks := []string{}
 	for _, at := range strings.Split(strings.TrimSpace(listing), "\n") {
 		if ticketPath(at) {
-			tip.Files = append(tip.Files, ticket.File{Path: at})
+			files = append(files, ticket.File{Path: at})
 			asks = append(asks, commit+":"+at)
 		}
 	}
-	if trunk != "" {
-		asks = append(asks, trunk+":"+ticketAt(name))
+	asks = append(asks, more...)
+	if len(asks) == 0 {
+		return files, nil, nil
 	}
 	said, err := one.run([]byte(strings.Join(asks, "\n")+"\n"), "cat-file", "--batch")
 	if err != nil {
-		return tip, err
+		return nil, nil, err
 	}
 	texts := framed([]byte(said), len(asks))
-	for at := range tip.Files {
-		tip.Files[at].Text = texts[at]
+	for at := range files {
+		files[at].Text = texts[at]
 	}
-	if trunk != "" {
-		tip.Trunk = texts[len(asks)-1]
-	}
-	return tip, nil
+	return files, texts[len(files):], nil
 }
 
 // The payload a batch answers each ask, and nothing for a missing object, the reading framed in src/scripts/work-read.js holds. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -201,17 +240,29 @@ func (one *FakeGit) Tips() ([]ticket.Tip, error) {
 	defer one.mu.Unlock()
 	out := []ticket.Tip{}
 	for name, files := range one.branches {
-		tip := ticket.Tip{Name: name, Trunk: one.trunk[ticketAt(name)], Files: []ticket.File{}}
-		for at, text := range files {
-			if ticketPath(at) {
-				tip.Files = append(tip.Files, ticket.File{Path: at, Text: text})
-			}
-		}
-		sort.Slice(tip.Files, func(a, b int) bool { return tip.Files[a].Path < tip.Files[b].Path })
-		out = append(out, tip)
+		out = append(out, ticket.Tip{Name: name, Trunk: one.trunk[ticketAt(name)], Files: ticketFiles(files)})
 	}
 	sort.Slice(out, func(a, b int) bool { return out[a].Name < out[b].Name })
 	return out, nil
+}
+
+// [[spec/tickets/index-reads-trunk-off-origin]]
+func (one *FakeGit) Trunk() ([]ticket.File, error) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	return ticketFiles(one.trunk), nil
+}
+
+// The ticket files among files, in path order. [[spec/tickets/index-reads-trunk-off-origin]]
+func ticketFiles(files map[string]string) []ticket.File {
+	out := []ticket.File{}
+	for at, text := range files {
+		if ticketPath(at) {
+			out = append(out, ticket.File{Path: at, Text: text})
+		}
+	}
+	sort.Slice(out, func(a, b int) bool { return out[a].Path < out[b].Path })
+	return out
 }
 
 func copied(files map[string]string) map[string]string {
@@ -233,23 +284,34 @@ func ticketPath(at string) bool {
 
 // [[spec/design_output/model#io-modules-are-modules]]
 func Registers(c *q.Catalog) q.Writer {
-	return q.OutIn(c, Port, []ticket.Tip{}, q.Doc("every work branch standing on origin, with the ticket files on its tip and trunk's copy of its group ticket"), q.IO())
+	return q.Join(
+		q.OutIn(c, Port, []ticket.Tip{}, q.Doc("every work branch standing on origin, with the ticket files on its tip and trunk's copy of its group ticket"), q.IO()),
+		q.OutIn(c, TrunkPort, []ticket.File{}, q.Doc("the ticket files on trunk as origin holds it"), q.IO()),
+	)
 }
 
 // Commits the tips at start, and again each span where they change. A read git refuses commits no branch. [[spec/tickets/the-index-reads-standing-branches]]
 func Start(from Git, every func(time.Duration, func(time.Time)) func(), commit func(values map[string]any) error) (stop func()) {
-	last := ""
+	last := map[string]string{}
 	send := func() {
 		tips, err := from.Tips()
 		if err != nil {
 			tips = []ticket.Tip{}
 		}
-		key, _ := json.Marshal(tips)
-		if string(key) == last {
-			return
+		trunk, err := from.Trunk()
+		if err != nil {
+			trunk = []ticket.File{}
 		}
-		last = string(key)
-		_ = commit(map[string]any{Port: tips})
+		moved := map[string]any{}
+		for port, value := range map[string]any{Port: tips, TrunkPort: trunk} {
+			if key, _ := json.Marshal(value); string(key) != last[port] {
+				last[port] = string(key)
+				moved[port] = value
+			}
+		}
+		if len(moved) > 0 {
+			_ = commit(moved)
+		}
 	}
 	send()
 	return every(span, func(time.Time) { send() })

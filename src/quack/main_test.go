@@ -20,9 +20,15 @@ import (
 )
 
 // The git module's tips, which a case wiring the tickets module and no git feeds empty. [[spec/tickets/the-index-reads-standing-branches]]
-const tipsName = "git/tips"
+const (
+	tipsName  = "git/tips"
+	trunkName = "git/trunk"
+)
 
-func noTips(c *q.Catalog) { q.OutIn(c, tipsName, []ticket.Tip{}, q.Doc("the tips, empty")) }
+func noTips(c *q.Catalog) {
+	q.OutIn(c, tipsName, []ticket.Tip{}, q.Doc("the tips, empty"))
+	q.OutIn(c, trunkName, []ticket.File{}, q.Doc("trunk's ticket files, empty"))
+}
 
 func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
@@ -232,7 +238,7 @@ func awaits(t *testing.T, want map[string]string) {
 func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}},
-		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.tips": tipsName, "tickets.branched": "tickets/branched"},
+		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.tips": tipsName, "tickets.trunk": trunkName, "tickets.branched": "tickets/branched"},
 	}
 	c := q.New()
 	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
@@ -259,7 +265,7 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}},
 		Wires: map[string]string{
-			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud", "tickets.tips": tipsName, "tickets.branched": "tickets/branched",
+			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud", "tickets.tips": tipsName, "tickets.trunk": trunkName, "tickets.branched": "tickets/branched",
 			"queue.rows": "tickets/all", "queue.plan": "files/.se/.runtime/plan.json", "queue.cloud": "tickets/cloud",
 			"queue.stood": q.BuiltIn, "queue.minute": "clock/minute",
 		},

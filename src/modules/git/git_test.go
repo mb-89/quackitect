@@ -39,6 +39,29 @@ func TestTheStartCommitsTheTipsAndEachChange(t *testing.T) {
 	}
 }
 
+// The start commits trunk's ticket files beside the tips, and again where trunk moves. [[spec/tickets/index-reads-trunk-off-origin]]
+func TestTheStartCommitsTrunksTicketFiles(t *testing.T) {
+	fake := NewFake()
+	fake.Land(map[string]string{"spec/tickets/one.md": "one\n"})
+	var tick func(time.Time)
+	every := func(_ time.Duration, hand func(time.Time)) func() {
+		tick = hand
+		return func() {}
+	}
+	var trunks [][]ticket.File
+	Start(fake, every, func(values map[string]any) error {
+		if files, ok := values[TrunkPort].([]ticket.File); ok {
+			trunks = append(trunks, files)
+		}
+		return nil
+	})
+	fake.Land(map[string]string{"spec/tickets/two.md": "two\n"})
+	tick(time.Time{})
+	if len(trunks) != 2 || len(trunks[0]) != 1 || len(trunks[1]) != 2 {
+		t.Fatalf("the start commits trunk, then trunk again once it moves, and commits %+v", trunks)
+	}
+}
+
 func TestTheTipsStandUnderTheirLocalPort(t *testing.T) {
 	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
 	if got, ok := index.Read(Port).([]ticket.Tip); !ok || len(got) != 0 {
