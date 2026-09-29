@@ -22,7 +22,7 @@ const (
 // The two config files and the keys the rules count by, which src/config names for the LSP. src/config reads the disk, so this module spells them again. [[spec/design_output/config#the-resolver-holds-the-layers]]
 const (
 	trackedConfig = "spec/config/level0.json"
-	localConfig   = ".se/.runtime/config.json"
+	localConfig   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
 	wordsKey      = "names.words"
 	pointerKey    = "restated.pointer"
 	ruleKey       = "restated.rule"

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 0a65097bd12e1a5a9da73855dd88d97d5499d1cd
+    hash_after: 0a65097bd12e1a5a9da73855dd88d97d5499d1cd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes; green, src/modules/migration passes; green, src/imports passes; green, src/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: f547f05bfa96d6f2
+        size: 1015
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -326,26 +349,33 @@ go vet ./src/lsp ./src/modules/check ./src/modules/migration ./src/imports
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check/sweep_test.go src/modules/migration src/imports src/lsp
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The LSP rules and schema checks now stand once, in `src/modules/check`, and the LSP calls them through `src/lsp/rules.go`. The tree reads a `Source` of slash paths, so the module imports no `io/fs`. The LSP hands in its disk, and the sweep hands in the files the index mirrors. The module answers `check/sweep` off `files/` and `env/`, with the word cap and the restated runs read off the layers in the order `src/config` reads them. The migration module adds the shared key `lsp`, built in as old, and the default file sets it to shadow. Under shadow, `se-lsp check` over the whole tree reads `check/sweep` off `/v1`, and each finding one side holds alone writes a `shadow` row, slice `lsp`. The rules reading the box stand outside the compare. The words case wanted no finding with the local cap at two, against the order its own message names, so it now wants the finding.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the contract cases the rename moved
+- the new doors reach the shadow as functions, so each case hands in a fake
+- each new file opens on a header pointing at this ticket
+- each fact the change adds stands once, and `sweep.go` says why it spells the layer order again
 
 # accept
 

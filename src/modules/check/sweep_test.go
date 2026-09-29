@@ -63,3 +63,16 @@ func TestTheSweepReadsTheWordsOffTheLocalLayer(t *testing.T) {
 		t.Fatalf("the sweep answers %+v, and wants the local file over the variable, as src/config reads it", found)
 	}
 }
+
+func TestTheSweepReadsTheVariableOverTheTrackedFile(t *testing.T) {
+	files := map[string]string{
+		"spec/config/level0.json": `{"names": {"words": 5}}`,
+		"spec/one-two-three.md":   "# One\n",
+	}
+	if found := sweepOver(t, files, nil); holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
+		t.Fatalf("the sweep answers %+v, and wants the tracked cap of five to pass three words", found)
+	}
+	if found := sweepOver(t, files, map[string]string{"SE_NAMES_WORDS": "2"}); !holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
+		t.Fatalf("the sweep answers %+v, and wants the variable over the tracked file, as src/config reads it", found)
+	}
+}
