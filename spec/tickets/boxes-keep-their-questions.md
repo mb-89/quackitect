@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -41,6 +41,23 @@ record:
       - name: check
         exit: 1
         said: "}"
+  - step: do
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: f4c507523c6ccf7207a5ea46672a903d4b673b9a
+    hash_after: a567d283178a0c32eee3b528a77f0b7484b57b25
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 20 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 6849c2cd60135766
+        size: 617
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
