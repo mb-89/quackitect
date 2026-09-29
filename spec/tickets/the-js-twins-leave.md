@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -129,6 +129,19 @@ record:
         hash: cea2b1b9bf4bfda7
         size: 14154
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: 4f9532c8db466c75ebf149fdabb6f69e2fa9b408
+    hash_after: 4f9532c8db466c75ebf149fdabb6f69e2fa9b408
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f3b5d686ac3a0cbe
+        size: 3706
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -211,26 +224,31 @@ The comparison twins leave: src/scripts/config-shadow.js, src/scripts/log-shadow
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/twins-left.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/contract/twins-left.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All three cases fail on their own assertion: the four twin files stand, the tree imports them, and the enum still lists old and shadow. Nothing surprised me.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: twins-left.test.js decides the import line, and the check decides the exit
+- every door the tests reach has a fake: the contract test reads the real tree through the disk door, as a contract test does
 
 # gate
 
