@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -162,6 +162,15 @@ record:
         hash: 9077ecae87856252
         size: 5609
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: dc036d9918b7012b492fd82b059c5f3376923b21
+    hash_after: dc036d9918b7012b492fd82b059c5f3376923b21
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -291,14 +300,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/modules/check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `sweep.go` and the case alone
+- the change reaches no door, and the fake index takes the buffers as seeds
+- a comment beside the loop names the overlay the approach lays
+- the port name stands once, in `sweep.go`
 
 ## tests-green
 

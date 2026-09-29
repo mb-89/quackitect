@@ -17,6 +17,8 @@ const (
 	SweepPort = "sweep"
 	FilesPort = "files/<path...>"
 	EnvPort   = "env/<name>"
+	// The unsaved text of each path an editor holds open, which the lsp IO module writes. [[spec/tickets/buffers-feed-the-checks]]
+	BuffersPort = "buffers/<path...>"
 )
 
 // The two config files and the keys the rules count by, which src/config names for the LSP. src/config reads the disk, so this module spells them again. [[spec/design_output/config#the-resolver-holds-the-layers]]
@@ -31,6 +33,8 @@ const (
 type sweepIn struct {
 	Files map[string]q.Content `q:"files/<path...>"`
 	Env   map[string]string    `q:"env/<name>,optional"`
+	// [[spec/tickets/buffers-feed-the-checks]]
+	Buffers map[string]string `q:"buffers/<path...>,optional"`
 }
 
 // Every rule over the files, as the LSP's own sweep answers it over the same tree. [[spec/tickets/lsp-rules-move-to-check]]
@@ -42,6 +46,10 @@ func sweepOf(in sweepIn) []Finding {
 		}
 	}
 	tree := TreeOver("", texts)
+	// A buffer stands over its file, as the LSP's overlay holds an open editor's text, and adds no path. [[spec/tickets/buffers-feed-the-checks]]
+	for at, text := range in.Buffers {
+		tree.Holds(at, text)
+	}
 	tree.Words = countOf(texts, in.Env, wordsKey)
 	return CheckerOver(tree, countOf(texts, in.Env, pointerKey), countOf(texts, in.Env, ruleKey)).Sweep()
 }
