@@ -3,7 +3,13 @@
 // [[spec/tickets/the-log-topic-lands]]
 package log
 
-import "quackitect/src/q"
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+
+	"quackitect/src/q"
+)
 
 // The ports, by their local names. [[spec/design_output/model#the-wiring-file]]
 const (
@@ -13,7 +19,13 @@ const (
 )
 
 // The ladder Python's logging climbs. [[spec/design_output/log#what-a-box-writes]]
-var Ladder = []string{}
+var Ladder = []string{"debug", "info", "warn", "error", "fatal"}
+
+// The level an empty or unknown level reads as. [[spec/design_output/log#what-a-box-writes]]
+const fallback = 1
+
+// The fields a row holds by name, which no extra carries. [[spec/design_output/tui#one-row]]
+var own = map[string]bool{"at": true, "level": true, "kind": true, "door": true, "said": true, "text": true}
 
 // One row of the session log. [[spec/design_output/tui#one-row]]
 type Row struct {
@@ -43,10 +55,66 @@ func rowsOf(in rowsIn) []Row {
 
 // One row a line that holds anything. [[spec/design_output/tui#one-row]]
 func RowsOf(text string) []Row {
-	return nil
+	out := []Row{}
+	for _, line := range strings.Split(text, "\n") {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		out = append(out, RowOf(line))
+	}
+	return out
+}
+
+// One line's row, read the way ParseRecord reads it: a line no parser takes stands as a broken row at error. [[spec/tickets/the-log-topic-lands]]
+func RowOf(line string) Row {
+	var fields map[string]any
+	decoder := json.NewDecoder(strings.NewReader(line))
+	decoder.UseNumber()
+	if err := decoder.Decode(&fields); err != nil || fields == nil {
+		return Row{Level: "error", Kind: "unparsed", Said: strings.TrimSpace(line), Broken: true}
+	}
+	r := Row{
+		At:    textOf(fields["at"]),
+		Level: Ladder[Rank(textOf(fields["level"]))],
+		Kind:  textOf(fields["kind"]),
+		Said:  textOf(fields["said"]),
+		Text:  textOf(fields["text"]),
+	}
+	if r.Kind == "" {
+		r.Kind = textOf(fields["door"])
+	}
+	for key, value := range fields {
+		if own[key] {
+			continue
+		}
+		if r.Extra == nil {
+			r.Extra = map[string]string{}
+		}
+		r.Extra[key] = textOf(value)
+	}
+	return r
+}
+
+// A field's value as text, a list or an object as its JSON. [[spec/design_output/tui#one-row]]
+func textOf(value any) string {
+	switch one := value.(type) {
+	case nil:
+		return ""
+	case string:
+		return one
+	case map[string]any, []any:
+		out, _ := json.Marshal(one)
+		return string(out)
+	}
+	return fmt.Sprint(value)
 }
 
 // A level's place on the ladder, and info's place for a level nobody knows. [[spec/design_output/log#what-a-box-writes]]
 func Rank(level string) int {
-	return 0
+	for at, one := range Ladder {
+		if strings.EqualFold(one, level) {
+			return at
+		}
+	}
+	return fallback
 }

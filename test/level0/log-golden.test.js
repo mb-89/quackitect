@@ -26,3 +26,10 @@ test("the golden holds the rows lib/log.js and the extension read", () => {
     );
   }
 });
+
+test("a torn line drops out of lib/log.js, and the extension prints it raw", () => {
+  const said = readersOf("not a row\n");
+  assert.deepEqual(said[READERS.asRow], []);
+  assert.equal(said[READERS.rowOf].length, 1);
+  assert.match(String(said[READERS.rowOf][0]), /not a row/);
+});

@@ -22,6 +22,7 @@ import (
 	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
 	manager "quackitect/src/modules/index"
+	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/tickets"
@@ -61,6 +62,7 @@ var modules = map[string]ioModule{
 	"migration": {registers: migration.Registers},
 	"check":     {registers: check.Registers},
 	"guidance":  {registers: guidance.Registers},
+	"log":       {registers: logmodule.Registers},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -133,6 +135,13 @@ func main() {
 	}
 	if len(os.Args) == 2 && os.Args[1] == "guidance" {
 		if err := guidances("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) == 2 && os.Args[1] == "log" {
+		if err := logs("."); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}

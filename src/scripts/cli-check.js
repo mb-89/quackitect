@@ -82,6 +82,10 @@ export function tuiDoors() {
     show,
     // The log verb reads a span against now, and a door answers the clock. [[spec/guidance/code/testing]]
     clock: it.clock,
+    // The log slice in shadow reads its mode, runs quack under the method root, and writes its rows through the log door. [[spec/tickets/log-shadow-wiring-gets-tests]]
+    config: it.config,
+    log: it.log,
+    method: it.method,
   };
 }
 

@@ -12,6 +12,8 @@ func TestTheWatchMirrorsTheSessionLog(t *testing.T) {
 		".se/.log/serve.log":         false,
 		".se/.runtime/plan.json":     true,
 		".se/.dump/rows.json":        false,
+		".se/.runtime/plan.jsonl":    false,
+		".se/.log/plan.json":         false,
 	} {
 		if got := heard(rel); got != want {
 			t.Errorf("%s reaches the family %v, and wants %v", rel, got, want)

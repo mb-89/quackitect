@@ -63,3 +63,11 @@ func TestLogGoldenHoldsTheModule(t *testing.T) {
 		t.Fatalf("%s reads apart from the golden file: run go test ./src/quack -run TestLogGolden -update, and read the difference at the merge", logModule)
 	}
 }
+
+// The log verb takes an array alone, so a log holding no row answers an empty one. [[spec/tickets/log-shadow-reads-unfiltered-rows]]
+func TestLogAnswersAnEmptyArrayForNoRow(t *testing.T) {
+	said, err := json.Marshal(logRows(""))
+	if err != nil || string(said) != "[]" {
+		t.Fatalf("no row reads %s, %v, and wants []", said, err)
+	}
+}

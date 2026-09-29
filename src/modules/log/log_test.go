@@ -60,3 +60,14 @@ func TestABrokenLineStandsAsARowAtError(t *testing.T) {
 		t.Fatalf("the rows read %+v, and want %+v", rows, want)
 	}
 }
+
+func TestANestedFieldReadsAsItsJSON(t *testing.T) {
+	rows := rowsOver(t, `{"kind":"tool","said":"ran","call":{"a":1},"level":"WARN"}`+"\nnull\n")
+	want := []Row{
+		{Level: "warn", Kind: "tool", Said: "ran", Extra: map[string]string{"call": `{"a":1}`}},
+		{Level: "error", Kind: "unparsed", Said: "null", Broken: true},
+	}
+	if !reflect.DeepEqual(rows, want) {
+		t.Fatalf("the rows read %+v, and want %+v", rows, want)
+	}
+}
