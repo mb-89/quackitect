@@ -26,5 +26,5 @@ test("./RUNME.sh hands get to quack, which reads the verbs slice off the index",
 test("./RUNME.sh hands config to cli.js, which names the verbs slice in the tracked file", () => {
   const said = runs("config", "migration.verbs");
   assert.equal(said.exitCode, 0, said.stderr);
-  assert.match(said.stdout, /migration\.verbs\s+shadow\s+spec\/config\/level0\.json/);
+  assert.match(said.stdout, /migration\.verbs\s+new\s+spec\/config\/level0\.json/);
 });

@@ -39,7 +39,7 @@ func TestTheLspSliceStandsOld(t *testing.T) {
 // The verbs slice stands switched over to new, so a box with no tracked mode runs every twin alone. [[spec/tickets/agents-call-quack-directly]]
 func TestTheVerbsSliceStandsNew(t *testing.T) {
 	for _, one := range slices {
-		if one.key == VerbsKey && one.mode == "new" {
+		if one.key == VerbsKey && one.mode == "new" && strings.Contains(one.doc, "switched over") {
 			return
 		}
 	}

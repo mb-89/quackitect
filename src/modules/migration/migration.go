@@ -37,7 +37,7 @@ var slices = []struct{ key, mode, doc string }{
 	{GuidanceKey, "old", "the guidance slice, the rules a step reads: old, shadow or new"},
 	{CheckKey, "old", "the check slice, the check/ names and their twins: old, shadow or new"},
 	{ProseKey, "old", "the prose slice, the prose checks in Go beside wink: old, shadow or new"},
-	{VerbsKey, "old", "the verbs slice, the road ./RUNME.sh hands a verb down: old, shadow or new"},
+	{VerbsKey, "new", "the verbs slice, switched over to new: each verb quack answers runs alone"},
 	{CageKey, "old", "the cage slice, the road a hook event takes to the hooks IO module: old, shadow or new"},
 	{WindowKey, "old", "the window slice, the rows and the badges the window reads off the index: old, shadow or new"},
 	{LspKey, "old", "the lsp slice, the LSP's rules the check module answers beside it: old, shadow or new"},

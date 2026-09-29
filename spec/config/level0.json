@@ -113,7 +113,7 @@
     "guidance": "new",
     "check": "new",
     "prose": "new",
-    "verbs": "shadow",
+    "verbs": "new",
     "cage": "shadow",
     "window": "shadow",
     "lsp": "shadow"
