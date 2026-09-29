@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -163,6 +163,22 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/tickets/the-sidebar-renders-generically]]
+  - step: design/tests-red
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 0592570c20f7f5a9feb0716fcabba922399226ef
+    hash_after: 0592570c20f7f5a9feb0716fcabba922399226ef
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: baa2b39c4d52bd5e
+        size: 7485
+      - name: [[spec/tickets/the-sidebar-renders-generically]]
+        hash: ecdfa10dc707c2ae
+        size: 15191
+    def: 08e16d07b0de477c
 ---
 
 # Ask
