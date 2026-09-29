@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: 2016b703e694ec8c
         size: 840
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 6c08ba3af49679877ac4816c74e6e072652f33e8
+    hash_after: 6c08ba3af49679877ac4816c74e6e072652f33e8
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -271,14 +280,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/prose src/quack/prose.go src/bridge/prose-shadow.js src/bridge/findings.js src/bridge/prose.js src/scripts/cli-read.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the prose package, quack prose, the shadow and its callers the draft and the gate points name, and go.mod for golem.
+The shadow cases and the wiring cases run over fake settings, proc and log, and the Go vetoes read text alone.
+The headers of src/prose/prose.go, src/prose/lemma.go and src/bridge/prose-shadow.js name the approach.
+The exception list stands once, in src/prose/lemmas.yml, and the domain words stand in the vocabulary lists.
 
 ## tests-green
 
