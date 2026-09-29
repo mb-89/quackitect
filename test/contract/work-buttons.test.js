@@ -39,7 +39,7 @@ test("each line a work button runs or counts names a verb the command line knows
   ]).filter(Boolean);
   assert.deepEqual(lines, [
     "./RUNME.sh tui work",
-    "./RUNME.sh tui work --count",
+    './RUNME.sh index call value {"name":"work/open-tasks"}',
     "./RUNME.sh ticket yours --next",
   ]);
   for (const line of lines) {

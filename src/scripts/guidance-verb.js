@@ -14,6 +14,7 @@ import {
   PROCESSES,
   readsFor,
 } from "./guidance-hand.js";
+import { shadowLeaf } from "./guidance-shadow.js";
 import { leafOf } from "./pull-route.js";
 
 const STEP = "--step";
@@ -59,7 +60,10 @@ function stepNotes(it, step, env) {
     console.error(`${name} names no step ${path}, or names one holding steps.`);
     return 1;
   }
-  return said(it, readsFor(it, leaf, env));
+  const notes = readsFor(it, leaf, env);
+  // The verb reads its answer now, and the shadow row lands behind it. [[spec/tickets/the-guidance-topic-lands]]
+  shadowLeaf(it, `${name}:${path}`, notes);
+  return said(it, notes);
 }
 
 function stepIn(argv) {

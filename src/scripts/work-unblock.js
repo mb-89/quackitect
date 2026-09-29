@@ -16,6 +16,7 @@ import {
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { landedAlone } from "./pull-landed.js";
 import { leafOf, stepPathOf } from "./pull.js";
+import { onPersonRoute, PERSON } from "./work-fix.js";
 
 const DISCUSSION = "# Discussion";
 // What mint leaves in an empty chapter, in either spelling. A hand writing under Discussion drops it, so the chapter reads as what a hand wrote. [[spec/design_output/work#a-person-step-leaves]]
@@ -129,7 +130,11 @@ function admits(successor, nextName) {
   const opens = openLeaf(successor.front);
   if (!opens)
     return `${nextName} names no step, and a successor opens at one waiting for a person.`;
-  if (opens.by === "person") return "";
+  // Only work a person alone can do leaves a group, and a question an agent answers stays in it. [[spec/tickets/a-box-keeps-its-tickets]]
+  if (opens.by === "person")
+    return onPersonRoute(successor.text)
+      ? ""
+      : `${nextName} stands off the person route, and only work a person alone can do leaves a group. Mint it with --process=${PERSON}.`;
   const by = opens.by || "anyone";
   return `${nextName} opens at ${opens.path} under by: ${by}, and a successor waits for a person.`;
 }

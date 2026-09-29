@@ -479,3 +479,38 @@ test("a bless message writes the bless file, and leaves the config files alone",
   await sidebar.took({ kind: "bless", value: false });
   assert.deepEqual(JSON.parse(door.files.read(BLESS_FILE)), { agent: false });
 });
+
+// A ticket write draws the badge again once its burst settles, with no window reload. [[spec/tickets/the-badge-reads-open-tasks]]
+test("a ticket write draws the badge again once its burst settles", async () => {
+  const door = doorOf();
+  const timers = [];
+  door.later = (run, span) => {
+    const one = { run, span, cancelled: false, cancel: () => (one.cancelled = true) };
+    timers.push(one);
+    return one;
+  };
+  const drawn = [];
+  await activate({}, door);
+  await door.said.views.get("quackitect.sidebar")({
+    set: (html) => drawn.push(html),
+    onMessage: () => {},
+  });
+
+  const watch = door.said.watched.find((one) =>
+    one.paths.includes("spec/tickets/*.md"),
+  );
+  assert.ok(watch, "the view watches the ticket folders");
+  assert.deepEqual(watch.paths, [
+    "spec/tickets/*.md",
+    ".se/tickets/*.md",
+    ".se/.runtime/plan.json",
+    ".se/.runtime/hold/*.json",
+  ]);
+
+  watch.draw();
+  watch.draw();
+  watch.draw();
+  assert.equal(drawn.length, 1, "a burst draws nothing before it settles");
+  await timers.at(-1).run();
+  assert.equal(drawn.length, 2, "the settled burst draws once");
+});

@@ -13,7 +13,7 @@ import {
 import { SAID } from "../../.claude/skills/level0/lib/log.js";
 
 const OWNER = new Set(["composer", "sdk"]);
-const PROMPT_WHY = "The owner sent a prompt";
+export const PROMPT_WHY = "The owner sent a prompt";
 const REACHES = new Set(["AskUserQuestion", "mcp__level0__report"]);
 export const SPOKE = "agent.spoke";
 
@@ -28,7 +28,13 @@ export const SAYS = (why) =>
 
 // The skips are the grace: the block rides that many calls, and the next one asks for the reply. [[spec/design_output/stop#the-grace]]
 export function demands(box, why, block = "", onPaid = null, skips = 0) {
-  box.demand = { why, seen: box.spoken ?? "", skips: Math.max(0, Number(skips) || 0), block, onPaid };
+  box.demand = {
+    why,
+    seen: box.spoken ?? "",
+    skips: Math.max(0, Number(skips) || 0),
+    block,
+    onPaid,
+  };
 }
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
@@ -53,7 +59,9 @@ export function onPromptSubmit(e, box) {
   box.asks = questionsIn(String(e?.text ?? ""));
   // The answer-first line rides the prompt's own event. [[spec/tickets/a-reply-follows-its-prompt]]
   const { before: _before, ...rest } = e ?? {};
-  return { event: { ...rest, text: `${warns(PROMPT_WHY)}\n\n${String(e?.text ?? "")}` } };
+  return {
+    event: { ...rest, text: `${warns(PROMPT_WHY)}\n\n${String(e?.text ?? "")}` },
+  };
 }
 
 // One writer of the spoken text, so its stamp stands beside it. [[spec/tickets/a-reply-follows-its-prompt]]

@@ -11,6 +11,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 
 	"quackitect/src/tui/frame"
+	"quackitect/src/tui/tree"
 	"quackitect/src/tui/work"
 )
 
@@ -36,14 +37,6 @@ func TestTheAnswerReadsAsPlacesAndTheGroupsOnACloud(t *testing.T) {
 	}
 	if _, held := said.Queue["unplaced"]; held {
 		t.Fatal("a row the pull places nowhere carries no place")
-	}
-	// The count reads the placed rows past the cloud's. [[spec/design_output/tui#the-work-tab]]
-	if said.Takeable != 3 {
-		t.Fatalf("three rows stand up for taking, and the count reads %d", said.Takeable)
-	}
-	cloud, _ := work.PlacesIn([]byte(`{"branches":[{"name":"held-group","queue":"∞","tickets":[{"name":"its-child","queue":"∞"}]}],"loose":[{"name":"free","queue":"1"}]}`))
-	if cloud.Takeable != 1 {
-		t.Fatalf("the cloud's rows count nowhere, and the count reads %d", cloud.Takeable)
 	}
 	// A merged branch stands for a group off the cloud, so it lights no letter. [[spec/design_output/work#a-row-per-group]]
 	if !said.Cloud["one-group"] || said.Cloud["gone-group"] {
@@ -71,13 +64,14 @@ func TestThePlacesLandOverTheTreeAndALaterTreeTakesThemAgain(t *testing.T) {
 	t.Parallel()
 	m := press(workWindow(t, 3), "2")
 	places, _ := work.PlacesIn([]byte(answerSaid))
+	places.Takeable, places.Counted = 3, true
 	out, _ := m.Update(work.PlacesMsg{Places: places})
 	m = out.(frame.Model)
 	rows := theWork(m).Tree.Rows(120, 8)
 	if !strings.Contains(rows, "one-group") || theWork(m).Tree.Items[0].Keys[work.QueueKey] != "2" {
 		t.Fatalf("the group carries its place, and the rows read:\n%s", rows)
 	}
-	// The strip counts the rows this box takes behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+	// The strip draws the count the index answers behind the tab's name. [[spec/tickets/the-count-chain-leaves]]
 	if !strings.Contains(m.RenderStrip(), "work (3)") {
 		t.Fatalf("the strip counts the takeable rows, and reads %q", m.RenderStrip())
 	}
@@ -147,4 +141,39 @@ func TestARootHoldingNoVerbAnswersWhy(t *testing.T) {
 		t.Fatal("a root with no survey runs node off the path")
 	}
 	var _ tea.Msg = said
+}
+
+// A todo the index nests under its group takes no second row at the left. [[spec/tickets/the-queue-views-agree]]
+func TestATodoUnderItsGroupDrawsOnce(t *testing.T) {
+	t.Parallel()
+	places, err := work.PlacesIn([]byte(`{"branches":[],"loose":[{"name":"a-todo","queue":"1","kind":"todo"},{"name":"a-free-todo","queue":"2","kind":"todo"}]}`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	grid := &tree.Tree{Items: []tree.Item{{
+		Name: "a-group", Keys: map[string]string{},
+		Kids: []tree.Item{{Name: "a-todo", Keys: map[string]string{}}},
+	}}}
+	work.Placed(grid, places)
+	count := 0
+	var walk func([]tree.Item)
+	walk = func(items []tree.Item) {
+		for _, one := range items {
+			if one.Name == "a-todo" {
+				count++
+			}
+			walk(one.Kids)
+		}
+	}
+	walk(grid.Items)
+	if count != 1 {
+		t.Fatalf("a todo under its group draws once, and it draws %d times", count)
+	}
+	free := false
+	for _, one := range grid.Items {
+		free = free || one.Name == "a-free-todo"
+	}
+	if !free {
+		t.Fatal("a todo the tree lacks still lands as a row at the left")
+	}
 }

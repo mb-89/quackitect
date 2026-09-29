@@ -1,7 +1,7 @@
 // The resident process that owns the database. One writer keeps the tree and
 // the rows in step, and every reader asks the same warm cache.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package main
+package index
 
 import (
 	"database/sql"
@@ -19,14 +19,11 @@ import (
 	"strings"
 	"sync"
 
-	"quackitect/src/ops"
 	"quackitect/src/q"
-	"quackitect/src/watchdog"
+	"quackitect/src/watcher"
 	"sync/atomic"
 	"syscall"
 	"time"
-
-	"github.com/fsnotify/fsnotify"
 )
 
 const (
@@ -64,12 +61,11 @@ type answer struct {
 
 type door struct {
 	db    *sql.DB
-	book  *ops.Book
 	v1    net.Listener
 	root  string
 	guard sync.Mutex
 	dirty chan struct{}
-	eyes  *fsnotify.Watcher
+	eyes  *watcher.Watcher
 
 	pending atomic.Bool
 	// The paths the watch names since the last settle, whether git's own index moved, and whether the plan moved. [[spec/design_output/index#a-change-moves-its-rows]]
@@ -85,9 +81,14 @@ type door struct {
 	wake     chan struct{}
 	wakeLock sync.Mutex
 
-	// The values modules read, and the paths committed under files/ so far. [[spec/tickets/files-topic-reads-the-rows]]
-	store     *q.Store
-	published map[string]bool
+	// The values modules read. [[spec/tickets/files-topic-reads-the-rows]]
+	store *q.Store
+	// Waits out every run the scheduler holds, so an answer off a derived name reads the commits before it. [[spec/tickets/tickets-becomes-a-module]]
+	drains func()
+	// The hands the manager gives the work loop, each run on every step. [[spec/design_output/model#a-lease]]
+	steps []func()
+	// The manager's call, which /v1 hands each action it serves. [[spec/tickets/actions-answer-over-http]]
+	call Call
 }
 
 // What a changes call answers: the tick the rows stand at. [[spec/design_output/index#the-index-fires-on-change]]
@@ -141,42 +142,81 @@ func trackedIn(root string) func(rel string) bool {
 	return func(rel string) bool { return held[rel] }
 }
 
-func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
-	registersTopics(catalog)
-	ops.Registers(catalog)
-	watchdog.Registers(catalog)
-	// The catalog check runs before the database opens, so a fault refuses the start and no provider key stands yet. [[spec/design_output/model#the-index-resolves-in-passes]]
-	if faults := catalog.Check(nil); len(faults) > 0 {
+// Commits values into the served store as the writer a module holds. [[spec/design_output/model#io-modules-are-modules]]
+type Commit func(as q.Writer, values map[string]any) error
+
+// Starts an IO module over the root, committing what comes in, and answers its stop. [[spec/design_output/model#io-modules-are-modules]]
+type Start func(root string, commit Commit) (stop func(), err error)
+
+// The door with no manager, as a case of the door alone runs it. [[spec/design_output/model#the-index-manager]]
+func Serve(root, at string, catalog *q.Catalog, starts ...Start) (func(), net.Listener, error) {
+	return ServeManaged(root, at, catalog, nil, starts...)
+}
+
+// Answers the door beside its stop, so a case reads the steps the work loop runs. [[spec/design_output/model#a-lease]]
+func opens(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
+	return opensOn(net.Listen, root, at, catalog, manage, starts...)
+}
+
+// The door's start over the listen it takes, so a case fails a port. [[spec/design_output/index#the-door-owns-the-database]]
+func opensOn(listens func(network, address string) (net.Listener, error), root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (*door, func(), net.Listener, error) {
+	beat := spanOf(root, "watchdog.beat", builtInBeat)
+	// The catalog check runs before the database opens, so a fault refuses the start. [[spec/design_output/model#the-index-resolves-in-passes]]
+	if faults := catalog.Check(); len(faults) > 0 {
 		said := make([]string, 0, len(faults))
 		for _, one := range faults {
 			said = append(said, one.String())
 		}
-		return nil, nil, fmt.Errorf("the catalog refuses the start:\n  %s", strings.Join(said, "\n  "))
+		return nil, nil, nil, fmt.Errorf("the catalog refuses the start:\n  %s", strings.Join(said, "\n  "))
 	}
 	db, err := Open(root, at)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
+	}
+	// A start that fails stops every part it reached, newest first. [[spec/design_output/index#the-door-owns-the-database]]
+	undo := []func(){func() { db.Close() }}
+	failed := func(err error) (*door, func(), net.Listener, error) {
+		for i := len(undo) - 1; i >= 0; i-- {
+			undo[i]()
+		}
+		return nil, nil, nil, err
 	}
 	// The door comes up on a sweep against the rows it finds, so a restart rewrites what moved while it stood down. [[spec/design_output/index#a-change-moves-its-rows]]
 	tracked := trackedIn(root)
 	if _, _, err := sweep(db, root, tracked); err != nil {
-		return nil, nil, err
+		return failed(err)
 	}
 
 	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
-	one.store, one.published = q.NewStore(catalog, nil), map[string]bool{}
-	if err := one.opensBook(); err != nil {
-		db.Close()
-		return nil, nil, err
-	}
-	if err := one.publishes(nil); err != nil {
-		db.Close()
-		return nil, nil, err
-	}
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
+	one.store = q.NewStore(catalog)
+	// The tickets move on the scheduler after the rows do, so their commit ticks the changes call too. [[spec/tickets/tickets-becomes-a-module]]
+	one.store.OnCommit(func(values map[string]any) {
+		if _, ok := values[TicketsName]; ok {
+			one.moved()
+		}
+	})
+	// The scheduler hears every commit from here on, the IO modules' first ones too. [[spec/design_output/model#the-provider-kinds]]
+	scheduler := q.NewScheduler(one.store, func(run func()) { go run() }, func(name string, err error) {
+		fmt.Fprintln(stderr, "the run of", name, "did not commit:", err)
+	})
+	one.drains = scheduler.Settle
+	undo = append(undo, scheduler.Stop)
+	managed, err := one.manages(manage)
 	if err != nil {
-		return nil, nil, err
+		return failed(err)
+	}
+	undo = append(undo, managed.Stop)
+	one.call = managed.Call
+	stops, err := one.starts(starts)
+	if err != nil {
+		return failed(err)
+	}
+	undo = append(undo, stops...)
+	stops = append(stops, managed.Stop)
+	listen, err := listens("tcp", "127.0.0.1:0")
+	if err != nil {
+		return failed(err)
 	}
 
 	mux := http.NewServeMux()
@@ -185,13 +225,13 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 
 	go one.sweeps()
 	go one.guards()
+	beats := one.beats(beat)
 	go server.Serve(listen)
+	undo = append(undo, func() { server.Close() }, beats)
 	// The old API keeps its port, and /v1 stands on a port of its own. [[spec/design_output/model#surfaces]]
-	v1, served, err := one.servesV1()
+	v1, served, err := one.servesV1(listens)
 	if err != nil {
-		server.Close()
-		db.Close()
-		return nil, nil, err
+		return failed(err)
 	}
 	one.v1 = v1
 
@@ -201,6 +241,11 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 	}
 	// The stop lets go of the database and the watch too, so a test's folder clears on Windows. [[spec/design_output/index#the-door-owns-the-database]]
 	stop := func() {
+		beats()
+		for _, one := range stops {
+			one()
+		}
+		scheduler.Stop()
 		server.Close()
 		served.Close()
 		if one.eyes != nil {
@@ -208,7 +253,27 @@ func Serve(root, at string, catalog *q.Catalog) (func(), net.Listener, error) {
 		}
 		one.db.Close()
 	}
-	return stop, listen, one.stands(listen)
+	return one, stop, listen, one.stands(listen)
+}
+
+// Each IO module commits through the store at its own revision, and a start that fails stops the ones before it. [[spec/design_output/model#io-modules-are-modules]]
+func (one *door) starts(starts []Start) ([]func(), error) {
+	commit := func(as q.Writer, values map[string]any) error {
+		_, err := one.store.Commit(one.store.Snapshot().Revision, as, values)
+		return err
+	}
+	var stops []func()
+	for _, start := range starts {
+		stop, err := start(one.root, commit)
+		if err != nil {
+			for _, done := range stops {
+				done()
+			}
+			return nil, err
+		}
+		stops = append(stops, stop)
+	}
+	return stops, nil
 }
 
 func (one *door) stands(listen net.Listener) error {
@@ -254,6 +319,9 @@ func (one *door) sweeps() {
 	for range one.dirty {
 		time.Sleep(burstSettleDelay)
 		one.guard.Lock()
+		for _, hand := range one.steps {
+			hand()
+		}
 		one.settles()
 		one.guard.Unlock()
 	}
@@ -279,7 +347,6 @@ func (one *door) settles() {
 	if len(paths) > 0 {
 		if rows, err := touches(one.db, one.root, paths, one.tracked); err == nil {
 			moved += rows
-			one.tells(one.publishes(paths))
 		} else {
 			one.keeps(paths, false, err)
 		}
@@ -287,7 +354,6 @@ func (one *door) settles() {
 	if retrack {
 		if rows, err := retracks(one.db, one.tracked); err == nil {
 			moved += rows
-			one.tells(one.publishes(nil))
 		} else {
 			one.keeps(nil, true, err)
 		}
@@ -312,21 +378,10 @@ func (one *door) keeps(paths []string, retrack bool, err error) {
 // A sweep reads git's list again, and the door holds what it reads. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) walks() (int, int, error) {
 	one.tracked = trackedIn(one.root)
-	count, moved, err := sweep(one.db, one.root, one.tracked)
-	if err == nil && moved > 0 {
-		one.tells(one.publishes(nil))
-	}
-	return count, moved, err
+	return sweep(one.db, one.root, one.tracked)
 }
 
-// A commit that fails says so, and the next settle of that path commits it again. [[spec/tickets/files-topic-reads-the-rows]]
-func (one *door) tells(err error) {
-	if err != nil {
-		fmt.Fprintln(stderr, "the files topic did not commit:", err)
-	}
-}
-
-// The sweep on a clock, which catches a change the watch misses and clears nothing. [[spec/design_output/index#a-change-moves-its-rows]]
+// The sweep on a clock, which catches a change the watch misses. [[spec/design_output/index#a-change-moves-its-rows]]
 func (one *door) guards() {
 	for range time.Tick(sweepEvery) {
 		one.guard.Lock()
@@ -402,83 +457,6 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writes(w, answer{Result: result, ID: said.ID})
-}
-
-func (one *door) answers(said call) (any, error) {
-	var asked struct {
-		Words  string   `json:"words"`
-		Name   string   `json:"name"`
-		Target string   `json:"target"`
-		Path   string   `json:"path"`
-		Paths  []string `json:"paths"`
-		Limit  int      `json:"limit"`
-	}
-	if len(said.Params) > 0 {
-		json.Unmarshal(said.Params, &asked)
-	}
-
-	switch strings.ToLower(said.Method) {
-	case "why":
-		return one.store.Why(asked.Name)
-	case "files":
-		return Files(one.db)
-	case "read":
-		// A module in its own process reads a name at the latest revision. [[spec/tickets/files-topic-reads-the-rows]]
-		if value := one.store.Snapshot().Read(asked.Name); value != nil {
-			return value, nil
-		}
-		return nil, errorOf("no name called " + asked.Name)
-	case "texts":
-		return Texts(one.db, asked.Paths)
-	case "hashes":
-		// [[spec/design_output/pull#an-input-marks-its-steps]]
-		var ask struct {
-			Asks []HashAsk `json:"asks"`
-		}
-		if err := json.Unmarshal(said.Params, &ask); err != nil {
-			return nil, err
-		}
-		return Hashes(one.db, ask.Asks)
-	case "grep":
-		var ask GrepAsk
-		if err := json.Unmarshal(said.Params, &ask); err != nil {
-			return nil, err
-		}
-		return Grep(one.db, ask)
-	case "glob":
-		var ask GlobAsk
-		if err := json.Unmarshal(said.Params, &ask); err != nil {
-			return nil, err
-		}
-		return Glob(one.db, ask)
-	case "find":
-		return Find(one.db, asked.Words, asked.Limit)
-	case "notes":
-		return Notes(one.db, asked.Words, asked.Limit)
-	case "links":
-		return Links(one.db, asked.Target)
-	case "dangling":
-		return Dangling(one.db)
-	case "tickets":
-		return Tickets(one.db)
-	case "same":
-		return Same(one.db, asked.Path)
-	case "reindex":
-		// The verb sweeps now, so a reader asking it reads the disk as it stands, and nothing clears. [[spec/design_output/index#a-change-moves-its-rows]]
-		count, moved, err := one.walks()
-		if err == nil && moved > 0 {
-			one.moved()
-		}
-		return map[string]int{"files": count}, err
-	case "stop":
-		go stopsSoon(one.root)
-		return map[string]string{"stopping": one.root}, nil
-	case "standing":
-		var files int
-		one.db.QueryRow(`SELECT count(*) FROM file`).Scan(&files)
-		return map[string]any{"root": one.root, "files": files}, nil
-	}
-	return nil, errorOf("no method called " + said.Method)
 }
 
 // [[spec/design_output/index#a-door-comes-back]]

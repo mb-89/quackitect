@@ -24,6 +24,7 @@ import {
 } from "./guidance-hand.js";
 import { cutRefusal, printPart } from "./pull-cap.js";
 import { agentOf, BOX, handOf, roleOf } from "./pull-hand-of.js";
+import { WORK_VERBS } from "./work.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const WORK = "work";
@@ -39,26 +40,14 @@ export const ANSWERED = /^\s*answered:/;
 export const FENCE = /^\s*(```|~~~)/;
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
-export const BRANCH = [
-  "new",
-  "take",
-  "sync",
-  "done",
-  "release",
-  "merge",
-  "close",
-  "read",
-  "review",
-  "list",
-  "escalate",
-  "guidance",
-  "test",
-];
-
-// [[spec/design_output/pull#a-need-is-a-verb]]
+// The branch verbs read the table work answers when a need asks, since work.js imports the pull, and a read at load meets its table unbuilt. [[spec/tickets/branch-list-reads-work-table]]
 export const VERBS = {
-  branch: BRANCH,
-  work: BRANCH,
+  get branch() {
+    return Object.keys(WORK_VERBS);
+  },
+  get work() {
+    return Object.keys(WORK_VERBS);
+  },
   ticket: ["pull", "note", "update", "open"],
   retro: [
     "notes",

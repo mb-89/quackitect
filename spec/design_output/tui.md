@@ -445,11 +445,15 @@ ticket stands off it. For the places, see
 Nothing off the body draws there, because the name in the table opens the
 note.
 
-`./RUNME.sh tui work --count` prints `{"count":N}`, the number in the tab's brackets, and the
-work editor's button in the sidebar draws that count. Both read `Places.Takeable` off `PlacesAt` in
-`src/tui/work/workplaces.go`, and `countTakeable` there counts it. A verb answering nothing prints its
-reason on stderr and exits failing, so the button draws no count. A tree lacking the viewer prints `{"count":null}`. Each
-sidebar draw pays a viewer start, and a `go build` where `viewerOf` finds the viewer stale.
+The tab's brackets and the work editor's button in the sidebar read one index name, `work/open-tasks`:
+
+| reader | how it asks |
+|---|---|
+| the tab | `PlacesAt` in `src/tui/work/workplaces.go` asks the door, and starts one where none stands |
+| the button | its `counts` line runs `./RUNME.sh index call value`, and the index answers a bare count |
+
+The queue column reads `queue/places`, the map the count reads. A door answering nothing leaves the
+brackets off the tab, and the button draws no count.
 
 `src/tui/work/workindex.go` holds the road to the door, and `src/tui/work/workitems.go` turns the rows
 into items. A box with no door and no binary draws the reason in the tab, and
