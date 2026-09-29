@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-lands-in-shadow
 depends_on: ["the-hooks-door-lands", "the-mcp-module-lands"]
+record:
+  - step: design/draft
+    hand: box d85490c97110e · claude-code-remote
+    hash_before: 0bfb55460e29787cc07c811062040be8288ba2cf
+    hash_after: 0bfb55460e29787cc07c811062040be8288ba2cf
+    inputs:
+      - name: ask
+        hash: 0d0e968145a856df
+        size: 319
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,56 @@ Copilot then meets the same rules as Claude, from one copy.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Copilot reaches the hooks door through a hook verb on the quack binary, and the door compares live.
+
+1. `se-index hook <event>`, in src/quack/hook.go, reads Copilot's hook input off stdin, with `old` beside it. It maps the Copilot event onto the protocol: PreToolUse to tool.call, PostToolUse to classic.PostToolUse, Stop to classic.Stop, and the rest to classic.<name>. It posts event, harness copilot, the session and e to the hooks door off hooks.json, behind its token, and prints the answer. A missing file or a dead port prints nothing and exits 0, so the old path stands.
+2. The hooks door gains `Shadow` on its Outside. Where a post carries `old` and Shadow stands, Hook reads OldDecisionOf and NewDecisionOf, and hands a mismatch to Shadow as a shadow row naming the harness. src/quack/main.go wires Shadow to ShadowTo over the session log, so the Claude bridge's live posts compare too.
+3. src/scripts/copilot.js, after handle, runs the hook verb where migration.cage reads shadow. Its stdin carries the input and old as {result}, the shape OldDecisionOf reads. It ignores the verb's answer and failure, within the time left.
+4. MCP: the mcp module serves every action as a tool. Copilot's own config names that server once the port stands fixed, which rides with go-cage-switches-over.
+
+I assume the Copilot result {deny, block} reads as the bridge's result does, since OldDecisionOf reads both keys alike.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go listensHooks: hooks.Outside takes Shadow
+- src/quack/cli.go cliVerbs: names hook
+- src/modules/hooks/cage.go ShadowRowOf: a live row carries the harness and no line
+- src/modules/hooks/hooks.go Hook: compares a post carrying old
+- src/modules/hooks/hooks_test.go doorOver: builds the Outside
+- src/quack/hooks_test.go TestTheWiringBindsTheHooksEventsAndTheSessionFolds: builds the Outside
+- src/scripts/copilot.js hook mode: runs the verb in shadow
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/hook_test.go TestAHookPostMapsCopilotOntoTheProtocol
+- src/quack/hook_test.go TestAHookWithNoDoorPrintsNothing
+- src/modules/hooks/cage_test.go TestALivePostDecidedApartWritesAShadowRow
+- src/modules/hooks/cage_test.go TestALivePostDecidedAlikeWritesNothing
+- test/level0/copilot-shadow.test.js copilot in shadow runs the hook verb with its own answer as old
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened: copilot.js, copilot.js under lib, copilot-runtime.js, cage.go, hooks.go, cage-shadow.js, config.js, cli.go, main.go and install.sh, which builds se-index off src/quack
+- the callers list names every builder of hooks.Outside and every reader of ShadowRowOf, found by grep
+- go test names the Go cases, the log line names the live shadow case, and the check stands as a command
 
 ## tests-red
 
