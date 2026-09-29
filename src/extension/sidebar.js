@@ -10,6 +10,7 @@ const { newestIn, rowsIn } = require("./lib/rows.js");
 const { FOLDERS, HOLD_WATCHES, ticketLensOf } = require("./lib/lens.js");
 const { opened } = require("./lib/session.js");
 const { viewsOf } = require("./lib/views.js");
+const { apartOf } = require("./lib/views-shadow.js");
 const { statesOf } = require("./lib/states.js");
 const { asType, parsed, withValue } = require("./lib/values.js");
 const {
@@ -40,6 +41,8 @@ const COUNTS = [...FOLDERS.map((folder) => `${folder}/*.md`), PLAN, ...HOLD_WATC
 const VIEWS = "spec/views";
 const YAML = ".claude/skills/level0/lib/schema-yaml.js";
 const CATALOG = ["index/names", "index/actions"];
+// The config key of the sidebar's migration slice. [[spec/tickets/the-sidebar-shadow-compares]]
+const SLICE = "migration.sidebar";
 
 function sidebarOf(door) {
   const readAll = async () => {
@@ -56,6 +59,8 @@ function sidebarOf(door) {
   };
   const logbook = logbookOf(door, async () => (await valueNow("log.level")) ?? "info");
   const held = new Map();
+  // The shadow lines told this session, each once. [[spec/tickets/the-sidebar-shadow-compares]]
+  const told = new Set();
 
   const set = async (key, value, how) => {
     const schema = parsed(await door.read(SCHEMA));
@@ -112,14 +117,21 @@ function sidebarOf(door) {
     async html() {
       const said = await readAll();
       const values = valuesOf(said.tracked, said.local, said.schema);
-      const groups = litBy(groupsIn(said.schema, values), door.processes?.() ?? {});
+      const groups = await counted(
+        door,
+        litBy(groupsIn(said.schema, values), door.processes?.() ?? {}),
+      );
+      const bases = await basesIn(door);
+      const catalog = await catalogOf(door);
+      if (values.get(SLICE)?.value === "shadow")
+        await tells(logbook, told, apartOf(groups, bases, catalog));
       return panelHtml({
-        groups: await counted(door, groups),
+        groups,
         tree: treeIn(said.schema, [
           { path: TRACKED, said: said.tracked },
           { path: LOCAL, said: said.local },
         ]),
-        views: viewsOf(await basesIn(door), await catalogOf(door)),
+        views: viewsOf(bases, catalog),
         bless: parsed(await door.read(BLESS))?.agent === true,
         script: door.scriptUri(),
         source: door.source(),
@@ -191,6 +203,15 @@ async function counted(door, groups) {
     }
   }
   return groups;
+}
+
+// Under shadow, each pair the two paths draw apart writes one row, once a session. [[spec/tickets/the-sidebar-shadow-compares]]
+async function tells(logbook, told, lines) {
+  for (const line of lines) {
+    if (told.has(line)) continue;
+    told.add(line);
+    await logbook.say("info", "shadow", line, { slice: "sidebar" });
+  }
 }
 
 // Every base file under spec/views, parsed, and none where the door lists no folder. [[spec/design_output/extension#the-views-section]]

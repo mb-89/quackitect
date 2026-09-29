@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-lands-in-shadow
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     hand: box d85821f54410d · claude-code-remote
@@ -162,6 +162,15 @@ record:
         hash: 06813455cd75e77a
         size: 858
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: ec5b9f826223cbb13f2736468513682d6d821de8
+    hash_after: ec5b9f826223cbb13f2736468513682d6d821de8
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -329,14 +338,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/extension/sidebar.js src/extension/lib/views-shadow.js src/modules/migration/migration.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the three config projections the gate names
+- the compare runs over plain rows, and the sidebar case runs over the fake disk and a fake index door
+- each new function carries a pointer at this ticket, which holds the approach
+- the slice key stands once in migration.go, and the sidebar reads it as migration.sidebar off the schema
 
 ## tests-green
 
