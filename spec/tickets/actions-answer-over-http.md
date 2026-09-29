@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
@@ -144,6 +144,18 @@ record:
         hash: faa1a587698ca718
         size: 4110
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84fcad60110c · claude-code-remote · helper-3
+    hash_before: 6f558326fc5e69544c9301f7f43f7f91d1228cc8
+    hash_after: 6f558326fc5e69544c9301f7f43f7f91d1228cc8
+    inputs:
+      - name: design/draft
+        hash: faa1a587698ca718
+        size: 4110
+      - name: design/tests-red
+        hash: 5851393963daace7
+        size: 961
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -312,8 +324,12 @@ I assume the default key takes the instance prefix the wiring gives, as `migrati
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- wait-key-meets-its-wiring: the no-Prefer case seeds http/config/wait itself through q.OutIn, and src/modules/http/http_test.go holds TestTheWaitKeyReadsNoneByDefault over config/wait, not the TestTheWaitKeyStandsUnderTheInstance the draft names; so no case ties the door's WaitName to the name the wiring binds the http module's key under. Add a case over the wiring's instance, or derive WaitName off httpmodule.WaitKey
+- action-refusals-meet-cases: the 400 for a body the input type refuses and the 422 for a refusing module carry no case in src/index/actions_test.go
+- gone-names-its-unit: Called.Gone encodes a time.Duration as nanoseconds; name the unit in the 202 schema or answer seconds, as the wait reads
 
 # implement
 
