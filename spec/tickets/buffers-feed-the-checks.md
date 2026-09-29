@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-lands-in-shadow
+record:
+  - step: design/draft
+    hand: box 5c8055bbc025 · claude-code-remote
+    hash_before: daa6e9463d6beefdfe9a9b5fa42ec6443cfbf78f
+    hash_after: daa6e9463d6beefdfe9a9b5fa42ec6443cfbf78f
+    inputs:
+      - name: ask
+        hash: ed1f5fec9ced9579
+        size: 308
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,50 @@ The editor checks what a person types, before a save.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The check module's `sweep` takes a second input, `buffers/<path...>`, optional, each value the unsaved text of one path. Before it sweeps, the module lays every buffer over its file with `Tree.Holds`, the overlay the LSP already keeps for an open editor. So a check reads the buffer where one stands open, and the file otherwise, as [[spec/design_output/model#the-topics-and-their-writers]] says.
+
+| the part | what it does |
+|---|---|
+| `src/modules/check/sweep.go`, the input struct | gains `Buffers map[string]string` under `buffers/<path...>,optional` |
+| the sweep | calls `Holds` for each buffer before `Sweep`, so the rules read one overlay on both paths |
+| a buffer over a path the files lack | adds no path, as `Holds` keeps it on the LSP side |
+
+The `lsp` IO module writes the name, and [[spec/tickets/the-lsp-door-lands]] adds the writer and its wire. Until then the input stands optional, and the index takes a reader of a name nobody writes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/check/sweep.go: the sweep's input and its run
+- src/modules/check/tree.go: Tree.Holds, which the sweep calls
+- src/lsp/lsp.go: didOpen and didChange, which call Holds today and keep calling it
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/check/buffers_test.go: TestABufferStandsOverItsFile
+- src/modules/check/buffers_test.go: TestAPathWithNoBufferReadsItsFile
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: tree.go for Holds and Paths, lsp.go for the calls, the model note for the topic
+- the callers list names the sweep, the overlay it calls, and the LSP's own calls into the same overlay
+- go test ./... meets both cases, the fake buffer case meets TestABufferStandsOverItsFile, and the check runs over the module
 
 ## tests-red
 
