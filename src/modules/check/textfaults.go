@@ -2,7 +2,7 @@
 // exemption naming no reason, the code ceilings, and the magic numbers. Each
 // reads what its JavaScript twin reads, so the lint and the panel agree.
 // [[spec/design_output/lsp#the-server-runs-the-tools]]
-package main
+package check
 
 import (
 	"fmt"
@@ -59,8 +59,8 @@ func walked(path string) bool {
 	return true
 }
 
-// The rules over one file's text, where the lint's walk reaches it. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func (one *Outside) textFaults(tree *Tree, path string) []Finding {
+// The rules over one file's text, where the lint's walk reaches it, under the ceilings named and each finding marked as the source says. [[spec/design_output/lsp#the-server-runs-the-tools]]
+func textFaults(tree *Tree, path string, function, file int, source string) []Finding {
 	prose, sized := proseFile.MatchString(path), sizedFile.MatchString(path)
 	if (!prose && !sized) || !walked(path) {
 		return nil
@@ -71,11 +71,11 @@ func (one *Outside) textFaults(tree *Tree, path string) []Finding {
 		out = append(out, unreasoned(path, text)...)
 	}
 	if sized {
-		out = append(out, sizeFaults(path, text, one.Function, one.File)...)
+		out = append(out, sizeFaults(path, text, function, file)...)
 		out = append(out, magicIn(path, text)...)
 	}
 	for i := range out {
-		out[i].Source = fromTree
+		out[i].Source = source
 	}
 	return out
 }

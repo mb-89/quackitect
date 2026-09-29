@@ -546,6 +546,15 @@
           ],
           "help": "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's."
         },
+        "lsp": {
+          "type": "string",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ],
+          "help": "The LSP's rules: old answers on the LSP's own sweep alone, shadow runs the check module's sweep beside it and logs each finding apart, new answers the module's."
+        },
         "phase0": {
           "type": "boolean",
           "help": "Phase 0, the specs. true in the tracked file on main lets a cloud box take the-migration-writes-its-specs. A write on this box turns nothing on in the cloud."

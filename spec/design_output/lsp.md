@@ -53,7 +53,7 @@ The fronts below ask for a reading, and each reaches one rule set:
 | a person, at `se-lsp check` | the same sweep, fresh |
 | `./RUNME.sh lint` | `se-lsp check`, and `findingsOver` in `src/bridge/findings.js` beside it |
 
-`Whole` in `src/lsp/check.go` holds the sweep every front reads: this server's
+`Whole` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
 own rules, and the tools beside them. The tree readers and the schema readers
 in `src/scripts/cli-read.js` stand behind `se-lsp check`, for a box carrying no
 server.
@@ -134,7 +134,7 @@ its buffer stands no more.
 ## A change reads one note
 
 A change to a buffer re-parses the note it changes, and reads every other note
-from what the tree holds. `parsed` in `src/lsp/parsed.go` keeps each note's
+from what the tree holds. `parsed` in `src/modules/check/parsed.go` keeps each note's
 headings, their slugs and a guidance note's rule lines, keyed by the text they
 come from:
 
@@ -159,7 +159,7 @@ rows. `Outside` in `src/lsp/outside.go` holds the runs:
 | a past tense row | the tense reader in `src/engine/tense.js`, run through node |
 | the code ceilings | `code.functionLines` and `code.fileLines`, through the config reader |
 
-`src/lsp/textfaults.go` reads the code faults and the exemption markers the
+`src/modules/check/textfaults.go` reads the code faults and the exemption markers the
 way the lint reads them, over the files the lint walks. `SKIP` in
 `src/bridge/findings.js` names the folders that walk passes.
 
@@ -190,7 +190,7 @@ editor hands it an absolute one. So every section naming a folder opens on
 
 # A second copy draws
 
-`src/lsp/restated.go` holds the rules below over a second copy of a fact. One
+`src/modules/check/restated.go` holds the rules below over a second copy of a fact. One
 measure answers both: the longest run of words the places share.
 
 | the rule | what it weighs | the bound it reads |
@@ -212,7 +212,7 @@ lands, see [[spec/design_output/projection#a-layer-writes-two-files]].
 # A pointer reaches a heading
 
 A pointer names a note and a chapter, as `[[note#anchor]]`. `anchorFaults` in
-`src/lsp/anchor.go` reads every pointer a tracked file carries. It resolves the
+`src/modules/check/anchor.go` reads every pointer a tracked file carries. It resolves the
 note the way the restated rule does, and reads the anchor against the note's
 headings through `headingNamed`. A note that stands and holds no such heading
 draws `DeadAnchor` on the pointer's line, and the message names the anchor.
@@ -231,7 +231,7 @@ each one.
 # A marked rule wants argument
 
 A guidance note marks the rules wanting an argument, and the rationale beside it
-carries a chapter for each. `src/lsp/marked.go` reads the pair, off the schema
+carries a chapter for each. `src/modules/check/marked.go` reads the pair, off the schema
 key `matches`. [[spec/design_output/schema#a-finding-names-the-section]]
 
 | what it reads | where it comes from |
@@ -356,7 +356,7 @@ under `spec/tickets` whose frontmatter says `state: closed`:
 
 | the front | where it drops the rows |
 |---|---|
-| the server | `isHistory` in `src/lsp/history.go`, in the checker's four entry points |
+| the server | `isHistory` in `src/modules/check/history.go`, in the checker's four entry points |
 | the lint | `pastHistory` in `src/bridge/findings.js` |
 
 An open ticket keeps every row.
@@ -398,7 +398,7 @@ reads what comes back.
 
 # Every pointer resolves
 
-`EveryPointerResolves` in `src/lsp/pointer.go` follows every pointer a tracked
+`EveryPointerResolves` in `src/modules/check/pointer.go` follows every pointer a tracked
 file writes, and names each one landing nowhere as an error. So the check
 refuses it, and the panel draws it under the line.
 
@@ -483,10 +483,10 @@ a save reaches the next hover. For the table, see
 A property carrying `x-engine: true` belongs to the verbs. For who writes each
 one, see [[spec/design_output/schema#the-verbs-own-their-fields]].
 
-`engineFaults` in `src/lsp/owned.go` reads an open buffer against the file the
+`engineFaults` in `src/modules/check/owned.go` reads an open buffer against the file the
 index holds. Where the value of such a key differs, it draws
 `EngineOwnsField` at hint, on the line of that key. `hint` in
-`src/lsp/finding.go` owns the level, and
+`src/modules/check/finding.go` owns the level, and
 [[spec/design_output/lsp#a-finding-is-a-diagnostic]] says what it draws as.
 
 | the buffer | what draws |

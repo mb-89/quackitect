@@ -42,7 +42,7 @@ func (one *door) servesV1(listens func(network, address string) (net.Listener, e
 	}, func(_ context.Context, in *struct {
 		Name string `path:"name"`
 	}) (*valueOut, error) {
-		return valueOf(one.store, in.Name)
+		return valueOf(one.store, one.drains, in.Name)
 	})
 	one.servesActions(api)
 	one.servesTools(api)
@@ -51,10 +51,13 @@ func (one *door) servesV1(listens func(network, address string) (net.Listener, e
 	return listen, server, nil
 }
 
-// A name the catalog lacks answers a problem, and a stale one carries its mark. [[spec/design_output/model#a-stale-mark]]
-func valueOf(store *q.Store, name string) (*valueOut, error) {
+// A name the catalog lacks answers a problem, and a stale one carries its mark. The scheduler settles first, as the door's value call does, so a reader beside the old path reads the settled value. [[spec/design_output/model#a-stale-mark]]
+func valueOf(store *q.Store, settle func(), name string) (*valueOut, error) {
 	if _, ok := store.Declared(name); !ok {
 		return nil, huma.Error404NotFound("the catalog holds no provider of " + name)
+	}
+	if settle != nil {
+		settle()
 	}
 	snap := store.Snapshot()
 	out := &valueOut{}

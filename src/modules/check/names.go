@@ -2,7 +2,7 @@
 // counts a heading's words, and this counts a name's, because Vale reads what
 // a file holds.
 // [[spec/design_output/level0#a-name-meets-the-cap]]
-package main
+package check
 
 import (
 	"regexp"

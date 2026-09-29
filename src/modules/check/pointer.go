@@ -2,7 +2,7 @@
 // names a file, and a chapter after a hash, and this rule follows every one
 // the way a reader does.
 // [[spec/design_output/lsp#every-pointer-resolves]]
-package main
+package check
 
 import (
 	"quackitect/src/pointer"
