@@ -68,6 +68,24 @@ test("the red list holds a ticket past tests-red, and drops it at tests-green", 
   );
 });
 
+// A reject inserts tests-red-2 with a list of its own, and the check leaves both lists out. [[spec/tickets/red-list-reads-inserted-leaves]]
+test("the red list holds the files an inserted tests-red-2 names", () => {
+  const text = TICKET(`${PAST_RED}  - step: design/tests-red-2\n    hand: box one\n`)
+    .replace(
+      "  - name: implement\n",
+      "      - name: tests-red-2\n        evidence:\n          - name: red\n            form: list\n            says: the test files standing red\n  - name: implement\n",
+    )
+    .replace(
+      "# implement\n",
+      "## tests-red-2\n\n### red\n\n- test/level0/three.test.js\n\n# implement\n",
+    );
+  assert.deepEqual(expectedRed([{ name: "a-child", text }]), [
+    "test/level0/one.test.js",
+    "test/level0/three.test.js",
+    "test/level0/two.test.js",
+  ]);
+});
+
 // The runner's file list reads the tree this case stands in. [[spec/design_output/pull#the-gate]]
 test("the check's run names every test file but the red ones, and the globs where none stands red", () => {
   const at = resolve(".");
