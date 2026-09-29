@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: 5d91f54bb2d59460
         size: 2602
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8509c02d5db · claude-code-remote · helper-3
+    hash_before: 7ae8214fc269f591d863203092058fd0e03aaef7
+    hash_after: 7ae8214fc269f591d863203092058fd0e03aaef7
+    inputs:
+      - name: design/draft
+        hash: 5d91f54bb2d59460
+        size: 2602
+      - name: design/tests-red
+        hash: 5afed80b58640373
+        size: 691
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,11 @@ The vehicle and stub verb lists stand empty, and the wiring loads neither topic.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- vehicle-stub-native-ports: the draft says a Discussion line on quack-verbs-switch-over names the native ports of theVehicle and theStub, and that ticket holds none; its ask takes cli.js out of the tree, which these actions run through, so a ticket names the ports
+- vehicle-cases-own-files: the red cases share src/modules/verbs/verbs_test.go and src/quack/twins_test.go with work-verbs-become-actions, so tests-green moves them into files of their own before it turns green
 
 # implement
 
