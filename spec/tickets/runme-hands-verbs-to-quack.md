@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
 depends_on: ["the-quack-cli-gets-generated"]
+record:
+  - step: design/draft
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 35e8e347740181b927e322e45034068ff9261197
+    hash_after: 35e8e347740181b927e322e45034068ff9261197
+    inputs:
+      - name: ask
+        hash: 805ab1b7d41c19cd
+        size: 291
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,67 @@ The old verbs keep working while each topic ports.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`./RUNME.sh` hands every verb to the `quack` binary, and `quack verb` picks the road off the slice key. The mode reads as `migration.verbs`, which the migration module declares as a shared key beside its other slices.
+
+| the mode | a verb `cli.js` answers alone | a verb with a `quack` twin | a verb `quack` answers alone |
+|---|---|---|---|
+| `old` | `cli.js` | `cli.js` | `cli.js`, which refuses it |
+| `shadow` | `cli.js` | `cli.js` answers, the twin runs dry beside it, and a mismatch writes a `shadow` row | `quack` |
+| `new` | `cli.js` | `quack` | `quack` |
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the entry | `RUNME.sh` | execs `.se/.runtime/bin/se-index verb <cli.js> <argv>` where the binary stands, and `node cli.js` where it does not |
+| the road | a new `src/quack/verbs.go`, `verbs` and `roadOf` | reads the mode through `configRows`, and runs `node cli.js` with the caller's streams, the twin, or both |
+| the twins | `twins` in `verbs.go` | a table from the verb words to a Go answer taking a dry flag. Each topic ticket adds its rows. It starts empty |
+| the alone verbs | `alone` in `verbs.go` | the tree verbs `run` and `get`, which `cli.js` lacks |
+| the row | `shadows` in `verbs.go` | appends one line to the session log, kind `shadow`, slice `verbs`, naming the verb and both answers |
+| the key | `src/modules/migration/migration.go` | adds `VerbsKey`, built in as `old`. The tracked file sets it to `shadow` |
+
+A twin runs dry in shadow, so a writing verb computes its answer and writes nothing twice. The old answer and its exit code stand for the caller.
+
+The ask names `migration/config/slices/verbs`. The standing slices read as `migration/config/<slice>`, so this one follows them as `migration/config/verbs`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- RUNME.sh: the entry every hook, skill and person runs, whose arguments stay the same
+- src/quack/main.go: main, which hands verb to the road
+- src/quack/config.go: configRows, which the road reads the mode through
+- src/modules/migration/migration.go: Registers, which declares the new key
+- spec/config/level0.json: the migration block, which sets verbs to shadow
+- src/scripts/install.sh: get_index, which builds the binary the entry execs
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verbs_test.go: TestTheRoadHandsEachVerbByItsMode
+- src/quack/verbs_test.go: TestATwinAnsweringApartWritesAShadowRow
+- src/quack/verbs_test.go: TestATwinAgreeingWritesNoRow
+- src/modules/migration/migration_test.go: TestTheVerbsSliceStandsSharedAndOld
+- test/contract/runme-road.test.js: ./RUNME.sh hands get to quack and config to cli.js
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- RUNME.sh, main.go, config.go, migration.go, level0.json, install.sh and cli-check.js readConfig stand opened, and each claim checked there
+- the callers list names the entry, the root, the resolver, the key and the build
+- the ported verb case names runme-road.test.js, and the check names the check verb
 
 ## tests-red
 
