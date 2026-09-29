@@ -6,7 +6,7 @@ package check
 
 import "quackitect/src/q"
 
-// The prefix every name of this module carries. [[spec/tickets/check-names-meet-their-goldens]]
+// The prefix every name of this module carries once the wiring loads it as the check instance, which names each port `<instance>/<port>`. [[spec/tickets/check-module-joins-the-wiring]]
 const Prefix = "check/"
 
 // Every twin, by the name its check/ name and its golden file carry. src/scripts/check-twins.js spells the list again, since a script imports no Go. [[spec/tickets/check-names-meet-their-goldens]]
@@ -26,7 +26,7 @@ type Finding struct {
 func Registers(c *q.Catalog) q.Writer {
 	writers := make([]q.Writer, 0, len(Twins))
 	for _, twin := range Twins {
-		writers = append(writers, q.OutIn(c, Prefix+twin, []Finding{}, q.Doc("the findings of the "+twin+" check, which phase 7 moves in")))
+		writers = append(writers, q.OutIn(c, twin, []Finding{}, q.Doc("the findings of the "+twin+" check, which phase 7 moves in")))
 	}
 	return q.Join(writers...)
 }

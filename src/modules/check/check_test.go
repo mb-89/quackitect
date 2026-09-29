@@ -13,9 +13,9 @@ import (
 func TestEveryTwinNameStands(t *testing.T) {
 	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
 	for _, twin := range Twins {
-		said, ok := index.Read(Prefix + twin).([]Finding)
+		said, ok := index.Read(twin).([]Finding)
 		if !ok || len(said) != 0 {
-			t.Fatalf("%s%s reads %v, and wants an empty list of findings", Prefix, twin, said)
+			t.Fatalf("%s reads %v, and wants an empty list of findings", twin, said)
 		}
 	}
 }

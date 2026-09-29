@@ -16,6 +16,8 @@ instances:
     module: work
   migration:
     module: migration
+  check:
+    module: check
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/check"
 	"quackitect/src/q"
 )
 
@@ -102,6 +103,34 @@ func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
 		}
 		if said := s.Snapshot().Read(one.Name); said != "shadow" {
 			t.Fatalf("%s reads %v, and wants shadow", one.Name, said)
+		}
+	}
+}
+
+// The wiring loads the check module, and every check/ name reads its empty list off the wired tree. [[spec/tickets/check-module-joins-the-wiring]]
+func TestTheWiredTreeAnswersEveryCheckName(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	all, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w := q.Wiring{Wires: all.Wires}
+	for _, one := range all.Instances {
+		if one.Module == "check" {
+			w.Instances = append(w.Instances, one)
+		}
+	}
+	c := q.New()
+	if _, err := load(w, c); err != nil {
+		t.Fatal(err)
+	}
+	read := q.NewStore(c).Snapshot()
+	for _, twin := range check.Twins {
+		if said, ok := read.Read(check.Prefix + twin).([]check.Finding); !ok || len(said) != 0 {
+			t.Fatalf("%s%s reads %v off the wired tree, and wants an empty list", check.Prefix, twin, said)
 		}
 	}
 }

@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/check"
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
 	"quackitect/src/modules/env"
@@ -55,6 +56,7 @@ var modules = map[string]ioModule{
 	"queue":     {registers: queue.Places},
 	"work":      {registers: work.Registers},
 	"migration": {registers: migration.Registers},
+	"check":     {registers: check.Registers},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
