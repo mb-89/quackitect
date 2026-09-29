@@ -1,5 +1,5 @@
 ---
-description: "config / migration / log: sets migration.log to new. The session log rows: old answers alone, shadow runs the log topic beside it and logs a mismatch, new answers the topic's."
+description: "config / migration / log: sets migration.log to new. The session log rows, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

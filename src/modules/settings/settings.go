@@ -105,9 +105,6 @@ var sections = map[string][]key{
 		{local: "person-signs", def: false, doc: "The stronger door on a person's hand. Switched on, a person's hand-back on a tracked ticket meets a signed tip."},
 		{local: "retro-readers", def: float64(4), doc: "The hands a retro's collect spawns, each taking the next chapter until none stands.", unit: "hands"},
 		{local: "retro-cap", def: float64(8), doc: "The tickets a retro's improve step mints, so the list holds what gets done.", unit: "tickets"},
-		{local: "block-score", def: float64(10), doc: "The score a ticket takes for each one waiting under it, down the whole chain.", unit: "score"},
-		{local: "day-score", def: float64(1), doc: "The score a ticket takes for each day it stands.", unit: "score"},
-		{local: "fail-score", def: float64(5), doc: "The score a ticket takes for each hand-back that comes back refused.", unit: "score"},
 	},
 }
 

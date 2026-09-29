@@ -87,6 +87,14 @@ test("a module of the server no test names comes back", () => {
   assert.equal(found[0].rule, "EveryModuleTested");
 });
 
+// A deletion waits for the commit verb to stage it, and the check runs first. [[spec/tickets/twins-leave-misses-some-callers]]
+test("a module git tracks and the working tree deleted asks for no test", () => {
+  const tree = fakeTree({}, ["src/bridge/gone.js"]);
+
+  assert.deepEqual(everyModuleTested(tree), []);
+  assert.deepEqual(tree.paths(), []);
+});
+
 test("a module a test imports stands quiet", () => {
   const tree = fakeTree(
     {

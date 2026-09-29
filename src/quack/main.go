@@ -19,6 +19,7 @@ import (
 	"quackitect/src/modules/config"
 	"quackitect/src/modules/env"
 	"quackitect/src/modules/files"
+	"quackitect/src/modules/git"
 	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
 	"quackitect/src/modules/hooks"
@@ -63,6 +64,10 @@ var modules = map[string]ioModule{
 	}},
 	"env": {env.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
 		return func() {}, env.Start(env.New(), commit)
+	}},
+	// [[spec/tickets/the-index-reads-standing-branches]]
+	"git": {git.Registers, func(root string, commit func(map[string]any) error) (func(), error) {
+		return git.Start(git.New(root), clock.New().Every, commit), nil
 	}},
 	"tickets":   {registers: withActions(tickets.Registers, verbsmodule.TicketsActions)},
 	"queue":     {registers: queue.Places},

@@ -15,6 +15,7 @@ import { proc } from "../doors/proc.js";
 import { front } from "../doors/front.js";
 import { index } from "../doors/index.js";
 import { homeIn } from "./editor.js";
+import { SLICES } from "../bridge/config.js";
 import { handDoors } from "./pull-hand-of.js";
 import { readTools, whereIs } from "../engine/tools.js";
 import { rootsHere } from "./vehicle.js";
@@ -63,6 +64,12 @@ export async function doorsHere() {
       level: await said.ask("log.level"),
     }),
     config: said,
+    // The mode each migration slice reads, taken once at startup so a sync reader asks no door. [[spec/tickets/readers-name-one-mode-source]]
+    slices: Object.fromEntries(
+      await Promise.all(
+        SLICES.map(async (one) => [one, await said.ask(`migration.${one}`)]),
+      ),
+    ),
     method: roots.method,
     work: roots.work,
     words: await said.ask("names.words"),
@@ -74,9 +81,9 @@ export async function doorsHere() {
     personSigns: await said.ask("work.personSigns"),
     // [[spec/design_output/pull#the-queue-is-a-score]]
     weights: {
-      block: await said.ask("work.blockScore"),
-      day: await said.ask("work.dayScore"),
-      fail: await said.ask("work.failScore"),
+      block: await said.ask("queue.block"),
+      day: await said.ask("queue.day"),
+      fail: await said.ask("queue.fail"),
     },
     // A name on the pull asks for one ticket, and the queue binding refuses the ask. [[spec/design_output/pull#the-hand-out]]
     binding: await said.ask("engine.binding"),

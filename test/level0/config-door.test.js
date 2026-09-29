@@ -84,3 +84,16 @@ test("a file beats the built-in, and a key the schema leaves out reads nothing",
   assert.equal(asks(box, "names.none"), undefined);
   assert.deepEqual(whereFrom(box, "names.none"), { value: undefined, layer: "" });
 });
+
+// [[spec/tickets/readers-name-one-mode-source]]
+test("slicesOf names each slice and reads its mode off the box at the ask", async () => {
+  const { LOG_LEVEL, SLICES, slicesOf } = await import("../../src/bridge/config.js");
+  const box = boxOf({
+    "/method/spec/config/level0.json": '{"migration":{"log":"new"}}',
+  });
+  const slices = slicesOf(() => box);
+  assert.deepEqual(Object.keys(slices), SLICES);
+  assert.equal(slices.log, "new");
+  assert.equal(slices.prose, undefined);
+  assert.equal(LOG_LEVEL, "log.level");
+});

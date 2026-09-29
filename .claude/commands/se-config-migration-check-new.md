@@ -1,5 +1,5 @@
 ---
-description: "config / migration / check: sets migration.check to new. The check twins: old answers alone, shadow runs the check names beside it and logs a mismatch, new answers the names'."
+description: "config / migration / check: sets migration.check to new. The check twins, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

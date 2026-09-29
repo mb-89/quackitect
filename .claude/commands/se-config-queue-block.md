@@ -1,14 +1,14 @@
 ---
-description: "config / work / blockScore: sets work.blockScore to what you type. The score a ticket takes for each one waiting under it, down the whole chain."
+description: "config / queue / block: sets queue.block to what you type. the score a ticket takes for each ticket its chain holds up"
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 
-!`./RUNME.sh config work.blockScore $ARGUMENTS`
+!`./RUNME.sh config queue.block $ARGUMENTS`
 
-The line above runs before this turn opens, so `work.blockScore` reads what you type
+The line above runs before this turn opens, so `queue.block` reads what you type
 after the name. Run `./RUNME.sh config` to read which layer answers a key:
 `.se/.runtime/config.json` beats the environment, and the environment beats
 `spec/config/level0.json`.

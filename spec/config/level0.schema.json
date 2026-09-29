@@ -147,24 +147,6 @@
           "asks": "name",
           "opens": "spec/tickets/<name>.md"
         },
-        "blockScore": {
-          "type": "number",
-          "default": 10,
-          "help": "The score a ticket takes for each one waiting under it, down the whole chain.",
-          "unit": "score"
-        },
-        "dayScore": {
-          "type": "number",
-          "default": 1,
-          "help": "The score a ticket takes for each day it stands.",
-          "unit": "score"
-        },
-        "failScore": {
-          "type": "number",
-          "default": 5,
-          "help": "The score a ticket takes for each hand-back that comes back refused.",
-          "unit": "score"
-        },
         "failsBeforePerson": {
           "type": "number",
           "default": 2,
@@ -448,41 +430,33 @@
         },
         "check": {
           "type": "string",
-          "default": "old",
-          "help": "The check twins: old answers alone, shadow runs the check names beside it and logs a mismatch, new answers the names'.",
+          "default": "new",
+          "help": "The check twins, switched over in phase 4.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },
         "config": {
           "type": "string",
-          "default": "old",
-          "help": "The config readers: old answers alone, shadow runs the config module beside them and logs a mismatch, new answers the module's.",
+          "default": "new",
+          "help": "The config readers, switched over in phase 4.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },
         "guidance": {
           "type": "string",
-          "default": "old",
-          "help": "The rules a step reads: old answers alone, shadow runs the guidance topic beside it and logs a mismatch, new answers the topic's.",
+          "default": "new",
+          "help": "The rules a step reads, switched over in phase 4.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },
         "log": {
           "type": "string",
-          "default": "old",
-          "help": "The session log rows: old answers alone, shadow runs the log topic beside it and logs a mismatch, new answers the topic's.",
+          "default": "new",
+          "help": "The session log rows, switched over in phase 4.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },
@@ -606,11 +580,9 @@
         },
         "prose": {
           "type": "string",
-          "default": "old",
-          "help": "The prose checks: old answers on wink alone, shadow runs the Go checks beside it and logs a mismatch, new answers the Go checks'.",
+          "default": "new",
+          "help": "The prose checks, switched over in phase 4.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },
@@ -707,25 +679,20 @@
     "queue": {
       "type": "object",
       "properties": {
-        "weight": {
-          "type": "object",
-          "properties": {
-            "block": {
-              "type": "number",
-              "default": 0,
-              "help": "the score a ticket takes for each ticket its chain holds up"
-            },
-            "day": {
-              "type": "number",
-              "default": 0,
-              "help": "the score a ticket takes for each whole day it stands"
-            },
-            "fail": {
-              "type": "number",
-              "default": 0,
-              "help": "the score a ticket takes for each hand-back that failed on it"
-            }
-          }
+        "block": {
+          "type": "number",
+          "default": 10,
+          "help": "the score a ticket takes for each ticket its chain holds up"
+        },
+        "day": {
+          "type": "number",
+          "default": 1,
+          "help": "the score a ticket takes for each whole day it stands"
+        },
+        "fail": {
+          "type": "number",
+          "default": 5,
+          "help": "the score a ticket takes for each hand-back that failed on it"
         }
       }
     },

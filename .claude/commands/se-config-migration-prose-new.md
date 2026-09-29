@@ -1,5 +1,5 @@
 ---
-description: "config / migration / prose: sets migration.prose to new. The prose checks: old answers on wink alone, shadow runs the Go checks beside it and logs a mismatch, new answers the Go checks'."
+description: "config / migration / prose: sets migration.prose to new. The prose checks, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

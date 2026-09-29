@@ -38,11 +38,11 @@ var slices = []struct {
 	enum           []string
 }{
 	{OpenTasksKey, "new", "The open-tasks slice's record, switched over in phase 2. The badge, the work tab's brackets and its queue column read the index.", []string{"new"}},
-	{ConfigKey, "old", "The config readers: old answers alone, shadow runs the config module beside them and logs a mismatch, new answers the module's.", modes},
-	{LogKey, "old", "The session log rows: old answers alone, shadow runs the log topic beside it and logs a mismatch, new answers the topic's.", modes},
-	{GuidanceKey, "old", "The rules a step reads: old answers alone, shadow runs the guidance topic beside it and logs a mismatch, new answers the topic's.", modes},
-	{CheckKey, "old", "The check twins: old answers alone, shadow runs the check names beside it and logs a mismatch, new answers the names'.", modes},
-	{ProseKey, "old", "The prose checks: old answers on wink alone, shadow runs the Go checks beside it and logs a mismatch, new answers the Go checks'.", modes},
+	{ConfigKey, "new", "The config readers, switched over in phase 4.", []string{"new"}},
+	{LogKey, "new", "The session log rows, switched over in phase 4.", []string{"new"}},
+	{GuidanceKey, "new", "The rules a step reads, switched over in phase 4.", []string{"new"}},
+	{CheckKey, "new", "The check twins, switched over in phase 4.", []string{"new"}},
+	{ProseKey, "new", "The prose checks, switched over in phase 4.", []string{"new"}},
 	{VerbsKey, "old", "The road ./RUNME.sh hands a verb down: old answers alone, shadow runs quack beside it and logs a mismatch, new answers quack's.", modes},
 	{CageKey, "old", "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's.", modes},
 	{WindowKey, "old", "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's.", modes},

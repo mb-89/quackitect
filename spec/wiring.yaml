@@ -8,6 +8,8 @@ instances:
     module: clock
   env:
     module: env
+  git:
+    module: git
   tickets:
     module: tickets
   queue:
@@ -88,13 +90,21 @@ wires:
   lsp.buffers/<path...>: buffers/<path...>
   check.buffers/<path...>: buffers/<path...>
   log.session: files/.se/.log/session.jsonl
+  git.tips: git/tips
+  git.trunk: git/trunk
+  git.stood: git/stood
+  tickets.tips: git/tips
+  tickets.trunk: git/trunk
   tickets.all: tickets/all
   tickets.cloud: tickets/cloud
-  queue.rows: tickets/all
+  tickets.branched: tickets/branched
+  tickets.branches: tickets/branches
+  queue.rows: tickets/branched
   queue.plan: files/.se/.runtime/plan.json
   queue.cloud: tickets/cloud
-  queue.stood: built-in
+  queue.stood: git/stood
   queue.minute: clock/minute
-  work.tickets: tickets/all
+  work.tickets: tickets/branched
+  work.branches: tickets/branches
   work.places: queue.places
   work.cloud: tickets/cloud

@@ -141,3 +141,28 @@ test("the doors read work.failsBeforePerson into the fail cap, and the config na
     "the doors read it into the fail cap",
   );
 });
+
+// The score's weights stand under queue, where the Go queue reads them too, so both paths order alike. [[spec/tickets/verbs-queue-order]]
+test("the doors read the score weights off queue, and work names none", async () => {
+  const { it } = await import("../../src/scripts/cli-doors.js");
+  const schema = JSON.parse(
+    files.read(join(method, "spec", "config", "level0.schema.json")),
+  );
+  const config = underBuiltIns(
+    schema,
+    JSON.parse(files.read(join(method, "spec", "config", "level0.json"))),
+  );
+
+  for (const old of ["blockScore", "dayScore", "failScore"]) {
+    assert.equal(config.work[old], undefined, `${old} leaves work`);
+    assert.equal(schema.properties.work.properties[old], undefined, `and its schema`);
+  }
+  for (const key of ["block", "day", "fail"]) {
+    assert.equal(
+      schema.properties.queue.properties[key]?.type,
+      "number",
+      `the schema declares queue.${key}`,
+    );
+    assert.equal(it.weights[key], config.queue[key], `the doors read queue.${key}`);
+  }
+});

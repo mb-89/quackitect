@@ -1,5 +1,5 @@
 ---
-description: "config / migration / guidance: sets migration.guidance to new. The rules a step reads: old answers alone, shadow runs the guidance topic beside it and logs a mismatch, new answers the topic's."
+description: "config / migration / guidance: sets migration.guidance to new. The rules a step reads, switched over in phase 4."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
