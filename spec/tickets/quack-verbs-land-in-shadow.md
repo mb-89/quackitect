@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -100,6 +100,18 @@ record:
         exit: 0
         said: work/quack-verbs-land-in-shadow already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 2e6216be8a8ce6554e5419fba395c169f5f3a723
+    hash_after: 2e6216be8a8ce6554e5419fba395c169f5f3a723
+    inputs:
+      - name: ask
+        hash: b473a38aee98cc88
+        size: 613
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["open-tasks-shadow-lands", "read-topics-land-in-shadow"]
 enabled_by: migration.phase4shadow
 cloud: true
@@ -129,14 +141,44 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/action-refusals-meet-cases]] trivial
+[[spec/tickets/actions-answer-over-http]] standard
+[[spec/tickets/branch-list-reads-work-table]] trivial
+[[spec/tickets/cli-draft-lists-every-case]] trivial
+[[spec/tickets/gone-names-its-unit]] trivial
+[[spec/tickets/needs-shadow-callers-named-whole]] trivial
+[[spec/tickets/needs-wait-on-branch-topic]] trivial
+[[spec/tickets/pull-verbs-become-actions]] standard
+[[spec/tickets/quack-alone-verbs-skip-mode]] trivial
+[[spec/tickets/quack-main-routes-the-tree]] trivial
+[[spec/tickets/quack-tools-spares-runme-tools]] trivial
+[[spec/tickets/retro-notes-twin-joins-road]] trivial
+[[spec/tickets/retro-usage-names-every-verb]] trivial
+[[spec/tickets/retro-verbs-become-actions]] standard
+[[spec/tickets/runme-hands-verbs-to-quack]] standard
+[[spec/tickets/the-hook-registers-index-tools]] standard
+[[spec/tickets/the-quack-cli-gets-generated]] standard
+[[spec/tickets/ticket-draft-real-callers]] trivial
+[[spec/tickets/ticket-verbs-become-actions]] standard
+[[spec/tickets/ticket-verbs-each-pinned]] trivial
+[[spec/tickets/tool-list-shape-held-once]] trivial
+[[spec/tickets/vehicle-cases-own-files]] trivial
+[[spec/tickets/vehicle-stub-native-ports]] trivial
+[[spec/tickets/vehicle-verbs-become-actions]] standard
+[[spec/tickets/verb-road-keeps-the-terminal]] trivial
+[[spec/tickets/wait-key-meets-its-wiring]] trivial
+[[spec/tickets/work-verbs-become-actions]] standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each standard child ports one topic or one layer, and each trivial child one fix, so every one reads whole in one review
+the children lay down the generated quack, the road that runs it beside cli.js, the ticket, retro, pull, vehicle, stub and branch topics as actions, and the tool list the hook registers; the native ports past shadow belong to quack-verbs-switch-over
+each standard child names the one it waits on under depends_on, back to actions-answer-over-http
 
 # children
 
