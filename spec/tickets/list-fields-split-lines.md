@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/owner-read
+step: implement/tests-green
 group: loose-fixes-99f4547
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: a9d1f95bb1c8a3d43e44860f77ca4d8785ff8ee5
+    hash_after: a9d1f95bb1c8a3d43e44860f77ca4d8785ff8ee5
+    inputs:
+      - name: ask
+        hash: 05e7db43ad340a67
+        size: 581
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 6b48ecec417a46a47c63750b51a1d7dd7712a2b1
+    hash_after: 6b48ecec417a46a47c63750b51a1d7dd7712a2b1
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 9ef7c2e96a66b47f
+        size: 1411
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 15a6e864a69047ac7ec040015fed14e3330e68ee
+    hash_after: 15a6e864a69047ac7ec040015fed14e3330e68ee
+    inputs:
+      - name: design/draft
+        hash: 9ef7c2e96a66b47f
+        size: 1411
+      - name: design/tests-red
+        hash: d30bab38f96a35c2
+        size: 589
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: dcba88dc2c81d144730ee98403cff474bed5d647
+    hash_after: dcba88dc2c81d144730ee98403cff474bed5d647
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: 44dbbefede9e761a3d305965406fc5a41034dfd2
+    hash_after: 44dbbefede9e761a3d305965406fc5a41034dfd2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: d30bab38f96a35c2
+        size: 589
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -153,38 +223,50 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+formatted in src/scripts/pull-format.js turns a field value into text with String, and String joins an array by commas. It now joins an array one item a line before its other rules run. withPayload in src/scripts/pull-chapter.js calls it for every field, so a list field handed back as an array lands one item a line, and redListOf reads each row as one file. Assumption: an array means a list, whatever form the field names, since a text field has no use for commas between items. Cost: a hand passing an array to a text field gets lines in place of commas.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/pull-chapter.js: withPayload, the one caller of formatted
+src/scripts/pull.js: the hand-back, the one caller of withPayload
+src/scripts/red-list.js: redListOf, which reads the rows formatted writes and stays unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-fields.test.js: a list field handed back as an array lands one item a line
+test/level0/pull-fields.test.js: a red list handed back as an array names each file to expectedRed
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first on a first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/scripts/pull-format.js
+test/level0/pull-fields.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- formatted, withPayload, withFieldText and redListOf stand opened, and String over an array joins by commas
+- the callers come off a grep of formatted and withPayload
+- each done_when line names its case in pull-fields.test.js, and the check stays for tests-green
 
 ## tests-red
 
@@ -193,26 +275,31 @@ The source: none.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-fields.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/pull-fields.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The array case fails on its own assertion: the red field lands as one comma-joined line. The expectedRed case passes already, because this group split comma-joined red rows in redListOf to green the check. It stays as the guard on the reader side.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the array case decides the first done_when line and fails, the expectedRed case decides the second, and the check stays for tests-green
+- withPayload and expectedRed read text alone, so the cases reach no door
 
 # gate
 
@@ -221,8 +308,9 @@ The source: none.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -233,14 +321,19 @@ The source: none.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint test/level0/pull-fields.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches test/level0/pull-fields.test.js alone, since main already carries the formatted change in src/scripts/pull-format.js
+- the change reaches no door: withPayload and expectedRed read text alone
+- the comment in formatted on main names the approach, and the case links this ticket
+- the bullet form stands once, in formatted and its test in pull-format.test.js, and this case reads it
 
 ## tests-green
 
@@ -249,26 +342,33 @@ The source: none.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-fields.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A list field handed back as a JSON array lands one item a line, as a bullet row, and expectedRed names each file of a red list handed back that way. The formatted change landed on main first, under the-guidance-topic-lands, so this ticket brings its cases onto main's bullet form and keeps them as the guard on both sides: the write and the red list reader.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches test/level0/pull-fields.test.js alone, since main carries the formatted change
+- the change reaches no door: withPayload and expectedRed read text alone
+- the comment in formatted on main names the approach, and the cases link this ticket
+- the bullet form stands once, in formatted and its test, and these cases read it
 
 # accept
 

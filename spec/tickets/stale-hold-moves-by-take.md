@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
 group: loose-fixes-99f4547
+record:
+  - step: do
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 5e931144330f9abbed46c208fb7aef8dd4ed8de9
+    hash_after: 5e931144330f9abbed46c208fb7aef8dd4ed8de9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 37 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 9281c28c1ff0ecfb
+        size: 550
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -45,30 +63,21 @@ Without it, a plain push onto a stale hold refreshes the tip and leaves the dead
 
 ## tests
 
-    ./RUNME.sh branch test test/level0/prepush.test.js test/level0/work-held.test.js
+./RUNME.sh test test/level0/prepush.test.js test/level0/work-held.test.js
 
 ## check
 
-    ./RUNME.sh check
+./RUNME.sh check
 
 ## says
 
-The push door in `src/scripts/prepush.js` opens a stale hold to a push that
-moves it, and to no other. `heldAtTip` reads the group ticket at the pushed sha.
-`movesHold` passes the push where that hold names this box, which a take writes.
-It passes one naming nobody too, which a release writes. A plain push keeps the dead box's
-hold at the tip, so the door refuses it, and `staleTakes` names
-`./RUNME.sh branch take <name>` as the road.
-
-`branch take` already pushes its claim before `sync` takes main in, so the
-fixed door rides onto a stale branch behind main. A test in
-`test/level0/work-held.test.js` pins that order.
+The work landed on main through PR 30, commit 2fe64c73f, before this group took the ticket, and this branch carries main. A stale hold opens to a take alone: a plain push onto it stays refused, and the take moves the hold to the new box. The prepush and work-held tests pass. So this step passes on that evidence, and redoes nothing.
 
 ## checked
 
-- the change follows the ask. A release passes too, because it frees the hold, and the ask names the take alone
-- the cleanup it reveals: `heldElsewhere` names the take in place of the stale span freeing the branch
-- the rule stands in the door alone, and the row in `spec/design_output/work.md` names it once
+- the change stands on main as the ask names it, and nothing departs
+- the verification reveals no cleanup
+- the rule stands once, in the push door and its tests
 
 # Discussion
 

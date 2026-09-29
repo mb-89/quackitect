@@ -3,6 +3,7 @@
 // [[spec/design_output/pull#the-pass]]
 
 import { entryNamed } from "../../.claude/skills/level0/lib/schema.js";
+import { GATE_POINT, POINT } from "../../.claude/skills/level0/lib/todo.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
@@ -109,7 +110,9 @@ export function stepOn(it, one, leaf, before, changes, stays = false) {
 
 // A design review passing with findings mints a draft child a row on the trivial route, and every child is built before any is written. The children ride the parent's pass commit. A gate's points stand open at the front of the queue. [[spec/design_output/pull#a-finding-rides-out]]
 export function minted(it, who, one, leaf, held, findings, answered) {
-  const standsAs = leaf.gate ? { state: OPEN, todo: true } : { state: DRAFT };
+  const standsAs = leaf.gate
+    ? { state: OPEN, todo: true, [POINT]: GATE_POINT }
+    : { state: DRAFT };
   const route = processAt(it.disk, it.method ?? it.root, it.join, CHILD_ROUTE);
   if (route.why) return unminted(one, leaf, route.why);
   const folder = one.private ? NOTES : TICKETS;

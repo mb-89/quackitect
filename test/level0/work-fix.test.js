@@ -42,6 +42,20 @@ test("leftOpen names each open child and each open loose ticket the branch adds,
   assert.deepEqual(leftOpen(it, "one-group"), ["a-child", "a-draft", "left"]);
 });
 
+// A draft the branch adds with no group waits on a person, and lands loose on main. [[spec/tickets/done-skips-added-drafts]]
+test("leftOpen leaves out a draft the branch adds with no group", () => {
+  const { it } = doorsSaying(
+    { [ADDED]: { stdout: "spec/tickets/sketch.md\nspec/tickets/left.md\n" } },
+    {
+      [on("sketch")]: CHILD("", "draft").replace("group: \n", ""),
+      [on("left")]: loose,
+      [on("one-group")]: GROUP_NOTE,
+    },
+  );
+  it.root = "/tree";
+  assert.deepEqual(leftOpen(it, "one-group"), ["left"]);
+});
+
 // [[spec/design_output/work#a-box-leaves]]
 test("onPersonRoute reads the process in either spelling, and nothing else", () => {
   assert.equal(onPersonRoute(person), true);

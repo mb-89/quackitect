@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -35,6 +35,13 @@ process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 step: answer
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 31227eff09b7ce311aec1cb250e1dd3c9ba0be1f
+    hash_after: 31227eff09b7ce311aec1cb250e1dd3c9ba0be1f
+reason: became
+successors: [desk-probe-reply-trial]
 ---
 
 # Ask

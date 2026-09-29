@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-step: answer
+state: closed
+step: do
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -36,6 +36,36 @@ process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 depends_on: ["the-process-stays-editable"]
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 1399b4e4820f6c5cf9d5d105c2babe66530e3582
+    hash_after: 1399b4e4820f6c5cf9d5d105c2babe66530e3582
+    inputs:
+      - name: ask
+        hash: 2666e23e7826c6d7
+        size: 446
+      - name: [[spec/design_input/level-two]]
+        hash: 8dddb2221fafbe09
+        size: 15813
+    def: 2280015d497a3abd
+  - step: do
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 74cc3a068b1ca0576f0abdb9e1de131da2dece9e
+    hash_after: 74cc3a068b1ca0576f0abdb9e1de131da2dece9e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 30 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: 7b91099f9034f0df
+        size: 812
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -54,8 +84,13 @@ The owner decides how the editor draws and edits a process file: the steps, the 
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+The editor draws a process file with the drawing a ticket takes, off the graph ./RUNME.sh graph answers. A person edits there the steps, their order, on_fail, by and when: every row the-editor-draws-the-ticket names in The drawing takes an edit, save the pointer. A gate draws as a marked node, and its question and final edit as leaf fields.
+
+The tags draw as labels on a node, and edit as a leaf field. The bless stays ./RUNME.sh ticket bless on a ticket, since a process file holds no verdict. A change reaches the open tickets through ./RUNME.sh ticket update.
+
+Weighed: the design input already rules the drawing and the rows it edits, and leaves how far to a desk trial. Assumed: the trial stays with the editor ticket the do step mints, so a wrong call costs one ticket edit before code lands.
 
 # do
 
@@ -64,26 +99,32 @@ The owner decides how the editor draws and edits a process file: the steps, the 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/schema.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer lands as a minted draft, the-editor-edits-a-process, whose ask names what the editor draws and what a person edits there. The draft stands loose on main, off this fix group. The cloud design input rules that a fix group files no ticket for an agent, and a draft waits on a person until it opens.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the minted ask follows the answer line for line
+the change reveals no cleanup
+the rows the editor takes stand in the-editor-draws-the-ticket, and the ask points there
 
 # Discussion
 

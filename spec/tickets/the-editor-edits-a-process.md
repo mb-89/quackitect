@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: closed
+state: draft
 steps:
   - name: design
     steps:
@@ -116,93 +116,24 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/tests-green
-group: loose-fixes-99f4547
-record:
-  - step: design/owner-read
-    skipped: true
-    why: the ask comes off no handover
-  - step: design/draft
-    hand: box d84e33ce20f7 · claude-code-remote
-    hash_before: ec87651d2ef2dde4d8411e8f210fad8fdff3a2db
-    hash_after: ec87651d2ef2dde4d8411e8f210fad8fdff3a2db
-    inputs:
-      - name: ask
-        hash: c4c74c1ffc222572
-        size: 680
-    def: 7883b3d10633c780
-  - step: design/tests-red
-    hand: box d84e33ce20f7 · claude-code-remote
-    hash_before: dea4f1defa9f97e5930272fcf3dd2e7b37262d7c
-    hash_after: dea4f1defa9f97e5930272fcf3dd2e7b37262d7c
-    answered:
-      - name: tests
-        exit: 1
-        said: assertion, 2 test(s) fail on their own assertion
-    inputs:
-      - name: design/draft
-        hash: 8b7dbb366e81581b
-        size: 1713
-    def: 08e16d07b0de477c
-  - step: gate
-    hand: box d84f325b2110d · claude-code-remote
-    hash_before: 0c885861943ae3eb4f26d9dc0c2e806c3bcdc165
-    hash_after: 0c885861943ae3eb4f26d9dc0c2e806c3bcdc165
-    inputs:
-      - name: design/draft
-        hash: 8b7dbb366e81581b
-        size: 1713
-      - name: design/tests-red
-        hash: 5ff9005e4f6c534d
-        size: 683
-    def: dc4904ab364efa10
-  - step: implement/change
-    hand: box d84f325b2110d · claude-code-remote
-    hash_before: e51aec1382039541cc93eb3b739f6faab44807b3
-    hash_after: e51aec1382039541cc93eb3b739f6faab44807b3
-    answered:
-      - name: lint
-        exit: 0
-        said: The rules pass.
-    def: f150b8c0dc20fe45
-  - step: implement/tests-green
-    hand: box d84f325b2110d · claude-code-remote
-    hash_before: 139c60f71eff12b820bce4882bf59318c7ee9bc0
-    hash_after: 139c60f71eff12b820bce4882bf59318c7ee9bc0
-    answered:
-      - name: tests
-        exit: 0
-        said: green, 10 test(s) pass in 1 file(s)
-      - name: check
-        exit: 0
-        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
-    inputs:
-      - name: design/tests-red
-        hash: 5ff9005e4f6c534d
-        size: 683
-    def: ec253787263043a7
-  - step: accept
-    skipped: true
-    why: the delivery's acceptance reads this ticket
-  - step: view
-    skipped: true
-    why: the ask names no view the owner reads
-reason: done
 ---
 
 # Ask
 
-A helper's pull hands it the step its spawn names, while the session's plan holds that ticket as its work in hand. So a gate helper takes its step with no change to the caller's plan.
+The editor draws a process file with the drawing a ticket takes, and a person edits the route there. A process then changes in the editor, and every open ticket takes the change through `./RUNME.sh ticket update`.
 
-Today the plain pull waits on the plan's working todo. The named pull then refuses under the queue binding. The guard in `src/scripts/pull.js` lets a name through for the minted ticket or a person's step alone. The helper loops, and its gate stands untaken.
+A process file stays a YAML file a person edits by hand, so a route change costs a read of the schema first.
 
-- a case in `test/level0/pull-hand.test.js` hands a helper the gate while the plan works that ticket
-- a case there still refuses a named pull of a ticket outside the plan
+- the editor draws a process file off the graph `./RUNME.sh graph` answers, as it draws a ticket
+- a person edits there the steps, their order, `on_fail`, `by` and `when`, per [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]], save the pointer
+- a gate draws as a marked node, and its question and `final` edit as leaf fields
+- the tags draw as labels on a node, and edit as a leaf field
+- the bless stays `./RUNME.sh ticket bless` on a ticket, and the process drawing offers none
 - `./RUNME.sh check` exits 0
 
-The view: none.
+The view: the process file open in the editor, drawn as a graph.
 
-The source: none.
+The source: [[spec/tickets/the-owner-shapes-the-editor]].
 
 # design
 
@@ -223,51 +154,38 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-<!-- the form is text -->
 
-In pull in src/scripts/pull.js, read the plan's working item once, as working. A pull carrying --as is a helper. A helper with no name and nothing in hand asks for working, and skips the working-todo wait at the top of the hand-out. The queue guard lets a helper's name through where it equals working, beside the minted name and a person's hand. A helper naming a ticket outside the plan stays refused, and a pull with no --as keeps the wait. Assumption: a helper serves the session whose plan it reads, since both read one plan file on one box. Cost: a helper spawned while the plan works a todo rather than a ticket asks for a name no ticket carries, and waits, as it waits today.
+<!-- the form is text -->
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-<!-- the form is list -->
 
-src/scripts/pull.js: pull, the one reader of the working todo and the queue guard
-src/scripts/pull-spawn.js: spawnPrompt, which tells the helper to run the pull with --as
-src/engine/named.js: inHand, which answers the working item and stays unchanged
-src/scripts/pull-hand.js: handOut, which reads who.wanted and who.oneStep and stays unchanged
+<!-- the form is list -->
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-<!-- the form is list -->
 
-test/level0/pull-hand.test.js: a helper's pull takes the gate of the ticket the plan works
-test/level0/pull-hand.test.js: a helper's named pull of a ticket outside the plan stays refused under the queue
+<!-- the form is list -->
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-<!-- the form is list -->
 
-first on a first draft
+<!-- the form is list -->
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-<!-- the form is list -->
 
-src/scripts/pull.js
-test/level0/pull-hand.test.js
+<!-- the form is list -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- every file, function and verb the approach names stands opened: pull.js lines 128 to 150, inHand in named.js, handOut in pull-hand.js and spawnPrompt
-- the callers list comes off a read of pull, handOut, inHand and spawnPrompt
-- each done_when line names its case in pull-hand.test.js, and the check stays for tests-green
+<!-- the form is checklist -->
 
 ## tests-red
 
@@ -276,31 +194,26 @@ test/level0/pull-hand.test.js
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-<!-- the form is command -->
 
-./RUNME.sh test test/level0/pull-hand.test.js
+<!-- the form is command -->
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-<!-- the form is list -->
 
-test/level0/pull-hand.test.js
+<!-- the form is list -->
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-<!-- the form is text -->
 
-Both cases fail on their own assertions. The plain helper pull meets the working-todo wait and hands nothing. The named pull outside the plan also meets that wait first, and answers 0 in place of the queue refusal. That surprised me: today the wait hides the guard from every helper, so the guard case turns green only once the helper skips the wait.
+<!-- the form is text -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- each behavioural done_when line meets a failing case in pull-hand.test.js, and the check stays for tests-green
-- the cases reach the fake disk and fake git that pull-doors.js builds, and nothing past them
+<!-- the form is checklist -->
 
 # gate
 
@@ -309,9 +222,8 @@ Both cases fail on their own assertions. The plain helper pull meets the working
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-<!-- the form is verdict -->
 
-accept
+<!-- the form is verdict -->
 
 # implement
 
@@ -322,19 +234,14 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-<!-- the form is command -->
 
-./RUNME.sh lint src/scripts/pull.js
+<!-- the form is command -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- the change touches src/scripts/pull.js alone, the file the size list names
-- the change reaches no new door: inHand reads the disk door the fake in the tests already stands for
-- a comment above wanted names the approach and links the ticket
-- the working item stands read once in pull, and the rule stays in the ticket the comment links
+<!-- the form is checklist -->
 
 ## tests-green
 
@@ -343,33 +250,26 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-<!-- the form is command -->
 
-./RUNME.sh test test/level0/pull-hand.test.js
+<!-- the form is command -->
 
 ### check
 
 <!-- the check is green on the commit -->
-<!-- the form is command -->
 
-./RUNME.sh check
+<!-- the form is command -->
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-<!-- the form is text -->
 
-A helper spawned with --as now takes a step of the ticket the plan works. Before, the pull waited on the working todo, and a named pull met the queue guard, so a gate helper looped. The pull reads the working item once: a helper skips the wait, one naming nothing asks for the working item, and the queue guard passes a helper whose name equals it. A helper naming another ticket still stands behind the queue.
+<!-- the form is text -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- the change touches src/scripts/pull.js and the red cases in test/level0/pull-hand.test.js, both on the size list
-- the change reaches no new door: inHand reads the disk door the fake in the tests stands for
-- a comment above wanted names the approach and links the ticket
-- the working item stands read once in pull, and the rule stays in the ticket the comment links
+<!-- the form is checklist -->
 
 # accept
 
@@ -394,5 +294,3 @@ A helper spawned with --as now takes a step of the ticket the plan works. Before
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-This ticket waits on nobody. `design/owner-read` holds `when: handed`, and the ask says the source is none, so the next pull skips that step and hands out `design/draft`. The dispatch hands the ticket to a box like other open work.

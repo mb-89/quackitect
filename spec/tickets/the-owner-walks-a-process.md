@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: answer
 steps:
   - name: answer
@@ -36,6 +36,13 @@ process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 depends_on: ["the-engine-holds-the-route"]
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: dc5998ad9a55a7a8e9ade08584f8ff05fdb93151
+    hash_after: dc5998ad9a55a7a8e9ade08584f8ff05fdb93151
+reason: became
+successors: [owner-walks-process-trial]
 ---
 
 # Ask

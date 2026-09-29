@@ -278,7 +278,10 @@ tuning the queue costs an edit. `branch list --queue` writes the order the pull
 hands out, and the column a board draws reads that answer.
 
 A ticket's age comes off one `git log` over the folder holding the tickets, so
-the cost stands beside the pull, once a pull.
+the cost stands beside the pull, once a pull. The queue module in
+`src/modules/queue` wires its `stood` port `built-in`, so its day term scores
+zero until a git IO module answers that port.
+[[spec/tickets/queue-reads-git-for-came]]
 
 # The queue is an outline
 
