@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -131,6 +131,19 @@ record:
         hash: c4c74c1ffc222572
         size: 680
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: dea4f1defa9f97e5930272fcf3dd2e7b37262d7c
+    hash_after: dea4f1defa9f97e5930272fcf3dd2e7b37262d7c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 8b7dbb366e81581b
+        size: 1713
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -219,26 +232,31 @@ test/level0/pull-hand.test.js
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-hand.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/pull-hand.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertions. The plain helper pull meets the working-todo wait and hands nothing. The named pull outside the plan also meets that wait first, and answers 0 in place of the queue refusal. That surprised me: today the wait hides the guard from every helper, so the guard case turns green only once the helper skips the wait.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each behavioural done_when line meets a failing case in pull-hand.test.js, and the check stays for tests-green
+- the cases reach the fake disk and fake git that pull-doors.js builds, and nothing past them
 
 # gate
 
