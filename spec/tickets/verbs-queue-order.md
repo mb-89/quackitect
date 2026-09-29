@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d858e079edd6 · claude-code-remote
+    hash_before: 80417b35dbe95c6cca71c3a3b8aa9751ca5f15fd
+    hash_after: 80417b35dbe95c6cca71c3a3b8aa9751ca5f15fd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s); green, src/quack passes; green, src/modules/queue passes; green, src/modules/git pas
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 6ae28a85b72a72d6
+        size: 771
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -53,7 +71,6 @@ Left undone, `ticket yours` and `branch list --queue` write a shadow row on ever
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
 
 ./RUNME.sh test src/quack src/modules/queue src/modules/git test/contract/one-config.test.js
@@ -61,7 +78,6 @@ Left undone, `ticket yours` and `branch list --queue` write a shadow row on ever
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
 ./RUNME.sh check
@@ -69,7 +85,6 @@ Left undone, `ticket yours` and `branch list --queue` write a shadow row on ever
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
 The Go queue replays a captured cli.js run place for place, so the order rule matches. The inputs differ on the served index:
@@ -90,7 +105,6 @@ The block weight carries the order here, since tickets depend on the-editor and 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
 - the change follows the ask: the served queue orders as cli.js does, and the verbs shadow stays quiet
