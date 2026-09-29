@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -142,6 +142,18 @@ record:
         hash: 99a930a70f1b4180
         size: 2813
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8509c02d5db · claude-code-remote · helper-3
+    hash_before: f272fbdd6f0a2275d7b480d38ccf198ba717e445
+    hash_after: f272fbdd6f0a2275d7b480d38ccf198ba717e445
+    inputs:
+      - name: design/draft
+        hash: 99a930a70f1b4180
+        size: 2813
+      - name: design/tests-red
+        hash: 079b49b2aba3501b
+        size: 692
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -266,8 +278,12 @@ The registry table stands empty, the shadow writes no row, and BRANCH still list
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- branch-list-reads-work-table: the draft edits BRANCH by hand to match the doing table in work.js, which leaves two copies to drift again; the drift ticket asks BRANCH built off the table work answers, so one place owns the names, with a case holding the two together
+- needs-shadow-callers-named-whole: the callers list names pull-hand.js once, but holdsVerb answers there at two sites, the hand-out filter at line 285 and the lacking check at line 426; the builder wires or leaves each on purpose
+- needs-wait-on-branch-topic: the branch open done_when line rests on a fake registry, since src/modules/verbs/branch.go registers no action while work-verbs-become-actions stands at gate; depends_on names ticket-verbs-become-actions alone, so the live index answers branch/open only once that ticket lands
 
 # implement
 
