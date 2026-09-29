@@ -140,6 +140,17 @@ func TestTheNewSliceKeepsTheOldCountWhereNoDoorAnswers(t *testing.T) {
 	}
 }
 
+// The shadow slice answers the old count, and writes its row beside it. [[spec/tickets/the-badge-reads-open-tasks]]
+func TestTheShadowSliceAnswersTheOldCountAndWritesItsRow(t *testing.T) {
+	root := sliced(t, "shadow", 5)
+	if count := slicedCount(root, 3, shadowAt); count != 3 {
+		t.Fatalf("the shadow slice answers %d, and wants the old 3", count)
+	}
+	if rows := rowsIn(t, root); len(rows) != 1 || rows[0]["new"] != 5.0 {
+		t.Fatalf("the shadow slice writes %v", rows)
+	}
+}
+
 // The badge's verb and the window's header both read Places.Takeable, which PlacesAt fills off the slice. [[spec/tickets/the-badge-reads-open-tasks]]
 func TestTheBadgeAndTheHeaderReadOneValue(t *testing.T) {
 	root := sliced(t, "new", 5)

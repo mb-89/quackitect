@@ -19,6 +19,7 @@ const (
 	openTasksKey   = "migration.opentasks"
 	openTasksName  = "work/open-tasks"
 	shadowMode     = "shadow"
+	newMode        = "new"
 )
 
 // The session log, whose folder .claude/skills/level0/lib/folders.js owns, spelled again here because a Go module imports neither. [[spec/design_output/log#one-verb-reads-the-log]]
@@ -64,8 +65,14 @@ func shadowOf(root string, old int, now time.Time) error {
 	return appendFile(path, append(row, '\n'))
 }
 
-// The count the slice answers. [[spec/tickets/the-badge-reads-open-tasks]]
+// The count the slice answers: the index's under new, where a door answers, and the old one otherwise. [[spec/tickets/the-badge-reads-open-tasks]]
 func slicedCount(root string, old int, now time.Time) int {
+	if mode, _ := config.Value(root, openTasksKey); mode == newMode {
+		if count, answered := askOpenTasks(root); answered {
+			return count
+		}
+		return old
+	}
 	_ = shadowOf(root, old, now)
 	return old
 }

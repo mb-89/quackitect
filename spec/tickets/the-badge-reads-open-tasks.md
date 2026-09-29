@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -219,6 +219,15 @@ record:
         hash: 163a9a7ab1ecc62c
         size: 894
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 76c63ec49707bb873170ab1dae362079c18fbcc8
+    hash_after: 76c63ec49707bb873170ab1dae362079c18fbcc8
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 group: open-tasks-switch-lands
 ---
 
@@ -434,14 +443,20 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the ones draft-2 names, and lens.js, which exports FOLDERS so COUNTS spells no folder twice
+- fakes: the index, the verb, the badge verb and the timer each take a fake
+- comments: slicedCount, settled, COUNTS and the view watch each point at this ticket
+- one place: COUNTS builds on FOLDERS and HOLD_WATCHES, and PLAN copies PLANS as BLESS copies its file
+- BURST names its margin over the index sweep delay
 
 ## tests-green
 

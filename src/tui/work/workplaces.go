@@ -184,8 +184,8 @@ func PlacesAt(root string) (Places, error) {
 	if err != nil {
 		return Places{}, err
 	}
-	// The shadow writes a row beside the count, and its failure leaves the count standing. [[spec/tickets/open-tasks-run-in-shadow]]
-	_ = shadowOf(root, places.Takeable, time.Now())
+	// The slice answers the count the badge and the header read, and the shadow writes its row beside it. [[spec/tickets/the-badge-reads-open-tasks]]
+	places.Takeable = slicedCount(root, places.Takeable, time.Now())
 	return places, nil
 }
 

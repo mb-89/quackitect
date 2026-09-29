@@ -7,7 +7,7 @@ const { fresh, pressed } = require("./lib/gesture.js");
 const { logbookOf } = require("./lib/logbook.js");
 const { panelHtml } = require("./lib/panel.js");
 const { newestIn, rowsIn } = require("./lib/rows.js");
-const { ticketLensOf } = require("./lib/lens.js");
+const { FOLDERS, HOLD_WATCHES, ticketLensOf } = require("./lib/lens.js");
 const { opened } = require("./lib/session.js");
 const { statesOf } = require("./lib/states.js");
 const { asType, parsed, withValue } = require("./lib/values.js");
@@ -31,8 +31,10 @@ const {
 const SCHEMA = "spec/config/level0.schema.json";
 // A copy of inRun("bless.json") out of .claude/skills/level0/lib/folders.js, which BLESS_FILE in src/scripts/pull-bless.js names, because the extension loads CommonJS and those modules are ESM. [[spec/design_output/pull#the-bless]]
 const BLESS = ".se/.runtime/bless.json";
+// A copy of PLANS out of .claude/skills/level0/lib/runs.js, because the extension loads CommonJS and that module is ESM. [[spec/tickets/the-badge-reads-open-tasks]]
+const PLAN = ".se/.runtime/plan.json";
 // The files a ticket move, a plan todo or a hold writes, whose burst draws the badge again. [[spec/tickets/the-badge-reads-open-tasks]]
-const COUNTS = [];
+const COUNTS = [...FOLDERS.map((folder) => `${folder}/*.md`), PLAN, ...HOLD_WATCHES];
 
 function sidebarOf(door) {
   const readAll = async () => {
