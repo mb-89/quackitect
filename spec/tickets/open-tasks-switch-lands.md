@@ -85,11 +85,11 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2switch
 depends_on: [open-tasks-shadow-lands]
-cloud: true
 record:
   - step: sync
     hand: box d81f28f032e0 · claude-code-remote
     hash_before: f65c54b8d6a7627d7168ca85c1bd562e0d0de680
+    hash_after: 08f06838d838e95e545fa28c5eab3415ee68a820
   - step: sync
     hand: box d81f28f032e0 · claude-code-remote
     hash_before: ecda1a149e9935c878ad39edbc0c1eb6fa50c174
