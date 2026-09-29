@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -159,6 +159,15 @@ record:
         hash: 2b9e5ed65e24e46d
         size: 1223
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 921c159b2085abba2bf555279206c6b85843ed65
+    hash_after: 921c159b2085abba2bf555279206c6b85843ed65
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -278,14 +287,19 @@ accept: the approach runs the module beside the old readers through quack config
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/config.go src/scripts/config-shadow.js src/scripts/config-golden.js src/scripts/cli-check.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the config module, the quack config verb, the config reader and the shadow door the ask names, and the migration slice keys it declares, and nothing past them.
+The shadow run takes fake settings, files, proc and log, and the Go tests seed the fixture files under testdata.
+The headers of src/scripts/config-shadow.js and src/quack/config.go name the approach and link this ticket.
+The slice keys stand once in src/modules/migration/migration.go, and the golden fixture stands once under src/quack/testdata.
 
 ## tests-green
 
