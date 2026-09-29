@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 5afed80b58640373
         size: 691
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 470f3b90d13589a4039a8a7e8cdae8501223e0fe
+    hash_after: 470f3b90d13589a4039a8a7e8cdae8501223e0fe
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -290,14 +299,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/verbs/vehicle.go src/modules/verbs/vehicle_test.go src/modules/verbs/verbs_test.go src/quack/main.go src/quack/twins_test.go src/quack/vehicle_twins_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the vehicle verbs, their twins, main.go dispatch and the two test files the cases moved out of, and nothing else
+the actions reach cli.js through the node module, whose fake the twins tests already use
+vehicle.go points at the switch-over design section it implements
+the native ports stand once, in the table under the quack-verbs-switch-over Discussion
 
 ## tests-green
 
