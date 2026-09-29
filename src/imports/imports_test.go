@@ -5,8 +5,11 @@
 package imports
 
 import (
+	"go/build"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"testing"
 
 	"golang.org/x/tools/go/analysis/analysistest"
@@ -85,6 +88,29 @@ func TestAModuleReadsYamlAsQDoes(t *testing.T) {
 func TestAModuleImportsThePointerReader(t *testing.T) {
 	if said := Faults("quackitect/src/modules/check", []string{"quackitect/src/q", "quackitect/src/pointer"}); len(said) != 0 {
 		t.Fatalf("src/pointer reads as past q: %v", said)
+	}
+}
+
+// Each reader of the tree a module takes imports the pure standard library and the other readers alone, so a name joining pureTree keeps a module off the outside. [[spec/tickets/lsp-rules-move-to-check]]
+func TestEveryPureReaderImportsThePureLibraryAlone(t *testing.T) {
+	for _, path := range pureTree {
+		found, err := build.ImportDir(filepath.Join("..", "..", strings.TrimPrefix(path, module)), 0)
+		if err != nil {
+			t.Fatalf("%s reads as no package: %v", path, err)
+		}
+		for _, one := range found.Imports {
+			if strings.HasPrefix(one, module) && !slices.Contains(pureTree, one) {
+				t.Errorf("%s imports %s, which pureTree names nowhere", path, one)
+			}
+			if !strings.HasPrefix(one, module) && strings.Contains(strings.Split(one, "/")[0], ".") {
+				t.Errorf("%s imports %s, past the standard library", path, one)
+			}
+			for _, bad := range impure {
+				if one == bad || strings.HasPrefix(one, bad+"/") {
+					t.Errorf("%s imports %s, which reaches the outside", path, one)
+				}
+			}
+		}
 	}
 }
 

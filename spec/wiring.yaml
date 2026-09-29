@@ -47,6 +47,8 @@ wires:
   env.vars/<name>: env/<name>
   tickets.files/<path...>: files/<path...>
   guidance.files/<path...>: files/<path...>
+  check.files/<path...>: files/<path...>
+  check.env/<name>: env/<name>
   log.session: files/.se/.log/session.jsonl
   tickets.all: tickets/all
   tickets.cloud: tickets/cloud

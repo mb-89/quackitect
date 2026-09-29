@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: f547f05bfa96d6f2
         size: 1015
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 073167fad9e91db1a294e2f15b85c84e73cc4234
+    hash_after: 073167fad9e91db1a294e2f15b85c84e73cc4234
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -296,14 +305,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/lsp ./src/modules/check ./src/modules/migration ./src/imports
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names. The rename verb also rewrote comment reaches in the design output and three code files, and three contract cases now name a Go file of `src/lsp` the rule still reaches
+- the new doors, the sweep off `/v1` and the log append, reach `shadowsSweep` as functions, so each case hands in its own
+- each new file opens on a header pointing at this ticket
+- the layer order stands in `src/config`, and `sweep.go` spells it again with a comment saying why
 
 ## tests-green
 

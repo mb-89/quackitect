@@ -13,15 +13,23 @@ import (
 // What the sweep answers over the files and variables a case seeds. [[spec/tickets/lsp-rules-move-to-check]]
 func sweepOver(t *testing.T, files, env map[string]string) []Finding {
 	t.Helper()
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
+	var vars q.Writer
+	index := qtest.New(t, func(c *q.Catalog) {
+		Registers(c)
+		vars = q.OutIn(c, "env/<name>", "", q.Doc("an SE_ variable, as the case seeds it"))
+	})
 	seeds := map[string]any{}
 	for at, text := range files {
 		seeds["files/"+at] = q.Content{Hash: "h", Text: text}
 	}
-	for name, value := range env {
-		seeds["env/"+name] = value
-	}
 	index.Seed(seeds)
+	if len(env) > 0 {
+		set := map[string]any{}
+		for name, value := range env {
+			set["env/"+name] = value
+		}
+		index.SeedAs(vars, set)
+	}
 	said, _ := index.Read("sweep").([]Finding)
 	return said
 }
@@ -51,7 +59,7 @@ func TestTheSweepReadsTheWordsOffTheLocalLayer(t *testing.T) {
 	if found := sweepOver(t, files, nil); !holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
 		t.Fatalf("the sweep answers %+v, and wants the local cap of two words to draw NameHoldsTheWords", found)
 	}
-	if found := sweepOver(t, files, map[string]string{"SE_NAMES_WORDS": "4"}); holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
+	if found := sweepOver(t, files, map[string]string{"SE_NAMES_WORDS": "4"}); !holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
 		t.Fatalf("the sweep answers %+v, and wants the local file over the variable, as src/config reads it", found)
 	}
 }

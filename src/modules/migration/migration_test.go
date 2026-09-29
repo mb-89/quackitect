@@ -28,7 +28,7 @@ func TestTheSliceKeyReadsTheDefaultFile(t *testing.T) {
 // The lsp slice stands among the slices, built in as old, so a box with no tracked mode runs no shadow of the editor checks. [[spec/tickets/lsp-rules-move-to-check]]
 func TestTheLspSliceStandsOld(t *testing.T) {
 	for _, one := range slices {
-		if one.key == "lsp" && one.mode == "old" {
+		if one.key == LspKey && one.mode == "old" {
 			return
 		}
 	}
