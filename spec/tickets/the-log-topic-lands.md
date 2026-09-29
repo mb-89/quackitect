@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-topics-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 3b194abbad44baad78f7d8130cf7643fa1fc26ab
+    hash_after: 3b194abbad44baad78f7d8130cf7643fa1fc26ab
+    inputs:
+      - name: ask
+        hash: ff79964a04aa4033
+        size: 289
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,51 @@ Three readers of a row stand today, and the ladder stands twice.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new module src/modules/log holds the log topic, and the three readers keep answering beside it until the switch. The ladder stands once in the module: debug, info, warn, error and fatal, with an unknown or empty level reading as info, the rule rank in .claude/skills/level0/lib/log.js and Rank in src/tui/log/record.go each hold today. The module answers it under log/ladder. The rows come off the session log file. The watch in src/modules/files/watch.go skips a dot folder under .se unless its named map holds it, so .se/.log joins that map beside .se/.runtime. The module projects files/.se/.log/session.jsonl through a line codec into log/rows: one row a line, with its stamp, its level off the ladder, its kind (the door where no kind stands), its said, its text, every other field, and a line that reads as no JSON standing as a broken row at error, the rule ParseRecord holds. quack log prints the rows as JSON. Where migration.log reads shadow, the log verb (src/scripts/log-verb.js) runs quack log once and writes one shadow row per row the two read apart, through the log door, which ./RUNME.sh log --kind shadow names. It leaves the rows it writes itself out of the compare, so no shadow row breeds another. A golden file src/quack/testdata/log.golden.json holds, over one fixture session log src/quack/testdata/session.jsonl, the rows each reader reads: the module, ParseRecord, rowOf and asRow in lib/log.js, and rowOf in src/extension/lib/rows.js, each a section its own test writes and holds. The fixture carries a plain row, a row with extra fields, a door row with no kind, a row at an unknown level, a reply keeping its lines and a broken line. Weighed: log/rows as a fold over session/ waits on the hooks module, and the file stands today. Assumed: the watch reading the session log costs one commit a row, which the fold pays later anyway.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/files/watch.go the named map, which gains .se/.log
+- src/quack/main.go the modules map, which gains log, and the verb dispatch, which gains log
+- spec/wiring.yaml the log instance and its files wire
+- src/scripts/log-verb.js the log verb, which gains the shadow call
+- src/modules/migration/migration.go LogKey, which the shadow reads
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/log/log_test.go TestTheLadderRanksAnUnknownLevelAsInfo
+- src/modules/log/log_test.go TestARowCarriesItsFieldsOffTheLine
+- src/modules/log/log_test.go TestABrokenLineStandsAsARowAtError
+- src/modules/files/watch_test.go TestTheWatchMirrorsTheSessionLog
+- src/quack/log_test.go TestLogGoldenHoldsTheModule
+- src/tui/log/golden_test.go TestLogGoldenHoldsParseRecord
+- test/level0/log-golden.test.js the golden holds the rows lib/log.js and the extension read
+- test/level0/log-shadow.test.js a row read apart writes one shadow row
+- test/level0/log-shadow.test.js a shadow row leaves the compare
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft, no earlier review
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened lib/log.js rowOf, rank, asRow and LEVELS, record.go ParseRecord and Rank, the extension's rows.js, the model's log/rows section, watch.go's skipped and named maps, and shadow.go, and checked each claim there
+the callers list names every place the topic joins: the watch, the wiring, quack and the log verb
+go test ./... passes: the module, watch and golden Go tests; the golden holds every reader's rows off one log: the Go and node golden tests; check exits 0: ./RUNME.sh check
 
 ## tests-red
 
