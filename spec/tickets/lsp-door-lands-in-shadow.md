@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -99,6 +99,15 @@ record:
   - step: sync
     hand: box d8572d2183d7 · claude-code-remote
     hash_before: 6e2afbfda2ef0a3f4503e18983101c11bece3b43
+  - step: sync
+    hand: box d8572d2183d7 · claude-code-remote
+    hash_before: 7a3a351fa4a08395fb0955025703baa11e561c2c
+    hash_after: 0a36082a110ece35fd98e98253c8563f7f4a39e6
+    answered:
+      - name: sync
+        exit: 0
+        said: work/lsp-door-lands-in-shadow took 6 commit(s) from main.
+    def: 8a9850a81227554b
 depends_on: ["read-topics-land-in-shadow", "quack-verbs-land-in-shadow"]
 enabled_by: migration.phase7shadow
 cloud: true
@@ -117,8 +126,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
