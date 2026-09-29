@@ -77,3 +77,14 @@ func TestABranchWithNoGroupCopyDrawsNoStep(t *testing.T) {
 		t.Fatalf("the branch draws one row with no step and no state, and yours holds %+v", said)
 	}
 }
+
+// A branch holding a place with no ticket behind it draws its branch row and no todo row beside it. [[spec/tickets/the-index-reads-standing-branches]]
+func TestAPlacedBranchWithNoTicketDrawsNoTodoRow(t *testing.T) {
+	rows := rowsBy(t, map[string]any{
+		PlacesPort:   map[string]string{"a-branch": "2"},
+		BranchesPort: []ticket.Branch{{Name: "a-branch"}},
+	})
+	if row := rows["a-branch"]; len(rows) != 1 || row.Kind != "group" || row.Todo {
+		t.Fatalf("the branch draws one group row, and the rows read %+v", rows)
+	}
+}

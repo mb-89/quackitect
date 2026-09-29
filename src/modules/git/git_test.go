@@ -45,3 +45,12 @@ func TestTheTipsStandUnderTheirLocalPort(t *testing.T) {
 		t.Fatalf("%s reads %#v before any commit", Port, index.Read(Port))
 	}
 }
+
+// A batch answers a payload an ask and an empty text for a missing object, and a payload holding a newline stays whole. [[spec/design_output/work#the-listing-reads-git-once]]
+func TestTheBatchReadsEachPayloadAndNothingForAMissingObject(t *testing.T) {
+	said := "aaa blob 6\nab\ncd\n\nmain:spec/tickets/gone.md missing\nbbb blob 3\nxyz\n"
+	got := framed([]byte(said), 3)
+	if len(got) != 3 || got[0] != "ab\ncd\n" || got[1] != "" || got[2] != "xyz" {
+		t.Fatalf("the batch reads %q", got)
+	}
+}

@@ -1,6 +1,6 @@
-// The work module's rows: one a ticket, with its place and its flags, and one
-// a placed todo no ticket carries, ported from rowOfTicket in
-// src/scripts/work-answer.js. It reads no git.
+// The work module's rows: one a ticket, with its place and its flags, one a
+// standing branch, and one a placed todo no ticket carries, ported from
+// answerOf in src/scripts/work-answer.js. The git module reads the branches.
 // [[spec/tickets/open-tasks-come-from-work]]
 package work
 
@@ -104,13 +104,27 @@ func rowsOf(in rowsIn) []Row {
 	for _, one := range in.Tickets {
 		state[one.Name] = one.State
 	}
+	// A branch row stands for its group, so a ticket under that group rides the branch and draws no row of its own. [[spec/design_output/work#one-reading-answers-git]]
+	branched := map[string]bool{}
+	for _, one := range in.Branches {
+		branched[one.Name] = true
+	}
 	out := []Row{}
+	for _, one := range in.Branches {
+		out = append(out, branchRow(one, in.Places[one.Name], cloud[one.Name]))
+		for _, child := range one.Children {
+			out = append(out, rowOf(child, in.Places[child.Name], cloud[child.Name], waits(child, state)))
+		}
+	}
 	for _, one := range in.Tickets {
+		if branched[one.Name] || branched[one.Group] {
+			continue
+		}
 		out = append(out, rowOf(one, in.Places[one.Name], cloud[one.Name], waits(one, state)))
 	}
 	loose := []string{}
 	for name := range in.Places {
-		if _, stands := state[name]; !stands {
+		if _, stands := state[name]; !stands && !branched[name] {
 			loose = append(loose, name)
 		}
 	}
@@ -131,6 +145,15 @@ func rowOf(one ticket.Ticket, place string, cloud, waits bool) Row {
 		Name: one.Name, Kind: kind, State: stateAt(one.State, place), Step: one.Step, Progress: one.Progress,
 		Group: one.Group, Urgent: one.Urgent, Person: one.Person, Held: one.Held, Waits: waits,
 		Todo: one.Todo, Says: one.Says, Queue: place, Cloud: cloud,
+	}
+}
+
+// A branch's row, the way answerOf draws it: no state, and the fields of its group's copy on the tip where it holds one. [[spec/design_output/work#one-reading-answers-git]]
+func branchRow(one ticket.Branch, place string, cloud bool) Row {
+	group := one.Ticket
+	return Row{
+		Name: one.Name, Kind: groupKind, Step: group.Step, Progress: group.Progress, Urgent: group.Urgent,
+		Person: group.Person, Held: group.Held, Says: group.Says, Queue: place, Cloud: cloud,
 	}
 }
 

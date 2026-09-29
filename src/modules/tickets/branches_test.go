@@ -124,3 +124,17 @@ func TestABranchWhoseTicketIsNoGroupCarriesNoGroupCopy(t *testing.T) {
 		t.Fatalf("the branch's own ticket still speaks for its name, and reads %+v", rows["one-ticket"])
 	}
 }
+
+// A child standing on the branch of a marked group alone stands on the cloud, as cloudsIn in src/scripts/work-answer.js reads the folded list. [[spec/tickets/the-queue-reads-the-marker]]
+func TestTheCloudReadsATipChildOfAMarkedGroup(t *testing.T) {
+	marked := "---\nkind: [[ticket]]\nstate: open\ncloud: true\nprocess: [[spec/processes/group]]\n---\n\n# Ask\n\nMarked.\n"
+	files := map[string]any{"files/spec/tickets/the-group.md": file(marked)}
+	tips := []ticket.Tip{{Name: "the-group", Trunk: marked, Files: []ticket.File{
+		{Path: "spec/tickets/the-group.md", Text: marked},
+		{Path: "spec/tickets/own-child.md", Text: child("the-group", "open")},
+	}}}
+	said, _ := tipsRead(t, CloudPort, files, tips).([]string)
+	if len(said) != 2 || said[0] != "own-child" || said[1] != "the-group" {
+		t.Fatalf("the marked group and its child on the tip stand on the cloud, and the cloud reads %v", said)
+	}
+}

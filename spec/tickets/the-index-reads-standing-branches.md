@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -158,6 +158,15 @@ record:
         hash: a7a51b4ff7583ad2
         size: 1371
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d857b1c19ed5 · claude-code-remote
+    hash_before: ce82f35d1f8aa4a77831fa6a22f95b338868552c
+    hash_after: ce82f35d1f8aa4a77831fa6a22f95b338868552c
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -329,14 +338,19 @@ The approach answers the ask, with the two corrections `design/tests-red` names 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/git src/modules/tickets src/modules/work src/quack src/ticket spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the old test wirings the new ports force
+- the git door has `FakeGit`, held to a real clone by `TestGitKeepsItsContract`
+- each new function points at `spec/tickets/the-index-reads-standing-branches` or the design output it ports
+- the refs and the ticket folder stand once in `src/modules/git/git.go`, and the merged rule once in `merged`
 
 ## tests-green
 

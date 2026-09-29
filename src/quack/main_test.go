@@ -232,7 +232,7 @@ func awaits(t *testing.T, want map[string]string) {
 func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}},
-		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.tips": tipsName},
+		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.tips": tipsName, "tickets.branched": "tickets/branched"},
 	}
 	c := q.New()
 	files := q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
@@ -259,7 +259,7 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}},
 		Wires: map[string]string{
-			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud", "tickets.tips": tipsName,
+			"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.cloud": "tickets/cloud", "tickets.tips": tipsName, "tickets.branched": "tickets/branched",
 			"queue.rows": "tickets/all", "queue.plan": "files/.se/.runtime/plan.json", "queue.cloud": "tickets/cloud",
 			"queue.stood": q.BuiltIn, "queue.minute": "clock/minute",
 		},
@@ -277,7 +277,7 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 	if _, err := s.Commit(0, files, map[string]any{"files/spec/tickets/one.md": q.Content{Hash: "h", Text: text}}); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"tickets/all", "tickets/cloud", "queue/places"} {
+	for _, name := range []string{"tickets/all", "tickets/branched", "tickets/cloud", "queue/places"} {
 		if err := s.Run(name); err != nil {
 			t.Fatalf("the run of %s answers %v", name, err)
 		}
@@ -324,7 +324,7 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 	if _, err := s.Commit(0, files, tree); err != nil {
 		t.Fatal(err)
 	}
-	for _, name := range []string{"tickets/all", "tickets/cloud", "tickets/branched", "tickets/branches", "queue/places", "work/open-tasks"} {
+	for _, name := range []string{"tickets/all", "tickets/branched", "tickets/branches", "tickets/cloud", "queue/places", "work/open-tasks"} {
 		if err := s.Run(name); err != nil {
 			t.Fatalf("the run of %s answers %v", name, err)
 		}
