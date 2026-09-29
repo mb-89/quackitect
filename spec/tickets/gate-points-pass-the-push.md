@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+step: implement/tests-green
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -156,6 +156,15 @@ record:
         hash: 5efa799e33716409
         size: 712
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: 3b51a0a8855d2e95498ea0e9daabaf1221dd1f47
+    hash_after: b5a03253c7ee7bc22cd76229b5e4742a6390e9ac
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ The approach answers the ask, and a red case decides each line: the push door ca
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/pull-writes.js .claude/skills/level0/lib/todo.js spec/schemas/ticket.schema.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the ask needs, plus the schema the gate named
+- no door: the change reads and writes ticket text alone
+- a comment names the approach in todo.js, and pull-writes.js carries the minted comment
+- the point field stands once, as POINT and GATE_POINT in todo.js, and pull-writes.js imports both
 
 ## tests-green
 
