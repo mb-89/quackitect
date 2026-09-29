@@ -265,9 +265,9 @@ it:
 | the term | what it does | its weight |
 |---|---|---|
 | the mark | puts a ticket over every unmarked one | none, because it overrides |
-| what waits under it | raises it, down the whole chain | `work.blockScore` |
-| how long it stands | raises it, so nothing sits forever | `work.dayScore` |
-| how often a hand-back comes back refused | raises it | `work.failScore` |
+| what waits under it | raises it, down the whole chain | `queue.block` |
+| how long it stands | raises it, so nothing sits forever | `queue.day` |
+| how often a hand-back comes back refused | raises it | `queue.fail` |
 
 The walk reaches the whole chain, so a ticket blocking one that blocks ten
 counts eleven. A ticket waiting on one still open leaves the queue before the

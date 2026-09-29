@@ -7,6 +7,7 @@ package git
 import (
 	"bytes"
 	"encoding/json"
+	"os"
 	"os/exec"
 	"path"
 	"sort"
@@ -23,6 +24,7 @@ import (
 const (
 	Port      = "tips"
 	TrunkPort = "trunk"
+	StoodPort = "stood"
 )
 
 // The folder a public ticket stands directly under, and the ending it carries, which TICKETS in src/engine/group.js names and a Go module spells again. [[spec/tickets/the-index-reads-standing-branches]]
@@ -44,6 +46,12 @@ const (
 	sizeAt       = 2
 )
 
+// The log writes each second in decimal, and a second fits an int64. [[spec/tickets/verbs-queue-order]]
+const (
+	secondsBase = 10
+	secondsBits = 64
+)
+
 // The span between two reads of the refs, so a fetch reaches the index before a person reads the queue. [[spec/tickets/the-index-reads-standing-branches]]
 const span = 5 * time.Second
 
@@ -51,6 +59,7 @@ const span = 5 * time.Second
 type Git interface {
 	Tips() ([]ticket.Tip, error)
 	Trunk() ([]ticket.File, error)
+	Stood() (map[string]int64, error)
 }
 
 // The refs as the last read found them, and the tips read off them, so a read over unmoved refs spawns one git. [[spec/tickets/the-index-reads-standing-branches]]
@@ -60,6 +69,8 @@ type repo struct {
 	last    []ticket.Tip
 	trunkAt string
 	trunk   []ticket.File
+	headAt  string
+	stood   map[string]int64
 }
 
 // The real reader over the repository at root. [[spec/design_output/model#its-file-carries-its-fake]]
@@ -102,6 +113,55 @@ func (one *repo) Trunk() ([]ticket.File, error) {
 	}
 	one.trunkAt, one.trunk = commit, files
 	return files, nil
+}
+
+// The second each path under the ticket folder came in on the checkout's history, off one git log, the reading stoodHere in src/scripts/pull-queue.js holds. It reads again where the checkout moves. [[spec/tickets/verbs-queue-order]]
+func (one *repo) Stood() (map[string]int64, error) {
+	head, err := one.run(nil, "rev-parse", "--verify", "--quiet", "HEAD")
+	if err != nil {
+		return map[string]int64{}, nil
+	}
+	// A fetch that deepens a shallow clone moves no HEAD, so the shallow file's content keys the reading beside it. [[spec/tickets/verbs-queue-order]]
+	commit := strings.TrimSpace(head) + " " + one.shallow()
+	if one.stood != nil && commit == one.headAt {
+		return one.stood, nil
+	}
+	said, err := one.run(nil, "log", "--diff-filter=A", "--format=%ct", "--name-only", "--", strings.TrimSuffix(ticketsFolder, "/"))
+	if err != nil {
+		return nil, err
+	}
+	one.headAt, one.stood = commit, stoodIn(said)
+	return one.stood, nil
+}
+
+// The boundary commits of a shallow clone, and nothing for a whole history. [[spec/tickets/verbs-queue-order]]
+func (one *repo) shallow() string {
+	at, err := one.run(nil, "rev-parse", "--path-format=absolute", "--git-path", "shallow")
+	if err != nil {
+		return ""
+	}
+	body, _ := os.ReadFile(strings.TrimSpace(at))
+	return string(body)
+}
+
+// The log names a second, then the paths that commit adds, newest first, so the first second a path meets is its newest add. [[spec/design_output/pull#the-queue-is-a-score]]
+func stoodIn(said string) map[string]int64 {
+	out := map[string]int64{}
+	var when int64
+	for _, row := range strings.Split(said, "\n") {
+		line := strings.TrimSpace(row)
+		if line == "" {
+			continue
+		}
+		if second, err := strconv.ParseInt(line, secondsBase, secondsBits); err == nil {
+			when = second
+			continue
+		}
+		if _, stands := out[line]; !stands {
+			out[line] = when
+		}
+	}
+	return out
 }
 
 // Trunk's commit, and each work branch as its name and its commit, in the order git lists them. [[spec/tickets/the-index-reads-standing-branches]]
@@ -206,10 +266,33 @@ type FakeGit struct {
 	mu       sync.Mutex
 	branches map[string]map[string]string
 	trunk    map[string]string
+	stood    map[string]int64
 }
 
 func NewFake() *FakeGit {
-	return &FakeGit{branches: map[string]map[string]string{}, trunk: map[string]string{}}
+	return &FakeGit{branches: map[string]map[string]string{}, trunk: map[string]string{}, stood: map[string]int64{}}
+}
+
+// Adds these paths on the checkout's history at the second given, so a path under the ticket folder came in then. [[spec/tickets/verbs-queue-order]]
+func (one *FakeGit) Add(second int64, paths ...string) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	for _, at := range paths {
+		if strings.HasPrefix(at, ticketsFolder) {
+			one.stood[at] = second
+		}
+	}
+}
+
+// [[spec/tickets/verbs-queue-order]]
+func (one *FakeGit) Stood() (map[string]int64, error) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	out := make(map[string]int64, len(one.stood))
+	for at, second := range one.stood {
+		out[at] = second
+	}
+	return out, nil
 }
 
 // Stands the branch work/<name> on the remote, its tip holding these files alone. [[spec/design_output/model#io-modules-and-their-fakes]]
@@ -287,6 +370,7 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
 		q.OutIn(c, Port, []ticket.Tip{}, q.Doc("every work branch standing on origin, with the ticket files on its tip and trunk's copy of its group ticket"), q.IO()),
 		q.OutIn(c, TrunkPort, []ticket.File{}, q.Doc("the ticket files on trunk as origin holds it"), q.IO()),
+		q.OutIn(c, StoodPort, map[string]int64{}, q.Doc("the second each path under the ticket folder came in on the checkout's history"), q.IO()),
 	)
 }
 
@@ -302,8 +386,12 @@ func Start(from Git, every func(time.Duration, func(time.Time)) func(), commit f
 		if err != nil {
 			trunk = []ticket.File{}
 		}
+		stood, err := from.Stood()
+		if err != nil {
+			stood = map[string]int64{}
+		}
 		moved := map[string]any{}
-		for port, value := range map[string]any{Port: tips, TrunkPort: trunk} {
+		for port, value := range map[string]any{Port: tips, TrunkPort: trunk, StoodPort: stood} {
 			if key, _ := json.Marshal(value); string(key) != last[port] {
 				last[port] = string(key)
 				moved[port] = value

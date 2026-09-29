@@ -23,6 +23,7 @@ import (
 const (
 	tipsName  = "git/tips"
 	trunkName = "git/trunk"
+	stoodName = "git/stood"
 )
 
 func noTips(c *q.Catalog) {

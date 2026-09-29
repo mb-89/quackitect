@@ -7,6 +7,7 @@
 package git
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -21,6 +22,7 @@ type remote struct {
 	push func(name string, files map[string]string)
 	land func(files map[string]string)
 	drop func(name string)
+	add  func(second int64, files map[string]string)
 }
 
 func gitSuite(t *testing.T, one Git, hands remote) {
@@ -66,12 +68,31 @@ func gitSuite(t *testing.T, one Git, hands remote) {
 	if said := tips(); len(said) != 1 || said[0].Name != "the-group" {
 		t.Fatalf("a deleted branch leaves, and the remote answers %+v", said)
 	}
+	stoodSuite(t, one, hands)
+}
+
+// The checkout's history answers the second each path under the ticket folder came in, and a path outside it stands nowhere. [[spec/tickets/verbs-queue-order]]
+func stoodSuite(t *testing.T, one Git, hands remote) {
+	t.Helper()
+	if said, err := one.Stood(); err != nil || len(said) != 0 {
+		t.Fatalf("a checkout adding no ticket answers %v, %v", said, err)
+	}
+	hands.add(1_700_000_000, map[string]string{"spec/tickets/first.md": "one\n", "spec/other.md": "outside\n"})
+	hands.add(1_700_086_400, map[string]string{"spec/tickets/second.md": "two\n"})
+	want := map[string]int64{"spec/tickets/first.md": 1_700_000_000, "spec/tickets/second.md": 1_700_086_400}
+	if said, err := one.Stood(); err != nil || !reflect.DeepEqual(said, want) {
+		t.Fatalf("the checkout answers %v, %v, and wants %v", said, err, want)
+	}
 }
 
 func TestGitKeepsItsContract(t *testing.T) {
 	t.Run("fake", func(t *testing.T) {
 		fake := NewFake()
-		gitSuite(t, fake, remote{push: fake.Push, land: fake.Land, drop: fake.Drop})
+		gitSuite(t, fake, remote{push: fake.Push, land: fake.Land, drop: fake.Drop, add: func(second int64, files map[string]string) {
+			for at := range files {
+				fake.Add(second, at)
+			}
+		}})
 	})
 	t.Run("real", func(t *testing.T) {
 		origin, local := scratch(t)
@@ -91,8 +112,31 @@ func TestGitKeepsItsContract(t *testing.T) {
 				run(t, origin, "branch", "-q", "-D", "work/"+name)
 				run(t, local, "fetch", "-q", "--prune", "origin")
 			},
+			add: func(second int64, files map[string]string) {
+				t.Setenv("GIT_COMMITTER_DATE", fmt.Sprintf("@%d +0000", second))
+				committed(t, local, files)
+			},
 		})
 	})
+}
+
+// A shallow clone reads its ages again once a fetch deepens it, though HEAD stands still. [[spec/tickets/verbs-queue-order]]
+func TestADeepenedCloneReadsItsAgesAgain(t *testing.T) {
+	origin, _ := scratch(t)
+	t.Setenv("GIT_COMMITTER_DATE", "@1700000000 +0000")
+	committed(t, origin, map[string]string{"spec/tickets/old.md": "old\n"})
+	t.Setenv("GIT_COMMITTER_DATE", "@1700086400 +0000")
+	committed(t, origin, map[string]string{"spec/tickets/new.md": "new\n"})
+	shallow := filepath.Join(t.TempDir(), "shallow")
+	run(t, ".", "clone", "-q", "--depth", "1", "file://"+origin, shallow)
+	one := New(shallow)
+	if said, _ := one.Stood(); said["spec/tickets/old.md"] != 1_700_086_400 {
+		t.Fatalf("a shallow clone dates every file to its boundary, and answers %v", said)
+	}
+	run(t, shallow, "fetch", "-q", "--unshallow")
+	if said, _ := one.Stood(); said["spec/tickets/old.md"] != 1_700_000_000 {
+		t.Fatalf("the deepened clone answers %v, and wants old.md at its own second", said)
+	}
 }
 
 // A repository standing as origin, and a clone of it. [[spec/design_output/model#the-fake-keeps-a-contract]]

@@ -14,10 +14,13 @@
     "stepsBeforeSplit": 3,
     "personSigns": false,
     "retroReaders": 4,
-    "retroCap": 8,
-    "blockScore": 10,
-    "dayScore": 1,
-    "failScore": 5
+    "retroCap": 8
+  },
+  "queue": {
+    "comment": "The weights of the queue's score. spec/design_output/pull.md, chapter The queue is a score, says the rest.",
+    "block": 10,
+    "day": 1,
+    "fail": 5
   },
   "restated": {
     "comment": "The runs the restated rules refuse. A run is a count of words two places share, and spec/design_output/lsp.md says what the rules reading them weigh.",

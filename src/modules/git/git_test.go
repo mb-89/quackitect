@@ -77,3 +77,11 @@ func TestTheBatchReadsEachPayloadAndNothingForAMissingObject(t *testing.T) {
 		t.Fatalf("the batch reads %q", got)
 	}
 }
+
+// The log lists the newest commit first, so a path added twice keeps its newest second, and a blank line reads as nothing. [[spec/tickets/verbs-queue-order]]
+func TestTheAgesKeepEachPathsNewestAdd(t *testing.T) {
+	said := stoodIn("200\n\nspec/tickets/again.md\n100\n\nspec/tickets/again.md\nspec/tickets/once.md\n")
+	if len(said) != 2 || said["spec/tickets/again.md"] != 200 || said["spec/tickets/once.md"] != 100 {
+		t.Fatalf("the ages read %v", said)
+	}
+}
