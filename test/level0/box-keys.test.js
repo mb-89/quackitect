@@ -25,3 +25,20 @@ test("a root with no drive keeps its case", () => {
   const boxes = boxesOf("/tree", doors());
   assert.notEqual(boxes("/tree"), boxes("/Tree"));
 });
+
+// [[spec/tickets/readers-name-one-mode-source]]
+test("a box holds the mode of each slice, read off the tracked config at the ask", () => {
+  const disk = fakeDisk({
+    "/tree/spec/config/level0.json": JSON.stringify({
+      migration: { prose: "new", log: "old" },
+    }),
+  });
+  const box = boxesOf("/tree", { disk, clock: fakeClock() })("/tree");
+  assert.equal(box.slices.prose, "new");
+  assert.equal(box.slices.log, "old");
+  disk.write(
+    "/tree/spec/config/level0.json",
+    JSON.stringify({ migration: { prose: "old" } }),
+  );
+  assert.equal(box.slices.prose, "old", "a change reaches the next ask");
+});

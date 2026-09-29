@@ -11,11 +11,10 @@ import {
   warningsStood,
 } from "../../src/scripts/cli-read.js";
 
-// The prose shadow reads its slice through the config and writes its rows through the log. [[spec/tickets/prose-shadow-hooks-reads-text]]
-test("the check's own reading hands the prose shadow the config and the log", async () => {
+// The lint's prose reader asks its slice's mode off the doors it runs on. [[spec/tickets/read-topics-switch-over]]
+test("the check's own reading carries the slices the prose reader asks", async () => {
   const doors = await findingsDoors();
-  assert.equal(typeof doors.config.ask, "function");
-  assert.equal(typeof doors.log.say, "function");
+  assert.equal(typeof doors.slices?.prose, "string");
 });
 
 // A warning lands under every door, and the stamp carries the list. [[spec/design_output/config#the-engine-controls]]

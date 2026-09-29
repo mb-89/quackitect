@@ -21,8 +21,8 @@ import {
   RULE as GRID,
   lineOf,
 } from "../extension/lib/grid.js";
+import { answerOf, keptOf, PAST, quackAt, readsNew } from "../scripts/quack-topic.js";
 import { assemble } from "../scripts/styles.js";
-import { PAST, quackAt, shadowProse } from "./prose-shadow.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
@@ -70,8 +70,6 @@ export async function findingsOver(it, asked) {
   // Vale reads a file the walk passes, and the tense reader alone reads its rows. [[spec/design_output/level0#the-tense-reader]]
   const rest = readThrough(it, [...rows.values()].flat(), docs);
   found.push(...rest.map((one) => from(one, FROM.vale)));
-  // One quack process reads every document of the run. [[spec/tickets/prose-shadow-hooks-reads-text]]
-  await shadowOver(it, docs);
   // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
   for (const file of walkOver(it, where, SIZED)) {
     for (const one of codeFaults(it.disk.read(file), showOf(it, file), it.ceilings)) {
@@ -156,12 +154,10 @@ export function voiceOver(it, path, text, span = {}) {
   const found = readsText(it, path, text, fromJson(ran.stdout), docs).filter(
     (fault) => REFUSES.has(fault.severity) && fault.line >= first && fault.line <= last,
   );
-  // The verb reads its answer now, and the shadow row lands behind it. [[spec/tickets/prose-shadow-hooks-reads-text]]
-  shadowOver(it, docs);
   return found;
 }
 
-// The doors the prose shadow takes off a caller's own: its config, its log and its processes. A caller naming no config or no log runs no shadow. [[spec/tickets/prose-shadow-hooks-reads-text]]
+// The doors a shadow takes off a caller's own: its config, its log and its processes. A caller naming no config or no log runs no shadow. [[spec/tickets/prose-shadow-hooks-reads-text]]
 export function shadowDoorsOf(it) {
   if (!it?.config?.ask || !it?.log?.say || !it?.proc?.run) return null;
   const root = it.method ?? it.root;
@@ -175,20 +171,6 @@ export function shadowDoorsOf(it) {
   };
 }
 
-// The past veto's documents meet Go's in shadow, and a fault there leaves the reading as it stands. [[spec/tickets/prose-shadow-hooks-reads-text]]
-async function shadowOver(it, docs) {
-  try {
-    await shadowProse(
-      shadowDoorsOf(it),
-      docs,
-      docs.map((one) => one.kept),
-      PAST,
-    );
-  } catch {
-    return;
-  }
-}
-
 // The Vale call the lint and the pull share, on the config the assembly writes. A caller adds the paths or the stdin path. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export function valeArgvOf(it) {
   return [it.vale, `--config=${configOf(it)}`, "--output=JSON", "--no-exit"];
@@ -196,7 +178,10 @@ export function valeArgvOf(it) {
 
 // One file's reading past Vale: the tense reader over Vale's rows, then every marker naming no reason. The lint and the pull both read a file here. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export function readsText(it, file, text, rows, docs) {
-  const kept = withoutFalsePast(text, rows);
+  // The Go vetoes answer where the prose slice reads new. [[spec/tickets/readers-take-the-go-topics]]
+  const kept = readsNew(it, "prose")
+    ? answerOf(keptOf(it, text, rows, PAST), "prose")
+    : withoutFalsePast(text, rows);
   docs?.push({ file: showOf(it, file), text, found: rows, kept });
   return [
     ...kept.map((one) => from(one, FROM.vale)),

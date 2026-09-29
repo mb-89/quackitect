@@ -9,8 +9,7 @@ import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { withContext, withoutFalsePast } from "../engine/tense.js";
-import { asksText } from "./config.js";
-import { ALL, quackAt, shadowProse } from "./prose-shadow.js";
+import { ALL, answerOf, keptOf, readsNew } from "../scripts/quack-topic.js";
 import { proseFaults } from "./write.js";
 
 const nlp = winkNLP(model);
@@ -73,6 +72,10 @@ export async function readsDraft(ask, box) {
 const said = (text) => ({ result: { result: text } });
 
 export function readsProse(box, text, found) {
+  // The Go vetoes answer where the prose slice reads new. [[spec/tickets/readers-take-the-go-topics]]
+  if (readsNew(box, "prose")) {
+    return withContext(text, answerOf(keptOf(box, text, found, ALL), "prose"));
+  }
   const caps = capsOf(box);
   let kept = withoutFalsePast(text, found);
   kept = withoutFalseLength(text, kept, caps);
@@ -84,32 +87,7 @@ export function readsProse(box, text, found) {
       `the prose reader lets ${found.length - kept.length} finding(s) stand`,
     );
   }
-  // The door reads its answer now, and the shadow row lands behind it. [[spec/tickets/prose-shadow-hooks-reads-text]]
-  shadowDraft(box, text, found, kept);
   return withContext(text, kept);
-}
-
-// One quack process reads the draft beside wink, and a fault there leaves the answer as it stands. [[spec/tickets/prose-shadow-hooks-reads-text]]
-async function shadowDraft(box, text, found, kept) {
-  if (!box?.proc?.run || !box.log?.say || !box.disk) return;
-  const file = String(found?.[0]?.file ?? "");
-  try {
-    // The server answers others while quack runs, so the shadow starts it where the door can. [[spec/tickets/prose-shadow-spawns-off-thread]]
-    const started = box.proc.start
-      ? { run: (argv, init) => box.proc.start(argv, init) }
-      : box.proc;
-    const doors = {
-      settings: { ask: async (key) => asksText(box, key) },
-      files: box.disk,
-      proc: started,
-      log: box.log,
-      root: box.method,
-      binary: quackAt(box.disk, join, box.method),
-    };
-    await shadowProse(doors, [{ file, text, found: found ?? [] }], [kept], ALL);
-  } catch {
-    return;
-  }
 }
 
 export function withoutFalseLength(text, found, caps) {

@@ -413,7 +413,9 @@ test("every forced copy of the session file says what the hand module says", () 
 // [[spec/design_output/level0#a-name-meets-the-cap]]
 test("a tracked name past the cap is refused", () => {
   const long = Array.from({ length: words + 1 }, (_, i) => `word${i}`).join("-");
-  const found = nameHoldsTheWords(fakeTree({}, [`src/${long}.js`]));
+  const found = nameHoldsTheWords(
+    fakeTree({ [`src/${long}.js`]: "export {};\n" }, [`src/${long}.js`]),
+  );
 
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "NameHoldsTheWords");

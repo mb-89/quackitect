@@ -21,3 +21,16 @@ test("the doors carry the process id and the platform, as the listen reads the r
   assert.equal(it.pid, process.pid);
   assert.equal(it.windows, process.platform === "win32");
 });
+
+// [[spec/tickets/readers-name-one-mode-source]]
+test("the doors carry the mode of each slice a reader takes a Go topic for", () => {
+  for (const slice of ["config", "log", "guidance", "check", "prose"]) {
+    assert.equal(it.slices[slice], said.migration[slice], `slices.${slice}`);
+  }
+});
+
+// [[spec/tickets/readers-name-one-mode-source]]
+test("the doors name the slices the bridge config names", async () => {
+  const { SLICES } = await import("../../src/bridge/config.js");
+  assert.deepEqual(Object.keys(it.slices), SLICES);
+});

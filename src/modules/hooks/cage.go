@@ -23,7 +23,7 @@ const (
 	HoldWord   = "hold"
 )
 
-// The row kinds the replay reads and writes, the slice it names, the level a shadow row takes, and the stamp the JS clock writes. src/doors/log.js owns the hook row, and src/scripts/log-shadow.js the shadow row. [[spec/tickets/cage-rules-replay-session-logs]]
+// The row kinds the replay reads and writes, the slice it names, the level a shadow row takes, and the stamp the JS clock writes. src/doors/log.js owns the hook row, and src/scripts/needs-shadow.js writes the shadow row on the same fields. [[spec/tickets/cage-rules-replay-session-logs]]
 const (
 	hookKind    = "hook"
 	shadowKind  = "shadow"
@@ -161,7 +161,7 @@ func (d *Door) shadows(post Post, said Answer) {
 	_ = d.from.Shadow(row)
 }
 
-// The shadow row an Apart writes, on the fields src/scripts/log-shadow.js writes, so ./RUNME.sh log --kind shadow names it. [[spec/tickets/cage-rules-replay-session-logs]]
+// The shadow row an Apart writes, on the fields src/scripts/needs-shadow.js writes, so ./RUNME.sh log --kind shadow names it. [[spec/tickets/cage-rules-replay-session-logs]]
 func (d *Door) ShadowRowOf(one Apart) map[string]any {
 	aim := strings.TrimSpace(one.Event + " " + one.Tool)
 	row := map[string]any{

@@ -3,7 +3,9 @@
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { frontOf } from "../../src/engine/group.js";
 import {
@@ -168,4 +170,23 @@ test("a hand-out on a tagged leaf prints each note its tags resolve as a section
     /spec\/guidance\/code/,
     "an untagged leaf resolves none",
   );
+});
+
+// [[spec/tickets/readers-take-the-go-topics]]
+test("a pull prints the notes quack guidance answers where the guidance slice reads new", () => {
+  const { it } = doors({}, {}, { root: ROOT });
+  const quack = join(ROOT, BIN);
+  it.disk.write(quack, "");
+  it.disk.write(
+    join(ROOT, "spec/guidance/other.md"),
+    "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Read other.\n",
+  );
+  it.slices = { guidance: "new" };
+  it.proc = fakeProc({
+    [`${quack} guidance`]: {
+      stdout: JSON.stringify({ ":gate": ["spec/guidance/other"] }),
+    },
+  });
+  const one = { name: "a-child", text: GATED, front: frontOf(GATED) };
+  assert.match(workAnswer(it, one, leafOf(frontOf(GATED), "gate")), /Read other/);
 });

@@ -99,7 +99,8 @@ export function treeOf(it) {
         .out.split(/\r?\n/)
         .map((one) => one.trim())
         .filter(Boolean)
-        .filter((one) => !isDraft(one));
+        .filter((one) => !isDraft(one))
+        .filter((one) => it.disk.exists(at(one)));
       return held;
     },
   };
@@ -389,11 +390,19 @@ export function installerHoldsTheNames(tree) {
   const rule = "InstallerHoldsTheNames";
   const out = [];
   const lists = { MOVED, RENAMED, LOGGED };
-  const said = loopNames(tree.paths().includes(INSTALL) ? tree.read(INSTALL) : "", lists);
+  const said = loopNames(
+    tree.paths().includes(INSTALL) ? tree.read(INSTALL) : "",
+    lists,
+  );
 
   for (const line of said.unmarked) {
     out.push(
-      fault(rule, INSTALL, `This loop names no list ${FOLDERS} holds. Name one above it.`, line),
+      fault(
+        rule,
+        INSTALL,
+        `This loop names no list ${FOLDERS} holds. Name one above it.`,
+        line,
+      ),
     );
   }
   for (const [name, list] of Object.entries(lists)) {
@@ -404,15 +413,30 @@ export function installerHoldsTheNames(tree) {
 
 // A name one side holds alone stands refused, unless APART names that side with its reason. [[spec/design_input/the-runtime-files-stand-apart]]
 function standingApart(rule, name, list, loop) {
-  if (!loop) return [fault(rule, INSTALL, `${name} stands in ${FOLDERS}, and no loop here moves it.`)];
+  if (!loop)
+    return [
+      fault(rule, INSTALL, `${name} stands in ${FOLDERS}, and no loop here moves it.`),
+    ];
   const out = [];
   for (const one of list) {
     if (loop.includes(one) || APART[one]?.side === "loop") continue;
-    out.push(fault(rule, INSTALL, `${name} holds ${one}, and this installer moves it nowhere.`));
+    out.push(
+      fault(
+        rule,
+        INSTALL,
+        `${name} holds ${one}, and this installer moves it nowhere.`,
+      ),
+    );
   }
   for (const one of loop) {
     if (list.includes(one) || APART[one]?.side === "rule") continue;
-    out.push(fault(rule, INSTALL, `This installer moves ${one}, and ${name} holds it nowhere.`));
+    out.push(
+      fault(
+        rule,
+        INSTALL,
+        `This installer moves ${one}, and ${name} holds it nowhere.`,
+      ),
+    );
   }
   return out;
 }
