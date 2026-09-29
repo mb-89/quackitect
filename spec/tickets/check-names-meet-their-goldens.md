@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: d6c6458a87f2810387c06d82627138959c9781b4
+    hash_after: d6c6458a87f2810387c06d82627138959c9781b4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s); green, src/lsp passes; green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "src/scripts/guidance-shadow.js:12:1: CodeComment: Code carries no comment here. Write a header of at most five lines at "
+    inputs:
+      - name: design/tests-red
+        hash: 09300e00ea9ba763
+        size: 1172
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -301,26 +324,33 @@ The twin list stands in check.Twins, and src/scripts/check-twins.js spells it ag
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/check-twins.test.js src/lsp src/modules/check
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every twin of a JavaScript check and its Go port now stands as a check name on the index, loaded by the check instance of the wiring, and each holds an empty list until phase 7 moves the rules in. TestTwinGoldens runs both sides of every twin over the tracked tree and compares the rows each side reports alone with a golden file under src/modules/check/testdata, so the owner reads each difference at the merge. Run go test ./src/lsp -run TestTwinGoldens -twins to write the goldens again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the check module, the twin walk, its goldens and the wiring, and nothing past them.
+The node case runs over a fake disk and a fake git, and the parsers read captured tool output.
+The headers of src/modules/check/check.go and src/lsp/twins_test.go name the approach.
+The twin list stands in check.Twins, which the golden test reads.
 
 # accept
 
