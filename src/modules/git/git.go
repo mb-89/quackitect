@@ -46,6 +46,12 @@ const (
 	sizeAt       = 2
 )
 
+// The log writes each second in decimal, and a second fits an int64. [[spec/tickets/verbs-queue-order]]
+const (
+	secondsBase = 10
+	secondsBits = 64
+)
+
 // The span between two reads of the refs, so a fetch reaches the index before a person reads the queue. [[spec/tickets/the-index-reads-standing-branches]]
 const span = 5 * time.Second
 
@@ -147,7 +153,7 @@ func stoodIn(said string) map[string]int64 {
 		if line == "" {
 			continue
 		}
-		if second, err := strconv.ParseInt(line, 10, 64); err == nil {
+		if second, err := strconv.ParseInt(line, secondsBase, secondsBits); err == nil {
 			when = second
 			continue
 		}
