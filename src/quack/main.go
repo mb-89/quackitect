@@ -22,6 +22,7 @@ import (
 	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
 	"quackitect/src/modules/hooks"
+	"quackitect/src/modules/mcp"
 	httpmodule "quackitect/src/modules/http"
 	manager "quackitect/src/modules/index"
 	logmodule "quackitect/src/modules/log"
@@ -71,6 +72,8 @@ var modules = map[string]ioModule{
 	// [[spec/tickets/the-hooks-door-lands]]
 	hooksModule: {registers: hooks.Registers},
 	"session":   {registers: session.Registers},
+	// [[spec/tickets/the-mcp-module-lands]]
+	mcpModule: {registers: mcp.Registers},
 	// [[spec/tickets/ticket-verbs-become-actions]]
 	"ticket":  {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
 	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
@@ -183,18 +186,26 @@ func main() {
 		os.Exit(routes(os.Stdout, os.Stderr, index.V1, os.Args[1:]))
 	}
 	as := manager.Registers(q.Main)
-	starts, hooked, err := wired()
+	starts, doors, err := wired()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	// The config module loads always, after the wiring, so it resolves every key the wiring declares. [[spec/design_output/model#the-config-module]]
 	config.Registers(q.Main)
-	index.Main(manages(as, hooked), starts...)
+	index.Main(manages(as, doors), starts...)
 }
 
 // The module type the wiring loads as hooks, whose door the manager's start opens. [[spec/tickets/the-hooks-door-lands]]
 const hooksModule = "hooks"
+
+// The module type the wiring loads as mcp, whose listener starts beside the hooks door. [[spec/tickets/the-mcp-module-lands]]
+const mcpModule = "mcp"
+
+// The instances whose listeners the manager's start opens: the hooks door, and the mcp server. [[spec/tickets/the-mcp-module-lands]]
+type doors struct {
+	hooks, mcp hooked
+}
 
 // The hooks instance the wiring loads: its writer, and the name each local name binds to. No instance leaves on false. [[spec/tickets/the-hooks-door-lands]]
 type hooked struct {
@@ -215,7 +226,7 @@ func hookedOf(w q.Wiring, hands map[string]q.Writer, module string) hooked {
 }
 
 // The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept, and the hooks door beside it where the wiring loads one. [[spec/design_output/model#the-index-manager]]
-func manages(as q.Writer, hook hooked) index.Manage {
+func manages(as q.Writer, open doors) index.Manage {
 	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
@@ -224,7 +235,7 @@ func manages(as q.Writer, hook hooked) index.Manage {
 		if err != nil {
 			return index.Managed{}, err
 		}
-		stop, err := listens(root, store, hook, served)
+		stop, err := listens(root, store, open, served)
 		if err != nil {
 			served.Stop()
 			return index.Managed{}, err
@@ -236,11 +247,52 @@ func manages(as q.Writer, hook hooked) index.Manage {
 	}
 }
 
-// Opens the hooks door over the manager's call and book, at the clock IO module's time, and answers the stop of both. The listener stands in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
-func listens(root string, store *q.Store, hook hooked, served manager.Served) (func(), error) {
-	if !hook.on {
-		return served.Stop, nil
+// Opens the hooks door and the mcp server the wiring loads, and answers the stop of each with the manager's. The listeners stand in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
+func listens(root string, store *q.Store, open doors, served manager.Served) (func(), error) {
+	halts := []func(){}
+	stop := func() {
+		for _, halt := range halts {
+			halt()
+		}
+		served.Stop()
 	}
+	if hook := open.hooks; hook.on {
+		halt, err := listensHooks(root, store, hook, served)
+		if err != nil {
+			return nil, err
+		}
+		halts = append(halts, halt)
+	}
+	if one := open.mcp; one.on {
+		halt, err := listensMCP(root, store, one, served)
+		if err != nil {
+			for _, halt := range halts {
+				halt()
+			}
+			return nil, err
+		}
+		halts = append(halts, halt)
+	}
+	return stop, nil
+}
+
+// Opens the mcp server over the manager's call, so a harness with no function hooks reaches every action. [[spec/tickets/the-mcp-module-lands]]
+func listensMCP(root string, store *q.Store, one hooked, served manager.Served) (func(), error) {
+	server, err := mcp.New(mcp.Outside{
+		Store: store, Bound: one.bound,
+		Call: func(name string, input any, caller string, wait time.Duration) (mcp.Called, error) {
+			said, err := served.Call(name, input, caller, wait)
+			return mcp.Called(said), err
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return mcp.Listen(root, server)
+}
+
+// Opens the hooks door over the manager's call and book, at the clock IO module's time. [[spec/tickets/hooks-listener-joins-io-process]]
+func listensHooks(root string, store *q.Store, hook hooked, served manager.Served) (func(), error) {
 	door := hooks.New(hooks.Outside{
 		Store: store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
@@ -249,14 +301,7 @@ func listens(root string, store *q.Store, hook hooked, served manager.Served) (f
 		},
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
 	})
-	halt, err := hooks.Listen(root, door)
-	if err != nil {
-		return nil, err
-	}
-	return func() {
-		halt()
-		served.Stop()
-	}, nil
+	return hooks.Listen(root, door)
 }
 
 // The book's operations as the hooks door reads them: the fraction done, and the time gone by to its end or to now. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -311,21 +356,21 @@ func (one opRows) All() ([]manager.Row, error) {
 }
 
 // The module instances of the wiring file, loaded into q.Main. A tree with no wiring file loads its vehicle's, and where neither stands the index runs none. [[spec/design_output/model#the-wiring-file]]
-func wired() ([]index.Start, hooked, error) {
+func wired() ([]index.Start, doors, error) {
 	root, err := index.Root()
 	if err != nil {
-		return nil, hooked{}, err
+		return nil, doors{}, err
 	}
 	text, err := wiringOf(root, vehicleOf(os.Executable()))
 	if text == "" || err != nil {
-		return nil, hooked{}, err
+		return nil, doors{}, err
 	}
 	w, err := q.ReadWiring(text)
 	if err != nil {
-		return nil, hooked{}, err
+		return nil, doors{}, err
 	}
 	starts, hands, err := loaded(w, q.Main)
-	return starts, hookedOf(w, hands, hooksModule), err
+	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule)}, err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]

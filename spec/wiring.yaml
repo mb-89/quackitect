@@ -38,6 +38,8 @@ instances:
     module: hooks
   session:
     module: session
+  mcp:
+    module: mcp
 wires:
   hooks.events/<id>: session/<id>/events
   watch.files/<path...>: files/<path...>

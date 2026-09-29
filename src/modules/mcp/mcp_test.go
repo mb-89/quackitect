@@ -185,6 +185,15 @@ func TestASlowToolAnswersStillRunning(t *testing.T) {
 	}
 }
 
+func TestAFailingCallAnswersIsError(t *testing.T) {
+	c := &calls{said: &Called{Error: "no ticket stands free", Handle: "h2"}}
+	one := serverOver(t, c, nil)
+	result := called(t, one.server, map[string]any{"ticket": "t1"})
+	if result["isError"] != true || !strings.Contains(textOf(result), "no ticket stands free") {
+		t.Fatalf("the failing call answers %+v, and wants isError with the action's reason", result)
+	}
+}
+
 func TestTheListenAnswersAPostBehindItsToken(t *testing.T) {
 	one := serverOver(t, &calls{}, nil)
 	root := t.TempDir()
