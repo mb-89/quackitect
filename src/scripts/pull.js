@@ -125,9 +125,11 @@ export function pull(it, argv) {
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
   // A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-joins-the-queue]] [[spec/tickets/the-todo-road-stands-first]]
   // A pull naming the working item itself takes that ticket, because the shell door wants it named there first. [[spec/design_output/pull#the-hand-out]]
-  const todo =
-    held || verdict.said ? "" : inHand({ disk: it.disk, root: it.root }).todo;
-  if (todo && todo !== name) {
+  const working = inHand({ disk: it.disk, root: it.root }).todo;
+  const todo = held || verdict.said ? "" : working;
+  // A helper serves the session whose plan it reads, so it skips the wait, and one naming nothing asks for the working item. [[spec/tickets/helpers-pull-past-plans]]
+  const wanted = name || (as && !held && !verdict.said ? working : "");
+  if (todo && todo !== name && !as) {
     say(WAIT, [
       `the todo ${todo} stands in hand, so the pull hands nothing else out.`,
       "Finish it, and take it off the plan, then pull again.",
@@ -137,16 +139,25 @@ export function pull(it, argv) {
   // A name on trunk that is a group takes its branch on a cloud box, and a desk refuses it. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
-  const asking = Boolean(name) && !named && !verdict.said && !held;
-  // A ticket a verb mints for this session passes the queue, and so does a person's hand or the owner's word. [[spec/design_output/config#the-engine-controls]]
-  if (asking && it.binding === QUEUE && name !== it.minted && !byPerson(it, took)) {
-    console.error(`${name} stands behind the queue, because this session binds to it.`);
+  const asking = Boolean(wanted) && !named && !verdict.said && !held;
+  // A ticket a verb mints for this session passes the queue, and so does a person's hand, the owner's word, or a helper's pull of the ticket the plan works. [[spec/design_output/config#the-engine-controls]]
+  const helps = Boolean(as) && wanted === working;
+  if (
+    asking &&
+    it.binding === QUEUE &&
+    wanted !== it.minted &&
+    !helps &&
+    !byPerson(it, took)
+  ) {
+    console.error(
+      `${wanted} stands behind the queue, because this session binds to it.`,
+    );
     console.error(
       "Run ./RUNME.sh ticket pull with no name, and take what it hands you.",
     );
     return 2;
   }
-  who.wanted = asking ? name : "";
+  who.wanted = asking ? wanted : "";
   if (!named && (verdict.said || (name && held)))
     return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);

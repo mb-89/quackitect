@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+step: implement/tests-green
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
@@ -156,6 +156,15 @@ record:
         hash: 5ff9005e4f6c534d
         size: 683
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d84f325b2110d · claude-code-remote
+    hash_before: e51aec1382039541cc93eb3b739f6faab44807b3
+    hash_after: e51aec1382039541cc93eb3b739f6faab44807b3
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -290,14 +299,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/pull.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/scripts/pull.js alone, the file the size list names
+- the change reaches no new door: inHand reads the disk door the fake in the tests already stands for
+- a comment above wanted names the approach and links the ticket
+- the working item stands read once in pull, and the rule stays in the ticket the comment links
 
 ## tests-green
 
