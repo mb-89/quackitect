@@ -97,7 +97,19 @@ record:
         exit: 0
         said: work/loose-fixes-4140d51 already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: aee81ffed8cc12d914e651cf1a946da6ff2d2815
+    hash_after: aee81ffed8cc12d914e651cf1a946da6ff2d2815
+    inputs:
+      - name: ask
+        hash: 514ac4d454e0004c
+        size: 371
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -131,14 +143,18 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/take-honours-the-name]], process trivial, closed done on the work PR #7 landed on main
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child is a single scoped change, small enough to review whole
+- the goal is the loose agent tickets on main, and take-honours-the-name is the only ticket naming this group
+- no child waits on another, so no depends_on stands
 
 # children
 
