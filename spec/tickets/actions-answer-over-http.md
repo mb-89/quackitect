@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 423279a58bd3256c89745d48e3a7ed181d48a277
+    hash_after: 423279a58bd3256c89745d48e3a7ed181d48a277
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/index passes; green, src/modules/index passes; green, src/modules/http passes; green, sr
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 5851393963daace7
+        size: 961
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -370,26 +393,33 @@ go vet ./...
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q src/index src/modules/index src/modules/http src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every action now answers over HTTP. The door registers POST /v1/actions/<name> for each action the store holds, with a request schema off its input type and a 200 schema off the type q.Answers declares, each field titled by its label. A post waits as long as Prefer: wait=N asks, or the http module key http/config/wait where it asks nothing. It answers 200 with the result, or 202 with the fraction done, the seconds gone by and the handle path /v1/values/ops/<id>. The manager answers its call beside its stop, and the root hands it an accept routing disk requests to the files module.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names and no other, the test files among them
+- the only door the change reaches is the manager call, and the index cases run it through a fake manager over a fake accept
+- each new function carries a comment naming the chapter on the wait or this ticket
+- the wait name stands once as index.WaitName, the local key once as http.WaitKey, and a root case ties the two
 
 # accept
 

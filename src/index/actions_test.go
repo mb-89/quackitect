@@ -138,7 +138,7 @@ func TestAnActionAnswersItsResultWithinTheWait(t *testing.T) {
 		t.Fatalf("the post answers %d: %s", said.StatusCode, body)
 	}
 	out := postedOf(t, body)
-	if out.Result == nil || out.Result.Sum != 5 || out.Running || !strings.HasPrefix(out.Handle, "/v1/values/ops/") {
+	if out.Result == nil || out.Result.Sum != 5 || out.Running || !strings.HasPrefix(out.Handle, "/v1/values/ops/") || out.Gone == nil || *out.Gone >= 5 {
 		t.Fatalf("the post answers %s", body)
 	}
 	if applied := said.Header.Get("Preference-Applied"); applied != "wait=5" {
