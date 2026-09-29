@@ -1,5 +1,5 @@
 ---
-description: "config / migration / opentasks: sets migration.opentasks to new. The open-tasks slice's record. The badge, the work tab's brackets and its queue column read the index, and old and shadow reach no reader since phase 2 switched over."
+description: "config / migration / opentasks: sets migration.opentasks to new. The open-tasks slice's record, switched over in phase 2. The badge, the work tab's brackets and its queue column read the index."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
