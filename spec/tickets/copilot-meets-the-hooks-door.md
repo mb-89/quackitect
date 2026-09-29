@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 0d0e968145a856df
         size: 319
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d85490c97110e · claude-code-remote
+    hash_before: 0e52362b7000993174941a5ead5bbac9a9025e3c
+    hash_after: 0e52362b7000993174941a5ead5bbac9a9025e3c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: bd17b44aea6f7261
+        size: 2767
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -215,26 +228,33 @@ I assume the Copilot result {deny, block} reads as the bridge's result does, sin
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/hook_test.go src/modules/hooks/cage_test.go test/level0/copilot-shadow.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/hook_test.go
+- src/modules/hooks/cage_test.go
+- test/level0/copilot-shadow.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion over the stubs: the live compare writes no row, the post reads empty, the verb prints nothing, and the script runs no verb. The two cases that pass on the stubs, a post decided alike and a verb with no door, pin the quiet side of the shadow, which the stubs already hold. The door's Outside reaches a same-package test through its from field, so the live cases need no second builder.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- go test meets the Go cases, the live shadow case meets the log line, since the row it writes is the row log --kind shadow reads, and the check stands as a command
+- the doors the tests reach: the process door through fakeProc, the disk through fakeDisk, and the loopback listen, which the reach case drives for real
 
 # gate
 

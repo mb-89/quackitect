@@ -111,6 +111,8 @@ type Outside struct {
 	Call  Call
 	Ops   func(caller string) []Op
 	Now   func() time.Time
+	// Takes the shadow row of a live post the door decides apart from its old decision. None writes nothing. [[spec/tickets/copilot-meets-the-hooks-door]]
+	Shadow func(row map[string]any) error
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]

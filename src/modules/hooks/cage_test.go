@@ -193,3 +193,41 @@ func goldenOf(t *testing.T, at string) []Apart {
 	}
 	return out
 }
+
+// A live post carrying the old path's refusal, which the door passes, writes one shadow row naming its harness. [[spec/tickets/copilot-meets-the-hooks-door]]
+func TestALivePostDecidedApartWritesAShadowRow(t *testing.T) {
+	one := doorOver(t, &calls{}, &book{})
+	var rows []map[string]any
+	one.door.from.Shadow = func(row map[string]any) error {
+		rows = append(rows, row)
+		return nil
+	}
+	post := Post{Event: "tool.call", Harness: "copilot", E: map[string]any{"tool": "Bash", "session_id": "s1"}, Old: map[string]any{"result": map[string]any{"deny": "no"}}}
+	if _, err := one.door.Hook(post); err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("the live post writes %+v, and wants one shadow row", rows)
+	}
+	row := rows[0]
+	if row["kind"] != "shadow" || row["slice"] != "cage" || row["old"] != RefuseWord || row["new"] != PassWord || row["harness"] != "copilot" || row["tool"] != "Bash" {
+		t.Fatalf("the shadow row reads %+v, and wants the cage slice, refuse on the old path, pass off the door, copilot and Bash", row)
+	}
+}
+
+// A live post the door decides as the old path did writes no row. [[spec/tickets/copilot-meets-the-hooks-door]]
+func TestALivePostDecidedAlikeWritesNothing(t *testing.T) {
+	one := doorOver(t, &calls{}, &book{})
+	var rows []map[string]any
+	one.door.from.Shadow = func(row map[string]any) error {
+		rows = append(rows, row)
+		return nil
+	}
+	post := Post{Event: "tool.call", Harness: "copilot", E: map[string]any{"tool": "Read", "session_id": "s1"}, Old: map[string]any{"result": map[string]any{}}}
+	if _, err := one.door.Hook(post); err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 0 {
+		t.Fatalf("the live post writes %+v, and wants no row where both pass", rows)
+	}
+}
