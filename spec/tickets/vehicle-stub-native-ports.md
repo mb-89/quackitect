@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: vehicle-verbs-become-actions
+record:
+  - step: do
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: a4644a5ddcef25f2ded6d49f66cd13842c02a057
+    hash_after: a4644a5ddcef25f2ded6d49f66cd13842c02a057
+reason: became
+successors: [vehicle-verbs-become-actions]
 ---
 
 # Ask
