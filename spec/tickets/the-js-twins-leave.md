@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -163,6 +163,29 @@ record:
         exit: 0
         said: "test/level0/cli-read.test.js:8:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 737d8654716f754e1d3d8d7d0d060b2fbe5722f9
+    hash_after: 737d8654716f754e1d3d8d7d0d060b2fbe5722f9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "test/level0/cli-read.test.js:8:1: correctness/noUnusedImports: Several of these imports are unused."
+    inputs:
+      - name: design/tests-red
+        hash: bef6251a63abb67c
+        size: 538
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -315,26 +338,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/twins-left.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The config, log, guidance and prose comparison twins leave the tree, with their seven test files and their wiring in each reader. Each reader on a new slice takes its Go topic's answer, and a topic answering nothing throws an error naming the topic. The five topic keys take new alone, and the projection drops their old and shadow commands. The check twins stay until phase 7, where the phase 7 switch carries their leave. The contract test twins-left.test.js decides the done line: no removed file stands, nothing imports one, and the keys take new alone. Three faults came up on the way, and each fix carries its case. The write door threw on every note write, the config topic's values were parsed twice, and the check refused a staged deletion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out, past the three faults it trips over
+- every door the change reaches has a fake: the readers run over the fake disk, process and log
+- a comment names the approach at each reader
+- every fact stands in one place: the prose modes and the fault live in quack-topic.js
 
 # accept
 
