@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -163,6 +163,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: b5ba2d54357f8c96a30b0c9037254c3ed6ba52bc
+    hash_after: b5ba2d54357f8c96a30b0c9037254c3ed6ba52bc
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["open-tasks-shadow-lands"]
 enabled_by: migration.phase3shadow
 cloud: true
@@ -253,38 +265,60 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- unused-shadow-package-leaves: the shadow package leaves the tree, since nothing imports it
+- review-builds-its-front: the branch review builds the branch own se-front into its worktree before the check
+- the group passes its second accept, over the removal and the review fix
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a search for importers before the deletion proved it safe, so the removal took one commit
+- a worktree nested where the review opens its own reproduced the red mint test, and its trace named the missing binary
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 03:1x: the plan call found no server at the event address, and a restart brought it back
+- 03:2x: the first hand-back named prose in the command fields, and the engine ran it as a command
+- 03:2x: the review answered red on the mint contract test twice, while a check in place answered green
+- 03:28: a git stash and a shell copy over a source file came back refused, while the agent tried to show the new test red
+- 03:31: the push waited, because the new build read the platform past a door
+- 03:35: the commit came back refused, because the platform change carried no test
+- 03:35: the bridge lost events while the check restarted the server
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the mint output for a command field in the pull verb: print one example command beside the field
+- the review design in spec/design_output/review: a table row now names every binary a check needs, so the next install-only binary lands there first
+- the agent: read the doors bundle before a platform branch, since it carries windows already
+- the agent: show a test red by reading the assert, or through a scratch copy of the test, since stash stands refused
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The review had failed since the front writer moved to Go, and every group since would have met it. A check in place hid it, because the install had built the binary on this box. A fresh worktree is the only place the fault shows.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the source folder of se-front stands in BUILDS alone, and the review reads it there
+- the change adds no number
+- the change writes no header
+- the badly list carries each error of this window with its time, and the owner sent no prompt
+- the chapter names roles and tree paths alone, and no box path
 
 ## cloud
 
