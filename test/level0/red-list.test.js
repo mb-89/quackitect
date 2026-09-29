@@ -92,3 +92,13 @@ test("one leaf's red list reads each row as a bare path, and a leaf with no list
   ]);
   assert.deepEqual(redListOf(text, "implement/change"), []);
 });
+
+// [[spec/design_output/pull#kept-red-leaves]]
+test("a red row joined by commas reads one path each", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# design\n\n## tests-red\n\n### red\n\nsrc/one/one_test.go,test/level0/a.test.js\n";
+  assert.deepEqual(redListOf(text, "design/tests-red"), [
+    "src/one/one_test.go",
+    "test/level0/a.test.js",
+  ]);
+});
