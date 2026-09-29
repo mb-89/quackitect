@@ -41,3 +41,41 @@ While the switch reads false, `branch take` passes those groups over.
 - `./RUNME.sh config` reads `migration.phase3switch true spec/config/level0.json`
 - `./RUNME.sh log --kind shadow` names no mismatch of the read topics after a run of config, log and check
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test src/modules/migration src/quack
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The phase-3 read topics stand at shadow in spec/config/level0.json (config, log, guidance, check, prose). I ran config, log, branch list and check against this tree with those keys at shadow, and ./RUNME.sh log --kind shadow named no row. The shadow writes nothing on a match, so the empty log is the evidence, and the shadow tests prove a mismatch writes a row. The guidance verb has no entry point to drive in this tree, so that topic is judged on its tests alone. So migration.phase3switch turns true, and a box may take read-topics-switch-over.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: one key in spec/config/level0.json
+- the cleanup it reveals: an empty shadow log proves little alone; the gap stands as the phase 2 note left it
+- every fact stands once: the run lives on this ticket and the pull request
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
