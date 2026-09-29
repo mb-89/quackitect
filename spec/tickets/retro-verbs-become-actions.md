@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 29425e5241068bd8
         size: 756
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 416fc5b837784645b305e9cd6dbff89a1795c817
+    hash_after: 416fc5b837784645b305e9cd6dbff89a1795c817
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -293,14 +302,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/retro_twins_test.go src/quack/twins_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the retro verbs, their twin, the usage and their tests, as the ask names them
+the twin reads the index through the V1 door, and notesTree stands up a real index over a seeded tickets/all
+each Go file opens on a header naming the ticket its approach answers
+RetroVerbs owns the verb list, twinVerbs owns the road, and the tests read both in place
 
 ## tests-green
 
