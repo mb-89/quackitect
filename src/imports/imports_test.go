@@ -81,6 +81,13 @@ func TestAModuleReadsYamlAsQDoes(t *testing.T) {
 	}
 }
 
+// The pointer reader the moved rules take passes, as the yaml reader does. [[spec/tickets/lsp-rules-move-to-check]]
+func TestAModuleImportsThePointerReader(t *testing.T) {
+	if said := Faults("quackitect/src/modules/check", []string{"quackitect/src/q", "quackitect/src/pointer"}); len(said) != 0 {
+		t.Fatalf("src/pointer reads as past q: %v", said)
+	}
+}
+
 // The ticket type a wire between two modules carries passes, as the yaml reader does. [[spec/tickets/the-queue-becomes-a-module]]
 func TestAModuleReadsTheTicketType(t *testing.T) {
 	if said := Faults("quackitect/src/modules/queue", []string{"quackitect/src/q", "quackitect/src/ticket"}); len(said) != 0 {

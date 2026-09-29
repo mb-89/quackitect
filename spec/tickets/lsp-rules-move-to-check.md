@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: 8ae6e5341e97a787
         size: 320
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 5c8055bbc025 · claude-code-remote
+    hash_before: e0aecd37cc0aeb86ecb60df9d836a7896b6ee6c1
+    hash_after: e0aecd37cc0aeb86ecb60df9d836a7896b6ee6c1
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: 4b2bf176b63e20be
+        size: 3663
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -222,26 +235,34 @@ The shadow: the `migration` module declares `lsp`, built in as `old`, and the de
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check src/modules/migration src/imports src/lsp
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/check/sweep_test.go
+- src/modules/migration/migration_test.go
+- src/imports/imports_test.go
+- src/lsp/shadow_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Six cases fail on their own assertion: both sweep cases read an empty list, the lsp key stands nowhere, the pointer reader reads as past q, and the stub shadow writes no row. TestTheShadowLeavesTheBoxRulesOut passes against the stub, since a stub writing nothing leaves every rule out. It guards the compare once tests-green writes rows. The shadow cases needed a stub of shadowsSweep in src/lsp/shadow.go, so the package builds and each case reaches its assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a red case: go test ./... meets all four files, the shadow rows meet shadow_test.go, and the check meets the pointer case the analyzer reads
+- the one door the tests reach, the new road to /v1, takes a function the case hands in, and the session log takes one too
 
 # gate
 

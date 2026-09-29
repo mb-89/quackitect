@@ -25,6 +25,16 @@ func TestTheSliceKeyReadsTheDefaultFile(t *testing.T) {
 	}
 }
 
+// The lsp slice stands among the slices, built in as old, so a box with no tracked mode runs no shadow of the editor checks. [[spec/tickets/lsp-rules-move-to-check]]
+func TestTheLspSliceStandsOld(t *testing.T) {
+	for _, one := range slices {
+		if one.key == "lsp" && one.mode == "old" {
+			return
+		}
+	}
+	t.Fatalf("the slices read %+v, and want lsp built in as old", slices)
+}
+
 // The verbs slice stands among the slices, built in as old, so a box with no tracked mode keeps every verb on cli.js. [[spec/tickets/runme-hands-verbs-to-quack]]
 func TestTheVerbsSliceStandsSharedAndOld(t *testing.T) {
 	for _, one := range slices {
