@@ -35,8 +35,10 @@ export function expectedRed(tickets) {
 // The files one red leaf names under its red field. [[spec/design_output/pull#kept-red-leaves]]
 export function redListOf(text, path) {
   return (chapterOf(text, path).fields.get(FIELD) ?? [])
-    .map((row) =>
-      String(row)
+    .flatMap((row) => String(row).split(","))
+    .map((item) =>
+      item
+        .trim()
         .replace(/^[-*]\s+/, "")
         .replaceAll("`", "")
         .trim(),

@@ -110,3 +110,13 @@ test("one leaf's red list reads each row as a bare path, and a leaf with no list
   ]);
   assert.deepEqual(redListOf(text, "implement/change"), []);
 });
+
+// A hand-back landing an array as one comma-joined row still names each file. [[spec/tickets/list-fields-split-lines]]
+test("one leaf's red list reads a comma-joined row as each file it names", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# implement\n\n## tests-red\n\n### red\n\ntest/level0/a.test.js,test/level0/b.test.js\n\n## change\n";
+  assert.deepEqual(redListOf(text, "implement/tests-red"), [
+    "test/level0/a.test.js",
+    "test/level0/b.test.js",
+  ]);
+});

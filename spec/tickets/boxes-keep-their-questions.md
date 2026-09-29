@@ -40,7 +40,7 @@ record:
         said: green, 20 test(s) pass in 1 file(s)
       - name: check
         exit: 1
-        said:   }
+        said: "}"
 ---
 
 # Ask
@@ -94,3 +94,8 @@ the rule stands in the guidance, and its reason in the rationale alone
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A second fail would send this ticket to a person, so the box greened the check instead. Two faults stood red:
+
+- `redListOf` read a comma-joined red row as one path, so the check ran the gate-points red tests. It now splits a row on commas, with a case in `test/level0/red-list.test.js`. `list-fields-split-lines` still owns the writer fault.
+- `Quote` in `src/front/front.go` left a value opening on a space or a flow closer bare, so the last fail recorded `said:   }` and Vale read no file. It now quotes such a value, with cases in `src/front/front_test.go`. The box repaired the one row through `se-front normalise`, the engine's own front writer, and the recorded value stands as it was.
