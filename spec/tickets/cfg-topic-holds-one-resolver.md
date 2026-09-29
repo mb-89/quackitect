@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 09d03c0caad39f3068426d2db4b9bfc82f9bc56f
+    hash_after: 09d03c0caad39f3068426d2db4b9bfc82f9bc56f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s); green, src/modules/config passes; green, src/config passes; green, src/shadow passes
+      - name: check
+        exit: 0
+        said: "src/scripts/guidance-shadow.js:12:1: CodeComment: Code carries no comment here. Write a header of at most five lines at "
+    inputs:
+      - name: design/tests-red
+        hash: 2b9e5ed65e24e46d
+        size: 1223
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -308,26 +331,33 @@ The slice keys stand once in src/modules/migration/migration.go, and the golden 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/config-shadow.test.js src/modules/config src/config src/shadow
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The config module now answers every config key beside the old readers. quack config lists each key with its value and the layer that answers it. Where migration.config reads shadow, ./RUNME.sh config compares both answers and writes one shadow row a key they answer apart, which ./RUNME.sh log --kind shadow names. The readers golden holds each reader answer over one frozen fixture, and it shows four keys apart today: the SE_ANSWER_WARN_AT spelling, the rank of a variable against the local file, variables kept as text, and a shared slice key the local file sets. TestReadersGolden in src/quack passes with go test -run TestReadersGolden, while that folder also holds the sibling tickets red tests.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches no file past the config readers, the module and the shadow door the ask names.
+The shadow run meets fake settings, files, proc and log.
+The config-shadow and quack config headers name the approach.
+The slice keys stand once, in src/modules/migration/migration.go.
 
 # accept
 
