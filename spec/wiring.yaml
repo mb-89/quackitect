@@ -18,11 +18,14 @@ instances:
     module: migration
   check:
     module: check
+  guidance:
+    module: guidance
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
   env.vars/<name>: env/<name>
   tickets.files/<path...>: files/<path...>
+  guidance.files/<path...>: files/<path...>
   tickets.all: tickets/all
   tickets.cloud: tickets/cloud
   queue.rows: tickets/all

@@ -346,3 +346,8 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Tests-red settles two things the draft reads otherwise:
+
+- the env binding: each read carries the env a note names on `Read.Env`, and `Notes` in src/modules/guidance/guidance.go keeps a read where that env stands set, with no env port
+- the tests past the draft's list: `TestGuidanceGoldenOldMeetsNew` in src/quack/guidance_test.go, and the case a missing binary writes nothing in test/level0/guidance-shadow.test.js

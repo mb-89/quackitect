@@ -35,3 +35,12 @@ test("the golden's old section holds what readsFor hands every leaf", () => {
     "readsFor answers apart from the golden file: run node test/level0/guidance-golden.js, and read the difference at the merge",
   );
 });
+
+test("a tree with no processes folder holds an empty old section", () => {
+  const bare = {
+    root: "/nowhere",
+    join: (...parts) => parts.join("/"),
+    disk: { exists: () => false },
+  };
+  assert.deepEqual(oldSection(bare), {});
+});

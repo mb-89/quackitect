@@ -111,3 +111,39 @@ func TestOwnReadsFollowTheResolved(t *testing.T) {
 		t.Errorf("design/tests-red reads %v, and wants %v", got, want)
 	}
 }
+
+// What the module resolves over the method root's files with the work root's layered over them, as quack guidance layers the two. [[spec/tickets/guidance-module-cases-cover-edges]]
+func stepsOverBoth(method, work map[string]string) map[string][]Read {
+	contents := func(files map[string]string) map[string]q.Content {
+		out := map[string]q.Content{}
+		for at, text := range files {
+			out[at] = q.Content{Hash: "h", Text: text}
+		}
+		return out
+	}
+	return Resolve(Layered(contents(method), contents(work)))
+}
+
+func TestAWorkRootNoteStandsOverTheMethodRootNote(t *testing.T) {
+	steps := stepsOverBoth(map[string]string{
+		"spec/processes/standard.yaml":  process,
+		"spec/guidance/code/testing.md": "---\ntags: [\"testing\"]\n---\n# Testing\n",
+	}, map[string]string{
+		"spec/guidance/code/testing.md": "# Testing, with no tag past its folder\n",
+	})
+	want := []string{"spec/guidance/code/testing"}
+	if got := notesOf(steps["standard:design/draft"]); !reflect.DeepEqual(got, want) {
+		t.Errorf("design/draft reads %v, and wants the work root's note, which names no testing tag", got)
+	}
+}
+
+func TestANoteOpeningWithAnUnderscoreStandsAsADraft(t *testing.T) {
+	steps := stepsOver(t, map[string]string{
+		"spec/processes/standard.yaml": process,
+		"spec/guidance/code/_draft.md": "# Draft\n",
+		"spec/guidance/code/style.md":  "# Style\n",
+	})
+	if got := notesOf(steps["standard:design/draft"]); !reflect.DeepEqual(got, []string{"spec/guidance/code/style"}) {
+		t.Errorf("design/draft reads %v, and wants the draft note left out", got)
+	}
+}

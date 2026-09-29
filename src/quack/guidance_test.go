@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
+
+	"quackitect/src/modules/guidance"
 )
 
 // The golden file, and the names each section stands under. [[spec/tickets/the-guidance-topic-lands]]
@@ -80,5 +82,24 @@ func TestGuidanceGoldenOldMeetsNew(t *testing.T) {
 		if _, held := old[key]; !held {
 			t.Errorf("%s stands in the module's section alone", key)
 		}
+	}
+}
+
+func TestGuidanceFilesKeyEachFileByItsPathUnderTheRoot(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, filepath.FromSlash(guidance.Guidance), "code")
+	if err := os.MkdirAll(at, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(at, "code.md"), []byte("# Actionables\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	said, err := guidanceFiles(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := guidance.Guidance + "/code/code.md"
+	if len(said) != 1 || said[want].Text != "# Actionables\n" {
+		t.Fatalf("the files read %v, and want %s alone, with a processes folder standing nowhere", said, want)
 	}
 }
