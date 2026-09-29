@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: do
 steps:
   - name: answer
@@ -49,6 +49,23 @@ record:
         hash: 8dddb2221fafbe09
         size: 15813
     def: 2280015d497a3abd
+  - step: do
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: 74cc3a068b1ca0576f0abdb9e1de131da2dece9e
+    hash_after: 74cc3a068b1ca0576f0abdb9e1de131da2dece9e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 30 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: answer
+        hash: 7b91099f9034f0df
+        size: 812
+    def: 9395391d8c0e6392
+reason: done
 ---
 
 # Ask
@@ -82,26 +99,32 @@ Weighed: the design input already rules the drawing and the rows it edits, and l
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/schema.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The answer lands as a minted draft, the-editor-edits-a-process, whose ask names what the editor draws and what a person edits there. The draft stands loose on main, off this fix group. The cloud design input rules that a fix group files no ticket for an agent, and a draft waits on a person until it opens.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the minted ask follows the answer line for line
+the change reveals no cleanup
+the rows the editor takes stand in the-editor-draws-the-ticket, and the ask points there
 
 # Discussion
 
