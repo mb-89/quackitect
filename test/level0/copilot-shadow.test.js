@@ -17,6 +17,7 @@ function itOf(mode, answer = { exitCode: 0, stdout: '{"effects":[]}' }) {
   return {
     root: ROOT,
     work: ROOT,
+    method: ROOT,
     platform: "linux",
     env: {},
     disk: fakeDisk({ [TRACKED]: JSON.stringify({ migration: { cage: mode } }) }),
