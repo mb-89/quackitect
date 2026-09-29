@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,19 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
 depends_on: ["ticket-verbs-become-actions"]
+record:
+  - step: design/draft
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 830e4c43db498cbc3e04e505bf8423e4af122f48
+    hash_after: 784586c7a2a42da50a79dfa2be4ba107421983bd
+    inputs:
+      - name: ask
+        hash: 928b54ee00fca695
+        size: 467
+      - name: [[spec/tickets/the-need-list-lacks-verbs]]
+        hash: 64d6c843b10759d8
+        size: 2071
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -148,32 +161,57 @@ The hand-back is the longest road a hook waits on, and the wait frees it.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The pull stands as the action `ticket/pull` already, which `ticket-verbs-become-actions` registers with no deadline, so a hook waits on it within its own wait. This ticket adds what that leaves: the needs of a leaf resolve against the registry's actions, in shadow beside the table `cli.js` keeps.
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the shadow | a new `src/scripts/needs-shadow.js`, `needsShadow` | where `migration.verbs` reads shadow, runs `quack get index/actions`, builds a table of topic and verb off each name, and writes one shadow row a need the two tables answer apart |
+| the table | `registryOf` in the same file | reads `branch/open` as the verb open of the topic branch, and takes `work` as a second name for `branch`, as `VERBS` does |
+| the call | `pull-hand.js`, beside `shadowLeaf` | hands the leaf's needs to `shadowNeeds`, which runs `needsShadow` over the shadow doors and holds no answer back |
+| the drift | `BRANCH` in `src/scripts/pull-route.js` | gains open and unblock, and drops new, so the table answers as `work` does |
+
+What I weigh: `holdsVerb` runs sync on three roads, and a read of the index over a child process on each road costs every pull. The shadow runs once a hand-out, behind the answer, as the guidance slice does. The registry answers alone once `quack-verbs-switch-over` flips the slice, which a line under its Discussion names.
+
+What I assume: the branch topic lands under `work-verbs-become-actions`, so a live index answers `branch/open`. The case over a fake registry holds the drift until then.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/pull-hand.js: the hand-out, which calls shadowNeeds beside shadowLeaf
+- src/scripts/pull-route.js: BRANCH and VERBS, which the shadow reads as the old table
+- src/scripts/pull-route.js: holdsVerb, which answers both tables
+- src/scripts/work.js: the need check at line 310, which reads BRANCH through holdsVerb
+- src/bridge/findings.js: shadowDoorsOf, which hands the shadow its doors
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/needs-shadow.test.js: the registry's actions answer branch open for a need naming it
+- test/level0/needs-shadow.test.js: a need the two tables answer apart writes one shadow row
+- test/level0/needs-shadow.test.js: a slice standing at old runs no quack and writes no row
+- test/level0/needs-shadow.test.js: BRANCH holds open and unblock, and lacks new
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- pull-route.js, pull-hand.js, work.js, guidance-shadow.js, findings.js, catalog.go and cli.go stand opened, and each claim checked there
+- the callers list names the hand-out, the two tables, the need check and the doors
+- go test from the root meets the Go side unchanged, the shadow line meets the row case, the branch open line meets the registry case, and the check meets the check verb
 
 ## tests-red
 
