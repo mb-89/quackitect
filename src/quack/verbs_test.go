@@ -6,8 +6,12 @@ package main
 import (
 	"fmt"
 	"io"
+	"os"
+	"runtime"
 	"strings"
+	"syscall"
 	"testing"
+	"time"
 )
 
 // A twin answering the words it holds, and recording whether it ran dry. [[spec/tickets/runme-hands-verbs-to-quack]]
@@ -97,5 +101,31 @@ func TestTheNewRoadRunsTheTwinForReal(t *testing.T) {
 	doors, out, rows := roadOver("new", "old\n", map[string]twin{"ticket yours": twinSaying("new\n", &dry)})
 	if code := verbs(doors, []string{"ticket", "yours"}); code != 0 || out.String() != "new\n" || len(*rows) != 0 || len(dry) != 1 || dry[0] {
 		t.Fatalf("the new road answers %d, %q, rows %v, runs %v", code, out.String(), *rows, dry)
+	}
+}
+
+// The old door hands the child the caller's stdin, and answers the child's exit code. [[spec/tickets/verb-road-keeps-the-terminal]]
+func TestTheOldDoorHandsStdinAndAnswersTheExitCode(t *testing.T) {
+	var out, errs strings.Builder
+	old := oldDoor([]string{"sh", "-c", "cat; exit 3"}, strings.NewReader("typed\n"), &errs, nil)
+	if code := old(&out); code != 3 || out.String() != "typed\n" {
+		t.Fatalf("the old door answers %d, %q, %q", code, out.String(), errs.String())
+	}
+}
+
+// A signal the road takes reaches the child, which ends on it as under exec. [[spec/tickets/verb-road-keeps-the-terminal]]
+func TestTheOldDoorForwardsASignalToTheChild(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("a Windows process takes no SIGTERM")
+	}
+	signals := make(chan os.Signal, 1)
+	var out strings.Builder
+	old := oldDoor([]string{"sh", "-c", "trap 'echo caught; exit 7' TERM; echo ready; while :; do sleep 0.05; done"}, strings.NewReader(""), io.Discard, signals)
+	go func() {
+		time.Sleep(300 * time.Millisecond)
+		signals <- syscall.SIGTERM
+	}()
+	if code := old(&out); code != 7 || !strings.Contains(out.String(), "caught") {
+		t.Fatalf("the child ends %d with %q, and wants 7 after the trap", code, out.String())
 	}
 }

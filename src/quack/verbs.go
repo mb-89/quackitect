@@ -3,7 +3,13 @@
 // [[spec/tickets/runme-hands-verbs-to-quack]]
 package main
 
-import "io"
+import (
+	"errors"
+	"fmt"
+	"io"
+	"os"
+	"os/exec"
+)
 
 // Where a verb goes: to cli.js, to quack, or to both with the old answer standing. [[spec/tickets/runme-hands-verbs-to-quack]]
 type road int
@@ -34,4 +40,38 @@ func roadOf(mode string, argv []string, twins map[string]twin) road {
 // Runs the verb on its road, and answers the exit code the caller reads. [[spec/tickets/runme-hands-verbs-to-quack]]
 func verbs(d verbDoors, argv []string) int {
 	return d.old(d.out)
+}
+
+// The old road: cli.js as a child holding the caller's stdin and error stream, its standard output written to out, each signal forwarded, and its exit code answered. An out that is the caller's own file hands the child the terminal itself. [[spec/tickets/verb-road-keeps-the-terminal]]
+func oldDoor(command []string, stdin io.Reader, errs io.Writer, signals <-chan os.Signal) func(out io.Writer) int {
+	return func(out io.Writer) int {
+		child := exec.Command(command[0], command[1:]...)
+		child.Stdin, child.Stdout, child.Stderr = stdin, out, errs
+		if err := child.Start(); err != nil {
+			fmt.Fprintln(errs, err)
+			return exitFailed
+		}
+		ended := make(chan struct{})
+		go func() {
+			for {
+				select {
+				case one := <-signals:
+					child.Process.Signal(one)
+				case <-ended:
+					return
+				}
+			}
+		}()
+		err := child.Wait()
+		close(ended)
+		var exit *exec.ExitError
+		if errors.As(err, &exit) && exit.ExitCode() >= 0 {
+			return exit.ExitCode()
+		}
+		if err != nil {
+			fmt.Fprintln(errs, err)
+			return exitFailed
+		}
+		return 0
+	}
 }
