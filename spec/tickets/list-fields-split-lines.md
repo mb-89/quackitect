@@ -116,12 +116,21 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: a9d1f95bb1c8a3d43e44860f77ca4d8785ff8ee5
+    hash_after: a9d1f95bb1c8a3d43e44860f77ca4d8785ff8ee5
+    inputs:
+      - name: ask
+        hash: 05e7db43ad340a67
+        size: 581
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,50 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+formatted in src/scripts/pull-format.js turns a field value into text with String, and String joins an array by commas. It now joins an array one item a line before its other rules run. withPayload in src/scripts/pull-chapter.js calls it for every field, so a list field handed back as an array lands one item a line, and redListOf reads each row as one file. Assumption: an array means a list, whatever form the field names, since a text field has no use for commas between items. Cost: a hand passing an array to a text field gets lines in place of commas.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/pull-chapter.js: withPayload, the one caller of formatted
+src/scripts/pull.js: the hand-back, the one caller of withPayload
+src/scripts/red-list.js: redListOf, which reads the rows formatted writes and stays unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-fields.test.js: a list field handed back as an array lands one item a line
+test/level0/pull-fields.test.js: a red list handed back as an array names each file to expectedRed
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first on a first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/scripts/pull-format.js
+test/level0/pull-fields.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- formatted, withPayload, withFieldText and redListOf stand opened, and String over an array joins by commas
+- the callers come off a grep of formatted and withPayload
+- each done_when line names its case in pull-fields.test.js, and the check stays for tests-green
 
 ## tests-red
 
