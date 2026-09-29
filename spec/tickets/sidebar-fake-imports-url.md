@@ -34,7 +34,7 @@ step: do
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-The fake door in test/level0/sidebar-views.test.js imports a bare path, which Node refuses on Windows. The real door in src/extension/editor-files.js already turns the path into a file URL, so the fake does the same, and `check (windows-latest)` goes green.
+The fake door in test/level0/sidebar-views.test.js imports a bare path, which Node refuses on Windows. The real door in src/extension/editor-files.js already turns the path into a file URL. The fake does the same, and `check (windows-latest)` goes green.
 
 - `./RUNME.sh test test/level0/sidebar-views.test.js` is green
 - `check (windows-latest)` passes on the pull request
@@ -48,7 +48,7 @@ The fake door in test/level0/sidebar-views.test.js imports a bare path, which No
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-node --test test/level0/sidebar-views.test.js
+./RUNME.sh test test/level0/sidebar-views.test.js
 
 ## check
 
