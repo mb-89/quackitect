@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: bd17b44aea6f7261
         size: 2767
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85490c97110e · claude-code-remote · helper-3
+    hash_before: a2b8aece880898c88ce9a16951160fa70f087ae9
+    hash_after: a2b8aece880898c88ce9a16951160fa70f087ae9
+    inputs:
+      - name: design/draft
+        hash: bd17b44aea6f7261
+        size: 2767
+      - name: design/tests-red
+        hash: a83cb8e7d18bb295
+        size: 994
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,11 @@ Every new case fails on its own assertion over the stubs: the live compare write
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- copilot-config-names-mcp: the ask routes Copilot through MCP, and the draft hands Copilot's MCP config to go-cage-switches-over, whose ask names no Copilot config, so the MCP half lands nowhere; name the mcp module's server in the config Copilot reads, in shadow, or write that line into the ask of go-cage-switches-over
+- copilot-shadow-carries-method: asksText in src/bridge/config.js joins box.method for the tracked file, and neither the it in test/level0/copilot-shadow.test.js nor the it in src/scripts/copilot.js carries method, so shadowsHook throws before it reads migration.cage; give both a method of root
 
 # implement
 
