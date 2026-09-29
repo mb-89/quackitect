@@ -377,3 +377,32 @@ func TestIndexNamesNestsNoListOfItself(t *testing.T) {
 		t.Fatalf("index/names carries a value of itself after two steps: %v", row["value"])
 	}
 }
+
+// The manager's call runs an action through the accept its outside hands it, and a nil accept refuses every request. [[spec/tickets/actions-answer-over-http]]
+func TestServesCallsAnActionThroughItsAccept(t *testing.T) {
+	for _, accept := range []func(q.Request) (any, error){held(nil), nil} {
+		c := q.New()
+		as := Registers(c)
+		q.ActionIn(c, "t/read", func(path string) []q.Request {
+			return []q.Request{{Module: "disk", Verb: "read", Args: path, NoUndo: "a read"}}
+		}, q.Deadline(time.Minute))
+		l := &loop{now: time.Unix(1000, 0).UTC()}
+		from := l.outside(t, q.NewStore(c), as, rowsOf(map[string]string{}))
+		from.Accept = accept
+		stop, call, err := Serves(from)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(stop)
+		said, err := call("t/read", "a.md", "s1", quick)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if accept != nil && said.Result != "read a.md" {
+			t.Fatalf("the call answers %+v", said)
+		}
+		if accept == nil && !strings.Contains(said.Error, "no IO module accepts disk.read") {
+			t.Fatalf("a nil accept answers %+v", said)
+		}
+	}
+}

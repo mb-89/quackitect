@@ -48,6 +48,7 @@ type registration struct {
 	fields   []Field
 	out      []Field
 	answers  reflect.Type
+	takes    reflect.Type
 	deadline time.Duration
 	writes   bool
 	io       bool

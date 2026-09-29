@@ -4,6 +4,7 @@
 package index
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -47,6 +48,8 @@ type Outside struct {
 	Steps func(hand func())
 	Now   func() time.Time
 	Every func(span time.Duration, hand func(time.Time)) (stop func())
+	// The IO modules' side, which answers each request an action lists. A nil refuses every request. [[spec/tickets/actions-answer-over-http]]
+	Accept func(q.Request) (any, error)
 }
 
 // The manager writes ops/<id>, session/alarms, index/health, index/leases and the catalog rows, and carries q.IO(), since it starts and ends processes. [[spec/design_output/model#the-index-manager]]
@@ -78,11 +81,25 @@ type managed struct {
 
 // [[spec/design_output/model#the-index-manager]]
 func Start(from Outside) (stop func(), err error) {
+	stop, _, err = Serves(from)
+	return stop, err
+}
+
+// Starts the manager, and answers its stop beside the call an action takes through it. [[spec/tickets/actions-answer-over-http]]
+func Serves(from Outside) (stop func(), call func(name string, input any, caller string, wait time.Duration) (Answer, error), err error) {
 	one, err := begins(from)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return one.stops, nil
+	accept := from.Accept
+	if accept == nil {
+		accept = func(asked q.Request) (any, error) {
+			return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
+		}
+	}
+	return one.stops, func(name string, input any, caller string, wait time.Duration) (Answer, error) {
+		return Call(one.book, from.Store, name, input, caller, wait, accept)
+	}, nil
 }
 
 // Opens the book over the rows and fails what a restart leaves in flight, holds the index's lease, hands the work loop its step, and ticks at the beat. [[spec/design_output/model#the-index-manager]]

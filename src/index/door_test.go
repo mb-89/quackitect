@@ -338,9 +338,9 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 	root := tree(t)
 	write(t, root, config.Tracked, `{"watchdog":{"beat":1,"lease":5}}`)
 	var stepped atomic.Int64
-	manage := func(_ string, _ *q.Store, _ OpRows, steps func(func())) (func(), error) {
+	manage := func(_ string, _ *q.Store, _ OpRows, steps func(func())) (Managed, error) {
 		steps(func() { stepped.Add(1) })
-		return func() {}, nil
+		return Managed{Stop: func() {}}, nil
 	}
 	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), q.New(), manage)
 	if err != nil {

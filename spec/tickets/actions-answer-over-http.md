@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/tests-red
+step: gate
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
@@ -131,6 +131,19 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 5ba4f45baf5f11b7de7ca47edc1ae418844fda25
+    hash_after: 5ba4f45baf5f11b7de7ca47edc1ae418844fda25
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: faa1a587698ca718
+        size: 4110
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -261,26 +274,36 @@ I assume the default key takes the instance prefix the wiring gives, as `migrati
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q src/index
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/q/action_test.go
+- src/index/actions_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+- `Store.Input` answers no decode yet, so the JSON case fails on its own assertion
+- `servesActions` registers nothing yet, so each post reads `404` and the OpenAPI document holds no `/actions/t/add`
+- the manager seam, the `http` module and its wiring land whole in this step, since the cases reach the route through them. The module case passes, and the rest of `go test ./...` stays green
+- what surprises the hand: an op ends at the state `done`, and the case first read `finished`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches q's action registration, the manager's start, the door's seam, the http module, the wiring and the root, as the draft names
+- the index cases drive the real manager over a fake action and its accept, and the q case runs against the store alone
+- each file carries a pointer at the ticket or the chapter on the wait
 
 # gate
 

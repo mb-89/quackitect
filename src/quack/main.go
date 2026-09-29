@@ -21,6 +21,7 @@ import (
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
+	httpmodule "quackitect/src/modules/http"
 	manager "quackitect/src/modules/index"
 	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/migration"
@@ -63,6 +64,7 @@ var modules = map[string]ioModule{
 	"check":     {registers: check.Registers},
 	"guidance":  {registers: guidance.Registers},
 	"log":       {registers: logmodule.Registers},
+	"http":      {registers: httpmodule.Registers},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -172,13 +174,31 @@ func main() {
 	index.Main(manages(as), starts...)
 }
 
-// The index manager's start, over the store and the op table the index hands it, the wall clock, and its writer. [[spec/design_output/model#the-index-manager]]
+// The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept. [[spec/design_output/model#the-index-manager]]
 func manages(as q.Writer) index.Manage {
-	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (func(), error) {
-		return manager.Start(manager.Outside{
+	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
+		stop, call, err := manager.Serves(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
-			Now: time.Now, Every: clock.New().Every,
+			Now: time.Now, Every: clock.New().Every, Accept: accepts(root),
 		})
+		if err != nil {
+			return index.Managed{}, err
+		}
+		return index.Managed{Stop: stop, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+			said, err := call(name, input, caller, wait)
+			return index.Called(said), err
+		}}, nil
+	}
+}
+
+// The IO modules that answer a request an action lists: disk over the root, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
+func accepts(root string) func(q.Request) (any, error) {
+	disk := files.Accept(files.NewDisk(root))
+	return func(asked q.Request) (any, error) {
+		if asked.Module == files.DiskModule {
+			return disk(asked)
+		}
+		return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
 	}
 }
 

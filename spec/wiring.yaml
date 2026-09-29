@@ -22,6 +22,8 @@ instances:
     module: guidance
   log:
     module: log
+  http:
+    module: http
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute

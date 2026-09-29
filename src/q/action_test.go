@@ -21,3 +21,27 @@ func TestAnActionAnswersItsRequests(t *testing.T) {
 		t.Fatal("the action takes an int")
 	}
 }
+
+// An action decodes a JSON body into the type it takes, an empty body into the zero value, and refuses a body of another shape. [[spec/tickets/actions-answer-over-http]]
+func TestAnActionDecodesItsInputOffJSON(t *testing.T) {
+	type save struct {
+		Path string `json:"path" doc:"the file"`
+	}
+	c := New()
+	ActionIn(c, "t/save", func(save) []Request { return nil })
+	s := NewStore(c)
+	got, err := s.Input("t/save", []byte(`{"path":"a.md"}`))
+	if err != nil || got != (save{Path: "a.md"}) {
+		t.Fatalf("the body decodes into %#v, %v", got, err)
+	}
+	empty, err := s.Input("t/save", nil)
+	if err != nil || empty != (save{}) {
+		t.Fatalf("an empty body decodes into %#v, %v", empty, err)
+	}
+	if _, err := s.Input("t/save", []byte(`{"path":7}`)); err == nil {
+		t.Fatal("a number decodes into the path")
+	}
+	if _, err := s.Input("t/none", nil); err == nil {
+		t.Fatal("a name the catalog lacks decodes an input")
+	}
+}

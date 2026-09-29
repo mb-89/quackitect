@@ -14,6 +14,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/files"
 	"quackitect/src/q"
 )
 
@@ -321,5 +322,20 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 	}
 	if said := s.Snapshot().Read("work/open-tasks"); said != 1 {
 		t.Fatalf("work/open-tasks reads %v over the fake tree, and wants 1", said)
+	}
+}
+
+// The root hands a request to disk through the files module, and refuses one to any other module by its name. [[spec/tickets/actions-answer-over-http]]
+func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
+	root := t.TempDir()
+	accept := accepts(root)
+	if _, err := accept(q.Request{Module: files.DiskModule, Verb: "write", Args: files.Write{Path: "a.md", Text: "one"}}); err != nil {
+		t.Fatal(err)
+	}
+	if body, err := os.ReadFile(filepath.Join(root, "a.md")); err != nil || string(body) != "one" {
+		t.Fatalf("disk writes %q, %v", body, err)
+	}
+	if _, err := accept(q.Request{Module: "git", Verb: "commit"}); err == nil || !strings.Contains(err.Error(), "git.commit") {
+		t.Fatalf("a request to git answers %v", err)
 	}
 }
