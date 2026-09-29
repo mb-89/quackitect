@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -100,6 +100,18 @@ record:
         exit: 0
         said: work/read-topics-land-in-shadow already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 96b2ff14ca822eaf552c423563f3a54c2a121037
+    hash_after: 96b2ff14ca822eaf552c423563f3a54c2a121037
+    inputs:
+      - name: ask
+        hash: 7b2f4813dd22d30b
+        size: 598
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["open-tasks-shadow-lands"]
 enabled_by: migration.phase3shadow
 cloud: true
@@ -129,14 +141,33 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/cfg-topic-holds-one-resolver]], standard
+- [[spec/tickets/check-names-meet-their-goldens]], standard
+- [[spec/tickets/prose-checks-run-in-go]], standard
+- [[spec/tickets/the-guidance-topic-lands]], standard
+- [[spec/tickets/the-log-topic-lands]], standard
+- [[spec/tickets/check-module-joins-the-wiring]], trivial
+- [[spec/tickets/twin-goldens-walk-every-twin]], trivial
+- [[spec/tickets/twin-golden-flag-name-agrees]], trivial
+- [[spec/tickets/lsp-past-veto-reads-go]], trivial
+- [[spec/tickets/prose-shadow-hooks-reads-text]], trivial
+- [[spec/tickets/prose-shadow-wiring-gets-tests]], trivial
+- [[spec/tickets/guidance-draft-matches-tests-red]], trivial
+- [[spec/tickets/guidance-shadow-wiring-tested]], trivial
+- [[spec/tickets/guidance-module-cases-cover-edges]], trivial
+- [[spec/tickets/log-shadow-reads-unfiltered-rows]], trivial
+- [[spec/tickets/log-shadow-wiring-gets-tests]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Each child holds one topic or one gate point, small enough to review whole.
+The children add up to the goal: config, log, guidance, the check names and the prose checks each run in shadow under their own slice key, which spec/config/level0.json sets to shadow, and nothing of the goal stands outside them.
+Each fix ticket names its parent, and the topics wait on none of each other.
 
 # children
 
