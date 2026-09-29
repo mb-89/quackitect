@@ -316,7 +316,7 @@ index_here() {
 # [[spec/design_output/index#the-compiler-it-needs]]
 get_index() {
   say "  building the index"
-  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/quack) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here

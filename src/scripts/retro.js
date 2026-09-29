@@ -49,6 +49,9 @@ export function retro(root, argv, doors) {
     "  notes            the private notes still open on this box, and 0 when none stands",
   );
   console.log(
+    "  audit            the experiments still open, and 0 once each stands decided",
+  );
+  console.log(
     "  collect <ticket> copies this box into the retro's folder, and writes its manifest; --again merges what arrived since",
   );
   console.log(
@@ -72,6 +75,8 @@ export function retro(root, argv, doors) {
   );
   console.log(
     "  backlog <retro>  every prose criterion the window closes, and 0 once each holds a verdict",
+  );
+  console.log(
     "  mint <retro>     mints one ticket a class standing open, and opens each draft",
   );
   console.log(
