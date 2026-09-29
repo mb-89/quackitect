@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-land-in-shadow
 parent: actions-answer-over-http
+record:
+  - step: do
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: 592c5e4f54eb6302da3cd50ce390d1d46000d715
+    hash_after: 592c5e4f54eb6302da3cd50ce390d1d46000d715
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/wait-key-meets-its-wiring.md:41:387: Vocabulary: waitkey stands outside the words this tree writes. Write a"
+    inputs:
+      - name: ask
+        hash: 87b8320a18ad63b1
+        size: 120
+    def: 545a0133c6b1cae7
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ Called.Gone encodes a time.Duration as nanoseconds; name the unit in the 202 sch
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A post over /v1 answers the time gone by in seconds, the unit the wait reads, and its schema names the unit. The OpenAPI case reads that description off the 202 schema.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change answers seconds, as the ask offers, and names the unit in the schema
+- the change reveals no cleanup past the body type the route already carries
+- the unit stands once, in the doc tag of calledBody.Gone, and the case reads it off the document
 
 # Discussion
 

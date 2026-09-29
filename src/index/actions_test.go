@@ -206,6 +206,10 @@ func TestTheOpenAPIEntryReadsTheAnswerFields(t *testing.T) {
 	if !strings.Contains(schema, `"title":"Sum"`) || !strings.Contains(schema, `"description":"the two terms added"`) {
 		t.Fatalf("the 200 schema reads %s", schema)
 	}
+	// The time gone by answers seconds, as the wait reads. [[spec/tickets/gone-names-its-unit]]
+	if running := string(entry.Responses["202"].Content["application/json"].Schema); !strings.Contains(running, `"description":"the seconds gone by since it started"`) {
+		t.Fatalf("the 202 schema reads %s", running)
+	}
 }
 
 // A body the input type refuses reads 400, and a module refusing a request reads 422 with its reason. [[spec/tickets/action-refusals-meet-cases]]
