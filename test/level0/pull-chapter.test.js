@@ -81,7 +81,7 @@ test("a verdict's table rows ride one piece, and a plain row between two tables 
   assert.equal(said.reason, "| a |\\n| b |; after; | c |");
 });
 
-// A point names the child the gate mints, so a link in the name's place never reaches the mint. [[spec/tickets/verdict-point-crashes-on-a]]
+// A point names the child the gate mints, so the form refuses a link in the name's place. [[spec/design_output/pull#a-finding-rides-out]]
 test("a gate point opening with a link is refused as no ticket name", () => {
   const { it } = doors({}, {}, { root: ROOT });
   const rows = ["accept with points", "- [[spec/tickets/a-link]]: a line"];
