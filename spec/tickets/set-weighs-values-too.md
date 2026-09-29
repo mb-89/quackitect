@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: sidebar-lands-in-shadow
 parent: view-actions-run-through-verbs
+record:
+  - step: do
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 1014a0b5542d9ec6f9c687d0a46af033b44e92ed
+    hash_after: 1014a0b5542d9ec6f9c687d0a46af033b44e92ed
+reason: became
+successors: [view-actions-run-through-verbs]
 ---
 
 # Ask
