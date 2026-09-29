@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 805ab1b7d41c19cd
         size: 291
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 492ec4ae01aacf399a442b4f0bc5b8a1e58320ad
+    hash_after: 492ec4ae01aacf399a442b4f0bc5b8a1e58320ad
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 825fda2631eb19d3
+        size: 2947
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +238,33 @@ The ask names `migration/config/slices/verbs`. The standing slices read as `migr
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/verbs_test.go src/modules/migration/migration_test.go test/contract/runme-road.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verbs_test.go
+- src/modules/migration/migration_test.go
+- test/contract/runme-road.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The road cases fail on their assertions against a stub that hands every verb to the old path. The contract cases fail with exit 2, since the old path knows no get verb and no layer answers the verbs key. The migration case finds no verbs slice. What surprises: the tree names its slices without the slices segment, so the key reads as migration/config/verbs.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ported verb and the unported verb each meet a contract case through the entry, and the check meets the check verb
+- the road reaches cli.js, the twins and the session log through functions the doors carry, and the cases hand it fakes
 
 # gate
 
