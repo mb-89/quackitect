@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -83,6 +83,87 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 fix: true
+record:
+  - step: sync
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: f5e429651e5110315ee42723c4e059ab70ee87ea
+    hash_after: 85c37df258d74338cfcc4c91874bea3723553738
+  - step: sync
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 8d423ed8256a532a6fb342d9dc413e34107af0f0
+    hash_after: 8d423ed8256a532a6fb342d9dc413e34107af0f0
+    answered:
+      - name: sync
+        exit: 0
+        said: work/loose-fixes-4140d51 already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: aee81ffed8cc12d914e651cf1a946da6ff2d2815
+    hash_after: aee81ffed8cc12d914e651cf1a946da6ff2d2815
+    inputs:
+      - name: ask
+        hash: 514ac4d454e0004c
+        size: 371
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 69fc23f0a1e23973f89874bfdbe45962c950a34b
+    hash_after: 69fc23f0a1e23973f89874bfdbe45962c950a34b
+  - step: accept
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 83718dc38c2cd4fa8b6f402913b359cde33ec4f3
+    hash_after: 83718dc38c2cd4fa8b6f402913b359cde33ec4f3
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/loose-fixes-4140d51 already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 514ac4d454e0004c
+        size: 371
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 980425de8377e06c59c760cb4ee62cc0140aacca
+    hash_after: 980425de8377e06c59c760cb4ee62cc0140aacca
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 1e49f2481ea444977ad86b8efdab34f29eb90bf8
+    hash_after: 1e49f2481ea444977ad86b8efdab34f29eb90bf8
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d84ce7ff23d8 · claude-code-remote
+    hash_before: 13edb800fdd876d8bc5eed5853092dc55b8025c7
+    hash_after: 13edb800fdd876d8bc5eed5853092dc55b8025c7
+    inputs:
+      - name: retro/write
+        hash: 5cf6c1e6ef86c8a7
+        size: 1633
+    def: 4da1ca5da87d5bbc
+step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -105,8 +186,9 @@ The source: none.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -115,14 +197,18 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/take-honours-the-name]], process trivial, closed done on the work PR #7 landed on main
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child is a single scoped change, small enough to review whole
+- the goal is the loose agent tickets on main, and take-honours-the-name is the only ticket naming this group
+- no child waits on another, so no depends_on stands
 
 # children
 
@@ -133,8 +219,11 @@ The source: none.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+The one child, take-honours-the-name, closes done. Its work stands on main in commit 008c2a7b8, and its named test answers green here.
+./RUNME.sh check exits 0 on this branch. Six prose warnings stand, five on tickets other hands hold, and the door refuses a write to them.
 
 # retro
 
@@ -145,8 +234,9 @@ The source: none.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -155,38 +245,57 @@ The source: none.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- take-honours-the-name closes done on the work main already carries, verified by its named test
+- the group passes sync, split, children and accept, and the check exits 0
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the dispatch prompt named the landed commit, so the box verified and redid nothing
+- the pull printed each field it wanted, so every step passed on one try but split
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 00:33 the first shell call named no ticket, and the door refused it
+- 00:33 a raw git push met the door, which wants the push verb
+- 00:36 a plan todo named the group, and the pull then handed nothing out
+- 00:37 the group stood draft, and the pull refused it by name until the open verb ran
+- 00:38 split refused a JSON list for its checklist, which wants lines in one string
+- 00:40 the door refused prose fixes on tickets other hands hold, so their warnings stand
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the work skill names `./RUNME.sh ticket open` for a draft group, before the first pull
+- the pull hand-back hint shows a checklist field as lines in one string
+- the retro of the next box reads this list before its first call
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The child needed no code. The work was reading the engine's doors, and each refusal named its fix. The warnings on other open tickets stay with their hands, because the door gives their fields to the engine alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the retro adds no fact standing elsewhere, and points at the tickets it names
+- the retro adds no number past the times of the run
+- the change writes no file header
+- the badly list carries each error of the run with its time, and no owner prompt came
+- the chapter names the box by its role alone
 
 ## cloud
 
@@ -195,21 +304,29 @@ The source: none.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the box lacked nothing: every tool the take installed ran, and the proxy refused no host
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 00:33 the git door refused a raw push, and the verbs pushed in its place
+- 00:37 the sync met no conflict, since the branch carried main
+- the named test and the check ran green on the box
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked, and the box mints no ticket
+- five prose warnings stand on open tickets other hands hold
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- take-honours-the-name: the box passes `do` on the work main already carries, and redoes nothing. It weighs three facts. Commit 008c2a7b8 stands on `origin/main` and adds `src/scripts/work-held.js` with `pastHold`. `test/level0/work-held.test.js` holds both cases the ask names. One takes a name over a done hold, and one meets a refusal naming both branches. `./RUNME.sh branch test test/level0/work-held.test.js` answers green on this branch. It assumes the ticket's `says` evidence still describes main. No later commit on those files changes the take's order.
