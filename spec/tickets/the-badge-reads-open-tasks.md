@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -228,7 +228,33 @@ record:
         exit: 0
         said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 16a702d25a8f7434bfba581e04b3483d17ecc062
+    hash_after: 16a702d25a8f7434bfba581e04b3483d17ecc062
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 29 test(s) pass in 2 file(s); green, src/tui/work passes; green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: ac0aa081eda77646
+        size: 518
+      - name: design/tests-red-2
+        hash: 163a9a7ab1ecc62c
+        size: 894
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: open-tasks-switch-lands
+reason: done
 ---
 
 # Ask
@@ -465,26 +491,37 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/settle.test.js test/level0/sidebar.test.js src/tui/work src/tui
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The open-tasks slice switches to new. PlacesAt fills Places.Takeable through slicedCount. Under new that answers the index value work/open-tasks, and it keeps the old count where no door answers. The badge verb and the work tab header both read Takeable, so they read one number. On this tree the badge verb and the index both read 25.
+
+The sidebar badge also redraws after a burst of writes to a ticket folder, the plan file or the hold folder. The burst settles for BURST, which stands above the index sweep delay, so the badge reads the swept count.
+
+One commit on migration.opentasks in spec/config/level0.json puts the old count back.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the ones draft-2 names, and lens.js for FOLDERS
+- fakes: the index, the verb, the badge verb and the timer each take a fake
+- comments: each new piece points at this ticket
+- one place: COUNTS builds on FOLDERS and HOLD_WATCHES
 
 # accept
 

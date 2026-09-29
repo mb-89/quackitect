@@ -31,7 +31,7 @@ const {
 const SCHEMA = "spec/config/level0.schema.json";
 // A copy of inRun("bless.json") out of .claude/skills/level0/lib/folders.js, which BLESS_FILE in src/scripts/pull-bless.js names, because the extension loads CommonJS and those modules are ESM. [[spec/design_output/pull#the-bless]]
 const BLESS = ".se/.runtime/bless.json";
-// A copy of PLANS out of .claude/skills/level0/lib/runs.js, because the extension loads CommonJS and that module is ESM. [[spec/tickets/the-badge-reads-open-tasks]]
+// A copy of PLANS out of .claude/skills/level0/lib/runs.js, built on inRun in .claude/skills/level0/lib/folders.js, because the extension loads CommonJS and those modules are ESM. [[spec/tickets/the-badge-reads-open-tasks]]
 const PLAN = ".se/.runtime/plan.json";
 // The files a ticket move, a plan todo or a hold writes, whose burst draws the badge again. [[spec/tickets/the-badge-reads-open-tasks]]
 const COUNTS = [...FOLDERS.map((folder) => `${folder}/*.md`), PLAN, ...HOLD_WATCHES];
