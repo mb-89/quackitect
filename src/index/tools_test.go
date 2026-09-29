@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"quackitect/src/q"
+	"quackitect/src/q/tool"
 )
 
 // One tool as the list reads it. [[spec/tickets/the-hook-registers-index-tools]]
@@ -86,6 +87,19 @@ func TestV1ListsEachActionAsATool(t *testing.T) {
 	}
 	if a := add.InputSchema.Properties["a"]; a.Type != "integer" || a.Description != "the first term" {
 		t.Fatalf("the input schema of t/add reads %+v", add.InputSchema)
+	}
+}
+
+// Every tool the list names spells its action as the shared surface does, so the hooks door and the mcp module read it back. [[spec/tickets/tool-surface-moves-into-q]]
+func TestEveryListedNameIsTheSharedToolName(t *testing.T) {
+	listed := listedTools(t)
+	if len(listed) == 0 {
+		t.Fatal("the list holds no tool, and wants t/add and t/echo")
+	}
+	for name, one := range listed {
+		if name != tool.Name(one.Action) {
+			t.Fatalf("%s lists as %q, and wants the shared name %q", one.Action, name, tool.Name(one.Action))
+		}
 	}
 }
 
