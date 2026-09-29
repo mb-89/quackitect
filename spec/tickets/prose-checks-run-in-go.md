@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: a2d542f562e78107
         size: 342
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 0bda4a0d5127edd36888ce4b82bde37701c9c691
+    hash_after: 0bda4a0d5127edd36888ce4b82bde37701c9c691
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 9b19e9c0eab11f4a
+        size: 3582
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -197,26 +210,31 @@ go test ./... passes: the src/prose and src/quack tests; log --kind shadow names
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/prose-shadow.test.js src/prose src/quack
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/prose/prose_test.go,src/quack/prose_test.go,test/level0/prose-shadow.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The stubs compile, so every Go case and both JS rows fail on an assertion and none on a build. The guards for a slice at old and a missing binary pass on the stub already, since the stub writes nothing, and they hold the implementation to that. The captured tool outputs under src/modules/check/testdata ended in .txt, so Vale linted them and the push refused. They now end in .out.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test: go test over src/prose and src/quack, the shadow rows in prose-shadow.test.js, and the check at tests-green
+the one door the tests reach, the quack process, has a fake in doorsOf, beside the settings, the files and the log
 
 # gate
 
