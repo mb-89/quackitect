@@ -166,3 +166,16 @@ func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
 		t.Fatal("the road holds no retro notes twin in shadow")
 	}
 }
+
+// A verb cli.js answers too takes cli.js, even where quack's verb table holds it, so ./RUNME.sh tools keeps writing tools.json. [[spec/tickets/quack-tools-spares-runme-tools]]
+func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
+	table := map[string]bool{"run": true, "tools": true, "act": true}
+	for _, verb := range []string{"tools", "act"} {
+		if aloneOf([]string{verb}, table) {
+			t.Fatalf("%s runs in quack alone, and cli.js stops answering it", verb)
+		}
+	}
+	if !aloneOf([]string{"run"}, table) {
+		t.Fatal("run, which cli.js lacks, runs in cli.js")
+	}
+}

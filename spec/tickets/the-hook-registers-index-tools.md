@@ -354,3 +354,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- `src/quack/verbs.go` `aloneOf` stands among the callers. It keeps each verb `cliJsKeeps` names on the road to cli.js, tools and act among them. For details, see [[spec/tickets/quack-tools-spares-runme-tools]].

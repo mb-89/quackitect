@@ -63,9 +63,12 @@ type verbDoors struct {
 	out, errs io.Writer
 }
 
-// Whether quack answers the verb alone: a verb of the tree past help, which cli.js lacks. [[spec/tickets/quack-alone-verbs-skip-mode]]
-func aloneOf(argv []string) bool {
-	return len(argv) > 0 && cliVerbs[argv[0]] && argv[0] != "help" && !strings.HasPrefix(argv[0], "-")
+// The verbs cli.js answers under the same word, which keep its road. [[spec/tickets/quack-tools-spares-runme-tools]]
+var cliJsKeeps = map[string]bool{"help": true, "tools": true, "act": true}
+
+// Whether quack answers the verb alone: a verb of the table past the ones cli.js keeps. [[spec/tickets/quack-alone-verbs-skip-mode]]
+func aloneOf(argv []string, table map[string]bool) bool {
+	return len(argv) > 0 && table[argv[0]] && !cliJsKeeps[argv[0]] && !strings.HasPrefix(argv[0], "-")
 }
 
 // The twin the verb's words name, two words before one, and its key. [[spec/tickets/runme-hands-verbs-to-quack]]
@@ -81,7 +84,7 @@ func twinOf(argv []string, twins map[string]twin) (string, twin) {
 
 // The road a verb takes under the mode: a verb quack answers alone takes quack under every mode, and a twin runs beside cli.js in shadow and alone under new. [[spec/tickets/runme-hands-verbs-to-quack]]
 func roadOf(mode string, argv []string, twins map[string]twin) road {
-	if aloneOf(argv) {
+	if aloneOf(argv, cliVerbs) {
 		return toQuack
 	}
 	if _, one := twinOf(argv, twins); one != nil {
