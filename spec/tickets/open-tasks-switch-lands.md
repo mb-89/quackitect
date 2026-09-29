@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: children
+step: accept
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2switch
@@ -111,6 +111,10 @@ record:
         hash: e122785976621597
         size: 10947
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 0f9a6049a01c8702954986f27cee58dadce29344
+    hash_after: 0f9a6049a01c8702954986f27cee58dadce29344
 ---
 
 # Ask
