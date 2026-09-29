@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d857a59424d7 · claude-code-remote
+    hash_before: 9977f126be4d2f8fa617f18b17afdc4be7cd27bb
+    hash_after: 9977f126be4d2f8fa617f18b17afdc4be7cd27bb
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["quack-verbs-land-in-shadow", "read-topics-land-in-shadow"]
 enabled_by: migration.phase6shadow
 cloud: true
@@ -227,38 +239,57 @@ The log view stands as a declared view over log/rows with a draw case, the work 
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- Took the stale hold by its bare name, and merged main, keeping both the window and lsp keys in the config, the schema and the migration module
+- Refreshed the size golden after the merge grew the schema
+- Closed the-log-becomes-a-view with a draw case over fake rows and a ViewOver for the log
+- Closed log-draft-test-path-wrong with the corrected path in the parent Discussion
+- Closed renderers-stand-inside-ioonly: the analyzer holds every renderer to its door files, and two net/http reaches moved into doors
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- The check named each fault plainly, so each fix was one step
+- The parent held the gate points as tickets, so each stood as a small leaf
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 18:37 the push refused on a red check because the merge grew the schema past the size golden, and the golden refreshed only after a full check run
+- 18:39 to 18:43 the pull held on a stale plan entry, because the plan call took done and working under other names, until the parameters were read in the source
+- 18:47 the commit refused for a missing test beside changed code, and the layout table refused an import the new view added, one check run apart
+- branch take with the full work/ name doubled the prefix and took nothing
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- The work skill should say branch take takes the bare group name, and its home is .claude/skills/work/SKILL.md
+- The plan tool description should name the done parameter, and its home is the tool schema
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The stale hold cost nothing once the merge was clean. The renderer rule reads files, since a door and its logic share one package, and that shaped the analyzer more than the ask said.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands once: the import row stands in the tui chapter and the layout test reads it
+- every number carries a name: the status bound became a constant in the registry
+- every header says what its file is for and counts nothing
+- the chapter carries no owner prompt, and the errors of the run stand with their times
+- the chapter says the role and carries no name, address or path
 
 ## cloud
 
