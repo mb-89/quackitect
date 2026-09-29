@@ -32,6 +32,14 @@ var twinsAt = filepath.Join("..", "modules", "check", "testdata")
 // The name the private twin looks for, as src/scripts/check-twins.js names it. [[spec/tickets/check-names-meet-their-goldens]]
 const twinName = "owner"
 
+// The rules that read the box beside the tree, so their rows part with each runner and sit outside the golden. [[spec/tickets/check-names-meet-their-goldens]]
+var boxBound = []string{"SurveyFindsNode"}
+
+// The rows of a side with every box-bound rule taken out. [[spec/tickets/check-names-meet-their-goldens]]
+func treeBound(rows []twinRow) []twinRow {
+	return slices.DeleteFunc(slices.Clone(rows), func(row twinRow) bool { return slices.Contains(boxBound, row.Rule) })
+}
+
 var twinHeading = regexp.MustCompile(`^#{1,6}\s+(.+?)\s*#*\s*$`)
 
 // One row a twin reports, in the shape both sides write. [[spec/tickets/check-names-meet-their-goldens]]
@@ -198,7 +206,8 @@ func TestTwinGoldens(t *testing.T) {
 			t.Errorf("the JavaScript side prints no %s twin, which check.Twins names", twin)
 			continue
 		}
-		said := twinGolden{JavaScript: aloneIn(jsSide[twin], goSide[twin]), Go: aloneIn(goSide[twin], jsSide[twin])}
+		jsRows, goRows := treeBound(jsSide[twin]), treeBound(goSide[twin])
+		said := twinGolden{JavaScript: aloneIn(jsRows, goRows), Go: aloneIn(goRows, jsRows)}
 		at := filepath.Join(twinsAt, twin+".golden.json")
 		if *twinsUpdate {
 			body, err := json.MarshalIndent(said, "", "  ")

@@ -23,12 +23,6 @@
       "rule": "stopFolderIsData",
       "line": 0,
       "message": "runs"
-    },
-    {
-      "file": ".se/.runtime/tools.json",
-      "rule": "SurveyFindsNode",
-      "line": 4,
-      "message": "The survey names node 22.22.2, and node  runs this sweep. Run ./RUNME.sh tools."
     }
   ],
   "go": [
@@ -97,12 +91,6 @@
       "rule": "EveryPointerResolves",
       "line": 100,
       "message": "This pointer names a chapter nobody wrote: spec/design_output/work#a-successor-stands-on-question. Point at a heading of spec/design_output/work.md, or write the chapter."
-    },
-    {
-      "file": "src/scripts/install.sh",
-      "rule": "SurveyFindsNode",
-      "line": 1,
-      "message": ".se/.runtime/tools.json stands nowhere, so every caller guesses a path. Run ./RUNME.sh tools."
     }
   ]
 }
