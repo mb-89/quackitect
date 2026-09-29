@@ -24,13 +24,20 @@ var fixed = time.Date(2026, 9, 29, 12, 0, 0, 0, time.UTC)
 
 // The manager's call, as a case teaches it: it keeps each wait and answers what the case sets. [[spec/design_output/model#a-caller-sets-its-wait]]
 type calls struct {
-	waits []time.Duration
-	said  Called
+	waits  []time.Duration
+	inputs []any
+	said   Called
 }
 
-func (c *calls) call(_ string, _ any, _ string, wait time.Duration) (Called, error) {
+func (c *calls) call(_ string, input any, _ string, wait time.Duration) (Called, error) {
 	c.waits = append(c.waits, wait)
+	c.inputs = append(c.inputs, input)
 	return c.said, nil
+}
+
+// An input declaring a wait of its own. [[spec/tickets/hooks-wait-leaves-tool-input]]
+type sleep struct {
+	Wait int `json:"wait"`
 }
 
 // The manager's book, as a case teaches it: the operations of the session s1. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -57,6 +64,7 @@ func doorOver(t *testing.T, c *calls, b *book) over {
 		resolved = q.OutIn(cat, q.ResolvedName, q.Resolved{}, q.Doc("the config values, as the case seeds them"))
 		q.FoldIn(cat, "session/<id>/count", 0, func(n int, _ q.Event) int { return n + 1 }, q.Doc("the events a session lands"))
 		q.ActionIn(cat, "work/pull", func(struct{}) []q.Request { return nil }, q.Doc("pulls the next ticket"))
+		q.ActionIn(cat, "work/sleep", func(sleep) []q.Request { return nil }, q.Doc("sleeps as long as its input says"))
 	})
 	door := New(Outside{
 		Store: ix.Store(), As: events, Bound: func(local string) string { return local },
@@ -151,6 +159,18 @@ func TestACallTakesTheDefaultWaitOffItsKey(t *testing.T) {
 	}
 }
 
+func TestAnActionsOwnWaitFieldKeepsItsValue(t *testing.T) {
+	c := &calls{said: Called{Result: "slept", Handle: "h1"}}
+	one := doorOver(t, c, &book{})
+	hooks(t, one.door, Post{Event: "tool.call", E: map[string]any{"tool": "index_work_sleep", "input": map[string]any{"wait": 2}, "session_id": "s1"}})
+	if len(c.waits) != 1 || c.waits[0] != 2*time.Second {
+		t.Fatalf("the call waits %v, and wants the two seconds the call sets", c.waits)
+	}
+	if in, ok := c.inputs[0].(sleep); !ok || in.Wait != 2 {
+		t.Fatalf("the action takes %#v, and wants its own wait of 2 kept", c.inputs[0])
+	}
+}
+
 func TestAnOperationEndingAfterItsCallReachesTheNextTurn(t *testing.T) {
 	c := &calls{said: Called{Running: true, Handle: "h1", Fraction: 0.4, Gone: time.Second}}
 	b := &book{}
@@ -192,16 +212,24 @@ func TestTheListenAnswersAPostAndStandsItsPort(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stop()
-	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(StandingFile)))
+	text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(StandingFile)))
+	var standing Standing
+	if err := json.Unmarshal(text, &standing); err != nil || standing.Port == 0 || standing.Token == "" {
+		t.Fatalf("the standing file reads %q, and wants the port and the token", text)
+	}
+	at := "http://127.0.0.1:" + jsonNumber(standing.Port) + "/hook"
+	body := []byte(`{"event":"session.start","e":{"session_id":"s9"}}`)
+	bare, err := http.Post(at, "application/json", bytes.NewReader(body))
 	if err != nil {
 		t.Fatal(err)
 	}
-	var standing struct{ Port int }
-	if err := json.Unmarshal(text, &standing); err != nil || standing.Port == 0 {
-		t.Fatalf("the standing file reads %s, and wants the port", text)
+	bare.Body.Close()
+	if bare.StatusCode != http.StatusUnauthorized {
+		t.Fatalf("a post with no token answers %d, and wants 401", bare.StatusCode)
 	}
-	body := []byte(`{"event":"session.start","e":{"session_id":"s9"}}`)
-	posted, err := http.Post("http://127.0.0.1:"+jsonNumber(standing.Port)+"/hook", "application/json", bytes.NewReader(body))
+	asked, _ := http.NewRequest(http.MethodPost, at, bytes.NewReader(body))
+	asked.Header.Set("Authorization", "Bearer "+standing.Token)
+	posted, err := http.DefaultClient.Do(asked)
 	if err != nil {
 		t.Fatal(err)
 	}

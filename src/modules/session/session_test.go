@@ -27,3 +27,10 @@ func TestTheLastReadsThePlaceAndKindOfTheNewestEvent(t *testing.T) {
 		t.Fatalf("the last reads %+v, and wants seq 2, classic.Stop", last)
 	}
 }
+
+func TestTheFillTakesAWholeNumberAsTheDoorHandsIt(t *testing.T) {
+	ix := qtest.New(t, func(c *q.Catalog) { Registers(c) })
+	if fill := ix.Land("s1/fill", q.Event{Seq: 1, Kind: "tool.call", Fields: map[string]any{"fill": 900}}); fill != 900 {
+		t.Fatalf("the fill reads %v, and wants 900", fill)
+	}
+}

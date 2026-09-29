@@ -21,11 +21,13 @@ import (
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
+	"quackitect/src/modules/hooks"
 	httpmodule "quackitect/src/modules/http"
 	manager "quackitect/src/modules/index"
 	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
+	"quackitect/src/modules/session"
 	"quackitect/src/modules/tickets"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
@@ -66,6 +68,9 @@ var modules = map[string]ioModule{
 	"guidance":  {registers: guidance.Registers},
 	"log":       {registers: logmodule.Registers},
 	"http":      {registers: httpmodule.Registers},
+	// [[spec/tickets/the-hooks-door-lands]]
+	hooksModule: {registers: hooks.Registers},
+	"session":   {registers: session.Registers},
 	// [[spec/tickets/ticket-verbs-become-actions]]
 	"ticket":  {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
 	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
@@ -178,31 +183,97 @@ func main() {
 		os.Exit(routes(os.Stdout, os.Stderr, index.V1, os.Args[1:]))
 	}
 	as := manager.Registers(q.Main)
-	starts, err := wired()
+	starts, hooked, err := wired()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	// The config module loads always, after the wiring, so it resolves every key the wiring declares. [[spec/design_output/model#the-config-module]]
 	config.Registers(q.Main)
-	index.Main(manages(as), starts...)
+	index.Main(manages(as, hooked), starts...)
 }
 
-// The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept. [[spec/design_output/model#the-index-manager]]
-func manages(as q.Writer) index.Manage {
+// The module type the wiring loads as hooks, whose door the manager's start opens. [[spec/tickets/the-hooks-door-lands]]
+const hooksModule = "hooks"
+
+// The hooks instance the wiring loads: its writer, and the name each local name binds to. No instance leaves on false. [[spec/tickets/the-hooks-door-lands]]
+type hooked struct {
+	on    bool
+	as    q.Writer
+	bound func(local string) string
+}
+
+// [[spec/tickets/the-hooks-door-lands]]
+func hookedOf(w q.Wiring, hands map[string]q.Writer) hooked {
+	for _, one := range w.Instances {
+		if one.Module == hooksModule {
+			name := one.Name
+			return hooked{on: true, as: hands[name], bound: func(local string) string { return w.Bound(name, local) }}
+		}
+	}
+	return hooked{}
+}
+
+// The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept, and the hooks door beside it where the wiring loads one. [[spec/design_output/model#the-index-manager]]
+func manages(as q.Writer, hook hooked) index.Manage {
 	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
-		stop, call, err := manager.Serves(manager.Outside{
+		served, err := manager.Serving(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
 			Now: time.Now, Every: clock.New().Every, Accept: accepts(root),
 		})
 		if err != nil {
 			return index.Managed{}, err
 		}
+		stop, err := listens(root, store, hook, served)
+		if err != nil {
+			served.Stop()
+			return index.Managed{}, err
+		}
 		return index.Managed{Stop: stop, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
-			said, err := call(name, input, caller, wait)
+			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil
 	}
+}
+
+// Opens the hooks door over the manager's call and book, at the clock IO module's time, and answers the stop of both. The listener stands in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
+func listens(root string, store *q.Store, hook hooked, served manager.Served) (func(), error) {
+	if !hook.on {
+		return served.Stop, nil
+	}
+	door := hooks.New(hooks.Outside{
+		Store: store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
+		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
+			said, err := served.Call(name, input, caller, wait)
+			return hooks.Called(said), err
+		},
+		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
+	})
+	halt, err := hooks.Listen(root, door)
+	if err != nil {
+		return nil, err
+	}
+	return func() {
+		halt()
+		served.Stop()
+	}, nil
+}
+
+// The book's operations as the hooks door reads them: the fraction done, and the time gone by to its end or to now. [[spec/design_output/model#the-agent-does-not-poll]]
+func opsOf(all []manager.Op, now time.Time) []hooks.Op {
+	out := make([]hooks.Op, 0, len(all))
+	for _, one := range all {
+		end := now
+		if !one.Ended.IsZero() {
+			end = one.Ended
+		}
+		var fraction float64
+		if one.Progress.Known > 0 {
+			fraction = float64(one.Progress.Done) / float64(one.Progress.Known)
+		}
+		out = append(out, hooks.Op{Handle: one.ID, Action: one.Action, State: string(one.State), Fraction: fraction, Gone: end.Sub(one.Started), Result: one.Result, Error: one.Error})
+	}
+	return out
 }
 
 // The IO modules that answer a request an action lists: disk over the root, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
@@ -240,20 +311,21 @@ func (one opRows) All() ([]manager.Row, error) {
 }
 
 // The module instances of the wiring file, loaded into q.Main. A tree with no wiring file loads its vehicle's, and where neither stands the index runs none. [[spec/design_output/model#the-wiring-file]]
-func wired() ([]index.Start, error) {
+func wired() ([]index.Start, hooked, error) {
 	root, err := index.Root()
 	if err != nil {
-		return nil, err
+		return nil, hooked{}, err
 	}
 	text, err := wiringOf(root, vehicleOf(os.Executable()))
 	if text == "" || err != nil {
-		return nil, err
+		return nil, hooked{}, err
 	}
 	w, err := q.ReadWiring(text)
 	if err != nil {
-		return nil, err
+		return nil, hooked{}, err
 	}
-	return load(w, q.Main)
+	starts, hands, err := loaded(w, q.Main)
+	return starts, hookedOf(w, hands), err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]
@@ -285,6 +357,12 @@ func vehicleOf(exe string, err error) string {
 
 // Loads each IO module instance into into, and answers a start committing its local names under the names the wiring binds. [[spec/design_output/model#the-wiring-file]]
 func load(w q.Wiring, into *q.Catalog) ([]index.Start, error) {
+	starts, _, err := loaded(w, into)
+	return starts, err
+}
+
+// Load, answering the writer each instance's registration hands back beside the starts. [[spec/tickets/the-hooks-door-lands]]
+func loaded(w q.Wiring, into *q.Catalog) ([]index.Start, map[string]q.Writer, error) {
 	kept := q.Wiring{Wires: w.Wires}
 	hands := map[string]q.Writer{}
 	types := map[string]func(*q.Catalog){}
@@ -297,11 +375,11 @@ func load(w q.Wiring, into *q.Catalog) ([]index.Start, error) {
 		name := one.Name
 		types[one.Module] = func(c *q.Catalog) { hands[name] = module.registers(c) }
 	}
-	loaded, faults := q.Load(kept, types)
+	catalog, faults := q.Load(kept, types)
 	if len(faults) > 0 {
-		return nil, q.Refused(faults)
+		return nil, nil, q.Refused(faults)
 	}
-	into.Take(loaded)
+	into.Take(catalog)
 	// A projection reads files/, so it loads where the wiring loads the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
 	for _, one := range kept.Instances {
 		if one.Module == "watch" {
@@ -327,7 +405,7 @@ func load(w q.Wiring, into *q.Catalog) ([]index.Start, error) {
 			})
 		})
 	}
-	return starts, nil
+	return starts, hands, nil
 }
 
 // Prints every key off the config module, over both files under the root, the wiring and the SE_ variables. [[spec/tickets/cfg-topic-holds-one-resolver]]

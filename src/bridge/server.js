@@ -22,6 +22,7 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { wire } from "../doors/wire.js";
+import { shadowsCage } from "./cage-shadow.js";
 import { projectionsHere, sourcesOf } from "../engine/projection.js";
 import { onAgent } from "./agent.js";
 import {
@@ -337,6 +338,7 @@ export function boxOf(method, work = method, doors = {}) {
     vale: doors.vale ?? vale(files, outside, method, work),
     biome: doors.biome ?? biome(files, outside, method),
     awake: doors.awake ?? awake(),
+    http: doors.http,
     log: doors.log,
   };
   if (box.log) return box;
@@ -511,6 +513,7 @@ export async function answersEvent(body, over, boxes, own) {
     box = boxes(said.root);
     const decided = await decide(said, box);
     await box.log.event(said, decided);
+    shadowsCage(box, said, decided);
     return decided;
   } catch (error) {
     try {

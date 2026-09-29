@@ -34,7 +34,12 @@ instances:
     module: stub
   branch:
     module: branch
+  hooks:
+    module: hooks
+  session:
+    module: session
 wires:
+  hooks.events/<id>: session/<id>/events
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
   env.vars/<name>: env/<name>

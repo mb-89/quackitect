@@ -5,6 +5,20 @@
 package hooks
 
 import (
+	"bufio"
+	"bytes"
+	"crypto/rand"
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"os"
+	"path/filepath"
+	"reflect"
+	"strings"
+	"sync"
 	"time"
 
 	"quackitect/src/q"
@@ -19,6 +33,31 @@ const (
 
 // The file the listen writes its port to, under the root, which the bridge reads in shadow. .claude/skills/level0/lib/folders.js owns the folder, and a module spells it again. [[spec/tickets/the-hooks-door-lands]]
 const StandingFile = ".se/.runtime/hooks.json"
+
+// The protocol's words: the events the door reads, the effects it answers, the harness a post naming none comes from, and the tool prefix and arguments /v1/tools writes. [[spec/design_output/model#the-hook-protocol]]
+const (
+	toolEvent      = "tool.call"
+	stopEvent      = "classic.Stop"
+	passKind       = "pass"
+	afterKind      = "after"
+	resultKind     = "result"
+	builtInHarness = "claude-code"
+	toolPrefix     = "index_"
+	waitArg        = "wait"
+	bareArg        = "input"
+	sessionKey     = "<id>"
+	foldsUnder     = "session/<id>/"
+	noSession      = "unknown"
+	percent        = 100
+)
+
+// The cap on a post's body, the span a request's header takes to read, the bytes of the token, and the scheme the post carries it under. [[spec/tickets/hooks-standing-file-names-token]]
+const (
+	bodyCap           = 1 << 20
+	headerReadTimeout = 5 * time.Second
+	tokenBytes        = 16
+	bearer            = "Bearer "
+)
 
 // One post of the hook protocol. Old carries the bridge's own decision, in shadow. [[spec/design_output/model#a-post-and-its-answer]]
 type Post struct {
@@ -67,7 +106,7 @@ type Op struct {
 	Error    string        `json:"error,omitempty"`
 }
 
-// What the door reaches: the store and the writer of its out-port, the name a local name binds to, the manager's call and its book, and the clock. [[spec/tickets/the-hooks-door-lands]]
+// What the door reaches: the store and the writer of its out-port, the name a local name binds to, the manager's call and its book, and the clock IO module's time. [[spec/tickets/hooks-at-reads-clock-module]]
 type Outside struct {
 	Store *q.Store
 	As    q.Writer
@@ -77,9 +116,12 @@ type Outside struct {
 	Now   func() time.Time
 }
 
-// [[spec/tickets/the-hooks-door-lands]]
+// The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
 type Door struct {
 	from Outside
+	mu   sync.Mutex
+	seqs map[string]int64
+	told map[string]bool
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -97,14 +139,378 @@ func Registers(c *q.Catalog) q.Writer {
 	)
 }
 
-// [[spec/tickets/the-hooks-door-lands]]
-func New(from Outside) *Door { return &Door{from: from} }
+// A door with no book tells nothing, and one with no binding reads its local names. [[spec/tickets/the-hooks-door-lands]]
+func New(from Outside) *Door {
+	if from.Bound == nil {
+		from.Bound = func(local string) string { return local }
+	}
+	if from.Ops == nil {
+		from.Ops = func(string) []Op { return nil }
+	}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}}
+}
 
-// [[spec/tickets/the-hooks-door-lands]]
-func (d *Door) Hook(post Post) (Answer, error) { return Answer{}, nil }
+// Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
+func (d *Door) Hook(post Post) (Answer, error) {
+	session := sessionOf(post)
+	if err := d.writes(session, post); err != nil {
+		return Answer{}, err
+	}
+	effects := []Effect{}
+	if post.Event == toolEvent {
+		said, ok, err := d.calls(session, post.E)
+		if err != nil {
+			return Answer{}, err
+		}
+		if ok {
+			effects = append(effects, said)
+		}
+	}
+	if len(effects) == 0 {
+		effects = append(effects, Effect{Kind: passKind})
+	}
+	told := d.ended(session)
+	if post.Event == stopEvent {
+		told = d.running(session)
+	}
+	if told != "" {
+		effects = append(effects, Effect{Kind: afterKind, Text: told})
+	}
+	return Answer{Effects: effects}, nil
+}
 
-// [[spec/tickets/the-hooks-door-lands]]
-func Listen(root string, door *Door) (func(), error) { return func() {}, nil }
+// Commits the event at the session's next place, and lands it on every fold over the session. [[spec/design_output/model#the-events-of-a-session]]
+func (d *Door) writes(session string, post Post) error {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	store := d.from.Store
+	name := d.from.Bound(strings.Replace(EventsName, sessionKey, session, 1))
+	seq := d.seqs[session]
+	if seq == 0 {
+		if last, ok := store.Snapshot().Read(name).(q.Event); ok {
+			seq = last.Seq
+		}
+	}
+	hand := q.Hand{Session: session, Agent: textOf(post.E, "agentId", "agent_id")}
+	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fieldsOf(post)}
+	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
+		return err
+	}
+	d.seqs[session] = event.Seq
+	for _, fold := range store.Folds(foldsUnder) {
+		if err := store.Land(strings.Replace(fold, sessionKey, session, 1), event); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
-// [[spec/design_output/model#an-inbound-fake-replays]]
-func Replay(door *Door, recording []byte) ([]Mismatch, error) { return nil, nil }
+func (d *Door) now() time.Time {
+	if d.from.Now == nil {
+		return time.Now()
+	}
+	return d.from.Now()
+}
+
+// The action a tool of /v1/tools names, called within the call's wait or the key's, and its result or the line saying it still runs. [[spec/design_output/model#a-caller-sets-its-wait]]
+func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
+	action, ok := d.actionOf(textOf(e, "tool"))
+	if !ok || d.from.Call == nil {
+		return Effect{}, false, nil
+	}
+	args, _ := e["input"].(map[string]any)
+	input, err := d.inputOf(action, args)
+	if err != nil {
+		return Effect{Kind: resultKind, Text: err.Error()}, true, nil
+	}
+	said, err := d.from.Call(action, input, session, d.waitOf(args))
+	if err != nil {
+		return Effect{}, true, err
+	}
+	if said.Running {
+		text := fmt.Sprintf("%s still running: %s, handle %s. Its result reaches your next turn.", action, progressOf(said.Fraction, said.Gone), said.Handle)
+		return Effect{Kind: resultKind, Text: text}, true, nil
+	}
+	d.tells(said.Handle)
+	if said.Error != "" {
+		return Effect{Kind: resultKind, Text: fmt.Sprintf("%s fails: %s", action, said.Error)}, true, nil
+	}
+	return Effect{Kind: resultKind, Result: said.Result}, true, nil
+}
+
+func (d *Door) tells(handle string) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.told[handle] = true
+}
+
+// The action whose tool name the post names, as /v1/tools spells it. [[spec/tickets/the-hook-registers-index-tools]]
+func (d *Door) actionOf(tool string) (string, bool) {
+	if !strings.HasPrefix(tool, toolPrefix) {
+		return "", false
+	}
+	for _, name := range d.from.Store.Names() {
+		if _, _, ok := d.from.Store.Types(name); ok && toolPrefix+strings.ReplaceAll(name, "/", "_") == tool {
+			return name, true
+		}
+	}
+	return "", false
+}
+
+// The input past the wait argument, which an input declaring its own wait keeps, or the bare input a tool carries under its one property. [[spec/tickets/hooks-wait-leaves-tool-input]]
+func (d *Door) inputOf(action string, args map[string]any) (any, error) {
+	in, _, _ := d.from.Store.Types(action)
+	kept := map[string]any{}
+	for key, value := range args {
+		if key != waitArg || declares(in, waitArg) {
+			kept[key] = value
+		}
+	}
+	body, err := json.Marshal(kept)
+	if err != nil {
+		return nil, err
+	}
+	input, err := d.from.Store.Input(action, body)
+	if bare, ok := kept[bareArg]; err != nil && ok && len(kept) == 1 {
+		if body, err = json.Marshal(bare); err != nil {
+			return nil, err
+		}
+		return d.from.Store.Input(action, body)
+	}
+	return input, err
+}
+
+// Whether the input type carries a field its JSON names so. [[spec/tickets/hooks-wait-leaves-tool-input]]
+func declares(in reflect.Type, key string) bool {
+	if in == nil || in.Kind() != reflect.Struct {
+		return false
+	}
+	for i := range in.NumField() {
+		field := in.Field(i)
+		name, _, _ := strings.Cut(field.Tag.Get("json"), ",")
+		if name == key || (name == "" && strings.EqualFold(field.Name, key)) {
+			return true
+		}
+	}
+	return false
+}
+
+// The wait the call sets, or the one its key reads, or the built-in second. [[spec/design_output/model#a-caller-sets-its-wait]]
+func (d *Door) waitOf(args map[string]any) time.Duration {
+	if seconds, ok := numberOf(args[waitArg]); ok && seconds >= 0 {
+		return time.Duration(seconds * float64(time.Second))
+	}
+	if seconds, ok := d.from.Store.Snapshot().Read(d.from.Bound("config/" + WaitKey)).(int); ok && seconds >= 0 {
+		return time.Duration(seconds) * time.Second
+	}
+	return defaultWait * time.Second
+}
+
+// Every operation of the session that ends untold, once, with its result or its reason. [[spec/design_output/model#the-agent-does-not-poll]]
+func (d *Door) ended(session string) string {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	var lines []string
+	for _, one := range d.from.Ops(session) {
+		if open(one) || d.told[one.Handle] {
+			continue
+		}
+		d.told[one.Handle] = true
+		said := one.Error
+		if said == "" {
+			said = textOfValue(one.Result)
+		}
+		lines = append(lines, fmt.Sprintf("%s ends %s after %s: %s", one.Action, one.State, one.Gone, said))
+	}
+	if len(lines) == 0 {
+		return ""
+	}
+	return "An operation you started ends:\n" + strings.Join(lines, "\n")
+}
+
+// Every operation of the session still running, which the Stop names and lets through. [[spec/design_output/model#the-agent-does-not-poll]]
+func (d *Door) running(session string) string {
+	var lines []string
+	for _, one := range d.from.Ops(session) {
+		if open(one) {
+			lines = append(lines, fmt.Sprintf("%s still running: %s, handle %s", one.Action, progressOf(one.Fraction, one.Gone), one.Handle))
+		}
+	}
+	if len(lines) == 0 {
+		return ""
+	}
+	return "These operations still run past your turn, and each result reaches your next one:\n" + strings.Join(lines, "\n")
+}
+
+func open(one Op) bool { return one.State == "queued" || one.State == "running" }
+
+func progressOf(fraction float64, gone time.Duration) string {
+	return fmt.Sprintf("%.0f%% done after %s", fraction*percent, gone)
+}
+
+// The session id where the post or its event names one, in every spelling the harnesses send. [[spec/design_output/pull#the-hand-and-the-hold]]
+func sessionOf(post Post) string {
+	if post.Session != "" {
+		return post.Session
+	}
+	if nested, ok := post.E["session"].(map[string]any); ok {
+		if id := textOf(nested, "id"); id != "" {
+			return id
+		}
+	}
+	if id := textOf(post.E, "sessionId", "session_id"); id != "" {
+		return id
+	}
+	return noSession
+}
+
+func harnessOf(post Post) string {
+	if post.Harness != "" {
+		return post.Harness
+	}
+	return builtInHarness
+}
+
+// The event's payload, with the root and the fill the post carries beside it. [[spec/design_output/model#a-post-and-its-answer]]
+func fieldsOf(post Post) map[string]any {
+	fields := make(map[string]any, len(post.E))
+	for key, value := range post.E {
+		fields[key] = value
+	}
+	if post.Root != "" {
+		fields["root"] = post.Root
+	}
+	if post.Fill != nil {
+		fields["fill"] = post.Fill
+	}
+	return fields
+}
+
+func textOf(from map[string]any, keys ...string) string {
+	for _, key := range keys {
+		if text, ok := from[key].(string); ok && text != "" {
+			return text
+		}
+	}
+	return ""
+}
+
+func textOfValue(value any) string {
+	if text, ok := value.(string); ok {
+		return text
+	}
+	body, err := json.Marshal(value)
+	if err != nil {
+		return fmt.Sprint(value)
+	}
+	return string(body)
+}
+
+func numberOf(value any) (float64, bool) {
+	switch one := value.(type) {
+	case float64:
+		return one, true
+	case int:
+		return float64(one), true
+	case int64:
+		return float64(one), true
+	case json.Number:
+		n, err := one.Float64()
+		return n, err == nil
+	}
+	return 0, false
+}
+
+// What the standing file holds: the port, and the token a post carries. [[spec/tickets/hooks-standing-file-names-token]]
+type Standing struct {
+	Port  int    `json:"port"`
+	Token string `json:"token"`
+}
+
+// Serves POST /hook on a loopback port behind a token, and writes both under the root. The listener stands in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
+func Listen(root string, door *Door) (func(), error) {
+	secret := make([]byte, tokenBytes)
+	if _, err := rand.Read(secret); err != nil {
+		return nil, err
+	}
+	token := hex.EncodeToString(secret)
+	listen, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return nil, err
+	}
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /hook", door.serves(token))
+	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
+	go server.Serve(listen)
+	at := filepath.Join(root, filepath.FromSlash(StandingFile))
+	body, err := json.Marshal(Standing{Port: listen.Addr().(*net.TCPAddr).Port, Token: token})
+	if err == nil {
+		err = os.MkdirAll(filepath.Dir(at), 0o755)
+	}
+	if err == nil {
+		err = os.WriteFile(at, body, 0o600)
+	}
+	if err != nil {
+		server.Close()
+		return nil, err
+	}
+	return func() {
+		server.Close()
+		os.Remove(at)
+	}, nil
+}
+
+// A post short of the token answers 401, a body past the cap or short of JSON 400, and a door that fails 500. [[spec/tickets/hooks-standing-file-names-token]]
+func (d *Door) serves(token string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != bearer+token {
+			http.Error(w, "the post carries no token the standing file names", http.StatusUnauthorized)
+			return
+		}
+		var post Post
+		if err := json.NewDecoder(io.LimitReader(r.Body, bodyCap)).Decode(&post); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		said, err := d.Hook(post)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(said)
+	}
+}
+
+// One line of a recording: the post as the harness sends it, and the answer the module gives. [[spec/design_output/model#an-inbound-fake-replays]]
+type recorded struct {
+	Post   Post   `json:"post"`
+	Answer Answer `json:"answer"`
+}
+
+// The inbound fake: it drives the door off a recording, one post a line, and answers each line whose answer differs. [[spec/design_output/model#an-inbound-fake-replays]]
+func Replay(door *Door, recording []byte) ([]Mismatch, error) {
+	var missed []Mismatch
+	lines := bufio.NewScanner(bytes.NewReader(recording))
+	lines.Buffer(nil, bodyCap)
+	for at := 1; lines.Scan(); at++ {
+		text := bytes.TrimSpace(lines.Bytes())
+		if len(text) == 0 {
+			continue
+		}
+		var one recorded
+		if err := json.Unmarshal(text, &one); err != nil {
+			return nil, fmt.Errorf("line %d of the recording reads as no JSON: %w", at, err)
+		}
+		said, err := door.Hook(one.Post)
+		if err != nil {
+			return nil, fmt.Errorf("line %d of the recording: %w", at, err)
+		}
+		want, _ := json.Marshal(one.Answer)
+		got, _ := json.Marshal(said)
+		if !bytes.Equal(want, got) {
+			missed = append(missed, Mismatch{Line: at, Want: string(want), Got: string(got)})
+		}
+	}
+	return missed, lines.Err()
+}

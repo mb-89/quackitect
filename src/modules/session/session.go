@@ -25,6 +25,20 @@ func Registers(c *q.Catalog) q.Writer {
 	)
 }
 
-func fills(state int, _ q.Event) int { return state }
+// The field of an event carrying the context's tokens. [[spec/design_output/model#a-post-and-its-answer]]
+const fillField = "fill"
 
-func lasts(state Last, _ q.Event) Last { return state }
+// An event naming no fill keeps the one before. [[spec/design_output/model#a-fold-keeps-its-state]]
+func fills(state int, event q.Event) int {
+	switch one := event.Fields[fillField].(type) {
+	case float64:
+		return int(one)
+	case int:
+		return one
+	case int64:
+		return int(one)
+	}
+	return state
+}
+
+func lasts(_ Last, event q.Event) Last { return Last{Seq: event.Seq, Kind: event.Kind} }

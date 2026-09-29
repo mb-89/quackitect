@@ -146,11 +146,6 @@ func (b *Book) Open(caller string) []string {
 	return ids
 }
 
-// Every operation the session starts, in or out of flight, by id. [[spec/tickets/the-hooks-door-lands]]
-func (b *Book) Of(caller string) []Op {
-	return nil
-}
-
 // ops/wait with no handle: every open operation of the session, once each ends or the span runs out. [[spec/design_output/model#the-agent-does-not-poll]]
 func (b *Book) WaitCaller(caller string, span time.Duration) []Op {
 	until := time.Now().Add(span)

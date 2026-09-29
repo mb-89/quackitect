@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -257,7 +258,16 @@ func (s *Store) Land(name string, event any) error {
 
 // The folds whose name opens on the prefix, such as session/<id>/, sorted, so the hooks IO module lands each event on every fold over its session. [[spec/tickets/the-hooks-door-lands]]
 func (s *Store) Folds(prefix string) []string {
-	return nil
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	out := []string{}
+	for _, one := range s.active {
+		if one.kind == fold && strings.HasPrefix(one.name, prefix) {
+			out = append(out, one.name)
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 // [[spec/design_output/model#a-caller-sets-its-wait]]

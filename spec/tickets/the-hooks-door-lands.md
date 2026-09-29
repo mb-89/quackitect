@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: 29670034f5135614
         size: 1196
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8535e12fc10e · claude-code-remote
+    hash_before: f463b77e63913ab33e256f8700ce61752c1a8e38
+    hash_after: f463b77e63913ab33e256f8700ce61752c1a8e38
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -311,14 +320,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/hooks src/modules/session src/quack/main.go src/quack/hooks_test.go src/q/store.go src/q/event.go src/modules/index src/bridge/cage-shadow.js src/bridge/server.js test/level0/cage-shadow.test.js spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and the answered findings add the token, the clock and the wait field
+- every door the change reaches has a fake: the manager call and book, the fake http door, and the replay
+- a comment on each function points at the ticket or the model section it implements
+- the standing file, the slice key and the wait key each stand in one place, and the bridge takes the folder off folders.js
 
 ## tests-green
 
