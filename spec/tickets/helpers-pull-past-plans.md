@@ -116,12 +116,21 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 group: loose-fixes-99f4547
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d84e33ce20f7 · claude-code-remote
+    hash_before: ec87651d2ef2dde4d8411e8f210fad8fdff3a2db
+    hash_after: ec87651d2ef2dde4d8411e8f210fad8fdff3a2db
+    inputs:
+      - name: ask
+        hash: c4c74c1ffc222572
+        size: 680
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,51 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+In pull in src/scripts/pull.js, read the plan's working item once, as working. A pull carrying --as is a helper. A helper with no name and nothing in hand asks for working, and skips the working-todo wait at the top of the hand-out. The queue guard lets a helper's name through where it equals working, beside the minted name and a person's hand. A helper naming a ticket outside the plan stays refused, and a pull with no --as keeps the wait. Assumption: a helper serves the session whose plan it reads, since both read one plan file on one box. Cost: a helper spawned while the plan works a todo rather than a ticket asks for a name no ticket carries, and waits, as it waits today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/pull.js: pull, the one reader of the working todo and the queue guard
+src/scripts/pull-spawn.js: spawnPrompt, which tells the helper to run the pull with --as
+src/engine/named.js: inHand, which answers the working item and stays unchanged
+src/scripts/pull-hand.js: handOut, which reads who.wanted and who.oneStep and stays unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/pull-hand.test.js: a helper's pull takes the gate of the ticket the plan works
+test/level0/pull-hand.test.js: a helper's named pull of a ticket outside the plan stays refused under the queue
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first on a first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/scripts/pull.js
+test/level0/pull-hand.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: pull.js lines 128 to 150, inHand in named.js, handOut in pull-hand.js and spawnPrompt
+- the callers list comes off a read of pull, handOut, inHand and spawnPrompt
+- each done_when line names its case in pull-hand.test.js, and the check stays for tests-green
 
 ## tests-red
 
