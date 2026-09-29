@@ -4,7 +4,11 @@
 // [[spec/tickets/view-actions-run-through-verbs]]
 package verbs
 
-import "quackitect/src/q"
+import (
+	"strconv"
+
+	"quackitect/src/q"
+)
 
 // The input of an action taking nothing. [[spec/tickets/view-actions-run-through-verbs]]
 type Nothing struct{}
@@ -28,7 +32,21 @@ type FieldSet struct {
 }
 
 // The actions the work instance takes. [[spec/tickets/view-actions-run-through-verbs]]
-func WorkActions(c *q.Catalog) q.Writer { return q.Join() }
+func WorkActions(c *q.Catalog) q.Writer {
+	return q.Join(
+		q.ActionIn(c, "pull", func(Nothing) []q.Request { return nodeRun("ticket", "yours", "--next") },
+			q.Doc("Take the ticket waiting on you first, and open it."), q.Label("Pull for me"), q.Icon("📥")),
+		q.ActionIn(c, "place", func(in Placed) []q.Request { return nodeRun("ticket", "place", in.Name, strconv.Itoa(in.N)) },
+			q.Doc("Place the ticket in the queue, and the same place again clears it."), q.Label("Place"), q.Icon("🔢"), q.Writes()),
+	)
+}
 
 // The actions the tickets instance takes. [[spec/tickets/view-actions-run-through-verbs]]
-func TicketsActions(c *q.Catalog) q.Writer { return q.Join() }
+func TicketsActions(c *q.Catalog) q.Writer {
+	return q.Join(
+		q.ActionIn(c, "flip-urgent", func(in Named) []q.Request { return nodeRun("ticket", "urgent", in.Name) },
+			q.Doc("Flip the ticket's urgent mark."), q.Label("Urgent"), q.Icon("🚨"), q.Writes()),
+		q.ActionIn(c, "set-field", func(in FieldSet) []q.Request { return nodeRun("ticket", "set", in.Name, in.Field, in.Value) },
+			q.Doc("Write one field of the ticket's front, as the schema takes it."), q.Label("Set a field"), q.Icon("✏️"), q.Writes()),
+	)
+}

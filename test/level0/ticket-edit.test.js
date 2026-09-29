@@ -84,14 +84,18 @@ test("place writes the value into the plan file, off the siblings the queue answ
   assert.deepEqual(JSON.parse(said.disk.read(at(PLAN))).places, { [second]: "true" });
 });
 
-test("urgent writes the mark at its other value", () => {
+test("urgent writes the mark, and drops it where it turns off", () => {
   const said = treeOf(["a-thing"]);
   const path = at("spec/tickets/a-thing.md");
 
   assert.equal(heard(() => ticket(ROOT, ["urgent", "a-thing"], said.it)).code, 0);
   assert.match(said.disk.read(path), /^urgent: true$/m);
   assert.equal(heard(() => ticket(ROOT, ["urgent", "a-thing"], said.it)).code, 0);
-  assert.match(said.disk.read(path), /^urgent: false$/m);
+  assert.doesNotMatch(
+    said.disk.read(path),
+    /^urgent:/m,
+    "the mark drops, as the tab's write drops it",
+  );
 });
 
 test("set writes one field and refuses a field the engine owns", () => {
@@ -110,4 +114,19 @@ test("set writes one field and refuses a field the engine owns", () => {
     assert.equal(ran.code, 2, `set refuses ${field}`);
   }
   assert.equal(said.disk.read(path), before);
+});
+
+test("set weighs the value against the schema, as the tab does", () => {
+  const said = treeOf(["a-thing"]);
+  const path = at("spec/tickets/a-thing.md");
+  const before = said.disk.read(path);
+
+  const ran = heard(() => ticket(ROOT, ["set", "a-thing", "urgent", "maybe"], said.it));
+  assert.equal(ran.code, 2);
+  assert.equal(said.disk.read(path), before);
+  assert.equal(
+    heard(() => ticket(ROOT, ["set", "a-thing", "urgent", "true"], said.it)).code,
+    0,
+  );
+  assert.match(said.disk.read(path), /^urgent: true$/m);
 });

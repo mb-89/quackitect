@@ -64,9 +64,9 @@ var modules = map[string]ioModule{
 	"env": {env.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
 		return func() {}, env.Start(env.New(), commit)
 	}},
-	"tickets":   {registers: tickets.Registers},
+	"tickets":   {registers: withActions(tickets.Registers, verbsmodule.TicketsActions)},
 	"queue":     {registers: queue.Places},
-	"work":      {registers: work.Registers},
+	"work":      {registers: withActions(work.Registers, verbsmodule.WorkActions)},
 	"migration": {registers: migration.Registers},
 	"check":     {registers: check.Registers},
 	"guidance":  {registers: guidance.Registers},
@@ -86,6 +86,11 @@ var modules = map[string]ioModule{
 	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
 	// [[spec/tickets/work-verbs-become-actions]]
 	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
+}
+
+// A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
+func withActions(own, actions func(*q.Catalog) q.Writer) func(*q.Catalog) q.Writer {
+	return func(c *q.Catalog) q.Writer { return q.Join(own(c), actions(c)) }
 }
 
 // A settings section loads as a module type of its own name, and a module of that name takes the section's keys beside its own. [[spec/tickets/the-config-schema-gets-generated]]
