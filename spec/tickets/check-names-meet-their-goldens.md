@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: 69c8aa2cc80f8682
         size: 3168
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84d03dd63d7 · claude-code-remote
+    hash_before: 8b8407d479ae82e542cdfa71d4da131d42d0f042
+    hash_after: 8b8407d479ae82e542cdfa71d4da131d42d0f042
+    inputs:
+      - name: design/draft
+        hash: 69c8aa2cc80f8682
+        size: 3168
+      - name: design/tests-red
+        hash: 09300e00ea9ba763
+        size: 1172
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -243,8 +255,12 @@ Every door the tests reach takes a fake or a captured answer: the node case runs
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- check-module-joins-the-wiring: check.Registers stands in no wiring in src/quack/main.go, so the check names stand in a test catalog alone, where the group ask puts every read-only topic in shadow under its own slice key
+- twin-goldens-walk-every-twin: TestTwinGoldens in src/lsp/twins_test.go walks the twins node prints, so a twin the JavaScript side drops passes unread; walk check.Twins and fail where a side lacks a twin
+- twin-golden-flag-name-agrees: the draft names -update as the flag that rewrites the goldens, where src/lsp/twins_test.go names it -twins
 
 # implement
 
