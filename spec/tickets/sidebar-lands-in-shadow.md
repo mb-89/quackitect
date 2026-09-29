@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -112,6 +112,25 @@ record:
     hand: the engine
     hash_before: 2871560716d4faea8f3d7ee4617388a4fa93b729
     hash_after: 2871560716d4faea8f3d7ee4617388a4fa93b729
+  - step: accept
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 768186c291b2ff11573e0d1d718de6664b772d07
+    hash_after: 768186c291b2ff11573e0d1d718de6664b772d07
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/sidebar-lands-in-shadow already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 44916162433af90b
+        size: 559
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["tui-shell-lands-in-shadow"]
 enabled_by: migration.phase8shadow
 cloud: true
@@ -166,8 +185,14 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the sidebar draws the views section off the catalog, and the four view actions run through the verbs
+- the migration module declares the slice sidebar, built-in old, and the tracked default file now sets it to shadow beside window, so the shadow runs on main
+- under shadow each badge or button the two paths draw apart writes one shadow row naming the slice sidebar, so ./RUNME.sh log --kind shadow names it
+- the key reads migration/config/sidebar beside its siblings, where the ask names migration/config/slices/sidebar, and the child draft names the call
+- the check answers 0 on the tree
 
 # retro
 

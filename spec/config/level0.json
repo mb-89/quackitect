@@ -17,6 +17,7 @@
     "verbs": "shadow",
     "cage": "shadow",
     "window": "shadow",
+    "sidebar": "shadow",
     "lsp": "shadow"
   }
 }
