@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: answer
+step: do
 steps:
   - name: answer
     does: answers the question the ask carries
@@ -35,6 +35,19 @@ steps:
 process: [[spec/processes/question]]
 process_hash: d1a6e26348695e24
 group: loose-fixes-99f4547
+record:
+  - step: answer
+    hand: box d84d8ece51e9 · claude-code-remote
+    hash_before: d9376b38ae8fa277de8fc2a081b05a71eff1a767
+    hash_after: d9376b38ae8fa277de8fc2a081b05a71eff1a767
+    inputs:
+      - name: ask
+        hash: a91a3020231e319c
+        size: 394
+      - name: [[spec/design_input/level-two]]
+        hash: b8bf73d993bb8909
+        size: 15501
+    def: 2280015d497a3abd
 ---
 
 # Ask
@@ -53,8 +66,9 @@ The owner decides how a finding reaches the owner: as a question ticket, as a no
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+A finding reaches the owner by the road its work takes. Work a box can do becomes a ticket in the group the box works, and closes before the group reaches done. Work a person alone can do becomes a ticket on the person process, loose on main, with every command in its ask. A doubt with no work in it yet stays a note, and the retro decides it. No finding opens a GitHub issue. A finding carries three fields: the failure it names, the evidence as a command with its output, and what it leaves unchecked. Weighed: the owner rulings that a box assigns a ticket it can solve to its own group and that the ticket system holds a question, tickets rule 9 (a doubt a note, an ask a ticket), and cloud.md rules 6 to 8. Assumed: a finding the design already answers stays no finding, as the chapter says.
 
 # do
 
