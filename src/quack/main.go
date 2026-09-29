@@ -40,6 +40,7 @@ import (
 const (
 	dumpFolder = ".se/.dump/"
 	dumpArgs   = 3
+	hookArgs   = 3
 )
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -144,7 +145,7 @@ func dumps(prefix string) error {
 }
 
 func main() {
-	if len(os.Args) == 3 && os.Args[1] == "hook" {
+	if len(os.Args) == hookArgs && os.Args[1] == "hook" {
 		os.Exit(hookVerb(".", os.Args[2], os.Stdin, os.Stdout))
 	}
 	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
