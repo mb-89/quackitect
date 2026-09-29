@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -142,6 +142,18 @@ record:
         hash: f3d4d510dd589bd1
         size: 2747
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d84fcad60110c · claude-code-remote · helper-3
+    hash_before: 41f918ab8028d0fdb21f765fc70133b9fc03113c
+    hash_after: 41f918ab8028d0fdb21f765fc70133b9fc03113c
+    inputs:
+      - name: design/draft
+        hash: f3d4d510dd589bd1
+        size: 2747
+      - name: design/tests-red
+        hash: 0dba4234b02ec5d7
+        size: 856
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -274,8 +286,11 @@ I assume `quack` with no verb keeps running the index as today, since `RUNME.sh`
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- quack-main-routes-the-tree: no case reads main hand help, --help, run and get to cli over V1, so the done_when line on quack --help rests on cli alone; add a case in src/quack/main_test.go driving the route
+- cli-draft-lists-every-case: the draft tests list leaves out TestRunPostsItsFlagsAsTheInput, which cli_test.go holds; the implementer names it in the tests-green evidence
 
 # implement
 
