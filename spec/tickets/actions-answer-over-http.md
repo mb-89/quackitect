@@ -114,10 +114,23 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: design/tests-red
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
+record:
+  - step: design/draft
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: a4ec036db54d2595060023635a05ff2d17e6a389
+    hash_after: a4ec036db54d2595060023635a05ff2d17e6a389
+    inputs:
+      - name: ask
+        hash: 210de2d83f01697a
+        size: 700
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -151,38 +164,95 @@ An action then answers over HTTP the way it answers on the command line, and a s
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The door serves one Huma operation an action, off the store's names, and the index manager runs each call.
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the input type | `actionOf` and a new `Store.Input` in `src/q/action.go` | the registration keeps its input type, and `Input(name, body)` decodes a JSON body into it, an empty body into the zero value |
+| the types | a new `Store.Types` in `src/q/action.go` | answers an action's input type and the type `q.Answers` declares, so a surface builds its schema |
+| the call seam | `Manage` in `src/index/ops.go` | answers `Managed`: the stop, and a `Call` taking a name, an input, a caller and a wait |
+| the manager | `Start` and `begins` in `src/modules/index/manager.go` | `Serves` answers the stop and the call. `Outside` gains `Accept`, which a nil refuses every request through |
+| the route | `servesV1` in `src/index/v1.go`, and a new `src/index/actions.go` | `POST /v1/actions/<name>` a action: `RawBody` with the request schema off the input type, the `200` schema off the answer type with each `Out` field's label as its title and its doc as its description, and a `202` schema |
+| the wait | `waitOf` in `src/index/actions.go` | reads `wait=N` off `Prefer` per RFC 7240, and answers `Preference-Applied`. With no `Prefer` it reads `http/config/wait` off the store |
+| the key | a new `src/modules/http/http.go`, `spec/wiring.yaml`, `modules` in `src/quack/main.go` | the `http` module type registers `wait`, in seconds, built in at none, and the wiring loads it as `http` |
+
+The answers:
+
+- the action ends within the wait: `200`, the result, the handle path and the time gone by
+- the wait runs out: `202`, `running`, the fraction done, the time gone by, and the handle path `/v1/values/ops/<id>`, which `GET` reads
+- the action fails: `422`, with the reason the refusing module gives
+- a body the input type refuses: `400`
+
+The caller stands as `http`. The root's `Accept` routes a request to `disk` through `files.Accept`, and refuses every other module, since no action stands yet.
+
+I assume the default key takes the instance prefix the wiring gives, as `migration/config/slices/verbs` does, so the door reads the name `http/config/wait`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/ops.go: Manage, door.manages, ServeManaged
+- src/index/door.go: opensOn, which takes the call off the manager and hands it to servesV1
+- src/index/v1.go: servesV1
+- src/quack/main.go: manages, main, modules
+- src/modules/index/manager.go: Start, begins, Outside
+- src/modules/index/call.go: Call, which the manager's call wraps
+- src/q/action.go: actionOf, ActionIn, Action
+- src/index/failed_start_test.go: the manage stub
+- src/index/door_test.go: the manage stub
+- src/quack/manager_test.go: TestAnOverrideSetsTheSpanTheManagerTicksAt, over manager.Start
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/actions_test.go: TestAnActionAnswersItsResultWithinTheWait
+- src/index/actions_test.go: TestAWaitOfNoneAnswersAcceptedWithTheHandle
+- src/index/actions_test.go: TestNoPreferReadsTheDefaultWaitOffItsKey
+- src/index/actions_test.go: TestTheOpenAPIEntryReadsTheAnswerFields
+- src/q/action_test.go: TestAnActionDecodesItsInputOffJSON
+- src/modules/http/http_test.go: TestTheWaitKeyStandsUnderTheInstance
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/q/action.go
+- src/q/action_test.go
+- src/index/ops.go
+- src/index/door.go
+- src/index/v1.go
+- src/index/actions.go
+- src/index/actions_test.go
+- src/index/failed_start_test.go
+- src/index/door_test.go
+- src/modules/index/manager.go
+- src/modules/http/http.go
+- src/modules/http/http_test.go
+- src/quack/main.go
+- src/quack/testdata/tree.golden.json
+- spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened: action.go, looks.go, store.go, send.go, call.go, manager.go, ops.go, door.go, v1.go, quack/main.go, and Huma's Register over RawBody and preset responses
+- the callers list names every caller of Manage, manager.Start and actionOf a grep finds
+- each done_when line names its case: wait=5 in the first, wait=0 in the second, no Prefer in the third, and go test and the check in tests-green
 
 ## tests-red
 
