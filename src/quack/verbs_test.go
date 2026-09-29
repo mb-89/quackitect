@@ -159,3 +159,10 @@ func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 		}
 	}
 }
+
+// The road holds retro notes among its twins, so the shadow runs it beside cli.js. [[spec/tickets/retro-notes-twin-joins-road]]
+func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
+	if twinVerbs["retro notes"] == nil || roadOf(modeShadow, []string{"retro", "notes"}, twinVerbs) != toBoth {
+		t.Fatal("the road holds no retro notes twin in shadow")
+	}
+}

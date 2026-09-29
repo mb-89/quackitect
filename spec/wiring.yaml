@@ -26,6 +26,8 @@ instances:
     module: http
   ticket:
     module: ticket
+  retro:
+    module: retro
 wires:
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute

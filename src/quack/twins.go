@@ -15,10 +15,18 @@ import (
 
 	"quackitect/src/modules/work"
 	"quackitect/src/q"
+	"quackitect/src/ticket"
 )
 
 // The state a row stands open at, as OPEN in src/engine/group.js names it. [[spec/tickets/ticket-verbs-become-actions]]
 const openRow = "open"
+
+// The state a note stands closed at, the folder NOTES in src/scripts/ticket.js names, and the name the tickets module answers every ticket under. [[spec/tickets/retro-verbs-become-actions]]
+const (
+	closedRow   = "closed"
+	notesFolder = ".se/tickets"
+	allTickets  = "tickets/all"
+)
 
 // The name spec/wiring.yaml binds the work module's yours port under. [[spec/tickets/ticket-verbs-become-actions]]
 const yoursName = "work/" + work.YoursPort
@@ -77,8 +85,35 @@ func printsLine(out, errs io.Writer, value any) int {
 
 // retro notes off tickets/all over the base v1 answers: every note under .se/tickets standing open. [[spec/tickets/retro-verbs-become-actions]]
 func retroNotes(v1 func() (string, error)) twin {
-	return func(argv []string, _ bool, out, errs io.Writer) int {
-		return exitUsage
+	return func(_ []string, _ bool, out, errs io.Writer) int {
+		base, err := v1()
+		if err != nil {
+			fmt.Fprintln(errs, err)
+			return exitFailed
+		}
+		var said struct {
+			Value []ticket.Ticket `json:"value"`
+		}
+		if err := reads(base+"/values/"+allTickets, &said); err != nil {
+			fmt.Fprintln(errs, err)
+			return exitFailed
+		}
+		open := []string{}
+		for _, one := range said.Value {
+			if strings.HasPrefix(one.Path, notesFolder+"/") && one.State != closedRow {
+				open = append(open, one.Name)
+			}
+		}
+		if len(open) == 0 {
+			fmt.Fprintf(out, "%s holds no open note, so the box leaves nothing behind.\n", notesFolder)
+			return 0
+		}
+		slices.Sort(open)
+		fmt.Fprintf(out, "%d note(s) stand open under %s. Decide each one, then run this again:\n", len(open), notesFolder)
+		for _, name := range open {
+			fmt.Fprintf(out, "  %s\n", name)
+		}
+		return exitFailed
 	}
 }
 

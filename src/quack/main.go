@@ -68,6 +68,7 @@ var modules = map[string]ioModule{
 	"http":      {registers: httpmodule.Registers},
 	// [[spec/tickets/ticket-verbs-become-actions]]
 	"ticket": {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
+	"retro":  {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
