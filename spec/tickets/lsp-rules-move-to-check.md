@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-lands-in-shadow
+record:
+  - step: design/draft
+    hand: box 5c8055bbc025 · claude-code-remote
+    hash_before: cd89a9fa15affa8a670a676fb3ac1a9bfc6e428b
+    hash_after: cd89a9fa15affa8a670a676fb3ac1a9bfc6e428b
+    inputs:
+      - name: ask
+        hash: 8ae6e5341e97a787
+        size: 320
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,64 @@ One copy of each rule then answers the editor, the check and the write door.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The rules move whole, as one copy, into the check module, and the LSP keeps the protocol.
+
+| the part | lands in | why |
+|---|---|---|
+| the tree, the checker, the note parse, the schema reader and every rule file: anchor, check, conflict, finding, group, history, install, marked, names, note, owned, parsed, paths, pointer, restated, schema-body, schema, syntax, textfaults, tree, and the pure half of private | `src/modules/check`, package `check`, exported where the LSP calls them | one copy answers the editor, the check and the write door |
+| the tree's disk | a `Source` of slash paths and text in `check`: `Read`, `Paths`, `Folder` | `onlyq` refuses `io/fs`, which the LSP's `Disk` speaks |
+| the `Disk`, the index client, the walk, the config and box reads, the outside tools, the protocol and the command line | stay in `src/lsp`, which adapts its `Disk` to a `Source` | they reach the outside, and the `lsp` IO module keeps them |
+| the names the LSP calls | one file, `src/lsp/rules.go`, aliasing each moved name | the protocol files and their tests stay untouched, so the diff reads as a move |
+| `src/pointer` | joins `pureTree` in `src/imports` | it imports the pure standard library alone |
+
+The new path: the check module registers the port `sweep`, derived off `files/<path...>` and `env/<name>`. It answers `Checker.Sweep` over a `Source` on the files map, with the name words and the restated runs resolved local file over variable over default file, the order `src/config` holds. The wiring binds `check.files/<path...>` and `check.env/<name>`.
+
+The shadow: the `migration` module declares `lsp`, built in as `old`, and the default file sets `migration.lsp` to `shadow`. Where it reads `shadow`, `se-lsp check` over the whole tree reads `check/sweep` off `/v1` and writes one `shadow` row, slice `lsp`, for each finding one side holds alone. The rules reading the box, `NothingPrivateTravels` and `SurveyFindsNode`, stand outside the compare, since the index reads no user, no git identity and no node. The old answer prints as it stands, and a fault on the new road writes nothing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/lsp: every protocol file and case calling a moved name, through src/lsp/rules.go
+- src/lsp/main.go: checks, which runs the shadow after its answer
+- src/lsp/twins_test.go: goTwins, through the aliases
+- src/quack/main.go: the module table loading check.Registers
+- src/quack/main_test.go: the check twins case
+- spec/wiring.yaml: the check instance, which gains its two wires
+- src/modules/migration/migration.go: Registers, which gains the lsp key
+- src/imports/imports.go: pastQ, through pureTree
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/check/sweep_test.go: TestTheSweepAnswersADeadPointerOffTheFiles
+- src/modules/check/sweep_test.go: TestTheSweepReadsTheWordsOffTheLocalLayer
+- src/modules/migration/migration_test.go: TestTheLspSliceStandsOld
+- src/lsp/shadow_test.go: TestTheShadowWritesARowForEachFindingApart
+- src/lsp/shadow_test.go: TestTheShadowLeavesTheBoxRulesOut
+- src/lsp/shadow_test.go: TestTheShadowWritesNothingUnderOld
+- src/imports/imports_test.go: TestAModuleImportsThePointerReader
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: the rule files and their imports, door.go, holds.go, indexed.go, main.go, check.go, the check and migration modules, imports.go, the wiring, and verbs.go for the row
+- the callers list names every package importing check and every file calling a moved name, which the alias file holds in one place
+- `go test ./...` meets every case above, `./RUNME.sh log --kind shadow` meets the shadow cases, and `./RUNME.sh check` runs the analyzers over the moved package
 
 ## tests-red
 
