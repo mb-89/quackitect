@@ -139,8 +139,9 @@ func TestAToolsDescriptionIsItsActionsDoc(t *testing.T) {
 		t.Fatalf("the tool reads %+v, and wants the doc of work/pull", tool)
 	}
 	props, _ := tool.InputSchema["properties"].(map[string]any)
-	if _, ok := props["ticket"]; !ok {
-		t.Fatalf("the schema reads %+v, and wants the input's field ticket", tool.InputSchema)
+	ticket, _ := props["ticket"].(map[string]any)
+	if ticket == nil || ticket["description"] != "the ticket to pull" {
+		t.Fatalf("the schema reads %+v, and wants the input's field ticket with the doc its tag carries", tool.InputSchema)
 	}
 	if _, ok := props["wait"]; !ok {
 		t.Fatalf("the schema reads %+v, and wants the wait argument", tool.InputSchema)

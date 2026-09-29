@@ -114,7 +114,7 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: gate
+step: implement/change
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-lands-in-shadow
@@ -145,6 +145,18 @@ record:
         hash: 7d3074c95701cd20
         size: 3605
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8535e12fc10e · claude-code-remote · helper-3
+    hash_before: 21e6de57fe8382a2e8f44b57495b9ec0219063fb
+    hash_after: 21e6de57fe8382a2e8f44b57495b9ec0219063fb
+    inputs:
+      - name: design/draft
+        hash: 7d3074c95701cd20
+        size: 3605
+      - name: design/tests-red
+        hash: 09e30bdebd78c5de
+        size: 1065
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -287,8 +299,11 @@ Every case fails on its own assertion over the stub. The replay case fails on th
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- hooked-of-caller-missed: the draft changes `hookedOf` to take the module type. Its callers list misses `src/quack/hooks_test.go`, whose line 33 calls it, so the implement step changes that caller too.
+- tool-surface-moves-into-q: the tool name, the Huma input schema, the wait read and the still running line stand in `src/index/tools.go` and `src/modules/hooks/hooks.go` already. The draft writes a third copy in `src/modules/mcp`. Move the shared piece into `src/q`, which the index core and every module import.
 
 # implement
 
