@@ -52,3 +52,37 @@ func TestATodoNestedTwoRowsDownTakesNoRowAtTheLeft(t *testing.T) {
 		t.Fatalf("the left holds the group alone, and it holds %d rows", len(grid.Items))
 	}
 }
+
+// The places carry the count the index answers, whatever the verb's rows place. [[spec/tickets/the-count-chain-leaves]]
+func TestPlacesAtReadsTheIndexCount(t *testing.T) {
+	wasPlaces, wasAsk := runPlaces, askOpenTasks
+	t.Cleanup(func() { runPlaces, askOpenTasks = wasPlaces, wasAsk })
+	runPlaces = func(string) ([]byte, error) {
+		return []byte(`{"loose":[{"name":"free","queue":"1"},{"name":"other","queue":"2"}]}`), nil
+	}
+	askOpenTasks = func(string) (int, bool) { return 5, true }
+	places, err := PlacesAt(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if label := (&Tab{Places: &places}).Label(nil); label != "work (5)" {
+		t.Fatalf("the header reads %q, and wants the index's 5", label)
+	}
+}
+
+// A door answering nothing leaves the header with no count, since the window counts nothing of its own. [[spec/tickets/the-count-chain-leaves]]
+func TestTheLabelDrawsNoCountWhereNoDoorAnswers(t *testing.T) {
+	wasPlaces, wasAsk := runPlaces, askOpenTasks
+	t.Cleanup(func() { runPlaces, askOpenTasks = wasPlaces, wasAsk })
+	runPlaces = func(string) ([]byte, error) {
+		return []byte(`{"loose":[{"name":"free","queue":"1"}]}`), nil
+	}
+	askOpenTasks = func(string) (int, bool) { return 0, false }
+	places, err := PlacesAt(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if label := (&Tab{Places: &places}).Label(nil); label != "work" {
+		t.Fatalf("the header reads %q with no door, and wants work alone", label)
+	}
+}

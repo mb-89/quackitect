@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: fd1d73f001a22d7b
         size: 318
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 218d0ec1d53b6264863f6db56a18972d28d7fd04
+    hash_after: 218d0ec1d53b6264863f6db56a18972d28d7fd04
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 91127a9904ac8c51
+        size: 2942
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +238,34 @@ spec/design_output/tui.md, chapter the work tab, says the badge reads the index,
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/work-strings.test.js src/tui/work
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/work-strings.test.js
+- src/tui/work/workplaces_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three cases fail on their own assertion. countIn reads no bare integer. The header reads the rows the verb places, 2 and 1, where it wants the index's 5, and no brackets with no door.
+
+With no config in the case root the slice reads old, so the header counts its own rows. That is the old path behind the key the build takes away.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the header cases fail, and the grep line stands as a checkpoint the build answers
+- fakes: runPlaces for the verb, askOpenTasks for the index, and the run record for countIn
 
 # gate
 
