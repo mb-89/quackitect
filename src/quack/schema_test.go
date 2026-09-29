@@ -137,3 +137,10 @@ func normalised(t *testing.T, literal string) string {
 	}
 	return string(out)
 }
+
+// The schema verb's write form holds the program, the verb and the flag, the count main weighs it by. [[spec/design_output/config#the-magic-numbers-take-names]]
+func TestTheSchemaWriteFormHoldsItsArgs(t *testing.T) {
+	if said := len([]string{"quack", "schema", "--write"}); said != schemaArgs {
+		t.Fatalf("the write form holds %d arguments, and main weighs %d", said, schemaArgs)
+	}
+}

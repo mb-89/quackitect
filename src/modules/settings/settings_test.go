@@ -38,3 +38,14 @@ func TestAKeyTakesTheTypeOfItsBuiltIn(t *testing.T) {
 		}
 	}
 }
+
+// A named built-in reads the same number through the catalog, so the constants block changes no key. [[spec/design_output/config#the-magic-numbers-take-names]]
+func TestANamedBuiltInReadsItsNumber(t *testing.T) {
+	c := q.New()
+	Of("stop")(c)
+	for _, key := range c.Keys() {
+		if key.Local == "most-in-a-row" && key.Default != "3" {
+			t.Fatalf("most-in-a-row reads the built-in %s, and wants 3", key.Default)
+		}
+	}
+}

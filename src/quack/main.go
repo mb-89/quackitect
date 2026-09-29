@@ -44,6 +44,7 @@ const (
 	dumpFolder = ".se/.dump/"
 	dumpArgs   = 3
 	hookArgs   = 3
+	schemaArgs = 3
 )
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -199,7 +200,7 @@ func main() {
 		return
 	}
 	if len(os.Args) >= 2 && os.Args[1] == "schema" {
-		if err := schemas(".", len(os.Args) == 3 && os.Args[2] == "--write"); err != nil {
+		if err := schemas(".", len(os.Args) == schemaArgs && os.Args[2] == "--write"); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
