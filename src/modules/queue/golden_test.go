@@ -98,7 +98,7 @@ func seedsOf(t *testing.T, golden queueGolden) map[string]any {
 		})
 	}
 	values := q.Resolved{}
-	for key, value := range map[string]string{"weight/block": blockWeight, "weight/day": dayWeight, "weight/fail": failWeight} {
+	for key, value := range map[string]string{"block": blockWeight, "day": dayWeight, "fail": failWeight} {
 		values["config/"+key] = strconv.FormatFloat(golden.At.Weights[value], 'f', -1, floatBits)
 	}
 	return map[string]any{

@@ -81,9 +81,9 @@ export async function doorsHere() {
     personSigns: await said.ask("work.personSigns"),
     // [[spec/design_output/pull#the-queue-is-a-score]]
     weights: {
-      block: await said.ask("work.blockScore"),
-      day: await said.ask("work.dayScore"),
-      fail: await said.ask("work.failScore"),
+      block: await said.ask("queue.block"),
+      day: await said.ask("queue.day"),
+      fail: await said.ask("queue.fail"),
     },
     // A name on the pull asks for one ticket, and the queue binding refuses the ask. [[spec/design_output/pull#the-hand-out]]
     binding: await said.ask("engine.binding"),

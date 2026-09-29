@@ -43,16 +43,17 @@ type placesIn struct {
 	Cloud  []string         `q:"cloud"`
 	Stood  map[string]int64 `q:"stood"`
 	Minute int64            `q:"minute"`
-	Block  float64          `q:"config/weight/block"`
-	Day    float64          `q:"config/weight/day"`
-	Fail   float64          `q:"config/weight/fail"`
+	Block  float64          `q:"config/block"`
+	Day    float64          `q:"config/day"`
+	Fail   float64          `q:"config/fail"`
 }
 
 // The module type the wiring loads as queue. [[spec/tickets/the-queue-becomes-a-module]]
 func Places(c *q.Catalog) q.Writer {
-	q.CfgIn(c, "weight/block", float64(0), q.Doc("the score a ticket takes for each ticket its chain holds up"))
-	q.CfgIn(c, "weight/day", float64(0), q.Doc("the score a ticket takes for each whole day it stands"))
-	q.CfgIn(c, "weight/fail", float64(0), q.Doc("the score a ticket takes for each hand-back that failed on it"))
+	// The keys stand under queue in spec/config/level0.json, where cli.js reads them too. [[spec/tickets/verbs-queue-order]]
+	q.CfgIn(c, "block", float64(0), q.Doc("the score a ticket takes for each ticket its chain holds up"))
+	q.CfgIn(c, "day", float64(0), q.Doc("the score a ticket takes for each whole day it stands"))
+	q.CfgIn(c, "fail", float64(0), q.Doc("the score a ticket takes for each hand-back that failed on it"))
 	return q.DerivedIn(c, PlacesPort, map[string]string{}, placesOf, q.Doc("every open row's place in the queue, as an outline number, and ∞ for a row the cloud holds"))
 }
 

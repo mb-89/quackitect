@@ -61,20 +61,46 @@ ifVale("a rule a project alone carries refuses on every road", async () => {
     const door = vale(files, outside, method, work);
     const gate = await door.lint(TEXT, NOTE);
     assert.ok(gate.ran, `the answer gate ran: ${gate.why}`);
-    assert.ok(gate.found.some((one) => one.rule === RULE), "the answer gate refuses the word");
+    assert.ok(
+      gate.found.some((one) => one.rule === RULE),
+      "the answer gate refuses the word",
+    );
 
     const findings = await findingsOver(
-      { disk: files, proc: outside, join, root: work, method, work, vale: bin, biome: "", ceilings: { function: 150, file: 600 } },
+      {
+        disk: files,
+        proc: outside,
+        join,
+        root: work,
+        method,
+        work,
+        vale: bin,
+        biome: "",
+        ceilings: { function: 150, file: 600 },
+      },
       [NOTE],
     );
     assert.equal(findings.fault, "");
-    assert.ok(findings.found.some((one) => one.rule === RULE), "the findings road refuses the word");
+    assert.ok(
+      findings.found.some((one) => one.rule === RULE),
+      "the findings road refuses the word",
+    );
 
     const runtime = await import("../../.claude/skills/level0/lib/copilot-runtime.js");
-    assert.equal(typeof runtime.check, "function", "the copilot road's check stands exported");
+    assert.equal(
+      typeof runtime.check,
+      "function",
+      "the copilot road's check stands exported",
+    );
     const run = async (argv, init) => outside.run(argv, { ...init, cwd: work });
     const config = assemble(files, { method, work, itself: false }).config;
-    const copilot = await runtime.check(TEXT, NOTE, { vale: bin, biome: "", run, config, cwd: work });
+    const copilot = await runtime.check(TEXT, NOTE, {
+      vale: bin,
+      biome: "",
+      run,
+      config,
+      cwd: work,
+    });
     assert.match(copilot, new RegExp(RULE), "the copilot road refuses the word");
   } finally {
     files.remove(work);
@@ -85,15 +111,51 @@ ifVale("a rule a project alone carries refuses on every road", async () => {
 test("the doors read work.failsBeforePerson into the fail cap, and the config names no failsBeforeWait", async () => {
   const { it } = await import("../../src/scripts/cli-doors.js");
   const config = JSON.parse(files.read(join(method, "spec", "config", "level0.json")));
-  const schema = JSON.parse(files.read(join(method, "spec", "config", "level0.schema.json")));
+  const schema = JSON.parse(
+    files.read(join(method, "spec", "config", "level0.schema.json")),
+  );
 
   assert.equal(config.work.failsBeforeWait, undefined, "the old key leaves the config");
-  assert.equal(schema.properties.work.properties.failsBeforeWait, undefined, "and the schema");
-  assert.equal(typeof config.work.failsBeforePerson, "number", "the config names the new key");
+  assert.equal(
+    schema.properties.work.properties.failsBeforeWait,
+    undefined,
+    "and the schema",
+  );
+  assert.equal(
+    typeof config.work.failsBeforePerson,
+    "number",
+    "the config names the new key",
+  );
   assert.equal(
     schema.properties.work.properties.failsBeforePerson?.type,
     "number",
     "the schema declares it",
   );
-  assert.equal(it.fails, config.work.failsBeforePerson, "the doors read it into the fail cap");
+  assert.equal(
+    it.fails,
+    config.work.failsBeforePerson,
+    "the doors read it into the fail cap",
+  );
+});
+
+// The score's weights stand under queue, where the Go queue reads them too, so both paths order alike. [[spec/tickets/verbs-queue-order]]
+test("the doors read the score weights off queue, and work names none", async () => {
+  const { it } = await import("../../src/scripts/cli-doors.js");
+  const config = JSON.parse(files.read(join(method, "spec", "config", "level0.json")));
+  const schema = JSON.parse(
+    files.read(join(method, "spec", "config", "level0.schema.json")),
+  );
+
+  for (const old of ["blockScore", "dayScore", "failScore"]) {
+    assert.equal(config.work[old], undefined, `${old} leaves work`);
+    assert.equal(schema.properties.work.properties[old], undefined, `and its schema`);
+  }
+  for (const key of ["block", "day", "fail"]) {
+    assert.equal(
+      schema.properties.queue.properties[key]?.type,
+      "number",
+      `the schema declares queue.${key}`,
+    );
+    assert.equal(it.weights[key], config.queue[key], `the doors read queue.${key}`);
+  }
 });

@@ -58,6 +58,7 @@ wires:
   log.session: files/.se/.log/session.jsonl
   git.tips: git/tips
   git.trunk: git/trunk
+  git.stood: git/stood
   tickets.tips: git/tips
   tickets.trunk: git/trunk
   tickets.all: tickets/all
@@ -67,7 +68,7 @@ wires:
   queue.rows: tickets/branched
   queue.plan: files/.se/.runtime/plan.json
   queue.cloud: tickets/cloud
-  queue.stood: built-in
+  queue.stood: git/stood
   queue.minute: clock/minute
   work.tickets: tickets/branched
   work.branches: tickets/branches
