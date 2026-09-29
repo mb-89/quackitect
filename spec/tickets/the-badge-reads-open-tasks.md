@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -201,6 +201,24 @@ record:
         hash: 4ff8057cc2e3969d
         size: 3593
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box d81f28f032e0 · claude-code-remote · helper-7
+    hash_before: 803cd4d2264af62af3f41faf665170448f7b2752
+    hash_after: 803cd4d2264af62af3f41faf665170448f7b2752
+    inputs:
+      - name: design/draft
+        hash: 3f388022f20d8f55
+        size: 1464
+      - name: design/tests-red
+        hash: ac0aa081eda77646
+        size: 518
+      - name: design/draft-2
+        hash: 4ff8057cc2e3969d
+        size: 3593
+      - name: design/tests-red-2
+        hash: 163a9a7ab1ecc62c
+        size: 894
+    def: 01417e29801ecc2f
 group: open-tasks-switch-lands
 ---
 
@@ -404,13 +422,8 @@ The badge verb case in src/tui/count_test.go passes already. countSaid reads Tak
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- the approach leaves out the three parts the owner moves here under Discussion, though that entry says the draft takes them in: a sidebar redraw after a burst of writes to a ticket folder, the plan file or the hold folder, in src/extension/sidebar.js; a case in test/level0/sidebar.test.js holding a ticket write changing the badge; and the owner's before-and-after compare with no window reload
-- src/extension/sidebar.js watches only SCHEMA, TRACKED, LOCAL and BLESS, so the badge keeps its old number after a ticket moves while the work tab reads fresh places; the two numbers still disagree, and the ask's goal stays unmet
-- design/tests-red holds no red case for the redraw, so no failing test decides that part; the draft names the redraw and its case in test/level0/sidebar.test.js, and tests-red writes that case red
-- the callers list names no caller in src/extension; add sidebar.js counted and its watches list
-- form, rides to the build: TestTheBadgeAndTheHeaderReadOneValue reads Places.Takeable as the badge; a case on countSaid in src/tui holds the badge's own verb
-- checked and holding: slicedCount, shadowOf, askOpenTasks, PlacesAt, Tab.Label and countSaid read as the draft says; migration.opentasks takes new under the schema enum; openTasksOf in src/modules/work counts what countTakeable counts; two of the three new tests fail on their own assertion, reading 3 and 2 where they want 5
+pass with findings
+- queue-column-reads-the-index: under new, Takeable reads the index while the queue column reads the pull verb. The shadow stops logging, so a bracket its column contradicts goes unseen.
 
 # implement
 
