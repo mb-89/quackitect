@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -163,6 +163,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 2fdd264d6a0a061b8141d2acffb349fd6b92f497
+    hash_after: 2fdd264d6a0a061b8141d2acffb349fd6b92f497
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 0dba4234b02ec5d7
+        size: 856
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,37 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/cli_test.go src/index/v1_test.go src/quack/main_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`quack` now builds its command tree off the registry over `/v1`. `quack --help` lists each action beside its doc, `quack run <action>` builds its flags off the action fields and follows the call to its end, `--detach` answers the handle at once, and `quack get <name>` prints a value. `index.V1` reaches the standing door, starting one where none answers, and answers its `/v1` base. `main` hands the tree verbs to the tree, and every other verb to the index as before.
+
+The cases that pass: `TestTheHelpReadsEachActionsDoc`, `TestRunPostsItsFlagsAsTheInput`, `TestRunFollowsASlowActionToItsResult`, `TestRunDetachedAnswersTheHandleAtOnce`, `TestGetPrintsTheValueOfAName`, `TestV1AnswersTheBaseOfTheStandingDoor`, and `TestMainHandsTheTreeVerbsToCliOverV1` for the route.
+
+An action taking no struct and given no argument posts `null`, since the door refuses an empty body.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the index main, the cli file, the quack main and their cases alone
+- the tree reaches the door over HTTP, and the cases stand a real door over fake actions, so no new door asks a fake
+- each function links the ticket or the design note it implements
+- each constant stands once at the top of the cli file
 
 # accept
 
