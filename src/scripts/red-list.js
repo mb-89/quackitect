@@ -34,12 +34,13 @@ export function expectedRed(tickets) {
 
 // The files one red leaf names under its red field. [[spec/design_output/pull#kept-red-leaves]]
 export function redListOf(text, path) {
+  // A row a list payload wrote before formatted took arrays holds its paths joined by commas. [[spec/design_output/pull#kept-red-leaves]]
   return (chapterOf(text, path).fields.get(FIELD) ?? [])
-    .map((row) =>
+    .flatMap((row) =>
       String(row)
         .replace(/^[-*]\s+/, "")
-        .replaceAll("`", "")
-        .trim(),
+        .split(","),
     )
+    .map((one) => one.replaceAll("`", "").trim())
     .filter(Boolean);
 }

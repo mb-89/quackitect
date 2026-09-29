@@ -30,7 +30,12 @@ func TestTheSliceKeyStandsShared(t *testing.T) {
 	c := q.New()
 	Registers(c)
 	keys := c.Keys()
-	if len(keys) != 1 || keys[0].Local != OpenTasksKey || !keys[0].Shared {
-		t.Fatalf("the module registers %+v, and wants the shared key %s alone", keys, OpenTasksKey)
+	if len(keys) != len(slices) {
+		t.Fatalf("the module registers %+v, and wants one key a slice", keys)
+	}
+	for i, one := range keys {
+		if one.Local != slices[i].key || !one.Shared {
+			t.Fatalf("the module registers %+v, and wants the shared key %s", one, slices[i].key)
+		}
 	}
 }

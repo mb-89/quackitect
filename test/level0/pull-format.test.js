@@ -37,6 +37,11 @@ test("a payload lands formatted before the checks read it", () => {
   assert.match(put.text, /### tests\n\nnode --test\n\n## change/);
 });
 
+// [[spec/design_output/pull#kept-red-leaves]]
+test("a list payload lands one item a line", () => {
+  assert.equal(formatted(["a_test.go", "b.test.js"]), "- a_test.go\n- b.test.js");
+});
+
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the spawn prompt hands a helper the payload, and sends it into no file", () => {
   const leaf = {

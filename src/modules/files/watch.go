@@ -29,19 +29,18 @@ var skipped = map[string]bool{".git": true, "node_modules": true}
 
 const private = ".se"
 
-// The dot folders under the private one the watch adds by name, since a loaded projection reads their JSON files. Each stands alone, and no folder under it joins. [[spec/design_output/model#everything-on-disk-mirrors]]
+// The dot folders under the private one the watch adds by name, each with the extension of the files a module reads there: a loaded projection's JSON, and the session log's lines. Each stands alone, and no folder under it joins. [[spec/tickets/the-log-topic-lands]]
 // .claude/skills/level0/lib/folders.js owns these names, and a module spells them again. [[spec/design_output/model#everything-on-disk-mirrors]]
-var named = map[string]bool{".se/.runtime": true, ".se/.runtime/hold": true}
+var named = map[string]string{".se/.runtime": ".json", ".se/.runtime/hold": ".json", ".se/.log": ".jsonl"}
 
-const namedExt = ".json"
-
-// Whether a change at rel reaches the family: a path the walk stands off does not, past a JSON file straight under a named folder. [[spec/design_output/model#everything-on-disk-mirrors]]
+// Whether a change at rel reaches the family: a path the walk stands off does not, past a file carrying its folder's extension straight under a named folder. [[spec/design_output/model#everything-on-disk-mirrors]]
 func heard(rel string) bool {
 	parts := strings.Split(rel, "/")
 	for i, part := range parts[:len(parts)-1] {
 		if skipped[part] || (i > 0 && parts[i-1] == private && strings.HasPrefix(part, ".")) {
 			folder := rel[:strings.LastIndex(rel, "/")]
-			return named[folder] && strings.HasSuffix(rel, namedExt)
+			ext, ok := named[folder]
+			return ok && strings.HasSuffix(rel, ext)
 		}
 	}
 	return true
@@ -98,7 +97,7 @@ func (one watch) hears(eyes *watcher.Watcher, event fsnotify.Event, hand Hand) {
 	}
 	rel = filepath.ToSlash(rel)
 	if !heard(rel) {
-		if named[rel] {
+		if named[rel] != "" {
 			_ = eyes.Add(event.Name)
 		}
 		return
@@ -133,7 +132,7 @@ func entered(rel string) bool {
 			return false
 		}
 		if i > 0 && parts[i-1] == private && strings.HasPrefix(part, ".") {
-			return named[rel]
+			return named[rel] != ""
 		}
 	}
 	return true

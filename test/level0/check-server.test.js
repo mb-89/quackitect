@@ -37,6 +37,14 @@ test("the check answers no hook probe of its own, and cli-hooks.js answers it", 
   assert.equal(check.hookRows, undefined, "and the rows it answers");
 });
 
+// The log verb runs its shadow over the doors the window's verbs share. [[spec/tickets/log-shadow-wiring-gets-tests]]
+test("the doors the log verb runs on carry the shadow's settings and log", () => {
+  const doors = check.tuiDoors();
+  assert.equal(typeof doors.config?.ask, "function");
+  assert.equal(typeof doors.log?.say, "function");
+  assert.equal(typeof doors.proc?.run, "function");
+});
+
 // A fetch door answering the health call, so the probe runs off the wire. [[spec/design_output/doors#a-fake-behaves]]
 const answers = (body) => async () => ({ json: async () => body });
 const silent = () => async () => {

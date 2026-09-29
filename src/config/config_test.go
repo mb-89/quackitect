@@ -145,3 +145,18 @@ func TestACountReadsANumberOrATextAndZeroWhereNoneStands(t *testing.T) {
 		t.Fatalf("a key standing nowhere reads %d", said)
 	}
 }
+
+// Where names the layer answering: the local file over the variable over the tracked file. [[spec/tickets/cfg-topic-holds-one-resolver]]
+func TestWhereNamesTheLayer(t *testing.T) {
+	root := rootWith(t, map[string]string{Tracked: `{"names": {"words": 3, "kept": 1}}`, Local: `{"names": {"words": 8}}`})
+	t.Setenv("SE_NAMES_KEPT", "4")
+	if _, layer, held := Where(root, "names.words"); !held || layer != Local {
+		t.Fatalf("names.words reads off %q", layer)
+	}
+	if said, layer, held := Where(root, "names.kept"); !held || layer != "SE_NAMES_KEPT" || said != "4" {
+		t.Fatalf("names.kept reads %v off %q", said, layer)
+	}
+	if _, layer, held := Where(root, "names.none"); held || layer != "" {
+		t.Fatalf("names.none reads off %q", layer)
+	}
+}

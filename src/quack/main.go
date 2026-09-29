@@ -6,6 +6,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -13,16 +14,20 @@ import (
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/check"
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
 	"quackitect/src/modules/env"
 	"quackitect/src/modules/files"
+	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
 	manager "quackitect/src/modules/index"
+	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/tickets"
 	"quackitect/src/modules/work"
+	"quackitect/src/prose"
 	"quackitect/src/q"
 )
 
@@ -55,6 +60,9 @@ var modules = map[string]ioModule{
 	"queue":     {registers: queue.Places},
 	"work":      {registers: work.Registers},
 	"migration": {registers: migration.Registers},
+	"check":     {registers: check.Registers},
+	"guidance":  {registers: guidance.Registers},
+	"log":       {registers: logmodule.Registers},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -118,6 +126,34 @@ func dumps(prefix string) error {
 }
 
 func main() {
+	if len(os.Args) == 2 && os.Args[1] == "config" {
+		if err := configs("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) == 2 && os.Args[1] == "guidance" {
+		if err := guidances("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) == 2 && os.Args[1] == "log" {
+		if err := logs("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	if len(os.Args) == 2 && os.Args[1] == "prose" {
+		if err := proses("."); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) == dumpArgs && os.Args[1] == "dump" {
 		if err := dumps(os.Args[2]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -253,4 +289,52 @@ func load(w q.Wiring, into *q.Catalog) ([]index.Start, error) {
 		})
 	}
 	return starts, nil
+}
+
+// Prints every key off the config module, over both files under the root, the wiring and the SE_ variables. [[spec/tickets/cfg-topic-holds-one-resolver]]
+func configs(root string) error {
+	read := func(path string) []byte {
+		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		return body
+	}
+	shared, err := sharedKeys(string(read(q.WiringFile)))
+	if err != nil {
+		return err
+	}
+	env := map[string]string{}
+	for _, one := range os.Environ() {
+		if name, value, ok := strings.Cut(one, "="); ok && strings.HasPrefix(name, "SE_") {
+			env[name] = value
+		}
+	}
+	rows, err := configRows(read(config.Tracked), read(config.Local), env, shared)
+	if err != nil {
+		return err
+	}
+	text, err := configText(rows)
+	if err != nil {
+		return err
+	}
+	_, err = os.Stdout.Write(text)
+	return err
+}
+
+// Reads one prose request on stdin, and prints what the Go vetoes keep over the caps and the domain words the tree names. [[spec/tickets/prose-checks-run-in-go]]
+func proses(root string) error {
+	read := func(path string) string {
+		body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		return string(body)
+	}
+	caps, paths := proseSchema([]byte(read(paragraphSchema)))
+	words := prose.Words(read(paths[0]), read(paths[1]), read(paths[2]))
+	ask, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		return err
+	}
+	text, err := proseAnswer(ask, words, caps)
+	if err != nil {
+		return err
+	}
+	_, err = os.Stdout.Write(text)
+	return err
 }
