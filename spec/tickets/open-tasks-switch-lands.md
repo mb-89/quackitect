@@ -80,7 +80,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/write
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2switch
@@ -143,6 +143,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: aa9e4479e5604df94b590f832d132a560e932527
+    hash_after: aa9e4479e5604df94b590f832d132a560e932527
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -222,38 +234,65 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+count-grep-misses-the-scripts closes at do, since the tree case reads the three files that held the chain
+count-tests-miss-the-chain closes at do, since the build commits rewrote its three tests
+open-tasks-fake-moves-over closes at do, since askOpenTasks stands beside PlacesAt on askIndex
+opentasks-help-names-dead-modes closes at do, since the schema help names the record
+the group passes its accept through a reviewer helper, a hand other than the builder
+opentasks-enum-keeps-dead-values drops old and shadow from the enum, the module default and the projected commands
+verdict-point-crashes-on-a: the findings check refuses a point whose name is no ticket name
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the handover named each child and why it closes, so four closes took one check each
+a reviewer helper gave the accept a second hand, and found the dead enum values the build left
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+01:05 the first Bash call named no ticket in its description, and the hook refused it
+01:08 the tests field took ./RUNME.sh check, which ends on a warning line, and the pull refused it as not green
+01:10 an Agent call ran in the foreground, and the hook refused it
+01:13 the box minted the accept's fix ticket by hand, around the gate that mints it
+01:15 a verdict point opening with a wiki link crashed the pull with ENOENT
+01:16 a note decide answered without --pass, and the pull printed the leaf again
+01:20 the commit door refused a change to pull-chapter.js with its test in pull-findings.test.js alone
+01:22 the test pointed at a private note, and EveryPointerResolves failed the check
+01:14 and 01:19 LandingFollowsItsGate refused a landing joined to its gate with a semicolon
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the findings check in src/scripts/pull-chapter.js now refuses a link in the name place
+the gate's own mint from its points stands as the road, in spec/design_output/pull#a-finding-rides-out, and the box reads it before any hand mint
+the tests field names a test command, and the check stays under check
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask names migration/config/slices, and the slice key stands in spec/config/level0.json. The reviewer read past it, and a later ask on a slice names the real folder. The gate verdict both mints and parses, so the fix ticket belongs to the verdict line, and the hand mint only doubled it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+one place: every fix points at the file that holds it
+numbers: the change adds none
+headers: the change writes none
+prompts and errors: the one owner prompt is the clear, and each error carries its time
+roles: the chapter names the box and the reviewer, and no person or path of the box
 
 ## cloud
 
