@@ -125,8 +125,8 @@ func TestAllAnswersEveryTicketWithItsFields(t *testing.T) {
 	if held.Group != "one-group" || held.Route != "trivial" || !held.Todo || held.Path != "spec/tickets/a-child.md" {
 		t.Fatalf("a child answers its fields, and reads %+v", held)
 	}
-	if rows["a-loose-one"].Step != "" || rows["a-loose-one"].Route != "" {
-		t.Fatalf("a ticket naming no step and no route answers neither, and reads %+v", rows["a-loose-one"])
+	if rows["a-loose-one"].Step != "do" || rows["a-loose-one"].Route != "" {
+		t.Fatalf("a ticket naming no step reads its first leaf, and one naming no route answers none, and reads %+v", rows["a-loose-one"])
 	}
 }
 
