@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -144,6 +144,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 3e366e4eb61f99892c39bcd4f10e0e07066b2742
+    hash_after: 3e366e4eb61f99892c39bcd4f10e0e07066b2742
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["open-tasks-shadow-lands", "read-topics-land-in-shadow"]
 enabled_by: migration.phase4shadow
 cloud: true
@@ -248,38 +260,65 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+vehicle-cases-own-files and vehicle-stub-native-ports close became vehicle-verbs-become-actions
+vehicle-verbs-become-actions passes change and tests-green, and closes done
+work-verbs-become-actions passes its gate through a separate hand, then change and tests-green, and closes done
+the branch row stands in the ports table under the quack-verbs-switch-over Discussion
+the note config-reads-the-tracked-file becomes index-reads-loaded-projections under quack-verbs-switch-over
+the group passes sync, split, accept and retro/notes
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the handover named each step in order, so the box needed no search after the clear
+the red cases stood in files of their own, so the branch change turned them green without touching the vehicle cases
+the gate hand named three concrete rows, and each took one line at implement
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+10:02 the implement/change checked line said vehicle.go points at a design section, and it points at its ticket; the box wrote the line before it opened the file
+10:06 the engine refused go test as the tests field, and took ./RUNME.sh test over the same files
+10:09 the stop claiming a helper still runs fell, since a cloud box ending its turn stops its helpers; the wait tool holds the turn instead
+10:10 the pull answered wait after the gate, since the plan held the ticket as its working todo, and an empty working field left it standing; done on the todo cleared it
+10:21 the accept hand-back refused --pass, since a verdict field decides the leaf alone
+10:22 the decide leaf ignored the outcome field, and closed on --became
+10:22 the gate hand's bare pull answered wait, and it took the ticket by name
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+spec/guidance/tickets rule 15 already asks the author to open every file before a claim; the box holds it at implement/change as at design
+the tests field of tests-green names ./RUNME.sh test in its says line, in spec/processes/standard
+the stop tool's helpers reason already says so; the box reaches for the wait tool first
+the plan tool clears a ticket todo on done alone; the handover's restart line names done, not an empty working field
+the verdict and choice forms name the hand-back flag they take, in the pull's answer line, in src/scripts/pull-hand.js
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The note on the config looked like a missing wire, and the index showed every loaded projection reading its default, the queue plan and the ticket notes among them. That moved the successor out of this group, since the verbs road reads the tracked file straight and the shadow runs without the index's config.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each fact points at the file owning it: the ports table, the successor ticket, the process
+the queue columns carry names once, as constants in twins.go beside the queueOnly pointer
+the headers the change writes say what the file is for
+the badly list carries each error off the transcript with its time; no owner prompt came in this window past the clear
+the chapter names roles and repository files, and no box path
 
 ## cloud
 
