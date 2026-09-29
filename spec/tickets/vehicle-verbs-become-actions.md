@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8509c02d5db · claude-code-remote
+    hash_before: 357c04e7dc18a85dd20f26a059e9166585eaa69b
+    hash_after: 357c04e7dc18a85dd20f26a059e9166585eaa69b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/verbs passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-verbs-become-actions.md:260:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 5afed80b58640373
+        size: 691
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -320,26 +343,33 @@ the native ports stand once, in the table under the quack-verbs-switch-over Disc
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/verbs/vehicle_test.go src/quack/vehicle_twins_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The vehicle and stub verbs stand as actions of their topics, and the wiring loads both topics, so an agent calls them through the index while cli.js answers in shadow. Their cases moved out of verbs_test.go and twins_test.go into vehicle_test.go and vehicle_twins_test.go, so the red branch case of work-verbs-become-actions shares no file with them. The native ports stand in the table under the quack-verbs-switch-over Discussion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the vehicle verbs, main.go wiring and the four test files the cases moved between, and nothing else
+the actions reach cli.js through the node module, whose fake the twin tests use
+vehicle.go points at this ticket, not at a design section: the implement/change line saying otherwise was wrong
+the native ports stand once, in the table under the quack-verbs-switch-over Discussion
 
 # accept
 
