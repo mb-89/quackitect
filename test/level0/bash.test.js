@@ -5,17 +5,18 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  findings,
+  reaches,
+  testIn,
+  writesAPath,
+} from "../../.claude/skills/level0/lib/bash.js";
+import {
   addsIn,
   branchIn,
   commitIn,
-  findings,
-  reaches,
   skipsTheHook,
-  testIn,
-  VERBS,
-  verbLine,
-  writesAPath,
-} from "../../.claude/skills/level0/lib/bash.js";
+} from "../../.claude/skills/level0/lib/commit-reads.js";
+import { VERBS, verbLine } from "../../.claude/skills/level0/lib/verb-line.js";
 import { RULE as GIT_WRITE } from "../../.claude/skills/level0/lib/git-writes.js";
 import { scriptsIn } from "../../.claude/skills/level0/lib/scripted.js";
 
@@ -454,14 +455,13 @@ test("the description names the index tools where the index lists them", () => {
     "index_verb_doctor",
   ].map((name) => ({ name }));
   const said = verbLine(tools);
-  for (const name of [
-    "index_verb_check",
-    "index_branch_<verb>",
-    "index_verb_tui",
-    "index_verb_doctor",
-  ]) {
+  for (const name of ["index_verb_check", "index_branch_<verb>", "index_verb_doctor"]) {
     assert.ok(said.includes(`mcp__level0__${name}`), `the line names ${name}: ${said}`);
   }
+  assert.ok(
+    !said.includes("index_verb_tui"),
+    "a tool holding a terminal stays off the line",
+  );
   assert.doesNotMatch(said, /\.\/RUNME\.sh/);
   assert.match(said, /Reach for the tool before the shell\./);
   assert.equal(verbLine([]), verbLine(), "an empty list keeps the verb line");

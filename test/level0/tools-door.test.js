@@ -13,6 +13,8 @@ import {
   onSessionStart,
   TOOLS_BLOCK,
 } from "../../src/bridge/guidance.js";
+import { onDescribe } from "../../src/bridge/bash.js";
+import { indexToolsOf } from "../../src/bridge/index-tools.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -70,7 +72,7 @@ test("a surveyed box reads the file and runs nothing", () => {
 
   const tools = blocksOf(it).find((one) => one.name === TOOLS_BLOCK);
 
-  const surveyed = it.proc.ran.filter((one) => !one.argv.includes("help"));
+  const surveyed = it.proc.ran.filter((one) => !one.argv.includes("tools"));
   assert.equal(surveyed.length, 0, "the survey stays as it stands");
   assert.match(tools.text, /- `vale` 3\.20\.0, for the prose rules/);
   assert.doesNotMatch(tools.text, /`node`/);
@@ -150,4 +152,34 @@ test("a helper's spawn writes the model it runs on to the log", () => {
   assert.equal(row?.[0], "info");
   assert.match(row?.[2] ?? "", /spawns on haiku/);
   assert.equal(row?.[3]?.detail, "find the callers");
+});
+
+// The Bash description reads the box's tool list, so it names the tool the session holds. [[spec/tickets/describe-reaches-the-tool-list]]
+test("the Bash description names the tools the box's index lists", () => {
+  const listed = JSON.stringify([
+    { name: "index_verb_check", description: "the check" },
+  ]);
+  const it = box(
+    {},
+    { [`${ROOT}/.se/.runtime/bin/se-index tools`]: { stdout: listed } },
+  );
+
+  const said = onDescribe({ tool: "Bash" }, it).after.description;
+
+  assert.match(said, /mcp__level0__index_verb_check/);
+  assert.doesNotMatch(said, /\.\/RUNME\.sh check/);
+});
+
+// The list reads once a box, so a second surface asks no second process. [[spec/tickets/describe-reaches-the-tool-list]]
+test("the tool list reads once a box", () => {
+  const listed = JSON.stringify([
+    { name: "index_verb_check", description: "the check" },
+  ]);
+  const it = box(
+    {},
+    { [`${ROOT}/.se/.runtime/bin/se-index tools`]: { stdout: listed } },
+  );
+
+  assert.equal(indexToolsOf(it), indexToolsOf(it));
+  assert.equal(it.proc.ran.length, 1);
 });

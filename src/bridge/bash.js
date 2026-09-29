@@ -3,6 +3,7 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { join } from "node:path";
+import { indexToolsOf } from "./index-tools.js";
 import {
   commitIn,
   findings,
@@ -123,9 +124,10 @@ function ticketDoor(command, e, box) {
 }
 
 // [[spec/design_output/bash#the-description-names-verbs]]
-export function onDescribe(e) {
+export function onDescribe(e, box) {
   if (String(e?.tool ?? "") !== "Bash") return PASS;
-  return { after: { description: verbLine() } };
+  // The line names the tools the session holds, and the verbs where the index lists none. [[spec/tickets/describe-reaches-the-tool-list]]
+  return { after: { description: verbLine(box ? indexToolsOf(box) : []) } };
 }
 
 // The box carries no join, so the door hands the reading the work root and the join of the path module. [[spec/tickets/one-door-joins-a-path]]
