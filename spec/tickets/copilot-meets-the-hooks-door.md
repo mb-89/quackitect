@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: "src/quack/main.go:147:21: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d855c2347910b · claude-code-remote
+    hash_before: 8dca7f6ba7a3113fe907ad25e38b11926c70e9a2
+    hash_after: 3d02b38ffc52359f76a0fe00536b6622898c5d14
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s); green, src/quack passes; green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: a83cb8e7d18bb295
+        size: 994
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -320,26 +343,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/hook_test.go src/modules/hooks/cage_test.go test/level0/copilot-shadow.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Copilot now reaches the hooks door in shadow. The hook verb on the quack binary maps a Copilot event onto the protocol and posts it with the old answer beside it. The door compares the two and writes a shadow row where they part, which log --kind shadow reads. The Copilot script runs the verb where the cage reads shadow, and ignores its answer, so the old path keeps deciding. The hook verb argument count takes a name beside the dump count.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and main.go takes one named constant past them
+- the process door and the disk have fakes, and the reach case drives the hooks listen for real
+- the head of hook.go and of copilot-shadow.js names the approach
+- the hook argument count stands once, in the constants block of main.go
 
 # accept
 
