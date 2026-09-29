@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -108,6 +108,18 @@ record:
         exit: 0
         said: work/lsp-door-lands-in-shadow took 6 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d8572d2183d7 · claude-code-remote
+    hash_before: 326edc16db340967f0df8853b412586fe63e89c1
+    hash_after: 326edc16db340967f0df8853b412586fe63e89c1
+    inputs:
+      - name: ask
+        hash: 103d386a888107c8
+        size: 559
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["read-topics-land-in-shadow", "quack-verbs-land-in-shadow"]
 enabled_by: migration.phase7shadow
 cloud: true
@@ -137,14 +149,20 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/lsp-rules-move-to-check]] standard, closed: the rules answer in the check module and shadow rows name each finding the old sweep and the new hold apart
+- [[spec/tickets/buffers-feed-the-checks]] standard, closed: the buffers input feeds the sweep
+- [[spec/tickets/the-lsp-door-lands]] standard, closed: the lsp IO module, the listener and quack lsp
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is a reviewed ticket, closed with its own check green
+- the goal holds: the migration key slices/lsp already reads shadow in the default file, the check-side shadow writes the rows log --kind shadow names, and the door replays a recorded session. I weigh a door-level compare against the old server and drop it, since the old server answers on its own port only while an editor holds it, and the rule rows already name every mismatch. I assume the owner reads mismatches in the rows, as the ask says
+- no child waits on another beyond the depends_on the tickets carry
 
 # children
 
