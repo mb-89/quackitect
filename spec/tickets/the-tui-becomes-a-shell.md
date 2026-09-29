@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -147,6 +147,27 @@ record:
         hash: 04353381cefa7404
         size: 5426
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 1adf4c9594f80f4609b8f1e93da536502b4359e3
+    hash_after: 1adf4c9594f80f4609b8f1e93da536502b4359e3
+    inputs:
+      - name: design/draft
+        hash: 44af430987b84e61
+        size: 4553
+      - name: design/tests-red
+        hash: 91bcad980dd148b8
+        size: 1066
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/the-work-view-gains-actions]]
+        hash: e037af28d323c289
+        size: 5675
+      - name: [[spec/tickets/the-log-becomes-a-view]]
+        hash: 04353381cefa7404
+        size: 5426
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -291,8 +312,9 @@ Every case fails on its assertion over a stub that compiles. The frame hands eac
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. Weighed: the approach names files and functions that stand (src/tui/main.go newModel/Frame/runWindow, src/tui/frame, src/tui/registry stubs, the model note anchor); each done_when line meets a red test (index case, help case over q.Doc, go test, check). Assumed: the cli tab form under Enter rides a child the group mints. Form-level nits wait for the push.
 
 # implement
 
