@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,19 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-land-in-shadow
 depends_on: ["actions-answer-over-http"]
+record:
+  - step: design/draft
+    hand: box d84fcad60110c · claude-code-remote
+    hash_before: b20604d47d46c7bbf871a42dd1f65d550a218658
+    hash_after: 43e6a0eb915cea6f18d11a9568bab40a2d42ad6c
+    inputs:
+      - name: ask
+        hash: ca2485addab1b9fe
+        size: 627
+      - name: [[spec/design_input/the-index-holds-the-model]]
+        hash: 5f2da8fccb387d1f
+        size: 23680
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -148,32 +161,60 @@ A command then costs no hand-written verb, and its help reads the text every oth
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`quack` reads the registry over `/v1` and builds its command tree off it. It keeps no list of verbs of its own.
+
+| what changes | where it stands | what it does |
+|---|---|---|
+| the base | a new `V1` in `src/index/main.go` | reaches the door through `reaches`, which starts one where none answers, and answers `http://127.0.0.1:<port>/v1` off the standing file |
+| the tree | a new `src/quack/cli.go`, `commands` | reads `GET /v1/values/index/actions`, the rows the manager commits, each with its name, its `q.Doc` and its fields |
+| the help | `helps` in `cli.go` | `quack --help` prints each action beside its `q.Doc`. `quack run <action> --help` prints the `q.Doc` on its first line, then a flag a field, with the field's `doc` tag as its usage |
+| the run | `runs` in `cli.go` | builds a `flag.FlagSet` off the fields, posts the flags as a JSON object, and follows the call: `Prefer: wait=1`, then a read of the handle path each pause until the state ends, the fraction done on standard error. `--detach` posts `Prefer: wait=0` and prints the handle alone |
+| the read | `gets` in `cli.go` | `quack get <name>` prints the value `GET /v1/values/<name>` answers, as the design input shows |
+| the root | `main` in `src/quack/main.go` | hands `help`, `--help`, `run` and `get` to the tree, and every other verb to `index.Main` as today |
+
+A flag value reads as JSON where it parses as a number, a boolean or `null`, and as a string otherwise, since a field carries no type on its row. An action taking no struct takes its input as the one argument past its name.
+
+A failed operation prints its error and exits 1. A 400 or 422 prints the problem's detail and exits 1.
+
+I assume `quack` with no verb keeps running the index as today, since `RUNME.sh` and the editor start it so.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go: main, which routes the new verbs
+- src/index/main.go: reaches, which V1 calls
+- src/index/main.go: standingOf, which V1 reads
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/cli_test.go: TestTheHelpReadsEachActionsDoc
+- src/quack/cli_test.go: TestRunFollowsASlowActionToItsResult
+- src/quack/cli_test.go: TestRunDetachedAnswersTheHandleAtOnce
+- src/quack/cli_test.go: TestGetPrintsTheValueOfAName
+- src/index/v1_test.go: TestV1AnswersTheBaseOfTheStandingDoor
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function the approach names stands opened: main.go of quack and of the index, reaches, standingOf, catalog.go and its ActionRow, and the /v1 route of actions-answer-over-http
+- the callers list names every caller of reaches and standingOf the change touches, and main, the one caller of the tree
+- each done_when line names its case: the help case, the follow case and the detach case, and go test and the check in tests-green
 
 ## tests-red
 
