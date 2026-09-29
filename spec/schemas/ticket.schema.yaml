@@ -50,6 +50,11 @@ frontmatter:
       type: boolean
       description: whether the pull hands this out first, over the order the score sets
 
+    point:
+      type: string
+      enum: [gate]
+      description: the gate whose verdict minted this ticket, so its tag rides the push
+
     todo:
       type: [boolean, string]
       description: a place in the queue a hand forces, as true for the front or the name of the row this one stands before, and a note lacking it reads false. A note waits for its retro and carries no tag
