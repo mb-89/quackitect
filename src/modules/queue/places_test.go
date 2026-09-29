@@ -41,6 +41,19 @@ func TestANoteAndAClosedTicketTakeNoPlace(t *testing.T) {
 	}
 }
 
+// A key no layer sets reads the file's weight, so the older of two tickets stands first. [[spec/tickets/index-reads-loaded-projections]]
+func TestTheBuiltInWeightsOrderTheOlderFirst(t *testing.T) {
+	const minute, day = int64(29_000_000), int64(86400)
+	said := placesOver(t, map[string]any{
+		RowsPort:   []ticket.Ticket{{Name: "a-new", Path: "spec/tickets/a-new.md", State: "open"}, {Name: "b-old", Path: "spec/tickets/b-old.md", State: "open"}},
+		StoodPort:  map[string]int64{"spec/tickets/a-new.md": minute*60 - 60, "spec/tickets/b-old.md": minute*60 - 3*day},
+		MinutePort: minute,
+	})
+	if said["b-old"] != "1" || said["a-new"] != "2" {
+		t.Fatalf("the places read %v, and want b-old at 1 and a-new at 2", said)
+	}
+}
+
 func TestAPersonStepCountsDownFirst(t *testing.T) {
 	said := placesOver(t, map[string]any{
 		RowsPort: []ticket.Ticket{

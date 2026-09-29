@@ -120,6 +120,25 @@ func TestGitKeepsItsContract(t *testing.T) {
 	})
 }
 
+// A shallow clone reads its ages again once a fetch deepens it, though HEAD stands still. [[spec/tickets/verbs-queue-order]]
+func TestADeepenedCloneReadsItsAgesAgain(t *testing.T) {
+	origin, _ := scratch(t)
+	t.Setenv("GIT_COMMITTER_DATE", "@1700000000 +0000")
+	committed(t, origin, map[string]string{"spec/tickets/old.md": "old\n"})
+	t.Setenv("GIT_COMMITTER_DATE", "@1700086400 +0000")
+	committed(t, origin, map[string]string{"spec/tickets/new.md": "new\n"})
+	shallow := filepath.Join(t.TempDir(), "shallow")
+	run(t, ".", "clone", "-q", "--depth", "1", "file://"+origin, shallow)
+	one := New(shallow)
+	if said, _ := one.Stood(); said["spec/tickets/old.md"] != 1_700_086_400 {
+		t.Fatalf("a shallow clone dates every file to its boundary, and answers %v", said)
+	}
+	run(t, shallow, "fetch", "-q", "--unshallow")
+	if said, _ := one.Stood(); said["spec/tickets/old.md"] != 1_700_000_000 {
+		t.Fatalf("the deepened clone answers %v, and wants old.md at its own second", said)
+	}
+}
+
 // A repository standing as origin, and a clone of it. [[spec/design_output/model#the-fake-keeps-a-contract]]
 func scratch(t *testing.T) (origin, local string) {
 	t.Helper()

@@ -7,6 +7,7 @@ package git
 import (
 	"bytes"
 	"encoding/json"
+	"os"
 	"os/exec"
 	"path"
 	"sort"
@@ -114,7 +115,8 @@ func (one *repo) Stood() (map[string]int64, error) {
 	if err != nil {
 		return map[string]int64{}, nil
 	}
-	commit := strings.TrimSpace(head)
+	// A fetch that deepens a shallow clone moves no HEAD, so the shallow file's content keys the reading beside it. [[spec/tickets/verbs-queue-order]]
+	commit := strings.TrimSpace(head) + " " + one.shallow()
 	if one.stood != nil && commit == one.headAt {
 		return one.stood, nil
 	}
@@ -124,6 +126,16 @@ func (one *repo) Stood() (map[string]int64, error) {
 	}
 	one.headAt, one.stood = commit, stoodIn(said)
 	return one.stood, nil
+}
+
+// The boundary commits of a shallow clone, and nothing for a whole history. [[spec/tickets/verbs-queue-order]]
+func (one *repo) shallow() string {
+	at, err := one.run(nil, "rev-parse", "--path-format=absolute", "--git-path", "shallow")
+	if err != nil {
+		return ""
+	}
+	body, _ := os.ReadFile(strings.TrimSpace(at))
+	return string(body)
 }
 
 // The log names a second, then the paths that commit adds, newest first, so the first second a path meets is its newest add. [[spec/design_output/pull#the-queue-is-a-score]]
