@@ -2,10 +2,10 @@
 // tree: node test/level0/guidance-golden.js
 // [[spec/tickets/the-guidance-topic-lands]]
 
-import { join } from "node:path";
-import { disk } from "../../src/doors/disk.js";
-import { writeGolden } from "../../src/scripts/guidance-golden.js";
+import { it as doors } from "../../src/scripts/cli-doors.js";
+import { GOLDEN, treeOf, writeGolden } from "../../src/scripts/guidance-golden.js";
 
 if (process.argv[1]?.endsWith("guidance-golden.js")) {
-  writeGolden({ disk: disk(), join, root: join(import.meta.dirname, "..", "..") });
+  writeGolden(treeOf(doors));
+  console.log(`${GOLDEN} holds the old reader again.`);
 }

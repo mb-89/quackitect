@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: ff79964a04aa4033
         size: 289
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d81edba2a3d5 · claude-code-remote
+    hash_before: 7fae7dca5f6c784c370a4bdf3731dc18e39122e5
+    hash_after: 7fae7dca5f6c784c370a4bdf3731dc18e39122e5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: fdf5bd20b28244f6
+        size: 3409
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -209,26 +222,36 @@ go test ./... passes: the module, watch and golden Go tests; the golden holds ev
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/log src/modules/files src/tui/log src/quack test/level0/log-golden.test.js test/level0/log-shadow.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/log/log_test.go
+- src/modules/files/named_test.go
+- src/quack/log_test.go
+- src/tui/log/golden_test.go
+- test/level0/log-golden.test.js
+- test/level0/log-shadow.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+ParseRecord already reads the fixture, so its golden case stands red on the missing golden file alone, and the -update run turns it green. The named map admits a JSON file alone, so the session log needs its folder to carry its own extension. The fixture carries a reply with its lines, and the extension's rowOf prints it across two lines, which the golden shows at the merge.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a red test: go test over the module, the watch, quack and the TUI, the golden in the Go and node golden cases, and the check at tests-green
+the module cases seed the session port through qtest, and the shadow cases fake the quack process, the settings, the files and the log
 
 # gate
 

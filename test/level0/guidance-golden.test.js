@@ -3,13 +3,16 @@
 // [[spec/tickets/the-guidance-topic-lands]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { test } from "node:test";
-import { disk } from "../../src/doors/disk.js";
-import { GOLDEN, oldSection, SECTION } from "../../src/scripts/guidance-golden.js";
+import { it as doors } from "../../src/scripts/cli-doors.js";
+import {
+  GOLDEN,
+  oldSection,
+  SECTION,
+  treeOf,
+} from "../../src/scripts/guidance-golden.js";
 
-const it = { disk: disk(), join, root: join(import.meta.dirname, "..", "..") };
+const it = treeOf(doors);
 
 test("the golden's old section holds what readsFor hands every leaf", () => {
   const said = oldSection(it);
@@ -20,7 +23,7 @@ test("the golden's old section holds what readsFor hands every leaf", () => {
   );
   let golden = {};
   try {
-    golden = JSON.parse(readFileSync(GOLDEN, "utf8"));
+    golden = JSON.parse(String(it.disk.read(GOLDEN)));
   } catch {}
   assert.ok(
     golden[SECTION],
