@@ -5,6 +5,7 @@ package verbs
 
 import (
 	"fmt"
+	"strings"
 
 	"quackitect/src/q"
 )
@@ -29,13 +30,18 @@ type Words struct {
 // The module type of a topic, registering one action a verb. [[spec/tickets/ticket-verbs-become-actions]]
 // Each action writes, since cli.js writes the tree, and declares no deadline, since the caller's wait keeps it free however long the verb runs. [[spec/design_output/model#a-caller-sets-its-wait]]
 func Topic(topic string, verbs []Verb) func(*q.Catalog) q.Writer {
+	return actions(verbs, func(verb string) []string { return []string{topic, verb} })
+}
+
+// The actions of a list of verbs, each handing the words before it and the caller's words to the node module. [[spec/tickets/agents-call-quack-directly]]
+func actions(verbs []Verb, before func(verb string) []string) func(*q.Catalog) q.Writer {
 	return func(c *q.Catalog) q.Writer {
 		hands := make([]q.Writer, 0, len(verbs))
 		for _, one := range verbs {
-			verb := one.Name
-			hands = append(hands, q.ActionIn(c, verb, func(in Words) []q.Request {
-				args := append([]string{topic, verb}, in.Args...)
-				return []q.Request{{Module: NodeModule, Verb: NodeRun, Args: args, NoUndo: fmt.Sprintf("%s %s runs through cli.js, which keeps no undo", topic, verb)}}
+			head := before(one.Name)
+			hands = append(hands, q.ActionIn(c, one.Name, func(in Words) []q.Request {
+				args := append(append([]string{}, head...), in.Args...)
+				return []q.Request{{Module: NodeModule, Verb: NodeRun, Args: args, NoUndo: fmt.Sprintf("%s runs through cli.js, which keeps no undo", strings.Join(head, " "))}}
 			}, q.Doc(one.Doc), q.Writes()))
 		}
 		return q.Join(hands...)

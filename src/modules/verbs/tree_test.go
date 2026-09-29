@@ -33,3 +33,14 @@ func TestEveryTreeVerbHoldsADoc(t *testing.T) {
 		}
 	}
 }
+
+// A tree verb names no topic, so no verb stands as two tools. [[spec/tickets/agents-call-quack-directly]]
+func TestNoTreeVerbNamesATopic(t *testing.T) {
+	for _, one := range TreeVerbs {
+		for _, topic := range []string{"ticket", "retro", "branch", "vehicle", "stub"} {
+			if one.Name == topic {
+				t.Fatalf("the tree verbs name the topic %s", topic)
+			}
+		}
+	}
+}

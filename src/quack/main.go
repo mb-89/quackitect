@@ -90,6 +90,8 @@ var modules = map[string]ioModule{
 	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
 	// [[spec/tickets/work-verbs-become-actions]]
 	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
+	// [[spec/tickets/agents-call-quack-directly]]
+	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
 }
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]

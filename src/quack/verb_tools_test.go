@@ -100,3 +100,10 @@ func TestEveryVerbStandsAmongTheTools(t *testing.T) {
 		t.Fatalf("the session registers no tool %v", missing)
 	}
 }
+
+// The module types hold the verb topic under the name the wiring loads. [[spec/tickets/agents-call-quack-directly]]
+func TestTheModuleTypesHoldTheVerbTopic(t *testing.T) {
+	if _, ok := modules[verbsmodule.TreeTopic]; !ok {
+		t.Fatalf("the module types hold no %s", verbsmodule.TreeTopic)
+	}
+}

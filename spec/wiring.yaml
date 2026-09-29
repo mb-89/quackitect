@@ -36,6 +36,8 @@ instances:
     module: stub
   branch:
     module: branch
+  verb:
+    module: verb
   hooks:
     module: hooks
   session:

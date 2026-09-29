@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: 54b3812c97580c07
         size: 892
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: 2bd99cb8010ff6756a87f9794c57a028b5ec682e
+    hash_after: 2bd99cb8010ff6756a87f9794c57a028b5ec682e
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -295,14 +304,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus findings.js, whose shadowDoorsOf lost its last reader with needs-shadow.js
+- the node module stands behind q.Request, so the change reaches no door past the catalog
+- each new file opens with a comment naming this ticket
+- the verb docs stand in tree.go, copied off the cli.js help once; cli-js-leaves takes the cli.js copy away
 
 ## tests-green
 
