@@ -6,6 +6,7 @@
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
   CLOSED,
+  DRAFT,
   fieldOf,
   GROUP,
   isGroup,
@@ -33,8 +34,12 @@ function personProcess(said) {
 
 // The tickets a group leaves open that a box can close: each open or draft child, and each open ticket the branch adds with no group. [[spec/design_output/work#a-box-leaves]]
 export function leftOpen(it, name) {
+  // A draft the branch adds waits on a person, so it lands loose on main. [[spec/tickets/done-skips-added-drafts]]
   const added = addedHere(it).filter(
-    (one) => one.name !== name && !fieldOf(one.text, GROUP),
+    (one) =>
+      one.name !== name &&
+      !fieldOf(one.text, GROUP) &&
+      fieldOf(one.text, "state") !== DRAFT,
   );
   const names = [...childrenHere(it, name), ...added]
     .filter(
