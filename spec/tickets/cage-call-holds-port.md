@@ -117,12 +117,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: 40b9ceea310b2d6ccfd2e8cfe036c80777befbc6
+    hash_after: d4dfa4d4fd1b779fd4065a4a5448242bcad73974
+    inputs:
+      - name: ask
+        hash: bc49d4efc513831a
+        size: 986
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -166,38 +175,138 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The holds port into src/modules/hooks, beside the command door. A new fold in src/modules/session keeps the state each hold reads off the events under session/<id>.
+
+1. The files, one a bridge door:
+- src/modules/session/holds.go: the fold HoldsName, <id>/holds, and its step over q.Event. It keeps what the bridge keeps on the box:
+  - the finish calls of the turn, off box.finishCalls in holdsCall. A turn.complete resets them, as dropsHold does.
+  - the agent's own calls since the plan's last answer, off box.calls in onToolCall. They reset on an mcp__level0__plan call, or on a level0 call carrying a plan field, as planRides and planned do.
+  - the grace, off wants and holdsGrace. It opens once the calls reach plan.everyCalls, holds plan.grace calls, and spends one on each call that reaches holdsGrace and is neither ENDS_TURN nor the plan call.
+  - the demand, off demands, onPromptSubmit, asksForUpdate, paid, pays, onTurnEnd and freshTexts. It opens on an owner's prompt.submit (origin kind composer or sdk) with its before row, or on the update ask off ask.wanted with grace.update skips. It is paid by a classic.MessageDisplay delta, a report call, a turn.complete answer, or an agent.spoke carrying a fresh text.
+  An event naming agentId moves none of it, since every bridge hold skips a helper.
+- src/modules/hooks/holds.go: Door.holds, the chain onToolCall runs: holdsCall, holdsCloudAsk, holdsGrace, then holdsForAnswer. It also holds their texts:
+  - refusedByHold
+  - ASKS_NOBODY
+  - refusedByGrace, with the plan ask's why off asksForPlan and plansHere
+  - the answer door's SAYS, and the lacks line of onAgentSpoke with head cut at SAID
+- src/modules/hooks/agent.go: the Agent door, off onAgent, tiersOf and tiersText.
+
+2. The config words a hold reads are not recorded on the event. So Door.writes stamps them on a tool.call's fields under held: stop.hold, ask.wanted and the cloud flag. The fold then counts the way the box counts:
+- a finish call counts where the stamp reads finish, report and stop calls included, as holdsCall counts before its ENDS_TURN test.
+- a grace call or a demand skip spends only where no earlier hold answered. The bridge chains the holds with ??, so a finish ride from holdsCall ends the chain before holdsGrace runs.
+
+3. hooks.Settings gains Hold, Ask, Binding, FinishGrace, UpdateGrace, PlanEvery, PlanGrace, PlanMostOpen and Helpers, a tier-to-model map. commandSettings in src/quack/command.go fills them through the src/config reader the command rules use.
+
+4. Door.refuses runs the bridge's order: the holds first, then the tool's own door. That door is onAgent for Agent, and the command door for Bash and PowerShell.
+- Each hold answers nothing, a ride, a refusal or a hold.
+- A ride ends the chain and lets the tool door run, as held does in onToolCall.
+- A refusal answers a result effect carrying its text.
+- The answer-first hold answers a rows effect with a call id. Effect gains a Call field for it. NewDecisionOf reads it as hold, as OldDecisionOf reads needs.
+- Under engine.binding god, every refusal and hold of Door.refuses passes, as letsThrough does. The command door falls under the same wrapper.
+- The after block a ride carries reads as pass on both sides, so it ports with the hook module's switch, as the parent names.
+
+5. Door.Hook answers agent.spoke, the post the bridgehead sends after a needs hold:
+- a result effect carrying the lacks text, where the fold holds the demand unpaid after the event.
+- pass, where the event paid it.
+The spoke post names no session, so the door files it under the session of the newest call it held under that root. The stop child's holdsTurn reads the same demand fold.
+
+6. One case table, test/replay/cage/call-holds-cases.json, holds a tree and, for each case: the config, the cloud flag, the events leading in, the call, the decision and the text. A JS case, test/level0/call-holds-cases.test.js, drives each event through decide on boxOf over fakeDisk. A Go case drives each through Door.Hook over doorOver, with the case's Settings. So the two texts cannot drift apart.
+
+7. A recorded log, test/replay/cage/call-holds.jsonl, stands with an empty golden shadow. Its box is a cloud box with tiers and a short plan grace. Its rows, in order:
+- an owner's prompt
+- a call held for the reply
+- an agent.spoke refused
+- a display paying it
+- the plan grace riding, then refusing
+- AskUserQuestion refused
+- an Agent call held in the foreground
+- an Agent call naming no tier's model
+The finish hold reads config for a whole log, so call-holds-finish.jsonl carries grace.finish's ride and its spent refusal, with an empty golden too. A log's box stands beside it as <name>.box.json, the Settings the replay's door answers. TestReplayLogAnswersEveryRecordedLog reads that file where it exists.
+
+8. The parent's every-refusal.jsonl holds an Agent row, a helper held in the foreground, with run_in_background false. It meets onAgent's first refusal, so it leaves every-refusal.shadow.jsonl once this port lands. The Write row stays there for cage-write-door-port.
+
+What the port decides past the ask:
+- The bridge keys this state by the work root, and the fold keys it by session, as the ask says. A root holding two sessions in turn reads apart on the two sides, and the recorded logs name one session each.
+- The holds write config at a turn's end, through dropsHold and dropsAsk, and the door writes none. [[spec/tickets/cage-hold-drops-port]] carries the writes.
+- The god binding wraps the command door too, since letsThrough wraps every tool door.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.Hook, which gains the holds ahead of the tool doors and the agent.spoke answer
+- src/modules/hooks/hooks.go: Door.writes, which stamps the held words on a tool.call
+- src/modules/hooks/hooks.go: Door.refuses, which runs the holds, the Agent door and the god binding
+- src/modules/hooks/hooks.go: Door.serves and Replay, calling Door.Hook
+- src/modules/hooks/cage.go: Door.ReplayLog, calling Door.Hook
+- src/quack/main.go: listensHooks, passing commandSettings as Config
+- src/quack/main.go: the modules table, loading session.Registers, which gains the holds fold
+- src/quack/command.go: commandSettings, which fills the new Settings fields
+- src/quack/hooks_test.go: the wiring cases calling hooks.New, Door.Hook and commandSettings
+- src/quack/hook_test.go: the wiring case calling hooks.New
+- src/modules/hooks/hooks_test.go: doorOver, calling hooks.New with Settings and registering the session folds
+- src/modules/hooks/command_test.go and cage_test.go: Door.Hook through doorOver
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/session/holds_test.go: TestTheHoldsFoldCountsAsTheBoxCounts
+- src/modules/hooks/holds_test.go: TestTheHoldsAnswerWhatTheBridgeAnswers, over call-holds-cases.json
+- src/modules/hooks/holds_test.go: TestAHeldCallAsksBackForRows
+- src/modules/hooks/agent_test.go: TestTheAgentDoorReadsTheTiers
+- src/quack/hooks_test.go: TestCommandSettingsReadTheHoldKeys
+- test/level0/call-holds-cases.test.js: the bridge answers every shared hold case
+- test/replay/cage/call-holds.jsonl and its empty shadow, through TestReplayLogAnswersEveryRecordedLog
+- test/replay/cage/call-holds-finish.jsonl and its empty shadow, through TestReplayLogAnswersEveryRecordedLog
+- test/replay/cage/every-refusal.jsonl: its Agent row, through TestReplayLogAnswersEveryRecordedLog
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/session/holds.go
+- src/modules/session/holds_test.go
+- src/modules/session/session.go
+- src/modules/hooks/holds.go
+- src/modules/hooks/holds_test.go
+- src/modules/hooks/agent.go
+- src/modules/hooks/agent_test.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/hooks_test.go
+- src/modules/hooks/cage_test.go
+- src/quack/command.go
+- src/quack/hooks_test.go
+- test/replay/cage/call-holds-cases.json
+- test/level0/call-holds-cases.test.js
+- test/replay/cage/call-holds.jsonl
+- test/replay/cage/call-holds.shadow.jsonl
+- test/replay/cage/call-holds.box.json
+- test/replay/cage/call-holds-finish.jsonl
+- test/replay/cage/call-holds-finish.shadow.jsonl
+- test/replay/cage/call-holds-finish.box.json
+- test/replay/cage/every-refusal.shadow.jsonl
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened server.js onToolCall, letsThrough and DOORS, stop.js holdsCall, refusedByHold and dropsHold, cloud-ask.js holdsCloudAsk, grace.js wants, holdsGrace and refusedByGrace, plan.js asksForPlan, planned and plansHere, answer.js onPromptSubmit, holdsForAnswer, onAgentSpoke, paid and onTurnEnd, ask.js asksForUpdate and dropsAsk, agent.js onAgent, hooks.go Hook, writes and refuses, cage.go, cage_test.go, command_test.go, hooks_test.go doorOver, session.go, store.go Folds and Land, command.go commandSettings, main.go listensHooks, and every-refusal.jsonl, and each claim holds there
+- the callers list names every caller of Door.Hook, Door.writes, Door.refuses, hooks.New, hooks.Settings, commandSettings and session.Registers
+- done_when line one meets call-holds.jsonl, call-holds-finish.jsonl and every-refusal.jsonl's Agent row, each with an empty golden. Line two meets TestTheHoldsAnswerWhatTheBridgeAnswers over the shared table, with its JS twin. Line three is the check
 
 ## tests-red
 
