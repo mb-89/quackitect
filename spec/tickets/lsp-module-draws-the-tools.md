@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 9c15e28df12267fe
         size: 2649
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8922c5f7ed7 · claude-code-remote · helper-4
+    hash_before: ebcb7775db992cb2c47be0d8c2463acfbd54acce
+    hash_after: ebcb7775db992cb2c47be0d8c2463acfbd54acce
+    inputs:
+      - name: design/draft
+        hash: 9c15e28df12267fe
+        size: 2649
+      - name: design/tests-red
+        hash: 199a3aa8f4a7901b
+        size: 620
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -279,8 +291,9 @@ Each of the six cases fails on its own assertion: every publish comes back empty
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach ports the old Outside runs into the module, and each done_when line meets its decider. The Vale, Biome and tree lines meet their own red cases, and the check line meets `./RUNME.sh check` at the build. Every case fails on its own assertion. The gate fixed the Vale fixtures in place: they named a `Voice` style the port never strips, so the Vale and closed-file cases wanted a code the port cannot draw. They now name `VoiceVale`, the style the tree holds, and the tense case now decides the drop.
 
 # implement
 

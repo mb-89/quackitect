@@ -89,7 +89,7 @@ func valeSays(file, check, match string) string {
 }
 
 func TestAValeRowPublishesUnderItsSource(t *testing.T) {
-	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/a.md", "Voice.Sentence", "Some")}}
+	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/a.md", "VoiceVale.Sentence", "Some")}}
 	server, pushed := toolsOver(t, map[string]string{"spec/a.md": "# A\n\nSome text\n"}, fake)
 	server.Handle(opened("file:///tree/spec/a.md", "# A\nSome text\n"))
 	server.Settle()
@@ -116,7 +116,7 @@ func TestACodeFaultPublishesUnderTree(t *testing.T) {
 }
 
 func TestAClosedFileDrawsItsRowsAtTheListen(t *testing.T) {
-	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "Voice.Sentence", "Some")}}
+	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}}
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nSome text\n"}, fake)
 	if drawn := drawnOn(server.SweepTools(), "file:///tree/spec/b.md"); !holds(drawn, "vale", "Sentence") {
 		t.Fatalf("the closed file draws %+v, and wants its Vale row off the whole run", drawn)
@@ -124,7 +124,7 @@ func TestAClosedFileDrawsItsRowsAtTheListen(t *testing.T) {
 }
 
 func TestTheTenseReaderDropsAPastRow(t *testing.T) {
-	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "Voice.PastTense", "read"), "node": "[false]"}}
+	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.PastTense", "read"), "node": "[false]"}}
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nWe read it\n"}, fake)
 	bodies := server.SweepTools()
 	if drawn := drawnOn(bodies, "file:///tree/spec/b.md"); holds(drawn, "vale", "PastTense") {
