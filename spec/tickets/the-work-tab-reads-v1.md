@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
-depends_on: [v1-watch-streams-changes]
+depends_on: [v1-watch-sends-changes]
 step: implement/change
 record:
   - step: design/owner-read
