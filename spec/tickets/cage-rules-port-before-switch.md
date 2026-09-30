@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -221,6 +221,33 @@ record:
         hash: 29ccd1d3cec3f09e
         size: 761
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 4c44da18e5be24b3522c1ab18b96f07c944e2914
+    hash_after: 4c44da18e5be24b3522c1ab18b96f07c944e2914
+    inputs:
+      - name: design/draft
+        hash: a6919ba809d8b0d3
+        size: 2872
+      - name: design/tests-red
+        hash: 8a7fd2a70caf0128
+        size: 941
+      - name: [[spec/tickets/cage-command-rules-port]]
+        hash: 36e18c6742eba22f
+        size: 908
+      - name: [[spec/tickets/cage-commit-guards-port]]
+        hash: 7c90d003597ffeb3
+        size: 821
+      - name: [[spec/tickets/cage-write-door-port]]
+        hash: 106cb5766c01d2f3
+        size: 947
+      - name: [[spec/tickets/cage-call-holds-port]]
+        hash: bc49d4efc513831a
+        size: 986
+      - name: [[spec/tickets/cage-stop-rules-port]]
+        hash: 29ccd1d3cec3f09e
+        size: 761
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -360,8 +387,9 @@ What surprised me: the live evidence ran with a todo in hand, and one replay tre
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -432,3 +460,10 @@ What surprised me: the live evidence ran with a todo in hand, and one replay tre
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+**The gate, weighed.** The gate accepts. Each rule family ports as its own child, and each port shrinks a golden shadow, which is the first `done_when` line as written.
+
+- the replay under `test/replay/cage/every-refusal.jsonl` carries a row for each of the five refusals the live shadow names on [[spec/tickets/shadow-evidence-5-6]], plus the Write and the helper hold
+- the command child turned the golden shadow into a record of the gap: it holds the Write and the Agent rows, and `./RUNME.sh test src/modules/hooks` reads green
+- the draft's line that the replay stands red until the last child lands reads stale, and the accept still catches an unported rule through the second `done_when` line
+- the accept reads the golden shadow empty before it passes
