@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: c682cac5c2d7ac62ad84ae8da0e1961c11e5ea21
+    hash_after: c682cac5c2d7ac62ad84ae8da0e1961c11e5ea21
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/config passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-lens-calls-actions.md:307:61: Vocabulary: fakedisk stands outside the words this tree writes. Write a c"
+    inputs:
+      - name: design/tests-red
+        hash: 785641c4668ade44
+        size: 1067
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -359,26 +382,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/config/keys_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The config module now answers config/keys: every key, its value and the layer answering it. Three actions stand beside it. config/set runs the config verb, config/override holds a value for a window, and config/opened drops the overrides other windows hold. An action reaches config/held through a new store land request, which the root's router folds into the guard. quack config reads the same resolver, so the rows stand in one place. The sidebar reads and writes its config through these once its own tickets land.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays inside the config module, the q request names, the router and quack config
+- each door has its fake: the store in landsAll and the router case, the node module in the request list
+- keys.go opens on a header naming the approach
+- Rows owns the resolver, and each copied name says which file owns it
 
 # accept
 
