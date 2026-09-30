@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 93c57888817cc59e
         size: 2505
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d894eee95148f · claude-code-remote
+    hash_before: 5968e1c87b16b7b7b5fc9b04706b942b58dd7b47
+    hash_after: 5968e1c87b16b7b7b5fc9b04706b942b58dd7b47
+    inputs:
+      - name: design/draft
+        hash: 93c57888817cc59e
+        size: 2505
+      - name: design/tests-red
+        hash: 1337bb662cc08e0a
+        size: 785
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -281,8 +293,11 @@ What surprises me: the other-tool case passes already, since the door answers no
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: the door answers a describe of Bash with the verb line, and `stepOf` maps the named after to the describe shape the bridge takes today. Checked at src/bridge/bash.js onDescribe, src/bridge/server.js, verb-line.js, cage.js stepOf and hooks.go Door.Hook, and each claim holds. The first done_when line meets the red Bash case in describe_test.go and the red cage case, and the check decides the second at tests-green.
 
 # implement
 
