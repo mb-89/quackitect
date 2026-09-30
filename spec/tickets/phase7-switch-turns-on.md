@@ -39,3 +39,41 @@ The phase-7 shadow reads clean now that [[spec/tickets/check-sweep-reads-tracked
 - `./RUNME.sh config` reads `migration.phase7switch true`
 - `.se/.runtime/bin/se-lsp check` over this tree adds no row to `./RUNME.sh log --kind shadow`
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test src/lsp src/modules/check src/modules/migration
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The coordinator ran the probe twice, with the lsp slice at shadow and se-index standing. The first run was on main at 4aba6a9, before the fix. There, an untracked note carrying a dead pointer made `se-lsp check` write three shadow rows, each held by the check module alone. So the compare runs and tells the roads apart. The second run was on main at e5522a7, after the fix, with se-lsp and se-index built fresh. There, the whole-tree check wrote no row, and the same untracked note wrote none. The index's `check/sweep` named the note nowhere. Staged, the note drew the same three findings on both roads, so the new road answers and agrees. So migration.phase7switch turns true.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: one key in spec/config/level0.json
+- the cleanup it reveals: none
+- every fact stands once: the run lives on this ticket and the pull request
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
