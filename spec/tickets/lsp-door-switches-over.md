@@ -197,3 +197,5 @@ Done when the LSP's own server, port and index client leave the tree.
 <!-- what anybody adds, at any time, on this ticket -->
 
 The JavaScript twins of the Go checks leave with this group. The twins row of [[spec/design_output/migration#what-goes-with-no-successor]] lists them. Phase 3 leaves them standing, since the check names answer an empty list until phase 7 moves the rules in. [[spec/tickets/check-twins-leave-phase-seven]]
+
+The split keeps the lint's own twin reads here, since the lint loses `se-lsp check` and reads the check module's sweep in its place. The write door, the bash guard, the pull and the mint keep their twins until [[spec/tickets/node-leaves-the-boxes]]. The write door checks a draft the index holds nowhere yet, and those callers stay JavaScript until Node leaves.

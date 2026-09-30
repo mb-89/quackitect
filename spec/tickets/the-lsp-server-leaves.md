@@ -115,6 +115,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
+depends_on: ["lsp-module-serves-the-features","lsp-module-draws-the-tools"]
 ---
 
 # Ask
