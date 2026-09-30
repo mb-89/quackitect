@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -190,6 +190,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: c634e7e32068ff8c3fcb5be273ee135c1d63263c
+    hash_after: c634e7e32068ff8c3fcb5be273ee135c1d63263c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/modules/config passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/index-reads-loaded-projections.md:342:153: Characters: The character / stands outside the set a paragraph a"
+    inputs:
+      - name: design/tests-red
+        hash: dd6885586879f5d3
+        size: 1035
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -384,26 +407,33 @@ each new function names the ticket
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/q src/modules/config
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The scheduler runs a loaded projection once per concrete key a wave moves, so the index answers the parsed file the watch holds, and no longer the family default. `curl` over V1 at `migration/config/cage` answers `shadow`, the value `spec/config/level0.json` holds, over a built-in `old`. The ask's `migration/config/config` takes `new` alone and decides nothing, as the Discussion says.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches `src/q/scheduler.go`, `src/q/store.go` and `src/q/scheduler_test.go` alone, each inside the ask
+the change reaches no door: the cases run against the store and `q/qtest`
+each comment the change adds names this ticket, which carries the approach
+`filesPrefix` and `covers` stand once, and the Discussion points at the cases instead of repeating them
 
 # accept
 
