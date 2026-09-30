@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides, the-sidebar-reads-v1]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 72598afa192c1458
         size: 5559
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: 21be11ec52ee554f2afc91b4d3c7f7d50cd5ea7d
+    hash_after: 21be11ec52ee554f2afc91b4d3c7f7d50cd5ea7d
+    inputs:
+      - name: design/draft
+        hash: 72598afa192c1458
+        size: 5559
+      - name: design/tests-red
+        hash: a9fc599b7b6295e6
+        size: 1771
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -345,8 +357,14 @@ The tests fix the input shapes the draft leaves open:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- every done_when line meets a red case in test/level0/sidebar-writes.test.js, and the check runs at tests-green
+- the JS and Go cases fail on their own assertion, and every older case in their files passes
+- the size list names test/level0/session.test.js, which stands nowhere, so the build moves the `opened` cases in session-layer.test.js in place
+- the bless guard holds as strong as the person mark on the verb actions, which the draft names and the ask accepts
+- the view line reads as a click kept across a new window. The draft takes the ask's own sentences, where a hand-written local value survives, and the view step reads that
 
 # implement
 
