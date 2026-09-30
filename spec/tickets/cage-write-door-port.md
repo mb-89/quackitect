@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -157,6 +157,15 @@ record:
         hash: a142e138d4d49227
         size: 1604
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88f0683f2d7 · claude-code-remote
+    hash_before: a174d8d64135c4e38bb990e30a6016d8d77b789a
+    hash_after: 35a84b0d7c4489a5a56aad932b17b35bd9228e11
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/cage-write-door-port.md:349:39: Vocabulary: ticketdoor stands outside the words this tree writes. Write a c"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -357,14 +366,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the ones the import rules forced: the Schema port in src/quack/writedoor.go, the StrangerFault export and the two Go wordings in src/modules/check, and the Refuses and Cut exports in the command package
+- every door the change reaches has a fake: taughtProse and taughtSchema teach the hooks tests, and TestTheSchemaPortAnswersWhatEveryWriteTableTeaches holds the taught schema answers to the real check
+- each new file opens with a header naming this ticket and the bridge function it ports
+- the refusal wording stands once in src/modules/hooks/write, and the Discussion of the-bridge-server-leaves points here for the rules the patch tool keeps
 
 ## tests-green
 
