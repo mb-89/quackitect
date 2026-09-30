@@ -232,6 +232,11 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		}
 	}
 	if len(effects) == 0 {
+		if said, ok := d.spawned(post, root); ok {
+			effects = append(effects, said)
+		}
+	}
+	if len(effects) == 0 {
 		effects = append(effects, Effect{Kind: passKind})
 	}
 	// A context read and a call passing on carry the brief. [[spec/tickets/brief-answers-off-the-door]]

@@ -78,3 +78,14 @@ func TestTheCanaryReadsTheFirstLine(t *testing.T) {
 		}
 	}
 }
+
+// A layer opens the prompt and the task follows under its heading, and no layer leaves the prompt alone. [[spec/tickets/spawn-answers-off-the-door]]
+func TestTheHelperReadsTheLayerBeforeItsTask(t *testing.T) {
+	wrapped := ForHelper("### voice\n\n1. Say what is.", "do the thing")
+	if !strings.HasPrefix(wrapped, "# How this tree is worked") || !strings.HasSuffix(wrapped, "# Your task\n\ndo the thing") {
+		t.Fatalf("the wrapped prompt reads\n%s", wrapped)
+	}
+	if got := ForHelper("", "do the thing"); got != "do the thing" {
+		t.Fatalf("no layer answers %q, and wants the prompt alone", got)
+	}
+}

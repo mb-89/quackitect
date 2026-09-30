@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: a3d6a4605929ae60
         size: 789
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 401dad7ecaf1d14feddb2c34c86530983ce2e8a7
+    hash_after: 401dad7ecaf1d14feddb2c34c86530983ce2e8a7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door"]
 ---
 
@@ -309,14 +318,19 @@ What I weigh: the layer joins the brief package, which reads the same notes, so 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the brief package, hooks.go and a new spawn.go beside it, since hooks.go stands near its line ceiling. brief.go takes the shared tree builder
+- the layer reads the tree it is handed, and each case builds its own temp tree
+- each new function carries a pointer at the ticket or at the design chapter it ports
+- the tree over both roots stands once, in treeAt, and the brief's stamp reads it there
 
 ## tests-green
 

@@ -7,7 +7,6 @@ package hooks
 import (
 	"encoding/json"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"quackitect/src/modules/hooks/brief"
@@ -131,11 +130,7 @@ func stampIn(fields map[string]any) Stamp {
 func (d *Door) stampOf(settings Settings, root string) Stamp {
 	var counts brief.Counts
 	if root != "" {
-		var tree brief.Tree = disk{root}
-		if method := d.from.Root; method != "" && filepath.Clean(method) != filepath.Clean(root) {
-			tree = brief.Layered(disk{method}, disk{root})
-		}
-		counts = brief.CountsOf(tree, os.Getenv)
+		counts = brief.CountsOf(d.treeAt(root), os.Getenv)
 	}
 	return Stamp{Counts: counts, Sentence: brief.Canary(counts, !settings.StopOff)}
 }
