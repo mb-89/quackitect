@@ -3,9 +3,18 @@
 package q
 
 import (
+	"encoding/json"
 	"reflect"
 	"testing"
 )
+
+// A land request carries the fold's name and its event under the names a surface decodes. [[spec/tickets/config-answers-keys-and-overrides]]
+func TestALandingCarriesItsNameAndEvent(t *testing.T) {
+	body, err := json.Marshal(Request{Module: StoreModule, Verb: StoreLand, Args: Landing{Name: "t/sum", Event: 2}}.Args)
+	if err != nil || string(body) != `{"name":"t/sum","event":2}` {
+		t.Fatalf("a landing reads %s, %v", body, err)
+	}
+}
 
 func TestAnActionAnswersItsRequests(t *testing.T) {
 	c := New()

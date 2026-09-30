@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 785641c4668ade44
         size: 1067
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 35485d2326a636e012a196758c073d744ca3941f
+    hash_after: 35485d2326a636e012a196758c073d744ca3941f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -329,14 +338,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/config src/q/action.go src/quack/config.go src/quack/main.go src/quack/main_test.go src/quack/ticket_twins_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the config module, the q request names, the root router and quack config, each named in the draft or its discussion
+- the store door has its fake in landsAll and in the router case, the node door in the request list the set case reads
+- keys.go opens on a header naming the approach, and each function points at the ticket
+- Rows owns the resolver both config/keys and quack config read, and BuiltIn and the node names say which file owns them
 
 ## tests-green
 
@@ -397,4 +411,6 @@ The gate's points correct the draft, and the build follows them:
 - a key no layer sets reads the layer `built-in`, the name `BuiltIn` in `src/config/config.go` gives it
 - the config module imports `q` alone, so it builds the `node` `run` request itself
 - `config/set` and `config/override` both take the dotted key, and the module maps it to the full name through the catalog
-- `config/keys` owns the rows `configRows` in `src/quack/config.go` answers today, and `quack config` reads them off `config/keys`
+- the config module owns the rows `configRows` in `src/quack/config.go` answers today, and `quack config` reads them there
+
+`config/keys` reads the declarations and both files, as `configRows` did, so it projects no schema. `Rows` in `src/modules/config/keys.go` answers `quack config` at rest, with no index standing.

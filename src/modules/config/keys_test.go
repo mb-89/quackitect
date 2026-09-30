@@ -13,16 +13,6 @@ import (
 	"quackitect/src/q/qtest"
 )
 
-// The schema the generator writes, over the four keys the case declares. [[spec/tickets/config-answers-keys-and-overrides]]
-const schemaFile = "spec/config/level0.schema.json"
-
-const fourKeys = `{"type": "object", "properties": {"queue": {"type": "object", "properties": {
-  "weight": {"type": "integer", "default": 1},
-  "depth": {"type": "integer", "default": 2},
-  "fail": {"type": "integer", "default": 3},
-  "day": {"type": "integer", "default": 4}
-}}}}`
-
 func fourDeclared(c *q.Catalog) {
 	q.CfgIn(c, "weight", 1, q.Doc("how much a ticket weighs"))
 	q.CfgIn(c, "depth", 2, q.Doc("how deep a group nests"))
@@ -33,9 +23,8 @@ func fourDeclared(c *q.Catalog) {
 // Each row of config/keys, by its dotted key. [[spec/tickets/config-answers-keys-and-overrides]]
 func keyRows(t *testing.T, ix *qtest.Index) map[string]map[string]any {
 	t.Helper()
-	ix.Seed(map[string]any{"files/" + schemaFile: q.Content{Hash: "s", Text: fourKeys}})
-	settles(t, ix, "config/"+schemaFile, "config/keys")
-	body, err := json.Marshal(ix.Read("config/keys"))
+	settles(t, ix, KeysName)
+	body, err := json.Marshal(ix.Read(KeysName))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -14,6 +14,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/config"
 	"quackitect/src/modules/files"
 	"quackitect/src/q"
 	"quackitect/src/ticket"
@@ -349,7 +350,7 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 // The root hands a request to disk through the files module, and refuses one to any other module by its name. [[spec/tickets/actions-answer-over-http]]
 func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
 	root := t.TempDir()
-	accept := accepts(root)
+	accept := accepts(root, nil)
 	if _, err := accept(q.Request{Module: files.DiskModule, Verb: "write", Args: files.Write{Path: "a.md", Text: "one"}}); err != nil {
 		t.Fatal(err)
 	}
@@ -358,6 +359,21 @@ func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
 	}
 	if _, err := accept(q.Request{Module: "git", Verb: "commit"}); err == nil || !strings.Contains(err.Error(), "git.commit") {
 		t.Fatalf("a request to git answers %v", err)
+	}
+}
+
+// The router folds a store land into the guard it names, so an action reaches config/held. [[spec/tickets/config-answers-keys-and-overrides]]
+func TestTheRootLandsAStoreRequest(t *testing.T) {
+	c := q.New()
+	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
+	config.Registers(c)
+	store := q.NewStore(c)
+	change := config.Change{Kind: config.Overrides, Holder: "w1", Values: map[string]string{"queue/config/weight": "9"}}
+	if _, err := accepts(t.TempDir(), store)(q.Request{Module: q.StoreModule, Verb: q.StoreLand, Args: q.Landing{Name: config.HeldName, Event: change}}); err != nil {
+		t.Fatal(err)
+	}
+	if held, _ := store.Snapshot().Read(config.HeldName).(config.Held); held.Overrides["queue/config/weight"] != "9" || held.By["queue/config/weight"] != "w1" {
+		t.Fatalf("%s holds %+v after the land", config.HeldName, held)
 	}
 }
 

@@ -32,11 +32,12 @@ const (
 	ValuesName = q.ResolvedName
 )
 
-// The kinds of a change to config/held. [[spec/design_output/model#a-context-holds-a-lease]]
+// The kinds of a change to config/held. A drop keeps the overrides its holder set, and drops every other. [[spec/design_output/model#a-context-holds-a-lease]]
 const (
 	Opens     = "open"
 	Closes    = "close"
 	Overrides = "override"
+	Drops     = "drop"
 )
 
 // A change config/held folds: a context opening under its holder's lease, a context closing, or an override. Values map a full key name to its JSON literal, and Leases carry the parts the opener read live. [[spec/design_output/model#a-context-holds-a-lease]]
@@ -61,6 +62,8 @@ type Context struct {
 type Held struct {
 	Contexts  []Context         `json:"contexts"`
 	Overrides map[string]string `json:"overrides"`
+	// The holder of each override, a window, by full key name. [[spec/tickets/config-answers-keys-and-overrides]]
+	By map[string]string `json:"by"`
 }
 
 // The layers config/values reads: both files, the SE_ variables, the live leases and the held contexts and overrides. [[spec/design_output/model#a-keys-layers]]
@@ -79,6 +82,8 @@ func Registers(c *q.Catalog) q.Writer {
 		q.ProjectIn(c, "config", Tracked, q.JSON, q.Loaded, q.Ordered{}, q.Also(Local), q.Optional(), q.Doc("a config layer, keyed by its file")),
 		q.GuardIn(c, HeldName, Held{}, holds, q.Doc("the contexts open and the overrides set, which a restart drops")),
 		q.DerivedIn(c, ValuesName, q.Resolved{}, func(in layersIn) q.Resolved { return resolves(c.Keys(), in) }, q.Doc("the JSON literal each key resolves off its layers, by its full name")),
+		q.DerivedIn(c, KeysName, []Row{}, func(in layersIn) []Row { return rowsOf(dottedIn(c.Keys()), in) }, q.Doc("every key, dotted, with the JSON literal it resolves to and the layer answering it")),
+		actions(c),
 	)
 }
 
@@ -94,9 +99,20 @@ func holds(held Held, change Change) (Held, error) {
 	case Closes:
 		next.Contexts = slices.DeleteFunc(slices.Clone(held.Contexts), func(one Context) bool { return one.Handle == change.Handle })
 	case Overrides:
-		next.Overrides = map[string]string{}
+		next.Overrides, next.By = map[string]string{}, map[string]string{}
 		maps.Copy(next.Overrides, held.Overrides)
 		maps.Copy(next.Overrides, change.Values)
+		maps.Copy(next.By, held.By)
+		for name := range change.Values {
+			next.By[name] = change.Holder
+		}
+	case Drops:
+		next.Overrides, next.By = map[string]string{}, map[string]string{}
+		for name, literal := range held.Overrides {
+			if held.By[name] == change.Holder {
+				next.Overrides[name], next.By[name] = literal, change.Holder
+			}
+		}
 	default:
 		return held, fmt.Errorf("%s takes no change of the kind %q", HeldName, change.Kind)
 	}

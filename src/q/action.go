@@ -20,6 +20,18 @@ type Request struct {
 	Then   func(answers []any) []Request
 }
 
+// The IO module and verb that fold an event into a fold or a guard the store holds, and the arguments a request of it carries. [[spec/tickets/config-answers-keys-and-overrides]]
+const (
+	StoreModule = "store"
+	StoreLand   = "land"
+)
+
+// A land: the fold's name, and the event it folds. [[spec/tickets/config-answers-keys-and-overrides]]
+type Landing struct {
+	Name  string `json:"name"`
+	Event any    `json:"event"`
+}
+
 func Action[In any](name string, fn func(In) []Request, opts ...Option) Writer {
 	return Main.add(actionOf(name, fn), callerAt(2), opts)
 }
