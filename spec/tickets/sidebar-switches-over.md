@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -108,6 +108,18 @@ record:
         exit: 0
         said: work/sidebar-switches-over already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d891eb0f26d7 · claude-code-remote
+    hash_before: 083efb941ab7e61b72017402fbf268ef331b875a
+    hash_after: 083efb941ab7e61b72017402fbf268ef331b875a
+    inputs:
+      - name: ask
+        hash: 682752d3b4cefff7
+        size: 344
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["sidebar-lands-in-shadow", "tui-shell-switches-over"]
 enabled_by: migration.phase8switch
 cloud: true
@@ -137,14 +149,29 @@ Done when the extension spawns no verb and reads no file itself.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/config-answers-keys-and-overrides]] standard
+- [[spec/tickets/config-draft-names-keys-test]] trivial
+- [[spec/tickets/config-keys-built-in-layer]] trivial
+- [[spec/tickets/config-keys-one-resolver]] trivial
+- [[spec/tickets/config-override-takes-dotted-key]] trivial
+- [[spec/tickets/config-root-lands-store-case]] trivial
+- [[spec/tickets/config-set-spells-node-run]] trivial
+- [[spec/tickets/the-sidebar-reads-v1]] standard
+- [[spec/tickets/the-sidebar-writes-through-actions]] standard
+- [[spec/tickets/the-lens-calls-actions]] standard
+- [[spec/tickets/the-lens-reads-v1]] standard
+- [[spec/tickets/the-extension-reads-no-files]] standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child reaches one module or one side of the extension, so a reader takes its diff whole
+- the reads, the writes, the lens and the switch add up to the goal, and every child stands closed
+- the-extension-reads-no-files names the five it waits on under depends_on
 
 # children
 
