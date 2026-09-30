@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-sends-changes]
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,25 @@ record:
         exit: 0
         said: "spec/tickets/the-work-tab-reads-v1.md:314:32: Vocabulary: placesin stands outside the words this tree writes. Write a co"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: 73f57c6b649747d5d1182eff2081a628e11dd9f7
+    hash_after: 73f57c6b649747d5d1182eff2081a628e11dd9f7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/work passes; green, src/modules/work passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-work-tab-reads-v1.md:346:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 7a798193d358629a
+        size: 772
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -352,26 +371,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/work/v1_test.go src/modules/work/rows_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work tab now draws off work/rows and its count off work/open-tasks, both through the catalog the window hands it, and wakes on the /v1 watch. Each row carries its place, its cloud flag, its todo letter, its path, its route and when it changed, so the branch verb's second answer and the tab's own JSON-RPC client leave. A watch that ends shows its reason and opens again after a pause. The Shadow compare stays until the switch ticket takes it out.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: tests-green adds no file past the implement leaf's.
+- fakes: registry.Fake stands for the catalog and the watch in every case.
+- comments: each new function points at this ticket.
+- one place: the rows names stand in v1.go, and the design note points at the file.
 
 # accept
 
