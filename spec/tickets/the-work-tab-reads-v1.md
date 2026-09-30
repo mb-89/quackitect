@@ -382,3 +382,16 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate names callers the draft misses. The implement takes each one, as a caller and in the size:
+
+| the file | what it reads |
+|---|---|
+| `src/tui/work_test.go` | `Load`, `IndexStandingAt` |
+| `src/tui/workdetail_test.go` | `Load` |
+| `src/tui/workedit_test.go` | `Load`, `Placed` |
+| `src/tui/workplace_test.go` | `Load`, `PlacesIn`, `Placed`, `PlacesMsg` |
+| `src/tui/workplaces_test.go` | `PlacesIn`, `Placed`, `PlacesCmd`, `NodeAt` |
+| `src/tui/work/door_post_test.go` | `postJSON` |
+| `src/tui/work/shadow_test.go` | `ViewOver`, `IndexRow` |
+| `src/quack/testdata/tree.golden.json` | the new fields of `Row` |
