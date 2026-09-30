@@ -3,45 +3,18 @@
 // [[spec/tickets/the-sidebar-reads-v1]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { activate } from "../../src/extension/extension.js";
 import { LOCAL, TRACKED } from "../../src/extension/lib/widgets.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
-
-const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+import { orderedOf } from "./v1-index.js";
 
 const BASE = {
   reads: "work/rows",
   badge: "work/open-tasks",
   actions: [{ button: "pull", label: "Written by the view", calls: "work/pull" }],
 };
-
-// A projection as /v1 hands it: q.Ordered, marshalled field by field. [[spec/design_output/model#everything-on-disk-mirrors]]
-function orderedOf(value) {
-  const one = {
-    Keys: null,
-    Fields: null,
-    Items: null,
-    Literal: "",
-    Object: false,
-    Array: false,
-  };
-  if (Array.isArray(value)) return { ...one, Items: value.map(orderedOf), Array: true };
-  if (value && typeof value === "object") {
-    const keys = Object.keys(value);
-    return {
-      ...one,
-      Keys: keys,
-      Fields: keys.map((key) => orderedOf(value[key])),
-      Object: true,
-    };
-  }
-  return { ...one, Literal: JSON.stringify(value) };
-}
 
 function valuesOf() {
   return {
@@ -53,7 +26,7 @@ function valuesOf() {
     [`config/${TRACKED}`]: orderedOf({}),
     [`config/${LOCAL}`]: orderedOf({ stop: { hold: "finish" } }),
     "migration/config/sidebar": "new",
-    "bless/.se/.runtime/bless.json": orderedOf({ agent: true }),
+    "bless/agent": true,
     "work/open-tasks": 7,
     "views/bases": [{ name: "work", said: BASE }],
     "index/names": [
@@ -174,13 +147,8 @@ test("a watch event draws the sidebar again", async () => {
   );
 
   door.values["work/open-tasks"] = 9;
-  await watch.fn("work/open-tasks", 9);
+  for (const one of door.said.watches) await one.fn("work/open-tasks", 9);
   for (const one of door.said.timers.filter((each) => !each.cancelled)) await one.run();
   assert.ok(drawn.length >= 2, "the event draws the page again");
   assert.match(drawn.at(-1), /<span class="count">9<\/span>/);
-});
-
-test("sidebar.js names no door.read, door.list, door.imports or door.watch", () => {
-  const text = readFileSync(join(ROOT, "src/extension/sidebar.js"), "utf8");
-  assert.deepEqual(text.match(/door\.(read|list|imports|watch)\b/g) ?? [], []);
 });

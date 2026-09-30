@@ -8,6 +8,7 @@ import {
   countIn,
   lineArgvOf,
   NEW_TICKET,
+  nameIn,
   nextIn,
   ticketPathOf,
 } from "../../src/extension/lib/work.js";
@@ -64,4 +65,13 @@ test("a new ticket carries its kind and an empty process, and an ask to fill", (
 test("an answer of the wrong shape reads as none", () => {
   assert.equal(countIn({ code: 0, out: '{"count":"3"}' }), undefined);
   assert.equal(nextIn({ code: 0, out: '{"ticket":"one"}' }), null);
+});
+
+// [[spec/tickets/the-sidebar-reads-v1]]
+test("a counts line names the value the index answers the count at", () => {
+  assert.equal(
+    nameIn('./RUNME.sh index call value {"name":"work/open-tasks"}'),
+    "work/open-tasks",
+  );
+  assert.equal(nameIn("./RUNME.sh ticket yours --count"), undefined);
 });

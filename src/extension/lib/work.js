@@ -51,6 +51,11 @@ function nextIn(ran) {
   return { ticket: String(said.ticket), path: String(said.path) };
 }
 
+// The value name a button's `counts` line asks the index for. [[spec/tickets/the-sidebar-reads-v1]]
+function nameIn(counts) {
+  return /"name"\s*:\s*"([^"]+)"/.exec(String(counts ?? ""))?.[1];
+}
+
 function ticketPathOf(opens, name) {
   const said = String(name ?? "").trim();
   if (!NAME.test(said)) return "";
@@ -59,4 +64,4 @@ function ticketPathOf(opens, name) {
     .join(said);
 }
 
-module.exports = { NEW_TICKET, countIn, lineArgvOf, nextIn, ticketPathOf };
+module.exports = { NEW_TICKET, countIn, lineArgvOf, nameIn, nextIn, ticketPathOf };

@@ -55,3 +55,9 @@ test("a button whose icon reads apart reads as one line, naming the action", () 
 test("pairs that agree read no line", () => {
   assert.deepEqual(apartOf(groupsOf([EDITOR, PULL]), BASES, catalogOf()), []);
 });
+
+// [[spec/tickets/the-sidebar-reads-v1]]
+test("a badge pairs with no cell whose counts line names another value", () => {
+  const other = { ...EDITOR, counts: '{"name":"work/rows"}', count: 2 };
+  assert.deepEqual(apartOf(groupsOf([other, PULL]), BASES, catalogOf()), []);
+});

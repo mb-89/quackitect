@@ -142,6 +142,13 @@ function valuesOf(tracked, local, schema) {
   return out;
 }
 
+// The value and the layer of every key, off the rows config/keys answers. [[spec/tickets/the-sidebar-reads-v1]]
+function valuesOfKeys(rows) {
+  return new Map(
+    (rows ?? []).map((one) => [one.key, { value: one.value, layer: one.layer }]),
+  );
+}
+
 function flat(said) {
   const out = new Map();
   for (const [section, held] of Object.entries(said ?? {})) {
@@ -165,4 +172,5 @@ module.exports = {
   litBy,
   treeIn,
   valuesOf,
+  valuesOfKeys,
 };

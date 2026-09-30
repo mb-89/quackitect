@@ -34,6 +34,7 @@ import (
 	"quackitect/src/modules/settings"
 	"quackitect/src/modules/tickets"
 	verbsmodule "quackitect/src/modules/verbs"
+	"quackitect/src/modules/views"
 	"quackitect/src/modules/work"
 	"quackitect/src/prose"
 	"quackitect/src/q"
@@ -48,7 +49,7 @@ const (
 )
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
-var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers}
+var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers, views.Registers}
 
 // A module type the wiring loads: its registration, and for an IO module the start that runs it under the names its instance binds. A module with no start runs on the scheduler alone. [[spec/tickets/tickets-becomes-a-module]]
 type ioModule struct {

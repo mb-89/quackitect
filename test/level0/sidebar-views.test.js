@@ -3,17 +3,14 @@
 // [[spec/tickets/the-sidebar-renders-generically]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath, pathToFileURL } from "node:url";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { v1Over } from "./v1-index.js";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { badgeOf, formOf, viewsOf } from "../../src/extension/lib/views.js";
 import { TRACKED } from "../../src/extension/lib/widgets.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import cases from "../../src/tui/work/testdata/badges.json" with { type: "json" };
-
-const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
 const BASE = [
   "reads: work/rows",
@@ -50,23 +47,13 @@ const CATALOG = {
   ],
 };
 
-function doorOf() {
-  const files = fakeDisk({ "spec/views/work.base": BASE });
-  const called = [];
+function doorOf(files = fakeDisk({ "spec/views/work.base": BASE }), given = CATALOG) {
+  const index = v1Over(files, given);
   return {
-    called,
-    read: async (path) => (files.exists(path) ? files.read(path) : ""),
+    called: index.called,
     write: async (path, text) => files.write(path, text),
     append: async (path, text) => files.append(path, text),
-    list: async (folder) => (folder === "spec/views" ? ["work.base"] : []),
-    imports: (path) => import(pathToFileURL(join(ROOT, path)).href),
-    index: {
-      values: async (name) => CATALOG[name],
-      calls: async (name, input) => {
-        called.push({ name, input });
-        return {};
-      },
-    },
+    index,
     nonce: () => "nonce",
     source: () => "https://box",
     scriptUri: () => "https://box/webview/clicks.js",
@@ -136,12 +123,10 @@ function shadowDoorOf(mode) {
   });
   const appended = [];
   return {
-    ...doorOf(),
+    ...doorOf(files, { ...CATALOG, "work/open-tasks": 2 }),
     appended,
-    read: async (path) => (files.exists(path) ? files.read(path) : ""),
     append: async (_path, text) => appended.push(text),
     now: () => 0,
-    asksVerb: async () => ({ code: 0, out: "2\n", err: "" }),
   };
 }
 

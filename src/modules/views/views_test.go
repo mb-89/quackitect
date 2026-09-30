@@ -14,7 +14,7 @@ import (
 func TestViewsBasesParsesEachBase(t *testing.T) {
 	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
 	index.Seed(map[string]any{
-		"files/spec/views/work.base": q.Content{Hash: "w", Text: "reads: work/rows\nbadge: work/open-tasks\n"},
+		"files/spec/views/work.base":  q.Content{Hash: "w", Text: "reads: work/rows\nbadge: work/open-tasks\n"},
 		"files/spec/views/board.base": q.Content{Hash: "b", Text: "reads: work/rows\n"},
 	})
 	if err := index.Store().Run("views/bases"); err != nil {

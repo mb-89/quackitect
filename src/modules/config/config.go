@@ -19,6 +19,8 @@ const (
 	Tracked = "spec/config/level0.json"
 	// .claude/skills/level0/lib/folders.js owns this name. [[spec/design_output/config#the-layers]]
 	Local = ".se/.runtime/config.json"
+	// The declaration the sidebar draws its widgets off, which it reads over /v1. [[spec/tickets/the-sidebar-reads-v1]]
+	Schema = "spec/config/level0.schema.json"
 )
 
 // The variable the environment layer reads for a key. src/config.EnvOf owns the spelling, and a module spells it again because it imports q alone. [[spec/design_output/config#the-go-reader]]
@@ -79,7 +81,7 @@ type layersIn struct {
 // The two projections, the contexts and overrides it holds, and the values it resolves for every key of the catalog it registers into. [[spec/design_output/model#the-config-module]]
 func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
-		q.ProjectIn(c, "config", Tracked, q.JSON, q.Loaded, q.Ordered{}, q.Also(Local), q.Optional(), q.Doc("a config layer, keyed by its file")),
+		q.ProjectIn(c, "config", Tracked, q.JSON, q.Loaded, q.Ordered{}, q.Also(Local), q.Also(Schema), q.Optional(), q.Doc("a config layer, keyed by its file")),
 		q.GuardIn(c, HeldName, Held{}, holds, q.Doc("the contexts open and the overrides set, which a restart drops")),
 		q.DerivedIn(c, ValuesName, q.Resolved{}, func(in layersIn) q.Resolved { return resolves(c.Keys(), in) }, q.Doc("the JSON literal each key resolves off its layers, by its full name")),
 		q.DerivedIn(c, KeysName, []Row{}, func(in layersIn) []Row { return rowsOf(dottedIn(c.Keys()), in) }, q.Doc("every key, dotted, with the JSON literal it resolves to and the layer answering it")),

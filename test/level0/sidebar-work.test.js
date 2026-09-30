@@ -8,10 +8,11 @@ import { test } from "node:test";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
+import { v1Over } from "./v1-index.js";
 
 const NEXT = JSON.stringify({ ticket: "one", path: "spec/tickets/one.md", step: "do" });
 
-function doorOf({ seed = {}, answers = {}, typed = "" } = {}) {
+function doorOf({ seed = {}, answers = {}, typed = "", given = {} } = {}) {
   const files = fakeDisk({ [SCHEMA]: JSON.stringify(schema), ...seed });
   const said = {
     asked: [],
@@ -31,6 +32,7 @@ function doorOf({ seed = {}, answers = {}, typed = "" } = {}) {
   return {
     files,
     said,
+    index: v1Over(files, given),
     read: async (path) => (files.exists(path) ? files.read(path) : ""),
     write: async (path, text) => files.write(path, text),
     list: async () => [],
@@ -73,15 +75,11 @@ test("the work group draws the three buttons the config declares", async () => {
     assert.ok(section.includes(`data-key="${key}"`), key);
 });
 
-// The badge asks the index for the count the work tab's brackets read. [[spec/tickets/the-count-chain-leaves]]
+// The badge reads the count the work tab's brackets read off the index, and spawns no verb. [[spec/tickets/the-sidebar-reads-v1]]
 test("the work editor's button carries the count the index answers", async () => {
-  const door = doorOf({
-    answers: { "index call": { code: 0, out: "3\n", err: "" } },
-  });
+  const door = doorOf({ given: { "work/open-tasks": 3 } });
   const html = await sidebarOf(door).html();
-  assert.deepEqual(door.said.quiet, [
-    ["index", "call", "value", '{"name":"work/open-tasks"}'],
-  ]);
+  assert.deepEqual(door.said.quiet, []);
   assert.deepEqual(door.said.ran, []);
   const button = html.slice(html.indexOf('data-key="work.editor"'));
   assert.match(

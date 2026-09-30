@@ -5,6 +5,8 @@
 // index/actions.
 // [[spec/tickets/the-sidebar-shadow-compares]]
 
+const { nameIn } = require("./work.js");
+
 // [[spec/tickets/the-sidebar-shadow-compares]]
 function apartOf(groups, bases, catalog) {
   const cells = (groups ?? []).flatMap((group) =>
@@ -36,11 +38,6 @@ function apartOf(groups, bases, catalog) {
     }
   }
   return lines;
-}
-
-// [[spec/tickets/the-sidebar-shadow-compares]]
-function nameIn(counts) {
-  return /"name"\s*:\s*"([^"]+)"/.exec(String(counts ?? ""))?.[1];
 }
 
 module.exports = { apartOf };

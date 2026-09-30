@@ -11,7 +11,8 @@ import { COMMAND } from "../../src/extension/lib/lens.js";
 import { FLIP } from "../../src/extension/lib/route-host.js";
 import { KEY } from "../../src/extension/lib/session.js";
 import { LOCAL, TRACKED } from "../../src/extension/lib/widgets.js";
-import { sidebarOf } from "../../src/extension/sidebar.js";
+import { NAMES, sidebarOf } from "../../src/extension/sidebar.js";
+import { v1Over } from "./v1-index.js";
 
 const SCHEMA = "spec/config/level0.schema.json";
 
@@ -86,6 +87,7 @@ function doorOf(seed = {}) {
     toasted: [],
     commands: new Map(),
     revealed: 0,
+    timers: [],
     asked: [],
     folder: "",
   };
@@ -93,12 +95,18 @@ function doorOf(seed = {}) {
   return {
     files,
     said,
+    index: v1Over(files),
     holds: () => true,
     takes: () => {
       said.pages += 1;
     },
     pid: () => 42,
     now: () => said.at,
+    later: (run, span) => {
+      const one = { run, span, cancelled: false, cancel: () => (one.cancelled = true) };
+      said.timers.push(one);
+      return one;
+    },
     marks: (name, on) => said.marked.push([name, on]),
     quiets: () => {
       said.quiet += 1;
@@ -342,10 +350,11 @@ test("the extension starts nothing, and registers the view a person opens", asyn
   assert.equal(door.said.quiet, 1);
   assert.deepEqual(door.said.ran, []);
   assert.equal(
-    door.said.watched.length,
+    door.index.watches.length,
     1,
     "the status bar alone watches before a view opens",
   );
+  assert.deepEqual(door.said.watched, [], "the sidebar watches no file");
   assert.deepEqual(
     door.said.shown,
     [[]],
@@ -369,7 +378,7 @@ test("god mode stands in the status bar from the start, and a new hold toasts", 
     LOCAL,
     JSON.stringify({ engine: { binding: "god" }, stop: { hold: "stop" } }),
   );
-  await door.said.watched[0].draw();
+  await door.index.fire(`config/${LOCAL}`);
   assert.deepEqual(door.said.shown.at(-1), ["god", "stop"]);
   assert.deepEqual(door.said.toasted, ["stop"]);
 
@@ -454,17 +463,12 @@ test("the view opening draws the page once, and the watcher draws it again", asy
   });
   assert.equal(drawn.length, 1);
 
-  const watch = door.said.watched.at(-1);
-  assert.deepEqual(watch.paths, [
-    "spec/config/level0.schema.json",
-    TRACKED,
-    LOCAL,
-    BLESS_FILE,
-    "spec/views/*.base",
-  ]);
+  const watch = door.index.watches.at(-1);
+  assert.deepEqual(watch.names, NAMES);
 
   door.files.write(LOCAL, JSON.stringify({ stop: { hold: "finish" } }));
-  await watch.draw();
+  await door.index.fire(`config/${LOCAL}`);
+  await door.said.timers.at(-1).run();
   assert.equal(drawn.length, 2);
   assert.match(drawn[1], /class="widget at-0-1-1-1 away"/);
 });
@@ -490,15 +494,10 @@ test("a bless message writes the bless file, and leaves the config files alone",
   assert.deepEqual(JSON.parse(door.files.read(BLESS_FILE)), { agent: false });
 });
 
-// A ticket write draws the badge again once its burst settles, with no window reload. [[spec/tickets/the-badge-reads-open-tasks]]
-test("a ticket write draws the badge again once its burst settles", async () => {
+// A burst of index events draws the badge again once it settles, with no window reload. [[spec/tickets/the-sidebar-reads-v1]]
+test("a burst of index events draws the badge again once it settles", async () => {
   const door = doorOf();
-  const timers = [];
-  door.later = (run, span) => {
-    const one = { run, span, cancelled: false, cancel: () => (one.cancelled = true) };
-    timers.push(one);
-    return one;
-  };
+  const timers = door.said.timers;
   const drawn = [];
   await activate({}, door);
   await door.said.views.get("quackitect.sidebar")({
@@ -506,20 +505,12 @@ test("a ticket write draws the badge again once its burst settles", async () => 
     onMessage: () => {},
   });
 
-  const watch = door.said.watched.find((one) =>
-    one.paths.includes("spec/tickets/*.md"),
-  );
-  assert.ok(watch, "the view watches the ticket folders");
-  assert.deepEqual(watch.paths, [
-    "spec/tickets/*.md",
-    ".se/tickets/*.md",
-    ".se/.runtime/plan.json",
-    ".se/.runtime/hold/*.json",
-  ]);
+  const watch = door.index.watches.at(-1);
+  assert.ok(watch.names.includes("work/open-tasks"), "the view watches the count");
 
-  watch.draw();
-  watch.draw();
-  watch.draw();
+  await watch.fn("work/open-tasks", 1);
+  await watch.fn("work/open-tasks", 2);
+  await watch.fn("work/open-tasks", 3);
   assert.equal(drawn.length, 1, "a burst draws nothing before it settles");
   await timers.at(-1).run();
   assert.equal(drawn.length, 2, "the settled burst draws once");

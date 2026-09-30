@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 391eea19266a6d16
         size: 1863
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 6b6356f68faf019d065a50cea66dc10e06602d69
+    hash_after: 6b6356f68faf019d065a50cea66dc10e06602d69
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -353,14 +362,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/views src/modules/holds src/modules/config src/quack/main.go src/extension test/level0/sidebar-v1.test.js test/level0/v1-index.js test/level0/sidebar.test.js test/level0/sidebar-work.test.js test/level0/sidebar-views.test.js test/contract/editor-index.test.js test/contract/sidebar-reads-no-file.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size names, with main.go for modules.go and holds.go for a new bless.go as the gate says, plus test/level0/v1-index.js as the shared fake index and test/contract/sidebar-reads-no-file.test.js, where the grep case moves since it reads the real tree
+- the index door has its fake in test/level0/v1-index.js, which answers each value off the fake disk as the Go modules do, and the real door meets a real server in test/contract/editor-index.test.js
+- each new function and constant carries a link to spec/tickets/the-sidebar-reads-v1 or the design section it implements
+- every name the sidebar reads stands once in sidebar.js under NAMES, the bless path's copies name folders.js beside them, and orderedOf stands once in v1-index.js
 
 ## tests-green
 

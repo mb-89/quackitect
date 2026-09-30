@@ -29,7 +29,8 @@ async function activate(context, given) {
   let shown = await sidebar.states();
   door.registers(REST, (key, value) => sidebar.took({ kind: "set", key, value }));
   door.shows(shown, REST);
-  door.watch(sidebar.watches, async () => {
+  // [[spec/tickets/the-sidebar-reads-v1]]
+  door.index?.watch(sidebar.names, async () => {
     const now = await sidebar.states();
     door.shows(now, REST);
     for (const one of toastsOf(shown, now)) door.toasts(one, REST);
@@ -82,9 +83,8 @@ async function activate(context, given) {
     page.onMessage((message) => sidebar.took(message));
     await sidebar.opened(door.pid());
     await draw();
-    // A ticket move, a plan todo or a hold draws the badge again once its burst settles. [[spec/tickets/the-badge-reads-open-tasks]]
-    door.watch(sidebar.counts, settled(draw, BURST, door.later ?? timer));
-    door.watch(sidebar.watches, draw);
+    // A burst of index events draws the panel once it settles. [[spec/tickets/the-sidebar-reads-v1]]
+    door.index?.watch(sidebar.names, settled(draw, BURST, door.later ?? timer));
     // [[spec/design_output/extension#the-hook-button]]
     door.onProcess?.(draw);
     await door.adoptsProcess?.("bridge.hook");
