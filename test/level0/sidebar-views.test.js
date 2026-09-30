@@ -3,17 +3,15 @@
 // [[spec/tickets/the-sidebar-renders-generically]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath, pathToFileURL } from "node:url";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
+import level0 from "../../spec/config/level0.json" with { type: "json" };
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { badgeOf, formOf, viewsOf } from "../../src/extension/lib/views.js";
 import { TRACKED } from "../../src/extension/lib/widgets.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import cases from "../../src/tui/work/testdata/badges.json" with { type: "json" };
-
-const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+import { v1Over } from "./v1-index.js";
 
 const BASE = [
   "reads: work/rows",
@@ -50,23 +48,11 @@ const CATALOG = {
   ],
 };
 
-function doorOf() {
-  const files = fakeDisk({ "spec/views/work.base": BASE });
-  const called = [];
+function doorOf(files = fakeDisk({ "spec/views/work.base": BASE }), given = CATALOG) {
+  const index = v1Over(files, given);
   return {
-    called,
-    read: async (path) => (files.exists(path) ? files.read(path) : ""),
-    write: async (path, text) => files.write(path, text),
-    append: async (path, text) => files.append(path, text),
-    list: async (folder) => (folder === "spec/views" ? ["work.base"] : []),
-    imports: (path) => import(pathToFileURL(join(ROOT, path)).href),
-    index: {
-      values: async (name) => CATALOG[name],
-      calls: async (name, input) => {
-        called.push({ name, input });
-        return {};
-      },
-    },
+    called: index.called,
+    index,
     nonce: () => "nonce",
     source: () => "https://box",
     scriptUri: () => "https://box/webview/clicks.js",
@@ -134,33 +120,31 @@ function shadowDoorOf(mode) {
     [TRACKED]: JSON.stringify({ migration: { sidebar: mode } }),
     "spec/views/work.base": BASE,
   });
-  const appended = [];
   return {
-    ...doorOf(),
-    appended,
-    read: async (path) => (files.exists(path) ? files.read(path) : ""),
-    append: async (_path, text) => appended.push(text),
+    ...doorOf(files, { ...CATALOG, "work/open-tasks": 2 }),
     now: () => 0,
-    asksVerb: async () => ({ code: 0, out: "2\n", err: "" }),
   };
 }
 
+// Each row the sidebar posts through log/say. [[spec/tickets/the-sidebar-writes-through-actions]]
 const shadowRows = (door) =>
-  door.appended
-    .join("")
-    .split("\n")
-    .filter(Boolean)
-    .map((line) => JSON.parse(line))
+  door.called
+    .filter((one) => one.name === "log/say")
+    .map(({ input }) => ({ kind: input.kind, said: input.said, ...input.extra }))
     .filter((row) => row.kind === "shadow");
 
-test("under shadow a mismatch writes a shadow row naming the slice, and under old none", async () => {
-  const shadow = shadowDoorOf("shadow");
-  await sidebarOf(shadow).html();
-  const rows = shadowRows(shadow);
-  assert.ok(rows.length > 0, "a mismatch writes a row");
-  assert.ok(rows.every((row) => row.slice === "sidebar"));
+// The slice reads new in the tracked file, so the compare leaves with its mode. [[spec/tickets/the-extension-reads-no-files]]
+test("the sidebar under new writes no shadow row: the tracked file reads new, and a pair apart writes nothing", async () => {
+  const mode = level0.migration?.sidebar;
+  assert.equal(mode, "new", "the tracked file reads new");
+  const door = shadowDoorOf(mode);
+  await sidebarOf(door).html();
+  assert.deepEqual(shadowRows(door), [], "a pair apart writes nothing");
+});
 
-  const old = shadowDoorOf("old");
-  await sidebarOf(old).html();
-  assert.deepEqual(shadowRows(old), []);
+// The views section draws the work badge, so the grid draws no copy of it. [[spec/tickets/the-extension-reads-no-files]]
+test("the grid draws no badge the views section draws: the work group carries no count", async () => {
+  const said = await sidebarOf(shadowDoorOf("old")).html();
+  assert.match(said, /work \(3\)/, "the views section draws the badge");
+  assert.doesNotMatch(said, /class="count"/, "the work group carries no count");
 });

@@ -46,7 +46,32 @@ type rowsIn struct {
 func Registers(c *q.Catalog) q.Writer {
 	rows := q.DerivedIn(c, RowsPort, []Row{}, rowsOf, q.Doc("every row of the session log, in the order it holds them"))
 	ladder := q.OutIn(c, LadderPort, Ladder, q.Doc("the level ladder every reader ranks a row by"))
-	return q.Join(rows, ladder)
+	// [[spec/tickets/the-sidebar-writes-through-actions]]
+	says := q.ActionIn(c, SayAction, sayOf, q.Doc("Append one row to the session log."), q.Label("Say a line"), q.Writes())
+	return q.Join(rows, ladder, says)
+}
+
+// The action a sidebar line posts, by its local name. [[spec/tickets/the-sidebar-writes-through-actions]]
+const SayAction = "say"
+
+// The node module's name and its verb. src/modules/verbs owns both, and a module spells them again because it imports q alone. [[spec/tickets/the-sidebar-writes-through-actions]]
+const (
+	nodeModule = "node"
+	nodeRun    = "run"
+)
+
+// The input of a say: the row's level, kind, words and extra fields. [[spec/tickets/the-sidebar-writes-through-actions]]
+type Said struct {
+	Level string         `json:"level" label:"level" doc:"the row's level"`
+	Kind  string         `json:"kind" label:"kind" doc:"the row's kind"`
+	Said  string         `json:"said" label:"said" doc:"the row's words"`
+	Extra map[string]any `json:"extra,omitempty" doc:"the row's extra fields"`
+}
+
+// The log verb's say, handed the row as one JSON word. [[spec/tickets/the-sidebar-writes-through-actions]]
+func sayOf(in Said) []q.Request {
+	row, _ := json.Marshal(in)
+	return []q.Request{{Module: nodeModule, Verb: nodeRun, Args: []string{"log", "--say", string(row)}, NoUndo: "log --say appends through its program, which keeps no undo"}}
 }
 
 func rowsOf(in rowsIn) []Row {

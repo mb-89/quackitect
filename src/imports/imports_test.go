@@ -91,6 +91,13 @@ func TestAModuleImportsThePointerReader(t *testing.T) {
 	}
 }
 
+// The note reader the check and the tickets modules share passes, as the pointer reader does. [[spec/tickets/the-lens-reads-v1]]
+func TestAModuleImportsTheNoteReader(t *testing.T) {
+	if said := Faults("quackitect/src/modules/tickets", []string{"quackitect/src/q", "quackitect/src/note"}); len(said) != 0 {
+		t.Fatalf("src/note reads as past q: %v", said)
+	}
+}
+
 // Each reader of the tree a module takes imports the pure standard library and the other readers alone, so a name joining pureTree keeps a module off the outside. [[spec/tickets/lsp-rules-move-to-check]]
 func TestEveryPureReaderImportsThePureLibraryAlone(t *testing.T) {
 	for _, path := range pureTree {
