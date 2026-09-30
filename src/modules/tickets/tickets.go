@@ -70,7 +70,9 @@ func Registers(c *q.Catalog) q.Writer {
 	cloud := q.DerivedIn(c, CloudPort, []string{}, cloudOf, q.Doc("the tickets the cloud holds: every group carrying the mark, and every ticket naming one"))
 	branched := q.DerivedIn(c, BranchedPort, []Ticket{}, branchedOf, q.Doc("every ticket as the work reads it: a standing branch's copy of its group and the tickets naming it, then the rest off the folders"))
 	branches := q.DerivedIn(c, BranchesPort, []ticket.Branch{}, branchesOf, q.Doc("every standing work branch as the work draws it, with its group's copy and its children off the tip"))
-	return q.Join(notes, all, cloud, branched, branches)
+	// The drawing of each ticket, which the lens, the marks and the route drawing read. [[spec/tickets/the-lens-reads-v1]]
+	drawn := q.ProjectIn(c, DrawnPort, folders[0]+"*"+noteExt, q.Codec[Drawn](DrawnCodec{}), q.Loaded, Drawn{}, q.Also(folders[1]+"*"+noteExt), q.ReadOnly(), q.Doc("a ticket's drawing: its graph, its route, and each leaf's fields with the line a mark stands at"))
+	return q.Join(notes, all, cloud, branched, branches, drawn)
 }
 
 // What the branch reading takes: the tickets off the folders, and the tips the git module reads. [[spec/tickets/the-index-reads-standing-branches]]

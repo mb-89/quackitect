@@ -34,6 +34,7 @@ import (
 	"quackitect/src/modules/settings"
 	"quackitect/src/modules/tickets"
 	verbsmodule "quackitect/src/modules/verbs"
+	"quackitect/src/modules/views"
 	"quackitect/src/modules/work"
 	"quackitect/src/prose"
 	"quackitect/src/q"
@@ -48,7 +49,7 @@ const (
 )
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
-var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers}
+var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers, views.Registers}
 
 // A module type the wiring loads: its registration, and for an IO module the start that runs it under the names its instance binds. A module with no start runs on the scheduler alone. [[spec/tickets/tickets-becomes-a-module]]
 type ioModule struct {
@@ -139,7 +140,7 @@ func projections() []projection {
 	}
 	var out []projection
 	for _, one := range c.Projections() {
-		if one.Kind == q.Loaded {
+		if one.Kind == q.Loaded && !one.ReadOnly {
 			out = append(out, projection{glob: one.Glob, roundTrip: one.RoundTrip})
 		}
 	}
@@ -292,7 +293,7 @@ func manages(as q.Writer, open doors) index.Manage {
 	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
-			Now: time.Now, Every: clock.New().Every, Accept: accepts(root),
+			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store),
 		})
 		if err != nil {
 			return index.Managed{}, err
@@ -410,13 +411,17 @@ func opsOf(all []manager.Op, now time.Time) []hooks.Op {
 	return out
 }
 
-// The IO modules that answer a request an action lists: disk over the root, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
-func accepts(root string) func(q.Request) (any, error) {
+// The IO modules that answer a request an action lists: disk over the root, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
+func accepts(root string, store *q.Store) func(q.Request) (any, error) {
 	disk := files.Accept(files.NewDisk(root))
 	node := nodeAccept(root)
 	return func(asked q.Request) (any, error) {
 		if asked.Module == files.DiskModule {
 			return disk(asked)
+		}
+		// [[spec/tickets/config-answers-keys-and-overrides]]
+		if landing, ok := asked.Args.(q.Landing); ok && store != nil && asked.Module == q.StoreModule && asked.Verb == q.StoreLand {
+			return nil, store.Land(landing.Name, landing.Event)
 		}
 		// [[spec/tickets/ticket-verbs-become-actions]]
 		if asked.Module == verbsmodule.NodeModule && asked.Verb == verbsmodule.NodeRun {

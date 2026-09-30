@@ -37,11 +37,7 @@ test("each line a work button runs or counts names a verb the command line knows
     keyed.get(key)?.runs,
     keyed.get(key)?.counts,
   ]).filter(Boolean);
-  assert.deepEqual(lines, [
-    "./RUNME.sh tui work",
-    './RUNME.sh index call value {"name":"work/open-tasks"}',
-    "./RUNME.sh ticket yours --next",
-  ]);
+  assert.deepEqual(lines, ["./RUNME.sh tui work", "./RUNME.sh ticket yours --next"]);
   for (const line of lines) {
     const verb = line.split(" ")[1];
     assert.ok(commands().has(verb), `${line} names a verb the command line knows`);

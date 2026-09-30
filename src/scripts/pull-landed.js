@@ -74,6 +74,8 @@ function journaled(it, name) {
     if (row.kind !== "file" || !row.name.endsWith(".json")) continue;
     const entry = parsed(it.disk.read(it.join(folder, row.name)));
     if (!entry?.ticket || String(entry.at ?? "") < taken) continue;
+    // [[spec/design_output/apply#a-first-fault-writes-nothing]]
+    if (entry.landed === false) continue;
     const into = entry.ticket === name ? out.mine : out.theirs;
     for (const one of entry.files ?? []) into.push(inTree(it, String(one.file)));
   }

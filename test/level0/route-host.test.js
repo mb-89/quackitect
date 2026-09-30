@@ -1,16 +1,33 @@
 // The host of the drawing over a ticket, over a fake door. The door hands a
-// page, folds and unfolds, and answers the theme, so every case here reads
-// what the host asks of the editor and posts to the page, with no editor.
-// [[spec/tickets/the-inset-folds-the-frontmatter]]
+// page, folds and unfolds, and answers the theme, and a fake index draws the
+// saved ticket, so every case here reads what the host asks of the editor and
+// posts to the page, with no editor.
+// [[spec/tickets/the-lens-reads-v1]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { HOLDS } from "../../src/extension/lib/lens.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { FLIP, routeHostOf } from "../../src/extension/lib/route-host.js";
-import * as emitter from "../../src/scripts/graph.js";
-import * as schema from "../../.claude/skills/level0/lib/schema.js";
+import { v1Over } from "./v1-index.js";
 
+const HOLDS = ".se/.runtime/hold";
 const PATH = "spec/tickets/one.md";
+
+// The host over a door whose editor saves the ticket before it draws, since the index draws the saved file. [[spec/tickets/the-lens-reads-v1]]
+function hostOf(door) {
+  const drawn = routeHostOf(door);
+  return {
+    ...drawn,
+    opened: (path, text) => {
+      door.disk.write(path, text);
+      return drawn.opened(path, text);
+    },
+    changed: (path, text) => {
+      door.disk.write(path, text);
+      return drawn.changed(path, text);
+    },
+  };
+}
 
 const ticket = (state, names) =>
   [
@@ -90,15 +107,11 @@ function doorOf({
     };
     return page;
   };
+  const disk = fakeDisk(files);
   return {
     said,
+    disk,
     theme: () => theme,
-    list: async (folder) =>
-      Object.keys(files)
-        .filter((one) => one.startsWith(`${folder}/`))
-        .map((one) => one.slice(folder.length + 1)),
-    read: async (path) => files[path] ?? "",
-    imports: async (path) => (path.endsWith("graph.js") ? emitter : schema),
     page: (path, lines) => {
       if (!inset) return null;
       const page = pageOf(path, lines);
@@ -119,9 +132,13 @@ function doorOf({
     },
     asksLine: async () => "the ask stands unmet",
     saves: async (path) => said.saved.push(path),
-    runsVerb: async (argv) => {
-      said.ran.push(argv);
-      return ran[argv[1]] ?? { code: 0, out: "work\n  the next leaf\n", err: "" };
+    index: {
+      ...v1Over(disk),
+      acts: async (name, input) => {
+        const argv = [...name.split("/"), ...input.args];
+        said.ran.push(argv);
+        return ran[argv[1]] ?? { code: 0, out: "work\n  the next leaf\n", err: "" };
+      },
     },
     says: (lines) => said.says.push(lines),
     tells: (title, detail, refused) => said.told.push([title, detail, refused]),
@@ -135,7 +152,7 @@ test("a ticket draws its route over the folded frontmatter, and ready answers th
   const door = doorOf({
     files: { [`${HOLDS}/person-a-desk.json`]: JSON.stringify(hold) },
   });
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, SHORT);
 
   assert.equal(door.said.pages.length, 1);
@@ -164,7 +181,7 @@ test("a person's hold on a ticket that reads closed draws the page unheld", asyn
   const door = doorOf({
     files: { [`${HOLDS}/person-a-desk.json`]: JSON.stringify(hold), [PATH]: closed },
   });
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, closed);
   const page = door.said.pages[0];
   await page.hears({ kind: "ready" });
@@ -174,14 +191,14 @@ test("a person's hold on a ticket that reads closed draws the page unheld", asyn
 
 test("a note outside the ticket folders draws nothing", async () => {
   const door = doorOf();
-  await routeHostOf(door).opened("spec/guidance/working.md", SHORT);
+  await hostOf(door).opened("spec/guidance/working.md", SHORT);
   assert.deepEqual(door.said.pages, []);
   assert.deepEqual(door.said.folds, []);
 });
 
 test("the side panel stands in where the inset fails, and takes the same messages", async () => {
   const door = doorOf({ inset: false, theme: "light" });
-  await routeHostOf(door).opened(PATH, SHORT);
+  await hostOf(door).opened(PATH, SHORT);
 
   assert.equal(door.said.panels.length, 1);
   const page = door.said.panels[0];
@@ -193,7 +210,7 @@ test("the side panel stands in where the inset fails, and takes the same message
 
 test("the flip shows the YAML and back, and the lens title follows", async () => {
   const door = doorOf();
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, SHORT);
   const page = door.said.pages[0];
   assert.deepEqual(host.lenses(PATH), [
@@ -209,12 +226,12 @@ test("the flip shows the YAML and back, and the lens title follows", async () =>
   assert.equal(page.hidden, false);
   assert.deepEqual(door.said.folds, [PATH, PATH]);
   assert.equal(host.lenses(PATH)[0].title, "Show the YAML");
-  assert.deepEqual(host.watches, []);
+  assert.deepEqual(host.names, ["holds/standing", "tickets/all"]);
 });
 
 test("a closed ticket carries the flip", async () => {
   const door = doorOf();
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, ticket("closed", ["draft"]));
   assert.equal(host.lenses(PATH)[0].title, "Show the YAML");
   assert.deepEqual(host.lenses("spec/guidance/working.md"), []);
@@ -222,7 +239,7 @@ test("a closed ticket carries the flip", async () => {
 
 test("a change redraws the drawing with the new route", async () => {
   const door = doorOf();
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, SHORT);
   const page = door.said.pages[0];
   await host.changed(PATH, ticket("open", ["draft", "review"]));
@@ -237,7 +254,7 @@ test("a change redraws the drawing with the new route", async () => {
 
 test("a theme change reaches every page", async () => {
   const door = doorOf();
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, SHORT);
   door.theme = () => "light";
   host.themed();
@@ -246,12 +263,12 @@ test("a theme change reaches every page", async () => {
 
 test("a longer route opens a taller inset, and a change of height opens it again", async () => {
   const short = doorOf();
-  await routeHostOf(short).opened(PATH, SHORT);
+  await hostOf(short).opened(PATH, SHORT);
   const long = doorOf();
-  await routeHostOf(long).opened(PATH, LONG);
+  await hostOf(long).opened(PATH, LONG);
   assert.ok(long.said.pages[0].lines > short.said.pages[0].lines);
 
-  const host = routeHostOf(short);
+  const host = hostOf(short);
   await host.opened(PATH, SHORT);
   const first = short.said.pages.at(-1);
   await host.changed(PATH, LONG);
@@ -261,7 +278,7 @@ test("a longer route opens a taller inset, and a change of height opens it again
 
 test("a longer route under the YAML side reopens the page hidden, and folds nothing", async () => {
   const door = doorOf();
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, SHORT);
   host.flipped(PATH);
   await host.changed(PATH, LONG);
@@ -275,7 +292,7 @@ test("a longer route under the YAML side reopens the page hidden, and folds noth
 
 test("a page the person closes leaves the host, so a change posts nothing", async () => {
   const door = doorOf({ inset: false });
-  const host = routeHostOf(door);
+  const host = hostOf(door);
   await host.opened(PATH, SHORT);
   const page = door.said.panels[0];
   page.gone();
@@ -305,7 +322,7 @@ const VERDICT = [
 
 async function pressed(message, options = {}, text = SHORT) {
   const door = doorOf(options);
-  await routeHostOf(door).opened(PATH, text);
+  await hostOf(door).opened(PATH, text);
   await door.said.pages[0].hears(message);
   return door.said;
 }

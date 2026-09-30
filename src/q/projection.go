@@ -36,6 +36,13 @@ type Projection struct {
 	Kind      Mirror
 	Glob      string
 	RoundTrip func(body []byte) ([]byte, error)
+	// A read-only projection draws a file and writes none, so its codec refuses a write and no round trip holds it. [[spec/tickets/the-lens-reads-v1]]
+	ReadOnly bool
+}
+
+// Marks a projection whose codec reads a file and writes none. [[spec/tickets/the-lens-reads-v1]]
+func ReadOnly() Option {
+	return func(one *registration) { one.readOnly = true }
 }
 
 // A second glob the same family projects, such as the local layer of a config file. [[spec/design_output/model#everything-on-disk-mirrors]]
@@ -56,8 +63,9 @@ func ProjectIn[T any](c *Catalog, name, glob string, codec Codec[T], kind Mirror
 	if kind == Loaded {
 		one.kind = derived
 		one.inputs = []input{{name: filesPrefix + "<path...>", typ: typeOf[Content]()}}
+		// The wiring renames the family after this runs, so the key trims off the name the registration carries at call time. [[spec/tickets/the-lens-reads-v1]]
 		one.keyed = func(snap Snapshot, full string) (any, error) {
-			key := strings.TrimPrefix(full, name+"/")
+			key := strings.TrimPrefix(full, strings.TrimSuffix(one.name, "<path...>"))
 			if !one.covers(key) {
 				return nil, fmt.Errorf("%s stands outside the globs of %s", key, one.name)
 			}
@@ -85,7 +93,7 @@ func (c *Catalog) Projections() []Projection {
 	var out []Projection
 	for _, one := range c.all() {
 		for _, glob := range one.globs {
-			out = append(out, Projection{Name: one.name, Kind: one.mirror, Glob: glob, RoundTrip: one.trip})
+			out = append(out, Projection{Name: one.name, Kind: one.mirror, Glob: glob, RoundTrip: one.trip, ReadOnly: one.readOnly})
 		}
 	}
 	return out

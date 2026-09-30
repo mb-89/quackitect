@@ -4,12 +4,11 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   answerOf,
   argvOf,
   fillArgvOf,
-  HOLDS,
-  holdsIn,
   lensesOf,
   personEnv,
   routeArgvOf,
@@ -17,6 +16,9 @@ import {
   ticketLensOf,
   ticketOf,
 } from "../../src/extension/lib/lens.js";
+import { v1Over } from "./v1-index.js";
+
+const HOLDS = ".se/.runtime/hold";
 
 const ROUTE = [
   "steps:",
@@ -210,19 +212,17 @@ function doorOf(seed, typed = "") {
   };
   return {
     said,
-    list: async (folder) =>
-      Object.keys(seed)
-        .filter((one) => one.startsWith(`${folder}/`))
-        .map((one) => one.slice(folder.length + 1)),
-    read: async (path) => seed[path] ?? "",
     asksLine: async (prompt) => {
       said.asked.push(prompt);
       return typed;
     },
     saves: async (path) => said.saved.push(path),
-    runsVerb: async (argv) => {
-      said.ran.push(argv);
-      return { code: 0, out: "work\n  the next leaf\n", err: "" };
+    index: {
+      ...v1Over(fakeDisk(seed)),
+      acts: async (name, input) => {
+        said.ran.push([...name.split("/"), ...input.args]);
+        return { code: 0, out: "work\n  the next leaf\n", err: "" };
+      },
     },
     says: (lines) => said.says.push(lines),
     tells: (title, detail, refused) => said.told.push([title, detail, refused]),
@@ -232,35 +232,14 @@ function doorOf(seed, typed = "") {
   };
 }
 
-test("the lenses read the holds off the hold folder", async () => {
+test("the lenses read the holds off holds/standing", async () => {
   const hold = { ticket: "one", step: "design/draft", hand: "person a-desk" };
   const lens = ticketLensOf(
     doorOf({ [`${HOLDS}/person-a-desk.json`]: JSON.stringify(hold) }),
   );
   const said = await lens.lenses(PATH, ticket("open", "design/draft"));
   assert.equal(said[0].arguments[0], "pass");
-  assert.deepEqual(lens.watches, [`${HOLDS}/*.json`]);
-});
-
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-test("the holds skip the older hold file and one whose ticket reads closed, and keep one naming no path or no file", async () => {
-  const door = doorOf({
-    [`${HOLDS}/a.json`]: JSON.stringify({
-      ticket: "shut",
-      path: "spec/tickets/shut.md",
-    }),
-    [`${HOLDS}/b.json`]: JSON.stringify({ ticket: "loose" }),
-    [`${HOLDS}/c.json`]: JSON.stringify({
-      ticket: "away",
-      path: "spec/tickets/away.md",
-    }),
-    [`${HOLDS}/d.json`]: JSON.stringify({ ticket: "one", path: PATH }),
-    ".se/.runtime/hold.json": JSON.stringify({ ticket: "old" }),
-    "spec/tickets/shut.md": ticket("closed"),
-    [PATH]: ticket("open"),
-  });
-  const holds = await holdsIn(await door.list(HOLDS), door.read);
-  assert.deepEqual(holds.map((one) => one.ticket).sort(), ["away", "loose", "one"]);
+  assert.deepEqual(lens.names, ["holds/standing", "tickets/cloud"]);
 });
 
 test("a pass saves the ticket, runs the pull, and says the answer", async () => {
@@ -383,26 +362,21 @@ const groupNote = (cloud) =>
 // [[spec/tickets/the-queue-views-agree]]
 test("a ticket whose group carries the cloud marker draws no lens", () => {
   const text = GROUPED(ticket("open", "design/draft"));
-  assert.deepEqual(
-    lensesOf({ path: PATH, text, holds: [], group: groupNote(true) }),
-    [],
-  );
+  assert.deepEqual(lensesOf({ path: PATH, text, holds: [], cloud: true }), []);
   const own = text.replace("state: open", "state: open\ncloud: true");
-  assert.deepEqual(lensesOf({ path: PATH, text: own, holds: [], group: "" }), []);
+  assert.deepEqual(lensesOf({ path: PATH, text: own, holds: [], cloud: false }), []);
   assert.deepEqual(
-    titles(lensesOf({ path: PATH, text, holds: [], group: groupNote(false) })),
+    titles(lensesOf({ path: PATH, text, holds: [], cloud: false })),
     [["Take this ticket at design/draft", "take"]],
     "a group off the cloud keeps the take",
   );
 });
 
 // [[spec/tickets/the-queue-views-agree]]
-test("the lens door reads the group file and runs no verb", async () => {
-  const door = doorOf({ [GROUP_FILE]: groupNote(true) });
-  const said = await ticketLensOf(door).lenses(
-    PATH,
-    GROUPED(ticket("open", "design/draft")),
-  );
+test("the lens reads the group's mark off tickets/cloud and runs no verb", async () => {
+  const text = GROUPED(ticket("open", "design/draft"));
+  const door = doorOf({ [GROUP_FILE]: groupNote(true), [PATH]: text });
+  const said = await ticketLensOf(door).lenses(PATH, text);
   assert.deepEqual(said, []);
   assert.deepEqual(door.said.ran, []);
 });

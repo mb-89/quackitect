@@ -126,3 +126,12 @@ func TestABrokenFileFailsItsRoundTrip(t *testing.T) {
 		t.Fatal("no break fails the round trip")
 	}
 }
+
+// A read-only projection writes nothing back, so the round trip leaves it out: the ticket drawing refuses a write. [[spec/tickets/the-lens-reads-v1]]
+func TestARoundTripLeavesAReadOnlyProjectionOut(t *testing.T) {
+	for _, one := range projections() {
+		if _, err := one.roundTrip([]byte("---\nkind: [[ticket]]\n---\n")); err != nil && strings.Contains(err.Error(), "writes none") {
+			t.Fatalf("the projection over %s refuses a write, and the round trip takes it", one.glob)
+		}
+	}
+}

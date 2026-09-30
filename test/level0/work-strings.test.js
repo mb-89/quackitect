@@ -1,13 +1,14 @@
 // The strings behind the work group: the line a config entry runs, the count
-// and the next ticket the verbs answer, and the new ticket's path and text.
-// [[spec/tickets/the-work-group-draws-buttons]]
+// and the next ticket the verbs answer, and the new ticket's path. The bare
+// ticket's text moves to the ticket verb, which test/level0/ticket-new.test.js holds.
+// [[spec/tickets/the-work-group-draws-buttons]] [[spec/tickets/the-sidebar-writes-through-actions]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   countIn,
   lineArgvOf,
-  NEW_TICKET,
+  nameIn,
   nextIn,
   ticketPathOf,
 } from "../../src/extension/lib/work.js";
@@ -56,12 +57,16 @@ test("a name takes the ticket path, and a name outside the ticket form takes non
     assert.equal(ticketPathOf(opens, bad), "", bad);
 });
 
-test("a new ticket carries its kind and an empty process, and an ask to fill", () => {
-  assert.match(NEW_TICKET, /^---\nkind: \[\[ticket\]\]\nprocess: ""\n---\n/);
-  assert.match(NEW_TICKET, /^# Ask$/m);
-});
-
 test("an answer of the wrong shape reads as none", () => {
   assert.equal(countIn({ code: 0, out: '{"count":"3"}' }), undefined);
   assert.equal(nextIn({ code: 0, out: '{"ticket":"one"}' }), null);
+});
+
+// [[spec/tickets/the-sidebar-reads-v1]]
+test("a counts line names the value the index answers the count at", () => {
+  assert.equal(
+    nameIn('./RUNME.sh index call value {"name":"work/open-tasks"}'),
+    "work/open-tasks",
+  );
+  assert.equal(nameIn("./RUNME.sh ticket yours --count"), undefined);
 });
