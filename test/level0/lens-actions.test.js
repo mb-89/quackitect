@@ -1,9 +1,8 @@
-// The ticket buttons post their actions through the index door, and the
-// extension spawns no verb. A fake index door records each post.
+// The ticket buttons post their actions through the index door, which a fake
+// records.
 // [[spec/tickets/the-lens-calls-actions]]
 
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
 import { test } from "node:test";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import * as emitter from "../../src/scripts/graph.js";
@@ -104,19 +103,4 @@ test("pull for me takes the first row of work/yours", async () => {
   await pressed(() => sidebarOf(door).took({ kind: "run", key: "work.pull" }));
   assert.deepEqual(door.said.posted, [post([PICKED])]);
   assert.deepEqual(door.said.opened, [PATH]);
-});
-
-test("no verb spawn stands in the extension", () => {
-  let found = "";
-  try {
-    found = execFileSync(
-      "git",
-      ["grep", "-n", "spawn(", "--", "src/extension", ":!src/extension/node_modules"],
-      {
-        encoding: "utf8",
-      },
-    );
-  } catch {}
-  const spawns = found.split("\n").filter((one) => one && !one.includes("respawn("));
-  assert.deepEqual(spawns, []);
 });

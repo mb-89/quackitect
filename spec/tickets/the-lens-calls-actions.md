@@ -385,3 +385,5 @@ Every case fails on its own assertion. The lens cases catch the throw a missing 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The grep case drives the real git, so it stands under `test/contract`. It lands at tests-green as `test/contract/extension-spawns-no-verb.test.js`, once no spawn stands.

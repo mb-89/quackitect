@@ -389,3 +389,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's tests and size lists name `src/modules/config/config_test.go`. The config cases stand in `src/modules/config/keys_test.go` instead, so the red list leaves no standing case out of the check. The router's case `TestTheRootLandsAStoreRequest` lands in `src/quack/main_test.go` at tests-green.
