@@ -118,7 +118,11 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [the-lens-calls-actions, the-sidebar-reads-v1]
-step: design/owner-read
+step: design/draft
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
