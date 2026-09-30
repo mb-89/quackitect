@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -157,6 +157,15 @@ record:
         hash: e451f12e63829e77
         size: 1840
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: ddf18a932a6414190c0da72f365e766bc2f44e8c
+    hash_after: ddf18a932a6414190c0da72f365e766bc2f44e8c
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/cage-write-door-port.md:319:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -357,14 +366,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, plus stopfacts.go and status.go, which split the door's tree reads and the full update's shape off stops.go under the ceiling, fold.go and holds.go for the chapters the demand carries, and command.go with its test, since main.go stands near the ceiling
+every door the change reaches has a fake: git through taughtGit, the clock through the door's Now, the tree under a temporary root, and the index through q/qtest
+a comment above each new file and function names the approach and links the ticket or the note it ports
+the rule files under spec/config/stop and status.yaml stay the one source both sides read, and each copied folder name carries a comment naming its owner
 
 ## tests-green
 
@@ -417,3 +431,7 @@ accept
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The tests the implement lands beside, as the commit door reads them:
+
+    ./RUNME.sh test src/modules/hooks/stops_test.go src/modules/hooks/stop/stop_test.go src/quack/stop_settings_test.go

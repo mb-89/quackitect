@@ -37,6 +37,7 @@ func heldOf(settings Settings, root string) map[string]any {
 		heldCloud:       settings.Cloud,
 		heldWorking:     working,
 		heldTodos:       todos,
+		heldChapters:    chaptersAt(root, settings.Ask),
 	}
 }
 

@@ -10,6 +10,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/modules/hooks/stop"
+	"quackitect/src/q"
 )
 
 // The case table the bridge's own answers wrote, the tree's root the live files stand under, and the layer the config and the schema answer from. [[spec/tickets/cage-stop-rules-port]]
@@ -151,5 +154,94 @@ func TestTheStopBlocksWhatTheBridgeBlocks(t *testing.T) {
 				t.Fatalf("the door says\n%s\nwhere the bridge says\n%s", got, one.Text)
 			}
 		})
+	}
+}
+
+// The fill a case measures, past the handover mark it sets, and the rules it votes over. [[spec/tickets/cage-stop-rules-port]]
+const (
+	caseMark  = 1000
+	caseFill  = 5000
+	caseRules = `- id: the-work-stands-complete
+  side: stop
+  priority: 45
+  decides: claimed
+  runs: the-plan-is-empty
+  asks: Does the work stand complete?
+
+- id: the-last-line-names-no-stop
+  side: continue
+  priority: 50
+  decides: mechanical
+  runs: no-stop-line
+  says: The last line names no stop reason.
+
+- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+`
+)
+
+// One event of the session s1, or of the helper a1, at the next place, beside the holds the same event left. [[spec/tickets/cage-stop-rules-port]]
+func stopStepper() func(kind, agent string, fields map[string]any, holds Holds) Stops {
+	var state Stops
+	seq := int64(0)
+	return func(kind, agent string, fields map[string]any, holds Holds) Stops {
+		seq++
+		with := map[string]any{holdsField: holds}
+		for key, value := range fields {
+			with[key] = value
+		}
+		state = stepStops(state, q.Event{Seq: seq, At: fixed, Kind: kind, Hand: q.Hand{Session: "s1", Agent: agent}, Fields: with})
+		return state
+	}
+}
+
+// The fold counts the owner's prompts, the helpers and the todos, keeps the stop call's claim until the Stop reads it, goes due past the mark and clears at the turn the clear ends, and reads the owner's dropped hold off the holds fold alone. [[spec/tickets/cage-stop-rules-port]]
+func TestTheStopsFoldKeepsWhatTheBoxKeeps(t *testing.T) {
+	rules, _ := stop.RulesOf(caseRules)
+	queue := map[string]any{heldBinding: queueBinding}
+	facts := Stopped{HandoverAt: caseMark, Rules: rules, Layer: builtInLayer}
+	land := stopStepper()
+	owner := map[string]any{"origin": map[string]any{"kind": "composer"}, heldField: queue, stoppedField: facts}
+	land(promptEvent, "", owner, Holds{})
+	land(promptEvent, "", map[string]any{"origin": map[string]any{"kind": "task"}, heldField: queue, stoppedField: facts}, Holds{})
+	land(spawnEvent, "", map[string]any{"background": true}, Holds{})
+	state := land(toolEvent, "", map[string]any{"tool": "TodoWrite", "todos": []any{map[string]any{"status": "pending"}}}, Holds{})
+	if state.Prompts != 1 || state.Helpers != 1 || !state.standing() || state.Binding == nil || state.Binding.Layer != builtInLayer {
+		t.Fatalf("the fold keeps %+v, and wants one owner prompt, one helper, a todo standing and the binding read", state)
+	}
+	if state = land(stopEvent, "a1", nil, Holds{}); state.Helpers != 0 || state.Said.Word != "" {
+		t.Fatalf("a helper's stop leaves %+v, and wants its mark off and a pass", state)
+	}
+	call := map[string]any{"tool": stopCall, "reason": "the-work-stands-complete", heldField: queue, stoppedField: facts}
+	if state = land(toolEvent, "", call, Holds{Said: Said{Word: HoldWord}}); state.Claim != "" {
+		t.Fatalf("a stop call the holds hold claims %q, and wants no claim", state.Claim)
+	}
+	if state = land(toolEvent, "", call, Holds{}); state.Claim != "the-work-stands-complete" {
+		t.Fatalf("a stop call over an empty plan claims %q, and wants its reason", state.Claim)
+	}
+	end := map[string]any{"last_assistant_message": "done", heldField: queue, stoppedField: facts}
+	if state = land(stopEvent, "", end, Holds{}); state.Said.Word != "" || state.Claim != "" || state.InARow != 0 {
+		t.Fatalf("the Stop over the call's claim leaves %+v, and wants a pass with the claim spent", state)
+	}
+	if state = land(stopEvent, "", end, Holds{}); state.Said.Word != BlockWord || state.InARow != 1 {
+		t.Fatalf("a Stop naming no line leaves %+v, and wants a block and one hold in a row", state)
+	}
+	if state = land(stopEvent, "", end, Holds{Stood: stopHold}); state.Said.Word != "" || state.InARow != 0 {
+		t.Fatalf("a Stop under the stood hold leaves %+v, and wants a pass", state)
+	}
+	measure := map[string]any{"context": map[string]any{"tokens": float64(caseFill)}, heldField: queue, stoppedField: facts}
+	if state = land(measureEvent, "", measure, Holds{}); state.Handover == nil || state.Handover.Phase != dueFinish {
+		t.Fatalf("a fill past the mark leaves %+v, and wants the session due", state.Handover)
+	}
+	cleared := facts
+	cleared.Clear = true
+	if state = land(stopEvent, "", map[string]any{"last_assistant_message": "done", heldField: queue, stoppedField: cleared}, Holds{}); state.Said.Word != "" || state.Handover.Phase != dueClear {
+		t.Fatalf("a held clear leaves %+v, and wants the turn to end on the clear", state)
+	}
+	if state = land(turnEvent, "", map[string]any{"reason": answerReason, heldField: queue, stoppedField: facts}, Holds{}); state.Handover != nil {
+		t.Fatalf("the turn the clear ends leaves %+v, and wants the mark off", state.Handover)
 	}
 }

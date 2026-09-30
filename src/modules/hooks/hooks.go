@@ -175,6 +175,7 @@ func Registers(c *q.Catalog) q.Writer {
 		q.OutIn(c, EventsName, q.Event{}, q.IO(), q.Doc("the newest hook event of a session")),
 		q.CfgIn(c, WaitKey, defaultWait, q.Doc("the seconds an agent's call waits on its action, where the call sets none")),
 		q.FoldIn(c, HoldsName, Holds{}, stepHolds, q.Doc("the state the holds keep over a session, and the answer to its newest event")),
+		q.FoldIn(c, StopsName, Stops{}, stepStops, q.Doc("the state the stop keeps over a session, and the answer to its newest Stop")),
 	)
 }
 
@@ -207,6 +208,8 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	effects := []Effect{}
 	if said, ok := d.held(session, post, root); ok {
 		effects = append(effects, said)
+	} else if said, ok := d.blocked(session, post); ok {
+		effects = append(effects, said)
 	} else if refused := d.refuses(post, root, settings); post.Event == toolEvent && refused != "" {
 		effects = append(effects, Effect{Kind: resultKind, Text: refused})
 	} else if post.Event == toolEvent {
@@ -233,7 +236,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	return said, nil
 }
 
-// Commits the event at the session's next place, stamped with the config its holds read, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]]
+// Commits the event at the session's next place, stamped with the config its holds read and the facts the stop reads, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/cage-stop-rules-port]]
 func (d *Door) writes(session string, post Post, settings Settings, root string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -248,6 +251,7 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	hand := q.Hand{Session: session, Agent: textOf(post.E, "agentId", "agent_id")}
 	fields := fieldsOf(post)
 	fields[heldField] = heldOf(settings, root)
+	fields[stoppedField] = d.stoppedOf(post, settings, root)
 	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
 		return err
@@ -258,7 +262,10 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 			return err
 		}
 	}
-	return store.Land(d.holdsOf(session), event)
+	if err := store.Land(d.holdsOf(session), event); err != nil {
+		return err
+	}
+	return d.landsStops(session, event)
 }
 
 func (d *Door) now() time.Time {

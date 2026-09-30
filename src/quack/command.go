@@ -40,6 +40,13 @@ const (
 	helperKey       = "helper."
 )
 
+// The keys the stop reads: the hook's switch, the cap on holds in a row, and the fill the handover comes due at. [[spec/tickets/cage-stop-rules-port]]
+const (
+	stopEnabledKey = "stop.enabled"
+	mostInARowKey  = "stop.mostInARow"
+	handoverAtKey  = "context.handoverAt"
+)
+
 // The helper tiers the Agent door reads, off TIERS in src/bridge/agent.js. [[spec/design_output/level0#a-spawn-names-its-tier]]
 var helperTiers = []string{"find", "change", "decide"}
 
@@ -83,7 +90,24 @@ func commandSettings(root string) hooks.Settings {
 		PlanEvery: settingsreader.Count(root, planEveryKey), PlanGrace: settingsreader.Count(root, planGraceKey),
 		PlanMostOpen: settingsreader.Count(root, planMostOpenKey), Helpers: helpers,
 		User: firstSet(userVariables), Home: firstSet(homeVariables),
+		StopOff: stopOff(root), MostInARow: settingsreader.Count(root, mostInARowKey),
+		HandoverAt: settingsreader.Count(root, handoverAtKey), BindingLayer: layerOf(root, bindingKey),
 	}
+}
+
+// The stop hook stands off where its switch reads false, as a JSON false or a variable saying so. [[spec/tickets/cage-stop-rules-port]]
+func stopOff(root string) bool {
+	said, held := settingsreader.Value(root, stopEnabledKey)
+	if text, ok := said.(string); ok {
+		return held && strings.TrimSpace(strings.ToLower(text)) == "false"
+	}
+	return held && said == false
+}
+
+// The layer a key reads off, which the stop's binding line names. [[spec/design_output/stop#a-refusal-names-the-binding]]
+func layerOf(root, key string) string {
+	_, layer, _ := settingsreader.Where(root, key)
+	return layer
 }
 
 // The first variable set, or nothing. [[spec/tickets/cage-commit-guards-port]]

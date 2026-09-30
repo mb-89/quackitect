@@ -7,7 +7,9 @@ package hooks
 import (
 	"math"
 	"regexp"
+	"strconv"
 	"strings"
+	"unicode/utf16"
 
 	"quackitect/src/q"
 )
@@ -97,6 +99,8 @@ type Demand struct {
 	Prompt bool   `json:"prompt,omitempty"`
 	Before string `json:"before,omitempty"`
 	Update string `json:"update,omitempty"`
+	// The chapters a full update carries, which a text lacking one pays nothing of. [[spec/tickets/cage-stop-rules-port]]
+	Chapters []string `json:"chapters,omitempty"`
 }
 
 // The answer the holds give one event: its place, the word, and the refusal's text. No word lets the event through. [[spec/tickets/cage-call-holds-port]]
@@ -123,7 +127,7 @@ func stepHolds(state Holds, event q.Event) Holds {
 	case displayEvent:
 		if text := strings.TrimSpace(textOf(fields, "delta")); text != "" {
 			state.Spoken = text
-			if state.Demand != nil {
+			if state.Demand != nil && state.Demand.lacks(text) == "" {
 				state.paid(text, heldIn(fields))
 			}
 		}
@@ -158,13 +162,22 @@ func (state *Holds) prompted(fields map[string]any) {
 	state.Demand = &Demand{Why: promptWhy, Seen: state.Spoken, Prompt: true, Before: textOf(fields, "before")}
 }
 
-// The spoke post pays with a fresh text, and refuses naming the last text seen where none stands. [[spec/design_output/level0#the-owners-prompt-comes-first]]
+// The spoke post pays with a fresh text fitting the demand, refuses naming what the newest one lacks, and names the last text seen where none stands. [[spec/design_output/level0#the-owners-prompt-comes-first]] [[spec/tickets/cage-stop-rules-port]]
 func (state *Holds) spoke(fields map[string]any) {
 	if state.Demand == nil {
 		return
 	}
-	if fresh := freshTexts(fields, state.Demand); len(fresh) > 0 {
-		state.paid(fresh[len(fresh)-1], heldIn(fields))
+	fresh := freshTexts(fields, state.Demand)
+	for at := len(fresh) - 1; at >= 0; at-- {
+		if state.Demand.lacks(fresh[at]) == "" {
+			state.paid(fresh[at], heldIn(fields))
+			return
+		}
+	}
+	if len(fresh) > 0 {
+		newest := fresh[len(fresh)-1]
+		state.Said.Word = RefuseWord
+		state.Said.Text = state.Demand.lacks(newest) + " The last text seen (" + strconv.Itoa(len(utf16.Encode([]rune(newest)))) + " characters) reads: \"" + head(newest) + "\"."
 		return
 	}
 	state.Said.Word = RefuseWord
@@ -181,11 +194,13 @@ func (state *Holds) turnEnds(fields map[string]any) {
 	text := strings.TrimSpace(textOf(fields, "answer"))
 	answered := textOf(fields, "reason") == answerReason && text != ""
 	switch {
-	case answered && state.Demand != nil:
+	case answered && state.Demand != nil && state.Demand.lacks(text) == "":
 		state.paid(text, held)
 	case answered:
 		state.Spoken = text
-	default:
+	}
+	// A full update's demand outlives the turn that lacks its chapters. [[spec/tickets/cage-stop-rules-port]]
+	if state.Demand != nil && len(state.Demand.Chapters) == 0 {
 		state.Demand = nil
 	}
 	state.Finish = 0
@@ -240,14 +255,16 @@ func (state *Holds) called(fields map[string]any) {
 		state.planned()
 	case reportCall:
 		if said := strings.TrimSpace(textOf(fields, "text")); said != "" && state.Demand != nil {
-			state.paid(said, held)
+			if state.Demand.lacks(said) == "" {
+				state.paid(said, held)
+			}
 		} else if said != "" {
 			state.Spoken = said
 		}
 	}
 }
 
-// The update ask opens a demand whose block rides its grace, unless an unpaid prompt stands or the same ask stands already. A full update's shape stays with the bridge. [[spec/design_output/extension#the-ask-is-a-line]]
+// The update ask opens a demand whose block rides its grace, unless an unpaid prompt stands or the same ask stands already. A full update's demand carries the chapters the door stamps. [[spec/design_output/extension#the-ask-is-a-line]] [[spec/tickets/cage-stop-rules-port]]
 func (state *Holds) asksForUpdate(held map[string]any) {
 	wanted := textOf(held, heldAsk)
 	if wanted == "" {
@@ -261,7 +278,7 @@ func (state *Holds) asksForUpdate(held map[string]any) {
 	if grace < leastGrace {
 		grace = leastGrace
 	}
-	state.Demand = &Demand{Why: "The owner asks for a " + wanted + " update", Seen: state.Spoken, Skips: grace, Block: true, Update: wanted}
+	state.Demand = &Demand{Why: "The owner asks for a " + wanted + " update", Seen: state.Spoken, Skips: grace, Block: true, Update: wanted, Chapters: chaptersIn(held)}
 }
 
 // The plan's answer starts the count over and answers the engine's ask. [[spec/design_output/stop#the-plan]]
