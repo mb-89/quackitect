@@ -1,0 +1,220 @@
+// The hook's door road under new: the cage the config layers decide, the
+// refusal a down door answers, and the effects a live one carries.
+// [[spec/design_output/level0#the-bridge-says-it-falls]]
+
+import assert from "node:assert/strict";
+import test from "node:test";
+import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
+import { LOCAL, TRACKED } from "../../.claude/skills/level0/lib/config.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+
+const STUB = "/stub";
+
+// A box whose cage reads new, whose hooks door names its port, and whose every post falls. Another writer appends a row to the session log after each read and each post, as a server writing beside the hook does. [[spec/tickets/a-down-index-refuses-calls]]
+const DOOR = {
+  [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k" }),
+};
+const CAGED = {
+  ...DOOR,
+  [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "new" } }),
+};
+
+// The tracked key reads old, and the override layer lays new over it. [[spec/tickets/cage-key-reads-the-layers]]
+const OVERRIDDEN = {
+  ...DOOR,
+  [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "old" } }),
+  [`${STUB}/${LOCAL}`]: JSON.stringify({ migration: { cage: "new" } }),
+};
+
+// The tracked key reads old, and no layer moves it. [[spec/tickets/cage-key-reads-the-layers]]
+const UNCAGED = {
+  ...DOOR,
+  [`${STUB}/${TRACKED}`]: JSON.stringify({ migration: { cage: "old" } }),
+};
+const LOG = `${STUB}/.se/.log/session.jsonl`;
+
+function caged(layers = CAGED) {
+  const files = fakeDisk({ ...layers, [LOG]: "" });
+  const runs = [];
+  const logged = [];
+  let others = 0;
+  const another = () => {
+    others += 1;
+    files.append(LOG, `${JSON.stringify({ kind: "other", n: others })}\n`);
+  };
+  const at = (rel) => (String(rel).startsWith("/") ? String(rel) : `${STUB}/${rel}`);
+  const $ = {
+    logged,
+    ui: { log: (text) => logged.push(text) },
+    fs: {
+      read: async (rel) => {
+        const said = files.read(at(rel));
+        if (at(rel) === LOG) another();
+        return said;
+      },
+      exists: async (rel) => files.exists(at(rel)),
+      write: async (rel, text) => files.write(at(rel), text),
+    },
+    process: {
+      run: async (argv) => {
+        runs.push(argv);
+        if (argv[0] === "node" && String(argv[2]).includes("appendFileSync"))
+          files.append(at(argv[3]), String(argv[4]));
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    },
+    http: {
+      fetch: async () => {
+        another();
+        throw new Error("Unable to connect");
+      },
+    },
+  };
+  const hooks = {};
+  level0((event, fn) => {
+    hooks[event] = fn;
+  }, {});
+  const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
+  return { files, runs, $, hooks, handed, others: () => others };
+}
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("a stopped hooks door refuses a guarded call and names session/alarms", async () => {
+  const box = caged();
+
+  const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+  await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+
+  assert.equal(said?.handed, undefined, "the guarded call goes no further");
+  assert.match(
+    String(said?.deny ?? ""),
+    /session\/alarms/,
+    "the refusal names the alarm",
+  );
+  assert.match(String(said.deny), /\.\/RUNME\.sh /, "and the command that clears it");
+  const starts = box.runs.filter((argv) => !String(argv[2]).includes("appendFileSync"));
+  assert.equal(starts.length, 1, "the hook starts the index once");
+});
+
+// [[spec/tickets/cage-key-reads-the-layers]]
+test("an override layer alone puts the hook on the door road, and the tracked key alone leaves it off", async () => {
+  const call = { tool: "Bash", command: "ls" };
+
+  const laid = caged(OVERRIDDEN);
+  const bare = caged(UNCAGED);
+
+  const over = await laid.hooks["*"](laid.$, call, laid.handed);
+  const off = await bare.hooks["*"](bare.$, call, bare.handed);
+
+  assert.equal(over?.handed, undefined, "the override sends the call to the door");
+  assert.match(
+    String(over?.deny ?? ""),
+    /session\/alarms/,
+    "and the down door refuses it",
+  );
+  assert.equal(off?.deny, undefined, "the tracked key alone refuses nothing");
+});
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("a read passes while the hooks door stands down", async () => {
+  const box = caged();
+  const call = { tool: "Read", file_path: `${STUB}/a.md` };
+
+  const said = await box.hooks["*"](box.$, call, box.handed);
+
+  assert.deepEqual(said?.handed, call, "the read reaches the harness");
+});
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("a row another writer appends while the index falls stays in the session log", async () => {
+  const box = caged();
+
+  await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+
+  const rows = String(box.files.read(LOG))
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  const kept = rows.filter((row) => row.kind === "other").map((row) => row.n);
+  assert.deepEqual(
+    kept,
+    Array.from({ length: box.others() }, (_, at) => at + 1),
+    "every row the other writer appends stays",
+  );
+  assert.ok(
+    rows.some((row) => row.kind === "bridge"),
+    "and the hook's own row lands beside them",
+  );
+});
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("under new a tool call takes the hooks door effects, and a prompt still reaches the bridge", async () => {
+  const box = caged();
+  const posts = [];
+  box.$.http = {
+    fetch: async (url, init) => {
+      posts.push({ url, init });
+      if (url.endsWith("/hook")) {
+        const effects = [{ kind: "result", text: "the door refuses this call" }];
+        return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+      }
+      return { ok: true, status: 200, text: "{}" };
+    },
+  };
+
+  const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+  const context = Object.assign(async () => ({ blocks: [] }), {
+    event: "prompt.context",
+  });
+  await box.hooks["*"](box.$, {}, context);
+
+  assert.equal(
+    said?.deny,
+    "the door refuses this call",
+    "the result effect answers the call",
+  );
+  assert.equal(
+    posts[0].url,
+    "http://127.0.0.1:7001/hook",
+    "the call goes to the hooks door",
+  );
+  assert.equal(
+    posts[0].init.headers.authorization,
+    "Bearer t0k",
+    "with the token it names",
+  );
+  assert.equal(JSON.parse(posts[0].init.body).event, "tool.call");
+  assert.match(posts[1].url, /\/event$/, "and the prompt goes to the bridge");
+});
+
+// [[spec/tickets/spoke-answer-reaches-the-door]]
+test("under new a held call asks back on agent.spoke with the effect's call id, and the second answer stands", async () => {
+  const box = caged();
+  const posts = [];
+  box.$.session = {
+    messages: async () => [{ role: "assistant", id: "a1", text: "the reply" }],
+  };
+  box.$.http = {
+    fetch: async (url, init) => {
+      const body = JSON.parse(init.body);
+      posts.push({ url, body });
+      const effects =
+        body.event === "agent.spoke"
+          ? [{ kind: "result", text: "the hold refuses" }]
+          : [{ kind: "rows", call: "s1.2" }];
+      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+    },
+  };
+
+  const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+
+  assert.deepEqual(said, { deny: "the hold refuses" });
+  assert.equal(
+    posts[1].url,
+    "http://127.0.0.1:7001/hook",
+    "the answer goes to the door",
+  );
+  assert.equal(posts[1].body.event, "agent.spoke");
+  assert.equal(posts[1].body.e.call, "s1.2", "and names the call it answers");
+  assert.equal(posts[1].body.e.text, "the reply");
+});
