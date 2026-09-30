@@ -117,12 +117,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: fd5cdaf3f8ded054b8dddda953582993304aadde
+    hash_after: fd5cdaf3f8ded054b8dddda953582993304aadde
+    inputs:
+      - name: ask
+        hash: 29ccd1d3cec3f09e
+        size: 761
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -162,38 +171,96 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The door answers `classic.Stop` in the bridge's order off `src/bridge/server.js`: a helper's stop passes, then `holdsForHandover`, then `onStop`. `gatesAnswer` stands between them and blocks nothing, so it stays with the bridge. `holdsTurn` blocks only on a demand carrying `fits`, which the full update alone sets, and the holds fold leaves that shape to the bridge. So the Go side reads it as a pass, and the ticket that ports the full update takes it up.
+
+The work lands in four commits.
+
+1. A pure package `src/modules/hooks/stop`, off `.claude/skills/level0/lib/stop.js`:
+   - a reader of the flat rule list under `spec/config/stop`, which keeps a rule it cannot read out of the vote, as `pool` does
+   - `Decide`, `AtTurnEnd` over the run of holds, `StopReasons`, `NamesNext`, `ReportStands`, the last line's reason, `ClaimFalls` and the block text of `asksForStop`
+   - each check of `CHECKS` in `src/bridge/stop.js`, as a function over a `Facts` struct
+2. A stops fold in `src/modules/hooks`, beside the holds fold, keeps what the bridge keeps on the box across events:
+   - the run of holds in a row
+   - the claim the stop call makes
+   - the report mark off `turn.said`
+   - the helpers spawned in the background
+   - the todo list off TodoWrite, and the handover phase with its asks, fill and marks off `session.measure`
+   - the owner prompts, which `chatIsNew` counts
+3. `Door.writes` stamps the facts under `stopped` on a `classic.Stop` post and on the stop call, as it stamps `held` on a call. The facts:
+   - the plan, the holds in hand and the clear ticket
+   - the ticket texts a person's step reads, the group in hand off the branch, the open private tickets
+   - the free queue off the tickets and `git for-each-ref`
+   - the binding, `stop.enabled`, `stop.mostInARow`, `context.handoverAt`, the cloud flag and the rules
+4. `Door.Hook` answers the Stop with a block effect carrying the bridge's text, the case table, and one recorded log a rule.
+
+What I weigh:
+
+- The facts ride the event, so the fold stays pure and replays over no disk, as the holds port chose.
+- The bridge counts prompts off the session log, which a restart keeps. The fold counts the session's events, which the index keeps, so the two agree within one session.
+- The stop tool's own result text stays the bridge's, since the ask names the turn's end. The fold records a claim where its check stands, so the vote reads the same claim.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Registers registers the folds
+- src/modules/hooks/hooks.go: Door.writes stamps each event
+- src/modules/hooks/hooks.go: Door.Hook answers each post
+- src/modules/hooks/cage.go: NewDecisionOf reads the block effect
+- src/modules/hooks/cage.go: OldDecisionOf reads the bridge's block
+- src/quack/main.go: listensHooks builds hooks.Outside
+- src/modules/hooks/hooks_test.go: doorOver builds Outside
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/stop_test.go: TestTheRulesReadAsThePoolReadsThem
+- src/modules/hooks/stop/stop_test.go: TestDecideVotesAsTheToothVotes
+- src/modules/hooks/stop/stop_test.go: TestTheToothLetsGoAfterItsCap
+- src/modules/hooks/stop/stop_test.go: TestEachCheckReadsItsFacts
+- src/modules/hooks/stops_test.go: TestTheStopsFoldKeepsWhatTheBoxKeeps
+- src/modules/hooks/stops_test.go: TestTheStopBlocksWhatTheBridgeBlocks
+- src/modules/hooks/cage_test.go: TestReplayLogAnswersEveryRecordedLog, over one log a rule
+- test/level0/stop-cases.test.js: the bridge answers the shared stop case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stop/rules.go
+- src/modules/hooks/stop/vote.go
+- src/modules/hooks/stop/checks.go
+- src/modules/hooks/stop/stop_test.go
+- src/modules/hooks/stops.go
+- src/modules/hooks/stops_test.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/cage_test.go
+- src/quack/main.go
+- test/replay/cage/stop-cases.json
+- test/level0/stop-cases.test.js
+- test/replay/cage: one log, box file and golden shadow a rule
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file and function named stands opened: the classic.Stop dispatch and endsTurn in src/bridge/server.js, holdsForHandover, measures, clearsHere and clearsAfter in src/bridge/handover.js, holdsTurn and onTurnEnd in src/bridge/answer.js, gatesAnswer in src/bridge/answer-read.js, onStop, claims, CHECKS and every tree read behind it in src/bridge/stop.js, decide, pool, toothOf, namesNext and todos in lib/stop.js, and the rules under spec/config/stop
+the callers list names every reader of the answer's effects and every builder of Outside, found by grep over src
+the replay line meets TestReplayLogAnswersEveryRecordedLog over the new logs, the text line meets TestTheStopBlocksWhatTheBridgeBlocks and its JS twin, and the check line meets ./RUNME.sh check
 
 ## tests-red
 
