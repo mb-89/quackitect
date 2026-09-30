@@ -82,6 +82,10 @@ record:
   - step: sync
     hand: box d88dc33717d8 · claude-code-remote
     hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
+    hash_after: 538cd707aca865e30480059942cab5eb1f16e6be
+  - step: sync
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 538cd707aca865e30480059942cab5eb1f16e6be
 ---
 
 # Ask
