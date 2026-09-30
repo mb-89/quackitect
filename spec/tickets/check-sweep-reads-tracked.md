@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,27 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d891ee20d0d7 · claude-code-remote
+    hash_before: 1b0c0be388cd9a42c14fec45061374076c0f6253
+    hash_after: 1b0c0be388cd9a42c14fec45061374076c0f6253
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes; green, src/modules/git passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/check-sweep-reads-tracked.md:42:1: ListItem: A sentence in a list item holds 20 words, and this one holds 2"
+    inputs:
+      - name: ask
+        hash: 8af59c19b26bcbe1
+        size: 661
+      - name: [[spec/design_output/lsp]]
+        hash: 6c482c703d22f7c9
+        size: 23036
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +70,32 @@ Left alone, every scratch note on a box draws a finding the check module holds a
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check src/modules/git
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check sweep read every file the watch mirrors, so an untracked note drew a finding the LSP sweep never drew. The git module now writes git/tracked, the paths git ls-files lists, and the wiring binds it to check.tracked. The sweep walks the tracked paths and the buffers over them alone. The count layers still read the local config file git ignores. A trial with an untracked note carrying a dead pointer ran se-lsp check, and the shadow log named no row.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the sweep skips untracked files, and the git contract proves the list on the fake and on real git
+- the cleanup it reveals: the two sweep helpers share one seeding function
+- every fact stands once: git/tracked names the list, and the sweep points at the lsp design note
 
 # Discussion
 
