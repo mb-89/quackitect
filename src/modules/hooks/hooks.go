@@ -122,6 +122,8 @@ type Outside struct {
 	Git    func(root string, args ...string) string
 	// The findings the voice keeps over a commit message, off Vale and the prose vetoes. None reads no voice. [[spec/tickets/cage-commit-guards-port]]
 	Voice func(root, message string) []command.Row
+	// Writes one config key of the local layer under the root. None writes nothing. [[spec/tickets/cage-hold-drops-port]]
+	Drop func(root, key, value string) error
 }
 
 // What the doors read off the config and the box: the words a name holds, whether the box stands in the cloud, the owner's hold and ask, the binding, the graces, the plan's numbers, and each helper tier's model. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-call-holds-port]]

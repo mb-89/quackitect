@@ -23,6 +23,11 @@ const (
 	BuiltIn = "built-in"
 )
 
+// Writes one key into the local layer and keeps every other key it holds, as writes in src/bridge/config.js does. [[spec/tickets/cage-hold-drops-port]]
+func Drop(root, key, value string) error {
+	return nil
+}
+
 // [[spec/design_output/config#the-go-reader]]
 func EnvOf(key string) string {
 	said := strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))

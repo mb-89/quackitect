@@ -164,3 +164,39 @@ func TestTheAgentDoorReadsTheTiers(t *testing.T) {
 		t.Fatalf("a call naming a tier's model answers %+v, and wants it passed", said)
 	}
 }
+
+// Each drop the fold names reaches the local layer through the door's writer: the hold at the turn's end, and the ask at its pay. [[spec/tickets/cage-hold-drops-port]]
+func TestTheDoorWritesEachDropItsFoldNames(t *testing.T) {
+	type dropped struct{ key, value string }
+	for _, one := range []struct {
+		name     string
+		settings Settings
+		posts    []Post
+		want     dropped
+	}{
+		{"the turn's end drops the hold", Settings{Hold: finishHold}, []Post{
+			{Event: turnEvent, E: map[string]any{"reason": answerReason, "answer": "done", "session_id": "s1"}},
+		}, dropped{heldHold, offHold}},
+		{"the paid update drops the ask", Settings{Ask: "brief"}, []Post{
+			{Event: toolEvent, E: map[string]any{"tool": "Read", "session_id": "s1"}},
+			{Event: displayEvent, E: map[string]any{"delta": "The tests stand green.", "session_id": "s1"}},
+		}, dropped{heldAsk, quiet}},
+	} {
+		t.Run(one.name, func(t *testing.T) {
+			door := holdDoor(t, one.settings)
+			var got []dropped
+			door.from.Drop = func(_, key, value string) error {
+				got = append(got, dropped{key, value})
+				return nil
+			}
+			for _, post := range one.posts {
+				if _, err := door.Hook(post); err != nil {
+					t.Fatal(err)
+				}
+			}
+			if len(got) != 1 || got[0] != one.want {
+				t.Fatalf("the door writes %v, and wants %v alone", got, one.want)
+			}
+		})
+	}
+}

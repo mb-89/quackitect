@@ -27,6 +27,7 @@ const (
 	heldField    = "held"
 	finishHold   = "finish"
 	stopHold     = "stop"
+	offHold      = "off"
 	quiet        = "quiet"
 	godBinding   = "god"
 	levelZero    = "mcp__level0__"
@@ -75,6 +76,8 @@ type Holds struct {
 	Asked  string  `json:"asked,omitempty"`
 	Spoken string  `json:"spoken,omitempty"`
 	Said   Said    `json:"said"`
+	// The owner's hold the turn's end dropped, which the stop vote reads until a prompt opens the next turn. [[spec/tickets/cage-hold-drops-port]]
+	Stood string `json:"stood,omitempty"`
 }
 
 // The engine's ask, off wants in src/bridge/grace.js. [[spec/design_output/stop#the-grace]]
@@ -101,6 +104,8 @@ type Said struct {
 	Seq  int64  `json:"seq"`
 	Word string `json:"word,omitempty"`
 	Text string `json:"text,omitempty"`
+	// The config keys the event drops, and the value each drops to. [[spec/tickets/cage-hold-drops-port]]
+	Drops map[string]string `json:"drops,omitempty"`
 }
 
 // The fold's step. Every hold skips a helper's event, so a helper's event moves nothing. [[spec/design_output/level0#a-helper-ends-no-turn]]

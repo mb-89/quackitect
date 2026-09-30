@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -137,6 +137,19 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: e534d81c0a86285645577efd0b2d190036e7fb00
+    hash_after: e534d81c0a86285645577efd0b2d190036e7fb00
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 5cfd65b6199235a5
+        size: 3793
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -260,26 +273,42 @@ the first done_when line meets the fold tests for each drop and TestTheDoorWrite
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks src/config
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/fold_test.go
+- src/modules/hooks/holds_test.go
+- src/config/config_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four tests stand red on their own assertion:
+
+- `TestATurnsEndDropsTheOwnersHold`: the fold names no drop at the turn's end
+- `TestAPaidUpdateDropsTheAsk`: the pay names no drop
+- `TestTheDoorWritesEachDropItsFoldNames`: the door writes nothing, in both cases
+- `TestDropWritesOneKeyOfTheLocalLayer`: the writer stands empty
+
+Two stand green before the change, as guards: `TestAPromptClearsTheStoodHold` and `TestAnAskPressedSinceStandsAtItsPay`. Each holds the fold back from a drop it must not make, so it goes red where the change drops too much.
+
+The scaffold adds the fields `Said.Drops`, `Holds.Stood` and `Outside.Drop`, the word `offHold`, and a `config.Drop` that writes nothing. The tests build, and fail on what they assert.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets TestTheDoorWritesEachDropItsFoldNames and the fold tests, red now; the check line stands a checkpoint the implement step answers with ./RUNME.sh check
+every door the tests reach has a fake: the door's writer through a recording Drop, the tree through t.TempDir, and the index through q/qtest in doorOver; the config test writes a root under t.TempDir, as every other case of that file does
 
 # gate
 
