@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides, the-sidebar-reads-v1]
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,25 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: 9bac5f891f9c87ffd27ebaed02b1538a2a55553d
+    hash_after: 9bac5f891f9c87ffd27ebaed02b1538a2a55553d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 4 file(s); green, src/modules/holds passes; green, src/modules/log passes; green, src/modules/v
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-sidebar-writes-through-actions.md:389:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: a9fc599b7b6295e6
+        size: 1771
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -405,26 +424,44 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-writes.test.js test/level0/ticket-new.test.js test/level0/bless-desk.test.js test/level0/log-say.test.js src/modules/holds/bless_test.go src/modules/log/say_test.go src/modules/verbs/new_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The sidebar writes no file of its own. Each write posts an index action, and the module owning the file writes it.
+
+| the button | the action |
+|---|---|
+| a click on a key | `config/override`, held for the window |
+| a new window | `config/opened`, which drops other windows' overrides |
+| bless | `bless/set`, which runs `ticket bless --desk` as a person |
+| new ticket | `tickets/new`, which runs `ticket new` |
+| a log line | `log/say`, which runs `log --say` |
+| a vehicle or stub button | the action its line names |
+
+A value the owner writes into the local file by hand now survives a new window.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list, the three script files the red tests import, the design note, and the tree contract test that read a deleted file
+- the index door has its fake in test/level0/v1-index.js, and the Go cases run on q/qtest
+- each changed file carries a comment pointing at this ticket
+- the bare ticket stands in the `ticket new` verb alone, and the design note states the new window rule once
 
 # accept
 
