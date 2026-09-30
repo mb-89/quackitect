@@ -19,7 +19,7 @@ const TICKETS = ["spec/tickets/", ".se/tickets/"];
 const DRAWN = "tickets/drawn/";
 const PERSON = "person";
 
-// The front of a note, as the Go note reader hands it.
+// The front of a note, as the Go note reader hands it. [[spec/tickets/the-lens-reads-v1]]
 const frontOf = (text) => (text ? (readNote(text).front.said ?? {}) : {});
 const word = (said) =>
   String(said ?? "")

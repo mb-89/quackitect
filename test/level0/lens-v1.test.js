@@ -5,10 +5,9 @@
 // [[spec/tickets/the-lens-reads-v1]]
 
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
+import { it as doors } from "../../src/scripts/cli-doors.js";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate, SHOW } from "../../src/extension/extension.js";
@@ -19,7 +18,6 @@ import { SCHEMA } from "../../src/extension/sidebar.js";
 import { graphIn } from "../../src/scripts/graph.js";
 import { v1Over } from "./v1-index.js";
 
-const ROOT = fileURLToPath(new URL("../../", import.meta.url));
 const PATH = "spec/tickets/one.md";
 const OTHER = "spec/tickets/two.md";
 const GROUP = "spec/tickets/up-there.md";
@@ -111,7 +109,7 @@ function filesOf() {
   });
 }
 
-// The extension reads its own two files, and every other read, list, import or watch refuses.
+// The extension reads its own two files, and every other read, list, import or watch refuses. [[spec/tickets/the-lens-reads-v1]]
 function doorOf(files) {
   const refuses = (name) => (path) => {
     throw new Error(`the lens calls ${name}(${JSON.stringify(path)})`);
@@ -256,18 +254,17 @@ test("the lens reads holds/standing and tickets/cloud, and a watch event draws i
 });
 
 test("src/extension/lib names no door.read, door.list, door.imports or door.watch", () => {
-  const ran = spawnSync(
-    "git",
+  const ran = doors.git.run(
     [
       "grep",
       "-n",
       "door.read\\|door.list\\|door.imports\\|door.watch",
       "src/extension/lib",
     ],
-    { cwd: ROOT, encoding: "utf8" },
+    true,
   );
   assert.equal(
-    ran.stdout,
+    String(ran.out ?? "").trim(),
     "",
     "the hosts under src/extension/lib read off the index alone",
   );
