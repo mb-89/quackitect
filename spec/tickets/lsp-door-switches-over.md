@@ -98,6 +98,7 @@ record:
   - step: sync
     hand: box d893e0ab0f106 · claude-code-remote
     hash_before: b469bd5334823361d70535e2b229724e338ac76b
+    hash_after: 3508a4e1f22dd1773ddfa4a9f77789f5b597abc1
   - step: sync
     hand: box d893e0ab0f106 · claude-code-remote
     hash_before: e3886a48606f95da656aae0421a25d7a24f06659
@@ -203,7 +204,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
-cloud: true
 reason: done
 ---
 
