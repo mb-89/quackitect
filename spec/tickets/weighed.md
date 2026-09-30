@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: go-cage-switches-over
 parent: a-down-index-refuses-calls
+record:
+  - step: do
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: a67eaf2582deff96b8e8add8c87480b887f588f2
+    hash_after: a67eaf2582deff96b8e8add8c87480b887f588f2
+    why: a-down-index-refuses-calls answers this ask
+reason: answered
 ---
 
 # Ask
