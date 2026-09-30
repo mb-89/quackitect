@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides]
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,25 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 2dc4510756881159e9092ac690acbb1c4b784be1
+    hash_after: 2dc4510756881159e9092ac690acbb1c4b784be1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/config passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-sidebar-reads-v1.md:377:128: Vocabulary: orderedof stands outside the words this tree writes. Write a c"
+    inputs:
+      - name: design/tests-red
+        hash: 391eea19266a6d16
+        size: 1863
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -383,26 +402,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-v1.test.js && ./RUNME.sh test test/contract/editor-index.test.js && ./RUNME.sh test src/modules/views/views_test.go && ./RUNME.sh test src/modules/holds/holds_test.go && ./RUNME.sh test src/modules/config/config_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The sidebar draws every value off the index door. The config tree, the widgets and the status bar read config/keys and the three config projections. The work badge reads work/open-tasks, the views section reads views/bases, and the bless button reads bless/agent. No verb spawns and no file is read. The index door gains watch, a reader of /v1/watch that opens again after a pause, and the extension wakes the status bar and the panel on it in place of three file watches. The index gains three names: the schema joins the config projection, bless/agent derives off the bless file beside the holds, and views/bases derives off the base files in a new views module loaded through projected in src/quack/main.go. bless/agent is a derived bool, since a loaded projection round-trips its file and the sidebar writes the bless file compact. The sidebar reads the field-by-field form /v1 hands a config projection in, through plainOf in src/extension/lib/values.js. A live index here answers every watched name, and the sidebar drawn over it shows the badge at the count work/open-tasks reads. The lens ticket case pull for me takes the first row of work/yours now needs its fake index to answer the schema value, and orderedOf in test/level0/v1-index.js builds it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays within the size the gate weighed: the sidebar, its door and helpers, the three Go modules, main.go and the sidebar cases, plus the shared fake index and the grep case under test/contract
+- the index door has its fake in test/level0/v1-index.js, and the real door meets a real SSE server in test/contract/editor-index.test.js
+- each new function and constant links spec/tickets/the-sidebar-reads-v1 or the design section it implements
+- every name the sidebar reads stands once under NAMES in sidebar.js, both copies of the bless path name folders.js beside them, and orderedOf stands once in v1-index.js
 
 # accept
 
