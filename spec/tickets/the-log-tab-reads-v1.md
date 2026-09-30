@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-streams-changes]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: df41b3226c24c186d868b6f0d8cb84f65ebf0c9a
+    hash_after: df41b3226c24c186d868b6f0d8cb84f65ebf0c9a
+    inputs:
+      - name: ask
+        hash: 7acc0ab40e14130e
+        size: 487
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,68 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The log tab reads `log/rows` off the catalog the window hands it, and wakes on the watch the ticket `v1-watch-sends-changes` builds. Its implement waits on that ticket.
+
+- `log.Tab` gains `From`, the catalog and the watch, as the work tab does. `main.go` hands it in place of the `Shadow`.
+- `Init` starts `registry.Stream` over `log/rows`. Each `registry.Change` reads the rows off the event's value.
+- `RecordOf` maps a row of the `log` module to a `Record`: the time parsed off `at`, the level, the kind, the said, the text, the extras and the broken mark. The raw line the details show reads the row's JSON.
+- A change whose rows hold fewer than the tab holds reads as a new session, so the tab starts again the way a rotated tail does. Otherwise the rows past the ones held land as new, and follow moves as it does now.
+- The wide `Row` in `shadow.go` gains `text` and `extra`, matching the module's row.
+- `tail.go`, `newTailer`, `tailErrMsg` and `LinesMsg` leave, and `fsnotify` leaves the window.
+- The `--frame` mode draws one frame off the file its command line names, so it reads that file once through `ParseRecord`, with no watcher.
+
+Weighed: each change carries the whole session's rows, which costs bytes on a long session. A range read, rows past a count, answers that later where it bites. Assumed: `log/rows` reads the session the window's path names, since both read the session file under `.se/.log`.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/main.go newModelOver, which builds the log tab, and Frame, which reads the Tailer
+- src/tui/log/tab.go Tab.Init and Tab.Update, which read the tail's messages
+- src/tui/log/golden_test.go and src/tui/log/tail_test.go, which read the tail
+- src/tui/frame/footer.go and the window tests, which read the log tab's rows
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/log/v1_test.go TestTheLogTabDrawsOffLogRows
+- src/tui/log/v1_test.go TestAShorterLogReadsAsANewSession
+- src/tui/log/v1_test.go TestTheDetailsDrawARowWhole
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/log/tab.go
+- src/tui/log/tail.go
+- src/tui/log/tail_test.go
+- src/tui/log/v1.go
+- src/tui/log/v1_test.go
+- src/tui/log/shadow.go
+- src/tui/main.go
+- go.mod
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function the approach names stands opened on this branch: the log tab, its tail, its view and shadow, detail.go, record.go, and the log module's Row and RowOf
+- the callers list names every caller git grep finds of newTailer, LinesMsg, Tailer and the log tab's Shadow
+- each done_when line names its test: the fsnotify grep, the v1_test.go cases, and the check
 
 ## tests-red
 
