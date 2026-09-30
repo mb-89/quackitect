@@ -78,6 +78,10 @@ process_hash: 57b2cccd0445ea9a
 depends_on: [lsp-door-lands-in-shadow, read-topics-switch-over]
 enabled_by: migration.phase7switch
 cloud: true
+record:
+  - step: sync
+    hand: box d8922c5f7ed7 · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
 ---
 
 # Ask
