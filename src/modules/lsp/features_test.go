@@ -20,7 +20,7 @@ var hoverFiles = map[string]string{
 // A schema governing one kind, so a bare note offers it. [[spec/tickets/lsp-module-serves-the-features]]
 const flagSchema = "kind: flag\ngoverns:\n  - spec/flags/**\nfrontmatter:\n  type: object\n  properties:\n    kind:\n      const: flag\n      x-link: true\n"
 
-// A server over the files named, whose sweep answers nothing and which runs no tool. [[spec/tickets/lsp-module-serves-the-features]]
+// A server over the files named, whose sweep answers nothing, which runs no tool, and whose features the fake check reads off the tree. [[spec/tickets/lsp-module-serves-the-features]]
 func featuresOver(t *testing.T, files map[string]string) *Server {
 	t.Helper()
 	store, as := catalogOf(t)
@@ -28,6 +28,7 @@ func featuresOver(t *testing.T, files map[string]string) *Server {
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },
 		Files: func() map[string]string { return files },
+		Check: fakeCheck,
 	})
 }
 

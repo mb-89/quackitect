@@ -78,7 +78,15 @@ type Check struct {
 	ValeIni  string
 	Survey   string
 	Bin      string
+	// The features the check module reads over the tree: the hover, the completion, the links and the folds, each answering a value the reply marshals whole. Links and folds read no position. [[spec/tickets/lsp-module-serves-the-features]]
+	Hover    Feature
+	Complete Feature
+	Links    Feature
+	Folds    Feature
 }
+
+// One feature's read: the tree, the path under the root, and the cursor. [[spec/tickets/lsp-module-serves-the-features]]
+type Feature func(tree Tree, path string, line, character int) any
 
 // Every row the tools answer over the whole tree. A buffer an editor holds reads as it stands. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func (one *Tools) Sweep(tree Tree) []Finding {

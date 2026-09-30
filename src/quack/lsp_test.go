@@ -39,6 +39,49 @@ func TestThePortsAnswerTheCheckModulesRows(t *testing.T) {
 	}
 }
 
+// The lsp module reads the check module's features through the ports quack wires, so a hover, a completion, a link and a fold reach it as check reads them. [[spec/tickets/lsp-module-serves-the-features]]
+func TestTheFeaturePortsAnswerTheCheckModulesReads(t *testing.T) {
+	texts := map[string]string{
+		"spec/schemas/paragraph.schema.yaml": "kind: paragraph\nlayers:\n  vocabulary:\n    terms: spec/vocabulary/terms.yml\n    endings: spec/config/stems.yaml\n",
+		"spec/vocabulary/terms.yml":          "terms:\n  - {word: door, means: \"the one place the tree guards an outside thing\"}\n",
+		"spec/config/stems.yaml":             "endings:\n  - end: s\n    to: [none]\n",
+		"spec/schemas/flag.schema.yaml":      "kind: flag\ngoverns:\n  - spec/flags/**\nfrontmatter:\n  type: object\n  properties:\n    kind:\n      const: flag\n      x-link: true\n",
+		"spec/design_output/one.md":          "# Scope\n",
+		"spec/notes/one.md":                  "---\nkind: [[flag]]\n---\n\nThe doors hold. See [[spec/design_output/one]].\n",
+		"spec/free.md":                       "",
+	}
+	const note = "spec/notes/one.md"
+	fresh := func() *check.Tree { return check.TreeOver("", check.Texts(texts)) }
+	ports := lspChecks()
+	cases := []struct {
+		name        string
+		port        lsp.Feature
+		path        string
+		line, where int
+		want        any
+	}{
+		{"Hover", ports.Hover, note, 4, 5, check.HoverAt(fresh(), note, 4, 5)},
+		{"Complete", ports.Complete, "spec/free.md", 0, 0, check.Offers(fresh(), "spec/free.md", 0, 0)},
+		{"Links", ports.Links, note, 0, 0, check.LinksIn(fresh(), note)},
+		{"Folds", ports.Folds, note, 0, 0, check.FoldsOf(texts[note])},
+	}
+	for _, one := range cases {
+		want, _ := json.Marshal(one.want)
+		if string(want) == "null" || string(want) == "[]" {
+			t.Errorf("the fixture draws no %s from the check module, so the case decides nothing", one.name)
+			continue
+		}
+		if one.port == nil {
+			t.Errorf("lspChecks fills no %s port", one.name)
+			continue
+		}
+		got, _ := json.Marshal(one.port(ports.Tree(texts), one.path, one.line, one.where))
+		if string(got) != string(want) {
+			t.Errorf("the %s port answers %s, and the check module reads %s", one.name, got, want)
+		}
+	}
+}
+
 // The tools and the features read the tracked texts, so the wiring binds the lsp module's inputs to the files the index mirrors and the paths git tracks. [[spec/tickets/lsp-module-draws-the-tools]]
 func TestTheWiringHandsTheLspModuleTheTrackedFiles(t *testing.T) {
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))

@@ -93,6 +93,8 @@ type Outside struct {
 	Tools *Tools
 	Files func() map[string]string
 	Quiet time.Duration
+	// What the check module lends the server, which the wiring hands in. [[spec/tickets/lsp-module-serves-the-features]]
+	Check Check
 }
 
 // The server over the buffers an editor holds open, and what it last published for each. [[spec/tickets/the-lsp-door-lands]]

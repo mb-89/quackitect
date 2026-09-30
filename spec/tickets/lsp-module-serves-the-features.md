@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -197,6 +197,19 @@ record:
         hash: ae606a0a840ebba9
         size: 590
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box d8932514a610d · claude-code-remote
+    hash_before: c76439cc0440379bfb55085e7b0824319ce4f031
+    hash_after: c76439cc0440379bfb55085e7b0824319ce4f031
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/lsp fails
+    inputs:
+      - name: design/draft-2
+        hash: bd465c04b5a9243c
+        size: 3451
+    def: 9c7cd4dd4a2dadb8
 group: lsp-door-switches-over
 ---
 
@@ -434,26 +447,33 @@ Weighed: the four reads inside the check module, against a copy inside `lsp`. A 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp/features_test.go src/modules/check/features_test.go src/quack/lsp_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/features_test.go
+- src/modules/check/features_test.go
+- src/quack/lsp_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The lsp cases see no capability and an empty answer from every port, since the handler routes no method yet. The check cases see the stubbed reads answer nothing. The ports case in quack stops on its guard, since the stubs draw no answer to compare. The fold case over a note with no frontmatter wants an empty list, not nil, so the reply marshals it as brackets.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each method line meets its lsp case, the moved reads meet the check cases, and the wiring meets the quack ports case
+- the one door the lsp cases reach, the check rules, takes the fake tree and fake reads in the lsp tests
 
 # gate
 

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"maps"
+	"regexp"
 	"slices"
 	"strings"
 	"sync"
@@ -81,6 +82,77 @@ var fakeCheck = Check{
 	Draft:    func(string) bool { return false },
 	Relative: func(root, path string) string { return strings.TrimPrefix(path, root+"/") },
 	ValeIni:  ".vale.ini",
+	Hover:    fakeHover,
+	Complete: fakeComplete,
+	Links:    fakeLinks,
+	Folds:    fakeFolds,
+}
+
+var (
+	fakeTerm    = regexp.MustCompile(`\{word: ([a-z ]+), means: "([^"]*)"\}`)
+	fakeWord    = regexp.MustCompile(`[A-Za-z]+`)
+	fakePointer = regexp.MustCompile(`\[\[([^\]#]+)\]\]`)
+	fakeKind    = regexp.MustCompile(`^spec/schemas/([a-z]+)\.schema\.yaml$`)
+)
+
+// The dictionary's line for the word under the cursor, an ending s cut, off the terms file the tree holds. [[spec/tickets/lsp-module-serves-the-features]]
+func fakeHover(tree Tree, path string, line, character int) any {
+	rows := strings.Split(tree.Read(path), "\n")
+	if line < 0 || line >= len(rows) {
+		return nil
+	}
+	for _, at := range fakeWord.FindAllStringIndex(rows[line], -1) {
+		if character < at[0] || character >= at[1] {
+			continue
+		}
+		word := strings.ToLower(rows[line][at[0]:at[1]])
+		for _, term := range fakeTerm.FindAllStringSubmatch(tree.Read("spec/vocabulary/terms.yml"), -1) {
+			if word == term[1] || strings.TrimSuffix(word, "s") == term[1] {
+				return map[string]any{"contents": map[string]any{"kind": "markdown", "value": "**" + term[1] + "**: " + term[2]}}
+			}
+		}
+	}
+	return nil
+}
+
+// A bare note offers every kind a schema the tree holds names. [[spec/tickets/lsp-module-serves-the-features]]
+func fakeComplete(tree Tree, path string, line, character int) any {
+	out := []map[string]any{}
+	if strings.TrimSpace(tree.Read(path)) != "" {
+		return out
+	}
+	for _, at := range tree.Paths() {
+		if kind := fakeKind.FindStringSubmatch(at); kind != nil {
+			out = append(out, map[string]any{"label": "kind: [[" + kind[1] + "]]"})
+		}
+	}
+	return out
+}
+
+// Every pointer landing on a note the tree holds, opening that note. [[spec/tickets/lsp-module-serves-the-features]]
+func fakeLinks(tree Tree, path string, line, character int) any {
+	out := []map[string]any{}
+	for _, pointer := range fakePointer.FindAllStringSubmatch(tree.Read(path), -1) {
+		if tree.Exists(pointer[1] + ".md") {
+			out = append(out, map[string]any{"target": "file:///tree/" + pointer[1] + ".md"})
+		}
+	}
+	return out
+}
+
+// The frontmatter from its opening fence to its closing one. [[spec/tickets/lsp-module-serves-the-features]]
+func fakeFolds(tree Tree, path string, line, character int) any {
+	rows := strings.Split(tree.Read(path), "\n")
+	out := []map[string]any{}
+	if len(rows) == 0 || rows[0] != "---" {
+		return out
+	}
+	for at := 1; at < len(rows); at++ {
+		if rows[at] == "---" {
+			return append(out, map[string]any{"startLine": 0, "endLine": at, "kind": "region"})
+		}
+	}
+	return out
 }
 
 // A server over the files named, whose sweep answers nothing, running the fake tools with no quiet span. [[spec/tickets/lsp-module-draws-the-tools]]
