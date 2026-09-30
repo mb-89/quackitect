@@ -25,6 +25,8 @@ const (
 	Port      = "tips"
 	TrunkPort = "trunk"
 	StoodPort = "stood"
+	// [[spec/tickets/check-sweep-reads-tracked]]
+	TrackedPort = "tracked"
 )
 
 // The folder a public ticket stands directly under, and the ending it carries, which TICKETS in src/engine/group.js names and a Go module spells again. [[spec/tickets/the-index-reads-standing-branches]]
@@ -60,6 +62,7 @@ type Git interface {
 	Tips() ([]ticket.Tip, error)
 	Trunk() ([]ticket.File, error)
 	Stood() (map[string]int64, error)
+	Tracked() ([]string, error)
 }
 
 // The refs as the last read found them, and the tips read off them, so a read over unmoved refs spawns one git. [[spec/tickets/the-index-reads-standing-branches]]
@@ -132,6 +135,21 @@ func (one *repo) Stood() (map[string]int64, error) {
 	}
 	one.headAt, one.stood = commit, stoodIn(said)
 	return one.stood, nil
+}
+
+// The paths git's own index holds, in the order git lists them, as trackedIn in src/index/door.go reads them. [[spec/tickets/check-sweep-reads-tracked]]
+func (one *repo) Tracked() ([]string, error) {
+	said, err := one.run(nil, "ls-files", "-z")
+	if err != nil {
+		return nil, err
+	}
+	out := []string{}
+	for _, at := range strings.Split(said, "\x00") {
+		if at != "" {
+			out = append(out, at)
+		}
+	}
+	return out, nil
 }
 
 // The boundary commits of a shallow clone, and nothing for a whole history. [[spec/tickets/verbs-queue-order]]
@@ -267,10 +285,11 @@ type FakeGit struct {
 	branches map[string]map[string]string
 	trunk    map[string]string
 	stood    map[string]int64
+	tracked  map[string]bool
 }
 
 func NewFake() *FakeGit {
-	return &FakeGit{branches: map[string]map[string]string{}, trunk: map[string]string{}, stood: map[string]int64{}}
+	return &FakeGit{branches: map[string]map[string]string{}, trunk: map[string]string{}, stood: map[string]int64{}, tracked: map[string]bool{}}
 }
 
 // Adds these paths on the checkout's history at the second given, so a path under the ticket folder came in then. [[spec/tickets/verbs-queue-order]]
@@ -278,10 +297,23 @@ func (one *FakeGit) Add(second int64, paths ...string) {
 	one.mu.Lock()
 	defer one.mu.Unlock()
 	for _, at := range paths {
+		one.tracked[at] = true
 		if strings.HasPrefix(at, ticketsFolder) {
 			one.stood[at] = second
 		}
 	}
+}
+
+// The paths the checkout's history adds, in path order. [[spec/tickets/check-sweep-reads-tracked]]
+func (one *FakeGit) Tracked() ([]string, error) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	out := make([]string, 0, len(one.tracked))
+	for at := range one.tracked {
+		out = append(out, at)
+	}
+	sort.Strings(out)
+	return out, nil
 }
 
 // [[spec/tickets/verbs-queue-order]]
@@ -371,6 +403,8 @@ func Registers(c *q.Catalog) q.Writer {
 		q.OutIn(c, Port, []ticket.Tip{}, q.Doc("every work branch standing on origin, with the ticket files on its tip and trunk's copy of its group ticket"), q.IO()),
 		q.OutIn(c, TrunkPort, []ticket.File{}, q.Doc("the ticket files on trunk as origin holds it"), q.IO()),
 		q.OutIn(c, StoodPort, map[string]int64{}, q.Doc("the second each path under the ticket folder came in on the checkout's history"), q.IO()),
+		// [[spec/tickets/check-sweep-reads-tracked]]
+		q.OutIn(c, TrackedPort, []string{}, q.Doc("the paths git's own index holds"), q.IO()),
 	)
 }
 
@@ -390,8 +424,12 @@ func Start(from Git, every func(time.Duration, func(time.Time)) func(), commit f
 		if err != nil {
 			stood = map[string]int64{}
 		}
+		tracked, err := from.Tracked()
+		if err != nil {
+			tracked = []string{}
+		}
 		moved := map[string]any{}
-		for port, value := range map[string]any{Port: tips, TrunkPort: trunk, StoodPort: stood} {
+		for port, value := range map[string]any{Port: tips, TrunkPort: trunk, StoodPort: stood, TrackedPort: tracked} {
 			if key, _ := json.Marshal(value); string(key) != last[port] {
 				last[port] = string(key)
 				moved[port] = value
