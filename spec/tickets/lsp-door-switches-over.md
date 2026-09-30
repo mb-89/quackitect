@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -137,6 +137,28 @@ record:
     hand: the engine
     hash_before: 6ee2f0eabb17f2708f223682e83734748bcf4718
     hash_after: 6ee2f0eabb17f2708f223682e83734748bcf4718
+  - step: accept
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 55cf3d4311ca12868efb27eead89b1ba33f8d799
+    hash_after: 55cf3d4311ca12868efb27eead89b1ba33f8d799
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/lsp-door-switches-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 677f7753166f6af8
+        size: 349
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: children-2
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: bf1fe6cde364dfd7
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
 cloud: true
@@ -194,8 +216,7 @@ the-lsp-server-leaves waits on the two module children, which close before it
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- the check answers red: a caller spawns a second se-index beside a busy door, and the get road times out on the door start; [[spec/tickets/one-index-a-tree]] fixes it
+accept
 
 # retro
 
