@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -237,6 +237,31 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/tickets/the-log-tab-reads-v1]]
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: d4b7cd57888119250e3e81e4319f8e7e1015ae54
+    hash_after: d4b7cd57888119250e3e81e4319f8e7e1015ae54
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 7343295707d8c3c4
+        size: 13099
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: a3a12f8afbc43705
+        size: 8428
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: 651e262af2241535
+        size: 12121
+    def: 08e16d07b0de477c
 ---
 
 # Ask
