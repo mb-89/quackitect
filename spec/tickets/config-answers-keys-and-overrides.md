@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 13bc68918f983603e2fa9774844673d085378537
+    hash_after: 13bc68918f983603e2fa9774844673d085378537
+    inputs:
+      - name: ask
+        hash: a85d7b24dea0e5fb
+        size: 1089
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,77 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The config module in `src/modules/config/config.go` gains one value and three actions, and the root's request router gains a road into a guard.
+
+- `config/keys`: a value derived off the layers `config/values` reads, plus the schema. `Registers` projects `spec/config/level0.schema.json` beside the two layer files, through `q.Also`, so the schema stands as `config/spec/config/level0.schema.json`. `config/keys` walks the schema's leaf entries in order. Each row carries the dotted key, the value's JSON literal and the layer answering it, through `winning`. A leaf the catalog declares no key for reads the two files alone, as `Layered` does. A key no layer sets carries its built-in literal and an empty layer.
+- `config/set {key, value}`: runs the `config` verb through `nodeRun`, as the view actions in `src/modules/verbs/actions.go` do. The verb types the value off the schema, writes the local file, or the tracked file for a shared key, and logs the line.
+- `config/override {key, value, window}`: lands an `override` change on `config/held`, with `Holder` set to the window. `Held` gains `By`, the holder of each override by full key name.
+- `config/opened {window}`: lands a new kind, `drop`, whose step keeps the overrides the window holds and drops every other.
+
+An action reaches no store today: `accepts` in `src/quack/main.go` routes `disk` and `node` alone. It takes the store's `Land`, and routes a request `store.land`, whose args name the fold and the event, to it. The request carries `NoUndo`, since a restart drops every override.
+
+Weighed: `config/set` could write the local file through `disk.write`. But an action reads no layer, so it cannot merge the key into the file's text. The node verb already merges, types and logs, and phase 10 moves every `nodeRun` at once.
+
+Assumed: two windows open side by side drop each other's overrides on open. The local file wipe did the same, so the owner loses nothing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/config/config.go Registers, which registers the schema projection, config/keys and the three actions
+- src/modules/config/config.go holds, which takes the drop kind and writes By
+- src/modules/config/config.go winning and Layered, which config/keys reads each row through
+- src/quack/main.go accepts, which routes store.land to the store
+- src/quack/main.go the index start at the Accept field, which hands accepts the store
+- src/quack/main_test.go TestTheRootAcceptsDiskAndRefusesEveryOtherModule, which calls accepts
+- src/quack/ticket_twins_test.go, which calls accepts
+- src/quack/described_test.go and src/quack/manager_test.go, which register the config module and read the catalog
+- src/quack/testdata/readers.golden.json and tree.golden.json, where the catalog's new names land
+- spec/design_output/model.md the config module chapter, which names what the module writes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/config/config_test.go TestConfigKeysNameEachLayer: a key set in the tracked file, one in the local file and one overridden each read their value and layer
+- src/modules/config/config_test.go TestConfigKeysCarryTheBuiltInWhereNoLayerSets: a key no layer sets reads its built-in literal and an empty layer
+- src/modules/config/config_test.go TestConfigSetRunsTheConfigVerb: the action answers one node request naming config, the key and the value
+- src/modules/config/config_test.go TestOpenedDropsTheOverridesOfOtherWindows: overrides for two windows, then opened for a third, leave none
+- src/quack/main_test.go TestTheRootLandsAStoreRequest: a store.land request folds its event into config/held
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/config/config.go
+- src/modules/config/config_test.go
+- src/quack/main.go
+- src/quack/main_test.go
+- src/quack/ticket_twins_test.go
+- src/quack/testdata/readers.golden.json
+- src/quack/testdata/tree.golden.json
+- spec/design_output/model.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every name here stands opened on this branch: Registers, holds, winning, Layered, Held, Change in config.go; accepts and its callers in main.go, main_test.go and ticket_twins_test.go; nodeRun in actions.go and verbs.go; readConfig in cli-check.js
+- git grep for accepts( and config.Registers names every caller above, and the goldens carry the catalog's names
+- the three done_when cases meet TestConfigKeysNameEachLayer, TestConfigSetRunsTheConfigVerb and TestOpenedDropsTheOverridesOfOtherWindows, and the check line meets ./RUNME.sh check
 
 ## tests-red
 
