@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/lsp-door-switches-over already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 2584487b2da2d2650c61ee6dae604661e34a933d
+    hash_after: 2584487b2da2d2650c61ee6dae604661e34a933d
+    inputs:
+      - name: ask
+        hash: 677f7753166f6af8
+        size: 349
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
 cloud: true
@@ -133,14 +145,20 @@ Done when the LSP's own server, port and index client leave the tree.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/lsp-module-draws-the-tools]], standard
+[[spec/tickets/lsp-module-serves-the-features]], standard
+[[spec/tickets/the-lsp-server-leaves]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each child moves one slice of the door and was reviewed whole at its own accept
+the tools, the features and the old server leaving add up to the goal; the tree holds no own server, port or index client, and test/contract/no-old-server.test.js holds it
+the-lsp-server-leaves waits on the two module children, which close before it
 
 # children
 
