@@ -1,0 +1,279 @@
+{
+  "tree": {
+    "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n",
+    "spec/tickets/done-one.md": "---\nkind: [[ticket]]\nstate: closed\n---\n\n# Ask\n",
+    "spec/config/level0.json": "{\"names\": {\"words\": 5}}\n"
+  },
+  "cases": [
+    {
+      "name": "a free verb passes",
+      "tool": "Bash",
+      "command": "./RUNME.sh ticket pull",
+      "decision": "pass"
+    },
+    {
+      "name": "a free verb beside a read passes",
+      "tool": "Bash",
+      "command": "cd /tree && ./RUNME.sh branch take 2>&1 | tail -20",
+      "decision": "pass"
+    },
+    {
+      "name": "a command naming no ticket",
+      "tool": "Bash",
+      "command": "ls",
+      "description": "list the files",
+      "decision": "refuse",
+      "text": "This write names no ticket. Open the description with <ticket>: what it does, where <ticket> names the open ticket this call serves: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a command naming a closed ticket",
+      "tool": "Bash",
+      "command": "ls",
+      "description": "done-one: list the files",
+      "decision": "refuse",
+      "text": "done-one stands closed. Open the description with <ticket>: what it does, where <ticket> names the open ticket this call serves: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a command naming no ticket that stands",
+      "tool": "Bash",
+      "command": "ls",
+      "description": "nope-one: list the files",
+      "decision": "refuse",
+      "text": "No ticket named nope-one stands under spec/tickets or .se/tickets. Open the description with <ticket>: what it does, where <ticket> names the open ticket this call serves: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a ticket outside the todo in hand",
+      "tool": "Bash",
+      "command": "ls",
+      "description": "a-ticket: list the files",
+      "todo": "a-todo",
+      "decision": "refuse",
+      "text": "a-ticket stands outside what is in hand. The working todo: a-todo. Open the description with <ticket>: what it does, where <ticket> names the open ticket this call serves: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "the todo in hand passes",
+      "tool": "Bash",
+      "command": "ls",
+      "description": "a-todo: list the files",
+      "todo": "a-todo",
+      "decision": "pass"
+    },
+    {
+      "name": "an open ticket passes",
+      "tool": "Bash",
+      "command": "ls",
+      "description": "a-ticket: list the files",
+      "decision": "pass"
+    },
+    {
+      "name": "a redirection into the tree",
+      "tool": "Bash",
+      "command": "echo hi > spec/notes.md",
+      "description": "a-ticket: write",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: echo hi > spec/notes.md\n\n  ShellWritesNothing\n    reads: spec/notes.md\n    A shell writes past every rule in this tree, so a redirection into spec/notes.md meets none. Read spec/notes.md with Read, and write it with mcp__level0__patch or mcp__level0__replace, naming the ticket the write serves in its ticket field.\n\nHold ShellWritesNothing for the rest of this turn."
+    },
+    {
+      "name": "an append into the tree",
+      "tool": "Bash",
+      "command": "echo hi >> src/a.js",
+      "description": "a-ticket: write",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: echo hi >> src/a.js\n\n  ShellWritesNothing\n    reads: src/a.js\n    A shell writes past every rule in this tree, so an append into src/a.js meets none. Read src/a.js with Read, and write it with mcp__level0__patch or mcp__level0__replace, naming the ticket the write serves in its ticket field.\n\nHold ShellWritesNothing for the rest of this turn."
+    },
+    {
+      "name": "a redirection into the scratch passes",
+      "tool": "Bash",
+      "command": "echo hi > /tmp/x.md",
+      "description": "a-ticket: write",
+      "decision": "pass"
+    },
+    {
+      "name": "a tee into the tree",
+      "tool": "Bash",
+      "command": "echo hi | tee README.md",
+      "description": "a-ticket: write",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: echo hi | tee README.md\n\n  ShellWritesNothing\n    reads: README.md\n    A shell writes past every rule in this tree, so tee into README.md meets none. Read README.md with Read, and write it with mcp__level0__patch or mcp__level0__replace, naming the ticket the write serves in its ticket field.\n\nHold ShellWritesNothing for the rest of this turn."
+    },
+    {
+      "name": "a sed in place",
+      "tool": "Bash",
+      "command": "sed -i s/a/b/ src/a.go",
+      "description": "a-ticket: write",
+      "decision": "pass"
+    },
+    {
+      "name": "a copy into the tree",
+      "tool": "Bash",
+      "command": "cp /tmp/x.md spec/x.md",
+      "description": "a-ticket: write",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: cp /tmp/x.md spec/x.md\n\n  ShellWritesNothing\n    reads: spec/x.md\n    A shell writes past every rule in this tree, so a copy into spec/x.md meets none. Read spec/x.md with Read, and write it with mcp__level0__patch or mcp__level0__replace, naming the ticket the write serves in its ticket field.\n\nHold ShellWritesNothing for the rest of this turn."
+    },
+    {
+      "name": "a heredoc into python",
+      "tool": "Bash",
+      "command": "python3 - <<EOF\nopen('spec/x.md', 'w').write('x')\nEOF",
+      "description": "a-ticket: write",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: python3 - <<EOF open('spec/x.md', 'w').write('x') EOF\n\n  ShellWritesNothing\n    reads: spec/x.md\n    A shell writes past every rule in this tree, so a heredoc into python3 into spec/x.md meets none. Read spec/x.md with Read, and write it with mcp__level0__patch or mcp__level0__replace, naming the ticket the write serves in its ticket field.\n\nHold ShellWritesNothing for the rest of this turn."
+    },
+    {
+      "name": "an inline script in node",
+      "tool": "Bash",
+      "command": "node -e \"require('fs').writeFileSync('src/a.js', 'x')\"",
+      "description": "a-ticket: write",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: node -e \"require('fs').writeFileSync('src/a.js', 'x')\"\n\n  ShellWritesNothing\n    reads: src/a.js\n    A shell writes past every rule in this tree, so an inline script in node into src/a.js meets none. Read src/a.js with Read, and write it with mcp__level0__patch or mcp__level0__replace, naming the ticket the write serves in its ticket field.\n\nHold ShellWritesNothing for the rest of this turn."
+    },
+    {
+      "name": "a landing after a semicolon",
+      "tool": "Bash",
+      "command": "./RUNME.sh check; ./RUNME.sh commit \"a-ticket: x\"",
+      "description": "a-ticket: land",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: ./RUNME.sh check; ./RUNME.sh commit \"a-ticket: x\"\n\n  LandingFollowsItsGate\n    reads: ./RUNME.sh commit\n    ./RUNME.sh commit runs whatever the command before it answers, so it lands over a failing gate. Join the two with &&, or run the landing alone once the gate answers green.\n\nHold LandingFollowsItsGate for the rest of this turn."
+    },
+    {
+      "name": "a landing after a double bar",
+      "tool": "Bash",
+      "command": "./RUNME.sh check || ./RUNME.sh ticket pull",
+      "description": "a-ticket: land",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: ./RUNME.sh check || ./RUNME.sh ticket pull\n\n  LandingFollowsItsGate\n    reads: ./RUNME.sh ticket pull\n    ./RUNME.sh ticket pull runs whatever the command before it answers, so it lands over a failing gate. Join the two with &&, or run the landing alone once the gate answers green.\n\nHold LandingFollowsItsGate for the rest of this turn."
+    },
+    {
+      "name": "a landing after a read passes",
+      "tool": "Bash",
+      "command": "git status; ./RUNME.sh ticket pull",
+      "description": "a-ticket: land",
+      "decision": "pass"
+    },
+    {
+      "name": "a landing after a gate joined passes",
+      "tool": "Bash",
+      "command": "./RUNME.sh check && ./RUNME.sh ticket pull",
+      "description": "a-ticket: land",
+      "decision": "pass"
+    },
+    {
+      "name": "a git add",
+      "tool": "Bash",
+      "command": "git add .",
+      "description": "a-ticket: stage",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git add .\n\n  GitWritesThroughAVerb\n    reads: git add\n    git add writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a git stash",
+      "tool": "Bash",
+      "command": "git stash",
+      "description": "a-ticket: stash",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git stash\n\n  GitWritesThroughAVerb\n    reads: git stash\n    git stash writes the repository, and the agent reaches git through the engine alone. No verb stashes. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a git reset",
+      "tool": "Bash",
+      "command": "git reset --hard HEAD~1",
+      "description": "a-ticket: reset",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git reset --hard HEAD~1\n\n  GitWritesThroughAVerb\n    reads: git reset\n    git reset writes the repository, and the agent reaches git through the engine alone. No verb moves a branch back. Put a write back with mcp__level0__undo, or ask a person.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a ticket moved by git",
+      "tool": "Bash",
+      "command": "git mv spec/tickets/a.md spec/tickets/b.md",
+      "description": "a-ticket: move",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git mv spec/tickets/a.md spec/tickets/b.md\n\n  TicketMovesByRename\n    reads: git mv\n    A ticket moves through ./RUNME.sh rename <from> <to>, which rewrites every link reaching it. git mv leaves each link pointing at the old name.\n\nHold TicketMovesByRename for the rest of this turn."
+    },
+    {
+      "name": "a git read passes",
+      "tool": "Bash",
+      "command": "git log --oneline -3",
+      "description": "a-ticket: read",
+      "decision": "pass"
+    },
+    {
+      "name": "a branch name past the cap",
+      "tool": "Bash",
+      "command": "git checkout -b one-two-three-four-five-six",
+      "description": "a-ticket: branch",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git checkout -b one-two-three-four-five-six\n\n  BranchNameHoldsFive\n    reads: one-two-three-four-five-six\n    A name holds at most 5 words, and one-two-three-four-five-six holds more. Cut it, or run ./RUNME.sh branch open <group>, which pushes the branch its group names.\n\nHold BranchNameHoldsFive for the rest of this turn."
+    },
+    {
+      "name": "a test run naming no file",
+      "tool": "Bash",
+      "command": "node --test",
+      "description": "a-ticket: test",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: node --test\n\n  TestRunPointsSomewhere\n    reads: node --test\n    ./RUNME.sh check runs the suite, the doors check and the plugin check, and node --test runs the suite alone. Run ./RUNME.sh check, or name one file: node --test test/level0/log.test.js.\n\nHold TestRunPointsSomewhere for the rest of this turn."
+    },
+    {
+      "name": "a private note staged",
+      "tool": "Bash",
+      "command": "git add .se/notes/x.md",
+      "description": "a-ticket: stage",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git add .se/notes/x.md\n\n  PrivateStaysHome\n    reads: .se/notes/x.md\n    .se is the private half, and git ignores it. .se/notes/x.md carries a raw note, a log line or a key, and a tracked file carries what an author writes for a reader outside this box. Write that, and leave .se/notes where it stands.\n\nHold PrivateStaysHome for the rest of this turn."
+    },
+    {
+      "name": "a commit through an editor",
+      "tool": "Bash",
+      "command": "git commit",
+      "description": "a-ticket: commit",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit\n\n  CommitCarriesItsMessage\n    reads: git commit\n    A commit through an editor is no thing an agent does, and a message no rule reads is prose nobody holds. Pass it: git commit -m \"...\", or -F <file>.\n\nHold CommitCarriesItsMessage for the rest of this turn."
+    },
+    {
+      "name": "a version branch pushed over",
+      "tool": "Bash",
+      "command": "git push --force origin v4",
+      "description": "a-ticket: push",
+      "decision": "refuse",
+      "text": "v4 is a version branch, and this command would rewrite it.\n\nA version branch holds a whole earlier tree. Nothing else carries it, and a\ndelete has already cost this tree one. So both push doors refuse the command.\n\nThe owner takes it off, in the repository's own branch rules."
+    },
+    {
+      "name": "the bless file named",
+      "tool": "Bash",
+      "command": "cat .se/.runtime/bless.json",
+      "description": "a-ticket: read",
+      "decision": "refuse",
+      "text": ".se/.runtime/bless.json is the owner's word on who blesses, and the sidebar button alone writes it. An agent reads and writes it nowhere."
+    },
+    {
+      "name": "a hand variable set",
+      "tool": "Bash",
+      "command": "export SE_CLOUD=1",
+      "description": "a-ticket: set",
+      "decision": "refuse",
+      "text": "SE_CLOUD name the hand and the box, so a command sets, exports, unsets or clears none of them. The environment decides who blesses."
+    },
+    {
+      "name": "the environment cleared",
+      "tool": "Bash",
+      "command": "env -i ls",
+      "description": "a-ticket: clear",
+      "decision": "refuse",
+      "text": "CLAUDE_CODE_REMOTE, SE_CLOUD, CLAUDECODE name the hand and the box, so a command sets, exports, unsets or clears none of them. The environment decides who blesses."
+    },
+    {
+      "name": "a PowerShell call naming no ticket",
+      "tool": "PowerShell",
+      "command": "Get-ChildItem",
+      "description": "list",
+      "decision": "refuse",
+      "text": "This write names no ticket. Open the description with <ticket>: what it does, where <ticket> names the open ticket this call serves: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a PowerShell call naming a ticket",
+      "tool": "PowerShell",
+      "command": "Get-ChildItem",
+      "description": "a-ticket: list",
+      "decision": "pass"
+    }
+  ]
+}

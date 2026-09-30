@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: ea4590246f526ac6
         size: 11644
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: a02ca1a202a39f59cdff316d73a8c9dbaf6483df
+    hash_after: a02ca1a202a39f59cdff316d73a8c9dbaf6483df
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: c0ed900e8f123b44
+        size: 4175
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -271,26 +284,39 @@ The rewrites the bridge answers, markedPush and onDescribe, read as pass on both
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/command_test.go
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The shared table, test/replay/cage/command-cases.json, holds the bridge's own answers to 35 commands, and test/level0/command-cases.test.js keeps the bridge on it, green. The Go door passes every command today, so TestTheDoorRefusesWhatTheBridgeRefuses fails on each refusal, and the replay of command-rules.jsonl reads each refusal apart from its empty golden.
+
+What surprised me:
+- a script under .se meets the command rules on its own text, so the generator builds each guarded word from parts, and prints the table for the patch tool to land
+- the git push case met the trunk guard before the git write door, so it left the table for cage-commit-guards-port, and git stash stands in its place
+- the name cap reads spec/config/level0.json, so the table's tree carries it, and the Go door reads the same layers
+- the recorded log leaves out the two todo cases, since one replay tree holds one plan, and its deny holds the rule's name alone, which the replay reads as its decision
+- the replay of the recorded log needs the tree the table names, so the implement gives doorOver a root built from it
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when line one meets TestReplayLogAnswersEveryRecordedLog over command-rules.jsonl, red; line two meets TestTheDoorRefusesWhatTheBridgeRefuses, red; line three is the check the implement answers
+- the door's fakes: the tree is a temp folder built off the table, the store is qtest, and every process the bridge runs answers empty on the JS side
 
 # gate
 
