@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: af127c0c7f909a02f39bb7f2aa1d693fdc56d86f
+    hash_after: af127c0c7f909a02f39bb7f2aa1d693fdc56d86f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: b0a81c2acc93e152
+        size: 801
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -341,26 +364,33 @@ What I weigh: the approach answers each done line. The three Go cases red on the
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/prompt_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door now answers an owner's prompt as the bridge does. The holds fold names the prompt's row and its rewrite, and the door answers the rewrite as a new event effect, opening on the answer-first line. A row writer in rows.go appends each row the folds name to the session log, in the Row shape the log module reads. The cage step maps the event effect back into the answer level0.js reads. Its case, an event effect answers the rewritten event, passes in cage.test.js. That file stays red on the clear ticket's own case until clear-answers-off-the-door closes. A prompt naming a note and the questions a prompt asks stay with the bridge until the doors flip.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches fold.go, hooks.go, rows.go and cage.js, each inside the draft's size
+- the row writer writes through the module's own disk, and each case builds its own temp tree
+- each new function carries a pointer at spec/tickets/prompt-answers-off-the-door
+- the row fills the Row the log module owns, and each copied path names folders.js beside it
 
 # accept
 
