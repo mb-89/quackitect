@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: f172a62732769c951cd8322939aa0ee246e35031
+    hash_after: f172a62732769c951cd8322939aa0ee246e35031
+    inputs:
+      - name: ask
+        hash: 347f33be92470662
+        size: 650
+      - name: [[spec/tickets/the-brief-leaves-the-bridge]]
+        hash: 19bd52b73471bf7a
+        size: 735
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +169,61 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The stops fold decides the clear at the turn's end, and the door answers it as a clear effect, as `clearsAfter` in src/bridge/handover.js does.
+
+1. At a turn complete of the main agent whose reason reads answer and whose handover stands at clear, `stepStops` in src/modules/hooks/stops.go drops the handover as today. Where `clearsHere` holds, it also says a clear word carrying the resume prompt. The prompt is `RESUME` in handover.js, spelled again under a pointer.
+2. `Door.Hook` in hooks.go answers that word as a clear effect whose text holds the prompt. It follows the stops fold's block answer, which reads a Stop alone.
+3. `stepOf` in .claude/skills/level0/hooks/cage.js maps a clear effect to an answer carrying pass and the clear prompt. `door` in level0.js already runs `clears` on `answer.clear`.
+
+The bridge keeps answering the turn's end until the-brief-leaves-the-bridge flips the doors, so this lands alone. What I weigh: the fold already holds the handover phase and the binding at the turn's end, so the decision stays pure and one effect carries it. I assume the turn complete event carries the facts the stops fold reads, since `stoppedOf` reads the holds on it today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stops.go: stepStops, at the turn complete
+- src/modules/hooks/hooks.go: Door.Hook, which answers the clear
+- .claude/skills/level0/hooks/cage.js: stepOf
+- .claude/skills/level0/hooks/level0.js: door, which reads stepOf and runs clears
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/clear_test.go: TestATurnCompleteWithTheClearInHandAnswersTheClear
+- src/modules/hooks/clear_test.go: TestATurnCompleteOffTheQueueKeepsTheConversation
+- test/level0/cage.test.js: a clear effect answers the clear prompt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stops.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/clear_test.go, new
+- .claude/skills/level0/hooks/cage.js
+- test/level0/cage.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened endsTurn in server.js, clearsAfter and RESUME in handover.js, stepOf in cage.js, clears in level0.js, and stepStops and holdsForHandover in stops.go, and each claim holds there
+- the callers list names the fold, the door, the cage's step and its reader
+- the first done line meets the clear case, the second the cage case, and the third the check
 
 ## tests-red
 
