@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -234,6 +234,9 @@ record:
         hash: 0d7bd743bbc7dc89
         size: 11159
     def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/tickets/the-log-tab-reads-v1]]
 ---
 
 # Ask
