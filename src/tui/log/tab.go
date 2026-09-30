@@ -44,6 +44,8 @@ type Tab struct {
 	Err      error
 	// The compare beside the tail, which the window hands the catalog. [[spec/design_output/model#the-log-is-a-view]]
 	Shadow *Shadow
+	// The catalog and the watch the tab reads through. [[spec/tickets/the-log-tab-reads-v1]]
+	From Watched
 }
 
 // The tab over the log at that path, following it from its first line. [[spec/design_output/tui#how-a-line-arrives]]

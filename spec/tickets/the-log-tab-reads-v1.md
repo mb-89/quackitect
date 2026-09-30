@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-streams-changes]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 7acc0ab40e14130e
         size: 487
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: e4aba5e415f51e7b7fa00184e0c04b72b1d5292a
+    hash_after: e4aba5e415f51e7b7fa00184e0c04b72b1d5292a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/log fails
+    inputs:
+      - name: design/draft
+        hash: d1372ecac93da55e
+        size: 2549
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -237,26 +250,31 @@ Weighed: each change carries the whole session's rows, which costs bytes on a lo
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/log/v1_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/log/v1_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The tab takes no `registry.Change`, so it holds no row, and `RecordOf` answers an empty record. The surprise: a map in the shadow's `Row` breaks the compares that test it for equality. So the road reads its own `IndexRow`, and the shadow's `Row` leaves with the compares.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fsnotify grep meets the change itself, the draw meets TestTheLogTabDrawsOffLogRows and TestTheDetailsDrawARowWhole, and the check closes it
+- the cases read through registry.Fake, the fake of the /v1 door, and touch no file
 
 # gate
 
