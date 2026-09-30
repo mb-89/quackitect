@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -181,6 +181,15 @@ record:
         hash: dd6885586879f5d3
         size: 1035
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: c8afc1cd42b0aa994f5b96991361a2dc95377ce2
+    hash_after: c8afc1cd42b0aa994f5b96991361a2dc95377ce2
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -354,14 +363,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches `src/q/scheduler.go`, `src/q/store.go` and `src/q/scheduler_test.go` alone
+the cases reach the store and `q/qtest` alone
+each new function names the ticket
+`filesPrefix` and `covers` stand once
 
 ## tests-green
 
