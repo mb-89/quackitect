@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -52,12 +53,51 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-2
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-2
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -65,7 +105,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate"]
+    input: ["design/draft", "gate", "design/draft-2"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -77,7 +117,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: design/tests-red
+        input: ["design/tests-red", "design/tests-red-2"]
         to: retro
         evidence:
           - name: tests
@@ -116,8 +156,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: lsp-door-switches-over
-step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +182,13 @@ record:
         hash: a3ccd4fce1d597b2
         size: 2489
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8932514a610d · claude-code-remote
+    hash_before: 50b811b3c1adefeff55a62f28b24b25be54c1add
+    hash_after: 50b811b3c1adefeff55a62f28b24b25be54c1add
+    returns: 1
+    why: "the approach moves hover, complete, links and fold into src/modules/lsp over a check.Tree, and the nomodule import rule refuses a module importing another, so TestTheTreeHoldsTheImportRules turns the check red; the four features call some twenty check helpers through the src/lsp aliases, so a copy into lsp makes a second owner of each; the redraft: the four reads move into src/modules/check as exported functions over its Tree, and lsp takes them through the Check ports lsp-module-draws-the-tools lands, which lspChecks in src/quack/lsp.go fills"
+group: lsp-door-switches-over
 ---
 
 # Ask
@@ -286,6 +331,74 @@ Each case fails on its own assertion: initialize announces text sync alone, and 
 - each method line meets its case in features_test.go, and the check line meets ./RUNME.sh check at the build
 - the cases reach no door: the files come in through Files, and the store is the qtest fake
 
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -293,8 +406,12 @@ Each case fails on its own assertion: initialize announces text sync alone, and 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- the approach moves hover, complete, links and fold into src/modules/lsp over a check.Tree, and the nomodule import rule refuses a module importing another, so TestTheTreeHoldsTheImportRules turns the check red
+- the four features call some twenty check helpers through the src/lsp aliases, so a copy into lsp makes a second owner of each
+- the redraft: the four reads move into src/modules/check as exported functions over its Tree, and lsp takes them through the Check ports lsp-module-draws-the-tools lands, which lspChecks in src/quack/lsp.go fills
 
 # implement
 
