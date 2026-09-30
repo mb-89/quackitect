@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: "spec/tickets/index-reads-loaded-projections.md:296:153: Characters: The character / stands outside the set a paragraph a"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 75b9a04d8ea531ca528a7743a2454be6d358d3d7
+    hash_after: 75b9a04d8ea531ca528a7743a2454be6d358d3d7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 3 file(s); green, src/modules/verbs passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/index-reads-loaded-projections.md:296:153: Characters: The character / stands outside the set a paragraph a"
+    inputs:
+      - name: design/tests-red
+        hash: 30e9911a371b1eed
+        size: 752
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -332,26 +355,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/cli-leaves.test.js test/level0/verb-line.test.js test/level0/verb-run.test.js src/modules/verbs src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+cli.js leaves the tree, and with it the second verb table. Commands in src/modules/verbs/tree.go holds every verb and its usage line, and TreeVerbs reads it less the topics. Each verb runs a program of its own under src/scripts/verbs, a few lines over verb-run.js, which reads the words past the verb, guards the main and exits drained. The bodies cli.js held move by topic: check-verb.js, vehicle-verb.js and mint-verb.js, and serveBridge and renameHere into their own programs. quack verb runs the program where no twin answers, and prints the usage off Commands for help or a verb it knows nowhere. RUNME.sh hands quack the scripts folder, and runs the program straight where no binary stands. Every spawn, the hook, the lens, the cage and the places verb name the program. Weighed and changed from the draft: serveBridge and renameHere stand in their programs, not in serve.js and rename.js, since those libraries load elsewhere and would open every door at import. The shadow road in verbs.go stays, its old door running the program, since the ask removes cli.js alone and the slice mode still reads there. The cloud guard in copilot-runtime.js reads branch.js as the branch verb, since a program path slipped past its words. Assumed: the quack binary stands wherever a verb runs, since install.sh builds it first.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the green run touches the files the change touched, and adds test/contract/verb-programs.test.js and a places case, which the commit door asks beside the programs
+- the new contract case drives the real disk through the programs, and the level0 cases keep their fakes
+- each new test file opens on a header naming [[spec/tickets/cli-js-leaves]]
+- the table reader in test/contract/commands.js reads Commands off tree.go, so no test copies a usage line
 
 # accept
 
