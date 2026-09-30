@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -257,6 +257,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: f5b6101f905a55f1a62ae5ef4e9337eb9629c1de
+    hash_after: f5b6101f905a55f1a62ae5ef4e9337eb9629c1de
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/cage-rules-port-before-switch.md:482:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 8a7fd2a70caf0128
+        size: 941
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -430,26 +453,33 @@ go build ./... && ./RUNME.sh lint src/modules/hooks
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The replay log test/replay/cage/every-refusal.jsonl carries one call of each refusal the live cage shadow met. Its golden shadow names the rows the Go door still passes. Each child in this group ports one rule family and deletes the rows that family decides. The group accept reads the golden shadow empty and a live shadow read clean before migration.cage moves to new.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the parent touches no file past its replay log and golden shadow
+- the parent reaches no door; each child carries the fake its port needs
+- the replay test carries its pointer at spec/tickets/cage-rules-replay-session-logs
+- the golden shadow stands once, in test/replay/cage/every-refusal.shadow.jsonl
 
 # accept
 
