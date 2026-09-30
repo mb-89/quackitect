@@ -244,8 +244,8 @@ test rule and the desk guard do. The verb answers what passes them all.
 is the carrot to the sticks above.
 
 Bash's description gains a paragraph naming the tree's verbs, and `VERBS` in
-`lib/bash.js` holds the list. A contract test reads `src/scripts/cli.js` and
-asserts every named verb stands there. So the carrot points at a road that
+`lib/bash.js` holds the list. A contract test reads `src/scripts/verbs` and
+asserts every named verb stands there as a program. So the carrot points at a road that
 runs.
 
 The engine caches a rendered description for the session, so `verbLine()` takes

@@ -92,6 +92,8 @@ var modules = map[string]ioModule{
 	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
 	// [[spec/tickets/work-verbs-become-actions]]
 	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
+	// [[spec/tickets/agents-call-quack-directly]]
+	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
 }
 
 // A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]

@@ -43,12 +43,12 @@ func NewScheduler(s *Store, spawn func(run func()), failed func(name string, err
 	return one
 }
 
-// Names every derived provider an owner's move runs. A family keyed by <key> stays out, since Store.Run takes a concrete name, and the wave owns it. [[spec/tickets/one-wave-settles-a-change]]
+// Names every derived provider an owner's move runs. A keyed family stays out, past a loaded projection, which the wave runs per concrete key. [[spec/tickets/index-reads-loaded-projections]]
 func readersOf(s *Store) map[string][]string {
 	readers := map[string][]string{}
 	for _, group := range s.groups {
 		one := s.active[group.name]
-		if one.kind != derived || keyed(group.name) {
+		if one.kind != derived || (keyed(group.name) && one.keyed == nil) {
 			continue
 		}
 		for _, in := range one.inputs {
@@ -125,11 +125,36 @@ func (one *Scheduler) listOf(owner string) []string {
 
 func (one *Scheduler) byHeight(names []string) {
 	sort.SliceStable(names, func(i, j int) bool {
-		if one.heights[names[i]] != one.heights[names[j]] {
-			return one.heights[names[i]] < one.heights[names[j]]
+		if one.heightOf(names[i]) != one.heightOf(names[j]) {
+			return one.heightOf(names[i]) < one.heightOf(names[j])
 		}
 		return names[i] < names[j]
 	})
+}
+
+// A concrete name stands at its family's height. [[spec/tickets/index-reads-loaded-projections]]
+func (one *Scheduler) heightOf(name string) int {
+	if at, ok := one.heights[name]; ok {
+		return at
+	}
+	if group := resolve(one.store.groups, name); group != nil {
+		return one.heights[group.name]
+	}
+	return 0
+}
+
+// The concrete names a loaded family runs for: one a moved file its globs cover. [[spec/tickets/index-reads-loaded-projections]]
+func (one *Scheduler) concreteOf(family string, names []string) []string {
+	reg := one.store.active[family]
+	prefix := strings.TrimSuffix(family, "<path...>")
+	var out []string
+	for _, name := range names {
+		key, ok := strings.CutPrefix(name, filesPrefix)
+		if ok && reg.covers(key) {
+			out = append(out, prefix+key)
+		}
+	}
+	return out
 }
 
 // A commit from outside a wave starts one, and a commit during a wave joins the next. [[spec/design_output/model#one-wave-settles-a-change]]
@@ -173,9 +198,16 @@ func (one *Scheduler) waves() {
 			}
 			moved[owner.name] = true
 			for _, reader := range one.listOf(owner.name) {
-				if !seen[reader] {
-					seen[reader] = true
-					order = append(order, reader)
+				// A loaded family runs as the concrete names the wave's files cover. [[spec/tickets/index-reads-loaded-projections]]
+				runs := []string{reader}
+				if keyed(reader) {
+					runs = one.concreteOf(reader, names)
+				}
+				for _, run := range runs {
+					if !seen[run] {
+						seen[run] = true
+						order = append(order, run)
+					}
 				}
 			}
 		}
@@ -201,16 +233,24 @@ func (one *Scheduler) wave(order []string, moved map[string]bool) {
 		}
 		if !one.watched(name, map[string]bool{}) {
 			one.hold(name, view.Revision)
-			moved[name] = true
+			one.marks(moved, name)
 			continue
 		}
 		view = one.settle(name, view, pushed)
 		if _, ok := pushed[name]; ok {
-			moved[name] = true
+			one.marks(moved, name)
 		}
 	}
 	if len(pushed) > 0 {
 		one.store.push(pushed)
+	}
+}
+
+// Marks a name moved, and its family beside it, so a reader of the family runs in the same wave. [[spec/tickets/index-reads-loaded-projections]]
+func (one *Scheduler) marks(moved map[string]bool, name string) {
+	moved[name] = true
+	if group := resolve(one.store.groups, name); group != nil {
+		moved[group.name] = true
 	}
 }
 

@@ -219,6 +219,15 @@ func TestLayeredNamesTheLayer(t *testing.T) {
 	}
 }
 
+// The tracked file reaches a shared key through the waves alone, with no run a case names. [[spec/tickets/index-reads-loaded-projections]]
+func TestValuesReadTheTrackedFile(t *testing.T) {
+	ix := layered(t, "migration", switched)
+	ix.Seed(files(`{"migration": {"switch": 3}}`, `{}`))
+	if got := ix.Read("migration/config/switch"); got != 3 {
+		t.Fatalf("migration/config/switch reads %v, where the tracked file says 3", got)
+	}
+}
+
 // A kebab-case local name reads its camel-case member of the file. [[spec/tickets/the-config-schema-gets-generated]]
 func TestAKebabKeyReadsItsCamelCaseMember(t *testing.T) {
 	tracked, err := q.JSON.Parse([]byte(`{"stop": {"mostInARow": 4}}`))

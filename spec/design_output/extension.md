@@ -342,7 +342,7 @@ the keys that program needs, and the declaration carries them beside the
 
 The hook stands before the log in the agent control, and it is a `process`
 widget: a button for a program the extension itself runs. A click starts the
-server behind the bridgehead detached, through the proc door's `respawn`. A
+server behind the bridgehead apart from the window, through the proc door's `respawn`. A
 click on a running one stops it over the wire. The server outlives the
 window, and the next window adopts it. Shift and click starts it under the editor's debugger,
 through the launch config the declaration names. The light says which: dark
@@ -634,7 +634,7 @@ counts, the way [[spec/design_output/pull#the-hand-rule]] reads it.
 
 ## A button runs the pull
 
-Each button runs `ticket pull` through `src/scripts/cli.js` of the method, as a
+Each button runs `pull` through `src/scripts/verbs/ticket.js` of the method, as a
 child of the extension:
 
 | the button | the line |

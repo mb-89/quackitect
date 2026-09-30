@@ -21,6 +21,7 @@ import { MESSAGE_HOW, ticketFault, ticketOf } from "../engine/named.js";
 import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
 import { coldIn, probeCold } from "./probe-cold.js";
 import { BY as RENAMED } from "./rename.js";
+import { verbArgv } from "./verb-run.js";
 
 const USAGE = ['Usage: ./RUNME.sh commit "<message>" [<path>...] [--no-push]'];
 
@@ -79,12 +80,9 @@ async function landsAndPushes(it, argv, message, paths) {
     return 1;
   }
   // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
-  const tested = it.proc.run(
-    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "test"],
-    {
-      cwd: it.root,
-    },
-  );
+  const tested = it.proc.run(verbArgv(it.node, it.root, ["test"], it.join), {
+    cwd: it.root,
+  });
   if (tested.exitCode !== 0) {
     console.error("The tests answer red, so nothing stages and nothing lands:");
     console.error(saidBy(tested) || "the test run answers nothing");
@@ -123,10 +121,9 @@ async function landsAndPushes(it, argv, message, paths) {
     return 1;
   }
 
-  const ran = it.proc.run(
-    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check"],
-    { cwd: it.root },
-  );
+  const ran = it.proc.run(verbArgv(it.node, it.root, ["check"], it.join), {
+    cwd: it.root,
+  });
   if (ran.exitCode !== 0) {
     console.error("The check answers red on this commit, so no push reaches origin.");
     // The check writes its faults to the error stream, so one stream names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]

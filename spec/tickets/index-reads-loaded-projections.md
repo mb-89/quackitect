@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: design
     steps:
@@ -117,6 +117,102 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: c44fed0452570fad3391dfac3d0850edcf4ce3dd
+    hash_after: c44fed0452570fad3391dfac3d0850edcf4ce3dd
+    inputs:
+      - name: ask
+        hash: d469d84a5fa315bf
+        size: 923
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d85989c4d4d5 · claude-code-remote
+    hash_before: 078fa90f6853d0c8ae97696ab88c6e729dee52ff
+    hash_after: 078fa90f6853d0c8ae97696ab88c6e729dee52ff
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: ef1962777dcbd748
+        size: 4357
+    def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: ask
+  - step: design/draft
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: d80f5dfc926949dd93f6dac9ea30fe6cafca14ed
+    hash_after: d80f5dfc926949dd93f6dac9ea30fe6cafca14ed
+    inputs:
+      - name: ask
+        hash: e07c6471d1922e43
+        size: 925
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 3f480422f34e40d763bdfdda73d52e00e3c947ad
+    hash_after: 3f480422f34e40d763bdfdda73d52e00e3c947ad
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: 37c497d04da200ac
+        size: 4528
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8888f6242d7 · claude-code-remote · helper-7
+    hash_before: 8e02f9ad55209003941d6cf008599d83cf949745
+    hash_after: 8e02f9ad55209003941d6cf008599d83cf949745
+    inputs:
+      - name: design/draft
+        hash: 37c497d04da200ac
+        size: 4528
+      - name: design/tests-red
+        hash: dd6885586879f5d3
+        size: 1035
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: c8afc1cd42b0aa994f5b96991361a2dc95377ce2
+    hash_after: c8afc1cd42b0aa994f5b96991361a2dc95377ce2
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: c634e7e32068ff8c3fcb5be273ee135c1d63263c
+    hash_after: c634e7e32068ff8c3fcb5be273ee135c1d63263c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes; green, src/modules/config passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/index-reads-loaded-projections.md:342:153: Characters: The character / stands outside the set a paragraph a"
+    inputs:
+      - name: design/tests-red
+        hash: dd6885586879f5d3
+        size: 1035
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -167,38 +263,72 @@ from: none, the note config-reads-the-tracked-file
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The scheduler runs a loaded projection per concrete key, off the files/ names a wave moves.
+
+Today `readersOf` in src/q/scheduler.go skips every keyed family, so a move of `files/<key>` reaches no loaded projection, and `Snapshot.Read` answers the family's default. `Store.Run` holds the per-key parse, and only the TUI, the LSP and qtest call it.
+
+1. `readersOf` takes a keyed family into the graph where its registration carries `keyed`, so `files/<path...>` names every loaded family as a reader, and `config/values` stays a reader of `config/<path...>`. A keyed family without `keyed` stays out, as now.
+2. `waves` expands a loaded family in the list to the concrete names `<family>/<key>`, one for each moved `files/<key>` its globs cover, through `registration.covers`. A key no glob covers adds nothing.
+3. `byHeight` reads the height of a concrete name off its owner group, so a concrete loaded name runs at its family's height, below `config/values`.
+4. `Store.settle` calls `one.keyed(view, name)` where the registration carries it, and `one.run(view)` otherwise, as `Store.Run` does. A parse error reaches `failed`.
+5. `wave` marks the owner group moved after a concrete name settles, beside the concrete name, so `reads` finds `config/<path...>` moved and `config/values` runs in the same wave.
+
+The index starts the scheduler before the IO modules (src/index/door.go), so the watch's start commit of the whole tree reaches step 2, and every loaded projection meets the tree at start. `migration/config/config` resolves through `config/values`, which reads `config/spec/config/level0.json`, so it answers the tracked file's value once step 5 holds.
+
+The strongest objection: a lazy parse inside `Snapshot.Read` fixes the read with a smaller diff. It commits nothing, so no derived reader such as `config/values` reruns, and the migration row stays `old`. The wave carries the change to the readers, so the fix belongs there.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/q/scheduler.go NewScheduler: calls readersOf
+- src/q/scheduler.go Scheduler.waves: calls listOf and byHeight, and gains the expansion
+- src/q/scheduler.go Scheduler.listOf: calls byHeight
+- src/q/scheduler.go Scheduler.wave: gains the owner mark after a settle
+- src/q/scheduler.go Scheduler.settle: calls Store.settle
+- src/q/store.go Store.onMove: reaches Scheduler.moved, which queues the waves
+- src/index/door.go start: calls NewScheduler
+- src/q/qtest/qtest.go: calls NewScheduler
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/q/scheduler_test.go TestALoadedProjectionReadsASeededFile: a seeded files/<key> commit answers the parsed value at <family>/<key>
+- src/q/scheduler_test.go TestALoadedProjectionFollowsAFileChange: a second commit of files/<key> answers the new parse
+- src/q/scheduler_test.go TestALoadedProjectionFeedsADerivedReader: a derived provider reading the concrete loaded name reruns in the same wave
+- src/q/scheduler_test.go TestAKeyOutsideTheGlobsRunsNothing: a files/ name no glob covers leaves the family at its default
+- src/modules/config/config_test.go TestValuesReadTheTrackedFile: a seeded files/spec/config/level0.json setting migration/config to shadow answers shadow through config/values
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the ask moved in wording alone, one sentence split in two, so the approach stands as drafted, and the four red cases still fail on the merged code for the cause the draft names
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/q/scheduler.go
+- src/q/store.go
+- src/q/scheduler_test.go
+- src/modules/config/config_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file, function and verb the approach names stands opened, and each claim checked there: read readersOf, heightsOf, keyed, listOf, byHeight, moved, waves, wave, settle and reads in src/q/scheduler.go, ProjectIn and covers in src/q/projection.go, Store.settle, Store.Run and Snapshot.Read in src/q/store.go, the start order in src/index/door.go, layersIn and Registers in src/modules/config/config.go, and the slices in src/modules/migration/migration.go
+the callers list names every caller of what the approach changes: grep over src for NewScheduler, readersOf, byHeight, settle and Store.Run; Store.Run keeps its callers and its behaviour, so the TUI and the LSP stand off the list
+every done_when line names the test that decides it: the first line meets the four scheduler cases and the config case under ./RUNME.sh test; the curl line stands a checkpoint the hand answers at tests-green against a running index, since no command in the tree drives V1 over a seeded file; the check line meets ./RUNME.sh check at tests-green
 
 ## tests-red
 
@@ -207,26 +337,32 @@ from: none, the note config-reads-the-tracked-file
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/q/scheduler_test.go
+- src/modules/config/config_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three scheduler cases read the family's default, an empty list, after the file lands, and the derived reader reads 0. The config case reads the key's default 0 where the tracked file says 3, so the migration row of the ask fails the same way. The out-of-glob case passes before the change, since it guards the default the fix keeps. No surprise: the failures match the draft's cause, a keyed family standing outside the scheduler's graph.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides: the first line meets the three scheduler cases and the config case, the curl line stays a checkpoint at tests-green against a running index, and the check line meets the check at tests-green
+every door the tests reach has a fake: the scheduler cases reach the store alone, and the config case runs over the fake index in q/qtest, seeding files/ as the case
 
 # gate
 
@@ -235,8 +371,11 @@ from: none, the note config-reads-the-tracked-file
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- loaded-projection-test-names-match: the draft names a `shadow` value for the config case, and the case seeds `switch` at 3. Align the tests list with the case.
+- loaded-projection-curl-checkpoint: the curl line has no command. The hand answers it at tests-green against a running index, and the evidence names the reply.
 
 # implement
 
@@ -247,14 +386,19 @@ from: none, the note config-reads-the-tracked-file
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches `src/q/scheduler.go`, `src/q/store.go` and `src/q/scheduler_test.go` alone
+the cases reach the store and `q/qtest` alone
+each new function names the ticket
+`filesPrefix` and `covers` stand once
 
 ## tests-green
 
@@ -263,26 +407,33 @@ from: none, the note config-reads-the-tracked-file
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/q src/modules/config
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The scheduler runs a loaded projection once per concrete key a wave moves, so the index answers the parsed file the watch holds, and no longer the family default. `curl` over V1 at `migration/config/cage` answers `shadow`, the value `spec/config/level0.json` holds, over a built-in `old`. The ask's `migration/config/config` takes `new` alone and decides nothing, as the Discussion says.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches `src/q/scheduler.go`, `src/q/store.go` and `src/q/scheduler_test.go` alone, each inside the ask
+the change reaches no door: the cases run against the store and `q/qtest`
+each comment the change adds names this ticket, which carries the approach
+`filesPrefix` and `covers` stand once, and the Discussion points at the cases instead of repeating them
 
 # accept
 
@@ -307,3 +458,6 @@ from: none, the note config-reads-the-tracked-file
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- the config case: `TestValuesReadTheTrackedFile` in `src/modules/config/config_test.go` seeds `migration.switch` at 3 and reads 3 at `migration/config/switch`. The draft's tests list names a `shadow` value, and the case decides this claim in its place. [[spec/tickets/loaded-projection-test-names-match]]
+- the curl line: `migration/config/config` takes `new` alone, so its reply decides nothing. The checkpoint reads `migration/config/cage`, which answers `shadow` off the tracked file over a default of `old`. [[spec/tickets/loaded-projection-curl-checkpoint]]

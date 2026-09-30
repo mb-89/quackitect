@@ -1,5 +1,5 @@
-// The Go twins of the verbs cli.js answers, each a read the index holds. The
-// road runs each beside cli.js in shadow, and alone under new.
+// The Go twins of the verbs a program answers, each a read the index holds.
+// The road runs each beside the program in shadow, and alone under new.
 // [[spec/tickets/ticket-verbs-become-actions]]
 package main
 
@@ -150,15 +150,19 @@ func branchQueue(v1 func() (string, error)) twin {
 	}
 }
 
-// The node module: runs cli.js under the root with the request's words, and answers its output. [[spec/tickets/ticket-verbs-become-actions]]
+// The node module: runs the verb's program under the root with the request's words, and answers its output. [[spec/tickets/cli-js-leaves]]
 func nodeAccept(root string) func(q.Request) (any, error) {
-	cli := filepath.Join(root, "src", "scripts", "cli.js")
+	scripts := filepath.Join(root, "src", "scripts")
 	return func(asked q.Request) (any, error) {
 		args, err := wordsOf(asked.Args)
 		if err != nil {
 			return nil, err
 		}
-		run := exec.Command("node", append([]string{cli}, args...)...)
+		if len(args) == 0 {
+			return nil, fmt.Errorf("the node module takes a verb, and reads no words")
+		}
+		argv := programOf(scripts, args)
+		run := exec.Command(argv[0], argv[1:]...)
 		run.Dir = root
 		said, err := run.CombinedOutput()
 		text := strings.TrimRight(string(said), "\n")

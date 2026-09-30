@@ -147,8 +147,11 @@ test("handed prints the whole hand-out and writes a hold with no rest where no c
   const { it, disk } = doors(standing());
   const { code, said } = heard(() => pulling(PULL_ROOT, ["pull"], it));
   assert.equal(code, 0);
-  assert.match(said, /ticket pull a-child --pass/);
+  assert.match(said, /index_ticket_pull with args \["a-child","--pass"/);
   assert.doesNotMatch(said, /for the rest/);
+  // The verbs slice stands at new, so the hand-out reads no registry beside the table. [[spec/tickets/agents-call-quack-directly]]
+  const ran = (it.proc?.ran ?? []).map((one) => one.argv.join(" "));
+  assert.ok(!ran.some((one) => one.includes("index/actions")), ran.join("\n"));
   const hold = JSON.parse(disk.read(HOLD));
   assert.equal(hold.step, "design/draft");
   assert.equal(hold.rest, undefined);

@@ -598,11 +598,9 @@
         },
         "verbs": {
           "type": "string",
-          "default": "old",
-          "help": "The road ./RUNME.sh hands a verb down: old answers alone, shadow runs quack beside it and logs a mismatch, new answers quack's.",
+          "default": "new",
+          "help": "The road a verb runs, switched over in phase 4. Each verb quack answers runs alone.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },

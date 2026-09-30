@@ -1,4 +1,4 @@
-// The ticket verb list holds every verb cli.js answers under ticket, each with
+// The ticket verb list holds every verb the verb's program answers under ticket, each with
 // its doc, and each verb of a topic stands as an action handing its words to
 // the node module under the topic and the verb.
 // [[spec/tickets/ticket-verbs-become-actions]]

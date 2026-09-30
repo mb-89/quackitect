@@ -21,7 +21,7 @@ import {
   RULE as GRID,
   lineOf,
 } from "../extension/lib/grid.js";
-import { answerOf, keptOf, PAST, quackAt, readsNew } from "../scripts/quack-topic.js";
+import { answerOf, keptOf, PAST, readsNew } from "../scripts/quack-topic.js";
 import { assemble } from "../scripts/styles.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
@@ -155,20 +155,6 @@ export function voiceOver(it, path, text, span = {}) {
     (fault) => REFUSES.has(fault.severity) && fault.line >= first && fault.line <= last,
   );
   return found;
-}
-
-// The doors a shadow takes off a caller's own: its config, its log and its processes. A caller naming no config or no log runs no shadow. [[spec/tickets/prose-shadow-hooks-reads-text]]
-export function shadowDoorsOf(it) {
-  if (!it?.config?.ask || !it?.log?.say || !it?.proc?.run) return null;
-  const root = it.method ?? it.root;
-  return {
-    settings: it.config,
-    files: it.disk,
-    proc: it.proc,
-    log: it.log,
-    root,
-    binary: quackAt(it.disk, it.join, root),
-  };
 }
 
 // The Vale call the lint and the pull share, on the config the assembly writes. A caller adds the paths or the stdin path. [[spec/design_output/pull#the-voice-reads-the-evidence]]

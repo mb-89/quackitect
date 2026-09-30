@@ -20,6 +20,7 @@ import { PERSON, roleOf } from "./pull-hand-of.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 import { notesOf, processNameOf } from "./quack-topic.js";
+import { callOf } from "./tool-call.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
 const NO_COMMAND = 127;
@@ -67,11 +68,11 @@ export function workAnswer(it, one, leaf) {
   rows.push("");
   if (leaf.evidence.some((field) => field.form === "verdict")) {
     rows.push(
-      `Hand it back with ./RUNME.sh ticket pull ${one.name} --fields '<json>', and the verdict field decides.`,
+      `Hand it back with ${callOf("ticket", "pull", [one.name, "--fields", "<json>"])}, and the verdict field decides.`,
     );
   } else {
     rows.push(
-      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass --fields '<json>', or --fail "why", or --became <ticket>, or --answered <ticket>.`,
+      `Hand it back: ${callOf("ticket", "pull", [one.name, "--pass", "--fields", "<json>"])}, or --fail "why", --became <ticket> or --answered <ticket> in place of --pass.`,
     );
   }
   return rows.join("\n");

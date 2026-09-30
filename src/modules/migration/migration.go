@@ -46,7 +46,7 @@ var slices = []struct {
 	{GuidanceKey, "new", "The rules a step reads, switched over in phase 4.", []string{"new"}},
 	{CheckKey, "new", "The check twins, switched over in phase 4.", []string{"new"}},
 	{ProseKey, "new", "The prose checks, switched over in phase 4.", []string{"new"}},
-	{VerbsKey, "old", "The road ./RUNME.sh hands a verb down: old answers alone, shadow runs quack beside it and logs a mismatch, new answers quack's.", modes},
+	{VerbsKey, "new", "The road a verb runs, switched over in phase 4. Each verb quack answers runs alone.", []string{"new"}},
 	{CageKey, "old", "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's.", modes},
 	{WindowKey, "old", "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's.", modes},
 	{SidebarKey, "old", "The sidebar: old draws its own groups alone, shadow weighs the views section against them and logs each pair apart, new draws the views section.", modes},

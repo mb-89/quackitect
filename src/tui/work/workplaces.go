@@ -18,8 +18,8 @@ import (
 // The survey's file, whose folder .claude/skills/level0/lib/folders.js owns and whose name src/modules/check/tree.go spells too, because a Go module imports no JavaScript. [[spec/design_output/tools#what-the-survey-writes]]
 const toolsAt = ".se/.runtime/tools.json"
 
-// The verb answering the places, off the command line every verb rides. [[spec/design_output/work#one-reading-answers-git]]
-var placesVerb = []string{"src/scripts/cli.js", "branch", "list", "--json"}
+// The verb answering the places, off the branch verb's program. [[spec/tickets/cli-js-leaves]]
+var placesVerb = []string{"src/scripts/verbs/branch.js", "list", "--json"}
 
 // The verb reads git, so a run past this span reads as a box with no git. [[spec/design_output/tui#the-work-tab]]
 const placesWait = 60 * time.Second

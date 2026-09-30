@@ -100,11 +100,13 @@ const edited = (where, change) => {
 };
 
 // [[spec/design_output/bash#the-description-names-verbs]]
-test("every verb the Bash description names stands in the command line", () => {
-  const said = files.read(join(SCRIPTS, "cli.js"));
+test("every verb the Bash description names stands as a program", () => {
   assert.ok(VERBS.length, "the description names at least one verb");
   for (const verb of VERBS) {
-    assert.match(said, new RegExp(`\\n  ${verb}: \\{`), `./RUNME.sh ${verb} stands`);
+    assert.ok(
+      files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
+      `./RUNME.sh ${verb} stands`,
+    );
   }
 });
 

@@ -17,7 +17,6 @@
     "phase8shadow": true,
     "phase8switch": true,
     "phase9shadow": true,
-    "verbs": "shadow",
     "cage": "shadow",
     "window": "shadow",
     "sidebar": "shadow",

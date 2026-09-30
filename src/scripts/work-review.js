@@ -140,7 +140,8 @@ function checkOn(it, at) {
     it.disk.link(it.join(it.root, rel), it.join(where, rel));
   }
 
-  const ran = it.proc.run([it.node, "src/scripts/cli.js", "check"], { cwd: where });
+  // The worktree reads its own check program, off the path relative to it. [[spec/tickets/cli-js-leaves]]
+  const ran = it.proc.run([it.node, "src/scripts/verbs/check.js"], { cwd: where });
   // The links go first, so the removal below keeps to the worktree. [[spec/design_output/review#a-worktree-runs-the-check]]
   for (const rel of borrowed) it.disk.remove(it.join(where, rel));
   it.git.run(["worktree", "remove", "--force", where], true);

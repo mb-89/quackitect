@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import test from "node:test";
 import { disk } from "../../src/doors/disk.js";
-import { verbs } from "../../src/scripts/cli.js";
+import { commands } from "./commands.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
 const SKILLS = ["dispatch", "work"];
@@ -46,7 +46,7 @@ test("every verb a skill names stands among the verbs help lists", () => {
   for (const name of SKILLS) {
     const used = named(skill(name));
     assert.ok(used.length, `${name} names no verb`);
-    for (const verb of used) assert.ok(verb in verbs, `${name} names ${verb}`);
+    for (const verb of used) assert.ok(commands().has(verb), `${name} names ${verb}`);
   }
 });
 

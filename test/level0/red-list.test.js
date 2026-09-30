@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { resolve } from "node:path";
-import { testArgv } from "../../src/scripts/cli.js";
+import { testArgv } from "../../src/scripts/check-verb.js";
 import { expectedRed, redListOf } from "../../src/scripts/red-list.js";
 
 const TICKET = (record) => `---

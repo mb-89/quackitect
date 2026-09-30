@@ -19,6 +19,14 @@ func TestThePlacesOffARootHoldingNoVerbAnswerWhy(t *testing.T) {
 	}
 }
 
+// The places read the branch verb's program, with no verb word before its own. [[spec/tickets/cli-js-leaves]]
+func TestThePlacesVerbRunsTheBranchProgram(t *testing.T) {
+	t.Parallel()
+	if placesVerb[0] != "src/scripts/verbs/branch.js" || placesVerb[1] != "list" {
+		t.Fatalf("the places verb reads %v", placesVerb)
+	}
+}
+
 // A marked group the queue places on the cloud lights the letter on a merged branch or none, and its ticket inherits it. [[spec/tickets/marked-groups-stay-cloud]]
 func TestARowPlacedOnTheCloudLightsTheLetter(t *testing.T) {
 	t.Parallel()

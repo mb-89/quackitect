@@ -1,5 +1,5 @@
 // The road hands each verb by the verbs slice's mode, and a twin in shadow
-// writes a shadow row where it answers apart from cli.js.
+// writes a shadow row where it answers apart from the verb's program.
 // [[spec/tickets/runme-hands-verbs-to-quack]]
 package main
 
@@ -52,7 +52,7 @@ func TestTheRoadHandsEachVerbByItsMode(t *testing.T) {
 	}
 }
 
-// The doors of a road whose cli.js answers old, and whose log gathers its rows. [[spec/tickets/runme-hands-verbs-to-quack]]
+// The doors of a road whose the verb's program answers old, and whose log gathers its rows. [[spec/tickets/runme-hands-verbs-to-quack]]
 func roadOver(mode, old string, twins map[string]twin) (verbDoors, *strings.Builder, *[]map[string]any) {
 	out, rows := &strings.Builder{}, &[]map[string]any{}
 	return verbDoors{
@@ -149,7 +149,7 @@ func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
 	}
 }
 
-// A verb the twin table leaves out runs cli.js alone in shadow, and the log holds no row for it. [[spec/tickets/vehicle-verbs-become-actions]]
+// A verb the twin table leaves out runs the verb's program alone in shadow, and the log holds no row for it. [[spec/tickets/vehicle-verbs-become-actions]]
 func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 	doors, out, rows := roadOver("shadow", "old\n", twinVerbs)
 	for _, argv := range [][]string{{"vehicle", "here"}, {"stub", "into", "elsewhere"}} {
@@ -160,22 +160,22 @@ func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 	}
 }
 
-// The road holds retro notes among its twins, so the shadow runs it beside cli.js. [[spec/tickets/retro-notes-twin-joins-road]]
+// The road holds retro notes among its twins, so the shadow runs it beside the verb's program. [[spec/tickets/retro-notes-twin-joins-road]]
 func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
 	if twinVerbs["retro notes"] == nil || roadOf(modeShadow, []string{"retro", "notes"}, twinVerbs) != toBoth {
 		t.Fatal("the road holds no retro notes twin in shadow")
 	}
 }
 
-// A verb cli.js answers too takes cli.js, even where quack's verb table holds it, so ./RUNME.sh tools keeps writing tools.json. [[spec/tickets/quack-tools-spares-runme-tools]]
+// A verb the verb's program answers too takes the verb's program, even where quack's verb table holds it, so ./RUNME.sh tools keeps writing tools.json. [[spec/tickets/quack-tools-spares-runme-tools]]
 func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
 	table := map[string]bool{"run": true, "tools": true, "act": true}
 	for _, verb := range []string{"tools", "act"} {
 		if aloneOf([]string{verb}, table) {
-			t.Fatalf("%s runs in quack alone, and cli.js stops answering it", verb)
+			t.Fatalf("%s runs in quack alone, and the verb's program stops answering it", verb)
 		}
 	}
 	if !aloneOf([]string{"run"}, table) {
-		t.Fatal("run, which cli.js lacks, runs in cli.js")
+		t.Fatal("run, which the verb's program lacks, runs in the verb's program")
 	}
 }

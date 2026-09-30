@@ -245,7 +245,7 @@ test("cloud guards every tool and leaves PR operations to the dispatcher", async
     "git switch main",
     "gh pr create",
     "gh pr merge 7",
-    "node src/scripts/cli.js branch release another",
+    "node src/scripts/verbs/branch.js release another",
   ]) {
     assert.ok(
       (
@@ -366,6 +366,9 @@ test("the check hands Vale the assembled config and the work root", async () => 
     cwd: "/project",
   });
   assert.equal(said, "");
-  assert.ok(seen[0].argv.includes("--config=.se/vale/.vale.ini"), seen[0].argv.join(" "));
+  assert.ok(
+    seen[0].argv.includes("--config=.se/vale/.vale.ini"),
+    seen[0].argv.join(" "),
+  );
   assert.equal(seen[0].init.cwd, "/project");
 });

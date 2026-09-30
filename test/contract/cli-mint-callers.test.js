@@ -73,7 +73,7 @@ test("each schema module stands under the file ceiling the config names", () => 
 
 // The command line exits at import, so its text says which module it mints through. [[spec/design_output/editor#one-command-opens-the-editor]]
 test("the command line, the tools, the hand and the retro reach the mint through its own module", () => {
-  const cli = String(files.read(join(root, "src", "scripts", "cli.js")));
+  const cli = String(files.read(join(root, "src", "scripts", "mint-verb.js")));
   assert.match(
     cli,
     /from "\.\.\/\.\.\/\.claude\/skills\/level0\/lib\/schema-mint\.js"/,
@@ -85,7 +85,7 @@ test("the command line, the tools, the hand and the retro reach the mint through
 
 // The command line exits at import, so its text says the mint refuses an empty group. [[spec/design_output/work#a-group-is-a-ticket]]
 test("the mint on the command line reads the group through emptyGroup before it writes", () => {
-  const cli = String(files.read(join(root, "src", "scripts", "cli.js")));
+  const cli = String(files.read(join(root, "src", "scripts", "mint-verb.js")));
   const mint = cli.slice(cli.indexOf("export function mint("));
   assert.ok(mint.indexOf("emptyGroup(") > 0, "the mint calls emptyGroup");
   assert.ok(

@@ -50,7 +50,7 @@ test("the spawn prompt hands a helper the payload, and sends it into no file", (
   };
   const said = spawnPrompt("a-child", leaf, "helper-2");
 
-  assert.match(said, /--as helper-2 --fields '<json>'/);
+  assert.match(said, /"--as","helper-2","--fields","<json>"/);
   assert.match(said, /The engine writes the ticket/);
   assert.doesNotMatch(said, /Write the fields into the ticket/);
 });

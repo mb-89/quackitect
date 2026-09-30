@@ -36,14 +36,14 @@ func TestTheLspSliceStandsOld(t *testing.T) {
 	t.Fatalf("the slices read %+v, and want lsp built in as old", slices)
 }
 
-// The verbs slice stands among the slices, built in as old, so a box with no tracked mode keeps every verb on cli.js. [[spec/tickets/runme-hands-verbs-to-quack]]
-func TestTheVerbsSliceStandsSharedAndOld(t *testing.T) {
+// The verbs slice stands switched over to new, so a box with no tracked mode runs every twin alone. [[spec/tickets/agents-call-quack-directly]]
+func TestTheVerbsSliceStandsNew(t *testing.T) {
 	for _, one := range slices {
-		if one.key == "verbs" && one.mode == "old" {
+		if one.key == VerbsKey && one.mode == "new" && strings.Contains(one.doc, "switched over") {
 			return
 		}
 	}
-	t.Fatalf("the slices read %+v, and want verbs built in as old", slices)
+	t.Fatalf("the slices read %+v, and want verbs built in as new", slices)
 }
 
 // The cage slice stands among the slices, built in as old, so a box with no tracked mode keeps the bridge alone. [[spec/tickets/the-hooks-door-lands]]

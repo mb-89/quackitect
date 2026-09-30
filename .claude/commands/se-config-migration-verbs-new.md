@@ -1,5 +1,5 @@
 ---
-description: "config / migration / verbs: sets migration.verbs to new. The road ./RUNME.sh hands a verb down: old answers alone, shadow runs quack beside it and logs a mismatch, new answers quack's."
+description: "config / migration / verbs: sets migration.verbs to new. The road a verb runs, switched over in phase 4. Each verb quack answers runs alone."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

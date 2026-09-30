@@ -62,18 +62,19 @@ test("the hook reads the generated list and registers each tool beside the pull"
   assert.deepEqual(Object.keys(add).sort(), ["description", "inputSchema", "name"]);
 });
 
-test("a call of an index tool runs act with its input, and answers what it prints", async () => {
+test("a call of an index tool runs act with the arguments the event spreads, and answers what it prints", async () => {
   const { $, ran } = engine();
   const tools = await registersIndexTools($, BIN);
   const said = await callsIndexTool($, BIN, tools, {
     tool: "mcp__level0__index_t_add",
-    input: { a: 2, b: 3 },
+    a: 2,
+    b: 3,
   });
   assert.deepEqual(ran.at(-1), [BIN, "act", "t/add", '{"a":2,"b":3}']);
   assert.equal(said, '{"sum": 5}');
   await callsIndexTool($, BIN, tools, {
     tool: "mcp__level0__index_t_echo",
-    input: { input: "x" },
+    input: "x",
   });
   assert.deepEqual(ran.at(-1), [BIN, "act", "t/echo", '"x"']);
 });

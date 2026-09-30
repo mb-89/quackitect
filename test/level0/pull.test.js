@@ -37,7 +37,7 @@ test("a pull off trunk and off a work branch refuses, and names the pull from tr
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 2);
-  assert.match(said, /ticket pull from main/);
+  assert.match(said, /index_ticket_pull from main/);
   assert.ok(!said.includes("branch take"), "no hand takes a branch");
 });
 
@@ -163,7 +163,7 @@ test("the pull hands out the child's first leaf, writes the hold, and the answer
   assert.match(said, /One piece of it\./);
   assert.match(said, /\n {2}approach {2}text: the approach/);
   assert.match(said, /# Reads spec\/guidance\/voice\n\n1\. Say what is\./);
-  assert.match(said, /ticket pull a-child --pass/);
+  assert.match(said, /index_ticket_pull with args \["a-child","--pass"/);
   const hold = JSON.parse(disk.read(HOLD));
   assert.equal(hold.ticket, "a-child");
   assert.equal(hold.step, "design/draft");
@@ -372,10 +372,10 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
     /^spawn\n {2}a-child at design\/review waits for a hand other than box d462e994b4cef/,
   );
   assert.match(said, /named helper-2, and you work one step of one ticket/);
-  assert.match(said, /ticket pull --as helper-2/);
+  assert.match(said, /index_ticket_pull with args \["--as","helper-2"\]/);
   assert.match(
     said,
-    /ticket pull a-child --as helper-2 --fields '<json>'`\. It checks/,
+    /index_ticket_pull with args \["a-child","--as","helper-2","--fields","<json>"\]\. It checks/,
   );
   assert.equal(disk.exists(HOLD), false, "the spawn answer holds nothing");
   assert.equal(

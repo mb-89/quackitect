@@ -1,5 +1,5 @@
-// ./RUNME.sh hands a verb quack knows to it, and every other verb to cli.js,
-// as the verbs slice's mode reads in the tracked file.
+// ./RUNME.sh hands a verb quack knows to it, and every other verb to its program,
+// as the verbs slice's mode reads, built in at new since the switch-over.
 // [[spec/tickets/runme-hands-verbs-to-quack]]
 
 import assert from "node:assert/strict";
@@ -23,8 +23,8 @@ test("./RUNME.sh hands get to quack, which reads the verbs slice off the index",
   assert.match(said.stdout.trim().split("\n").at(-1), /^"(old|shadow|new)"$/);
 });
 
-test("./RUNME.sh hands config to cli.js, which names the verbs slice in the tracked file", () => {
+test("./RUNME.sh hands config to its program, which names the verbs slice at its built-in new", () => {
   const said = runs("config", "migration.verbs");
   assert.equal(said.exitCode, 0, said.stderr);
-  assert.match(said.stdout, /migration\.verbs\s+shadow\s+spec\/config\/level0\.json/);
+  assert.match(said.stdout, /migration\.verbs\s+new\s+built-in/);
 });

@@ -3,6 +3,7 @@
 // [[spec/design_output/work#a-merged-branch-closes]]
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { verbArgv } from "./verb-run.js";
 import {
   CLOSED,
   fieldOf,
@@ -308,12 +309,9 @@ function installs(it) {
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 // The check under --errors prints the red cases alone, so the merge hands on every row. [[spec/tickets/the-verbs-need-no-wrapper]]
 function checkSays(it) {
-  const ran = it.proc.run(
-    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check", "--errors"],
-    {
-      cwd: it.root,
-    },
-  );
+  const ran = it.proc.run(verbArgv(it.node, it.root, ["check", "--errors"], it.join), {
+    cwd: it.root,
+  });
   return { ok: ran.exitCode === 0, says: String(ran.stdout ?? "").trim() };
 }
 

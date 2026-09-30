@@ -57,7 +57,7 @@ type placesIn struct {
 
 // The module type the wiring loads as queue. [[spec/tickets/the-queue-becomes-a-module]]
 func Places(c *q.Catalog) q.Writer {
-	// The keys stand under queue in spec/config/level0.json, where cli.js reads them too. The served index answers every key its built-in value until it reads loaded projections, so each built-in holds the file's value. [[spec/tickets/index-reads-loaded-projections]]
+	// The keys stand under queue in spec/config/level0.json, where the ticket program reads them too. The served index answers every key its built-in value until it reads loaded projections, so each built-in holds the file's value. [[spec/tickets/index-reads-loaded-projections]]
 	q.CfgIn(c, "block", builtInBlock, q.Doc("the score a ticket takes for each ticket its chain holds up"))
 	q.CfgIn(c, "day", builtInDay, q.Doc("the score a ticket takes for each whole day it stands"))
 	q.CfgIn(c, "fail", builtInFail, q.Doc("the score a ticket takes for each hand-back that failed on it"))

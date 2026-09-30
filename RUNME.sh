@@ -22,8 +22,14 @@ if [ "$#" -eq 0 ]; then
   exit 1
 fi
 
-# The binary picks the road off the verbs slice, and cli.js answers where no binary stands. [[spec/tickets/runme-hands-verbs-to-quack]]
+# The binary picks the road off the verbs slice, and the verb's program answers where no binary stands. [[spec/tickets/cli-js-leaves]]
 bin="$here/.se/.runtime/bin/se-index"
 [ -x "$bin.exe" ] && bin="$bin.exe"
-[ -x "$bin" ] && exec "$bin" verb "$here/src/scripts/cli.js" "$@"
-exec node "$here/src/scripts/cli.js" "$@"
+[ -x "$bin" ] && exec "$bin" verb "$here/src/scripts" "$@"
+program="$here/src/scripts/verbs/$1.js"
+if [ -f "$program" ]; then
+  shift
+  exec node "$program" "$@"
+fi
+printf '%s\n' "No quack binary stands at $bin, so help and $1 answer nothing. Run sh src/scripts/install.sh." >&2
+exit 2

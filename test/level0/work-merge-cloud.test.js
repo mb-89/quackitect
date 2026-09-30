@@ -11,7 +11,7 @@ import { doorsSaying, heard, merging, ROOT, ranGit } from "./work-doors.js";
 
 // A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = "claude/a-thing";
-const CHECK = `node ${join(ROOT, "src/scripts/cli.js")} check --errors`;
+const CHECK = `node ${join(ROOT, "src/scripts/verbs/check.js")} --errors`;
 function cloudMerge(cherry, more = {}) {
   const { it, outside } = doorsSaying(
     merging({ [`git cherry main origin/${CLOUD}`]: { stdout: cherry }, ...more }),

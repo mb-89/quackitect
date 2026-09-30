@@ -116,10 +116,20 @@ func (s *Store) onMove(fn func(names []string)) {
 // Runs a derived provider over the wave's view, and commits where its value moves, with no hand heard. [[spec/design_output/model#one-wave-settles-a-change]]
 func (s *Store) settle(name string, view Snapshot) (any, bool, error) {
 	one := s.owner(name)
-	if one == nil || one.kind != derived || one.run == nil {
+	if one == nil || one.kind != derived || (one.run == nil && one.keyed == nil) {
 		return nil, false, fmt.Errorf("%s names no derived provider", name)
 	}
-	value := one.run(view)
+	// A loaded projection parses one file per concrete name, as Run does. [[spec/tickets/index-reads-loaded-projections]]
+	var value any
+	if one.keyed != nil {
+		parsed, err := one.keyed(view, name)
+		if err != nil {
+			return nil, false, err
+		}
+		value = parsed
+	} else {
+		value = one.run(view)
+	}
 	if same(view.Read(name), value) {
 		return value, false, nil
 	}

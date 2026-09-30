@@ -1,5 +1,5 @@
 // The tools the index generates: the hook reads the list off the binary, the
-// way the pull reaches cli.js, and a call of one posts its input to its action.
+// way the pull reaches the ticket program, and a call of one posts its input to its action.
 // [[spec/tickets/the-hook-registers-index-tools]]
 
 import { RUN } from "./folders.js";
@@ -50,7 +50,17 @@ export async function callsIndexTool($, bin, tools, e) {
   const name = String(e?.tool ?? "").slice(SERVED.length);
   const one = tools.find((tool) => tool.name === name);
   if (!one) return `the index lists no tool ${name}`;
-  const input = one.bare ? e?.input?.input : (e?.input ?? {});
+  const spread = argumentsOf(one, e);
+  const input = one.bare ? spread.input : spread;
   const ran = await $.process.run([bin, "act", one.action, JSON.stringify(input)]);
   return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim();
+}
+
+// The arguments a call carries: the host spreads them on the event beside its tool, so each property the schema declares reads off the event. [[spec/tickets/verb-tools-keep-spaced-args]]
+function argumentsOf(one, e) {
+  const said = {};
+  for (const key of Object.keys(one.inputSchema?.properties ?? {})) {
+    if (e?.[key] !== undefined) said[key] = e[key];
+  }
+  return said;
 }

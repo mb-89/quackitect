@@ -54,11 +54,11 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
     proc: git.proc,
     env,
   };
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "check"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "check.js")], {
     exitCode: 0,
     stdout: "The rules pass.\n",
   });
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "test"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "test.js")], {
     exitCode: 0,
     stdout: "ok\n",
   });
@@ -129,7 +129,7 @@ test("a clean message lands, runs the check, and pushes on green", async () => {
 test("a red check holds the push back, and names what the check refuses", async () => {
   const { it, git } = doors();
   // The check writes its faults to the error stream, and its last passing line to the other. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "check"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "check.js")], {
     exitCode: 1,
     stdout: "The server stands at http://127.0.0.1:6510/health.\n",
     stderr: "src/a.js:1:1: Passive: Write in the active voice.\n",
@@ -218,7 +218,7 @@ test("the no-push flag leaves the branch where it stands", async () => {
 // The tests gate the commit, so a red run stages nothing and commits nothing. [[spec/design_output/work#the-battery-answers-first]]
 test("a red test run commits nothing, and names what the run says", async () => {
   const { it, git } = doors();
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "test"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "test.js")], {
     exitCode: 1,
     stdout: "not ok 1 - the door refuses\n",
   });
@@ -239,11 +239,11 @@ test("the tests run before the staging, and the check after the commit", async (
   await heard(() => commitVerb(it, [CLEAN]));
 
   const ran = git.ran.map((one) => one.argv.join(" "));
-  const cli = join(ROOT, "src", "scripts", "cli.js");
-  const tests = ran.indexOf(`node ${cli} test`);
+  const verbAt = (verb) => join(ROOT, "src", "scripts", "verbs", `${verb}.js`);
+  const tests = ran.indexOf(`node ${verbAt("test")}`);
   const staged = ran.indexOf("git add -A");
   const committed = ran.indexOf(`git commit -m ${CLEAN}`);
-  const checked = ran.indexOf(`node ${cli} check`);
+  const checked = ran.indexOf(`node ${verbAt("check")}`);
   assert.ok(tests >= 0 && tests < staged, "the tests run first");
   assert.ok(committed < checked, "the check stamps the commit");
 });
@@ -425,8 +425,8 @@ test("a staged file on the cold path runs the probe after the tests and before t
   assert.equal(asked[0].via, CLIENT);
   assert.match(said, /The cold probe passes/);
   const ran = ranGit(git);
-  const cli = join(ROOT, "src", "scripts", "cli.js");
-  assert.ok(ran.indexOf(`node ${cli} test`) < ran.indexOf(LISTED));
+  const verbAt = (verb) => join(ROOT, "src", "scripts", "verbs", `${verb}.js`);
+  assert.ok(ran.indexOf(`node ${verbAt("test")}`) < ran.indexOf(LISTED));
   assert.ok(
     ran.includes("git diff --cached --binary --no-renames"),
     "the delta reaches the probe",
