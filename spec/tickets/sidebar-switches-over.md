@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -99,6 +99,15 @@ record:
   - step: sync
     hand: box d891eb0f26d7 · claude-code-remote
     hash_before: 5923a0dffb980a7c64b96eec7ff43e42ed2b32f3
+  - step: sync
+    hand: box d891eb0f26d7 · claude-code-remote
+    hash_before: 1189d06612f9a97692256170a1ee0ba5e31fde45
+    hash_after: 0bc461d040fccec540a8d9c7776bfebd9590f5a4
+    answered:
+      - name: sync
+        exit: 0
+        said: work/sidebar-switches-over already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["sidebar-lands-in-shadow", "tui-shell-switches-over"]
 enabled_by: migration.phase8switch
 cloud: true
@@ -117,8 +126,9 @@ Done when the extension spawns no verb and reads no file itself.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
