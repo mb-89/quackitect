@@ -23,11 +23,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -46,19 +42,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -75,11 +63,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -101,11 +85,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -124,11 +104,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -147,11 +123,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -170,19 +142,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -199,19 +163,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -228,19 +184,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -257,19 +205,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "classic.Stop",
@@ -299,11 +239,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "classic.Stop",
@@ -322,19 +258,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -354,19 +282,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -390,11 +310,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -416,19 +332,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         }
       ],
       "call": {
@@ -448,19 +356,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "session.measure",
@@ -485,11 +385,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "session.measure",
@@ -512,11 +408,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "turn.said",
@@ -542,11 +434,7 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "classic.MessageDisplay",
@@ -579,19 +467,11 @@
       "events": [
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "carry on",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "prompt.submit",
-          "e": {
-            "text": "and the next",
-            "origin": { "kind": "composer" },
-            "session_id": "s1"
-          }
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
         },
         {
           "event": "turn.complete",
