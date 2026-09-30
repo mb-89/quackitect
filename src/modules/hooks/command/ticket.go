@@ -13,9 +13,9 @@ import (
 
 // The folder of the holds, the plan, the closed state, and the front's fence. [[spec/design_output/level0#a-write-names-its-ticket]]
 const (
-	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again.
+	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/design_output/level0#a-write-names-its-ticket]]
 	holdFolder = ".se/.runtime/hold"
-	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again.
+	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/design_output/level0#a-write-names-its-ticket]]
 	plans      = ".se/.runtime/plan.json"
 	closed     = "closed"
 	stateKey   = "state"

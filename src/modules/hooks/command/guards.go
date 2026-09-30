@@ -79,7 +79,7 @@ var (
 	commandOf = regexp.MustCompile(`&&|\|\||;`)
 )
 
-// One version branch a command would rewrite or delete. [[spec/design_output/work#a-version-branch-stands]]
+// One version branch a command rewrites or deletes. [[spec/design_output/work#a-version-branch-stands]]
 type versionRef struct {
 	name string
 	drop bool
