@@ -11,7 +11,10 @@ import (
 )
 
 func TestEveryTwinNameStands(t *testing.T) {
-	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
+	index := qtest.New(t, func(c *q.Catalog) {
+		Registers(c)
+		q.OutIn(c, TrackedPort, []string{}, q.Doc("the paths git tracks, as the case seeds them"))
+	})
 	for _, twin := range Twins {
 		said, ok := index.Read(twin).([]Finding)
 		if !ok || len(said) != 0 {
