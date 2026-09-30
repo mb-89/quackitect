@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/notes
+step: retro/write
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -139,6 +139,15 @@ record:
         hash: e122785976621597
         size: 10947
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 3b62eeb5472069e261f349fc95f76c91f3cf2db8
+    hash_after: 3b62eeb5472069e261f349fc95f76c91f3cf2db8
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 depends_on: ["tui-shell-lands-in-shadow", "quack-verbs-switch-over", "read-topics-switch-over"]
 enabled_by: migration.phase6switch
 cloud: true
@@ -224,8 +233,9 @@ What I weigh:
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
