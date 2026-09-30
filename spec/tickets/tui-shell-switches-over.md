@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box d88cc0681fd4 · claude-code-remote
     hash_before: 85d2fb604a52036b9449eaebaae4b4a50ed8bc61
+  - step: sync
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 611f0c7e6a89d7343e4c5db62b48d7083ed25b81
+    hash_after: 611f0c7e6a89d7343e4c5db62b48d7083ed25b81
+    answered:
+      - name: sync
+        exit: 0
+        said: work/tui-shell-switches-over already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["tui-shell-lands-in-shadow", "quack-verbs-switch-over", "read-topics-switch-over"]
 enabled_by: migration.phase6switch
 cloud: true
@@ -113,8 +122,9 @@ Done when the window reads its data off the index alone.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
