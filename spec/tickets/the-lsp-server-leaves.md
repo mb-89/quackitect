@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -172,6 +172,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 27e2030b48104f5d5be9e5f3d41b64e3c73a12ad
+    hash_after: 27e2030b48104f5d5be9e5f3d41b64e3c73a12ad
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 3 file(s); green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-lsp-server-leaves.md:344:122: Vocabulary: installerholdsthenames stands outside the words this tree wri"
+    inputs:
+      - name: design/tests-red
+        hash: f64de9f42fa5bedc
+        size: 1458
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -350,26 +373,33 @@ the approach answers the ask, and the red cases decide the lsp.json line, the ed
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/no-old-server.test.js test/level0/lsp.test.js test/level0/lint-sweep.test.js src/modules/lsp/lsp_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The old language server leaves whole, and the lsp IO module inside the index serves the editor. The lsp slice reads new. The editor starts quack lsp off the index binary, and the doctor probes the same. src/lsp, its se-lsp build, its port client cli-served.js and the lsp.json standing file leave the tree; the module's door file is lsp-door.json, so no name meets the old one. The lint reads the check module's sweep through a new quack sweep verb and lays the tools' rows findingsOver draws beside it, in place of the served list and the JavaScript tree and schema reads. The sweep reads the tracked files alone, so the box-bound survey rule reads off the box in the lint. TestTwinGoldens moves to src/quack over the lsp module's Vale and Biome readers, since a check module test may not run node or git. aloneOver lost its last caller and leaves. The lsp note describes the module, and the editor, doors and level zero notes follow. Weighed: keeping se-lsp check for the lint against reading the sweep; the sweep holds the same rules, so a second reader would stay for the lint alone. Assumed: the owner turned phase7switch on after a clean shadow, and the editor's false survey row, which the lsp module still publishes, waits as a note for the retro.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the sweep verb and the twin case in src/quack
+- the lint and sweep cases fake quack and the index, so no door is reached
+- each new file and function points at the ticket or its design section
+- the door file name stands in StandingFile, and folders.test.js holds it to MOVED
 
 # accept
 
