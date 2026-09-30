@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-streams-changes]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 234ed95717bef22c
         size: 3068
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d889b5fc6cd8 · claude-code-remote · helper-4
+    hash_before: 07306b46892cd86e1661f2fe2252d4d8bfe21486
+    hash_after: 07306b46892cd86e1661f2fe2252d4d8bfe21486
+    inputs:
+      - name: design/draft
+        hash: 234ed95717bef22c
+        size: 3068
+      - name: design/tests-red
+        hash: 7a798193d358629a
+        size: 772
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -293,8 +305,13 @@ Weighed: the base file read through the index keeps the tab off the disk whole. 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- work-tab-waits-sends-changes: depends_on names v1-watch-streams-changes, which stands closed while registry.Watch, Stream and Next are still stubs; the approach waits on v1-watch-sends-changes, so depends_on names that ticket, or the pull hands implement before the watch stands
+- work-tab-callers-complete: the callers list and size miss src/tui/work_test.go (Load, IndexStandingAt), src/tui/workdetail_test.go, src/tui/workedit_test.go, src/tui/workplace_test.go and src/tui/workplaces_test.go (Load, PlacesIn, Placed, PlacesMsg, PlacesCmd, NodeAt), src/tui/work/door_post_test.go (postJSON), src/tui/work/shadow_test.go (ViewOver, IndexRow), and src/quack/testdata/tree.golden.json, which the new Row fields move
+- rows-todo-folds-overrides: Row.Todo in src/modules/work/rows.go reads the front's todo alone, while the branch verb the tab drops also lights it for a plan override (overrides in src/scripts/work-answer.js), so a ticket placed with p loses its todo letter once the tab reads the rows alone
+- rows-cloud-matches-branches: PlacesIn marks every unmerged standing branch and its tickets cloud, while tickets/cloud marks only a group carrying the cloud mark and its tickets, so an unmarked standing branch loses its cloud letter; the ask asserts the rows carry the flag already, and no test pins which rule holds
 
 # implement
 
