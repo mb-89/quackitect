@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: 19bd52b73471bf7a
         size: 735
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 1ae6ff21c0bada5045000bdecef7727601b6ce19
+    hash_after: 1ae6ff21c0bada5045000bdecef7727601b6ce19
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: d58e9210ca6b388b
+        size: 2294
+    def: 08e16d07b0de477c
 depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door"]
 ---
 
@@ -234,26 +247,33 @@ The bridge keeps its spawn door until the-brief-leaves-the-bridge flips the door
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/spawn_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/spawn_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The two Go cases red on their own assertion: the door answers pass to an agent spawn, where each row of layer-cases.json wants an event carrying the wrapped prompt. The JavaScript case in cage.test.js rebuilds every row with the lib's builders and passes, so the table holds what the bridge gives today.
+
+What surprises me: stepOf already maps the event effect the prompt port added, so the cage needs no red case of its own here.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the two spawn cases, the second the table case in cage.test.js, and the third the check at tests-green
+- the Go cases build a temp tree off each row and reach no door past the package's own fixtures
 
 # gate
 

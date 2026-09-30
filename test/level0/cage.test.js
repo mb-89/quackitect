@@ -9,6 +9,9 @@ import {
   refusedText,
   stepOf,
 } from "../../.claude/skills/level0/hooks/cage.js";
+import { guidanceHere, onAgentSpawn } from "../../src/bridge/guidance.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import LAYERS from "../replay/cage/layer-cases.json" with { type: "json" };
 
 test("the door decides the tool call and the Stop, and the bridge keeps the prompt", () => {
   assert.equal(doors("tool.call"), true);
@@ -151,4 +154,33 @@ test("the refusal names the call, the alarm and the command that clears it", () 
   assert.match(text, /Bash/);
   assert.match(text, /session\/alarms/);
   assert.match(text, /\.\/RUNME\.sh serve/);
+});
+
+// The spawn door's layer builders write every row's wrapped prompt, and the Go door reads the same table. [[spec/tickets/spawn-answers-off-the-door]]
+test("the JavaScript layer matches the case table", () => {
+  const built = LAYERS.cases.map((one) => {
+    const disk = fakeDisk(
+      Object.fromEntries(
+        Object.entries(one.files).map(([path, text]) => [`/tree/${path}`, text]),
+      ),
+    );
+    const box = { disk, method: "/tree", work: "/tree", env: {}, log: { say() {} } };
+    const said = onAgentSpawn({ kind: one.kind, prompt: one.prompt }, box);
+    const layers = guidanceHere(disk, "/tree", "/tree", {}).layers;
+    return {
+      name: one.name,
+      layer: said.pass ? "none" : layers[one.kind] ? one.kind : "helper",
+      pass: Boolean(said.pass),
+      wrapped: said.pass ? "" : said.event.prompt,
+    };
+  });
+  assert.deepEqual(
+    built,
+    LAYERS.cases.map(({ name, layer, pass, wrapped }) => ({
+      name,
+      layer,
+      pass,
+      wrapped,
+    })),
+  );
 });
