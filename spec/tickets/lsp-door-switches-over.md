@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box d893e0ab0f106 · claude-code-remote
     hash_before: b469bd5334823361d70535e2b229724e338ac76b
+  - step: sync
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: e3886a48606f95da656aae0421a25d7a24f06659
+    hash_after: e3886a48606f95da656aae0421a25d7a24f06659
+    answered:
+      - name: sync
+        exit: 0
+        said: work/lsp-door-switches-over already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
 cloud: true
@@ -113,8 +122,9 @@ Done when the LSP's own server, port and index client leave the tree.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
