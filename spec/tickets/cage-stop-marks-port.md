@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -137,6 +137,19 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: 4d84db27f03ced768ce1e6ff9e1a4ef5dc731b0e
+    hash_after: 4d84db27f03ced768ce1e6ff9e1a4ef5dc731b0e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 7907f0e68e795da1
+        size: 3154
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -250,26 +263,35 @@ What I weigh: the fold stays pure, and one IO function per outside write holds t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/marks_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Two cases stand red on their own assertion. A measure past the fill writes no due mark, since the fold decides the handover and nothing writes it. A retro hold of another hand keeps the session from going due, since isRetro reads every retro as the session's own.
+
+The own hand case passes today, and it holds the edge: the session's own retro keeps its conversation.
+
+The departure: the cases read the marks off the disk under a temp root, so they compile against today's module. So the module writes the marks through its own disk, as it reads the holds, and Outside gains no Mark. The hand reads the box file, the session file and the environment inside the module too, so Outside gains no Hand, and src/quack/main.go stays as it stands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the due mark case, the second the retro hand case, and the third the check at tests-green
+- the doors the tests reach have fakes: a temp root the module reads and writes, and the environment set per case
 
 # gate
 
