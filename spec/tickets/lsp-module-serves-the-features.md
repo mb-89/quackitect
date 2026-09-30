@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -237,7 +237,33 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 02f8a23854ad70488edf0fb5b89695e83ffce815
+    hash_after: 02f8a23854ad70488edf0fb5b89695e83ffce815
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes; green, src/modules/check passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-lsp-server-leaves.md:227:7: Vocabulary: lsp stands outside the words this tree writes. Write a core wor"
+    inputs:
+      - name: design/tests-red
+        hash: bed9a6ad2b5f50c7
+        size: 570
+      - name: design/tests-red-2
+        hash: 2821f72ffc633c7a
+        size: 877
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: lsp-door-switches-over
+reason: done
 ---
 
 # Ask
@@ -544,26 +570,33 @@ the reads move into src/modules/check, which already imports src/yaml, so the no
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp/features_test.go src/modules/check/features_test.go src/quack/lsp_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hover, the completion, the links and the fold now answer from the lsp IO module, so the editor keeps all four once it starts quack lsp in place of se-lsp. The four reads moved out of src/lsp into src/modules/check (features.go and offers.go) as HoverAt, Offers, LinksIn and FoldsOf, pure over the check tree; the lsp module reaches them through the Hover, Complete, Links and Folds ports on Outside.Check, which lspChecks in src/quack/lsp.go fills, since one module imports no other. initialize now announces the four capabilities, and the recorded session takes that answer. The wiring builds the tree under the real root, so a link opens the file under the tree. The old server keeps its handlers as thin calls into the check reads until the-lsp-server-leaves takes the package, and its moved cases now stand in the check module. The stray quack binary an earlier box committed at the root leaves git, and .gitignore holds /quack, since its row broke the size twin golden. Weighed: a copy inside lsp against the move into check; the copy makes a second owner of the check helpers and breaks the import rule. Assumed: uriOf escapes the path by hand, the way net/url did, because a module imports only the pure standard library.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files draft-2 names, plus offers.go and features.go split off under the file ceiling, the byteAt case moved beside byteAt, and the stray binary with its ignore line
+- the reads are pure over the tree, and the lsp cases read the fake check, so no door is reached
+- each new file and function points at the ticket or its design section
+- the triggers stand once, in src/modules/lsp/features.go, and src/lsp reads them from there
 
 # accept
 
