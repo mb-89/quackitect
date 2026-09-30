@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [the-lens-calls-actions, the-sidebar-reads-v1]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 856bfcbf8f23ff19
         size: 738
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 76525ac47293425321ec90fc262a5404d8e525ba
+    hash_after: 76525ac47293425321ec90fc262a5404d8e525ba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: c2dda916aefee2d6
+        size: 7569
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -288,26 +301,42 @@ What I weigh and assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/lens-v1.test.js src/q/keyed_test.go src/index/v1keyed_test.go src/modules/holds/standing_test.go src/modules/tickets/drawn_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/lens-v1.test.js
+- src/q/keyed_test.go
+- src/index/v1keyed_test.go
+- src/modules/holds/standing_test.go
+- src/modules/tickets/drawn_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion, and every older case in the same packages and the sidebar files passes.
+
+What surprised me:
+- The holds module stands outside `spec/wiring.yaml`, so its names come out bare as `hold/<path...>` and `bless/agent`. So `holds/standing` reads the bare name `tickets/all`, and the wiring line of the approach falls away.
+- A wired keyed read answers an error, and the door logs it and keeps the default. So a keyed watch sends the default once, in place of nothing. The keyed fix answers both cases.
+- The door holds a testdata ticket to the ticket schema, so each fixture carries every evidence heading. The `checked` field carries no heading, and it covers the line where a mark falls back to the leaf's heading.
+- `test/level0/drawn-twin.js` serves both sides: the fake index draws off it, and its main block writes the golden file the Go case reads.
+- The fake answers `tickets/drawn` as plain JSON. The Go codec answers the same, so the hosts need no `plainOf` there.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the grep line meets the grep case in lens-v1.test.js, the fake index line meets its first case, and the check line waits on the check itself, which leaves the red list out until tests-green
+- the index door has its fake in test/level0/v1-index.js, which now answers holds/standing, tickets/cloud and tickets/drawn; the Go cases run on q/qtest; the door in lens-v1 refuses every file read
 
 # gate
 
