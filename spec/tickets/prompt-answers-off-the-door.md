@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 31dfa12d59625063
         size: 2665
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: fbb8c42d2687faaa57052fe83ae60f2a40a4da77
+    hash_after: fbb8c42d2687faaa57052fe83ae60f2a40a4da77
+    inputs:
+      - name: design/draft
+        hash: 31dfa12d59625063
+        size: 2665
+      - name: design/tests-red
+        hash: b0a81c2acc93e152
+        size: 801
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -284,8 +296,11 @@ What surprises me: the cage test file stands red for the clear port already, so 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+What I weigh: the approach answers each done line. The three Go cases red on their own assertion, and cage.test.js stands red for the event effect. The row writer fills the Row the log module owns, so the viewer reads one shape. What I assume: under new the Go door takes no prompt submit until the-brief-leaves-the-bridge flips the doors, so no session log carries a prompt row twice before that flip.
 
 # implement
 
