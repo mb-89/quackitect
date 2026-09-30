@@ -405,8 +405,11 @@ moves them. `.claude/skills/level0/hooks/cage.js` holds the road.
 
 Where the door answers nothing, the bridgehead runs its start road once and
 posts again. Still down, a guarded call meets a deny naming `session/alarms`
-and `./RUNME.sh serve`. Read, Grep, Glob and the level zero read tools pass, and
-so does every other event. For the decision, see
+and `./RUNME.sh serve`. These pass, and so does every other event:
+
+- Read, Grep, Glob and the level zero read tools
+- `./RUNME.sh serve` and `./RUNME.sh doctor`, each run alone, so a box whose
+  index stands unbuilt brings the door back For the decision, see
 [[spec/rationales/the-cage-refuses-while-down]].
 
 ## A session says its cage

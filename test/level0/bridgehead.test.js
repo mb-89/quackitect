@@ -538,3 +538,35 @@ test("under new a tool call takes the hooks door effects, and a prompt still rea
   assert.equal(JSON.parse(posts[0].init.body).event, "tool.call");
   assert.match(posts[1].url, /\/event$/, "and the prompt goes to the bridge");
 });
+
+// [[spec/tickets/spoke-answer-reaches-the-door]]
+test("under new a held call asks back on agent.spoke with the effect's call id, and the second answer stands", async () => {
+  const box = caged();
+  const posts = [];
+  box.$.session = {
+    messages: async () => [{ role: "assistant", id: "a1", text: "the reply" }],
+  };
+  box.$.http = {
+    fetch: async (url, init) => {
+      const body = JSON.parse(init.body);
+      posts.push({ url, body });
+      const effects =
+        body.event === "agent.spoke"
+          ? [{ kind: "result", text: "the hold refuses" }]
+          : [{ kind: "rows", call: "s1.2" }];
+      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+    },
+  };
+
+  const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+
+  assert.deepEqual(said, { deny: "the hold refuses" });
+  assert.equal(
+    posts[1].url,
+    "http://127.0.0.1:7001/hook",
+    "the answer goes to the door",
+  );
+  assert.equal(posts[1].body.event, "agent.spoke");
+  assert.equal(posts[1].body.e.call, "s1.2", "and names the call it answers");
+  assert.equal(posts[1].body.e.text, "the reply");
+});

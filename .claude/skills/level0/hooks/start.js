@@ -3,6 +3,16 @@
 import { SERVE } from "../lib/log.js";
 import { SELF_TEST, TESTING } from "../lib/vehicle.js";
 
+// The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const STARTING = 180_000;
+// The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
+export const INSTALL_SKIP =
+  "editor-link editor-extensions editor-client go index se-lsp";
+// The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const NO_NODE = 5;
+// The code REASONS reads for a road that installs the modules and then starts the server. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const INSTALLED = 7;
+
 // THE CLOUD STARTS ITS OWN SERVER, AND BRINGS WHAT THE SERVER NEEDS. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the modules stand nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const START = [
   "const { spawn, spawnSync } = require('node:child_process');",
