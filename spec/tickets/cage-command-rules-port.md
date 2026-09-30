@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -224,6 +224,29 @@ record:
         exit: 0
         said: "src/modules/hooks/command/ticket.go:18:1: CodeComment: Code carries no comment here. Write a header of at most five line"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: 014cdab61fe24d7747b75db54783acb27b2238b1
+    hash_after: 014cdab61fe24d7747b75db54783acb27b2238b1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "src/modules/hooks/command/ticket.go:18:1: CodeComment: Code carries no comment here. Write a header of at most five line"
+    inputs:
+      - name: design/tests-red
+        hash: 35dd677e458f4287
+        size: 1603
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -444,26 +467,33 @@ go build ./... && ./RUNME.sh lint src/modules/hooks src/quack/main.go src/quack/
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Go hooks door now refuses every Bash and PowerShell command the bridge refuses, text for text. The command rules port into src/modules/hooks/command, one file a bridge library, and Door.Hook runs them in the bridge order: the ticket door, the bless guard, the command rules, the version guard, then the git write door. PowerShell meets the ticket door alone. One case table holds the bridge answers, and a JS case and a Go case read it, so the two sides cannot drift. The replay goldens keep only the Write and Agent rows, which the write door and the call holds ports decide. Without this, the cage key moving to new lets through every command the bridge refuses today.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft size names, plus the ones the gate adds and two splits for the file ceiling, command.go and writes.go
+- the door reaches the tree through the root a post names and git through Outside.Git, and the cases build a temp tree off the table
+- each Go function carries a pointer at the ticket or the design output it ports
+- the table texts stand once, in test/replay/cage/command-cases.json, and both sides read them there
 
 # accept
 
