@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-sends-changes]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 71f75553e780e505
         size: 615
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: a2def9c5f52cb2a4135b886d7c7f93efcf495714
+    hash_after: a2def9c5f52cb2a4135b886d7c7f93efcf495714
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-tui-data-paths-leave.md:376:73: Passive: Write in the active voice and name who acts: 'is reached'."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -310,14 +319,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the size list, less go.mod, which keeps fsnotify for the index, the files module and the watcher. src/tui/model_test.go sends rows through the watch in place of LinesMsg. tail_test.go gives way to read_test.go, which holds ReadLog and the older door line. spec/design_output/tui.md names the watch as the way a line arrives.
+- fakes: the tab reads through Watched, and registry.Fake stands for it in every case.
+- comments: each new function points at this ticket, and the change routing points at log-tab-takes-its-rows.
+- one place: rowsName moves to v1.go, the road owning it. The red case wanted Sel at -1 after a new session, and Rebuild follows to the newest row, as model_test.go's restart case pins. So the case now wants the newest row.
 
 ## tests-green
 

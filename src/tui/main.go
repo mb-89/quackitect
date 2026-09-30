@@ -111,6 +111,7 @@ func newModelOver(path string, zone *time.Location, catalog work.Source) frame.M
 	mode := windowMode(work.Root(path))
 	logTab := log.New(path, zone)
 	logTab.Shadow = &log.Shadow{From: catalog, Mode: mode, Now: time.Now}
+	logTab.From = catalog
 	workTab := work.New(path)
 	workTab.Shadow = &work.Shadow{From: catalog, Mode: mode, Now: time.Now}
 	workTab.From = catalog
@@ -155,7 +156,7 @@ func Frame(path string, w, h int, opened, narrow, floor string, zone *time.Locat
 	m := newModel(path, zone)
 	m.W, m.H = w, h
 	held := logTab(m)
-	recs, _, err := held.Tailer.Read()
+	recs, err := log.ReadLog(path)
 	if err != nil {
 		return "", err
 	}

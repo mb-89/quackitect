@@ -17,9 +17,8 @@ import (
 // The one read the index's catalog answers, which the registry tabs read through too. [[spec/design_output/model#the-registry-tabs]]
 type Source = frame.Source
 
-// The name the index answers the session rows under, and the slice a mismatch names. [[spec/design_output/model#the-log-is-a-view]]
+// The kind a shadow row carries, and the slice a mismatch names. [[spec/design_output/model#the-log-is-a-view]]
 const (
-	rowsName    = "log/rows"
 	shadowKind  = "shadow"
 	windowSlice = "window"
 	modeShadow  = "shadow"

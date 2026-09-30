@@ -27,8 +27,8 @@ one tab reads them all. These packages part it, and every import runs down:
 | `src/tui/draw` | `Cut`, `Pad`, `OneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `src/config`, for the palette |
 | `src/tui/tree` | the tree, the rows it draws and the base file | `src/tui/draw`, and `src/yaml` for the base file |
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
-| `src/tui/log` | the log tab: its records, its tailer, its columns, its details, the said style and its view drawn off the base file | the frame, the tree and the draw packages, and the registry package for the catalog and the watch |
-| `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | the frame, the tree and the draw packages, the registry package for the catalog and the watch, and `src/yaml` for the ticket schema |
+| `src/tui/log` | the log tab: its records, its rows off the watch, its columns, its details, the said style and its view drawn off the base file | the frame, the tree and the draw packages, and the registry package for the catalog and the watch |
+| `src/tui/work` | the work tab: its tree, its edit, and its rows and count off the watch | the frame, the tree and the draw packages, the registry package for the catalog and the watch, and `src/yaml` for the ticket schema |
 | `src/tui/registry` | the registry tabs `index`, `cli` and `help`, and the catalog door they read through, with its fake and its `/v1` road | the frame and the draw packages |
 | `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language, and `src/index` for the base of `/v1` |
 
@@ -335,28 +335,24 @@ reaches its details, and the scroll stays where it stands.
 
 # How a line arrives
 
-A writer appends each line the moment it happens. The viewer watches the log
-folder, and the operating system wakes it on every write to the session file. A
-poll every 250 ms stands behind the watcher.
+A writer appends each line the moment it happens. The `log` module reads the
+session file, and `log/rows` answers every row. The watch over `/v1` hands
+the tab the whole session on each change.
 
-The tail keeps the bytes it holds and hands over only what follows them.
-
-- The held bytes, then more: the tail hands over the complete lines after them.
-- Shorter, and a start of the held bytes: the tail waits for the write to finish.
-- Other bytes: the tail starts again at the top.
-
-A line with no newline waits for its end.
+- More rows than the tab holds: the rows past the held ones arrive as new.
+- Fewer rows: a new session stands, and the tab starts again at the top.
 
 ## A rotation starts it again
 
-A session start empties the file and writes the new session's first line. The
-tail waits on the empty file, and the first line of the new session starts the
-window again. So a window staying open moves on to the next session by itself.
+A session start empties the file and writes the new session's first line.
+`log/rows` then answers fewer rows than the tab holds, and the tab starts
+again. So a window staying open moves on to the next session by itself.
 
 # One frame
 
 `logview --frame --size WxH --pane details|help|filter --filter <text> <path>`
 draws the window once and prints it. A reader with no terminal sees the same window a person sees.
+`ReadLog` in `src/tui/log/read.go` reads the file the command line names, once.
 
 # The verb builds it
 

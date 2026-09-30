@@ -57,8 +57,8 @@ func TestAShorterLogReadsAsANewSession(t *testing.T) {
 	tab.Update(m, changeOf(t, rowOne, rowTwo, rowThree))
 	tab.Follow = false
 	tab.Update(m, changeOf(t, rowOne))
-	if len(tab.All) != 1 || !tab.Follow || tab.Sel != -1 {
-		t.Fatalf("the tab holds %d rows, follow %v, at %d, and wants a fresh start", len(tab.All), tab.Follow, tab.Sel)
+	if len(tab.All) != 1 || !tab.Follow || tab.Sel != 0 {
+		t.Fatalf("the tab holds %d rows, follow %v, at %d, and wants a fresh start on the newest row", len(tab.All), tab.Follow, tab.Sel)
 	}
 }
 
@@ -68,5 +68,17 @@ func TestTheDetailsDrawARowWhole(t *testing.T) {
 	one := RecordOf(row)
 	if one.Kind != "tool" || one.Text != "the body" || one.Extra["ticket"] != "a-ticket" || one.At.IsZero() || one.Raw == "" {
 		t.Fatalf("the record reads %+v, and wants the row whole", one)
+	}
+}
+
+// The log tab stands first, so it hands on every change it does not read. [[spec/tickets/log-tab-takes-its-rows]]
+func TestTheLogTabHandsOnAChangeToAnotherName(t *testing.T) {
+	t.Parallel()
+	tab, m := v1Tab(t)
+	if handled, _ := tab.Update(m, registry.Change{Name: "work/rows", Revision: 1, Value: json.RawMessage("[]")}); handled {
+		t.Fatal("the log tab takes a change to work/rows, and the work tab never sees it")
+	}
+	if handled, _ := tab.Update(m, registry.Ended{}); handled {
+		t.Fatal("the log tab takes a bare end, which another tab's watch sends")
 	}
 }
