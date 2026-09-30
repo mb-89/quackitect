@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: 16b225d1a1261d72ca3045aa28df5e534045d132
+    hash_after: 16b225d1a1261d72ca3045aa28df5e534045d132
+    inputs:
+      - name: ask
+        hash: 36e18c6742eba22f
+        size: 908
+      - name: [[spec/tickets/cage-rules-port-before-switch]]
+        hash: ea4590246f526ac6
+        size: 11644
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -165,38 +177,92 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The command door ports into a new Go package, src/modules/hooks/command, and Door.Hook calls it on a Bash or PowerShell call before any action runs.
+
+1. The package ports the parse and the rules, one file a library:
+- tokens.go: tokensOf, baseName, clean, the breaks, shells and readers, off lib/tokens.js and lib/shell-values.js
+- findings.go: partsOf, wordsIn, afterGit, writesAPath, landingsAfterGates, freeOfTicket and Findings, off lib/bash.js
+- reads.go: branchIn, addsIn, commitIn, skipsTheHook and testIn, off lib/commit-reads.js and lib/bash-test.js
+- scripts.go: scriptWrites and scriptsIn, off lib/scripted.js, and pulled.go off lib/pulled.js
+- gitwrites.go: the git write rows, off lib/git-writes.js
+- guards.go: the bless guard off src/bridge/bless.js, and the version guard off lib/trunk.js
+- ticket.go: TicketFault and InHand, off src/engine/named.js
+- refuse.go: RefusedCommand, off refusedCommand in lib/refuse.js
+
+2. hooks.Outside gains Root, Config and Git. Config reads names.words and the cloud flag, and Git runs a read the pull rule needs. Each takes a fake in the cases, and src/quack/main.go wires the real ones.
+
+3. Door.Hook runs the checks in the bridge's order: the ticket door, the bless guard, the command rules, the version guard, then the git write door. The commit guards and the commit voice slot in later, under cage-commit-guards-port. PowerShell meets the ticket door alone, as onPowerShell does. The first refusal answers a result effect carrying its text, which NewDecisionOf reads as refuse.
+
+4. One case table, test/replay/cage/command-cases.json, holds a command, its description, the todo in hand and the refusal text. A JS case runs onBash over it, and a Go case runs the door over it. So the two texts cannot drift apart.
+
+5. A recorded log, test/replay/cage/command-rules.jsonl, carries one hook row a rule with the bridge's answer. Its golden shadow loses a row with each rule ported, and stands empty at the end.
+
+The rewrites the bridge answers, markedPush and onDescribe, read as pass on both sides, so they port with the hook module's switch.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.Hook, which gains the command door before calls
+- src/modules/hooks/hooks.go: Door.serves and Replay, calling Door.Hook
+- src/modules/hooks/cage.go: Door.ReplayLog, calling Door.Hook
+- src/quack/main.go: listensHooks, which fills the new Outside fields
+- src/quack/hooks_test.go and src/quack/hook_test.go: the wiring cases calling hooks.New
+- src/modules/hooks/hooks_test.go and cage_test.go: doorOver, calling hooks.New
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/command/tokens_test.go: TestTokensOfSplitsOperatorsAndQuotes
+- src/modules/hooks/command/findings_test.go: TestFindingsAnswerTheSharedCases
+- src/modules/hooks/command/ticket_test.go: TestTicketFaultReadsTheHand
+- src/modules/hooks/command_test.go: TestTheDoorRefusesWhatTheBridgeRefuses, over command-cases.json
+- test/level0/command-cases.test.js: the bridge answers every shared case
+- test/replay/cage/command-rules.jsonl and its shadow, through TestReplayLogAnswersEveryRecordedLog
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/command/tokens.go
+- src/modules/hooks/command/findings.go
+- src/modules/hooks/command/reads.go
+- src/modules/hooks/command/scripts.go
+- src/modules/hooks/command/pulled.go
+- src/modules/hooks/command/gitwrites.go
+- src/modules/hooks/command/guards.go
+- src/modules/hooks/command/ticket.go
+- src/modules/hooks/command/refuse.go
+- src/modules/hooks/command/*_test.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/command_test.go
+- src/quack/main.go
+- test/replay/cage/command-cases.json
+- test/replay/cage/command-rules.jsonl
+- test/replay/cage/command-rules.shadow.jsonl
+- test/level0/command-cases.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened lib/bash.js, lib/refuse.js, lib/git-writes.js, src/engine/named.js, src/bridge/bless.js, src/bridge/bash.js onBash and onPowerShell, hooks.go Hook and main.go listensHooks, and each claim holds there
+- the callers list names every caller of Door.Hook and hooks.New
+- done_when line one meets command-rules.jsonl, line two the shared case table on both sides, line three the check
 
 ## tests-red
 
