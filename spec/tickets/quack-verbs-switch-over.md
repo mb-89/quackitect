@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: fc7e58fefb0f56bb7bd9f3e0d3df0546a053024f
     hash_after: fc7e58fefb0f56bb7bd9f3e0d3df0546a053024f
+  - step: accept
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 7a38146219e3a70e69370a49b4a779dbbffe695f
+    hash_after: 7a38146219e3a70e69370a49b4a779dbbffe695f
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/quack-verbs-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 8a0d99f99d9c7a55
+        size: 365
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["quack-verbs-land-in-shadow", "open-tasks-switch-lands", "read-topics-switch-over"]
 enabled_by: migration.phase4switch
 cloud: true
@@ -181,8 +200,10 @@ no child waits on another now, since every one stands closed
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- verb-tools-keep-spaced-args: the index verb tools lose an argument holding spaces. mcp__level0__index_ticket_note answers that it needs a name and a line when handed both, and mcp__level0__index_ticket_pull refuses a --fields hand-back that ./RUNME.sh takes, so an agent falls back to the shell
 
 # retro
 
