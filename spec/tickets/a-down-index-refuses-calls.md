@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -234,6 +234,27 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: d642f6666cbdde5d91bbf3ede6f756c2ebd2a1a9
+    hash_after: d642f6666cbdde5d91bbf3ede6f756c2ebd2a1a9
+    inputs:
+      - name: design/draft
+        hash: c6867e111a3b6fba
+        size: 2908
+      - name: design/tests-red
+        hash: afd47fba06c53205
+        size: 1065
+      - name: design/draft-2
+        hash: e5eb8e88440a6052
+        size: 4805
+      - name: design/tests-red-2
+        hash: eba558812135f39f
+        size: 964
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 01417e29801ecc2f
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
@@ -474,16 +495,9 @@ The surprise: in the full file run the raced row case also reads the down flags 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- level0.js approach step 1: under new every event goes to POST /hook, and the Go hooks door answers no prompt.context rules, no tool registration and no rows ask-back. The redraft splits the events: the door decides tool.call and classic.Stop, and the bridge keeps the rest, or it names the port that answers them
-- the result effect maps Text to a deny and Result to the tool result, and the rows effect of holds.go asks back through hook.back. The redraft maps both
-- session/alarms and index/health stand in the index store alone, and nothing writes them to disk. The redraft names a disk copy and its writer, or the refusal names the key session/alarms and a fixed command
-- no quack start verb stands. The redraft names the real start argv the hook runs once, and the ./RUNME.sh verb the refusal names
-- the hook reads migration.cage through configOf in lib/config.js, so a local override reads the same as asksText in the bridge
-- the callers list adds src/scripts/copilot-shadow.js shadowsHook and src/quack/hook.go copilotPost, and says the Copilot road under new, or scopes it to a fix ticket
-- register resets saidDown, toldDown, port and cage, or the raced row case stays red after a right append. The redraft names the append argv the test fake reads: node -e with an appendFileSync script, the path, then the text
-- step 6 adds the Every writer appends list in spec/design_output/log.md
-- weighed: the red tests decide every done line, and both fail on their own assertion. Step 1 changes who answers every event under new, drops the rules, the tools and the ask-back, and costs dear to undo once the key moves, so the approach takes a redraft
+accept with points
+- spoke-answer-reaches-the-door: draft-2 step 5 posts the rows answer as hook.back, and no Go code reads that word. The door meets a rows answer on agent.spoke, in src/modules/hooks/holds.go. Under new the hook posts agent.spoke to POST /hook with the effect call id, beside its bridge road, so a held call gets its answer
+- weighed: the split by event keeps the rules, the tools and the brief on the bridge, and every earlier finding meets an answer. configOf stands in .claude/skills/level0/lib/config.js, the serve verb stands, the door names tool.call and classic.Stop, and it answers pass, after, result, block and rows. The event effect of step 3 maps a kind the door never sends, which costs nothing. The three red cases fail on their own assertion, and the read and shadow cases hold the edges. The spoke road is one line in seen, which the builder edits anyway, so it rides as a point and takes no round
 
 # implement
 
