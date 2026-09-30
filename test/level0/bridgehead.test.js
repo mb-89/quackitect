@@ -498,3 +498,43 @@ test("a row another writer appends while the index falls stays in the session lo
     "and the hook's own row lands beside them",
   );
 });
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("under new a tool call takes the hooks door effects, and a prompt still reaches the bridge", async () => {
+  const box = caged();
+  const posts = [];
+  box.$.http = {
+    fetch: async (url, init) => {
+      posts.push({ url, init });
+      if (url.endsWith("/hook")) {
+        const effects = [{ kind: "result", text: "the door refuses this call" }];
+        return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+      }
+      return { ok: true, status: 200, text: "{}" };
+    },
+  };
+
+  const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+  const context = Object.assign(async () => ({ blocks: [] }), {
+    event: "prompt.context",
+  });
+  await box.hooks["*"](box.$, {}, context);
+
+  assert.equal(
+    said?.deny,
+    "the door refuses this call",
+    "the result effect answers the call",
+  );
+  assert.equal(
+    posts[0].url,
+    "http://127.0.0.1:7001/hook",
+    "the call goes to the hooks door",
+  );
+  assert.equal(
+    posts[0].init.headers.authorization,
+    "Bearer t0k",
+    "with the token it names",
+  );
+  assert.equal(JSON.parse(posts[0].init.body).event, "tool.call");
+  assert.match(posts[1].url, /\/event$/, "and the prompt goes to the bridge");
+});

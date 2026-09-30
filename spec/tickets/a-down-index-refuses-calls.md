@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -218,6 +218,22 @@ record:
         hash: e12c15cf9e654d97
         size: 791
     def: a3dfd8c60d853590
+  - step: design/tests-red-2
+    hand: box d88f0683f2d7 · claude-code-remote
+    hash_before: 7e733cfc85b9494fbab6f071efb0512f25719856
+    hash_after: 7e733cfc85b9494fbab6f071efb0512f25719856
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft-2
+        hash: e5eb8e88440a6052
+        size: 4805
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 9c7cd4dd4a2dadb8
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
@@ -419,26 +435,35 @@ What I weigh: the gate found that a full switch drops the rules, the tools and t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/bridgehead.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/bridgehead.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three cases stand red on their own assertion. The refusal case sees the call pass to the harness. The raced row case sees the hook write the log back over a row another writer appends. The split road case sees the tool call go to the bridge, not the hooks door.
+
+The read case and the shadow case pass today, and they hold the edges of the change.
+
+The surprise: in the full file run the raced row case also reads the down flags the case before it leaves set, so the reset in register decides it as much as the append does.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the refusal case, the second the raced row case, and the third the check at tests-green. The split road case holds the answer to the gate
+- the doors the tests reach have fakes: the fake disk, a process fake that appends on the node append argv, and an http fake that answers by url
 
 # gate
 
