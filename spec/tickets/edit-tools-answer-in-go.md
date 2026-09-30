@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d89586721a117 · claude-code-remote
+    hash_before: 142889fa1075d4a59677a80cd85abf48be70091a
+    hash_after: 142889fa1075d4a59677a80cd85abf48be70091a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: ae1006c9cecc729a
+        size: 770
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -379,26 +402,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/edits_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The patch, replace, undo and mint tools answer in Go, in a new IO module src/modules/edits, which stands off the wiring until the flip. A patch reads each file, runs the ops, and asks the ticket door and the write door over every file before it writes. It writes the undo journal first, under the keys the bridge writes, so commit-verb.js and pull-landed.js read it unchanged. The door judge lives in hooks as Judge, the schema refusal first and the voice refusal after, and the harness door calls it too. The mint ports into check/mint.go over front.Mint, so src/front joins the pure readers a module takes. A caller in the process hands an action a map, so q decodes a map into the struct an action takes. The replace sweep walks the root past every dot folder, since the accept side holds no index database. accepts moves to src/quack/accepts.go, so main.go stays under the file ceiling.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the size list, plus q/action.go, imports.go and quack/accepts.go, each named in says
+- the edits module reads its outside through Outside, and each quack case fills it over a temp tree
+- each file header names the approach, and each function points at its design section or this ticket
+- the journal folder stays spelled beside the note in folders.js that owns it, and says so
 
 # accept
 
