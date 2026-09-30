@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 3c86df4df802db9d
         size: 750
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: 4fd23bf69161a851b60c8b37cb98e611e061db90
+    hash_after: 4fd23bf69161a851b60c8b37cb98e611e061db90
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 31dfa12d59625063
+        size: 2665
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +248,34 @@ A prompt naming a note and the questions a prompt asks stay with the bridge unti
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/prompt_test.go test/level0/cage.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/prompt_test.go
+- test/level0/cage.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Three Go cases red on their own assertion. The door answers pass to an owner's prompt, and it writes no row of the session log for a prompt or a hand-back. The cage case reds too, since `stepOf` drops an event effect.
+
+What surprises me: the cage test file stands red for the clear port already, so both ports share one red file until their tests-green steps close.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the rewrite case, the second the two row cases, the third the cage case, and the fourth the check at tests-green
+- the cases reach a temp tree and the fake index the package already uses, and the cage case reaches no door
 
 # gate
 

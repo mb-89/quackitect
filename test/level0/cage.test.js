@@ -36,6 +36,20 @@ test("the post goes to the standing port with its token as a bearer", () => {
   });
 });
 
+test("an event effect answers the rewritten event", () => {
+  assert.deepEqual(
+    stepOf(
+      { effects: [{ kind: "event", result: { text: "first, then the prompt" } }] },
+      "prompt.submit",
+      {
+        asks: true,
+        served: false,
+      },
+    ),
+    { answer: { event: { text: "first, then the prompt" } } },
+  );
+});
+
 test("a clear effect answers the clear prompt, and the turn passes", () => {
   assert.deepEqual(
     stepOf(
