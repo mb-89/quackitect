@@ -20,8 +20,8 @@ var layout = map[string][]string{
 	"draw":     {},
 	"tree":     {"draw"},
 	"frame":    {"draw", "tree"},
-	"log":      {"frame", "tree", "draw"},
-	"work":     {"frame", "tree", "draw"},
+	"log":      {"frame", "tree", "draw", "registry"},
+	"work":     {"frame", "tree", "draw", "registry"},
 	"registry": {"frame", "draw"},
 	".":        {"frame", "log", "work", "registry", "draw"},
 }
