@@ -391,3 +391,10 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 The draft's tests and size lists name `src/modules/config/config_test.go`. The config cases stand in `src/modules/config/keys_test.go` instead, so the red list leaves no standing case out of the check. The router's case `TestTheRootLandsAStoreRequest` lands in `src/quack/main_test.go` at tests-green.
+
+The gate's points correct the draft, and the build follows them:
+
+- a key no layer sets reads the layer `built-in`, the name `BuiltIn` in `src/config/config.go` gives it
+- the config module imports `q` alone, so it builds the `node` `run` request itself
+- `config/set` and `config/override` both take the dotted key, and the module maps it to the full name through the catalog
+- `config/keys` owns the rows `configRows` in `src/quack/config.go` answers today, and `quack config` reads them off `config/keys`
