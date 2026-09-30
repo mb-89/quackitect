@@ -22,7 +22,11 @@ function engine(answers = {}) {
   const $ = {
     tool: { register: (spec) => void registered.push(spec) },
     process: {
-      run: (argv) => void ran.push(argv) || (answers.start ?? { exitCode: 0 }),
+      // The bridgehead appends its row through node, and a case counts the start runs apart from it. [[spec/tickets/a-down-index-refuses-calls]]
+      run: (argv) =>
+        String(argv?.[2]).includes("appendFileSync")
+          ? { exitCode: 0 }
+          : void ran.push(argv) || (answers.start ?? { exitCode: 0 }),
     },
     http: {
       fetch: (where, init) => {

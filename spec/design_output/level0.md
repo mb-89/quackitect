@@ -97,8 +97,10 @@ stub's bridgehead keeps a copy, because that file imports nothing at all.
 ## A desk serve returns
 
 `./RUNME.sh serve` probes the same port. Where nothing answers, it starts the
-server detached through the proc door's `respawn`, watches it for the window a
-restart takes, and returns. The server stays when the shell closes, and a
+server apart from the shell through the proc door's `respawn`. It watches the
+server for the window a restart takes, and returns.
+
+The server stays when the shell closes, and a
 second run finds it standing and starts nothing. A start that falls inside the
 window names the line it writes to `.se/.log/serve.log`. With `--inspect` the
 verb holds the server as its own child, because the debugger holds it.
@@ -387,6 +389,25 @@ The marks stand apart, because a session start writes the row and leaves
 the line. A harness offering no `$.ui` leaves the row alone, and nothing
 throws. `./RUNME.sh doctor` names the server under `server`, where a person
 asks after it later.
+
+## The cage refuses while down
+
+Under `migration.cage` at `new`, the hooks door decides the events it ports,
+and the bridge answers the rest until [[spec/tickets/the-bridge-server-leaves]]
+moves them. `.claude/skills/level0/hooks/cage.js` holds the road.
+
+| the event | who answers |
+|---|---|
+| `tool.call`, `classic.Stop` | the hooks door, at the port and token `.se/.runtime/hooks.json` names |
+| `agent.spoke`, where the door asks back for rows | the hooks door |
+| a level zero tool the door passes | the bridge |
+| every other event | the bridge |
+
+Where the door answers nothing, the bridgehead runs its start road once and
+posts again. Still down, a guarded call meets a deny naming `session/alarms`
+and `./RUNME.sh serve`. Read, Grep, Glob and the level zero read tools pass, and
+so does every other event. For the decision, see
+[[spec/rationales/the-cage-refuses-while-down]].
 
 ## A session says its cage
 

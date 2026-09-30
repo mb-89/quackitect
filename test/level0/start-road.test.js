@@ -53,6 +53,13 @@ function harness({
     },
     process: {
       run: async (argv) => {
+        // The bridgehead appends its row through node, and the append lands in the log the case reads. [[spec/tickets/a-down-index-refuses-calls]]
+        if (argv[0] === "node" && String(argv[2]).includes("appendFileSync")) {
+          tries.push(String(argv[4]));
+          if (!logs) return { exitCode: 1, stderr: "the log stands read only" };
+          wrote.set(argv[3], `${wrote.get(argv[3]) ?? ""}${argv[4]}`);
+          return { exitCode: 0, stderr: "" };
+        }
         ran.push(argv);
         return { exitCode, stderr };
       },

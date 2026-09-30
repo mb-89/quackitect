@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -255,6 +255,15 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: b33eeff84a4d2c0062edb00761a0dae83e9d70fb
+    hash_after: b33eeff84a4d2c0062edb00761a0dae83e9d70fb
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
+    def: f150b8c0dc20fe45
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
@@ -508,14 +517,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hook module, its three split files, the three tests whose fakes take the append, the key and the three notes the rationale names. The file split answers the line ceiling the change meets, and the fakes answer the append the ask calls for
+- every door the change reaches has a fake: the disk, the process fake appending on the node argv, and an http fake answering by url
+- cage.js opens on a header naming the approach and links the ticket and the rationale
+- the standing file, the alarm key and the cage key each stand in one constant with a pointer at the Go owner, and level0.md points at cage.js
 
 ## tests-green
 

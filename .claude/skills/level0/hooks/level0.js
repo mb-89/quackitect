@@ -9,16 +9,18 @@ import { REPLY_PROBE } from "../lib/guidance.js";
 import { SERVE, SESSION } from "../lib/log.js";
 import { findSpec } from "../lib/search.js";
 import { undoSpec } from "../lib/undo.js";
-import { POINTER, PORT_BASE as PORT, SELF_TEST, TESTING } from "../lib/vehicle.js";
+import { POINTER, PORT_BASE as PORT } from "../lib/vehicle.js";
+import { BRIDGE, doored, doorOf } from "./cage.js";
+import { cageText, reasonOf, spawnTagOf, START } from "./start.js";
+import { beforeOf, lastTexts, textOf } from "./transcript.js";
+
+export { cageText, reasonOf, spawnTagOf, START };
 
 // The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], under the runtime folder folders.js owns.
 const HAND_FILE = ".se/.runtime/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
 const SHORT = 4000;
-const TEXTS = 4;
-// The transcript rows the answer door reads past the prompt's own row. [[spec/tickets/a-reply-follows-its-prompt]]
-const ROWS = 64;
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const STARTING = 180_000;
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
@@ -56,77 +58,6 @@ export const CAGE_BLOCK = "level0-cage";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
-// THE CLOUD STARTS ITS OWN SERVER, AND BRINGS WHAT THE SERVER NEEDS. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the modules stand nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export const START = [
-  "const { spawn, spawnSync } = require('node:child_process');",
-  "const { existsSync, mkdirSync, openSync } = require('node:fs');",
-  "const [here, method, skip] = process.argv.slice(1);",
-  "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
-  "if (!existsSync(method)) process.exit(4);",
-  "mkdirSync(here + '/.se/.log', { recursive: true });",
-  `const out = openSync(here + '/${SERVE}', 'a');`,
-  "const brought = !existsSync(method + '/node_modules');",
-  // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-  "if (brought) {",
-  "  const env = Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' });",
-  "  spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env, stdio: ['ignore', out, out] });",
-  "}",
-  "if (!existsSync(method + '/node_modules')) process.exit(6);",
-  // The code proves it loads before a server starts on it, so a broken tree writes one line and loops nowhere. [[spec/design_output/level0#new-code-proves-it-loads]]
-  `const tested = spawnSync(process.execPath, [method + '/src/bridge/server.js', '${SELF_TEST}', method], { cwd: method, encoding: 'utf8', timeout: ${TESTING}, windowsHide: true });`,
-  "if (tested.status !== 0) {",
-  "  process.stderr.write(String(tested.stderr || tested.error || 'the self-test answers nothing').trim().split('\\n').slice(0, 4).join(' '));",
-  "  process.exit(8);",
-  "}",
-  "const argv = [method + '/src/bridge/server.js', method];",
-  "const born = spawn(process.execPath, argv, { cwd: method, detached: true, stdio: ['ignore', out, out], windowsHide: true });",
-  "born.unref();",
-  "process.exit(brought ? 7 : 0);",
-].join("\n");
-
-const REASONS = {
-  0: ["info", "no server answered, so the bridgehead starts one"],
-  1: ["warn", "the start of the server fails"],
-  3: ["", "a person starts the server here"],
-  4: ["warn", "the method root is absent, so no server starts"],
-  5: ["warn", "this box carries no node, so no server starts"],
-  6: ["warn", "the install brings no modules, so no server starts"],
-  7: [
-    "info",
-    "the modules stand nowhere, so the bridgehead installs them and starts one",
-  ],
-  8: ["warn", "the bridge code fails its self-test, so no server starts"],
-};
-
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export function reasonOf(code) {
-  return (
-    REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`]
-  );
-}
-
-// The one block a session outside the cage reads, because the agent inside it is the one reader who cannot see the fault. [[spec/design_output/level0#a-session-says-its-cage]]
-export function cageText(code, detail) {
-  return [
-    "LEVEL ZERO STANDS DOWN ON THIS BOX. No rule, no brief, no write door and no",
-    `stop hook reaches this session. The start road answers ${code}, and that`,
-    `code says: ${reasonOf(code)[1]}.`,
-    String(detail ?? "").trim() ? `The road itself says: ${String(detail).trim()}` : "",
-    "Open your first answer with one line saying level zero stands down here, and",
-    "what this box lacks. Then run ./RUNME.sh, which installs it, and start the",
-    "server with ./RUNME.sh serve.",
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-// [[spec/design_output/pull#a-hand-of-its-own]]
-export function spawnTagOf(held) {
-  const id = String(held?.id ?? "").trim();
-  if (!id) return "";
-  return `You are the hand of session ${id} on this box, so you pull under no --as.`;
-}
-
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
 const SERVED = "mcp__level0__";
@@ -142,6 +73,10 @@ export function register(on, options) {
   held = 0;
   armed = false;
   probing = false;
+  saidDown = false;
+  toldDown = false;
+  port = PORT;
+  cage = null;
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -166,6 +101,10 @@ async function seen($, e, next) {
   if (event === "engine.create") return next(e);
   await probes($, event, e);
   if (event === "session.start") await opens($, e);
+  if (!reading(event, e) && (await doored($, event))) {
+    const said = await door($, event, e, next);
+    if (said !== BRIDGE) return said;
+  }
   const answer = reading(event, e)
     ? await reads($, event, e, next)
     : await ask($, event, await beforeOf($, event, e), next, {
@@ -207,6 +146,25 @@ async function seen($, e, next) {
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
 }
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+const door = doorOf({
+  fill: ($, event, e) => fillOf($, event, e),
+  starts: ($) => starts($),
+  down: ($, event, error, where) => down($, event, error, where),
+  answered: () => {
+    saidDown = false;
+    toldDown = false;
+  },
+  root: () => root,
+  spoken: async ($) => {
+    const { texts, rows } = await lastTexts($);
+    return { text: stepText || texts.at(-1) || "", texts, rows };
+  },
+  merged,
+  served: (tool) => tool.startsWith(SERVED),
+  reads: (tool) => CALLED.includes(tool),
+});
 
 // A door answering a vote and a hand in one: the hand runs, and the vote stands as the answer. [[spec/tickets/the-spawn-reaches-its-guidance]]
 export async function besides($, answer, e, next) {
@@ -395,50 +353,6 @@ async function* streams($, e, next) {
   );
 }
 
-async function lastTexts($) {
-  const out = [];
-  let rows = [];
-  try {
-    rows = await $.session.messages();
-    for (let at = rows.length - 1; at >= 0 && out.length < TEXTS; at--) {
-      const said = String(rows[at]?.text ?? "").trim();
-      if (rows[at]?.role === "assistant" && said) out.unshift(said);
-    }
-  } catch {}
-  return {
-    texts: out,
-    rows: (Array.isArray(rows) ? rows : []).slice(-ROWS).map(rowOf),
-  };
-}
-
-// A row as the answer door reads it: its role, its id where it carries one, and its text where the agent wrote it. [[spec/tickets/a-reply-follows-its-prompt]]
-function rowOf(row) {
-  const id = row?.id ?? row?.uuid;
-  return {
-    role: String(row?.role ?? ""),
-    ...(id ? { id: String(id) } : {}),
-    ...((row?.toolResults ?? []).length ? { results: true } : {}),
-    ...(row?.role === "assistant" ? { text: String(row?.text ?? "").trim() } : {}),
-  };
-}
-
-// The prompt carries the id of the newest transcript row, so the answer door keys on it. [[spec/tickets/a-reply-follows-its-prompt]]
-async function beforeOf($, event, e) {
-  if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
-  try {
-    const rows = await $.session.messages();
-    const id = rows.at(-1)?.id ?? rows.at(-1)?.uuid;
-    return id ? { ...e, before: String(id) } : e;
-  } catch {
-    return e;
-  }
-}
-
-function textOf(chunk) {
-  if (!chunk || typeof chunk !== "object" || chunk.kind !== "text") return "";
-  return typeof chunk.text === "string" ? chunk.text : "";
-}
-
 async function spoke($, e, next) {
   const { texts, rows } = await lastTexts($);
   const text = stepText || texts.at(-1) || "";
@@ -536,13 +450,13 @@ function merged(said, after) {
 }
 
 // A fall reaches the person at the moment it falls, beside the row the log takes. The session start says nothing to them, because the start road runs under it. [[spec/design_output/level0#the-bridge-says-it-falls]]
-async function down($, event, error) {
+async function down($, event, error, where = url()) {
   const why = String(error?.message ?? error);
   if (!saidDown) {
     saidDown = true;
     await wrote($, {
       level: "warn",
-      said: `the server answers nothing at ${url()}`,
+      said: `the server answers nothing at ${where}`,
       event,
       detail: why,
     });
@@ -620,9 +534,29 @@ async function probes($, event, e) {
   });
 }
 
+// The append a row takes through a process, so a row another writer appends between a read and a write stays. [[spec/design_output/log#every-writer-appends]]
+const APPEND =
+  "const fs = require('node:fs'); const path = require('node:path'); const [file, row] = process.argv.slice(1); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.appendFileSync(file, row);";
+
 // One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 async function wrote($, said) {
   const row = { at: new Date().toISOString(), kind: "bridge", ...said };
+  if (typeof $?.process?.run === "function") {
+    try {
+      const file = root ? `${root}/${SESSION}` : SESSION;
+      const ran = await $.process.run([
+        "node",
+        "-e",
+        APPEND,
+        file,
+        `${JSON.stringify(row)}\n`,
+      ]);
+      return Number(ran?.exitCode ?? 1) === 0;
+    } catch {
+      return false;
+    }
+  }
+  // A host running no process reads and writes the file back. [[spec/design_output/log#every-writer-appends]]
   try {
     let held = "";
     try {

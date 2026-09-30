@@ -160,13 +160,15 @@ the others hold there. So the hook, the command line and the sidebar land in
 one file, in the order they happen.
 
 - The command line appends through the disk door's `append`.
-- `$.fs` offers no append, so the hook reads the file and writes it back one
-  line longer.
+- `$.fs` offers no append, so the hook appends through `$.process.run`, as
+  `node -e` with an `appendFileSync` script, the path and the row. A host
+  running no process reads the file and writes it back one line longer.
 - The editor's file system offers no append either, so the editor door appends
   through node's `appendFile`, the way the command line does.
 
 A read and a write back drop a line another writer lands between the two. So
-every writer that can append does, and the hook alone still rewrites. The hook
+every writer that can append does, and a hook on a host running no process
+alone still rewrites. The hook
 and the sidebar each queue their lines, so one of them writes one line at a
 time. `$.fs` refuses a read or a write over 4 MiB, and one session stays under
 that.
