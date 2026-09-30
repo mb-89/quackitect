@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -153,7 +153,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d85ab822b1d7 · claude-code-remote
+    hash_before: 45074c3453de9f6174cc3ae93647562030fa5fd4
+    hash_after: 45074c3453de9f6174cc3ae93647562030fa5fd4
+    inputs:
+      - name: retro/write
+        hash: d14ccde7721f3daa
+        size: 1900
+    def: 4da1ca5da87d5bbc
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -298,20 +308,26 @@ The group holds one child, and that child claims no fix. The real fix lands in a
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool stands installed, and no host or right meets a refusal
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the level zero doors on git writes and on a gate chained before a landing, at 00:00 UTC
+- the server stop after the check, at 23:57 UTC
+- no conflict at sync, and no test failing on the box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parks, and no ticket mints without a group
+- the person tickets on trunk stay loose on the person route, untouched
 
 # Discussion
 
