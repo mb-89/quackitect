@@ -119,17 +119,15 @@ two-way watching carries.
 
 ## A click writes the file
 
-The sidebar writes `.se/.runtime/config.json` and that file alone. A row under the
-tracked file shows the team's value. Typing there writes an override, so the
-tracked file stays as the team holds it.
+A click posts `config/override` with the key, the typed value and the window,
+and the sidebar writes no file. A row under the tracked file shows the team's
+value, and the tracked file stays as the team holds it.
 
-`withValue` reads the file, sets one key, and writes the whole text back. The
-shape it writes is the shape the tracked file holds. The value takes the type
+The config module holds the override for the window. The value takes the type
 the schema says, so `"5"` from a select lands as the number `5`. That keeps
-`"5" > 3` a bug nobody files. A key the schema leaves alone lands as the text a
-person types.
+`"5" > 3` a bug nobody files. [[spec/tickets/the-sidebar-writes-through-actions]]
 
-## The local file dies
+## A new window drops overrides
 
 A session is one window. The main process of the editor outlives a window
 reload and dies on a quit, so `process.ppid` draws that line:
@@ -140,14 +138,13 @@ reload and dies on a quit, so `process.ppid` draws that line:
 | Developer, Reload Window | no |
 | the engine restarts | no |
 
-The id stands beside the values as `session.pid`. A view opening under an id
-that differs writes a file holding the new id and `engine.binding` alone. So a
-hold lasts as long as the window a person sets it in, and the binding holds
-until the owner changes it.
+A view opening under a new id posts `config/opened` with that id. The config
+module drops every override another window holds, and writes no file. So a
+click lasts as long as its window, and a value the owner writes into the local
+file by hand survives a new window.
 
-A cloud box proves the rule and a person proves the id. `opened` answers what
-one id clears, and the reload row above waits for the first person to open the
-folder.
+A cloud box proves the rule and a person proves the id. The reload row above
+waits for the first person to open the folder.
 
 # Declaration to HTML
 

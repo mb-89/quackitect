@@ -51,8 +51,6 @@ function doorOf(files = fakeDisk({ "spec/views/work.base": BASE }), given = CATA
   const index = v1Over(files, given);
   return {
     called: index.called,
-    write: async (path, text) => files.write(path, text),
-    append: async (path, text) => files.append(path, text),
     index,
     nonce: () => "nonce",
     source: () => "https://box",
@@ -121,21 +119,17 @@ function shadowDoorOf(mode) {
     [TRACKED]: JSON.stringify({ migration: { sidebar: mode } }),
     "spec/views/work.base": BASE,
   });
-  const appended = [];
   return {
     ...doorOf(files, { ...CATALOG, "work/open-tasks": 2 }),
-    appended,
-    append: async (_path, text) => appended.push(text),
     now: () => 0,
   };
 }
 
+// Each row the sidebar posts through log/say. [[spec/tickets/the-sidebar-writes-through-actions]]
 const shadowRows = (door) =>
-  door.appended
-    .join("")
-    .split("\n")
-    .filter(Boolean)
-    .map((line) => JSON.parse(line))
+  door.called
+    .filter((one) => one.name === "log/say")
+    .map(({ input }) => ({ kind: input.kind, said: input.said, ...input.extra }))
     .filter((row) => row.kind === "shadow");
 
 test("under shadow a mismatch writes a shadow row naming the slice, and under old none", async () => {

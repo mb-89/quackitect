@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"path"
 	"sort"
+	"strconv"
 	"strings"
 
 	"quackitect/src/q"
@@ -34,7 +35,35 @@ func Registers(c *q.Catalog) q.Writer {
 		q.ProjectIn(c, "hold", Glob, q.JSON, q.Loaded, q.Ordered{}, q.Doc("a box's hold, keyed by its file")),
 		q.DerivedIn(c, BlessName, false, blesses, q.Doc("whether an agent at this desk blesses a gate, off the bless file the sidebar writes")),
 		q.DerivedIn(c, StandingName, []Standing{}, standingOf, q.Doc("every hold whose ticket stands, one row a hold file, marked where a person holds it")),
+		// [[spec/tickets/the-sidebar-writes-through-actions]]
+		q.ActionIn(c, BlessSet, deskBless, q.Doc("Write whether an agent at this desk blesses a gate, as a person."), q.Label("Bless"), q.Writes()),
 	)
+}
+
+// The action the bless button posts. [[spec/tickets/the-sidebar-writes-through-actions]]
+const BlessSet = "bless/set"
+
+// The node module's name and its verb, and the fields of a run a person posts. src/modules/verbs owns them, and a module spells them again because it imports q alone. [[spec/tickets/the-lens-calls-actions]]
+const (
+	nodeModule  = "node"
+	nodeRun     = "run"
+	wordsField  = "words"
+	personField = "person"
+)
+
+// The input of a bless: the desk's word, and the person mark. [[spec/tickets/the-sidebar-writes-through-actions]]
+type BlessIn struct {
+	Agent  bool `json:"agent" label:"agent blesses" doc:"whether an agent at this desk blesses a gate"`
+	Person bool `json:"person,omitempty" doc:"whether a person posts it, so the verb runs with no harness variable"`
+}
+
+// The ticket verb's desk bless, which writes the bless file and refuses an agent. [[spec/tickets/the-sidebar-writes-through-actions]]
+func deskBless(in BlessIn) []q.Request {
+	var args any = []string{"ticket", "bless", "--desk=" + strconv.FormatBool(in.Agent)}
+	if in.Person {
+		args = map[string]any{wordsField: args, personField: true}
+	}
+	return []q.Request{{Module: nodeModule, Verb: nodeRun, Args: args, NoUndo: "ticket bless runs through its program, which keeps no undo"}}
 }
 
 // The standing holds, which the lens, the marks and the drawing read. [[spec/tickets/the-lens-reads-v1]]

@@ -1,7 +1,7 @@
 // The sidebar with a fake editor. Every layer but the drawing runs here: a
-// message lands in the file, the watcher draws the file again, and a window
-// that opens twice takes the local values with it.
-// [[spec/guidance/code/testing]]
+// message posts an override for the window, the watcher draws the file again,
+// and a window that opens drops the overrides another window holds.
+// [[spec/guidance/code/testing]] [[spec/tickets/the-sidebar-writes-through-actions]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -9,7 +9,6 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate } from "../../src/extension/extension.js";
 import { COMMAND } from "../../src/extension/lib/lens.js";
 import { FLIP } from "../../src/extension/lib/route-host.js";
-import { KEY } from "../../src/extension/lib/session.js";
 import { LOCAL, TRACKED } from "../../src/extension/lib/widgets.js";
 import { NAMES, sidebarOf } from "../../src/extension/sidebar.js";
 import { v1Over } from "./v1-index.js";
@@ -133,7 +132,10 @@ function doorOf(seed = {}) {
   };
 }
 
-const local = (door) => JSON.parse(door.files.read(LOCAL));
+// The value config/keys answers at a key, and its layer. [[spec/tickets/the-sidebar-writes-through-actions]]
+const keyed = async (door, key) =>
+  (await door.index.values("config/keys")).find((one) => one.key === key) ?? {};
+const held = async (door, key) => (await keyed(door, key)).value;
 
 test("the sidebar draws the widgets the declaration names", async () => {
   const said = await sidebarOf(doorOf()).html();
@@ -142,25 +144,30 @@ test("the sidebar draws the widgets the declaration names", async () => {
   assert.match(said, /nonce="nonce"/);
 });
 
-// [[spec/design_output/extension#a-click-writes-the-file]]
-test("a set message writes the local file, and leaves the tracked one alone", async () => {
+// [[spec/tickets/the-sidebar-writes-through-actions]]
+test("a set message holds an override, and leaves both files alone", async () => {
   const door = doorOf();
   await sidebarOf(door).took({ kind: "set", key: "stop.hold", value: "stop" });
 
-  assert.deepEqual(local(door).stop, { hold: "stop" });
+  assert.deepEqual(await keyed(door, "stop.hold"), {
+    key: "stop.hold",
+    value: "stop",
+    layer: "override",
+  });
+  assert.equal(door.files.exists(LOCAL), false);
   assert.equal(JSON.parse(door.files.read(TRACKED)).stop.hold, "off");
 });
 
 test("a number typed as text lands as the number the schema says", async () => {
   const door = doorOf();
   await sidebarOf(door).took({ kind: "set", key: "stop.mostInARow", value: "5" });
-  assert.equal(local(door).stop.mostInARow, 5);
+  assert.equal(await held(door, "stop.mostInARow"), 5);
 });
 
 test("a key the schema leaves alone lands as the text a person types", async () => {
   const door = doorOf();
   await sidebarOf(door).took({ kind: "set", key: "helper.find", value: "sonnet" });
-  assert.equal(local(door).helper.find, "sonnet");
+  assert.equal(await held(door, "helper.find"), "sonnet");
 });
 
 // [[spec/design_output/extension#the-log-opens-a-terminal]]
@@ -236,26 +243,29 @@ test("the widget follows the file, because a redraw reads the file again", async
   assert.ok(!/class="said"/.test(now), "the mark stands alone");
 });
 
-// [[spec/design_output/extension#the-local-file-dies]]
-test("a window opening under a new id takes the local values with it", async () => {
-  const door = doorOf({
-    [LOCAL]: JSON.stringify({ stop: { hold: "stop" }, [KEY]: 7 }),
-  });
-  const said = await sidebarOf(door).opened(42);
+// [[spec/tickets/the-sidebar-writes-through-actions]]
+test("a window opening under a new id drops the overrides the last window held", async () => {
+  const door = doorOf();
+  const before = sidebarOf(door);
+  await before.opened(7);
+  await before.took({ kind: "set", key: "stop.hold", value: "stop" });
+  await sidebarOf(door).opened(42);
 
-  assert.deepEqual(said.cleared, ["stop.hold"]);
-  assert.equal(local(door).stop, undefined);
-  assert.equal(local(door).session.pid, 42);
+  assert.deepEqual(await keyed(door, "stop.hold"), {
+    key: "stop.hold",
+    value: "off",
+    layer: TRACKED,
+  });
 });
 
-test("a window reloading under the same id keeps every value it held", async () => {
-  const door = doorOf({
-    [LOCAL]: JSON.stringify({ stop: { hold: "stop" }, session: { pid: 42 } }),
-  });
-  const said = await sidebarOf(door).opened(42);
+test("a window reloading under the same id keeps every override it held", async () => {
+  const door = doorOf();
+  const before = sidebarOf(door);
+  await before.opened(42);
+  await before.took({ kind: "set", key: "stop.hold", value: "stop" });
+  await sidebarOf(door).opened(42);
 
-  assert.deepEqual(said.cleared, []);
-  assert.equal(local(door).stop.hold, "stop");
+  assert.equal(await held(door, "stop.hold"), "stop");
 });
 
 // [[spec/design_output/extension#a-gesture-picks-a-state]]
@@ -267,17 +277,17 @@ test("five presses reach the far state, though every write draws the page again"
     await sidebar.took({ kind: "press", key: "stop.hold" });
     await sidebar.html();
   }
-  assert.equal(local(door).stop.hold, "stop");
+  assert.equal(await held(door, "stop.hold"), "stop");
 });
 
 test("one press moves one rung, and a press after the burst moves back", async () => {
   const door = doorOf();
   const sidebar = sidebarOf(door);
   await sidebar.took({ kind: "press", key: "stop.hold" });
-  assert.equal(local(door).stop.hold, "finish");
+  assert.equal(await held(door, "stop.hold"), "finish");
   door.said.at = 5000;
   await sidebar.took({ kind: "press", key: "stop.hold" });
-  assert.equal(local(door).stop.hold, "off");
+  assert.equal(await held(door, "stop.hold"), "off");
 });
 
 // A press moves from the built-in where no file sets the key, so a press off finish moves back to rest. [[spec/tickets/the-config-schema-gets-generated]]
@@ -286,7 +296,7 @@ test("a press moves from the built-in", async () => {
   built.properties.stop.properties.hold.default = "finish";
   const door = doorOf({ [SCHEMA]: JSON.stringify(built), [TRACKED]: "{}" });
   await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
-  assert.equal(local(door).stop.hold, "off");
+  assert.equal(await held(door, "stop.hold"), "off");
 });
 
 // [[spec/design_output/extension#a-press-writes-a-line]]
@@ -383,7 +393,7 @@ test("god mode stands in the status bar from the start, and a new hold toasts", 
   assert.deepEqual(door.said.toasted, ["stop"]);
 
   await door.said.commands.get("quackitect.rest")("stop.hold", "off");
-  assert.equal(local(door).stop.hold, "off");
+  assert.equal(await held(door, "stop.hold"), "off");
 });
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
@@ -481,7 +491,7 @@ test("the sidebar draws the bless button with no schema entry naming it", async 
   assert.match(said, /data-widget="bless"/);
 });
 
-// [[spec/design_output/pull#the-bless]]
+// The fake index's bless/set writes the file, as the verb it runs does. [[spec/design_output/pull#the-bless]] [[spec/tickets/the-sidebar-writes-through-actions]]
 test("a bless message writes the bless file, and leaves the config files alone", async () => {
   const door = doorOf();
   const sidebar = sidebarOf(door);

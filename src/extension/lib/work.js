@@ -7,16 +7,6 @@ const RUNME = "./RUNME.sh";
 // A ticket's name is its file's name, in the lower-case words the ticket folder holds. [[spec/tickets/the-work-group-draws-buttons]]
 const NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HOLE = "<name>";
-// The ticket new ticket writes: a kind, an empty process the completion offers, and an ask to fill. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
-const NEW_TICKET = [
-  "---",
-  "kind: [[ticket]]",
-  'process: ""',
-  "---",
-  "",
-  "# Ask",
-  "",
-].join("\n");
 
 // A config line opens on the RUNME head, and a verb takes the words past it. [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 function lineArgvOf(line) {
@@ -64,4 +54,5 @@ function ticketPathOf(opens, name) {
     .join(said);
 }
 
-module.exports = { NEW_TICKET, countIn, lineArgvOf, nameIn, nextIn, ticketPathOf };
+// NEW_TICKET moves to the ticket verb in src/scripts/ticket.js, which tickets/new runs. [[spec/tickets/the-sidebar-writes-through-actions]]
+module.exports = { countIn, lineArgvOf, nameIn, nextIn, ticketPathOf };

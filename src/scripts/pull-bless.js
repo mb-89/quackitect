@@ -140,6 +140,23 @@ function mayBless(it) {
     : `an agent at a desk blesses where ${BLESS_FILE} holds agent true, and the sidebar button writes it.`;
 }
 
+// The prefix naming the desk's own word, which the sidebar's bless button posts through bless/set. [[spec/tickets/the-sidebar-writes-through-actions]]
+export const DESK = "--desk=";
+
+// A person writes whether an agent at this desk blesses, and an agent writes it nowhere. [[spec/tickets/the-sidebar-writes-through-actions]]
+export function blessDesk(it, word) {
+  if (it.agent || agentOf(it.env)) {
+    say(REFUSED, [blessRefusal()]);
+    return 1;
+  }
+  const parts = BLESS_FILE.split("/");
+  it.disk.makeDir?.(it.join(it.root, ...parts.slice(0, -1)));
+  const agent = String(word).trim() === "true";
+  it.disk.write(it.join(it.root, ...parts), `${JSON.stringify({ agent })}\n`);
+  console.log(`an agent at this desk blesses: ${agent}`);
+  return 0;
+}
+
 // [[spec/design_output/pull#the-bless]]
 export function bless(it, at, name) {
   if (!at) {

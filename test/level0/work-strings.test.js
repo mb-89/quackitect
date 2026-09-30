@@ -1,13 +1,13 @@
 // The strings behind the work group: the line a config entry runs, the count
-// and the next ticket the verbs answer, and the new ticket's path and text.
-// [[spec/tickets/the-work-group-draws-buttons]]
+// and the next ticket the verbs answer, and the new ticket's path. The bare
+// ticket's text moves to the ticket verb, which test/level0/ticket-new.test.js holds.
+// [[spec/tickets/the-work-group-draws-buttons]] [[spec/tickets/the-sidebar-writes-through-actions]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   countIn,
   lineArgvOf,
-  NEW_TICKET,
   nameIn,
   nextIn,
   ticketPathOf,
@@ -55,11 +55,6 @@ test("a name takes the ticket path, and a name outside the ticket form takes non
   assert.equal(ticketPathOf(opens, " slow-lint "), "spec/tickets/slow-lint.md");
   for (const bad of ["", "../escape", "a/b", "Slow Lint", "-lead", "a..b"])
     assert.equal(ticketPathOf(opens, bad), "", bad);
-});
-
-test("a new ticket carries its kind and an empty process, and an ask to fill", () => {
-  assert.match(NEW_TICKET, /^---\nkind: \[\[ticket\]\]\nprocess: ""\n---\n/);
-  assert.match(NEW_TICKET, /^# Ask$/m);
 });
 
 test("an answer of the wrong shape reads as none", () => {

@@ -1,5 +1,5 @@
 // The ticket verb's bless --desk: the owner's word on whether an agent at this
-// desk blesses, which a person writes and an agent never does.
+// desk blesses, which a person writes and the verb refuses to an agent.
 // [[spec/tickets/the-sidebar-writes-through-actions]]
 
 import assert from "node:assert/strict";

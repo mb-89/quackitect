@@ -14,6 +14,7 @@ const NEXT = { ticket: "one", path: "spec/tickets/one.md", step: "do" };
 
 function doorOf({ seed = {}, answers = {}, typed = "", given = {} } = {}) {
   const files = fakeDisk({ [SCHEMA]: JSON.stringify(schema), ...seed });
+  const index = v1Over(files, given);
   const said = {
     asked: [],
     ran: [],
@@ -32,8 +33,10 @@ function doorOf({ seed = {}, answers = {}, typed = "", given = {} } = {}) {
     files,
     said,
     index: {
-      ...v1Over(files, given),
+      ...index,
+      // A verb's action answers off the table, and an action taking no words, as tickets/new, does what its module does. [[spec/tickets/the-sidebar-writes-through-actions]]
       acts: async (name, input) => {
+        if (!input?.args) return index.acts(name, input);
         const argv = [...name.split("/"), ...input.args];
         said.ran.push(argv);
         return answer(argv);
@@ -108,6 +111,7 @@ test("new ticket asks a name, writes a ticket with an empty process, and opens i
   await press(door, "work.new");
   assert.equal(door.said.asked.length, 1);
   const path = "spec/tickets/slow-lint.md";
+  assert.deepEqual(door.index.called, [{ name: "tickets/new", input: { path } }]);
   assert.match(door.files.read(path), /^process: ""$/m);
   assert.deepEqual(door.said.opened, [path]);
   assert.deepEqual(door.said.ran, []);

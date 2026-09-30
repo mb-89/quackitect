@@ -1,5 +1,5 @@
-// The ticket verb's new: the bare ticket New ticket used to write, now the
-// verb's to write, where no file stands.
+// The ticket verb's new: the bare ticket the verb writes where no file
+// stands, which the New ticket button posts.
 // [[spec/tickets/the-sidebar-writes-through-actions]]
 
 import assert from "node:assert/strict";
