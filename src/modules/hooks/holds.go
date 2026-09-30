@@ -10,9 +10,10 @@ import (
 	"strings"
 )
 
-// The joint of a held call's id, and the plan's fields the grace reads. [[spec/tickets/cage-call-holds-port]]
+// The joint and the base of a held call's id, and the plan's fields the grace reads. [[spec/tickets/cage-call-holds-port]]
 const (
 	callJoin    = ":"
+	callBase    = 10
 	planWorking = "working"
 	planTodos   = "todos"
 )
@@ -79,7 +80,7 @@ func (d *Door) held(session string, post Post, root string) (Effect, bool) {
 		d.mu.Lock()
 		d.heldIn[root] = session
 		d.mu.Unlock()
-		return Effect{Kind: rowsKind, Call: session + callJoin + strconv.FormatInt(seq, 10)}, true
+		return Effect{Kind: rowsKind, Call: session + callJoin + strconv.FormatInt(seq, callBase)}, true
 	}
 	return Effect{}, false
 }
