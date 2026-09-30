@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: a85d7b24dea0e5fb
         size: 1089
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 9ab6b544d5682e034a5c7e3eab8ea60cb5baadf3
+    hash_after: 9ab6b544d5682e034a5c7e3eab8ea60cb5baadf3
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: 68b2bce98c183707
+        size: 4426
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -252,26 +265,31 @@ Assumed: two windows open side by side drop each other's overrides on open. The 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/config/keys_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/config/keys_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion: the schema stands outside the config projection's globs, and config/set and config/override name no action. The cases read the new names through the store and decode rows through JSON, so the file compiles against today's code. The router's store.land case waits for tests-green, because accepts takes the store only then, and a case naming the new signature would stop the package compiling. landsAll stands in for the router here, as the fake of the store door.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the keys line meets TestConfigKeysNameEachLayer and TestConfigKeysCarryTheBuiltInWhereNoLayerSets, the set line meets TestConfigSetRunsTheConfigVerb, the windows line meets TestOpenedDropsTheOverridesOfOtherWindows, and the check line meets ./RUNME.sh check
+- the files door is the seeded files/ value, the node door is the request list the case reads, and the store door is landsAll, which folds each land request into config/held
 
 # gate
 
