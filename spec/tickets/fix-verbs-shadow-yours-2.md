@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,25 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: loose-fixes-a906d84
+step: do
+record:
+  - step: do
+    hand: box d85ab822b1d7 · claude-code-remote
+    hash_before: 4be87f8b4b7a8b8c7b068911846ed665981dac41
+    hash_after: 4be87f8b4b7a8b8c7b068911846ed665981dac41
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/fix-verbs-shadow-yours-2.md:38:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 08b9d88566cc31cd
+        size: 528
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -34,7 +53,7 @@ group: loose-fixes-a906d84
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart from cli.js: the new path answered ten rows where the old one answered five. Gain: the shadow log stays empty for the verbs, so the coordinator can turn `migration.phase4switch` on. Breaks: the switch stays off while a verb answers apart from cli.js.
+The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart from cli.js. The new path answered ten rows where the old one answered five. Gain: the shadow log stays empty for the verbs, so the coordinator can turn `migration.phase4switch` on. Breaks: the switch stays off while a verb answers apart from cli.js.
 
 - the four shadowed verbs write no row to `./RUNME.sh log --kind shadow` after the run starts
 - this ticket names the cause of the split and what a fix needs
@@ -47,7 +66,6 @@ The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
 
 ./RUNME.sh test src/quack
@@ -55,7 +73,6 @@ The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
 ./RUNME.sh check
@@ -63,7 +80,6 @@ The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
 No code changes. The split does not reproduce on this tree, and the cause stands below.
@@ -78,11 +94,12 @@ No code changes. The split does not reproduce on this tree, and the cause stands
 - I took the second and minted the follow-up ticket the-index-reads-standing-branches. This ticket claims no fix.
 - I wrote no test that fails first. The fault needs a standing remote branch, and the git write door refuses a scratch remote.
 - Assumption: the prose shadow rows stand outside the verbs slice.
+- Recheck on this box: the four verbs exit 0, and `./RUNME.sh log --kind shadow` answers no row.
+- The follow-up ticket the-index-reads-standing-branches stands closed on trunk.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
 - the change follows the ask: the fix needs a branch input, so the follow-up ticket carries it
