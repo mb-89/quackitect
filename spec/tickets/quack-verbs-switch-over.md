@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/quack-verbs-switch-over already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 328f1998b76a824b1a03f97c432b7733b136c606
+    hash_after: 328f1998b76a824b1a03f97c432b7733b136c606
+    inputs:
+      - name: ask
+        hash: 8a0d99f99d9c7a55
+        size: 365
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["quack-verbs-land-in-shadow", "open-tasks-switch-lands", "read-topics-switch-over"]
 enabled_by: migration.phase4switch
 cloud: true
@@ -133,14 +145,28 @@ Done when agents call `quack` and no `./RUNME.sh` verb, and `cli.js` leaves the 
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/agents-call-quack-directly]] on standard
+[[spec/tickets/cage-comments-drop-needs-shadow]] on trivial
+[[spec/tickets/cli-callers-the-draft-misses]] on trivial
+[[spec/tickets/cli-js-leaves]] on standard
+[[spec/tickets/describe-reaches-the-tool-list]] on trivial
+[[spec/tickets/index-reads-loaded-projections]] on standard
+[[spec/tickets/loaded-projection-curl-checkpoint]] on trivial
+[[spec/tickets/loaded-projection-test-names-match]] on trivial
+[[spec/tickets/runme-road-reads-verbs-new]] on trivial
+[[spec/tickets/verb-outputs-name-index-tools]] on trivial
+[[spec/tickets/verbline-spares-blocking-verbs]] on trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every child is small enough to review whole: each is a one-line trivial fix or a standard ticket over one slice, and every one stands closed
+the children add up to the goal: agents-call-quack-directly moves the agents to quack, the leaving ticket takes the old script out of the tree, and index-reads-loaded-projections lets the index answer the tracked config the switched verbs read
+no child waits on another now, since every one stands closed
 
 # children
 
