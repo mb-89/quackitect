@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-sends-changes]
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,25 @@ record:
         exit: 0
         said: "spec/tickets/the-tui-data-paths-leave.md:376:73: Passive: Write in the active voice and name who acts: 'is reached'."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: 98501ed5e74701fafb6561f7abe0e62769cf0bfd
+    hash_after: 98501ed5e74701fafb6561f7abe0e62769cf0bfd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/log passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-tui-data-paths-leave.md:376:73: Passive: Write in the active voice and name who acts: 'is reached'."
+    inputs:
+      - name: design/tests-red
+        hash: 71f75553e780e505
+        size: 615
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -340,26 +359,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/log/v1_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The log tab now draws off log/rows through the catalog the window hands it, and wakes on the /v1 watch, so its own tail and file watcher leave the window. A change with fewer rows than the tab holds reads as a new session. The tab takes log/rows alone and its own watch end alone, because it stands first and would swallow the work tab's changes. The frame mode reads its file once through ReadLog.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: tests-green adds no file past the implement leaf's.
+- fakes: registry.Fake stands for the catalog and the watch.
+- comments: each new function points at this ticket.
+- one place: rowsName stands in v1.go, and the design note points at read.go.
 
 # accept
 
