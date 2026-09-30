@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: a5538f7d2957995ef68e2bf54247e0bf08f47397
+    hash_after: a5538f7d2957995ef68e2bf54247e0bf08f47397
+    inputs:
+      - name: ask
+        hash: 8b99734c935f88bf
+        size: 575
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,69 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+An action takes its own tool name as a registration option, and every surface reads the name off one function.
+
+1. `q` gains `ToolName(name string) Option`, beside `Doc` in src/q/q.go. The registration keeps it, and `Presentation` in src/q/looks.go carries it as `Tool`.
+2. `tool.NameOf(store, action)` in src/q/tool/tool.go answers the action's own tool name where it carries one, and `Name(action)` otherwise.
+3. `tool.Action` drops the level zero server's prefix off the called name, then matches every action's `NameOf`. An `index_` name resolves as today.
+4. The index's tool list in src/index/tools.go, the MCP module's list in src/modules/mcp/mcp.go and its call lookup read `NameOf`. The hooks door reaches `Action` alone, so it reads the new names with no change.
+5. `isIndexTool` in .claude/skills/level0/lib/index-tools.js intercepts a listed name, not the prefix alone, so the hook sends a named tool to the index.
+
+What I weigh: the names the guidance quotes stay, at the cost of a second naming path, and one function owns both. I assume no two actions claim one tool name. The tool list refuses a second claim at registration.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/q/q.go: the options, which gain ToolName
+- src/q/looks.go: Presentation, which gains Tool
+- src/q/tool/tool.go: Name, Action, and NameOf, new
+- src/index/tools.go: door.servesTools
+- src/modules/mcp/mcp.go: the tool list and the call lookup
+- src/modules/hooks/hooks.go: Door.calls, which reads Action
+- .claude/skills/level0/lib/index-tools.js: isIndexTool
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/tools_test.go: TestTheToolListNamesAnActionUnderItsOwnToolName
+- src/q/tool/tool_test.go: TestActionResolvesALevelZeroNameToItsAction
+- src/q/tool/tool_test.go: TestAnIndexNameResolvesAsBefore
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/q/q.go
+- src/q/looks.go
+- src/q/tool/tool.go
+- src/q/tool/tool_test.go
+- src/index/tools.go
+- src/index/tools_test.go
+- src/modules/mcp/mcp.go
+- .claude/skills/level0/lib/index-tools.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened tool.go, q.go, looks.go, tools.go, mcp.go, hooks.go and index-tools.js, and each claim holds there
+- the callers list names every reader of Name and Action off a grep of the tree
+- the first done line meets the tool list case, the second the Action cases, and the third the check
 
 ## tests-red
 
