@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 8b99734c935f88bf
         size: 575
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: f134f21bdcd3905c4415bc879e12e507d6ac1804
+    hash_after: f134f21bdcd3905c4415bc879e12e507d6ac1804
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q/tool fails
+    inputs:
+      - name: design/draft
+        hash: 021163b00bbb23b4
+        size: 2284
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -237,26 +250,33 @@ What I weigh: the names the guidance quotes stay, at the cost of a second naming
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/q/tool/tool_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/q/tool/tool_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The level zero case reds on its own assertion: `Action` refuses a name carrying the server's prefix, so the hooks door resolves no call the harness names that way.
+
+The departure: a case naming the tool name option cannot compile before the option stands, and a compile error proves no red. So the tool list case and the own name case land at implement with the option, each watched red first by a stub answering the index name. What surprises me: the MCP module and the hooks door share `Action`, so the one fix reaches both.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the second done line meets the level zero case now, and the first meets the tool list case at implement, as the departure says
+- the case reaches the store the package's fixture builds, and no door
 
 # gate
 

@@ -49,6 +49,17 @@ func TestAToolNameReadsBackToItsAction(t *testing.T) {
 	}
 }
 
+// The name the harness calls carries the level zero server's prefix, and reads back to the same action. [[spec/tickets/tools-keep-their-own-names]]
+func TestActionResolvesALevelZeroNameToItsAction(t *testing.T) {
+	s := storeOf(t)
+	if action, ok := Action(s, "mcp__level0__index_greet_one"); !ok || action != "greet/one" {
+		t.Fatalf("mcp__level0__index_greet_one reads back %q, and wants greet/one", action)
+	}
+	if _, ok := Action(s, "mcp__other__index_greet_one"); ok {
+		t.Fatal("a name under another server reads back an action, and wants none")
+	}
+}
+
 func TestABareInputRidesUnderItsOneProperty(t *testing.T) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
 	schema, bare, err := Schema(registry, reflect.TypeOf(""))
