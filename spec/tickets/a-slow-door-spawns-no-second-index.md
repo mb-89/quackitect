@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 96206126082fa520b2b19f7d5147ce2164b06422
+    hash_after: 96206126082fa520b2b19f7d5147ce2164b06422
+    inputs:
+      - name: ask
+        hash: 3c161e9d4453b9d6
+        size: 523
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,49 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+In reaches, a post to a standing door that fails on a timeout returns that fault, and spawns nothing: a door past its answer time is busy, and its process still runs. A refused or reset connection still drops the standing file and starts a fresh index, since that door stands dead. postTimeout moves from the const block to a var, so the test sets a short one.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/index/main.go V1
+src/index/main.go Ask
+src/index/main.go asks
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/index/reach_test.go TestASlowDoorKeepsItsPlaceAndStartsNoOther
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/index/main.go
+src/index/reach_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+reaches, posts, starts, stands and postTimeout stand opened in src/index/main.go and src/index/door.go
+V1, Ask and asks are every caller git grep finds of reaches outside the tests
+the first done_when line names the test, the second and third name the check and pgrep
 
 ## tests-red
 
