@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
-step: gate
+step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,9 @@ record:
         hash: ef1962777dcbd748
         size: 4357
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: ask
 ---
 
 # Ask
