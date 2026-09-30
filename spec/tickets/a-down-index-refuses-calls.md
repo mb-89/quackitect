@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,7 +115,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-depends_on: [cage-rules-port-before-switch]
+depends_on: [cage-rules-port-before-switch, cage-write-door-port, cage-call-holds-port, cage-hold-drops-port, cage-commit-guards-port, cage-stop-rules-port]
 record:
   - step: design/draft
     hand: box d889b5fde3d5 · claude-code-remote
@@ -135,6 +135,21 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/tickets/the-hook-log-loses-lines]]
+  - step: design/draft
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 34577aa8ab311b777f1fa21d5fede99efcc3ac94
+    hash_after: 34577aa8ab311b777f1fa21d5fede99efcc3ac94
+    inputs:
+      - name: ask
+        hash: 2e1097fa7d39ff56
+        size: 535
+      - name: [[spec/rationales/the-cage-refuses-while-down]]
+        hash: e54c50d8ed5defb6
+        size: 1649
+      - name: [[spec/tickets/the-hook-log-loses-lines]]
+        hash: e12c15cf9e654d97
+        size: 791
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -168,7 +183,7 @@ A fault then shows on the first call, and gets fixed early.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-The hook module answers off the hooks IO module once migration.cage reads new, and refuses a guarded call while that module stands down. The key moves last, after cage-rules-port-before-switch reads clean, which depends_on holds.
+The hook module answers off the hooks IO module once migration.cage reads new, and refuses a guarded call while that module stands down. The key moves last, after every port child in the group closes and the cage shadow reads clean, which depends_on holds.
 
 1. Under new, ask in .claude/skills/level0/hooks/level0.js posts {event, e, session, root, fill} to POST /hook on the port and token .se/.runtime/hooks.json names, and maps the effects in order: pass hands e on, event hands the changed event on, after merges its blocks, result answers the call, block holds the Stop. Under old and shadow the post goes to the bridge as today.
 2. Down means no standing file, a post the port refuses, or index/health carrying a lease past its term. The hook module then runs quack start once through $.process.run, and posts again.
@@ -204,7 +219,7 @@ The hook module answers off the hooks IO module once migration.cage reads new, a
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first draft
+- the stale mark: cage-rules-port-before-switch closed as an umbrella before its children, so depends_on now names each port child as well
 
 ### checked
 
