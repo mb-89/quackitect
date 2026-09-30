@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -349,8 +349,34 @@ record:
         exit: 0
         said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: fea3e0f5dbc79472067f12a56f4de2be362aaa9d
+    hash_after: e5e40c6120c5d6e6af5c49687e3deb5b473782cd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
+    inputs:
+      - name: design/tests-red
+        hash: afd47fba06c53205
+        size: 1065
+      - name: design/tests-red-2
+        hash: eba558812135f39f
+        size: 964
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
+reason: done
 ---
 
 # Ask
@@ -617,26 +643,39 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/caged-door.test.js test/level0/bridgehead.test.js test/level0/cage.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The cage key reads `new`, so every tool call and every turn's end goes to the Go hooks door first, and the bridge keeps the prompt.
+
+Three cases stood red, and each passes now. A guarded call meets a refusal naming `session/alarms` while the door stands down, and the refusal carries the command that clears it. A row another writer appends while the index falls stays in the session log. A tool call under `new` takes the door's effects, and a prompt still reaches the bridge.
+
+The gate's point stands built beside them: a held call asks back on `agent.spoke` carrying the effect's call id, and the second answer stands.
+
+The cases moved file since `tests-red-2` wrote its red list. They stand in `test/level0/caged-door.test.js`, cut off `bridgehead.test.js` when the override case grew it past the file ceiling. The command above names both files.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files are the ones the ask names: the hook, the cage, the config key and their cases
+- the doors carry fakes: a fake disk, a process fake reading the append argv, and a fetch answering by url
+- each road points at its chapter or its ticket, and the approach stands there
+- `refusedText` owns the refusal and `configOf` owns the key, so each fact stands once
 
 # accept
 
