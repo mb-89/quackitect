@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -139,6 +139,25 @@ record:
         hash: e122785976621597
         size: 10947
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 9ab27d2581dd959c9c3e4678fcccb68f8a513be8
+    hash_after: 9ab27d2581dd959c9c3e4678fcccb68f8a513be8
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/quack-verbs-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 8a0d99f99d9c7a55
+        size: 365
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["quack-verbs-land-in-shadow", "open-tasks-switch-lands", "read-topics-switch-over"]
 enabled_by: migration.phase4switch
 cloud: true
@@ -202,8 +221,7 @@ no child waits on another now, since every one stands closed
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- verb-tools-keep-spaced-args: the index verb tools lose an argument holding spaces. mcp__level0__index_ticket_note answers that it needs a name and a line when handed both, and mcp__level0__index_ticket_pull refuses a --fields hand-back that ./RUNME.sh takes, so an agent falls back to the shell
+accept
 
 # retro
 
