@@ -117,11 +117,26 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: 85a30ba6c16a2b755a47bcaf4b252b961e05a847
+    hash_after: b75b39f6c3bc12ee253a3a2caf150c947bbf8c6c
+    inputs:
+      - name: ask
+        hash: 7b1c2142fd07b98e
+        size: 1081
+      - name: [[spec/tickets/cage-stop-rules-port]]
+        hash: 29ccd1d3cec3f09e
+        size: 761
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +178,70 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The stops fold decides the marks on each event, and the door writes them, the way the holds fold decides its drops and `drops` in holds.go writes them.
+
+1. `Said` in src/modules/hooks/stops.go gains `Marks`: a due mark carrying the tokens and the key, a due drop, and a clear drop. `measures` sets the due mark where it puts the session in finish, as `marksDue` in handover.js does. It sets the due drop where the queue no longer clears, as `measures` there drops it.
+2. The turn's end sets the clear drop where a clear stands held and the queue no longer clears, as `dropsClear` does. It sets the due drop where the asks pass the cap.
+3. `Outside` gains `Mark func(root string, marks Marks) error`. `Door.marks` runs after `drops` in `Door.Hook`, reads the said of the newest event, and hands the marks over.
+4. src/quack/main.go wires `Mark`. It writes and removes the due file that `DUE` in lib/folders.js names, and removes each clear hold under the holds folder.
+5. `heldFile` in stopfacts.go reads the hold's `hand`. `Outside` gains `Hand func(root string) string`, a port of `handOf` in pull-hand-of.js: the box id, the session file's id and harness, and the harness the environment names.
+6. `stoppedOf` counts a retro hold as the session's own alone where its hand matches `Hand`. A door with no `Hand` reads every retro as its own, as today.
+
+What I weigh: the fold stays pure, and one IO function per outside write holds the fake at the module's edge. I assume the index process shares the session's environment on a box, since the bridge starts it from inside the session.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.Hook, which calls marks after drops
+- src/modules/hooks/hooks.go: Outside, which gains Mark and Hand
+- src/modules/hooks/stops.go: Stops fold, measures and the turn's end
+- src/modules/hooks/stopfacts.go: stoppedOf, holdsIn and heldFile
+- src/quack/main.go: the hooks Outside literal, which wires Mark and Hand
+- src/modules/hooks/hooks_test.go: the test Outside
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/marks_test.go: a measure past the fill writes the due mark, and a clear drops it
+- src/modules/hooks/marks_test.go: a retro hold of another hand leaves the session's handover due
+- src/modules/hooks/marks_test.go: a retro hold of the session's own hand keeps the conversation
+- src/quack/hand_test.go: the hand reads the box, the session and the harness, as handOf reads them
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stops.go
+- src/modules/hooks/stopfacts.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/marks.go, new
+- src/modules/hooks/marks_test.go, new
+- src/quack/main.go
+- src/quack/hand.go, new
+- src/quack/hand_test.go, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened handover.js measures, clearsHere, retroInHand, holdsForHandover and dropsClear, ephemeral.js marksDue and dropsDue, pull-hand-of.js handOf, stops.go measures, stopfacts.go stoppedOf and isRetro, holds.go drops and main.go, and each claim holds there
+- the callers list names Door.Hook, both Outside literals, the fold and the facts
+- the first done line meets the due mark case, the second the retro hand case, and the third the check
 
 ## tests-red
 
