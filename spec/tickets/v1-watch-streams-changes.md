@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: caefb865e41e8e38
         size: 11091
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 7e249f55d3e1b7da5e0b8ae2c35c88631ba9a8e7
+    hash_after: 7e249f55d3e1b7da5e0b8ae2c35c88631ba9a8e7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 461f087ba5f948e3
+        size: 2842
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -236,26 +249,32 @@ Weighed: the event carries the value, so a tab reads it off the event and makes 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/index src/tui/registry
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/v1watch_test.go
+- src/tui/registry/watch_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The three door cases fail on their status and their bodies: `/v1/watch` answers the mux's plain 404, and the stream ends before any event. The two registry cases compile against a stub `watch.go` and read an empty message. No surprise: the fake needed a `Watch` of its own before the registry case compiled, so the stub carries one that hands nothing on.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a failing case: the door's stream in src/index/v1watch_test.go, the window's client in src/tui/registry/watch_test.go, and the check once both pass
+- the door cases run a real door over a temp tree, as v1_test.go does, and the registry cases run an httptest server and registry.Fake, so no case reaches the box's own index
 
 # gate
 

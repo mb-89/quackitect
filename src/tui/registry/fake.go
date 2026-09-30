@@ -5,6 +5,7 @@
 package registry
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 )
@@ -13,6 +14,13 @@ import (
 type Fake struct {
 	Values map[string]any
 	Err    error
+	// The changes the watch hands on, in order, before it ends. [[spec/tickets/v1-watch-streams-changes]]
+	Changes []Change
+}
+
+// Each change the case seeded, then the end. [[spec/tickets/v1-watch-streams-changes]]
+func (f Fake) Watch(_ context.Context, _ []string, _ func(Change)) error {
+	return f.Err
 }
 
 // The value the case seeded under the name, and an error for a name it left out, as the /v1 door answers. [[spec/design_output/model#the-fake-keeps-a-contract]]
