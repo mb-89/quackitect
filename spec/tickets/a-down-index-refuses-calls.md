@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/tests-green
+step: design/draft
 steps:
   - name: design
     steps:
@@ -264,6 +264,12 @@ record:
         exit: 0
         said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
     def: f150b8c0dc20fe45
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/rationales/the-cage-refuses-while-down]]
+  - step: design/draft-2
+    hand: the engine
+    stale: [[spec/rationales/the-cage-refuses-while-down]]
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
