@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: 647f24fdbaf124ecdf0e2852ca69001259305e4d
     hash_after: 647f24fdbaf124ecdf0e2852ca69001259305e4d
+  - step: accept
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 998707f51fad19b4e7f3fac5987a22b62f33ecd3
+    hash_after: 998707f51fad19b4e7f3fac5987a22b62f33ecd3
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/tui-shell-switches-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 0b88c45282ea1a19
+        size: 336
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["tui-shell-lands-in-shadow", "quack-verbs-switch-over", "read-topics-switch-over"]
 enabled_by: migration.phase6switch
 cloud: true
@@ -184,8 +203,17 @@ Done when the window reads its data off the index alone.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+What I weigh:
+
+- the goal holds: the work tab and the log tab read work/rows, work/open-tasks and log/rows over the /v1 watch, the keys post to /v1/actions, and the window holds no compare
+- the grep line answers nothing, and ./RUNME.sh check exits 0 on 998707f51
+- branch review saw one JS contract case time out while it booted an index. The same file passes alone, and two full checks on this code pass, so I read it as load on the review's run
+- the window still reads the ticket schema and the colours off the disk. Both are config the tab weighs a value with, not rows it draws, so they stand outside this goal
+- tree.golden.json carries drift from tickets past this group, because its generator reads every ticket. The merge reads that difference
 
 # retro
 
