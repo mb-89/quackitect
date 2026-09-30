@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -145,6 +145,24 @@ record:
         hash: ca27b08b2eb5acbe
         size: 15910
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 55cafb42f851f33f7cc26347a569c25a48b22ab9
+    hash_after: 55cafb42f851f33f7cc26347a569c25a48b22ab9
+    inputs:
+      - name: design/draft
+        hash: 2daa6e613ad1a13f
+        size: 3685
+      - name: design/tests-red
+        hash: f64de9f42fa5bedc
+        size: 1458
+      - name: [[spec/tickets/lsp-module-serves-the-features]]
+        hash: 95ea1cdfa0608ff2
+        size: 25715
+      - name: [[spec/tickets/lsp-module-draws-the-tools]]
+        hash: ca27b08b2eb5acbe
+        size: 15910
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -288,8 +306,10 @@ Each case fails on its own assertion. The sweep finds lsp.json, se-lsp and cli-s
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+the approach answers the ask, and the red cases decide the lsp.json line, the editor start, the lint sweep and the door file, with the check line at the build; two calls ride the implement step in place: TestTwinGoldens moves to src/quack beside the other twin cases, since a check module test may not run node or git, and quack gains a sweep verb printing check/sweep as JSON, which sweepRowsOf reads through topicOf
 
 # implement
 
