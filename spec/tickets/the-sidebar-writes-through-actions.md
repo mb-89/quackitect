@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -185,6 +185,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: debafd33dd5f4ca02fde6072c297f843259c85a6
+    hash_after: debafd33dd5f4ca02fde6072c297f843259c85a6
+    inputs:
+      - name: ask
+        hash: 9c024090bdfb0cdb
+        size: 870
+      - name: implement/tests-green
+        hash: 70b09eaaf803f0a7
+        size: 1314
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -480,8 +493,14 @@ A value the owner writes into the local file by hand now survives a new window.
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass
+- no editor runs on this cloud box, so the view is the live index the sidebar posts to
+- `config/override` for window w111 reads back at layer `override` in `config/keys`
+- `config/opened` for window w222 drops it, and the key reads its built-in value again
+- no local config file stands after either post, so a hand-written local value meets no rewrite
+- the first take found the design note naming the schema as what types an override. The fix landed, the hold dropped, and this take reads the tip carrying it
 
 # Discussion
 
