@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,19 @@ record:
         hash: 5839e9993ce46677
         size: 13455
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: 45ec4386e9671eb184364aa7b794c5c0bae5ace8
+    hash_after: 45ec4386e9671eb184364aa7b794c5c0bae5ace8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 44b8d45db15bec88
+        size: 4991
+    def: 08e16d07b0de477c
 ---
 
 # Ask
