@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/v1-watch-sends-changes.md:374:1: ListItem: A sentence in a list item holds 20 words, and this one holds 21."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: d96fbad8eee1b13b3771e9ca068cd46a5eacae7e
+    hash_after: d96fbad8eee1b13b3771e9ca068cd46a5eacae7e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/tui/registry passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/v1-watch-sends-changes.md:388:1: ListItem: A sentence in a list item holds 20 words, and this one holds 21."
+    inputs:
+      - name: design/tests-red
+        hash: ad805c8cd278a55f
+        size: 785
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -339,26 +362,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/index src/tui/registry
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index door now answers GET /v1/watch as a server-sent event stream. It sends each named value once, then each name whose value moves on a commit, until the request ends. A commit channel in opensOn wakes every watch, the way moved wakes the changes call. A middleware refuses a name the catalog lacks with a 404 problem before the stream writes its status. The window reads the stream through V1.Watch, and Stream with Next hand each change to a tab as a message, then one Ended.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the change stands in the files the implement leaf names, and tests-green adds none.
+- fakes: Fake.Watch stands for the window's road to the index.
+- comments: each new function points at this ticket.
+- one place: the event shape stands in watchEvent, and the refusal wording in valueOf's line.
 
 # accept
 
