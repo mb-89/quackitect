@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -185,6 +185,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: cdb9738dad611d2cdac6c4e3ad0e5f21ea84e822
+    hash_after: cdb9738dad611d2cdac6c4e3ad0e5f21ea84e822
+    inputs:
+      - name: ask
+        hash: 7acc0ab40e14130e
+        size: 487
+      - name: implement/tests-green
+        hash: e34dd2dac9f7fff7
+        size: 759
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -404,8 +417,9 @@ The log tab now draws off log/rows through the catalog the window hands it, and 
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass: this box has no screen, so .se/scripts/logview renders the window off the index standing over this tree, with the log tab and the work tab under one frame. Every event passes through the frame's own dispatch. The log tab draws this session's rows with time, level, kind and said, and the work tab takes its own rows and its count beside it. A first run met the door while it stood up and drew the wait line, which the tab's watch-again answers after a pause.
 
 # Discussion
 
