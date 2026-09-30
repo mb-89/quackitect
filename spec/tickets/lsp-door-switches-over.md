@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: children-2
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -26,12 +26,15 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: children-2
+    by: children
+    on_fail: split
   - name: accept
     gate: does the work of every child add up to the goal, and does every command of the route pass
     final: true
     does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
     tags: ["review", "accept"]
-    input: ["ask", "children"]
+    input: ["ask", "children", "children-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -49,7 +52,7 @@ steps:
             says: retro notes, which passes when the private folder is empty
       - name: write
         does: writes the retro over the box's own window
-        input: ["children", "notes"]
+        input: ["children", "notes", "children-2"]
         checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it", "every header the change writes says what its file is for, and counts nothing", "the chapter carries the run's owner prompts and errors off the transcript, each with its time", "the chapter says the role, and carries no name, address or path of the box"]
         evidence:
           - name: done
@@ -120,6 +123,16 @@ record:
     hand: the engine
     hash_before: f539ffdacc41d144c798199408510a514b1c0c81
     hash_after: f539ffdacc41d144c798199408510a514b1c0c81
+  - step: accept
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 8c4942082dcd357f4547a06c4de3adb59940d801
+    hash_after: 88454cc101c16cae9f6633ede734f99f235c32e5
+    returns: 1
+    why: "the check answers red: a caller spawns a second se-index beside a busy door, and the get road times out on the door start; [[spec/tickets/a-slow-door-spawns-no-second-index]] fixes it"
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/lsp-door-switches-over already carries every commit on main.
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
 cloud: true
@@ -166,6 +179,8 @@ the-lsp-server-leaves waits on the two module children, which close before it
 
 # children
 
+# children-2
+
 # accept
 
 <!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
@@ -173,8 +188,10 @@ the-lsp-server-leaves waits on the two module children, which close before it
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- the check answers red: a caller spawns a second se-index beside a busy door, and the get road times out on the door start; [[spec/tickets/a-slow-door-spawns-no-second-index]] fixes it
 
 # retro
 
