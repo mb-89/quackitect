@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -215,6 +215,15 @@ record:
         hash: 35dd677e458f4287
         size: 1603
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: b51eed090fed458178ddda658079456e120c4f75
+    hash_after: 10cf75c7fb7d9d8afeeb5c6812294d928c84f2c6
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/modules/hooks/command/ticket.go:18:1: CodeComment: Code carries no comment here. Write a header of at most five line"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -414,14 +423,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && ./RUNME.sh lint src/modules/hooks src/quack/main.go src/quack/command.go src/quack/hooks_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft size names, plus the three the gate adds (cage_test.go, src/quack/hooks_test.go, and src/quack/command.go, split off main.go past the file ceiling) and writes.go, split off findings.go for size
+- the door reaches the tree through the root a post names and git through Outside.Git; the cases build a temp tree off the table, and a door with no Git fake finds no pull commit
+- each Go function carries a pointer at spec/tickets/cage-command-rules-port or the design output it ports
+- the table texts stand once, in test/replay/cage/command-cases.json, and both sides read them there
 
 ## tests-green
 
