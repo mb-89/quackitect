@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: f025a48123b54193dac48a48857ba75281782bae
+    hash_after: f025a48123b54193dac48a48857ba75281782bae
+    inputs:
+      - name: ask
+        hash: 3c86df4df802db9d
+        size: 750
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,66 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The holds fold names the prompt's row and its rewrite, and the door writes the row and answers the rewrite as an event effect, as `onPromptSubmit` in src/bridge/answer.js does.
+
+1. `prompted` in src/modules/hooks/fold.go already opens the owner's demand. The prompt submit now also says a row, prompt for an owner and agent for anything else, and the rewrite for an owner's prompt. The rewrite puts `warns` of the prompt's why in front of the text, and drops `before` off the event.
+2. The door gains an event effect kind. `Door.Hook` answers the rewrite as an event effect carrying the rewritten fields.
+3. A row writer in the hooks module appends each row the folds name to the session log, in the shape `Row` in src/modules/log/log.go reads. It writes through the module's own disk, as the marks do, under a pointer at the folder's owner.
+4. `stepOf` in cage.js maps an event effect to an answer carrying the event, the shape level0.js reads off the bridge today.
+
+A prompt naming a note and the questions a prompt asks stay with the bridge until the flip, as the fold says today. They join the brief's flip ticket as points if the gate asks. What I weigh: one writer of rows in Go serves the spawn and the clear ports after this one. I assume the log's reader takes a row a Go writer appends beside the bridge's rows.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/fold.go: stepHolds and prompted
+- src/modules/hooks/hooks.go: Door.Hook and Effect
+- src/modules/hooks/rows.go, new: the row writer
+- .claude/skills/level0/hooks/cage.js: stepOf
+- .claude/skills/level0/hooks/level0.js: door, which reads stepOf
+- src/modules/log/log.go: Row, which the writer fills
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/prompt_test.go: TestAnOwnersPromptAnswersTheEventOpeningOnTheAnswerFirstLine
+- src/modules/hooks/prompt_test.go: TestAPromptLandsAsARowOfTheSessionLog
+- src/modules/hooks/prompt_test.go: TestAHelpersHandBackLandsAsAnAgentRowAndPasses
+- test/level0/cage.test.js: an event effect answers the rewritten event
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/fold.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/rows.go, new
+- src/modules/hooks/prompt_test.go, new
+- .claude/skills/level0/hooks/cage.js
+- test/level0/cage.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened onPromptSubmit and warns in answer.js, the Row type in the log module, the session log path in src/quack/log.go, prompted in fold.go and stepOf in cage.js, and each claim holds there
+- the callers list names the fold, the door, the new writer, the cage's step and the Row it fills
+- the first done line meets the rewrite case, the second the row cases, the third the cage case, and the fourth the check
 
 ## tests-red
 
