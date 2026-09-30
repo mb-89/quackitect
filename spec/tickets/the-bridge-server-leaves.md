@@ -115,7 +115,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-depends_on: ["a-down-index-refuses-calls", "cage-stop-marks-port", "copilot-answers-off-the-door", "the-level0-tools-leave-the-bridge", "the-brief-leaves-the-bridge", "the-start-road-starts-the-index"]
+depends_on: ["a-down-index-refuses-calls", "cage-stop-marks-port", "copilot-answers-off-the-door", "level0-tools-leave-the-bridge", "the-brief-leaves-the-bridge", "start-road-starts-the-index"]
 record:
   - step: design/draft
     hand: box d891eb165fd6 · claude-code-remote
@@ -331,3 +331,5 @@ The hooks door answers every harness write, and `onWrite` in `src/bridge/write.j
 - the private rule
 
 For details, see [[spec/tickets/cage-write-door-port]].
+
+The draft names two children by their names at the mint. They stand as [[spec/tickets/level0-tools-leave-the-bridge]] and [[spec/tickets/start-road-starts-the-index]] now, since a ticket name holds five words.

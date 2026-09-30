@@ -117,34 +117,17 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
-record:
-  - step: design/owner-read
-    skipped: true
-    why: the ask comes off no handover
-  - step: design/draft
-    hand: box d891eb165fd6 · claude-code-remote
-    hash_before: b33a214d41b2df61bdb0c8709fecdfee19d25543
-    hash_after: 904412bb702dbef9157103b0e2f9e28b6a8b56b5
-    inputs:
-      - name: ask
-        hash: 19bd52b73471bf7a
-        size: 735
-      - name: [[spec/tickets/the-bridge-server-leaves]]
-        hash: f6037bc7affa843e
-        size: 247
-    def: 7883b3d10633c780
-depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door", "spawn-answers-off-the-door", "clear-answers-off-the-door", "level0-tools-leave-the-bridge"]
+step: design/owner-read
 ---
 
 # Ask
 
-The brief, the canary debt and every event the bridge's `DOORS` table names answer off the hooks door.
+The level zero tools answer off the Go side, so the bridge serves no tool.
 
-The rules, the tools block and the canary come off `onSessionStart` and `onPromptContext` in `src/bridge/guidance.js`. A session with no bridge reads no rule, so [[spec/tickets/the-bridge-server-leaves]] waits.
+The `TOOLS` table in `src/bridge/server.js` serves every `mcp__level0__` tool, and `stepOf` in the cage hands each such call back to the bridge. So the server stays, and [[spec/tickets/the-bridge-server-leaves]] waits.
 
-- `doors` in `.claude/skills/level0/hooks/cage.js` answers true for every event the bridge's `DOORS` table names, in a case of `test/level0/cage.test.js`. `node --test test/level0/cage.test.js` decides it
-- a session start posted to the hooks door answers the brief with the canary line, in a case of `src/modules/hooks`. `go test ./src/modules/hooks/...` decides it
+- every tool the bridge's `TOOLS` table names answers off the Go side, in a case of `src/quack`. `go test ./src/quack/...` decides it
+- `stepOf` in `.claude/skills/level0/hooks/cage.js` hands no call to the bridge, in a case of `test/level0/cage.test.js`. `node --test test/level0/cage.test.js` decides it
 - `./RUNME.sh check` exits 0
 
 view: none
@@ -170,63 +153,38 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
 <!-- the form is text -->
-
-This ticket flips the doors last, once five ports give every event of the bridge's DOORS table an answer off the hooks door. Today `Door.Hook` answers pass for every event but a tool call, a Stop and a spoke post. So a flip now drops the brief, the canary debt, the prompt's row, the helper layer and the clear.
-
-1. brief-answers-off-the-door: the brief on the prompt context, the reset at a session start, the first call's layer, and the canary debt.
-2. prompt-answers-off-the-door: the answer-first line as an event effect, and a Go writer of the session log's rows.
-3. spawn-answers-off-the-door: the helper layer on a spawn.
-4. clear-answers-off-the-door: the clear effect at a turn's end.
-5. level0-tools-leave-the-bridge also answers the tool describe and agent answered events, and the tool registration a session start answers today.
-6. This ticket then makes `doors` in cage.js answer true for every key of DOORS, and drops those doors from server.js and guidance.js.
-
-The ask's second done line names a session start. The brief rides the prompt context, since `opensSession` answers `register` and no brief. The first child's case decides the line in that form.
-
-What I weigh: each port lands alone and keeps the bridge answering its event until the flip, so every commit stands working. I assume the harness takes added context on the prompt context alone, as level0.js reads it today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-<!-- the form is list -->
 
-- .claude/skills/level0/hooks/cage.js: doors, DOORED
-- .claude/skills/level0/hooks/level0.js: seen, which asks doors
-- src/bridge/server.js: DOORS
-- src/bridge/guidance.js: onSessionStart, onPromptContext
+<!-- the form is list -->
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-<!-- the form is list -->
 
-- test/level0/cage.test.js: the door decides every event the bridge's DOORS table names
+<!-- the form is list -->
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-<!-- the form is list -->
 
-- first
+<!-- the form is list -->
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-<!-- the form is list -->
 
-- .claude/skills/level0/hooks/cage.js
-- test/level0/cage.test.js
-- src/bridge/server.js
-- src/bridge/guidance.js
+<!-- the form is list -->
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-<!-- the form is checklist -->
 
-- the helper opened server.js, guidance.js, cage.js, level0.js and hooks.go, and I checked opensSession and DOORS myself
-- the callers list names what the flip touches, and the five ports carry the rest
-- the first done line meets the cage case, the second the first child's case, and the third the check
+<!-- the form is checklist -->
 
 ## tests-red
 
@@ -335,3 +293,5 @@ What I weigh: each port lands alone and keeps the bridge answering its event unt
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The tool describe event and the agent answered event read the bridge's tool and review state, so this port answers both off the door too. The split of [[spec/tickets/the-brief-leaves-the-bridge]] leaves them here.
