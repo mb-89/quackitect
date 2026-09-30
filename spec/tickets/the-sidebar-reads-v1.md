@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 47c12695b7948cf351d6d3a4bd83225b6e842ee9
+    hash_after: 47c12695b7948cf351d6d3a4bd83225b6e842ee9
+    inputs:
+      - name: ask
+        hash: 15d474e44d438e62
+        size: 920
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -165,38 +174,96 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The sidebar takes every value it draws off the index door, and wakes on one watch over the same names.
+
+1. The index gains the three values it lacks, each a projection beside the ones standing:
+   - `src/modules/config/config.go` adds `q.Also("spec/config/level0.schema.json")` to the config projection, so the schema answers at `config/spec/config/level0.schema.json`.
+   - `src/modules/verbs/bless.go` projects the runtime bless file as JSON under `bless/<path...>`, optional, beside the `ticket/bless` action.
+   - `src/modules/views/views.go` projects `spec/views/*.base` through a YAML codec off `src/yaml.Read`, and derives `views/bases`: every base as `{name, said}`, in name order. `src/modules/modules.go` registers it.
+2. `src/extension/editor-index.js` gains `watch(names, fn)`: a GET on `/v1/watch?names=...` read as server-sent events, one `fn(name, value)` an event, and a `stop()` it returns. A stream the index ends opens again after a pause, because the index restarts under a window.
+3. `src/extension/sidebar.js` reads through `door.index.values(name)` alone:
+   - `readAll` reads `config/keys`, the schema value and the two file projections `config/spec/config/level0.json` and `config/.se/.runtime/config.json`. `valuesOf` gives way to `valuesOfKeys(rows, schema)` in `src/extension/lib/widgets.js`, which maps each row to its value and layer. `treeIn` takes the two projections.
+   - `html` reads `migration/config/sidebar` for the slice, the bless projection for the bless button, and `views/bases` for the bases. `basesIn` and the YAML import leave.
+   - `counted` reads each cell's value by `nameIn(cell.counts)`, which moves out of `lib/views-shadow.js` into `lib/work.js`, so the badge reads `work/open-tasks` and spawns no verb.
+   - `set` and `opened` read the local file off its projection, and write it as the door writes today. `newTicket` asks `tickets/notes/<path>` whether the file stands. `shows` reads `log/rows`. Their writes stay for the-sidebar-writes-through-actions.
+   - `watches` and `counts` leave, and `names` takes their place: every value name above.
+4. `src/extension/extension.js` swaps both `door.watch(sidebar.watches, ...)` calls and `door.watch(sidebar.counts, ...)` for `door.index.watch(sidebar.names, ...)`, and keeps the `settled` burst on the panel draw.
+
+Outside this ticket: `pullsNext` keeps `door.asksVerb` for the-lens-calls-actions, the `door.read(SCHEMA)` in `activate` leaves with the-extension-reads-no-files, and the shadow compare stays until that ticket drops it.
+
+What I weigh and assume: the grep line reaches `set`, `opened`, `newTicket` and `shows`, so their reads move here and their writes stay put, and the writes sibling posts actions over reads that already come off the index. I assume a derived `views/bases` over the projection, in the shape `work/rows` takes over the notes, where the catalog lists no instances of a projection.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/extension/extension.js activate: sidebarOf, sidebar.watches, sidebar.counts, sidebar.states, sidebar.html
+- src/extension/editor.js editorDoor: indexDoor
+- src/extension/lib/views-shadow.js apartOf: nameIn
+- test/level0/sidebar.test.js: sidebarOf over a fake door
+- test/level0/sidebar-work.test.js: sidebarOf, SCHEMA
+- test/level0/sidebar-views.test.js: sidebarOf, SCHEMA
+- test/level0/lens-actions.test.js: sidebarOf, SCHEMA
+- test/contract/editor-index.test.js: indexDoor
+- src/modules/modules.go: the module list the views module joins
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/sidebar-v1.test.js: the sidebar draws the config tree and the views off a fake index
+- test/level0/sidebar-v1.test.js: the work badge reads work/open-tasks off the index, and spawns no verb
+- test/level0/sidebar-v1.test.js: a watch event draws the sidebar again
+- test/level0/sidebar-v1.test.js: sidebar.js names no door.read, door.list, door.imports or door.watch
+- test/contract/editor-index.test.js: watch hands each named value, then a change
+- src/modules/views/views_test.go: TestViewsBasesParsesEachBase
+- src/modules/verbs/bless_test.go: TestBlessProjectsTheFile
+- src/modules/config/config_test.go: TestSchemaProjects
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/extension/sidebar.js
+- src/extension/editor-index.js
+- src/extension/extension.js
+- src/extension/lib/widgets.js
+- src/extension/lib/work.js
+- src/extension/lib/views-shadow.js
+- src/modules/config/config.go
+- src/modules/verbs/bless.go
+- src/modules/views/views.go
+- src/modules/modules.go
+- src/modules/config/config_test.go
+- src/modules/verbs/bless_test.go
+- src/modules/views/views_test.go
+- test/level0/sidebar-v1.test.js
+- test/level0/sidebar.test.js
+- test/level0/sidebar-work.test.js
+- test/level0/sidebar-views.test.js
+- test/level0/lens-actions.test.js
+- test/contract/editor-index.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened sidebar.js, editor-index.js, extension.js, views-shadow.js, widgets.js, config.go, keys.go, v1.go, codec.go, markdown.go and src/yaml, and read the live catalog for every name the approach reads
+- the callers list names every file that requires sidebar.js or editor-index.js, and the one that imports nameIn
+- each done_when line meets a test: the grep and the fake index in sidebar-v1.test.js, the watch in sidebar-v1.test.js and editor-index.test.js, and the check in its own run
 
 ## tests-red
 
