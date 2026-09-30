@@ -167,6 +167,16 @@ test("a named after on a describe answers the description", () => {
   assert.deepEqual(said, { answer: { after: { description: "the line" } } });
 });
 
+// An unnamed after on a describe names no field, so it rides as context. [[spec/tickets/describe-answers-off-the-door]]
+test("an unnamed after on a describe rides as context", () => {
+  const said = stepOf(
+    { effects: [{ kind: "after", text: "the line" }] },
+    "tool.describe",
+    {},
+  );
+  assert.deepEqual(said, { after: ["the line"] });
+});
+
 test("the JavaScript layer matches the case table", () => {
   const built = LAYERS.cases.map((one) => {
     const disk = fakeDisk(

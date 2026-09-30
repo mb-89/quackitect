@@ -51,6 +51,9 @@ export function stepOf(answer, event, { asks, served }) {
     const text = String(one.text);
     const name = String(one.name ?? "");
     // An after on the prompt context rides as a named block, the shape the context read hands on, and a named after on another event opens on its name as a heading. [[spec/tickets/brief-answers-off-the-door]]
+    // A named after on a describe answers the field it names, the shape the bridge's describe answer takes. [[spec/tickets/describe-answers-off-the-door]]
+    if (name && event === "tool.describe")
+      return { answer: { after: { [name]: text } } };
     if (name && event === "prompt.context") blocks.push({ name, text });
     else after.push(name ? `# ${name}\n${text}` : text);
   }

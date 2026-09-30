@@ -220,6 +220,8 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		effects = append(effects, said)
 	} else if said, ok := d.blocked(session, post); ok {
 		effects = append(effects, said)
+	} else if said, ok := d.describes(post); ok {
+		effects = append(effects, said)
 	} else if refused := d.refuses(post, root, settings); post.Event == toolEvent && refused != "" {
 		effects = append(effects, Effect{Kind: resultKind, Text: refused})
 	} else if post.Event == toolEvent {

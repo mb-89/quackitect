@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 1337bb662cc08e0a
         size: 785
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d894eee95148f · claude-code-remote
+    hash_before: a947b1de2fe3e3f788a19a2361ad53cb7c6dfd1d
+    hash_after: a947b1de2fe3e3f788a19a2361ad53cb7c6dfd1d
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -308,14 +317,19 @@ The approach answers the ask: the door answers a describe of Bash with the verb 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches describe.go, hooks.go, cage.js and cage.test.js, the files the draft names, and no other
+- the door reads the store alone, and the Go cases build it through the fake index
+- describe.go and the new line in cage.js each carry a pointer at the design section and the ticket
+- the verb line stands in describe.go, and the case table holds it to the JavaScript line the bridge writes
 
 ## tests-green
 
