@@ -155,12 +155,14 @@ function listening(open) {
 // [[spec/tickets/every-server-stands-and-answers]]
 test("a restart starts the child once the port stops listening, with a connection open", async () => {
   const server = listening(1);
-  const born = new Promise((take) => restarts(server, () => take(server.listening)));
-
-  const was = await Promise.race([
-    born,
-    new Promise((take) => setTimeout(() => take("waits"), 50)),
-  ]);
+  let was = "waits";
+  restarts(
+    server,
+    () => {
+      was = server.listening;
+    },
+    (then) => then(),
+  );
   server.ends();
 
   assert.equal(
