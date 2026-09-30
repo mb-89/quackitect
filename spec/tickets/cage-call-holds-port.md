@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -172,6 +172,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 463722bb181483f036852a6ae86dbbc85546828f
+    hash_after: 463722bb181483f036852a6ae86dbbc85546828f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes; green, src/modules/session passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "src/modules/hooks/holds.go:82:83: MagicNumber: 10 carries a meaning here. Name it in the constants block at the top of t"
+    inputs:
+      - name: design/tests-red
+        hash: 08c0f6bb927a556c
+        size: 1552
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -427,26 +450,33 @@ go build ./... && ./RUNME.sh lint src/modules/hooks src/modules/session src/quac
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks src/modules/session src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door now holds and refuses every call the bridge holds before a tool door runs, with the bridge's words. The hooks module keeps a holds fold under each session: the finish calls, the calls since the plan's answer, the engine's grace, the reply the owner waits for, and the answer to the newest event. The door stamps the config each hold reads on a call under held, so the fold replays the bridge's chain in its order and reads no file. The door answers the fold's refusal, or the rows effect a held call asks back for, and a spoke post meets the session of the call it held last. The Agent door and the command door run after the holds, and the god binding lets each one through. The fold stands in the hooks module and not in the session module as the draft named, since the import rules keep a module and its tests off every other module. Three gaps stay with the bridge: a full update's shape, a prompt a parked note answers, and the config writes at a turn's end, which cage-hold-drops-port carries.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft size names, the fold in src/modules/hooks/fold.go in place of the session module, plus agent.go and holds.go under hooks
+- the fold reads no outside world, since the door stamps the config each hold reads on the call
+- each new Go function carries a pointer at the ticket or the design output it ports
+- the hold texts stand once in Go, in src/modules/hooks/fold.go and agent.go
 
 # accept
 

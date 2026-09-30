@@ -34,3 +34,12 @@ func TestTheFillTakesAWholeNumberAsTheDoorHandsIt(t *testing.T) {
 		t.Fatalf("the fill reads %v, and wants 900", fill)
 	}
 }
+
+// The module keeps the fill and the last alone, since the holds fold stands in the hooks module that reads it. [[spec/tickets/cage-call-holds-port]]
+func TestTheModuleKeepsTheFillAndTheLastAlone(t *testing.T) {
+	c := q.New()
+	Registers(c)
+	if folds := q.NewStore(c).Folds(""); len(folds) != 2 || folds[0] != FillName || folds[1] != LastName {
+		t.Fatalf("the module keeps the folds %v, and wants %s and %s", folds, FillName, LastName)
+	}
+}

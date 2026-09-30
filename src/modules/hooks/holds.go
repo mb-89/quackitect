@@ -10,35 +10,31 @@ import (
 	"strings"
 )
 
-// The fold the session module keeps under each session, the words its answer takes, the post the bridgehead sends after a held call, and the binding that lets every hold through. [[spec/tickets/cage-call-holds-port]]
+// The joint of a held call's id, and the plan's fields the grace reads. [[spec/tickets/cage-call-holds-port]]
 const (
-	holdsFold   = "session/<id>/holds"
-	heldField   = "held"
-	spokeEvent  = "agent.spoke"
-	godBinding  = "god"
 	callJoin    = ":"
 	planWorking = "working"
 	planTodos   = "todos"
 )
 
-// .claude/skills/level0/lib/runs.js owns the plan's file, and the package spells it again. [[spec/tickets/cage-call-holds-port]]
+// .claude/skills/level0/lib/folders.js owns the runtime folder and runs.js the plan's file, and the package spells them again. [[spec/tickets/cage-call-holds-port]]
 const planFile = ".se/.runtime/plan.json"
 
-// The config words each hold reads, by the keys the bridge reads them under, and the plan's work in hand and its open todos. [[spec/tickets/cage-call-holds-port]]
+// The config words each hold reads, and the plan's work in hand and its open todos. [[spec/tickets/cage-call-holds-port]]
 func heldOf(settings Settings, root string) map[string]any {
 	working, todos := planOf(root)
 	return map[string]any{
-		"stop.hold":       settings.Hold,
-		"grace.finish":    settings.FinishGrace,
-		"ask.wanted":      settings.Ask,
-		"grace.update":    settings.UpdateGrace,
-		"plan.everyCalls": settings.PlanEvery,
-		"plan.grace":      settings.PlanGrace,
-		"plan.mostOpen":   settings.PlanMostOpen,
-		"engine.binding":  settings.Binding,
-		"cloud":           settings.Cloud,
-		"plan.working":    working,
-		"plan.todos":      todos,
+		heldHold:        settings.Hold,
+		heldFinishGrace: settings.FinishGrace,
+		heldAsk:         settings.Ask,
+		heldUpdateGrace: settings.UpdateGrace,
+		heldPlanEvery:   settings.PlanEvery,
+		heldPlanGrace:   settings.PlanGrace,
+		heldPlanMost:    settings.PlanMostOpen,
+		heldBinding:     settings.Binding,
+		heldCloud:       settings.Cloud,
+		heldWorking:     working,
+		heldTodos:       todos,
 	}
 }
 
@@ -59,11 +55,9 @@ func planOf(root string) (string, int) {
 	return strings.TrimSpace(textOf(plan, planWorking)), len(todos)
 }
 
-// The answer the holds fold gives the newest event of the session, read off the store as the fold writes it. [[spec/tickets/cage-call-holds-port]]
-type holdSaid struct {
-	Seq  int64  `json:"seq"`
-	Word string `json:"word"`
-	Text string `json:"text"`
+// The name the holds fold of a session stands under. [[spec/tickets/cage-call-holds-port]]
+func (d *Door) holdsOf(session string) string {
+	return d.from.Bound(strings.Replace(HoldsName, sessionKey, session, 1))
 }
 
 // The effect the holds answer the event with, where they answer it: a refusal's text, or the rows a held call asks back for. A ride and a pass answer none. [[spec/tickets/cage-call-holds-port]]
@@ -71,18 +65,11 @@ func (d *Door) held(session string, post Post, root string) (Effect, bool) {
 	if post.Event != toolEvent && post.Event != spokeEvent {
 		return Effect{}, false
 	}
-	value := d.from.Store.Snapshot().Read(strings.Replace(holdsFold, sessionKey, session, 1))
-	body, err := json.Marshal(value)
-	if err != nil {
-		return Effect{}, false
-	}
-	var state struct {
-		Said holdSaid `json:"said"`
-	}
+	state, ok := d.from.Store.Snapshot().Read(d.holdsOf(session)).(Holds)
 	d.mu.Lock()
 	seq := d.seqs[session]
 	d.mu.Unlock()
-	if json.Unmarshal(body, &state) != nil || state.Said.Seq != seq {
+	if !ok || state.Said.Seq != seq {
 		return Effect{}, false
 	}
 	switch state.Said.Word {

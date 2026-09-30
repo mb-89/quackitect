@@ -36,8 +36,8 @@ func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
 		t.Fatalf("the hooks instance binds events/s1 to %q, and wants session/s1/events", hook.bound("events/s1"))
 	}
 	s := q.NewStore(c)
-	if folds := strings.Join(s.Folds("session/<id>/"), " "); folds != "session/<id>/fill session/<id>/holds session/<id>/last" {
-		t.Fatalf("the folds under session/ read %q, and want the fill, the holds and the last", folds)
+	if folds := strings.Join(s.Folds("session/<id>/"), " "); folds != "session/<id>/fill session/<id>/last" {
+		t.Fatalf("the folds under session/ read %q, and want the fill and the last", folds)
 	}
 	door := hooks.New(hooks.Outside{Store: s, As: hook.as, Bound: hook.bound})
 	if _, err := door.Hook(hooks.Post{Event: "tool.call", E: map[string]any{"tool": "Read", "session_id": "s1"}, Fill: 900}); err != nil {

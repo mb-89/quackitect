@@ -159,6 +159,7 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
 		q.OutIn(c, EventsName, q.Event{}, q.IO(), q.Doc("the newest hook event of a session")),
 		q.CfgIn(c, WaitKey, defaultWait, q.Doc("the seconds an agent's call waits on its action, where the call sets none")),
+		q.FoldIn(c, HoldsName, Holds{}, stepHolds, q.Doc("the state the holds keep over a session, and the answer to its newest event")),
 	)
 }
 
@@ -243,7 +244,7 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 			return err
 		}
 	}
-	return nil
+	return store.Land(d.holdsOf(session), event)
 }
 
 func (d *Door) now() time.Time {

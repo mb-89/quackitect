@@ -14,7 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"quackitect/src/modules/session"
 	"quackitect/src/q"
 	"quackitect/src/q/qtest"
 	"quackitect/src/q/tool"
@@ -68,7 +67,6 @@ func doorOver(t *testing.T, c *calls, b *book) over {
 		events = Registers(cat)
 		resolved = q.OutIn(cat, q.ResolvedName, q.Resolved{}, q.Doc("the config values, as the case seeds them"))
 		q.FoldIn(cat, "session/<id>/count", 0, func(n int, _ q.Event) int { return n + 1 }, q.Doc("the events a session lands"))
-		q.FoldIn(cat, holdsFold, session.Holds{}, session.StepHolds, q.Doc("the holds the session module keeps, beside the door as the wiring binds them"))
 		q.ActionIn(cat, "work/pull", func(struct{}) []q.Request { return nil }, q.Doc("pulls the next ticket"))
 		q.ActionIn(cat, "work/sleep", func(sleep) []q.Request { return nil }, q.Doc("sleeps as long as its input says"))
 	})
