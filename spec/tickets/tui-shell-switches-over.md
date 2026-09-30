@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -160,9 +160,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 6d2911e19d836cfa01169c44a6d924c3fb3856fe
+    hash_after: 6d2911e19d836cfa01169c44a6d924c3fb3856fe
+    inputs:
+      - name: retro/write
+        hash: 76967bf04ce1c98d
+        size: 2830
+    def: 4da1ca5da87d5bbc
 depends_on: ["tui-shell-lands-in-shadow", "quack-verbs-switch-over", "read-topics-switch-over"]
 enabled_by: migration.phase6switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -322,20 +332,29 @@ The run weighed two costs of a large golden. A shell write back past the door br
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- no terminal a person watches, at the view step of the-work-keys-call-actions, so a window case stood in
+- the auto mode classifier refused go vet and go test over the window package, once each, before the cases held a fake
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the push guard refused a push on a commit the check had not run on, and a check then a push landed it
+- the commit hook refused code in three packages with no test beside it
+- the shell write door refused a restore of a golden file
+- a contract case that boots an index timed out under the review's load, and passed alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked, and no ticket stands minted with no group
+- the merge reads the tree.golden.json drift, which comes off its generator
+- no handover, since the group reaches done in this session
 
 # Discussion
 
