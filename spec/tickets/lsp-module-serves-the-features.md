@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -210,6 +210,24 @@ record:
         hash: bd465c04b5a9243c
         size: 3451
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 53a67d0724fc093f99ea420d75fbf18722e8eaaa
+    hash_after: 53a67d0724fc093f99ea420d75fbf18722e8eaaa
+    inputs:
+      - name: design/draft
+        hash: a3ccd4fce1d597b2
+        size: 2489
+      - name: design/tests-red
+        hash: bed9a6ad2b5f50c7
+        size: 570
+      - name: design/draft-2
+        hash: bd465c04b5a9243c
+        size: 3451
+      - name: design/tests-red-2
+        hash: 2821f72ffc633c7a
+        size: 877
+    def: 01417e29801ecc2f
 group: lsp-door-switches-over
 ---
 
@@ -484,10 +502,8 @@ Each case fails on its own assertion. The lsp cases see no capability and an emp
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- the approach moves hover, complete, links and fold into src/modules/lsp over a check.Tree, and the nomodule import rule refuses a module importing another, so TestTheTreeHoldsTheImportRules turns the check red
-- the four features call some twenty check helpers through the src/lsp aliases, so a copy into lsp makes a second owner of each
-- the redraft: the four reads move into src/modules/check as exported functions over its Tree, and lsp takes them through the Check ports lsp-module-draws-the-tools lands, which lspChecks in src/quack/lsp.go fills
+accept
+the reads move into src/modules/check, which already imports src/yaml, so the nomodule rule holds; lsp takes them through the Check ports over its Tree, type-asserted in lspChecks the way Faults is; each method line meets its red case in src/modules/lsp/features_test.go, the moved reads meet src/modules/check/features_test.go, and the wiring meets src/quack/lsp_test.go
 
 # implement
 
