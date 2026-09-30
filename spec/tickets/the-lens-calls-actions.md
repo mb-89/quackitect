@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: dcb6d88df5f0252a
         size: 4500
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 8c345ae48da6f11e258990c46bc30c66e260730c
+    hash_after: 8c345ae48da6f11e258990c46bc30c66e260730c
+    inputs:
+      - name: design/draft
+        hash: dcb6d88df5f0252a
+        size: 4500
+      - name: design/tests-red
+        hash: e381fe43c48eb17a
+        size: 966
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -313,8 +325,14 @@ Every case fails on its own assertion. The lens cases catch the throw a missing 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask: every ticket button posts ticket/pull, ticket/fill or ticket/route through one acts seam, pull for me reads work/yours, and the spawn in editor-lens.js leaves
+- each done_when line meets a red case: the spawn grep and the button cases in test/level0/lens-actions.test.js, and the check at tests-green
+- fix in place: counted in src/extension/sidebar.js reads the index since the-sidebar-reads-v1, so that item of the approach stands done
+- fix in place: the fake index in lens-actions.test.js answers config/spec/config/level0.schema.json, which orderedOf in test/level0/v1-index.js builds, or the sidebar finds no work.pull entry
+- fix in place: acts in src/extension/editor-index.js builds on the asks helper beside calls, so the door holds one fetch path
 
 # implement
 
