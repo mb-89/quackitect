@@ -118,14 +118,13 @@
       "type": "object",
       "properties": {
         "editor": {
-          "help": "Open the work tab, which draws every ticket and takes a cell edit. The count beside it is the number in the work tab's brackets.",
+          "help": "Open the work tab, which draws every ticket and takes a cell edit.",
           "widget": "action",
           "icon": "💼",
           "group": "work",
           "row": 0,
           "column": 0,
-          "runs": "./RUNME.sh tui work",
-          "counts": "./RUNME.sh index call value {\"name\":\"work/open-tasks\"}"
+          "runs": "./RUNME.sh tui work"
         },
         "pull": {
           "help": "Take the ticket waiting on you first, and open it.",
