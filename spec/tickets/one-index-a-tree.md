@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/one-index-a-tree.md:269:58: Vocabulary: httptest stands outside the words this tree writes. Write a core wo"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: eaf347f74bb3f204695332ea2001b8f25d63219e
+    hash_after: eaf347f74bb3f204695332ea2001b8f25d63219e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/one-index-a-tree.md:313:67: Vocabulary: startingpath stands outside the words this tree writes. Write a cor"
+    inputs:
+      - name: design/tests-red
+        hash: 93e1f2834e269578
+        size: 514
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -319,26 +342,33 @@ the post wait stands once as postWait, and the claim path once in startingPath
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/index/reach_test.go src/modules/lsp/lsp_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A client meeting a door past its answer time returns the fault, and starts no second index. Callers racing a start share one spawn through a claim file. The lsp module lets its lock go while it commits a buffer, so the index no longer hangs on an editor open. After the check, one index stands over the tree.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change reaches src/modules/lsp and src/index/binary.go past the ask, and the discussion of reaches-keeps-the-post-fault says why
+the spawn runs through fakeSpawn and the door through a test server, and the claim reads a temp folder
+each new function carries a comment pointing at the ticket whose approach it implements
+the post wait stands once as postWait, and the claim path once in startingPath
 
 # accept
 
