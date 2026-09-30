@@ -85,16 +85,17 @@ func (t *Tab) Update(m *frame.Model, msg tea.Msg) (bool, tea.Cmd) {
 		}
 		// An open edit takes every key, the way the filter line does. [[spec/design_output/tui#the-work-tab-takes-edits]]
 		if t.Tree != nil && t.Tree.Editing() {
-			t.editing(msg)
-			return true, nil
+			return true, t.editing(msg)
 		}
 		t.Notice = ""
 		// The place chord takes the next key, digit or not. [[spec/design_output/tui#the-work-tab-takes-edits]]
-		// The plan write moves work/rows, and the watch hands the new place over. [[spec/tickets/the-work-tab-reads-v1]]
+		// The verb's plan write moves work/rows, and the watch hands the new place over. [[spec/tickets/the-work-tab-reads-v1]]
 		if t.Placing {
-			t.placeAt(msg.String())
-			return true, nil
+			return true, t.placeAt(msg.String())
 		}
+	case actionSaid:
+		t.answered(msg)
+		return true, nil
 	}
 	return false, nil
 }
@@ -296,9 +297,12 @@ func (t *Tab) Keys(_ *frame.Model) frame.Band {
 			t.openPlace()
 			return nil
 		}},
-		{Key: frame.Bind("u", "flip the urgent mark", "u"), Do: func(_ *frame.Model, _ string) tea.Cmd {
-			t.flip(UrgentKey)
-			return nil
+		{Key: frame.Bind("u", "flip the urgent mark", urgentTrigger), Do: func(_ *frame.Model, _ string) tea.Cmd {
+			return t.flip()
+		}},
+		// The view's pull button, on a key the tab leaves free. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		{Key: frame.Bind("P", "pull the ticket waiting on you first", pullKey), Do: func(_ *frame.Model, _ string) tea.Cmd {
+			return t.pull()
 		}},
 	}}
 }

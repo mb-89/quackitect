@@ -27,9 +27,21 @@ type Posted struct {
 	Input json.RawMessage
 }
 
-// [[spec/tickets/the-work-keys-call-actions]]
-func (f Fake) Call(_ string, _ any) (Said, error) {
-	return Said{}, nil
+// Keeps the post where the case holds the list, and answers the result the case seeded, or an error naming an action it left out, as the /v1 door answers. [[spec/design_output/model#the-fake-keeps-a-contract]]
+func (f Fake) Call(name string, input any) (Said, error) {
+	body, err := json.Marshal(input)
+	if err != nil {
+		return Said{}, err
+	}
+	if f.Posted != nil {
+		*f.Posted = append(*f.Posted, Posted{Name: name, Input: body})
+	}
+	result, found := f.Results[name]
+	if !found {
+		return Said{}, fmt.Errorf("no action answers %s", name)
+	}
+	said, err := json.Marshal(result)
+	return Said{Result: said}, err
 }
 
 // Each change the case seeded, then the end. [[spec/tickets/v1-watch-streams-changes]]

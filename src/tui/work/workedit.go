@@ -1,5 +1,5 @@
 // The edit the work tab takes: a column cursor, a cell opening on a key a
-// person writes, and the write into the ticket's own front. The ticket schema
+// person writes, and a post of the field to the action the base file names. The ticket schema
 // says what each field takes and which field the verbs own, so the tab offers
 // the values it names, refuses the rest the way the write door does, and reads
 // no list of its own.
@@ -8,7 +8,6 @@
 package work
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"slices"
@@ -17,7 +16,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/src/front"
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/tree"
 	"quackitect/src/yaml"
@@ -210,36 +208,52 @@ func (t *Tab) TicketRules() TicketSchema {
 }
 
 // A key while an edit stands open: Enter takes it, Escape drops it, Tab takes the first value offered, and alt or shift with Enter fills the view. [[spec/design_output/tree-view#a-cell-takes-an-edit]]
-func (t *Tab) editing(msg tea.KeyMsg) {
+func (t *Tab) editing(msg tea.KeyMsg) tea.Cmd {
 	switch msg.String() {
 	case "esc":
 		t.Tree.Drop()
 		t.Notice = ""
 	case "enter":
-		left := t.Tree.Take()
-		t.writes(left)
+		return t.writes(t.Tree.Take())
 	case "alt+enter", "shift+enter":
-		left := t.Tree.Fill()
-		t.writes(left)
+		return t.writes(t.Tree.Fill())
 	case "tab":
 		t.Tree.Complete()
 	default:
 		t.Tree.Typing(msg)
 	}
+	return nil
 }
 
-// Every item the edit wrote reaches its ticket, and the rows the schema kept back get named with its reason. [[spec/design_output/tree-view#a-schema-refuses-a-value]]
-func (t *Tab) writes(left []string) {
-	said := []string{}
+// The input of a field write, as the verb reads it. [[spec/design_output/tui#the-work-tab-takes-edits]]
+type fieldSet struct {
+	Name  string `json:"name"`
+	Field string `json:"field"`
+	Value string `json:"value"`
+}
+
+// Every item the edit wrote posts its field, and the rows the schema kept back get named with its reason. [[spec/design_output/tree-view#a-schema-refuses-a-value]]
+func (t *Tab) writes(left []string) tea.Cmd {
+	kept := ""
+	if len(left) > 0 {
+		kept = t.Tree.Refused() + " " + strings.Join(left, ", ") + " keeps the value it carries."
+	}
+	inputs := []any{}
 	for _, one := range t.Tree.Written() {
-		if err := writeTicket(Root(t.Path), one); err != nil {
-			said = append(said, err.Error())
+		if key := one.Keys[tree.EditedKey]; key != "" {
+			inputs = append(inputs, fieldSet{Name: one.Name, Field: key, Value: one.Keys[key]})
 		}
 	}
-	if len(left) > 0 {
-		said = append(said, t.Tree.Refused(), strings.Join(left, ", ")+" keeps the value it carries.")
+	t.Notice = kept
+	if len(inputs) == 0 {
+		return nil
 	}
-	t.Notice = strings.Join(said, " ")
+	name, err := t.actionFor(editTrigger, func(one tree.Action) bool { return one.Edits == editTrigger })
+	if err != nil {
+		t.Notice = err.Error()
+		return nil
+	}
+	return t.posts(name, inputs, kept)
 }
 
 // The line under the rows: a notice where one stands, and the offer or the keys while an edit stands open. [[spec/design_output/tui#the-work-tab-takes-edits]]
@@ -255,14 +269,19 @@ func (t *Tab) footLine(w int) string {
 	return draw.Dim.Render(draw.Cut("enter writes, esc drops, alt+enter fills every row", w))
 }
 
-// A key flips a mark on the selected row, or on every marked row where marks stand. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
-func (t *Tab) flip(key string) {
+// The input of a flip, as the verb reads it. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
+type named struct {
+	Name string `json:"name"`
+}
+
+// The urgent key posts a flip for the selected row, or for every marked row where marks stand. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
+func (t *Tab) flip() tea.Cmd {
 	if t.Tree == nil {
-		return
+		return nil
 	}
-	if why := t.TicketRules().Weighs(key, FlagOn); why != "" {
+	if why := t.TicketRules().Weighs(UrgentKey, FlagOn); why != "" {
 		t.Notice = why
-		return
+		return nil
 	}
 	rows := t.Tree.MarkedItems()
 	if len(rows) == 0 {
@@ -270,52 +289,17 @@ func (t *Tab) flip(key string) {
 			rows = []*tree.Item{one}
 		}
 	}
-	said := []string{}
-	for _, one := range rows {
-		value := FlagOn
-		if one.Keys[key] == FlagOn {
-			value = FlagOff
-		}
-		tree.SetValue(one, key, value)
-		tree.SetValue(one, tree.EditedKey, key)
-		if err := writeTicket(Root(t.Path), *one); err != nil {
-			said = append(said, err.Error())
-		}
-	}
-	t.Notice = strings.Join(said, " ")
-}
-
-// The write into the ticket's front, on the one key the item's edit changed. [[spec/design_output/tui#the-work-tab-takes-edits]]
-func writeTicket(root string, one tree.Item) error {
-	at := one.Keys["path"]
-	if at == "" {
-		return errors.New(one.Name + " names no path, so the write reaches no file")
-	}
-	key := one.Keys[tree.EditedKey]
-	if key == "" {
+	if len(rows) == 0 {
 		return nil
 	}
-	file := filepath.Join(root, filepath.FromSlash(at))
-	text, err := readFile(file)
+	name, err := t.keyAction(urgentTrigger)
 	if err != nil {
-		return err
+		t.Notice = err.Error()
+		return nil
 	}
-	said, ok := WithField(string(text), key, one.Keys[key])
-	if !ok {
-		return errors.New(at + " carries no front, so the write reaches no field")
+	inputs := make([]any, 0, len(rows))
+	for _, one := range rows {
+		inputs = append(inputs, named{Name: one.Name})
 	}
-	return writeFile(file, []byte(said), 0o644)
-}
-
-// The front with one top-level field set, or dropped where the value is empty or a flag standing off. The one writer holds the form. [[spec/tickets/go-writes-the-frontmatter]]
-func WithField(text, key, value string) (string, bool) {
-	write := func() (string, error) { return front.Set(text, key, value) }
-	if value == "" || value == FlagOff {
-		write = func() (string, error) { return front.Drop(text, key) }
-	}
-	said, err := write()
-	if err != nil {
-		return text, false
-	}
-	return said, true
+	return t.posts(name, inputs, "")
 }

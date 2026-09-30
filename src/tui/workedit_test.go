@@ -15,9 +15,59 @@ import (
 
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
+	"quackitect/src/tui/registry"
 	"quackitect/src/tui/tree"
 	"quackitect/src/tui/work"
 )
+
+// How long a case waits on the command a key hands back. [[spec/tickets/the-work-keys-call-actions]]
+const postWithin = time.Second
+
+// The result each action the work tab posts answers over the fake. [[spec/tickets/the-work-keys-call-actions]]
+var workResults = map[string]any{"work/place": "placed", "tickets/flip-urgent": "flipped", "tickets/set-field": "set", "work/pull": "pulled"}
+
+// The posts the window's fake keeps. [[spec/tickets/the-work-keys-call-actions]]
+func postsIn(m frame.Model) []registry.Posted {
+	return *theWork(m).From.(registry.Fake).Posted
+}
+
+// Each key reaches the window, and the message its command answers comes back to it, so a post runs the way the program runs it. [[spec/tickets/the-work-keys-call-actions]]
+func posting(m frame.Model, keys ...string) frame.Model {
+	for _, one := range keys {
+		var msg tea.Msg = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune(one)}
+		if one == "enter" {
+			msg = tea.KeyMsg{Type: tea.KeyEnter}
+		}
+		for msg != nil {
+			next, cmd := m.Update(msg)
+			m, msg = next.(frame.Model), answerOf(cmd)
+		}
+	}
+	return m
+}
+
+// The message a command answers within the wait, the first of a batch that answers one, and nothing past the wait. [[spec/tickets/the-work-keys-call-actions]]
+func answerOf(cmd tea.Cmd) tea.Msg {
+	if cmd == nil {
+		return nil
+	}
+	said := make(chan tea.Msg, 1)
+	go func() { said <- cmd() }()
+	select {
+	case msg := <-said:
+		if batch, ok := msg.(tea.BatchMsg); ok {
+			for _, one := range batch {
+				if got := answerOf(one); got != nil {
+					return got
+				}
+			}
+			return nil
+		}
+		return msg
+	case <-time.After(postWithin):
+		return nil
+	}
+}
 
 const childNote = `---
 kind: [[ticket]]
@@ -57,6 +107,10 @@ func editWindow(t *testing.T) (frame.Model, string) {
 	m := newModel(path, time.UTC)
 	m.W, m.H = 120, 24
 	theWork(m).Tree = held
+	// The tab posts through a fake, so no case reaches an index standing on this box. [[spec/tickets/the-work-keys-call-actions]]
+	fake := workCatalog(t, workRowsSaid)
+	fake.Results, fake.Posted = workResults, &[]registry.Posted{}
+	theWork(m).From = fake
 	m.OpenTab(m.TabNamed("work"))
 	return m, root
 }
@@ -144,7 +198,7 @@ func TestTheSchemaNamesWhatAFieldTakesAndWhoOwnsIt(t *testing.T) {
 }
 
 // [[spec/design_output/tui#the-work-tab-takes-edits]]
-func TestAnEditInTheWorkTabWritesTheFieldToTheTicket(t *testing.T) {
+func TestAnEditInTheWorkTabPostsTheFieldToItsAction(t *testing.T) {
 	t.Parallel()
 	m, root := editWindow(t)
 	m = toRow(toColumn(m, "group"), "a-child")
@@ -152,18 +206,17 @@ func TestAnEditInTheWorkTabWritesTheFieldToTheTicket(t *testing.T) {
 	if !theWork(m).Tree.Editing() || theWork(m).Tree.Typed() != "one-group" {
 		t.Fatalf("the edit opens on the group the cell holds, and holds %q", theWork(m).Tree.Typed())
 	}
-	m = pressed(m, "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "t", "w", "o", "-", "g", "r", "o", "u", "p", "enter")
+	m = pressed(m, "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "backspace", "t", "w", "o", "-", "g", "r", "o", "u", "p")
+	m = posting(m, "enter")
 	if theWork(m).Tree.Editing() {
 		t.Fatal("enter closes the edit")
 	}
-	if theWork(m).Notice != "" {
-		t.Fatalf("a write that lands names nothing, and the tab says %q", theWork(m).Notice)
+	posts := postsIn(m)
+	if len(posts) != 1 || posts[0].Name != "tickets/set-field" || string(posts[0].Input) != `{"name":"a-child","field":"group","value":"two-group"}` {
+		t.Fatalf("enter posts the field to tickets/set-field, and posts %+v", posts)
 	}
-	if !strings.Contains(noteAt(t, root), "\ngroup: two-group\n") {
-		t.Fatalf("enter writes the field into the ticket's front, and the note reads:\n%s", noteAt(t, root))
-	}
-	if strings.Contains(noteAt(t, root), "edited") {
-		t.Fatal("the key naming the edit reaches no file")
+	if noteAt(t, root) != childNote {
+		t.Fatal("the tab writes no file, and the verb behind the action writes the front")
 	}
 }
 
@@ -209,30 +262,20 @@ func TestAFieldTheVerbsOwnRefusesTheEdit(t *testing.T) {
 }
 
 // [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
-func TestAKeyFlipsAMarkAndWritesIt(t *testing.T) {
+func TestTheUrgentKeyPostsAFlipAndWritesNothing(t *testing.T) {
 	t.Parallel()
 	m, root := editWindow(t)
-	m = toRow(m, "a-child")
-	// The index calls the row urgent, so the first press turns the mark off, and a note carrying none drops nothing. [[spec/design_output/tui#the-work-tab-takes-edits]]
-	m = pressed(m, "u")
-	if theWork(m).Tree.Selected().Keys[work.UrgentKey] != work.FlagOff || noteAt(t, root) != childNote {
-		t.Fatalf("u turns the mark off, the tab says %q, and the note reads:\n%s", theWork(m).Notice, noteAt(t, root))
+	m = posting(toRow(m, "a-child"), "u")
+	posts := postsIn(m)
+	if len(posts) != 1 || posts[0].Name != "tickets/flip-urgent" || string(posts[0].Input) != `{"name":"a-child"}` {
+		t.Fatalf("u posts tickets/flip-urgent for the row, and posts %+v", posts)
 	}
-	m = pressed(m, "u")
-	if !strings.Contains(noteAt(t, root), "\nurgent: true\n") {
-		t.Fatalf("u writes the urgent mark on, the tab says %q, and the note reads:\n%s", theWork(m).Notice, noteAt(t, root))
-	}
-	if theWork(m).Tree.Selected().Keys[work.UrgentKey] != work.FlagOn {
-		t.Fatal("the row wears the mark the moment the key flips it")
-	}
-	m = pressed(m, "u")
-	said := noteAt(t, root)
-	if strings.Contains(said, "urgent") {
-		t.Fatalf("a mark flipped off leaves the front, and the note reads:\n%s", said)
+	if noteAt(t, root) != childNote {
+		t.Fatal("the tab writes no file, and the verb behind the action writes the mark")
 	}
 	// The todo takes no key of its own, because a place is the todo. [[spec/design_output/pull#a-todo-forces-a-place]]
-	if m = pressed(m, "t"); strings.Contains(noteAt(t, root), "todo") {
-		t.Fatal("t writes nothing")
+	if m = posting(m, "t"); len(postsIn(m)) != 1 {
+		t.Fatal("t posts nothing")
 	}
 }
 
@@ -262,67 +305,6 @@ func TestTheCursorMovesAcrossTheColumnsAndTheHeaderLightsIt(t *testing.T) {
 	lit = lit[:strings.Index(lit, "name")+len("name")]
 	if !strings.Contains(theWork(m).Tree.Header(120), lit) || lit == "name" {
 		t.Fatalf("the column under the cursor stands lit, and the header reads %q", theWork(m).Tree.Header(120))
-	}
-}
-
-// [[spec/design_output/tui#the-work-tab-takes-edits]]
-func TestAFrontTakesAFieldSetDroppedAndAdded(t *testing.T) {
-	t.Parallel()
-	said, ok := work.WithField("---\nkind: [[ticket]]\ngroup: one\n---\n\nbody\n", "group", "two")
-	if !ok || !strings.Contains(said, "\ngroup: two\n") {
-		t.Fatalf("a field standing takes the value, and reads:\n%s", said)
-	}
-	said, _ = work.WithField("---\nkind: [[ticket]]\ngroup: one\n---\n\nbody\n", "group", "")
-	if strings.Contains(said, "group") {
-		t.Fatal("an empty value drops the field")
-	}
-	said, _ = work.WithField("---\nkind: [[ticket]]\n---\n\nbody\n", "urgent", "true")
-	if !strings.HasPrefix(said, "---\nkind: [[ticket]]\nurgent: true\n---\n") {
-		t.Fatalf("a field standing nowhere lands before the closing fence, and reads:\n%s", said)
-	}
-	said, _ = work.WithField("---\nkind: [[ticket]]\n---\n", "group", "a: b")
-	if !strings.Contains(said, `group: "a: b"`) {
-		t.Fatalf("a value a reader trips on stands quoted, and reads:\n%s", said)
-	}
-	if _, ok := work.WithField("no front here\n", "group", "two"); ok {
-		t.Fatal("a note with no front takes no field")
-	}
-	said, _ = work.WithField("---\nkind: [[ticket]]\ndepends_on:\n  - one\n  - two\ngroup: g\n---\n", "depends_on", "three")
-	if said != "---\nkind: [[ticket]]\ndepends_on: three\ngroup: g\n---\n" {
-		t.Fatalf("a block value leaves with its key, and the note reads:\n%s", said)
-	}
-}
-
-// [[spec/design_output/tui#the-work-tab-takes-edits]]
-func TestAFrontFencedWithCRLFTakesTheFieldAndKeepsItsLineEnds(t *testing.T) {
-	t.Parallel()
-	crlf := "---\r\nkind: [[ticket]]\r\ngroup: one\r\n---\r\n\r\nbody\r\n"
-	said, ok := work.WithField(crlf, "group", "two")
-	if !ok || said != strings.Replace(crlf, "group: one", "group: two", 1) {
-		t.Fatalf("a CRLF front takes the value and keeps its ends, and reads %q", said)
-	}
-	said, ok = work.WithField(crlf, "urgent", "true")
-	if !ok || said != "---\r\nkind: [[ticket]]\r\ngroup: one\r\nurgent: true\r\n---\r\n\r\nbody\r\n" {
-		t.Fatalf("a field standing nowhere lands with the front's own line end, and reads %q", said)
-	}
-	said, ok = work.WithField(crlf, "group", "")
-	if !ok || said != "---\r\nkind: [[ticket]]\r\n---\r\n\r\nbody\r\n" {
-		t.Fatalf("a dropped field takes its line end with it, and reads %q", said)
-	}
-}
-
-// [[spec/design_output/tui#the-work-tab-takes-edits]]
-func TestTheUrgentKeyWritesACRLFTicket(t *testing.T) {
-	t.Parallel()
-	m, root := editWindow(t)
-	crlf := strings.ReplaceAll(childNote, "\n", "\r\n")
-	writeAt(t, root, "spec/tickets/a-child.md", crlf)
-	m = pressed(toRow(m, "a-child"), "u", "u")
-	if theWork(m).Notice != "" {
-		t.Fatalf("a CRLF ticket carries a front, and the tab says %q", theWork(m).Notice)
-	}
-	if said := noteAt(t, root); !strings.Contains(said, "\r\nurgent: true\r\n---\r\n") || strings.Count(said, "\n") != strings.Count(said, "\r\n") {
-		t.Fatalf("u writes the mark with the file's own line ends, and the note reads %q", said)
 	}
 }
 
@@ -395,9 +377,9 @@ func TestTheCellOffersWhatTheSchemaNamesAndTabTakesIt(t *testing.T) {
 	if !strings.Contains(m.View(), "tab takes done · dropped") {
 		t.Fatal("the offer draws on the tab's last line")
 	}
-	m = pressed(m, "d", "r", "tab", "enter")
-	if !strings.Contains(noteAt(t, root), "\nreason: dropped\n") {
-		t.Fatalf("tab takes the offer and enter writes it, the tab says %q, and the note reads:\n%s", theWork(m).Notice, noteAt(t, root))
+	m = posting(pressed(m, "d", "r", "tab"), "enter")
+	if posts := postsIn(m); len(posts) != 1 || string(posts[0].Input) != `{"name":"a-child","field":"reason","value":"dropped"}` || noteAt(t, root) != childNote {
+		t.Fatalf("tab takes the offer and enter posts it, the tab says %q, and the fake keeps %+v", theWork(m).Notice, posts)
 	}
 	m = pressed(toColumn(m, "urgent"), "e", "backspace", "backspace", "backspace", "backspace")
 	if got := strings.Join(theWork(m).Tree.Offer(), " "); got != "true false" {

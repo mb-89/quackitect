@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [the-work-tab-reads-v1]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 9b51b64dd4244ee3
         size: 1642
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 447439180353822a32f2361106c697ca8f54d4ed
+    hash_after: 447439180353822a32f2361106c697ca8f54d4ed
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-work-keys-call-actions.md:353:146: Vocabulary: indexcatalog stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -361,14 +370,19 @@ Fixed in place, no round: the draft names catalog_contract_test.go where tests-r
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the files: each one the draft's size list names, plus the two window tests and main.go the gate names, and no file past them
+the doors: the posts reach registry.Caller alone, which registry.Fake keeps, and call_contract_test.go holds the fake to the V1 door
+the comment: src/tui/work/actions.go opens on the approach, and each function points at its design section
+one place: the action names stand in spec/views/work.base alone, the tab looks each up by its trigger, and tui.md points at actions.go
 
 ## tests-green
 

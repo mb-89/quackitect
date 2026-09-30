@@ -456,21 +456,23 @@ the tab with no restart.
 
 # The work tab takes edits
 
-A person edits a ticket where they read it. The write lands in the ticket's
-front. The index sees it and hands the tab its tree again, so the row reads
-what the note now says. `src/tui/work/workedit.go` and
-`src/tui/work/workplace.go` hold it.
+A person edits a ticket where they read it. Each key posts the action
+`spec/views/work.base` names to `/v1/actions`, and the verb behind it writes
+the ticket's front or the plan file. The watch on `work/rows` hands the tab
+the row again, so the row reads what the note now says. The tab writes no
+file. `src/tui/work/actions.go` holds the posts.
 
 | key | what it does |
 |---|---|
 | `a`, `d`, and the arrows beside them | move the column cursor, which the header lights |
 | `e` | open the cell under the cursor, on the selected row |
-| Enter | write the open cell's value into the row's ticket |
+| Enter | post the open cell's value to `tickets/set-field` for the row |
 | Esc | drop the open cell, and write nothing |
 | Tab | take the first value the completion offers |
-| `alt+enter` | write the open cell's value into every row the view holds, or the marked rows. Shift with Enter does the same where the terminal tells it apart |
-| `u` | flip the urgent mark on the row |
-| `p`, then a digit | place the row in the queue at that digit, which writes its todo, and the same digit again takes the todo off. For the rule, see [[spec/design_output/pull#a-todo-forces-a-place]] |
+| `alt+enter` | post the open cell's value for every row the view holds, or the marked rows. Shift with Enter does the same where the terminal tells it apart |
+| `u` | post `tickets/flip-urgent` for the row, or for every marked row |
+| `p`, then a digit | post `work/place` for the row at that digit. For the rule the verb holds, see [[spec/design_output/pull#a-todo-forces-a-place]] |
+| `P` | post `work/pull`, the view's pull button |
 
 The cell edit is the tree view's own. For the edit, see
 [[spec/design_output/tree-view#a-cell-takes-an-edit]].

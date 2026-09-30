@@ -314,8 +314,8 @@ merge brings in. So a closed ticket leaves the queue whatever a branch says.
 ## A todo forces a place
 
 A todo overrides the score at its own level. It is an overlay this box
-holds: the queue computes first, and the override lays over it. The work
-tab writes it under `places` in `.se/.runtime/plan.json`, so it stands on
+holds: the queue computes first, and the override lays over it. The place
+verb writes it under `places` in `.se/.runtime/plan.json`, so it stands on
 this box alone, travels into no ticket and reaches no git. A private note's
 own `todo` field reads the same way. The value names the row the ticket
 stands before, or one of the words below:
@@ -333,7 +333,7 @@ another todo of the plan, and any other anchor reads as `last`.
 
 The place moves as the queue drains, because the todo holds the order and
 no number. Todos of the plan tied on every score keep the order the plan
-writes them in. The work tab writes it under `p` and a digit, the pull hands a
+writes them in. The work tab posts `work/place` under `p` and a digit, the pull hands a
 tagged ticket out first, and the `T` letter lights on every tagged row.
 
 The tab draws the place it reads and holds no rule of its own. A place

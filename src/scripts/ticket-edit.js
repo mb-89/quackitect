@@ -12,7 +12,7 @@ const SCHEMA = "spec/schemas/ticket.schema.yaml";
 const URGENT = "urgent";
 const ON = "true";
 const OFF = "false";
-// The word a place past every sibling writes, as lastPlaceWord in src/tui/work/workplace.go. [[spec/design_output/pull#a-todo-forces-a-place]]
+// The word a place past every sibling writes. [[spec/design_output/pull#a-todo-forces-a-place]]
 const LAST = "last";
 const FIRST_PLACE = 1;
 const LAST_PLACE = 9;
@@ -24,7 +24,7 @@ function placeNumber(place) {
   return /^\d+$/.test(last) && !String(place).startsWith("-") ? Number(last) : 0;
 }
 
-// The value a place writes for the row at n, by the rule PlaceValue in src/tui/work/workplace.go holds, or the notice saying why it writes none. [[spec/tickets/view-actions-run-through-verbs]]
+// The value a place writes for the row at n, by the rule this verb alone holds, or the notice saying why it writes none. [[spec/tickets/view-actions-run-through-verbs]]
 export function placeValue(rows, name, n) {
   const one = rows.find((row) => row.name === name) ?? { name };
   const others = rows.filter((row) => row.name !== name);
@@ -58,7 +58,7 @@ function levelOf(answer, name) {
   return group ? group.tickets.map(rowOf) : null;
 }
 
-// The override lands under places in the plan file, and the same place again takes it out, as writePlace in src/tui/work/workplace.go. [[spec/design_output/pull#a-todo-forces-a-place]]
+// The override lands under places in the plan file, and the same place again takes it out. [[spec/design_output/pull#a-todo-forces-a-place]]
 function writePlace(it, name, value) {
   const path = it.join(it.root, ...PLANS.split("/"));
   let plan = {};
@@ -138,7 +138,7 @@ export function weighs(schema, key, said) {
   return `${key} takes a ${types.join(" or ")}, and "${said}" reads as none.`;
 }
 
-// One field written, or dropped where the value is empty or a flag standing off, as WithField in src/tui/work/workedit.go. [[spec/tickets/go-writes-the-frontmatter]]
+// One field written, or dropped where the value is empty or a flag standing off. [[spec/tickets/go-writes-the-frontmatter]]
 function written(it, at, key, value) {
   const text = it.disk.read(at.path);
   const why = weighs(it.disk.read(it.join(it.root, ...SCHEMA.split("/"))), key, value);
