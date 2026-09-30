@@ -157,6 +157,16 @@ test("the refusal names the call, the alarm and the command that clears it", () 
 });
 
 // The spawn door's layer builders write every row's wrapped prompt, and the Go door reads the same table. [[spec/tickets/spawn-answers-off-the-door]]
+// A named after on a describe answers the field it names, the shape the bridge's describe answer takes. [[spec/tickets/describe-answers-off-the-door]]
+test("a named after on a describe answers the description", () => {
+  const said = stepOf(
+    { effects: [{ kind: "after", name: "description", text: "the line" }] },
+    "tool.describe",
+    {},
+  );
+  assert.deepEqual(said, { answer: { after: { description: "the line" } } });
+});
+
 test("the JavaScript layer matches the case table", () => {
   const built = LAYERS.cases.map((one) => {
     const disk = fakeDisk(

@@ -6,6 +6,14 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { freeOfTicket } from "../../.claude/skills/level0/lib/bash.js";
 import { verbLine } from "../../.claude/skills/level0/lib/verb-line.js";
+import CASES from "../replay/cage/verb-line-cases.json" with { type: "json" };
+
+// The table the Go door reads holds the line the JavaScript writes. [[spec/tickets/describe-answers-off-the-door]]
+test("the verb line matches its case table", () => {
+  for (const one of CASES.cases) {
+    assert.equal(verbLine(one.tools.map((name) => ({ name }))), one.line, one.name);
+  }
+});
 
 // The index lists each verb as a tool, so the description names the tools and sends the agent there first. [[spec/tickets/agents-call-quack-directly]]
 test("the description names the index tools where the index lists them", () => {
