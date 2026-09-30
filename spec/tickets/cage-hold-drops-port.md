@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -171,6 +171,29 @@ record:
         exit: 0
         said: "spec/tickets/cage-write-door-port.md:319:3: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 4e80a376503969aa6a6d43f8f344f97642fbb2d1
+    hash_after: 4e80a376503969aa6a6d43f8f344f97642fbb2d1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes; green, src/config passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/cage-write-door-port.md:319:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: bbc2060d52184a48
+        size: 1346
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -376,26 +399,35 @@ the bridge owns the drop rules, the fold ports them once, and the copied layer p
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/fold_test.go src/modules/hooks/holds_test.go src/config src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Go side now drops what a hold sets, where the bridge drops it. At the turn's end the holds fold names a drop of stop.hold to off, and keeps the hold as the stood mark the stop rules port reads. A paid update names a drop of ask.wanted to quiet, unless a value pressed since stands.
+
+The door stamps the held config on every event, reads the fold's drops at the event's place, and hands each to Outside.Drop. The quack binary wires config.Drop there, which writes one key of the local layer under the work root and keeps every other key, as the bridge's writer does.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, plus src/config/door.go, holds.go and a quack wiring test, each named in the change step
+every door the tests reach has a fake: a recording Drop, a temporary root, and q/qtest
+a comment above each new function names the approach and links the ticket
+the bridge owns the drop rules, the fold ports them once, and the copied layer path names its owner
 
 # accept
 
