@@ -5,12 +5,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { onBash } from "../../src/bridge/bash.js";
-import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
+import MASKED from "../replay/cage/commit-guards-cases.json" with { type: "json" };
 
 const ROOT = "/tree";
-const AT = new URL("../replay/cage/commit-guards-cases.json", import.meta.url);
 
 // The table masks each private shape, so its own commit meets the private delta clean. [[spec/tickets/cage-commit-guards-port]]
 function unmasked(text) {
@@ -22,7 +21,7 @@ function unmasked(text) {
   return JSON.parse(out);
 }
 
-const TABLE = unmasked(disk().read(AT));
+const TABLE = unmasked(JSON.stringify(MASKED));
 
 // A box answering each git read the case teaches, and every other run as a failure git reads as empty. [[spec/tickets/cage-commit-guards-port]]
 function box(one) {
