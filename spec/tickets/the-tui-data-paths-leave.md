@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -323,7 +323,30 @@ record:
         exit: 0
         said: "spec/tickets/the-tui-data-paths-leave.md:447:23: Vocabulary: appendfile stands outside the words this tree writes. Write"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 3faf231f9295b082a3d9b159f5d2dd40dd113e72
+    hash_after: 3faf231f9295b082a3d9b159f5d2dd40dd113e72
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-tui-data-paths-leave.md:485:14: Vocabulary: testthewindowslicestandsswitchedovertonew stands outside th"
+    inputs:
+      - name: design/tests-red
+        hash: b41ceddb426778c6
+        size: 696
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 depends_on: [the-work-tab-reads-v1, the-work-keys-call-actions, the-log-tab-reads-v1]
+reason: done
 ---
 
 # Ask
@@ -492,26 +515,40 @@ one place: the key's mode stands in migration.go alone, and the schema and the c
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/switched_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The window slice switches to new. The window now draws off the index alone, and keeps no second copy to compare.
+
+- migration.go builds window in as new, with no other mode, so the tracked config drops the key
+- the work and log tabs lose their Shadow, and main.go loses windowMode and the wiring
+- the three shadow.go files leave, and so do log/view.go and BadgeOf, the second drawings the compare read
+- frame/door.go loses the append the shadow row wrote through
+
+The schema, its command file and the size golden come off their generators.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the files: the change's own, plus the generated files and the three cases holding that the window writes nothing
+the doors: the change adds no door
+the comment: the migration row and the new tests name the switch
+one place: the key's mode stands in migration.go alone
 
 # accept
 
