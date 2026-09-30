@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 21f4b2fc0b7859579517c9e5454c2460138c9be6
+    hash_after: 21f4b2fc0b7859579517c9e5454c2460138c9be6
+    inputs:
+      - name: ask
+        hash: 817f149b07ac76c5
+        size: 682
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,67 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The door serves `GET /v1/watch?names=<a>,<b>` through the `sse` package of the HTTP library, beside the values route in `src/index/v1.go`. The OpenAPI document then names the stream and its event.
+
+- The door gains a commit channel. The `OnCommit` hook in `Serve` closes it on every commit and makes the next, the way `moved` does for the tick.
+- The handler checks every name with `store.Declared` first. A name the catalog lacks answers a 404 problem, before the stream opens.
+- It settles the scheduler once, as the values route does. It then sends one `change` event a name, carrying `name`, `revision` and `value`.
+- It waits on the commit channel or the request's end. On each commit it reads a snapshot, and sends an event for each name whose JSON form moved.
+- The window's client stands in `src/tui/registry/watch.go`. `V1.Watch` reads the stream's `data:` lines and hands each `Change` on, and ends with the stream.
+- `Stream` runs a watch off the tab, and `Next` answers the next change as a message, so a tab arms `Next` again after each one.
+
+Weighed: the event carries the value, so a tab makes no second read. It costs the bytes of a large value on each change, the same bytes a read costs. Assumed: a compare of JSON forms a name answers what moved, since the snapshot carries one revision for the whole store.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/door.go Serve, whose OnCommit hook closes the commit channel as well
+- src/index/v1.go door.servesV1, which registers the watch
+- src/tui/registry/v1.go V1, which gains Watch
+- src/tui/registry/fake.go Fake, which gains the changes a case seeds
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/v1watch_test.go TestV1WatchSendsEachNamedValueOnConnect
+- src/index/v1watch_test.go TestV1WatchSendsAChangeToANamedValue
+- src/index/v1watch_test.go TestV1WatchAnswersANameTheCatalogLacksWithAProblem
+- src/tui/registry/watch_test.go TestTheWatchHandsEachEventOnAsAMessage
+- src/tui/registry/watch_test.go TestTheWatchEndsWithItsStream
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/index/v1.go
+- src/index/door.go
+- src/index/v1watch_test.go
+- src/tui/registry/watch.go
+- src/tui/registry/watch_test.go
+- src/tui/registry/fake.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function the approach names stands opened on this branch, and the `sse` package stands in the module cache at the version go.mod names
+- the callers list names each function the change reaches, found by git grep
+- each done_when line names its test: the door cases, the registry cases, and the check
 
 ## tests-red
 
