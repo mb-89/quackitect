@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: c0e49c56e6b0e0f75708e60aa0f578b6483e98d5
+    hash_after: 19d82786c1b42707514ad1b0aa2b8f428124e978
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q/tool passes; green, src/index passes; green, src/q passes; green, src/modules/mcp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/tools-keep-their-own-names.md:313:482: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: c62c9216b2cdca11
+        size: 842
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -342,26 +365,33 @@ What I weigh: the approach answers the ask with one naming function, `NameOf`, w
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/q/tool/tool_test.go src/index/tools_test.go src/q/looks_test.go src/modules/mcp/mcp_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A Go action can now keep the tool name the agent already calls, such as plan or patch. The option `q.ToolName` records it, and `tool.NameOf` answers it, or the generated `index_` name where the action keeps none. The index's tool list, the MCP list and `tool.Action` all read `NameOf`, and `Action` drops the level zero server's prefix first. So a tool ported off the bridge keeps its name, and no rule quoting it goes stale. No action claims an own name yet, so the hook in index-tools.js stays as it stands until a port claims one. To green the check, the sibling ticket log-report-stop-answer-in-go takes the five-word name log-report-stop-in-go.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q, src/q/tool, src/index and src/modules/mcp, each inside the draft's size, plus the rename the check asks
+- the change reaches no door, and each case builds its own catalog through q
+- each new function carries a pointer at spec/tickets/tools-keep-their-own-names
+- the server's prefix stands once in Go as tool.Served, and NameOf alone answers a tool name
 
 # accept
 
