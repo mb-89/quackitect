@@ -112,3 +112,15 @@ func TestTheCommitGuardsRefuseWhatTheBridgeRefuses(t *testing.T) {
 		})
 	}
 }
+
+// A door reaching no git and no voice reads neither, and its guards pass a commit. [[spec/tickets/cage-commit-guards-port]]
+func TestADoorWithNoGitOrVoiceReadsNeither(t *testing.T) {
+	root := t.TempDir()
+	d := &Door{}
+	if got := d.git(root, "status"); got != "" {
+		t.Errorf("a door with no git reads %q", got)
+	}
+	if rows := d.commitVoice(`git commit -m "a message"`, root, disk{root}); rows != nil {
+		t.Errorf("a door with no voice reads %v", rows)
+	}
+}

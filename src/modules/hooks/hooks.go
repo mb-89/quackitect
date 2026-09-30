@@ -313,7 +313,7 @@ func (d *Door) refuses(post Post, root string, settings Settings) string {
 	return d.commands(post, root, settings)
 }
 
-// The first refusal of a Bash call, in the bridge's order: the ticket door, the bless guard, the command rules, the version guard, then the git write door. PowerShell meets the ticket door alone. A post standing in no tree meets none. [[spec/tickets/cage-command-rules-port]]
+// The first refusal of a Bash call, in the bridge's order: the ticket door, the bless guard, the command rules with the voice's refusals, the commit guards, the version guard, then the git write door. PowerShell meets the ticket door alone. A post standing in no tree meets none. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-commit-guards-port]]
 func (d *Door) commands(post Post, root string, settings Settings) string {
 	tool := textOf(post.E, "tool")
 	if tool != bashTool && tool != powerShellTool || root == "" {
@@ -335,8 +335,12 @@ func (d *Door) commands(post Post, root string, settings Settings) string {
 			rules = append(rules, one)
 		}
 	}
+	rules = append(rules, d.commitVoice(line, root, tree)...)
 	if len(rules) > 0 {
 		return command.RefusedCommand(line, rules)
+	}
+	if said := d.commitGuards(line, root, settings, tree); said != "" {
+		return said
 	}
 	if said := command.VersionGuard(line); said != "" {
 		return said

@@ -5,13 +5,20 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"regexp"
+	"sort"
 	"strings"
 	"time"
 
 	settingsreader "quackitect/src/config"
+	"quackitect/src/modules/check"
 	"quackitect/src/modules/hooks"
+	"quackitect/src/modules/hooks/command"
+	"quackitect/src/prose"
 )
 
 // The key capping a name's words, and the span a git read takes. [[spec/tickets/cage-command-rules-port]]
@@ -39,6 +46,23 @@ var helperTiers = []string{"find", "change", "decide"}
 // The variables saying the box stands in the cloud, off .claude/skills/level0/lib/cloud.js. [[spec/guidance/cloud/cloud]]
 var cloudVariables = []string{"CLAUDE_CODE_REMOTE", "SE_CLOUD"}
 
+// The variables naming the box's user and its home folder, first set first, off boxHere in src/bridge/bash.js. [[spec/tickets/cage-commit-guards-port]]
+var (
+	userVariables = []string{"USER", "USERNAME", "LOGNAME"}
+	homeVariables = []string{"HOME", "USERPROFILE"}
+)
+
+// The name Vale reads a commit message under, the configs it takes, the style a prose rule's name drops, and the span it takes, off src/bridge/bash.js and lib/vale.js. [[spec/tickets/cage-commit-guards-port]]
+const (
+	commitName = "level0-commit.md"
+	valeOwn    = ".vale.ini"
+	valeBuilt  = ".se/vale/.vale.ini"
+	valeSpan   = 30 * time.Second
+)
+
+// [[spec/tickets/cage-commit-guards-port]]
+var proseStyle = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
+
 // The words a name holds under the root, and whether a cloud variable reads true. [[spec/tickets/cage-command-rules-port]]
 func commandSettings(root string) hooks.Settings {
 	cloud := false
@@ -58,7 +82,102 @@ func commandSettings(root string) hooks.Settings {
 		FinishGrace: settingsreader.Count(root, finishGraceKey), UpdateGrace: settingsreader.Count(root, updateGraceKey),
 		PlanEvery: settingsreader.Count(root, planEveryKey), PlanGrace: settingsreader.Count(root, planGraceKey),
 		PlanMostOpen: settingsreader.Count(root, planMostOpenKey), Helpers: helpers,
+		User: firstSet(userVariables), Home: firstSet(homeVariables),
 	}
+}
+
+// The first variable set, or nothing. [[spec/tickets/cage-commit-guards-port]]
+func firstSet(names []string) string {
+	for _, name := range names {
+		if said := os.Getenv(name); said != "" {
+			return said
+		}
+	}
+	return ""
+}
+
+// The findings the voice keeps over a commit message: Vale over it as level0-commit.md, each past the Go prose vetoes. A box with no Vale, or a Vale answering no rows, reads none, as messageFaults does. [[spec/tickets/cage-commit-guards-port]]
+func commitVoice(root, message string) []command.Row {
+	vale := valeAt(root)
+	if vale == "" {
+		return nil
+	}
+	config := valeOwn
+	if !standsUnder(root, valeOwn) && standsUnder(root, valeBuilt) {
+		config = valeBuilt
+	}
+	span, stop := context.WithTimeout(context.Background(), valeSpan)
+	defer stop()
+	run := exec.CommandContext(span, vale, "--config="+config, "--path="+commitName, "--output=JSON", "--no-exit")
+	run.Dir, run.Stdin = root, strings.NewReader(message)
+	said, _ := run.Output()
+	var read map[string][]struct {
+		Check   string `json:"Check"`
+		Line    int    `json:"Line"`
+		Span    []int  `json:"Span"`
+		Match   string `json:"Match"`
+		Message string `json:"Message"`
+	}
+	if json.Unmarshal(said, &read) != nil {
+		return nil
+	}
+	body := func(path string) string {
+		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+		return string(text)
+	}
+	caps, paths := proseSchema([]byte(body(paragraphSchema)))
+	words := prose.Words(body(paths[0]), body(paths[1]), body(paths[2]))
+	type heard struct {
+		found   prose.Finding
+		message string
+	}
+	var all []heard
+	for _, rows := range read {
+		for _, one := range rows {
+			found := prose.Finding{Rule: proseStyle.ReplaceAllString(one.Check, ""), Line: max(one.Line, 1), Column: 1, Said: one.Match}
+			if len(one.Span) > 0 {
+				found.Column = one.Span[0]
+			}
+			all = append(all, heard{found, one.Message})
+		}
+	}
+	sort.SliceStable(all, func(a, b int) bool {
+		if all[a].found.Line != all[b].found.Line {
+			return all[a].found.Line < all[b].found.Line
+		}
+		return all[a].found.Column < all[b].found.Column
+	})
+	var out []command.Row
+	for _, one := range all {
+		if len(prose.Kept(message, []prose.Finding{one.found}, caps, words, prose.All)) > 0 {
+			out = append(out, command.Row{Rule: one.found.Rule, Said: one.found.Said, Message: one.message})
+		}
+	}
+	return out
+}
+
+// The Vale the survey names where it stands, else the one in the runtime binary folder, else nothing. [[spec/tickets/cage-commit-guards-port]]
+func valeAt(root string) string {
+	var survey map[string]struct {
+		Path string `json:"path"`
+	}
+	if text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
+		if said := survey["vale"].Path; said != "" && standsUnder("", said) {
+			return said
+		}
+	}
+	for _, name := range []string{"vale", "vale.exe"} {
+		if guess := filepath.Join(root, filepath.FromSlash(check.Bin), name); standsUnder("", guess) {
+			return guess
+		}
+	}
+	return ""
+}
+
+// Whether a file stands at the path, under the root where one names it. [[spec/tickets/cage-commit-guards-port]]
+func standsUnder(root, path string) bool {
+	_, err := os.Stat(filepath.Join(root, filepath.FromSlash(path)))
+	return err == nil
 }
 
 // A text key's value under the root, or nothing where it stands nowhere. [[spec/tickets/cage-call-holds-port]]

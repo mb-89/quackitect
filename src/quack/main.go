@@ -383,7 +383,7 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
 		// [[spec/tickets/copilot-meets-the-hooks-door]]
 		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
-		Root:   root, Config: commandSettings, Git: gitRead,
+		Root:   root, Config: commandSettings, Git: gitRead, Voice: commitVoice,
 	})
 	return hooks.Listen(root, door)
 }
