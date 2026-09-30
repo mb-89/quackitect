@@ -30,6 +30,7 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: go-cage-switches-over
 parent: edit-tools-answer-in-go
+depends_on: ["edit-tools-answer-in-go"]
 ---
 
 # Ask

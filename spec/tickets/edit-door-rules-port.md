@@ -30,6 +30,21 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: go-cage-switches-over
 parent: edit-tools-answer-in-go
+depends_on: ["edit-tools-answer-in-go"]
+record:
+  - step: do
+    hand: box d894eee95148f · claude-code-remote
+    hash_before: e299712d42dfc788506680d99754a4c0f32ba409
+    hash_after: e299712d42dfc788506680d99754a4c0f32ba409
+    returns: 1
+    why: waits on edit-tools-answer-in-go, whose edits module this port writes into; depends_on now names it
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
 ---
 
 # Ask
@@ -47,26 +62,32 @@ the Go edit door lacks the bless file, the conflict markers, the open ticket doo
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/edits_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Nothing changes yet. The rules port into the edits module, which edit-tools-answer-in-go builds, so this child waits on it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change waits on its parent, and depends_on names it
+- no cleanup stands yet, since no code changes
+- no fact lands yet
 
 # Discussion
 
