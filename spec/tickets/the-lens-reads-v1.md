@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [the-lens-calls-actions, the-sidebar-reads-v1]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 85e6ff1c384fab28
         size: 1761
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: fcf59bc46272b98973a540674ce4fdcd06511501
+    hash_after: d19338c2d79af9f137b9e852f3a89efdcb561555
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -374,14 +383,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q src/note src/imports src/quack/main.go src/quack/codec_test.go src/modules/check src/modules/holds src/modules/tickets src/extension test/level0/lens.test.js test/level0/fields-to-fill.test.js test/level0/route-host.test.js test/level0/drawing.test.js test/level0/sidebar.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays in the size list, past four files the tree needs: `q.ReadOnly` in src/q/q.go, the round trip in src/quack/main.go leaving a read-only projection out, src/note joining `pureTree` in src/imports/imports.go, and the sidebar start-up case naming its three watches. `spec/wiring.yaml` stays untouched, as tests-red found
+- the index door has its fake in test/level0/v1-index.js, and the Go modules run on q/qtest
+- each changed file carries a comment pointing at this ticket
+- the note reader stands in src/note alone, and src/modules/check aliases it. The drawing ports `graphIn`, `leafOf` and `chapterOf`, and the golden case holds the two equal
 
 ## tests-green
 
