@@ -1,4 +1,4 @@
-// retro notes reads tickets/all off the index and prints what cli.js prints,
+// retro notes reads tickets/all off the index and prints what the verb's program prints,
 // and the wiring loads the retro topic.
 // [[spec/tickets/retro-verbs-become-actions]]
 package main

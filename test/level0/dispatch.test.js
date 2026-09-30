@@ -7,7 +7,6 @@ import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, isGroup, withField } from "../../src/engine/group.js";
-import { verbs } from "../../src/scripts/cli.js";
 import { dispatch, planOf } from "../../src/scripts/dispatch.js";
 import { fixName } from "../../src/scripts/dispatch-write.js";
 import { cutTo } from "../../src/scripts/ticket.js";
@@ -183,9 +182,12 @@ test("freeNow and the plan name the same ready groups", () => {
   );
 });
 
-// The verb table carries the row `./RUNME.sh dispatch` reaches. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
-test("the verb table carries dispatch", () => {
-  assert.equal(typeof verbs.dispatch?.run, "function");
+// The dispatch program stands where `./RUNME.sh dispatch` reaches. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
+test("the verb table carries dispatch", async () => {
+  assert.equal(
+    typeof (await import("../../src/scripts/verbs/dispatch.js")).run,
+    "function",
+  );
 });
 
 test("a child reads off its own group's branch, and another branch's older copy counts nowhere", () => {

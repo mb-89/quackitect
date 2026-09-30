@@ -64,7 +64,7 @@ const standing = (more = {}) => ({
   [`git worktree add --detach ${AT} ${REF}`]: { exitCode: 0 },
   [`git worktree remove --force ${AT}`]: { exitCode: 0 },
   [`go build -o ${join(AT, BIN, "se-front")} ./src/front/cmd`]: { exitCode: 0 },
-  "/node src/scripts/cli.js check": { exitCode: 0, stdout: "1..3\n# pass 3\n" },
+  "/node src/scripts/verbs/check.js": { exitCode: 0, stdout: "1..3\n# pass 3\n" },
   ...more,
 });
 
@@ -131,7 +131,7 @@ test("the verb answers the check and the retro, and no model runs", () => {
 test("the check runs on the surveyed tools, so the worktree downloads none", () => {
   const { it, disk } = doorsSaying(standing());
   const runs = [];
-  it.proc.teach(["/node", "src/scripts/cli.js", "check"], (argv, init) => {
+  it.proc.teach(["/node", "src/scripts/verbs/check.js"], (argv, init) => {
     runs.push({ argv, cwd: init.cwd, survey: disk.exists(join(AT, TOOLS)) });
     return { exitCode: 0 };
   });
@@ -146,7 +146,7 @@ test("the check runs on the surveyed tools, so the worktree downloads none", () 
 test("the worktree carries the caller's brand before the check runs", () => {
   const { it, disk } = doorsSaying(standing());
   const stamped = [];
-  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
     stamped.push(disk.exists(join(AT, PLUGIN)));
     return { exitCode: 0 };
   });
@@ -163,7 +163,7 @@ test("the worktree borrows the caller's modules, and gives them back before git 
     Object.fromEntries(kept.map((rel) => [join(ROOT, rel, "held"), ""])),
   );
   const seen = [];
-  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
     for (const rel of kept) {
       seen.push(disk.realOf(join(AT, rel)) === disk.realOf(join(ROOT, rel)));
     }
@@ -192,7 +192,7 @@ test("the worktree borrows the webview's modules, and gives them back before git
   const rel = "src/extension/webview/node_modules";
   const { it, disk } = doorsSaying(standing(), { [join(ROOT, rel, "held")]: "" });
   let seen = false;
-  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
     seen = disk.realOf(join(AT, rel)) === disk.realOf(join(ROOT, rel));
     return { exitCode: 0 };
   });
@@ -211,7 +211,7 @@ test("the worktree borrows the webview's modules, and gives them back before git
 test("the worktree borrows nothing out of the caller's bin but the compiler", () => {
   const { it, disk } = doorsSaying(standing(), { [join(ROOT, BIN, "logview")]: "" });
   let linked = true;
-  it.proc.teach(["/node", "src/scripts/cli.js", "check"], () => {
+  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
     linked = disk.isLink(join(AT, BIN)) || disk.isLink(join(AT, BIN, "logview"));
     return { exitCode: 0 };
   });
@@ -232,7 +232,7 @@ test("the worktree builds the branch's own se-front into its bin, in the worktre
     cwd: one.init?.cwd,
   }));
   const build = ran.findIndex((one) => one.line.startsWith("go build"));
-  const check = ran.findIndex((one) => one.line === "/node src/scripts/cli.js check");
+  const check = ran.findIndex((one) => one.line === "/node src/scripts/verbs/check.js");
   assert.equal(
     ran[build]?.line,
     `go build -o ${join(AT, BIN, "se-front")} ./src/front/cmd`,
@@ -255,7 +255,7 @@ test("a windows box builds se-front.exe, the name the front door tries there", (
 test("a red check comes back with the rows the runner refused", () => {
   const { it } = doorsSaying(
     standing({
-      "/node src/scripts/cli.js check": {
+      "/node src/scripts/verbs/check.js": {
         exitCode: 1,
         stdout: "ok 1 - a\nnot ok 2 - the door holds\nnot ok 3 - the rule fires\n",
       },
@@ -488,7 +488,7 @@ test("a worktree that opens nowhere answers so, and runs no check", () => {
   assert.equal(material.check.code, null);
   assert.match(material.check.says, /no worktree opens on origin\/work/);
   assert.equal(
-    it.proc.ran.some((one) => one.argv.includes("src/scripts/cli.js")),
+    it.proc.ran.some((one) => one.argv.includes("src/scripts/verbs/check.js")),
     false,
     "no check runs where no worktree stands",
   );

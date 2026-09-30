@@ -122,7 +122,7 @@ func TestABranchCarriesItsGroupCopyAndTheChildrenOnItsTip(t *testing.T) {
 	}
 }
 
-// A branch whose ticket runs no group route carries no group copy, so the work draws its row with no step, as cli.js does. [[spec/tickets/the-index-reads-standing-branches]]
+// A branch whose ticket runs no group route carries no group copy, so the work draws its row with no step, as the verb's program does. [[spec/tickets/the-index-reads-standing-branches]]
 func TestABranchWhoseTicketIsNoGroupCarriesNoGroupCopy(t *testing.T) {
 	tips := []ticket.Tip{{Name: "one-ticket", Files: []ticket.File{{Path: "spec/tickets/one-ticket.md", Text: "---\nkind: ticket\nstate: open\nstep: design/tests-red\n---\n\n# Ask\n\nOne.\n"}}}}
 	branches, _ := tipsRead(t, BranchesPort, map[string]any{}, tips).([]ticket.Branch)

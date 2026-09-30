@@ -538,7 +538,7 @@ fi
 # The survey names where each tool stands, and every caller reads it in place
 # of guessing. It runs where anything landed, and where the file is absent.
 if [ -n "$missing" ] || [ ! -f "$run/tools.json" ]; then
-  (cd "$root" && node src/scripts/cli.js tools >/dev/null) ||
+  (cd "$root" && node src/scripts/verbs/tools.js >/dev/null) ||
     say "  the survey wrote no tools.json under $run, so every caller guesses again." >&2
 fi
 

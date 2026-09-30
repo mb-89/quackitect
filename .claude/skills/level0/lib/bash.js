@@ -31,7 +31,19 @@ export const HOME = NOTES.split("/")[0];
 const REDIRECTS = new Set([">", ">>", "&>"]);
 // The operators that run the next segment whatever the one before answers, and the scripts a verb runs through. [[spec/design_output/bash#a-landing-follows-its-gate]]
 const GATES = new Set([";", "||", "&"]);
-const VERB_ROOTS = new Set(["RUNME.sh", "RUNME.ps1", "cli.js"]);
+const VERB_ROOTS = new Set(["RUNME.sh", "RUNME.ps1"]);
+// A verb's program, which names its verb off the file name. [[spec/tickets/cli-js-leaves]]
+const VERB_PROGRAM = /(^|\/)src\/scripts\/verbs\/([a-z]+)\.js$/;
+
+// The verb and the words past it, off a verb root or a verb's program, or null where the words name neither. [[spec/tickets/cli-js-leaves]]
+function verbWordsIn(words) {
+  for (let at = 0; at < words.length; at++) {
+    if (VERB_ROOTS.has(baseName(words[at]))) return words.slice(at + 1);
+    const program = VERB_PROGRAM.exec(String(words[at]).replace(/\\/g, "/"));
+    if (program) return [program[2], ...words.slice(at + 1)];
+  }
+  return null;
+}
 
 // The paths no rule reads, which is where a hand writes a script. [[spec/design_output/bash#a-shell-writes-nothing]]
 export const FREE = [
@@ -139,9 +151,9 @@ export function freeOfTicket(command) {
 }
 
 function freeVerbIn(words) {
-  const at = words.findIndex((word) => VERB_ROOTS.has(baseName(word)));
-  if (at < 0) return false;
-  const [verb, sub] = words.slice(at + 1);
+  const said = verbWordsIn(words);
+  if (!said) return false;
+  const [verb, sub] = said;
   return TICKET_FREE.some(([said, form]) => said === verb && form === sub);
 }
 
@@ -432,9 +444,9 @@ function landingOf(segment) {
   const words = wordsIn(segment);
   if (baseName(words[0]) === "git")
     return afterGit(words)[0] === "commit" ? "git commit" : "";
-  const at = words.findIndex((one) => VERB_ROOTS.has(baseName(one)));
-  if (at < 0) return "";
-  const [verb, sub] = words.slice(at + 1);
+  const said = verbWordsIn(words);
+  if (!said) return "";
+  const [verb, sub] = said;
   if (verb === "commit") return "./RUNME.sh commit";
   if (verb === "ticket" && (sub === "pull" || sub === "open"))
     return `./RUNME.sh ticket ${sub}`;

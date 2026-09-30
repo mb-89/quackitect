@@ -91,7 +91,7 @@ func TestTheWiringLoadsTheBranchTopic(t *testing.T) {
 	}
 }
 
-// A twin keyed on three words runs beside cli.js for that spelling, and the two-word verb runs cli.js alone. [[spec/tickets/work-verbs-become-actions]]
+// A twin keyed on three words runs beside the verb's program for that spelling, and the two-word verb runs the verb's program alone. [[spec/tickets/work-verbs-become-actions]]
 func TestATwinKeysOnThreeWords(t *testing.T) {
 	dry := []bool{}
 	doors, _, rows := roadOver("shadow", "old\n", map[string]twin{"branch list --queue": twinSaying("new\n", &dry)})

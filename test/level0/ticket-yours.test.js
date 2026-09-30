@@ -7,7 +7,6 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { verbs } from "../../src/scripts/cli.js";
 import { taggedFirst } from "../../src/scripts/pull-hand.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { answerOf } from "../../src/scripts/work-answer.js";
@@ -131,10 +130,6 @@ test("bare yours lists every row the queue places, in its order", () => {
   );
   assert.equal(rows[0].ticket, "b-urgent-one");
   assert.equal(rows[0].step, "sign");
-});
-
-test("the command line's ticket entry names the yours verb", () => {
-  assert.match(verbs.ticket.says, /\byours\b/);
 });
 
 test("a person named on the phase holds each leaf under it", () => {

@@ -1,6 +1,6 @@
-// The tree verbs: every verb cli.js answers outside a topic, each standing as
-// an action of the verb topic through the node module.
-// [[spec/tickets/agents-call-quack-directly]]
+// The verb table: every verb in help order, and the tree verbs among them,
+// each standing as an action of the verb topic through the node module.
+// [[spec/tickets/cli-js-leaves]]
 package verbs
 
 import "quackitect/src/q"
@@ -8,11 +8,11 @@ import "quackitect/src/q"
 // The topic the tree verbs stand under, which names no word of their own. [[spec/tickets/agents-call-quack-directly]]
 const TreeTopic = "verb"
 
-// Every verb in help order with its usage line, the topics among them. [[spec/tickets/cli-js-leaves]]
-var Commands = []Verb{}
+// The verbs that stand as topics of their own, and so as no tree verb. [[spec/tickets/agents-call-quack-directly]]
+var topics = map[string]bool{"branch": true, "ticket": true, "retro": true, "vehicle": true, "stub": true}
 
-// Every verb cli.js answers outside a topic, with its usage line as its doc. [[spec/tickets/agents-call-quack-directly]]
-var TreeVerbs = []Verb{
+// Every verb in help order with its usage line, the topics among them. Each runs its program under src/scripts/verbs. [[spec/tickets/cli-js-leaves]]
+var Commands = []Verb{
 	{Name: "check", Doc: "the tests, the doors, the server, then the rules over the tree"},
 	{Name: "lint", Doc: "the rules over the tree, or over what you name"},
 	{Name: "fix", Doc: "the fixes a program can make"},
@@ -24,8 +24,11 @@ var TreeVerbs = []Verb{
 	{Name: "doors", Doc: "every door, and the contract test that holds it"},
 	{Name: "project", Doc: "write every projection again, from the source it names"},
 	{Name: "config", Doc: "every key, its value, and the layer answering it"},
+	{Name: "branch", Doc: "work branches and groups: new, take, sync, done, list, merge, close, test"},
 	{Name: "cloud", Doc: "the cloud routine: trigger"},
 	{Name: "dispatch", Doc: "the dispatcher's plan: --dry prints it, --json prints it as JSON, and --fire fires the workers"},
+	{Name: "ticket", Doc: "tickets: pull, note, update, open, todo, route, yours, fill"},
+	{Name: "retro", Doc: "the retro a group's route runs: notes"},
 	{Name: "mint", Doc: "write a new note of a kind, in the shape its schema names"},
 	{Name: "graph", Doc: "a process or a ticket, drawn as the graph the editor reads"},
 	{Name: "probe", Doc: "measure the client itself: compact says what a compaction keeps"},
@@ -37,10 +40,25 @@ var TreeVerbs = []Verb{
 	{Name: "push", Doc: "push the branch you stand on, once the check answers green on it"},
 	{Name: "serve", Doc: "the server behind the bridgehead, which stands detached, so the call returns"},
 	{Name: "find", Doc: "every line carrying the words, out of the index, or out of the session log with --log"},
+	{Name: "vehicle", Doc: "this vehicle, the project it drives, and a vehicle made elsewhere"},
+	{Name: "stub", Doc: "a bare project this vehicle drives: into <folder> [--upstream <url>]"},
 	{Name: "notes", Doc: "the notes the words belong to, ranked by name and body"},
 	{Name: "links", Doc: "what reaches a note, and what reaches nothing"},
 	{Name: "index", Doc: "the index itself: standing, reindex, or same <path>"},
 	{Name: "rename", Doc: "move a name and rewrite every reach: rename <from> <to>"},
+}
+
+// Every verb of the table outside a topic, with its usage line as its doc. [[spec/tickets/cli-js-leaves]]
+var TreeVerbs = lessTopics(Commands)
+
+func lessTopics(all []Verb) []Verb {
+	var out []Verb
+	for _, one := range all {
+		if !topics[one.Name] {
+			out = append(out, one)
+		}
+	}
+	return out
 }
 
 // The module type of the tree verbs, each handing the verb and the caller's words to the node module. [[spec/tickets/agents-call-quack-directly]]

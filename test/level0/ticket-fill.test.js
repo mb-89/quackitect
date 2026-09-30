@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { mintFields, verbs } from "../../src/scripts/cli.js";
+import { mintFields } from "../../src/scripts/mint-verb.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { TICKET_SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
 import { heard } from "./pull-doors.js";
@@ -78,10 +78,6 @@ test("fill over a ticket naming no process refuses, and writes nothing", () => {
   assert.equal(said.code, 2);
   assert.match(said.said, /Name a process/);
   assert.equal(said.now, bare);
-});
-
-test("the command line's ticket entry names the fill verb", () => {
-  assert.match(verbs.ticket.says, /\bfill\b/);
 });
 
 test("fill over a path standing nowhere refuses with exit 2", () => {

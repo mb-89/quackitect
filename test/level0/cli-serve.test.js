@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { serveBridge } from "../../src/scripts/cli.js";
+import { serveBridge } from "../../src/scripts/verbs/serve.js";
 import { probeOf } from "../../src/scripts/serve.js";
 
 const ROOT = "/tree";

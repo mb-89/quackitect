@@ -1,5 +1,5 @@
 // The wired queue scores a ticket by the weights the config holds and the
-// second git says it came in, the way cli.js does, so the verbs shadow reads
+// second git says it came in, the way the verb's program does, so the verbs shadow reads
 // the same order on both paths.
 // [[spec/tickets/verbs-queue-order]]
 package main
@@ -18,7 +18,7 @@ const (
 	aDay       = int64(86400)
 )
 
-// Two open tickets tie on every term but their age. The name puts a-new first, and the day it stood puts b-old first, as cli.js orders them. [[spec/design_output/pull#the-queue-is-a-score]]
+// Two open tickets tie on every term but their age. The name puts a-new first, and the day it stood puts b-old first, as the verb's program orders them. [[spec/design_output/pull#the-queue-is-a-score]]
 func TestTheWiredQueueWeighsTheDaysATicketStood(t *testing.T) {
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {

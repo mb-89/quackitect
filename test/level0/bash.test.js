@@ -26,7 +26,11 @@ const rules = (command, most = 5, it = {}) =>
 const paths = (command) => writesAPath(command).map((one) => one.path);
 
 test("the rules reach a prose file and a code file, and stop at the ignored roots", () => {
-  for (const path of ["spec/guidance/voice.md", "src/scripts/cli.js", "./README.md"]) {
+  for (const path of [
+    "spec/guidance/voice.md",
+    "src/scripts/verb-run.js",
+    "./README.md",
+  ]) {
     assert.equal(reaches(path), true, path);
   }
   for (const path of [
@@ -55,7 +59,7 @@ test("a redirection into a file the rules reach is refused", () => {
 test("a redirection nowhere the rules reach passes", () => {
   for (const said of [
     "cat > .se/notes.md",
-    "node src/scripts/cli.js check > /tmp/out.md",
+    "node src/scripts/verbs/check.js > /tmp/out.md",
     "./RUNME.sh check > .se/check.log",
     "git status --porcelain",
     "grep -rn describes spec/design_output",
@@ -71,8 +75,8 @@ test("tee and an in-place edit are writes, and a plain read is not", () => {
   assert.deepEqual(paths("cat one | tee .se/x.md"), []);
   assert.deepEqual(paths("sed -i 's/a/b/' README.md"), ["README.md"]);
   assert.deepEqual(paths("sed -i.bak s/a/b/ README.md"), ["README.md"]);
-  assert.deepEqual(paths("perl -pi -e 's/a/b/' src/scripts/cli.js"), [
-    "src/scripts/cli.js",
+  assert.deepEqual(paths("perl -pi -e 's/a/b/' src/scripts/verb-run.js"), [
+    "src/scripts/verb-run.js",
   ]);
   assert.deepEqual(paths("sed -n '1,20p' README.md"), []);
 });
@@ -150,11 +154,11 @@ test("a script naming its path on one line and writing on another is refused, an
   const node = [
     "node <<'JS'",
     "const fs = require('fs');",
-    "const at = 'src/scripts/cli.js';",
+    "const at = 'src/scripts/verb-run.js';",
     "fs.writeFileSync(at, fs.readFileSync(at, 'utf8') + '\\n');",
     "JS",
   ].join("\n");
-  assert.deepEqual(paths(node), ["src/scripts/cli.js"]);
+  assert.deepEqual(paths(node), ["src/scripts/verb-run.js"]);
 
   const reading = [
     "python - <<'PY'",
@@ -300,7 +304,7 @@ test("a whole-suite run is refused, and a run naming one file passes", () => {
     'node --test --test-name-pattern="the prune"',
     "node --test --test-only test/level0/log.test.js",
     "./RUNME.sh check",
-    "node src/scripts/cli.js check",
+    "node src/scripts/verbs/check.js",
     "npm run lint",
   ]) {
     assert.deepEqual(testIn(said), [], said);
@@ -369,7 +373,7 @@ test("a runner and a shell each name their script, and a tracked path names none
   assert.deepEqual(scriptsIn("sh .se/scripts/edit.sh"), [".se/scripts/edit.sh"]);
   assert.deepEqual(scriptsIn("python3 /tmp/one.py"), ["/tmp/one.py"]);
   assert.deepEqual(scriptsIn("node --test test/level0/bash.test.js"), []);
-  assert.deepEqual(scriptsIn("node src/scripts/cli.js check"), []);
+  assert.deepEqual(scriptsIn("node src/scripts/verbs/check.js"), []);
 });
 
 test("a script the rules already read names no script here", () => {
@@ -377,7 +381,7 @@ test("a script the rules already read names no script here", () => {
     "bash src/scripts/install.sh",
     "python3 src/tools/gen.py",
     "bash ./RUNME.sh check",
-    "node src/scripts/cli.js branch done",
+    "node src/scripts/verbs/branch.js done",
   ]) {
     assert.deepEqual(scriptsIn(said), [], said);
   }

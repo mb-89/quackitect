@@ -7,7 +7,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"testing"
 
@@ -16,14 +15,8 @@ import (
 	"quackitect/src/q/tool"
 )
 
-// The file whose verb table the case reads, and the table's opening and closing lines. [[spec/tickets/agents-call-quack-directly]]
-const (
-	cliFile   = "src/scripts/cli.js"
-	tableOpen = "export const verbs = {"
-	tableEnd  = "\n};"
-)
-
-var verbRow = regexp.MustCompile(`(?m)^  ([a-z]+): \{`)
+// The folder holding one program a verb, which the case reads as the verb table. [[spec/tickets/cli-js-leaves]]
+const programsFolder = "src/scripts/verbs"
 
 // The verbs a topic of its own answers, each with its list. [[spec/tickets/agents-call-quack-directly]]
 var topics = map[string][]verbsmodule.Verb{
@@ -34,20 +27,17 @@ var topics = map[string][]verbsmodule.Verb{
 	"stub":    verbsmodule.StubVerbs,
 }
 
-func cliTable(t *testing.T) []string {
+func programTable(t *testing.T) []string {
 	t.Helper()
-	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(cliFile)))
+	listed, err := os.ReadDir(filepath.Join("..", "..", filepath.FromSlash(programsFolder)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, table, ok := strings.Cut(string(text), tableOpen)
-	if !ok {
-		t.Fatalf("%s holds no verb table", cliFile)
-	}
-	table, _, _ = strings.Cut(table, tableEnd)
 	var out []string
-	for _, one := range verbRow.FindAllStringSubmatch(table, -1) {
-		out = append(out, one[1])
+	for _, one := range listed {
+		if verb, ok := strings.CutSuffix(one.Name(), ".js"); ok {
+			out = append(out, verb)
+		}
 	}
 	return out
 }
@@ -78,9 +68,9 @@ func registered(t *testing.T) map[string]bool {
 
 func TestEveryVerbStandsAmongTheTools(t *testing.T) {
 	tools := registered(t)
-	table := cliTable(t)
+	table := programTable(t)
 	if len(table) == 0 {
-		t.Fatalf("%s lists no verb", cliFile)
+		t.Fatalf("%s lists no verb", programsFolder)
 	}
 	var missing []string
 	for _, verb := range table {

@@ -33,8 +33,11 @@ test("a windows separator answers the one vale reads", () => {
 
 test("a drive letter in either case names the same root", () => {
   assert.equal(
-    relativeTo("c:/users/one/desktop/ai/quackitect-v5", `${ROOT}/src/scripts/cli.js`),
-    "src/scripts/cli.js",
+    relativeTo(
+      "c:/users/one/desktop/ai/quackitect-v5",
+      `${ROOT}/src/scripts/verb-run.js`,
+    ),
+    "src/scripts/verb-run.js",
   );
 });
 

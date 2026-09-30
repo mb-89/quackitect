@@ -1,5 +1,5 @@
 // The tools the index generates: the hook reads the list off the binary, the
-// way the pull reaches cli.js, and a call of one posts its input to its action.
+// way the pull reaches the ticket program, and a call of one posts its input to its action.
 // [[spec/tickets/the-hook-registers-index-tools]]
 
 import { RUN } from "./folders.js";

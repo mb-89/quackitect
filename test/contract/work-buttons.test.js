@@ -8,7 +8,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { verbs } from "../../src/scripts/cli.js";
+import { commands } from "./commands.js";
 import { entriesIn } from "../../src/extension/lib/widgets.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -44,7 +44,7 @@ test("each line a work button runs or counts names a verb the command line knows
   ]);
   for (const line of lines) {
     const verb = line.split(" ")[1];
-    assert.ok(verbs[verb], `${line} names a verb the command line knows`);
+    assert.ok(commands().has(verb), `${line} names a verb the command line knows`);
   }
 });
 

@@ -19,9 +19,9 @@ test("the disk's maps find a Windows path under its posix key", () => {
 });
 
 test("the process table taught a posix path answers a Windows run", () => {
-  const proc = fakeProc({ "node /tree/cli.js check": { exitCode: 3 } });
+  const proc = fakeProc({ "node /tree/run.js check": { exitCode: 3 } });
   proc.teach(["\\node"], { exitCode: 4 });
 
-  assert.equal(proc.run(["node", "\\tree\\cli.js", "check"]).exitCode, 3);
+  assert.equal(proc.run(["node", "\\tree\\run.js", "check"]).exitCode, 3);
   assert.equal(proc.run(["/node", "--version"]).exitCode, 4);
 });
