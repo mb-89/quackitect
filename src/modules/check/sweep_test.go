@@ -146,3 +146,13 @@ func TestCountReadsTheBuiltIn(t *testing.T) {
 		t.Fatalf("the count answers %d, and wants the default 7", said)
 	}
 }
+
+// The survey stands on the box and git tracks it nowhere, so the sweep over the tracked files leaves out the rule that reads it. [[spec/tickets/sweep-skips-box-rules]]
+func TestTheSweepLeavesTheBoxRulesOut(t *testing.T) {
+	found := sweepOver(t, map[string]string{Install: "#!/bin/sh\n"}, nil)
+	for _, one := range found {
+		if one.Rule == "SurveyFindsNode" {
+			t.Fatalf("the sweep answers %+v, a row the box alone decides", one)
+		}
+	}
+}
