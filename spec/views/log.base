@@ -1,0 +1,15 @@
+reads: log/rows
+follow: true
+actions:
+  - key: E
+    jumps: "level: error"
+  - key: alt+l
+    cycles: floor
+views:
+  - type: table
+    name: session log
+    order:
+      - at
+      - level
+      - kind
+      - said

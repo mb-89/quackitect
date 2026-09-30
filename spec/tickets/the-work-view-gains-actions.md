@@ -1,10 +1,19 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -24,35 +33,41 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -60,7 +75,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -74,11 +89,100 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 9d870e3fd3c577a6
+process_hash: 22b42ea1501e8967
 group: tui-shell-lands-in-shadow
-depends_on: [the-tui-becomes-a-shell]
+depends_on: ["the-tui-becomes-a-shell"]
+record:
+  - step: design/draft
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 0c2433d538594cf7099e5a0c5eba3743c7e5f9cb
+    hash_after: 0c2433d538594cf7099e5a0c5eba3743c7e5f9cb
+    inputs:
+      - name: ask
+        hash: ba3b442f05fd963f
+        size: 456
+    def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 5ee956e005f1ccc682dcfee40fa1c324e27d77d7
+    hash_after: 5ee956e005f1ccc682dcfee40fa1c324e27d77d7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/work fails
+    inputs:
+      - name: design/draft
+        hash: 0bf85019502e2423
+        size: 3555
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856db450bd7 · claude-code-remote · helper-3
+    hash_before: b2093b6d197dc1283db477a460381534530104f4
+    hash_after: b2093b6d197dc1283db477a460381534530104f4
+    inputs:
+      - name: design/draft
+        hash: 0bf85019502e2423
+        size: 3555
+      - name: design/tests-red
+        hash: cd03e20b564a0228
+        size: 961
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 9aa5afdf1b35b20013ba66a7eee0e52390bfb0c4
+    hash_after: 9aa5afdf1b35b20013ba66a7eee0e52390bfb0c4
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: e56748f8e250f7e35d56cf7b335c9cd2f5940a1b
+    hash_after: e56748f8e250f7e35d56cf7b335c9cd2f5940a1b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes; green, src/modules/work passes; green, src/modules/index passes; green, src/modules/migration pas
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: cd03e20b564a0228
+        size: 961
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -94,6 +198,16 @@ The work view stops computing what it shows.
 
 # design
 
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -101,44 +215,64 @@ The work view stops computing what it shows.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The work view becomes a declared view, in shadow: the tab keeps drawing off the verb and the tickets answer, and the rows and the badge the index holds stand beside them.
+
+| the part | where | what it does |
+|---|---|---|
+| the declaration | spec/views/work.base | gains the top-level keys reads work/rows, badge work/open-tasks, and the four actions of the views chapter, in block style. The file writes no label, doc or look |
+| the port | src/modules/work/open_tasks.go and rows.go Registers | work/open-tasks declares q.Label work and q.Looks q.Count, and work/rows declares q.Looks q.Rows, so the registration owns what the badge wears |
+| the catalog | src/modules/index/catalog.go NameRow | gains label, icon and looks off the presentation, so a renderer reads them off index/names |
+| the badge | src/tui/work/shadow.go BadgeOf | draws the label and the count off the index/names rows, the way the strip draws work (N) |
+| the rows | src/tui/work/shadow.go ViewOver | builds the tree off a work/rows answer and the base file, so a case draws the view over fake rows |
+| the compare | src/tui/work/shadow.go Apart and Check | names each row the tab and work/rows read apart on name, state and queue, and the badge the strip and the index read apart, then writes one shadow row a pair |
+| the write | src/tui/frame/shadow.go WriteShadow | appends one shadow row to the session log. The log tab and the work tab share it, so the file call stands once in the frame's door |
+| the window | src/tui/main.go newModelOver | hands the work tab the catalog and the mode off migration.window |
+
+Assumptions for the hand at the merge: the model note names work/place, tickets/flip-urgent and tickets/set-field, and the catalog holds none of them today, so the file declares them as the note says and the actions shadow lands them. The tab keeps its own keys under shadow. The log ticket's approach named its write in log/door.go, and this ticket moves it into the frame, which both tabs reach.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go Load: reads work.base through tree.ReadBase
+- src/tui/work/work.go Label: draws the strip's count
+- src/tui/main.go newModelOver: builds the work tab
+- src/modules/index/catalog.go catalogOf: builds every NameRow
+- src/tui/log/shadow.go Check: the write moves to frame.WriteShadow
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/work/shadow_test.go TestTheWorkViewDrawsOverAFakeWorkRows
+- src/tui/work/shadow_test.go TestTheBadgeDrawsTheLabelAndLookThePortDeclares
+- src/tui/work/shadow_test.go TestTheShadowNamesEachWorkRowTheTabAndTheIndexReadApart
+- src/tui/work/shadow_test.go TestTheShadowNamesABadgeTheTwoPathsDrawApart
+- src/tui/work/shadow_test.go TestTheWorkShadowWritesNoRowUnderOld
+- src/tui/frame/shadow_test.go TestAShadowRowStandsInTheLogWithItsSlice
+- src/tui/tree/base_test.go TestTheWorkBaseFileDeclaresItsRowsBadgeAndActions
+- src/modules/work/open_tasks_test.go TestTheOpenTasksPortDeclaresItsLabelAndLook
+- src/modules/index/catalog_test.go TestANameRowCarriesItsLabelAndLook
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first, on a first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
+- every file named stands opened: work.base, work/work.go, workplaces.go, modules/work/rows.go and open_tasks.go, index/catalog.go, q/looks.go, wiring.yaml and the views chapter of the model note
+- the callers list names each reader of the base file, the strip's label, the constructor and the row builder
+- the ask's fake work/rows case is TestTheWorkViewDrawsOverAFakeWorkRows and its badge case is TestTheBadgeDrawsTheLabelAndLookThePortDeclares, and go test with the check close it
 
 ## tests-red
 
@@ -147,20 +281,50 @@ The work view stops computing what it shows.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/work src/tui/frame src/tui/tree src/modules/work src/modules/index
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/tui/work/shadow_test.go
+- src/tui/frame/shadow_test.go
+- src/tui/tree/base_test.go
+- src/modules/work/open_tasks_test.go
+- src/modules/index/manager_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its assertion over stubs that compile, except the no-row-under-old case, which passes on a stub that writes nothing. The frame writer stands empty, so the shared write stands red once for the log tab and the work tab. I added a badge port to the catalogued fixture, so the names row can carry a label and a look.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask fake rows case is TestTheWorkViewDrawsOverAFakeWorkRows and its badge case is TestTheBadgeDrawsTheLabelAndLookThePortDeclares; go test and the check close them at tests-green
+- the one door, Source, has the fake in shadow_test.go, and the /v1 road stands in the registry package under its contract suite
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept with points
+- work-view-awaits-log-parse: depends_on names only the-tui-becomes-a-shell, while TestTheWorkBaseFileDeclaresItsRowsBadgeAndActions rests on tree.ReadBase filling Reads, Badge and Actions, which the-log-becomes-a-view lands and which reads empty today; name that ticket under depends_on so implement waits on it
+- fake-rows-case-panics-red: TestTheWorkViewDrawsOverAFakeWorkRows panics in tree.Header on the empty tree the ViewOver stub hands back, so it fails on no assertion of its own and stops the rest of src/tui/work; give the stub the base file columns so the case fails on its want
+
+# implement
 
 ## change
 
@@ -169,14 +333,19 @@ The work view stops computing what it shows.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files touched: the view base files, the base reader, the frame shadow writer and its door, the log and work shadows and their tabs, the work module labels, the catalog row, the window slice with its config key and projections, and main.go; each serves the ask or the log view it rests on
+- every door reached has a fake: the shadow source has fakeSource, and the file write stands in the frame door
+- comments name the approach in each new file
+- the shadow row write stands once in frame.WriteShadow, and the import table stands in tui.md alone
 
 ## tests-green
 
@@ -185,26 +354,53 @@ The work view stops computing what it shows.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui src/modules/work src/modules/index src/modules/migration
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work view and the log view become declared views in shadow. The base files name what they read, their badge and their actions, and the base reader carries those keys. A shared shadow writer in the frame appends one shadow row a mismatch. The log tab compares the tail to log/rows, and the work tab compares its rows and its badge to work/rows and the label and look the open-tasks port declares. The index names carry each label, icon and look. A new window slice, at shadow in the default file, gates it, and a pair already told stands once in the log. The old path keeps drawing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files touched: the view base files, the base reader, the frame shadow writer and its door, the log and work shadows and their tabs, the work module labels, the catalog row, the window slice with its config key and projections, and main.go
+- every door reached has a fake: the shadow source has fakeSource, and the file write stands in the frame door
+- comments name the approach in each new file
+- the shadow row write stands once in frame.WriteShadow, and the import table stands in tui.md alone
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
 
 # Discussion
 

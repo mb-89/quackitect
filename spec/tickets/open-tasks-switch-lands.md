@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -80,12 +80,91 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
+step: retro/cloud
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase2switch
 depends_on: [open-tasks-shadow-lands]
-cloud: true
+record:
+  - step: sync
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: f65c54b8d6a7627d7168ca85c1bd562e0d0de680
+    hash_after: 08f06838d838e95e545fa28c5eab3415ee68a820
+  - step: sync
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: ecda1a149e9935c878ad39edbc0c1eb6fa50c174
+    hash_after: bb01c094539f1d0fd6154752766ce3bce8b727c8
+    answered:
+      - name: sync
+        exit: 0
+        said: work/open-tasks-switch-lands already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 67758709e551733352b7107138c179a29a49fc93
+    hash_after: 67758709e551733352b7107138c179a29a49fc93
+    inputs:
+      - name: ask
+        hash: 84879e30408c4c2c
+        size: 395
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 0f9a6049a01c8702954986f27cee58dadce29344
+    hash_after: 0f9a6049a01c8702954986f27cee58dadce29344
+  - step: accept
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 7b61189ef8930fbef3f89239926110aa4a062217
+    hash_after: 5b975c59238afae3b4f20c1e0be630f4e87b3bb2
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/open-tasks-switch-lands already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 84879e30408c4c2c
+        size: 395
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: 347d254acf2f9f883ef3889438d3f35a931741f2
+    hash_after: 347d254acf2f9f883ef3889438d3f35a931741f2
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: aa9e4479e5604df94b590f832d132a560e932527
+    hash_after: aa9e4479e5604df94b590f832d132a560e932527
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d81f28f032e0 · claude-code-remote
+    hash_before: d94308fc386b6fd73844a6af68a7112877476d1b
+    hash_after: d94308fc386b6fd73844a6af68a7112877476d1b
+    inputs:
+      - name: retro/write
+        hash: 061fe493942b94b5
+        size: 2593
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -101,8 +180,9 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -111,14 +191,25 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/the-badge-reads-open-tasks]], standard
+[[spec/tickets/the-count-chain-leaves]], standard
+[[spec/tickets/queue-column-reads-the-index]], trivial
+[[spec/tickets/red-list-reads-inserted-leaves]], trivial
+[[spec/tickets/count-grep-misses-the-scripts]], trivial
+[[spec/tickets/count-tests-miss-the-chain]], trivial
+[[spec/tickets/open-tasks-fake-moves-over]], trivial
+[[spec/tickets/opentasks-help-names-dead-modes]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+size: every child closed through one review each
+goal: the badge, the brackets and the queue column read the index, and the count chain left the tree, so the goal stands inside the children
+order: every child stands closed, so no child waits on another
 
 # children
 
@@ -129,8 +220,9 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -141,8 +233,9 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -151,38 +244,65 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+count-grep-misses-the-scripts closes at do, since the tree case reads the three files that held the chain
+count-tests-miss-the-chain closes at do, since the build commits rewrote its three tests
+open-tasks-fake-moves-over closes at do, since askOpenTasks stands beside PlacesAt on askIndex
+opentasks-help-names-dead-modes closes at do, since the schema help names the record
+the group passes its accept through a reviewer helper, a hand other than the builder
+opentasks-enum-keeps-dead-values drops old and shadow from the enum, the module default and the projected commands
+verdict-point-crashes-on-a: the findings check refuses a point whose name is no ticket name
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the handover named each child and why it closes, so four closes took one check each
+a reviewer helper gave the accept a second hand, and found the dead enum values the build left
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+01:05 the first Bash call named no ticket in its description, and the hook refused it
+01:08 the tests field took ./RUNME.sh check, which ends on a warning line, and the pull refused it as not green
+01:10 an Agent call ran in the foreground, and the hook refused it
+01:13 the box minted the accept's fix ticket by hand, around the gate that mints it
+01:15 a verdict point opening with a wiki link crashed the pull with ENOENT
+01:16 a note decide answered without --pass, and the pull printed the leaf again
+01:20 the commit door refused a change to pull-chapter.js with its test in pull-findings.test.js alone
+01:22 the test pointed at a private note, and EveryPointerResolves failed the check
+01:14 and 01:19 LandingFollowsItsGate refused a landing joined to its gate with a semicolon
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+the findings check in src/scripts/pull-chapter.js now refuses a link in the name place
+the gate's own mint from its points stands as the road, in spec/design_output/pull#a-finding-rides-out, and the box reads it before any hand mint
+the tests field names a test command, and the check stays under check
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask names migration/config/slices, and the slice key stands in spec/config/level0.json. The reviewer read past it, and a later ask on a slice names the real folder. The gate verdict both mints and parses, so the fix ticket belongs to the verdict line, and the hand mint only doubled it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+one place: every fix points at the file that holds it
+numbers: the change adds none
+headers: the change writes none
+prompts and errors: the one owner prompt is the clear, and each error carries its time
+roles: the chapter names the box and the reviewer, and no person or path of the box
 
 ## cloud
 
@@ -191,21 +311,39 @@ Done when the badge and the work tab's brackets read one name, and every child c
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+nothing: every tool, host and right the run asked for answered
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+the sync took main in with no conflict
+the description hook and LandingFollowsItsGate refused calls, as the badly list names
+the commit door refused a change whose paired test stood unchanged
+no test failed on this box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step stands parked
+no ticket stands minted outside the group
+the handover says the group stands at done, and the pull request carries it to main with auto-merge on
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The cloud box flips `migration.phase2switch` to true in this group, on a green shadow.
+
+| weighed | what it read |
+|---|---|
+| the shadow log | `./RUNME.sh log --kind shadow` holds no row after the box ran the old count with the index up |
+| both counts on one queue | `./RUNME.sh tui work --count` and the index's `work/open-tasks` read one value, and read one value again after a todo closed |
+| a false alarm | one early pair disagreed, since the old count read before the plan added todos and the index read after. Read on one queue, the pair agrees |
+| the tests | `./RUNME.sh test src/modules/work src/modules/queue src/tui/work src/modules/migration` answers green |
+| the strongest objection | the shadow read one box alone, so the evidence is two reads there. One commit on `migration.opentasks` puts the old count back, which makes the flip cheap to undo |

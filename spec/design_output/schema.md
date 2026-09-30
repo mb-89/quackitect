@@ -11,9 +11,9 @@ reads one, how it weighs a note against one, and what it answers.
 |---|---|
 | the reader and the checker | `.claude/skills/level0/lib/schema*.js`, one module a topic |
 | the ticket door | `.claude/skills/level0/lib/ticket.js` |
-| the sweep, beside the tree rules | `src/scripts/cli.js` |
+| the sweep, beside the tree rules | `src/scripts/cli-read.js` |
 | the underscore skip | `lib/paths.js`, and every caller of it |
-| the `mint` verb | `src/scripts/cli.js` |
+| the `mint` verb | `src/scripts/mint-verb.js` |
 | the `mint_note` tool | `.claude/skills/level0/hooks/level0.js` |
 
 # The reader and the checker

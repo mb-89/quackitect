@@ -1,0 +1,45 @@
+[
+  {
+    "action": "t/add",
+    "bare": false,
+    "description": "adds two terms",
+    "inputSchema": {
+      "additionalProperties": false,
+      "properties": {
+        "a": {
+          "description": "the first term",
+          "format": "int64",
+          "type": "integer"
+        },
+        "b": {
+          "description": "the second term",
+          "format": "int64",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "a",
+        "b"
+      ],
+      "type": "object"
+    },
+    "name": "index_t_add"
+  },
+  {
+    "action": "t/echo",
+    "bare": true,
+    "description": "echoes its input",
+    "inputSchema": {
+      "properties": {
+        "input": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "input"
+      ],
+      "type": "object"
+    },
+    "name": "index_t_echo"
+  }
+]

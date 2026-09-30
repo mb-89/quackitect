@@ -1,4 +1,4 @@
-// The base file this tree ships, read through the work tab's loader: the
+// The base file this tree ships, read through the work tab's road: the
 // presets, the letters and the tones it names. Each case reads a folder a
 // case writes.
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -10,17 +10,12 @@ import (
 	"testing"
 
 	"quackitect/src/tui/tree"
-	"quackitect/src/tui/work"
 )
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 	t.Parallel()
-	root := workTree(t)
-	tree, err := work.Load(strings.Join([]string{root, ".se", ".log", "session.jsonl"}, "/"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	tree := loadWork(t, workRowsSaid)
 	said := tree.PresetList()
 	if len(said) == 0 {
 		t.Fatal("this tree's own base file names its presets")
@@ -54,11 +49,7 @@ func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 // Adding a letter costs a line in the base file. [[spec/design_output/tree-view#a-base-file-says-it]]
 func TestABaseFileNamesTheLettersAndTheKeysTheyRead(t *testing.T) {
 	t.Parallel()
-	root := workTree(t)
-	tree, err := work.Load(strings.Join([]string{root, ".se", ".log", "session.jsonl"}, "/"))
-	if err != nil {
-		t.Fatal(err)
-	}
+	tree := loadWork(t, workRowsSaid)
 	said := tree.Flags()
 	if len(said) == 0 {
 		t.Fatal("this tree's own base file names its letters")
@@ -84,11 +75,7 @@ func TestABaseFileNamesTheLettersAndTheKeysTheyRead(t *testing.T) {
 // The shipped base file tones open and closed apart. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 func TestTheShippedBaseFileTonesOpenAndClosedApart(t *testing.T) {
 	t.Parallel()
-	root := workTree(t)
-	shipped, err := work.Load(logOf(root))
-	if err != nil {
-		t.Fatal(err)
-	}
+	shipped := loadWork(t, workRowsSaid)
 	if said := shipped.Flags()[0].Tones; said["open"] != tree.ToneGood || said["closed"] == tree.ToneGood {
 		t.Fatalf("this tree's base file tones open and closed apart, and reads %v", said)
 	}

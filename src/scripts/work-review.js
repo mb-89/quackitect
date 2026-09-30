@@ -11,10 +11,11 @@ import {
   retroOnTicket,
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
-import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { BIN, pathOf, surveyOf, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { brandOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import { stamps } from "./brand.js";
+import { BUILDS } from "./go-source.js";
 import { DONE, standingAll, standOf } from "./work.js";
 
 const LOUD = 5;
@@ -123,18 +124,24 @@ function checkOn(it, at) {
   }
 
   const survey = it.join(it.root, TOOLS);
-  if (it.disk.exists(survey)) {
+  const said = it.disk.exists(survey) ? it.disk.read(survey) : "";
+  if (said) {
     it.disk.makeDir(it.join(where, RUN));
-    it.disk.write(it.join(where, TOOLS), it.disk.read(survey));
+    it.disk.write(it.join(where, TOOLS), said);
   }
   stamps(it.disk, where, brandOf(it.root));
+  // The check mints through se-front, and the install alone builds it, so the branch's own lands in the worktree's bin. [[spec/design_output/review#a-worktree-runs-the-check]]
+  const go = pathOf(surveyOf(said), "go") || "go";
+  const front = it.join(where, BIN, `se-front${it.windows ? ".exe" : ""}`);
+  it.proc.run([go, "build", "-o", front, `./${BUILDS["se-front"]}`], { cwd: where });
   const borrowed = BORROWED.filter((rel) => it.disk.exists(it.join(it.root, rel)));
   for (const rel of borrowed) {
     it.disk.makeDir(dirname(it.join(where, rel)));
     it.disk.link(it.join(it.root, rel), it.join(where, rel));
   }
 
-  const ran = it.proc.run([it.node, "src/scripts/cli.js", "check"], { cwd: where });
+  // The worktree reads its own check program, off the path relative to it. [[spec/tickets/cli-js-leaves]]
+  const ran = it.proc.run([it.node, "src/scripts/verbs/check.js"], { cwd: where });
   // The links go first, so the removal below keeps to the worktree. [[spec/design_output/review#a-worktree-runs-the-check]]
   for (const rel of borrowed) it.disk.remove(it.join(where, rel));
   it.git.run(["worktree", "remove", "--force", where], true);

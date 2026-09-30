@@ -58,7 +58,7 @@ test("answered closes the ticket, the record names the ticket answering it, and 
     }),
   );
   const out = heard(() => pulling(ROOT, ["pull"], it));
-  assert.match(out.said, /or --answered <ticket>\./);
+  assert.match(out.said, /or --answered <ticket> in place of --pass\./);
 
   const bare = heard(() => pulling(ROOT, ["pull", "a-child", "--answered"], it));
   assert.equal(bare.code, 2);
@@ -477,7 +477,10 @@ test("a closed group hands no leaf out on its branch, and sends the box back to 
   assert.equal(code, 0);
   assert.match(said, /^done/);
   assert.match(said, /one-group stands closed/);
-  assert.match(said, /branch done, then \.\/RUNME\.sh ticket pull from main/);
+  assert.match(
+    said,
+    /index_branch_done, then mcp__level0__index_ticket_pull from main/,
+  );
   assert.ok(!disk.exists(HOLD), "no leaf stands in hand");
   assert.equal(
     fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"),

@@ -205,9 +205,9 @@ test("the delta reader answers an added line, and the removed line passes", () =
 });
 
 test("the reader numbers every added line of a hunk from the hunk head", () => {
-  const diff = `diff --git a/src/scripts/cli.js b/src/scripts/cli.js
---- a/src/scripts/cli.js
-+++ b/src/scripts/cli.js
+  const diff = `diff --git a/src/scripts/verb-run.js b/src/scripts/verb-run.js
+--- a/src/scripts/verb-run.js
++++ b/src/scripts/verb-run.js
 @@ -0,0 +12,3 @@
 +const one = 1;
 +const two = 2;
@@ -297,7 +297,10 @@ test("the box's own user, home, git name and git address each refuse", () => {
 
 test("a name inside a longer word passes, and a name carrying no person names nobody", () => {
   const here = box({ user: "duck", home: AT_HOME, name: "Duck" });
-  assert.deepEqual(boxNamesIn(at("src/scripts/cli.js", "const ducks = 2;"), here), []);
+  assert.deepEqual(
+    boxNamesIn(at("src/scripts/verb-run.js", "const ducks = 2;"), here),
+    [],
+  );
   assert.deepEqual(
     boxNamesIn(at("spec/guidance/voice.md", "The user root owns this box."), box()),
     [],

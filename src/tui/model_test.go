@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -14,6 +15,7 @@ import (
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/log"
+	"quackitect/src/tui/registry"
 )
 
 // A row the way the log writes one, read through the parser the tab reads with. [[spec/design_output/log#what-one-line-looks-like]]
@@ -58,8 +60,18 @@ func press(m frame.Model, keys ...string) frame.Model {
 	return m
 }
 
+// The rows the log tab holds and the new ones, as the watch sends the whole session. [[spec/tickets/the-log-tab-reads-v1]]
 func arrive(m frame.Model, recs ...log.Record) frame.Model {
-	out, _ := m.Update(log.LinesMsg{Recs: recs})
+	return watched(m, append(append([]log.Record(nil), logTab(m).All...), recs...)...)
+}
+
+func watched(m frame.Model, recs ...log.Record) frame.Model {
+	rows := make([]log.IndexRow, 0, len(recs))
+	for _, one := range recs {
+		rows = append(rows, log.IndexRow{At: one.At.Format(time.RFC3339Nano), Level: one.Level, Kind: one.Kind, Said: one.Said, Text: one.Text, Extra: one.Extra, Broken: one.Broken})
+	}
+	value, _ := json.Marshal(rows)
+	out, _ := m.Update(registry.Change{Name: "log/rows", Value: value})
 	return out.(frame.Model)
 }
 
@@ -449,8 +461,7 @@ func TestEWithNoErrorLeavesTheSelectionWhereItStands(t *testing.T) {
 func TestARestartedLogReplacesWhatWasRead(t *testing.T) {
 	t.Parallel()
 	m := press(window(10), "home")
-	out, _ := m.Update(log.LinesMsg{Recs: []log.Record{row(1, "level0", "session start")}, Restarted: true})
-	m = out.(frame.Model)
+	m = watched(m, row(1, "level0", "session start"))
 	if len(logTab(m).All) != 1 || logTab(m).Sel != 0 || !logTab(m).Follow {
 		t.Fatalf("a restart keeps the one new row, selected and following, and got %d rows at %d follow %v", len(logTab(m).All), logTab(m).Sel, logTab(m).Follow)
 	}

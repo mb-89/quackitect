@@ -23,3 +23,9 @@ test("the check runs on a Linux runner and a Windows runner", () => {
   assert.match(text, /shell: bash/);
   assert.match(text, /key: se-bin-\$\{\{ runner\.os \}\}-/);
 });
+
+// A pull request against main runs the check GitHub's auto-merge waits on. [[spec/tickets/groups-land-through-pull-requests]]
+test("the check runs on a push and on a pull request against main", () => {
+  const text = disk().read(WORKFLOW);
+  assert.match(text, /^on:\n {2}push:\n {2}pull_request:\n {4}branches: \[main\]$/m);
+});

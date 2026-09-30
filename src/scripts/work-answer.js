@@ -116,26 +116,27 @@ function ownTickets(held) {
   );
 }
 
-// The order the pull hands out, as an outline place a name. A person's open steps order first and count down, and the agent's takeable ones count up. [[spec/design_output/pull#the-queue-is-an-outline]]
-export function placesIn(it, read, stood) {
-  const plan = planHere(it);
-  // A sentence todo stands in the queue as a row of its own, placed by its anchor and held by nobody. [[spec/design_output/stop#the-plan]]
-  const all = [...ticketsIn(read), ...todoRows(plan)];
-  // A row a standing branch holds belongs to the cloud, so it leaves this box's lists and stands at infinity. [[spec/design_output/pull#the-queue-is-an-outline]]
-  // A group trunk marks for the cloud belongs there with its tickets too, whatever its branch reads. [[spec/tickets/marked-groups-stay-cloud]]
+// The names the cloud holds, off the marker on each group ticket and no git ref. [[spec/tickets/the-queue-reads-the-marker]]
+export function cloudsIn(all) {
   const marked = new Set(
     all
       .filter((one) => fieldOf(one.text, CLOUD_MARK) === "true")
       .map((one) => one.name),
   );
-  const onCloud = new Set([
-    ...read.stand
-      .filter((held) => !held.merged)
-      .flatMap((held) => [held.name, ...ownTickets(held).map((one) => one.name)]),
-    ...all
+  return new Set(
+    all
       .filter((one) => marked.has(one.name) || marked.has(fieldOf(one.text, GROUP)))
       .map((one) => one.name),
-  ]);
+  );
+}
+
+// The order the pull hands out, as an outline place a name. A person's open steps order first and count down, and the agent's takeable ones count up. [[spec/design_output/pull#the-queue-is-an-outline]]
+export function placesIn(it, read, stood) {
+  const plan = planHere(it);
+  // A sentence todo stands in the queue as a row of its own, placed by its anchor and held by nobody. [[spec/design_output/stop#the-plan]]
+  const all = [...ticketsIn(read), ...todoRows(plan)];
+  // A row the cloud holds leaves this box's lists and stands at infinity, and the marker alone says which. [[spec/tickets/the-queue-reads-the-marker]]
+  const onCloud = cloudsIn(all);
   // A note waits for its retro, so it takes no place. [[spec/design_output/pull#the-queue-is-an-outline]]
   const open = all.filter(
     (one) =>
@@ -296,7 +297,7 @@ function ephemeralRows(it) {
 }
 
 // [[spec/design_output/pull#the-queue-is-an-outline]]
-function waitsOnPerson(one) {
+export function waitsOnPerson(one) {
   return (
     personStep(one.text) ||
     (fieldOf(one.text, "state") === DRAFT && !agentOpens(one.text))

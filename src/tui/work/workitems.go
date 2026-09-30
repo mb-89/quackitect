@@ -16,6 +16,8 @@ import (
 const (
 	KindTicket = "ticket"
 	KindGroup  = "group"
+	// A sentence todo, which draws with no link. [[spec/design_output/stop#the-plan]]
+	KindTodo = "todo"
 )
 
 // The standing a held branch gives, one of the words [[spec/design_output/work#what-the-standing-says]] names.
@@ -35,13 +37,17 @@ type ticketRow struct {
 	Says     string `json:"says"`
 	Progress string `json:"progress"`
 	Changed  int64  `json:"changed"`
+	Person   bool   `json:"person"`
 }
 
-// The keys the verb's answer lays over the rows, which the index holds nowhere. [[spec/design_output/tui#the-work-tab]]
+// The keys the queue's place and the cloud mark draw under, off work/rows. [[spec/tickets/the-work-tab-reads-v1]]
 const (
 	QueueKey = "queue"
 	CloudKey = "cloud"
 )
+
+// The key a row lights where a ticket for a person stands open in it or anywhere under it. [[spec/design_input/the-cloud-runs-itself#the-editor-draws-a-parent]]
+const PersonKey = "person"
 
 // [[spec/design_output/tui#the-work-tab]]
 func ReadWorkItems(text string) ([]tree.Item, error) {
@@ -78,11 +84,15 @@ func itemsOfTickets(rows []ticketRow) []tree.Item {
 	return out
 }
 
-// A parent's kids landed before their own kids did, so the tree reads the map once more on the way down. [[spec/design_output/tree-view#the-name-column-nests]]
+// A parent's kids landed before their own kids did, so the tree reads the map once more on the way down. A kid holding a ticket for a person lights its parent on the way back up. [[spec/design_output/tree-view#the-name-column-nests]]
 func withKids(items map[string]*tree.Item, one tree.Item) tree.Item {
 	kids := make([]tree.Item, 0, len(one.Kids))
 	for _, kid := range one.Kids {
-		kids = append(kids, withKids(items, *items[kid.Name]))
+		full := withKids(items, *items[kid.Name])
+		if full.Keys[PersonKey] == flagOf(true) {
+			one.Keys[PersonKey] = flagOf(true)
+		}
+		kids = append(kids, full)
 	}
 	one.Kids = kids
 	return one
@@ -107,6 +117,7 @@ func itemOfTicket(one ticketRow) tree.Item {
 		"todo":     flagOf(one.Todo),
 		"held":     flagOf(one.Standing == heldStanding),
 		CloudKey:   flagOf(false),
+		PersonKey:  flagOf(one.Person),
 		"changed":  changedOf(one.Changed),
 		"says":     one.Says,
 	}}

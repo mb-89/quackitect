@@ -1,23 +1,22 @@
 // The work tab. It draws every ticket this tree holds, nested under its group,
-// off the rows the index answers. A change under the tree wakes the index,
-// and the index wakes this tab, so it redraws with no key pressed and polls
-// nothing. The details draw one row whole, with its links.
+// off the rows the index answers. The watch over /v1 wakes this tab on each
+// change, so it redraws with no key pressed and polls nothing. The details
+// draw one row whole, with its links.
 // [[spec/design_output/tui#the-work-tab]]
 
 package work
 
 import (
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
-	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
+	"quackitect/src/tui/registry"
 	"quackitect/src/tui/tree"
 )
 
@@ -32,14 +31,18 @@ type Tab struct {
 	Path string
 	Tree *tree.Tree
 	Why  string
-	Tick int64
 	// [[spec/design_output/tui#the-work-tab-takes-edits]]
 	Notice string
 	rules  *TicketSchema
-	// The places the verb answers last, laid over each tree the index hands over. [[spec/design_output/tui#the-work-tab]]
-	Places *Places
 	// The place chord stands open, and the next key closes it. [[spec/design_output/tui#the-work-tab-takes-edits]]
 	Placing bool
+	// The catalog and the watch the tab reads through. [[spec/tickets/the-work-tab-reads-v1]]
+	From Source
+	// The base file's text, the count work/open-tasks answers last, and the stream the tab watches. [[spec/tickets/the-work-tab-reads-v1]]
+	base    string
+	count   int
+	counted bool
+	stream  <-chan tea.Msg
 }
 
 // The tab over the tree whose log stands at that path. [[spec/design_output/tui#the-work-tab]]
@@ -47,10 +50,10 @@ func New(path string) *Tab { return &Tab{Path: path} }
 
 func (*Tab) Name() string { return "work" }
 
-// The rows this box takes stand behind the name, once the verb answers. [[spec/design_output/tui#the-work-tab]]
+// The rows this box takes stand behind the name, once work/open-tasks answers. [[spec/tickets/the-work-tab-reads-v1]]
 func (t *Tab) Label(_ *frame.Model) string {
-	if t.Places != nil {
-		return fmt.Sprintf("work (%d)", t.Places.Takeable)
+	if t.counted {
+		return fmt.Sprintf("work (%d)", t.count)
 	}
 	return "work"
 }
@@ -60,114 +63,65 @@ func Root(path string) string {
 	return filepath.Dir(filepath.Dir(filepath.Dir(path)))
 }
 
-// [[spec/design_output/tui#the-work-tab]]
-func Load(path string) (*tree.Tree, error) {
-	root := Root(path)
-	base, err := readFile(filepath.Join(root, filepath.FromSlash(BaseAt)))
-	if err != nil {
-		return nil, err
-	}
-	views, err := tree.ReadBase(string(base))
-	if err != nil {
-		return nil, err
-	}
-	said, err := askIndex(root, "tickets", map[string]any{})
-	if err != nil {
-		return nil, err
-	}
-	items, err := ReadWorkItems(string(said))
-	if err != nil {
-		return nil, err
-	}
-	one := views[0]
-	out := tree.NewTree(one.Cols, items, one.Nests)
-	out.Sorted(one.Sorts)
-	// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
-	out.Flagged(one.Flags)
-	out.Presets(one.Presets)
-	// A name in the table links to its note, so the details carry no path. [[spec/design_output/tree-view#a-value-carries-a-link]]
-	out.LinkOf = func(item tree.Item) string {
-		// A sentence todo is no note, so its name links nowhere. [[spec/design_output/stop#the-plan]]
-		if item.Keys["kind"] == KindTodo {
-			return ""
-		}
-		return draw.FileAddress(root, pathOf(item))
-	}
-	return out, nil
-}
+// The watch's first events carry the rows and the count, so the tab draws off them. [[spec/tickets/the-work-tab-reads-v1]]
+func (t *Tab) Init(_ *frame.Model) tea.Cmd { return t.watches() }
 
-func (t *Tab) Init(_ *frame.Model) tea.Cmd { return Cmd(t.Path, 0) }
-
-// The index's answer, the verb's answer, and the keys while an edit or the place chord stands open are this tab's. [[spec/design_output/tui#the-work-tab-takes-edits]]
+// A drawn tree, a change the watch sends, its end, and the keys while an edit or the place chord stands open are this tab's. [[spec/design_output/tui#the-work-tab-takes-edits]]
 func (t *Tab) Update(m *frame.Model, msg tea.Msg) (bool, tea.Cmd) {
 	switch msg := msg.(type) {
 	case Msg:
 		return true, t.takes(m, msg)
-	case PlacesMsg:
-		if msg.Why != "" {
-			return true, nil
-		}
-		places := msg.Places
-		t.Places = &places
-		if t.Tree != nil {
-			Placed(t.Tree, places)
-			t.Tree.Filtering(m.SourceOf(m.TabNamed("work") - 1))
-			m.LoadPane()
-		}
-		return true, nil
+	case registry.Change:
+		return t.changes(m, msg)
+	case watchEnded:
+		return true, t.ended(msg)
+	case watchAgain:
+		return true, t.watches()
 	case tea.KeyMsg:
 		if m.Open != m.TabNamed("work")-1 {
 			return false, nil
 		}
 		// An open edit takes every key, the way the filter line does. [[spec/design_output/tui#the-work-tab-takes-edits]]
 		if t.Tree != nil && t.Tree.Editing() {
-			t.editing(msg)
-			return true, nil
+			return true, t.editing(msg)
 		}
 		t.Notice = ""
 		// The place chord takes the next key, digit or not. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		// The verb's plan write moves work/rows, and the watch hands the new place over. [[spec/tickets/the-work-tab-reads-v1]]
 		if t.Placing {
-			t.placeAt(msg.String())
-			// The tab asks the verb again itself, ahead of the tick the plan write moves. [[spec/design_output/pull#a-todo-forces-a-place]]
-			return true, PlacesCmd(Root(t.Path))
+			return true, t.placeAt(msg.String())
 		}
+	case actionSaid:
+		t.answered(msg)
+		return true, nil
 	}
 	return false, nil
 }
 
-// [[spec/design_output/tui#the-work-tab]]
+// A drawn tree carries the rows the old one held open, and a failed draw says why. [[spec/design_output/tui#the-work-tab]]
 func (t *Tab) takes(m *frame.Model, msg Msg) tea.Cmd {
-	next := []tea.Cmd{}
-	if !msg.Same {
-		if msg.Tree != nil {
-			msg.Tree.Carry(t.Tree)
-		}
-		t.Tree, t.Why = msg.Tree, msg.Why
-		if t.Tree != nil {
-			// The schema stands on the tree from the first answer, so the header lights the column an edit opens on. [[spec/design_output/tui#the-work-tab-takes-edits]]
-			if t.Tree.Schema == nil {
-				t.Tree.Schema = t.TicketRules()
-			}
-			// The first answer opens the line on the preset the file presses, and a later one keeps what stands. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
-			at := m.TabNamed("work") - 1
-			if !m.Opened && at >= 0 {
-				m.Sources[at] = t.Tree.Opening()
-				m.Opened = true
-				if m.Open == at {
-					m.Input.SetValue(m.Sources[at])
-				}
-			}
-			if t.Places != nil {
-				Placed(t.Tree, *t.Places)
-			}
-			t.Tree.Filtering(m.SourceOf(at))
-			// A change under the tree moves the queue too, so the verb runs again behind each tree. [[spec/design_output/tui#the-work-tab]]
-			next = append(next, PlacesCmd(Root(t.Path)))
-		}
-		m.LoadPane()
+	if msg.Tree != nil {
+		msg.Tree.Carry(t.Tree)
 	}
-	t.Tick = msg.Tick
-	return tea.Batch(append(next, Cmd(t.Path, t.Tick))...)
+	t.Tree, t.Why = msg.Tree, msg.Why
+	if t.Tree != nil {
+		// The schema stands on the tree from the first answer, so the header lights the column an edit opens on. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		if t.Tree.Schema == nil {
+			t.Tree.Schema = t.TicketRules()
+		}
+		// The first answer opens the line on the preset the file presses, and a later one keeps what stands. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+		at := m.TabNamed("work") - 1
+		if !m.Opened && at >= 0 {
+			m.Sources[at] = t.Tree.Opening()
+			m.Opened = true
+			if m.Open == at {
+				m.Input.SetValue(m.Sources[at])
+			}
+		}
+		t.Tree.Filtering(m.SourceOf(at))
+	}
+	m.LoadPane()
+	return nil
 }
 
 // The presets the base file names, each under a number with alt. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
@@ -188,39 +142,10 @@ func (t *Tab) Presets(_ *frame.Model) []frame.Preset {
 	return out
 }
 
-// [[spec/design_output/tui#the-work-tab]]
+// A tree drawn off the rows, or why none drew. [[spec/tickets/the-work-tab-reads-v1]]
 type Msg struct {
 	Tree *tree.Tree
 	Why  string
-	Tick int64
-	Same bool
-}
-
-// The index holds the call until a sweep past the tick, and the tab reads the rows again then. [[spec/design_output/index#the-index-fires-on-change]]
-func Cmd(path string, was int64) tea.Cmd {
-	return func() tea.Msg {
-		root := Root(path)
-		said, err := askIndex(root, "changes", map[string]any{"since": was})
-		if err != nil {
-			// A door answering nowhere costs a pause before the next ask, so a dead index spins nothing. [[spec/design_output/tui#the-work-tab]]
-			time.Sleep(frame.Poll)
-			return Msg{Why: err.Error(), Tick: was}
-		}
-		var at struct {
-			Tick int64 `json:"tick"`
-		}
-		if err := json.Unmarshal(said, &at); err != nil {
-			return Msg{Why: err.Error(), Tick: was}
-		}
-		if at.Tick == was {
-			return Msg{Tick: at.Tick, Same: true}
-		}
-		loaded, err := Load(path)
-		if err != nil {
-			return Msg{Why: err.Error(), Tick: at.Tick}
-		}
-		return Msg{Tree: loaded, Tick: at.Tick}
-	}
 }
 
 // [[spec/design_output/tui#the-work-tab]]
@@ -370,9 +295,12 @@ func (t *Tab) Keys(_ *frame.Model) frame.Band {
 			t.openPlace()
 			return nil
 		}},
-		{Key: frame.Bind("u", "flip the urgent mark", "u"), Do: func(_ *frame.Model, _ string) tea.Cmd {
-			t.flip(UrgentKey)
-			return nil
+		{Key: frame.Bind("u", "flip the urgent mark", urgentTrigger), Do: func(_ *frame.Model, _ string) tea.Cmd {
+			return t.flip()
+		}},
+		// The view's pull button, on a key the tab leaves free. [[spec/design_output/tui#the-work-tab-takes-edits]]
+		{Key: frame.Bind("P", "pull the ticket waiting on you first", pullKey), Do: func(_ *frame.Model, _ string) tea.Cmd {
+			return t.pull()
 		}},
 	}}
 }

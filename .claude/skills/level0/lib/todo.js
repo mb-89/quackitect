@@ -7,12 +7,18 @@ import { readNote } from "./schema.js";
 
 export const TODO = "todo";
 
+// A gate's point carries its tag on git, so every box pulls it first. [[spec/tickets/gate-points-pass-the-push]]
+export const POINT = "point";
+export const GATE_POINT = "gate";
+
 const NOTE = ".md";
 
 // A tag is any value past false: a bare true, or the name of the row the ticket stands before. [[spec/design_output/pull#the-queue-is-an-outline]]
 export function isTagged(text) {
   const said = readNote(text).front.said?.[TODO];
-  return said !== undefined && said !== null && said !== false && String(said) !== "false";
+  return (
+    said !== undefined && said !== null && said !== false && String(said) !== "false"
+  );
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
@@ -24,8 +30,15 @@ export function reaches(name) {
 export function taggedIn(files) {
   return [files ?? []]
     .flat()
-    .filter((one) => reaches(one?.name) && isTagged(one?.text))
+    .filter(
+      (one) => reaches(one?.name) && isTagged(one?.text) && !isGatePoint(one?.text),
+    )
     .map((one) => String(one.name));
+}
+
+// [[spec/tickets/gate-points-pass-the-push]]
+export function isGatePoint(text) {
+  return String(readNote(text).front.said?.[POINT] ?? "") === GATE_POINT;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

@@ -270,10 +270,22 @@ The owner reads each finding, and the table holds the ones that stand.
 
 # Findings
 
-- A finding reaches the owner as a question ticket, or as a note.
-- A finding names the failure it shows, the evidence it checks, and marks what it leaves unchecked.
 - A finding the design answers already is no finding.
-- The owner and the agent settle how findings reach the owner in a later session.
+- A finding opens no GitHub issue.
+
+A finding takes the road its work takes:
+
+| the finding | the road |
+|---|---|
+| work a box can do | a ticket in the group the box works, closing before the group reaches done |
+| work a person alone can do | a ticket on [[spec/processes/person]], loose on `main`, with every command in its ask |
+| a doubt with no work in it yet | a note, which the retro decides |
+
+A finding carries three fields:
+
+- `failure`: the failure it names
+- `evidence`: the command it runs, and the output
+- `unchecked`: what it leaves unchecked
 
 # What waits for level three
 

@@ -81,11 +81,27 @@ function reworked(it, one, gatePath, round) {
   const nested = Array.isArray(before.steps);
   const into = nested ? before.steps : list;
   const prefix = nested ? [...parts.slice(0, -1), before.name] : parts.slice(0, -1);
-  const copies = (nested ? before.steps : [before])
-    .filter((held) => !held.steps && !held.when && !COPIED.test(String(held.name)))
-    .map((held) => ({ ...structuredClone(held), name: `${held.name}-${round + 1}` }));
+  const originals = (nested ? before.steps : [before]).filter(
+    (held) => !held.steps && !held.when && !COPIED.test(String(held.name)),
+  );
+  const copies = originals.map((held) => ({
+    ...structuredClone(held),
+    name: `${held.name}-${round + 1}`,
+  }));
   if (!copies.length) return null;
+  const named = new Map(
+    originals.map((held, i) => [String(held.name), copies[i].name]),
+  );
+  const pathed = new Map(
+    [...named].map(([from, to]) => [
+      [...prefix, from].join("/"),
+      [...prefix, to].join("/"),
+    ]),
+  );
+  for (const copy of copies)
+    if (copy.input !== undefined) copy.input = rewired(copy.input, named, pathed);
   into.splice(nested ? into.length : at, 0, ...copies);
+  readsBoth(steps, new Set(copies), pathed);
 
   const schema = schemasHere(it).get("ticket");
   const text = schema ? reRouted(one.text, schema, steps, "", it.front) : one.text;
@@ -97,6 +113,28 @@ function reworked(it, one, gatePath, round) {
     it.front,
   );
   return { first, names: copies.map((held) => held.name) };
+}
+
+// A copy reads the copies of its own round, in place of the leaves they copy. [[spec/design_output/pull#the-gate]]
+function rewired(input, named, pathed) {
+  const list = [input]
+    .flat()
+    .map((one) => named.get(String(one)) ?? pathed.get(String(one)) ?? one);
+  return Array.isArray(input) ? list : list[0];
+}
+
+// A step reading a copied leaf by path reads its copy beside it, so every round keeps a reader. [[spec/design_output/pull#the-gate]]
+function readsBoth(list, copies, pathed) {
+  for (const held of list) {
+    if (!copies.has(held) && held.input !== undefined) {
+      const reads = [held.input].flat().map(String);
+      const more = reads
+        .map((one) => pathed.get(one))
+        .filter((one) => one && !reads.includes(one));
+      if (more.length) held.input = [...reads, ...more];
+    }
+    if (Array.isArray(held.steps)) readsBoth(held.steps, copies, pathed);
+  }
 }
 
 // A copy an earlier round inserts, or a person step, which a reject copies nothing of. [[spec/design_output/pull#the-gate]]

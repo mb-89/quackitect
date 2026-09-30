@@ -366,3 +366,43 @@ test("a route edit builds the route line over the whole list", () => {
   ]);
   assert.deepEqual(routeArgvOf("one"), ["ticket", "route", "one", "--steps=[]"]);
 });
+
+const GROUPED = (text) =>
+  text.replace("kind: [[ticket]]", "kind: [[ticket]]\ngroup: a-group");
+const GROUP_FILE = "spec/tickets/a-group.md";
+const groupNote = (cloud) =>
+  [
+    "---",
+    "kind: [[ticket]]",
+    "state: open",
+    ...(cloud ? ["cloud: true"] : []),
+    "---",
+    "",
+  ].join("\n");
+
+// [[spec/tickets/the-queue-views-agree]]
+test("a ticket whose group carries the cloud marker draws no lens", () => {
+  const text = GROUPED(ticket("open", "design/draft"));
+  assert.deepEqual(
+    lensesOf({ path: PATH, text, holds: [], group: groupNote(true) }),
+    [],
+  );
+  const own = text.replace("state: open", "state: open\ncloud: true");
+  assert.deepEqual(lensesOf({ path: PATH, text: own, holds: [], group: "" }), []);
+  assert.deepEqual(
+    titles(lensesOf({ path: PATH, text, holds: [], group: groupNote(false) })),
+    [["Take this ticket at design/draft", "take"]],
+    "a group off the cloud keeps the take",
+  );
+});
+
+// [[spec/tickets/the-queue-views-agree]]
+test("the lens door reads the group file and runs no verb", async () => {
+  const door = doorOf({ [GROUP_FILE]: groupNote(true) });
+  const said = await ticketLensOf(door).lenses(
+    PATH,
+    GROUPED(ticket("open", "design/draft")),
+  );
+  assert.deepEqual(said, []);
+  assert.deepEqual(door.said.ran, []);
+});

@@ -82,7 +82,7 @@ func TestHoverReadsTheSavedTerms(t *testing.T) {
 	if got := hoverOn(tree, "walk"); got != "" {
 		t.Fatalf("walk stands on no list yet, and the hover answers %q", got)
 	}
-	disk := tree.disk.(*memDisk)
+	disk := diskOf(tree).(*memDisk)
 	disk.files["/tree/spec/vocabulary/terms.yml"] = hoverTerms + "  - {word: walk, means: \"to move on foot\"}\n"
 	if got := hoverOn(tree, "walk"); got != "**walk**: to move on foot" {
 		t.Errorf("a hover after the save answers %q", got)

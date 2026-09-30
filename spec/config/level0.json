@@ -1,136 +1,24 @@
 {
-  "comment": "The controls for level zero, and the defaults every box starts from. spec/config/level0.schema.json says the type of each one and what it does, the environment beats this file, and .se/.runtime/config.json beats both. Ask ./RUNME.sh config which layer answers.",
-  "stop": {
-    "comment": "The tooth. The rules it votes over live in spec/config/stop.",
-    "enabled": true,
-    "mostInARow": 3,
-    "hold": "off"
-  },
-  "work": {
-    "comment": "The knobs the work verbs read. For a stale group, see spec/design_output/work.md.",
-    "staleAfter": "12h",
-    "failsBeforePerson": 2,
-    "refusalsBeforeFail": 5,
-    "stepsBeforeSplit": 3,
-    "personSigns": false,
-    "retroReaders": 4,
-    "retroCap": 8,
-    "blockScore": 10,
-    "dayScore": 1,
-    "failScore": 5
-  },
-  "restated": {
-    "comment": "The runs the restated rules refuse. A run is a count of words two places share, and spec/design_output/lsp.md says what the rules reading them weigh.",
-    "pointer": 4,
-    "rule": 6
-  },
-  "grace": {
-    "comment": "The calls the engine lets pass before an ask refuses them: the owner's ask for an update, and the finish hold before it stops hard. spec/design_output/stop.md, chapter The grace, says the rest.",
-    "update": 5,
-    "finish": 10
-  },
-  "context": {
-    "comment": "The context a session carries before it hands over. Past handoverAt the ticket in hand runs to its end, and the next pull hands the handover ticket, then the clear, then the ticket reading the handover in a fresh conversation. 0 switches it off. spec/design_output/stop.md, chapter The context hands over, says the rest.",
-    "handoverAt": 300000
-  },
-  "helper": {
-    "comment": "The model each tier of helper work runs on. The session weighs the work it hands and names the tier's model on the Agent call. find finds, lists, reads and reports. change makes a scoped change with its test, or reviews against a list. decide takes a design, an unknown cause, or a verdict the owner reads. spec/design_output/level0.md, chapter A spawn names its tier, says the rest.",
-    "find": "haiku",
-    "change": "opus",
-    "decide": "opus"
-  },
-  "plan": {
-    "comment": "The engine's three questions every so many calls: what you work on, which todos you finished, which you add. The third stays away past mostOpen. spec/design_output/stop.md, chapter The plan, says the rest.",
-    "everyCalls": 10,
-    "mostOpen": 5,
-    "grace": 6
-  },
-  "engine": {
-    "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",
-    "binding": "queue"
-  },
-  "ask": {
-    "comment": "What the owner wants said. The standing block carries a line while this stands past quiet, and the turn's end writes it back to quiet.",
-    "wanted": "quiet"
-  },
-  "answer": {
-    "comment": "The door holding the owner's prompt first, and the gate reading the answer at the turn's end. The score is the findings a thousand words. For the bands, see spec/design_output/level0.md.",
-    "enabled": true,
-    "warnAt": 5,
-    "ceiling": 15,
-    "words": 150
-  },
-  "wait": {
-    "comment": "The wait tool's spans, in seconds: its cap, and the span a file stands unchanged before it reads as quiet. spec/design_output/level0.md, chapter The wait returns on a signal, says the rest.",
-    "most": 600,
-    "quiet": 30
-  },
-  "log": {
-    "comment": "The level this box writes at, on the ladder debug, info, warn, error, fatal. info writes every line a door says, debug writes what the hooks see too, warn writes a refusal and a fault, error writes a fault, fatal writes what ends a session.",
-    "level": "info"
-  },
-  "code": {
-    "comment": "The ceilings a function and a file hold, in lines. The write door refuses a write that grows past one, and the check names what stands past one.",
-    "functionLines": 150,
-    "fileLines": 600
-  },
-  "battery": {
-    "comment": "The check's runs the stamp keeps at one commit, and a retro reads each part's median over them. spec/guidance/retro/effect.md says the rest.",
-    "runs": 5
-  },
-  "names": {
-    "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",
-    "words": 5
-  },
   "migration": {
-    "comment": "One switch a migration group. A group naming a key here under enabled_by waits while this file on main reads anything but true there, so the owner sets a key on main and pushes to let the cloud take that group. A local layer or a variable unlocks nothing. spec/design_output/work.md, chapter A switch holds a group, says the rest.",
     "phase0": true,
     "phase1": true,
     "phase1gaps": true,
     "phase2shadow": true,
-    "phase2switch": false,
+    "phase2switch": true,
     "phase3shadow": true,
-    "phase3switch": false,
+    "phase3switch": true,
     "phase4shadow": true,
-    "phase4switch": false,
+    "phase4switch": true,
     "phase5shadow": true,
-    "phase5switch": false,
+    "phase5switch": true,
     "phase6shadow": true,
-    "phase6switch": false,
+    "phase6switch": true,
     "phase7shadow": true,
-    "phase7switch": false,
     "phase8shadow": true,
-    "phase8switch": false,
+    "phase8switch": true,
     "phase9shadow": true,
-    "phase9switch": false,
-    "phase10": false
-  },
-  "pull": {
-    "comment": "The size cap. One tool answer reaches the model whole up to cap, in bytes, and the pull keeps each part margin below it. spec/design_input/level-two.md, chapter The size cap, holds the measure.",
-    "cap": 48823,
-    "margin": 4000
-  },
-  "budget": {
-    "comment": "The time budget of each call a hand makes, in milliseconds, which test/level0/budget.test.js times as the median of several runs over a fixture the size of real work. Each budget stands at about ten times the median a box measures, and at 10 where that median stays under a millisecond, so a loaded cloud box stays inside it and a call slowing by an order turns the battery red. spec/design_input/level-two.md, chapter Time budgets, asks it.",
-    "pull": 1000,
-    "handBack": 1000,
-    "resolver": 10,
-    "stale": 10
-  },
-  "ops": {
-    "comment": "How long an ended operation stays, in seconds. A window of zero keeps it. spec/design_output/model.md, chapter What stays how long, says the rest.",
-    "keepDone": 3600,
-    "keepFailed": 86400
-  },
-  "watchdog": {
-    "comment": "The spans of the watchdog, in seconds, and the faults that raise an alarm. spec/design_output/model.md, chapter Watchdogs, says the rest.",
-    "backoffFirst": 1,
-    "backoffCap": 60,
-    "faults": 5,
-    "window": 300,
-    "deadlineDerived": 30,
-    "deadlineFold": 30,
-    "deadlineAction": 30,
-    "deadlineOp": 600
+    "cage": "shadow",
+    "sidebar": "shadow",
+    "lsp": "shadow"
   }
 }

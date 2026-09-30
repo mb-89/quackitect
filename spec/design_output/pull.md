@@ -168,7 +168,7 @@ holds no open note.
 | the route says | the pull admits |
 |---|---|
 | `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
-| `by: person` under `when: view` or `when: handed` | a hand off a harness, or one under `--owner-says`. An agent waits, on a cloud box too |
+| `by: person` under `when: view` or `when: handed` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -265,9 +265,9 @@ it:
 | the term | what it does | its weight |
 |---|---|---|
 | the mark | puts a ticket over every unmarked one | none, because it overrides |
-| what waits under it | raises it, down the whole chain | `work.blockScore` |
-| how long it stands | raises it, so nothing sits forever | `work.dayScore` |
-| how often a hand-back comes back refused | raises it | `work.failScore` |
+| what waits under it | raises it, down the whole chain | `queue.block` |
+| how long it stands | raises it, so nothing sits forever | `queue.day` |
+| how often a hand-back comes back refused | raises it | `queue.fail` |
 
 The walk reaches the whole chain, so a ticket blocking one that blocks ten
 counts eleven. A ticket waiting on one still open leaves the queue before the
@@ -278,7 +278,10 @@ tuning the queue costs an edit. `branch list --queue` writes the order the pull
 hands out, and the column a board draws reads that answer.
 
 A ticket's age comes off one `git log` over the folder holding the tickets, so
-the cost stands beside the pull, once a pull.
+the cost stands beside the pull, once a pull. The queue module in
+`src/modules/queue` wires its `stood` port `built-in`, so its day term scores
+zero until a git IO module answers that port.
+[[spec/tickets/queue-reads-git-for-came]]
 
 # The queue is an outline
 
@@ -311,8 +314,8 @@ merge brings in. So a closed ticket leaves the queue whatever a branch says.
 ## A todo forces a place
 
 A todo overrides the score at its own level. It is an overlay this box
-holds: the queue computes first, and the override lays over it. The work
-tab writes it under `places` in `.se/.runtime/plan.json`, so it stands on
+holds: the queue computes first, and the override lays over it. The place
+verb writes it under `places` in `.se/.runtime/plan.json`, so it stands on
 this box alone, travels into no ticket and reaches no git. A private note's
 own `todo` field reads the same way. The value names the row the ticket
 stands before, or one of the words below:
@@ -330,7 +333,7 @@ another todo of the plan, and any other anchor reads as `last`.
 
 The place moves as the queue drains, because the todo holds the order and
 no number. Todos of the plan tied on every score keep the order the plan
-writes them in. The work tab writes it under `p` and a digit, the pull hands a
+writes them in. The work tab posts `work/place` under `p` and a digit, the pull hands a
 tagged ticket out first, and the `T` letter lights on every tagged row.
 
 The tab draws the place it reads and holds no rule of its own. A place
@@ -676,7 +679,7 @@ A gate carrying `final: true` reads the whole work, and the process closes on it
 |---|---|
 | the hand-out | waits while a ticket naming this one as `parent` or `group` stands open |
 | the hand-out | names the diff since the base, merges and all |
-| the hand-back | runs every command field of the route, and the record keeps each answer |
+| the hand-back | runs every command field of the leaves before the gate, and the record keeps each answer. A leaf past the gate, a retro's among them, runs its own when the route reaches it |
 | the hand-back | reruns a red pass expecting its cases green, because the green pass after it turns those cases green |
 | `accept with points` | mints the fix tickets and leaves the step on the gate, so it waits on them and reads again |
 | a verdict short of accept past `work.failsBeforePerson` | mints a question ticket and closes the process `became` onto it |
@@ -748,6 +751,24 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 |---|---|
 | a leaf past `step` | copies the new route onto the leaves ahead, as `updated` does |
 | a leaf at or before `step` | copies the new route, and sets `step` to the first leaf whose `def` differs |
+
+## Kept red leaves
+
+A red leaf holds a command field expecting `assertion`. Once the change lands, its tests pass, so a rewind handing it out again strands the ticket. `keptRed` in `src/scripts/pull-kept.js` keeps it, and `stepOn` and `advanced` write its entry and walk on.
+
+| read | how |
+|---|---|
+| the red pass | the last entry of the leaf carrying `def`, with no `stale`, `skipped` or `returns` |
+| a later pass | an entry after it, of a leaf past the red leaf in route order, of the same kind |
+| the red commit | the first commit after the red pass's `hash_after` whose subject names the ticket and carries the whole change `passes <leaf>` |
+| the red tests | the leaf's `red` list, through `redListOf` in `src/scripts/red-list.js`, or the files under `test/` the red commit lands where the leaf lists none |
+| they stand | `git diff -M --name-status` from the red commit to HEAD deletes none of them, and a rename keeps one |
+
+The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the change line reads `keeps <leaf>`.
+
+- A rewind before a later leaf passes hands the leaf out, so a case the edited draft adds runs red.
+- A red commit landing no test, and a private ticket with an empty `hash_after`, keep nothing.
+- A case appended to a red file after the change lands runs green at once. The change it guards already stands.
 
 # Done leaves no takeable step
 
