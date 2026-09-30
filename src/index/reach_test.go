@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"sync"
 	"testing"
+	"time"
 
 	"quackitect/src/q"
 )
@@ -200,5 +201,34 @@ func TestTheIndexStartsItselfAndAClientTheIndexBesideIt(t *testing.T) {
 	t.Cleanup(func() { serving.Store(false) })
 	if got := serverOf(self, root); got != self {
 		t.Fatalf("the index starts %q, where it stands at %q itself", got, self)
+	}
+}
+
+// A door past its answer time is busy, and its process still runs, so a client answers the fault and starts no index beside it. [[spec/tickets/a-slow-door-spawns-no-second-index]]
+func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
+	root := t.TempDir()
+	bin := builtIndex(t, root, "the index build")
+	late := make(chan struct{})
+	door := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		<-late
+	}))
+	t.Cleanup(door.Close)
+	t.Cleanup(func() { close(late) })
+	was := postTimeout
+	postTimeout = 50 * time.Millisecond
+	t.Cleanup(func() { postTimeout = was })
+	port := door.Listener.Addr().(*net.TCPAddr).Port
+	busy := Standing{Port: port, Pid: 1, Root: root, Stamp: stampOf(bin)}
+	standsAt(t, root, busy)
+	ran := fakeSpawn(t, func(root string) { standsAt(t, root, busy) })
+
+	if _, err := reaches(root, []string{"standing"}); err == nil {
+		t.Fatal("a client answers no fault, where the door answers late")
+	}
+	if got := ran(); len(got) != 0 {
+		t.Fatalf("a client starts %q beside a busy door", got)
+	}
+	if _, err := standingOf(root); err != nil {
+		t.Fatalf("the busy door loses its standing file: %v", err)
 	}
 }

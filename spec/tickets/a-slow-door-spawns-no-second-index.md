@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 3c161e9d4453b9d6
         size: 523
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 6b931e1f116f43989919d823b53c8d30b6e514b1
+    hash_after: 6b931e1f116f43989919d823b53c8d30b6e514b1
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: d06d089e006eda49
+        size: 894
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -217,26 +230,31 @@ the first done_when line names the test, the second and third name the check and
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/index/reach_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/index/reach_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion: the client starts the index three times beside a busy door, one a try. That matches the pile the check leaves on this box.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets the new test, and the check and the process count stand as checkpoints the hand answers at tests-green
+the spawn runs through fakeSpawn and the door through an httptest server, so the test starts no real index
 
 # gate
 

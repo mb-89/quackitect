@@ -19,11 +19,13 @@ import (
 
 const (
 	reachTries         = 3
-	postTimeout        = 30 * time.Second
 	callArgsWithParams = 3
 	startPolls         = 300
 	startPollPause     = 100 * time.Millisecond
 )
+
+// How long a client waits on the door's answer, which a test cuts short. [[spec/tickets/a-slow-door-spawns-no-second-index]]
+var postTimeout = 30 * time.Second
 
 // The command line the composition root runs, with the IO modules it starts in the served index. [[spec/design_output/model#io-modules-are-modules]]
 func Main(manage Manage, starts ...Start) {
