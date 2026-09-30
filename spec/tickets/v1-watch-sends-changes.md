@@ -371,3 +371,4 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 - watch-callers-name-opens-on: the approach and the callers line say `Serve`, and the engine freezes both. Read `opensOn` in `src/index/door.go` in their place. The `OnCommit` hook the commit channel extends stands there, and `Serve` only calls `opensOn` with `net.Listen`.
+- watch-refuses-before-it-streams: the approach checks `store.Declared` inside the stream handler, and that comes too late. `sse.Register` returns a `StreamResponse` whose body sets `text/event-stream` before it calls the handler. Put the check in a `Resolve` method on the watch input, and answer the missing name there. The server runs `Resolve` before the handler, and its `StatusError` sets the status.
