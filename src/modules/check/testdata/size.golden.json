@@ -29,7 +29,7 @@
       "file": "spec/design_output/level0.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 2006. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 2030. Split it by topic."
     },
     {
       "file": "spec/design_output/model.md",
@@ -54,6 +54,12 @@
       "rule": "FileCeiling",
       "line": 1,
       "message": "A file holds 600 lines, and the file holds 1444. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/a-down-index-refuses-calls.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 628. Split it by topic."
     },
     {
       "file": "spec/tickets/a-rename-reaches-every-note.md",
