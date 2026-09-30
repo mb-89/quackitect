@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -132,6 +132,19 @@ record:
         hash: c2115216999e4826
         size: 553
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: f97e4782af32aa764fbb91a11c28b095dca045fa
+    hash_after: f97e4782af32aa764fbb91a11c28b095dca045fa
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: dd884d28441201b2
+        size: 5357
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -271,26 +284,33 @@ Risks the gate may send out as children:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/edits_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/edits_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case reds on its own assertion. Each call answers that edits/patch, edits/undo or edits/mint names no action, and the case names the file, journal entry or note it wants.
+
+The cases drive the quack index by action name over a temp tree, so they compile before the edits module stands. What surprises me: the off-wiring case passes today, since no line names the module yet. It guards the choice to hold the module off the wiring.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the patch and undo cases, the second the two mint cases, and the third the check at tests-green
+- the cases build each tree in a temp folder, and reach no door past the quack index they open
 
 # gate
 
