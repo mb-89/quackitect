@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: 3d3d0e58ff85ff7ec3f38fd20c422a6808989d72
+    hash_after: 3d3d0e58ff85ff7ec3f38fd20c422a6808989d72
+    inputs:
+      - name: ask
+        hash: 3633fde9011c41cd
+        size: 831
+      - name: [[spec/tickets/the-brief-leaves-the-bridge]]
+        hash: 19bd52b73471bf7a
+        size: 735
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +170,74 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A brief fold keeps the debt, a pure package builds the text, and the door answers the text as named after effects.
+
+1. A pure package `src/modules/hooks/brief` ports `countsOf`, `canary` and `canaryText` in `.claude/skills/level0/lib/guidance.js`. It also ports the tools block off `.se/.runtime/tools.json` and the tier line off `Settings.Helpers`, as `blocksOf` and `toolsText` in `src/bridge/guidance.js` build them. It reads the top notes under both roots, as `inherits` does.
+2. A fold `brief/<id>` in `src/modules/hooks/brief.go` ports `sessionHere`, `paid`, `onTurnComplete`, `owesCanary` and `onSessionCompact`. It keeps what the session has read, whether the debt stands open, and what paid it. `Door.writes` stamps the canary sentence on each event, as it stamps `held` and `stopped`, so the fold stays pure.
+3. `Effect` gains `Name`. A prompt context answers one after effect a block, with the block's name. A tool call answers the layer on the first call where no prompt context read, and the debt's line while the debt stands open.
+4. `stepOf` in cage.js hands an after on the prompt context back as named blocks, the shape level0.js reads.
+5. The handover block reads and removes the handover file through the door's own disk, as the marks port does.
+
+The bridge keeps its brief until the-brief-leaves-the-bridge flips the doors, so this port lands alone. What I weigh: a shared case table holds the Go counts to the JavaScript counts, since both read one set of notes. I assume the dead index line drops out, because the door answers only while the index stands.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Registers, which gains the brief fold
+- src/modules/hooks/hooks.go: Door.writes, which stamps the canary sentence
+- src/modules/hooks/hooks.go: Door.Hook, which answers the blocks
+- src/modules/hooks/hooks.go: Effect, which gains Name
+- src/modules/hooks/cage.go: ReplayLog and shadows, which read Effect
+- .claude/skills/level0/hooks/cage.js: stepOf
+- .claude/skills/level0/hooks/level0.js: door, which reads stepOf
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/brief_test.go: TestAPromptContextAfterAStartAnswersTheCanary
+- src/modules/hooks/brief_test.go: TestAnOpenDebtRidesTheNextCall
+- src/modules/hooks/brief_test.go: TestTheCanaryLinePaysTheDebt
+- src/modules/hooks/brief_test.go: TestACompactionOpensTheDebtAgain
+- src/modules/hooks/brief/brief_test.go: TestTheCountsMatchTheCaseTable
+- test/level0/brief-cases.test.js: the JavaScript counts match the case table
+- test/level0/cage.test.js: an after on the prompt context answers as named blocks
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/brief/brief.go, new
+- src/modules/hooks/brief/brief_test.go, new
+- src/modules/hooks/brief.go, new
+- src/modules/hooks/brief_test.go, new
+- src/modules/hooks/hooks.go
+- .claude/skills/level0/hooks/cage.js
+- test/level0/cage.test.js
+- test/replay/cage/brief-cases.json, new
+- test/level0/brief-cases.test.js, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the helper opened guidance.js in both places, server.js, cage.js, level0.js and hooks.go, and I checked the canary and counts exports myself
+- the callers list names every reader of Effect, the fold list and stepOf
+- the first done line meets the prompt context case, the second the debt cases, the third the shared table, and the fourth the check
 
 ## tests-red
 
