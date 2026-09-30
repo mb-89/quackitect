@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tui-shell-switches-over
 parent: the-work-tab-reads-v1
+record:
+  - step: do
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: d0137a036e42392649f7edc08977b4e264c332a3
+    hash_after: d0137a036e42392649f7edc08977b4e264c332a3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/tickets passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-tab-waits-sends-changes.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 89f92187c4942d0e
+        size: 248
+    def: b10bf3e839860457
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ depends_on names v1-watch-streams-changes, which stands closed while registry.Wa
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/tickets
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work tab and the log tab waited on the watch ticket that became its successor, so its close freed them before the watch stood. `ticket set` points both at `v1-watch-sends-changes`. The switch ticket waits on the three pieces the same way, which its approach carried in prose alone. The pull now hands each piece's implement only once the ticket before it closes.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and carries the same fix to the log tab and the switch ticket, which met the same wall
+- no cleanup stands past it
+- each wait stands once, in its ticket's front
 
 # Discussion
 
