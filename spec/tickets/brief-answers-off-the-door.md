@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: c42c3a783cec40e9
         size: 3311
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: a9794b4ed4935e884ffa0affe233c5786e344c21
+    hash_after: a9794b4ed4935e884ffa0affe233c5786e344c21
+    inputs:
+      - name: design/draft
+        hash: c42c3a783cec40e9
+        size: 3311
+      - name: design/tests-red
+        hash: 9ecae725e23856c1
+        size: 827
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -294,8 +306,11 @@ What surprises me: the table carries a row with the stop hook off, so the Go por
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+What I weigh: every source the draft ports stands where it cites, in both guidance files. The four Go cases in brief_test.go red on their own assertion, and cage.test.js stands on the red list for the named blocks. The third done line's Go half, TestTheCountsMatchTheCaseTable, cannot compile before the brief package stands, so it lands at implement. What I assume: the port keeps the bridge's brief whole until the-brief-leaves-the-bridge flips the doors, as the draft says.
 
 # implement
 
