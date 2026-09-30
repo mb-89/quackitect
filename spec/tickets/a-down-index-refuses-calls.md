@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -340,6 +340,15 @@ record:
         hash: eba558812135f39f
         size: 964
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: c5a667f54ca19f4ac1d82276d2b1c6d4da587fcd
+    hash_after: c5a667f54ca19f4ac1d82276d2b1c6d4da587fcd
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
+    def: f150b8c0dc20fe45
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
@@ -596,10 +605,10 @@ accept with points
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches the hook module, its three split files, the three tests whose fakes take the append, the key and the three notes the rationale names. The file split answers the line ceiling the change meets, and the fakes answer the append the ask calls for
-- every door the change reaches has a fake: the disk, the process fake appending on the node argv, and an http fake answering by url
-- cage.js opens on a header naming the approach and links the ticket and the rationale
-- the standing file, the alarm key and the cage key each stand in one constant with a pointer at the Go owner, and level0.md points at cage.js
+- the files are the ones the ask names: the hooks, the cage, the config key and their cases
+- the doors carry fakes: a fake disk, a fake process and a fetch that falls
+- each road points at its chapter or its ticket, and states the approach there
+- `refusedText` owns the refusal, and `configOf` owns the key, so each fact stands once
 
 ## tests-green
 
