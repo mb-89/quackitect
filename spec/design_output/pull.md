@@ -741,6 +741,7 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 |---|---|
 | `ask`, or a leaf path | `hashText` over that chapter of the ticket |
 | a note link | the `hashes` method of the index, and `hashText` over the disk where the index stands dead |
+| a ticket link | `hashText` over the linked ticket's Ask, as [[#ticket-links-read-the-ask]] says |
 
 - An input matches where `hashText` over its first `size` bytes answers the hash. So an append keeps the steps reading it whole.
 - Any other input differs, and the pull marks each leaf reading it `stale` in the record, naming the input.
@@ -751,6 +752,10 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 |---|---|
 | a leaf past `step` | copies the new route onto the leaves ahead, as `updated` does |
 | a leaf at or before `step` | copies the new route, and sets `step` to the first leaf whose `def` differs |
+
+## Ticket links read the Ask
+
+A leaf linking a ticket under `spec/tickets` or `.se/tickets` hashes that ticket's Ask alone. No pass writes an Ask, so a parent and a child linking each other stand whole through each other's passes. The gate reads the rest of a linked ticket.
 
 ## Kept red leaves
 

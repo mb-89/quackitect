@@ -113,6 +113,7 @@ function made(child, files = {}) {
     { words: 5 },
   );
   built.it.index = fakeIndex(built.disk, ROOT, built.it.join);
+  built.it.root = ROOT;
   return built;
 }
 
@@ -218,6 +219,49 @@ test("a moved input marks exactly the leaves reading it, and the first takes the
       `${whole} reads no moved input`,
     );
   }
+});
+
+const SIBLING = at("spec/tickets/a-sibling.md");
+const LINKED = (sibling) =>
+  made(
+    CHILD("implement/tests").replace(
+      "One piece of it.",
+      "One piece of it, beside [[spec/tickets/a-sibling]].",
+    ),
+    { [SIBLING]: sibling },
+  );
+
+// [[spec/design_output/pull#ticket-links-read-the-ask]]
+test("a linked ticket whose front and chapters move keeps the leaves reading it whole", () => {
+  const built = LINKED(CHILD("design/review"));
+  passedUpTo(built, "implement/tests");
+  built.disk.write(
+    SIBLING,
+    CHILD("implement/change").replace("It reads well.", "It reads better."),
+  );
+  pull(built);
+
+  const text = textOf(built);
+  assert.equal(fieldOf(text, "step"), "implement/tests");
+  assert.ok(!recordIn(text).some((one) => one.stale), "no leaf stands stale");
+});
+
+// [[spec/design_output/pull#ticket-links-read-the-ask]]
+test("a linked ticket whose Ask moves marks the leaves reading it", () => {
+  const built = LINKED(CHILD("design/review"));
+  passedUpTo(built, "implement/tests");
+  built.disk.write(
+    SIBLING,
+    CHILD("design/review").replace("One piece of it.", "Another piece."),
+  );
+  pull(built);
+
+  const text = textOf(built);
+  assert.equal(fieldOf(text, "step"), "design/draft");
+  assert.match(
+    String(entryOf(text, "design/draft").stale ?? ""),
+    /spec\/tickets\/a-sibling/,
+  );
 });
 
 // [[spec/design_output/pull#an-input-marks-its-steps]]
