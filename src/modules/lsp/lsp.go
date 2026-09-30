@@ -271,7 +271,10 @@ func (s *Server) Republish(uris map[string]string) [][]byte {
 	return s.publishAll(nil)
 }
 
+// Commits the buffer. The caller holds the lock, and the commit runs with it let go, since the store's hook republishes under the same lock. [[spec/tickets/reaches-keeps-the-post-fault]]
 func (s *Server) writes(at, text string) error {
+	s.mu.Unlock()
+	defer s.mu.Lock()
 	name := s.from.Bound("buffers/" + at)
 	_, err := s.from.Store.Commit(s.from.Store.Snapshot().Revision, s.from.As, map[string]any{name: text})
 	return err

@@ -204,7 +204,7 @@ func TestTheIndexStartsItselfAndAClientTheIndexBesideIt(t *testing.T) {
 	}
 }
 
-// A door past its answer time is busy, and its process still runs, so a client answers the fault and starts no index beside it. [[spec/tickets/a-slow-door-spawns-no-second-index]]
+// A door past its answer time is busy, and its process still runs, so a client answers the fault and starts no index beside it. [[spec/tickets/one-index-a-tree]]
 func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 	root := t.TempDir()
 	bin := builtIndex(t, root, "the index build")
@@ -230,5 +230,50 @@ func TestASlowDoorKeepsItsPlaceAndStartsNoOther(t *testing.T) {
 	}
 	if _, err := standingOf(root); err != nil {
 		t.Fatalf("the busy door loses its standing file: %v", err)
+	}
+}
+
+// A caller meeting a fresh claim spawns nothing, and reads the door the claiming caller's index stands. [[spec/tickets/reaches-keeps-the-post-fault]]
+func TestACallerMeetingAClaimWaitsAndSpawnsNothing(t *testing.T) {
+	root := t.TempDir()
+	bin := builtIndex(t, root, "the index build")
+	ran := fakeSpawn(t, nil)
+	if !claims(startingPath(root)) {
+		t.Fatal("the first caller claims no start")
+	}
+	go func() {
+		time.Sleep(3 * startPollPause)
+		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
+	}()
+	if err := starts(root); err != nil {
+		t.Fatal(err)
+	}
+	if got := ran(); len(got) != 0 {
+		t.Fatalf("a caller meeting a claim spawns %q", got)
+	}
+}
+
+// A claim older than the start wait stands dead, so the next caller takes it and spawns. [[spec/tickets/reaches-keeps-the-post-fault]]
+func TestAStaleClaimGivesWay(t *testing.T) {
+	root := t.TempDir()
+	bin := builtIndex(t, root, "the index build")
+	if !claims(startingPath(root)) {
+		t.Fatal("the first caller claims no start")
+	}
+	long := time.Now().Add(-2 * startPolls * startPollPause)
+	if err := os.Chtimes(startingPath(root), long, long); err != nil {
+		t.Fatal(err)
+	}
+	ran := fakeSpawn(t, func(root string) {
+		standsAt(t, root, Standing{Port: 1, Root: root, Stamp: stampOf(bin)})
+	})
+	if err := starts(root); err != nil {
+		t.Fatal(err)
+	}
+	if got := ran(); len(got) != 1 {
+		t.Fatalf("a caller meeting a stale claim spawns %q", got)
+	}
+	if _, err := os.Stat(startingPath(root)); err == nil {
+		t.Fatal("the claim outlives the start it guards")
 	}
 }

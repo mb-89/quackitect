@@ -94,6 +94,22 @@ func TestAnOpenBufferWritesItsName(t *testing.T) {
 	}
 }
 
+// The listen hooks a republish onto every commit, and the buffer's own commit runs that hook, so an open answers while the store republishes. [[spec/tickets/reaches-keeps-the-post-fault]]
+func TestAnOpenAnswersWhileTheCommitRepublishes(t *testing.T) {
+	server, store := serverOver(t)
+	store.OnCommit(func(map[string]any) { server.Republish(nil) })
+	done := make(chan struct{})
+	go func() {
+		server.Handle(opened("file:///tree/spec/b.md", "# B\n"))
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("the open waits on the republish its own commit runs")
+	}
+}
+
 func TestAClosedBufferDropsItsName(t *testing.T) {
 	server, store := serverOver(t)
 	server.Handle(opened("file:///tree/spec/b.md", "# B\n"))

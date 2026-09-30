@@ -128,7 +128,7 @@ record:
     hash_before: 8c4942082dcd357f4547a06c4de3adb59940d801
     hash_after: 88454cc101c16cae9f6633ede734f99f235c32e5
     returns: 1
-    why: "the check answers red: a caller spawns a second se-index beside a busy door, and the get road times out on the door start; [[spec/tickets/a-slow-door-spawns-no-second-index]] fixes it"
+    why: "the check answers red: a caller spawns a second se-index beside a busy door, and the get road times out on the door start; [[spec/tickets/one-index-a-tree]] fixes it"
     answered:
       - name: sync/sync
         exit: 0
@@ -191,7 +191,7 @@ the-lsp-server-leaves waits on the two module children, which close before it
 <!-- the form is verdict -->
 
 reject
-- the check answers red: a caller spawns a second se-index beside a busy door, and the get road times out on the door start; [[spec/tickets/a-slow-door-spawns-no-second-index]] fixes it
+- the check answers red: a caller spawns a second se-index beside a busy door, and the get road times out on the door start; [[spec/tickets/one-index-a-tree]] fixes it
 
 # retro
 

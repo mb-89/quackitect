@@ -6,7 +6,9 @@ package index
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -22,10 +24,11 @@ const (
 	callArgsWithParams = 3
 	startPolls         = 300
 	startPollPause     = 100 * time.Millisecond
+	postWait           = 30 * time.Second
 )
 
-// How long a client waits on the door's answer, which a test cuts short. [[spec/tickets/a-slow-door-spawns-no-second-index]]
-var postTimeout = 30 * time.Second
+// How long a client waits on the door's answer, which a test cuts short. [[spec/tickets/one-index-a-tree]]
+var postTimeout = postWait
 
 // The command line the composition root runs, with the IO modules it starts in the served index. [[spec/design_output/model#io-modules-are-modules]]
 func Main(manage Manage, starts ...Start) {
@@ -156,9 +159,13 @@ func reaches(root string, argv []string) (answer, error) {
 	for try := 0; try < reachTries; try++ {
 		standing, err := standingOf(root)
 		if err == nil && stands(standing, root) {
-			said, err := posts(standing, argv)
-			if err == nil {
+			said, posted := posts(standing, argv)
+			if posted == nil {
 				return said, nil
+			}
+			// A door past its answer time is busy, and its process still runs, so a second index sweeps beside it. [[spec/tickets/one-index-a-tree]]
+			if late(posted) {
+				return answer{}, posted
 			}
 		}
 		if err == nil && standing.Port != 0 && !stands(standing, root) {
@@ -170,6 +177,12 @@ func reaches(root string, argv []string) (answer, error) {
 		}
 	}
 	return answer{}, errorOf("the index door does not answer, and one would not start")
+}
+
+// Whether a post ran out its answer time, where a refused connection names a door that stands dead. [[spec/tickets/reaches-keeps-the-post-fault]]
+func late(err error) bool {
+	var timed net.Error
+	return errors.As(err, &timed) && timed.Timeout()
 }
 
 // A door stands while the build that stands it lies unchanged on disk, whatever build the caller runs. [[spec/design_output/index#a-door-comes-back]]
