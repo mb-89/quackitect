@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [the-lens-calls-actions, the-sidebar-reads-v1]
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,25 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: c2bfb9262f493ce6cf851d6616018d3a216e67ea
+    hash_after: c2bfb9262f493ce6cf851d6616018d3a216e67ea
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s); green, src/q passes; green, src/index passes; green, src/modules/holds passes; green
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-sidebar-writes-through-actions.md:274:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 85e6ff1c384fab28
+        size: 1761
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -404,26 +423,39 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/lens-v1.test.js src/q/keyed_test.go src/index/v1keyed_test.go src/modules/holds/standing_test.go src/modules/tickets/drawn_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The ticket lens, the field marks and the route drawing now read the index alone. They read `holds/standing`, `tickets/cloud` and `tickets/drawn/<path>`, and wake on the index watch.
+
+The Go side gains two values. The holds module answers each standing hold, and drops one whose ticket reads closed. The tickets module draws each ticket as its graph, its route and the fields of each leaf. A golden case holds that drawing equal to the JS emitter the `graph` verb still uses.
+
+A keyed family the wiring renames now reads its file, since the key trim follows the wired name. The note reader moves to `src/note`, so the check and the tickets modules share it.
+
+The cost: a mark and the drawing follow the saved file, not the buffer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches four files past the size list, each one the tree needs, and leaves `spec/wiring.yaml` alone
+- every door the change reaches has a fake: the index in test/level0/v1-index.js, the Go modules in q/qtest
+- each changed file carries a comment pointing at this ticket
+- the note reader stands in src/note alone, and the golden case holds the drawing equal to the emitter
 
 # accept
 
