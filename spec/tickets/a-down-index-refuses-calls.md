@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -270,6 +270,25 @@ record:
   - step: design/draft-2
     hand: the engine
     stale: [[spec/rationales/the-cage-refuses-while-down]]
+  - step: design/draft
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: d6b7bee376b412ab661a9636ca24c0c990e8faf4
+    hash_after: d6b7bee376b412ab661a9636ca24c0c990e8faf4
+    inputs:
+      - name: ask
+        hash: 2e1097fa7d39ff56
+        size: 535
+      - name: [[spec/rationales/the-cage-refuses-while-down]]
+        hash: 8217a9861c295a70
+        size: 1738
+      - name: [[spec/tickets/the-hook-log-loses-lines]]
+        hash: e12c15cf9e654d97
+        size: 791
+    def: 71651f49796eeda4
+  - step: design/tests-red
+    skipped: true
+    kept: 6e79614d3280ee8feb6516dbbe4b152b43cef2da
+    why: its red tests stand as 6e79614d3 landed them, and a later leaf passed since
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
@@ -305,25 +324,25 @@ A fault then shows on the first call, and gets fixed early.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-The hook module answers off the hooks IO module once migration.cage reads new, and refuses a guarded call while that module stands down. The key moves last, after every port child in the group closes and the cage shadow reads clean, which depends_on holds.
+The approach of design/draft-2 stands, and implement/change builds it. Under new, .claude/skills/level0/hooks/cage.js sends tool.call and classic.Stop to POST /hook, and the bridge answers every other event.
 
-1. Under new, ask in .claude/skills/level0/hooks/level0.js posts {event, e, session, root, fill} to POST /hook on the port and token .se/.runtime/hooks.json names, and maps the effects in order: pass hands e on, event hands the changed event on, after merges its blocks, result answers the call, block holds the Stop. Under old and shadow the post goes to the bridge as today.
-2. Down means no standing file, a post the port refuses, or index/health carrying a lease past its term. The hook module then runs quack start once through $.process.run, and posts again.
-3. Still down, a guarded call gets a deny naming session/alarms, the alarm it reads there where the index answered last, and the command that clears it. A guarded call is every tool.call outside Read, Grep, Glob and the index tools, whose calls keep the dead line. Every other event passes, per spec/rationales/the-cage-refuses-while-down.
-4. wrote appends its row through $.process.run with a node append, and keeps the read and write back only where the host offers no process, so a row another writer appends stays.
-5. src/bridge/cage-shadow.js posts nothing under new, since the hook module posts itself.
-6. spec/config/level0.json moves migration.cage to new, and the chapters the rationale lists name the refusal in place of the pass.
+The gate's point joins it. A rows effect asks back on agent.spoke with the effect's call id, which src/modules/hooks/holds.go reads.
+
+A level zero tool the door passes goes on to the bridge, since the door serves only the tools the index registers as actions.
+
+The rationale changes because the ask rewrites its fifth chapter. That chapter now says what passes under new, and names the chapter in level0.md that holds the road. The input goes stale for that reason alone, and no claim of the approach moves with it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
 <!-- the form is list -->
 
-- src/bridge/server.js: the tool.call road calling shadowsCage
-- src/bridge/cage-shadow.js: shadowsCage
-- .claude/skills/level0/hooks/level0.js: seen, ask, fell, down, starts, probes and clears, each calling ask or wrote
-- .claude/skills/level0/hooks/level0.js: wrote
-- spec/config/level0.json: migration.cage, read by asksText in src/bridge/config.js and the config verb
+- .claude/skills/level0/hooks/level0.js: seen, which picks the road by event and key through doored
+- .claude/skills/level0/hooks/level0.js: register, which resets the fall marks, the port and the cage
+- .claude/skills/level0/hooks/level0.js: wrote, called by down, starts, probes and clears
+- .claude/skills/level0/hooks/cage.js: doorOf, doored and refusedText
+- src/scripts/serve.js: reasonOf and START, which level0.js exports again off start.js
+- spec/config/level0.json: migration.cage, read by asksText and configOf
 
 ### tests
 
@@ -331,26 +350,27 @@ The hook module answers off the hooks IO module once migration.cage reads new, a
 <!-- the form is list -->
 
 - test/level0/bridgehead.test.js: a stopped hooks door refuses a guarded call and names session/alarms
-- test/level0/bridgehead.test.js: a read passes while the hooks door stands down
 - test/level0/bridgehead.test.js: a row another writer appends while the index falls stays in the session log
-- test/level0/cage-shadow.test.js: under new the bridge posts no shadow
-- ./RUNME.sh check exits 0, for the third done_when line
+- test/level0/bridgehead.test.js: under new a tool call takes the hooks door effects, and a prompt still reaches the bridge
+- test/level0/cage.test.js: a held call asks back on agent.spoke with the effect's call id, and the second answer stands
+- test/level0/cage.test.js: a local override moves the cage as the tracked key does
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- the stale mark: cage-rules-port-before-switch closed as an umbrella before its children, so depends_on now names each port child as well
+- spoke-answer-reaches-the-door: the rows ask-back posts agent.spoke to the door with the call id, and cage.test.js decides it
+- every finding of the first gate: draft-2 answers each, and implement/change builds it
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- opened level0.js seen, ask, fell, down, wrote, cage-shadow.js, server.js line 516, lease.go AlarmsName and the rationale, and each claim holds there
-- the callers list names every caller of ask, wrote and shadowsCage, and the one reader of the key
-- done_when line one meets the first test, line two the third, and line three the check
+- opened cage.js, level0.js seen and register, holds.go held and sessionFor, hooks.go Hook and calls, and the rationale, and each claim holds there
+- the callers list names every caller of seen, wrote, register and the moved exports
+- the first done line meets the refusal case, the second the raced row case, and the third the check at tests-green
 
 ## tests-red
 
