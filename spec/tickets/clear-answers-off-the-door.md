@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: 19bd52b73471bf7a
         size: 735
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: 5d0bb60737cc2b7b80e0558ecd33ccd4214f25d9
+    hash_after: 5d0bb60737cc2b7b80e0558ecd33ccd4214f25d9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 33c98a0ec2e70d0b
+        size: 2292
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -232,26 +245,34 @@ The bridge keeps answering the turn's end until the-brief-leaves-the-bridge flip
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/clear_test.go test/level0/cage.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/clear_test.go
+- test/level0/cage.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The clear case reds on its own assertion: the door answers pass at the turn's end, with the clear in hand. The cage case reds too, since `stepOf` drops a clear effect and answers nothing.
+
+The case off the queue passes today, and it holds the edge: a binding moved off the queue keeps the conversation. What surprises me: the red list takes the whole cage test file out of the check until tests-green, its passing cases among them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the clear case, the second the cage case, and the third the check at tests-green
+- the cases reach a temp tree and the fake index the package already uses, and the cage case reaches no door
 
 # gate
 

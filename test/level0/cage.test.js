@@ -36,6 +36,20 @@ test("the post goes to the standing port with its token as a bearer", () => {
   });
 });
 
+test("a clear effect answers the clear prompt, and the turn passes", () => {
+  assert.deepEqual(
+    stepOf(
+      { effects: [{ kind: "clear", text: "read the handover" }] },
+      "turn.complete",
+      {
+        asks: true,
+        served: false,
+      },
+    ),
+    { answer: { pass: true, clear: { prompt: "read the handover" } } },
+  );
+});
+
 test("a result's text answers as a deny, its result as the tool result, and a block holds the Stop", () => {
   const plain = { asks: true, served: false };
   assert.deepEqual(
