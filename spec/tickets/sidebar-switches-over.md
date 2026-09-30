@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -164,9 +164,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d891eb0f26d7 · claude-code-remote
+    hash_before: 8d15f54d859687b519478af4609885abb8be729c
+    hash_after: 8d15f54d859687b519478af4609885abb8be729c
+    inputs:
+      - name: retro/write
+        hash: bc4ca3ccb9580ec2
+        size: 2715
+    def: 4da1ca5da87d5bbc
 depends_on: ["sidebar-lands-in-shadow", "tui-shell-switches-over"]
 enabled_by: migration.phase8switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -325,20 +335,29 @@ The run weighed the draft's line on the pull button. Dropping its help and icon 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 16:15 the level0 server stood down at the plan call, and a serve brought it back each time
+- no person watches the view on a cloud box, and the engine skipped the view step
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the shell write guard refused a heredoc into python at the tests-green hand-back, and patch wrote the fields
+- the commit hook refused a hand-back naming a path outside the tree, off an unlanded journal
+- no conflict met the sync, and main added its commits cleanly
+- the check went red once inside the hand-back, and green alone and on the retry
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked
+- no ticket stands minted with no group
+- no handover stands, since the group reaches done in one session
 
 # Discussion
 
