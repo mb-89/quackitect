@@ -14,9 +14,30 @@ import (
 	"testing"
 	"time"
 
+	"quackitect/src/modules/check"
 	"quackitect/src/modules/lsp"
 	"quackitect/src/q"
 )
+
+// The lsp module reads the check module's rules through the ports quack wires, so a text fault reaches it as check draws it. [[spec/tickets/lsp-module-draws-the-tools]]
+func TestThePortsAnswerTheCheckModulesRows(t *testing.T) {
+	const path, function, file = "src/over.go", 2, 3
+	texts := map[string]string{path: "package over\n\nfunc a() {\n\tb()\n\tb()\n\tb()\n}\n"}
+	ports := lspChecks()
+	got := ports.Faults(ports.Tree(texts), path, function, file, "tree")
+	want := check.TextFaults(check.TreeOver("", check.Texts(texts)), path, function, file, "tree")
+	if len(want) == 0 {
+		t.Fatal("the fixture draws no row from the check module, so the case decides nothing")
+	}
+	if len(got) != len(want) {
+		t.Fatalf("the ports answer %d rows, and the check module draws %d: %v", len(got), len(want), got)
+	}
+	for i := range want {
+		if got[i] != lsp.Finding(want[i]) {
+			t.Fatalf("row %d reads %+v through the ports, and %+v off the check module", i, got[i], want[i])
+		}
+	}
+}
 
 // The tools and the features read the tracked texts, so the wiring binds the lsp module's inputs to the files the index mirrors and the paths git tracks. [[spec/tickets/lsp-module-draws-the-tools]]
 func TestTheWiringHandsTheLspModuleTheTrackedFiles(t *testing.T) {

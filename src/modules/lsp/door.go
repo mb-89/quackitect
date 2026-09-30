@@ -17,7 +17,6 @@ import (
 	"time"
 
 	"quackitect/src/config"
-	"quackitect/src/modules/check"
 )
 
 // The longest a tool runs before the module gives up on it, and the Vale config the assembly writes where the root holds none. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -28,23 +27,24 @@ const (
 )
 
 // The tools the box names in its survey, else the runtime binary folder, each read again before a whole run. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func ToolsAt(root string) *Tools {
-	one := &Tools{Root: root, Run: runsIn, Again: reads}
+func ToolsAt(root string, rules Check) *Tools {
+	one := &Tools{Root: root, Run: runsIn, Again: reads, Check: rules}
 	reads(one)
 	return one
 }
 
 // [[spec/design_output/lsp#the-server-runs-the-tools]]
 func reads(one *Tools) {
-	known := toolsIn(one.Root)
-	one.Vale = toolAt(one.Root, known, "vale")
-	one.Biome = toolAt(one.Root, known, "biome")
-	one.Node = toolAt(one.Root, known, "node")
+	known := toolsIn(filepath.Join(one.Root, filepath.FromSlash(one.Check.Survey)))
+	bin := filepath.Join(one.Root, filepath.FromSlash(one.Check.Bin))
+	one.Vale = toolAt(bin, known, "vale")
+	one.Biome = toolAt(bin, known, "biome")
+	one.Node = toolAt(bin, known, "node")
 	if one.Node == "" {
 		one.Node = "node"
 	}
-	one.Config = check.ValeIni
-	if !standsAt(filepath.Join(one.Root, check.ValeIni)) && standsAt(filepath.Join(one.Root, filepath.FromSlash(valeBuilt))) {
+	one.Config = one.Check.ValeIni
+	if !standsAt(filepath.Join(one.Root, one.Check.ValeIni)) && standsAt(filepath.Join(one.Root, filepath.FromSlash(valeBuilt))) {
 		one.Config = valeBuilt
 	}
 	one.Tense = ""
@@ -60,9 +60,9 @@ func reads(one *Tools) {
 }
 
 // Each tool's path the survey names. [[spec/design_output/tools#what-the-survey-writes]]
-func toolsIn(root string) map[string]string {
+func toolsIn(survey string) map[string]string {
 	out := map[string]string{}
-	body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt)))
+	body, err := os.ReadFile(survey)
 	if err != nil {
 		return out
 	}
@@ -79,11 +79,11 @@ func toolsIn(root string) map[string]string {
 }
 
 // The path the survey names where a file stands there, else the one in the runtime binary folder, else nothing. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func toolAt(root string, known map[string]string, name string) string {
+func toolAt(bin string, known map[string]string, name string) string {
 	if said := known[name]; said != "" && standsAt(said) {
 		return said
 	}
-	guess := filepath.Join(root, filepath.FromSlash(check.Bin), name)
+	guess := filepath.Join(bin, name)
 	if runtime.GOOS == "windows" {
 		guess += ".exe"
 	}

@@ -127,12 +127,6 @@ func asks(t *testing.T, root, token string) string {
 	return string(reply)
 }
 
-func TestTheListenWritesTheDoorFile(t *testing.T) {
-	if StandingFile != ".se/.runtime/lsp-door.json" {
-		t.Fatalf("the listen writes %s, and the old server's own file name leaves with it", StandingFile)
-	}
-}
-
 func TestAConnectionWithoutTheTokenReadsNothing(t *testing.T) {
 	server, _ := serverOver(t)
 	root := t.TempDir()

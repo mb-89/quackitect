@@ -54,6 +54,7 @@ const (
 
 // The severities a finding carries, and the levels the protocol draws them at. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
 const (
+	severe       = "error"
 	warning      = "warning"
 	hint         = "hint"
 	levelError   = 1

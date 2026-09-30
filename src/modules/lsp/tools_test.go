@@ -6,6 +6,8 @@ package lsp
 import (
 	"encoding/json"
 	"errors"
+	"maps"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -29,11 +31,63 @@ func (one *fakeTools) run(dir, input, name string, argv ...string) (string, erro
 	return one.says[name], nil
 }
 
+// A tree over the texts git tracks, each buffer an editor holds over its file. [[spec/tickets/lsp-module-draws-the-tools]]
+type fakeTree struct {
+	texts map[string]string
+	held  map[string]string
+}
+
+func (one *fakeTree) Holds(path, text string) { one.held[path] = text }
+
+func (one *fakeTree) Held(path string) bool {
+	_, ok := one.held[path]
+	return ok
+}
+
+func (one *fakeTree) Buffers() []string { return sortedKeys(one.held) }
+
+func (one *fakeTree) Read(path string) string {
+	if text, ok := one.held[path]; ok {
+		return text
+	}
+	return one.texts[path]
+}
+
+func (one *fakeTree) Exists(path string) bool {
+	_, ok := one.texts[path]
+	return ok
+}
+
+func (one *fakeTree) Paths() []string {
+	every := map[string]string{}
+	maps.Copy(every, one.texts)
+	maps.Copy(every, one.held)
+	return sortedKeys(every)
+}
+
+func sortedKeys(texts map[string]string) []string {
+	return slices.Sorted(maps.Keys(texts))
+}
+
+// The check module's rules as a case stands them in: a marker naming no reason draws its fault, and no path is a draft. [[spec/tickets/lsp-module-draws-the-tools]]
+var fakeCheck = Check{
+	Tree: func(texts map[string]string) Tree { return &fakeTree{texts: texts, held: map[string]string{}} },
+	Faults: func(tree Tree, path string, function, file int, source string) []Finding {
+		if !strings.Contains(tree.Read(path), "= NO -->") {
+			return nil
+		}
+		return []Finding{{File: path, Rule: "ExemptionCarriesAReason", Line: 3, Column: 1, Message: "The marker names no reason.", Severity: severe, Source: source}}
+	},
+	Draft:    func(string) bool { return false },
+	Relative: func(root, path string) string { return strings.TrimPrefix(path, root+"/") },
+	ValeIni:  ".vale.ini",
+}
+
 // A server over the files named, whose sweep answers nothing, running the fake tools with no quiet span. [[spec/tickets/lsp-module-draws-the-tools]]
 func toolsOver(t *testing.T, files map[string]string, fake *fakeTools) (*Server, *[][]byte) {
 	t.Helper()
 	store, as := catalogOf(t)
-	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Node: "node", Config: ".vale.ini", Tense: "file:///tree/src/engine/tense.js", Run: fake.run}
+	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Node: "node", Config: ".vale.ini", Tense: "file:///tree/src/engine/tense.js", Run: fake.run, Check: fakeCheck}
 	server := New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },

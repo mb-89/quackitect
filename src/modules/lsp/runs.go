@@ -9,8 +9,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"quackitect/src/modules/check"
 )
 
 // The quiet span a change waits before the tools read its buffer, where the wiring names none. [[spec/design_output/lsp#the-panel-lints-as-typed]]
@@ -46,14 +44,14 @@ func (s *Server) SweepTools() [][]byte {
 }
 
 // The tree the tools and the features read: the files git tracks, each open buffer over its file. The caller holds the lock. [[spec/tickets/lsp-module-draws-the-tools]]
-func (s *Server) tree() *check.Tree {
-	texts := check.Texts{}
+func (s *Server) tree() Tree {
+	texts := map[string]string{}
 	if s.from.Files != nil {
 		for at, text := range s.from.Files() {
 			texts[at] = text
 		}
 	}
-	tree := check.TreeOver("", texts)
+	tree := s.from.Tools.Check.Tree(texts)
 	for at, text := range s.open {
 		if text != "" {
 			tree.Holds(at, text)
@@ -121,7 +119,7 @@ func (s *Server) follows(values map[string]any) {
 	if len(moved) == 0 {
 		return
 	}
-	if readByTools(moved) {
+	if s.from.Tools.readByTools(moved) {
 		bodies := s.SweepTools()
 		s.mu.Lock()
 		push := s.push
