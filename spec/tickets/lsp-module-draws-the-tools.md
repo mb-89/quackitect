@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d8932514a610d · claude-code-remote
+    hash_before: 729cb5548cad21869ccef974556fecd8d24eaf6d
+    hash_after: fd09cf310621af374fe2451cb86872d48724981c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-lsp-server-leaves.md:227:7: Vocabulary: lsp stands outside the words this tree writes. Write a core wor"
+    inputs:
+      - name: design/tests-red
+        hash: 199a3aa8f4a7901b
+        size: 620
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -334,26 +357,33 @@ accept. The approach ports the old Outside runs into the module, and each done_w
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp/tools_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The `lsp` module runs Vale and Biome and the text faults, and publishes each row under its own source, `vale`, `biome` or `tree`, beside the check module's sweep. It reads the check module's rules through ports: a `Tree` interface and a `Check` struct of functions and names, which `lspChecks` in `src/quack/lsp.go` fills off the check module. The first cut imported the check module, and the import rule refuses a module importing another. So the rules cross at the quack main, where both modules meet, and the lsp cases hand a fake tree and fake faults. `TestThePortsAnswerTheCheckModulesRows` holds the ports to the check module's own rows. The listener moves beside the ports, so the main file stands under its ceiling. The red case of the-lsp-server-leaves rode into this ticket's change, and leaves it, since that ticket's tests-red writes it under its red list.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the lsp module, the quack wiring and their tests, the files the size list names, and the quack file carrying the ports
+- the tool runner and the check rules are the doors the change reaches, and the cases hand a fake of each
+- each new file and name points at this ticket
+- each tool name stands once in tools.go, and the check rules stand once in the check module, handed across by lspChecks
 
 # accept
 
