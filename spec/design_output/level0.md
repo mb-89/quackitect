@@ -97,9 +97,11 @@ stub's bridgehead keeps a copy, because that file imports nothing at all.
 ## A desk serve returns
 
 `./RUNME.sh serve` probes the same port. Where nothing answers, it starts the
-server detached through the proc door's `respawn`, watches it for the window a
-restart takes, and returns. The server stays when the shell closes, and a
-second run finds it standing and starts nothing. A start that falls inside the
+server apart from the shell through the proc door's `respawn`. It watches the
+server for the window a restart takes, and returns.
+
+The server stays when the shell closes, and a second run finds it standing and
+starts nothing. A start that falls inside the
 window names the line it writes to `.se/.log/serve.log`. With `--inspect` the
 verb holds the server as its own child, because the debugger holds it.
 `detachedStart` in `src/scripts/serve.js` holds it.

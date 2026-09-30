@@ -553,7 +553,7 @@ the turn open for a hand-back nobody owes.
 |---|---|
 | a desk | pushes nothing and runs no check: the hand-back stands on this box, as with the commit verb. [[spec/guidance/working]] |
 | a cloud box | pushes its work branch with no check, because that push meets no battery |
-| a moved branch | fetches, rebases once, and pushes again |
+| a branch the remote moves on | fetches, rebases once, and pushes again |
 | any other refusal | answers the push door's own lines, and runs no rebase |
 
 No cloud box hands back on trunk, so the push holds no trunk road. For the

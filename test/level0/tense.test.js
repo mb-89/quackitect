@@ -12,3 +12,7 @@ test("the import builds no model, and the first read builds it", () => {
   assert.equal(readsAsPast("the door reads the write", "reads"), false);
   assert.equal(built(), true, "the first read builds the model");
 });
+
+test("a match holding no letter reads as no past tense", () => {
+  assert.equal(readsAsPast("| the part | what it holds |", "|"), false);
+});

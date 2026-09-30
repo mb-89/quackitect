@@ -71,7 +71,7 @@ the count and the findings.
 # The server reads the index
 
 Every front reads the tree off the index, and no file of the tree off the
-disk. The check module's sweep reads the files git tracks, and the lsp module
+disk. The check module's sweep reads the files git tracks. The lsp module
 reads their text off `texts`, which the wiring binds to the files the index
 mirrors. Vale and Biome read a file no editor holds off the disk themselves,
 and a buffer reaches Vale on its input. For the verbs a reader asks, see
@@ -258,7 +258,7 @@ way it switches the past tense off.
 # The editor speaks over stdio
 
 The extension starts `quack lsp` over the language server protocol, on the
-index binary under the runtime folder, and the verb relays the editor's stdio to
+index binary under the runtime folder. The verb relays the editor's stdio to
 the lsp IO module whole. A box carrying no binary keeps the sidebar and loses
 the server. `serverAsk` in `src/extension/lib/lsp.js` says what the client
 runs, and `Handle` in `src/modules/lsp/lsp.go` answers it:
@@ -274,7 +274,7 @@ runs, and `Handle` in `src/modules/lsp/lsp.go` answers it:
 | a document closes | empties the buffer, so the file reads as it stands on disk |
 | `shutdown` | answers |
 
-The four features read the check module through the ports `lspChecks` in
+The features read the check module through the ports `lspChecks` in
 `src/quack/lsp.go` fills, because one module imports no other. The replies and
 the publishes share one connection, and `send` holds a lock for each frame, so
 a publish lands between replies.
@@ -324,9 +324,8 @@ and `sweepRowsOf` in `src/scripts/quack-topic.js` reads it for the lint:
 | a folder | the rows under that folder |
 
 `readingFor` in `src/scripts/cli-read.js` lays the tools' rows `findingsOver`
-draws beside them. The survey stands on the box alone, and the sweep reads the
-tracked files, so the lint reads `SurveyFindsNode` off the box in place of the
-sweep's row.
+draws beside them. The survey stands on the box alone, so the lint reads `SurveyFindsNode` off the
+box. The sweep reads the tracked files, and leaves that rule out.
 
 # A closed ticket is history
 
