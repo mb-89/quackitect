@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides, the-sidebar-reads-v1]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 09f506dee71c934013082457ff1cd98a02e31ccc
+    hash_after: ab2f39b9b76c79c58c654d4204b8036c4e28ca63
+    inputs:
+      - name: ask
+        hash: 9c024090bdfb0cdb
+        size: 870
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -165,38 +174,104 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Every sidebar write posts an action through `door.index`. Three actions stand already. The index gains three more, each running a node verb, as `config/set` runs one.
+
+| the write today | the action it posts |
+|---|---|
+| `set` writes the local file | `config/override` |
+| `opened` rewrites the local file | `config/opened` |
+| the bless button writes the bless file | `bless/set`, new |
+| `newTicket` writes a bare ticket | `tickets/new`, new |
+| `logbook.say` appends the session log | `log/say`, new |
+| a vehicle or stub button runs a terminal line | the action its line names |
+
+1. `set` in `src/extension/sidebar.js` posts `config/override` with the key, the typed value and the window. The window is the pid `opened` takes.
+2. `opened` posts `config/opened` with the window, and writes no file. The hand-written local value stays. `opened` in `src/extension/lib/session.js` leaves, with its callers.
+3. `src/modules/holds/holds.go` registers `bless/set`. It takes `agent` and `person`, and runs `ticket bless --desk=<agent>` as a person, the way the verb actions run with `person`. The verb writes the bless file, and refuses where the hand reads an agent, so the rule in `src/scripts/pull-bless.js` holds: the button alone writes it.
+4. `src/modules/verbs/actions.go` registers `tickets/new`, which runs `ticket new <path>`. The verb writes the bare ticket `NEW_TICKET` holds in `src/extension/lib/work.js` where no file stands, and moves that constant into the verb's program.
+5. `src/modules/log/log.go` registers `log/say`. It takes `level`, `kind`, `said` and `extra`, and runs `log --say`, which appends one row through `.claude/skills/level0/lib/log.js`. `logbookOf` posts it, and keeps its level filter and its queue.
+6. `press` reads `index/actions`. A button whose line names a topic and a verb standing there posts that action through `actsOn` in `src/extension/lib/lens.js`. A line naming no action runs in the terminal as today. So the vehicle and stub buttons post `vehicle/<verb>` and `stub/into`.
+
+What I weigh and assume:
+- The view line reads as if a clicked key survives a new window. The ask's own sentences post `config/override` for the window, and `config/opened` drops what other windows hold. I take the sentences: a click holds for its window, and a value the owner writes by hand in the local file survives a new window. The view step reads that.
+- The bless action is the one an agent must never land. The verb's hand rule refuses it, and that rule reads the harness variables the person mark strips. A caller who forges the mark defeats it. So the guard stands as strong as the verb actions' guard, and no stronger.
+- The three new verbs are subcommands of verbs that stand, so no new program comes in.
+- What breaks this: an action that answers after the draw it feeds. Each post awaits its answer, and the watch draws what it writes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/extension/sidebar.js sidebarOf: set, took, opened, newTicket, press
+- src/extension/extension.js activate: sidebar.opened
+- src/extension/lib/logbook.js logbookOf: say
+- src/extension/lib/session.js opened
+- src/extension/lib/work.js NEW_TICKET
+- test/level0/sidebar.test.js, sidebar-work.test.js, sidebar-views.test.js, sidebar-v1.test.js, lens-actions.test.js: sidebarOf over a fake door
+- test/level0/logbook.test.js: logbookOf
+- test/level0/session.test.js: opened
+- src/scripts/verbs/ticket.js: the new and bless subcommands
+- src/scripts/verbs/log.js: the say mode
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/sidebar-writes.test.js: a new window over a local file posts config/opened and leaves the file unchanged
+- test/level0/sidebar-writes.test.js: a click on a key posts config/override for the window
+- test/level0/sidebar-writes.test.js: each button posts its action over a fake action door
+- test/level0/sidebar-writes.test.js: sidebar.js and lib name no door.write or door.append
+- test/level0/ticket-new.test.js: ticket new writes the bare ticket where no file stands, and leaves a standing one
+- test/level0/bless-desk.test.js: ticket bless --desk writes the bless file for a person, and refuses an agent
+- test/level0/log-say.test.js: log --say appends one row and keeps a row another writer lands
+- src/modules/holds/bless_test.go: TestBlessSetRunsTheDeskVerb
+- src/modules/log/say_test.go: TestLogSayRunsTheVerb
+- src/modules/verbs/new_test.go: TestTicketsNewRunsTheVerb
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/extension/sidebar.js
+- src/extension/lib/logbook.js
+- src/extension/lib/session.js
+- src/extension/lib/work.js
+- src/modules/holds/holds.go
+- src/modules/log/log.go
+- src/modules/verbs/actions.go
+- src/scripts/verbs/ticket.js
+- src/scripts/verbs/log.js
+- test/level0/v1-index.js
+- test/level0/sidebar-writes.test.js
+- test/level0/ticket-new.test.js
+- test/level0/bless-desk.test.js
+- test/level0/log-say.test.js
+- test/level0/logbook.test.js
+- test/level0/session.test.js
+- src/modules/holds/bless_test.go
+- src/modules/log/say_test.go
+- src/modules/verbs/new_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened sidebar.js at set, took, opened and newTicket, logbook.js, session.js opened, work.js NEW_TICKET, keys.go actions, action.go, disk.go Accept, verbs.go person mark, pull-bless.js, log.go, and read the live action catalog for config, vehicle, stub, ticket and verb
+- the callers list names every file calling the functions the approach changes, and the tests driving them
+- the unchanged-file line meets the new-window case, the buttons line meets the fake action door case, the grep line meets the grep case, and the check line meets its own run
 
 ## tests-red
 
