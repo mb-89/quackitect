@@ -3,15 +3,12 @@
 // [[spec/tickets/cage-command-rules-port]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { onBash, onPowerShell } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import TABLE from "../replay/cage/command-cases.json" with { type: "json" };
 
 const ROOT = "/tree";
-const TABLE = JSON.parse(
-  readFileSync(new URL("../replay/cage/command-cases.json", import.meta.url), "utf8"),
-);
 
 // Every command the table names runs no process, so the box answers every run empty. [[spec/tickets/cage-command-rules-port]]
 function box(one) {
