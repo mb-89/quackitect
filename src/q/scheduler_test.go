@@ -210,6 +210,23 @@ func TestALoadedProjectionFeedsADerivedReader(t *testing.T) {
 	}
 }
 
+// One commit moving two files runs both concrete keys in one wave. [[spec/tickets/index-reads-loaded-projections]]
+func TestOneWaveRunsEveryKeyItsFilesCover(t *testing.T) {
+	s, scheduler, files := loadedPlan(t)
+	if _, err := s.Commit(s.Snapshot().Revision, files, map[string]any{
+		"files/.se/.runtime/a.txt": Content{Hash: "a", Text: "one\n"},
+		"files/.se/.runtime/b.txt": Content{Hash: "b", Text: "two\nthree\n"},
+	}); err != nil {
+		t.Fatal(err)
+	}
+	scheduler.Settle()
+	a, _ := s.Snapshot().Read("queue/.se/.runtime/a.txt").([]string)
+	b, _ := s.Snapshot().Read("queue/.se/.runtime/b.txt").([]string)
+	if len(a) != 1 || len(b) != 2 {
+		t.Fatalf("the two keys read %v and %v after one commit moves both files", a, b)
+	}
+}
+
 func TestAKeyOutsideTheGlobsRunsNothing(t *testing.T) {
 	s, scheduler, files := loadedPlan(t)
 	seed(t, s, files, "files/.se/.runtime/plan.json", Content{Hash: "h", Text: "a\n"})
