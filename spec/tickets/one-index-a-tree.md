@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 93e1f2834e269578
         size: 514
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 51ca165540324d9b9df1abe0613dbb590e20629b
+    hash_after: 51ca165540324d9b9df1abe0613dbb590e20629b
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/one-index-a-tree.md:269:58: Vocabulary: httptest stands outside the words this tree writes. Write a core wo"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change reaches src/modules/lsp and src/index/binary.go past the ask, and the discussion of reaches-keeps-the-post-fault says why
+the spawn runs through fakeSpawn and the door through a test server, and the claim reads a temp folder
+each new function carries a comment pointing at the ticket whose approach it implements
+the post wait stands once as postWait, and the claim path once in startingPath
 
 ## tests-green
 
