@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-sends-changes]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 7a798193d358629a
         size: 772
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: c211a504f84bb9aecc926696321e47b43d2d99c1
+    hash_after: c211a504f84bb9aecc926696321e47b43d2d99c1
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-work-tab-reads-v1.md:314:32: Vocabulary: placesin stands outside the words this tree writes. Write a co"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -322,14 +331,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: the size list plus the callers the gate named, and src/tui/work_test.go, workdetail_test.go, workedit_test.go, workplace_test.go and workplaces_test.go draw their tree off a fake catalog. spec/design_output/tui.md names the new road in place of the verb and the changes call. workindex.go, workplaces.go, door_post_test.go, queuecolumn_test.go and the package's workplaces_test.go leave whole.
+- fakes: the tab reads through work.Source, and registry.Fake stands for it in every case. indexCatalog gains Watch over the /v1 door.
+- comments: each new function points at this ticket, and view.go and v1.go open on it.
+- one place: the rows names stand in v1.go alone, IndexRow and ViewOver in view.go alone, and the Shadow keeps index/names only until the-tui-data-paths-leave takes it out.
 
 ## tests-green
 

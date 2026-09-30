@@ -38,7 +38,7 @@ One piece of it.
 # Discussion
 `
 
-// The window over a tree with a door standing, the schema this tree ships, and one ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]
+// The window over the rows a catalog answers, the schema this tree ships, and one ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]
 func editWindow(t *testing.T) (frame.Model, string) {
 	t.Helper()
 	root := workTree(t)
@@ -49,10 +49,7 @@ func editWindow(t *testing.T) (frame.Model, string) {
 	writeAt(t, root, work.TicketSchemaAt, string(schema))
 	writeAt(t, root, "spec/tickets/a-child.md", childNote)
 	path := logOf(root)
-	held, err := work.Load(path)
-	if err != nil {
-		t.Fatal(err)
-	}
+	held := loadWork(t, workRowsSaid)
 	// The shipped table draws no front field a person writes, so the edit road runs over the columns a case adds. [[spec/design_output/tui#the-work-tab-takes-edits]]
 	for _, key := range []string{"group", "step", "reason", "urgent", "kind"} {
 		held.Cols = append(held.Cols, tree.Column{Name: key, Key: key, Wide: tree.ColumnWide})

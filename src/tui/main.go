@@ -5,6 +5,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -106,12 +107,13 @@ func newModel(path string, zone *time.Location) frame.Model {
 }
 
 // The window over the catalog handed in, so a case hands the fake. [[spec/design_output/model#the-registry-tabs]]
-func newModelOver(path string, zone *time.Location, catalog registry.Catalog) frame.Model {
+func newModelOver(path string, zone *time.Location, catalog work.Source) frame.Model {
 	mode := windowMode(work.Root(path))
 	logTab := log.New(path, zone)
 	logTab.Shadow = &log.Shadow{From: catalog, Mode: mode, Now: time.Now}
 	workTab := work.New(path)
 	workTab.Shadow = &work.Shadow{From: catalog, Mode: mode, Now: time.Now}
+	workTab.From = catalog
 	return frame.New(path, zone, []frame.Tab{logTab, workTab,
 		registry.Index(catalog), registry.Cli(catalog), registry.Help(catalog)})
 }
@@ -134,6 +136,15 @@ func (indexCatalog) Read(name string) (json.RawMessage, error) {
 		return nil, err
 	}
 	return registry.V1{Base: base}.Read(name)
+}
+
+// Each watch finds the base the same way, so a restart of the index reaches the next watch. [[spec/tickets/the-work-tab-reads-v1]]
+func (indexCatalog) Watch(ctx context.Context, names []string, each func(registry.Change)) error {
+	base, err := index.V1()
+	if err != nil {
+		return err
+	}
+	return registry.V1{Base: base}.Watch(ctx, names, each)
 }
 
 // The log tab the window holds first, which the frame draws its footer off. [[spec/design_output/tui#the-packages-the-window-holds]]

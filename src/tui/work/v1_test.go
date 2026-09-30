@@ -97,3 +97,27 @@ func TestTheCountReadsWorkOpenTasks(t *testing.T) {
 		t.Fatalf("the label reads %q, and wants work (3)", said)
 	}
 }
+
+// The window counts nothing of its own, so the name stands bare until work/open-tasks answers. [[spec/tickets/the-count-chain-leaves]]
+func TestTheLabelDrawsNoCountBeforeTheIndexAnswersOne(t *testing.T) {
+	t.Parallel()
+	if said := New(filepath.Join(t.TempDir(), "session.jsonl")).Label(nil); said != "work" {
+		t.Fatalf("the label reads %q before any count, and wants work alone", said)
+	}
+}
+
+// A row at place zero keeps the state the rows answer, since the held rule stands in the tickets module alone. [[spec/tickets/the-window-held-override-goes]]
+func TestARowInHandKeepsTheStateTheRowsAnswer(t *testing.T) {
+	t.Parallel()
+	base, err := os.ReadFile(filepath.Join("..", "..", "..", "spec", "views", "work.base"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	grid, err := ViewOver(string(base), []IndexRow{{Name: "in-hand", Kind: "ticket", State: "open", Queue: "0"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if said := itemsByName(grid)["in-hand"].Keys["state"]; said != "open" {
+		t.Fatalf("the row at place zero reads state %q, and the rows answer open", said)
+	}
+}

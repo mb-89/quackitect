@@ -66,6 +66,10 @@ type Row struct {
 	Says     string `json:"says"`
 	Queue    string `json:"queue,omitempty"`
 	Cloud    bool   `json:"cloud"`
+	// The note's path, its route and when it last changed, which the tab's links, flags and recently done sort read. [[spec/tickets/the-work-tab-reads-v1]]
+	Path    string `json:"path,omitempty"`
+	Route   string `json:"route,omitempty"`
+	Changed int64  `json:"changed,omitempty"`
 }
 
 type rowsIn struct {
@@ -149,6 +153,7 @@ func rowOf(one ticket.Ticket, place string, cloud, waits bool, overridden string
 		Name: one.Name, Kind: kind, State: stateAt(one.State, place), Step: one.Step, Progress: one.Progress,
 		Group: one.Group, Urgent: one.Urgent, Person: one.Person, Held: one.Held, Waits: waits,
 		Todo: one.Todo || overridden != "", Says: one.Says, Queue: place, Cloud: cloud,
+		Path: one.Path, Route: one.Route, Changed: one.Changed,
 	}
 }
 

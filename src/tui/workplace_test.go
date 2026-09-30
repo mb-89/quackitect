@@ -15,14 +15,12 @@ import (
 	"quackitect/src/tui/work"
 )
 
-// A window whose roots carry places, with every ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]
+// A window whose rows carry places, with every ticket on disk. [[spec/design_output/tui#the-work-tab-takes-edits]]
 func placedWindow(t *testing.T) (frame.Model, string) {
 	t.Helper()
 	m, root := editWindow(t)
 	writeAt(t, root, "spec/tickets/a-loose-one.md", strings.Replace(childNote, "group: one-group\n", "", 1))
 	writeAt(t, root, "spec/tickets/one-group.md", strings.Replace(childNote, "group: one-group\n", "", 1))
-	places, _ := work.PlacesIn([]byte(`{"branches":[{"name":"one-group","queue":"1","tickets":[{"name":"a-child","queue":"1.1"}]}],"loose":[{"name":"a-loose-one","queue":"2"}]}`))
-	work.Placed(theWork(m).Tree, places)
 	return m, root
 }
 

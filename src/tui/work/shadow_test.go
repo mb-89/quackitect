@@ -152,18 +152,18 @@ func TestTheViewOverDrawsTheColumnsOfTheBaseFile(t *testing.T) {
 	}
 }
 
-// The tab starts no compare before the queue has landed, or with no shadow. [[spec/tickets/the-work-view-gains-actions]]
-func TestTheWorkTabRunsNoCompareBeforeTheQueueLands(t *testing.T) {
+// The tab starts no compare before the count has landed, or with no shadow. [[spec/tickets/the-work-view-gains-actions]]
+func TestTheWorkTabRunsNoCompareBeforeTheCountLands(t *testing.T) {
 	t.Parallel()
 	tab := New(filepath.Join(t.TempDir(), "session.jsonl"))
 	tab.Shadow = shadowOf("shadow")
 	tab.Tree = tree.NewTree(nil, nil, false)
 	if tab.check() != nil {
-		t.Fatal("a tab with no queue starts a compare")
+		t.Fatal("a tab with no count starts a compare")
 	}
-	tab.Places = &Places{Counted: true}
+	tab.counted = true
 	if tab.check() == nil {
-		t.Fatal("a tab with its queue starts no compare")
+		t.Fatal("a tab with its count starts no compare")
 	}
 	tab.Shadow = nil
 	if tab.check() != nil {

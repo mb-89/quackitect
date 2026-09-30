@@ -412,27 +412,24 @@ and the presets. For the view itself, see [[spec/design_output/tree-view]].
 
 | what the tab holds | where it comes from |
 |---|---|
-| the rows | `tickets`, which [[spec/design_output/index#the-index-answers-the-tickets]] answers |
-| the redraw | `changes`, which [[spec/design_output/index#the-index-fires-on-change]] holds until a sweep |
-| the door's port | the standing file the door writes, off the root two folders over the log |
-| a door standing nowhere | the binary's own `standing` verb, which puts one up and drops a stale one |
-| the places and the branches | `branch list --json`, which [[spec/design_output/work#one-reading-answers-git]] answers, run behind each tree |
+| the base file | `files/spec/views/work.base`, read once through the catalog |
+| the rows, each with its place and its flags | `work/rows` |
+| the count behind its name | `work/open-tasks` |
+| the redraw | the watch over `/v1`, whose first events carry each value |
 
 A ticket naming another row nests under it, at any depth, and one naming a row
 the rows hold nowhere stands at the left. The mark before the name says which
 row is a group, so no column says it. A ticket in hand stands at place zero
-in the queue, so no letter says it. A group holding a branch wears the `C`
-letter, off the verb's answer. The window's `Init` asks for the tick from
-nothing, and each answer hands the tab its tree again.
+in the queue, so no letter says it. A group the cloud holds wears the `C`
+letter, off its row. The window's `Init` opens the watch, and each change to
+the rows hands the tab its tree again.
 
 The table draws the name, the flags and the queue, and it stands as it is
 when a pane opens. The nesting says the group, and the details say the step.
 The name links to its note. The state leads the flags as its first letter.
 
-The queue is an outline the pull owns, and git holds the branches. So the
-tab runs the verb behind each tree the index hands over, and lays its answer
-over the rows. `src/tui/work/workplaces.go` holds that road, and a verb answering nothing
-leaves the last places standing. The tab opens on the queue: the rows
+The queue is an outline the pull owns, and each row carries its place. The
+tab opens on the queue: the rows
 holding a place, sorted by it. So a person's rows stand first, and a closed
 ticket stands off it. For the places, see
 [[spec/design_output/pull#the-queue-is-an-outline]].
@@ -450,16 +447,16 @@ The tab's brackets and the work editor's button in the sidebar read one index na
 
 | reader | how it asks |
 |---|---|
-| the tab | `PlacesAt` in `src/tui/work/workplaces.go` asks the door, and starts one where none stands |
+| the tab | the watch in `src/tui/work/v1.go` |
 | the button | its `counts` line runs `./RUNME.sh index call value`, and the index answers a bare count |
 
-The queue column reads `queue/places`, the map the count reads. A door answering nothing leaves the
-brackets off the tab, and the button draws no count.
+A door answering nothing leaves the brackets off the tab, and the button draws
+no count.
 
-`src/tui/work/workindex.go` holds the road to the door, and `src/tui/work/workitems.go` turns the rows
-into items. A box with no door and no binary draws the reason in the tab, and
-asks again after a pause. So a build landing later reaches the tab with no
-restart.
+`src/tui/work/v1.go` holds the road to the index, and `src/tui/work/view.go`
+turns the rows into the tree. A watch that ends draws its reason in the tab,
+and the tab watches again after a pause. So an index standing later reaches
+the tab with no restart.
 
 # The work tab takes edits
 

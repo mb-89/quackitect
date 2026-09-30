@@ -17,32 +17,13 @@ import (
 	"quackitect/src/tui/tree"
 )
 
-// The names the index answers the rows and the badge under, and the slice a mismatch names. [[spec/tickets/the-work-view-gains-actions]]
+// The name the index answers the badges under, and the slice a mismatch names. [[spec/tickets/the-work-view-gains-actions]]
 const (
-	rowsName    = "work/rows"
 	namesName   = "index/names"
-	badgeName   = "work/open-tasks"
 	windowSlice = "window"
 	modeShadow  = "shadow"
 	looksCount  = "count"
 )
-
-// One row of work/rows, on the fields the view reads. [[spec/design_output/tui#the-work-tab]]
-type IndexRow struct {
-	Name     string `json:"name"`
-	Kind     string `json:"kind"`
-	State    string `json:"state"`
-	Step     string `json:"step"`
-	Progress string `json:"progress"`
-	Group    string `json:"group"`
-	Urgent   bool   `json:"urgent"`
-	Person   bool   `json:"person"`
-	Held     bool   `json:"held"`
-	Todo     bool   `json:"todo"`
-	Says     string `json:"says"`
-	Queue    string `json:"queue"`
-	Cloud    bool   `json:"cloud"`
-}
 
 // One row of index/names, on the fields the badge reads. [[spec/tickets/the-work-view-gains-actions]]
 type NameRow struct {
@@ -66,36 +47,6 @@ type Shadow struct {
 
 	mu   sync.Mutex
 	told map[string]bool
-}
-
-// The view drawn off the base file and the rows work/rows answers, with no verb and no ticket file read. [[spec/tickets/the-work-view-gains-actions]]
-func ViewOver(base string, rows []IndexRow) (*tree.Tree, error) {
-	views, err := tree.ReadBase(base)
-	if err != nil {
-		return nil, err
-	}
-	one := views[0]
-	tickets := make([]ticketRow, 0, len(rows))
-	queued := map[string]string{}
-	for _, row := range rows {
-		standing := ""
-		if row.Held {
-			standing = heldStanding
-		}
-		route := ""
-		if row.Kind == KindGroup {
-			route = KindGroup
-		}
-		tickets = append(tickets, ticketRow{Name: row.Name, State: row.State, Step: row.Step, Route: route, Group: row.Group,
-			Urgent: row.Urgent, Todo: row.Todo, Standing: standing, Says: row.Says, Progress: row.Progress, Person: row.Person})
-		queued[row.Name] = row.Queue
-	}
-	out := tree.NewTree(one.Cols, itemsOfTickets(tickets), one.Nests)
-	out.Amend(func(item *tree.Item) { item.Keys[QueueKey] = queued[item.Name] })
-	out.Sorted(one.Sorts)
-	out.Flagged(one.Flags)
-	out.Presets(one.Presets)
-	return out, nil
 }
 
 // The badge drawn off the label and the look the port declares and the count it holds. [[spec/tickets/the-work-view-gains-actions]]
@@ -203,9 +154,9 @@ func (s *Shadow) tell(line string) bool {
 	return true
 }
 
-// The compare runs beside the tab over a copy of what it draws, once the queue has landed, so no later message moves a row under it. [[spec/tickets/the-work-view-gains-actions]]
+// The compare runs beside the tab over a copy of what it draws, once the count has landed, so no later message moves a row under it. [[spec/tickets/the-work-view-gains-actions]]
 func (t *Tab) check() tea.Cmd {
-	if t.Shadow == nil || t.Tree == nil || t.Places == nil || !t.Places.Counted {
+	if t.Shadow == nil || t.Tree == nil || !t.counted {
 		return nil
 	}
 	var copied []tree.Item
