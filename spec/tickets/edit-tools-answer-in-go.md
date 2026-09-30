@@ -117,12 +117,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: b06c5b5e74a9cb10d4139beefb905a116731fe73
+    hash_after: b06c5b5e74a9cb10d4139beefb905a116731fe73
+    inputs:
+      - name: ask
+        hash: c2115216999e4826
+        size: 553
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,102 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new IO module lands the edit tools in Go, and stays off the wiring until the flip, since the Go door lacks most rules the bridge's door runs.
+
+1. A new IO module `src/modules/edits` holds the port. `apply.go` ports `applied` from `lib/apply.js` as `Applied(held, ops) Took`. It covers the exact, create, write, append, prepend and regex ops.
+2. `edits/journal.go` ports `lib/undo.js` as `JournalOf`, `NameOf`, `NewestOn` and `Restores`. The JSON keys stay alike, so `commit-verb.js` and `pull-landed.js` read each entry unchanged.
+3. `edits/edits.go` registers `edits/patch`, `edits/replace`, `edits/undo` and `edits/mint`. Each carries `q.ToolName` with `patch`, `replace`, `undo` or `mint_note`, plus `q.Doc` and `q.Writes`.
+4. Each action lists one request to module `edits`, whose `NoUndo` names the journal. `edits.Accept` reads, judges, writes the journal, then writes the files.
+5. The door moves into `src/modules/hooks/write`. `refusedVoice` leaves `hooks/writes.go` as `write.RefusedVoice`. A new `write.Judge` answers the schema refusal, then the voice refusal.
+6. `Door.writeDoor` calls `write.Judge` for the handover. `write.TicketHow` exports `ticketHow`, and `command.TicketFault` checks the `ticket` field against it, as `unnamedIn` does in the bridge.
+7. `src/quack/writedoor.go` gains `editDoor(root)`, which wraps `writeSchema` and `writeProse` in `write.Judge`. `accepts` in `src/quack/main.go` routes module `edits` to `edits.Accept`.
+8. `modules` in `main.go` gains `edits`, and `spec/wiring.yaml` gains no line. The cage key reads new, so a wired module would answer the live tools at once.
+9. `src/modules/check/mint.go` ports `mintNote` and `mintedNote` from `schema-mint.js`, over `front.Mint`, `ChaptersWanted`, `CheckNote`, `GovernorOf` and a newly exported `Minted`.
+10. The replace action takes its file list from an injected sweep. `quack` wires it to the index's grep read, and the test hands a fake list.
+
+What I weigh: holding the module off the wiring lands the Go side with no live flip, at the cost of one flip line later.
+I assume the flip waits on a port of the door's missing rules: the bless file, conflict markers, the open-ticket door, engine fields, the owner, the private rule, code format and warnings.
+
+Risks the gate may send out as children:
+- the Go door lacks most rules onWrite runs, so the flip waits on their port
+- Go regex takes no lookaround or backreference, so a pattern needs a parity case or a refusal naming it
+- the flip must drop READ_TOOLS in level0.js, or the tools register twice
+- the Go chapters stay flat, so a mint with nested steps differs from the JavaScript mint
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/writes.go: Door.writeDoor, which calls write.Judge and loses refusedVoice
+- src/modules/hooks/write/door.go: ToolRefusal, which reads the exported TicketHow
+- src/modules/hooks/write/refuse.go: RefusedVoice, moved in from hooks/writes.go
+- src/modules/check/export.go: the alias block, which gains Minted
+- src/quack/main.go: modules, which gains edits, and accepts, which routes module edits
+- src/quack/writedoor.go: writeSchema and writeProse, which editDoor also calls
+- src/quack/described_test.go: TestEveryModuleDescribesWhatItExposes, which now loads edits
+- src/scripts/commit-verb.js and src/scripts/pull-landed.js: read the journal Go writes, unchanged
+- src/index/tools.go: door.servesTools, which lists the edit tools once the flip wires them
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/edits_test.go: TestAPatchLandsAtomicallyThroughTheWriteDoor
+- src/quack/edits_test.go: TestAFailingOpInAPatchWritesNothing
+- src/quack/edits_test.go: TestAPatchTheSchemaRefusesWritesNoFile
+- src/quack/edits_test.go: TestAPatchNamingNoOpenTicketWritesNothing
+- src/quack/edits_test.go: TestAnUndoPutsEveryFileBack
+- src/quack/edits_test.go: TestAnUndoRefusesAFileThatMovesSinceThePatch
+- src/quack/edits_test.go: TestTheJournalReadsAsTheBridgeWritesIt
+- src/quack/edits_test.go: TestAMintWritesANoteInItsSchemasShape
+- src/quack/edits_test.go: TestAMintRefusesAPathAnotherKindGoverns
+- src/quack/edits_test.go: TestTheEditModuleStandsOffTheWiring
+- src/modules/edits/apply_test.go: TestEachOpReadsTheFileTheOpsBeforeItLeave
+- src/modules/edits/journal_test.go: TestNewestOnWalksPastAnotherName
+- src/modules/hooks/write/door_test.go: TestJudgeRefusesTheSchemaBeforeTheVoice
+- src/modules/check/mint_test.go: TestMintFillsEachChapterTheSchemaNames
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/edits/edits.go, new
+- src/modules/edits/apply.go, new
+- src/modules/edits/journal.go, new
+- src/modules/edits/apply_test.go, new
+- src/modules/edits/journal_test.go, new
+- src/modules/hooks/write/door.go
+- src/modules/hooks/write/refuse.go
+- src/modules/hooks/write/door_test.go
+- src/modules/hooks/writes.go
+- src/modules/check/mint.go, new
+- src/modules/check/mint_test.go, new
+- src/modules/check/export.go
+- src/quack/main.go
+- src/quack/writedoor.go
+- src/quack/edits_test.go, new
+- spec/design_output/apply.md, a pointer at the Go twin
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- a helper opened apply.js in both places, undo.js, write.js onWrite, tools.js and schema-mint.js line by line
+- it opened writedoor.go, the write package, hooks/writes.go, command/ticket.go, tool.go, index/tools.go and Door.calls
+- the first done line meets the patch and undo cases, the second the mint cases, and the third the check
 
 ## tests-red
 
