@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,40 @@ record:
         hash: 8ec0fc4f549a34ae
         size: 416
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: c8a2ba5b0c5c20c810fd739d70e4f29a45243a7b
+    hash_after: 21833859d946b721c7dbec2719b7e5f45d03288f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 7365711ecc8738d9
+        size: 4323
+      - name: [[spec/tickets/config-answers-keys-and-overrides]]
+        hash: 024425bb053a8083
+        size: 20286
+      - name: [[spec/tickets/the-sidebar-reads-v1]]
+        hash: 9feaf3494c9e4c93
+        size: 23517
+      - name: [[spec/tickets/the-sidebar-writes-through-actions]]
+        hash: d569e1d8c0e26cf0
+        size: 22109
+      - name: [[spec/tickets/the-lens-calls-actions]]
+        hash: bb26ad094b752a9d
+        size: 21775
+      - name: [[spec/tickets/the-lens-reads-v1]]
+        hash: b20a6afe64383a9d
+        size: 24078
+      - name: [[spec/tickets/go-cage-switches-over]]
+        hash: 3a226fd3193528d2
+        size: 6086
+      - name: [[spec/tickets/lsp-door-switches-over]]
+        hash: 67bd0f62c86a8558
+        size: 6048
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -224,26 +258,38 @@ Assumed, and left outside this group:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-views.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/sidebar-views.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both new cases fail on their own assertion, and the six older cases in the file pass.
+
+What surprised me:
+- The spawn line needs no new case. `test/contract/extension-spawns-no-verb.test.js` greps `\bspawn\(` over src/extension, and passes today.
+- A literal grep for `spawn(` meets `respawn(` in `editor-process.js`, which the draft leaves to go-cage-switches-over.
+- The draft's `extension-reads-no-files.test.js` falls away for both reasons.
+- The ask names `migration/config/slices/sidebar`, and the sidebar reads `migration/config/sidebar`.
+- The build drops the older shadow case, which reads a shadow row under shadow.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the spawn line meets test/contract/extension-spawns-no-verb.test.js, green since the-lens-calls-actions. The new window line meets the case in test/level0/sidebar-writes.test.js. The check line waits on the check
+- the index door has its fake in test/level0/v1-index.js, and the grid case seeds it
 
 # gate
 

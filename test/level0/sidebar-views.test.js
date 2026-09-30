@@ -4,13 +4,14 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { v1Over } from "./v1-index.js";
+import level0 from "../../spec/config/level0.json" with { type: "json" };
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { badgeOf, formOf, viewsOf } from "../../src/extension/lib/views.js";
 import { TRACKED } from "../../src/extension/lib/widgets.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import cases from "../../src/tui/work/testdata/badges.json" with { type: "json" };
+import { v1Over } from "./v1-index.js";
 
 const BASE = [
   "reads: work/rows",
@@ -142,4 +143,20 @@ test("under shadow a mismatch writes a shadow row naming the slice, and under ol
   const old = shadowDoorOf("old");
   await sidebarOf(old).html();
   assert.deepEqual(shadowRows(old), []);
+});
+
+// The slice reads new in the tracked file, so the compare leaves with its mode. [[spec/tickets/the-extension-reads-no-files]]
+test("the sidebar under new writes no shadow row: the tracked file reads new, and a pair apart writes nothing", async () => {
+  const mode = level0.migration?.sidebar;
+  assert.equal(mode, "new", "the tracked file reads new");
+  const door = shadowDoorOf(mode);
+  await sidebarOf(door).html();
+  assert.deepEqual(shadowRows(door), [], "a pair apart writes nothing");
+});
+
+// The views section draws the work badge, so the grid draws no copy of it. [[spec/tickets/the-extension-reads-no-files]]
+test("the grid draws no badge the views section draws: the work group carries no count", async () => {
+  const said = await sidebarOf(shadowDoorOf("old")).html();
+  assert.match(said, /work \(3\)/, "the views section draws the badge");
+  assert.doesNotMatch(said, /class="count"/, "the work group carries no count");
 });
