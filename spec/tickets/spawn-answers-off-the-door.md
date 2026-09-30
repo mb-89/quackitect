@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: d58e9210ca6b388b
         size: 2294
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 85231ea31eb303bc9820ebf1d922d09d95eaab34
+    hash_after: 85231ea31eb303bc9820ebf1d922d09d95eaab34
+    inputs:
+      - name: design/draft
+        hash: d58e9210ca6b388b
+        size: 2294
+      - name: design/tests-red
+        hash: a3d6a4605929ae60
+        size: 789
+    def: dc4904ab364efa10
 depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door"]
 ---
 
@@ -282,8 +294,11 @@ What surprises me: stepOf already maps the event effect the prompt port added, s
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+What I weigh: the layer joins the brief package, which reads the same notes, so one package owns both. The two Go cases red on their own assertion, and the table case pins the JavaScript layer. The event effect already maps through stepOf. What I assume: the spawn event carries the kind and the prompt as the bridge reads them, which the table's rows hold.
 
 # implement
 
