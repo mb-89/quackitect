@@ -99,6 +99,7 @@ record:
   - step: sync
     hand: box d891eb0f26d7 · claude-code-remote
     hash_before: 5923a0dffb980a7c64b96eec7ff43e42ed2b32f3
+    hash_after: 870ce27741b1f403995acb1817036836ae935594
   - step: sync
     hand: box d891eb0f26d7 · claude-code-remote
     hash_before: 1189d06612f9a97692256170a1ee0ba5e31fde45
@@ -175,7 +176,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["sidebar-lands-in-shadow", "tui-shell-switches-over"]
 enabled_by: migration.phase8switch
-cloud: true
 reason: done
 ---
 
