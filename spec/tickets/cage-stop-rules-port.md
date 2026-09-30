@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "spec/tickets/cage-write-door-port.md:319:3: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: ce408747700b0d890a73bf0efc4897d29e688cf4
+    hash_after: ce408747700b0d890a73bf0efc4897d29e688cf4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 23 test(s) pass in 1 file(s); green, src/modules/hooks passes; green, src/modules/hooks/stop passes; green, src/q
+      - name: check
+        exit: 0
+        said: "spec/tickets/cage-write-door-port.md:319:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: e451f12e63829e77
+        size: 1840
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -387,26 +410,37 @@ the rule files under spec/config/stop and status.yaml stay the one source both s
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/stops_test.go src/modules/hooks/stop src/quack test/contract/stop-cases.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door now blocks every turn's end the bridge blocks, with the bridge's text. It answers a Stop in the bridge's order: a helper's stop passes, then the handover due, then the owner's full update, then the vote over the stop rules and the tooth.
+
+A pure stop package ports the rule reader, the vote and every check off lib/stop.js and src/bridge/stop.js. A stops fold keeps what the bridge keeps on the box across events, and reads the stood mark off the holds fold. The door stamps the tree's facts on the Stop and the stop call, so the fold stays pure and replays over no disk.
+
+Two parts stay with the bridge and ride the child ticket cage-stop-marks-port: the due marks the handover writes to disk for the pull, and the check that a retro hold belongs to this session's hand.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the same tests the tests-red step names pass, narrowed to this ticket's files, since the hooks package holds the write door ticket's red logs
+every door the tests reach has a fake: git, the clock, a temporary root and q/qtest
+a comment above each new function names the approach
+the rule files stay the one source both sides read
 
 # accept
 
