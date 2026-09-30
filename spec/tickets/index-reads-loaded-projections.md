@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,15 @@ record:
   - step: design/draft
     hand: the engine
     stale: ask
+  - step: design/draft
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: d80f5dfc926949dd93f6dac9ea30fe6cafca14ed
+    hash_after: d80f5dfc926949dd93f6dac9ea30fe6cafca14ed
+    inputs:
+      - name: ask
+        hash: e07c6471d1922e43
+        size: 925
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -243,7 +252,7 @@ The strongest objection: a lazy parse inside `Snapshot.Read` fixes the read with
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first
+- the ask moved in wording alone, one sentence split in two, so the approach stands as drafted, and the four red cases still fail on the merged code for the cause the draft names
 
 ### size
 
