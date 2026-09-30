@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-streams-changes]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 87ed5e12d18b37a3
         size: 788
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 79adf20880a29baa63279bbe8270bfa2bf9e790e
+    hash_after: 79adf20880a29baa63279bbe8270bfa2bf9e790e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/work fails
+    inputs:
+      - name: design/draft
+        hash: 234ed95717bef22c
+        size: 3068
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -246,26 +259,32 @@ Weighed: the base file read through the index keeps the tab off the disk whole. 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/work/v1_test.go src/modules/work/rows_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/work/v1_test.go
+- src/modules/work/rows_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+`Read` answers the stub's error, the tab takes no `registry.Change`, and the label stays bare. The row's JSON carries no path, route or change. The surprise: the draw case needs `files/spec/views/work.base` seeded as a content value with its text, since the tab reads the base file through the index too.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the grep line meets the change itself, the draw line meets TestTheWorkTabDrawsOffWorkRowsAlone, the wake meets TestTheWorkTabRedrawsOnAWatchedChange, and the check closes it
+- the cases read through registry.Fake, the fake of the /v1 door, and the module case reads through its own seeds
 
 # gate
 

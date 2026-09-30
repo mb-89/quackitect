@@ -4,6 +4,7 @@
 package work
 
 import (
+	"encoding/json"
 	"testing"
 
 	"quackitect/src/ticket"
@@ -100,5 +101,23 @@ func TestYoursKeepsALooseTodoInOutlineOrder(t *testing.T) {
 	}).([]YoursRow)
 	if len(said) != 2 || said[0].Ticket != "a-todo" || said[0].Path != "" || said[1].Ticket != "later" {
 		t.Fatalf("yours holds %+v", said)
+	}
+}
+
+// The tab draws the route flag, links the note, and sorts the newest done first, so the row carries all three. [[spec/tickets/the-work-tab-reads-v1]]
+func TestARowCarriesItsPathRouteAndChange(t *testing.T) {
+	rows := rowsBy(t, map[string]any{
+		TicketsPort: []ticket.Ticket{{Name: "a", Path: "spec/tickets/a.md", Route: "standard", State: "open", Changed: 5}},
+	})
+	said, err := json.Marshal(rows["a"])
+	if err != nil {
+		t.Fatal(err)
+	}
+	var keys map[string]any
+	if err := json.Unmarshal(said, &keys); err != nil {
+		t.Fatal(err)
+	}
+	if keys["path"] != "spec/tickets/a.md" || keys["route"] != "standard" || keys["changed"] != float64(5) {
+		t.Fatalf("the row reads %s, and wants its path, route and change", said)
 	}
 }

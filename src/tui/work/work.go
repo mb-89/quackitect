@@ -42,6 +42,8 @@ type Tab struct {
 	Placing bool
 	// The compare beside the tab, which the window hands the catalog. [[spec/tickets/the-work-view-gains-actions]]
 	Shadow *Shadow
+	// The catalog and the watch the tab reads through. [[spec/tickets/the-work-tab-reads-v1]]
+	From Source
 }
 
 // The tab over the tree whose log stands at that path. [[spec/design_output/tui#the-work-tab]]
