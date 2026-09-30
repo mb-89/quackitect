@@ -71,8 +71,8 @@ func TestConfigKeysCarryTheBuiltInWhereNoLayerSets(t *testing.T) {
 	ix := layered(t, "queue", fourDeclared)
 	ix.Seed(files(`{}`, `{}`))
 	row := keyRows(t, ix)["queue.day"]
-	if fmt.Sprint(row["value"]) != "4" || row["layer"] != "" {
-		t.Fatalf("queue.day reads %v, and wants its built-in 4 off no layer", row)
+	if fmt.Sprint(row["value"]) != "4" || row["layer"] != "built-in" {
+		t.Fatalf("queue.day reads %v, and wants its built-in 4 off the built-in layer, as quack config names it", row)
 	}
 }
 
@@ -115,8 +115,8 @@ func landsAll(t *testing.T, ix *qtest.Index, ran []q.Request) {
 func TestOpenedDropsTheOverridesOfOtherWindows(t *testing.T) {
 	ix := layered(t, "queue", fourDeclared)
 	ix.Seed(files(`{}`, `{}`))
-	landsAll(t, ix, posted(t, ix, "config/override", `{"key": "queue/config/weight", "value": "9", "window": "w1"}`))
-	landsAll(t, ix, posted(t, ix, "config/override", `{"key": "queue/config/depth", "value": "9", "window": "w2"}`))
+	landsAll(t, ix, posted(t, ix, "config/override", `{"key": "queue.weight", "value": "9", "window": "w1"}`))
+	landsAll(t, ix, posted(t, ix, "config/override", `{"key": "queue.depth", "value": "9", "window": "w2"}`))
 	if held, _ := ix.Read(HeldName).(Held); len(held.Overrides) != 2 {
 		t.Fatalf("%s holds %+v after two windows override", HeldName, held)
 	}

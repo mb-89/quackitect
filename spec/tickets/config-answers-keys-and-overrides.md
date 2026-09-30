@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 68b2bce98c183707
         size: 4426
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88dc33717d8 · claude-code-remote · helper-4
+    hash_before: ba9e31e85de38337ee81bc2fea2306c1938fe47c
+    hash_after: ba9e31e85de38337ee81bc2fea2306c1938fe47c
+    inputs:
+      - name: design/draft
+        hash: 68b2bce98c183707
+        size: 4426
+      - name: design/tests-red
+        hash: 785641c4668ade44
+        size: 1067
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -298,8 +310,15 @@ Each case fails on its own assertion: the schema stands outside the config proje
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- config-draft-names-keys-test: the draft's tests and size lists name `config_test.go`, and the cases stand in `keys_test.go`.
+- config-set-spells-node-run: `nodeRun` stays unexported in `verbs`, so the config module spells the `node.run` request again.
+- config-keys-built-in-layer: the draft gives a built-in an empty layer, and the red case now wants `built-in`, as `quack config` answers.
+- config-override-takes-dotted-key: the red case posts the dotted key to `config/override`, so the action maps it through the catalog.
+- config-keys-one-resolver: `configRows` in `src/quack/config.go` resolves the same rows, so `config/keys` owns them and `quack config` reads them.
+- config-root-lands-store-case: `TestTheRootLandsAStoreRequest` waits for tests-green, so the implement step writes it beside the router change.
 
 # implement
 
