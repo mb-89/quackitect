@@ -1,7 +1,7 @@
 // The holds fold: the state the bridge's holds keep on its box, folded over a
 // session's events, and the answer the chain gives the newest call. The door
-// stamps the config each hold reads on a call, under held, so the fold reads
-// no file. [[spec/tickets/cage-call-holds-port]]
+// stamps the config each hold reads on every event, under held, so the fold
+// reads no file. [[spec/tickets/cage-call-holds-port]]
 package hooks
 
 import (
@@ -118,12 +118,13 @@ func stepHolds(state Holds, event q.Event) Holds {
 	fields := event.Fields
 	switch event.Kind {
 	case promptEvent:
+		state.Stood = ""
 		state.prompted(fields)
 	case displayEvent:
 		if text := strings.TrimSpace(textOf(fields, "delta")); text != "" {
 			state.Spoken = text
 			if state.Demand != nil {
-				state.paid(text)
+				state.paid(text, heldIn(fields))
 			}
 		}
 	case spokeEvent:
@@ -163,20 +164,25 @@ func (state *Holds) spoke(fields map[string]any) {
 		return
 	}
 	if fresh := freshTexts(fields, state.Demand); len(fresh) > 0 {
-		state.paid(fresh[len(fresh)-1])
+		state.paid(fresh[len(fresh)-1], heldIn(fields))
 		return
 	}
 	state.Said.Word = RefuseWord
 	state.Said.Text = says(state.Demand.Why) + " The last text seen stands from before the ask, and reads: \"" + head(state.Demand.Seen) + "\"."
 }
 
-// The turn's end pays with its answer or drops the demand, and puts the finish calls back. [[spec/design_output/stop#the-hold]]
+// The turn's end pays with its answer or drops the demand, and puts the finish calls back. A finish or a stop hold drops to off and stands as the stood mark, as dropsHold in src/bridge/stop.js does. [[spec/design_output/stop#the-hold]] [[spec/tickets/cage-hold-drops-port]]
 func (state *Holds) turnEnds(fields map[string]any) {
+	held := heldIn(fields)
+	if hold := textOf(held, heldHold); hold == finishHold || hold == stopHold {
+		state.Stood = hold
+		state.drops(heldHold, offHold)
+	}
 	text := strings.TrimSpace(textOf(fields, "answer"))
 	answered := textOf(fields, "reason") == answerReason && text != ""
 	switch {
 	case answered && state.Demand != nil:
-		state.paid(text)
+		state.paid(text, held)
 	case answered:
 		state.Spoken = text
 	default:
@@ -185,17 +191,35 @@ func (state *Holds) turnEnds(fields map[string]any) {
 	state.Finish = 0
 }
 
-func (state *Holds) paid(text string) {
-	if state.Demand.Update != "" {
+// The pay clears the demand. Where it pays an update and the ask still stands at the paid value, the ask drops to quiet, as dropsAsk in src/bridge/ask.js does. A value pressed since stands. [[spec/tickets/cage-hold-drops-port]]
+func (state *Holds) paid(text string, held map[string]any) {
+	if wanted := state.Demand.Update; wanted != "" {
 		state.Asked = ""
+		if textOf(held, heldAsk) == wanted {
+			state.drops(heldAsk, quiet)
+		}
 	}
 	state.Demand = nil
 	state.Spoken = text
 }
 
+// Names one config key the event drops, and the value it drops to. [[spec/tickets/cage-hold-drops-port]]
+func (state *Holds) drops(key, value string) {
+	if state.Said.Drops == nil {
+		state.Said.Drops = map[string]string{}
+	}
+	state.Said.Drops[key] = value
+}
+
+// The config the door stamps on an event, or none. [[spec/tickets/cage-hold-drops-port]]
+func heldIn(fields map[string]any) map[string]any {
+	held, _ := fields[heldField].(map[string]any)
+	return held
+}
+
 // A call meets the update ask and the plan's count, then the chain onToolCall runs: the owner's hold, the cloud ask, the grace, then the answer door. The first that answers ends the chain, and a call the chain lets through meets its tool's own door. [[spec/tickets/cage-call-holds-port]]
 func (state *Holds) called(fields map[string]any) {
-	held, _ := fields[heldField].(map[string]any)
+	held := heldIn(fields)
 	tool := textOf(fields, "tool")
 	state.asksForUpdate(held)
 	if _, rides := fields["plan"].(map[string]any); rides && strings.HasPrefix(tool, levelZero) && tool != planCall {
@@ -216,7 +240,7 @@ func (state *Holds) called(fields map[string]any) {
 		state.planned()
 	case reportCall:
 		if said := strings.TrimSpace(textOf(fields, "text")); said != "" && state.Demand != nil {
-			state.paid(said)
+			state.paid(said, held)
 		} else if said != "" {
 			state.Spoken = said
 		}

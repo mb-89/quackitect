@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	oldconfig "quackitect/src/config"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/clock"
@@ -383,7 +384,7 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
 		// [[spec/tickets/copilot-meets-the-hooks-door]]
 		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
-		Root:   root, Config: commandSettings, Git: gitRead, Voice: commitVoice,
+		Root:   root, Config: commandSettings, Git: gitRead, Voice: commitVoice, Drop: oldconfig.Drop,
 	})
 	return hooks.Listen(root, door)
 }

@@ -57,6 +57,7 @@ func TestBatteryReadsTheChecksStamp(t *testing.T) {
 		{`{"sha":"` + sha + `","clean":false,"ok":true}`, true, false, "the check ran over an unclean tree"},
 		{`{"sha":"` + sha + `","clean":true,"ok":false,"at":"noon"}`, true, false, "the check answered red at noon"},
 		{`{"sha":"` + sha + `","clean":true,"ok":true,"warnings":2,"files":["a"]}`, true, false, "2 warning(s) stand in 1 file(s), which ./RUNME.sh lint names"},
+		{`{"sha":"` + sha + `","clean":true,"ok":true,"warnings":1234567,"files":["a","b"]}`, true, false, "1234567 warning(s) stand in 2 file(s), which ./RUNME.sh lint names"},
 		{`{"sha":"` + sha + `","clean":true,"ok":true,"warnings":0}`, true, true, "the check passes on 01234567"},
 	} {
 		green, says := Battery(one.stamp, one.stands, sha)

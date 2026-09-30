@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,15 @@ record:
         hash: bbc2060d52184a48
         size: 1346
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 9ff456fc2000f682458faa9ff12196db495e329a
+    hash_after: 9ff456fc2000f682458faa9ff12196db495e329a
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/cage-write-door-port.md:319:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -346,14 +355,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, plus src/config/door.go, which holds every disk call of that package, holds.go, where Door.drops stands beside Door.held so hooks.go stays under the ceiling, and trunk.go with its test, for a bare number the commit guards port left
+every door the change reaches has a fake: the writer through a recording Drop, the config test under a temporary root, and the index through q/qtest
+a comment above each new function names the approach and links the ticket
+the bridge owns the drop rules, the fold ports them once, and the copied layer path carries a comment naming its owner
 
 ## tests-green
 
@@ -406,3 +420,7 @@ accept
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The tests the implement lands beside, as the commit door reads them:
+
+    ./RUNME.sh test src/modules/hooks/fold_test.go src/modules/hooks/holds_test.go src/config/config_test.go src/quack/hold_drops_test.go

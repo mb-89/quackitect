@@ -203,6 +203,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	if err := d.writes(session, post, settings, root); err != nil {
 		return Answer{}, err
 	}
+	d.drops(session, root)
 	effects := []Effect{}
 	if said, ok := d.held(session, post, root); ok {
 		effects = append(effects, said)
@@ -232,7 +233,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	return said, nil
 }
 
-// Commits the event at the session's next place, a call stamped with the config its holds read, and lands it on every fold over the session. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]]
+// Commits the event at the session's next place, stamped with the config its holds read, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]]
 func (d *Door) writes(session string, post Post, settings Settings, root string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -246,9 +247,7 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	}
 	hand := q.Hand{Session: session, Agent: textOf(post.E, "agentId", "agent_id")}
 	fields := fieldsOf(post)
-	if post.Event == toolEvent {
-		fields[heldField] = heldOf(settings, root)
-	}
+	fields[heldField] = heldOf(settings, root)
 	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
 		return err

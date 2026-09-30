@@ -18,6 +18,7 @@ const (
 	HowCommit  = "commit"
 	HowPush    = "push"
 	shortSha   = 8
+	floatBits  = 64
 )
 
 // The words git runs behind, a name given its value, a verb's own words, a push naming the trunk, and a push's words. [[spec/tickets/a-nested-git-still-lands]]
@@ -163,7 +164,7 @@ func Battery(stamp string, stands bool, sha string) (bool, string) {
 		return false, "the check answered red at " + textOf(read.At)
 	}
 	if warned, _ := read.Warnings.(float64); warned > 0 {
-		return false, strconv.FormatFloat(warned, 'f', -1, 64) + " warning(s) stand in " + itoa(len(read.Files)) + " file(s), which ./RUNME.sh lint names"
+		return false, strconv.FormatFloat(warned, 'f', -1, floatBits) + " warning(s) stand in " + itoa(len(read.Files)) + " file(s), which ./RUNME.sh lint names"
 	}
 	return true, "the check passes on " + short(sha)
 }

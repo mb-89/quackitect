@@ -1,4 +1,4 @@
-// The holds at the door: it stamps the config each hold reads on a call, and
+// The holds at the door: it stamps the config each hold reads on an event, and
 // answers what the holds fold answers the call, a refusal or the rows it asks
 // back for. A spoke post naming no session meets the session of the call the
 // door held last under its root. [[spec/tickets/cage-call-holds-port]]
@@ -6,6 +6,7 @@ package hooks
 
 import (
 	"encoding/json"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -97,4 +98,26 @@ func (d *Door) sessionFor(post Post, root string) string {
 		return held
 	}
 	return session
+}
+
+// Hands each drop the holds fold names at the event's own place to the door's writer, in key order. A door with no writer writes nothing, and a failing write leaves the answer standing, as the shadow write does. [[spec/tickets/cage-hold-drops-port]]
+func (d *Door) drops(session, root string) {
+	if d.from.Drop == nil {
+		return
+	}
+	state, ok := d.from.Store.Snapshot().Read(d.holdsOf(session)).(Holds)
+	d.mu.Lock()
+	seq := d.seqs[session]
+	d.mu.Unlock()
+	if !ok || state.Said.Seq != seq {
+		return
+	}
+	keys := make([]string, 0, len(state.Said.Drops))
+	for key := range state.Said.Drops {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		_ = d.from.Drop(root, key, state.Said.Drops[key])
+	}
 }
