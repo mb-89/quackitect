@@ -24,6 +24,15 @@ const (
 // [[spec/design_output/apply#the-verbs]]
 var opNames = []string{opExact, opCreate, opWrite, opAppend, opPrepend, opRegex}
 
+// The constructs a JavaScript pattern takes and Go regexp takes nowhere, each past an even run of backslashes. [[spec/tickets/edit-regex-names-its-limit]]
+var lacked = []struct {
+	shape *regexp.Regexp
+	name  string
+}{
+	{regexp.MustCompile(`(?:^|[^\\])(?:\\\\)*\(\?<?[=!]`), "a lookaround"},
+	{regexp.MustCompile(`(?:^|[^\\])(?:\\\\)*\\(?:[1-9]|k<)`), "a backreference"},
+}
+
 // One edit of a manifest, under the keys the bridge's tool takes. [[spec/design_output/apply#the-verbs]]
 type Op struct {
 	File        string   `json:"file"`
@@ -181,6 +190,11 @@ func byPattern(one Op, text, at string) (string, int, string) {
 
 // A pattern under the flags out of i, m and s, as the bridge reads them. [[spec/design_output/apply#a-pattern-matching-nothing]]
 func Compiled(pattern, flags string) (*regexp.Regexp, error) {
+	for _, one := range lacked {
+		if one.shape.MatchString(pattern) {
+			return nil, fmt.Errorf("the pattern names %s, which Go regexp takes nowhere. Write the match without it, or make one exact op a place", one.name)
+		}
+	}
 	kept := ""
 	for _, one := range flags {
 		if strings.ContainsRune(regexOK, one) && !strings.ContainsRune(kept, one) {
