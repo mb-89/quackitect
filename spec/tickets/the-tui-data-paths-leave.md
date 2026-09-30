@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,31 @@ record:
         hash: 55e3dcccd4ae2c25
         size: 276
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 42849f666ee11cead27a8022d0c7e3bd93e35691
+    hash_after: 42849f666ee11cead27a8022d0c7e3bd93e35691
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 713ca59bcb9fe911
+        size: 12950
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: cd951631732229fe
+        size: 8612
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: a3a12f8afbc43705
+        size: 8428
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: edbcb9b1a3bb9473
+        size: 8311
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -211,26 +236,31 @@ Weighed: one ticket over the whole cutover spares three reviews. It costs a diff
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/switched_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/tui/switched_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The tracked config reads `shadow` for the window, and `work.Tab` and `log.Tab` each hold a `Shadow`. Both cases fail on that. The surprise: the front of an open ticket stands closed to its hand, so this ticket's wait on the three pieces rides in its approach. The pull hands this ticket ahead of them, so its tests cover its own part alone. The grep line in its ask meets its test in [[spec/tickets/the-work-tab-reads-v1]], whose ask carries the same line.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the key line meets TestTheWindowModeReadsNew, and the compares leaving meet TestTheWindowHoldsNoCompare. The grep line meets the work tab piece's own done_when, and the check decides the last line
+- the cases read the tracked config and the tab types alone, so no door is reached and none needs a fake
 
 # gate
 
