@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -168,7 +168,30 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 64c34d7f2101e6ceb71a0ce1ad3209022c718b47
+    hash_after: 64c34d7f2101e6ceb71a0ce1ad3209022c718b47
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: a3d6a4605929ae60
+        size: 789
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door"]
+reason: done
 ---
 
 # Ask
@@ -339,26 +362,33 @@ What I weigh: the layer joins the brief package, which reads the same notes, so 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/spawn_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door now wraps a spawned helper's prompt in the layer its kind reads, as onAgentSpawn in the bridge does. The brief package gains LayerFor and ForHelper. A kind's layer holds the notes binding it beside the notes binding none, and a kind holding no layer takes the helper layer. The door answers the spawn's own event with the wrapped prompt, and a tree holding no rule passes it. The case in cage.test.js pins the table to the JavaScript builders and passes. That file stays red on the clear ticket's own case until clear-answers-off-the-door closes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the brief package, hooks.go and a new spawn.go beside it, since hooks.go stands near its line ceiling
+- the layer reads the tree it is handed, and each case builds its own temp tree
+- each new function carries a pointer at the ticket or at the design chapter it ports
+- the tree over both roots stands once, in treeAt, and the brief's stamp reads it there
 
 # accept
 
