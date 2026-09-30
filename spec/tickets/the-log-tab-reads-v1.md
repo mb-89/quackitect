@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-sends-changes]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: d1372ecac93da55e
         size: 2549
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: ac721fb8540b078edc42b8ea74b301faae6e33a9
+    hash_after: ac721fb8540b078edc42b8ea74b301faae6e33a9
+    inputs:
+      - name: design/draft
+        hash: d1372ecac93da55e
+        size: 2549
+      - name: design/tests-red
+        hash: 71f75553e780e505
+        size: 615
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -283,8 +295,11 @@ The tab takes no `registry.Change`, so it holds no row, and `RecordOf` answers a
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- log-tab-takes-its-rows: the log tab stands first, and the frame hands each message to the first tab taking it. So the tab takes a `registry.Change` named `log/rows` alone. Its stream's end lands as a message of its own, as `watchEnded` does in `src/tui/work/v1.go`. A case sends `work/rows` and wants it declined.
+- log-approach-matches-tree: `src/tui/model_test.go` sends `LinesMsg` twice, so the callers and the size name it. `go.mod` keeps `fsnotify`, since the index, the files module and the watcher import it. The road reads `IndexRow`, so the shadow's `Row` gains no field.
 
 # implement
 
@@ -355,3 +370,11 @@ The tab takes no `registry.Change`, so it holds no row, and `RecordOf` answers a
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate weighed these, and they stand:
+
+| the claim | what the tree says |
+|---|---|
+| `log/rows` reads the window's session | `log.session` in `spec/wiring.yaml` names `files/.se/.log/session.jsonl`, the path the window opens by default. A window over another file reads the live session instead, and the frame mode keeps its own read. |
+| the red cases decide the ask | the draw and the new session meet a case each. The details case reads `RecordOf`, which the details pane draws from. |
+| the watch reaches the tab | the work tab's watch stands on this branch, and `registry.Stream` hands each change on. |
