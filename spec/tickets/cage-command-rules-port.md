@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -203,6 +203,18 @@ record:
         hash: 44b8d45db15bec88
         size: 4991
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d889b5fde3d5 · claude-code-remote · helper-10
+    hash_before: f51cbda5ea72ceea9705dd5b1f0653328bdcc96b
+    hash_after: f51cbda5ea72ceea9705dd5b1f0653328bdcc96b
+    inputs:
+      - name: design/draft
+        hash: 44b8d45db15bec88
+        size: 4991
+      - name: design/tests-red
+        hash: 35dd677e458f4287
+        size: 1603
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -385,8 +397,13 @@ What surprised me:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: Door.Hook runs the ticket door, the bless guard, the command rules, the version guard and the git write door in onBash's order, and PowerShell meets the ticket door alone, as onPowerShell does
+- done_when one meets TestReplayLogAnswersEveryRecordedLog over command-rules.jsonl, which holds a refusal of each of the five rules, and over every-refusal.jsonl's four command rows; done_when two meets TestTheDoorRefusesWhatTheBridgeRefuses over command-cases.json; done_when three is the check the implement answers
+- fix in place: lib/bash.js also imports names.js for overLong, code.js, private.js, vale.js and verb-line.js, which the approach's file list leaves out, so the implement ports what findings reads from them
+- fix in place: size leaves out src/modules/hooks/cage_test.go, which the red list names, and src/quack/hooks_test.go and hook_test.go, which the callers list names as calling hooks.New with the new Outside fields
 
 # implement
 
