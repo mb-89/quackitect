@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: view
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -184,6 +184,12 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 1aec9f974ca3d14355b26d70ac15066551d4d115
+    hash_after: 1aec9f974ca3d14355b26d70ac15066551d4d115
+    returns: 1
+    why: "a person action posted through acts on the live index answers running at once, since acts sets no Prefer wait and the default wait is zero; so a pass pressed reads work before the verb ends, and a refusal never reaches the toast; the fix: acts sends Prefer wait=N, and a wait that runs out answers the handle to read"
 ---
 
 # Ask
@@ -437,8 +443,12 @@ Every ticket button reaches its verb through the index. The lens, the save fill 
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+fail
+- a person action posted through acts on the live index answers running at once, since acts sets no Prefer wait and the default wait is zero
+- so a pass pressed reads work before the verb ends, and a refusal never reaches the toast
+- the fix: acts sends Prefer wait=N, and a wait that runs out answers the handle to read
 
 # Discussion
 
