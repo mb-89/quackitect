@@ -117,11 +117,24 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: fb75d6cfa4a3f0490a76f5f5544a6fd440a06e39
+    hash_after: fb75d6cfa4a3f0490a76f5f5544a6fd440a06e39
+    inputs:
+      - name: ask
+        hash: e31e3e8fdb75c4ab
+        size: 676
+      - name: [[spec/tickets/the-brief-leaves-the-bridge]]
+        hash: 19bd52b73471bf7a
+        size: 735
+    def: 7883b3d10633c780
+depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door"]
 ---
 
 # Ask
@@ -157,38 +170,62 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The door answers an agent spawn with the spawn's own event, its prompt wrapped in the layer the spawn's kind reads, as `onAgentSpawn` in src/bridge/guidance.js does.
+
+1. The brief package `src/modules/hooks/brief`, which brief-answers-off-the-door adds, gains the layer: `layersOf`, `standingLayer` and `forHelper` in .claude/skills/level0/lib/guidance.js, ported over the notes it already reads. A spawn naming no kind takes the helper layer, as `layerHere` does.
+2. `Door.Hook` in hooks.go answers an agent spawn of the main agent with the event effect prompt-answers-off-the-door adds. The effect carries the spawn's fields with the wrapped prompt. A kind with no layer answers pass.
+3. `stepOf` in cage.js already maps the event effect once the prompt port lands, so the cage needs no change here.
+4. One case table holds the layer: the JavaScript builders write each row's layer, and the Go builder answers the same.
+
+The bridge keeps its spawn door until the-brief-leaves-the-bridge flips the doors, so this lands alone. What I weigh: the layer and the brief read one set of notes, so one package owns both. I assume the spawn event carries the kind and the prompt as the bridge reads them.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.Hook, at an agent spawn
+- src/modules/hooks/brief: the note reader, which gains the layer
+- .claude/skills/level0/hooks/cage.js: stepOf, which maps the event effect
+- src/bridge/guidance.js: onAgentSpawn, which the flip retires
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/spawn_test.go: TestASpawnAnswersItsPromptWrappedInTheHelperLayer
+- src/modules/hooks/spawn_test.go: TestASpawnOfAKindTakesThatKindsLayer
+- test/level0/cage.test.js: the JavaScript layer matches the case table
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/brief/layer.go, new
+- src/modules/hooks/hooks.go
+- src/modules/hooks/spawn_test.go, new
+- test/replay/cage/layer-cases.json, new
+- test/level0/cage.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened onAgentSpawn and layerHere in the bridge, and layersOf, standingLayer and forHelper in the lib, and each claim holds there
+- the callers list names the door, the brief package, the cage's step and the bridge door the flip retires
+- the first done line meets the spawn cases, the second the shared table, and the third the check
 
 ## tests-red
 
