@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -178,6 +178,12 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/tickets/the-tui-data-paths-leave]]
+  - step: design/draft
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: cb2d7d31d5665a13a4c8633c4a1899863b89bd29
+    hash_after: 3c47676d76b472d69fb6a24221f5bd4dc9bd33d0
+reason: became
+successors: [v1-watch-sends-changes]
 ---
 
 # Ask
