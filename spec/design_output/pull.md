@@ -741,7 +741,7 @@ A passed leaf keeps the hash of each input and of its own definition. A pull fin
 |---|---|
 | `ask`, or a leaf path | `hashText` over that chapter of the ticket |
 | a note link | the `hashes` method of the index, and `hashText` over the disk where the index stands dead |
-| a ticket link | `hashText` over the linked ticket's Ask, as [[#ticket-links-read-the-ask]] says |
+| a ticket link | `hashText` over the linked ticket's Ask, as [[spec/design_output/pull#ticket-links-read-the-ask]] says |
 
 - An input matches where `hashText` over its first `size` bytes answers the hash. So an append keeps the steps reading it whole.
 - Any other input differs, and the pull marks each leaf reading it `stale` in the record, naming the input.
