@@ -12,6 +12,8 @@ const REOPEN = 2000;
 // What a verb's action answers where no index stands. [[spec/tickets/the-lens-calls-actions]]
 const NO_INDEX =
   "no index answers at this tree, and ./RUNME.sh index standing starts one";
+// The seconds a person's press waits on its verb, past which the answer names the handle to read. [[spec/design_output/model#a-caller-sets-its-wait]]
+const ACT_WAIT = 600;
 
 // [[spec/design_output/extension#the-views-section]]
 function indexDoor(root) {
@@ -62,18 +64,27 @@ function indexDoor(root) {
     calls: (name, input) => asks(`/actions/${name}`, posted(input)),
     // A verb's action, answered as a run: its output on a 200, and the problem's detail, which carries the verb's output, on a refusal. [[spec/tickets/the-lens-calls-actions]]
     acts: async (name, input) => {
-      const said = await answered(`/actions/${name}`, posted(input));
+      const said = await answered(`/actions/${name}`, posted(input, ACT_WAIT));
       if (!said) return { code: 1, out: "", err: NO_INDEX };
+      if (said.ok && said.body?.running)
+        return {
+          code: 0,
+          out: `wait\n${name} runs on at ${said.body.handle}`,
+          err: "",
+        };
       if (said.ok) return { code: 0, out: textOf(said.body?.result), err: "" };
       return { code: 1, out: "", err: String(said.body?.detail ?? "") };
     },
   };
 }
 
-function posted(input) {
+function posted(input, wait) {
   return {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      ...(wait ? { prefer: `wait=${wait}` } : {}),
+    },
     body: JSON.stringify(input ?? {}),
   };
 }

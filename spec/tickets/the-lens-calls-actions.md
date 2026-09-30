@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -190,6 +190,15 @@ record:
     hash_after: 1aec9f974ca3d14355b26d70ac15066551d4d115
     returns: 1
     why: "a person action posted through acts on the live index answers running at once, since acts sets no Prefer wait and the default wait is zero; so a pass pressed reads work before the verb ends, and a refusal never reaches the toast; the fix: acts sends Prefer wait=N, and a wait that runs out answers the handle to read"
+  - step: implement/change
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 6e162009ea5b795f3ae9662ed75fca87b5cabdd2
+    hash_after: 6e162009ea5b795f3ae9662ed75fca87b5cabdd2
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -379,17 +388,17 @@ pass
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-./RUNME.sh lint src/extension src/modules/verbs src/quack/twins.go test/level0/lens-actions.test.js test/level0/lens.test.js test/level0/route-host.test.js test/level0/save-fills.test.js test/level0/sidebar-work.test.js test/contract/extension-spawns-no-verb.test.js
+./RUNME.sh lint src/extension src/modules/verbs src/quack/twins.go test/contract/editor-index.test.js test/contract/extension-spawns-no-verb.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches the files the size names, less counted, which the-sidebar-reads-v1 moved already, plus route-host took, which the red route case reads, and the spawn grep case under test/contract
-- the index door has the fakes each case builds with acts, the shared one in test/level0/v1-index.js among them, and the real door meets a real server in test/contract/editor-index.test.js
-- each new function, constant and field links spec/tickets/the-lens-calls-actions
-- the harness names stand in HARNESS in src/extension/lib/lens.js, and the Go copy in src/quack/twins.go names that owner beside it
+- the fix touches editor-index.js and its contract case alone, both inside the size
+- the real door meets a real server in test/contract/editor-index.test.js, which reads the Prefer wait, the output and the refusal
+- ACT_WAIT links the design section on a caller setting its wait
+- the wait stands once, as ACT_WAIT in src/extension/editor-index.js
 
 ## tests-green
 

@@ -31,6 +31,17 @@ function served() {
         setTimeout(() => answer.end(change(4)), 20);
         return undefined;
       }
+      if (asked.method === "POST" && asked.url.startsWith("/v1/actions/ticket/")) {
+        posted.push({ prefer: asked.headers.prefer, ...JSON.parse(body) });
+        if (asked.url.endsWith("/pull"))
+          return answer.end(
+            JSON.stringify({ result: "work\n  the next leaf", running: false }),
+          );
+        answer.statusCode = 422;
+        return answer.end(
+          JSON.stringify({ detail: "refused\n  the leaf holds no hand" }),
+        );
+      }
       if (asked.method === "POST" && asked.url === "/v1/actions/work/pull") {
         posted.push(JSON.parse(body));
         return answer.end(JSON.stringify({ state: "done" }));
@@ -99,4 +110,39 @@ test("the index door's watch hands each named value, then a change", async () =>
     watch?.stop();
     server.close();
   }
+});
+
+// [[spec/tickets/the-lens-calls-actions]]
+test("the index door's acts waits on the verb, and answers its output or its refusal", async () => {
+  const files = disk();
+  const root = files.tempDir("level0-index-");
+  const { server, posted } = await served();
+  try {
+    files.makeDir(join(root, ".se", ".runtime"));
+    files.write(
+      join(root, ".se", ".runtime", "index.json"),
+      JSON.stringify({ port: 1, v1: server.address().port }),
+    );
+    const door = indexDoor(root);
+    const input = { args: ["one", "--pass"], person: true };
+    assert.deepEqual(await door.acts("ticket/pull", input), {
+      code: 0,
+      out: "work\n  the next leaf",
+      err: "",
+    });
+    assert.deepEqual(await door.acts("ticket/route", input), {
+      code: 1,
+      out: "",
+      err: "refused\n  the leaf holds no hand",
+    });
+    assert.match(posted[0].prefer, /^wait=\d+$/, "a press waits on its verb");
+    assert.deepEqual(posted[0].args, input.args);
+  } finally {
+    server.close();
+  }
+  assert.equal(
+    (await indexDoor(root).acts("ticket/pull", {})).code,
+    1,
+    "no index refuses",
+  );
 });
