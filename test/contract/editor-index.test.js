@@ -23,6 +23,14 @@ function served() {
       answer.setHeader("content-type", "application/json");
       if (asked.method === "GET" && asked.url === "/v1/values/index/names")
         return answer.end(JSON.stringify({ value: [{ name: "work/open-tasks" }] }));
+      if (asked.method === "GET" && asked.url === "/v1/watch?names=work/open-tasks") {
+        answer.setHeader("content-type", "text/event-stream");
+        const change = (value) =>
+          `event: change\ndata: ${JSON.stringify({ name: "work/open-tasks", revision: value, value })}\n\n`;
+        answer.write(change(3));
+        setTimeout(() => answer.end(change(4)), 20);
+        return undefined;
+      }
       if (asked.method === "POST" && asked.url === "/v1/actions/work/pull") {
         posted.push(JSON.parse(body));
         return answer.end(JSON.stringify({ state: "done" }));
@@ -61,4 +69,34 @@ test("the index door answers nothing where no index stands", async () => {
   const door = indexDoor(root);
   assert.equal(await door.values("index/names"), undefined);
   assert.equal(await door.calls("work/pull", {}), undefined);
+});
+
+test("the index door's watch hands each named value, then a change", async () => {
+  const files = disk();
+  const root = files.tempDir("level0-index-");
+  const { server } = await served();
+  const seen = [];
+  let watch;
+  try {
+    files.makeDir(join(root, ".se", ".runtime"));
+    files.write(
+      join(root, ".se", ".runtime", "index.json"),
+      JSON.stringify({ port: 1, v1: server.address().port }),
+    );
+    const door = indexDoor(root);
+    assert.equal(typeof door.watch, "function", "the door carries a watch");
+    await new Promise((done) => {
+      watch = door.watch(["work/open-tasks"], (name, value) => {
+        seen.push([name, value]);
+        if (seen.length === 2) done();
+      });
+    });
+    assert.deepEqual(seen, [
+      ["work/open-tasks", 3],
+      ["work/open-tasks", 4],
+    ]);
+  } finally {
+    watch?.stop();
+    server.close();
+  }
 });

@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 15d474e44d438e62
         size: 920
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 68e016c087952c1b91beb510d5bd8cbaa6ef8d8d
+    hash_after: 68e016c087952c1b91beb510d5bd8cbaa6ef8d8d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: d8e34f6fff8ed198
+        size: 5290
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -272,26 +285,35 @@ What I weigh and assume: the grep line reaches `set`, `opened`, `newTicket` and 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-v1.test.js && ./RUNME.sh test test/contract/editor-index.test.js && ./RUNME.sh test src/modules/views/views_test.go && ./RUNME.sh test src/modules/holds/holds_test.go && ./RUNME.sh test src/modules/config/config_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/sidebar-v1.test.js
+- test/contract/editor-index.test.js
+- src/modules/views/views_test.go
+- src/modules/holds/holds_test.go
+- src/modules/config/config_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion: the schema stands outside the config globs, bless/ and views/bases name no provider, the index door carries no watch, and the sidebar reads files, spawns the count and watches files. Three things differ from the draft, and the gate weighs them. First, q.Ordered carries no MarshalJSON, so /v1 hands a config projection field by field as Keys, Fields, Items and Literal, and the fake index answers that form: the sidebar decodes it, or q.Ordered gains its JSON form. Second, src/modules/modules.go registers nothing: the queue and holds projections load unprefixed through projected in src/quack/main.go, so views.Registers joins that list, and views.go stands as an empty Registers so its case compiles. Third, the bless projection joins holds.Registers, the other runtime file the agent's state stands in, in place of a new verbs file. The watch case drives the settled burst through a fake later, so it waits on no clock.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing case: the grep in sidebar-v1.test.js, the fake index draw in sidebar-v1.test.js, the watch event in sidebar-v1.test.js and editor-index.test.js, and the check line in its own run at tests-green
+- the index door is faked in sidebar-v1.test.js with values, calls and watch, and the contract case drives the real door against a real SSE server; the Go cases seed files/ through q/qtest
 
 # gate
 
