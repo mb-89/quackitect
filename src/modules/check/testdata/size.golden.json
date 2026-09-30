@@ -1,0 +1,167 @@
+{
+  "javascript": [],
+  "go": [
+    {
+      "file": "spec/config/level0.schema.json",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 799. Split it by topic."
+    },
+    {
+      "file": "spec/config/styles/VoiceParagraph/Vocabulary.yml",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 2480. Split it by topic."
+    },
+    {
+      "file": "spec/design_input/the-agent-pulls-tickets.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 1144. Split it by topic."
+    },
+    {
+      "file": "spec/design_output/extension.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 714. Split it by topic."
+    },
+    {
+      "file": "spec/design_output/level0.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 2006. Split it by topic."
+    },
+    {
+      "file": "spec/design_output/model.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 1585. Split it by topic."
+    },
+    {
+      "file": "spec/design_output/pull.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 912. Split it by topic."
+    },
+    {
+      "file": "spec/design_output/work.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 889. Split it by topic."
+    },
+    {
+      "file": "spec/pages/the-agent-pulls-tickets.html",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 1444. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/a-rename-reaches-every-note.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 660. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/a-rewind-spares-landed-tests.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 666. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/an-engine-takes-bridge-work.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 718. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/sessions-boot-from-the-repo.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 846. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/the-check-holds-test-first.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 644. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/the-colours-stand-in-config.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 607. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/the-door-reads-script-writes.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 617. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/the-retro-cuts-its-window.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 649. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/the-retro-takes-the-box.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 603. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/the-runtime-files-stand-apart.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 681. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/the-window-splits-by-tab.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 704. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/verbs-read-two-roots.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 674. Split it by topic."
+    },
+    {
+      "file": "spec/vocabulary/core.yml",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 19534. Split it by topic."
+    },
+    {
+      "file": "src/extension/webview/package-lock.json",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 799. Split it by topic."
+    },
+    {
+      "file": "src/modules/queue/testdata/queue.golden.json",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 6209. Split it by topic."
+    },
+    {
+      "file": "src/quack/testdata/readers.golden.json",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 1937. Split it by topic."
+    },
+    {
+      "file": "src/quack/testdata/readers.schema.json",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 733. Split it by topic."
+    },
+    {
+      "file": "src/quack/testdata/tree.golden.json",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 3602. Split it by topic."
+    }
+  ]
+}

@@ -15,11 +15,11 @@ import (
 	"quackitect/src/tui/tree"
 )
 
-// The survey's file, whose folder .claude/skills/level0/lib/folders.js owns and whose name src/lsp/tree.go spells too, because a Go module imports no JavaScript. [[spec/design_output/tools#what-the-survey-writes]]
+// The survey's file, whose folder .claude/skills/level0/lib/folders.js owns and whose name src/modules/check/tree.go spells too, because a Go module imports no JavaScript. [[spec/design_output/tools#what-the-survey-writes]]
 const toolsAt = ".se/.runtime/tools.json"
 
-// The verb answering the places, off the command line every verb rides. [[spec/design_output/work#one-reading-answers-git]]
-var placesVerb = []string{"src/scripts/cli.js", "branch", "list", "--json"}
+// The verb answering the places, off the branch verb's program. [[spec/tickets/cli-js-leaves]]
+var placesVerb = []string{"src/scripts/verbs/branch.js", "list", "--json"}
 
 // The verb reads git, so a run past this span reads as a box with no git. [[spec/design_output/tui#the-work-tab]]
 const placesWait = 60 * time.Second
@@ -29,8 +29,9 @@ type Places struct {
 	Queue map[string]string
 	Cloud map[string]bool
 	Todo  map[string]bool
-	// The rows this box takes: every placed row past the cloud's, which the strip counts behind the tab's name and the sidebar's button draws. [[spec/design_output/tui#the-work-tab]]
+	// The rows this box takes, as the index counts them, and whether a door answered. The tab draws the count behind its name where one did. [[spec/tickets/the-count-chain-leaves]]
 	Takeable int
+	Counted  bool
 	// The plan's own todos, which the index holds nowhere, so the tab adds them as rows. [[spec/design_output/stop#the-plan]]
 	Rows []answerRow
 }
@@ -98,7 +99,6 @@ func PlacesIn(said []byte) (Places, error) {
 			out.Rows = append(out.Rows, one)
 		}
 	}
-	out.Takeable = out.countTakeable()
 	return out, nil
 }
 
@@ -110,36 +110,28 @@ func (p Places) place(one answerRow) {
 	p.Todo[one.Name] = one.Todo
 }
 
-// The rows this box takes: placed, and off the cloud. [[spec/design_output/tui#the-work-tab]]
-func (p Places) countTakeable() int {
-	n := 0
-	for _, place := range p.Queue {
-		if place != cloudPlace {
-			n++
-		}
-	}
-	return n
-}
-
 // The places laid over the tree's items, so the queue column and the cloud letter read them. [[spec/design_output/tui#the-work-tab]]
 func Placed(t *tree.Tree, p Places) {
 	t.Amend(func(one *tree.Item) {
 		one.Keys[QueueKey] = p.Queue[one.Name]
 		one.Keys[CloudKey] = flagOf(p.Cloud[one.Name])
-		// A row at zero stands in hand, so its state reads held whatever the index says. [[spec/design_output/pull#the-queue-is-an-outline]]
-		if p.Queue[one.Name] == heldPlace {
-			one.Keys["state"] = HeldState
-		}
+		// The state stays what the index answers, since the held rule stands in the tickets module alone. [[spec/tickets/the-window-held-override-goes]]
 		// The todo letter reads the verb's answer, which folds the override on this box into the front's tag. [[spec/design_output/pull#a-todo-forces-a-place]]
 		if said, held := p.Todo[one.Name]; held {
 			one.Keys[TodoKey] = flagOf(said)
 		}
 	})
 	// A sentence todo the tree lacks lands as a row of its own, at the left, with no path and no link. [[spec/design_output/stop#the-plan]]
+	// A todo the index nests under its group stands already, so every nested row counts. [[spec/tickets/the-queue-views-agree]]
 	standing := map[string]bool{}
-	for _, one := range t.Items {
-		standing[one.Name] = true
+	var mark func([]tree.Item)
+	mark = func(items []tree.Item) {
+		for _, one := range items {
+			standing[one.Name] = true
+			mark(one.Kids)
+		}
 	}
+	mark(t.Items)
 	added := []tree.Item{}
 	for _, row := range p.Rows {
 		if standing[row.Name] {
@@ -174,11 +166,58 @@ func PlacesAt(root string) (Places, error) {
 	if err != nil {
 		return Places{}, err
 	}
-	return PlacesIn(said)
+	places, err := PlacesIn(said)
+	if err != nil {
+		return Places{}, err
+	}
+	// The queue column reads the places the index answers, the ones its count reads. [[spec/tickets/queue-column-reads-the-index]]
+	if queue, answered := askQueuePlaces(root); answered {
+		places.Queue = queue
+		for name, place := range queue {
+			if place == cloudPlace {
+				places.Cloud[name] = true
+			}
+		}
+	}
+	// The count reads the index alone, since the window counts nothing of its own. [[spec/tickets/the-count-chain-leaves]]
+	places.Takeable, places.Counted = askOpenTasks(root)
+	return places, nil
+}
+
+// The index's queue, as a place a name, and whether a door answered it. A door standing nowhere answers nothing, and starts nothing. [[spec/tickets/queue-column-reads-the-index]]
+var askQueuePlaces = func(root string) (map[string]string, bool) {
+	said, err := askIndex(root, "value", map[string]string{"name": queuePlacesName})
+	if err != nil {
+		return nil, false
+	}
+	var queue map[string]string
+	if json.Unmarshal(said, &queue) != nil || queue == nil {
+		return nil, false
+	}
+	return queue, true
+}
+
+// The index name the queue module answers its places under. [[spec/tickets/queue-column-reads-the-index]]
+const queuePlacesName = "queue/places"
+
+// The index name the work module counts the open tasks under. [[spec/tickets/the-count-chain-leaves]]
+const openTasksName = "work/open-tasks"
+
+// The index's count, and whether a door answered it. A door standing nowhere gets started once. [[spec/tickets/open-tasks-fake-moves-over]]
+var askOpenTasks = func(root string) (int, bool) {
+	said, err := askIndex(root, "value", map[string]string{"name": openTasksName})
+	if err != nil {
+		return 0, false
+	}
+	var count int
+	if json.Unmarshal(said, &count) != nil {
+		return 0, false
+	}
+	return count, true
 }
 
 // A root holding no verb answers its error at once, so a case's tree spawns nothing. [[spec/design_output/work#one-reading-answers-git]]
-func runPlaces(root string) ([]byte, error) {
+var runPlaces = func(root string) ([]byte, error) {
 	if _, err := statOf(filepath.Join(root, filepath.FromSlash(placesVerb[0]))); err != nil {
 		return nil, err
 	}

@@ -17,12 +17,13 @@ const module = "quackitect/src/tui"
 
 // What each package imports of this module, as the chapter's table says. [[spec/design_output/tui#the-packages-the-window-holds]]
 var layout = map[string][]string{
-	"draw":  {},
-	"tree":  {"draw"},
-	"frame": {"draw", "tree"},
-	"log":   {"frame", "draw"},
-	"work":  {"frame", "tree", "draw"},
-	".":     {"frame", "log", "work", "draw"},
+	"draw":     {},
+	"tree":     {"draw"},
+	"frame":    {"draw", "tree"},
+	"log":      {"frame", "tree", "draw"},
+	"work":     {"frame", "tree", "draw"},
+	"registry": {"frame", "draw"},
+	".":        {"frame", "log", "work", "registry", "draw"},
 }
 
 func importsOf(t *testing.T, folder string) map[string]bool {

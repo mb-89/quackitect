@@ -110,6 +110,8 @@ const NAME_FILLER = "x".repeat(20);
 const TREE_AT = `:${TICKETS}`;
 
 // The three reads a listing runs, and an object stands under `<branch>:<path>`. [[spec/design_output/work#the-listing-reads-git-once]]
+const TRUNK_TIP = "trunk";
+
 export function remoteSaying(refs, objects = {}) {
   const rows = refs
     .map((one) => `origin/${one.branch} ${one.tip} ${one.when ?? 0}`)
@@ -128,8 +130,17 @@ export function remoteSaying(refs, objects = {}) {
         { stdout: "---\nkind: [[ticket]]\nstate: closed\n---\n" },
       ]),
   );
+  // Each ref shares the trunk tip as its base unless the case names an older one, which reads behind. [[spec/design_output/work#the-listing-reads-git-once]]
+  const bases = Object.fromEntries(
+    refs.map((one) => [
+      `git merge-base origin/main origin/${one.branch}`,
+      { stdout: `${one.base ?? TRUNK_TIP}\n` },
+    ]),
+  );
   return {
     ...closedOnTrunk,
+    ...bases,
+    "git rev-parse origin/main": { stdout: `${TRUNK_TIP}\n` },
     [`git for-each-ref --format=${REF_FORMAT} refs/remotes/origin/work/`]: {
       stdout: rows ? `${rows}\n` : "",
     },
@@ -209,14 +220,16 @@ export const merging = (extra = {}) => ({
   [`git diff --unified=0 base111..origin/main -- ${GROUP_AT}`]: { stdout: "" },
   "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 0 },
   [`sh ${join(ROOT, "src/scripts/install.sh")}`]: { exitCode: 0 },
-  [`node ${join(ROOT, "src/scripts/cli.js")} check --errors`]: {
+  [`node ${join(ROOT, "src/scripts/verbs/check.js")} --errors`]: {
     exitCode: 0,
     stdout: "green\n",
   },
   // The merge pushes trunk and closes the branch trunk now holds. [[spec/design_output/work#a-dependency-waits-for-trunk]]
   "git push origin main": { exitCode: 0 },
   "git rev-list --count origin/main..main": { stdout: "0\n" },
-  "git branch -r --merged origin/main": { stdout: "  origin/main\n  origin/work/one-group\n" },
+  "git branch -r --merged origin/main": {
+    stdout: "  origin/main\n  origin/work/one-group\n",
+  },
   "git branch -r --points-at origin/main": { stdout: "  origin/main\n" },
   "git rev-list --first-parent origin/main": { stdout: `${SHA}\n` },
   "git rev-parse origin/work/one-group": { stdout: "b9\n" },

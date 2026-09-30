@@ -6,6 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  callFor,
   matches,
   messageFor,
   picked,
@@ -231,4 +232,20 @@ test("a click on the bless button asks the value it does not hold", () => {
     kind: "bless",
     value: false,
   });
+});
+
+// [[spec/design_output/extension#the-views-section]]
+test("a click on a view button posts a call with every field of its row, keyed", () => {
+  assert.deepEqual(
+    callFor({ calls: "tickets/open" }, [
+      { dataset: { field: "name" }, value: "a-name" },
+    ]),
+    { kind: "call", calls: "tickets/open", input: { name: "a-name" } },
+  );
+  assert.deepEqual(callFor({ calls: "work/pull" }), {
+    kind: "call",
+    calls: "work/pull",
+    input: {},
+  });
+  assert.equal(callFor({}), undefined);
 });

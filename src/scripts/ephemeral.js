@@ -4,6 +4,7 @@
 // [[spec/design_input/the-clear-hands-ephemeral-tickets]]
 
 import { join } from "node:path";
+import { callOf } from "./tool-call.js";
 import {
   DUE,
   HANDOVER,
@@ -27,7 +28,7 @@ export const ASKS = {
     // The owner's words travel as the owner said them. [[spec/tickets/the-owners-words-travel-verbatim]]
     "Quote the owner's words under The owner's words, as said, each with its session and transcript line.",
     `Name no file under ${RETRO}: the next retro reads that folder, and a hand does not.`,
-    "Hand it back with ./RUNME.sh ticket pull --pass.",
+    `Hand it back with ${callOf("ticket", "pull", ["--pass"])}.`,
   ],
   [CLEAR]: [
     "The handover stands. End the turn now, with no stop line of your own.",
@@ -35,7 +36,7 @@ export const ASKS = {
   ],
   [READ]: [
     "Level zero cleared the conversation, and the handover block says where the work stands.",
-    "Read it, then hand this back with ./RUNME.sh ticket pull --pass, and the queue hands the next step.",
+    `Read it, then hand this back with ${callOf("ticket", "pull", ["--pass"])}, and the queue hands the next step.`,
   ],
 };
 

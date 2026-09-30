@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { testArgv } from "../../src/scripts/cli.js";
+import { testArgv } from "../../src/scripts/check-verb.js";
 
 const AT = resolve("/tree");
 const reporters = (argv) =>

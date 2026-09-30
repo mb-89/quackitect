@@ -151,8 +151,8 @@ export async function handle(event, it) {
         if (
           cloud &&
           (landsOnTrunk(command, state.branch) ||
-            /\bbranch\s+(?:take|new|merge|close)\b/.test(command) ||
-            /\bbranch\s+release\s+[^\s;&|]/.test(command) ||
+            /\bbranch(?:\.js)?\s+(?:take|new|merge|close)\b/.test(command) ||
+            /\bbranch(?:\.js)?\s+release\s+[^\s;&|]/.test(command) ||
             /\bgit\b[^\r\n;&|]*\b(?:switch|checkout)\b/.test(command) ||
             /\bgh\b[^\r\n;&|]*\bpr\s+(?:create|merge|close)\b/.test(command))
         ) {

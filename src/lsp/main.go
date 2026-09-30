@@ -156,7 +156,8 @@ func checks(root string, where []string) int {
 	}
 	// The same sweep the running server holds, so a caller with no editor reads the same list. [[spec/design_output/lsp#a-port-serves-the-list]]
 	found := []Finding{}
-	if len(where) == 0 || (len(where) == 1 && where[0] == ".") {
+	whole := len(where) == 0 || (len(where) == 1 && where[0] == ".")
+	if whole {
 		found = checker.Whole()
 	} else {
 		found = checker.Reads(where)
@@ -168,6 +169,10 @@ func checks(root string, where []string) int {
 		return 1
 	}
 	fmt.Println(string(out))
+	// The old answer stands printed, and the check module's sweep runs beside it. [[spec/tickets/lsp-rules-move-to-check]]
+	if whole {
+		shadowsCheck(root, found)
+	}
 	return 0
 }
 

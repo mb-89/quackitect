@@ -4,7 +4,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import said from "../../spec/config/level0.json" with { type: "json" };
+import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
+import file from "../../spec/config/level0.json" with { type: "json" };
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { partOf } from "../../src/scripts/pull-cap.js";
 import { stillHeld } from "../../src/scripts/pull-route.js";
@@ -17,6 +18,7 @@ const RULES = Array.from(
   (_, i) => `${i + 1}. Rule ${i + 1} says what the hand does next.`,
 ).join("\n");
 const LONG = `---\nkind: [[guidance]]\n---\n\n# Actionables\n\n${RULES}\n`;
+const said = underBuiltIns(schema, file);
 const CAP = { bytes: 1200, margin: 200 };
 const bytes = (text) => Buffer.byteLength(text, "utf8");
 
@@ -58,7 +60,7 @@ test("a hand-out past the margin splits, and the next pull on the same step prin
   const whole = parts.join("\n");
   assert.ok(parts.length > 1, "the hand-out splits");
   assert.match(whole, /40\. Rule 40 says what the hand does next\./);
-  assert.match(whole, /ticket pull a-child --pass/);
+  assert.match(whole, /index_ticket_pull with args \["a-child","--pass"/);
   const hold = JSON.parse(disk.read(HOLD));
   assert.equal(hold.step, "design/draft", "the step stays whole");
 
@@ -86,7 +88,7 @@ test("a refusal reprinting the notes stays under the margin, and names the verb 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(code, 1);
   assert.ok(bytes(said) <= CAP.bytes - CAP.margin);
-  assert.match(said, /branch guidance/);
+  assert.match(said, /index_branch_guidance/);
 });
 
 // [[spec/design_input/level-two#the-size-cap]]

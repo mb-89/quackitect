@@ -1,0 +1,9 @@
+{
+  "ticket": "a-seeded-ticket",
+  "path": "spec/tickets/a-seeded-ticket.md",
+  "step": "do",
+  "by": "anyone",
+  "hand": "box seeded",
+  "refused": 0,
+  "reads": []
+}

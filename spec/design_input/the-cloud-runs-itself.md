@@ -20,9 +20,6 @@ The asks, one to a line:
 - Boot a session off the repo alone.
 - Keep the old road working until the new one stands whole.
 
-This note rules [[spec/funnel/work-lands-through-pull-requests]], and that
-funnel note leaves with the child building the hand-over.
-
 # The dispatcher
 
 One routine fires every hour. Its prompt reads `run the dispatch skill`, and

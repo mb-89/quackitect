@@ -1,5 +1,5 @@
 ---
-description: "config / plan / everyCalls: sets plan.everyCalls to what you type."
+description: "config / plan / everyCalls: sets plan.everyCalls to what you type. The calls between two asks of the engine's three questions."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

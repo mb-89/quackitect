@@ -2,7 +2,7 @@
 // rows of the paths it names, a git index change marks the tracked rows again,
 // and a sweep compares every file against its row to catch what the events miss.
 // [[spec/design_output/index#a-change-moves-its-rows]]
-package main
+package index
 
 import (
 	"database/sql"

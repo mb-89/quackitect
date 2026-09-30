@@ -16,6 +16,15 @@ export function messageFor(said, shift = false) {
   return { kind: "press", key: said.key };
 }
 
+// A view button calls its action with every field of its row, keyed. [[spec/design_output/extension#the-views-section]]
+export function callFor(said, fields = []) {
+  if (!said?.calls) return undefined;
+  const input = {};
+  for (const one of fields)
+    if (one?.dataset?.field) input[one.dataset.field] = one.value;
+  return { kind: "call", calls: said.calls, input };
+}
+
 // [[spec/design_output/extension#the-filter-reads-an-expression]]
 export function matches(said, filter) {
   if (!filter) return true;
@@ -74,6 +83,14 @@ export function wire(root, post, view) {
     const fold = event.target?.closest?.(".fold");
     if (fold) {
       folded(root, fold.dataset?.fold === "open");
+      return;
+    }
+
+    const call = event.target?.closest?.(".call");
+    if (call) {
+      const fields = call.closest?.(".call-row")?.querySelectorAll?.(".field") ?? [];
+      const message = callFor(call.dataset, [...fields]);
+      if (message) post(message);
       return;
     }
 

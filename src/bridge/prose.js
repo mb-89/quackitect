@@ -9,6 +9,7 @@ import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import { pathsOf, wordsOf } from "../../.claude/skills/level0/lib/vocabulary.js";
 import { withContext, withoutFalsePast } from "../engine/tense.js";
+import { ALL, answerOf, keptOf, readsNew } from "../scripts/quack-topic.js";
 import { proseFaults } from "./write.js";
 
 const nlp = winkNLP(model);
@@ -58,7 +59,8 @@ function proseSpec() {
 export async function readsDraft(ask, box) {
   const where = String(ask?.path ?? "");
   const text = ask?.text;
-  if (!where) return said("This call names no path, and the rules read the kind a path names.");
+  if (!where)
+    return said("This call names no path, and the rules read the kind a path names.");
   if (typeof text !== "string") {
     return said("This call carries no text, so there is no draft to read.");
   }
@@ -70,6 +72,10 @@ export async function readsDraft(ask, box) {
 const said = (text) => ({ result: { result: text } });
 
 export function readsProse(box, text, found) {
+  // The Go vetoes answer where the prose slice reads new. [[spec/tickets/readers-take-the-go-topics]]
+  if (readsNew(box, "prose")) {
+    return withContext(text, answerOf(keptOf(box, text, found, ALL), "prose"));
+  }
   const caps = capsOf(box);
   let kept = withoutFalsePast(text, found);
   kept = withoutFalseLength(text, kept, caps);

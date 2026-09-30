@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,11 +114,109 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [projections-read-the-mirror, the-manager-becomes-a-module, reads-resolve-in-two-passes]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 788506af379e10011e75ee2a84cf677a96846b59
+    hash_after: 788506af379e10011e75ee2a84cf677a96846b59
+    inputs:
+      - name: ask
+        hash: 453697f99f171291
+        size: 1001
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 35ad34a273f86697bfdb84872414526dc4ce0fe4
+    hash_after: 35ad34a273f86697bfdb84872414526dc4ce0fe4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: dfe6ac5c2a96ea79
+        size: 6161
+    def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/model]]
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 7233c36db8620984b3439f3cfd22e8af3c3b232c
+    hash_after: 7233c36db8620984b3439f3cfd22e8af3c3b232c
+    inputs:
+      - name: ask
+        hash: 453697f99f171291
+        size: 1001
+      - name: [[spec/design_output/model]]
+        hash: 1717325681c1003e
+        size: 74654
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: eb09a917d66c5d3de6705d3283bb626ae06c53a6
+    hash_after: eb09a917d66c5d3de6705d3283bb626ae06c53a6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: dfe6ac5c2a96ea79
+        size: 6161
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-6
+    hash_before: ead86e5949ea71e8509aae7250949e580c9e1071
+    hash_after: ead86e5949ea71e8509aae7250949e580c9e1071
+    inputs:
+      - name: design/draft
+        hash: dfe6ac5c2a96ea79
+        size: 6161
+      - name: design/tests-red
+        hash: 852fe43a4ea64b36
+        size: 986
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 5ca0d4a145010e853ed9f0a8c996e06ad0f720a7
+    hash_after: 5ca0d4a145010e853ed9f0a8c996e06ad0f720a7
+    answered:
+      - name: lint
+        exit: 0
+        said: green, src/modules/config passes; green, src/q passes; green, src/modules/index passes
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: a412901a7f16a946c0ec98a3ed6a597d452d11e9
+    hash_after: a412901a7f16a946c0ec98a3ed6a597d452d11e9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/config passes; green, src/q passes; green, src/modules/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-meets-fake-modules.md:306:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 852fe43a4ea64b36
+        size: 986
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -155,38 +253,113 @@ A key then answers one value off one resolver, and a script's own values leave w
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One, q.CfgIn registers a derived key at `config/<key>`, typed by its built-in value, reading the absolute name `config/values`.
+Two, bind renames the key to `<instance>/config/<key>` and leaves `config/values` as it stands.
+Three, the key's run decodes its own entry of `config/values` into its type, and answers the built-in value where none stands.
+Four, a new option q.Shared() marks a shared key.
+Five, Catalog.Keys() lists each key with its instance, local name and shared mark.
+Six, an input tagged `,optional` passes the check with no writer, and reads its zero value.
+Seven, ProjectIn hands q.Optional() on to its files input, so a projection with no watch reads its default.
+Eight, q.GuardIn registers a fold whose step answers an error, so Land refuses loudly and keeps the state.
+Nine, the config module keeps its two projections, and adds the guarded fold `config/held` for contexts and overrides.
+Ten, an open names its handle, holder, parent and values, and carries the live leases its opener read.
+Eleven, the fold refuses an open that sets a key a live unrelated context holds, and names that holder.
+Twelve, the config module adds the derived `config/values`, reading both projections, `env/<name>`, `index/leases` and `config/held`, each optional.
+Thirteen, it walks Catalog.Keys() through the catalog it captured at registration.
+Fourteen, each key takes the override, then the innermost live context, then environment, local file, default file.
+Fifteen, a shared key reads the default file alone.
+Sixteen, a context whose lease part is missing from `index/leases` drops out, so readers take the layer below.
+Seventeen, the environment layer reads the variable src/config.EnvOf names for `<instance>.<key>`.
+Eighteen, the manager registers `index/leases`, and each tick commits the parts whose lease still holds.
+Nineteen, quack main registers the config module into q.Main beside the manager, after the wiring loads, whatever the wiring holds.
+Weighed: CfgIn only declares, and the config module writes one family `<instance>/config/<key>`. A family carries one type, so the check would lose the per-key type an input reads.
+Assumed: a client holding and renewing a context lease, and the quack cfg verbs, come in a later ticket.
+Assumed: an absent `index/leases` reads every context as live.
+Assumed: context and override values travel as JSON literals, as the command line hands text.
+Assumed: the default file and the local file key by instance and then key, as the model says.
+Assumed: the env layer reading env/<name> as one map waits on the family-map input tickets-becomes-a-module builds.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/wiring.go: CfgIn, registers a derived key reading config/values in place of a given
+src/q/wiring.go: bind, leaves an absolute input unrenamed while it still renames config/<key>
+src/q/q.go: derivedOf, reads the optional tag and the absolute mark off a field
+src/q/q.go: foldOf, gains a guarded twin whose step answers an error (GuardIn)
+src/q/check.go: inputFaults, skips NoName for an optional input with no writer
+src/q/projection.go: ProjectIn, hands q.Optional() on to its files/<path...> input
+src/q/wiring_test.go: TestOneTypeLoadsAsTwoInstancesEachWithItsConfig, seeds config/values in place of the key's own hand
+src/q/qtest/qtest.go: New, provides config/values as a seedable input beside cfg/<key...>
+src/modules/config/config.go: Registers, adds config/held and config/values beside the two projections
+src/modules/index/manager.go: Registers, adds index/leases
+src/modules/index/manager.go: ticks, commits the live leases after dog.Check
+src/modules/index/lease.go: Dog, gains Live, the parts whose lease still holds
+src/modules/index/manager_test.go: catalogued and TestIndexNamesNameEachNameItsProviderAndState, config/depth now reads as derived
+src/quack/main.go: main, registers config.Registers(q.Main) always, after wired
+src/quack/main.go: projected and load, config.Registers leaves the watch branch
+src/quack/described_test.go: TestEveryModuleDescribesWhatItExposes, registers config.Registers beside projected
+src/quack/manager_test.go: TestTheIndexLoadsTheManagerWithNoOtherModule, loads the config module too
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/modules/config/config_test.go: TestADeclaredKeyReadsItsInstanceConfigAsInput
+src/modules/config/config_test.go: TestAContextPastItsLeaseReadsTheLayerBelow
+src/modules/config/config_test.go: TestAnInnerContextWinsAndHandsBackOnExit
+src/modules/config/config_test.go: TestTwoUnrelatedContextsOnOneKeyRefuseNamingTheHolder
+src/modules/config/config_test.go: TestASharedKeyReadsTheDefaultFileAlone
+src/modules/config/config_test.go: TestAnOverrideWinsOverAContext
+src/q/wiring_test.go: TestAKeyReadsItsEntryOfTheResolvedValues
+src/q/catalog_test.go: TestAnOptionalInputWithNoWriterPassesTheCheck
+src/q/store_test.go: TestAGuardedFoldRefusesAndKeepsItsState
+src/modules/index/lease_test.go: TestALeasePastItsTermLeavesIndexLeases
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/wiring.go
+src/q/q.go
+src/q/check.go
+src/q/projection.go
+src/q/wiring_test.go
+src/q/catalog_test.go
+src/q/store_test.go
+src/q/qtest/qtest.go
+src/modules/config/config.go
+src/modules/config/config_test.go
+src/modules/index/manager.go
+src/modules/index/lease.go
+src/modules/index/lease_test.go
+src/modules/index/manager_test.go
+src/quack/main.go
+src/quack/described_test.go
+src/quack/manager_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened the ticket, the five model chapters, config.md, both config packages, wiring.go, q.go, store.go, check.go, projection.go, qtest, manager.go, lease.go, main.go and imports.go, checked each claim at its line, and ran go test on src/q and src/modules/index to see which tests stand red
+the callers list comes off greps over src for CfgIn, the cfg and config prefixes, projected, config.Registers, config.Tracked and the lease functions, plus the quack tests that call load and the manager's catalogued test
+each done_when line maps to one test: go test and the check each have a line, and each of the six case lines maps to one test in src/modules/config/config_test.go, which the q, qtest and lease cases back
 
 ## tests-red
 
@@ -195,26 +368,35 @@ A key then answers one value off one resolver, and a script's own values leave w
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/config/config_test.go src/q/wiring_test.go src/q/catalog_test.go src/q/store_test.go src/modules/index/lease_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/config/config_test.go
+src/q/wiring_test.go
+src/q/catalog_test.go
+src/q/store_test.go
+src/modules/index/lease_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over stubs: GuardIn and Shared in q, Resolved in wiring.go, Live on the dog, and the change kinds in the config module. The five context and override cases fail in one lands helper, since config/held names no fold yet. config/values falls under the projection family config/<path...> today, so the build registers it by its exact name. No test outside these changes state.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case: six config cases decide the six case lines, and go test and the check stand as commands
+the config cases seed files, env and index/leases through a writer of their own over qtest.Over, and reach no door
 
 # gate
 
@@ -223,8 +405,11 @@ A key then answers one value off one resolver, and a script's own values leave w
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- env-layer-reads-its-variables: the draft's assumption that the environment layer waits on a family-map input is stale, since tickets-becomes-a-module stands closed and input.family in src/q/q.go reads map[string]T over a family such as env/<name>. Build the environment layer in this change, and add a case to src/modules/config/config_test.go where an env/SE_ value beats the local file. TestASharedKeyReadsTheDefaultFileAlone seeds env yet passes with no environment layer at all, so no case decides the layer the ask names.
+- config-spells-the-env-name: step Seventeen reads the variable src/config.EnvOf names, and the onlyq analyzer keeps src/config out of a module. The config module spells the SE_ name itself, with a pointer at EnvOf, the way config.go already spells Tracked and Local.
 
 # implement
 
@@ -235,14 +420,19 @@ A key then answers one value off one resolver, and a script's own values leave w
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    go vet ./... && ./RUNME.sh branch test src/modules/config/config_test.go src/q/wiring_test.go src/q/catalog_test.go src/q/store_test.go src/modules/index/lease_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files the change touches are the ones the draft's callers list names, less qtest.go and wiring_test.go, which the key's optional input leaves unchanged
+- the change reaches no door: the environment arrives as the env/<name> input, and the leases as index/leases
+- each function carries a pointer at the model section of the approach it implements
+- EnvOf and the file names each stand in one place, and the module's copies point at src/config and folders.js
 
 ## tests-green
 
@@ -251,26 +441,33 @@ A key then answers one value off one resolver, and a script's own values leave w
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/modules/config/config_test.go src/modules/config/env_test.go src/q/wiring_test.go src/q/catalog_test.go src/q/store_test.go src/modules/index/lease_test.go src/quack/described_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each config key now resolves off its layers. `q.CfgIn` registers a key as a derived name, which reads its own entry of `config/values` and answers its built-in value where none stands. The config module adds the guarded fold `config/held` for contexts and overrides, and the derived `config/values`. That name walks the catalog's keys, and takes the override, then the innermost live context, then the `SE_` variable, then the local file, then the default file. A shared key reads the default file alone. The manager commits `index/leases`, and a context whose holder holds no lease drops out. The environment layer lands here, not in a later ticket, since `env/<name>` reads as one map today. Departures from the draft: an empty `index/leases` reads every holder live, since the manager registers it empty; `qtest.New` provides no `config/values`, because the key's input is optional; an inner context wins by opening last. The eight cases of `the-index-meets-fake-modules` stay red, and that ticket carries them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's callers list names, less qtest.go and wiring_test.go
+- the change reaches no door, since the environment and the leases arrive as inputs
+- each function carries a pointer at the model section it implements
+- EnvOf and both file names stand in one place, and each copy points at its owner
 
 # accept
 
@@ -295,3 +492,8 @@ A key then answers one value off one resolver, and a script's own values leave w
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- `env-layer-reads-its-variables` folds into this change. The environment layer sits inside `config/values`, so it lands with step Twelve, not after it.
+- The draft's last assumption no longer holds: `input.family` in `src/q/q.go` reads `env/<name>` as one map today.
+- `TestAnEnvValueBeatsTheLocalFile` in `src/modules/config/config_test.go` joins the red cases, and step Seventeen turns it green.
+- Step Seventeen names the variable through `EnvOf` in `src/modules/config/config.go`, which `config-spells-the-env-name` adds.

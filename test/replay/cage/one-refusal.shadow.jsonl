@@ -1,0 +1,2 @@
+{"line":3,"stamp":"2026-09-29T12:00:02Z","event":"tool.call","tool":"Bash","old":"refuse","new":"pass"}
+{"line":6,"stamp":"2026-09-29T12:00:05Z","event":"classic.Stop","old":"hold","new":"pass"}

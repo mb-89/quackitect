@@ -1,0 +1,6 @@
+{"at":"2026-09-29T12:00:00Z","level":"info","kind":"bridge","said":"the server stands at /tree"}
+{"at":"2026-09-29T12:00:01Z","level":"debug","kind":"hook","said":"tool.call Read /tree/README.md","event":"tool.call","tool":"Read","file_path":"/tree/README.md","answer":"{\"pass\":true}","text":"{\"e\":{\"tool\":\"Read\",\"file_path\":\"/tree/README.md\",\"session_id\":\"s1\"},\"origin\":null}"}
+{"at":"2026-09-29T12:00:02Z","level":"debug","kind":"hook","said":"tool.call Bash git push --force","event":"tool.call","tool":"Bash","command":"git push --force","answer":"{\"result\":{\"deny\":\"level zero refuses a force push\"}}","text":"{\"e\":{\"tool\":\"Bash\",\"command\":\"git push --force\",\"session_id\":\"s1\"},\"origin\":null}"}
+{"at":"2026-09-29T12:00:03Z","level":"info","kind":"shadow","said":"cage in shadow: an earlier row","slice":"cage"}
+{"at":"2026-09-29T12:00:04Z","level":"debug","kind":"hook","said":"prompt.submit","event":"prompt.submit","chars":"9","answer":"{\"pass\":true}","text":"{\"e\":{\"text\":\"carry on\",\"session_id\":\"s1\"},\"origin\":null}"}
+{"at":"2026-09-29T12:00:05Z","level":"debug","kind":"hook","said":"classic.Stop","event":"classic.Stop","answer":"{\"needs\":\"reply\"}","text":"{\"e\":{\"session_id\":\"s1\"},\"origin\":null}"}

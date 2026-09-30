@@ -7,6 +7,7 @@ import { onDesk } from "../../.claude/skills/level0/lib/cloud.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { checkNote } from "../../.claude/skills/level0/lib/schema.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { callOf } from "./tool-call.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./pull-spawn.js";
 
@@ -74,6 +75,7 @@ import {
 import { NOTES, schemasHere } from "./ticket.js";
 
 export * from "./pull-chapter.js";
+export * from "./pull-children.js";
 export * from "./pull-escalate.js";
 export * from "./pull-hand.js";
 export * from "./pull-route.js";
@@ -102,7 +104,7 @@ export function pull(it, argv) {
       `ticket pull runs on ${TRUNK} or a work branch, and this is ${branch}.`,
     );
     console.error(
-      `Run ./RUNME.sh ticket pull from ${TRUNK}, which hands out work there.`,
+      `Call ${callOf("ticket", "pull")} from ${TRUNK}, which hands out work there.`,
     );
     return 2;
   }
@@ -124,9 +126,11 @@ export function pull(it, argv) {
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
   // A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-joins-the-queue]] [[spec/tickets/the-todo-road-stands-first]]
   // A pull naming the working item itself takes that ticket, because the shell door wants it named there first. [[spec/design_output/pull#the-hand-out]]
-  const todo =
-    held || verdict.said ? "" : inHand({ disk: it.disk, root: it.root }).todo;
-  if (todo && todo !== name) {
+  const working = inHand({ disk: it.disk, root: it.root }).todo;
+  const todo = held || verdict.said ? "" : working;
+  // A helper serves the session whose plan it reads, so it skips the wait, and one naming nothing asks for the working item. [[spec/tickets/helpers-pull-past-plans]]
+  const wanted = name || (as && !held && !verdict.said ? working : "");
+  if (todo && todo !== name && !as) {
     say(WAIT, [
       `the todo ${todo} stands in hand, so the pull hands nothing else out.`,
       "Finish it, and take it off the plan, then pull again.",
@@ -136,16 +140,25 @@ export function pull(it, argv) {
   // A name on trunk that is a group takes its branch on a cloud box, and a desk refuses it. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
-  const asking = Boolean(name) && !named && !verdict.said && !held;
-  // A ticket a verb mints for this session passes the queue, and so does a person's hand or the owner's word. [[spec/design_output/config#the-engine-controls]]
-  if (asking && it.binding === QUEUE && name !== it.minted && !byPerson(it, took)) {
-    console.error(`${name} stands behind the queue, because this session binds to it.`);
+  const asking = Boolean(wanted) && !named && !verdict.said && !held;
+  // A ticket a verb mints for this session passes the queue, and so does a person's hand, the owner's word, or a helper's pull of the ticket the plan works. [[spec/design_output/config#the-engine-controls]]
+  const helps = Boolean(as) && wanted === working;
+  if (
+    asking &&
+    it.binding === QUEUE &&
+    wanted !== it.minted &&
+    !helps &&
+    !byPerson(it, took)
+  ) {
     console.error(
-      "Run ./RUNME.sh ticket pull with no name, and take what it hands you.",
+      `${wanted} stands behind the queue, because this session binds to it.`,
+    );
+    console.error(
+      `Call ${callOf("ticket", "pull")} with no name, and take what it hands you.`,
     );
     return 2;
   }
-  who.wanted = asking ? name : "";
+  who.wanted = asking ? wanted : "";
   if (!named && (verdict.said || (name && held)))
     return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
@@ -178,7 +191,7 @@ function closedGroup(it, group) {
 function groupDone(group) {
   say(DONE, [
     `${group} stands closed, so work/${group} takes no more work.`,
-    `Run ./RUNME.sh branch done, then ./RUNME.sh ticket pull from ${TRUNK}.`,
+    `Call ${callOf("branch", "done")}, then ${callOf("ticket", "pull")} from ${TRUNK}.`,
   ]);
   return 0;
 }
@@ -329,7 +342,7 @@ export function handBack(it, who, name, verdict) {
   const held = who.held;
   if (!held) {
     say(REFUSED, [
-      "nothing stands in your hand. Run ./RUNME.sh ticket pull to take a leaf.",
+      `nothing stands in your hand. Call ${callOf("ticket", "pull")} to take a leaf.`,
     ]);
     return 1;
   }
@@ -450,7 +463,7 @@ export function handBack(it, who, name, verdict) {
   const fails = verdict.said === "fail";
   const answered =
     found.length || becomes ? [] : commandsRun(it, leaf, chapter, fails ? [] : found);
-  // A final gate runs every command field of the route, and the record keeps each answer. [[spec/design_output/pull#the-final-acceptance]]
+  // A final gate runs every command field of the leaves before it, and the record keeps each answer. [[spec/design_output/pull#the-final-acceptance]]
   if (leaf.final && !becomes && !found.length)
     answered.push(...routeRun(it, one, leaf, fails ? [] : found));
   found.push(...handFaults(it, one, leaf, who.hand, held));
@@ -476,30 +489,27 @@ export function handBack(it, who, name, verdict) {
   return passed(it, who, one, leaf, held, answered, { stays: asksBless(leaf) });
 }
 
-// Every command field the route's other leaves hold a line under, run as the leaf's own run does. [[spec/design_output/pull#the-final-acceptance]]
+// Every command field the leaves before the gate hold a line under, run as the leaf's own run does. A leaf past the gate, a retro's among them, runs its own when the route reaches it, so a line an earlier round wrote there waits. [[spec/design_output/pull#the-final-acceptance]]
 function routeRun(it, one, leaf, found) {
-  return leaf.leaves
-    .filter((other) => other.path !== leaf.path)
-    .flatMap((other) => {
-      const chapter = chapterOf(one.text, other.path);
-      const evidence = [other.said.evidence ?? []]
-        .flat()
-        .filter((field) => String(field?.form) === "command")
-        .filter((field) =>
-          String((chapter.fields.get(field.name) ?? [])[0] ?? "").trim(),
-        )
-        // A red pass reruns expecting its cases green, since the green pass after it turns those cases green. [[spec/design_output/pull#the-final-acceptance]]
-        .map((field) =>
-          String(field.expects) === RED ? { ...field, expects: GREEN } : field,
-        );
-      if (!evidence.length) return [];
-      return commandsRun(it, { path: other.path, evidence }, chapter, found).map(
-        (ran) => ({
-          ...ran,
-          name: `${other.path}/${ran.name}`,
-        }),
+  const at = leaf.leaves.findIndex((other) => other.path === leaf.path);
+  return leaf.leaves.slice(0, at < 0 ? leaf.leaves.length : at).flatMap((other) => {
+    const chapter = chapterOf(one.text, other.path);
+    const evidence = [other.said.evidence ?? []]
+      .flat()
+      .filter((field) => String(field?.form) === "command")
+      .filter((field) => String((chapter.fields.get(field.name) ?? [])[0] ?? "").trim())
+      // A red pass reruns expecting its cases green, since the green pass after it turns those cases green. [[spec/design_output/pull#the-final-acceptance]]
+      .map((field) =>
+        String(field.expects) === RED ? { ...field, expects: GREEN } : field,
       );
-    });
+    if (!evidence.length) return [];
+    return commandsRun(it, { path: other.path, evidence }, chapter, found).map(
+      (ran) => ({
+        ...ran,
+        name: `${other.path}/${ran.name}`,
+      }),
+    );
+  });
 }
 
 // [[spec/design_output/pull#the-hand-back-refused]]

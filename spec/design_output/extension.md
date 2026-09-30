@@ -342,8 +342,9 @@ the keys that program needs, and the declaration carries them beside the
 
 The hook stands before the log in the agent control, and it is a `process`
 widget: a button for a program the extension itself runs. A click starts the
-server behind the bridgehead as a child of the extension, and a click on a
-running one kills it. Shift and click starts it under the editor's debugger,
+server behind the bridgehead apart from the window, through the proc door's `respawn`. A
+click on a running one stops it over the wire. The server outlives the
+window, and the next window adopts it. Shift and click starts it under the editor's debugger,
 through the launch config the declaration names. The light says which: dark
 for nothing, green for the server, amber for the server under the debugger.
 
@@ -361,14 +362,13 @@ server. For details, see
 
 ## The light follows the server
 
-A server restarts itself when its code moves, and the child the button starts
-ends there. A person or an agent starts one by hand too. So the light reads the
-server, and no child alone:
+A server restarts itself when its code moves, and a person or an agent starts
+one by hand too. So the light reads the server, and no start alone:
 
 | what happens | what the light does |
 |---|---|
 | a line lands in `.se/.log/serve.log`, which every start writes | asks `/health`, takes a server that answers, and drops an adopted one that answers nothing |
-| the button's own child ends | goes dark, and asks again after the respawn's grace |
+| the button's own start falls inside its window | goes dark, and a warning names the log |
 | a debug session ends | goes dark, the way the debugger says |
 
 `rechecks` in `src/extension/editor-process.js` holds it, and one watch on the
@@ -634,7 +634,7 @@ counts, the way [[spec/design_output/pull#the-hand-rule]] reads it.
 
 ## A button runs the pull
 
-Each button runs `ticket pull` through `src/scripts/cli.js` of the method, as a
+Each button runs `pull` through `src/scripts/verbs/ticket.js` of the method, as a
 child of the extension:
 
 | the button | the line |
@@ -651,6 +651,23 @@ of [[spec/design_output/pull#the-answers]] stands in a notification, and a
 refusal takes the warning colour. The whole answer stands in the output
 channel `quackitect`. Then the buttons draw again, and a change under
 `.se/.runtime/hold` draws them too.
+
+## The views section
+
+The sidebar draws one section for each base file under `spec/views`, below the
+groups. The base file names what shows. The catalog says how each thing reads.
+For the keys, see [[spec/design_output/model#views]].
+
+| part | reads off |
+|---|---|
+| the badge and its icon | the `index/names` row of the name under `badge` |
+| a button's label, doc and icon | the `index/actions` row of its action |
+| a form's fields | the input fields of that row, where the button carries `edits: form` |
+
+The index door in `src/extension/editor-index.js` reads both rows over `/v1`,
+at the port the index's standing file names. A click posts the kind `call`, and
+the door posts the action with the fields of its row. Where no index stands,
+each section draws its base names alone, and the groups above stand whole.
 
 ## The child names no harness
 

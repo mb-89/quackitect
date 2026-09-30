@@ -9,7 +9,9 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/fs"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -44,5 +46,26 @@ func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
 func writeFile(path string, data []byte, mode fs.FileMode) error {
 	return os.WriteFile(path, data, mode)
 }
+func appendFile(path string, data []byte) error {
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return err
+	}
+	if _, err := file.Write(data); err != nil {
+		file.Close()
+		return err
+	}
+	return file.Close()
+}
 func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
 func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
+
+// One JSON post to the index's door, answering the body it sends back. [[spec/design_output/tui#the-work-tab]]
+func postJSON(url string, body []byte, wait time.Duration) ([]byte, error) {
+	got, err := (&http.Client{Timeout: wait}).Post(url, "application/json", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	defer got.Body.Close()
+	return io.ReadAll(got.Body)
+}

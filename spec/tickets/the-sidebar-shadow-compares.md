@@ -1,0 +1,435 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
+      - name: change
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
+process: [[spec/processes/standard]]
+process_hash: 22b42ea1501e8967
+group: sidebar-lands-in-shadow
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 48956a6421ee6e14f592483bcb1ee3567a91647d
+    hash_after: 48956a6421ee6e14f592483bcb1ee3567a91647d
+    inputs:
+      - name: ask
+        hash: eecebd8b5f500ddc
+        size: 630
+    def: dfe8a19a676f7573
+  - step: design/draft
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: 4ac3362d2168bc43594de43675cede76e3c13fb4
+    hash_after: 4ac3362d2168bc43594de43675cede76e3c13fb4
+    inputs:
+      - name: ask
+        hash: eecebd8b5f500ddc
+        size: 630
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: a2b28af8f5ccde36d5e372655891f9bc16ced713
+    hash_after: a2b28af8f5ccde36d5e372655891f9bc16ced713
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f9fe69c7c1ba8cd3
+        size: 2597
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d85821f54410d · claude-code-remote · helper-4
+    hash_before: fbc38f72d540a5c6925c88dd76d2035eb703a826
+    hash_after: fbc38f72d540a5c6925c88dd76d2035eb703a826
+    inputs:
+      - name: design/draft
+        hash: f9fe69c7c1ba8cd3
+        size: 2597
+      - name: design/tests-red
+        hash: 06813455cd75e77a
+        size: 858
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: ec5b9f826223cbb13f2736468513682d6d821de8
+    hash_after: ec5b9f826223cbb13f2736468513682d6d821de8
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d85821f54410d · claude-code-remote
+    hash_before: f3e6e65e9007957077058a38214a1627292630d6
+    hash_after: f3e6e65e9007957077058a38214a1627292630d6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 2 file(s); green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "src/quack/main.go:202:42: MagicNumber: 3 carries a meaning here. Name it in the constants block at the top of this file,"
+    inputs:
+      - name: design/tests-red
+        hash: 06813455cd75e77a
+        size: 858
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
+---
+
+# Ask
+
+from: handover
+
+The sidebar weighs the views section against the old sidebar while the slice `migration/config/slices/sidebar` reads shadow. Each place the two draw apart writes a `shadow` row to the session log. So the owner reads every mismatch before the old sidebar retires.
+
+Without it the two stand side by side with nothing weighing them, and the switch-over flips blind.
+
+- `go test ./src/modules/migration` decides that the migration module declares the slice, built-in old
+- a case under `test/level0` reads a `shadow` row for a badge the two paths draw apart, and none under old
+- `./RUNME.sh check` exits 0
+
+view: none
+
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+<!-- the form is verdict -->
+
+pass: the ask carries the group brief, the shadow row on each mismatch and the slice key `migration/config/slices/sidebar`, in the brief's words
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+The migration module declares the slice `sidebar`, built-in old, beside `window`. While it reads shadow, each draw of the sidebar weighs the old groups against the views section, and writes a `shadow` row for each pair that reads apart.
+
+| pair | old side | new side |
+|---|---|---|
+| a badge | the count of the cell whose `counts` names a value | the badge value off `index/names` for that name |
+| a button | the help and icon of the cell `work.pull` | the doc and icon of the action `work/pull` |
+
+A cell key pairs with the action whose name swaps its dot for a slash.
+
+| part | file | what changes |
+|---|---|---|
+| the slice | `src/modules/migration/migration.go`, `slices` | the key `sidebar`, built-in old, with the three modes |
+| the compare | `src/extension/lib/views-shadow.js`, new, `apartOf(groups, views, names)` | one line a pair that reads apart, and none where the pairs agree |
+| the rows | `src/extension/sidebar.js`, `html` | under shadow, each new line writes one row through the logbook: kind `shadow`, slice `sidebar` |
+
+What I weigh and assume:
+- The key follows its siblings as `migration.sidebar`, so it reads `migration/config/sidebar`. The brief's `slices/` segment names no key standing today.
+- A line told once stays quiet for the session, as `tell` in `src/tui/work/shadow.go` keeps it.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- `src/extension/sidebar.js`, `html`, which draws both paths and calls the compare
+- `src/modules/migration/migration.go`, `Registers`, which reads `slices`
+- `spec/config/level0.schema.json`, which `quack schema --write` writes off the declaration
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- `src/modules/migration/migration_test.go`, `TestTheSidebarSliceStandsBuiltInOld`
+- `test/level0/views-shadow.test.js`, `a badge the two paths count apart reads as one line`
+- `test/level0/views-shadow.test.js`, `a button whose help and icon agree reads no line`
+- `test/level0/sidebar-views.test.js`, `under shadow a mismatch writes one shadow row, and under old none`
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first draft, so no earlier review names a finding
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- `src/modules/migration/migration.go`
+- `src/modules/migration/migration_test.go`
+- `src/extension/lib/views-shadow.js`
+- `src/extension/sidebar.js`
+- `test/level0/views-shadow.test.js`
+- `test/level0/sidebar-views.test.js`
+- `spec/config/level0.schema.json`
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- every file the approach names stands opened, among them `shadow.go`, `migration.go`, `sidebar.js` and the logbook
+- the callers come off a search for `slices`, `html` and `WriteShadow`
+- each done line meets a test: the slice case, the row case, and the check
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh test test/level0/views-shadow.test.js test/level0/sidebar-views.test.js src/modules/migration
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- test/level0/views-shadow.test.js
+- test/level0/sidebar-views.test.js
+- src/modules/migration/migration_test.go
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+The slice case fails, since no slice names the sidebar. The two compare cases fail against the stub, and the case where the pairs agree passes at once. The sidebar case fails on its first assertion, since no row reads shadow. What surprises me: the compare takes the base files and the catalog, the reads the sidebar holds at a draw, in place of the drawn views the draft names.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the first done line meets the slice case, the second the sidebar case, and the check is a checkpoint at tests-green
+- the cases run over the fake disk and a fake index door, and the Go case over the slice list
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
+- the approach answers the ask: the slice beside window in src/modules/migration/migration.go, the compare in src/extension/lib/views-shadow.js, and the rows through the logbook in src/extension/sidebar.js html, whose rowOf in .claude/skills/level0/lib/log.js carries kind shadow and slice sidebar as frame.WriteShadow writes them
+- each done_when line meets a test: TestTheSidebarSliceStandsBuiltInOld the first, the shadow case in test/level0/sidebar-views.test.js the second, and the check a checkpoint at tests-green; all three cases fail on their own assertion today, and the agreeing pair passes
+- the key reads migration/config/sidebar, beside its siblings, where the ask names migration/config/slices/sidebar; the draft names the call, and the test seeds migration.sidebar, so it stands
+- the compare takes groups, bases and catalog as the red test calls it, where the draft names views and names; the builder follows the test
+- size leaves out the three tracked projections .claude/commands/se-config-migration-sidebar-old.md, -shadow.md and -new.md, which the new slice writes as its siblings carry; the builder runs ./RUNME.sh project beside quack schema --write
+- the shadow case reads the real spec/config/level0.schema.json, so it greens only once quack schema --write lands the key
+- the work.pull cell and the pull action in src/modules/verbs/actions.go agree on help and icon today, so the button pair writes no row in the tree as it stands
+
+# implement
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+./RUNME.sh lint src/extension/sidebar.js src/extension/lib/views-shadow.js src/modules/migration/migration.go
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the three config projections the gate names
+- the compare runs over plain rows, and the sidebar case runs over the fake disk and a fake index door
+- each new function carries a pointer at this ticket, which holds the approach
+- the slice key stands once in migration.go, and the sidebar reads it as migration.sidebar off the schema
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+./RUNME.sh test test/level0/views-shadow.test.js test/level0/sidebar-views.test.js src/modules/migration
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The migration module declares the slice sidebar, built-in old, with the three modes. While it reads shadow, each draw of the sidebar weighs the old groups against the views section. apartOf in src/extension/lib/views-shadow.js pairs a badge count with its value off index/names, and a button cell with its action off index/actions. Each pair that reads apart writes one shadow row naming the slice sidebar, once a session. So the owner reads every mismatch before the old sidebar retires.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the three config projections and the size golden the schema moves
+- the sidebar case runs over the fake disk and a fake index door
+- each new function points at this ticket
+- the slice key stands once in migration.go
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
