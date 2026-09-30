@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 30e9911a371b1eed
         size: 752
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: d3f41bba1ee9519587921f04a49c08d42628c0b9
+    hash_after: b97cb182cd86baf4027df8f4c0fe42e00c5a8192
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/index-reads-loaded-projections.md:296:153: Characters: The character / stands outside the set a paragraph a"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -302,14 +311,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft and the gate finding name, and past them the cloud guard in copilot-runtime.js, which read the branch verb as words and now reads its program too, and four design notes naming cli.js as live
+- the programs reach the outside through cli-doors.js as cli.js did, and every test the change touches runs over the fakes it ran over before
+- each new file opens on a header naming [[spec/tickets/cli-js-leaves]], the approach it implements
+- the verb table stands once, in Commands in src/modules/verbs/tree.go; TreeVerbs reads it less the topics, the JavaScript holds no usage line, and the lens and the hook each spell the programs folder with a comment naming VERBS in verb-run.js as its owner
 
 ## tests-green
 
