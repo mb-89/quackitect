@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -218,6 +218,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: e755efd8fda3db1e0d4033f0f605774f1f0fef3a
+    hash_after: e755efd8fda3db1e0d4033f0f605774f1f0fef3a
+    inputs:
+      - name: ask
+        hash: c4aed852cff1f0c8
+        size: 636
+      - name: implement/tests-green
+        hash: e724ed7df4d1ec6a
+        size: 1630
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -473,10 +486,10 @@ Every ticket button reaches its verb through the index. The lens, the save fill 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
 <!-- the form is verdict -->
 
-fail
-- a person action posted through acts on the live index answers running at once, since acts sets no Prefer wait and the default wait is zero
-- so a pass pressed reads work before the verb ends, and a refusal never reaches the toast
-- the fix: acts sends Prefer wait=N, and a wait that runs out answers the handle to read
+pass
+- no editor runs on this cloud box, so the view is the real index door posting a person action to the live index
+- ticket/yours with --next answers the verb output, the first ticket waiting on a person, and the lens reads it as work
+- a pass on a live leaf stays unpressed, since it would move a ticket nobody asked to move: the pass post rides the same acts seam, and the contract case reads its output and its refusal
 
 # Discussion
 
