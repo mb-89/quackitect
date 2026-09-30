@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,7 +115,17 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-depends_on: ["a-down-index-refuses-calls", "cage-stop-marks-port"]
+depends_on: ["a-down-index-refuses-calls", "cage-stop-marks-port", "copilot-answers-off-the-door", "the-level0-tools-leave-the-bridge", "the-brief-leaves-the-bridge", "the-start-road-starts-the-index"]
+record:
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: 5c160bbf01e4d9155fcfb7b696d25696eae9a850
+    hash_after: c9ba833e5c8477ef3ca65a6bd3255a4e3f96d99a
+    inputs:
+      - name: ask
+        hash: f6037bc7affa843e
+        size: 247
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,64 @@ A second cage drifts from the first.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The server leaves last, once four ports move its live duties to the Go side. Today pid 3210 on this box runs src/bridge/server.js, and it serves every level zero tool, the brief and every event outside DOORED in cage.js. So a delete now leaves a session with no rule and no tool.
+
+1. copilot-answers-off-the-door moves Copilot's hooks to the hooks door, and copilot-runtime.js leaves with its case.
+2. the-level0-tools-leave-the-bridge moves every tool of the TOOLS table to the Go side.
+3. the-brief-leaves-the-bridge moves the brief, the canary debt and every event of the DOORS table to the hooks door.
+4. the-start-road-starts-the-index repoints every start road, the stub, the serve verb, the extension and the reload watcher at the index.
+5. This ticket then deletes src/bridge/server.js and src/doors/fake/bridgehead.js, whose fake nothing calls. It deletes the cases whose subject is the server, and trims the design notes naming it.
+
+What I weigh: one ticket carrying all five buries each port in one review, and a port landing alone stands testable. I assume each port keeps the bridge serving until the port lands, so the tree works at every commit.
+
+The files this ticket touches:
+
+- src/bridge/server.js, deleted
+- src/doors/fake/bridgehead.js, deleted
+- test/contract/server-loads.test.js, wire.test.js, stop-dry-run.test.js and stop-cases.test.js, deleted
+- test/level0/server-crash, restart-box, reload, serve, cli-serve, box-keys, awake-box and cage-shadow tests, deleted
+- test/contract/bridge-server-leaves.test.js, new
+- src/modules/hooks/stops.go and cage.go, comments
+- spec/design_output/level0.md, migration.md and copilot.md
+- src/quack/testdata/tree.golden.json
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/bridge/server.js: the whole module, which leaves
+- src/doors/fake/bridgehead.js: fakeBridgehead, which leaves
+- src/modules/hooks/stops.go: the header comment naming server.js
+- src/modules/hooks/cage.go: the comments naming server.js
+- spec/design_output/level0.md, migration.md and copilot.md: the sections naming the server
+- src/quack/testdata/tree.golden.json: the tree golden, regenerated
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/bridge-server-leaves.test.js: git ls-files names neither the bridge server nor the copilot runtime
+- test/contract/bridge-server-leaves.test.js: no start road, stub or verb names src/bridge/server.js
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the helper opened server.js, cage.js, level0.js, start.js, copilot.js and each caller, and I checked the live process and doors myself
+- the callers list names what this ticket touches, and the four children carry the rest
+- the first done line meets the ls-files case, and the second the check
 
 ## tests-red
 
