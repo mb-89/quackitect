@@ -337,3 +337,5 @@ The tool registration moves to the Go tool list, which the hook already register
 <!-- what anybody adds, at any time, on this ticket -->
 
 The tool describe event and the agent answered event read the bridge's tool and review state, so this port answers both off the door too. The split of [[spec/tickets/the-brief-leaves-the-bridge]] leaves them here.
+
+The flip that wires the edits module drops patch, replace and undo from `READ_TOOLS` in `.claude/skills/level0/hooks/level0.js` in the same change, so each edit tool registers once. [[spec/tickets/flip-drops-read-tools]] becomes this line, since a drop before the flip leaves the three tools served nowhere.

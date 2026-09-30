@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,13 +24,20 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: go-cage-switches-over
 parent: edit-tools-answer-in-go
 depends_on: ["edit-tools-answer-in-go"]
+record:
+  - step: do
+    hand: box d89586721a117 · claude-code-remote
+    hash_before: 34ebf7185be4f4e3bbaf0d074402b9f1a4ab8b9b
+    hash_after: 34ebf7185be4f4e3bbaf0d074402b9f1a4ab8b9b
+reason: became
+successors: [level0-tools-leave-the-bridge]
 ---
 
 # Ask
