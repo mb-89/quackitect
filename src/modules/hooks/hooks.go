@@ -142,6 +142,11 @@ type Settings struct {
 	// The user and the home folder the box answers, which the private delta reads. [[spec/tickets/cage-commit-guards-port]]
 	User string
 	Home string
+	// The stop hook set off, the holds the tooth lets pass in a row, the fill the handover comes due at, and the layer the binding reads off. [[spec/tickets/cage-stop-rules-port]]
+	StopOff      bool
+	MostInARow   int
+	HandoverAt   int
+	BindingLayer string
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]

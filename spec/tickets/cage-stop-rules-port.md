@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -132,6 +132,19 @@ record:
         hash: 29ccd1d3cec3f09e
         size: 761
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 2b754047a72b2317c0755f0882da1af01f75b138
+    hash_after: 2b754047a72b2317c0755f0882da1af01f75b138
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: 967bb22b1139c872
+        size: 4718
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -269,26 +282,42 @@ the replay line meets TestReplayLogAnswersEveryRecordedLog over the new logs, th
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/stops_test.go
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+`TestTheStopBlocksWhatTheBridgeBlocks` stands red on its own assertion in each case the bridge blocks, and green in each case it lets end. Today the door passes every Stop. The bridge twin `test/level0/stop-cases.test.js` passes every case over the live rules.
+
+The replay stands red on the four stop logs: the handover, the vote, a claim that falls, and a full update lacking its chapters.
+
+The surprises:
+
+- `holdsTurn` blocks only on a full update's shape, which the call-holds port left to the bridge. The shape is a chapter list in `spec/config/status.yaml` and a heading check, so this port carries it, and the gap the call-holds handover names closes here
+- the block text ends on the binding line, which stamps the moment the binding was first read. The table records the fake clock's instant as `now`, and the Go twin sets the door's clock to it. The fold keeps that moment
+- the owner prompt's demand refuses a stop call made before the prompt is paid, so the stop call case pays the prompt with a display first
+
+The scaffold adds `StopOff`, `MostInARow`, `HandoverAt` and `BindingLayer` to `Settings`, so the red tests build.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the replay line meets TestReplayLogAnswersEveryRecordedLog over stop-handover, stop-vote, stop-claims and stop-full-update, red now; the text line meets TestTheStopBlocksWhatTheBridgeBlocks, red in each block case; the check line stands a checkpoint the implement step answers with ./RUNME.sh check
+every door the tests reach has a fake: git through taughtGit, the clock through the door's Now, the tree through t.TempDir holding the live rules, and the index through q/qtest in doorOver; the bridge twin takes fakeDisk, fakeProc, fakeClock and fakeLog
 
 # gate
 

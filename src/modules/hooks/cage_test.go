@@ -165,6 +165,9 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 				reads := readsOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json")
 				replay.from.Git = taughtGit(reads.Git)
 				replay.from.Voice = taughtVoice(reads.Voice)
+				if len(reads.Live) > 0 {
+					replay.from.Root = stopTreeOf(t, stopTable{Live: reads.Live}, stopCase{Config: reads.Config, Files: reads.Files})
+				}
 			}
 			said, err := replay.ReplayLog(string(text), func(map[string]any) error { return nil })
 			if err != nil {
@@ -200,6 +203,10 @@ func boxOf(t *testing.T, at string) (Settings, bool) {
 type boxReads struct {
 	Git   map[string]string `json:"git"`
 	Voice []voiced          `json:"voice"`
+	// The live files, the config and the files a stop log's tree holds. [[spec/tickets/cage-stop-rules-port]]
+	Live   []string          `json:"live"`
+	Config map[string]any    `json:"config"`
+	Files  map[string]string `json:"files"`
 }
 
 func readsOf(t *testing.T, at string) boxReads {
