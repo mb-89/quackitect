@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -160,6 +160,39 @@ record:
         hash: 67bd0f62c86a8558
         size: 6048
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: 6475ea189f863e0b349f8587a73cbd69baf7446e
+    hash_after: 6475ea189f863e0b349f8587a73cbd69baf7446e
+    inputs:
+      - name: design/draft
+        hash: 7365711ecc8738d9
+        size: 4323
+      - name: design/tests-red
+        hash: 0a5858b2b4c9eb74
+        size: 1061
+      - name: [[spec/tickets/config-answers-keys-and-overrides]]
+        hash: 024425bb053a8083
+        size: 20286
+      - name: [[spec/tickets/the-sidebar-reads-v1]]
+        hash: 9feaf3494c9e4c93
+        size: 23517
+      - name: [[spec/tickets/the-sidebar-writes-through-actions]]
+        hash: d569e1d8c0e26cf0
+        size: 22109
+      - name: [[spec/tickets/the-lens-calls-actions]]
+        hash: bb26ad094b752a9d
+        size: 21775
+      - name: [[spec/tickets/the-lens-reads-v1]]
+        hash: b20a6afe64383a9d
+        size: 24078
+      - name: [[spec/tickets/go-cage-switches-over]]
+        hash: 3a226fd3193528d2
+        size: 6086
+      - name: [[spec/tickets/lsp-door-switches-over]]
+        hash: 67bd0f62c86a8558
+        size: 6048
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -298,8 +331,13 @@ What surprised me:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the spawn line meets test/contract/extension-spawns-no-verb.test.js, and the new window line meets test/level0/sidebar-writes.test.js, both green off closed children
+- the two red cases in test/level0/sidebar-views.test.js decide the slice move and the badge leaving
+- the draft's extension-reads-no-files.test.js falls away, since a literal grep meets `respawn(` in a file another group owns
+- the build drops the older shadow case and `views-shadow.js` with its test, as the callers list names
 
 # implement
 
