@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
+record:
+  - step: design/draft
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 559950a8fa50a4ed33a7c39e86a35bc710810963
+    hash_after: 2fda61bb40d775d2172c4006fc2eabb5f3ddba0e
+    inputs:
+      - name: ask
+        hash: 55e3dcccd4ae2c25
+        size: 276
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -145,32 +155,54 @@ The window stops computing a second copy of any value.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The ask splits into four pieces, each small enough to read whole, and this ticket takes the last one. Each piece is a child of this group, minted and open.
+
+- [[spec/tickets/v1-watch-streams-changes]]: the door answers `GET /v1/watch`, and the window gets its client. The JSON-RPC `changes` call is the window's only wake today, so the index client leaves only after this stands.
+- [[spec/tickets/the-work-tab-reads-v1]]: the work tab reads `work/rows` and `work/open-tasks` off `/v1`, and wakes on the watch. `workindex.go`, `runVerb`, `startIndex`, `NodeAt` and the `branch.js list --json` spawn in `workplaces.go` leave, since `work/rows` carries the places, the cloud flag and the todos.
+- [[spec/tickets/the-work-keys-call-actions]]: the keys post `work/place`, `tickets/flip-urgent`, `tickets/set-field` and `work/pull` to `/v1/actions`. The writes in `workplace.go` and `workedit.go` leave.
+- [[spec/tickets/the-log-tab-reads-v1]]: the log tab reads `log/rows` off `/v1`. `tail.go` and its `fsnotify` watcher leave.
+
+This ticket lands once the three before it close. `migration.window` in `spec/config/level0.json` reads `new`. The compares leave with the mode that runs them. `src/tui/work/shadow.go`, `src/tui/log/shadow.go` and `src/tui/frame/shadow.go` lose `Shadow`, `Check`, `Apart`, `BadgeApart` and `WriteShadow`, and `main.go` loses `windowMode` and the `Shadow` wiring. A draw function a piece moves onto the index path stays with that piece. The door keeps this ticket's front closed while it stands in hand, so its wait on the three rides here. The pull hands the pieces first by their own `depends_on`.
+
+Weighed: one ticket over the whole cutover spares three reviews. It costs a diff across three packages and the door, which nobody reads whole. Assumed: `/v1/watch` belongs to this group, since the design names it and the window's switch lands only on it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/main.go newModelOver, which hands each tab its Shadow
+- src/tui/main.go windowMode, which reads migration.window
+- src/tui/work/work.go Tab.Update and Tab.takes, which call Tab.check
+- src/tui/log/tab.go Tab, which calls Shadow.Check off its snapshot
+- src/tui/window_test.go, which reads the mode and the shadows the window holds
+- spec/config/level0.json migration.window, which the index and quack read
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/window_test.go TestTheWindowHoldsNoCompare: the window builds every tab with no compare
+- src/tui/window_test.go TestTheWindowModeReadsNew: migration.window reads new off the tracked config
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened on this branch: main.go, work.go, workplaces.go, workindex.go, door.go, log/tab.go, the three shadow.go files, registry/v1.go, index/actions.go and work/rows.go
+- the callers list names every caller git grep finds of Shadow, WriteShadow, windowMode and migration.window
+- each done_when line names its decider: git grep for the spawn string, and ./RUNME.sh check
 
 ## tests-red
 
