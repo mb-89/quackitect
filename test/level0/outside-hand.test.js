@@ -11,7 +11,6 @@ import { boxOf } from "../../src/bridge/server.js";
 import { registeredPort } from "../../src/bridge/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { verbs } from "../../src/scripts/cli.js";
 import { handRule } from "../../src/scripts/pull-hand.js";
 import { registerDirs } from "../../src/scripts/vehicle.js";
 import { work } from "../../src/scripts/work.js";
@@ -70,7 +69,10 @@ test("the guidance reading takes an empty map where nobody hands one", () => {
   assert.equal(typeof said, "object");
 });
 
-test("the work verbs and the command root stand after the change", () => {
+test("the work verbs and the check program stand after the change", async () => {
   assert.equal(typeof work, "function");
-  assert.equal(typeof verbs.check.run, "function");
+  assert.equal(
+    typeof (await import("../../src/scripts/verbs/check.js")).run,
+    "function",
+  );
 });

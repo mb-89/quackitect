@@ -316,7 +316,7 @@ index_here() {
 # [[spec/design_output/index#the-compiler-it-needs]]
 get_index() {
   say "  building the index"
-  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/quack) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here
@@ -538,7 +538,7 @@ fi
 # The survey names where each tool stands, and every caller reads it in place
 # of guessing. It runs where anything landed, and where the file is absent.
 if [ -n "$missing" ] || [ ! -f "$run/tools.json" ]; then
-  (cd "$root" && node src/scripts/cli.js tools >/dev/null) ||
+  (cd "$root" && node src/scripts/verbs/tools.js >/dev/null) ||
     say "  the survey wrote no tools.json under $run, so every caller guesses again." >&2
 fi
 

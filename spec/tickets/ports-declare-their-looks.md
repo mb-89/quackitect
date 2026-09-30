@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,11 +114,81 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [the-wiring-file-binds-ports]
+record:
+  - step: design/draft
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 37569899b2f7451ce68cda56c901050768699195
+    hash_after: 37569899b2f7451ce68cda56c901050768699195
+    inputs:
+      - name: ask
+        hash: 2224b695bf6460e9
+        size: 845
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e1c5ea2bd1 · claude-code-remote
+    hash_before: 231fdf5229e1f851fb72f9e379472f5676ef977a
+    hash_after: 231fdf5229e1f851fb72f9e379472f5676ef977a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q fails
+    inputs:
+      - name: design/draft
+        hash: fdd4f3f45b32d5c5
+        size: 2927
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 5151dd687ae0221266772493cef57f604ffd3e67
+    hash_after: 5151dd687ae0221266772493cef57f604ffd3e67
+    inputs:
+      - name: design/draft
+        hash: fdd4f3f45b32d5c5
+        size: 2927
+      - name: design/tests-red
+        hash: fc25582a6d83a8e0
+        size: 644
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 5e0ca1b3827c7d545b4c33c800b601b01653e60a
+    hash_after: 5e0ca1b3827c7d545b4c33c800b601b01653e60a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: b94c209a9a9c825afbc56be25d1ab0183a6e1a54
+    hash_after: b94c209a9a9c825afbc56be25d1ab0183a6e1a54
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "src/q/qtest/suite.go:75:48: MagicNumber: 6 carries a meaning here. Name it in the constants block at the top of this fil"
+    inputs:
+      - name: design/tests-red
+        hash: fc25582a6d83a8e0
+        size: 644
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -152,38 +222,70 @@ Every surface then reads one text off the registration, and no view or surface w
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Four pieces, following spec/design_output/model at a module is one file and the options.
+
+One, the options: src/q/q.go adds label, icon and looks to the registration, and the options q.Label, q.Icon and q.Looks beside q.Doc. A look is a named kind, type Look string, with the constants q.Count, q.Rows and q.State the options table names.
+
+Two, the fields: actionOf in src/q/action.go keeps the input type. A struct input answers one Field a exported field: its json name, its label tag and its doc tag. An input of another kind, such as a string, answers no fields.
+
+Three, the reading: a new src/q/looks.go adds type Presentation, holding Doc, Label, Icon, Looks and Fields, and Catalog.Presentation(name), which answers it off the registration. Every surface reads its text there.
+
+Four, the refusal: looks.go adds Catalog.Undescribed, which answers a fault of the new kind NoDoc for each registration with no doc and each action field with no doc tag, naming the registration's file and line and the field. Start in src/q/wiring.go appends these faults beside Load and Check.
+
+Weighed: the refusal runs in Start alone, against Check. Check runs under qtest, the door and the watchdog, so a doc fault there breaks every test catalog in the tree. Every production registration carries a q.Doc today, and nothing past the tests calls Start, so the refusal breaks the start cases alone. Assumed: an exposed name is every registration a module type holds, and a field is a field of an action's input. The output of an action answers requests, and carries no fields to describe, so the output tags wait for an action answering a typed result.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/q.go: registration, and the options Doc, Label, Icon and Looks
+src/q/action.go: actionOf, which keeps the input type
+src/q/wiring.go: Start, which appends the undescribed faults
+src/q/check.go: Kind, which gains NoDoc
+src/q/wiring_test.go: source and counter, which take a q.Doc
+src/q/start_test.go: labeller and the types of each start case, which take a q.Doc
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/q/looks_test.go: TestAPortCarriesItsLabelIconAndLook
+src/q/looks_test.go: TestTheStartRefusesAnActionWithNoDocNamingItsFileAndLine
+src/q/looks_test.go: TestTheStartRefusesAnInputFieldWithNoDocTag
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/q.go
+src/q/action.go
+src/q/check.go
+src/q/wiring.go
+src/q/looks.go
+src/q/looks_test.go
+src/q/wiring_test.go
+src/q/start_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened spec/design_output/model at a module is one file and the options, src/q/q.go, src/q/action.go, src/q/check.go, src/q/wiring.go Start and src/q/start_test.go, and checked each claim there
+the callers come off a grep for Start, Check and every registration outside src/q, which shows each production registration carrying a q.Doc
+each done_when line names its test: the three looks cases decide the port, the action and the field, and go test and the check decide the first and last
 
 ## tests-red
 
@@ -192,26 +294,31 @@ Every surface then reads one text off the registration, and no view or surface w
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/looks_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/looks_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over the stubs. The catalog presents no port, and the start answers a store for an action with no doc and for a field with no doc tag. The surprise: nothing past the tests calls Start yet, so the refusal meets the start cases alone. Their types source, counter and labeller take a q.Doc at implement.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a failing case: the port, the action and the field cases, and go test and the check as commands
+the cases run over a catalog and a wiring in memory, and reach no door
 
 # gate
 
@@ -220,8 +327,12 @@ Every surface then reads one text off the registration, and no view or surface w
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- action-outputs-carry-field-tags: the ask has output fields carry label and doc tags; the draft defers them because an action answers []Request, so a typed result and its field tags wait on a ticket of their own
+- the-check-refuses-undescribed-modules: the ask has the check refuse a missing description before a merge, and nothing past the tests calls q.Start, so a production module with no q.Doc passes the check; a test in a package importing every module runs Catalog.Undescribed over the full catalog
+- looks-reads-a-field-label: no case reads a field label off Presentation.Fields; the builder adds that assertion to the field case in place
 
 # implement
 
@@ -232,14 +343,19 @@ Every surface then reads one text off the registration, and no view or surface w
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/looks.go src/q/q.go src/q/action.go src/q/wiring.go src/q/looks_test.go src/q/wiring_test.go src/q/start_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, and no other past looks_test.go, which gains the field label case the gate asked for
+the cases run over a catalog and a wiring in memory, and reach no door
+looks.go carries the pointer at spec/design_output/model#the-options over each option and the Presentation it implements
+the fields, the options and the refusal stand in looks.go alone, and Start calls Undescribed there
 
 ## tests-green
 
@@ -248,26 +364,33 @@ Every surface then reads one text off the registration, and no view or surface w
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/looks_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The core takes a label, an icon and a look beside q.Doc, and an action keeps the fields of its struct input off their json, label and doc tags. Catalog.Presentation answers that one text for a name, and every surface reads it there. The start refuses a registration with no q.Doc, and an input field with no doc tag, naming the file, the line and the field. Output field tags wait on actions-answer-typed-results, because an action answers requests and no typed result. The check reading every production module for its doc waits on the-check-refuses-undescribed-modules.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, and looks_test.go gains the field label case the gate asked for
+the cases run over a catalog and a wiring in memory, and reach no door
+looks.go points at the options section of the model over each piece it implements
+the fields, the options and the refusal stand in looks.go alone, and Start calls Undescribed there
 
 # accept
 

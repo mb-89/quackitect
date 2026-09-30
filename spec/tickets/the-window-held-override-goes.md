@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -23,11 +24,28 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-step: do
 process: [[spec/processes/trivial]]
-process_hash: 05e53b89dab63152
+process_hash: 2b5ab398855a1aba
 group: tui-shell-lands-in-shadow
 parent: the-tickets-topic-lands
+record:
+  - step: do
+    hand: box d856db450bd7 · claude-code-remote
+    hash_before: 80a65d4a997a812f23b3e974ddb2b14209c895b6
+    hash_after: 80a65d4a997a812f23b3e974ddb2b14209c895b6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/work passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 0c7d250b2d9dce29
+        size: 176
+    def: b9df9de658bcf6e8
+reason: done
 ---
 
 # Ask
@@ -45,26 +63,32 @@ parent: the-tickets-topic-lands
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/tui/work
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The window stops reading held off the queue place. A ticket at place zero keeps the state the index answers, since the held rule stands in the tickets module alone. A todo row the index lacks still reads held at place zero.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches workplaces.go and its test alone, both in the ask
+- the index answer stands as the one reading of held, and the comment points at this ticket
+- no door is reached, so no fake is owed
 
 # Discussion
 

@@ -325,9 +325,9 @@ test("a move under two holds names no ticket", () => {
   assert.equal(JSON.parse(disk.read(join(folder, row.name))).ticket, "");
 });
 
-// The cli hands the rename its clock through a context of its own, and a name standing nowhere refuses before any write. [[spec/tickets/journal-the-rename-verb]]
-test("the cli's rename over a name standing nowhere refuses, and writes no journal", async () => {
-  const { renameHere } = await import("../../src/scripts/cli.js");
+// The rename program hands the rename its clock through a context of its own, and a name standing nowhere refuses before any write. [[spec/tickets/journal-the-rename-verb]]
+test("the rename program over a name standing nowhere refuses, and writes no journal", async () => {
+  const { renameHere } = await import("../../src/scripts/verbs/rename.js");
   const said = [];
   const was = console.error;
   console.error = (one) => said.push(String(one));

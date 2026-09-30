@@ -7,7 +7,6 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { verbs } from "../../src/scripts/cli.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import {
   aheadOnly,
@@ -229,10 +228,6 @@ test("reachedOf names each leaf up to the pointer, and each step the record name
     steps: ROUTE,
   };
   assert.deepEqual([...reachedOf(front)].sort(), ["design/draft", "do"]);
-});
-
-test("the command line's ticket entry names the route verb", () => {
-  assert.match(verbs.ticket.says, /\broute\b/);
 });
 
 test("a ticket standing nowhere is refused with exit 1, as JSON naming the folders", () => {

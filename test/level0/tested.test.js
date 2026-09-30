@@ -87,6 +87,14 @@ test("a module of the server no test names comes back", () => {
   assert.equal(found[0].rule, "EveryModuleTested");
 });
 
+// A deletion waits for the commit verb to stage it, and the check runs first. [[spec/tickets/twins-leave-misses-some-callers]]
+test("a module git tracks and the working tree deleted asks for no test", () => {
+  const tree = fakeTree({}, ["src/bridge/gone.js"]);
+
+  assert.deepEqual(everyModuleTested(tree), []);
+  assert.deepEqual(tree.paths(), []);
+});
+
 test("a module a test imports stands quiet", () => {
   const tree = fakeTree(
     {
@@ -325,6 +333,21 @@ test("the carried tests are the test paths the ticket's command lines name, and 
     "src/engine/queue/pick_test.go",
   ]);
   assert.deepEqual(tested.carriedIn(""), []);
+});
+
+// The engine writes a command field bare, so the door reads that line too. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a bare command line a leaf writes carries its test paths, and prose carries none", () => {
+  const ticket = [
+    "### tests",
+    "",
+    "./RUNME.sh branch test test/level0/one.test.js src/tui/two_test.go",
+    "",
+    "A line of prose names test/level0/prose.test.js.",
+  ].join("\n");
+  assert.deepEqual(tested.carriedIn(ticket), [
+    "test/level0/one.test.js",
+    "src/tui/two_test.go",
+  ]);
 });
 
 // [[spec/tickets/a-reorder-asks-a-test]]

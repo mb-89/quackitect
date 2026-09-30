@@ -5,8 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { resolve } from "node:path";
-import { testArgv } from "../../src/scripts/cli.js";
-import { expectedRed } from "../../src/scripts/red-list.js";
+import { testArgv } from "../../src/scripts/check-verb.js";
+import { expectedRed, redListOf } from "../../src/scripts/red-list.js";
 
 const TICKET = (record) => `---
 kind: [[ticket]]
@@ -68,6 +68,24 @@ test("the red list holds a ticket past tests-red, and drops it at tests-green", 
   );
 });
 
+// A reject inserts tests-red-2 with a list of its own, and the check leaves both lists out. [[spec/tickets/red-list-reads-inserted-leaves]]
+test("the red list holds the files an inserted tests-red-2 names", () => {
+  const text = TICKET(`${PAST_RED}  - step: design/tests-red-2\n    hand: box one\n`)
+    .replace(
+      "  - name: implement\n",
+      "      - name: tests-red-2\n        evidence:\n          - name: red\n            form: list\n            says: the test files standing red\n  - name: implement\n",
+    )
+    .replace(
+      "# implement\n",
+      "## tests-red-2\n\n### red\n\n- test/level0/three.test.js\n\n# implement\n",
+    );
+  assert.deepEqual(expectedRed([{ name: "a-child", text }]), [
+    "test/level0/one.test.js",
+    "test/level0/three.test.js",
+    "test/level0/two.test.js",
+  ]);
+});
+
 // The runner's file list reads the tree this case stands in. [[spec/design_output/pull#the-gate]]
 test("the check's run names every test file but the red ones, and the globs where none stands red", () => {
   const at = resolve(".");
@@ -80,4 +98,35 @@ test("the check's run names every test file but the red ones, and the globs wher
     testArgv(at).some((one) => one.includes("*")),
     "no red list runs the globs",
   );
+});
+
+// [[spec/tickets/kept-red-reads-red-list]]
+test("one leaf's red list reads each row as a bare path, and a leaf with no list reads empty", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# implement\n\n## tests-red\n\n### red\n\n- `test/level0/a.test.js`\n* test/level0/b.test.js\n\n## change\n";
+  assert.deepEqual(redListOf(text, "implement/tests-red"), [
+    "test/level0/a.test.js",
+    "test/level0/b.test.js",
+  ]);
+  assert.deepEqual(redListOf(text, "implement/change"), []);
+});
+
+// A hand-back landing an array as one comma-joined row still names each file. [[spec/tickets/list-fields-split-lines]]
+test("one leaf's red list reads a comma-joined row as each file it names", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# implement\n\n## tests-red\n\n### red\n\ntest/level0/a.test.js,test/level0/b.test.js\n\n## change\n";
+  assert.deepEqual(redListOf(text, "implement/tests-red"), [
+    "test/level0/a.test.js",
+    "test/level0/b.test.js",
+  ]);
+});
+
+// [[spec/design_output/pull#kept-red-leaves]]
+test("a red row joined by commas reads one path each", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# design\n\n## tests-red\n\n### red\n\nsrc/one/one_test.go,test/level0/a.test.js\n";
+  assert.deepEqual(redListOf(text, "design/tests-red"), [
+    "src/one/one_test.go",
+    "test/level0/a.test.js",
+  ]);
 });

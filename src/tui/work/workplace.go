@@ -46,22 +46,10 @@ func (t *Tab) placeAt(key string) {
 		return
 	}
 	n := int(key[0] - '0')
-	mine := placeOf(t.Tree, one.Name)
-	value := FlagOn
-	switch {
-	// The same place again takes the todo off, so the score places the row once more. [[spec/design_output/pull#a-todo-forces-a-place]]
-	case one.Keys[TodoKey] != "" && one.Keys[TodoKey] != FlagOff && mine == n:
-		value = FlagOff
-	case mine == n:
-		t.Notice = fmt.Sprintf("%s stands at %d already", one.Name, n)
+	value, notice := PlaceValue(t.Tree, *one, n)
+	if value == "" {
+		t.Notice = notice
 		return
-	case n == 1:
-	default:
-		value = anchorFor(t.Tree, one.Name, n, mine)
-		if value == "" {
-			t.Notice = fmt.Sprintf("the places at this level end at %d, so no row stands at %d", LastPlace(t.Tree, one.Name), n)
-			return
-		}
 	}
 	// The override lands in the plan file on this box, so the ticket's front stays as it is and nothing travels. [[spec/design_output/pull#a-todo-forces-a-place]]
 	tree.SetValue(one, TodoKey, flagOf(value != FlagOff))
@@ -70,6 +58,24 @@ func (t *Tab) placeAt(key string) {
 		return
 	}
 	t.Notice = fmt.Sprintf("%s takes place %d once the queue reads it", one.Name, n)
+}
+
+// The value a place writes for the row at n, or the notice saying why it writes none. src/scripts/ticket-edit.js holds the same rule for the place verb. [[spec/design_output/pull#a-todo-forces-a-place]]
+func PlaceValue(t *tree.Tree, one tree.Item, n int) (string, string) {
+	mine := placeOf(t, one.Name)
+	switch {
+	// The same place again takes the todo off, so the score places the row once more. [[spec/design_output/pull#a-todo-forces-a-place]]
+	case one.Keys[TodoKey] != "" && one.Keys[TodoKey] != FlagOff && mine == n:
+		return FlagOff, ""
+	case mine == n:
+		return "", fmt.Sprintf("%s stands at %d already", one.Name, n)
+	case n == 1:
+		return FlagOn, ""
+	}
+	if value := anchorFor(t, one.Name, n, mine); value != "" {
+		return value, ""
+	}
+	return "", fmt.Sprintf("the places at this level end at %d, so no row stands at %d", LastPlace(t, one.Name), n)
 }
 
 // The plan file this box holds, whose folder folders.js owns and whose name lib/runs.js owns, spelled again here because a Go module imports neither. [[spec/design_output/stop#the-plan]]

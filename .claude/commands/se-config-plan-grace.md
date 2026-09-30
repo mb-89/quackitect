@@ -1,5 +1,5 @@
 ---
-description: "config / plan / grace: sets plan.grace to what you type."
+description: "config / plan / grace: sets plan.grace to what you type. The calls that pass after the ask, before every call waits on the plan's answer."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

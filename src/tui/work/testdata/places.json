@@ -1,0 +1,49 @@
+{
+  "rows": [
+    { "name": "a", "queue": "1", "todo": "false" },
+    { "name": "b", "queue": "2", "todo": "false" },
+    { "name": "c", "queue": "3", "todo": "false" },
+    { "name": "d", "queue": "4", "todo": "true" },
+    { "name": "e", "queue": "", "todo": "false" }
+  ],
+  "cases": [
+    { "says": "place one writes the todo alone", "name": "c", "n": 1, "want": "true" },
+    {
+      "says": "a row moving up stands before the row at n",
+      "name": "c",
+      "n": 2,
+      "want": "b"
+    },
+    {
+      "says": "a row moving down stands before the row past n",
+      "name": "a",
+      "n": 2,
+      "want": "c"
+    },
+    {
+      "says": "a row moving to the last place writes last",
+      "name": "a",
+      "n": 4,
+      "want": "last"
+    },
+    {
+      "says": "a row with no place stands before the row at n",
+      "name": "e",
+      "n": 2,
+      "want": "b"
+    },
+    {
+      "says": "the same place again takes the todo off",
+      "name": "d",
+      "n": 4,
+      "want": "false"
+    },
+    {
+      "says": "the same place refuses where no todo stands",
+      "name": "b",
+      "n": 2,
+      "want": ""
+    },
+    { "says": "a place past the end refuses", "name": "a", "n": 6, "want": "" }
+  ]
+}

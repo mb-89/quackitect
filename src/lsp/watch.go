@@ -103,7 +103,7 @@ func pointingAt(tree *Tree, targets, skip []string) []string {
 			continue
 		}
 		for _, said := range pointersIn(path, yaml.SplitLines(text)) {
-			if namesAny(said.target, targets) {
+			if namesAny(said.Target(), targets) {
 				out = append(out, path)
 				break
 			}

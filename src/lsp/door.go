@@ -7,6 +7,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/fs"
@@ -112,7 +113,32 @@ func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
 func writeFile(path string, data []byte, mode fs.FileMode) error {
 	return os.WriteFile(path, data, mode)
 }
-func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
+func statOf(path string) (fs.FileInfo, error) { return os.Stat(path) }
+
+// The session log under the root, which src/quack/log.go names too, since each server builds as its own package main. [[spec/design_output/log#what-one-line-looks-like]]
+const sessionLog = ".se/.log/session.jsonl"
+
+// Appends one row to the session log under the root, stamped as the log writes its rows. [[spec/design_output/log#what-one-line-looks-like]]
+func appendsRow(root string, now func() time.Time) func(row map[string]any) error {
+	return func(row map[string]any) error {
+		row["at"] = now().UTC().Format(logStamp)
+		line, err := json.Marshal(row)
+		if err != nil {
+			return err
+		}
+		at := filepath.Join(root, filepath.FromSlash(sessionLog))
+		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+			return err
+		}
+		file, err := os.OpenFile(at, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		_, err = file.Write(append(line, '\n'))
+		return err
+	}
+}
 func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
 func removeFile(path string) error                { return os.Remove(path) }
 

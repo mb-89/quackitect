@@ -211,7 +211,7 @@ test("a second hand-out at one step says the short line, and hands no note again
   const { code, said } = await heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 1);
-  assert.match(said, /branch guidance/);
+  assert.match(said, /index_branch_guidance/);
   assert.ok(!/Say what is\./.test(said), "an unmoved hash hands no note again");
 });
 

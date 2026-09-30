@@ -4,6 +4,7 @@
 // [[spec/guidance/retro/check]]
 
 import { processAt } from "../../scripts/process.js";
+import { verbArgv } from "../../scripts/verb-run.js";
 import { CLASSES, recordOf } from "./classes.js";
 import { homeOf } from "./timeline.js";
 
@@ -12,13 +13,9 @@ export const TICKETS = "spec/tickets";
 export const CLOSED = ["fixed:", "past:"];
 const OPEN = "open";
 
-// The command line stands under the method root, and a stub's work root holds none, so the call names it there and hands the child the work root. [[spec/design_output/vehicle#the-work-root-inherits]]
-function cliOf(it) {
-  return [it.node ?? "node", it.join(it.method ?? it.root, "src", "scripts", "cli.js")];
-}
-
+// The verb programs stand under the method root, and a stub's work root holds none, so the call names them there and hands the child the work root. [[spec/design_output/vehicle#the-work-root-inherits]]
 function runIn(it, argv) {
-  return it.proc.run([...cliOf(it), ...argv], {
+  return it.proc.run(verbArgv(it.node ?? "node", it.method ?? it.root, argv, it.join), {
     cwd: it.root,
     env: { SE_WORK_ROOT: it.root },
   });

@@ -25,7 +25,7 @@ import {
   standing,
 } from "./pull-doors.js";
 
-const CHECK = `node ${join(ROOT, "src", "scripts", "cli.js")} check`;
+const CHECK = `node ${join(ROOT, "src", "scripts", "verbs", "check.js")}`;
 const PUSH = "git push origin main";
 const FREE = (step = "design/draft") =>
   filled(

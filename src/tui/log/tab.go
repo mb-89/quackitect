@@ -42,6 +42,8 @@ type Tab struct {
 	Filter   draw.Filter
 	Tailer   *tailer
 	Err      error
+	// The compare beside the tail, which the window hands the catalog. [[spec/design_output/model#the-log-is-a-view]]
+	Shadow *Shadow
 }
 
 // The tab over the log at that path, following it from its first line. [[spec/design_output/tui#how-a-line-arrives]]
@@ -68,7 +70,7 @@ func (t *Tab) Update(m *frame.Model, msg tea.Msg) (bool, tea.Cmd) {
 		t.All = append(t.All, msg.Recs...)
 		t.Rebuild(m.Rows())
 		m.LoadPane()
-		return true, t.Tailer.cmd()
+		return true, tea.Batch(t.Tailer.cmd(), t.check(msg.Recs))
 	}
 	return false, nil
 }
@@ -322,4 +324,24 @@ func (t *Tab) renderRow(r Record, selected bool, w int) string {
 		mark(draw.KindStyle(r.Label())).Render(draw.Pad(r.Label(), KindWide)),
 		mark(saidStyle(r)).Render(said),
 	}, gap)
+}
+
+// The compare runs beside the tail, over the rows held so far, and only for lines that are no shadow row, so the row a mismatch writes wakes no compare of its own. [[spec/design_output/model#the-log-is-a-view]]
+func (t *Tab) check(arrived []Record) tea.Cmd {
+	if t.Shadow == nil {
+		return nil
+	}
+	counted := false
+	for _, one := range arrived {
+		counted = counted || one.Kind != shadowKind
+	}
+	if !counted {
+		return nil
+	}
+	snapshot := append([]Record(nil), t.All...)
+	shadow, path := t.Shadow, t.Path
+	return func() tea.Msg {
+		_ = shadow.Check(path, snapshot)
+		return nil
+	}
 }

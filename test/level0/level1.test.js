@@ -232,7 +232,11 @@ test("the pull hook matches the level zero call, and runs the script the method 
     },
   };
   assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
-  assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
+  assert.deepEqual(ran[0].slice(0, 3), [
+    "node",
+    "/vehicle/src/scripts/verbs/ticket.js",
+    "pull",
+  ]);
 });
 
 // The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]

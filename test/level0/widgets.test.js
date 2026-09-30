@@ -133,3 +133,19 @@ test("a row takes the unit and the help the schema gives its key", () => {
   assert.equal(row.help, "How many turns.");
   assert.equal(row.type, "number");
 });
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("valuesOf lays the built-ins under the files", () => {
+  const schema = structuredClone(SCHEMA);
+  schema.properties.stop.properties.hold.default = "off";
+  schema.properties.stop.properties.mostInARow.default = 3;
+  const values = valuesOf({ stop: { mostInARow: 5 } }, {}, schema);
+  assert.deepEqual(values.get("stop.hold"), { value: "off", layer: "built-in" });
+  assert.deepEqual(values.get("stop.mostInARow"), { value: 5, layer: TRACKED });
+});
+
+// [[spec/tickets/the-config-schema-gets-generated]]
+test("valuesOf with no schema reads the two files alone", () => {
+  const values = valuesOf({ stop: { mostInARow: 5 } }, {});
+  assert.deepEqual([...values.keys()], ["stop.mostInARow"]);
+});

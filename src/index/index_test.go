@@ -1,7 +1,7 @@
 // The index, driven over a tree a case writes. Every question here is one a
 // verb asks, so what the door answers stands proven with no door running.
 // [[spec/guidance/code/testing]]
-package main
+package index
 
 import (
 	"database/sql"
@@ -161,7 +161,8 @@ func TestTwoRootsDifferingInTheDriveLettersCaseReadAsOneTree(t *testing.T) {
 		other = strings.ToUpper(volume) + root[2:]
 	}
 
-	if !stands(Standing{Root: other, Stamp: stampHere()}, root) {
+	self, _ := os.Executable()
+	if !stands(Standing{Root: other, Stamp: stampOf(self), Bin: self}, root) {
 		t.Fatal("the door stands aside for its own tree under the other drive case")
 	}
 	at := filepath.Join(t.TempDir(), "index.db")

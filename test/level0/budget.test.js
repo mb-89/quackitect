@@ -6,7 +6,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import said from "../../spec/config/level0.json" with { type: "json" };
+import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
+import file from "../../spec/config/level0.json" with { type: "json" };
+import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import * as hand from "../../src/scripts/guidance-hand.js";
 import { pulling } from "../../src/scripts/work.js";
@@ -28,6 +30,8 @@ function median(run) {
   }
   return took.sort((a, b) => a - b)[Math.floor(RUNS / 2)];
 }
+
+const said = underBuiltIns(schema, file);
 
 const budgetOf = (call) => {
   const ms = said.budget?.[call];

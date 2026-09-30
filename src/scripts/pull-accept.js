@@ -48,7 +48,10 @@ export function acceptRows(it, one, leaf) {
   const diff = base
     ? `the diff since ${base}, merges and all: git diff ${base}..HEAD`
     : "the whole diff of the ticket";
-  return ["", `Read ${diff}. The hand-back runs every command field of the route.`];
+  return [
+    "",
+    `Read ${diff}. The hand-back runs every command field of the leaves before this gate.`,
+  ];
 }
 
 // Whether this verdict short of accept passes the cap the fail reads. [[spec/design_output/pull#the-final-acceptance]]
