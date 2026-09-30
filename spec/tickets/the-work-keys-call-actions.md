@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [the-work-tab-reads-v1]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 92f5a8d308b09e53
         size: 607
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: 1ea140c60cf93698c3b4807eb9bcb57e1cdd028e
+    hash_after: 1ea140c60cf93698c3b4807eb9bcb57e1cdd028e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui/work fails
+    inputs:
+      - name: design/draft
+        hash: 3a6564cc53a8353e
+        size: 5780
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -278,26 +291,39 @@ the done_when lines: the git grep line is its own command; the key case is src/t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/work/actions_test.go src/tui/registry/call_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/tui/work/actions_test.go
+src/tui/registry/call_contract_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion. The fake and the V1 door both answer an empty `Said`, and the work tab posts nothing. The flip case shows the old road: the refused flip reads `spec/tickets/one-ticket.md` off the disk and says the file stands nowhere. `TestAValueTheSchemaRefusesPostsNothing` passes already, as the guard that the schema refuses before any post.
+
+What departs from the draft:
+- `Call` answers a `registry.Said` holding the result, the running mark and the handle, so a 202 carries its handle.
+- The 202 case stands in `call_contract_test.go` beside the contract, so the registry holds one red file.
+- The window's `indexCatalog` in `src/tui/main.go` gains `Call` now, a pass-through like its `Read` and `Watch`, so the window builds. The callers list left it out. `TestTheIndexCatalogAnswersAnErrorForAnActionNoIndexTakes` in `src/tui/window_test.go` covers it.
+
+The surprise: a key's command runs off the program, so the cases feed each answered message back through `keyed`, with a wait on each command.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the done_when lines: the grep line is its own command at implement; the key case is src/tui/work/actions_test.go, with a case each for p, u, the edit and P, each reading what the fake door keeps; the check line is ./RUNME.sh check
+the doors: the cases post through registry.Fake, which call_contract_test.go holds to the V1 door over an httptest server, and they touch no file past the schema this tree ships
 
 # gate
 

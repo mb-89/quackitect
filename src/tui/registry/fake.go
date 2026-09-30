@@ -16,6 +16,20 @@ type Fake struct {
 	Err    error
 	// The changes the watch hands on, in order, before it ends. [[spec/tickets/v1-watch-streams-changes]]
 	Changes []Change
+	// The result each action answers, and every post the fake takes, where the case holds the list. [[spec/tickets/the-work-keys-call-actions]]
+	Results map[string]any
+	Posted  *[]Posted
+}
+
+// One post the fake takes: the action and its input as JSON. [[spec/tickets/the-work-keys-call-actions]]
+type Posted struct {
+	Name  string
+	Input json.RawMessage
+}
+
+// [[spec/tickets/the-work-keys-call-actions]]
+func (f Fake) Call(_ string, _ any) (Said, error) {
+	return Said{}, nil
 }
 
 // Each change the case seeded, then the end. [[spec/tickets/v1-watch-streams-changes]]

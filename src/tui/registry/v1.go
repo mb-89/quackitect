@@ -38,6 +38,11 @@ func (v V1) Read(name string) (json.RawMessage, error) {
 	return value.Value, nil
 }
 
+// [[spec/tickets/the-work-keys-call-actions]]
+func (v V1) Call(_ string, _ any) (Said, error) {
+	return Said{}, nil
+}
+
 // The problem's detail where the index answers one, and the status where it answers none. [[spec/design_output/model#surfaces]]
 func problemIn(status string, body []byte) error {
 	var problem struct {

@@ -17,3 +17,15 @@ const (
 type Catalog interface {
 	Read(name string) (json.RawMessage, error)
 }
+
+// What a post of an action answers: its result once it ends within the wait, or the handle its operation reads at while it runs on. [[spec/tickets/the-work-keys-call-actions]]
+type Said struct {
+	Result  json.RawMessage
+	Running bool
+	Handle  string
+}
+
+// The road to the actions the index takes: one post a call. [[spec/tickets/the-work-keys-call-actions]]
+type Caller interface {
+	Call(name string, input any) (Said, error)
+}

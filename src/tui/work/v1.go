@@ -28,6 +28,7 @@ const (
 type Source interface {
 	registry.Catalog
 	registry.Watcher
+	registry.Caller
 }
 
 // The watch ends, and the tab says why and watches again after a pause. [[spec/tickets/the-work-tab-reads-v1]]

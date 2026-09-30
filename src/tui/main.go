@@ -148,6 +148,15 @@ func (indexCatalog) Watch(ctx context.Context, names []string, each func(registr
 	return registry.V1{Base: base}.Watch(ctx, names, each)
 }
 
+// Each call finds the base the same way, so a restart of the index reaches the next call. [[spec/tickets/the-work-keys-call-actions]]
+func (indexCatalog) Call(name string, input any) (registry.Said, error) {
+	base, err := index.V1()
+	if err != nil {
+		return registry.Said{}, err
+	}
+	return registry.V1{Base: base}.Call(name, input)
+}
+
 // The log tab the window holds first, which the frame draws its footer off. [[spec/design_output/tui#the-packages-the-window-holds]]
 func logTab(m frame.Model) *log.Tab { return m.Tabs[0].(*log.Tab) }
 
