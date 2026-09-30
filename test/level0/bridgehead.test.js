@@ -352,7 +352,11 @@ function cutting(stands) {
     posts.push(JSON.parse(init.body));
     if (posts.length === 1 || !stands) throw new Error("The operation timed out.");
     const line = "The helper a1 reports.";
-    return { ok: true, status: 200, text: JSON.stringify({ result: { result: line } }) };
+    return {
+      ok: true,
+      status: 200,
+      text: JSON.stringify({ result: { result: line } }),
+    };
   };
   return { posts, fetch };
 }
@@ -373,10 +377,18 @@ test("a wait the host cuts answers its signal on a live server, and the line on 
   const $ = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: live.fetch } };
   const said = await hooks["*"]($, call, handed);
 
-  assert.equal(said?.result, "The helper a1 reports.", "the signal takes the line's place");
+  assert.equal(
+    said?.result,
+    "The helper a1 reports.",
+    "the signal takes the line's place",
+  );
   assert.equal(live.posts.length, 2, "the cut post goes again");
   assert.ok(live.posts[0].e.since > 0, "the post carries the wait's since");
-  assert.equal(live.posts[1].e.since, live.posts[0].e.since, "and the post again the same");
+  assert.equal(
+    live.posts[1].e.since,
+    live.posts[0].e.since,
+    "and the post again the same",
+  );
   assert.deepEqual($.logged, [], "a cut on a live server tells nobody it falls");
 
   const dead = cutting(false);
@@ -385,4 +397,104 @@ test("a wait the host cuts answers its signal on a live server, and the line on 
 
   assert.match(String(line?.result ?? ""), /no server answers at .*mcp__level0__wait/);
   assert.equal(dead.posts.length, 1, "a dead server takes no post again");
+});
+
+// A box whose cage reads new, whose hooks door names its port, and whose every post falls. Another writer appends a row to the session log after each read and each post, as a server writing beside the hook does. [[spec/tickets/a-down-index-refuses-calls]]
+const CAGED = {
+  [`${STUB}/spec/config/level0.json`]: JSON.stringify({ migration: { cage: "new" } }),
+  [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k" }),
+};
+const LOG = `${STUB}/.se/.log/session.jsonl`;
+
+function caged() {
+  const files = fakeDisk({ ...CAGED, [LOG]: "" });
+  const runs = [];
+  let others = 0;
+  const another = () => {
+    others += 1;
+    files.append(LOG, `${JSON.stringify({ kind: "other", n: others })}\n`);
+  };
+  const at = (rel) => (String(rel).startsWith("/") ? String(rel) : `${STUB}/${rel}`);
+  const $ = {
+    ...hand(files, fakeGit({}, STUB)),
+    fs: {
+      read: async (rel) => {
+        const said = files.read(at(rel));
+        if (at(rel) === LOG) another();
+        return said;
+      },
+      exists: async (rel) => files.exists(at(rel)),
+      write: async (rel, text) => files.write(at(rel), text),
+    },
+    process: {
+      run: async (argv) => {
+        runs.push(argv);
+        if (argv[0] === "node" && String(argv[2]).includes("appendFileSync"))
+          files.append(at(argv[3]), String(argv[4]));
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    },
+    http: {
+      fetch: async () => {
+        another();
+        throw new Error("Unable to connect");
+      },
+    },
+  };
+  const hooks = {};
+  level0((event, fn) => {
+    hooks[event] = fn;
+  }, {});
+  const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
+  return { files, runs, $, hooks, handed, others: () => others };
+}
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("a stopped hooks door refuses a guarded call and names session/alarms", async () => {
+  const box = caged();
+
+  const said = await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+  await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+
+  assert.equal(said?.handed, undefined, "the guarded call goes no further");
+  assert.match(
+    String(said?.deny ?? ""),
+    /session\/alarms/,
+    "the refusal names the alarm",
+  );
+  assert.match(String(said.deny), /\.\/RUNME\.sh /, "and the command that clears it");
+  const starts = box.runs.filter((argv) => !String(argv[2]).includes("appendFileSync"));
+  assert.equal(starts.length, 1, "the hook starts the index once");
+});
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("a read passes while the hooks door stands down", async () => {
+  const box = caged();
+  const call = { tool: "Read", file_path: `${STUB}/a.md` };
+
+  const said = await box.hooks["*"](box.$, call, box.handed);
+
+  assert.deepEqual(said?.handed, call, "the read reaches the harness");
+});
+
+// [[spec/tickets/a-down-index-refuses-calls]]
+test("a row another writer appends while the index falls stays in the session log", async () => {
+  const box = caged();
+
+  await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+
+  const rows = String(box.files.read(LOG))
+    .split("\n")
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  const kept = rows.filter((row) => row.kind === "other").map((row) => row.n);
+  assert.deepEqual(
+    kept,
+    Array.from({ length: box.others() }, (_, at) => at + 1),
+    "every row the other writer appends stays",
+  );
+  assert.ok(
+    rows.some((row) => row.kind === "bridge"),
+    "and the hook's own row lands beside them",
+  );
 });

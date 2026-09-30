@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -150,6 +150,19 @@ record:
         hash: e12c15cf9e654d97
         size: 791
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d88f0683f2d7 · claude-code-remote
+    hash_before: 9629736b844117b21ddea962a14ad4ee84f4cb56
+    hash_after: 9629736b844117b21ddea962a14ad4ee84f4cb56
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: c6867e111a3b6fba
+        size: 2908
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -237,26 +250,35 @@ The hook module answers off the hooks IO module once migration.cage reads new, a
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/bridgehead.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/bridgehead.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The refusal case stands red on its own assertion: today the hook passes every call while no server answers, so the call reaches the harness and no line names session/alarms. The raced row case stands red too. The hook reads the session log, another writer appends, and the hook writes the log back over that row.
+
+The read case and the shadow case pass today, and they hold the edges of the change: a read passes while the door stands down, and the bridge posts no shadow under new.
+
+The surprise: the hook module reads no config today, so the cage key reaches it through spec/config/level0.json on the hand disk, beside the standing file the hooks door writes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the refusal case, the second the raced row case, and the third the check at tests-green
+- the doors the tests reach have fakes: the fake disk, a process fake that appends where the hook runs a node append, and an http fake whose every post falls
 
 # gate
 

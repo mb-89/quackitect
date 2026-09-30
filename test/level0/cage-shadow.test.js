@@ -41,6 +41,13 @@ test("under old the bridge posts nothing", async () => {
   assert.equal(box.http.sent.length, 0);
 });
 
+// The hook module posts itself under new, so the bridge's copy would reach the door twice. [[spec/tickets/a-down-index-refuses-calls]]
+test("under new the bridge posts no shadow", async () => {
+  const box = boxOf("new");
+  await shadowsCage(box, { event: "tool.call", e: {} }, { pass: true });
+  assert.equal(box.http.sent.length, 0);
+});
+
 test("a hooks port that refuses leaves the bridge's answer standing", async () => {
   const box = boxOf("shadow");
   box.http = {
