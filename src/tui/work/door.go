@@ -1,71 +1,10 @@
-// The work tab's door. A verb of the tree runs under the root and answers what
-// it prints, and the index binary's own standing verb puts a door up where
-// none stands.
-// [[spec/design_output/tui#the-work-tab]]
+// The work tab's door: the ticket schema is the one file the tab reads, and
+// every write goes to an action over the index.
+// [[spec/design_output/tui#the-work-tab-takes-edits]]
 
 package work
 
-import (
-	"bytes"
-	"context"
-	"fmt"
-	"io"
-	"io/fs"
-	"net/http"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"time"
-)
-
-// A verb of the tree runs under the root, and answers what it prints. A run past the wait dies, and answers the deadline. [[spec/design_output/tui#the-work-tab]]
-func runVerb(root, program string, argv []string, wait time.Duration) ([]byte, error) {
-	ctx, stop := context.WithTimeout(context.Background(), wait)
-	defer stop()
-	one := exec.CommandContext(ctx, program, argv...)
-	one.Dir = root
-	return one.Output()
-}
-
-// The binary's own standing verb puts a door up where none stands, and drops a stale one. [[spec/design_output/index#a-door-comes-back]]
-func startIndex(root string) error {
-	binary := filepath.Join(root, filepath.FromSlash(indexBinAt))
-	if _, err := os.Stat(binary); err != nil {
-		return fmt.Errorf("no index stands here: %s is unbuilt, and ./RUNME.sh builds it", indexBinAt)
-	}
-	one := exec.Command(binary, "standing")
-	one.Dir = root
-	if out, err := one.CombinedOutput(); err != nil {
-		return fmt.Errorf("the index door did not stand: %s", bytes.TrimSpace(out))
-	}
-	return nil
-}
+import "os"
 
 // The outside every other file of this package reads through. [[spec/design_output/doors#a-door-reads-the-outside]]
 func readFile(path string) ([]byte, error) { return os.ReadFile(path) }
-func writeFile(path string, data []byte, mode fs.FileMode) error {
-	return os.WriteFile(path, data, mode)
-}
-func appendFile(path string, data []byte) error {
-	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-	if err != nil {
-		return err
-	}
-	if _, err := file.Write(data); err != nil {
-		file.Close()
-		return err
-	}
-	return file.Close()
-}
-func statOf(path string) (fs.FileInfo, error)     { return os.Stat(path) }
-func makeDir(path string, mode fs.FileMode) error { return os.MkdirAll(path, mode) }
-
-// One JSON post to the index's door, answering the body it sends back. [[spec/design_output/tui#the-work-tab]]
-func postJSON(url string, body []byte, wait time.Duration) ([]byte, error) {
-	got, err := (&http.Client{Timeout: wait}).Post(url, "application/json", bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-	defer got.Body.Close()
-	return io.ReadAll(got.Body)
-}

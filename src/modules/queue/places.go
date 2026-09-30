@@ -34,6 +34,8 @@ const (
 	StoodPort  = "stood"
 	MinutePort = "minute"
 	PlacesPort = "places"
+	// The places a hand overrides, which the work module reads. [[spec/tickets/rows-todo-folds-overrides]]
+	OverridesPort = "overrides"
 )
 
 // The weights a key reads where no layer sets it, the values spec/config/level0.json holds. [[spec/tickets/index-reads-loaded-projections]]
@@ -61,7 +63,9 @@ func Places(c *q.Catalog) q.Writer {
 	q.CfgIn(c, "block", builtInBlock, q.Doc("the score a ticket takes for each ticket its chain holds up"))
 	q.CfgIn(c, "day", builtInDay, q.Doc("the score a ticket takes for each whole day it stands"))
 	q.CfgIn(c, "fail", builtInFail, q.Doc("the score a ticket takes for each hand-back that failed on it"))
-	return q.DerivedIn(c, PlacesPort, map[string]string{}, placesOf, q.Doc("every open row's place in the queue, as an outline number, and ∞ for a row the cloud holds"))
+	places := q.DerivedIn(c, PlacesPort, map[string]string{}, placesOf, q.Doc("every open row's place in the queue, as an outline number, and ∞ for a row the cloud holds"))
+	overrides := q.DerivedIn(c, OverridesPort, map[string]string{}, overridesOf, q.Doc("every place a hand overrides in the plan file, by name"))
+	return q.Join(places, overrides)
 }
 
 // The places placesIn answers. A closed row, a note and a row the cloud holds take no place in the lists. A held row and the plan's work stand in hand, a person's step and a draft wait on a person, a ticket whose waits all stand closed goes to the agents, and every other row goes back. A row the cloud holds that stands open takes ∞. [[spec/design_output/pull#the-queue-is-an-outline]]
@@ -171,6 +175,14 @@ func (p plan) rows() []Row {
 	}
 	return out
 }
+
+// What the overrides read: the plan file alone. [[spec/tickets/rows-todo-folds-overrides]]
+type overridesIn struct {
+	Plan q.Content `q:"plan"`
+}
+
+// The places a hand overrides in the plan file, which the work module's rows light the todo letter off. [[spec/tickets/rows-todo-folds-overrides]]
+func overridesOf(in overridesIn) map[string]string { return planOf(in.Plan).overrides() }
 
 // The overrides a hand writes, and a todo's own passes the check its anchor does. [[spec/design_output/pull#a-todo-forces-a-place]]
 func (p plan) overrides() map[string]string {

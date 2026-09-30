@@ -27,8 +27,8 @@ one tab reads them all. These packages part it, and every import runs down:
 | `src/tui/draw` | `Cut`, `Pad`, `OneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `src/config`, for the palette |
 | `src/tui/tree` | the tree, the rows it draws and the base file | `src/tui/draw`, and `src/yaml` for the base file |
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
-| `src/tui/log` | the log tab: its records, its tailer, its columns, its details, the said style and its view drawn off the base file | the frame, the tree and the draw packages |
-| `src/tui/work` | the work tab: its tree, its edit, its places, the index calls and the index start | the frame, the tree and the draw packages, and `src/yaml` for the ticket schema |
+| `src/tui/log` | the log tab: its records, its rows off the watch, its columns, its details, the said style and its view drawn off the base file | the frame, the tree and the draw packages, and the registry package for the catalog and the watch |
+| `src/tui/work` | the work tab: its tree, its edit, and its rows and count off the watch | the frame, the tree and the draw packages, the registry package for the catalog and the watch, and `src/yaml` for the ticket schema |
 | `src/tui/registry` | the registry tabs `index`, `cli` and `help`, and the catalog door they read through, with its fake and its `/v1` road | the frame and the draw packages |
 | `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language, and `src/index` for the base of `/v1` |
 
@@ -335,28 +335,24 @@ reaches its details, and the scroll stays where it stands.
 
 # How a line arrives
 
-A writer appends each line the moment it happens. The viewer watches the log
-folder, and the operating system wakes it on every write to the session file. A
-poll every 250 ms stands behind the watcher.
+A writer appends each line the moment it happens. The `log` module reads the
+session file, and `log/rows` answers every row. The watch over `/v1` hands
+the tab the whole session on each change.
 
-The tail keeps the bytes it holds and hands over only what follows them.
-
-- The held bytes, then more: the tail hands over the complete lines after them.
-- Shorter, and a start of the held bytes: the tail waits for the write to finish.
-- Other bytes: the tail starts again at the top.
-
-A line with no newline waits for its end.
+- More rows than the tab holds: the rows past the held ones arrive as new.
+- Fewer rows: a new session stands, and the tab starts again at the top.
 
 ## A rotation starts it again
 
-A session start empties the file and writes the new session's first line. The
-tail waits on the empty file, and the first line of the new session starts the
-window again. So a window staying open moves on to the next session by itself.
+A session start empties the file and writes the new session's first line.
+`log/rows` then answers fewer rows than the tab holds, and the tab starts
+again. So a window staying open moves on to the next session by itself.
 
 # One frame
 
 `logview --frame --size WxH --pane details|help|filter --filter <text> <path>`
 draws the window once and prints it. A reader with no terminal sees the same window a person sees.
+`ReadLog` in `src/tui/log/read.go` reads the file the command line names, once.
 
 # The verb builds it
 
@@ -412,27 +408,24 @@ and the presets. For the view itself, see [[spec/design_output/tree-view]].
 
 | what the tab holds | where it comes from |
 |---|---|
-| the rows | `tickets`, which [[spec/design_output/index#the-index-answers-the-tickets]] answers |
-| the redraw | `changes`, which [[spec/design_output/index#the-index-fires-on-change]] holds until a sweep |
-| the door's port | the standing file the door writes, off the root two folders over the log |
-| a door standing nowhere | the binary's own `standing` verb, which puts one up and drops a stale one |
-| the places and the branches | `branch list --json`, which [[spec/design_output/work#one-reading-answers-git]] answers, run behind each tree |
+| the base file | `files/spec/views/work.base`, read once through the catalog |
+| the rows, each with its place and its flags | `work/rows` |
+| the count behind its name | `work/open-tasks` |
+| the redraw | the watch over `/v1`, whose first events carry each value |
 
 A ticket naming another row nests under it, at any depth, and one naming a row
 the rows hold nowhere stands at the left. The mark before the name says which
 row is a group, so no column says it. A ticket in hand stands at place zero
-in the queue, so no letter says it. A group holding a branch wears the `C`
-letter, off the verb's answer. The window's `Init` asks for the tick from
-nothing, and each answer hands the tab its tree again.
+in the queue, so no letter says it. A group the cloud holds wears the `C`
+letter, off its row. The window's `Init` opens the watch, and each change to
+the rows hands the tab its tree again.
 
 The table draws the name, the flags and the queue, and it stands as it is
 when a pane opens. The nesting says the group, and the details say the step.
 The name links to its note. The state leads the flags as its first letter.
 
-The queue is an outline the pull owns, and git holds the branches. So the
-tab runs the verb behind each tree the index hands over, and lays its answer
-over the rows. `src/tui/work/workplaces.go` holds that road, and a verb answering nothing
-leaves the last places standing. The tab opens on the queue: the rows
+The queue is an outline the pull owns, and each row carries its place. The
+tab opens on the queue: the rows
 holding a place, sorted by it. So a person's rows stand first, and a closed
 ticket stands off it. For the places, see
 [[spec/design_output/pull#the-queue-is-an-outline]].
@@ -450,34 +443,36 @@ The tab's brackets and the work editor's button in the sidebar read one index na
 
 | reader | how it asks |
 |---|---|
-| the tab | `PlacesAt` in `src/tui/work/workplaces.go` asks the door, and starts one where none stands |
+| the tab | the watch in `src/tui/work/v1.go` |
 | the button | its `counts` line runs `./RUNME.sh index call value`, and the index answers a bare count |
 
-The queue column reads `queue/places`, the map the count reads. A door answering nothing leaves the
-brackets off the tab, and the button draws no count.
+A door answering nothing leaves the brackets off the tab, and the button draws
+no count.
 
-`src/tui/work/workindex.go` holds the road to the door, and `src/tui/work/workitems.go` turns the rows
-into items. A box with no door and no binary draws the reason in the tab, and
-asks again after a pause. So a build landing later reaches the tab with no
-restart.
+`src/tui/work/v1.go` holds the road to the index, and `src/tui/work/view.go`
+turns the rows into the tree. A watch that ends draws its reason in the tab,
+and the tab watches again after a pause. So an index standing later reaches
+the tab with no restart.
 
 # The work tab takes edits
 
-A person edits a ticket where they read it. The write lands in the ticket's
-front. The index sees it and hands the tab its tree again, so the row reads
-what the note now says. `src/tui/work/workedit.go` and
-`src/tui/work/workplace.go` hold it.
+A person edits a ticket where they read it. Each key posts the action
+`spec/views/work.base` names to `/v1/actions`, and the verb behind it writes
+the ticket's front or the plan file. The watch on `work/rows` hands the tab
+the row again, so the row reads what the note now says. The tab writes no
+file. `src/tui/work/actions.go` holds the posts.
 
 | key | what it does |
 |---|---|
 | `a`, `d`, and the arrows beside them | move the column cursor, which the header lights |
 | `e` | open the cell under the cursor, on the selected row |
-| Enter | write the open cell's value into the row's ticket |
+| Enter | post the open cell's value to `tickets/set-field` for the row |
 | Esc | drop the open cell, and write nothing |
 | Tab | take the first value the completion offers |
-| `alt+enter` | write the open cell's value into every row the view holds, or the marked rows. Shift with Enter does the same where the terminal tells it apart |
-| `u` | flip the urgent mark on the row |
-| `p`, then a digit | place the row in the queue at that digit, which writes its todo, and the same digit again takes the todo off. For the rule, see [[spec/design_output/pull#a-todo-forces-a-place]] |
+| `alt+enter` | post the open cell's value for every row the view holds, or the marked rows. Shift with Enter does the same where the terminal tells it apart |
+| `u` | post `tickets/flip-urgent` for the row, or for every marked row |
+| `p`, then a digit | post `work/place` for the row at that digit. For the rule the verb holds, see [[spec/design_output/pull#a-todo-forces-a-place]] |
+| `P` | post `work/pull`, the view's pull button |
 
 The cell edit is the tree view's own. For the edit, see
 [[spec/design_output/tree-view#a-cell-takes-an-edit]].

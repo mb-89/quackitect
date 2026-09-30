@@ -20,6 +20,7 @@ func fed(c *q.Catalog) q.Writer {
 		q.OutIn(c, PlacesPort, map[string]string{}, q.Doc("the places, as the case seeds them")),
 		q.OutIn(c, CloudPort, []string{}, q.Doc("the tickets the cloud holds, as the case seeds them")),
 		q.OutIn(c, BranchesPort, []ticket.Branch{}, q.Doc("the standing branches, as the case seeds them")),
+		q.OutIn(c, OverridesPort, map[string]string{}, q.Doc("the places the plan overrides, as the case seeds them")),
 	)
 	Registers(c)
 	return hand

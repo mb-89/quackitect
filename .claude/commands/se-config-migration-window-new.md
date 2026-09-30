@@ -1,5 +1,5 @@
 ---
-description: "config / migration / window: sets migration.window to new. The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's."
+description: "config / migration / window: sets migration.window to new. The window, switched over in phase 6. It draws the index's reads alone."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

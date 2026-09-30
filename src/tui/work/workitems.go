@@ -16,6 +16,8 @@ import (
 const (
 	KindTicket = "ticket"
 	KindGroup  = "group"
+	// A sentence todo, which draws with no link. [[spec/design_output/stop#the-plan]]
+	KindTodo = "todo"
 )
 
 // The standing a held branch gives, one of the words [[spec/design_output/work#what-the-standing-says]] names.
@@ -38,7 +40,7 @@ type ticketRow struct {
 	Person   bool   `json:"person"`
 }
 
-// The keys the verb's answer lays over the rows, which the index holds nowhere. [[spec/design_output/tui#the-work-tab]]
+// The keys the queue's place and the cloud mark draw under, off work/rows. [[spec/tickets/the-work-tab-reads-v1]]
 const (
 	QueueKey = "queue"
 	CloudKey = "cloud"
