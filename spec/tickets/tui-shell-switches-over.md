@@ -78,6 +78,10 @@ process_hash: 57b2cccd0445ea9a
 depends_on: [tui-shell-lands-in-shadow, quack-verbs-switch-over, read-topics-switch-over]
 enabled_by: migration.phase6switch
 cloud: true
+record:
+  - step: sync
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
 ---
 
 # Ask
