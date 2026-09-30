@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,17 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
+depends_on: [config-answers-keys-and-overrides, the-sidebar-reads-v1, the-sidebar-writes-through-actions, the-lens-calls-actions, the-lens-reads-v1]
+record:
+  - step: design/draft
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 7785112c7df1266da35ec5571878aebaf8603688
+    hash_after: 4b7a5477937f4ca9eda80e0d809d9ce60d8a9481
+    inputs:
+      - name: ask
+        hash: 8ec0fc4f549a34ae
+        size: 416
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +157,65 @@ The extension then shows what the index holds, and computes nothing.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The ask splits into six pieces, each small enough to read whole, and this ticket takes the last one. The five before it are children of this group, open, and this ticket waits on them under `depends_on`.
+
+- [[spec/tickets/config-answers-keys-and-overrides]]: the config module answers `config/keys`, and takes `config/set`, `config/override` and `config/opened` over `/v1/actions`. No route posts to `config/held` today, so every other piece waits on this one.
+- [[spec/tickets/the-sidebar-reads-v1]]: `sidebar.js` and `extension.js` read the config, the slice, the bless value, the badge and the parsed bases off `/v1`. The index door gains a `/v1/watch` client, and the file watches leave.
+- [[spec/tickets/the-sidebar-writes-through-actions]]: every sidebar write posts an action. A new window posts `config/opened` and leaves the local file whole, which answers the second done_when line.
+- [[spec/tickets/the-lens-calls-actions]]: the ticket buttons post `ticket/pull`, `ticket/fill` and `ticket/route`. The node spawn in `editor-lens.js` leaves, which answers the first done_when line.
+- [[spec/tickets/the-lens-reads-v1]]: the lens, the field marks and the route drawing read the holds, the marks and the graph off `/v1`, and import nothing out of the tree.
+
+This ticket lands once the five close. `migration.sidebar` in `spec/config/level0.json` reads `new`. The compare leaves with the mode that runs it: `src/extension/lib/views-shadow.js`, its test, and `tells`, `told` and `SLICE` in `sidebar.js`. The views section draws the work badge and the pull button, so the grid's copies leave. `work.editor` in `spec/config/draws.json` loses `counts`, and `work.pull` loses its help and icon, which the `work/pull` row carries. `./RUNME.sh project` writes the schema again from both.
+
+Weighed: one ticket over the whole cutover spares five reviews. Its diff would reach the config module, the index door, the sidebar and the lens, which nobody reads whole. The window's switch took the same split.
+
+Assumed, and left outside this group:
+- the hook button starts the bridge server through `editor-process.js`. That process, its register read and `serve.log` leave with the bridge server in [[spec/tickets/go-cage-switches-over]]
+- the LSP client start in `editor.js` and its binary lookup leave with the LSP's own server in [[spec/tickets/lsp-door-switches-over]]
+- the index door keeps one read, `.se/.runtime/index.json`, since it names the port the extension reaches `/v1` on
+- the terminal lines `./RUNME.sh tui` and `tui work` stay, since the owner runs the window in that terminal
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- spec/config/level0.json migration.sidebar, which the index and the sidebar read
+- src/extension/sidebar.js html, which reads the slice and calls tells over apartOf
+- src/extension/sidebar.js counted, which runs the counts line the work.editor entry carries
+- src/extension/lib/views-shadow.js apartOf, which leaves
+- test/level0/views-shadow.test.js, which reads apartOf
+- test/level0/sidebar-views.test.js, whose shadow case reads the rows tells writes
+- spec/config/draws.json work.editor and work.pull, which the schema projects
+- spec/config/level0.schema.json work.editor and work.pull, which ./RUNME.sh project writes
+- src/modules/migration/migration.go SidebarKey, whose declaration stays with its built-in old
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/sidebar-views.test.js the sidebar under new writes no shadow row: the tracked file reads new, and a pair apart writes nothing
+- test/level0/sidebar-views.test.js the grid draws no badge the views section draws: the work group carries no count
+- test/level0/extension-reads-no-files.test.js no verb spawn stands in the extension: git grep for spawn( over src/extension names none
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened on this branch: sidebar.js, extension.js, editor-process.js, editor-index.js, editor-lens.js, views-shadow.js, draws.json, level0.schema.json, level0.json, migration.go and config.go
+- the callers list names every hit git grep finds for apartOf, views-shadow, migration.sidebar and the counts line
+- the spawn line meets extension-reads-no-files.test.js and the child the-lens-calls-actions, the new window line meets the child the-sidebar-writes-through-actions, and the check line meets ./RUNME.sh check
 
 ## tests-red
 
