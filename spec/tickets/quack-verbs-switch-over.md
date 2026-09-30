@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -167,6 +167,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 5c6812c7ba4498ea91a515d953e16ba1b8b550a2
+    hash_after: 5c6812c7ba4498ea91a515d953e16ba1b8b550a2
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["quack-verbs-land-in-shadow", "open-tasks-switch-lands", "read-topics-switch-over"]
 enabled_by: migration.phase4switch
 cloud: true
@@ -252,38 +264,64 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+loaded-projection-curl-checkpoint: curl over V1 answers migration/config/cage as shadow off the tracked file, over a default of old
+loaded-projection-test-names-match: the parent Discussion names the value the config case seeds
+index-reads-loaded-projections: passed implement/change and implement/tests-green, and closed
+verb-tools-keep-spaced-args: an index tool call reads the arguments the host spreads on the event, with its test
+the two private notes: one closed as done by the fix, one became a successor for the guidance prose
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the split read every child closed, so the group reached accept in one pass
+the accept gate read the goal against this run: the tools failing through the session turned into a point, and the point into a fix with a red test first
+the binary answered the action directly, which split the fault between the plugin and the index in two calls
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+01:32 the first plan call met no server until serve ran
+01:33 read-handover stayed in hand after two passes: the last session wrote its hold by hand with a script, and the pass releases only a hold the engine writes
+01:34 a stop claimed the-owner-holds-the-step on a cloud box, and the gate refused it
+01:40 the engine ran the check to exit 1 once, and the same check answered 0 twice beside it
+01:59 ShellWritesNothing read the ticket name cli-js-leaves as the file it names
+02:03 to 02:12 the bridge server answered nothing at its event port several times
+every index verb tool ran with no words past its verb through the whole session, so each hand-back went through the shell
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+a hold written off the engine: the pull verb, which takes a hold it wrote nowhere and hands the ticket out again
+the hand-made clear: .se/scripts carries no script writing a hold, and the handover names the verb in its place
+the lost words: verb-tools-keep-spaced-args, which reads the spread arguments
+ShellWritesNothing: the rule reads a file name at a path boundary, and leaves a hyphenated ticket name alone
+the server dropping: a ticket on the bridge server, which the log lines at the event port carry
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask of the fix blamed spaces, and a call with one word failed the same way, which moved the search off quoting and onto the event shape. The running plugin loads once, so a probe inside the hook showed nothing and cost three calls. The host reference settled the shape.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every fact stands in one place: each line points at the ticket or verb owning it
+no number the change adds needs a name: the retro carries times alone
+no header changes: the fix adds a function under the standing header of index-tools.js
+the chapter carries the errors off the log with their times, and the run met no owner prompt past the plugin prompt after the clear
+the chapter says the role and names no box path
 
 ## cloud
 
