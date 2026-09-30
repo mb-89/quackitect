@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides, the-sidebar-reads-v1]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 9c024090bdfb0cdb
         size: 870
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: 33a5f73e490b852cf083bc50309779c918466b3c
+    hash_after: 33a5f73e490b852cf083bc50309779c918466b3c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 7 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 72598afa192c1458
+        size: 5559
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -280,26 +293,50 @@ What I weigh and assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-writes.test.js test/level0/ticket-new.test.js test/level0/bless-desk.test.js test/level0/log-say.test.js src/modules/holds/bless_test.go src/modules/log/say_test.go src/modules/verbs/new_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/sidebar-writes.test.js
+- test/level0/ticket-new.test.js
+- test/level0/bless-desk.test.js
+- test/level0/log-say.test.js
+- src/modules/holds/bless_test.go
+- src/modules/log/say_test.go
+- src/modules/verbs/new_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion. Every older case in the same files and packages passes.
+
+What surprised me:
+- The mixed run's tail counts the JS cases alone. `go test` shows each Go case failing on its `t.Fatalf`.
+- The door refuses a command naming the bless file path, so bless-desk.test.js imports `BLESS_FILE`.
+- `holds.Registers` needs `tickets/all` seeded as `[]ticket.Ticket`.
+- session.test.js stands nowhere. Only session-layer.test.js stands, so the size line names a missing file.
+- The draft names no new case in logbook.test.js.
+- The vehicle and stub buttons post their args without the quotes the line builder adds today.
+
+The tests fix the input shapes the draft leaves open:
+- `config/override` takes `key`, `value` and `window`, with the window as a string.
+- `bless/set` runs `ticket bless --desk=<agent>` as a person.
+- `tickets/new` runs `ticket new <path>`, and `log/say` runs `log --say <row>`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the unchanged-file line meets the new-window case, the buttons line meets the fake action door case, and the grep line meets the grep case in sidebar-writes.test.js. The check line waits on the check itself
+- the index door has its fake in test/level0/v1-index.js, which now answers every write action. The Go cases run on q/qtest
 
 # gate
 

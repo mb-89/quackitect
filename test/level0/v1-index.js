@@ -18,6 +18,24 @@ const HOLDS = ".se/.runtime/hold/";
 const TICKETS = ["spec/tickets/", ".se/tickets/"];
 const DRAWN = "tickets/drawn/";
 const PERSON = "person";
+// The layer an override answers at, the name OverrideLayer in src/modules/config holds. [[spec/tickets/the-sidebar-writes-through-actions]]
+const OVERRIDE = "override";
+// The bare ticket tickets/new writes where no file stands. [[spec/tickets/the-sidebar-writes-through-actions]]
+const BARE = ["---", "kind: [[ticket]]", 'process: ""', "---", "", "# Ask", ""].join(
+  "\n",
+);
+// What a verb's action answers where the verb runs clean. [[spec/tickets/the-lens-calls-actions]]
+const RAN = { code: 0, out: "", err: "" };
+const STAMP = "2026-01-01T00:00:00.000Z";
+
+// A value as the config verb types it: a JSON literal where the text reads as one, and the text otherwise. [[spec/tickets/the-sidebar-writes-through-actions]]
+function literalOf(text) {
+  try {
+    return JSON.parse(String(text));
+  } catch {
+    return String(text);
+  }
+}
 
 // The front of a note, as the Go note reader hands it. [[spec/tickets/the-lens-reads-v1]]
 const frontOf = (text) => (text ? (readNote(text).front.said ?? {}) : {});
@@ -99,7 +117,39 @@ export function orderedOf(value) {
 export function v1Over(files, given = {}) {
   const text = (path) => (files.exists(path) ? String(files.read(path)) : "");
   const file = (path) => (files.exists(path) ? parsed(text(path)) : undefined);
-  const keys = () => valuesOf(file(TRACKED), file(LOCAL), file(SCHEMA) ?? {});
+  // The overrides config/override holds, each by its window, in memory as config/held keeps them. [[spec/tickets/the-sidebar-writes-through-actions]]
+  const overrides = new Map();
+  const keys = () => {
+    const out = valuesOf(file(TRACKED), file(LOCAL), file(SCHEMA) ?? {});
+    for (const [key, one] of overrides)
+      out.set(key, { ...out.get(key), value: one.value, layer: OVERRIDE });
+    return out;
+  };
+  // Each write action does what its module does, and answers the names it changes. [[spec/tickets/the-sidebar-writes-through-actions]]
+  const behaves = {
+    "config/override": ({ key, value, window }) => {
+      overrides.set(String(key), { value: literalOf(value), window: String(window) });
+      return ["config/keys"];
+    },
+    "config/opened": ({ window }) => {
+      for (const [key, one] of overrides)
+        if (one.window !== String(window)) overrides.delete(key);
+      return ["config/keys"];
+    },
+    "bless/set": ({ agent }) => {
+      files.write(BLESS, `${JSON.stringify({ agent: agent === true })}\n`);
+      return ["bless/agent"];
+    },
+    "log/say": ({ level, kind, said, extra }) => {
+      const row = { at: given.at ?? STAMP, level, kind, said, ...(extra ?? {}) };
+      files.append(LOG, `${JSON.stringify(row)}\n`);
+      return ["log/rows"];
+    },
+    "tickets/new": ({ path }) => {
+      if (!files.exists(String(path))) files.write(String(path), BARE);
+      return [`tickets/notes/${path}`];
+    },
+  };
   const answers = {
     "config/keys": () =>
       [...keys()].map(([key, one]) => ({ key, value: one.value, layer: one.layer })),
@@ -147,25 +197,36 @@ export function v1Over(files, given = {}) {
     }
     return undefined;
   };
+  const fire = async (name) => {
+    for (const one of watches) {
+      if (!one.stopped && one.names.includes(name))
+        await one.fn(name, await values(name));
+    }
+  };
+  // A post lands in called, does what its module does, and fires each name it changes. [[spec/tickets/the-sidebar-writes-through-actions]]
+  const posts = async (name, input) => {
+    called.push({ name, input });
+    for (const one of behaves[name]?.(input ?? {}) ?? []) await fire(one);
+  };
   return {
     given,
     called,
     watches,
     values,
     calls: async (name, input) => {
-      called.push({ name, input });
+      await posts(name, input);
       return given.answers?.[name] ?? {};
+    },
+    // A verb's action, answered as a run. [[spec/tickets/the-lens-calls-actions]]
+    acts: async (name, input) => {
+      await posts(name, input);
+      return given.acts?.[name] ?? RAN;
     },
     watch: (names, fn) => {
       const one = { names, fn, stopped: false };
       watches.push(one);
       return { stop: () => (one.stopped = true) };
     },
-    fire: async (name) => {
-      for (const one of watches) {
-        if (!one.stopped && one.names.includes(name))
-          await one.fn(name, await values(name));
-      }
-    },
+    fire,
   };
 }
