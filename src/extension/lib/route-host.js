@@ -6,6 +6,7 @@
 const { EMITTER, drawable } = require("./drawing.js");
 const {
   HOLDS,
+  actsOn,
   answerOf,
   holdsIn,
   personHolds,
@@ -94,7 +95,7 @@ function routeHostOf(door) {
   const routes = async (path, ticket, steps) => {
     await door.saves(path);
     const argv = routeArgvOf(ticket, steps);
-    const ran = await door.runsVerb(argv);
+    const ran = await actsOn(door, argv);
     const said = answerOf(ran);
     door.says([`./RUNME.sh ${argv.join(" ")}`, "", ...said.lines]);
     const refused = refusalIn(ran);
@@ -113,6 +114,8 @@ function routeHostOf(door) {
 
   return {
     watches: [],
+    // A message for the page a path shows. [[spec/tickets/the-lens-calls-actions]]
+    took: (path, message) => took(path, shown.get(path), message),
 
     async opened(path, text) {
       if (drawable(path) !== "ticket") return undefined;

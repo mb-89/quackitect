@@ -22,13 +22,7 @@ const {
   treeIn,
   valuesOfKeys,
 } = require("./lib/widgets.js");
-const {
-  NEW_TICKET,
-  lineArgvOf,
-  nameIn,
-  nextIn,
-  ticketPathOf,
-} = require("./lib/work.js");
+const { NEW_TICKET, nameIn, ticketPathOf } = require("./lib/work.js");
 
 const SCHEMA = "spec/config/level0.schema.json";
 // A copy of inRun("bless.json") out of .claude/skills/level0/lib/folders.js, which BLESS_FILE in src/scripts/pull-bless.js names, because the extension loads CommonJS and those modules are ESM. [[spec/design_output/pull#the-bless]]
@@ -56,6 +50,8 @@ const NAMES = [
 ];
 // The rows of the session log, and the ticket files, which the log button and New ticket read. [[spec/tickets/the-sidebar-reads-v1]]
 const LOG_ROWS = "log/rows";
+// The rows waiting on a person, in queue order, whose first Pull for me takes. [[spec/tickets/the-lens-calls-actions]]
+const YOURS = "work/yours";
 const NOTES = "tickets/notes";
 
 function sidebarOf(door) {
@@ -152,7 +148,7 @@ function sidebarOf(door) {
         const one = await entryOf(message.key);
         // [[spec/tickets/the-work-group-draws-buttons]]
         if (one?.opens) return newTicket(door, asked, one);
-        if (one?.pulls) return pullsNext(door, one);
+        if (one?.pulls) return pullsNext(door, asked);
         const runs = await lineOf(message);
         if (runs === undefined) return undefined;
         await logbook.say(
@@ -243,10 +239,11 @@ async function catalogOf(asked) {
   return Object.fromEntries(CATALOG.map((name, at) => [name, rows[at]]));
 }
 
-// Pull for me takes the ticket the queue names, through the road the ticket's buttons run. [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
-async function pullsNext(door, one) {
-  const next = nextIn(await door.asksVerb(lineArgvOf(one.runs)));
-  if (!next) return door.tells("Nothing waits on you", "", false);
+// Pull for me takes the first row of work/yours, through the road the ticket's buttons run. [[spec/tickets/the-lens-calls-actions]]
+async function pullsNext(door, asked) {
+  const next = (await asked(YOURS))?.[0];
+  if (!next?.ticket || !next?.path)
+    return door.tells("Nothing waits on you", "", false);
   const said = await ticketLensOf(door).took("take", next.ticket, next.path);
   if (said?.word !== "refused") await door.opens(next.path);
   return said;

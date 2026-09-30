@@ -220,9 +220,11 @@ function doorOf(seed, typed = "") {
       return typed;
     },
     saves: async (path) => said.saved.push(path),
-    runsVerb: async (argv) => {
-      said.ran.push(argv);
-      return { code: 0, out: "work\n  the next leaf\n", err: "" };
+    index: {
+      acts: async (name, input) => {
+        said.ran.push([...name.split("/"), ...input.args]);
+        return { code: 0, out: "work\n  the next leaf\n", err: "" };
+      },
     },
     says: (lines) => said.says.push(lines),
     tells: (title, detail, refused) => said.told.push([title, detail, refused]),

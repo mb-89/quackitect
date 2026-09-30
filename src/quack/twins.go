@@ -8,11 +8,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
 
+	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
 	"quackitect/src/q"
 	"quackitect/src/ticket"
@@ -154,7 +156,11 @@ func branchQueue(v1 func() (string, error)) twin {
 func nodeAccept(root string) func(q.Request) (any, error) {
 	scripts := filepath.Join(root, "src", "scripts")
 	return func(asked q.Request) (any, error) {
-		args, err := wordsOf(asked.Args)
+		words, person := asked.Args, false
+		if marked, ok := asked.Args.(map[string]any); ok {
+			words, person = marked[verbsmodule.WordsField], marked[verbsmodule.PersonField] == true
+		}
+		args, err := wordsOf(words)
 		if err != nil {
 			return nil, err
 		}
@@ -164,6 +170,9 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 		argv := programOf(scripts, args)
 		run := exec.Command(argv[0], argv[1:]...)
 		run.Dir = root
+		if person {
+			run.Env = personEnv(os.Environ(), root)
+		}
 		said, err := run.CombinedOutput()
 		text := strings.TrimRight(string(said), "\n")
 		if err != nil {
@@ -171,6 +180,23 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 		}
 		return text, nil
 	}
+}
+
+// The variables a harness sets, which HARNESS in src/extension/lib/lens.js owns, and the root a person's run names, which WORK_ROOT there owns. [[spec/design_output/pull#the-hand-rule]]
+var harness = []string{"CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"}
+
+const workRoot = "SE_WORK_ROOT"
+
+// The environment a person's run takes: the harness variables left behind, and the root named. [[spec/tickets/the-lens-calls-actions]]
+func personEnv(env []string, root string) []string {
+	out := make([]string, 0, len(env)+1)
+	for _, one := range env {
+		name, _, _ := strings.Cut(one, "=")
+		if !slices.Contains(harness, name) && name != workRoot {
+			out = append(out, one)
+		}
+	}
+	return append(out, workRoot+"="+root)
 }
 
 // The words a request carries, as a list of strings or as the list JSON decodes. [[spec/tickets/ticket-verbs-become-actions]]

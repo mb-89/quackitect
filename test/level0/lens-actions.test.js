@@ -11,6 +11,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { ticketLensOf } from "../../src/extension/lib/lens.js";
 import { routeHostOf } from "../../src/extension/lib/route-host.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
+import { orderedOf } from "./v1-index.js";
 
 const PATH = "spec/tickets/one.md";
 const PICKED = "one";
@@ -28,6 +29,7 @@ function doorOf({
 } = {}) {
   const files = fakeDisk({ [SCHEMA]: JSON.stringify(schema) });
   const said = { posted: [], told: [], opened: [], saved: [] };
+  const answers = { "work/yours": rows, [`config/${SCHEMA}`]: orderedOf(schema) };
   return {
     said,
     files,
@@ -47,7 +49,7 @@ function doorOf({
     opens: async (path) => said.opened.push(path),
     lensChanged: () => {},
     index: {
-      values: async (name) => (name === "work/yours" ? rows : undefined),
+      values: async (name) => answers[name],
       calls: async () => undefined,
       acts: async (name, input) => {
         said.posted.push([name, input]);

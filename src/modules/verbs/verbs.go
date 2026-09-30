@@ -25,7 +25,15 @@ type Verb struct {
 // The input of a verb's action: the words past the verb, as a person types them. [[spec/tickets/ticket-verbs-become-actions]]
 type Words struct {
 	Args []string `json:"args" doc:"the words past the verb, as a person types them"`
+	// [[spec/tickets/the-lens-calls-actions]]
+	Person bool `json:"person,omitempty" doc:"whether a person posts it, so the verb runs with no harness variable"`
 }
+
+// The fields of a run's args when a person posts it: the words, and the mark. [[spec/tickets/the-lens-calls-actions]]
+const (
+	WordsField  = "words"
+	PersonField = "person"
+)
 
 // The module type of a topic, registering one action a verb. [[spec/tickets/ticket-verbs-become-actions]]
 // Each action writes, since the verb's program writes the tree, and declares no deadline, since the caller's wait keeps it free however long the verb runs. [[spec/design_output/model#a-caller-sets-its-wait]]
@@ -40,7 +48,10 @@ func actions(verbs []Verb, before func(verb string) []string) func(*q.Catalog) q
 		for _, one := range verbs {
 			head := before(one.Name)
 			hands = append(hands, q.ActionIn(c, one.Name, func(in Words) []q.Request {
-				args := append(append([]string{}, head...), in.Args...)
+				var args any = append(append([]string{}, head...), in.Args...)
+				if in.Person {
+					args = map[string]any{WordsField: args, PersonField: true}
+				}
 				return []q.Request{{Module: NodeModule, Verb: NodeRun, Args: args, NoUndo: fmt.Sprintf("%s runs through its program, which keeps no undo", strings.Join(head, " "))}}
 			}, q.Doc(one.Doc), q.Writes()))
 		}

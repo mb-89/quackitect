@@ -1,23 +1,16 @@
 // The buttons over a ticket: the lens provider, the box asking why a step
-// fails, and the child process running the pull. editor.js holds every other
-// call into the editor.
+// fails, and the pick and the toast around the pull. editor.js holds every
+// other call into the editor.
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 
 const vscode = require("vscode");
-const { spawn } = require("node:child_process");
-const { realpathSync } = require("node:fs");
-const { join } = require("node:path");
-
-const { PROGRAMS, personEnv } = require("./lib/lens.js");
 
 const TICKETS = "{spec/tickets,.se/tickets}/*.md";
-const NODE = "node";
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 function lensDoor(context, folder) {
   const changed = new vscode.EventEmitter();
   context.subscriptions.push(changed);
-  const root = folder?.uri?.fsPath ?? "";
   const pathOf = (uri) =>
     vscode.workspace.asRelativePath(uri, false).replace(/\\/g, "/");
 
@@ -84,53 +77,7 @@ function lensDoor(context, folder) {
       if (refused) vscode.window.showWarningMessage(said);
       else vscode.window.showInformationMessage(said);
     },
-
-    // A verb a draw runs, so no progress toast rides it. [[spec/tickets/the-work-group-draws-buttons]]
-    asksVerb(argv) {
-      const home = join(realpathSync.native(context.extensionPath), "..", "..");
-      return ranOf(home, argv, root);
-    },
-
-    runsVerb(argv) {
-      const home = join(realpathSync.native(context.extensionPath), "..", "..");
-      return vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: argv.join(" "),
-        },
-        () => ranOf(home, argv, root),
-      );
-    },
   };
-}
-
-// [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-function ranOf(home, argv, root) {
-  const [verb, ...words] = argv;
-  const program = join(home, ...PROGRAMS.split("/"), `${verb}.js`);
-  return new Promise((resolve) => {
-    let out = "";
-    let err = "";
-    const child = spawn(NODE, [program, ...words], {
-      cwd: root,
-      env: personEnv(process.env, root),
-      windowsHide: true,
-    });
-    child.stdout.on("data", (chunk) => {
-      out += chunk;
-    });
-    child.stderr.on("data", (chunk) => {
-      err += chunk;
-    });
-    child.on("error", (error) =>
-      resolve({
-        code: 1,
-        out,
-        err: `${err}${NODE} runs nowhere: ${error.message}`,
-      }),
-    );
-    child.on("close", (code) => resolve({ code, out, err }));
-  });
 }
 
 module.exports = { lensDoor };

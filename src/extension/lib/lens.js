@@ -185,6 +185,18 @@ function fillArgvOf(path, text) {
   return ["ticket", "fill", String(path).replace(/\\/g, "/")];
 }
 
+// The action a verb's words post to, with the words past the verb and the person mark. [[spec/tickets/the-lens-calls-actions]]
+function actionOf(argv) {
+  const [topic, verb, ...args] = argv;
+  return { name: `${topic}/${verb}`, input: { args, person: true } };
+}
+
+// [[spec/tickets/the-lens-calls-actions]]
+function actsOn(door, argv) {
+  const one = actionOf(argv);
+  return door.index.acts(one.name, one.input);
+}
+
 // The child runs as a person, so the names a harness sets stay behind. [[spec/design_output/pull#the-hand-rule]]
 function personEnv(env, root) {
   const out = { ...(env ?? {}) };
@@ -253,7 +265,7 @@ function ticketLensOf(door) {
       if (HANDS_BACK.has(act)) await door.saves(path);
       const argv = argvOf(act, ticket, reason);
       if (!argv.length) return undefined;
-      const said = answerOf(await door.runsVerb(argv));
+      const said = answerOf(await actsOn(door, argv));
       door.says([`./RUNME.sh ${argv.join(" ")}`, "", ...said.lines]);
       door.tells(`${ticket}: ${said.word}`, said.detail, said.word === "refused");
       door.lensChanged?.();
@@ -263,7 +275,7 @@ function ticketLensOf(door) {
     async saved(path, text) {
       const argv = fillArgvOf(path, text);
       if (!argv.length) return undefined;
-      const ran = await door.runsVerb(argv);
+      const ran = await actsOn(door, argv);
       const lines = `${ran?.out ?? ""}\n${ran?.err ?? ""}`
         .split(/\r?\n/)
         .filter((one) => one.trim());
@@ -283,6 +295,8 @@ module.exports = {
   HARNESS,
   HOLDS,
   HOLD_WATCHES,
+  actionOf,
+  actsOn,
   answerOf,
   argvOf,
   fillArgvOf,

@@ -119,9 +119,12 @@ function doorOf({
     },
     asksLine: async () => "the ask stands unmet",
     saves: async (path) => said.saved.push(path),
-    runsVerb: async (argv) => {
-      said.ran.push(argv);
-      return ran[argv[1]] ?? { code: 0, out: "work\n  the next leaf\n", err: "" };
+    index: {
+      acts: async (name, input) => {
+        const argv = [...name.split("/"), ...input.args];
+        said.ran.push(argv);
+        return ran[argv[1]] ?? { code: 0, out: "work\n  the next leaf\n", err: "" };
+      },
     },
     says: (lines) => said.says.push(lines),
     tells: (title, detail, refused) => said.told.push([title, detail, refused]),

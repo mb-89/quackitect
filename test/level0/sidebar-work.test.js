@@ -10,14 +10,13 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import { v1Over } from "./v1-index.js";
 
-const NEXT = JSON.stringify({ ticket: "one", path: "spec/tickets/one.md", step: "do" });
+const NEXT = { ticket: "one", path: "spec/tickets/one.md", step: "do" };
 
 function doorOf({ seed = {}, answers = {}, typed = "", given = {} } = {}) {
   const files = fakeDisk({ [SCHEMA]: JSON.stringify(schema), ...seed });
   const said = {
     asked: [],
     ran: [],
-    quiet: [],
     opened: [],
     told: [],
     saved: [],
@@ -32,7 +31,14 @@ function doorOf({ seed = {}, answers = {}, typed = "", given = {} } = {}) {
   return {
     files,
     said,
-    index: v1Over(files, given),
+    index: {
+      ...v1Over(files, given),
+      acts: async (name, input) => {
+        const argv = [...name.split("/"), ...input.args];
+        said.ran.push(argv);
+        return answer(argv);
+      },
+    },
     read: async (path) => (files.exists(path) ? files.read(path) : ""),
     write: async (path, text) => files.write(path, text),
     list: async () => [],
@@ -43,14 +49,6 @@ function doorOf({ seed = {}, answers = {}, typed = "", given = {} } = {}) {
     asksLine: async (prompt) => {
       said.asked.push(prompt);
       return typed;
-    },
-    asksVerb: async (argv) => {
-      said.quiet.push(argv);
-      return answer(argv);
-    },
-    runsVerb: async (argv) => {
-      said.ran.push(argv);
-      return answer(argv);
     },
     runs: (line) => said.ran.push(line),
     opens: async (path) => said.opened.push(path),
@@ -79,7 +77,6 @@ test("the work group draws the three buttons the config declares", async () => {
 test("the work editor's button carries the count the index answers", async () => {
   const door = doorOf({ given: { "work/open-tasks": 3 } });
   const html = await sidebarOf(door).html();
-  assert.deepEqual(door.said.quiet, []);
   assert.deepEqual(door.said.ran, []);
   const button = html.slice(html.indexOf('data-key="work.editor"'));
   assert.match(
@@ -89,16 +86,15 @@ test("the work editor's button carries the count the index answers", async () =>
 });
 
 test("pull for me takes the ticket the queue names, and opens it", async () => {
-  const door = doorOf({ answers: { "ticket yours": { code: 0, out: NEXT, err: "" } } });
+  const door = doorOf({ given: { "work/yours": [NEXT] } });
   await press(door, "work.pull");
-  assert.deepEqual(door.said.quiet, [["ticket", "yours", "--next"]]);
   assert.deepEqual(door.said.ran, [["ticket", "pull", "one"]]);
   assert.deepEqual(door.said.opened, ["spec/tickets/one.md"]);
 });
 
 test("pull for me over an empty queue says so, and pulls nothing", async () => {
   const door = doorOf({
-    answers: { "ticket yours": { code: 0, out: '{"ticket":null}', err: "" } },
+    given: { "work/yours": [] },
   });
   await press(door, "work.pull");
   assert.deepEqual(door.said.ran, []);

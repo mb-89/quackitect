@@ -1,6 +1,6 @@
-// A save in the editor runs the fill verb, over a fake disk. The door's
-// `runsVerb` runs the `ticket` verb in place of a child process, so the case
-// reads the file the save leaves behind.
+// A save in the editor runs the fill verb, over a fake disk. The index door's
+// `acts` runs the `ticket` verb in place of the index, so the case reads the
+// file the save leaves behind.
 // [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
 
 import assert from "node:assert/strict";
@@ -33,10 +33,13 @@ function doorOver(disk) {
     said,
     list: async () => [],
     read: async () => "",
-    runsVerb: async ([verb, ...rest]) => {
-      assert.equal(verb, "ticket");
-      const ran = heard(() => ticket(ROOT, rest, { disk, join, front: fakeFront() }));
-      return { code: ran.code, out: ran.said, err: "" };
+    index: {
+      acts: async (name, input) => {
+        const [verb, ...rest] = [...name.split("/"), ...input.args];
+        assert.equal(verb, "ticket");
+        const ran = heard(() => ticket(ROOT, rest, { disk, join, front: fakeFront() }));
+        return { code: ran.code, out: ran.said, err: "" };
+      },
     },
     says: (lines) => said.says.push(lines),
     tells: (...one) => said.told.push(one),

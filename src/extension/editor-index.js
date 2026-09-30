@@ -9,6 +9,9 @@ const { join } = require("node:path");
 const STANDING = [".se", ".runtime", "index.json"];
 // The pause before a watch opens again, since the index restarts under a window. [[spec/tickets/the-sidebar-reads-v1]]
 const REOPEN = 2000;
+// What a verb's action answers where no index stands. [[spec/tickets/the-lens-calls-actions]]
+const NO_INDEX =
+  "no index answers at this tree, and ./RUNME.sh index standing starts one";
 
 // [[spec/design_output/extension#the-views-section]]
 function indexDoor(root) {
@@ -20,15 +23,19 @@ function indexDoor(root) {
       return "";
     }
   };
-  const asks = async (path, init) => {
+  const answered = async (path, init) => {
     const at = base();
     if (!at) return undefined;
     try {
       const said = await fetch(`${at}${path}`, init);
-      return said.ok ? await said.json() : undefined;
+      return { ok: said.ok, body: await said.json().catch(() => undefined) };
     } catch {
       return undefined;
     }
+  };
+  const asks = async (path, init) => {
+    const said = await answered(path, init);
+    return said?.ok ? said.body : undefined;
   };
   // Each named value once, then each change, one call of fn an event, until stop. [[spec/tickets/the-sidebar-reads-v1]]
   const watch = (names, fn) => {
@@ -52,13 +59,28 @@ function indexDoor(root) {
   return {
     watch,
     values: async (name) => (await asks(`/values/${name}`))?.value,
-    calls: (name, input) =>
-      asks(`/actions/${name}`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(input ?? {}),
-      }),
+    calls: (name, input) => asks(`/actions/${name}`, posted(input)),
+    // A verb's action, answered as a run: its output on a 200, and the problem's detail, which carries the verb's output, on a refusal. [[spec/tickets/the-lens-calls-actions]]
+    acts: async (name, input) => {
+      const said = await answered(`/actions/${name}`, posted(input));
+      if (!said) return { code: 1, out: "", err: NO_INDEX };
+      if (said.ok) return { code: 0, out: textOf(said.body?.result), err: "" };
+      return { code: 1, out: "", err: String(said.body?.detail ?? "") };
+    },
   };
+}
+
+function posted(input) {
+  return {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify(input ?? {}),
+  };
+}
+
+function textOf(result) {
+  if (result === undefined || result === null) return "";
+  return typeof result === "string" ? result : JSON.stringify(result);
 }
 
 // Reads a server-sent stream, and hands each event's name and value to fn. [[spec/tickets/the-sidebar-reads-v1]]
