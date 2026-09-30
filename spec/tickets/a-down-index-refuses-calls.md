@@ -115,6 +115,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
+depends_on: [cage-rules-port-before-switch]
 ---
 
 # Ask
@@ -280,3 +281,5 @@ A fault then shows on the first call, and gets fixed early.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+**The order.** This ticket waits on [[spec/tickets/cage-rules-port-before-switch]]. Its ask moves the cage key to `new`, and the Go door refuses nothing the bridge refuses until the rules port. The ticket `shadow-evidence-5-6` on the branch `claude/shadow-evidence-5-6` names the refusals the door passes. Weighed: the switch first leaves the cage open, and the port first costs this ticket a wait alone.
