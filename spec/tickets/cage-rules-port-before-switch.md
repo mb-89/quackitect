@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: 9aef028935cf6fae3c5e4fc4439fa2128b7b54da
+    hash_after: e331f9c4f269b3669d8270e95e6766ae14fa7392
+    inputs:
+      - name: ask
+        hash: 69047d049588488a
+        size: 690
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,67 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The port splits into five children in this group, one a rule family, each small enough to review whole, off the inventory of src/bridge/server.js DOORS and TOOLS:
+
+- [[spec/tickets/cage-command-rules-port]]: the ticket door, the command findings, the git write door, the version and bless guards. It lands the tree reader the door needs, the root, the config and the todo in hand, as fields of hooks.Outside, so the rest wait on it
+- [[spec/tickets/cage-commit-guards-port]]: the private and tested deltas, the todo on a push, the desk and trunk guards, the commit voice
+- [[spec/tickets/cage-write-door-port]]: a write naming no ticket, and every onWrite rule
+- [[spec/tickets/cage-call-holds-port]]: the holds before a tool door runs, and the helper tier
+- [[spec/tickets/cage-stop-rules-port]]: the handover due, the unanswered prompt, the stop reasons
+
+Each child ports its rules into Door.Hook one at a time, each through a recorded log under test/replay/cage whose golden shadow loses the rows the rule decides. The rewrites the bridge answers as event or after read as pass on both sides, so none of them ports here.
+
+This ticket holds the whole: a recorded session log, test/replay/cage/every-refusal.jsonl, carrying one call of each refusal the bridge makes, with an empty golden shadow. It stands red until the last child lands. Its accept then reads ./RUNME.sh log --kind shadow over a live session recorded after the last port.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go: the index wiring calling hooks.New and Listen
+- src/modules/hooks/hooks.go: Door.serves and Replay calling Door.Hook
+- src/modules/hooks/cage.go: Door.ReplayLog calling Door.Hook
+- src/bridge/cage-shadow.js: shadowsCage posting to the door
+- src/quack/hooks_test.go and src/quack/hook_test.go: the wiring cases calling hooks.New
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/replay/cage/every-refusal.jsonl with an empty every-refusal.shadow.jsonl: TestReplayLogAnswersEveryRecordedLog/every-refusal.jsonl in src/modules/hooks/cage_test.go
+- each child adds its own log under test/replay/cage and its table case, named on its own ticket
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- test/replay/cage/every-refusal.jsonl
+- test/replay/cage/every-refusal.shadow.jsonl
+- spec/tickets/cage-command-rules-port.md
+- spec/tickets/cage-commit-guards-port.md
+- spec/tickets/cage-write-door-port.md
+- spec/tickets/cage-call-holds-port.md
+- spec/tickets/cage-stop-rules-port.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened server.js DOORS, TOOLS and answersEvent, cage.go OldDecisionOf, NewDecisionOf and ReplayLog, cage_test.go TestReplayLogAnswersEveryRecordedLog, hooks.go Hook and calls, and each claim holds there
+- the callers list names every caller of Door.Hook and hooks.New, and the bridge post
+- done_when line one meets the every-refusal replay and each child log, line two the accept reading the live shadow, line three the check
 
 ## tests-red
 
