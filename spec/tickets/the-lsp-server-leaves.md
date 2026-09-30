@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
 depends_on: ["lsp-module-serves-the-features","lsp-module-draws-the-tools"]
+record:
+  - step: design/draft
+    hand: box d8922c5f7ed7 · claude-code-remote
+    hash_before: 61ae1d4a1783960d885a8d54d0dcd555152035e8
+    hash_after: f12a9c68e8c06aa796c538a3fd07f559e79a8876
+    inputs:
+      - name: ask
+        hash: cd2c7ff40c7ad82d
+        size: 226
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +156,75 @@ A second server drifts from the model.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The editor starts `quack lsp` off the index binary, and `src/lsp` leaves whole once its two children land: the features in [[spec/tickets/lsp-module-serves-the-features]] and the tool rows in [[spec/tickets/lsp-module-draws-the-tools]].
+
+| what | the change |
+|---|---|
+| the slice | `migration.lsp` reads `new` in `spec/config/level0.json` |
+| the editor | `serverAsk` in `src/extension/lib/lsp.js` starts `.se/.runtime/bin/se-index` with `lsp`, the binary `BIN` in `.claude/skills/level0/lib/index.js` names |
+| the server | `src/lsp` leaves: `serve.go` and its `lsp.json`, `port.go` and its `panel.json`, `indexed.go`, `shadow.go`, `watch.go`, and the stdio server |
+| the port client | `src/scripts/cli-served.js` leaves |
+| the lint | `readingFor` in `src/scripts/cli-read.js` reads `check/sweep` through `topicOf` in `src/scripts/quack-topic.js`, keeps the rows under the paths it asks, and adds `findingsOver` and `aloneOver` beside it. The JavaScript `treeFaults` and `schemaFaults` reads leave it |
+| the standing file | `StandingFile` in `src/modules/lsp/lsp.go` names `.se/.runtime/lsp-door.json`, and `folders.js` and the clean list in `install.sh` name it |
+| the build | `install.sh` drops the `se-lsp` build, `lsp_here` and `get_lsp`. `go-source.js`, `tools.js`, the hook's skip list and `Wanted` in `src/modules/check/tree.go` drop the name |
+| the doctor | the `se-lsp lsp` row becomes `quack lsp`, and `lsp-probe.js` starts the index binary with `lsp` |
+| the twin goldens | `TestTwinGoldens` moves from `src/lsp/twins_test.go` into `src/modules/check` |
+| the notes | `spec/design_output/lsp.md` describes the module, and `editor.md`, `level0.md`, `doors.md` and `migration.md` point at it |
+
+Weighed: keeping `se-lsp check` for the lint against reading the sweep. The sweep holds the same rules, so a second reader of the tree would stay for the lint alone. Assumed: the owner turned `phase7switch` on after reading a clean shadow.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/extension/lib/lsp.js serverAsk, clientOf
+- src/extension/extension.js and src/extension/editor.js, which start the client off serverAsk
+- src/scripts/cli-read.js readingFor, lint
+- src/scripts/cli-served.js serverFaults, privateRow
+- src/scripts/cli-doors.js lsp
+- src/scripts/cli-check.js the doctor rows
+- src/scripts/lsp-probe.js lspProbe
+- src/scripts/go-source.js the binary map
+- src/scripts/install.sh lsp_here, get_lsp, the skip and describe cases, the clean list
+- .claude/skills/level0/lib/tools.js the tool list
+- .claude/skills/level0/lib/folders.js the runtime names
+- .claude/skills/level0/hooks/level0.js the install skip list
+- src/modules/check/tree.go Wanted
+- src/modules/check/export.go and check_test.go, the comments naming src/lsp
+- src/modules/lsp/lsp.go StandingFile, Listen
+- src/quack/main.go lspVerb
+- test/contract one-reading, cli-check-doors, outside-in-doors, install, cloud-start, fetching
+- test/level0 lsp, doctor-hooks, go-source, check-twins, magic, tools
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/no-old-server.test.js no source names lsp.json or se-lsp
+- test/level0/lsp.test.js the editor starts quack lsp off the index binary
+- test/level0/lint-sweep.test.js the lint reads the check sweep through quack
+- src/modules/lsp/lsp_test.go TestTheListenWritesTheDoorFile
+- src/modules/check/twins_test.go TestTwinGoldens
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened, and each claim checked there, the standing file clash among them
+- the callers list names every file a git grep for se-lsp, src/lsp, panel.json and cli-served finds
+- the lsp.json line meets test/contract/no-old-server.test.js, and the check line meets ./RUNME.sh check
 
 ## tests-red
 
