@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides, the-sidebar-reads-v1]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: a9fc599b7b6295e6
         size: 1771
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: 6bd2bdb4343679f80bfc33c1d19bdd465b2408e7
+    hash_after: cdc0712e66817ba07bfcc78a34fcbe0de4f1a1cf
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -375,14 +384,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/extension src/modules/holds src/modules/log src/modules/verbs src/scripts/ticket.js src/scripts/pull-bless.js src/scripts/log-verb.js spec/design_output/extension.md test/contract/tree-extension.test.js test/level0
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the verbs land in `src/scripts/ticket.js`, `pull-bless.js` and `log-verb.js`, where the red tests import them. The design note and the tree contract test follow the change. `session.test.js` stands nowhere
+- the index door has its fake in test/level0/v1-index.js, which answers every write action. The Go cases run on q/qtest
+- each changed file carries a comment pointing at this ticket
+- `NEW_TICKET` moves into the `ticket new` verb, and `opened` leaves with `session.js`
 
 ## tests-green
 
