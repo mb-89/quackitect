@@ -91,6 +91,12 @@
       "rule": "EveryPointerResolves",
       "line": 100,
       "message": "This pointer names a chapter nobody wrote: spec/design_output/work#a-successor-stands-on-question. Point at a heading of spec/design_output/work.md, or write the chapter."
+    },
+    {
+      "file": "spec/tickets/the-sidebar-writes-through-actions.md",
+      "rule": "GroupAsksNobody",
+      "line": 1,
+      "message": "the-sidebar-writes-through-actions stands at view, a step a person takes, inside the open group sidebar-switches-over. A desk runs ./RUNME.sh branch unblock the-sidebar-writes-through-actions \u003csuccessor\u003e. A cloud box takes the step, per rule 7 of spec/guidance/cloud/cloud."
     }
   ]
 }

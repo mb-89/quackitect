@@ -123,9 +123,10 @@ A click posts `config/override` with the key, the typed value and the window,
 and the sidebar writes no file. A row under the tracked file shows the team's
 value, and the tracked file stays as the team holds it.
 
-The config module holds the override for the window. The value takes the type
-the schema says, so `"5"` from a select lands as the number `5`. That keeps
-`"5" > 3` a bug nobody files. [[spec/tickets/the-sidebar-writes-through-actions]]
+The config module holds the override for the window. `literalOfText` in
+`src/modules/config/config.go` reads the value as JSON where it parses, so `5`
+from a select lands as the number `5`, and other text lands as text.
+[[spec/tickets/the-sidebar-writes-through-actions]]
 
 ## A new window drops overrides
 
