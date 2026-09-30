@@ -83,11 +83,11 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 fix: true
-cloud: true
 record:
   - step: sync
     hand: box d85ab822b1d7 · claude-code-remote
     hash_before: a6a479785bf111a127f126518d43c77cf515c860
+    hash_after: cab2a34967dc66d6182d2b25c1dec82bf0ef4c25
   - step: sync
     hand: box d85ab822b1d7 · claude-code-remote
     hash_before: 98d779fa92c5e65c2e2e731aec922241a1f25605
