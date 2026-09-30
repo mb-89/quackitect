@@ -117,12 +117,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 8c35e8670417d30a5c6e7374ffa717890e1ace64
+    hash_after: 8c35e8670417d30a5c6e7374ffa717890e1ace64
+    inputs:
+      - name: ask
+        hash: 106cb5766c01d2f3
+        size: 947
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -165,38 +174,92 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The port keeps the order `onToolWrite` and `onWrite` in `src/bridge/write.js` give a harness write. `Door.refuses` in `src/modules/hooks/hooks.go` routes Write, Edit, MultiEdit and NotebookEdit to a new `Door.writeDoor`, beside the Agent and Bash roads. The god binding passes it, as `letsThrough` does. A harness write takes one of three roads:
+
+- a path outside the root passes, since `onWrite` passes an outside path after the bless check, and the bless file stands inside the root
+- a path inside the root other than `.se/HANDOVER.md` meets the no-ticket refusal, in the text `toolRefusal` in `src/engine/named.js` writes, `FIELD_HOW` included
+- the handover meets the rest of `onWrite`: the schema door, then the voice door
+
+The bless file, the conflict markers, the open ticket door, the fields the engine owns and the private rule each stand behind the no-ticket refusal on a harness write. The bless file and every ticket stand inside the root and off the handover. `privateDoor` skips `.se/`, and the owner door finds no projection there, since `spec/config/projections.json` targets nothing under `.se/`. So the hook answers each of those writes with the no-ticket refusal, and the port holds that answer per rule. A Go copy of `engineRestores` or `ticketDoor` decides no hook answer, so no test holds it. Those rules move with the patch tool's port, which calls `onWrite` inside the tool. A private note carries that.
+
+Pure reads land in a new package `src/modules/hooks/write`, ported line for line with the refusal text alike:
+
+- `write/door.go`: `ToolRefusal`, `Outside` off `outside`, `WholeAfter` off `wholeAfter`, and the handover road off `schemaDoor`, which calls `check.GovernorOf`, `check.KindOf` and `check.CheckNote`
+- `write/refuse.go`: `RefusedKind` and `RefusedNote` off `lib/schema.js`, and `RefusedVoice` off `lib/refuse.js` `refusal`, sharing the body `command.RefusedCommand` writes
+
+IO stays in the `hooks` module, in a new `writes.go`: it reads the file on disk through `disk{root}` for an Edit, and the schemas under `spec/schemas`. A new `Outside.Prose` takes a root, a path and a text, and answers the findings Vale and `src/prose` keep. `listensHooks` in `src/quack/main.go` wires it as the commit port wires `Outside.Voice`. The door splits refusals from form through the split the commit port lands in `command/voice.go`. A door with no Prose reads no voice.
+
+The evidence follows the road the commit port took:
+
+- `test/replay/cage/write-door-cases.json` holds a tree and per case the write, the kept voice findings, and the bridge's decision and text
+- `test/level0/write-door-cases.test.js` drives `onToolWrite` over those cases, so a drift in the bridge reads there first
+- `.se/scripts/write-door-log.mjs` prints `write-door.jsonl` off the bridge's own answers: a row a listed rule, with a `write-door.box.json` carrying the files and the voice
+- `cage_test.go` `boxOf` reads `prose` off the box file into `Outside.Prose`, so the replay meets each row with an empty golden shadow
+- the Write row of `every-refusal.shadow.jsonl` leaves the golden file
+
+What I weigh: the ask names every rule of `onWrite`, and a harness write reaches three roads of it. Porting the unreachable rules costs a large Go copy of the ticket engine that no hook answer tests. Holding each rule's answer at the hook meets the ask's done lines as the cage reads them. The cost: a later patch port writes those rules anew, and the note names that. I assume the cage reads harness writes alone, since the bridge answers a patch call inside its tool.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.refuses routes the write tools to Door.writeDoor
+- src/modules/hooks/hooks.go: Door.Hook calls Door.refuses
+- src/quack/main.go: listensHooks builds hooks.Outside with Prose
+- src/modules/hooks/cage_test.go: TestReplayLogAnswersEveryRecordedLog builds the replay door
+- src/modules/hooks/cage_test.go: boxOf and readsOf read the box file
+- src/quack/hook_test.go: builds hooks.Outside
+- src/quack/hooks_test.go: builds hooks.Outside
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/write/door_test.go: TestToolRefusalReadsTheBridgesText
+- src/modules/hooks/write/door_test.go: TestWholeAfterAppliesEachEdit
+- src/modules/hooks/writes_test.go: TestTheWriteDoorRefusesWhatTheBridgeRefuses, over write-door-cases.json
+- src/modules/hooks/cage_test.go: TestReplayLogAnswersEveryRecordedLog, over write-door.jsonl
+- test/level0/write-door-cases.test.js: the bridge answers each shared write case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go
+- src/modules/hooks/writes.go
+- src/modules/hooks/writes_test.go
+- src/modules/hooks/cage_test.go
+- src/modules/hooks/write/door.go
+- src/modules/hooks/write/door_test.go
+- src/modules/hooks/write/refuse.go
+- src/quack/main.go
+- test/replay/cage/write-door-cases.json
+- test/replay/cage/write-door.jsonl
+- test/replay/cage/write-door.box.json
+- test/replay/cage/write-door.shadow.jsonl
+- test/replay/cage/every-refusal.shadow.jsonl
+- test/level0/write-door-cases.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened write.js, named.js, projection.js, projections.json, the handover schema, hooks.go, cage.go, cage_test.go, commits_test.go and the check exports, and checked each claim there
+- the callers list names Door.refuses, Door.Hook, listensHooks, the replay's box readers and both quack tests building Outside
+- the per-rule logs with an empty shadow decide the first done line, TestTheWriteDoorRefusesWhatTheBridgeRefuses decides the text line, and ./RUNME.sh check decides the last
 
 ## tests-red
 
