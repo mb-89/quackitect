@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [the-work-tab-reads-v1]
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,25 @@ record:
         exit: 0
         said: "spec/tickets/the-work-keys-call-actions.md:353:146: Vocabulary: indexcatalog stands outside the words this tree writes. "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 36e3727970ed9c5b1c6c27531e4bb70ae3c018e1
+    hash_after: 36e3727970ed9c5b1c6c27531e4bb70ae3c018e1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui/work passes; green, src/tui/registry passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-work-keys-call-actions.md:382:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 9b51b64dd4244ee3
+        size: 1642
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -391,26 +410,40 @@ one place: the action names stand in spec/views/work.base alone, the tab looks e
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/work/actions_test.go src/tui/registry/call_contract_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work tab writes no file now. Each key posts the action spec/views/work.base names:
+
+- p then a digit posts work/place
+- u posts tickets/flip-urgent for each marked row
+- an edit's enter posts tickets/set-field
+- P posts work/pull
+
+The verbs behind the index hold the place rule and the front write, so one writer stands for each file. The registry gains Call on the fake and the V1 door, held to one contract suite. The window tests post through the fake, so no case reaches an index on the box.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the files: the draft's size list, plus the two window tests and main.go the gate names
+the doors: registry.Caller alone, with its fake and its contract suite
+the comment: src/tui/work/actions.go opens on the approach
+one place: the action names stand in the base file alone, and tui.md points at actions.go
 
 # accept
 
