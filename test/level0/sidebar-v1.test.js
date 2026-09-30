@@ -123,7 +123,7 @@ test("the sidebar draws the config tree and the views off a fake index", async (
 test("the work badge reads work/open-tasks off the index, and spawns no verb", async () => {
   const door = doorOf();
   const said = await sidebarOf(door).html();
-  assert.match(said, /<span class="count">7<\/span>/);
+  assert.match(said, /work \(7\)/);
   assert.deepEqual(door.said.spawned, [], "the badge spawns no verb");
 });
 
@@ -146,9 +146,10 @@ test("a watch event draws the sidebar again", async () => {
     "the sidebar watches no file",
   );
 
-  door.values["work/open-tasks"] = 9;
-  for (const one of door.said.watches) await one.fn("work/open-tasks", 9);
+  door.values["index/names"] = [{ ...door.values["index/names"][0], value: 9 }];
+  for (const one of door.said.watches)
+    await one.fn("index/names", door.values["index/names"]);
   for (const one of door.said.timers.filter((each) => !each.cancelled)) await one.run();
   assert.ok(drawn.length >= 2, "the event draws the page again");
-  assert.match(drawn.at(-1), /<span class="count">9<\/span>/);
+  assert.match(drawn.at(-1), /work \(9\)/);
 });

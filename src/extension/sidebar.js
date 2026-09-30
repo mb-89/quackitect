@@ -9,7 +9,6 @@ const { panelHtml } = require("./lib/panel.js");
 const { rowOf } = require("./lib/rows.js");
 const { actsOn, ticketLensOf } = require("./lib/lens.js");
 const { viewsOf } = require("./lib/views.js");
-const { apartOf } = require("./lib/views-shadow.js");
 const { statesOf } = require("./lib/states.js");
 const { asType, plainOf } = require("./lib/values.js");
 const {
@@ -34,7 +33,6 @@ const KEYS = "config/keys";
 const SCHEMA_VALUE = `config/${SCHEMA}`;
 const TRACKED_VALUE = `config/${TRACKED}`;
 const LOCAL_VALUE = `config/${LOCAL}`;
-const SLICE = "migration/config/sidebar";
 const BLESSES = "bless/agent";
 const BASES = "views/bases";
 const OPEN_TASKS = "work/open-tasks";
@@ -45,7 +43,6 @@ const NAMES = [
   SCHEMA_VALUE,
   TRACKED_VALUE,
   LOCAL_VALUE,
-  SLICE,
   BLESSES,
   BASES,
   OPEN_TASKS,
@@ -64,8 +61,6 @@ function sidebarOf(door) {
     async () => (await readAll()).values.get("log.level")?.value ?? "info",
   );
   const held = new Map();
-  // The shadow lines told this session, each once. [[spec/tickets/the-sidebar-shadow-compares]]
-  const told = new Set();
   // The window a click holds its override for: the pid opened takes. [[spec/tickets/the-sidebar-writes-through-actions]]
   let window;
   const windowOf = () => String(window ?? door.pid?.() ?? "");
@@ -120,14 +115,11 @@ function sidebarOf(door) {
         asked,
         litBy(groupsIn(said.schema, said.values), door.processes?.() ?? {}),
       );
-      const [slice, blesses, bases, catalog] = await Promise.all([
-        asked(SLICE),
+      const [blesses, bases, catalog] = await Promise.all([
         asked(BLESSES),
         asked(BASES).then((some) => some ?? []),
         catalogOf(asked),
       ]);
-      if (slice === "shadow")
-        await tells(logbook, told, apartOf(groups, bases, catalog));
       return panelHtml({
         groups,
         tree: treeIn(said.schema, [
@@ -240,15 +232,6 @@ async function counted(asked, groups) {
     }
   }
   return groups;
-}
-
-// Under shadow, each pair the two paths draw apart writes one row, once a session. [[spec/tickets/the-sidebar-shadow-compares]]
-async function tells(logbook, told, lines) {
-  for (const line of lines) {
-    if (told.has(line)) continue;
-    told.add(line);
-    await logbook.say("info", "shadow", line, { slice: "sidebar" });
-  }
 }
 
 // The two catalog rows off the index door, and none where no index stands. [[spec/design_output/extension#the-views-section]]

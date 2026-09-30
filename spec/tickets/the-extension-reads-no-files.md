@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -193,6 +193,15 @@ record:
         hash: 67bd0f62c86a8558
         size: 6048
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d891eb0f26d7 · claude-code-remote
+    hash_before: 3a2bc55a8729fe5d95f340ac3d455cb979ea1c43
+    hash_after: 3a2bc55a8729fe5d95f340ac3d455cb979ea1c43
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-extension-reads-no-files.md:337:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -348,14 +357,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the three tests that read the grid's count, which the ask moves to the views section: sidebar-work, sidebar-v1 and the work-buttons contract
+- the change reaches no door, so no fake joins it
+- each changed test and the sidebar name this ticket or its child beside the line
+- the badge stands in index/names alone, and work.editor carries no copy; work.pull keeps its help and icon, since the grid still draws that button and the work-buttons contract holds every work button wears a mark
 
 ## tests-green
 

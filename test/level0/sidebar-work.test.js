@@ -76,16 +76,13 @@ test("the work group draws the three buttons the config declares", async () => {
     assert.ok(section.includes(`data-key="${key}"`), key);
 });
 
-// The badge reads the count the work tab's brackets read off the index, and spawns no verb. [[spec/tickets/the-sidebar-reads-v1]]
-test("the work editor's button carries the count the index answers", async () => {
+// The views section draws the work badge, so the grid's button carries no copy. [[spec/tickets/the-extension-reads-no-files]]
+test("the work editor's button carries no count, and spawns no verb", async () => {
   const door = doorOf({ given: { "work/open-tasks": 3 } });
   const html = await sidebarOf(door).html();
   assert.deepEqual(door.said.ran, []);
   const button = html.slice(html.indexOf('data-key="work.editor"'));
-  assert.match(
-    button.slice(0, button.indexOf("</button>")),
-    /<span class="count">3<\/span>/,
-  );
+  assert.doesNotMatch(button.slice(0, button.indexOf("</button>")), /class="count"/);
 });
 
 test("pull for me takes the ticket the queue names, and opens it", async () => {

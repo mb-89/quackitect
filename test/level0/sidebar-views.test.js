@@ -133,18 +133,6 @@ const shadowRows = (door) =>
     .map(({ input }) => ({ kind: input.kind, said: input.said, ...input.extra }))
     .filter((row) => row.kind === "shadow");
 
-test("under shadow a mismatch writes a shadow row naming the slice, and under old none", async () => {
-  const shadow = shadowDoorOf("shadow");
-  await sidebarOf(shadow).html();
-  const rows = shadowRows(shadow);
-  assert.ok(rows.length > 0, "a mismatch writes a row");
-  assert.ok(rows.every((row) => row.slice === "sidebar"));
-
-  const old = shadowDoorOf("old");
-  await sidebarOf(old).html();
-  assert.deepEqual(shadowRows(old), []);
-});
-
 // The slice reads new in the tracked file, so the compare leaves with its mode. [[spec/tickets/the-extension-reads-no-files]]
 test("the sidebar under new writes no shadow row: the tracked file reads new, and a pair apart writes nothing", async () => {
   const mode = level0.migration?.sidebar;
