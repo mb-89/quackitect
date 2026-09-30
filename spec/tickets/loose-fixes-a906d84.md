@@ -88,7 +88,16 @@ record:
   - step: sync
     hand: box d85ab822b1d7 · claude-code-remote
     hash_before: a6a479785bf111a127f126518d43c77cf515c860
-step: sync
+  - step: sync
+    hand: box d85ab822b1d7 · claude-code-remote
+    hash_before: 98d779fa92c5e65c2e2e731aec922241a1f25605
+    hash_after: 937b98f9738e3744da7d4233a8ce495b16d64375
+    answered:
+      - name: sync
+        exit: 0
+        said: work/loose-fixes-a906d84 took 5 commit(s) from main.
+    def: 8a9850a81227554b
+step: split
 ---
 
 # Ask
@@ -111,8 +120,9 @@ The source: none.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
