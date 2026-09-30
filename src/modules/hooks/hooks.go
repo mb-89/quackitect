@@ -76,6 +76,8 @@ type Effect struct {
 	Result any    `json:"result,omitempty"`
 	// The id an effect asking back carries, which the hook module's answer names. [[spec/design_output/model#an-effect-asks-back]]
 	Call string `json:"call,omitempty"`
+	// The name of the block an after carries, which a prompt context hands on as a named block. [[spec/tickets/brief-answers-off-the-door]]
+	Name string `json:"name,omitempty"`
 }
 
 // [[spec/design_output/model#a-post-and-its-answer]]
@@ -178,6 +180,7 @@ func Registers(c *q.Catalog) q.Writer {
 		q.CfgIn(c, WaitKey, defaultWait, q.Doc("the seconds an agent's call waits on its action, where the call sets none")),
 		q.FoldIn(c, HoldsName, Holds{}, stepHolds, q.Doc("the state the holds keep over a session, and the answer to its newest event")),
 		q.FoldIn(c, StopsName, Stops{}, stepStops, q.Doc("the state the stop keeps over a session, and the answer to its newest Stop")),
+		q.FoldIn(c, BriefName, Brief{}, stepBrief, q.Doc("the canary debt the brief keeps over a session, and the blocks its newest event hands over")),
 	)
 }
 
@@ -227,6 +230,10 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	if len(effects) == 0 {
 		effects = append(effects, Effect{Kind: passKind})
 	}
+	// A context read and a call passing on carry the brief. [[spec/tickets/brief-answers-off-the-door]]
+	if (post.Event == contextEvent || post.Event == toolEvent) && passesOn(effects) {
+		effects = append(effects, d.briefs(session, root, settings)...)
+	}
 	told := d.ended(session)
 	if post.Event == stopEvent {
 		told = d.running(session)
@@ -239,7 +246,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	return said, nil
 }
 
-// Commits the event at the session's next place, stamped with the config its holds read and the facts the stop reads, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/cage-stop-rules-port]]
+// Commits the event at the session's next place, stamped with the config its holds read, the facts the stop reads and the canary the brief reads, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/brief-answers-off-the-door]]
 func (d *Door) writes(session string, post Post, settings Settings, root string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -255,6 +262,7 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	fields := fieldsOf(post)
 	fields[heldField] = heldOf(settings, root)
 	fields[stoppedField] = d.stoppedOf(post, settings, root)
+	fields[briefField] = d.stampOf(settings, root)
 	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
 		return err
@@ -268,7 +276,10 @@ func (d *Door) writes(session string, post Post, settings Settings, root string)
 	if err := store.Land(d.holdsOf(session), event); err != nil {
 		return err
 	}
-	return d.landsStops(session, event)
+	if err := d.landsStops(session, event); err != nil {
+		return err
+	}
+	return d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
 }
 
 func (d *Door) now() time.Time {

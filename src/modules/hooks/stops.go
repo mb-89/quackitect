@@ -430,14 +430,7 @@ func (d *Door) stopsOf(session string) string {
 
 // Lands the event on the stops fold, beside the holds the same event left. [[spec/tickets/cage-stop-rules-port]]
 func (d *Door) landsStops(session string, event q.Event) error {
-	holds, _ := d.from.Store.Snapshot().Read(d.holdsOf(session)).(Holds)
-	fields := make(map[string]any, len(event.Fields)+1)
-	for key, value := range event.Fields {
-		fields[key] = value
-	}
-	fields[holdsField] = holds
-	event.Fields = fields
-	return d.from.Store.Land(d.stopsOf(session), event)
+	return d.from.Store.Land(d.stopsOf(session), d.besideHolds(session, event))
 }
 
 // The block the stops fold answers the newest Stop with, where it blocks. [[spec/tickets/cage-stop-rules-port]]

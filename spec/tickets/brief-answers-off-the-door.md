@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: 9ecae725e23856c1
         size: 827
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 220c850dcc922d29f594681971896a0d0ce93a9c
+    hash_after: 220c850dcc922d29f594681971896a0d0ce93a9c
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -321,14 +330,19 @@ What I weigh: every source the draft ports stands where it cites, in both guidan
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size, plus agent.go and stops.go, which now read the tier table and the holds helper from one place
+- the brief package reads the disk it is handed, and the fold stays pure, so each case builds its own tree
+- each new function carries a pointer at spec/tickets/brief-answers-off-the-door
+- the tier table stands once, in the brief package, and agent.go reads it there
 
 ## tests-green
 

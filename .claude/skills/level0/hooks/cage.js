@@ -38,16 +38,25 @@ export function postOf(standing, event, e, root, extra) {
 // The step the effects answer, in order: a result answers the call with its text as a deny, a block holds the Stop, rows ask back, and an after rides the answer as context. A tool the bridge serves and the door passes goes on to the bridge. [[spec/design_output/model#the-effects]]
 export function stepOf(answer, event, { asks, served }) {
   const after = [];
+  const blocks = [];
   for (const one of answer?.effects ?? []) {
     const kind = String(one?.kind ?? "");
     if (kind === "result")
       return { answer: one.text ? { deny: String(one.text) } : one.result };
     if (kind === "block") return { answer: { block: String(one.text ?? "") } };
     if (kind === "rows" && asks) return { rows: String(one.call ?? "") };
-    if (kind === "after" && one.text) after.push(String(one.text));
+    if (kind !== "after" || !one.text) continue;
+    const text = String(one.text);
+    const name = String(one.name ?? "");
+    // An after on the prompt context rides as a named block, the shape the context read hands on, and a named after on another event opens on its name as a heading. [[spec/tickets/brief-answers-off-the-door]]
+    if (name && event === "prompt.context") blocks.push({ name, text });
+    else after.push(name ? `# ${name}\n${text}` : text);
   }
   if (event === "tool.call" && served) return { bridge: true };
-  return after.length ? { after } : {};
+  return {
+    ...(blocks.length ? { blocks } : {}),
+    ...(after.length ? { after } : {}),
+  };
 }
 
 // A guarded call meets the refusal while the door stands down. [[spec/tickets/a-down-index-refuses-calls]]

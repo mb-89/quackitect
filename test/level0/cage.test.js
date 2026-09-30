@@ -104,6 +104,26 @@ test("rows ask back once, an after rides as context, and a served tool the door 
   );
 });
 
+test("an after on the prompt context answers as named blocks, and a named after on a call opens on its name", () => {
+  const plain = { asks: true, served: false };
+  const named = {
+    effects: [
+      { kind: "pass" },
+      { kind: "after", name: "level0-tools", text: "the tools" },
+      { kind: "after", name: "level0-canary", text: "the canary" },
+    ],
+  };
+  assert.deepEqual(stepOf(named, "prompt.context", plain), {
+    blocks: [
+      { name: "level0-tools", text: "the tools" },
+      { name: "level0-canary", text: "the canary" },
+    ],
+  });
+  assert.deepEqual(stepOf(named, "tool.call", plain), {
+    after: ["# level0-tools\nthe tools", "# level0-canary\nthe canary"],
+  });
+});
+
 test("a read passes while the door stands down, and every other call stands guarded", () => {
   const reads = ["mcp__level0__find"];
   assert.equal(guarded("tool.call", { tool: "Read" }, reads), false);
