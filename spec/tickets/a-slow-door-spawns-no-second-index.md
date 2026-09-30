@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: d06d089e006eda49
         size: 894
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d893e0ab0f106 · claude-code-remote · helper-4
+    hash_before: b220716051bdf513a2481068370d945bc800af81
+    hash_after: b220716051bdf513a2481068370d945bc800af81
+    inputs:
+      - name: design/draft
+        hash: d06d089e006eda49
+        size: 894
+      - name: design/tests-red
+        hash: 93e1f2834e269578
+        size: 514
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -263,8 +275,10 @@ the spawn runs through fakeSpawn and the door through an httptest server, so the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- reaches-keeps-the-post-fault: In reaches the inner err shadows the post fault. The builder names it apart and tests it for a timeout.
 
 # implement
 
