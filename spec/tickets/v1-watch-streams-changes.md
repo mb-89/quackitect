@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -150,6 +150,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/tickets/the-tui-data-paths-leave]]
+  - step: design/draft
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: dd3d9e1aad77ca29ac2fad44f6d034d34ec82d56
+    hash_after: dd3d9e1aad77ca29ac2fad44f6d034d34ec82d56
+    inputs:
+      - name: ask
+        hash: a302a386e06ca49d
+        size: 713
+      - name: [[spec/tickets/the-tui-data-paths-leave]]
+        hash: 445a8364c4e4561b
+        size: 12732
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -187,14 +199,16 @@ from: none
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-The door serves `GET /v1/watch?names=<a>,<b>` through Huma's `sse` package, beside the values route in `src/index/v1.go`, so the OpenAPI document names the stream and its event.
+The door serves `GET /v1/watch?names=<a>,<b>` through the `sse` package of the HTTP library, beside the values route in `src/index/v1.go`. The OpenAPI document then names the stream and its event.
 
-- The door gains a commit channel: the `OnCommit` hook in `Serve` closes it on every commit and makes the next, the way `moved` does for the tick. `standingAt` stays for the old `changes` call.
-- The handler checks every name with `store.Declared` first, and answers a 404 problem for one the catalog lacks, before the stream opens.
-- It settles the scheduler once, the way `valueOf` does, then sends one `change` event a name, carrying `name`, `revision` and `value`. Then it waits on the commit channel or the request's end. On each commit it reads a snapshot, and sends an event for each name whose JSON form moved since its last event. A name whose JSON stays sends nothing, the rule the store's wave holds already.
-- The window's client stands in `src/tui/registry/watch.go`: `V1.Watch(ctx, names, each)` reads the stream's `data:` lines and hands each `Change` to `each`, and ends with the stream. `Stream` runs it off the tab, and `Next` answers the next change as a `tea.Msg`, so a tab re-arms `Next` after each one.
+- The door gains a commit channel. The `OnCommit` hook in `Serve` closes it on every commit and makes the next, the way `moved` does for the tick.
+- The handler checks every name with `store.Declared` first. A name the catalog lacks answers a 404 problem, before the stream opens.
+- It settles the scheduler once, as the values route does. It then sends one `change` event a name, carrying `name`, `revision` and `value`.
+- It waits on the commit channel or the request's end. On each commit it reads a snapshot, and sends an event for each name whose JSON form moved.
+- The window's client stands in `src/tui/registry/watch.go`. `V1.Watch` reads the stream's `data:` lines and hands each `Change` on, and ends with the stream.
+- `Stream` runs a watch off the tab, and `Next` answers the next change as a message, so a tab arms `Next` again after each one.
 
-Weighed: the event carries the value, so a tab reads it off the event and makes no second GET. It costs the bytes of a large value, `work/rows` among them, on each change, the same bytes the GET costs. Assumed: a per-name compare of JSON forms answers what moved, since the snapshot carries one revision for the whole store and none per name.
+Weighed: the event carries the value, so a tab makes no second read. It costs the bytes of a large value on each change, the same bytes a read costs. Assumed: a compare of JSON forms a name answers what moved, since the snapshot carries one revision for the whole store.
 
 ### callers
 
@@ -204,16 +218,16 @@ Weighed: the event carries the value, so a tab reads it off the event and makes 
 - src/index/door.go Serve, whose OnCommit hook closes the commit channel as well
 - src/index/v1.go door.servesV1, which registers the watch
 - src/tui/registry/v1.go V1, which gains Watch
-- src/tui/registry/fake.go Fake, which gains a stream a case feeds
+- src/tui/registry/fake.go Fake, which gains the changes a case seeds
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
 <!-- the form is list -->
 
-- src/index/v1_test.go TestV1WatchSendsEachNamedValueOnConnect
-- src/index/v1_test.go TestV1WatchSendsAChangeToANamedValue
-- src/index/v1_test.go TestV1WatchAnswersANameTheCatalogLacksWithAProblem
+- src/index/v1watch_test.go TestV1WatchSendsEachNamedValueOnConnect
+- src/index/v1watch_test.go TestV1WatchSendsAChangeToANamedValue
+- src/index/v1watch_test.go TestV1WatchAnswersANameTheCatalogLacksWithAProblem
 - src/tui/registry/watch_test.go TestTheWatchHandsEachEventOnAsAMessage
 - src/tui/registry/watch_test.go TestTheWatchEndsWithItsStream
 
@@ -231,7 +245,7 @@ Weighed: the event carries the value, so a tab reads it off the event and makes 
 
 - src/index/v1.go
 - src/index/door.go
-- src/index/v1_test.go
+- src/index/v1watch_test.go
 - src/tui/registry/watch.go
 - src/tui/registry/watch_test.go
 - src/tui/registry/fake.go
@@ -241,9 +255,9 @@ Weighed: the event carries the value, so a tab reads it off the event and makes 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every file and function the approach names stands opened on this branch: v1.go servesV1 and valueOf, door.go Serve, moved and standingAt, store.go OnCommit and Snapshot, registry v1.go, and huma's sse package at v2.36.0 in the module cache
-- the callers list names each function the change reaches, found by git grep on OnCommit, servesV1 and registry.V1
-- each done_when line names its test: the three src/index cases, the two registry cases, and ./RUNME.sh check
+- every file and function the approach names stands opened on this branch, and the `sse` package stands in the module cache at the version go.mod names
+- the callers list names each function the change reaches, found by git grep
+- each done_when line names its test: the door cases, the registry cases, and the check
 
 ## tests-red
 
