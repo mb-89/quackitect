@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -314,6 +314,15 @@ record:
         hash: f8d74dda24c97d66
         size: 17093
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: ab59dbdff099654bd6b70fa8ccddcc9da27e6ba9
+    hash_after: ab59dbdff099654bd6b70fa8ccddcc9da27e6ba9
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-tui-data-paths-leave.md:447:23: Vocabulary: appendfile stands outside the words this tree writes. Write"
+    def: f150b8c0dc20fe45
 depends_on: [the-work-tab-reads-v1, the-work-keys-call-actions, the-log-tab-reads-v1]
 ---
 
@@ -455,14 +464,26 @@ Fixed in place, no round:
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the files: the draft's list and the gate's rows, plus these, each forced by the change:
+- log/view.go leaves, since the compare was its one user
+- work/badge_test.go leaves with BadgeOf
+- level0.json drops window, since a built-in value stands out of the tracked file
+- views.js drops a comment naming BadgeOf
+- the schema, the command file and size.golden.json come off their generators
+- tree.golden.json comes off its generator too, and the drift it carries from other tickets is for the merge to read
+- a case in frame, log and work each holds that the window writes nothing of its own
+the doors: the change adds no door, and it takes out the append the shadow row took
+the comment: TestTheWindowSliceStandsSwitchedOverToNew names this ticket, and the migration row says the window switched in phase 6
+one place: the key's mode stands in migration.go alone, and the schema and the command file come off it
 
 ## tests-green
 

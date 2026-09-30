@@ -42,8 +42,6 @@ type Tab struct {
 	SortDown bool
 	Filter   draw.Filter
 	Err      error
-	// The compare beside the tail, which the window hands the catalog. [[spec/design_output/model#the-log-is-a-view]]
-	Shadow *Shadow
 	// The catalog and the watch the tab reads through. [[spec/tickets/the-log-tab-reads-v1]]
 	From   Watched
 	stream <-chan tea.Msg
@@ -323,24 +321,4 @@ func (t *Tab) renderRow(r Record, selected bool, w int) string {
 		mark(draw.KindStyle(r.Label())).Render(draw.Pad(r.Label(), KindWide)),
 		mark(saidStyle(r)).Render(said),
 	}, gap)
-}
-
-// The compare runs beside the watch, over the rows held so far, and only for lines that are no shadow row, so the row a mismatch writes wakes no compare of its own. [[spec/design_output/model#the-log-is-a-view]]
-func (t *Tab) check(arrived []Record) tea.Cmd {
-	if t.Shadow == nil {
-		return nil
-	}
-	counted := false
-	for _, one := range arrived {
-		counted = counted || one.Kind != shadowKind
-	}
-	if !counted {
-		return nil
-	}
-	snapshot := append([]Record(nil), t.All...)
-	shadow, path := t.Shadow, t.Path
-	return func() tea.Msg {
-		_ = shadow.Check(path, snapshot)
-		return nil
-	}
 }

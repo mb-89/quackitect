@@ -82,19 +82,16 @@ func (t *Tab) changes(m *frame.Model, msg registry.Change) (bool, tea.Cmd) {
 		return true, t.next()
 	}
 	all := asRecords(rows)
-	arrived := all
 	if len(all) < len(t.All) {
 		t.Sel, t.Top, t.Follow = -1, 0, true
-	} else {
-		arrived = all[len(t.All):]
 	}
 	t.All, t.Err = all, nil
 	t.Rebuild(m.Rows())
 	m.LoadPane()
 	if t.stream == nil {
-		return true, tea.Batch(t.watches(), t.check(arrived))
+		return true, t.watches()
 	}
-	return true, tea.Batch(t.next(), t.check(arrived))
+	return true, t.next()
 }
 
 // The watch over log/rows, whose first event carries every row. [[spec/tickets/the-log-tab-reads-v1]]

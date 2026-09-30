@@ -36,8 +36,6 @@ type Tab struct {
 	rules  *TicketSchema
 	// The place chord stands open, and the next key closes it. [[spec/design_output/tui#the-work-tab-takes-edits]]
 	Placing bool
-	// The compare beside the tab, which the window hands the catalog. [[spec/tickets/the-work-view-gains-actions]]
-	Shadow *Shadow
 	// The catalog and the watch the tab reads through. [[spec/tickets/the-work-tab-reads-v1]]
 	From Source
 	// The base file's text, the count work/open-tasks answers last, and the stream the tab watches. [[spec/tickets/the-work-tab-reads-v1]]
@@ -123,7 +121,7 @@ func (t *Tab) takes(m *frame.Model, msg Msg) tea.Cmd {
 		t.Tree.Filtering(m.SourceOf(at))
 	}
 	m.LoadPane()
-	return t.check()
+	return nil
 }
 
 // The presets the base file names, each under a number with alt. [[spec/design_output/tree-view#a-preset-carries-its-sort]]

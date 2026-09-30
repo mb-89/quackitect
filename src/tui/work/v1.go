@@ -91,9 +91,9 @@ func (t *Tab) changes(m *frame.Model, msg registry.Change) (bool, tea.Cmd) {
 		return false, nil
 	}
 	if t.stream == nil {
-		return true, tea.Batch(t.check(), t.watches())
+		return true, t.watches()
 	}
-	return true, tea.Batch(t.check(), t.next())
+	return true, t.next()
 }
 
 // The rows land over the base file, read once. A change that fails to draw keeps the tree standing, and says why. [[spec/tickets/the-work-tab-reads-v1]]

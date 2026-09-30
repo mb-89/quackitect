@@ -76,14 +76,14 @@ func TestTheSliceKeyStandsShared(t *testing.T) {
 	}
 }
 
-// The window slice stands among the slices, built in as old, so a box with no tracked mode keeps the window's own reads. [[spec/tickets/the-log-becomes-a-view]]
-func TestTheWindowSliceStandsAmongTheSlicesBuiltInAsOld(t *testing.T) {
+// The window slice stands switched over, built in as new with no other mode, so no box keeps the window's own reads. [[spec/tickets/the-tui-data-paths-leave]]
+func TestTheWindowSliceStandsSwitchedOverToNew(t *testing.T) {
 	for _, one := range slices {
-		if one.key == WindowKey && one.mode == "old" {
+		if one.key == WindowKey && one.mode == "new" && strings.Join(one.enum, ", ") == "new" && one.doc != "" {
 			return
 		}
 	}
-	t.Fatalf("the slices read %+v, and want window built in as old", slices)
+	t.Fatalf("the slices read %+v, and want window built in as new alone", slices)
 }
 
 // The sidebar's slice stands beside the window's, built in as old, with the three modes. [[spec/tickets/the-sidebar-shadow-compares]]
@@ -105,14 +105,4 @@ func TestTheSidebarKeyReadsOldWithNothingSet(t *testing.T) {
 	if said := index.Run("config/" + SidebarKey); said != "old" {
 		t.Fatalf("the sidebar slice reads %v with nothing set, and wants old", said)
 	}
-}
-
-// The window slice names its three modes as its options. [[spec/tickets/the-config-schema-gets-generated]]
-func TestTheWindowSliceDocNamesItsModes(t *testing.T) {
-	for _, one := range slices {
-		if one.key == WindowKey && one.doc != "" && strings.Join(one.enum, ", ") == "old, shadow, new" {
-			return
-		}
-	}
-	t.Fatal("the window slice names no modes in its doc")
 }

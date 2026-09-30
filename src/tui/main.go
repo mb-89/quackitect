@@ -15,7 +15,6 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 
-	"quackitect/src/config"
 	"quackitect/src/index"
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
@@ -108,24 +107,12 @@ func newModel(path string, zone *time.Location) frame.Model {
 
 // The window over the catalog handed in, so a case hands the fake. [[spec/design_output/model#the-registry-tabs]]
 func newModelOver(path string, zone *time.Location, catalog work.Source) frame.Model {
-	mode := windowMode(work.Root(path))
 	logTab := log.New(path, zone)
-	logTab.Shadow = &log.Shadow{From: catalog, Mode: mode, Now: time.Now}
 	logTab.From = catalog
 	workTab := work.New(path)
-	workTab.Shadow = &work.Shadow{From: catalog, Mode: mode, Now: time.Now}
 	workTab.From = catalog
 	return frame.New(path, zone, []frame.Tab{logTab, workTab,
 		registry.Index(catalog), registry.Cli(catalog), registry.Help(catalog)})
-}
-
-// The mode the config names for the window slice, and nothing where it names none. [[spec/tickets/the-log-becomes-a-view]]
-func windowMode(root string) func() string {
-	return func() string {
-		said, _ := config.Value(root, "migration.window")
-		mode, _ := said.(string)
-		return mode
-	}
 }
 
 // The real catalog: each read finds the base of /v1 on the door standing over the root, so a restart of the index reaches the next read. [[spec/design_output/model#surfaces]]

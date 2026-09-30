@@ -6,6 +6,7 @@ package log
 
 import (
 	"encoding/json"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -80,5 +81,16 @@ func TestTheLogTabHandsOnAChangeToAnotherName(t *testing.T) {
 	}
 	if handled, _ := tab.Update(m, registry.Ended{}); handled {
 		t.Fatal("the log tab takes a bare end, which another tab's watch sends")
+	}
+}
+
+// The tab reads its rows and writes none back, so the session log holds no row of the window's own. [[spec/tickets/the-tui-data-paths-leave]]
+func TestTheLogTabWritesNoRowOfItsOwn(t *testing.T) {
+	t.Parallel()
+	tab, m := v1Tab(t)
+	tab.Update(m, changeOf(t, rowOne, rowTwo))
+	tab.Update(m, changeOf(t, rowOne, rowTwo, rowThree))
+	if _, err := os.Stat(tab.Path); !os.IsNotExist(err) {
+		t.Fatalf("the tab writes %s, and wants to write nothing", tab.Path)
 	}
 }
