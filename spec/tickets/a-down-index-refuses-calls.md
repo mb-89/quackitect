@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/draft
 steps:
   - name: design
     steps:
@@ -132,6 +132,9 @@ record:
         hash: 810c4e970082b08d
         size: 2110
     def: 71651f49796eeda4
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/tickets/the-hook-log-loses-lines]]
 ---
 
 # Ask
