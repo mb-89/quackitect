@@ -95,6 +95,7 @@ record:
   - step: sync
     hand: box d88cc0681fd4 · claude-code-remote
     hash_before: 85d2fb604a52036b9449eaebaae4b4a50ed8bc61
+    hash_after: 092c858f53f5f1cd1ffbfb461551a1e47f9c950e
   - step: sync
     hand: box d88cc0681fd4 · claude-code-remote
     hash_before: 611f0c7e6a89d7343e4c5db62b48d7083ed25b81
@@ -171,7 +172,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["tui-shell-lands-in-shadow", "quack-verbs-switch-over", "read-topics-switch-over"]
 enabled_by: migration.phase6switch
-cloud: true
 reason: done
 ---
 
