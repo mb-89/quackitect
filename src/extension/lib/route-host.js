@@ -3,21 +3,23 @@
 // theme through the door, so a test drives the whole of it with no editor.
 // [[spec/tickets/the-inset-folds-the-frontmatter]]
 
-const { EMITTER, drawable } = require("./drawing.js");
+const { drawable } = require("./drawing.js");
+const { drawnAt } = require("./fields.js");
 const {
-  HOLDS,
+  STANDING,
+  TICKETS,
   actsOn,
   answerOf,
-  holdsIn,
-  personHolds,
   routeArgvOf,
+  standingOf,
   stepsIn,
   ticketLensOf,
   ticketOf,
 } = require("./lens.js");
 
 const FLIP = "quackitect.route.flip";
-const SCHEMA = ".claude/skills/level0/lib/schema.js";
+// A ticket the index draws nothing for draws an empty graph. [[spec/tickets/the-lens-reads-v1]]
+const EMPTY = { nodes: [], edges: [] };
 // The inset's height in lines: a node the layout stacks takes a few, between a floor and a ceiling. [[spec/tickets/the-inset-folds-the-frontmatter]]
 const LINES_A_NODE = 3;
 const FLOOR = 8;
@@ -38,16 +40,14 @@ function routeHostOf(door) {
   const tickets = ticketLensOf(door);
 
   // The message the page draws: the graph, the route, and whether the person holds the ticket. [[spec/design_output/drawing#the-page-speaks-in-messages]]
-  const graphOf = async (path, text) => {
-    const [{ graphIn }, { readNote }] = await Promise.all([
-      door.imports(EMITTER),
-      door.imports(SCHEMA),
-    ]);
-    const steps = readNote(String(text ?? "")).front.said?.steps ?? [];
-    const holds = await holdsIn(await door.list(HOLDS), (one) => door.read(one));
+  // The graph and the route come off tickets/drawn, so they follow the saved file. [[spec/tickets/the-lens-reads-v1]]
+  const graphOf = async (path) => {
+    const [drawn, holds] = await Promise.all([drawnAt(door, path), standingOf(door)]);
     const ticket = ticketOf(path);
-    const held = holds.some((one) => one.ticket === ticket && personHolds(one));
-    return { kind: "graph", graph: graphIn(text), steps, held };
+    const held = holds.some((one) => one.ticket === ticket && one.person);
+    const graph = Array.isArray(drawn?.graph?.nodes) ? drawn.graph : EMPTY;
+    const steps = Array.isArray(drawn?.steps) ? drawn.steps : [];
+    return { kind: "graph", graph, steps, held };
   };
 
   const theme = () => ({ kind: "theme", theme: door.theme() });
@@ -112,26 +112,36 @@ function routeHostOf(door) {
     return tickets.took(picked, ticket, path);
   };
 
+  // A page draws the message again where the lines hold, and opens again where they move. [[spec/tickets/the-inset-folds-the-frontmatter]]
+  const redraws = async (path, one, text) => {
+    const message = await graphOf(path);
+    if (linesOf(message.graph) !== one.lines)
+      return opens(path, text, message, one.yaml);
+    one.text = text;
+    one.message = message;
+    one.page.post(message);
+    return one;
+  };
+
   return {
-    watches: [],
+    names: [STANDING, TICKETS],
     // A message for the page a path shows. [[spec/tickets/the-lens-calls-actions]]
     took: (path, message) => took(path, shown.get(path), message),
 
     async opened(path, text) {
       if (drawable(path) !== "ticket") return undefined;
-      return opens(path, text, await graphOf(path, text), false);
+      return opens(path, text, await graphOf(path), false);
     },
 
     async changed(path, text) {
       const one = shown.get(path);
       if (!one) return undefined;
-      const message = await graphOf(path, text);
-      if (linesOf(message.graph) !== one.lines)
-        return opens(path, text, message, one.yaml);
-      one.text = text;
-      one.message = message;
-      one.page.post(message);
-      return one;
+      return redraws(path, one, text);
+    },
+
+    // An index event draws every page shown again. [[spec/tickets/the-lens-reads-v1]]
+    async refreshed() {
+      for (const [path, one] of [...shown]) await redraws(path, one, one.text);
     },
 
     themed() {
@@ -169,4 +179,4 @@ function refusalIn(ran) {
   }
 }
 
-module.exports = { FLIP, SCHEMA, linesOf, routeHostOf };
+module.exports = { FLIP, linesOf, routeHostOf };

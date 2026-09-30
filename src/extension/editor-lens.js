@@ -34,14 +34,6 @@ function lensDoor(context, folder) {
           },
         ),
       );
-      for (const path of lens.watches) {
-        const one = vscode.workspace.createFileSystemWatcher(
-          new vscode.RelativePattern(folder, path),
-        );
-        for (const on of [one.onDidChange, one.onDidCreate, one.onDidDelete])
-          on.call(one, () => changed.fire());
-        context.subscriptions.push(one);
-      }
     },
 
     // A save under the ticket folders hands its path and text on. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]

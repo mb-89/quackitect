@@ -140,7 +140,7 @@ func projections() []projection {
 	}
 	var out []projection
 	for _, one := range c.Projections() {
-		if one.Kind == q.Loaded {
+		if one.Kind == q.Loaded && !one.ReadOnly {
 			out = append(out, projection{glob: one.Glob, roundTrip: one.RoundTrip})
 		}
 	}

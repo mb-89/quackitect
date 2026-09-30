@@ -349,10 +349,10 @@ test("the extension starts nothing, and registers the view a person opens", asyn
   assert.deepEqual(door.said.marked, [["quackitect.here", true]]);
   assert.equal(door.said.quiet, 1);
   assert.deepEqual(door.said.ran, []);
-  assert.equal(
-    door.index.watches.length,
-    1,
-    "the status bar alone watches before a view opens",
+  assert.deepEqual(
+    door.index.watches.map((one) => one.names),
+    [NAMES, ["holds/standing", "tickets/cloud"], ["holds/standing", "tickets/all"]],
+    "the status bar, the lens and the drawing watch before a view opens",
   );
   assert.deepEqual(door.said.watched, [], "the sidebar watches no file");
   assert.deepEqual(

@@ -62,6 +62,7 @@ type registration struct {
 	keyed    func(snap Snapshot, name string) (any, error)
 	mirror   Mirror
 	globs    []string
+	readOnly bool
 	trip     func(body []byte) ([]byte, error)
 	step     func(state, event any) (any, error)
 	act      func(input any) ([]Request, error)
