@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box d8888f6242d7 · claude-code-remote
     hash_before: db48964e661fe42fa924ed0cf4215f8712e1b68e
+  - step: sync
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: f31a380063a71d79d4be5b49923e52ad757449b5
+    hash_after: f31a380063a71d79d4be5b49923e52ad757449b5
+    answered:
+      - name: sync
+        exit: 0
+        said: work/quack-verbs-switch-over already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["quack-verbs-land-in-shadow", "open-tasks-switch-lands", "read-topics-switch-over"]
 enabled_by: migration.phase4switch
 cloud: true
@@ -113,8 +122,9 @@ Done when agents call `quack` and no `./RUNME.sh` verb, and `cli.js` leaves the 
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
