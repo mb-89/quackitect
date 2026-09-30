@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [the-lens-calls-actions, the-sidebar-reads-v1]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: c2dda916aefee2d6
         size: 7569
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: e2164e4f22caca2562bb90a872a64e92d9cc0b84
+    hash_after: e2164e4f22caca2562bb90a872a64e92d9cc0b84
+    inputs:
+      - name: design/draft
+        hash: c2dda916aefee2d6
+        size: 7569
+      - name: design/tests-red
+        hash: 85e6ff1c384fab28
+        size: 1761
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -345,8 +357,13 @@ What surprised me:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- every done_when line meets a red case: the grep and fake-index cases in test/level0/lens-v1.test.js, and the check at tests-green
+- the Go cases in src/q, src/index, src/modules/holds and src/modules/tickets compile and fail on their own assertion, and no older case there fails
+- the wiring line falls away, as tests-red found, since the holds module reads the bare name tickets/all
+- the marks follow the saved file, not the buffer; the draft names that cost and parks the buffers feed, which the ask leaves out
 
 # implement
 
