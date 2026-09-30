@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [the-lens-calls-actions, the-sidebar-reads-v1]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: bb46e7bbc795351b09a200c7d07eba94fd6fa6a8
+    hash_after: bb46e7bbc795351b09a200c7d07eba94fd6fa6a8
+    inputs:
+      - name: ask
+        hash: 856bfcbf8f23ff19
+        size: 738
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,113 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The lens, the marks and the drawing read two index values over `/v1`, and wake on `/v1/watch`. The index gains a list of standing holds and a drawing for each ticket path. It already answers `tickets/cloud`.
+
+1. `src/q/projection.go`: `keyed` trims the key off the family name the registration carries at call time, `strings.TrimSuffix(one.name, "<path...>")`, in place of the local name it captured. Today wiring renames `notes/<path...>` to `tickets/notes/<path...>`, so the trim misses, `covers` refuses, and every wired keyed read answers its default. Seen live: `tickets/notes/spec/tickets/the-lens-reads-v1.md` answers an empty head, and a watch on it sends nothing. The fix also mends `newTicket` in `src/extension/sidebar.js`, which asks that value whether a file stands.
+2. `src/note` owns the note reader: `readNote` and `sectionsOf` move out of `src/modules/check/note.go` and export, and the check module imports them.
+3. `src/modules/holds/holds.go` derives `holds/standing` over the `hold/<path...>` family and `tickets/all`. It answers one row a hold, as `{ticket, path, step, hand, person}`. `person` follows the rule `personHolds` in `lens.js` holds, and a hold whose ticket stands closed drops out, as `stillHeld` drops it today. `spec/wiring.yaml` binds `tickets/all` in.
+4. `src/modules/tickets/drawn.go` projects both ticket folders a second time as `tickets/drawn/<path...>`, Loaded, through a read-only codec: `Serialize` refuses. `Parse` answers `{graph, steps, leaves}`:
+   - `graph` is what `graphIn` in `src/scripts/graph.js` answers: nodes, hold, pass and fail edges, and each node's chapter and line.
+   - `steps` is the front's `steps`, which the page takes for an edit.
+   - `leaves` maps each leaf path to `{does, fields}`. `fields` lists the evidence in route order, with `checked` last where the chain carries a checklist, each as `{name, form, says, items, line, filled}`. `line` follows `headingLines` in `fields.js`, and `filled` follows `chapterOf` in `src/scripts/pull-chapter.js`.
+   A golden test holds the Go answer equal to the JS emitter over testdata tickets, the way the check twins hold theirs.
+5. `src/extension/lib/lens.js`: `ticketLensOf.lenses` reads `holds/standing` and `tickets/cloud` through `door.index.values`. `lensesOf` takes `cloud`, a boolean, in place of the group text, and keeps the ticket's own marker off the text it holds. `holdsIn`, `stillHeld`, `parsedOrNull`, `HOLDS`, `HOLD_WATCHES` and `GROUPS` leave, and `names` replaces `watches`.
+6. `src/extension/lib/fields.js` reads the person's holds off `holds/standing` and a path's marks off `tickets/drawn/<path>`: every field of the held leaf standing unfilled, at its line, with the hover `hoverOf` builds. `rules`, `marksIn`, `headingLines`, `ROUTE` and `CHAPTER` leave. `names` reads `holds/standing` and `tickets/all`, and `held` draws each seen path again.
+7. `src/extension/lib/route-host.js`: `graphOf` reads `tickets/drawn/<path>` and `holds/standing`, and the `EMITTER` and `SCHEMA` imports leave. `names` matches the one in `fields.js`, and `refreshed()` posts the message again to every page shown.
+8. `src/extension/lib/drawing.js`: `graphAt` and `EMITTER` leave, since nothing outside its own test calls them. `drawable` stays.
+9. `src/extension/extension.js` watches `tickets.names`, `fields.names` and `route.names` through `door.index.watch`. `src/extension/editor-lens.js` drops its file watchers over `lens.watches`.
+
+What I weigh and assume:
+- The cost: the marks and the drawing follow the saved file, where today they follow the buffer. A press in the drawing saves first, so its edit draws at once. A hand edit of the YAML draws on save. The strongest objection is that a field's mark now clears on save, not as the person types. I take that cost because the ask makes the index the one reader. Feeding the projection off the `buffers/<path...>` family in `src/modules/lsp` would close the gap, and a note parks it.
+- The per-path value rides the keyed fix, where one map over every ticket would ship every graph on each change.
+- The JS emitter stays, because the `graph` verb draws off it, and the golden test keeps both answers equal.
+- What breaks this: a keyed watch that still sends nothing after the fix. The `v1watch` case decides it, and where it stands red, the hosts wake on `tickets/all` alone and read the keyed value on each wake.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/extension/extension.js activate: ticketLensOf, routeHostOf, fieldMarksOf, fields.watches
+- src/extension/editor-lens.js lenses: lens.watches
+- src/extension/sidebar.js pullsNext: ticketLensOf(door).took
+- src/extension/sidebar.js newTicket: tickets/notes/<path>, whose read the keyed fix mends
+- src/modules/check/note.go and every check file calling readNote or sectionsOf
+- src/q/projection.go ProjectIn: every Loaded family, among them tickets/notes, hold, the config projections, bless and the views bases
+- test/level0/lens.test.js: lensesOf, holdsIn, HOLDS, ticketLensOf
+- test/level0/holds-leave.test.js: lensesOf
+- test/level0/fields-to-fill.test.js: fieldMarksOf, CHAPTER, ROUTE
+- test/level0/route-host.test.js: routeHostOf
+- test/level0/lens-actions.test.js: ticketLensOf, routeHostOf
+- test/level0/save-fills.test.js: ticketLensOf
+- test/level0/drawing.test.js: graphAt, EMITTER
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/q/projection_test.go: TestAWiredKeyedFamilyReadsItsFile
+- src/index/v1watch_test.go: TestWatchSendsAKeyedName
+- src/modules/holds/holds_test.go: TestStandingDropsAClosedTicketsHold
+- src/modules/holds/holds_test.go: TestStandingMarksThePersonsHold
+- src/modules/tickets/drawn_test.go: TestDrawnMeetsTheEmitter
+- src/modules/tickets/drawn_test.go: TestDrawnMarksTheOpenFields
+- src/modules/tickets/drawn_test.go: TestDrawnRefusesAWrite
+- test/level0/lens-v1.test.js: a held ticket draws its marks and route over a fake index
+- test/level0/lens-v1.test.js: the lens reads holds/standing and tickets/cloud, and a watch event draws it again
+- test/level0/lens-v1.test.js: src/extension/lib names no door.read, door.list, door.imports or door.watch
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/q/projection.go
+- src/q/projection_test.go
+- src/index/v1watch_test.go
+- src/note/note.go
+- src/note/note_test.go
+- src/modules/check/note.go
+- src/modules/holds/holds.go
+- src/modules/holds/holds_test.go
+- src/modules/tickets/drawn.go
+- src/modules/tickets/drawn_test.go
+- src/modules/tickets/testdata/drawn.golden.json
+- spec/wiring.yaml
+- src/extension/lib/lens.js
+- src/extension/lib/fields.js
+- src/extension/lib/route-host.js
+- src/extension/lib/drawing.js
+- src/extension/extension.js
+- src/extension/editor-lens.js
+- test/level0/v1-index.js
+- test/level0/drawn-twin.js
+- test/level0/lens-v1.test.js
+- test/level0/lens.test.js
+- test/level0/holds-leave.test.js
+- test/level0/fields-to-fill.test.js
+- test/level0/route-host.test.js
+- test/level0/lens-actions.test.js
+- test/level0/drawing.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened lens.js, fields.js, route-host.js, drawing.js, extension.js, editor-lens.js, editor-index.js, graph.js, leafOf in pull-route.js, chapterOf in pull-chapter.js, holds.go, cloudOf in tickets.go, ProjectIn in projection.go, Declared in store.go and v1.go, and read the live catalog, a live hold, a live keyed read and a live keyed watch
+- the callers list names every file the grep for the changed names finds under src and test, and the Loaded families the keyed fix reaches
+- the grep line meets the lens-v1 case on the grep, the fake index line meets the lens-v1 case drawing a held ticket, and the check line meets its own run
 
 ## tests-red
 
