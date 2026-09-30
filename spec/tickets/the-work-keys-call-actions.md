@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [the-work-tab-reads-v1]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 3a6564cc53a8353e
         size: 5780
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 2a58bd6881908936f8378b01bde2b0ac03ebf31a
+    hash_after: 2a58bd6881908936f8378b01bde2b0ac03ebf31a
+    inputs:
+      - name: design/draft
+        hash: 3a6564cc53a8353e
+        size: 5780
+      - name: design/tests-red
+        hash: 9b51b64dd4244ee3
+        size: 1642
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -332,8 +344,13 @@ the doors: the cases post through registry.Fake, which call_contract_test.go hol
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+What I weigh: the approach moves every write off the tab onto the actions the view file names, which answers the ask. Each done_when line meets its decider: the grep line runs at implement, src/tui/work/actions_test.go holds a red case for the place chord, the urgent key, the edit and the pull key, each failing on its own assertion over the fake door, and the check line runs at tests-green. The contract cases in src/tui/registry/call_contract_test.go hold the fake and the V1 door to one suite, and the 202 case reads the handle.
+
+Fixed in place, no round: the draft names catalog_contract_test.go where tests-red writes call_contract_test.go, and the callers list leaves out indexCatalog in src/tui/main.go, which tests-red names and window_test.go covers. The implementer reads both off tests-red.
 
 # implement
 
