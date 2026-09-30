@@ -50,3 +50,28 @@ func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
 		t.Fatalf("session/s1/fill reads %v, and wants the 900 the post carries", fill)
 	}
 }
+
+// The command rules read the name cap off the root's config and the cloud flag off the environment. [[spec/tickets/cage-command-rules-port]]
+func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, "spec", "config")
+	if err := os.MkdirAll(at, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"names":{"words":3}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range cloudVariables {
+		t.Setenv(name, "")
+	}
+	if said := commandSettings(root); said.Words != 3 || said.Cloud {
+		t.Fatalf("the settings read %+v, and want three words off the box's desk", said)
+	}
+	t.Setenv(cloudVariables[0], "1")
+	if said := commandSettings(root); !said.Cloud {
+		t.Fatalf("the settings read %+v, and want the cloud flag", said)
+	}
+	if said := gitRead(root, "no-such-verb"); said != "" {
+		t.Fatalf("a failing git read prints %q, and wants nothing", said)
+	}
+}

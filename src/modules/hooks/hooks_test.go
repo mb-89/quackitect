@@ -23,6 +23,9 @@ const recording = "../../../test/replay/hooks/one-tool-call.jsonl"
 
 var fixed = time.Date(2026, 9, 29, 12, 0, 0, 0, time.UTC)
 
+// The words a name holds in the table's tree, which its spec/config/level0.json sets. [[spec/tickets/cage-command-rules-port]]
+const nameWords = 5
+
 // The manager's call, as a case teaches it: it keeps each wait and answers what the case sets. [[spec/design_output/model#a-caller-sets-its-wait]]
 type calls struct {
 	waits  []time.Duration
@@ -70,6 +73,8 @@ func doorOver(t *testing.T, c *calls, b *book) over {
 	door := New(Outside{
 		Store: ix.Store(), As: events, Bound: func(local string) string { return local },
 		Call: c.call, Ops: b.of, Now: func() time.Time { return fixed },
+		Root:   treeOf(t, commandTableOf(t).Tree, ""),
+		Config: func(string) Settings { return Settings{Words: nameWords} },
 	})
 	return over{ix, door, resolved}
 }

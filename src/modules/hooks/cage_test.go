@@ -15,7 +15,7 @@ import (
 
 const cageLogs = "../../../test/replay/cage"
 
-const hookRow = `{"at":"2026-09-29T12:00:01Z","level":"debug","kind":"hook","said":"tool.call Bash rm -rf /","event":"tool.call","tool":"Bash","answer":"{\"result\":{\"deny\":\"no\"}}","text":"{\"e\":{\"tool\":\"Bash\",\"command\":\"rm -rf /\",\"session_id\":\"s1\"},\"origin\":null}"}`
+const hookRow = `{"at":"2026-09-29T12:00:01Z","level":"debug","kind":"hook","said":"tool.call Bash rm -rf /","event":"tool.call","tool":"Bash","answer":"{\"result\":{\"deny\":\"no\"}}","text":"{\"e\":{\"tool\":\"Bash\",\"command\":\"rm -rf /\",\"description\":\"a-ticket: remove\",\"session_id\":\"s1\"},\"origin\":null}"}`
 
 func TestPostsOfRebuildsEveryHookRow(t *testing.T) {
 	got, err := PostsOf(hookRow + "\n")
@@ -24,7 +24,7 @@ func TestPostsOfRebuildsEveryHookRow(t *testing.T) {
 	}
 	want := []Recorded{{Line: 1, Stamp: "2026-09-29T12:00:01Z", Post: Post{
 		Event: "tool.call",
-		E:     map[string]any{"tool": "Bash", "command": "rm -rf /", "session_id": "s1"},
+		E:     map[string]any{"tool": "Bash", "command": "rm -rf /", "description": "a-ticket: remove", "session_id": "s1"},
 		Old:   map[string]any{"result": map[string]any{"deny": "no"}},
 	}}}
 	if !reflect.DeepEqual(got, want) {
@@ -202,7 +202,7 @@ func TestALivePostDecidedApartWritesAShadowRow(t *testing.T) {
 		rows = append(rows, row)
 		return nil
 	}
-	post := Post{Event: "tool.call", Harness: "copilot", E: map[string]any{"tool": "Bash", "session_id": "s1"}, Old: map[string]any{"result": map[string]any{"deny": "no"}}}
+	post := Post{Event: "tool.call", Harness: "copilot", E: map[string]any{"tool": "Bash", "command": "ls", "description": "a-ticket: list", "session_id": "s1"}, Old: map[string]any{"result": map[string]any{"deny": "no"}}}
 	if _, err := one.door.Hook(post); err != nil {
 		t.Fatal(err)
 	}

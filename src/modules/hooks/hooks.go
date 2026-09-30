@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"quackitect/src/modules/hooks/command"
 	"quackitect/src/q"
 	"quackitect/src/q/tool"
 )
@@ -113,6 +114,16 @@ type Outside struct {
 	Now   func() time.Time
 	// Takes the shadow row of a live post the door decides apart from its old decision. None writes nothing. [[spec/tickets/copilot-meets-the-hooks-door]]
 	Shadow func(row map[string]any) error
+	// The tree a post naming no root stands in, what the config says there, and a git read's output there. None reads no tree, no cap and no git. [[spec/tickets/cage-command-rules-port]]
+	Root   string
+	Config func(root string) Settings
+	Git    func(root string, args ...string) string
+}
+
+// What the command rules read off the config and the box: the words a name holds, and whether the box stands in the cloud. [[spec/tickets/cage-command-rules-port]]
+type Settings struct {
+	Words int
+	Cloud bool
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -156,7 +167,9 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		return Answer{}, err
 	}
 	effects := []Effect{}
-	if post.Event == toolEvent {
+	if refused := d.refuses(post); post.Event == toolEvent && refused != "" {
+		effects = append(effects, Effect{Kind: resultKind, Text: refused})
+	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)
 		if err != nil {
 			return Answer{}, err
@@ -237,6 +250,115 @@ func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
 		return Effect{Kind: resultKind, Text: fmt.Sprintf("%s fails: %s", action, said.Error)}, true, nil
 	}
 	return Effect{Kind: resultKind, Result: said.Result}, true, nil
+}
+
+// The tools the command door reads, and the git read the pull rule asks. [[spec/tickets/cage-command-rules-port]]
+const (
+	bashTool       = "Bash"
+	powerShellTool = "PowerShell"
+	subjectFormat  = "--format=%s"
+)
+
+// The first refusal of a Bash call, in the bridge's order: the ticket door, the bless guard, the command rules, the version guard, then the git write door. PowerShell meets the ticket door alone. A post standing in no tree meets none. [[spec/tickets/cage-command-rules-port]]
+func (d *Door) refuses(post Post) string {
+	tool := textOf(post.E, "tool")
+	root := post.Root
+	if root == "" {
+		root = d.from.Root
+	}
+	if post.Event != toolEvent || (tool != bashTool && tool != powerShellTool) || root == "" {
+		return ""
+	}
+	line, description := callField(post.E, "command"), callField(post.E, "description")
+	tree := disk{root}
+	if said := command.TicketDoor(line, description, tree); said != "" || tool == powerShellTool {
+		return said
+	}
+	if said := command.BlessGuard(line, tree.text); said != "" {
+		return said
+	}
+	var settings Settings
+	if d.from.Config != nil {
+		settings = d.from.Config(root)
+	}
+	var rules, writes []command.Row
+	for _, one := range command.Findings(line, settings.Words, command.It{Cloud: settings.Cloud, Script: tree.text, Subjects: d.subjects(root)}) {
+		if one.Rule == command.GitWrite {
+			writes = append(writes, one)
+		} else {
+			rules = append(rules, one)
+		}
+	}
+	if len(rules) > 0 {
+		return command.RefusedCommand(line, rules)
+	}
+	if said := command.VersionGuard(line); said != "" {
+		return said
+	}
+	if len(writes) > 0 {
+		return command.RefusedCommand(line, writes)
+	}
+	return ""
+}
+
+// The subjects of the commits an undo drops, off git under the root, or none where the door reaches no git. [[spec/design_output/bash#a-pull-commit-stands]]
+func (d *Door) subjects(root string) func(command.Undo) []string {
+	if d.from.Git == nil {
+		return nil
+	}
+	return func(undo command.Undo) []string {
+		args := []string{"log"}
+		if !undo.Walks {
+			args = append(args, "--no-walk")
+		}
+		args = append(append(args, subjectFormat), undo.Revs...)
+		var out []string
+		for _, one := range strings.Split(d.from.Git(root, args...), "\n") {
+			if one != "" {
+				out = append(out, one)
+			}
+		}
+		return out
+	}
+}
+
+// A field of the call, off the event or the input a harness nests it in. [[spec/tickets/copilot-meets-the-hooks-door]]
+func callField(e map[string]any, key string) string {
+	if said := textOf(e, key); said != "" {
+		return said
+	}
+	input, _ := e["input"].(map[string]any)
+	return textOf(input, key)
+}
+
+// The tree under a root, as the command rules read it: a path under the root or an absolute one. [[spec/tickets/cage-command-rules-port]]
+type disk struct{ root string }
+
+func (one disk) at(path string) string {
+	if filepath.IsAbs(path) || strings.HasPrefix(path, "/") {
+		return path
+	}
+	return filepath.Join(one.root, filepath.FromSlash(path))
+}
+
+func (one disk) Read(path string) (string, bool) {
+	body, err := os.ReadFile(one.at(path))
+	return string(body), err == nil
+}
+
+func (one disk) List(folder string) []string {
+	found, _ := os.ReadDir(one.at(folder))
+	out := make([]string, 0, len(found))
+	for _, each := range found {
+		out = append(out, each.Name())
+	}
+	return out
+}
+
+// A file's text, or nothing where it stands nowhere. [[spec/tickets/one-door-joins-a-path]]
+func (one disk) text(path string) string {
+	said, _ := one.Read(path)
+	return said
 }
 
 func (d *Door) tells(handle string) {
