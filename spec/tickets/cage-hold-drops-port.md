@@ -117,11 +117,26 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 233bbd3c48bcc166a13cf88f39b3215046dfdf4d
+    hash_after: 233bbd3c48bcc166a13cf88f39b3215046dfdf4d
+    inputs:
+      - name: ask
+        hash: a34b00a52e331586
+        size: 749
+      - name: [[spec/tickets/cage-call-holds-port]]
+        hash: bc49d4efc513831a
+        size: 986
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +176,82 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The holds fold names each drop, and the door writes it.
+
+The fold in `src/modules/hooks/fold.go` stays pure:
+
+- `Said` gains `Drops`, the keys the event writes back and the value each takes
+- `turnEnds` reads the held `stop.hold`, as `dropsHold` in `src/bridge/stop.js` does. At `finish` or `stop` it names the drop to `off`, and keeps the hold as `Holds.Stood`
+- `Stood` is the mark `holdHere` reads, so the stop rules port finds the hold that ended the turn. A prompt that no helper sends clears it, as `sawPrompt` does
+- `paid` takes the held config. Where the demand pays an update, it clears `Asked` as today
+- where the held `ask.wanted` still equals the paid update, `paid` names the drop to `quiet`. A value pressed since stands, as `dropsAsk` in `src/bridge/ask.js` leaves it
+- a helper's event moves nothing, as today, so a helper drops no hold
+
+`Door.writes` in `src/modules/hooks/hooks.go` stamps the held config on every event, since a pay rides a display, a spoke post, a report or a turn's end. Today it stamps a tool call alone.
+
+`Door.Hook` reads the fold's `Said.Drops` at the event's own place and hands each to `Outside.Drop`, in key order. A door with no Drop writes nothing. A failing write leaves the answer standing, as the shadow write does.
+
+`src/config/config.go` gains `Drop(root, key, value)`. It writes one key into the local layer `Local` names and keeps every other key, as `writes` in `src/bridge/config.js` does. `listensHooks` in `src/quack/main.go` wires it as `Outside.Drop`, since `src/config` owns the layer's path and its reader.
+
+What I weigh: the fold could write the file itself, but a fold holds no IO, and its replays run over no disk. Stamping every event costs a read of the config a post, which the tool calls pay today already. The stood mark lands here because the drop and the mark are one move in `dropsHold`. The stop rules port reads it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Registers registers stepHolds as the holds fold
+- src/modules/hooks/hooks.go: Door.writes lands each event on the holds fold
+- src/modules/hooks/hooks.go: Door.Hook answers each post
+- src/modules/hooks/holds.go: Door.held reads the fold's Said
+- src/quack/main.go: listensHooks builds hooks.Outside
+- src/quack/hook_test.go: builds hooks.Outside
+- src/quack/hooks_test.go: builds hooks.Outside
+- src/modules/hooks/hooks_test.go: doorOver builds Outside
+- src/modules/hooks/fold_test.go: drives stepHolds
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/fold_test.go: TestATurnsEndDropsTheOwnersHold
+- src/modules/hooks/fold_test.go: TestAPaidUpdateDropsTheAsk
+- src/modules/hooks/fold_test.go: TestAnAskPressedSinceStandsAtItsPay
+- src/modules/hooks/fold_test.go: TestAPromptClearsTheStoodHold
+- src/modules/hooks/holds_test.go: TestTheDoorWritesEachDropItsFoldNames
+- src/config/config_test.go: TestDropWritesOneKeyOfTheLocalLayer
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/fold.go
+- src/modules/hooks/fold_test.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/holds_test.go
+- src/config/config.go
+- src/config/config_test.go
+- src/quack/main.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file and function named stands opened: dropsHold, holdHere and sawPrompt in src/bridge/stop.js, dropsAsk and asksForUpdate in src/bridge/ask.js, writes in src/bridge/config.js, endsTurn in src/bridge/server.js, stepHolds, turnEnds, paid and asksForUpdate in fold.go, Door.writes and Door.Hook in hooks.go, heldOf in holds.go, commandSettings in src/quack/command.go, and config.go, which holds Local and no writer
+the callers list names every builder of Outside, found by grep over src, and every reader of the fold's Said
+the first done_when line meets the fold tests for each drop and TestTheDoorWritesEachDropItsFoldNames, and the check line meets ./RUNME.sh check
 
 ## tests-red
 
