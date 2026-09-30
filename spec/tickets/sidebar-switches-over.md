@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -124,6 +124,25 @@ record:
     hand: the engine
     hash_before: d56c5138a3baa77295df8a10a30c9b9d3e1170ce
     hash_after: d56c5138a3baa77295df8a10a30c9b9d3e1170ce
+  - step: accept
+    hand: box d891eb0f26d7 · claude-code-remote
+    hash_before: bc725197d3f2ab641ead687620f5bc44aa7dfd46
+    hash_after: bc725197d3f2ab641ead687620f5bc44aa7dfd46
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/sidebar-switches-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 682752d3b4cefff7
+        size: 344
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["sidebar-lands-in-shadow", "tui-shell-switches-over"]
 enabled_by: migration.phase8switch
 cloud: true
@@ -186,8 +205,14 @@ Done when the extension spawns no verb and reads no file itself.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- git grep for spawn( over src/extension meets respawn( in editor-process.js alone, which go-cage-switches-over owns
+- a new window posts config/opened, and the local file stands whole, as sidebar-writes.test.js holds
+- the sidebar slice reads new, and the shadow compare leaves with its mode
+- three reads stay at start: the schema guard, the show-panel flag and the index port. Each runs before the index answers
+- the check exits 0 on the branch
 
 # retro
 
