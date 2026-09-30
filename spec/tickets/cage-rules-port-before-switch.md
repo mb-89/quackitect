@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,34 @@ record:
         hash: 69047d049588488a
         size: 690
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: e04a360d40ca7174f7f45e3cc311e24ed1e69b2a
+    hash_after: e04a360d40ca7174f7f45e3cc311e24ed1e69b2a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: a6919ba809d8b0d3
+        size: 2872
+      - name: [[spec/tickets/cage-command-rules-port]]
+        hash: fd1c2c01a882ff54
+        size: 15233
+      - name: [[spec/tickets/cage-commit-guards-port]]
+        hash: 4536259914e8c404
+        size: 8642
+      - name: [[spec/tickets/cage-write-door-port]]
+        hash: 7858a72eba21e4b3
+        size: 8768
+      - name: [[spec/tickets/cage-call-holds-port]]
+        hash: adef77bd3e029bd1
+        size: 8807
+      - name: [[spec/tickets/cage-stop-rules-port]]
+        hash: 1e365cc5550c2588
+        size: 8582
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -235,26 +263,33 @@ This ticket holds the whole: a recorded session log, test/replay/cage/every-refu
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+test/replay/cage/every-refusal.jsonl carries one call of each refusal the live shadow met, a Write naming no ticket, and a helper held in the foreground. Its golden shadow stands empty, so TestReplayLogAnswersEveryRecordedLog reads it red until the command, write and hold children land.
+
+What surprised me: the live evidence ran with a todo in hand, and one replay tree holds one plan, so the ticket row names no ticket in place of one outside the hand. The shared command table covers the todo case.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when line one meets the every-refusal replay, red. Line two is a checkpoint the accept answers off ./RUNME.sh log --kind shadow over a live session. Line three is the check
+- the replay reaches the store through qtest and the tree through the root the rows name, which the command child builds from the shared table
 
 # gate
 
