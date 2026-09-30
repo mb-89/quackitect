@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -290,6 +290,30 @@ record:
         hash: f8d74dda24c97d66
         size: 17093
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 936f3fa84f9814dc31af76a1a25dea711c6e8611
+    hash_after: 936f3fa84f9814dc31af76a1a25dea711c6e8611
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: design/tests-red
+        hash: b41ceddb426778c6
+        size: 696
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 365df2fa0fabfadf
+        size: 19014
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: d86d10e8babf3c95
+        size: 21078
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: f8d74dda24c97d66
+        size: 17093
+    def: dc4904ab364efa10
 depends_on: [the-work-tab-reads-v1, the-work-keys-call-actions, the-log-tab-reads-v1]
 ---
 
@@ -410,8 +434,17 @@ Both cases still fail on their own assertion: the tracked config reads shadow fo
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+What I weigh: the three pieces this ticket waits on stand closed, the grep line answers nothing on this branch, and phase6switch reads true in the tracked config. The approach moves the key and takes the compares out, which the two red cases decide, and the check decides the last line.
+
+Fixed in place, no round:
+
+- the callers list misses src/modules/migration/migration.go, whose WindowKey row takes new as its default and its one value, the way the switched slices read, and migration_test.go beside it
+- the three shadow_test.go files leave with the compares they test
+- frame/door.go loses appendFile once WriteShadow leaves
 
 # implement
 
