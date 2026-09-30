@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: a04101e5619b08bc
         size: 2494
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d889b5fc6cd8 · claude-code-remote · helper-4
+    hash_before: b3ab1017685cba034481f26377d895e61eafb2cc
+    hash_after: b3ab1017685cba034481f26377d895e61eafb2cc
+    inputs:
+      - name: design/draft
+        hash: a04101e5619b08bc
+        size: 2494
+      - name: design/tests-red
+        hash: ad805c8cd278a55f
+        size: 785
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -282,8 +294,11 @@ The three door cases fail on their status and their bodies: `/v1/watch` answers 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- watch-refuses-before-it-streams: `sse.Register` in huma v2.36.0 wraps the handler in a `StreamResponse` that writes 200 and `text/event-stream` before `f` runs, so the handler cannot answer the 404 problem `TestV1WatchAnswersANameTheCatalogLacksWithAProblem` wants. The builder checks `store.Declared` in a `huma.Resolver` on the input, which huma runs before the handler and whose `StatusError` sets the status, or registers through `huma.Register` and returns `huma.Error404NotFound` before the `StreamResponse`
+- watch-callers-name-opens-on: the `OnCommit` hook the approach extends stands in `opensOn` in `src/index/door.go`, not in `Serve`, so the callers line names `opensOn`
 
 # implement
 
