@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,27 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d856e248e31998 · claude-code-remote
+    hash_before: 9e1805daa55ad74b1de7e4066f93e2c11c2cc6d5
+    hash_after: 9e1805daa55ad74b1de7e4066f93e2c11c2cc6d5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s); green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/phase8-switch-turns-on.md:66:91: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: dc6498252959fe45
+        size: 443
+      - name: [[spec/tickets/sidebar-switches-over]]
+        hash: 56d8ead43ac2308d
+        size: 5736
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
