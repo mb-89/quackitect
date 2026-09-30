@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: design/draft
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,9 @@ record:
         hash: c0ed900e8f123b44
         size: 4175
     def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/tickets/cage-rules-port-before-switch]]
 ---
 
 # Ask
