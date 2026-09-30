@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: sidebar-switches-over
 parent: config-answers-keys-and-overrides
+record:
+  - step: do
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 120f4b1f2563ec532ad79af23279f433b94fb66c
+    hash_after: 120f4b1f2563ec532ad79af23279f433b94fb66c
+    why: config-keys-built-in-layer answers this ask
+reason: answered
 ---
 
 # Ask
