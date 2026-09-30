@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -163,6 +163,15 @@ record:
         hash: a34b00a52e331586
         size: 749
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 6481c8bfa37aa02836ed4f6d3bb7772e697e035b
+    hash_after: 6481c8bfa37aa02836ed4f6d3bb7772e697e035b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -397,14 +406,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && ./RUNME.sh lint src/modules/hooks src/modules/session src/quack/command.go src/quack/hooks_test.go test/level0/call-holds-box.js test/level0/call-holds-cases.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft size names, plus agent.go and holds.go under hooks, and the fold line in session.go
+- the fold reads no outside world, since the door stamps the config each hold reads on the call
+- each new Go function carries a pointer at the ticket or the design output it ports
+- the hold texts stand once in Go, in src/modules/session/holds.go and src/modules/hooks/agent.go
 
 ## tests-green
 

@@ -22,6 +22,7 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
 		q.FoldIn(c, FillName, 0, fills, q.Doc("the context's tokens, as the newest event naming them says")),
 		q.FoldIn(c, LastName, Last{}, lasts, q.Doc("the place and the kind of the newest event a session lands")),
+		q.FoldIn(c, HoldsName, Holds{}, StepHolds, q.Doc("the state the holds keep over a session, and the answer to its newest event")),
 	)
 }
 

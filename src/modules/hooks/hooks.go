@@ -73,6 +73,8 @@ type Effect struct {
 	Kind   string `json:"kind"`
 	Text   string `json:"text,omitempty"`
 	Result any    `json:"result,omitempty"`
+	// The id an effect asking back carries, which the hook module's answer names. [[spec/design_output/model#an-effect-asks-back]]
+	Call string `json:"call,omitempty"`
 }
 
 // [[spec/design_output/model#a-post-and-its-answer]]
@@ -120,10 +122,19 @@ type Outside struct {
 	Git    func(root string, args ...string) string
 }
 
-// What the command rules read off the config and the box: the words a name holds, and whether the box stands in the cloud. [[spec/tickets/cage-command-rules-port]]
+// What the doors read off the config and the box: the words a name holds, whether the box stands in the cloud, the owner's hold and ask, the binding, the graces, the plan's numbers, and each helper tier's model. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-call-holds-port]]
 type Settings struct {
-	Words int
-	Cloud bool
+	Words        int
+	Cloud        bool
+	Hold         string
+	Ask          string
+	Binding      string
+	FinishGrace  int
+	UpdateGrace  int
+	PlanEvery    int
+	PlanGrace    int
+	PlanMostOpen int
+	Helpers      map[string]string
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -132,6 +143,8 @@ type Door struct {
 	mu   sync.Mutex
 	seqs map[string]int64
 	told map[string]bool
+	// The session of the newest call the holds held under each root, which a spoke post meets. [[spec/tickets/cage-call-holds-port]]
+	heldIn map[string]string
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -157,17 +170,27 @@ func New(from Outside) *Door {
 	if from.Ops == nil {
 		from.Ops = func(string) []Op { return nil }
 	}
-	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}}
 }
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
 func (d *Door) Hook(post Post) (Answer, error) {
-	session := sessionOf(post)
-	if err := d.writes(session, post); err != nil {
+	root := post.Root
+	if root == "" {
+		root = d.from.Root
+	}
+	var settings Settings
+	if d.from.Config != nil {
+		settings = d.from.Config(root)
+	}
+	session := d.sessionFor(post, root)
+	if err := d.writes(session, post, settings, root); err != nil {
 		return Answer{}, err
 	}
 	effects := []Effect{}
-	if refused := d.refuses(post); post.Event == toolEvent && refused != "" {
+	if said, ok := d.held(session, post, root); ok {
+		effects = append(effects, said)
+	} else if refused := d.refuses(post, root, settings); post.Event == toolEvent && refused != "" {
 		effects = append(effects, Effect{Kind: resultKind, Text: refused})
 	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)
@@ -193,8 +216,8 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	return said, nil
 }
 
-// Commits the event at the session's next place, and lands it on every fold over the session. [[spec/design_output/model#the-events-of-a-session]]
-func (d *Door) writes(session string, post Post) error {
+// Commits the event at the session's next place, a call stamped with the config its holds read, and lands it on every fold over the session. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]]
+func (d *Door) writes(session string, post Post, settings Settings, root string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	store := d.from.Store
@@ -206,7 +229,11 @@ func (d *Door) writes(session string, post Post) error {
 		}
 	}
 	hand := q.Hand{Session: session, Agent: textOf(post.E, "agentId", "agent_id")}
-	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fieldsOf(post)}
+	fields := fieldsOf(post)
+	if post.Event == toolEvent {
+		fields[heldField] = heldOf(settings, root)
+	}
+	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
 		return err
 	}
@@ -259,14 +286,21 @@ const (
 	subjectFormat  = "--format=%s"
 )
 
-// The first refusal of a Bash call, in the bridge's order: the ticket door, the bless guard, the command rules, the version guard, then the git write door. PowerShell meets the ticket door alone. A post standing in no tree meets none. [[spec/tickets/cage-command-rules-port]]
-func (d *Door) refuses(post Post) string {
-	tool := textOf(post.E, "tool")
-	root := post.Root
-	if root == "" {
-		root = d.from.Root
+// The refusal of a tool's own door, which the god binding lets through as letsThrough does. [[spec/tickets/cage-call-holds-port]]
+func (d *Door) refuses(post Post, root string, settings Settings) string {
+	if post.Event != toolEvent || settings.Binding == godBinding {
+		return ""
 	}
-	if post.Event != toolEvent || (tool != bashTool && tool != powerShellTool) || root == "" {
+	if textOf(post.E, "tool") == agentTool {
+		return agentRefusal(post.E, settings)
+	}
+	return d.commands(post, root, settings)
+}
+
+// The first refusal of a Bash call, in the bridge's order: the ticket door, the bless guard, the command rules, the version guard, then the git write door. PowerShell meets the ticket door alone. A post standing in no tree meets none. [[spec/tickets/cage-command-rules-port]]
+func (d *Door) commands(post Post, root string, settings Settings) string {
+	tool := textOf(post.E, "tool")
+	if tool != bashTool && tool != powerShellTool || root == "" {
 		return ""
 	}
 	line, description := callField(post.E, "command"), callField(post.E, "description")
@@ -276,10 +310,6 @@ func (d *Door) refuses(post Post) string {
 	}
 	if said := command.BlessGuard(line, tree.text); said != "" {
 		return said
-	}
-	var settings Settings
-	if d.from.Config != nil {
-		settings = d.from.Config(root)
 	}
 	var rules, writes []command.Row
 	for _, one := range command.Findings(line, settings.Words, command.It{Cloud: settings.Cloud, Script: tree.text, Subjects: d.subjects(root)}) {
