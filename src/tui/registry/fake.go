@@ -19,7 +19,10 @@ type Fake struct {
 }
 
 // Each change the case seeded, then the end. [[spec/tickets/v1-watch-streams-changes]]
-func (f Fake) Watch(_ context.Context, _ []string, _ func(Change)) error {
+func (f Fake) Watch(_ context.Context, _ []string, each func(Change)) error {
+	for _, one := range f.Changes {
+		each(one)
+	}
 	return f.Err
 }
 

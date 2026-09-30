@@ -122,3 +122,14 @@ func TestV1WatchAnswersANameTheCatalogLacksWithAProblem(t *testing.T) {
 		t.Fatalf("the watch answers %d: %s", said.StatusCode, body)
 	}
 }
+
+func TestV1WatchSendsNothingWhereTheValueStands(t *testing.T) {
+	standing, writes := watchingV1(t)
+	_, events := openWatch(t, standing, "files/spec/one.md")
+	nextEvent(t, events)
+	writes("one")
+	writes("two")
+	if next := nextEvent(t, events); next.Value.Text != "two" {
+		t.Fatalf("the event after a write of the same text reads %+v, and wants two", next)
+	}
+}

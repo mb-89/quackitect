@@ -45,3 +45,18 @@ func TestTheWatchEndsWithItsStream(t *testing.T) {
 		t.Fatal("the stream ends, and no Ended message lands")
 	}
 }
+
+func TestTheWatchEndsOnTheProblemTheIndexAnswers(t *testing.T) {
+	t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/problem+json")
+		w.WriteHeader(http.StatusNotFound)
+		_, _ = w.Write([]byte(`{"detail":"the catalog holds no provider of t/none"}`))
+	}))
+	defer server.Close()
+	stream := Stream(context.Background(), V1{Base: server.URL}, []string{"t/none"})
+	ended, _ := Next(stream)().(Ended)
+	if ended.Why != "the catalog holds no provider of t/none" {
+		t.Fatalf("the stream ends on %q, and wants the problem's detail", ended.Why)
+	}
+}

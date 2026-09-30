@@ -27,13 +27,7 @@ func (v V1) Read(name string) (json.RawMessage, error) {
 		return nil, err
 	}
 	if code >= statusBad {
-		var problem struct {
-			Detail string `json:"detail"`
-		}
-		if json.Unmarshal(body, &problem) == nil && problem.Detail != "" {
-			return nil, fmt.Errorf("%s", problem.Detail)
-		}
-		return nil, fmt.Errorf("the index answers %s", status)
+		return nil, problemIn(status, body)
 	}
 	var value struct {
 		Value json.RawMessage `json:"value"`
@@ -42,4 +36,15 @@ func (v V1) Read(name string) (json.RawMessage, error) {
 		return nil, err
 	}
 	return value.Value, nil
+}
+
+// The problem's detail where the index answers one, and the status where it answers none. [[spec/design_output/model#surfaces]]
+func problemIn(status string, body []byte) error {
+	var problem struct {
+		Detail string `json:"detail"`
+	}
+	if json.Unmarshal(body, &problem) == nil && problem.Detail != "" {
+		return fmt.Errorf("%s", problem.Detail)
+	}
+	return fmt.Errorf("the index answers %s", status)
 }

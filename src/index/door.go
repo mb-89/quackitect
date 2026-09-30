@@ -83,6 +83,9 @@ type door struct {
 	tick     atomic.Int64
 	wake     chan struct{}
 	wakeLock sync.Mutex
+	// The channel the next commit closes, which every watch over /v1 waits on. [[spec/tickets/v1-watch-sends-changes]]
+	commit     chan struct{}
+	commitLock sync.Mutex
 
 	// The values modules read. [[spec/tickets/files-topic-reads-the-rows]]
 	store *q.Store
@@ -228,11 +231,12 @@ func opensOn(listens func(network, address string) (net.Listener, error), root, 
 		return failed(err)
 	}
 
-	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
+	one := &door{db: db, root: root, dirty: make(chan struct{}, 1), wake: make(chan struct{}), commit: make(chan struct{}), touched: map[string]bool{}, tracked: tracked}
 	one.tick.Store(1)
 	one.store = q.NewStore(catalog)
 	// The tickets move on the scheduler after the rows do, so their commit ticks the changes call too. [[spec/tickets/tickets-becomes-a-module]]
 	one.store.OnCommit(func(values map[string]any) {
+		one.committed()
 		if _, ok := values[TicketsName]; ok {
 			one.moved()
 		}
@@ -442,6 +446,21 @@ func (one *door) moved() {
 	one.tick.Add(1)
 	close(one.wake)
 	one.wake = make(chan struct{})
+}
+
+// A commit wakes every watch waiting on it. [[spec/tickets/v1-watch-sends-changes]]
+func (one *door) committed() {
+	one.commitLock.Lock()
+	defer one.commitLock.Unlock()
+	close(one.commit)
+	one.commit = make(chan struct{})
+}
+
+// The channel the next commit closes. [[spec/tickets/v1-watch-sends-changes]]
+func (one *door) nextCommit() chan struct{} {
+	one.commitLock.Lock()
+	defer one.commitLock.Unlock()
+	return one.commit
 }
 
 // The tick now, and the channel the next sweep closes. [[spec/design_output/index#the-index-fires-on-change]]

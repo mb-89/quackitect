@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: ad805c8cd278a55f
         size: 785
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: 08a1d61e5280b0adab94cc0b15a25d687d7de07e
+    hash_after: 08a1d61e5280b0adab94cc0b15a25d687d7de07e
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/v1-watch-sends-changes.md:374:1: ListItem: A sentence in a list item holds 20 words, and this one holds 21."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -309,14 +318,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- files: beyond the size list, src/tui/registry/door.go gains stream, because it holds every call the registry makes to the index. src/tui/registry/v1.go gives up problemIn, which Read and Watch share. Each test file gains a case: the problem the index answers, and a value that stands sends nothing.
+- fakes: the window's road reaches the index through stream in door.go, and Fake.Watch stands for it. The door side runs a real door over a temp tree, as v1_test.go does.
+- comments: each new function points at this ticket, and the middleware points at watch-refuses-before-it-streams.
+- one place: the refusal wording comes from valueOf's line, and the event shape stands in watchEvent alone.
 
 ## tests-green
 
@@ -371,4 +385,4 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 - watch-callers-name-opens-on: the approach and the callers line say `Serve`, and the engine freezes both. Read `opensOn` in `src/index/door.go` in their place. The `OnCommit` hook the commit channel extends stands there, and `Serve` only calls `opensOn` with `net.Listen`.
-- watch-refuses-before-it-streams: the approach checks `store.Declared` inside the stream handler, and that comes too late. `sse.Register` returns a `StreamResponse` whose body sets `text/event-stream` before it calls the handler. Put the check in a `Resolve` method on the watch input, and answer the missing name there. The server runs `Resolve` before the handler, and its `StatusError` sets the status.
+- watch-refuses-before-it-streams: the approach checks `store.Declared` inside the stream handler, and that comes too late. `sse.Register` returns a `StreamResponse` whose body sets `text/event-stream` before it calls the handler. The build checks each name in a middleware on the operation, which runs before the handler and writes the 404 problem. A `Resolve` method on the input holds no store to ask, so the build left that road.
