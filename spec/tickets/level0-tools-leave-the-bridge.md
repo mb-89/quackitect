@@ -117,11 +117,24 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: ca70b6cd3b91d4d91bfb89be6d248c46e6522e7d
+    hash_after: 487fa18ad2938528a302f54d7046aed0803ca39f
+    inputs:
+      - name: ask
+        hash: 21eb9ef6b92405e7
+        size: 654
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 7883b3d10633c780
+depends_on: ["tools-keep-their-own-names", "log-report-stop-answer-in-go", "plan-writes-off-go", "prose-tools-answer-in-go", "edit-tools-answer-in-go", "find-and-wait-in-go", "review-spawns-off-the-door", "describe-answers-off-the-door", "grep-glob-answer-off-index"]
 ---
 
 # Ask
@@ -157,38 +170,63 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+This ticket closes the tools port once nine children move each tool to the Go side. `Action` in src/q/tool/tool.go resolves an `index_` name alone, and the bridge's TOOLS table also answers Grep and Glob. So the port splits by tool family, and the names child lands first.
+
+1. tools-keep-their-own-names: an action answers under the tool name the agent calls.
+2. log-report-stop-answer-in-go, plan-writes-off-go, prose-tools-answer-in-go, edit-tools-answer-in-go and find-and-wait-in-go: each family answers off the Go side, and drops its entries from the bridge.
+3. review-spawns-off-the-door, after the spawn port, and describe-answers-off-the-door: the review and describe events.
+4. grep-glob-answer-off-index: Grep and Glob off the index.
+5. This ticket then drops `served` and the bridge branch from `stepOf` in cage.js, the bridge's read path and repost from level0.js, the read tools pull-tool.js registers, and the TOOLS table with its register answer from server.js.
+
+The tool registration moves to the Go tool list, which the hook already registers through `se-index tools`. What I weigh: each family lands while the bridge serves the rest, since a Go result answers before `stepOf` reaches the bridge. I assume the new cage stays off until every child lands.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/cage.js: stepOf
+- .claude/skills/level0/hooks/level0.js: door, seen, reads, spoke
+- .claude/skills/level0/hooks/pull-tool.js: register
+- src/bridge/server.js: TOOLS, onToolCall, decide, opensSession
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/cage.test.js: stepOf hands no call to the bridge
+- src/quack/tools_test.go: every tool the bridge listed stands in the index's tool list
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/cage.js
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/hooks/pull-tool.js
+- src/bridge/server.js
+- test/level0/cage.test.js
+- src/quack/tools_test.go, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the helper opened server.js, cage.js, level0.js, pull-tool.js, tool.go and tools.go, and I checked Action and the TOOLS table myself
+- the callers list names what this ticket touches, and the nine children carry the rest
+- the first done line meets the tool list case, the second the cage case, and the third the check
 
 ## tests-red
 

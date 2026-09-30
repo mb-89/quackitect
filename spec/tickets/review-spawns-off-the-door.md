@@ -118,6 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
 step: design/owner-read
+depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
 ---
 
 # Ask
