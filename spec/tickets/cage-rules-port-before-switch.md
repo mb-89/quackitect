@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -193,6 +193,34 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: "[[spec/tickets/cage-command-rules-port]], [[spec/tickets/cage-commit-guards-port]], [[spec/tickets/cage-write-door-port]], [[spec/tickets/cage-call-holds-port]], [[spec/tickets/cage-stop-rules-port]]"
+  - step: design/tests-red
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: f342f35687a9f0047a1a2c6aa2822c3c56773ad4
+    hash_after: f342f35687a9f0047a1a2c6aa2822c3c56773ad4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: a6919ba809d8b0d3
+        size: 2872
+      - name: [[spec/tickets/cage-command-rules-port]]
+        hash: 36e18c6742eba22f
+        size: 908
+      - name: [[spec/tickets/cage-commit-guards-port]]
+        hash: 7c90d003597ffeb3
+        size: 821
+      - name: [[spec/tickets/cage-write-door-port]]
+        hash: 106cb5766c01d2f3
+        size: 947
+      - name: [[spec/tickets/cage-call-holds-port]]
+        hash: bc49d4efc513831a
+        size: 986
+      - name: [[spec/tickets/cage-stop-rules-port]]
+        hash: 29ccd1d3cec3f09e
+        size: 761
+    def: 08e16d07b0de477c
 ---
 
 # Ask
