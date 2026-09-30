@@ -122,14 +122,23 @@ step: design/owner-read
 
 # Ask
 
-The lsp IO module answers the hover over a term, the completion the schema allows, the pointer that opens and the fold over the frontmatter, off the files the index holds. So the editor keeps all four once it starts `quack lsp` in place of `se-lsp`.
+The `lsp` IO module answers four asks off the files the index holds:
+
+- the hover over a term
+- the completion the schema allows
+- the pointer that opens
+- the fold over the frontmatter
+
+So the editor keeps all four once it starts `quack lsp` in place of `se-lsp`.
 
 The switch drops four features the owner reads in every note, and the old server stays for them alone.
 
-- `go test ./src/modules/lsp` passes a case for each of `textDocument/hover`, `textDocument/completion`, `textDocument/documentLink` and `textDocument/foldingRange`, answered off a fake store
+- `go test ./src/modules/lsp` answers each method below off a fake store
+  - `textDocument/hover`
+  - `textDocument/completion`
+  - `textDocument/documentLink`
+  - `textDocument/foldingRange`
 - `./RUNME.sh check` exits 0
-
-view: the editor, where a hover over a term, the completion after `kind:`, a pointer that opens, and the fold over the frontmatter each stand
 
 # design
 
