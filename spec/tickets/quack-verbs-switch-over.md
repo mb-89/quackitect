@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -179,9 +179,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 43a0940cf1369a95ec9f148ae55814f52dc50f4c
+    hash_after: 43a0940cf1369a95ec9f148ae55814f52dc50f4c
+    inputs:
+      - name: retro/write
+        hash: 68653081a7a1885b
+        size: 2834
+    def: 4da1ca5da87d5bbc
 depends_on: ["quack-verbs-land-in-shadow", "open-tasks-switch-lands", "read-topics-switch-over"]
 enabled_by: migration.phase4switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -330,20 +340,27 @@ the chapter says the role and names no box path
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+no tool, host or right: the box held every install the route needed
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+a hook: the level0 plugin loads once a session, so an edit to its hook takes no effect before the turn ends, and the live tool call proves the fix from the next turn on
+a hook: the bridge server stopped answering at its event port several times, and serve brought it back
+no trunk guard, no conflict at sync, and no test failing on the box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step parked, and no ticket minted outside the group
+the note on the guidance prose became a successor, and the decide step minted none: the next retro mints the ticket rewriting the guidance, the skills and the commands to name the index tools
+the handover names the live check of the verb tools as the next session opening step
 
 # Discussion
 
