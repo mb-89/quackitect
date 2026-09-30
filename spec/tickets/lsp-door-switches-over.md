@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children-2
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -133,6 +133,10 @@ record:
       - name: sync/sync
         exit: 0
         said: work/lsp-door-switches-over already carries every commit on main.
+  - step: children-2
+    hand: the engine
+    hash_before: 6ee2f0eabb17f2708f223682e83734748bcf4718
+    hash_after: 6ee2f0eabb17f2708f223682e83734748bcf4718
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
 cloud: true
