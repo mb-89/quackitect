@@ -117,12 +117,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 3e10455b46288bfa0f979d5c5080d5aee95e9c04
+    hash_after: 3e10455b46288bfa0f979d5c5080d5aee95e9c04
+    inputs:
+      - name: ask
+        hash: 7c90d003597ffeb3
+        size: 821
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,103 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The port keeps the bridge's order in `src/bridge/bash.js` `onBash`: the ticket door, the bless guard, the command rules with the voice refusals, the private delta, the tested delta, the todo tag on a push, the desk guard, the trunk guard, the version guard, then the git write door. `Door.commands` in `src/modules/hooks/hooks.go` runs the new guards between the command rules and the version guard.
+
+Pure reads land in the `command` package, one file a guard, each ported line for line from its lib module with the refusal text alike:
+
+- `command/private.go`: `addedIn`, `shapesIn`, `boxNamesIn`, `noteTextIn`, `privateIn` and `RefusedDelta`, off `lib/private.js` and `lib/refuse.js`
+- `command/tested.go`: `hunksIn`, `movedWhole`, `carriedIn`, `UntestedIn` and `RefusedTest`, off `lib/tested.js`
+- `command/todo.go`: `isTagged`, `reaches`, `TaggedIn` and `RefusedTodo`, off `lib/todo.js`
+- `command/trunk.go`: `TouchesGit`, `LandsOnTrunk`, the desk refusal off `lib/cloud.js`, the red battery text and `throughTheVerb`, off `lib/trunk.js` and `src/bridge/bash.js`
+- `command/voice.go`: the split of kept findings into refusals and form, off `lib/warnings.js` `refusesIn`
+
+IO stays in the `hooks` module, in a new `commits.go`. It reads git through `Outside.Git`, the tree through `disk{root}`, and the check's stamp at `.se/.runtime/check.json`. It reads the held tests off the holds folder `src/scripts/guidance-hand.js` `heldTests` walks. `Settings` gains `User` and `Home`, which `commandSettings` in `src/quack/command.go` fills off the process environment. A new `Outside.Voice` takes a commit message and answers the findings Vale and `src/prose` keep. `listensHooks` in `src/quack/main.go` wires it to run Vale over the message as `level0-commit.md` and pass the findings through `prose.Kept`. A door with no Voice reads no voice, as a door with no Git reads no git.
+
+The evidence follows the road the call-holds port took:
+
+- `test/replay/cage/commit-guards-cases.json` holds a tree, and per case the git answers keyed by the joined arguments, the kept voice findings, and the bridge's decision and text
+- `test/level0/commit-guards-cases.test.js` drives `onBash` over a `fakeProc` taught those git answers and a Vale fake answering those findings, so a drift in the bridge reads there first
+- `.se/scripts/commit-guards-log.mjs` prints one recorded log a guard off the bridge's own answers, with a `<name>.box.json` carrying settings, `git` and `voice`
+- `cage_test.go` `boxOf` reads `git` and `voice` off the box file into `Outside.Git` and `Outside.Voice`, so the replay meets each guard with an empty golden shadow
+
+One commit a guard, each with its Go test, its cases and its log, then the wiring commit.
+
+What I weigh: a Voice function beside Git keeps Vale and the wink twin out of the module, and the case table decides the refusal text alike. The cost is that the table fakes Vale's output, so a Vale rule change reads in neither test. The prose slice owns that drift, and `./RUNME.sh check` still runs the real Vale over the tree. The warn-on-form context and `markedPush` fall outside the ask, since neither refuses a call.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.refuses calls Door.commands
+- src/modules/hooks/hooks.go: Door.Hook calls Door.refuses
+- src/quack/main.go: listensHooks builds hooks.Outside
+- src/quack/command.go: commandSettings builds hooks.Settings
+- src/modules/hooks/cage_test.go: boxOf builds Settings for the replay
+- src/modules/hooks/cage_test.go: TestReplayLogAnswersEveryRecordedLog builds the replay door
+- src/quack/hook_test.go: builds hooks.Outside
+- src/quack/hooks_test.go: builds hooks.Outside
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/command/private_test.go: TestPrivateInReadsTheBridgesThreeChecks
+- src/modules/hooks/command/tested_test.go: TestUntestedInReadsTheBridgesDelta
+- src/modules/hooks/command/todo_test.go: TestTaggedInReadsTheTodoTag
+- src/modules/hooks/command/trunk_test.go: TestLandsOnTrunkReadsTheBridgesLanding
+- src/modules/hooks/command/voice_test.go: TestTheVoiceSplitsRefusalsFromForm
+- src/modules/hooks/commits_test.go: TestTheCommitGuardsRefuseWhatTheBridgeRefuses
+- src/modules/hooks/cage_test.go: TestReplayLogAnswersEveryRecordedLog, over the new logs
+- test/level0/commit-guards-cases.test.js: the bridge answers the shared commit case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go
+- src/modules/hooks/commits.go
+- src/modules/hooks/commits_test.go
+- src/modules/hooks/cage_test.go
+- src/modules/hooks/command/private.go
+- src/modules/hooks/command/private_test.go
+- src/modules/hooks/command/tested.go
+- src/modules/hooks/command/tested_test.go
+- src/modules/hooks/command/todo.go
+- src/modules/hooks/command/todo_test.go
+- src/modules/hooks/command/trunk.go
+- src/modules/hooks/command/trunk_test.go
+- src/modules/hooks/command/voice.go
+- src/modules/hooks/command/voice_test.go
+- src/quack/main.go
+- src/quack/command.go
+- test/replay/cage/commit-guards-cases.json
+- test/level0/commit-guards-cases.test.js
+- test/replay/cage/private-delta.jsonl, .box.json, .shadow.jsonl
+- test/replay/cage/tested-delta.jsonl, .box.json, .shadow.jsonl
+- test/replay/cage/todo-push.jsonl, .box.json, .shadow.jsonl
+- test/replay/cage/desk-trunk.jsonl, .box.json, .shadow.jsonl
+- test/replay/cage/commit-voice.jsonl, .box.json, .shadow.jsonl
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file and function named stands opened: src/bridge/bash.js onBash and each guard, lib/private.js privateNow and privateIn, lib/tested.js untestedIn, lib/todo.js, lib/trunk.js landsOnTrunk and touchesGit, lib/cloud.js onDesk and deskRefusal, lib/warnings.js refusesIn, lib/refuse.js refusedDelta, hooks.go Door.commands and Outside, cage_test.go boxOf and the replay test, command_test.go, src/quack/command.go and main.go listensHooks
+the callers list names every builder of Outside and Settings and every caller of Door.commands, found by grep over src
+each done_when line names its test: the replay line TestReplayLogAnswersEveryRecordedLog, the refusal text line TestTheCommitGuardsRefuseWhatTheBridgeRefuses with its JS twin, and the check line ./RUNME.sh check
 
 ## tests-red
 
