@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d894eee95148f · claude-code-remote
+    hash_before: b70e34a607e06401b6e0ba1bf0118ff52a66dcd0
+    hash_after: b70e34a607e06401b6e0ba1bf0118ff52a66dcd0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: 1337bb662cc08e0a
+        size: 785
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -338,26 +361,33 @@ The approach answers the ask: the door answers a describe of Bash with the verb 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/describe_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door now answers a describe of Bash with the verb line, so the Bash description keeps its verbs once the bridge leaves. The line comes off the tool names the store lists, which the bridge read by running the binary. The cage maps a named after on a describe to the field it names, the shape the bridge's describe answer takes. A case table holds the Go line to the JavaScript one.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches describe.go, hooks.go, cage.js and cage.test.js, the files the draft names
+- the door reads the store alone, and the Go cases build it through the fake index
+- describe.go and the new line in cage.js each carry a pointer at the design section and the ticket
+- the verb line stands in describe.go, and the case table holds it to the JavaScript line
 
 # accept
 
