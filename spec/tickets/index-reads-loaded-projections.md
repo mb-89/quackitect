@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -169,6 +169,18 @@ record:
         hash: 37c497d04da200ac
         size: 4528
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8888f6242d7 · claude-code-remote · helper-7
+    hash_before: 8e02f9ad55209003941d6cf008599d83cf949745
+    hash_after: 8e02f9ad55209003941d6cf008599d83cf949745
+    inputs:
+      - name: design/draft
+        hash: 37c497d04da200ac
+        size: 4528
+      - name: design/tests-red
+        hash: dd6885586879f5d3
+        size: 1035
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -327,8 +339,11 @@ every door the tests reach has a fake: the scheduler cases reach the store alone
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- loaded-projection-test-names-match: the draft names a `shadow` value for the config case, and the case seeds `switch` at 3. Align the tests list with the case.
+- loaded-projection-curl-checkpoint: the curl line has no command. The hand answers it at tests-green against a running index, and the evidence names the reply.
 
 # implement
 
