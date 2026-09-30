@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strconv"
 	"testing"
 )
 
@@ -78,6 +79,18 @@ func TestAMeasurePastTheFillWritesTheDueMarkAndADroppedClearDropsIt(t *testing.T
 	}
 	if _, ok := (disk{root}).Read(dueMark); ok {
 		t.Fatal("the dropped clear leaves the due mark standing")
+	}
+}
+
+// [[spec/tickets/cage-stop-marks-port]]
+func TestTheDueMarkLandsInTheShapeMarksDueWrites(t *testing.T) {
+	root := treeOf(t, map[string]string{}, "")
+
+	measured(t, marksDoor(t), root)
+
+	want := "{\n  \"tokens\": " + strconv.Itoa(caseFill) + ",\n  \"at\": " + strconv.Itoa(caseMark) + "\n}\n"
+	if body, _ := (disk{root}).Read(dueMark); body != want {
+		t.Fatalf("the due mark reads %q, and marksDue writes %q", body, want)
 	}
 }
 

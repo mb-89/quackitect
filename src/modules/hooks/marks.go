@@ -11,15 +11,22 @@ import (
 	"strings"
 )
 
-// .claude/skills/level0/lib/folders.js owns the due mark, and pull-hand-of.js the box and the session files, and the package spells them again. [[spec/tickets/cage-stop-marks-port]]
+// The runtime files the handover reads, which the package spells again. [[spec/tickets/cage-stop-marks-port]]
 const (
-	dueFile     = ".se/.runtime/due.json"
-	boxFile     = ".se/.runtime/box.json"
+	// .claude/skills/level0/lib/folders.js owns the due mark's folder, and the package spells it again. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
+	dueFile = ".se/.runtime/due.json"
+	// .claude/skills/level0/lib/folders.js owns the box file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+	boxFile = ".se/.runtime/box.json"
+	// .claude/skills/level0/lib/folders.js owns the session file's folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
 	sessionFile = ".se/.runtime/session.json"
-	handJoin    = " · "
-	markIndent  = "  "
-	folderMode  = 0o755
-	fileMode    = 0o644
+)
+
+// The joint of a hand's parts, and the shape the due mark lands in. [[spec/tickets/cage-stop-marks-port]]
+const (
+	handJoin   = " · "
+	markIndent = "  "
+	folderMode = 0o755
+	fileMode   = 0o644
 )
 
 // The variables naming the harness, and the name each gives, off HARNESS in src/scripts/pull-hand-of.js. [[spec/design_output/pull#the-hand-rule]]

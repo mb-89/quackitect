@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -162,6 +162,15 @@ record:
         hash: 2fc62139bc9e88c2
         size: 1090
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: ccfb3c17310e2be24d1d20206923c144f6869984
+    hash_after: 38b9366ccdbc4fdfb2459f9233092391cff7a641
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -358,14 +367,19 @@ What the build fixes within its own diff:
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the hooks module alone. The size golden takes the final length of a closed ticket, since the check reds on it
+- the disk under a temp root and the environment per case stand as the doors the cases reach
+- each new function points at this ticket or at the section it ports
+- each runtime path stands once in marks.go, beside a comment naming its owner
 
 ## tests-green
 
