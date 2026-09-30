@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/tui-shell-switches-over already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: f2932f9ef102997c8ce2984e9598efb68f5c1c58
+    hash_after: f2932f9ef102997c8ce2984e9598efb68f5c1c58
+    inputs:
+      - name: ask
+        hash: 0b88c45282ea1a19
+        size: 336
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["tui-shell-lands-in-shadow", "quack-verbs-switch-over", "read-topics-switch-over"]
 enabled_by: migration.phase6switch
 cloud: true
@@ -133,14 +145,31 @@ Done when the window reads its data off the index alone.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/v1-watch-streams-changes]] standard
+- [[spec/tickets/v1-watch-sends-changes]] standard
+- [[spec/tickets/the-work-tab-reads-v1]] standard
+- [[spec/tickets/the-work-keys-call-actions]] standard
+- [[spec/tickets/the-log-tab-reads-v1]] standard
+- [[spec/tickets/the-tui-data-paths-leave]] standard
+- [[spec/tickets/log-approach-matches-tree]] trivial
+- [[spec/tickets/log-tab-takes-its-rows]] trivial
+- [[spec/tickets/rows-cloud-matches-branches]] trivial
+- [[spec/tickets/rows-todo-folds-overrides]] trivial
+- [[spec/tickets/watch-callers-name-opens-on]] trivial
+- [[spec/tickets/watch-refuses-before-it-streams]] trivial
+- [[spec/tickets/work-tab-callers-complete]] trivial
+- [[spec/tickets/work-tab-waits-sends-changes]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each standard child is one piece of the window, and each trivial one is a finding a review minted
+- the children add up to the goal: the watch, both tabs' reads, the keys' posts, and the switch with the compares gone. Every child stands closed, so nothing stands outside them
+- the switch names the three reads it waits on under depends_on, and each tab names the watch
 
 # children
 
