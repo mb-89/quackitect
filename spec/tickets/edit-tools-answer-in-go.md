@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -157,6 +157,15 @@ record:
         hash: ae1006c9cecc729a
         size: 770
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d89586721a117 · claude-code-remote
+    hash_before: 35f6910c6a4359c50067cafb72d16ac911636415
+    hash_after: 35f6910c6a4359c50067cafb72d16ac911636415
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -349,14 +358,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, plus src/q/action.go, src/imports/imports.go and src/quack/accepts.go
+- the edits module reaches the disk alone, and its outside world rides in through Outside
+- each file header names the approach, and each function points at its design section or this ticket
+- the journal folder stays spelled beside the note in folders.js that owns it, and says so
 
 ## tests-green
 

@@ -19,7 +19,7 @@ const (
 	MultiTool    = "MultiEdit"
 	NotebookTool = "NotebookEdit"
 	patchCall    = "mcp__level0__patch"
-	ticketHow    = "Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+	TicketHow    = "Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
 )
 
 // A path the tree reads as its own, and one standing outside it, as outside in src/bridge/write.js reads it. [[spec/design_output/level0#the-write-door]]
@@ -49,7 +49,7 @@ func Writes(tool string) bool {
 
 // The refusal a harness write tool meets, since it carries no ticket field. [[spec/design_output/level0#a-write-names-its-ticket]]
 func ToolRefusal(tool string) string {
-	return tool + " carries no ticket field, so the door takes no write through it. Call " + patchCall + ", with an exact op for one spot. " + ticketHow
+	return tool + " carries no ticket field, so the door takes no write through it. Call " + patchCall + ", with an exact op for one spot. " + TicketHow
 }
 
 // The path a write names, a file's or a notebook's. [[spec/design_output/level0#a-write-names-its-ticket]]

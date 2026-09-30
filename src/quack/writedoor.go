@@ -4,11 +4,17 @@
 package main
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
+	"time"
 
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/edits"
+	"quackitect/src/modules/hooks"
+	"quackitect/src/modules/hooks/command"
 	"quackitect/src/modules/hooks/write"
 	"quackitect/src/yaml"
 )
@@ -73,6 +79,56 @@ func writeProse(root, where, text string) []write.Finding {
 	return out
 }
 
+// What the edits module reads past its own disk: the ticket door, the write door, the sweep and the mint, over the root. [[spec/tickets/edit-tools-answer-in-go]]
+func editsOutside(root string) edits.Outside {
+	return edits.Outside{
+		Root: root, Now: time.Now, Judge: editDoor(root), Sweep: func(glob string) []string { return swept(root, glob) },
+		Ticket: func(name string, files []string) string {
+			for _, one := range files {
+				if one != write.Handover {
+					return command.TicketFault(name, rootDisk{root}, write.TicketHow)
+				}
+			}
+			return ""
+		},
+		Mint: func(kind, where string, fields map[string]any) (string, string) {
+			return check.Minted(check.SchemasIn(check.TreeOver(root, rootDisk{root})), kind, where, fields)
+		},
+	}
+}
+
+// The write door over a text an edit writes: the schema's refusal, then the voice's. [[spec/tickets/edit-tools-answer-in-go]]
+func editDoor(root string) func(where, text string) string {
+	return func(where, text string) string {
+		return hooks.Judge(where,
+			func() write.Judged { return writeSchema(root, where, text) },
+			func() []write.Finding { return writeProse(root, where, text) })
+	}
+}
+
+// The files under the root a glob reaches, past every dot folder. [[spec/tickets/edit-tools-answer-in-go]]
+func swept(root, glob string) []string {
+	var out []string
+	_ = filepath.WalkDir(root, func(at string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return nil
+		}
+		where, _ := filepath.Rel(root, at)
+		where = filepath.ToSlash(where)
+		if entry.IsDir() {
+			if where != "." && strings.HasPrefix(entry.Name(), ".") {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if check.Matches(glob, where) {
+			out = append(out, where)
+		}
+		return nil
+	})
+	return out
+}
+
 // The disk under the root as the check module reads it: slash paths under the root. [[spec/design_output/tree#the-tree-handed-in]]
 type rootDisk struct{ root string }
 
@@ -103,6 +159,9 @@ func (one rootDisk) Names(folder string) []string {
 	}
 	return out
 }
+
+// The names a folder holds, as the ticket door reads the holds. [[spec/tickets/edit-tools-answer-in-go]]
+func (one rootDisk) List(folder string) []string { return one.Names(folder) }
 
 // The schema read walks no tree, so the disk lists no path. [[spec/tickets/cage-write-door-port]]
 func (one rootDisk) Paths() []string { return nil }

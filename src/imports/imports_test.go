@@ -99,6 +99,13 @@ func TestAModuleImportsTheNoteReader(t *testing.T) {
 }
 
 // Each reader of the tree a module takes imports the pure standard library and the other readers alone, so a name joining pureTree keeps a module off the outside. [[spec/tickets/lsp-rules-move-to-check]]
+// [[spec/tickets/edit-tools-answer-in-go]]
+func TestAModuleImportsTheFrontWriter(t *testing.T) {
+	if said := Faults("quackitect/src/modules/check", []string{"quackitect/src/q", "quackitect/src/front"}); len(said) != 0 {
+		t.Fatalf("src/front reads as past q: %v", said)
+	}
+}
+
 func TestEveryPureReaderImportsThePureLibraryAlone(t *testing.T) {
 	for _, path := range pureTree {
 		found, err := build.ImportDir(filepath.Join("..", "..", strings.TrimPrefix(path, module)), 0)

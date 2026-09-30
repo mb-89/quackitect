@@ -34,6 +34,7 @@ var (
 	Listed                   = listed
 	MagicIn                  = magicIn
 	Matches                  = matches
+	Minted                   = mintedNote
 	NameHoldsTheWords        = nameHoldsTheWords
 	NoConflictMarkers        = noConflictMarkers
 	NoLogDeleted             = noLogDeleted

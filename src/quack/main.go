@@ -18,6 +18,7 @@ import (
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
+	"quackitect/src/modules/edits"
 	"quackitect/src/modules/env"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/git"
@@ -96,6 +97,8 @@ var modules = map[string]ioModule{
 	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
 	// [[spec/tickets/agents-call-quack-directly]]
 	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
+	// [[spec/tickets/edit-tools-answer-in-go]]
+	edits.Module: {registers: edits.Registers},
 }
 
 // A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
@@ -405,26 +408,6 @@ func opsOf(all []manager.Op, now time.Time) []hooks.Op {
 		out = append(out, hooks.Op{Handle: one.ID, Action: one.Action, State: string(one.State), Fraction: fraction, Gone: end.Sub(one.Started), Result: one.Result, Error: one.Error})
 	}
 	return out
-}
-
-// The IO modules that answer a request an action lists: disk over the root, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
-func accepts(root string, store *q.Store) func(q.Request) (any, error) {
-	disk := files.Accept(files.NewDisk(root))
-	node := nodeAccept(root)
-	return func(asked q.Request) (any, error) {
-		if asked.Module == files.DiskModule {
-			return disk(asked)
-		}
-		// [[spec/tickets/config-answers-keys-and-overrides]]
-		if landing, ok := asked.Args.(q.Landing); ok && store != nil && asked.Module == q.StoreModule && asked.Verb == q.StoreLand {
-			return nil, store.Land(landing.Name, landing.Event)
-		}
-		// [[spec/tickets/ticket-verbs-become-actions]]
-		if asked.Module == verbsmodule.NodeModule && asked.Verb == verbsmodule.NodeRun {
-			return node(asked)
-		}
-		return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
-	}
 }
 
 // The index's op table read as the manager's rows, so neither side names the other's types. [[spec/design_output/model#an-operation-outlives-callers]]

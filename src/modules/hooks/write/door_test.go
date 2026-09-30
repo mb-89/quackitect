@@ -6,6 +6,13 @@ import "testing"
 
 const fieldHow = "Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
 
+// The edit tools name the ticket with the words the harness refusal names. [[spec/tickets/edit-tools-answer-in-go]]
+func TestTicketHowReadsTheBridgesText(t *testing.T) {
+	if TicketHow != fieldHow {
+		t.Errorf("TicketHow reads %q, want %q", TicketHow, fieldHow)
+	}
+}
+
 func TestToolRefusalReadsTheBridgesText(t *testing.T) {
 	for _, tool := range []string{"Write", "Edit", "MultiEdit", "NotebookEdit"} {
 		want := tool + " carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. " + fieldHow

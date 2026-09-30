@@ -25,16 +25,29 @@ func (d *Door) writeDoor(e map[string]any, root string) string {
 	}
 	was, stands := disk{root}.Read(where)
 	whole := write.WholeAfter(e, was, stands)
+	var schema func() write.Judged
 	if d.from.Schema != nil {
-		if said := write.RefusedSchema(where, d.from.Schema(root, where, whole)); said != "" {
+		schema = func() write.Judged { return d.from.Schema(root, where, whole) }
+	}
+	var voice func() []write.Finding
+	if d.from.Prose != nil {
+		voice = func() []write.Finding { return d.from.Prose(root, where, whole) }
+	}
+	return Judge(where, schema, voice)
+}
+
+// The refusal of a written text: the schema's first, then the voice's, or nothing where both pass. A nil read reads nothing. [[spec/tickets/edit-tools-answer-in-go]]
+func Judge(where string, schema func() write.Judged, voice func() []write.Finding) string {
+	if schema != nil {
+		if said := write.RefusedSchema(where, schema()); said != "" {
 			return said
 		}
 	}
-	if d.from.Prose == nil {
+	if voice == nil {
 		return ""
 	}
 	var found []write.Finding
-	for _, one := range d.from.Prose(root, where, whole) {
+	for _, one := range voice() {
 		if command.Refuses(one.Rule) {
 			found = append(found, one)
 		}
@@ -42,11 +55,11 @@ func (d *Door) writeDoor(e map[string]any, root string) string {
 	if len(found) == 0 {
 		return ""
 	}
-	return refusedVoice(where, found)
+	return RefusedVoice(where, found)
 }
 
 // The refusal of a write the voice refuses, naming each finding and the rules to hold, off refusal in lib/refuse.js. [[spec/design_output/level0#the-write-door]]
-func refusedVoice(where string, found []write.Finding) string {
+func RefusedVoice(where string, found []write.Finding) string {
 	lines := []string{"The voice rules refuse this write to " + where + ".", ""}
 	var names []string
 	for _, one := range found {

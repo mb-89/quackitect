@@ -112,3 +112,25 @@ func TestTheWriteDoorRefusesWhatTheBridgeRefuses(t *testing.T) {
 		})
 	}
 }
+
+// [[spec/tickets/edit-tools-answer-in-go]]
+func TestJudgeRefusesTheSchemaBeforeTheVoice(t *testing.T) {
+	where := "spec/a.md"
+	schema := func() write.Judged {
+		return write.Judged{Kind: "rationale", Found: []write.Finding{{Rule: "Front", Line: 1, Column: 1, Message: "a fault"}}}
+	}
+	voiced := false
+	voice := func() []write.Finding {
+		voiced = true
+		return []write.Finding{{Rule: "Level0.Private", Line: 2, Column: 1, Message: "a name"}}
+	}
+	if got := Judge(where, schema, voice); !strings.HasPrefix(got, "The rationale schema refuses this write to spec/a.md.") || voiced {
+		t.Errorf("Judge answers %q, reading the voice %v, and wants the schema's refusal alone", got, voiced)
+	}
+	if got := Judge(where, func() write.Judged { return write.Judged{} }, voice); !strings.HasPrefix(got, "The voice rules refuse this write to spec/a.md.") {
+		t.Errorf("Judge answers %q past a clean schema, and wants the voice's refusal", got)
+	}
+	if got := Judge(where, nil, func() []write.Finding { return []write.Finding{{Rule: "Level0.Modal"}} }); got != "" {
+		t.Errorf("Judge answers %q over a warning alone, and wants nothing", got)
+	}
+}
