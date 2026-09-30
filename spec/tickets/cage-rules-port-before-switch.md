@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -248,6 +248,15 @@ record:
         hash: 29ccd1d3cec3f09e
         size: 761
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: dde79e8f66ec0ca2efb3b4caa5fa501ded7a38e6
+    hash_after: dde79e8f66ec0ca2efb3b4caa5fa501ded7a38e6
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -400,14 +409,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go build ./... && ./RUNME.sh lint src/modules/hooks
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the parent change is the replay log and its golden shadow under test/replay/cage, which stand; each rule port lands through its own child in this group
+- the parent reaches no door itself; each child carries the fake its port needs
+- the replay test carries its pointer at spec/tickets/cage-rules-replay-session-logs
+- the golden shadow stands once, in test/replay/cage/every-refusal.shadow.jsonl
 
 ## tests-green
 
@@ -463,7 +477,7 @@ accept
 
 **The gate, weighed.** The gate accepts. Each rule family ports as its own child, and each port shrinks a golden shadow, which is the first `done_when` line as written.
 
-- the replay under `test/replay/cage/every-refusal.jsonl` carries a row for each of the five refusals the live shadow names on [[spec/tickets/shadow-evidence-5-6]], plus the Write and the helper hold
+- the replay under `test/replay/cage/every-refusal.jsonl` carries a row for each of the five refusals the live shadow names in `spec/tickets/shadow-evidence-5-6.md` on `claude/shadow-evidence-5-6`, plus the Write and the helper hold
 - the command child turned the golden shadow into a record of the gap: it holds the Write and the Agent rows, and `./RUNME.sh test src/modules/hooks` reads green
 - the draft's line that the replay stands red until the last child lands reads stale, and the accept still catches an unported rule through the second `done_when` line
 - the accept reads the golden shadow empty before it passes
