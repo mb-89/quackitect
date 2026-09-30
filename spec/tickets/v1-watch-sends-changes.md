@@ -369,3 +369,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- watch-callers-name-opens-on: the approach and the callers line say `Serve`, and the engine freezes both. Read `opensOn` in `src/index/door.go` in their place. The `OnCommit` hook the commit channel extends stands there, and `Serve` only calls `opensOn` with `net.Listen`.
