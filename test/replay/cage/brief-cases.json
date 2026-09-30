@@ -1,0 +1,56 @@
+{
+  "cases": [
+    {
+      "name": "one note with three rules",
+      "stop": true,
+      "files": {
+        "spec/guidance/voice.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n2. Put the bottom line first. *\n3. Use the same word\n   for the same thing.\n"
+      },
+      "rules": 3,
+      "notes": 1,
+      "sentence": "level0 holds this session: 3 rules, 1 notes, the stop hook on.",
+      "canary": "Open your FIRST answer with this line, first and alone, word for word:\n\n    level0 holds this session: 3 rules, 1 notes, the stop hook on.\n\nIt says out loud that level zero holds this session, and the numbers come from what it loaded. Write this line once and never again. The line opens an answer and ends no turn: a turn ends on the stop line, last and alone, and the two stand at opposite ends of the same answer.",
+      "owes": "This session owes the canary. Open your answer with this line, first and alone, word for word:\n\n    level0 holds this session: 3 rules, 1 notes, the stop hook on.\n\nThe numbers come from what level zero loaded. Level zero refuses the next tool call until that line opens an answer. The line ends no turn, so say what you do next under it and carry on."
+    },
+    {
+      "name": "a note with no rules counts for nothing",
+      "stop": true,
+      "files": {
+        "spec/guidance/voice.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n2. Put the bottom line first.\n",
+        "spec/guidance/working.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n- Carry on to the end.\n",
+        "spec/guidance/empty.md": "---\nkind: [[guidance]]\n---\n\n# Motivation\n\nNo rules stand here.\n"
+      },
+      "rules": 3,
+      "notes": 2,
+      "sentence": "level0 holds this session: 3 rules, 2 notes, the stop hook on.",
+      "canary": "Open your FIRST answer with this line, first and alone, word for word:\n\n    level0 holds this session: 3 rules, 2 notes, the stop hook on.\n\nIt says out loud that level zero holds this session, and the numbers come from what it loaded. Write this line once and never again. The line opens an answer and ends no turn: a turn ends on the stop line, last and alone, and the two stand at opposite ends of the same answer.",
+      "owes": "This session owes the canary. Open your answer with this line, first and alone, word for word:\n\n    level0 holds this session: 3 rules, 2 notes, the stop hook on.\n\nThe numbers come from what level zero loaded. Level zero refuses the next tool call until that line opens an answer. The line ends no turn, so say what you do next under it and carry on."
+    },
+    {
+      "name": "a kinded note and a note below the top stand out of the count",
+      "stop": true,
+      "files": {
+        "spec/guidance/voice.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n",
+        "spec/guidance/helper.md": "---\nkind: [[guidance]]\nscope: [\"helper: every helper\"]\n---\n\n# Actionables\n\n1. Report once.\n2. Stop after.\n",
+        "spec/guidance/code/testing.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Name a test as its claim.\n"
+      },
+      "rules": 1,
+      "notes": 1,
+      "sentence": "level0 holds this session: 1 rules, 1 notes, the stop hook on.",
+      "canary": "Open your FIRST answer with this line, first and alone, word for word:\n\n    level0 holds this session: 1 rules, 1 notes, the stop hook on.\n\nIt says out loud that level zero holds this session, and the numbers come from what it loaded. Write this line once and never again. The line opens an answer and ends no turn: a turn ends on the stop line, last and alone, and the two stand at opposite ends of the same answer.",
+      "owes": "This session owes the canary. Open your answer with this line, first and alone, word for word:\n\n    level0 holds this session: 1 rules, 1 notes, the stop hook on.\n\nThe numbers come from what level zero loaded. Level zero refuses the next tool call until that line opens an answer. The line ends no turn, so say what you do next under it and carry on."
+    },
+    {
+      "name": "the stop hook off",
+      "stop": false,
+      "files": {
+        "spec/guidance/voice.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n2. Put the bottom line first.\n"
+      },
+      "rules": 2,
+      "notes": 1,
+      "sentence": "level0 holds this session: 2 rules, 1 notes, the stop hook off.",
+      "canary": "Open your FIRST answer with this line, first and alone, word for word:\n\n    level0 holds this session: 2 rules, 1 notes, the stop hook off.\n\nIt says out loud that level zero holds this session, and the numbers come from what it loaded. Write this line once and never again. The line opens an answer and ends no turn: a turn ends on the stop line, last and alone, and the two stand at opposite ends of the same answer.",
+      "owes": "This session owes the canary. Open your answer with this line, first and alone, word for word:\n\n    level0 holds this session: 2 rules, 1 notes, the stop hook off.\n\nThe numbers come from what level zero loaded. Level zero refuses the next tool call until that line opens an answer. The line ends no turn, so say what you do next under it and carry on."
+    }
+  ]
+}

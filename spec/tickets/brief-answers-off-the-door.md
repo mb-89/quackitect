@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: 19bd52b73471bf7a
         size: 735
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: b8db87f6a54f93e6468bed4ea00f05f90afc0bd7
+    hash_after: b8db87f6a54f93e6468bed4ea00f05f90afc0bd7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: c42c3a783cec40e9
+        size: 3311
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -246,26 +259,33 @@ The bridge keeps its brief until the-brief-leaves-the-bridge flips the doors, so
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/brief_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/brief_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Four Go cases stand red on their own assertion, since the door answers pass to a prompt context and to every call. The canary case walks the four rows of the case table, and each row fails alike. The JavaScript half passes over the same table, so the counts it names are the counts the bridge gives today.
+
+What surprises me: the table carries a row with the stop hook off, so the Go port reads the tooth off the settings the door stamps.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the canary case, the second the debt, pay and compaction cases, the third the shared table, and the fourth the check at tests-green
+- the cases reach a temp tree and the fake index the package already uses, and no door past them
 
 # gate
 
