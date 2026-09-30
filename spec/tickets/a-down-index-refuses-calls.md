@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -203,6 +203,21 @@ record:
     hash_after: 6e79614d3280ee8feb6516dbbe4b152b43cef2da
     returns: 1
     why: "level0.js approach step 1: under new every event goes to POST /hook, and the Go hooks door answers no prompt.context rules, no tool registration and no rows ask-back. The redraft splits the events: the door decides tool.call and classic.Stop, and the bridge keeps the rest, or it names the port that answers them; the result effect maps Text to a deny and Result to the tool result, and the rows effect of holds.go asks back through hook.back. The redraft maps both; session/alarms and index/health stand in the index store alone, and nothing writes them to disk. The redraft names a disk copy and its writer, or the refusal names the key session/alarms and a fixed command; no quack start verb stands. The redraft names the real start argv the hook runs once, and the ./RUNME.sh verb the refusal names; the hook reads migration.cage through configOf in lib/config.js, so a local override reads the same as asksText in the bridge; the callers list adds src/scripts/copilot-shadow.js shadowsHook and src/quack/hook.go copilotPost, and says the Copilot road under new, or scopes it to a fix ticket; register resets saidDown, toldDown, port and cage, or the raced row case stays red after a right append. The redraft names the append argv the test fake reads: node -e with an appendFileSync script, the path, then the text; step 6 adds the Every writer appends list in spec/design_output/log.md; weighed: the red tests decide every done line, and both fail on their own assertion. Step 1 changes who answers every event under new, drops the rules, the tools and the ask-back, and costs dear to undo once the key moves, so the approach takes a redraft"
+  - step: design/draft-2
+    hand: box d88f0683f2d7 · claude-code-remote
+    hash_before: 3cc532c33c5404df8842ce34a6d8487041caa05c
+    hash_after: 3cc532c33c5404df8842ce34a6d8487041caa05c
+    inputs:
+      - name: ask
+        hash: 2e1097fa7d39ff56
+        size: 535
+      - name: [[spec/rationales/the-cage-refuses-while-down]]
+        hash: e54c50d8ed5defb6
+        size: 1649
+      - name: [[spec/tickets/the-hook-log-loses-lines]]
+        hash: e12c15cf9e654d97
+        size: 791
+    def: a3dfd8c60d853590
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
@@ -329,32 +344,73 @@ The surprise: the hook module reads no config today, so the cage key reaches it 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Under `new`, the hook module sends the two events the Go hooks door decides, `tool.call` and `classic.Stop`, to `POST /hook`. Every other event still goes to the bridge, which keeps the rules, the brief and the tool registration until [[spec/tickets/the-bridge-server-leaves]] moves them. Under `old` and `shadow` every event goes to the bridge, as today.
+
+1. The hook reads `migration.cage` through `configOf` in `lib/config.js`, so a local override reads as the bridge reads it.
+2. The hook reads the port and token off `.se/.runtime/hooks.json`, and posts `{event, e, session, root, fill}` with the token as a bearer.
+3. It maps the effects in order. `pass` hands `e` on. `event` hands the changed event on. `after` merges its text as context.
+4. A `result` effect answers the call. Its `Text` becomes a deny, and its `Result` becomes the tool result. A `block` holds the Stop.
+5. A `rows` effect reads the newest transcript rows, as `spoke` reads them, and posts them back as `hook.back` with the effect call id. The next answer stands.
+6. Down means no standing file, a post that throws, or a status of 500 and up. The hook then runs the start road it holds, `starts`, once a session, and posts again.
+7. Still down, a guarded call meets a deny. A guarded call is a `tool.call` outside Read, Grep, Glob and the level zero read tools. Every other event passes.
+8. The deny names `session/alarms` as the place the index keeps the fault, and `./RUNME.sh serve` as the command that brings it back. The index alone holds the alarm, so the deny names the key and reads no copy.
+9. `wrote` appends its row through `$.process.run` as `node -e <an appendFileSync script> <path> <row>`. It keeps the read and write back only where the host runs no process.
+10. `register` resets `saidDown`, `toldDown`, `port`, `cage` and the new down flag, so each load starts clean.
+11. `spec/config/level0.json` moves `migration.cage` to `new` last, once the tests pass. The chapters the rationale lists, and the list under Every writer appends in `spec/design_output/log.md`, name the refusal and the append.
+
+Copilot stays out of this ticket. Its shadow goes quiet under `new`, and [[spec/tickets/the-bridge-server-leaves]] carries its road, since the bridge answers Copilot today.
+
+What I weigh: the gate found that a full switch drops the rules, the tools and the ask-back. Splitting by event keeps what the bridge alone answers, and the Go door decides exactly the events it ports. I assume the Go door answers every served tool through its calls road, as `Door.Hook` reads.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/level0.js: seen, which picks the road by event and key
+- .claude/skills/level0/hooks/level0.js: ask and fell, which the new post road sits beside
+- .claude/skills/level0/hooks/level0.js: wrote, called by down, starts, probes and clears
+- .claude/skills/level0/hooks/level0.js: register, which resets the state
+- src/bridge/cage-shadow.js: shadowsCage, which posts nothing under new already
+- src/scripts/copilot-shadow.js: shadowsHook, quiet under new, carried by the-bridge-server-leaves
+- src/quack/hook.go: copilotPost, unchanged, carried by the-bridge-server-leaves
+- spec/config/level0.json: migration.cage, read by asksText and configOf
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/bridgehead.test.js: a stopped hooks door refuses a guarded call and names session/alarms
+- test/level0/bridgehead.test.js: a read passes while the hooks door stands down
+- test/level0/bridgehead.test.js: a row another writer appends while the index falls stays in the session log
+- test/level0/bridgehead.test.js: under new a tool call takes the hooks door effects, and a prompt still reaches the bridge
+- test/level0/cage-shadow.test.js: under new the bridge posts no shadow
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the full switch drops the rules, the tools and the ask-back: the hook sends tool.call and classic.Stop alone to the door
+- the result and rows effects: steps 4 and 5 map both
+- no disk copy of session/alarms stands: the deny names the key and reads no copy
+- no quack start verb stands: the hook runs its own start road once, and the deny names ./RUNME.sh serve
+- the key reads through configOf
+- Copilot: scoped to the-bridge-server-leaves, which owns the bridge answer Copilot takes today
+- register resets the state, and step 9 names the append argv the fake reads
+- the log.md list joins step 11
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened level0.js seen, ask, fell, down, starts, wrote and register, hooks.go Effect and holds.go rows, serve.js, copilot-shadow.js and lib/config.js configOf, and checked each claim there
+- the callers list names every caller of seen, ask, wrote and register, both shadows and the one key
+- the first done line meets the refusal case, the second the raced row case, and the third the check at tests-green
 
 ## tests-red-2
 
