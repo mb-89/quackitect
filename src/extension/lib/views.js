@@ -11,7 +11,7 @@ function rowIn(rows, name) {
   return (Array.isArray(rows) ? rows : []).find((one) => one?.name === name);
 }
 
-// The badge off the row of its name, by the rule BadgeOf in src/tui/work/shadow.go holds. [[spec/tickets/the-sidebar-renders-generically]]
+// The badge off the row of its name. [[spec/tickets/the-sidebar-renders-generically]]
 function badgeOf(names, name) {
   const row = rowIn(names, name);
   if (!row) return "";

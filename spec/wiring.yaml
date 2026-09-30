@@ -110,3 +110,4 @@ wires:
   work.branches: tickets/branches
   work.places: queue.places
   work.cloud: tickets/cloud
+  work.overrides: queue.overrides

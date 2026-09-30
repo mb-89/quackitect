@@ -606,11 +606,9 @@
         },
         "window": {
           "type": "string",
-          "default": "old",
-          "help": "The window: old draws its own reads, shadow reads the log and the work view off the index beside them and logs a mismatch, new draws the index's.",
+          "default": "new",
+          "help": "The window, switched over in phase 6. It draws the index's reads alone.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         }

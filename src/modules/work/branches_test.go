@@ -88,3 +88,19 @@ func TestAPlacedBranchWithNoTicketDrawsNoTodoRow(t *testing.T) {
 		t.Fatalf("the branch draws one group row, and the rows read %+v", rows)
 	}
 }
+
+// The cloud letter reads the group's mark alone, the rule the queue's cloud place reads, so an unmarked standing branch and its child stand off the cloud. [[spec/tickets/rows-cloud-matches-branches]]
+func TestTheCloudLetterReadsTheGroupsMarkAlone(t *testing.T) {
+	child := ticket.Ticket{Name: "a-child", Group: "unmarked", State: "open"}
+	branches := []ticket.Branch{
+		{Name: "unmarked", Ticket: ticket.Ticket{Name: "unmarked", Route: "group"}, Children: []ticket.Ticket{child}},
+		{Name: "marked", Ticket: ticket.Ticket{Name: "marked", Route: "group"}},
+	}
+	rows := rowsBy(t, map[string]any{BranchesPort: branches, CloudPort: []string{"marked"}})
+	if rows["unmarked"].Cloud || rows["a-child"].Cloud {
+		t.Fatalf("an unmarked branch and its child stand off the cloud, and read %+v, %+v", rows["unmarked"], rows["a-child"])
+	}
+	if !rows["marked"].Cloud {
+		t.Fatalf("the marked group stands on the cloud, and reads %+v", rows["marked"])
+	}
+}
