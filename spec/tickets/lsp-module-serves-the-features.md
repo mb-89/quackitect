@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -188,6 +188,15 @@ record:
     hash_after: 50b811b3c1adefeff55a62f28b24b25be54c1add
     returns: 1
     why: "the approach moves hover, complete, links and fold into src/modules/lsp over a check.Tree, and the nomodule import rule refuses a module importing another, so TestTheTreeHoldsTheImportRules turns the check red; the four features call some twenty check helpers through the src/lsp aliases, so a copy into lsp makes a second owner of each; the redraft: the four reads move into src/modules/check as exported functions over its Tree, and lsp takes them through the Check ports lsp-module-draws-the-tools lands, which lspChecks in src/quack/lsp.go fills"
+  - step: design/draft-2
+    hand: box d8932514a610d · claude-code-remote
+    hash_before: 40f85d60a6184bbc4a2f0e0209903c41bd29077f
+    hash_after: 40f85d60a6184bbc4a2f0e0209903c41bd29077f
+    inputs:
+      - name: ask
+        hash: ae606a0a840ebba9
+        size: 590
+    def: 2fcb4abe3d77d8a2
 group: lsp-door-switches-over
 ---
 
@@ -338,38 +347,85 @@ Each case fails on its own assertion: initialize announces text sync alone, and 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The four reads move into the check module, and the `lsp` module answers the protocol through ports the quack main wires, the shape the tools child lands.
+
+| what | the change |
+|---|---|
+| the reads | `hoverAt`, `offers`, `linksIn` and `foldsOf`, with the helpers only they call, move from `src/lsp` into `src/modules/check/features.go` as `HoverAt`, `Offers`, `LinksIn` and `FoldsOf`. They call the check helpers by their own names, past the aliases |
+| the ports | `Check` in `src/modules/lsp/tools.go` moves onto `Outside.Check` and takes `Hover`, `Complete`, `Links` and `Folds`, each over the port `Tree`, a path and a position, answering a value the reply marshals whole |
+| the tree | `Server.tree` builds off `Outside.Check.Tree`, and `ToolsAt` takes the same `Check` off the wiring |
+| the methods | `Handle` answers `textDocument/hover`, `textDocument/completion`, `textDocument/documentLink` and `textDocument/foldingRange` through the ports, and `initialize` answers the capabilities the old server announces |
+| the wiring | `lspChecks` in `src/quack/lsp.go` fills the four ports off the check module |
+| the recording | `test/replay/lsp/one-session.jsonl` takes the new initialize answer |
+
+Weighed: the four reads inside the check module, against a copy inside `lsp`. A copy makes a second owner of some twenty helpers, and one module imports no other. Assumed: the reads stay pure over the tree, so the check module holds them with no door.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/lsp.go listensLSP, lspChecks
+- src/modules/lsp/lsp.go Handle, New, capabilities
+- src/modules/lsp/runs.go tree
+- src/modules/lsp/door.go ToolsAt
+- src/modules/lsp/tools_test.go toolsOver, fakeCheck
+- src/lsp/hover.go hovers, src/lsp/complete.go completes, src/lsp/links.go links, src/lsp/fold.go folds, which call the moved reads until the-lsp-server-leaves takes the package
+- test/replay/lsp/one-session.jsonl, which TestTheReplayAnswersTheRecordedSession replays
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/features_test.go TestInitializeAnnouncesTheFeatures
+- src/modules/lsp/features_test.go TestAHoverOverATermAnswersItsLine
+- src/modules/lsp/features_test.go TestACompletionAfterKindOffersTheKinds
+- src/modules/lsp/features_test.go TestAPointerAnswersAsALink
+- src/modules/lsp/features_test.go TestTheFrontmatterFolds
+- src/modules/check/features_test.go, the hover, complete, links and fold cases moved from src/lsp
+- src/quack/lsp_test.go TestTheFeaturePortsAnswerTheCheckModulesReads
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the gate rejects a copy of the features into lsp over a check tree: the reads move into the check module, and lsp takes them through the Check ports
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/check/features.go
+- src/modules/check/features_test.go
+- src/modules/check/export.go
+- src/lsp/hover.go
+- src/lsp/complete.go
+- src/lsp/links.go
+- src/lsp/fold.go
+- src/lsp/rules.go
+- src/modules/lsp/lsp.go
+- src/modules/lsp/tools.go
+- src/modules/lsp/runs.go
+- src/modules/lsp/door.go
+- src/modules/lsp/features_test.go
+- src/modules/lsp/tools_test.go
+- src/quack/lsp.go
+- src/quack/lsp_test.go
+- test/replay/lsp/one-session.jsonl
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- hover.go, complete.go, links.go, fold.go and their cases in src/lsp, the Check ports in tools.go, lspChecks and the import rule stand opened
+- the callers list names the old handlers, the tree, the door and the wiring off a git grep
+- each method line meets its case in features_test.go, and the check line meets ./RUNME.sh check
 
 ## tests-red-2
 
