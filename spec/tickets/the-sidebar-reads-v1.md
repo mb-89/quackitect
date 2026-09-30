@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -185,6 +185,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 9d2b4b79af20952afc346b3a7b69ace3744819af
+    hash_after: 9d2b4b79af20952afc346b3a7b69ace3744819af
+    inputs:
+      - name: ask
+        hash: 15d474e44d438e62
+        size: 920
+      - name: implement/tests-green
+        hash: 0d9cbc31ca76ec98
+        size: 2207
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -447,8 +460,11 @@ The sidebar draws every value off the index door. The config tree, the widgets a
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass
+- no editor runs on this cloud box, so the view is the real sidebar module drawn over the live index door: the work badge reads 12, and work/open-tasks on /v1 reads 12
+- the same draw carries the views section off views/bases and the config tree off the projections, and /v1/watch streams every watched name
 
 # Discussion
 
