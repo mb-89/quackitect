@@ -11,10 +11,12 @@ import (
 	"strings"
 )
 
-// The folder the notes stand in, the files the blocks read, and the names each block rides under. .claude/skills/level0/lib/folders.js owns the files, and the package spells them again. [[spec/tickets/brief-answers-off-the-door]]
+// The folder the notes stand in, the files the blocks read, and the names each block rides under. [[spec/tickets/brief-answers-off-the-door]]
 const (
-	Guidance      = "spec/guidance"
-	ToolsFile     = ".se/.runtime/tools.json"
+	Guidance = "spec/guidance"
+	// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
+	ToolsFile = ".se/.runtime/tools.json"
+	// .claude/skills/level0/lib/folders.js owns the handover's folder, and the package spells it again. [[spec/tickets/brief-answers-off-the-door]]
 	HandoverFile  = ".se/HANDOVER.md"
 	ToolsBlock    = "level0-tools"
 	CanaryBlock   = "level0-canary"

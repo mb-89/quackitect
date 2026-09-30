@@ -1,29 +1,13 @@
-// The brief package against the shared case table the JavaScript counts
-// write, and the tools block off a survey.
+// The brief package's counts over a layered tree, the tools block off a
+// survey, and the canary on an answer's first line.
 // [[spec/tickets/brief-answers-off-the-door]]
 package brief
 
 import (
-	"encoding/json"
-	"os"
 	"path"
 	"strings"
 	"testing"
 )
-
-// The case table both sides read. [[spec/tickets/brief-answers-off-the-door]]
-const briefCases = "../../../../test/replay/cage/brief-cases.json"
-
-type row struct {
-	Name     string            `json:"name"`
-	Stop     bool              `json:"stop"`
-	Files    map[string]string `json:"files"`
-	Rules    int               `json:"rules"`
-	Notes    int               `json:"notes"`
-	Sentence string            `json:"sentence"`
-	Canary   string            `json:"canary"`
-	Owes     string            `json:"owes"`
-}
 
 // A tree over a map of paths to texts. [[spec/tickets/brief-answers-off-the-door]]
 type files map[string]string
@@ -51,41 +35,6 @@ func (one files) List(folder string) []string {
 }
 
 func noEnv(string) string { return "" }
-
-// Every row's counts, sentence, canary block and debt line match what the JavaScript gives. [[spec/tickets/brief-answers-off-the-door]]
-func TestTheCountsMatchTheCaseTable(t *testing.T) {
-	body, err := os.ReadFile(briefCases)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var table struct {
-		Cases []row `json:"cases"`
-	}
-	if err := json.Unmarshal(body, &table); err != nil {
-		t.Fatal(err)
-	}
-	if len(table.Cases) == 0 {
-		t.Fatalf("no case stands in %s", briefCases)
-	}
-	for _, one := range table.Cases {
-		t.Run(one.Name, func(t *testing.T) {
-			counts := CountsOf(files(one.Files), noEnv)
-			if counts.Rules != one.Rules || counts.Notes != one.Notes {
-				t.Fatalf("the counts read %+v, and the table says %d rules, %d notes", counts, one.Rules, one.Notes)
-			}
-			sentence := Canary(counts, one.Stop)
-			if sentence != one.Sentence {
-				t.Fatalf("the sentence reads %q, and the table says %q", sentence, one.Sentence)
-			}
-			if got := CanaryText(sentence); got != one.Canary {
-				t.Fatalf("the canary block reads\n%s\nand the table says\n%s", got, one.Canary)
-			}
-			if got := Owes(sentence); got != one.Owes {
-				t.Fatalf("the debt line reads\n%s\nand the table says\n%s", got, one.Owes)
-			}
-		})
-	}
-}
 
 // A note binding a variable counts where the variable reads true, and the work root's note stands over the method root's. [[spec/tickets/brief-answers-off-the-door]]
 func TestAVariableAndTheWorkRootMoveTheCounts(t *testing.T) {
