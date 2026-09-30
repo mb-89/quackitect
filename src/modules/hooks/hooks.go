@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/modules/hooks/write"
 	"quackitect/src/q"
 	"quackitect/src/q/tool"
 )
@@ -124,6 +125,8 @@ type Outside struct {
 	Voice func(root, message string) []command.Row
 	// Writes one config key of the local layer under the root. None writes nothing. [[spec/tickets/cage-hold-drops-port]]
 	Drop func(root, key, value string) error
+	// The findings the voice keeps over a written file, off Vale and the prose vetoes. None reads no voice. [[spec/tickets/cage-write-door-port]]
+	Prose func(root, where, text string) []write.Finding
 }
 
 // What the doors read off the config and the box: the words a name holds, whether the box stands in the cloud, the owner's hold and ask, the binding, the graces, the plan's numbers, and each helper tier's model. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-call-holds-port]]

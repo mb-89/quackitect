@@ -11,6 +11,8 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/hooks/write"
 )
 
 const cageLogs = "../../../test/replay/cage"
@@ -160,16 +162,18 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 			}
 			var got []Apart
 			replay := doorOver(t, &calls{}, &book{}).door
+			var reads boxReads
 			if settings, ok := boxOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json"); ok {
 				replay.from.Config = func(string) Settings { return settings }
-				reads := readsOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json")
+				reads = readsOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json")
 				replay.from.Git = taughtGit(reads.Git)
 				replay.from.Voice = taughtVoice(reads.Voice)
+				replay.from.Prose = taughtProse(reads.Prose)
 				if len(reads.Live) > 0 {
 					replay.from.Root = stopTreeOf(t, stopTable{Live: reads.Live}, stopCase{Config: reads.Config, Files: reads.Files})
 				}
 			}
-			said, err := replay.ReplayLog(string(text), func(map[string]any) error { return nil })
+			said, err := replay.ReplayLog(movedRoot(string(text), replay.from.Root), func(map[string]any) error { return nil })
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -207,6 +211,8 @@ type boxReads struct {
 	Live   []string          `json:"live"`
 	Config map[string]any    `json:"config"`
 	Files  map[string]string `json:"files"`
+	// The findings the voice keeps over a written file. [[spec/tickets/cage-write-door-port]]
+	Prose []write.Finding `json:"prose"`
 }
 
 func readsOf(t *testing.T, at string) boxReads {

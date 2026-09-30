@@ -1,0 +1,303 @@
+{
+  "root": "/tree",
+  "live": [
+    "spec/schemas/design_input.schema.yaml",
+    "spec/schemas/design_output.schema.yaml",
+    "spec/schemas/funnel.schema.yaml",
+    "spec/schemas/guidance.schema.yaml",
+    "spec/schemas/handover.schema.yaml",
+    "spec/schemas/paragraph.schema.yaml",
+    "spec/schemas/process.schema.yaml",
+    "spec/schemas/rationale.schema.yaml",
+    "spec/schemas/ticket.schema.yaml",
+    "spec/config/projections.json"
+  ],
+  "tree": {
+    "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/draft\n---\n\n# Ask\n\nThe door reads the write.\n\n# Discussion\n",
+    ".se/notes/raw.md": "the owner wants the bridge to leave before the summer ends\n"
+  },
+  "cases": [
+    {
+      "name": "a Write to a tracked note names no ticket and refuses",
+      "rule": "ticket",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/spec/notes-out.md",
+        "content": "The door reads the write.\n"
+      },
+      "decision": "refuse",
+      "text": "Write carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "an Edit of a tracked file names no ticket and refuses",
+      "rule": "ticket",
+      "e": {
+        "tool": "Edit",
+        "file_path": "/tree/src/engine/thing.js",
+        "old_string": "1",
+        "new_string": "2"
+      },
+      "decision": "refuse",
+      "text": "Edit carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a MultiEdit names no ticket and refuses",
+      "rule": "ticket",
+      "e": {
+        "tool": "MultiEdit",
+        "file_path": "/tree/spec/notes-out.md",
+        "edits": [{ "old_string": "a", "new_string": "b" }]
+      },
+      "decision": "refuse",
+      "text": "MultiEdit carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a NotebookEdit inside the tree names no ticket and refuses",
+      "rule": "ticket",
+      "e": {
+        "tool": "NotebookEdit",
+        "notebook_path": "/tree/test/one.ipynb",
+        "new_source": "x = 1"
+      },
+      "decision": "refuse",
+      "text": "NotebookEdit carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a Write to the bless file meets the no-ticket refusal",
+      "rule": "bless",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/.runtime/bless.json",
+        "content": "{}\n"
+      },
+      "decision": "refuse",
+      "text": "Write carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a Write carrying conflict markers to a ticket meets the no-ticket refusal",
+      "rule": "markers",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/spec/tickets/a-ticket.md",
+        "content": "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\n<<<<<<< HEAD\nThe door reads the write.\n=======\nThe door reads the change.\n>>>>>>> main\n"
+      },
+      "decision": "refuse",
+      "text": "Write carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "an Edit of an open ticket's ask meets the no-ticket refusal",
+      "rule": "open-ticket",
+      "e": {
+        "tool": "Edit",
+        "file_path": "/tree/spec/tickets/a-ticket.md",
+        "old_string": "The door reads the write.",
+        "new_string": "The door reads every write."
+      },
+      "decision": "refuse",
+      "text": "Edit carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "an Edit of an engine field meets the no-ticket refusal",
+      "rule": "engine-fields",
+      "e": {
+        "tool": "Edit",
+        "file_path": "/tree/spec/tickets/a-ticket.md",
+        "old_string": "step: design/draft",
+        "new_string": "step: implement"
+      },
+      "decision": "refuse",
+      "text": "Edit carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a Write to a projection target meets the no-ticket refusal",
+      "rule": "owner",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.claude/output-styles/level0.md",
+        "content": "# Style\n"
+      },
+      "decision": "refuse",
+      "text": "Write carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a Write copying a note's run meets the no-ticket refusal",
+      "rule": "private",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/spec/notes-out.md",
+        "content": "We hold that the owner wants the bridge to leave before the summer.\n"
+      },
+      "decision": "refuse",
+      "text": "Write carries no ticket field, so the door takes no write through it. Call mcp__level0__patch, with an exact op for one spot. Name the open ticket this write serves in the ticket field: its file name under spec/tickets or .se/tickets, without .md."
+    },
+    {
+      "name": "a Write outside the tree passes",
+      "rule": "outside",
+      "e": {
+        "tool": "Write",
+        "file_path": "/elsewhere/notes.md",
+        "content": "anything\n"
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a Write of the handover in its shape passes",
+      "rule": "schema",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "content": "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a Write of the handover naming no status refuses on its schema",
+      "rule": "schema",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "content": "---\nkind: [[handover]]\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "decision": "refuse",
+      "text": "The handover schema refuses this write to .se/HANDOVER.md.\n\n  .se/HANDOVER.md:1:1  Schema.status\n    A handover names status in its frontmatter.\n\nRun ./RUNME.sh mint handover <path> for the shape it names, or park a draft as _name.md."
+    },
+    {
+      "name": "a Write of the handover missing a chapter refuses on its schema",
+      "rule": "schema",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "content": "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "decision": "refuse",
+      "text": "The handover schema refuses this write to .se/HANDOVER.md.\n\n  .se/HANDOVER.md:1:1  Schema.WhatWaits\n    A handover carries a What waits chapter.\n\nRun ./RUNME.sh mint handover <path> for the shape it names, or park a draft as _name.md."
+    },
+    {
+      "name": "a Write of the handover naming another kind refuses as a stranger",
+      "rule": "schema",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "content": "---\nkind: [[rationale]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "decision": "refuse",
+      "text": "spec/schemas/handover.schema.yaml governs .se/HANDOVER.md, and it refuses this write.\n\n  .se/HANDOVER.md:1:1  Schema.Kind\n    .se/HANDOVER.md reads as a rationale, and the handover schema governs this path.\n\nCall mint_note with kind handover, this path and the fields, and it writes the note.\nA draft named _name.md stands outside every rule while a kind settles."
+    },
+    {
+      "name": "a Write of the handover naming no kind refuses as a stranger",
+      "rule": "schema",
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "content": "# Where it stands\n\n- nothing\n"
+      },
+      "decision": "refuse",
+      "text": "spec/schemas/handover.schema.yaml governs .se/HANDOVER.md, and it refuses this write.\n\n  .se/HANDOVER.md:1:1  Schema.Kind\n    .se/HANDOVER.md names no kind, and the handover schema governs this path.\n\nCall mint_note with kind handover, this path and the fields, and it writes the note.\nA draft named _name.md stands outside every rule while a kind settles."
+    },
+    {
+      "name": "an Edit of the handover dropping its status refuses on its schema",
+      "rule": "schema",
+      "files": {
+        ".se/HANDOVER.md": "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "e": {
+        "tool": "Edit",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "old_string": "status: todo\n",
+        "new_string": ""
+      },
+      "decision": "refuse",
+      "text": "The handover schema refuses this write to .se/HANDOVER.md.\n\n  .se/HANDOVER.md:1:1  Schema.status\n    A handover names status in its frontmatter.\n\nRun ./RUNME.sh mint handover <path> for the shape it names, or park a draft as _name.md."
+    },
+    {
+      "name": "an Edit of the handover keeping its shape passes",
+      "rule": "schema",
+      "files": {
+        ".se/HANDOVER.md": "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "e": {
+        "tool": "Edit",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "old_string": "the next leaf",
+        "new_string": "the next two leaves"
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a MultiEdit of the handover dropping a chapter refuses on its schema",
+      "rule": "schema",
+      "files": {
+        ".se/HANDOVER.md": "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "e": {
+        "tool": "MultiEdit",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "edits": [
+          { "old_string": "the next leaf", "new_string": "the leaf" },
+          {
+            "old_string": "# The owner's words\n\n> Carry the group to done.\n",
+            "new_string": ""
+          }
+        ]
+      },
+      "decision": "refuse",
+      "text": "The handover schema refuses this write to .se/HANDOVER.md.\n\n  .se/HANDOVER.md:1:1  Schema.TheOwnerSWords\n    A handover carries a The owner's words chapter.\n\nRun ./RUNME.sh mint handover <path> for the shape it names, or park a draft as _name.md."
+    },
+    {
+      "name": "a Write of the handover the voice refuses refuses",
+      "rule": "voice",
+      "voice": [
+        {
+          "rule": "level0.Private",
+          "line": 9,
+          "column": 3,
+          "said": "branch",
+          "message": "A private word leaves the box.",
+          "severity": "error"
+        }
+      ],
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "content": "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "decision": "refuse",
+      "text": "The voice rules refuse this write to .se/HANDOVER.md.\n\n  .se/HANDOVER.md:9:3  level0.Private\n    wrote: branch\n    A private word leaves the box.\n\nHold level0.Private for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."
+    },
+    {
+      "name": "a Write of the handover breaking form passes",
+      "rule": "voice",
+      "voice": [
+        {
+          "rule": "level0.Hedge",
+          "line": 9,
+          "column": 3,
+          "said": "branch",
+          "message": "Say it plainly.",
+          "severity": "warning"
+        }
+      ],
+      "e": {
+        "tool": "Write",
+        "file_path": "/tree/.se/HANDOVER.md",
+        "content": "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n"
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a NotebookEdit of the handover passes",
+      "rule": "schema",
+      "e": {
+        "tool": "NotebookEdit",
+        "notebook_path": "/tree/.se/HANDOVER.md",
+        "new_source": "x = 1"
+      },
+      "decision": "pass",
+      "text": ""
+    }
+  ]
+}

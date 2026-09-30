@@ -1,0 +1,28 @@
+{
+  "live": [
+    "spec/schemas/design_input.schema.yaml",
+    "spec/schemas/design_output.schema.yaml",
+    "spec/schemas/funnel.schema.yaml",
+    "spec/schemas/guidance.schema.yaml",
+    "spec/schemas/handover.schema.yaml",
+    "spec/schemas/paragraph.schema.yaml",
+    "spec/schemas/process.schema.yaml",
+    "spec/schemas/rationale.schema.yaml",
+    "spec/schemas/ticket.schema.yaml",
+    "spec/config/projections.json"
+  ],
+  "files": {
+    "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/draft\n---\n\n# Ask\n\nThe door reads the write.\n\n# Discussion\n",
+    ".se/notes/raw.md": "the owner wants the bridge to leave before the summer ends\n"
+  },
+  "prose": [
+    {
+      "rule": "level0.Private",
+      "line": 9,
+      "column": 3,
+      "said": "branch",
+      "message": "A private word leaves the box.",
+      "severity": "error"
+    }
+  ]
+}

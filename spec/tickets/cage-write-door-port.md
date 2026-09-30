@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -132,6 +132,19 @@ record:
         hash: 106cb5766c01d2f3
         size: 947
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 59bb98b16071cf39b654e9898d00087a426bd2a2
+    hash_after: 59bb98b16071cf39b654e9898d00087a426bd2a2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: d67a71ab464aed7f
+        size: 5545
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -268,26 +281,43 @@ What I weigh: the ask names every rule of `onWrite`, and a harness write reaches
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/writes_test.go
+- src/modules/hooks/write/door_test.go
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+`TestTheWriteDoorRefusesWhatTheBridgeRefuses` stands red on its own assertion in each case the bridge refuses, and green in each case it lets through. Today the door passes every harness write. The bridge twin `test/level0/write-door-cases.test.js` passes every case.
+
+The replay stands red on `write-door`, `write-voice` and `every-refusal`, since the Write row leaves the golden file of the last. `write/door_test.go` stands red on the stubs of `ToolRefusal` and `WholeAfter`.
+
+The surprises:
+
+- the bridge's `decide` consumes the handover on its first read, so a recorded handover Edit reads no file and refuses on the kind. The log carries handover Writes alone, and the table drives each handover Edit through `onToolWrite` straight
+- a live hook row carries no root, and the recorded logs stand under a fake root. The replay maps that root onto its own tree through `movedRoot`, which moves only the every-refusal Write and a Read of the older logs
+- the bless guard reads a script's text, so the fill script takes the bless path off `BLESS_FILE`
+
+The scaffold adds `Outside.Prose` and the `write` package with `Finding`, so the red tests build.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a red test: the replay over write-door, write-voice and every-refusal, the table test for the text, and the check at tests-green
+- the doors the tests reach have fakes: `taughtProse` for Vale, and a temp tree off `stopTreeOf` for the disk
 
 # gate
 
