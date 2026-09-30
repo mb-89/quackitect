@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/modules/hooks/command/trunk.go:166:54: MagicNumber: 64 carries a meaning here. Name it in the constants block at the"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 4043e2bc862ab3a89fa2b1f04bc21f5750a6149d
+    hash_after: 4043e2bc862ab3a89fa2b1f04bc21f5750a6149d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 32 test(s) pass in 1 file(s); green, src/modules/hooks passes; green, src/modules/hooks/command passes; green, sr
+      - name: check
+        exit: 0
+        said: "src/modules/hooks/command/trunk.go:166:54: MagicNumber: 64 carries a meaning here. Name it in the constants block at the"
+    inputs:
+      - name: design/tests-red
+        hash: 93f0d9ba7da441c5
+        size: 2105
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -390,26 +413,37 @@ every fact stands in one place: the lib modules own the refusal texts, and the c
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/commits_test.go src/modules/hooks/command src/quack test/level0/commit-guards-cases.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door now refuses every commit and push the bridge refuses. The private delta, the tested delta, the todo tag, the desk guard, the trunk guard and the commit voice port line for line into the command package. The file commits.go runs them between the command rules and the version guard, in the bridge's order, and the refusal text matches the bridge's text in every case of the shared table.
+
+The replay logs of the desk, todo and trunk guards read clean now, where they read red before. The private, tested and voice guards find a commit through the same parse as the git write door, so every shape they see meets that door on both sides. Their logs read alike before and after, and the case table alone decides them. The gate's point asking for a new replay row stands answered that way.
+
+The quack binary fills the user and the home into the settings, and runs Vale over the commit message through Outside.Voice. The replay logs of the stop and write ports stay red, and those tickets own them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft names, plus the tests of commitVoice and of a door with no git
+every door the tests reach has a fake: git through taughtGit, the voice through taughtVoice, the tree through disk under a temporary folder
+a comment above each new file and function names the approach and links the ticket
+the lib modules own the refusal texts, the case table holds them for both twins, and each copied folder name carries a comment naming its owner
 
 # accept
 
