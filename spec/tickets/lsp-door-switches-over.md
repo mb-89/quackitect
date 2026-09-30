@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -183,9 +183,28 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 173248322297533c
+  - step: retro/cloud
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: fa84d15c175739297407ddfef530e3252fd88804
+    hash_after: fa84d15c175739297407ddfef530e3252fd88804
+    inputs:
+      - name: retro/write
+        hash: 1c6a5cd1c6db5b56
+        size: 2227
+      - name: [[spec/tickets/one-index-a-tree]]
+        hash: 0e68a0131954c838
+        size: 13324
+      - name: [[spec/tickets/reaches-keeps-the-post-fault]]
+        hash: 20070aa41d2afab7
+        size: 3706
+      - name: [[spec/tickets/sweep-skips-box-rules]]
+        hash: c91e352ea3b90ab8
+        size: 3092
+    def: 4da1ca5da87d5bbc
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -324,20 +343,25 @@ the chapter names the agent and the owner, and no person, address or path
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+20:47 the plan tool reached no server through the plugin twice, while the shell reached it with the proxy off
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+20:52 the check failed on the box alone, since orphaned indexes from earlier runs stood over the tree
+21:12 the check ran past the ten-minute cap once, while the index hung
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+no person step, and no ticket minted outside the group
+the handover names the pull request and the plan tool doubt
 
 # Discussion
 
