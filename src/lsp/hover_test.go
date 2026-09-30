@@ -10,6 +10,9 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/check"
+	"quackitect/src/yaml"
 )
 
 const hoverSchema = `kind: paragraph
@@ -45,64 +48,22 @@ func hoverTree(terms string) *Tree {
 	})
 }
 
-func hoverOn(tree *Tree, word string) string {
-	at := strings.Index(hoverNote, word)
-	said := hoverAt(tree, "spec/notes/one.md", position{Line: 0, Character: at + 1})
-	if said == nil {
-		return ""
-	}
-	return said.Contents.Value
-}
-
-// [[spec/design_output/lsp#the-hover-shows-a-term]]
-func TestHoverShowsATermAndItsLine(t *testing.T) {
-	tree := hoverTree(hoverTerms)
-	cases := map[string]string{
-		"doors":  "**door**: the one place the tree guards an outside thing",
-		"level":  "**level zero**: the plugin holding every door",
-		"zero":   "**level zero**: the plugin holding every door",
-		"unread": "**read**: to take in a file",
-		"vale":   "**vale**: a prose linter\n\nhttps://vale.sh",
-	}
-	for word, want := range cases {
-		if got := hoverOn(tree, word); got != want {
-			t.Errorf("a hover over %s answers %q, and wants %q", word, got, want)
-		}
-	}
-	for _, word := range []string{"hold", "walk", "We"} {
-		if got := hoverOn(tree, word); got != "" {
-			t.Errorf("a hover over %s answers %q, and wants none", word, got)
-		}
-	}
-}
-
-// [[spec/design_output/lsp#the-hover-shows-a-term]]
-func TestHoverReadsTheSavedTerms(t *testing.T) {
-	tree := hoverTree(hoverTerms)
-	if got := hoverOn(tree, "walk"); got != "" {
-		t.Fatalf("walk stands on no list yet, and the hover answers %q", got)
-	}
-	disk := diskOf(tree).(*memDisk)
-	disk.files["/tree/spec/vocabulary/terms.yml"] = hoverTerms + "  - {word: walk, means: \"to move on foot\"}\n"
-	if got := hoverOn(tree, "walk"); got != "**walk**: to move on foot" {
-		t.Errorf("a hover after the save answers %q", got)
-	}
-}
-
 // The real table reaches every case it names, as the JavaScript reader does. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
 func TestTheStemsReachEveryCase(t *testing.T) {
 	text, err := os.ReadFile(filepath.Join("..", "..", "spec", "config", "stems.yaml"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	table := stemsIn(string(text))
-	cases := casesIn(string(text))
+	table := check.StemsIn(string(text))
+	cases := yaml.AsList(yaml.AsDoc(yaml.Read(string(text))).Get("cases"))
 	if len(cases) == 0 {
 		t.Fatal("the table names no case")
 	}
-	for _, one := range cases {
-		if !table.reaches(one.word, map[string]bool{one.reaches: true}) {
-			t.Errorf("%s reaches no %s", one.word, one.reaches)
+	for _, row := range cases {
+		doc := yaml.AsDoc(row)
+		word, reaches := yaml.AsString(doc.Get("word")), yaml.AsString(doc.Get("reaches"))
+		if !table.Reaches(word, map[string]bool{reaches: true}) {
+			t.Errorf("%s reaches no %s", word, reaches)
 		}
 	}
 }

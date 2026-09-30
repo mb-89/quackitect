@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -228,6 +228,15 @@ record:
         hash: 2821f72ffc633c7a
         size: 877
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: d6b29d00628ee2a9001d1b136bb0ff844b5a6862
+    hash_after: d6b29d00628ee2a9001d1b136bb0ff844b5a6862
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: lsp-door-switches-over
 ---
 
@@ -514,14 +523,19 @@ the reads move into src/modules/check, which already imports src/yaml, so the no
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/check/features.go src/modules/check/offers.go src/modules/lsp/lsp.go src/modules/lsp/features.go src/modules/lsp/runs.go src/quack/lsp.go src/lsp/hover.go src/lsp/complete.go src/lsp/links.go src/lsp/fold.go src/lsp/columns.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files draft-2 names, plus src/modules/check/offers.go and src/modules/lsp/features.go, split off to stay under the file ceiling, and src/lsp/stdio_test.go, whose byteAt case moves beside byteAt
+- the reads are pure over the tree and the lsp cases read the fake check, so no door is reached
+- each new file and function points at the ticket or its design section
+- the triggers stand once, in src/modules/lsp/features.go, and src/lsp reads them from there
 
 ## tests-green
 

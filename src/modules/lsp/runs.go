@@ -51,7 +51,7 @@ func (s *Server) tree() Tree {
 			texts[at] = text
 		}
 	}
-	tree := s.from.Tools.Check.Tree(texts)
+	tree := s.from.Check.Tree(texts)
 	for at, text := range s.open {
 		if text != "" {
 			tree.Holds(at, text)

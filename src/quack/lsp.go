@@ -68,7 +68,9 @@ func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
 		Root: root, Store: store, As: one.as, Bound: one.bound,
 		Sweep: func() any { return store.Snapshot().Read(sweepName) },
 		// [[spec/tickets/lsp-module-draws-the-tools]]
-		Tools: lsp.ToolsAt(root, lspChecks()), Quiet: -1,
+		Tools: lsp.ToolsAt(root, lspChecks(root)), Quiet: -1,
+		// [[spec/tickets/lsp-module-serves-the-features]]
+		Check: lspChecks(root),
 		Files: func() map[string]string {
 			texts, _ := store.Snapshot().Read(one.bound(lsp.TextsName)).(map[string]string)
 			return texts
@@ -77,10 +79,10 @@ func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
 	return lsp.Listen(root, server)
 }
 
-// The check module's rules the lsp tools draw on, handed across here because one module imports no other. [[spec/tickets/lsp-module-draws-the-tools]]
-func lspChecks() lsp.Check {
+// The check module's rules and reads the lsp module draws on, over a tree under the root the links open files at, handed across here because one module imports no other. [[spec/tickets/lsp-module-draws-the-tools]]
+func lspChecks(root string) lsp.Check {
 	return lsp.Check{
-		Tree: func(texts map[string]string) lsp.Tree { return check.TreeOver("", check.Texts(texts)) },
+		Tree: func(texts map[string]string) lsp.Tree { return check.TreeOver(root, check.Texts(texts)) },
 		Faults: func(tree lsp.Tree, path string, function, file int, source string) []lsp.Finding {
 			over, ok := tree.(*check.Tree)
 			if !ok {
@@ -94,5 +96,25 @@ func lspChecks() lsp.Check {
 		},
 		Draft: check.IsDraft, Relative: check.RelativeTo,
 		ValeIni: check.ValeIni, Survey: check.ToolsAt, Bin: check.Bin,
+		// [[spec/tickets/lsp-module-serves-the-features]]
+		Hover: overTree(func(tree *check.Tree, path string, line, character int) any {
+			return check.HoverAt(tree, path, line, character)
+		}),
+		Complete: overTree(func(tree *check.Tree, path string, line, character int) any {
+			return check.Offers(tree, path, line, character)
+		}),
+		Links: overTree(func(tree *check.Tree, path string, _, _ int) any { return check.LinksIn(tree, path) }),
+		Folds: overTree(func(tree *check.Tree, path string, _, _ int) any { return check.FoldsOf(tree.Read(path)) }),
+	}
+}
+
+// A read over the check module's own tree as a port, which answers nothing over a tree of another make. [[spec/tickets/lsp-module-serves-the-features]]
+func overTree(read func(tree *check.Tree, path string, line, character int) any) lsp.Feature {
+	return func(tree lsp.Tree, path string, line, character int) any {
+		over, ok := tree.(*check.Tree)
+		if !ok {
+			return nil
+		}
+		return read(over, path, line, character)
 	}
 }

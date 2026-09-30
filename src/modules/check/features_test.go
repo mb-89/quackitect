@@ -411,3 +411,18 @@ func TestANoteWithNoFrontmatterFoldsNothing(t *testing.T) {
 		}
 	}
 }
+
+// A cursor counts UTF-16 units, so four units in reach the byte past the emoji. [[spec/design_output/lsp#the-completion-reads-the-schema]]
+func TestAColumnReachesTheByteItNames(t *testing.T) {
+	row := "ä 😀 x"
+	if at := byteAt(row, 4); at != len("ä 😀") {
+		t.Fatalf("four units in reach the byte past the emoji, and it answers %d", at)
+	}
+}
+
+// A link escapes what a URI path cannot carry bare, as the old server's net/url did. [[spec/design_output/lsp#a-pointer-opens-its-target]]
+func TestALinkEscapesItsPath(t *testing.T) {
+	if got := uriOf("/tree/a b/ä#1.md"); got != "file:///tree/a%20b/%C3%A4%231.md" {
+		t.Fatalf("the URI reads %q", got)
+	}
+}

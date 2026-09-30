@@ -48,6 +48,10 @@ const (
 	didChange     = "textDocument/didChange"
 	didClose      = "textDocument/didClose"
 	publish       = "textDocument/publishDiagnostics"
+	hover         = "textDocument/hover"
+	completion    = "textDocument/completion"
+	documentLink  = "textDocument/documentLink"
+	foldingRange  = "textDocument/foldingRange"
 	syncFull      = 1
 	noMethod      = -32601
 )
@@ -186,6 +190,9 @@ func textsOf(in textsIn) map[string]string {
 
 // [[spec/tickets/the-lsp-door-lands]]
 func New(from Outside) *Server {
+	if from.Check.Tree == nil && from.Tools != nil {
+		from.Check = from.Tools.Check
+	}
 	return &Server{from: from, open: map[string]string{}, sent: map[string]string{}, tools: map[string][]Finding{}, uris: map[string]string{}, timers: map[string]*time.Timer{}}
 }
 
@@ -200,11 +207,19 @@ func (s *Server) Handle(message []byte) [][]byte {
 	switch in.Method {
 	case initialize:
 		return [][]byte{answers(in.ID, map[string]any{
-			"capabilities": map[string]any{"textDocumentSync": syncFull},
+			"capabilities": capabilities,
 			"serverInfo":   map[string]any{"name": serverName, "version": serverVersion},
 		})}
 	case shutdown:
 		return [][]byte{answers(in.ID, nil)}
+	case hover:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Hover, in.Params, nil))}
+	case completion:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Complete, in.Params, []any{}))}
+	case documentLink:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Links, in.Params, []any{}))}
+	case foldingRange:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Folds, in.Params, []any{}))}
 	case didOpen, didChange:
 		var params textParams
 		if json.Unmarshal(in.Params, &params) != nil {

@@ -20,14 +20,7 @@ func unitsTo(row string, at int) int {
 	return units(row[:at])
 }
 
-// The byte of the row an editor's column names, and the row's end where the column runs past it. [[spec/design_output/lsp#the-completion-reads-the-schema]]
-func byteAt(row string, character int) int {
-	counted := 0
-	for at, said := range row {
-		if counted >= character {
-			return at
-		}
-		counted += utf16.RuneLen(said)
-	}
-	return len(row)
+// A column in UTF-16 units, the unit the protocol counts by default. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
+func units(said string) int {
+	return len(utf16.Encode([]rune(said)))
 }

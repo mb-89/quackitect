@@ -154,7 +154,4 @@ func TestAColumnCountsUTF16Units(t *testing.T) {
 	if inside := unitsTo(row, 1); inside != 0 {
 		t.Fatalf("a byte inside ä counts from its start, and it answers %d", inside)
 	}
-	if at := byteAt(row, 4); at != len("ä 😀") {
-		t.Fatalf("four units in reach the byte past the emoji, and it answers %d", at)
-	}
 }

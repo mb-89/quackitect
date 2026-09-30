@@ -23,7 +23,7 @@ import (
 func TestThePortsAnswerTheCheckModulesRows(t *testing.T) {
 	const path, function, file = "src/over.go", 2, 3
 	texts := map[string]string{path: "package over\n\nfunc a() {\n\tb()\n\tb()\n\tb()\n}\n"}
-	ports := lspChecks()
+	ports := lspChecks("")
 	got := ports.Faults(ports.Tree(texts), path, function, file, "tree")
 	want := check.TextFaults(check.TreeOver("", check.Texts(texts)), path, function, file, "tree")
 	if len(want) == 0 {
@@ -45,14 +45,14 @@ func TestTheFeaturePortsAnswerTheCheckModulesReads(t *testing.T) {
 		"spec/schemas/paragraph.schema.yaml": "kind: paragraph\nlayers:\n  vocabulary:\n    terms: spec/vocabulary/terms.yml\n    endings: spec/config/stems.yaml\n",
 		"spec/vocabulary/terms.yml":          "terms:\n  - {word: door, means: \"the one place the tree guards an outside thing\"}\n",
 		"spec/config/stems.yaml":             "endings:\n  - end: s\n    to: [none]\n",
-		"spec/schemas/flag.schema.yaml":      "kind: flag\ngoverns:\n  - spec/flags/**\nfrontmatter:\n  type: object\n  properties:\n    kind:\n      const: flag\n      x-link: true\n",
+		"spec/schemas/flag.schema.yaml":      "kind: flag\ngoverns:\n  - spec/flags/**\nfrontmatter:\n  type: object\n  properties:\n    kind:\n      const: flag\n      x-link: true\nbody:\n  sections:\n    - header: Ask\n",
 		"spec/design_output/one.md":          "# Scope\n",
 		"spec/notes/one.md":                  "---\nkind: [[flag]]\n---\n\nThe doors hold. See [[spec/design_output/one]].\n",
 		"spec/free.md":                       "",
 	}
 	const note = "spec/notes/one.md"
 	fresh := func() *check.Tree { return check.TreeOver("", check.Texts(texts)) }
-	ports := lspChecks()
+	ports := lspChecks("")
 	cases := []struct {
 		name        string
 		port        lsp.Feature
