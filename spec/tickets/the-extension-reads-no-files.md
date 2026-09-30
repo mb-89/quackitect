@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -202,6 +202,29 @@ record:
         exit: 0
         said: "spec/tickets/the-extension-reads-no-files.md:337:3: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d891eb0f26d7 · claude-code-remote
+    hash_before: a97352a702b20611d562a7c98262c79f29fd433b
+    hash_after: a97352a702b20611d562a7c98262c79f29fd433b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-extension-reads-no-files.md:372:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 0a5858b2b4c9eb74
+        size: 1061
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -378,26 +401,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/sidebar-views.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The sidebar slice reads new in the tracked config. The shadow compare leaves with its mode: views-shadow.js, its test, and the tells call in sidebar.js. The views section draws the work badge off index/names. So the grid's work button drops its counts line, and the schema carries that. The tests that read the grid's count now read the views badge. The size golden takes the schema's new line count. The pull button keeps its help and icon. The grid still draws it, and the work-buttons contract holds that every work button wears a mark.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change reaches the files the approach names, and the tests reading the grid count the ask moves
+- the change reaches no door, so no fake joins it
+- each changed line in the sidebar and the tests names its ticket beside it
+- the badge stands in index/names alone, and the schema projects it off the draws file
 
 # accept
 
