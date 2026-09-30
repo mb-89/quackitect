@@ -48,5 +48,13 @@ func TicketsActions(c *q.Catalog) q.Writer {
 			q.Doc("Flip the ticket's urgent mark."), q.Label("Urgent"), q.Icon("🚨"), q.Writes()),
 		q.ActionIn(c, "set-field", func(in FieldSet) []q.Request { return nodeRun("ticket", "set", in.Name, in.Field, in.Value) },
 			q.Doc("Write one field of the ticket's front, as the schema takes it."), q.Label("Set a field"), q.Icon("✏️"), q.Writes()),
+		// [[spec/tickets/the-sidebar-writes-through-actions]]
+		q.ActionIn(c, "new", func(in Pathed) []q.Request { return nodeRun("ticket", "new", in.Path) },
+			q.Doc("Write the bare ticket where no file stands."), q.Label("New ticket"), q.Icon("🆕"), q.Writes()),
 	)
+}
+
+// The input of a new ticket: its path. [[spec/tickets/the-sidebar-writes-through-actions]]
+type Pathed struct {
+	Path string `json:"path" label:"path" doc:"the ticket's path, under spec/tickets or .se/tickets"`
 }

@@ -242,3 +242,17 @@ func TestAKebabKeyReadsItsCamelCaseMember(t *testing.T) {
 		t.Fatalf("the key reads %s, and wants 4 off the file", value)
 	}
 }
+
+// The schema answers off the config projection, so the sidebar reads it over /v1. [[spec/tickets/the-sidebar-reads-v1]]
+func TestSchemaProjects(t *testing.T) {
+	const schema = "spec/config/level0.schema.json"
+	index := qtest.New(t, func(c *q.Catalog) { Registers(c) })
+	index.Seed(map[string]any{"files/" + schema: q.Content{Hash: "h", Text: "{\n  \"type\": \"object\"\n}\n"}})
+	if err := index.Store().Run("config/" + schema); err != nil {
+		t.Fatalf("config/%s runs nowhere: %v", schema, err)
+	}
+	got, _ := index.Read("config/" + schema).(q.Ordered)
+	if len(got.Keys) != 1 || got.Keys[0] != "type" || got.Fields[0].Literal != `"object"` {
+		t.Fatalf("config/%s reads %+v", schema, got)
+	}
+}

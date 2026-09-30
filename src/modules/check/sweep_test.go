@@ -10,19 +10,30 @@ import (
 	"quackitect/src/q/qtest"
 )
 
-// What the sweep answers over the files and variables a case seeds. [[spec/tickets/lsp-rules-move-to-check]]
+// What the sweep answers over the files and variables a case seeds, git tracking every file. [[spec/tickets/lsp-rules-move-to-check]]
 func sweepOver(t *testing.T, files, env map[string]string) []Finding {
 	t.Helper()
-	var vars q.Writer
+	return sweepSeeded(t, files, pathsOf(files), nil, env)
+}
+
+// What the sweep answers over the files, the paths git tracks, the buffers and the variables a case seeds. [[spec/tickets/check-sweep-reads-tracked]]
+func sweepSeeded(t *testing.T, files map[string]string, tracked []string, buffers, env map[string]string) []Finding {
+	t.Helper()
+	var vars, git q.Writer
 	index := qtest.New(t, func(c *q.Catalog) {
 		Registers(c)
 		vars = q.OutIn(c, "env/<name>", "", q.Doc("an SE_ variable, as the case seeds it"))
+		git = q.OutIn(c, TrackedPort, []string{}, q.Doc("the paths git tracks, as the case seeds them"))
 	})
 	seeds := map[string]any{}
 	for at, text := range files {
 		seeds["files/"+at] = q.Content{Hash: "h", Text: text}
 	}
+	for at, text := range buffers {
+		seeds["buffers/"+at] = text
+	}
 	index.Seed(seeds)
+	index.SeedAs(git, map[string]any{TrackedPort: tracked})
 	if len(env) > 0 {
 		set := map[string]any{}
 		for name, value := range env {
@@ -32,6 +43,14 @@ func sweepOver(t *testing.T, files, env map[string]string) []Finding {
 	}
 	said, _ := index.Read("sweep").([]Finding)
 	return said
+}
+
+func pathsOf(files map[string]string) []string {
+	out := []string{}
+	for at := range files {
+		out = append(out, at)
+	}
+	return out
 }
 
 func holdsRule(found []Finding, rule, file string) bool {
@@ -47,6 +66,32 @@ func TestTheSweepAnswersADeadPointerOffTheFiles(t *testing.T) {
 	found := sweepOver(t, map[string]string{"spec/a.md": "# A\n\nSee [[spec/nowhere]].\n"}, nil)
 	if !holdsRule(found, "EveryPointerResolves", "spec/a.md") {
 		t.Fatalf("the sweep answers %+v, and wants EveryPointerResolves on spec/a.md", found)
+	}
+}
+
+// A file git tracks nowhere draws nothing, as the LSP's sweep reads tracked files alone. [[spec/tickets/check-sweep-reads-tracked]]
+func TestTheSweepSkipsAFileGitTracksNowhere(t *testing.T) {
+	files := map[string]string{"spec/a.md": "# A\n\nSee [[spec/nowhere]].\n", "spec/scratch.md": "# S\n\nSee [[spec/nowhere]].\n"}
+	found := sweepSeeded(t, files, []string{"spec/a.md"}, map[string]string{"spec/ghost.md": "# G\n\nSee [[spec/nowhere]].\n"}, nil)
+	if !holdsRule(found, "EveryPointerResolves", "spec/a.md") {
+		t.Fatalf("the sweep answers %+v, and wants the dead pointer the tracked spec/a.md holds", found)
+	}
+	for _, one := range found {
+		if one.File == "spec/scratch.md" || one.File == "spec/ghost.md" {
+			t.Fatalf("the sweep answers %+v, and wants nothing on a path git tracks nowhere", found)
+		}
+	}
+}
+
+// The local layer counts, though git ignores the file holding it. [[spec/tickets/check-sweep-reads-tracked]]
+func TestTheLocalLayerCountsUntracked(t *testing.T) {
+	files := map[string]string{
+		"spec/config/level0.json":  `{"names": {"words": 5}}`,
+		".se/.runtime/config.json": `{"names": {"words": 2}}`,
+		"spec/one-two-three.md":    "# One\n",
+	}
+	if found := sweepSeeded(t, files, []string{"spec/config/level0.json", "spec/one-two-three.md"}, nil, nil); !holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
+		t.Fatalf("the sweep answers %+v, and wants the untracked local cap of two words to draw NameHoldsTheWords", found)
 	}
 }
 

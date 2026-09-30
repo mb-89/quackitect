@@ -23,6 +23,8 @@ type remote struct {
 	land func(files map[string]string)
 	drop func(name string)
 	add  func(second int64, files map[string]string)
+	// Writes files into the checkout that no commit adds. [[spec/tickets/check-sweep-reads-tracked]]
+	write func(files map[string]string)
 }
 
 func gitSuite(t *testing.T, one Git, hands remote) {
@@ -83,6 +85,29 @@ func stoodSuite(t *testing.T, one Git, hands remote) {
 	if said, err := one.Stood(); err != nil || !reflect.DeepEqual(said, want) {
 		t.Fatalf("the checkout answers %v, %v, and wants %v", said, err, want)
 	}
+	trackedSuite(t, one, hands)
+}
+
+// The checkout answers every path its history adds, and no file written beside them. [[spec/tickets/check-sweep-reads-tracked]]
+func trackedSuite(t *testing.T, one Git, hands remote) {
+	t.Helper()
+	hands.write(map[string]string{"spec/scratch.md": "untracked\n"})
+	said, err := one.Tracked()
+	if err != nil {
+		t.Fatal(err)
+	}
+	held := map[string]bool{}
+	for _, at := range said {
+		held[at] = true
+	}
+	for _, at := range []string{"spec/tickets/first.md", "spec/other.md", "spec/tickets/second.md"} {
+		if !held[at] {
+			t.Fatalf("the checkout answers %v, and wants %s, which its history adds", said, at)
+		}
+	}
+	if held["spec/scratch.md"] {
+		t.Fatalf("the checkout answers %v, and wants no spec/scratch.md, which no commit adds", said)
+	}
 }
 
 func TestGitKeepsItsContract(t *testing.T) {
@@ -92,7 +117,7 @@ func TestGitKeepsItsContract(t *testing.T) {
 			for at := range files {
 				fake.Add(second, at)
 			}
-		}})
+		}, write: func(map[string]string) {}})
 	})
 	t.Run("real", func(t *testing.T) {
 		origin, local := scratch(t)
@@ -116,6 +141,7 @@ func TestGitKeepsItsContract(t *testing.T) {
 				t.Setenv("GIT_COMMITTER_DATE", fmt.Sprintf("@%d +0000", second))
 				committed(t, local, files)
 			},
+			write: func(files map[string]string) { written(t, local, files) },
 		})
 	})
 }
@@ -152,6 +178,14 @@ func scratch(t *testing.T) (origin, local string) {
 
 func committed(t *testing.T, dir string, files map[string]string) {
 	t.Helper()
+	written(t, dir, files)
+	run(t, dir, "add", "-A")
+	run(t, dir, "commit", "-q", "--allow-empty", "-m", "a step")
+}
+
+// [[spec/tickets/check-sweep-reads-tracked]]
+func written(t *testing.T, dir string, files map[string]string) {
+	t.Helper()
 	for at, text := range files {
 		full := filepath.Join(dir, filepath.FromSlash(at))
 		if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
@@ -161,8 +195,6 @@ func committed(t *testing.T, dir string, files map[string]string) {
 			t.Fatal(err)
 		}
 	}
-	run(t, dir, "add", "-A")
-	run(t, dir, "commit", "-q", "--allow-empty", "-m", "a step")
 }
 
 func run(t *testing.T, dir string, args ...string) {

@@ -14,11 +14,12 @@
     "phase6shadow": true,
     "phase6switch": true,
     "phase7shadow": true,
+    "phase7switch": true,
     "phase8shadow": true,
     "phase8switch": true,
     "phase9shadow": true,
     "cage": "new",
-    "sidebar": "shadow",
+    "sidebar": "new",
     "lsp": "shadow"
   }
 }

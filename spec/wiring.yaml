@@ -95,6 +95,8 @@ wires:
   git.tips: git/tips
   git.trunk: git/trunk
   git.stood: git/stood
+  git.tracked: git/tracked
+  check.tracked: git/tracked
   tickets.tips: git/tips
   tickets.trunk: git/trunk
   tickets.all: tickets/all

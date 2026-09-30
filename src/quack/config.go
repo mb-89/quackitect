@@ -9,13 +9,12 @@ import (
 	"sort"
 	"strings"
 
-	oldconfig "quackitect/src/config"
 	"quackitect/src/modules/config"
 	"quackitect/src/q"
 )
 
-// The member a config file explains itself under, which names no key. [[spec/design_output/config#a-key-names-a-path]]
-const explained = "comment"
+// The member a config file explains itself under, which the config module names. [[spec/design_output/config#a-key-names-a-path]]
+const explained = config.Explained
 
 // One key's answer off the config module: its JSON literal and its layer. [[spec/tickets/cfg-topic-holds-one-resolver]]
 type configRow struct {
@@ -36,58 +35,15 @@ func configRows(tracked, local []byte, env map[string]string, declared map[strin
 		}
 		files = append(files, parsed)
 	}
-	keys := map[string]bool{}
-	for _, file := range files {
-		leavesOf(file, "", keys)
-	}
-	for dotted := range declared {
-		keys[dotted] = true
-	}
 	out := map[string]configRow{}
-	for dotted := range keys {
-		key, ok := declared[dotted]
-		if !ok {
-			key = keyOfDotted(dotted)
-		}
-		if literal, layer, ok := config.Layered(key, files[0], files[1], env); ok {
-			out[dotted] = configRow{Value: json.RawMessage(literal), Layer: layer}
-		} else if key.Default != "" {
-			out[dotted] = configRow{Value: json.RawMessage(key.Default), Layer: oldconfig.BuiltIn}
-		}
+	for _, row := range config.Rows(declared, files[0], files[1], env) {
+		out[row.Key] = configRow{Value: row.Value, Layer: row.Layer}
 	}
 	return out, nil
 }
 
-// The dotted names of every member of a file that holds no object, past the explaining member. [[spec/design_output/config#a-key-names-a-path]]
-func leavesOf(value q.Ordered, at string, into map[string]bool) {
-	if !value.Object {
-		if at != "" {
-			into[at] = true
-		}
-		return
-	}
-	for i, name := range value.Keys {
-		if name == explained {
-			continue
-		}
-		under := name
-		if at != "" {
-			under = at + "." + name
-		}
-		leavesOf(value.Fields[i], under, into)
-	}
-}
-
-// A dotted key as the catalog names it: its first segment the instance, the rest its local name, each segment in kebab case. [[spec/design_output/model#config-comes-off-the-registrations]]
-func keyOfDotted(dotted string) q.Key {
-	instance, rest, _ := strings.Cut(dotted, ".")
-	segments := strings.Split(rest, ".")
-	for i, one := range segments {
-		segments[i] = q.Kebab(one)
-	}
-	local := strings.Join(segments, "/")
-	return q.Key{Name: instance + "/config/" + local, Instance: instance, Local: local}
-}
+// A dotted key as the catalog names it, as the config module reads it. [[spec/design_output/model#config-comes-off-the-registrations]]
+func keyOfDotted(dotted string) q.Key { return config.KeyOfDotted(dotted) }
 
 // Every key the modules the wiring loads declare, by its dotted name. [[spec/tickets/the-config-schema-gets-generated]]
 func declaredKeys(wiring string) (map[string]q.Key, error) {
