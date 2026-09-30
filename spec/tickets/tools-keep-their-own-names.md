@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 021163b00bbb23b4
         size: 2284
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 22bee429c20980490d112164d204f7991e415277
+    hash_after: 22bee429c20980490d112164d204f7991e415277
+    inputs:
+      - name: design/draft
+        hash: 021163b00bbb23b4
+        size: 2284
+      - name: design/tests-red
+        hash: c62c9216b2cdca11
+        size: 842
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -285,8 +297,11 @@ The departure: a case naming the tool name option cannot compile before the opti
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+What I weigh: the approach answers the ask with one naming function, `NameOf`, which the tool list, the MCP list and `Action` all read. Every caller the draft names stands at the line it cites, and `hooks.go` reaches `Action` alone. The second done line reds on its own assertion in `TestActionResolvesALevelZeroNameToItsAction`. The first done line's case cannot compile before `ToolName` stands, so it lands at implement, watched red first by a stub, as the tests-red note says. What I assume: the implement step adds a case for `isIndexTool` beside the Go cases, since its checklist asks a fake of every door the change reaches.
 
 # implement
 
