@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -185,6 +185,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: 338ca1d334676da964bd4f6539390f7489a85c4a
+    hash_after: 338ca1d334676da964bd4f6539390f7489a85c4a
+    inputs:
+      - name: ask
+        hash: 87ed5e12d18b37a3
+        size: 788
+      - name: implement/tests-green
+        hash: b5465287e2d7d4d0
+        size: 864
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -416,8 +429,9 @@ The work tab now draws off work/rows and its count off work/open-tasks, both thr
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass: this box has no screen, so .se/scripts/workview renders the tab off the index standing over this tree, through the same catalog and watch the window takes. The label reads work (13), and the index's own work/open-tasks answers 13. The queue column carries each place, groups nest with their tickets on the cloud, and the plan's todos stand at the left with no link. Assumed: the owner's terminal draws the same frame in colour, since the letters differ by tone alone.
 
 # Discussion
 
