@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d8922c5f7ed7 · claude-code-remote
+    hash_before: 57d5844760b63e1dcffe1dff88ce5f8b1d9397d2
+    hash_after: 57d5844760b63e1dcffe1dff88ce5f8b1d9397d2
+    inputs:
+      - name: ask
+        hash: cd2afb18da164609
+        size: 487
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,70 @@ The switch leaves the panel with the tree's own rules alone, and a prose fault s
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The module runs the tools the old server's `Outside` runs, and publishes their rows beside the sweep's.
+
+| what | the change |
+|---|---|
+| the runs | `src/modules/lsp/tools.go` carries `Outside.Sweep`, `Outside.Over`, the Vale and Biome parsers and the tense vetoes of `src/lsp/outside.go`, over a `check.Tree` the module builds off the store's `files/` and its open buffers |
+| the door | `src/modules/lsp/door.go` runs a binary and reads the survey and the code ceilings, and a case hands a runner of its own |
+| an open file | a change waits the quiet span `lintQuiet` names, then Vale reads the buffer on its input and the publish carries its rows |
+| a closed file | the listen runs one whole sweep, and publishes every file carrying a row, under the file address `uriOf` makes off the root |
+| a disk change | a commit moving a `files/` name runs the tools over those paths, and a change to a file `toolInputs` names runs the whole sweep again. One run goes at a time |
+| the rows | each keeps its source, `vale`, `biome` or `tree`, and a Vale fault draws `ValeRuns` on the config |
+| the wiring | `listensLSP` in `src/quack/main.go` hands the module the runs off the door |
+
+Weighed: a tools module writing the `check/vale` and `check/biome` names, against runs inside the `lsp` module. The module stands as an IO module already, and no other reader of those rows exists before phase 10, so the runs stay beside their one reader. Assumed: the tense reader keeps running through node until Node leaves.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go listensLSP
+- src/modules/lsp/lsp.go New, Handle, Republish, publishes, Listen
+- src/modules/lsp/lsp_test.go every case building a Server
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/tools_test.go TestAValeRowPublishesUnderItsSource
+- src/modules/lsp/tools_test.go TestABiomeRowPublishesUnderItsSource
+- src/modules/lsp/tools_test.go TestACodeFaultPublishesUnderTree
+- src/modules/lsp/tools_test.go TestAClosedFileDrawsItsRowsAtTheListen
+- src/modules/lsp/tools_test.go TestTheTenseReaderDropsAPastRow
+- src/modules/lsp/tools_test.go TestAValeFaultDrawsValeRuns
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/tools.go
+- src/modules/lsp/door.go
+- src/modules/lsp/lsp.go
+- src/modules/lsp/tools_test.go
+- src/quack/main.go
+- spec/design_output/lsp.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- src/lsp/outside.go, src/modules/lsp/lsp.go, src/modules/check/export.go and listensLSP stand opened, and the exports the runs need stand in export.go
+- the callers list names every caller of New, Listen and the publish, off a git grep
+- the Vale, Biome and tree lines meet their three cases, and the check line meets ./RUNME.sh check
 
 ## tests-red
 
