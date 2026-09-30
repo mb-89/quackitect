@@ -178,7 +178,7 @@ test("a box naming no hook reads no row", async () => {
   assert.deepEqual(await hookRows([], wire().get), []);
 });
 
-const LSP = "/tree/.se/.runtime/bin/se-lsp";
+const LSP = "/tree/.se/.runtime/bin/se-index";
 
 // The frames a language server reads off its input, in the order the probe writes them. [[spec/tickets/every-server-stands-and-answers]]
 function framesIn(input) {
@@ -198,7 +198,7 @@ const framed = (said) => {
   return `Content-Length: ${Buffer.byteLength(body)}\r\n\r\n${body}`;
 };
 
-// A server answering each frame the way se-lsp does: the initialize and the shutdown by id, and a note it opens with its diagnostics. [[spec/tickets/every-server-stands-and-answers]]
+// A server answering each frame the way quack lsp does: the initialize and the shutdown by id, and a note it opens with its diagnostics. [[spec/tickets/every-server-stands-and-answers]]
 function answering(codes) {
   const answer = (one) => {
     if (one.method === "initialize" || one.method === "shutdown")
@@ -239,7 +239,7 @@ test("a language server that exits draws a warn row naming the exit", () => {
   });
   const row = lspProbe(proc, LSP, ROOT);
 
-  assert.match(row, /^warn: se-lsp lsp exits with 2 before it answers/);
+  assert.match(row, /^warn: quack lsp exits with 2 before it answers/);
   assert.match(row, /panic: the checker reads no tree/);
 });
 

@@ -66,8 +66,19 @@ export function topicOf(it, argv, stdin) {
 }
 
 // The check module's sweep under the paths the lint asks, each row as quack answers it, or null where quack answers nothing a reader takes. [[spec/tickets/the-lsp-server-leaves]]
-export function sweepRowsOf(_it, _where) {
-  return [];
+export function sweepRowsOf(it, where) {
+  const said = topicOf(it, ["sweep"]);
+  return Array.isArray(said) ? rowsUnder(said, where) : null;
+}
+
+// The rows standing on a path asked or under a folder asked, and every row where the whole tree is asked. [[spec/tickets/the-lsp-server-leaves]]
+export function rowsUnder(rows, where) {
+  if (where.includes(".")) return rows;
+  const under = where.map((one) => one.split("\\").join("/").replace(/\/+$/, ""));
+  return rows.filter((row) => {
+    const file = String(row?.file ?? "");
+    return under.some((at) => file === at || file.startsWith(`${at}/`));
+  });
 }
 
 // The rows the config verb prints, off the map `quack config` answers, in key order. [[spec/tickets/cfg-topic-holds-one-resolver]]

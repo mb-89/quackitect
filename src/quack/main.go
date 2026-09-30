@@ -225,6 +225,14 @@ func main() {
 		}
 		return
 	}
+	// [[spec/tickets/the-lsp-server-leaves]]
+	if len(os.Args) == 2 && os.Args[1] == "sweep" {
+		if err := sweeps(os.Stdout, index.Ask); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) == 2 && os.Args[1] == "prose" {
 		if err := proses("."); err != nil {
 			fmt.Fprintln(os.Stderr, err)

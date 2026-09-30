@@ -1,5 +1,5 @@
-// The reads the editor's features answer, moved here from src/lsp with the
-// cases that hold them: the hover, the completion, the links and the fold.
+// The reads the editor's features answer, with the cases that hold them: the
+// hover, the completion, the links and the fold.
 // [[spec/tickets/lsp-module-serves-the-features]]
 package check
 

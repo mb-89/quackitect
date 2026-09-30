@@ -919,7 +919,7 @@ the one an environment carries leans on nothing:
     print("trusted", folder, "in", merge(os.path.expanduser("~/.claude.json"), trust))
     print("auto mode in", merge(os.path.expanduser("~/.claude/settings.json"), auto))
     PY
-    SE_INSTALL_SKIP="editor-link editor-extensions editor-client go index se-lsp" \
+    SE_INSTALL_SKIP="editor-link editor-extensions editor-client go index" \
       sh "$repo/src/scripts/install.sh" || true
     exit 0
 

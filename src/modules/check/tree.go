@@ -178,7 +178,7 @@ const (
 var Extensions = []string{"chrischinchilla.vale-vscode", "biomejs.biome", "bierner.markdown-mermaid"}
 
 // [[spec/design_output/tools#what-the-survey-writes]]
-var Wanted = []string{"node", "vale", "biome", "vale-ls", "se-lsp", "go", "git", "claude", "sh", "python"}
+var Wanted = []string{"node", "vale", "biome", "vale-ls", "go", "git", "claude", "sh", "python"}
 
 // [[spec/design_output/editor#what-the-tracked-settings-say]]
 func settingsNameBinaries(tree *Tree) []Finding {

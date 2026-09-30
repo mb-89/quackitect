@@ -51,7 +51,7 @@ import { FIX_USAGE, fixFlags } from "./cli-fix.js";
 import { goEnvOf, goGate, goTestNames } from "./cli-go.js";
 import { hookRows, hooksNamed } from "./cli-hooks.js";
 import { namesIn, show, walk } from "./cli-read.js";
-import { answerOf, configRowsOf, readsNew, topicOf } from "./quack-topic.js";
+import { answerOf, configRowsOf, quackAt, readsNew, topicOf } from "./quack-topic.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { lspProbe } from "./lsp-probe.js";
 import { HOOKS } from "./precommit.js";
@@ -471,12 +471,19 @@ export function sidebarSays() {
   return "unlinked: run ./RUNME.sh";
 }
 
+// The index binary where the install built it, and nothing where it stands unbuilt. [[spec/tickets/the-lsp-server-leaves]]
+function indexBuilt() {
+  const at = quackAt(files, join, root);
+  return files.exists(at) ? at : "";
+}
+
 export async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
     ...WANTED.map((one) => [one.name, standsAt(found[one.name])]),
     ["biome lsp-proxy", files.exists(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
-    ["se-lsp lsp", lspProbe(outside, found["se-lsp"]?.path ?? "", root)],
+    // The editor starts quack lsp off the index binary, so the probe starts the same. [[spec/tickets/the-lsp-server-leaves]]
+    ["quack lsp", lspProbe(outside, indexBuilt(), root)],
     [
       "editor",
       files.exists(join(root, EDITOR_SETTINGS))

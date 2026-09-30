@@ -11,7 +11,6 @@ export const FETCHING = [
   "go",
   "go-modules",
   "index",
-  "se-lsp",
   "se-front",
   "editor-client",
   "editor-link",

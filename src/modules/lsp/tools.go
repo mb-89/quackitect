@@ -440,3 +440,18 @@ func (one *Tools) readByTools(paths []string) bool {
 	}
 	return false
 }
+
+// Vale's answer as findings, and the fault it names in place of them, which the twin goldens read beside the JavaScript side. [[spec/tickets/the-lsp-server-leaves]]
+func (one *Tools) ValeRows(stdout string) ([]Finding, string) {
+	heard, fault := one.valeRowsOf(stdout)
+	out := make([]Finding, 0, len(heard))
+	for _, said := range heard {
+		out = append(out, said.Finding)
+	}
+	return out, fault
+}
+
+// Biome's answer as findings, which the twin goldens read beside the JavaScript side. [[spec/tickets/the-lsp-server-leaves]]
+func (one *Tools) BiomeRows(stdout, where string) []Finding {
+	return one.biomeRowsOf(stdout, where)
+}

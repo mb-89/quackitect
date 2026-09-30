@@ -5,17 +5,18 @@ refines: ["[[spec/design_input/one-server-holds-the-shape]]"]
 
 # Scope
 
-`src/lsp` holds a language server of this tree's own. It stands beside Biome,
-and draws every finding the battery reads. This note covers the shape a
-finding takes, the checker under every front, the fronts, the port, and
-the build.
+The `lsp` IO module in `src/modules/lsp` holds a language server of this
+tree's own, which the index serves and `quack lsp` relays to the editor. It
+stands beside Biome, and draws every finding the battery reads. This note
+covers the shape a finding takes, the checker under every front, the fronts,
+the door file, and the build.
 
 For the ask, see [[spec/design_input/one-server-holds-the-shape]].
 
 # The panel reads the battery
 
-The panel draws the list `se-lsp check` answers, and a finding standing there
-holds a push. The server runs every source itself, so a rule reaches the
+The panel draws the check module's sweep and the tools' rows, and a finding
+standing there holds a push. The server runs every source itself, so a rule reaches the
 editor the way it reaches the check:
 
 | source | draws an open file | draws a closed file |
@@ -48,15 +49,13 @@ The fronts below ask for a reading, and each reaches one rule set:
 
 | the front | what it asks |
 |---|---|
-| the editor's panel | this server's own sweep, and Vale and Biome beside it |
-| the port | the list the panel holds |
-| a person, at `se-lsp check` | the same sweep, fresh |
-| `./RUNME.sh lint` | `se-lsp check`, and `findingsOver` in `src/bridge/findings.js` beside it |
+| the editor's panel | the check module's sweep, and Vale and Biome beside it |
+| a person, at `quack sweep` | the same sweep, once the index settles |
+| `./RUNME.sh lint` | `quack sweep`, and `findingsOver` in `src/bridge/findings.js` beside it |
 
 `Whole` in `src/modules/check/checker.go` holds the sweep every front reads: this server's
-own rules, and the tools beside them. The tree readers and the schema readers
-in `src/scripts/cli-read.js` stand behind `se-lsp check`, for a box carrying no
-server.
+own rules, and the tools beside them. A box whose quack answers no sweep names
+the fault in the lint, because the tree has no second road.
 
 `test/contract/one-reading.test.js` holds the fronts against each other over
 one file.
@@ -71,42 +70,39 @@ the count and the findings.
 
 # The server reads the index
 
-Every front reads the tree off the index door, and no file of the tree off the
-disk. Vale and Biome read a file no editor holds off the disk themselves, and a
-buffer reaches Vale on its input. `indexDisk` in `src/lsp/indexed.go` holds what it pulls: each path, its
-hash, whether git tracks it, and its text. For the verbs it asks, see
+Every front reads the tree off the index, and no file of the tree off the
+disk. The check module's sweep reads the files git tracks, and the lsp module
+reads their text off `texts`, which the wiring binds to the files the index
+mirrors. Vale and Biome read a file no editor holds off the disk themselves,
+and a buffer reaches Vale on its input. For the verbs a reader asks, see
 [[spec/design_output/index#a-reader-takes-the-tree]].
 
-| the front | when it pulls |
+| the front | when it reads |
 |---|---|
-| the editor's panel | once at its start, then on every tick the door's `changes` answers |
-| `se-lsp check` | once, after the door sweeps, so the check reads the disk as it stands |
-| the loopback door | before every answer |
+| the editor's panel | on every commit that moves the sweep, or the buffers |
+| `quack sweep` | once the index settles, off its `value` ask |
 
-A door standing nowhere gets started through its binary, the way every caller
-starts one. A door that answers nothing stops the server, and the error names
-`./RUNME.sh`, which builds the index. The tree has no second road.
+`quack lsp` starts the index where none answers, the way every caller starts
+one. A quack that answers nothing names `./RUNME.sh`, which builds the index.
+The tree has no second road.
 
-`Tree.Paths` answers the paths git tracks, off the index. The cases read a
-folder they write, through a disk standing in the cases alone.
-`TestTheBinaryReadsTheTreeThroughTheIndexAlone` holds the binary to one reader.
-
-The config layers stand partly outside the tree, so the server reads them once
-at its start, through the config reader. [[spec/design_output/config#the-go-reader]]
+The sweep reads the counts off the config layers, the local file git ignores
+among them. [[spec/design_output/config#the-go-reader]]
 
 # The panel follows the index
 
-The server holds no watch of its own. It asks the door's `changes`, which
-answers once a sweep lands, and pulls again. So a file redraws whoever writes
-it: an agent, git, or a script.
+The server holds no watch of its own. Each commit to the index publishes again
+every file whose rows move, and `follows` in `src/modules/lsp/runs.go` runs the
+tools over the files the commit moves. So a file redraws whoever writes it: an
+agent, git, or a script.
 
 | what the pull names | what the panel does |
 |---|---|
 | a tracked file whose hash moves | redraws it off the index, and runs Vale and Biome over it at once |
 | a tracked file the index drops | takes its row with it, and no rule reads it |
 | a file git tracks nowhere | nothing, because no rule reads it |
-| a file a pointer names, where the file moves or goes | redraws the file carrying the pointer too, off this server's own rules, so a heading that lands clears the dead anchor on it |
-| a file the tools read, which `toolInputs` in `src/lsp/outside.go` names | runs Vale and Biome over the whole tree again |
+| a file a pointer names, where the file moves or goes | redraws the file carrying the pointer too, off the sweep, so a heading that lands clears the dead anchor on it |
+| a file the tools read, which `toolInputs` in `src/modules/lsp/tools.go` names | runs Vale and Biome over the whole tree again |
 
 One run of the tools goes at a time. A file named while one runs waits for the
 next, so the rows that land read the newest text.
@@ -117,7 +113,7 @@ once the index moves the rows the write names.
 # The panel lints as typed
 
 A change to an open file waits the quiet span `lintQuiet` names in
-`src/lsp/panel.go`, and every change inside that span joins one run. The run
+`src/modules/lsp/runs.go`, and a later change starts the span again. The run
 hands each buffer as it stands to Vale on its input.
 
 | what reads the buffer | how |
@@ -148,7 +144,7 @@ come from:
 
 The server runs both binaries the way `findingsOver` in
 `src/bridge/findings.js` runs them for the lint, so both lists name the same
-rows. `Outside` in `src/lsp/outside.go` holds the runs:
+rows. `Tools` in `src/modules/lsp/tools.go` holds the runs:
 
 | what | where the server reads it |
 |---|---|
@@ -261,25 +257,27 @@ way it switches the past tense off.
 
 # The editor speaks over stdio
 
-The extension starts `se-lsp` over the language server protocol, on the binary
-under the runtime folder. A box carrying no binary keeps the sidebar and loses
+The extension starts `quack lsp` over the language server protocol, on the
+index binary under the runtime folder, and the verb relays the editor's stdio to
+the lsp IO module whole. A box carrying no binary keeps the sidebar and loses
 the server. `serverAsk` in `src/extension/lib/lsp.js` says what the client
-runs, and `Speaks` in `src/lsp/lsp.go` answers it:
+runs, and `Handle` in `src/modules/lsp/lsp.go` answers it:
 
 | the editor sends | the server does |
 |---|---|
-| `initialize` | names itself, asks for the whole text on every change, and offers completion on `:`, a space, `#` and `[` |
-| `initialized` | sweeps the tree, and follows the index |
-| a document opens or changes | holds that buffer in the tree in place of the disk, an empty one too, and draws it |
-| a document saves | draws the buffer the tree holds |
+| `initialize` | names itself, asks for the whole text on every change, and announces the hover, the links, the fold and the completion on `:`, a space, `#` and `[` |
+| a document opens or changes | commits the buffer to the index in place of the disk, and draws the file |
+| `textDocument/hover` | answers the line the dictionary holds for the term |
 | `textDocument/documentLink` | answers every pointer as a link |
 | `textDocument/completion` | answers what the schema allows at the cursor |
-| a document closes | drops the buffer, so the disk answers again |
-| `shutdown`, then `exit` | answers, and ends |
+| `textDocument/foldingRange` | answers the fold over the frontmatter |
+| a document closes | empties the buffer, so the file reads as it stands on disk |
+| `shutdown` | answers |
 
-The answers and the panel share one pipe. `writes` holds a lock for each
-frame, and `wire` in `src/lsp/wire.go` holds the buffer under the pipe, so the
-swap watcher's flush lands between frames.
+The four features read the check module through the ports `lspChecks` in
+`src/quack/lsp.go` fills, because one module imports no other. The replies and
+the publishes share one connection, and `send` holds a lock for each frame, so
+a publish lands between replies.
 
 The language client is the extension's one dependency, pinned in its manifest.
 The installer links it beside the extension, so no copy travels.
@@ -295,58 +293,40 @@ line and column from one and the editor from zero, so the draw takes one off
 each.
 
 A finding counts its column in bytes, and the editor in UTF-16 units. So
-`unitsTo` in `src/lsp/columns.go` turns the column, and a line carrying `ä` or
+`unitsTo` in `src/modules/lsp/lsp.go` turns the column, and a line carrying `ä` or
 an emoji draws under the right characters.
 
 # The standing file
 
-`se-lsp serve` holds a resident server on a loopback port, so a caller pays the
-start once. `Serve` in `src/lsp/serve.go` writes where it stands into
-`.se/.runtime/lsp.json`, the way the index door writes its own:
+The index opens the lsp IO module's listener on a loopback port, so the editor
+pays no start of its own. `Listen` in `src/modules/lsp/lsp.go` writes where it
+stands into `.se/.runtime/lsp-door.json`, the door file:
 
 | the field | what it says |
 |---|---|
-| `port` | where the server listens |
-| `pid` | the process holding it |
-| `root` | the tree it reads |
-| `stamp` | the binary's own time and size |
+| `port` | where the listener waits |
+| `token` | the line a connection sends first |
 
-`reaches` in `src/lsp/main.go` reads that file first. A server answering on
-that port with the same root and stamp takes the call. It tells a stale one to stop, drops the file, and starts a
-fresh server, as many times as `tries` there allows.
+`lsps` in `src/quack/lsp.go` starts the index where none answers, reads the
+door file, sends the token line, and relays the editor's frames whole. The
+listener drops a connection sending another token, and the index drops the file
+as it stops.
 
-# A port serves the list
+# The sweep serves the lint
 
-While the editor speaks to the server over stdio, the server also listens on the
-loopback address. It writes where it stands into `.se/.runtime/panel.json`, the
-way the bridge writes `vehicle.json`:
+`quack sweep` prints the check module's sweep as JSON once the index settles,
+and `sweepRowsOf` in `src/scripts/quack-topic.js` reads it for the lint:
 
-| the field | what it says |
+| the lint asks | the rows it keeps |
 |---|---|
-| `port` | where the server listens |
-| `pid` | the process holding it |
-| `root` | the tree it reads |
+| the whole tree | every row |
+| a file | the rows on that file |
+| a folder | the rows under that folder |
 
-`GET /findings` answers the list the panel holds. Each `path` in the query
-keeps the rows on that file or under that folder, and a query naming none keeps
-every row. The answer waits until every run of the tools lands, up to the span
-`settleWait` names in `src/lsp/port.go`:
-
-| the key | what it holds |
-|---|---|
-| `ok` | true |
-| `settled` | whether every run lands before the answer |
-| `open` | the paths an editor holds, whose rows read the buffer |
-| `found` | each finding: `file`, `line`, `column`, `rule`, `severity`, `message`, and `source` where a tool draws it |
-
-The list carries an open file's Biome rows too, read off the disk, which the
-panel leaves to the Biome extension. The server drops the file as it exits,
-where the file still names its own process. A file naming a process that
-answers nothing stands stale.
-
-`se-lsp check` runs the same sweep with no server standing, so a caller with no
-editor reads the same list. `TestThePortAnswersWhatTheCheckAnswers` in
-`src/lsp/port_test.go` holds the two against each other.
+`readingFor` in `src/scripts/cli-read.js` lays the tools' rows `findingsOver`
+draws beside them. The survey stands on the box alone, and the sweep reads the
+tracked files, so the lint reads `SurveyFindsNode` off the box in place of the
+sweep's row.
 
 # A closed ticket is history
 
@@ -363,11 +343,11 @@ An open ticket keeps every row.
 
 # The build beside the index
 
-The server is pure Go, so it needs no compiler and no network. It shares no
-step with the index, which is C and waits on a compiler. A binary built off
-other source lints against rules the tree no longer carries.
+The server builds into the index binary, `se-index`, so it takes no build of
+its own. A binary built off other source lints against rules the tree no longer
+carries.
 
-`lsp_here` and `index_here` in `src/scripts/install.sh` ask
+`index_here` and `front_here` in `src/scripts/install.sh` ask
 `src/scripts/go-source.js` whether the stamp beside the binary holds the hash of
 its source. The hash reads the binary's folder, every tree package it imports
 and the root `go.mod` and `go.sum`, through `sourceHash` in
@@ -380,13 +360,13 @@ A rebuild swaps the binary, and the running server ends itself once it sees the
 swap. The language client's own handler stops at a cap of starts again, which
 `DefaultErrorHandler` in `vscode-languageclient` holds. So `clientOf` in
 `src/extension/lib/lsp.js`
-hands the client a handler starting `se-lsp` again on every close, after a
+hands the client a handler starting `quack lsp` again on every close, after a
 pause of a second. A server falling at its start then loops once a second.
 
 # The doctor probes the server
 
-`doctor` prints a `se-lsp lsp` row off `lspProbe` in `src/scripts/cli-check.js`.
-The probe starts `se-lsp lsp` in the tree, writes `initialize`, a `didOpen` of
+`doctor` prints a `quack lsp` row off `lspProbe` in `src/scripts/lsp-probe.js`.
+The probe starts `quack lsp` off the index binary in the tree, writes `initialize`, a `didOpen` of
 a note under `spec/tickets` carrying no frontmatter, `shutdown` and `exit`, and
 reads what comes back.
 
@@ -426,8 +406,8 @@ every file, and reaches into the chapter.
 # A pointer opens its target
 
 The server answers `textDocument/documentLink`, so an editor draws every
-pointer a file writes as a link, and a click opens what it names. `linksIn` in
-`src/lsp/links.go` reads the pointers `pointersIn` reads, and resolves each one
+pointer a file writes as a link, and a click opens what it names. `LinksIn` in
+`src/modules/check/features.go` reads the pointers `pointersIn` reads, and resolves each one
 the way the resolve rule does. For the order, see
 [[spec/design_output/lsp#every-pointer-resolves]].
 
@@ -443,7 +423,7 @@ rule names. A column counts UTF-16 units, the unit the protocol reads by default
 
 # The completion reads the schema
 
-`offers` in `src/lsp/complete.go` reads the line up to the cursor, off the
+`Offers` in `src/modules/check/offers.go` reads the line up to the cursor, off the
 buffer the tree holds. It reads the schema through the readers the checker
 reads, so the offer and the check name one shape:
 
@@ -457,13 +437,13 @@ reads, so the offer and the check name one shape:
 | after `[[note#` | the slug of every heading that note holds |
 
 The editor counts the cursor in UTF-16 units, so `byteAt` in
-`src/lsp/columns.go` turns it into a byte first. Every item replaces what the
+`src/modules/check/features.go` turns it into a byte first. Every item replaces what the
 line holds from the colon, the hashes or the brackets up to the cursor. A
 pointer closes its brackets where the line holds none.
 
 # The hover shows a term
 
-`hoverAt` in `src/lsp/hover.go` reads the word under the cursor and answers the
+`HoverAt` in `src/modules/check/features.go` reads the word under the cursor and answers the
 line the dictionary holds for it:
 
 | the cursor stands on | the hover shows |

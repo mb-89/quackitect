@@ -12,13 +12,14 @@ import { proc } from "../../src/doors/proc.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
-// The folders a source stands in, past the packages npm installs and this case, which names the words it looks for. [[spec/tickets/the-lsp-server-leaves]]
+// The folders a source stands in, past the packages npm installs, the goldens copying the tickets' prose, and this case, which names the words it looks for. [[spec/tickets/the-lsp-server-leaves]]
 const SWEPT = [
   "src",
   ".claude",
   "test",
   "RUNME.sh",
   ":!**/node_modules/**",
+  ":!**/testdata/**",
   ":!test/contract/no-old-server.test.js",
 ];
 

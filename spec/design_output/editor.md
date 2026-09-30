@@ -15,7 +15,7 @@ rule name at the door.
 
 | server | holds | arrives through |
 |---|---|---|
-| `se-lsp` | every Vale rule, through the tense reader, and the tree's own checks | the quackitect extension, which asks the bridge for the battery's list |
+| `quack lsp` | every Vale rule, through the tense reader, and the tree's own checks, off the lsp IO module. For details, see [[spec/design_output/lsp]] | the quackitect extension, which asks the bridge for the battery's list |
 | `biome lsp-proxy` | every Biome rule over JavaScript and JSON | `.se/.runtime/bin/biome`, one subcommand |
 
 The Vale extension stays installed, and reads a config that turns on no style.
@@ -39,7 +39,7 @@ relative to the workspace folder:
 | setting | value | why |
 |---|---|---|
 | `vale.valeCLI.path` | `.se/.runtime/bin/vale` | vale-ls spawns Vale with the workspace folder as its working directory |
-| `vale.valeCLI.config` | `spec/config/editor.vale.ini` | a config turning on no style, so the extension draws nothing beside `se-lsp` |
+| `vale.valeCLI.config` | `spec/config/editor.vale.ini` | a config turning on no style, so the extension draws nothing beside `quack lsp` |
 | `vale.valeCLI.installVale` | `false` | the Vale the installer pins answers, so no second copy arrives |
 | `vale.enableSpellcheck` | `false` | spelling sits outside VoiceVale, so the panel matches the door |
 | `vale.valeCLI.lintOnChange` | `true` | a rule that draws while typing costs less than one that waits for a save |

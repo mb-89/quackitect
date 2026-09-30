@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -163,6 +163,15 @@ record:
         hash: ca27b08b2eb5acbe
         size: 15910
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: cfcdc416b9b7abb4774714e35f7bb858c376dbfe
+    hash_after: cfcdc416b9b7abb4774714e35f7bb858c376dbfe
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -320,14 +329,19 @@ the approach answers the ask, and the red cases decide the lsp.json line, the ed
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/cli-read.js src/scripts/quack-topic.js src/scripts/cli-check.js src/scripts/install.sh src/extension/lib/lsp.js src/quack/sweep.go src/quack/main.go src/modules/lsp/tools.go src/modules/lsp/lsp.go src/bridge/findings.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus src/quack/sweep.go for the verb the lint reads, and src/quack/check_twins_test.go, where the twin case lands in place of src/modules/check
+- the lint case fakes quack through its disk and proc doors, and the sweep verb case fakes the index ask
+- each new file and function points at the ticket or its design section
+- the door file name stands in StandingFile, and folders.test.js holds it to MOVED, which the install list meets through installerHoldsTheNames
 
 ## tests-green
 

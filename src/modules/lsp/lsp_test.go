@@ -64,9 +64,6 @@ func TestTheListenWritesTheDoorFile(t *testing.T) {
 	if json.Unmarshal(body, &at) != nil || at.Port == 0 || at.Token == "" {
 		t.Fatalf("the door file reads %s, and wants a port and a token", body)
 	}
-	if _, err := os.Stat(filepath.Join(root, ".se", ".runtime", "lsp.json")); err == nil {
-		t.Fatal("the listen writes lsp.json, the old server's name")
-	}
 }
 
 func opened(uri, text string) []byte {

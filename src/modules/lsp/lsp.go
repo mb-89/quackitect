@@ -35,7 +35,7 @@ const BuffersName = "buffers/<path...>"
 const filesPrefix = "files/"
 
 // The file the listen writes its port and token to, under the root. .claude/skills/level0/lib/folders.js owns the folder. [[spec/tickets/the-lsp-door-lands]]
-const StandingFile = ".se/.runtime/lsp.json"
+const StandingFile = ".se/.runtime/lsp-door.json"
 
 // The protocol's words: the version and the name the server answers, its methods, the full-text sync kind, and the JSON-RPC error code. [[spec/tickets/the-lsp-door-lands]]
 const (
