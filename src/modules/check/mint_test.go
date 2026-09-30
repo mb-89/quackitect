@@ -53,3 +53,48 @@ func TestMintFillsEachChapterTheSchemaNames(t *testing.T) {
 		t.Errorf("a chapter left out takes no description as its placeholder")
 	}
 }
+
+// A schema writing one chapter a step of its route. [[spec/tickets/mint-keeps-nested-steps]]
+const routedSchema = `kind: routed
+frontmatter:
+  type: object
+  required:
+    - kind
+    - steps
+  properties:
+    kind:
+      const: routed
+      x-link: true
+      description: the schema
+    steps:
+      type: array
+      description: the route
+body:
+  headingLevel: 1
+  sections:
+    - header: Ask
+      required: true
+      description: what it asks
+    - header: Step
+      x-one-per: steps
+`
+
+// The body mintNote in lib/schema-mint.js writes over the same route. [[spec/tickets/mint-keeps-nested-steps]]
+const routedBody = "\n# Ask\n\nA thing.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n### approach\n\n<!-- the approach -->\n\n<!-- the form is text -->\n\n### checked\n\n<!-- one line per item of the checklist, on how you take it into account -->\n\n<!-- the form is checklist -->\n\n## owner-read\n\n<!-- does the ask say what the owner said -> -->\n\n# gate\n\n<!-- reads the design -->\n\n## verdict\n\n<!-- accept or reject -->\n\n<!-- the form is verdict -->\n"
+
+// [[spec/tickets/mint-keeps-nested-steps]]
+func TestAMintNestsEachStepAsTheJavaScriptMintDoes(t *testing.T) {
+	steps := []any{
+		map[string]any{"name": "design", "steps": []any{
+			map[string]any{"name": "draft", "does": "writes the approach", "checklist": []any{"every file stands opened"},
+				"evidence": []any{map[string]any{"name": "approach", "form": "text", "says": "the approach"}}},
+			map[string]any{"name": "owner-read", "asks": "does the ask  say what\n the owner said -->", "by": "person"},
+		}},
+		map[string]any{"name": "gate", "does": "reads the design", "evidence": []any{map[string]any{"name": "verdict", "form": "verdict", "says": "accept or reject"}}},
+	}
+	got := mintNote(yaml.AsDoc(yaml.Read(routedSchema)), map[string]any{"steps": steps, "Ask": "A thing."})
+	_, body, _ := strings.Cut(strings.TrimPrefix(got, "---\n"), "\n---\n")
+	if body != routedBody {
+		t.Errorf("the Go mint writes the body\n%s\nand the JavaScript mint writes\n%s", body, routedBody)
+	}
+}
