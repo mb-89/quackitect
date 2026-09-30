@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -185,6 +185,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: e46ac4d69157b69a4023b45b1476f016b2bf529d
+    hash_after: e46ac4d69157b69a4023b45b1476f016b2bf529d
+    inputs:
+      - name: ask
+        hash: 92f5a8d308b09e53
+        size: 607
+      - name: implement/tests-green
+        hash: eafe8982e91c643e
+        size: 959
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -462,8 +475,13 @@ one place: the action names stand in the base file alone, and tui.md points at a
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass
+
+What I weigh: this cloud box holds no terminal a person watches, so the window test stands in for the view. TestPThenADigitPostsThePlace in src/tui/workplace_test.go drives the whole window through p and 1. It reads work/place posted with the row and its place, and the notice the tab draws.
+
+What I assume: the verb behind work/place draws the row at its place through the watch on work/rows, which the verbs' own tests hold. A person on a desk confirms it in the work tab with p and a digit.
 
 # Discussion
 
