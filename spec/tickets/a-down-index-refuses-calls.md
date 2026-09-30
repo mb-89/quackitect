@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -322,6 +322,24 @@ record:
     skipped: true
     kept: d74c1b4bda7e08c7a815d7208ab09826b50aeacd
     why: its red tests stand as d74c1b4bd landed them, and a later leaf passed since
+  - step: gate
+    hand: box d8901afed4d6 · claude-code-remote · helper-20
+    hash_before: 727c410e068e99aad8501460690182f5f19f6724
+    hash_after: 727c410e068e99aad8501460690182f5f19f6724
+    inputs:
+      - name: design/draft
+        hash: 51464da247eb14a3
+        size: 2425
+      - name: design/tests-red
+        hash: afd47fba06c53205
+        size: 1065
+      - name: design/draft-2
+        hash: 51464da247eb14a3
+        size: 2425
+      - name: design/tests-red-2
+        hash: eba558812135f39f
+        size: 964
+    def: 01417e29801ecc2f
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
@@ -546,8 +564,19 @@ The surprise: in the full file run the raced row case also reads the down flags 
 <!-- the form is verdict -->
 
 accept with points
-- spoke-answer-reaches-the-door: draft-2 step 5 posts the rows answer as hook.back, and no Go code reads that word. The door meets a rows answer on agent.spoke, in src/modules/hooks/holds.go. Under new the hook posts agent.spoke to POST /hook with the effect call id, beside its bridge road, so a held call gets its answer
-- weighed: the split by event keeps the rules, the tools and the brief on the bridge, and every earlier finding meets an answer. configOf stands in .claude/skills/level0/lib/config.js, the serve verb stands, the door names tool.call and classic.Stop, and it answers pass, after, result, block and rows. The event effect of step 3 maps a kind the door never sends, which costs nothing. The three red cases fail on their own assertion, and the read and shadow cases hold the edges. The spoke road is one line in seen, which the builder edits anyway, so it rides as a point and takes no round
+- cage-key-reads-the-layers: design/draft-2 lists `test/level0/cage.test.js: a local override moves the cage as the tracked key does`, and the tree holds that case nowhere. `caged` in `.claude/skills/level0/hooks/level0.js` reads `migration.cage` through `configOf`, and `CAGED` in `test/level0/bridgehead.test.js` writes the tracked `spec/config/level0.json` alone. Add a case where an override alone reads `new`, and the hook takes the door road
+| what the gate weighed | what it found |
+|---|---|
+| the ask's refusal line | `a stopped hooks door refuses a guarded call and names session/alarms` in `test/level0/bridgehead.test.js` asserts the deny names `session/alarms` and a `./RUNME.sh` command, and `refusedText` in `cage.js` writes both |
+| the ask's raced row line | `a row another writer appends while the index falls stays in the session log` asserts every appended row stays, and the fixture's process fake appends on the node argv |
+| the ask's check line | it stands for `implement/tests-green`, and the draft names it there |
+| the approach | `doors` in `cage.js` names `tool.call` and `classic.Stop`, and `seen` hands every other event to the bridge, so the rules, the tools and the brief stay where they stand |
+| the earlier gate's point | `door` posts `agent.spoke` with the effect call id, and `holds.go` answers its rows effect with that call, so `spoke-answer-reaches-the-door` stands built |
+| the stale rationale | its What still passes chapter says what passes under `new` and names the chapters the migration rewrites, so the stale input moves no claim of the approach |
+| the callers list | it names `doorOf` and `doored`, and `cage.js` exports `doors`; the built road holds, so the drift grades as form and rides to the push |
+| the tests list | it names `cage.test.js` for the held call case, which stands in `bridgehead.test.js`; form again |
+| the kept red leaves | both kept commits stand in the history, and each answered on its own assertion |
+| the round | every fault beside the absent case is prose the builder passes anyway, so a reject buys nothing
 
 # implement
 
