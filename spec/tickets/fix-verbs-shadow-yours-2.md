@@ -53,7 +53,7 @@ reason: done
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart from cli.js: the new path answered ten rows where the old one answered five. Gain: the shadow log stays empty for the verbs, so the coordinator can turn `migration.phase4switch` on. Breaks: the switch stays off while a verb answers apart from cli.js.
+The verbs slice shadows `ticket yours`, and the coordinator saw it answer apart from cli.js. The new path answered ten rows where the old one answered five. Gain: the shadow log stays empty for the verbs, so the coordinator can turn `migration.phase4switch` on. Breaks: the switch stays off while a verb answers apart from cli.js.
 
 - the four shadowed verbs write no row to `./RUNME.sh log --kind shadow` after the run starts
 - this ticket names the cause of the split and what a fix needs
@@ -94,7 +94,8 @@ No code changes. The split does not reproduce on this tree, and the cause stands
 - I took the second and minted the follow-up ticket the-index-reads-standing-branches. This ticket claims no fix.
 - I wrote no test that fails first. The fault needs a standing remote branch, and the git write door refuses a scratch remote.
 - Assumption: the prose shadow rows stand outside the verbs slice.
-- Recheck on this box: the four verbs exit 0 and `./RUNME.sh log --kind shadow` answers no row; the follow-up ticket the-index-reads-standing-branches stands closed on trunk.
+- Recheck on this box: the four verbs exit 0, and `./RUNME.sh log --kind shadow` answers no row.
+- The follow-up ticket the-index-reads-standing-branches stands closed on trunk.
 
 ## checked
 
