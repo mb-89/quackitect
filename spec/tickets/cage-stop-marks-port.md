@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -171,6 +171,29 @@ record:
         exit: 0
         said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: 4f0e843d3fe22d72b37b3ba8f53a96791779bdb9
+    hash_after: 4f0e843d3fe22d72b37b3ba8f53a96791779bdb9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "test/level0/cage-shadow.test.js:44:65: Modal: This register holds the modals can, must, will. Say what is, or name the o"
+    inputs:
+      - name: design/tests-red
+        hash: 2fc62139bc9e88c2
+        size: 1090
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -388,26 +411,33 @@ What the build fixes within its own diff:
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The stops fold names the handover marks on its answer, and the door writes them after the drops. A measure past the key writes the due mark as marksDue does. A measure where the queue no longer clears drops it, and so does a spent ask. A clear held where the queue no longer clears drops the clear hold and the due mark, as dropsClear does. A retro hold keeps the conversation only where its hand matches the session's own hand. That hand reads off the box file, the session file and the harness variable, as handOf reads them. A box naming no hand counts every retro as its own, as before. The own hand case now decides the match: a match that fails makes the retro read as a helper's, so the session goes due and the case reds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests-green diff touches no file past the ask
+- the cases reach the disk under a temp root and the environment per case
+- the says chapter names the approach the change implements
+- each runtime path stands once in marks.go, beside its owner
 
 # accept
 
