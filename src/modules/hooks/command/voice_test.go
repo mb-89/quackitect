@@ -29,3 +29,20 @@ func TestWithoutTrailersDropsTheClosingTrailers(t *testing.T) {
 		}
 	}
 }
+
+func TestRefusesReadsTheRuleNamePastItsLastDot(t *testing.T) {
+	for rule, want := range map[string]bool{"level0.Private": true, "VoiceRulesRan": true, "level0.Hedge": false, "PrivateLike": false} {
+		if got := Refuses(rule); got != want {
+			t.Errorf("Refuses(%s) reads %v, want %v", rule, got, want)
+		}
+	}
+}
+
+func TestCutFlattensTheWordsAndEndsOnTheMark(t *testing.T) {
+	if got := Cut("one\n  two", LineCut); got != "one two" {
+		t.Errorf("Cut reads %q, want the words on one line", got)
+	}
+	if got := Cut("abcdefghij", 8); got != "abcde..." {
+		t.Errorf("Cut reads %q, want abcde...", got)
+	}
+}

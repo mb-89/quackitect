@@ -58,6 +58,7 @@ var (
 	Slashed                  = slashed
 	SlugOf                   = slugOf
 	Sorted                   = sorted
+	StrangerFault            = strangerFault
 	SurveyFindsNode          = surveyFindsNode
 	SurveyNamesInstalls      = surveyNamesInstalls
 	TextFaults               = textFaults

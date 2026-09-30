@@ -127,6 +127,8 @@ type Outside struct {
 	Drop func(root, key, value string) error
 	// The findings the voice keeps over a written file, off Vale and the prose vetoes. None reads no voice. [[spec/tickets/cage-write-door-port]]
 	Prose func(root, where, text string) []write.Finding
+	// What the schemas answer over a written note, off the check the tree holds. None reads no schema. [[spec/tickets/cage-write-door-port]]
+	Schema func(root, where, text string) write.Judged
 }
 
 // What the doors read off the config and the box: the words a name holds, whether the box stands in the cloud, the owner's hold and ask, the binding, the graces, the plan's numbers, and each helper tier's model. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-call-holds-port]]
@@ -315,6 +317,9 @@ func (d *Door) refuses(post Post, root string, settings Settings) string {
 	}
 	if textOf(post.E, "tool") == agentTool {
 		return agentRefusal(post.E, settings)
+	}
+	if write.Writes(textOf(post.E, "tool")) {
+		return d.writeDoor(post.E, root)
 	}
 	return d.commands(post, root, settings)
 }

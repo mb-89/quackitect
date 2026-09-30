@@ -207,3 +207,12 @@ A second cage drifts from the first.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The hooks door answers every harness write, and `onWrite` in `src/bridge/write.js` still answers a patch call inside the tool. These rules move with the patch tool's port, since no hook reaches them:
+
+- the bless file
+- the conflict markers and the open ticket door
+- the fields the engine owns, and a projection's owner
+- the private rule
+
+For details, see [[spec/tickets/cage-write-door-port]].

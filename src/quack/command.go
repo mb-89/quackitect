@@ -122,9 +122,32 @@ func firstSet(names []string) string {
 
 // The findings the voice keeps over a commit message: Vale over it as level0-commit.md, each past the Go prose vetoes. A box with no Vale, or a Vale answering no rows, reads none, as messageFaults does. [[spec/tickets/cage-commit-guards-port]]
 func commitVoice(root, message string) []command.Row {
+	var out []command.Row
+	for _, one := range heardOver(root, commitName, message).rows {
+		out = append(out, command.Row{Rule: one.found.Rule, Said: one.found.Said, Message: one.message})
+	}
+	return out
+}
+
+// One row Vale answers past the vetoes, with its message and severity. [[spec/tickets/cage-write-door-port]]
+type heard struct {
+	found    prose.Finding
+	message  string
+	severity string
+}
+
+// What Vale answers over a text read as the named file: the rows the Go prose vetoes keep, in place order, whether a Vale stands, and whether it answered JSON. [[spec/tickets/cage-write-door-port]]
+type valeHeard struct {
+	rows   []heard
+	stands bool
+	ran    bool
+}
+
+// Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
+func heardOver(root, name, text string) valeHeard {
 	vale := valeAt(root)
 	if vale == "" {
-		return nil
+		return valeHeard{}
 	}
 	config := valeOwn
 	if !standsUnder(root, valeOwn) && standsUnder(root, valeBuilt) {
@@ -132,18 +155,19 @@ func commitVoice(root, message string) []command.Row {
 	}
 	span, stop := context.WithTimeout(context.Background(), valeSpan)
 	defer stop()
-	run := exec.CommandContext(span, vale, "--config="+config, "--path="+commitName, "--output=JSON", "--no-exit")
-	run.Dir, run.Stdin = root, strings.NewReader(message)
+	run := exec.CommandContext(span, vale, "--config="+config, "--path="+name, "--output=JSON", "--no-exit")
+	run.Dir, run.Stdin = root, strings.NewReader(text)
 	said, _ := run.Output()
 	var read map[string][]struct {
-		Check   string `json:"Check"`
-		Line    int    `json:"Line"`
-		Span    []int  `json:"Span"`
-		Match   string `json:"Match"`
-		Message string `json:"Message"`
+		Check    string `json:"Check"`
+		Line     int    `json:"Line"`
+		Span     []int  `json:"Span"`
+		Match    string `json:"Match"`
+		Message  string `json:"Message"`
+		Severity string `json:"Severity"`
 	}
 	if json.Unmarshal(said, &read) != nil {
-		return nil
+		return valeHeard{stands: true}
 	}
 	body := func(path string) string {
 		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
@@ -151,10 +175,6 @@ func commitVoice(root, message string) []command.Row {
 	}
 	caps, paths := proseSchema([]byte(body(paragraphSchema)))
 	words := prose.Words(body(paths[0]), body(paths[1]), body(paths[2]))
-	type heard struct {
-		found   prose.Finding
-		message string
-	}
 	var all []heard
 	for _, rows := range read {
 		for _, one := range rows {
@@ -162,7 +182,7 @@ func commitVoice(root, message string) []command.Row {
 			if len(one.Span) > 0 {
 				found.Column = one.Span[0]
 			}
-			all = append(all, heard{found, one.Message})
+			all = append(all, heard{found, one.Message, one.Severity})
 		}
 	}
 	sort.SliceStable(all, func(a, b int) bool {
@@ -171,10 +191,10 @@ func commitVoice(root, message string) []command.Row {
 		}
 		return all[a].found.Column < all[b].found.Column
 	})
-	var out []command.Row
+	out := valeHeard{stands: true, ran: true}
 	for _, one := range all {
-		if len(prose.Kept(message, []prose.Finding{one.found}, caps, words, prose.All)) > 0 {
-			out = append(out, command.Row{Rule: one.found.Rule, Said: one.found.Said, Message: one.message})
+		if len(prose.Kept(text, []prose.Finding{one.found}, caps, words, prose.All)) > 0 {
+			out.rows = append(out.rows, one)
 		}
 	}
 	return out

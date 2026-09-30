@@ -14,5 +14,60 @@
   "files": {
     "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/draft\n---\n\n# Ask\n\nThe door reads the write.\n\n# Discussion\n",
     ".se/notes/raw.md": "the owner wants the bridge to leave before the summer ends\n"
+  },
+  "schema": {
+    "# Where it stands\n\n- nothing\n": {
+      "kind": "handover",
+      "stranger": true,
+      "found": [
+        {
+          "rule": "Schema.Kind",
+          "line": 1,
+          "column": 1,
+          "message": ".se/HANDOVER.md names no kind, and the handover schema governs this path.",
+          "severity": "error"
+        }
+      ]
+    },
+    "---\nkind: [[handover]]\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n": {
+      "kind": "handover",
+      "found": [
+        {
+          "rule": "Schema.status",
+          "line": 1,
+          "column": 1,
+          "message": "A handover names status in its frontmatter.",
+          "severity": "error"
+        }
+      ]
+    },
+    "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# The owner's words\n\n> Carry the group to done.\n": {
+      "kind": "handover",
+      "found": [
+        {
+          "rule": "Schema.WhatWaits",
+          "line": 1,
+          "column": 1,
+          "message": "A handover carries a What waits chapter.",
+          "severity": "error"
+        }
+      ]
+    },
+    "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n": {
+      "kind": "handover"
+    },
+    "---\nkind: [[rationale]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n": {
+      "kind": "handover",
+      "stranger": true,
+      "found": [
+        {
+          "rule": "Schema.Kind",
+          "line": 1,
+          "column": 1,
+          "message": ".se/HANDOVER.md reads as a rationale, and the handover schema governs this path.",
+          "severity": "error"
+        }
+      ]
+    }
   }
 }

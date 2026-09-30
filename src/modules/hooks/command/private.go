@@ -149,7 +149,7 @@ func RefusedDelta(found []Leak) string {
 	for _, one := range found {
 		lines = append(lines,
 			"  "+one.File+":"+strconv.Itoa(one.Line)+":"+strconv.Itoa(one.Column)+"  "+one.Rule,
-			"    adds: "+cut(one.Said, lineCut),
+			"    adds: "+Cut(one.Said, LineCut),
 			"    "+one.Message,
 			"")
 	}

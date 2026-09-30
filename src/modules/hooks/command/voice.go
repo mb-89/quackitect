@@ -22,7 +22,7 @@ var (
 func RefusesIn(found []Row) []Row {
 	var out []Row
 	for _, one := range found {
-		if refuses(one) {
+		if Refuses(one.Rule) {
 			out = append(out, one)
 		}
 	}
@@ -33,7 +33,7 @@ func RefusesIn(found []Row) []Row {
 func FormIn(found []Row) []Row {
 	var out []Row
 	for _, one := range found {
-		if !refuses(one) {
+		if !Refuses(one.Rule) {
 			out = append(out, one)
 		}
 	}
@@ -54,9 +54,9 @@ func WithoutTrailers(text string) string {
 	return strings.Join(paragraphs[:len(paragraphs)-1], "\n\n")
 }
 
-// [[spec/design_output/level0#the-panel-holds-a-warning]]
-func refuses(one Row) bool {
-	return refusing[one.Rule[strings.LastIndex(one.Rule, ".")+1:]]
+// Whether a rule refuses at a door, by the name past its last dot. [[spec/design_output/level0#the-panel-holds-a-warning]]
+func Refuses(rule string) bool {
+	return refusing[rule[strings.LastIndex(rule, ".")+1:]]
 }
 
 // [[spec/tickets/cage-commit-guards-port]]

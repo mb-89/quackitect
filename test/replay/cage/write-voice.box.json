@@ -24,5 +24,10 @@
       "message": "A private word leaves the box.",
       "severity": "error"
     }
-  ]
+  ],
+  "schema": {
+    "---\nkind: [[handover]]\nstatus: todo\n---\n\n# Where it stands\n\n- the branch stands on origin\n\n# What waits\n\n- the next leaf\n\n# The owner's words\n\n> Carry the group to done.\n": {
+      "kind": "handover"
+    }
+  }
 }

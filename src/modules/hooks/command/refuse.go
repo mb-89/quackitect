@@ -8,18 +8,18 @@ import "strings"
 // The letters the command line and a finding's words keep, and the mark a cut ends on. [[spec/design_output/bash#what-every-refusal-owes]]
 const (
 	commandCut = 120
-	lineCut    = 72
+	LineCut    = 72
 	ellipsis   = "..."
 )
 
 // The refusal naming every finding over a command. [[spec/design_output/bash#what-every-refusal-owes]]
 func RefusedCommand(command string, found []Row) string {
-	lines := []string{"Level zero refuses this command.", "", "  ran: " + cut(command, commandCut), ""}
+	lines := []string{"Level zero refuses this command.", "", "  ran: " + Cut(command, commandCut), ""}
 	var names []string
 	for _, one := range found {
 		lines = append(lines, "  "+one.Rule)
 		if one.Said != "" {
-			lines = append(lines, "    reads: "+cut(one.Said, lineCut))
+			lines = append(lines, "    reads: "+Cut(one.Said, LineCut))
 		}
 		lines = append(lines, "    "+one.Message, "")
 		if !holds(names, one.Rule) {
@@ -34,7 +34,7 @@ func RefusedCommand(command string, found []Row) string {
 }
 
 // A text flattened to one line, cut at a count of letters. [[spec/design_output/bash#what-every-refusal-owes]]
-func cut(said string, at int) string {
+func Cut(said string, at int) string {
 	letters := []rune(flat(said))
 	if len(letters) > at {
 		return string(letters[:at-len(ellipsis)]) + ellipsis

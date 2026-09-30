@@ -169,6 +169,7 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 				replay.from.Git = taughtGit(reads.Git)
 				replay.from.Voice = taughtVoice(reads.Voice)
 				replay.from.Prose = taughtProse(reads.Prose)
+				replay.from.Schema = taughtSchema(reads.Schema)
 				if len(reads.Live) > 0 {
 					replay.from.Root = stopTreeOf(t, stopTable{Live: reads.Live}, stopCase{Config: reads.Config, Files: reads.Files})
 				}
@@ -212,7 +213,8 @@ type boxReads struct {
 	Config map[string]any    `json:"config"`
 	Files  map[string]string `json:"files"`
 	// The findings the voice keeps over a written file. [[spec/tickets/cage-write-door-port]]
-	Prose []write.Finding `json:"prose"`
+	Prose  []write.Finding         `json:"prose"`
+	Schema map[string]write.Judged `json:"schema"`
 }
 
 func readsOf(t *testing.T, at string) boxReads {

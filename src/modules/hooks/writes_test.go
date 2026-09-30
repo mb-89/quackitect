@@ -33,6 +33,8 @@ type writeTable struct {
 	Live  []string          `json:"live"`
 	Tree  map[string]string `json:"tree"`
 	Cases []writeCase       `json:"cases"`
+	// What the schemas answer over each written text, which src/quack holds to the check. [[spec/tickets/cage-write-door-port]]
+	Schema map[string]write.Judged `json:"schema"`
 }
 
 func writeTableOf(t *testing.T) writeTable {
@@ -56,6 +58,14 @@ func taughtProse(found []write.Finding) func(root, where, text string) []write.F
 	return func(string, string, string) []write.Finding { return found }
 }
 
+// A Schema answering what the schemas say over each text a table teaches, or none where it teaches none. [[spec/tickets/cage-write-door-port]]
+func taughtSchema(said map[string]write.Judged) func(root, where, text string) write.Judged {
+	if said == nil {
+		return nil
+	}
+	return func(_, _, text string) write.Judged { return said[text] }
+}
+
 // The recorded root in a text, moved onto the tree a test stands in. [[spec/tickets/cage-write-door-port]]
 func movedRoot(text, root string) string {
 	return strings.ReplaceAll(text, recordedRoot+"/", filepath.ToSlash(root)+"/")
@@ -75,6 +85,7 @@ func TestTheWriteDoorRefusesWhatTheBridgeRefuses(t *testing.T) {
 			door := doorOver(t, &calls{}, &book{}).door
 			door.from.Root = stopTreeOf(t, stopTable{Live: table.Live}, stopCase{Files: files})
 			door.from.Prose = taughtProse(one.Voice)
+			door.from.Schema = taughtSchema(table.Schema)
 			body, err := json.Marshal(one.E)
 			if err != nil {
 				t.Fatal(err)
