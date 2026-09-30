@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -145,6 +145,18 @@ record:
         hash: 967bb22b1139c872
         size: 4718
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 26cf0d31488b8d768e082a04835309f91ecd47eb
+    hash_after: 26cf0d31488b8d768e082a04835309f91ecd47eb
+    inputs:
+      - name: design/draft
+        hash: 967bb22b1139c872
+        size: 4718
+      - name: design/tests-red
+        hash: e451f12e63829e77
+        size: 1840
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -326,8 +338,15 @@ every door the tests reach has a fake: git through taughtGit, the clock through 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: the door answers classic.Stop in the bridge's order off src/bridge/server.js, a helper's stop, then holdsForHandover, then onStop, with a pure stop package off lib/stop.js and a stops fold beside the holds fold
+- done_when one meets TestReplayLogAnswersEveryRecordedLog over stop-handover, stop-vote, stop-claims and stop-full-update, red now; done_when two meets TestTheStopBlocksWhatTheBridgeBlocks, red in each block case; done_when three is the check the implement answers
+- fix in place: the approach leaves holdsTurn to the bridge, while the ask names it and the tests-red seen field carries it, with stop-full-update red for it; the implement carries the full update's shape, the chapter list in spec/config/status.yaml and its heading check
+- fix in place: the holds fold now keeps Holds.Stood, the mark cage-hold-drops-port lands, so holdHere reads it there and the stops fold keeps no second copy
+- fix in place: the bridge twin moved to test/contract/stop-cases.test.js, since it reads the live rules off the disk door
+- weighed: the fold counts the session's owner prompts off the index, where the bridge counts them off the session log; they agree within one session, and a restart mid-session is the one place they part
 
 # implement
 
