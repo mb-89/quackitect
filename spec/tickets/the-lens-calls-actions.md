@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: c4aed852cff1f0c8
         size: 636
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 1204befd1a3083b814e23c85850ee3ad59916c5c
+    hash_after: 1204befd1a3083b814e23c85850ee3ad59916c5c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: dcb6d88df5f0252a
+        size: 4500
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -265,26 +278,33 @@ Assumed: with no index standing, a ticket button refuses with a toast naming the
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/lens-actions.test.js src/modules/verbs/person_test.go src/quack/person_run_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/lens-actions.test.js
+- src/modules/verbs/person_test.go
+- src/quack/person_run_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion. The lens cases catch the throw a missing seam raises, then read what the fake index door recorded, so each fails on the post it wants. The Go cases stand in files of their own, in place of twins_test.go and verbs_test.go. So the red list leaves no standing case out of the check. The node module refuses a map of words today, which the person case reads as its failure.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the spawn line meets the grep case, the buttons line meets the button, save, route, refusal and pull cases, and the check line meets ./RUNME.sh check
+- the index door is a fake recording each post, the disk is fakeDisk, and the node module runs a program the case writes under a temporary root
 
 # gate
 
