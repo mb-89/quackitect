@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -148,6 +148,21 @@ record:
         hash: a34b00a52e331586
         size: 749
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 118f229260ce9ea666967454b034d41fd6546a30
+    hash_after: 118f229260ce9ea666967454b034d41fd6546a30
+    inputs:
+      - name: design/draft
+        hash: e0c47ca511b0c8fd
+        size: 9186
+      - name: design/tests-red
+        hash: 08c0f6bb927a556c
+        size: 1552
+      - name: [[spec/tickets/cage-hold-drops-port]]
+        hash: a34b00a52e331586
+        size: 749
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -369,8 +384,9 @@ What surprised me: Grep under a riding grace reaches the index door, which the f
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
@@ -441,3 +457,9 @@ What surprised me: Grep under a riding grace reaches the index door, which the f
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+**The gate, weighed.** The gate accepts. The approach ports each hold the ask names, in the bridge's order, and keys the state by session as the ask says.
+
+- the plan ask opens the one grace and the prompt and the update ask open the demands, which matches `src/bridge/plan.js`, `answer.js` and `ask.js`
+- each `done_when` line meets a red test: the two recorded logs and the Agent row of `every-refusal.jsonl` for the first, and the shared table for the second
+- the grace text names the work in hand where `.se/.runtime/plan.json` names one, so the implement reads that file under the root, as the command door does, though no case covers it
