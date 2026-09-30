@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-verbs-switch-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,19 @@ record:
         hash: e07c6471d1922e43
         size: 925
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 3f480422f34e40d763bdfdda73d52e00e3c947ad
+    hash_after: 3f480422f34e40d763bdfdda73d52e00e3c947ad
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/config fails
+    inputs:
+      - name: design/draft
+        hash: 37c497d04da200ac
+        size: 4528
+    def: 08e16d07b0de477c
 ---
 
 # Ask
