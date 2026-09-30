@@ -15,6 +15,7 @@
     "phase6switch": true,
     "phase7shadow": true,
     "phase8shadow": true,
+    "phase8switch": true,
     "phase9shadow": true,
     "verbs": "shadow",
     "cage": "shadow",
