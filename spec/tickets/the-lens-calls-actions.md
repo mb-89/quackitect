@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: implement/tests-green
+step: view
 record:
   - step: design/owner-read
     skipped: true
@@ -165,6 +165,25 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 2cccc3d1ddd93e5cfe88175814d6eb32fbca1bac
+    hash_after: 2cccc3d1ddd93e5cfe88175814d6eb32fbca1bac
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s); green, src/modules/verbs passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-lens-calls-actions.md:367:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: e381fe43c48eb17a
+        size: 966
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
 ---
 
 # Ask
@@ -373,26 +392,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/lens-actions.test.js src/modules/verbs/person_test.go src/quack/person_run_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every ticket button reaches its verb through the index. The lens, the save fill and the route edit post ticket/pull, ticket/fill and ticket/route to /v1/actions through acts on the index door, which answers a run as the old spawn did: the output on a 200, and the problem detail, which carries the verb output, on a refusal. Where no index stands, acts answers a refusal naming ./RUNME.sh index standing. Each post carries the person mark. The verbs module hands the node module the words and that mark, and the node module then runs the verb with the harness variables taken out, so a person click reads as a person hand in the pull whoever started the index. Pull for me takes the first row of work/yours. The spawn, asksVerb and runsVerb leave editor-lens.js, and the progress toast wraps acts in editor.js. The route host gains took for a message on a path, which the route case drives.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays within the size the gate weighed, plus route-host took and the spawn grep case under test/contract
+- every case builds its index door with acts, and the real door meets a real server in test/contract/editor-index.test.js
+- each new function, constant and field links spec/tickets/the-lens-calls-actions
+- the harness names stand in HARNESS in src/extension/lib/lens.js, and the Go copy names that owner beside it
 
 # accept
 
