@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88dc33717d8 · claude-code-remote
+    hash_before: 48909e257bc6bc19ceac1eec9d58d614bc74f86c
+    hash_after: 48909e257bc6bc19ceac1eec9d58d614bc74f86c
+    inputs:
+      - name: ask
+        hash: c4aed852cff1f0c8
+        size: 636
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,91 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The door's two verb seams give way to one action seam over the index door.
+
+- `src/extension/editor-index.js`: `indexDoor` gains `acts(name, input)`. It posts to `/v1/actions/<name>` and answers the shape `answerOf` in `lib/lens.js` reads. A 200 answers `{code: 0, out: result}`. A 422 answers `{code: 1, err: detail}`, since the problem's detail carries the verb's output. No index answers `{code: 1, err}` naming `./RUNME.sh index standing`.
+- `src/extension/lib/lens.js`: a new `actionOf(argv)` turns the words `argvOf`, `fillArgvOf` and `routeArgvOf` answer into the action `ticket/<verb>` and the input `{args, person: true}`. `took` and `saved` post through `door.index.acts`.
+- `src/extension/lib/route-host.js`: `routes` posts the same way.
+- `src/extension/sidebar.js`: `pullsNext` reads `work/yours` through `door.index.values`, takes its first row, and hands it to the lens. `counted` reads the value its counts line names through `door.index.values`.
+- `src/extension/editor-lens.js`: `asksVerb`, `runsVerb`, `ranOf`, `personEnv`'s caller and the `spawn` import leave. The progress toast wraps `acts` in `editor.js`.
+
+The index runs the node module under its own environment, and an agent's session may have started it. So a person's click would read as an agent's hand in `handOf` in `src/scripts/pull-hand-of.js`. `Words` in `src/modules/verbs/verbs.go` gains `person`. `Topic` then hands the node module a request whose args carry the words and that mark. `nodeAccept` in `src/quack/twins.go` runs such a request with the harness variables taken out, as `personEnv` does today.
+
+Weighed: keeping `runsVerb` as the seam name spares the lens's callers a change. But the name would then lie about what it does, and the ask names both seams leaving.
+
+Assumed: with no index standing, a ticket button refuses with a toast naming the verb that starts it. The extension starts no index, since the ask forbids a verb spawn.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/extension/editor-lens.js lensDoor asksVerb and runsVerb, which leave
+- src/extension/editor-lens.js ranOf, which leaves with its spawn
+- src/extension/editor-index.js indexDoor, which gains acts
+- src/extension/lib/lens.js ticketLensOf took and saved
+- src/extension/lib/route-host.js routeHostOf routes
+- src/extension/sidebar.js pullsNext and counted
+- src/modules/verbs/verbs.go Topic and Words
+- src/quack/twins.go nodeAccept and wordsOf
+- test/level0/lens.test.js doorOf, whose fake holds runsVerb
+- test/level0/route-host.test.js, whose fake holds runsVerb
+- test/level0/save-fills.test.js, whose fake holds runsVerb
+- test/level0/sidebar-work.test.js doorOf, whose fake holds asksVerb and runsVerb
+- test/level0/sidebar-views.test.js, whose fake holds asksVerb
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/level0/lens-actions.test.js each ticket button posts its action: pass, fail, drop, take and back post ticket/pull with the words and person
+- test/level0/lens-actions.test.js a save posts ticket/fill, and a route edit posts ticket/route
+- test/level0/lens-actions.test.js a refusal reads its word off the 422 detail
+- test/level0/lens-actions.test.js pull for me takes the first row of work/yours
+- test/level0/lens-actions.test.js no verb spawn stands in the extension: git grep for spawn( over src/extension names none
+- src/quack/twins_test.go TestAPersonRunCarriesNoHarness: a request marked person runs with no harness variable
+- src/modules/verbs/verbs_test.go TestAVerbActionCarriesThePersonMark: the action hands the node module the words and the mark
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/extension/editor-index.js
+- src/extension/editor-lens.js
+- src/extension/editor.js
+- src/extension/lib/lens.js
+- src/extension/lib/route-host.js
+- src/extension/sidebar.js
+- src/modules/verbs/verbs.go
+- src/modules/verbs/verbs_test.go
+- src/quack/twins.go
+- src/quack/twins_test.go
+- test/level0/lens-actions.test.js
+- test/level0/lens.test.js
+- test/level0/route-host.test.js
+- test/level0/save-fills.test.js
+- test/level0/sidebar-work.test.js
+- test/level0/sidebar-views.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every name stands opened on this branch: indexDoor, lensDoor, ranOf, ticketLensOf, routes, pullsNext, counted, personEnv, answerOf, Topic, Words, nodeAccept, wordsOf, handOf and the actions route in src/index/actions.go
+- git grep for asksVerb, runsVerb, index.calls and ranOf names every caller above
+- the spawn line meets the grep case in lens-actions.test.js, the buttons line meets its button cases, and the check line meets ./RUNME.sh check
 
 ## tests-red
 
