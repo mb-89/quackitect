@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: sidebar-switches-over
 depends_on: [config-answers-keys-and-overrides]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: d8e34f6fff8ed198
         size: 5290
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88ef4f8a2d6 · claude-code-remote
+    hash_before: 35cdd68eb7074298f469c6a6778e1ac9ae0d7827
+    hash_after: 35cdd68eb7074298f469c6a6778e1ac9ae0d7827
+    inputs:
+      - name: design/draft
+        hash: d8e34f6fff8ed198
+        size: 5290
+      - name: design/tests-red
+        hash: 391eea19266a6d16
+        size: 1863
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -322,8 +334,15 @@ Each case fails on its own assertion: the schema stands outside the config globs
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask: every value the sidebar draws moves onto index.values, one index watch replaces the three file watches, and the count reads work/open-tasks with no spawn
+- each done_when line meets a red case: the grep and the fake index draw and the watch redraw in test/level0/sidebar-v1.test.js, the watch stream in test/contract/editor-index.test.js, and the check at tests-green
+- fix in place: src/modules/modules.go registers nothing, so views.Registers joins projected in src/quack/main.go beside queue and holds, which load unprefixed, and size names main.go in place of modules.go
+- fix in place: q.Ordered carries no MarshalJSON, so /v1 hands each config and bless projection as Keys, Fields, Items and Literal; the sidebar decodes that form in one helper under src/extension/lib, since a JSON form on q.Ordered reaches every /v1 reader past this ask
+- fix in place: the bless projection joins holds.Registers in src/modules/holds/holds.go in place of a new src/modules/verbs/bless.go, and TestBlessProjectsTheFile stands in holds_test.go
+- weighed: the size reaches four old sidebar tests, which the change moves to the index door where they read files; each rides the same ask
 
 # implement
 
