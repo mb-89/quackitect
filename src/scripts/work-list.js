@@ -19,6 +19,7 @@ import { answerOf } from "./work-answer.js";
 import {
   COL,
   DONE,
+  dependsOn,
   HELD,
   MERGED,
   readWork,
@@ -76,7 +77,14 @@ function rowOf(one, standing, now, it) {
   const text = one.ticket;
   const status = standing.get(one.branch) || "no status";
   const waits = waitsOf(one, standing);
-  const why = waits.length ? `waits for ${waits.join(", ")}` : markOf(text);
+  // A branch behind trunk says so after what it waits for and before the mark. [[spec/tickets/the-queue-views-agree]]
+  const why = [
+    waits.length ? `waits for ${waits.join(", ")}` : "",
+    one.behind ? "behind main" : "",
+    waits.length ? "" : markOf(text),
+  ]
+    .filter(Boolean)
+    .join(", ");
   // [[spec/design_output/work#a-stale-group-is-yours]]
   const { age, stale } =
     status === HELD ? staleClaim(one, now, it) : { age: "", stale: false };
@@ -92,13 +100,23 @@ function rowOf(one, standing, now, it) {
 // [[spec/design_output/work#a-ticket-under-its-group]]
 function childRows(one, all = false) {
   if (!one.ticket) return [];
+  // A child waits on a ticket standing open on the same tip. [[spec/tickets/the-queue-views-agree]]
+  const open = new Set(
+    one.tickets
+      .filter((child) => stateOf(child.text) === OPEN)
+      .map((child) => child.name),
+  );
   return one.tickets
     .filter((child) => fieldOf(child.text, GROUP) === one.name)
     .filter((child) => all || stateOf(child.text) !== CLOSED)
-    .map((child) => ({
-      stale: false,
-      said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${whyOf(child.text)}`,
-    }));
+    .map((child) => {
+      const waits = dependsOn(child.text).filter((name) => open.has(name));
+      const why = waits.length ? `waits for ${waits.join(", ")}` : whyOf(child.text);
+      return {
+        stale: false,
+        said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${why}`,
+      };
+    });
 }
 
 // [[spec/design_output/work#a-ticket-under-its-group]]

@@ -7,7 +7,6 @@
 package main
 
 import (
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -22,16 +21,9 @@ import (
 func workWindow(t *testing.T, n int) frame.Model {
 	t.Helper()
 	m := window(n)
-	root := workTree(t)
-	m.Path = filepath.Join(root, ".se", ".log", "session.jsonl")
-	tree, err := work.Load(m.Path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	out, _ := m.Update(work.Msg{Tree: tree})
-	// The queue view keeps the placed rows, so a case lays places over the three rows the way the verb does. [[spec/design_output/pull#the-queue-is-an-outline]]
-	places, _ := work.PlacesIn([]byte(`{"branches":[{"name":"one-group","queue":"1","tickets":[{"name":"a-child","queue":"1.1"}]}],"loose":[{"name":"a-loose-one","queue":"2"}]}`))
-	out, _ = out.(frame.Model).Update(work.PlacesMsg{Places: places})
+	m.Path = logOf(workTree(t))
+	// The queue view keeps the placed rows, and each row carries its place. [[spec/design_output/pull#the-queue-is-an-outline]]
+	out, _ := m.Update(work.Msg{Tree: loadWork(t, workRowsSaid)})
 	return out.(frame.Model)
 }
 

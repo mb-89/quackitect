@@ -28,6 +28,8 @@ import { forgetsReads, readsNext } from "./handover.js";
 import { dropsHandover } from "./plan.js";
 import { readTools, writeSurvey } from "../engine/tools.js";
 import { asks } from "./config.js";
+import { indexToolsOf } from "./index-tools.js";
+import { SERVED } from "../../.claude/skills/level0/lib/index-tools.js";
 import { deadIndexLine } from "./search.js";
 
 const GUIDANCE = "spec/guidance";
@@ -263,27 +265,14 @@ function toolsText(box) {
   ].join("\n");
 }
 
-// The command line's help rows stand as the one source of the verbs, read once a box. A spawn that fails leaves the part out. [[spec/tickets/the-verbs-need-no-wrapper]]
+// The index's tool list stands as the one source of the verbs. A binary listing none leaves the part out, since the hook registers no tool there. [[spec/tickets/agents-call-quack-directly]]
 function verbsText(box) {
-  if (!box.verbs) {
-    let said = "";
-    try {
-      const ran = box.proc.run(
-        [box.node ?? "node", `${box.method}/src/scripts/cli.js`, "help"],
-        { cwd: box.work },
-      );
-      if (ran.exitCode === 0) said = String(ran.stdout ?? "");
-    } catch {}
-    box.verbs = [...said.matchAll(/^ {2}(\S+)\s+(.+)$/gm)].map((one) => ({
-      name: one[1],
-      says: one[2].trim(),
-    }));
-  }
-  if (!box.verbs.length) return "";
+  const tools = indexToolsOf(box);
+  if (!tools.length) return "";
   return [
     VERBS_HEADING,
     "",
-    ...box.verbs.map((one) => `- \`./RUNME.sh ${one.name}\`: ${one.says}`),
+    ...tools.map((one) => `- \`${SERVED}${one.name}\`: ${one.description}`),
   ].join("\n");
 }
 

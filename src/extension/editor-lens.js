@@ -8,7 +8,7 @@ const { spawn } = require("node:child_process");
 const { realpathSync } = require("node:fs");
 const { join } = require("node:path");
 
-const { CLI, personEnv } = require("./lib/lens.js");
+const { PROGRAMS, personEnv } = require("./lib/lens.js");
 
 const TICKETS = "{spec/tickets,.se/tickets}/*.md";
 const NODE = "node";
@@ -62,7 +62,9 @@ function lensDoor(context, folder) {
 
     // A closed pick answers empty. [[spec/tickets/the-host-runs-the-verbs]]
     async picks(prompt, options) {
-      return (await vscode.window.showQuickPick(options, { placeHolder: prompt })) ?? "";
+      return (
+        (await vscode.window.showQuickPick(options, { placeHolder: prompt })) ?? ""
+      );
     },
 
     async asksLine(prompt) {
@@ -86,7 +88,7 @@ function lensDoor(context, folder) {
     // A verb a draw runs, so no progress toast rides it. [[spec/tickets/the-work-group-draws-buttons]]
     asksVerb(argv) {
       const home = join(realpathSync.native(context.extensionPath), "..", "..");
-      return ranOf(join(home, ...CLI.split("/")), argv, root);
+      return ranOf(home, argv, root);
     },
 
     runsVerb(argv) {
@@ -96,18 +98,20 @@ function lensDoor(context, folder) {
           location: vscode.ProgressLocation.Notification,
           title: argv.join(" "),
         },
-        () => ranOf(join(home, ...CLI.split("/")), argv, root),
+        () => ranOf(home, argv, root),
       );
     },
   };
 }
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-function ranOf(cli, argv, root) {
+function ranOf(home, argv, root) {
+  const [verb, ...words] = argv;
+  const program = join(home, ...PROGRAMS.split("/"), `${verb}.js`);
   return new Promise((resolve) => {
     let out = "";
     let err = "";
-    const child = spawn(NODE, [cli, ...argv], {
+    const child = spawn(NODE, [program, ...words], {
       cwd: root,
       env: personEnv(process.env, root),
       windowsHide: true,

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,7 +116,8 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+group: the-engine-fixes-its-faults
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -155,6 +156,38 @@ record:
         hash: 61870ef475e8bd94
         size: 1345
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 5c34e479c09290f225becedc368a4be55d8c77ed
+    hash_after: 5c34e479c09290f225becedc368a4be55d8c77ed
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 1a1a1f91a95d1c90bfe2f15852e291356f0824f0
+    hash_after: 1a1a1f91a95d1c90bfe2f15852e291356f0824f0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/pull-hand-of.js:61:38: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    inputs:
+      - name: design/tests-red
+        hash: 61870ef475e8bd94
+        size: 1345
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -334,14 +367,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change adds lib/log.js and server.js to the drafted files, so serve.js calls the log read and keeps no copy
+- the desk start reaches the proc and disk doors, and both carry fakes under src/doors/fake
+- each new function links its section, and the serve verb links a-desk-serve-returns
+- the log read stands once in lib/log.js, and the design notes point at the function that holds each road
 
 ## tests-green
 
@@ -350,26 +388,43 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/serve.test.js test/contract/desk-start.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The bridge on a desk now outlives whatever starts it.
+
+| start | before | now |
+|---|---|---|
+| the hook button | a child of the editor, killed when the window goes | detached through the proc door, adopted again on the next open |
+| `./RUNME.sh serve` | a child of the shell | detached, and the verb returns; a second run finds it standing |
+| `./RUNME.sh serve --inspect` | a child of the shell | the same, because the debugger holds it |
+
+A start that falls inside its window names the line it writes to the serve log.
+
+The owner checks one thing on a Windows desk, since no case reads the editor job: press the hook button, close the editor, then ask `/health` on the bridge port. An answer there closes the job doubt, and silence sends the start through WMI next.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests-green commit touches no file past the change leaf
+- the proc and disk doors the start reaches carry fakes, and the contract case drives the real proc door
+- the comments link the sections that hold each road
+- the log read stands once in lib/log.js, and both roads call it
 
 # accept
 
@@ -397,5 +452,5 @@ The owner's words: the hook, the bridge, dies all the time on this box. Fix that
 
 A read of the code found two more faults, graded as read:
 
-- plausible, unchecked: a respawn with `detached` alone stays inside the editor's job object on Windows, so closing the editor may kill it too. Closing the editor while a respawned server stands, then asking `/health`, settles it
-- checked in `src/bridge/server.js`: `boxesOf` keys boxes on the raw root, so a `C:` root and a `c:` root build two boxes on one server
+- plausible, unchecked: a respawn with `detached` alone stays inside the editor's job object on Windows. So closing the editor may kill it too. Closing the editor while a respawned server stands, then asking `/health`, settles it
+- checked in `src/bridge/server.js`: `boxesOf` keys boxes on the raw root. So a `C:` root and a `c:` root build two boxes on one server

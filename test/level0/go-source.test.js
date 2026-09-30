@@ -27,7 +27,7 @@ const tree = () =>
 test("the three binaries name their folders", () => {
   assert.deepEqual(BUILDS, {
     "se-lsp": "src/lsp",
-    "se-index": "src/index",
+    "se-index": "src/quack",
     "se-front": "src/front/cmd",
   });
 });

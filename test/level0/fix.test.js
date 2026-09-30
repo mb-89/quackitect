@@ -46,13 +46,13 @@ test("fix refuses an unknown flag, and runs nothing over the tree", async () => 
   ]);
 });
 
-// The dispatch hands the verb its words whole, so a flag reaches the refusal. The command line loads here first, under the argv this case sets. [[spec/tickets/the-small-faults-land]]
-test("the fix row in the command line hands the verb its flags, so an unknown one refuses", async () => {
+// The fix program hands the verb its words whole, so a flag reaches the refusal. [[spec/tickets/the-small-faults-land]]
+test("the fix program hands the verb its flags, so an unknown one refuses", async () => {
   const was = process.argv;
-  process.argv = [was[0], "/nowhere/cli.js", "fix", "--apply-everything"];
+  process.argv = [was[0], "/nowhere/verbs/fix.js", "--apply-everything"];
   try {
-    const { verbs } = await import("../../src/scripts/cli.js");
-    const { code, said, spawned } = await ranFix([], () => verbs.fix.run(["."]));
+    const { run } = await import("../../src/scripts/verbs/fix.js");
+    const { code, said, spawned } = await ranFix([], () => run(["--apply-everything"]));
     assert.equal(code, 2, said);
     assert.match(said, /fix knows no flag --apply-everything/);
     assert.deepEqual(spawned, [], "nothing runs over the tree");

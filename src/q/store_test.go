@@ -4,6 +4,7 @@
 package q
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -11,14 +12,14 @@ import (
 
 func TestASnapshotReadsOneRevision(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
-	s := NewStore(c, nil)
-	first, err := s.Commit(s.Snapshot().Revision, map[string]any{"t/n": 1})
+	n := OutIn(c, "t/n", 0)
+	s := NewStore(c)
+	first, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1})
 	if err != nil {
 		t.Fatal(err)
 	}
 	before := s.Snapshot()
-	second, err := s.Commit(before.Revision, map[string]any{"t/n": 2})
+	second, err := s.Commit(before.Revision, n, map[string]any{"t/n": 2})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -33,18 +34,18 @@ func TestASnapshotReadsOneRevision(t *testing.T) {
 
 func TestANameNobodyWritesReadsItsDefault(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 7)
-	if got := NewStore(c, nil).Snapshot().Read("t/n"); got != 7 {
+	OutIn(c, "t/n", 7)
+	if got := NewStore(c).Snapshot().Read("t/n"); got != 7 {
 		t.Fatalf("the default reads %v", got)
 	}
 }
 
 func TestARunCommitsTheRevisionItRead(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
+	n := OutIn(c, "t/n", 0)
 	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N * 2 })
-	s := NewStore(c, nil)
-	read, err := s.Commit(0, map[string]any{"t/n": 3})
+	s := NewStore(c)
+	read, err := s.Commit(0, n, map[string]any{"t/n": 3})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +61,7 @@ func TestARunCommitsTheRevisionItRead(t *testing.T) {
 func TestAFoldReducesEachEvent(t *testing.T) {
 	c := New()
 	FoldIn(c, "t/sum", 0, func(sum, event int) int { return sum + event })
-	s := NewStore(c, nil)
+	s := NewStore(c)
 	for _, event := range []int{1, 2, 3} {
 		if err := s.Land("t/sum", event); err != nil {
 			t.Fatal(err)
@@ -73,16 +74,16 @@ func TestAFoldReducesEachEvent(t *testing.T) {
 
 func TestAFamilyAnswersEachKey(t *testing.T) {
 	c := New()
-	GivenIn(c, "ops/<id>", "none")
-	s := NewStore(c, nil)
-	if _, err := s.Commit(0, map[string]any{"ops/7": "running"}); err != nil {
+	ops := OutIn(c, "ops/<id>", "none")
+	s := NewStore(c)
+	if _, err := s.Commit(0, ops, map[string]any{"ops/7": "running"}); err != nil {
 		t.Fatal(err)
 	}
 	now := s.Snapshot()
 	if now.Read("ops/7") != "running" || now.Read("ops/8") != "none" {
 		t.Fatalf("the family reads %v and %v", now.Read("ops/7"), now.Read("ops/8"))
 	}
-	if _, err := s.Commit(0, map[string]any{"nobody/7": 1}); err == nil {
+	if _, err := s.Commit(0, ops, map[string]any{"nobody/7": 1}); err == nil {
 		t.Fatal("a commit to a name the catalog lacks lands")
 	}
 }
@@ -90,16 +91,16 @@ func TestAFamilyAnswersEachKey(t *testing.T) {
 // [[spec/tickets/files-topic-reads-the-rows]]
 func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
 	c := New()
-	GivenIn(c, "files/<path...>", "")
-	s := NewStore(c, nil)
-	if _, err := s.Commit(0, map[string]any{"files/spec/deep/One.md": "said"}); err != nil {
+	files := OutIn(c, "files/<path...>", "")
+	s := NewStore(c)
+	if _, err := s.Commit(0, files, map[string]any{"files/spec/deep/One.md": "said"}); err != nil {
 		t.Fatal(err)
 	}
 	now := s.Snapshot()
 	if now.Read("files/spec/deep/One.md") != "said" || now.Read("files/two.md") != "" {
 		t.Fatalf("the family reads %v and %v", now.Read("files/spec/deep/One.md"), now.Read("files/two.md"))
 	}
-	if _, err := s.Commit(0, map[string]any{"files": "bare"}); err == nil {
+	if _, err := s.Commit(0, files, map[string]any{"files": "bare"}); err == nil {
 		t.Fatal("a name with no segment for the key lands")
 	}
 }
@@ -107,31 +108,31 @@ func TestAKeyOfManySegmentsTakesTheRestOfTheName(t *testing.T) {
 // [[spec/tickets/files-topic-reads-the-rows]]
 func TestAKeyOfManySegmentsFollowsAKeyOfOne(t *testing.T) {
 	c := New()
-	GivenIn(c, "trees/<tree>/<path...>", 0)
-	if faults := c.Check(nil); len(faults) > 0 {
+	trees := OutIn(c, "trees/<tree>/<path...>", 0)
+	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the check answers %+v", faults)
 	}
-	s := NewStore(c, nil)
-	if _, err := s.Commit(0, map[string]any{"trees/a/spec/one.md": 1}); err != nil {
+	s := NewStore(c)
+	if _, err := s.Commit(0, trees, map[string]any{"trees/a/spec/one.md": 1}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := s.Commit(0, map[string]any{"trees/a": 1}); err == nil {
+	if _, err := s.Commit(0, trees, map[string]any{"trees/a": 1}); err == nil {
 		t.Fatal("a name with no segment for the rest lands")
 	}
-	if _, err := s.Commit(0, map[string]any{"trees//one.md": 1}); err == nil {
+	if _, err := s.Commit(0, trees, map[string]any{"trees//one.md": 1}); err == nil {
 		t.Fatal("a name with an empty segment for the key lands")
 	}
 }
 
-func TestAnActionDeclaresItsHandleAndItsWrite(t *testing.T) {
+func TestAnActionDeclaresItsDeadlineAndItsWrite(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/pull", 0, Op(), Writes())
-	GivenIn(c, "t/read", 0)
-	s := NewStore(c, nil)
-	if got, ok := s.Declared("t/pull"); !ok || !got.Op || !got.Writes {
+	OutIn(c, "t/pull", 0, Deadline(time.Minute), Writes())
+	OutIn(c, "t/read", 0)
+	s := NewStore(c)
+	if got, ok := s.Declared("t/pull"); !ok || got.Deadline != time.Minute || !got.Writes {
 		t.Fatalf("t/pull declares %+v", got)
 	}
-	if got, ok := s.Declared("t/read"); !ok || got.Op || got.Writes {
+	if got, ok := s.Declared("t/read"); !ok || got.Deadline != 0 || got.Writes {
 		t.Fatalf("t/read declares %+v", got)
 	}
 	if _, ok := s.Declared("t/none"); ok {
@@ -141,9 +142,9 @@ func TestAnActionDeclaresItsHandleAndItsWrite(t *testing.T) {
 
 func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
-	GivenIn(c, "t/m", 0)
-	s := NewStore(c, nil)
+	n := OutIn(c, "t/n", 0)
+	OutIn(c, "t/m", 0)
+	s := NewStore(c)
 	since := time.Unix(1_700_000_000, 0)
 	if err := s.Stale("t/n", since); err != nil {
 		t.Fatal(err)
@@ -154,7 +155,7 @@ func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
 	if _, stale := s.Snapshot().Stale("t/m"); stale {
 		t.Fatal("t/m reads stale beside t/n")
 	}
-	if _, err := s.Commit(0, map[string]any{"t/n": 1}); err != nil {
+	if _, err := s.Commit(0, n, map[string]any{"t/n": 1}); err != nil {
 		t.Fatal(err)
 	}
 	if _, stale := s.Snapshot().Stale("t/n"); stale {
@@ -163,8 +164,150 @@ func TestACommitOfThePartClearsItsStaleMark(t *testing.T) {
 }
 
 func TestAStaleMarkOnANameNobodyProvidesRefuses(t *testing.T) {
-	s := NewStore(New(), nil)
+	s := NewStore(New())
 	if err := s.Stale("t/none", time.Unix(0, 0)); err == nil || !strings.Contains(err.Error(), "t/none") {
 		t.Fatalf("the mark answers %v", err)
+	}
+}
+
+func TestADropRemovesTheValuesItsWriterOwns(t *testing.T) {
+	c := New()
+	n := OutIn(c, "t/<id>", 0)
+	s := NewStore(c)
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/a": 1, "t/b": 2}); err != nil {
+		t.Fatal(err)
+	}
+	before := s.Snapshot()
+	if _, err := s.Drop(before.Revision, n, "t/a"); err != nil {
+		t.Fatal(err)
+	}
+	after := s.Snapshot()
+	if _, held := after.values["t/a"]; held || after.Read("t/b") != 2 || after.Revision <= before.Revision {
+		t.Fatalf("the drop leaves %v at %d", after.values, after.Revision)
+	}
+	if before.Read("t/a") != 1 {
+		t.Fatal("the drop reaches the snapshot before it")
+	}
+}
+
+func TestADropRefusesANameNobodyProvides(t *testing.T) {
+	c := New()
+	n := OutIn(c, "t/n", 0)
+	s := NewStore(c)
+	if _, err := s.Drop(s.Snapshot().Revision, n, "t/gone"); err == nil {
+		t.Fatal("the drop takes a name nobody provides")
+	}
+}
+
+// [[spec/tickets/commits-name-their-writer]]
+func TestADropRefusesANameAnotherWriterOwns(t *testing.T) {
+	c := New()
+	n := OutIn(c, "t/n", 0)
+	other := OutIn(c, "t/m", 0)
+	s := NewStore(c)
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := s.Drop(s.Snapshot().Revision, other, "t/n"); err == nil || !strings.Contains(err.Error(), "t/n") {
+		t.Fatalf("a drop of t/n as the writer of t/m answers %v", err)
+	}
+	if got := s.Snapshot().Read("t/n"); got != 1 {
+		t.Fatalf("t/n reads %v after the refusal", got)
+	}
+}
+
+// [[spec/design_output/model#what-stays-how-long]]
+func TestARefusedDropLeavesEveryValue(t *testing.T) {
+	c := New()
+	n := OutIn(c, "t/n", 0)
+	s := NewStore(c)
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
+		t.Fatal(err)
+	}
+	before := s.Snapshot().Revision
+	if _, err := s.Drop(before, n, "t/n", "t/gone"); err == nil {
+		t.Fatal("the drop takes a name nobody provides")
+	}
+	if after := s.Snapshot(); after.Read("t/n") != 1 || after.Revision != before {
+		t.Fatalf("the refused drop leaves t/n at %v, revision %d", after.Read("t/n"), after.Revision)
+	}
+}
+
+// [[spec/design_output/model#the-fake-index]]
+func TestAListenerReadsTheSnapshotOfItsCommit(t *testing.T) {
+	c := New()
+	n := OutIn(c, "t/n", 0)
+	s := NewStore(c)
+	var read []any
+	s.OnCommit(func(values map[string]any) { read = append(read, values["t/n"], s.Snapshot().Read("t/n")) })
+	if _, err := s.Commit(s.Snapshot().Revision, n, map[string]any{"t/n": 1}); err != nil {
+		t.Fatal(err)
+	}
+	if len(read) != 2 || read[0] != 1 || read[1] != 1 {
+		t.Fatalf("the listener reads %v", read)
+	}
+}
+
+// [[spec/tickets/files-seed-one-type]]
+func TestAnUntrackedPathReadsTheEmptyContent(t *testing.T) {
+	c := New()
+	OutIn(c, "files/<path...>", Content{})
+	if got := NewStore(c).Snapshot().Read("files/spec/a.md"); got != (Content{}) {
+		t.Fatalf("files/spec/a.md reads %+v", got)
+	}
+}
+
+// A guarded fold's step refuses an event, so the land answers its error and the state stands. [[spec/tickets/the-config-module-resolves-layers]]
+func TestAGuardedFoldRefusesAndKeepsItsState(t *testing.T) {
+	c := New()
+	GuardIn(c, "t/held", 0, func(held, add int) (int, error) {
+		if held+add > 5 {
+			return held, fmt.Errorf("t/held stands at %d, and %d passes five", held, add)
+		}
+		return held + add, nil
+	}, Doc("a sum that stays at five or under"))
+	s := NewStore(c)
+	if err := s.Land("t/held", 3); err != nil {
+		t.Fatalf("the land of 3 answers %v", err)
+	}
+	if err := s.Land("t/held", 4); err == nil || !strings.Contains(err.Error(), "passes five") {
+		t.Fatalf("the land of 4 answers %v, and no refusal", err)
+	}
+	if got := s.Snapshot().Read("t/held"); got != 3 {
+		t.Fatalf("t/held reads %v after the refusal", got)
+	}
+}
+
+// The store lists each name in catalog order, a family by its pattern, and hands the presentation of its active owner. [[spec/tickets/the-catalog-reads-as-rows]]
+func TestAStoreNamesEachNameAndItsPresentation(t *testing.T) {
+	c := New()
+	OutIn(c, "t/n", 0, Doc("a count"), Label("Count"))
+	OutIn(c, "t/items/<id>", 0, Doc("an item"))
+	s := NewStore(c)
+	if got := s.Names(); len(got) != 2 || got[0] != "t/n" || got[1] != "t/items/<id>" {
+		t.Fatalf("the store names %v", got)
+	}
+	if said, ok := s.Presentation("t/n"); !ok || said.Doc != "a count" || said.Label != "Count" {
+		t.Fatalf("t/n presents %+v, %v", said, ok)
+	}
+	if _, ok := s.Presentation("t/none"); ok {
+		t.Fatal("a name nobody provides presents itself")
+	}
+}
+
+// [[spec/tickets/the-hooks-door-lands]]
+func TestFoldsAnswerEveryFoldUnderThePrefixSorted(t *testing.T) {
+	c := New()
+	keep := func(n, _ int) int { return n }
+	FoldIn(c, "session/<id>/b", 0, keep)
+	FoldIn(c, "session/<id>/a", 0, keep)
+	FoldIn(c, "other/<id>", 0, keep)
+	OutIn(c, "session/<id>/events", 0)
+	got := NewStore(c).Folds("session/<id>/")
+	if strings.Join(got, " ") != "session/<id>/a session/<id>/b" {
+		t.Fatalf("the folds read %v, and want the two folds under session/<id>/, sorted", got)
+	}
+	if none := NewStore(c).Folds("log/"); none == nil || len(none) != 0 {
+		t.Fatalf("a prefix no fold opens on reads %#v, and wants an empty list", none)
 	}
 }

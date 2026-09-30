@@ -292,7 +292,7 @@ function commitDoors() {
     env: {},
   };
   for (const verb of ["test", "check"]) {
-    git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), verb], {
+    git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", `${verb}.js`)], {
       exitCode: 0,
       stdout: "ok\n",
     });

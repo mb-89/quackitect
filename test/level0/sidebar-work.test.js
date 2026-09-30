@@ -73,12 +73,15 @@ test("the work group draws the three buttons the config declares", async () => {
     assert.ok(section.includes(`data-key="${key}"`), key);
 });
 
-test("the work editor's button carries the number in the work tab's brackets", async () => {
+// The badge asks the index for the count the work tab's brackets read. [[spec/tickets/the-count-chain-leaves]]
+test("the work editor's button carries the count the index answers", async () => {
   const door = doorOf({
-    answers: { "tui work": { code: 0, out: '{"count":3}\n', err: "" } },
+    answers: { "index call": { code: 0, out: "3\n", err: "" } },
   });
   const html = await sidebarOf(door).html();
-  assert.deepEqual(door.said.quiet, [["tui", "work", "--count"]]);
+  assert.deepEqual(door.said.quiet, [
+    ["index", "call", "value", '{"name":"work/open-tasks"}'],
+  ]);
   assert.deepEqual(door.said.ran, []);
   const button = html.slice(html.indexOf('data-key="work.editor"'));
   assert.match(

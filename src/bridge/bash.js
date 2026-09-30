@@ -3,6 +3,7 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { join } from "node:path";
+import { indexToolsOf } from "./index-tools.js";
 import {
   commitIn,
   findings,
@@ -22,7 +23,12 @@ import {
   refusedCommand,
   refusedDelta,
 } from "../../.claude/skills/level0/lib/refuse.js";
-import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import {
+  ENGINE,
+  STAMP,
+  saysGreen,
+  stampOf,
+} from "../../.claude/skills/level0/lib/runs.js";
 import { fileText } from "../../.claude/skills/level0/lib/scripted.js";
 import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.js";
 import {
@@ -67,7 +73,17 @@ export async function onBash(e, box) {
     const found = await check(command, e, box, held);
     if (found) return { result: { deny: found } };
   }
-  return messageWarns(held.warned ?? [], box) ?? PASS;
+  const warned = messageWarns(held.warned ?? [], box);
+  const marked = markedPush(command, e);
+  return warned || marked ? { ...warned, ...marked } : PASS;
+}
+
+const VERB = /(^|[\s;&|(])\.\/RUNME\.sh(\s|$)/;
+
+// A push or a verb the engine lets through carries the mark, so the push door gates it. [[spec/tickets/push-gate-needs-the-engine]]
+export function markedPush(command, e) {
+  if (!touchesGit(command).pushes && !VERB.test(command)) return null;
+  return { event: { ...e, command: `export ${ENGINE}=1; ${command}` } };
 }
 
 // [[spec/design_output/level0#a-shell-names-its-ticket]]
@@ -108,9 +124,10 @@ function ticketDoor(command, e, box) {
 }
 
 // [[spec/design_output/bash#the-description-names-verbs]]
-export function onDescribe(e) {
+export function onDescribe(e, box) {
   if (String(e?.tool ?? "") !== "Bash") return PASS;
-  return { after: { description: verbLine() } };
+  // The line names the tools the session holds, and the verbs where the index lists none. [[spec/tickets/describe-reaches-the-tool-list]]
+  return { after: { description: verbLine(box ? indexToolsOf(box) : []) } };
 }
 
 // The box carries no join, so the door hands the reading the work root and the join of the path module. [[spec/tickets/one-door-joins-a-path]]

@@ -272,6 +272,15 @@ test("one press moves one rung, and a press after the burst moves back", async (
   assert.equal(local(door).stop.hold, "off");
 });
 
+// A press moves from the built-in where no file sets the key, so a press off finish moves back to rest. [[spec/tickets/the-config-schema-gets-generated]]
+test("a press moves from the built-in", async () => {
+  const built = structuredClone(schema);
+  built.properties.stop.properties.hold.default = "finish";
+  const door = doorOf({ [SCHEMA]: JSON.stringify(built), [TRACKED]: "{}" });
+  await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
+  assert.equal(local(door).stop.hold, "off");
+});
+
 // [[spec/design_output/extension#a-press-writes-a-line]]
 test("a press, a run and an edit each write a sidebar line naming what moved", async () => {
   const door = doorOf();
@@ -451,6 +460,7 @@ test("the view opening draws the page once, and the watcher draws it again", asy
     TRACKED,
     LOCAL,
     BLESS_FILE,
+    "spec/views/*.base",
   ]);
 
   door.files.write(LOCAL, JSON.stringify({ stop: { hold: "finish" } }));
@@ -478,4 +488,39 @@ test("a bless message writes the bless file, and leaves the config files alone",
 
   await sidebar.took({ kind: "bless", value: false });
   assert.deepEqual(JSON.parse(door.files.read(BLESS_FILE)), { agent: false });
+});
+
+// A ticket write draws the badge again once its burst settles, with no window reload. [[spec/tickets/the-badge-reads-open-tasks]]
+test("a ticket write draws the badge again once its burst settles", async () => {
+  const door = doorOf();
+  const timers = [];
+  door.later = (run, span) => {
+    const one = { run, span, cancelled: false, cancel: () => (one.cancelled = true) };
+    timers.push(one);
+    return one;
+  };
+  const drawn = [];
+  await activate({}, door);
+  await door.said.views.get("quackitect.sidebar")({
+    set: (html) => drawn.push(html),
+    onMessage: () => {},
+  });
+
+  const watch = door.said.watched.find((one) =>
+    one.paths.includes("spec/tickets/*.md"),
+  );
+  assert.ok(watch, "the view watches the ticket folders");
+  assert.deepEqual(watch.paths, [
+    "spec/tickets/*.md",
+    ".se/tickets/*.md",
+    ".se/.runtime/plan.json",
+    ".se/.runtime/hold/*.json",
+  ]);
+
+  watch.draw();
+  watch.draw();
+  watch.draw();
+  assert.equal(drawn.length, 1, "a burst draws nothing before it settles");
+  await timers.at(-1).run();
+  assert.equal(drawn.length, 2, "the settled burst draws once");
 });

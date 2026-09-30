@@ -23,7 +23,7 @@ const (
 )
 
 // A mark a YAML reader takes for something other than text when a value opens on it. [[spec/tickets/go-writes-the-frontmatter]]
-const marks = "\"'[{&*!|>%@`#"
+const marks = "\"'[]{},&*!|>%@`# \t"
 
 var link = regexp.MustCompile(`^\[\[[^\[\]]*\]\]$`)
 

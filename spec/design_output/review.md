@@ -77,10 +77,11 @@ The things below follow from where that worktree lands:
 | the thing | what the verb does |
 |---|---|
 | the worktree carries no `.se/.runtime/bin` | copies `.se/.runtime/tools.json` in, whose paths name this box's binaries |
-| `RUNME.sh` downloads every tool | runs `node src/scripts/cli.js check`, leaving the install script out |
+| `RUNME.sh` downloads every tool | runs `node src/scripts/verbs/check.js`, leaving the install script out |
 | the install script stamps the brand, and git ignores what it writes | stamps the worktree through `stamps` in `src/scripts/brand.js`, with the brand of the caller's tree |
 | the worktree carries no `node_modules` and no `.se/.runtime/bin/zig`, and the survey names no compiler [[spec/design_output/index#the-compiler-it-needs]] | links the caller's two in, and unlinks them before `git worktree remove` |
 | the check writes its own builds into `.se/.runtime/bin` | borrows the compiler's folder alone, so a branch's build lands in the worktree's own bin |
+| the check mints through `se-front`, which the install alone builds | builds the branch's own `se-front` into the worktree's bin before the check |
 | the check stamps `.se/.runtime/check.json` | lets it land in the worktree, so the caller's own stamp stands |
 
 `.se` is git ignored, so the worktree lands where nothing tracks it, and
@@ -164,7 +165,7 @@ The table below covers that call, both measured on client 2.1.267:
 | the thing | what the hook does |
 |---|---|
 | `timeoutMs` holds ten minutes at most | asks for five, and a longer ask rejects the call and skips the hook |
-| `RUNME.sh` writes install lines to both streams | runs `node src/scripts/cli.js`, whose output is the verb's alone |
+| `RUNME.sh` writes install lines to both streams | runs `node src/scripts/verbs/check.js`, whose output is the verb's alone |
 
 A call the engine rejects skips the hook, and the session then reads that level
 zero holds a tool nothing answers. So the ask stays inside the cap.

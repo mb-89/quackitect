@@ -8,7 +8,15 @@ const RUNME = "./RUNME.sh";
 const NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HOLE = "<name>";
 // The ticket new ticket writes: a kind, an empty process the completion offers, and an ask to fill. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
-const NEW_TICKET = ["---", "kind: [[ticket]]", 'process: ""', "---", "", "# Ask", ""].join("\n");
+const NEW_TICKET = [
+  "---",
+  "kind: [[ticket]]",
+  'process: ""',
+  "---",
+  "",
+  "# Ask",
+  "",
+].join("\n");
 
 // A config line opens on the RUNME head, and a verb takes the words past it. [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 function lineArgvOf(line) {
@@ -30,7 +38,9 @@ function jsonIn(ran) {
 
 // [[spec/design_input/the-editor-draws-the-ticket#the-work-group]]
 function countIn(ran) {
-  const said = jsonIn(ran)?.count;
+  const answer = jsonIn(ran);
+  // The index answers a bare count, and a verb a count object. [[spec/tickets/the-count-chain-leaves]]
+  const said = Number.isInteger(answer) ? answer : answer?.count;
   return Number.isInteger(said) ? said : undefined;
 }
 
@@ -44,7 +54,9 @@ function nextIn(ran) {
 function ticketPathOf(opens, name) {
   const said = String(name ?? "").trim();
   if (!NAME.test(said)) return "";
-  return String(opens ?? "").split(HOLE).join(said);
+  return String(opens ?? "")
+    .split(HOLE)
+    .join(said);
 }
 
 module.exports = { NEW_TICKET, countIn, lineArgvOf, nextIn, ticketPathOf };

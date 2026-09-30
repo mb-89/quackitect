@@ -22,6 +22,7 @@ keeps it.
 
 | layer | who writes it | when a reader reads it |
 |---|---|---|
+| built-in, the schema's `default` | the key's Go declaration | once, at the first ask |
 | `spec/config/level0.json` | the team, tracked in git | once, at the first ask |
 | the environment | whoever launches the box | once, at the first ask |
 | `.se/.runtime/config.json` | `./RUNME.sh config`, per box, git ignores it | on every ask |
@@ -31,8 +32,9 @@ and the environment beats the tracked file.
 
 These things follow:
 
-- The tracked file is the defaults, so no default stands in code. A key the
-  code reads and that file lacks is a fault, and the schema catches it.
+- Each key's built-in stands in its Go declaration, and the tracked file holds
+  a value off its built-in alone. A key no file sets reads its built-in, under
+  the layer `built-in`.
 - A key standing only in the per-box file resolves as well. The merge takes
   every key it meets, whichever layer names it.
 
@@ -81,18 +83,24 @@ directions over it.
 
 # The schema says the type
 
-`spec/config/level0.schema.json` says the type of each key and which ones a
-whole file carries. `keysOf` reads it, `typeOf` answers one key, and `faultsIn`
-names a key the tracked file lacks and a key carrying another type.
+`go run ./src/quack schema --write` writes `spec/config/level0.schema.json` off
+the keys the modules declare, one object a section. Each key's member holds
+its type, its built-in as `default`, its help, its unit and its options. So the
+schema says what the code declares, and nobody edits it by hand.
+`src/modules/settings/settings.go` declares each section no module of its own
+owns.
 
-The `comment` beside each section of the tracked file says what that section is
-for. A session start writes one `warn` line per fault, door `config`, and
-`./RUNME.sh config` says the same on the way out.
+`keysOf` reads the schema, `typeOf` answers one key, `builtInsOf` answers each
+`default`, and `faultsIn` names a key carrying another type. A session start
+writes one `warn` line per fault, door `config`, and `./RUNME.sh config` says
+the same on the way out.
 
 ## The schema says the drawing
 
 A key carries `help` and `unit` beside its type, and the sidebar hovers the one
-and prints the other. A key drawing as a control carries more:
+and prints the other. The generator lays `spec/config/draws.json` over each
+entry it names, drawn sections first in its order. A key drawing as a control
+carries more:
 [[spec/design_output/extension#one-declaration-draws-it]] names every field.
 `keysOf` answers the type alone, and `entriesIn` in the extension answers the
 whole entry.
@@ -101,7 +109,7 @@ whole entry.
 
 VS Code carries a JSON language service already, so `json.schemas` in
 `.vscode/settings.json` points the tracked file at the schema beside it. A
-person editing that file meets a missing key and a wrong type as they type,
+person editing that file meets a wrong type and an unknown option as they type,
 and `.vscode/extensions.json` names the extensions this tree recommends.
 
 # The resolver holds the layers
@@ -137,7 +145,8 @@ program in the tree calls it:
 
 | what it answers | what it reads |
 |---|---|
-| `Value(root, key)` | the tracked file, then the variable, then the local file |
+| `Value(root, key)` | the built-in, then the tracked file, then the variable, then the local file |
+| `Shared(root, key)` | the tracked file, then the built-in, for a key the catalog shares |
 | `Map(root, path, key)` | the map a named file holds at a key, off that file alone |
 | `List(root, path, key)` | the list a named file holds at a key, in the file's own order |
 | `EnvOf(key)` | the variable a key reads, as the key upper-cased under `SE_` |

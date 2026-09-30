@@ -272,14 +272,14 @@ func (one typing) pointerOffers(from int) []completion {
 		}
 		return out
 	}
-	at := placesIn(one.tree).fileOf(name)
+	at := placesIn(one.tree).FileOf(name)
 	if !strings.HasSuffix(at, ".md") {
 		return out
 	}
-	note := one.tree.parsed(at)
+	sections, slugs := one.tree.Chapters(at)
 	seen := map[string]bool{}
-	for i, section := range note.sections {
-		slug := note.slugs[i]
+	for i, section := range sections {
+		slug := slugs[i]
 		if slug == "" || seen[slug] {
 			continue
 		}

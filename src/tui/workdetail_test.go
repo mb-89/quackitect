@@ -89,14 +89,9 @@ func TestRecentlyDoneSortsByTheChangeTimeTheTableHides(t *testing.T) {
 	  {"name": "mid-done", "path": "spec/tickets/mid-done.md", "state": "closed", "route": "trivial", "changed": 200},
 	  {"name": "still-open", "path": "spec/tickets/still-open.md", "state": "open", "route": "trivial"}
 	]`
-	root, _ := workTreeWith(t, rows)
 	m := window(0)
-	m.Path = logOf(root)
-	tree, err := work.Load(m.Path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	out, _ := m.Update(work.Msg{Tree: tree})
+	m.Path = logOf(workTree(t))
+	out, _ := m.Update(work.Msg{Tree: loadWork(t, rows)})
 	m = press(out.(frame.Model), "2")
 	m = alt(m, '3')
 	if m.Input.Value() != "state: closed" {

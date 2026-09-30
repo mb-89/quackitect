@@ -5,7 +5,9 @@
 
 // A bullet writes as a dash, a line drops its trailing blanks, and a run of blank lines folds to one. The indent a command line opens with stands. [[spec/design_output/pull#the-fields-ride-the-payload]]
 export function formatted(said) {
-  return String(said ?? "")
+  // A list answer writes one item a line, so a reader of the field meets each item alone. [[spec/design_output/pull#kept-red-leaves]]
+  const text = Array.isArray(said) ? said.map((one) => `- ${one}`).join("\n") : said;
+  return String(text ?? "")
     .split(/\r?\n/)
     .map((row) => row.replace(/[ \t]+$/, "").replace(/^(\s*)\* /, "$1- "))
     .join("\n")

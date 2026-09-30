@@ -1,0 +1,38 @@
+[
+  {
+    "says": "a count reads its label and its value",
+    "names": [
+      {
+        "name": "work/open-tasks",
+        "label": "work",
+        "icon": "💼",
+        "looks": "count",
+        "value": 3
+      }
+    ],
+    "name": "work/open-tasks",
+    "want": "work (3)"
+  },
+  {
+    "says": "a count at zero still reads its value",
+    "names": [
+      { "name": "work/open-tasks", "label": "work", "looks": "count", "value": 0 }
+    ],
+    "name": "work/open-tasks",
+    "want": "work (0)"
+  },
+  {
+    "says": "a look other than a count reads its label alone",
+    "names": [{ "name": "log/rows", "label": "log", "looks": "rows", "value": [] }],
+    "name": "log/rows",
+    "want": "log"
+  },
+  {
+    "says": "a name the catalog lacks reads nothing",
+    "names": [
+      { "name": "work/open-tasks", "label": "work", "looks": "count", "value": 3 }
+    ],
+    "name": "work/rows",
+    "want": ""
+  }
+]

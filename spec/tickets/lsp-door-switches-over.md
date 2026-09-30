@@ -195,3 +195,5 @@ Done when the LSP's own server, port and index client leave the tree.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The JavaScript twins of the Go checks leave with this group. The twins row of [[spec/design_output/migration#what-goes-with-no-successor]] lists them. Phase 3 leaves them standing, since the check names answer an empty list until phase 7 moves the rules in. [[spec/tickets/check-twins-leave-phase-seven]]
