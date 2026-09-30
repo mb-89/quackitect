@@ -97,7 +97,19 @@ record:
         exit: 0
         said: work/loose-fixes-a906d84 took 5 commit(s) from main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box d85ab822b1d7 · claude-code-remote
+    hash_before: 261c8d99d9d1ce92b05289985edb5b069651f9ee
+    hash_after: 261c8d99d9d1ce92b05289985edb5b069651f9ee
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -131,14 +143,18 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/fix-verbs-shadow-yours-2]], process trivial, closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small: the one child is a single trivial step, and it reviews whole
+- the children add up to the goal: every other loose ticket on trunk waits on a person, three on the person route and one at draft, so none joins this fix group
+- depends_on: the one child waits on nothing
 
 # children
 
