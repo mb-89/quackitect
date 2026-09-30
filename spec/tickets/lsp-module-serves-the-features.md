@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: ae606a0a840ebba9
         size: 590
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d8922c5f7ed7 · claude-code-remote
+    hash_before: 5fa0b1c71fc0696f28dc63cdf53ef1dff05e71e6
+    hash_after: 5fa0b1c71fc0696f28dc63cdf53ef1dff05e71e6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/lsp fails
+    inputs:
+      - name: design/draft
+        hash: a3ccd4fce1d597b2
+        size: 2489
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -247,26 +260,31 @@ The tools child shares `Server.tree` and `Outside.Files`, so whichever lands fir
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp/features_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/features_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion: initialize announces text sync alone, and every feature request answers an error with no result. The cases compile against the Files field the tools child stubs, so both children share that shape.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each method line meets its case in features_test.go, and the check line meets ./RUNME.sh check at the build
+- the cases reach no door: the files come in through Files, and the store is the qtest fake
 
 # gate
 
