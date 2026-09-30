@@ -10,12 +10,14 @@ import (
 	"quackitect/src/modules/hooks/command"
 )
 
-// The raw notes the private delta reads, and the check's stamp the trunk guard reads. .claude/skills/level0/lib/private.js and lib/runs.js own both, and the module spells them again. [[spec/tickets/cage-commit-guards-port]]
+// The raw notes the private delta reads. lib/private.js owns them, and the module spells them again. [[spec/tickets/cage-commit-guards-port]]
 const (
 	rawNotes   = ".se/notes"
 	noteSuffix = ".md"
-	checkStamp = ".se/.runtime/check.json"
 )
+
+// .claude/skills/level0/lib/folders.js owns the runtime folder and runs.js the check's stamp the trunk guard reads, and the module spells them again. [[spec/tickets/cage-commit-guards-port]]
+const checkStamp = ".se/.runtime/check.json"
 
 // The first refusal of the commit guards, or nothing. [[spec/tickets/cage-commit-guards-port]]
 func (d *Door) commitGuards(line, root string, settings Settings, tree disk) string {

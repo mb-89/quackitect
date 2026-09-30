@@ -123,4 +123,7 @@ func TestADoorWithNoGitOrVoiceReadsNeither(t *testing.T) {
 	if rows := d.commitVoice(`git commit -m "a message"`, root, disk{root}); rows != nil {
 		t.Errorf("a door with no voice reads %v", rows)
 	}
+	if said := d.commitGuards(`git commit -m "a message"`, root, Settings{}, disk{root}); said != "" {
+		t.Errorf("a door with no git refuses a commit: %s", said)
+	}
 }

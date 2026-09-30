@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -157,6 +157,15 @@ record:
         hash: 93f0d9ba7da441c5
         size: 2105
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 46a2b1e85dc5e0f22a722417784b32edd3d3a39a
+    hash_after: 664a3dcdd0c9fc11f67207734d517e2e486c3c53
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/modules/hooks/command/trunk.go:166:54: MagicNumber: 64 carries a meaning here. Name it in the constants block at the"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -360,14 +369,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft's size names, plus src/quack/commit_voice_test.go, which tests commitVoice, and no file the ask leaves out
+every door the change reaches has a fake: git through Outside.Git and taughtGit, the voice through Outside.Voice and taughtVoice, the tree through disk under t.TempDir
+a comment names the approach above each new file and function, linking spec/tickets/cage-commit-guards-port
+every fact stands in one place: the lib modules own the refusal texts, and the case table holds them for both twins; the folder names carry a comment naming their owner
 
 ## tests-green
 
