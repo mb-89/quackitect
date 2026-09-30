@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,7 +24,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
@@ -45,6 +45,23 @@ record:
       - name: check
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+  - step: do
+    hand: box d89586721a117 · claude-code-remote
+    hash_before: 570a14cfe3379eb3936a272cfb378c16167cdb86
+    hash_after: 570a14cfe3379eb3936a272cfb378c16167cdb86
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: ask
+        hash: 1b3e767cd9bd5f73
+        size: 236
+    def: f6f5975f3f858eb1
+reason: done
 ---
 
 # Ask
@@ -64,7 +81,7 @@ the Go edit door lacks the bless file, the conflict markers, the open ticket doo
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-./RUNME.sh test src/quack/edits_test.go
+./RUNME.sh test src/quack/editdoor_test.go
 
 ## check
 
@@ -78,16 +95,18 @@ the Go edit door lacks the bless file, the conflict markers, the open ticket doo
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-Nothing changes yet. The rules port into the edits module, which edit-tools-answer-in-go builds, so this child waits on it.
+The Go edit door now runs the rules the bridge write door runs before the schema and the voice. It refuses the bless file, and passes a draft and a path outside the tree. It refuses markers in a ticket git lists unmerged. It refuses an edit of an open ticket past its Discussion. It puts the engine fields back on any other ticket, and refuses an edit of those fields alone.
+
+It refuses a file a projection owns. It refuses a text carrying a token or a run out of a note under .se/notes. The pure reads stand in hooks/write/rules.go and in the command package. quack/writedoor.go composes them in the bridge order. The door the edits module calls now reads the text before the write, and answers the text that lands.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change waits on its parent, and depends_on names it
-- no cleanup stands yet, since no code changes
-- no fact lands yet
+- the change ports the six rules the ask names, and leaves the formatter to the flip
+- the clear case failing on the base stands as a private note
+- each wording stands once: the texts in write, the notes folder in command
 
 # Discussion
 

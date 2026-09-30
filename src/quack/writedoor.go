@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -97,13 +98,99 @@ func editsOutside(root string) edits.Outside {
 	}
 }
 
-// The write door over a text an edit writes: the schema's refusal, then the voice's. [[spec/tickets/edit-tools-answer-in-go]]
-func editDoor(root string) func(where, text string) string {
-	return func(where, text string) string {
-		return hooks.Judge(where,
+// The write door over a text an edit writes, in the order onWrite in src/bridge/write.js reads it: the bless file, a draft or a path outside passing, the markers of a merge, the open ticket, the engine's fields, the owner, the private notes, then the schema and the voice. [[spec/tickets/edit-door-rules-port]]
+func editDoor(root string) func(where, was string, stands bool, text string) edits.Judged {
+	return func(where, was string, stands bool, text string) edits.Judged {
+		if where == write.BlessFile {
+			return edits.Judged{Refusal: write.BlessRefusal()}
+		}
+		if write.Outside(where) || check.IsDraft(where) {
+			return edits.Judged{Text: text}
+		}
+		merging := unmerged(root, where)
+		if lines := check.MarkerLines(text); merging && len(lines) > 0 {
+			return edits.Judged{Refusal: write.MarkedRefusal(where, lines)}
+		}
+		said := ""
+		if stands && !merging {
+			if refused := write.OpenTicketRefusal(where, was, text); refused != "" {
+				return edits.Judged{Refusal: refused}
+			}
+			if restored, keys := write.RestoredFields(was, text, engineKeys(root)); len(keys) > 0 {
+				if restored == was {
+					return edits.Judged{Refusal: write.EngineAloneRefusal(where, keys)}
+				}
+				text, said = restored, write.PutBack(where, keys)
+			}
+		}
+		if owner, ok := write.OwnerOf(projectionsIn(root), where); ok {
+			return edits.Judged{Refusal: write.RefusedWrite(owner, where)}
+		}
+		if !strings.HasPrefix(where, privateFolder) {
+			if carried, ok := command.CarriedFrom(text, notesIn(root)); ok {
+				return edits.Judged{Refusal: command.RefusedPrivate(where, carried)}
+			}
+		}
+		refused := hooks.Judge(where,
 			func() write.Judged { return writeSchema(root, where, text) },
 			func() []write.Finding { return writeProse(root, where, text) })
+		return edits.Judged{Refusal: refused, Text: text, Said: said}
 	}
+}
+
+// The private folder, which carries a note's text freely, the ticket kind, and the file the projections stand in. [[spec/tickets/edit-door-rules-port]]
+const (
+	privateFolder   = ".se/"
+	ticketKindName  = "ticket"
+	projectionsFile = "spec/config/projections.json"
+)
+
+// Whether git lists a ticket unmerged, while a merge stands over it. [[spec/design_output/pull#a-merge-opens-the-ticket]]
+func unmerged(root, where string) bool {
+	if !strings.HasPrefix(where, write.TicketsOnGit) || !strings.HasSuffix(where, ".md") {
+		return false
+	}
+	return gitRead(root, "ls-files", "-u", "--", where) != ""
+}
+
+// The front keys the ticket schema gives the engine. [[spec/design_output/schema#the-verbs-own-their-fields]]
+func engineKeys(root string) []string {
+	schema := check.SchemasIn(check.TreeOver(root, rootDisk{root})).Get(ticketKindName)
+	props := yaml.AsDoc(yaml.AsDoc(schema.Get("frontmatter")).Get("properties"))
+	var out []string
+	for _, key := range props.Keys() {
+		if yaml.AsBool(yaml.AsDoc(props.Get(key)).Get("x-engine")) {
+			out = append(out, key)
+		}
+	}
+	return out
+}
+
+// The projections the tree writes, none where the file stands nowhere. [[spec/design_output/projection#the-write-door-refuses-one]]
+func projectionsIn(root string) []write.Projection {
+	text, ok := rootDisk{root}.Read(projectionsFile)
+	var said struct {
+		Projections []write.Projection `json:"projections"`
+	}
+	if !ok || json.Unmarshal([]byte(text), &said) != nil {
+		return nil
+	}
+	return said.Projections
+}
+
+// The raw notes a person keeps on the box, a draft aside. [[spec/design_output/private#the-door-reads-the-notes]]
+func notesIn(root string) []command.Note {
+	disk := rootDisk{root}
+	var out []command.Note
+	for _, name := range disk.Names(command.NotesFolder) {
+		if !strings.HasSuffix(name, ".md") || check.IsDraft(name) {
+			continue
+		}
+		if text, ok := disk.Read(command.NotesFolder + "/" + name); ok {
+			out = append(out, command.Note{Name: name, Text: text})
+		}
+	}
+	return out
 }
 
 // The files under the root a glob reaches, past every dot folder. [[spec/tickets/edit-tools-answer-in-go]]

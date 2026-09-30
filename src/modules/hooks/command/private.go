@@ -445,3 +445,49 @@ func matchesAny(shapes []*regexp.Regexp, said string) bool {
 func leak(rule, file string, line int, said string, message ...string) Leak {
 	return Leak{File: file, Line: line, Column: firstColumn, Rule: rule, Said: said, Message: flat(strings.Join(message, " "))}
 }
+
+// The folder the raw notes stand in, which the edit door reads. [[spec/design_output/private#the-door-reads-the-notes]]
+const NotesFolder = notes
+
+// What a written text carries out of a note: a token or a run, the words, and the note. [[spec/design_output/private#the-door-reads-the-notes]]
+type Carried struct {
+	Token bool
+	Said  string
+	Note  string
+}
+
+// The first token a note carries, then the first run of words long enough to copy, off carriedFrom in lib/private.js. [[spec/design_output/private#the-door-reads-the-notes]]
+func CarriedFrom(text string, held []Note) (Carried, bool) {
+	mine := privateTokens(text)
+	for _, note := range held {
+		if found := sharedTokens(mine, privateTokens(note.Text)); len(found) > 0 {
+			return Carried{Token: true, Said: found[0].flat, Note: note.Name}, true
+		}
+	}
+	for _, note := range held {
+		length, end := longestRun(flatOf(mine), flatOf(privateTokens(note.Text)))
+		if length < copyRun {
+			continue
+		}
+		var said []string
+		for _, one := range mine[end-length : end] {
+			if len(said) == 0 || said[len(said)-1] != one.raw {
+				said = append(said, one.raw)
+			}
+		}
+		return Carried{Said: strings.Join(said, " "), Note: note.Name}, true
+	}
+	return Carried{}, false
+}
+
+// The refusal of a write carrying a note's text, off refusedPrivate in lib/private.js. [[spec/design_output/private#what-the-refusal-says]]
+func RefusedPrivate(where string, carried Carried) string {
+	head := where + " carries " + strconv.Itoa(len(strings.Fields(carried.Said))) + " words straight from a note under " + notes + ": \"" + carried.Said + "\"."
+	why := "A note is a dump and carries anything private. The rewrite is what makes a line safe to commit."
+	if carried.Token {
+		head = where + " carries " + strconv.Quote(carried.Said) + " straight from a note under " + notes + "."
+		why = "An address, a path or a secret is one word, and one word is enough to leak."
+	}
+	return strings.Join([]string{head, "", why, "", "Say what the thing is, in words written for a reader outside this box. " + notes,
+		"stays home, git ignores it, and what this tree tracks is the authored half."}, "\n")
+}

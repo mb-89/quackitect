@@ -67,3 +67,20 @@ func TestRefusedDeltaNamesEachFindingWhereItStands(t *testing.T) {
 		}
 	}
 }
+
+// [[spec/tickets/edit-door-rules-port]]
+func TestCarriedFromNamesATokenBeforeARun(t *testing.T) {
+	notes := []Note{{Name: "a.md", Text: "the key is sk_live_abcdefghijkl and one two three four five six seven"}}
+	if said, ok := CarriedFrom("we hold sk_live_abcdefghijkl here", notes); !ok || !said.Token || said.Note != "a.md" {
+		t.Errorf("a token reads as %+v, %v", said, ok)
+	}
+	if said, ok := CarriedFrom("so one two three four five six seven", notes); !ok || said.Token || said.Said != "one two three four five six seven" {
+		t.Errorf("a run reads as %+v, %v", said, ok)
+	}
+	if _, ok := CarriedFrom("one two three", notes); ok {
+		t.Errorf("a short run reads as carried")
+	}
+	if got := RefusedPrivate("docs/a.md", Carried{Said: "one two three four five six"}); !strings.HasPrefix(got, "docs/a.md carries 6 words straight from a note under .se/notes") {
+		t.Errorf("the refusal reads %q", got)
+	}
+}

@@ -91,10 +91,17 @@ func asked(verb string, in any) []q.Request {
 type Outside struct {
 	Root   string
 	Ticket func(name string, files []string) string
-	Judge  func(where, text string) string
+	Judge  func(where, was string, stands bool, text string) Judged
 	Sweep  func(glob string) []string
 	Mint   func(kind, where string, fields map[string]any) (text, why string)
 	Now    func() time.Time
+}
+
+// What the door answers over a written file: its refusal, or the text that lands and a line the answer carries. [[spec/tickets/edit-door-rules-port]]
+type Judged struct {
+	Refusal string
+	Text    string
+	Said    string
 }
 
 // The IO side of the module: it answers each request an edit action lists. [[spec/tickets/edit-tools-answer-in-go]]
@@ -186,17 +193,27 @@ func (from Outside) lands(took Took, ticket, on string, preview bool) (any, erro
 			return nil, errors.New(fault)
 		}
 	}
+	var notes []string
 	if from.Judge != nil {
-		for _, one := range took.Files {
-			if said := from.Judge(one.File, one.Made); said != "" {
-				return nil, fmt.Errorf("%s refuses the batch, and nothing is written.\n\n%s", one.File, said)
+		for i, one := range took.Files {
+			judged := from.Judge(one.File, one.Was, !one.Born, one.Made)
+			if judged.Refusal != "" {
+				return nil, fmt.Errorf("%s refuses the batch, and nothing is written.\n\n%s", one.File, judged.Refusal)
+			}
+			took.Files[i].Made = judged.Text
+			if judged.Said != "" {
+				notes = append(notes, judged.Said)
 			}
 		}
 	}
 	if preview {
 		return wouldLand(took), nil
 	}
-	return from.writes(took, on, ticket)
+	said, err := from.writes(took, on, ticket)
+	if err != nil || len(notes) == 0 {
+		return said, err
+	}
+	return strings.Join(append([]string{fmt.Sprint(said)}, notes...), "\n\n"), nil
 }
 
 // [[spec/design_output/apply#check-everything-then-write]]

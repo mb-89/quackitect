@@ -33,6 +33,7 @@ var (
 	Left                     = left
 	Listed                   = listed
 	MagicIn                  = magicIn
+	MarkerLines              = markerLines
 	Matches                  = matches
 	Minted                   = mintedNote
 	NameHoldsTheWords        = nameHoldsTheWords
