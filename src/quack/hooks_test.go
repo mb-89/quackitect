@@ -5,6 +5,7 @@ package main
 
 import (
 	"os"
+	"encoding/json"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -73,5 +74,32 @@ func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
 	}
 	if said := gitRead(root, "no-such-verb"); said != "" {
 		t.Fatalf("a failing git read prints %q, and wants nothing", said)
+	}
+}
+
+// The holds read the hold, the ask, the binding, the graces, the plan's numbers and the helper tiers off the root's config. [[spec/tickets/cage-call-holds-port]]
+func TestCommandSettingsReadTheHoldKeys(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, "spec", "config")
+	if err := os.MkdirAll(at, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	config := `{"stop":{"hold":"finish"},"ask":{"wanted":"short"},"engine":{"binding":"god"},"grace":{"finish":3,"update":2},"plan":{"everyCalls":4,"grace":1,"mostOpen":5},"helper":{"find":"haiku","change":"opus","decide":"opus"}}`
+	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(config), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	body, _ := json.Marshal(commandSettings(root))
+	var said map[string]any
+	if err := json.Unmarshal(body, &said); err != nil {
+		t.Fatal(err)
+	}
+	for key, want := range map[string]any{"Hold": "finish", "Ask": "short", "Binding": "god", "FinishGrace": float64(3), "UpdateGrace": float64(2), "PlanEvery": float64(4), "PlanGrace": float64(1), "PlanMostOpen": float64(5)} {
+		if said[key] != want {
+			t.Errorf("the settings read %s=%v, and want %v", key, said[key], want)
+		}
+	}
+	helpers, _ := said["Helpers"].(map[string]any)
+	if helpers["find"] != "haiku" || helpers["change"] != "opus" || helpers["decide"] != "opus" {
+		t.Fatalf("the settings read the tiers %v, and want each tier's model", said["Helpers"])
 	}
 }

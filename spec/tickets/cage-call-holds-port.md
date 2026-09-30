@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -132,6 +132,22 @@ record:
         hash: bc49d4efc513831a
         size: 986
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 9cc0700ae4904d48c465cb4625a9e59321533bf9
+    hash_after: 9cc0700ae4904d48c465cb4625a9e59321533bf9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: e0c47ca511b0c8fd
+        size: 9186
+      - name: [[spec/tickets/cage-hold-drops-port]]
+        hash: a34b00a52e331586
+        size: 749
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -315,26 +331,36 @@ What the port decides past the ask:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks src/modules/session src/quack
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/cage_test.go
+- src/modules/hooks/holds_test.go
+- src/modules/session/holds_test.go
+- src/quack/hooks_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The shared table test/replay/cage/call-holds-cases.json holds the bridge's own answers: .se/scripts/call-holds-fill.mjs drove each case through decide over test/level0/call-holds-box.js and printed them, and test/level0/call-holds-cases.test.js reads them green. The two recorded logs came off the same box through .se/scripts/call-holds-log.mjs, so each golden shadow stands empty and the replay reads every hold apart until the port lands. The Agent row leaves every-refusal.shadow.jsonl now, so that log reads red too.
+
+What surprised me: Grep under a riding grace reaches the index door, which the fake box lacks, so the plan grace in the log meets Read calls alone. The tests read the new Settings fields through JSON, and the fold through its JSON names finish and calls, so every test builds today and fails on its own assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when line one meets call-holds.jsonl, call-holds-finish.jsonl and the Agent row of every-refusal.jsonl, each red in TestReplayLogAnswersEveryRecordedLog. Line two meets TestTheHoldsAnswerWhatTheBridgeAnswers over the shared table, red, with its JS twin green on the bridge. Line three is the check
+- the tests reach the store through qtest and the tree through the temp root doorOver builds, and the JS twin reaches the bridge through the fakes under src/doors/fake
 
 # gate
 

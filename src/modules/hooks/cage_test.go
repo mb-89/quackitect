@@ -159,7 +159,11 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 				t.Fatal(err)
 			}
 			var got []Apart
-			said, err := doorOver(t, &calls{}, &book{}).door.ReplayLog(string(text), func(map[string]any) error { return nil })
+			replay := doorOver(t, &calls{}, &book{}).door
+			if settings, ok := boxOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json"); ok {
+				replay.from.Config = func(string) Settings { return settings }
+			}
+			said, err := replay.ReplayLog(string(text), func(map[string]any) error { return nil })
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -170,6 +174,23 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 			}
 		})
 	}
+}
+
+// The Settings a recorded log's box answers, off <name>.box.json where it stands, over the words the table's tree holds. [[spec/tickets/cage-call-holds-port]]
+func boxOf(t *testing.T, at string) (Settings, bool) {
+	t.Helper()
+	body, err := os.ReadFile(at)
+	if os.IsNotExist(err) {
+		return Settings{}, false
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	settings := Settings{Words: nameWords}
+	if err := json.Unmarshal(body, &settings); err != nil {
+		t.Fatal(err)
+	}
+	return settings, true
 }
 
 func goldenOf(t *testing.T, at string) []Apart {
