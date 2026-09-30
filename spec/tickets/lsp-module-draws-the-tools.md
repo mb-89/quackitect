@@ -122,14 +122,12 @@ step: design/owner-read
 
 # Ask
 
-The lsp IO module publishes the rows Vale, Biome and the code faults draw beside the check module's sweep, each under its own source, the way the old server's `Outside` draws them. So the panel keeps every row once the editor starts `quack lsp`.
+The `lsp` IO module publishes the rows Vale, Biome and the code faults draw, beside the check module's sweep. Each row names its own source, the way the old server's `Outside` draws them. So the panel keeps every row once the editor starts `quack lsp`.
 
 The switch leaves the panel with the tree's own rules alone, and a prose fault stands unseen until the lint.
 
-- `go test ./src/modules/lsp` passes a case publishing a `vale` row, a `biome` row and a `tree` row off a fake runner
+- `go test ./src/modules/lsp` publishes a `vale`, a `biome` and a `tree` row off a fake runner
 - `./RUNME.sh check` exits 0
-
-view: the editor's Problems panel, where a Vale row and a Biome row stand on a file the editor holds
 
 # design
 
