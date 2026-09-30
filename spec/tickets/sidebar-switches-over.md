@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -152,6 +152,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d891eb0f26d7 · claude-code-remote
+    hash_before: 86b49dea88c17a3a198a6c5269d368b21ba4ee33
+    hash_after: 86b49dea88c17a3a198a6c5269d368b21ba4ee33
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["sidebar-lands-in-shadow", "tui-shell-switches-over"]
 enabled_by: migration.phase8switch
 cloud: true
@@ -243,38 +255,68 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-extension-reads-no-files: change and tests-green. The sidebar slice reads new, and the shadow compare leaves
+- the grid's work button drops its count, and the views section alone draws the badge
+- patch-journals-a-refused-write: a hand-back skips a journal marked unlanded
+- the group: sync, split, accept and the notes
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the gate's rows named the red cases, so the change went green on the first build
+- the generators wrote the schema and the size golden, so no generated file took a hand edit
+- the note parked the journal fault at once, so the retro fixed it in place
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 16:13 branch take with the work/ prefix answered no free todo, and the bare group name took it
+- 16:15 the server behind the plan tool stood down twice, so the plan answered nothing
+- 16:18 the draft's callers list missed three tests reading the grid's count
+- 16:24 the check failed on the size golden, which holds the schema's line count
+- 16:28 a patch to a path outside the tree left a journal, and the hand-back refused
+- 16:35 the hand-back ran the check red once, and it passed alone and on retry
+- 16:21 the pass commits staged the journaled files alone, so the deletions waited for the commit verb
+- 16:44 a commit trailer carried a model name the owner's rules forbid, and it stands pushed
+- no owner prompt came during the run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the branch take verb reads a name with the work/ prefix as the bare name
+- the serve verb keeps its server up across a session, and the plan tool starts it where none answers
+- a draft's callers list greps the tests for the rendered markup it changes
+- a switch draft names the size golden where it changes a generated file's length
+- pull-landed.js skips an unlanded journal, and it does so now
+- the command evidence keeps the failing case beside the last line, so a red check names its cause
+- a deletion goes through a verb that journals it, so the pass commit carries it
+- the commit verb refuses a trailer naming a model, where the owner's rules forbid one
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The run weighed the draft's line on the pull button. Dropping its help and icon leaves a bare button the grid still draws. The work-buttons contract also holds that every work button wears a mark. So the button keeps both. At accept, the run weighed the three reads left in the extension. Each runs before the index answers, so none can move there.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: the badge stands in index/names, and draws.json no longer copies it
+- numbers: the change adds none
+- headers: the change writes no new file
+- the chapter carries the run's errors with their times, and no owner prompt came
+- the chapter names roles, and carries no name or path of the box
 
 ## cloud
 
