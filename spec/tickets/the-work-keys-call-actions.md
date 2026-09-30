@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [the-work-tab-reads-v1]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d88aea6eafd6 · claude-code-remote
+    hash_before: 4f6522967b68d9e5c6f366d9fdede2208175a447
+    hash_after: 4f6522967b68d9e5c6f366d9fdede2208175a447
+    inputs:
+      - name: ask
+        hash: 92f5a8d308b09e53
+        size: 607
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,109 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The work tab posts what it wants written, and the verbs behind the index write it.
+
+1. `registry` gains `Caller`, one method `Call(name string, input any) (json.RawMessage, error)`. `V1.Call` posts the input as JSON to `<base>/actions/<name>` with `Prefer: wait=N` through a new `post` in `registry/door.go`. It answers the result on a 200, the handle on a 202, and the problem's detail at 400 and past, through the standing `problemIn`. `Fake.Call` records each post in `Called`, answers the result a case seeds under `Results`, and answers an error for a name it lacks, the way the index answers a 404.
+2. `work.Source` embeds `registry.Caller`, so the window's `V1` catalog and a case's `Fake` both carry the posts.
+3. The tab reads the action names off its base text through `tree.ReadBase`. It looks each one up by trigger: `p`, `u`, the edit, and the `pull` button. `work.base` stays the one place that names them. A trigger the file leaves out answers a notice naming it.
+4. Each key answers a `tea.Cmd` that posts and hands back an `actionSaid` holding the name and the result or the error. The tab shows it as its notice, and the watch on `work/rows` redraws what the verb wrote.
+   - `p` then a digit posts `work/place` with `{name, n}`. The verb holds the place rule, so `PlaceValue`, `placeOf`, `anchorFor`, `SiblingAt`, `LastPlace`, `PlaceNumber`, `writePlace` and `PlanAt` leave the tab.
+   - `u` posts `tickets/flip-urgent` with `{name}` once a marked row, or once for the selected row.
+   - An edit's enter or fill posts `tickets/set-field` with `{name, field, value}` once a written row. `writeTicket` and `WithField` leave, since `ticket set` owns the front write.
+   - `P` presses the view's `pull` button and posts `work/pull` with `{}`.
+5. `door.go` keeps `readFile` for the ticket schema, and `writeFile`, `appendFile`, `makeDir` and `statOf` leave it.
+6. The schema checks `Refuses` and `Weighs` stay, so a refused value names its reason before any post.
+
+What I weigh and assume:
+- The base file names no key for the pull button, so the tab binds it to `P`, which the work tab leaves free. The view file stays the owner of the name `work/pull`.
+- The rule the Go tab and `ticket-edit.js` both spell moves to the verb alone. `src/tui/work/testdata/places.json` stays where `test/level0/ticket-edit.test.js` reads it.
+- The tab drops its early `SetValue` on a place or a flip, so a row changes once the watch hands it on. That costs a short lag, and in return the tab never draws a value the verb refuses.
+
+The section `spec/design_output/tui.md#the-work-tab-takes-edits` takes the new road, and `spec/design_output/pull.md#a-todo-forces-a-place` names the verb as the one writer of the plan file.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/tui/registry/catalog.go Caller, new
+src/tui/registry/v1.go V1.Call, new
+src/tui/registry/door.go post, new
+src/tui/registry/fake.go Fake.Call, new
+src/tui/work/v1.go Source
+src/tui/main.go main, wiring workTab.From = catalog
+src/tui/work/work.go Tab.Update
+src/tui/work/work.go Tab.Keys
+src/tui/work/workplace.go Tab.openPlace
+src/tui/work/workplace.go Tab.placeAt
+src/tui/work/workplace.go PlaceValue, writePlace, placeOf, anchorFor, SiblingAt, LastPlace, PlaceNumber, PlanAt
+src/tui/work/workedit.go Tab.writes
+src/tui/work/workedit.go Tab.flip
+src/tui/work/workedit.go writeTicket, WithField
+src/tui/work/door.go writeFile, appendFile, statOf, makeDir
+src/tui/workplace_test.go TestPThenADigitWritesTheTodoTheQueueReads, TestTheSiblingsOfARowStandAtItsOwnLevel
+src/tui/workedit_test.go TestAnEditInTheWorkTabWritesTheFieldToTheTicket, TestAKeyFlipsAMarkAndWritesIt, TestAFrontTakesAFieldSetDroppedAndAdded, TestAFrontFencedWithCRLFTakesTheFieldAndKeepsItsLineEnds, TestTheUrgentKeyWritesACRLFTicket, TestAValueTheSchemaRefusesNamesTheReasonAndWritesNothing
+src/tui/work/workplace_test.go TestPlaceValueReadsTheSharedCases
+src/tui/work/workedit_test.go TestTheWindowWritesAFieldInTheWritersForm
+src/scripts/ticket-edit.js the comments naming PlaceValue, writePlace and WithField
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/tui/registry/catalog_contract_test.go holdsTheContract gains its call cases, run by TestTheFakeCatalogKeepsTheContract and TestTheV1CatalogKeepsTheContract
+src/tui/registry/v1_test.go TestACallTheIndexStillRunsAnswersItsHandle
+src/tui/work/actions_test.go TestThePlaceChordPostsWorkPlace
+src/tui/work/actions_test.go TestTheUrgentKeyPostsFlipUrgentForEveryMarkedRow
+src/tui/work/actions_test.go TestAnEditPostsSetFieldForEveryRowItWrites
+src/tui/work/actions_test.go TestThePullKeyPostsWorkPull
+src/tui/work/actions_test.go TestAnActionTheIndexRefusesStandsAsTheNotice
+src/tui/work/actions_test.go TestAValueTheSchemaRefusesPostsNothing
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/tui/registry/catalog.go
+src/tui/registry/v1.go
+src/tui/registry/door.go
+src/tui/registry/fake.go
+src/tui/registry/catalog_contract_test.go
+src/tui/registry/v1_test.go
+src/tui/work/v1.go
+src/tui/work/work.go
+src/tui/work/workplace.go
+src/tui/work/workedit.go
+src/tui/work/door.go
+src/tui/work/actions.go
+src/tui/work/actions_test.go
+src/tui/work/workplace_test.go
+src/tui/work/workedit_test.go
+src/tui/workplace_test.go
+src/tui/workedit_test.go
+src/scripts/ticket-edit.js
+spec/design_output/tui.md
+spec/design_output/pull.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every name stands opened: verbs/actions.go, index/actions.go, registry v1.go, door.go, fake.go and catalog_contract_test.go, and work's door.go, workplace.go, workedit.go, work.go and v1.go, each read on this commit
+the callers list: git grep over src for every function the approach removes or changes, the tests and the JS comments among them
+the done_when lines: the git grep line is its own command; the key case is src/tui/work/actions_test.go, its five tests over Fake.Call; the check line is ./RUNME.sh check
 
 ## tests-red
 
