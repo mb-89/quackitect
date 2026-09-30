@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -145,6 +145,18 @@ record:
         hash: d67a71ab464aed7f
         size: 5545
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 0469b97a776cad4283c8482fe50718136dcaa4a4
+    hash_after: 3c198f670833937837f2dfbf7d369c5cfd2ae4d4
+    inputs:
+      - name: design/draft
+        hash: d67a71ab464aed7f
+        size: 5545
+      - name: design/tests-red
+        hash: a142e138d4d49227
+        size: 1604
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -326,8 +338,15 @@ The scaffold adds `Outside.Prose` and the `write` package with `Finding`, so the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask as the cage reads it: a harness write reaches three roads of onWrite, an outside path, the no-ticket refusal and the handover's schema and voice, and the rules behind the no-ticket refusal each answer with that refusal at the hook
+- done_when one meets TestReplayLogAnswersEveryRecordedLog over write-door, write-voice and every-refusal, red now; done_when two meets TestTheWriteDoorRefusesWhatTheBridgeRefuses; done_when three is the check the implement answers
+- fix in place: the rules the patch tool answers inside its tool travel on a private note, which stands on one box; the implement writes that line under Discussion of the-bridge-server-leaves, which owns where the patch tool runs once the bridge leaves
+- fix in place: the bridge twin moved to test/contract/write-door-cases.test.js, since it reads the live schemas off the disk door
+- fix in place: src/quack/main.go stands near the file ceiling, so the Prose wiring moves a coherent piece of it into a new file first, or wires through command.go as the stop port did
+- weighed: porting engineRestores and ticketDoor costs a Go copy of the ticket engine that no hook answer tests, so the port holds each rule's answer at the hook
 
 # implement
 
