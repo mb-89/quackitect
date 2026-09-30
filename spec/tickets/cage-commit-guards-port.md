@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -132,6 +132,19 @@ record:
         hash: 7c90d003597ffeb3
         size: 821
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 17b3699dba8609d3c006db434a1a575b3d4beb01
+    hash_after: 17b3699dba8609d3c006db434a1a575b3d4beb01
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: b282b0ed5f9e778a
+        size: 6138
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -278,26 +291,38 @@ each done_when line names its test: the replay line TestReplayLogAnswersEveryRec
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/commits_test.go
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The Go table test `TestTheCommitGuardsRefuseWhatTheBridgeRefuses` stands red on its own assertion in every case a guard decides. The cases the git write door answers stand green, and so does the pass. The bridge twin `test/level0/commit-guards-cases.test.js` passes every case, since the table holds the bridge's own answers.
+
+The surprise: the replay compares decision words alone. The Go door's git write door already refuses every plain `git commit` and `git push`, and every one behind `sudo`, `env` or `time`, so a log of those reads alike before the port. A probe of the Go door found the shapes it passes: `sh -c`, `bash -c`, `xargs` and `sudo -u`. The desk, trunk and todo logs carry those shapes, and their replays stand red. The private, tested and voice guards read only a bare `git commit`, which the git write door refuses on both sides. So their logs read alike before and after the port, and the table test alone tells their text apart.
+
+The table masks the address, the phone number and the home path it carries, and both twins unmask them on load. Otherwise the private delta refuses the table's own commit.
+
+The scaffold adds `Settings.User`, `Settings.Home` and `Outside.Voice` with no behaviour, so the red test builds and fails on its assertion rather than on the build.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each done_when line meets a failing test: the replay line meets TestReplayLogAnswersEveryRecordedLog over desk-guard, todo-push and trunk-guard, red now, while the private, tested and voice logs read alike on both sides as the seen field says; the refusal text line meets TestTheCommitGuardsRefuseWhatTheBridgeRefuses, red in each guard case; the check line stands a checkpoint the implement step answers with ./RUNME.sh check
+every door the tests reach has a fake: git through taughtGit, the voice through taughtVoice, the tree through treeOf under t.TempDir, and the index through q/qtest in doorOver; the bridge twin takes fakeDisk, fakeProc and a Vale fake
 
 # gate
 

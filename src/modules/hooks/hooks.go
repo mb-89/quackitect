@@ -120,6 +120,8 @@ type Outside struct {
 	Root   string
 	Config func(root string) Settings
 	Git    func(root string, args ...string) string
+	// The findings the voice keeps over a commit message, off Vale and the prose vetoes. None reads no voice. [[spec/tickets/cage-commit-guards-port]]
+	Voice func(root, message string) []command.Row
 }
 
 // What the doors read off the config and the box: the words a name holds, whether the box stands in the cloud, the owner's hold and ask, the binding, the graces, the plan's numbers, and each helper tier's model. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-call-holds-port]]
@@ -135,6 +137,9 @@ type Settings struct {
 	PlanGrace    int
 	PlanMostOpen int
 	Helpers      map[string]string
+	// The user and the home folder the box answers, which the private delta reads. [[spec/tickets/cage-commit-guards-port]]
+	User string
+	Home string
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]

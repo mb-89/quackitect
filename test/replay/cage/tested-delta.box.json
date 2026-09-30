@@ -1,0 +1,7 @@
+{
+  "cloud": true,
+  "git": {
+    "rev-parse --abbrev-ref HEAD": "work/some-group",
+    "diff --cached --unified=0": "diff --git a/src/engine/thing.js b/src/engine/thing.js\nindex 1111111..2222222 100644\n--- a/src/engine/thing.js\n+++ b/src/engine/thing.js\n@@ -0,0 +1,1 @@\n+export const THING = 1;"
+  }
+}

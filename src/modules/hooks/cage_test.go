@@ -162,6 +162,9 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 			replay := doorOver(t, &calls{}, &book{}).door
 			if settings, ok := boxOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json"); ok {
 				replay.from.Config = func(string) Settings { return settings }
+				reads := readsOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json")
+				replay.from.Git = taughtGit(reads.Git)
+				replay.from.Voice = taughtVoice(reads.Voice)
 			}
 			said, err := replay.ReplayLog(string(text), func(map[string]any) error { return nil })
 			if err != nil {
@@ -191,6 +194,25 @@ func boxOf(t *testing.T, at string) (Settings, bool) {
 		t.Fatal(err)
 	}
 	return settings, true
+}
+
+// The git reads and the voice a recorded log's box answers, off the same <name>.box.json. [[spec/tickets/cage-commit-guards-port]]
+type boxReads struct {
+	Git   map[string]string `json:"git"`
+	Voice []voiced          `json:"voice"`
+}
+
+func readsOf(t *testing.T, at string) boxReads {
+	t.Helper()
+	body, err := os.ReadFile(at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var reads boxReads
+	if err := json.Unmarshal(body, &reads); err != nil {
+		t.Fatal(err)
+	}
+	return reads
 }
 
 func goldenOf(t *testing.T, at string) []Apart {
