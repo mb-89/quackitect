@@ -4,7 +4,7 @@
 
 export const VERBS = ["check", "branch", "tui", "doctor"];
 
-// The verbs whose tools the line recommends: a verb that holds a terminal or never returns stays off, since a tool answers with no terminal. [[spec/tickets/verbline-spares-blocking-verbs]]
+// The verbs whose tools the line recommends: a verb that holds a terminal or runs without end stays off, since a tool answers with no terminal. [[spec/tickets/verbline-spares-blocking-verbs]]
 const TOOL_VERBS = ["check", "branch", "doctor"];
 
 // The tool standing for a verb: its own under the verb topic, or its topic's where the verb names one. [[spec/tickets/agents-call-quack-directly]]
