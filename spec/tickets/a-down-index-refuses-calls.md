@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -318,6 +318,10 @@ record:
   - step: design/tests-red-2
     hand: the engine
     stale: design/draft-2
+  - step: design/tests-red-2
+    skipped: true
+    kept: d74c1b4bda7e08c7a815d7208ab09826b50aeacd
+    why: its red tests stand as d74c1b4bd landed them, and a later leaf passed since
 group: go-cage-switches-over
 depends_on: ["cage-rules-port-before-switch", "cage-write-door-port", "cage-call-holds-port", "cage-hold-drops-port", "cage-commit-guards-port", "cage-stop-rules-port"]
 ---
