@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 64eccaa6617ea1230ee52eeca9692f4cb0363e03
+    hash_after: 64eccaa6617ea1230ee52eeca9692f4cb0363e03
+    inputs:
+      - name: ask
+        hash: 4ecabed2a10455d5
+        size: 406
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -156,38 +165,65 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The door answers a describe of Bash with the verb line, off the tool names the store lists, as `onDescribe` in src/bridge/bash.js answers it.
+
+1. A new src/modules/hooks/describe.go ports `VERBS`, `TOOL_VERBS`, `toolOf` and `verbLine` from .claude/skills/level0/lib/verb-line.js. It reads the tool names off the store through `tool.NameOf`, so the line names what the index lists, where the bridge ran the binary for the same list.
+2. `Door.Hook` in hooks.go answers a `tool.describe` naming Bash with an after effect named `description`, where no other effect answers. Any other tool passes.
+3. `stepOf` in .claude/skills/level0/hooks/cage.js maps a named after on `tool.describe` to `{ answer: { after: { [name]: text } } }`, the shape the bridge's describe answer takes.
+4. A case table, test/replay/cage/verb-line-cases.json, holds `verbLine` over a few tool lists. A case in test/level0/verb-line.test.js writes it off the JavaScript, and the Go case reads it, so the two lines stay one.
+
+The bridge keeps its describe door until the-brief-leaves-the-bridge flips the doors. What I weigh: the store lists the same tools the binary prints, so the Go line reads them in place. I assume a describe reaches the door with the tool's name under `tool`, as the bridge reads it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.Hook, at a tool describe
+- src/modules/hooks/describe.go, new: the verb line
+- .claude/skills/level0/hooks/cage.js: stepOf, which maps a named after on a describe
+- src/bridge/bash.js: onDescribe, which the flip retires
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/describe_test.go: TestADescribeOfBashAnswersTheVerbLine
+- src/modules/hooks/describe_test.go: TestADescribeOfAnotherToolPasses
+- test/level0/verb-line.test.js: the verb line matches its case table
+- test/level0/cage.test.js: a named after on a describe answers the description
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/describe.go, new
+- src/modules/hooks/describe_test.go, new
+- src/modules/hooks/hooks.go
+- .claude/skills/level0/hooks/cage.js
+- test/level0/cage.test.js
+- test/level0/verb-line.test.js
+- test/replay/cage/verb-line-cases.json, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened onDescribe in bash.js, verbLine and toolOf in verb-line.js, indexToolsOf, stepOf in cage.js and Door.Hook, and each claim holds there
+- the callers list names the door, the new file, the cage step and the bridge door the flip retires
+- the first done line meets the two describe cases, and the second the check at tests-green
 
 ## tests-red
 
