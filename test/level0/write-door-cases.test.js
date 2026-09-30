@@ -3,25 +3,23 @@
 // [[spec/tickets/cage-write-door-port]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { onToolWrite, schemasHere } from "../../src/bridge/write.js";
+import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { projectionsHere } from "../../src/engine/projection.js";
 
+const TREE = disk();
 const TABLE = JSON.parse(
-  readFileSync(
-    new URL("../replay/cage/write-door-cases.json", import.meta.url),
-    "utf8",
-  ),
+  TREE.read(new URL("../replay/cage/write-door-cases.json", import.meta.url)),
 );
 const REPO = new URL("../../", import.meta.url);
 
 // A box over the live schemas and projections, the table's tree and the case's files, with Vale answering the case's findings. [[spec/tickets/cage-write-door-port]]
 function box(one) {
   const live = Object.fromEntries(
-    TABLE.live.map((path) => [path, readFileSync(new URL(path, REPO), "utf8")]),
+    TABLE.live.map((path) => [path, TREE.read(new URL(path, REPO))]),
   );
   const files = Object.fromEntries(
     Object.entries({ ...live, ...TABLE.tree, ...(one.files ?? {}) }).map(

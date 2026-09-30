@@ -4,9 +4,9 @@
 // [[spec/tickets/cage-stop-rules-port]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { boxOf, decide } from "../../src/bridge/server.js";
+import { disk } from "../../src/doors/disk.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -15,7 +15,7 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 const ROOT = "/tree";
 const TREE = new URL("../../", import.meta.url);
 const TABLE = JSON.parse(
-  readFileSync(new URL("../replay/cage/stop-cases.json", import.meta.url), "utf8"),
+  disk().read(new URL("../replay/cage/stop-cases.json", import.meta.url)),
 );
 
 // The case's dotted keys, nested the way spec/config/level0.json holds them. [[spec/tickets/cage-stop-rules-port]]
@@ -34,7 +34,7 @@ function box(one) {
     [`${ROOT}/spec/config/level0.json`]: JSON.stringify(nested(one.config)),
   };
   for (const path of TABLE.live)
-    files[`${ROOT}/${path}`] = readFileSync(new URL(path, TREE), "utf8");
+    files[`${ROOT}/${path}`] = disk().read(new URL(path, TREE));
   for (const [path, text] of Object.entries(one.files ?? {}))
     files[`${ROOT}/${path}`] = text;
   const git = Object.fromEntries(

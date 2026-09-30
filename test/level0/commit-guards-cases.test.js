@@ -3,9 +3,9 @@
 // [[spec/tickets/cage-commit-guards-port]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { onBash } from "../../src/bridge/bash.js";
+import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -22,7 +22,7 @@ function unmasked(text) {
   return JSON.parse(out);
 }
 
-const TABLE = unmasked(readFileSync(AT, "utf8"));
+const TABLE = unmasked(disk().read(AT));
 
 // A box answering each git read the case teaches, and every other run as a failure git reads as empty. [[spec/tickets/cage-commit-guards-port]]
 function box(one) {
