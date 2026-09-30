@@ -251,6 +251,10 @@ frontmatter:
             type: string
             description: the reason the pull passes it over
 
+          kept:
+            type: string
+            description: the commit whose red tests a kept red leaf stands on, per [[spec/design_output/pull#kept-red-leaves]]
+
           blessed:
             type: string
             description: the hash of what a bless at this gate reads
