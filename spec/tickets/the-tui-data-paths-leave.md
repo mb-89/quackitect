@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -265,6 +265,31 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: "[[spec/tickets/the-work-tab-reads-v1]], [[spec/tickets/the-work-keys-call-actions]], [[spec/tickets/the-log-tab-reads-v1]]"
+  - step: design/tests-red
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 31907719d689737155dc9fb4e32d485cf8cc49a6
+    hash_after: 31907719d689737155dc9fb4e32d485cf8cc49a6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 365df2fa0fabfadf
+        size: 19014
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: d86d10e8babf3c95
+        size: 21078
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: f8d74dda24c97d66
+        size: 17093
+    def: 08e16d07b0de477c
 depends_on: [the-work-tab-reads-v1, the-work-keys-call-actions, the-log-tab-reads-v1]
 ---
 
@@ -368,7 +393,7 @@ Weighed: one ticket over the whole cutover spares three reviews. It costs a diff
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-The tracked config reads `shadow` for the window, and `work.Tab` and `log.Tab` each hold a `Shadow`. Both cases fail on that. The surprise: the front of an open ticket stands closed to its hand, so this ticket's wait on the three pieces rides in its approach. The pull hands this ticket ahead of them, so its tests cover its own part alone. The grep line in its ask meets its test in [[spec/tickets/the-work-tab-reads-v1]], whose ask carries the same line.
+Both cases still fail on their own assertion: the tracked config reads shadow for the window, and work.Tab and log.Tab each hold a Shadow. The three pieces before this one now stand closed, so this ticket's own part is all that is left: the key, the compares and windowMode.
 
 ### checked
 
