@@ -85,6 +85,10 @@ type Outside struct {
 	As    q.Writer
 	Bound func(local string) string
 	Sweep func() any
+	// The tools the module runs beside the sweep, the text of each file git tracks, and the quiet span a change waits before the tools read its buffer. Nil tools draw no tool row. [[spec/tickets/lsp-module-draws-the-tools]]
+	Tools *Tools
+	Files func() map[string]string
+	Quiet time.Duration
 }
 
 // The server over the buffers an editor holds open, and what it last published for each. [[spec/tickets/the-lsp-door-lands]]

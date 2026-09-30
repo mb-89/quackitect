@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: cd2afb18da164609
         size: 487
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d8922c5f7ed7 · claude-code-remote
+    hash_before: 5145bad52e5f229351d8c11869d16444cc57bb98
+    hash_after: 5145bad52e5f229351d8c11869d16444cc57bb98
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/lsp fails
+    inputs:
+      - name: design/draft
+        hash: 9c15e28df12267fe
+        size: 2649
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -233,26 +246,31 @@ Weighed: a tools module writing the `check/vale` and `check/biome` names, agains
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/lsp/tools_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/lsp/tools_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each of the six cases fails on its own assertion: every publish comes back empty, and the tense case sees no run at all. The stubs give the cases a shape to compile against. The fixture marker tripped the exemption rule in the test file itself, so the literal stands split in two.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the Vale, Biome and tree lines each meet a case failing on its assertion, and the check line meets ./RUNME.sh check at the build
+- the one door the cases reach, the tool runner, takes the fake in tools_test.go
 
 # gate
 
