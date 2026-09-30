@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -185,6 +185,19 @@ record:
   - step: accept
     skipped: true
     why: the delivery's acceptance reads this ticket
+  - step: view
+    hand: box d8901b0331d5 · claude-code-remote
+    hash_before: 75c05faca10135caddcd39337e8ecea5ff3bdc41
+    hash_after: 75c05faca10135caddcd39337e8ecea5ff3bdc41
+    inputs:
+      - name: ask
+        hash: 856bfcbf8f23ff19
+        size: 738
+      - name: implement/tests-green
+        hash: efedbfd2ad0c9129
+        size: 1343
+    def: 561b3819e1683d37
+reason: done
 ---
 
 # Ask
@@ -474,8 +487,13 @@ The cost: a mark and the drawing follow the saved file, not the buffer.
 ## seen
 
 <!-- pass where the view shows the ask's number, or fail with what it shows -->
-
 <!-- the form is verdict -->
+
+pass
+- no editor runs on this cloud box, so the view is the live index the lens, the marks and the drawing read
+- `holds/standing` answers this ticket's hold at `view`, with `person` false for a box
+- `tickets/drawn/spec/tickets/the-lens-reads-v1.md` answers the route graph and one unfilled mark on `seen`, at the line its heading stands on
+- the lens-v1 case draws a held ticket's marks and route over the fake index, so the drawing the page shows rides the same values
 
 # Discussion
 
