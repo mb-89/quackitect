@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -150,6 +150,18 @@ record:
         hash: 5cfd65b6199235a5
         size: 3793
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 42e12dd5d26940213ed80ca4e8a535bc972fa08e
+    hash_after: 42e12dd5d26940213ed80ca4e8a535bc972fa08e
+    inputs:
+      - name: design/draft
+        hash: 5cfd65b6199235a5
+        size: 3793
+      - name: design/tests-red
+        hash: bbc2060d52184a48
+        size: 1346
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -317,8 +329,13 @@ every door the tests reach has a fake: the door's writer through a recording Dro
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: the fold names each drop as dropsHold and dropsAsk decide it, the door hands each to Outside.Drop, and config.Drop writes one key of the local layer as writes in src/bridge/config.js does
+- done_when one meets TestATurnsEndDropsTheOwnersHold, TestAPaidUpdateDropsTheAsk and TestTheDoorWritesEachDropItsFoldNames, red now, with two green guards against a drop too many; done_when two is the check the implement answers
+- fix in place: writes in src/bridge/config.js joins the layer under box.work, so config.Drop writes under the root the post names, the work root, and makes the whole folder of the layer, where the bridge makes .se alone
+- weighed: the stood mark lands here beside the drop, since dropsHold sets both in one move, and the stop rules port reads it
 
 # implement
 
