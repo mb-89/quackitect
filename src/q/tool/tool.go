@@ -20,6 +20,7 @@ import (
 // The prefix a tool's name opens on, the argument a call sets its wait by, and the property a bare input rides under, since a tool takes an object. [[spec/tickets/the-hook-registers-index-tools]]
 const (
 	Prefix  = "index_"
+	Served  = "mcp__level0__"
 	WaitArg = "wait"
 	BareArg = "input"
 	percent = 100
@@ -30,13 +31,19 @@ func Name(action string) string {
 	return Prefix + strings.ReplaceAll(action, "/", "_")
 }
 
-// The action of the store whose tool name the call names. [[spec/tickets/the-hook-registers-index-tools]]
-func Action(store *q.Store, tool string) (string, bool) {
-	if !strings.HasPrefix(tool, Prefix) {
-		return "", false
+// The tool name an action answers under: its own where it carries one, and the generated one otherwise. [[spec/tickets/tools-keep-their-own-names]]
+func NameOf(store *q.Store, action string) string {
+	if looks, ok := store.Presentation(action); ok && looks.Tool != "" {
+		return looks.Tool
 	}
+	return Name(action)
+}
+
+// The action of the store whose tool name the call names, past the prefix the harness sets before a level zero tool. [[spec/tickets/tools-keep-their-own-names]]
+func Action(store *q.Store, tool string) (string, bool) {
+	tool = strings.TrimPrefix(tool, Served)
 	for _, name := range store.Names() {
-		if _, _, ok := store.Types(name); ok && Name(name) == tool {
+		if _, _, ok := store.Types(name); ok && NameOf(store, name) == tool {
 			return name, true
 		}
 	}

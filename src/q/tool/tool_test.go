@@ -60,6 +60,27 @@ func TestActionResolvesALevelZeroNameToItsAction(t *testing.T) {
 	}
 }
 
+// An action carrying its own tool name reads back from that name, bare or under the level zero prefix, and from no generated one. [[spec/tickets/tools-keep-their-own-names]]
+func TestAnOwnToolNameReadsBackToItsAction(t *testing.T) {
+	c := q.New()
+	q.ActionIn(c, "plans/set", func(greetIn) []q.Request { return nil }, q.ToolName("plan"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatal(faults)
+	}
+	s := q.NewStore(c)
+	if name := NameOf(s, "plans/set"); name != "plan" {
+		t.Fatalf("the tool name of plans/set reads %q, and wants plan", name)
+	}
+	for _, called := range []string{"plan", "mcp__level0__plan"} {
+		if action, ok := Action(s, called); !ok || action != "plans/set" {
+			t.Fatalf("%s reads back %q, and wants plans/set", called, action)
+		}
+	}
+	if _, ok := Action(s, "index_plans_set"); ok {
+		t.Fatal("the generated name reads back an action carrying its own, and wants none")
+	}
+}
+
 func TestABareInputRidesUnderItsOneProperty(t *testing.T) {
 	registry := huma.NewMapRegistry("#/components/schemas/", huma.DefaultSchemaNamer)
 	schema, bare, err := Schema(registry, reflect.TypeOf(""))

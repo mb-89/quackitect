@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: c62c9216b2cdca11
         size: 842
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 98430129083892e0543f78220760332a577f1586
+    hash_after: 98430129083892e0543f78220760332a577f1586
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -312,14 +321,19 @@ What I weigh: the approach answers the ask with one naming function, `NameOf`, w
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q, src/q/tool, src/index and src/modules/mcp, each inside the draft's size. index-tools.js stays, since no action claims an own name yet
+- the change reaches no door, and each case builds its own catalog through q
+- each new function carries a pointer at spec/tickets/tools-keep-their-own-names
+- the server's prefix stands once in Go as tool.Served, and NameOf alone answers a tool name
 
 ## tests-green
 

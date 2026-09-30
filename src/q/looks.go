@@ -24,6 +24,9 @@ func Label(text string) Option { return func(one *registration) { one.label = te
 // [[spec/design_output/model#the-options]]
 func Icon(name string) Option { return func(one *registration) { one.icon = name } }
 
+// The tool name the agent already calls, which the action answers under in place of its generated one. [[spec/tickets/tools-keep-their-own-names]]
+func ToolName(name string) Option { return func(one *registration) { one.tool = name } }
+
 // [[spec/design_output/model#the-options]]
 func Looks(kind Look) Option { return func(one *registration) { one.looks = kind } }
 
@@ -60,6 +63,7 @@ type Presentation struct {
 	Doc    string
 	Label  string
 	Icon   string
+	Tool   string
 	Looks  Look
 	Fields []Field
 	Out    []Field
@@ -84,7 +88,7 @@ func (c *Catalog) Presentation(name string) (Presentation, bool) {
 }
 
 func (one *registration) presentation() Presentation {
-	return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Looks: one.looks, Fields: one.fields, Out: one.out}
+	return Presentation{Doc: one.doc, Label: one.label, Icon: one.icon, Tool: one.tool, Looks: one.looks, Fields: one.fields, Out: one.out}
 }
 
 // The presentation of the name's active owner, which the catalog rows read. [[spec/tickets/the-catalog-reads-as-rows]]

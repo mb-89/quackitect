@@ -48,7 +48,7 @@ func (one *door) servesTools(api huma.API) {
 			if err != nil {
 				return nil, huma.Error500InternalServerError(err.Error())
 			}
-			out.Body = append(out.Body, listed{Name: tool.Name(name), Description: looks.Doc, Action: name, Bare: bare, InputSchema: schema})
+			out.Body = append(out.Body, listed{Name: tool.NameOf(one.store, name), Description: looks.Doc, Action: name, Bare: bare, InputSchema: schema})
 		}
 		return out, nil
 	})
