@@ -47,6 +47,28 @@ func catalogOf(t *testing.T) (*q.Store, q.Writer) {
 	return qtest.Over(t, c, as).Store(), as
 }
 
+// The listen writes its port and token to the door file, a name no other server stands under. [[spec/tickets/the-lsp-server-leaves]]
+func TestTheListenWritesTheDoorFile(t *testing.T) {
+	server, _ := serverOver(t)
+	root := t.TempDir()
+	stop, err := Listen(root, server)
+	if err != nil {
+		t.Fatalf("the listener stands nowhere: %v", err)
+	}
+	defer stop()
+	body, err := os.ReadFile(filepath.Join(root, ".se", ".runtime", "lsp-door.json"))
+	if err != nil {
+		t.Fatalf("the door file reads nothing: %v", err)
+	}
+	var at Standing
+	if json.Unmarshal(body, &at) != nil || at.Port == 0 || at.Token == "" {
+		t.Fatalf("the door file reads %s, and wants a port and a token", body)
+	}
+	if _, err := os.Stat(filepath.Join(root, ".se", ".runtime", "lsp.json")); err == nil {
+		t.Fatal("the listen writes lsp.json, the old server's name")
+	}
+}
+
 func opened(uri, text string) []byte {
 	body, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": uri, "version": 1, "text": text}}})
 	return body

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,25 @@ record:
         hash: cd2c7ff40c7ad82d
         size: 226
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 8c53b6f45f3696591d3ad710fb753991407c97ff
+    hash_after: 261bc6e002b60a79730cb71dcda45a014d2832ad
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 2daa6e613ad1a13f
+        size: 3685
+      - name: [[spec/tickets/lsp-module-serves-the-features]]
+        hash: 95ea1cdfa0608ff2
+        size: 25715
+      - name: [[spec/tickets/lsp-module-draws-the-tools]]
+        hash: ca27b08b2eb5acbe
+        size: 15910
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -233,26 +252,34 @@ Weighed: keeping `se-lsp check` for the lint against reading the sweep. The swee
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/no-old-server.test.js test/level0/lsp.test.js test/level0/lint-sweep.test.js src/modules/lsp/lsp_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/no-old-server.test.js
+- test/level0/lsp.test.js
+- test/level0/lint-sweep.test.js
+- src/modules/lsp/lsp_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The sweep finds lsp.json, se-lsp and cli-served across install.sh, folders.js, tools.js, the hook, the doctor, the probe, the extension and six test files, and src/lsp stands. The editor asks for se-lsp, not se-index. sweepRowsOf stands as a stub answering an empty list, so the lint cases see no rows and no null. The listen writes lsp.json, so the door file reads nothing. What surprises: no JSON topic answers the sweep yet, since dump writes a file, so the lint case fakes a quack sweep verb, which the implement step adds beside config and log. TestTwinGoldens stands green and only moves, so it takes no red case; it leaves src/lsp at the implement step for src/quack, beside the other twin cases, since a check module test may not run node or git. tree.golden.json in src/quack names the old names too, and its regeneration rides the implement step.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the lsp.json line meets no-old-server.test.js, which fails, and the check line meets ./RUNME.sh check at the build
+- the lint case fakes quack through its disk and proc doors, and the editor and door file cases touch no editor and only a temp folder
 
 # gate
 

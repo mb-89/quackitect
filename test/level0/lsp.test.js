@@ -5,6 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { BIN as INDEX } from "../../.claude/skills/level0/lib/index.js";
 import { startsServer } from "../../src/extension/extension.js";
 import {
   BIN,
@@ -41,6 +42,15 @@ test("the ask names the built binary, the lsp verb and the tree", () => {
   assert.equal(ask.server.command, `/at/root/${BIN}/${NAME}`);
   assert.deepEqual(ask.server.args, ["lsp"]);
   assert.equal(ask.server.options.cwd, "/at/root");
+});
+
+// The editor starts quack lsp, which the index binary answers, so no second server stands. [[spec/tickets/the-lsp-server-leaves]]
+test("the editor starts quack lsp off the index binary", () => {
+  const ask = serverAsk("/at/root", "linux");
+  assert.equal(ask.at, INDEX);
+  assert.equal(ask.server.command, `/at/root/${INDEX}`);
+  assert.deepEqual(ask.server.args, ["lsp"]);
+  assert.equal(serverAsk("/at/root", "win32").at, `${INDEX}.exe`);
 });
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -83,7 +93,9 @@ function clientModule() {
       error: () => ({ action: ErrorAction.Shutdown }),
       closed: () => {
         closes += 1;
-        return { action: closes <= CAP ? CloseAction.Restart : CloseAction.DoNotRestart };
+        return {
+          action: closes <= CAP ? CloseAction.Restart : CloseAction.DoNotRestart,
+        };
       },
     };
   };

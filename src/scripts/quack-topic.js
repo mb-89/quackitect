@@ -65,6 +65,11 @@ export function topicOf(it, argv, stdin) {
   }
 }
 
+// The check module's sweep under the paths the lint asks, each row as quack answers it, or null where quack answers nothing a reader takes. [[spec/tickets/the-lsp-server-leaves]]
+export function sweepRowsOf(_it, _where) {
+  return [];
+}
+
 // The rows the config verb prints, off the map `quack config` answers, in key order. [[spec/tickets/cfg-topic-holds-one-resolver]]
 export function configRowsOf(answered) {
   if (!answered || typeof answered !== "object" || Array.isArray(answered)) return null;
