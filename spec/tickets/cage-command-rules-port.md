@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -150,6 +150,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/tickets/cage-rules-port-before-switch]]
+  - step: design/draft
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: 536affc32aa1838dd2b96f5636694329ac8d06af
+    hash_after: 536affc32aa1838dd2b96f5636694329ac8d06af
+    inputs:
+      - name: ask
+        hash: 36e18c6742eba22f
+        size: 908
+      - name: [[spec/tickets/cage-rules-port-before-switch]]
+        hash: 5839e9993ce46677
+        size: 13455
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -215,6 +227,8 @@ The command door ports into a new Go package, src/modules/hooks/command, and Doo
 
 5. A recorded log, test/replay/cage/command-rules.jsonl, carries one hook row a rule with the bridge's answer. Its golden shadow loses a row with each rule ported, and stands empty at the end.
 
+6. The parent's recorded log, test/replay/cage/every-refusal.jsonl, carries four command rows this port decides: the ticket door on a command naming no ticket, LandingFollowsItsGate, GitWritesThroughAVerb and ShellWritesNothing. doorOver builds its root off the shared table, so the replay reads those four rows on the tree they name, and they leave the parent's apart list once this port lands.
+
 The rewrites the bridge answers, markedPush and onDescribe, read as pass on both sides, so they port with the hook module's switch.
 
 ### callers
@@ -240,13 +254,14 @@ The rewrites the bridge answers, markedPush and onDescribe, read as pass on both
 - src/modules/hooks/command_test.go: TestTheDoorRefusesWhatTheBridgeRefuses, over command-cases.json
 - test/level0/command-cases.test.js: the bridge answers every shared case
 - test/replay/cage/command-rules.jsonl and its shadow, through TestReplayLogAnswersEveryRecordedLog
+- test/replay/cage/every-refusal.jsonl: its four command rows, through TestReplayLogAnswersEveryRecordedLog
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
 <!-- the form is list -->
 
-- first draft
+- the parent's tests-red adds every-refusal.jsonl with four command rows this port decides: step 6 names them, and doorOver's root off the shared table serves that replay too
 
 ### size
 
@@ -264,6 +279,7 @@ The rewrites the bridge answers, markedPush and onDescribe, read as pass on both
 - src/modules/hooks/command/refuse.go
 - src/modules/hooks/command/*_test.go
 - src/modules/hooks/hooks.go
+- src/modules/hooks/hooks_test.go
 - src/modules/hooks/command_test.go
 - src/quack/main.go
 - test/replay/cage/command-cases.json
@@ -276,9 +292,9 @@ The rewrites the bridge answers, markedPush and onDescribe, read as pass on both
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- opened lib/bash.js, lib/refuse.js, lib/git-writes.js, src/engine/named.js, src/bridge/bless.js, src/bridge/bash.js onBash and onPowerShell, hooks.go Hook and main.go listensHooks, and each claim holds there
+- opened lib/bash.js, lib/refuse.js, lib/git-writes.js, src/engine/named.js, src/bridge/bless.js, src/bridge/bash.js onBash and onPowerShell, hooks.go Hook, cage.go ReplayLog, hooks_test.go doorOver, main.go listensHooks and the parent's every-refusal.jsonl, and each claim holds there
 - the callers list names every caller of Door.Hook and hooks.New
-- done_when line one meets command-rules.jsonl, line two the shared case table on both sides, line three the check
+- done_when line one meets command-rules.jsonl and every-refusal.jsonl's command rows, line two the shared case table on both sides, line three the check
 
 ## tests-red
 
