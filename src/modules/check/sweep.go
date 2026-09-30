@@ -6,6 +6,7 @@ package check
 
 import (
 	"encoding/json"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -70,8 +71,12 @@ func sweepOf(in sweepIn) []Finding {
 		}
 	}
 	tree.Words = countOf(texts, in.Env, wordsKey)
-	return CheckerOver(tree, countOf(texts, in.Env, pointerKey), countOf(texts, in.Env, ruleKey)).Sweep()
+	found := CheckerOver(tree, countOf(texts, in.Env, pointerKey), countOf(texts, in.Env, ruleKey)).Sweep()
+	return slices.DeleteFunc(found, func(one Finding) bool { return slices.Contains(boxRules, one.Rule) })
 }
+
+// The rules that read the survey on the box, which stands outside what git tracks, so the lint decides them off the box and the sweep leaves them out. [[spec/tickets/sweep-skips-box-rules]]
+var boxRules = []string{"SurveyFindsNode"}
 
 // A count off the layers: the local file beats the variable, the variable beats the tracked file, and the tracked file beats the schema's default, as src/config reads them. [[spec/design_output/config#the-resolver-holds-the-layers]]
 func countOf(texts Texts, env map[string]string, key string) int {

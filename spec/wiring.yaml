@@ -90,6 +90,8 @@ wires:
   check.files/<path...>: files/<path...>
   check.env/<name>: env/<name>
   lsp.buffers/<path...>: buffers/<path...>
+  lsp.files/<path...>: files/<path...>
+  lsp.tracked: git/tracked
   check.buffers/<path...>: buffers/<path...>
   log.session: files/.se/.log/session.jsonl
   git.tips: git/tips

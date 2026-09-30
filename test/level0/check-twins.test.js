@@ -117,7 +117,7 @@ test("a twin's golden file stands for every twin", async () => {
     }
     assert.ok(
       golden,
-      `no golden file stands for ${twin}: run go test ./src/lsp -run TestTwinGoldens -twins`,
+      `no golden file stands for ${twin}: run go test ./src/quack -run TestTwinGoldens -twins`,
     );
     assert.ok(
       Array.isArray(golden.javascript) && Array.isArray(golden.go),

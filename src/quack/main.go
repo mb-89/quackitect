@@ -225,6 +225,14 @@ func main() {
 		}
 		return
 	}
+	// [[spec/tickets/the-lsp-server-leaves]]
+	if len(os.Args) == 2 && os.Args[1] == "sweep" {
+		if err := sweeps(os.Stdout, index.Ask); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) == 2 && os.Args[1] == "prose" {
 		if err := proses("."); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -347,15 +355,6 @@ func listens(root string, store *q.Store, open doors, served manager.Served) (fu
 		halts = append(halts, halt)
 	}
 	return stop, nil
-}
-
-// Opens the lsp listener over the store, reading the check module's sweep at each publish. [[spec/tickets/the-lsp-door-lands]]
-func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
-	server := lsp.New(lsp.Outside{
-		Root: root, Store: store, As: one.as, Bound: one.bound,
-		Sweep: func() any { return store.Snapshot().Read(sweepName) },
-	})
-	return lsp.Listen(root, server)
 }
 
 // Opens the mcp server over the manager's call, so a harness with no function hooks reaches every action. [[spec/tickets/the-mcp-module-lands]]

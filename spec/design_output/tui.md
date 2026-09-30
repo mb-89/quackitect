@@ -27,7 +27,7 @@ one tab reads them all. These packages part it, and every import runs down:
 | `src/tui/draw` | `Cut`, `Pad`, `OneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `src/config`, for the palette |
 | `src/tui/tree` | the tree, the rows it draws and the base file | `src/tui/draw`, and `src/yaml` for the base file |
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
-| `src/tui/log` | the log tab: its records, its rows off the watch, its columns, its details, the said style and its view drawn off the base file | the frame, the tree and the draw packages, and the registry package for the catalog and the watch |
+| `src/tui/log` | the log tab: its records, its rows off the watch, its columns, its details, the `said` style and its view drawn off the base file | the frame, the tree and the draw packages, and the registry package for the catalog and the watch |
 | `src/tui/work` | the work tab: its tree, its edit, and its rows and count off the watch | the frame, the tree and the draw packages, the registry package for the catalog and the watch, and `src/yaml` for the ticket schema |
 | `src/tui/registry` | the registry tabs `index`, `cli` and `help`, and the catalog door they read through, with its fake and its `/v1` road | the frame and the draw packages |
 | `src/tui` | the window, which builds the tab list | the frame, each tab, and the draw package for the palette and the filter language, and `src/index` for the base of `/v1` |
@@ -322,7 +322,7 @@ the wrap reads a line:
 
 | the table | how it draws |
 |---|---|
-| fits the pane | a grid: each cell padded to its column, a bar between two, a rule under the header |
+| fits the pane | a grid: each cell pads to its column, a bar between two, a rule under the header |
 | wider than the pane | a card per row: each cell after its header's name, so a long value wraps under itself |
 
 Any other line reaches the wrap as it stands.

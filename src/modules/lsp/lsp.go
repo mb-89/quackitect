@@ -31,8 +31,11 @@ import (
 // The family the module writes, by its local name. [[spec/design_output/model#the-topics-and-their-writers]]
 const BuffersName = "buffers/<path...>"
 
+// The prefix of a name the watch module writes a file's text under, which a commit moving it names. [[spec/tickets/lsp-module-draws-the-tools]]
+const filesPrefix = "files/"
+
 // The file the listen writes its port and token to, under the root. .claude/skills/level0/lib/folders.js owns the folder. [[spec/tickets/the-lsp-door-lands]]
-const StandingFile = ".se/.runtime/lsp.json"
+const StandingFile = ".se/.runtime/lsp-door.json"
 
 // The protocol's words: the version and the name the server answers, its methods, the full-text sync kind, and the JSON-RPC error code. [[spec/tickets/the-lsp-door-lands]]
 const (
@@ -45,12 +48,17 @@ const (
 	didChange     = "textDocument/didChange"
 	didClose      = "textDocument/didClose"
 	publish       = "textDocument/publishDiagnostics"
+	hover         = "textDocument/hover"
+	completion    = "textDocument/completion"
+	documentLink  = "textDocument/documentLink"
+	foldingRange  = "textDocument/foldingRange"
 	syncFull      = 1
 	noMethod      = -32601
 )
 
 // The severities a finding carries, and the levels the protocol draws them at. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
 const (
+	severe       = "error"
 	warning      = "warning"
 	hint         = "hint"
 	levelError   = 1
@@ -85,6 +93,12 @@ type Outside struct {
 	As    q.Writer
 	Bound func(local string) string
 	Sweep func() any
+	// The tools the module runs beside the sweep, the text of each file git tracks, and the quiet span a change waits before the tools read its buffer. Nil tools draw no tool row. [[spec/tickets/lsp-module-draws-the-tools]]
+	Tools *Tools
+	Files func() map[string]string
+	Quiet time.Duration
+	// What the check module lends the server, which the wiring hands in. [[spec/tickets/lsp-module-serves-the-features]]
+	Check Check
 }
 
 // The server over the buffers an editor holds open, and what it last published for each. [[spec/tickets/the-lsp-door-lands]]
@@ -93,6 +107,13 @@ type Server struct {
 	mu   sync.Mutex
 	open map[string]string
 	sent map[string]string
+	// The tool rows by file, the address each open path came in under, the runs a change waits on, and the writer a run's publish goes to. [[spec/tickets/lsp-module-draws-the-tools]]
+	tools   map[string][]Finding
+	uris    map[string]string
+	timers  map[string]*time.Timer
+	pending sync.WaitGroup
+	runs    sync.Mutex
+	push    func(bodies ...[]byte)
 }
 
 // One line of a recording whose replies differ from the server's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -144,12 +165,35 @@ type diagnostic struct {
 
 // The module type the wiring loads as lsp. [[spec/tickets/the-lsp-door-lands]]
 func Registers(c *q.Catalog) q.Writer {
+	q.DerivedIn(c, TextsName, map[string]string{}, textsOf, q.Doc("the text of every file git tracks, which the tools and the features read"))
 	return q.OutIn(c, BuffersName, "", q.IO(), q.Doc("the unsaved text of a file an editor holds open"))
+}
+
+// The name the tracked texts stand under, by its local name. [[spec/tickets/lsp-module-draws-the-tools]]
+const TextsName = "texts"
+
+type textsIn struct {
+	Files   map[string]q.Content `q:"files/<path...>"`
+	Tracked []string             `q:"tracked"`
+}
+
+// The text of each file git tracks, off the files the index mirrors. [[spec/tickets/lsp-module-draws-the-tools]]
+func textsOf(in textsIn) map[string]string {
+	out := map[string]string{}
+	for _, at := range in.Tracked {
+		if file, ok := in.Files[at]; ok && file.Hash != "" {
+			out[at] = file.Text
+		}
+	}
+	return out
 }
 
 // [[spec/tickets/the-lsp-door-lands]]
 func New(from Outside) *Server {
-	return &Server{from: from, open: map[string]string{}, sent: map[string]string{}}
+	if from.Check.Tree == nil && from.Tools != nil {
+		from.Check = from.Tools.Check
+	}
+	return &Server{from: from, open: map[string]string{}, sent: map[string]string{}, tools: map[string][]Finding{}, uris: map[string]string{}, timers: map[string]*time.Timer{}}
 }
 
 // Answers one LSP message with the bodies it replies: initialize and shutdown answer, and didOpen and didChange commit the buffer and publish its diagnostics. didClose empties the buffer and publishes none. [[spec/design_output/model#the-editor-starts-quack-lsp]]
@@ -163,11 +207,19 @@ func (s *Server) Handle(message []byte) [][]byte {
 	switch in.Method {
 	case initialize:
 		return [][]byte{answers(in.ID, map[string]any{
-			"capabilities": map[string]any{"textDocumentSync": syncFull},
+			"capabilities": capabilities,
 			"serverInfo":   map[string]any{"name": serverName, "version": serverVersion},
 		})}
 	case shutdown:
 		return [][]byte{answers(in.ID, nil)}
+	case hover:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Hover, in.Params, nil))}
+	case completion:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Complete, in.Params, []any{}))}
+	case documentLink:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Links, in.Params, []any{}))}
+	case foldingRange:
+		return [][]byte{answers(in.ID, s.reads(s.from.Check.Folds, in.Params, []any{}))}
 	case didOpen, didChange:
 		var params textParams
 		if json.Unmarshal(in.Params, &params) != nil {
@@ -185,7 +237,9 @@ func (s *Server) Handle(message []byte) [][]byte {
 			return nil
 		}
 		s.open[at] = text
-		return [][]byte{s.publishes(params.TextDocument.URI, at, true)}
+		s.uris[at] = params.TextDocument.URI
+		s.schedule(at)
+		return [][]byte{s.drawn(params.TextDocument.URI, at, byFile(s.sweep())[at], true)}
 	case didClose:
 		var params textParams
 		if json.Unmarshal(in.Params, &params) != nil {
@@ -197,6 +251,8 @@ func (s *Server) Handle(message []byte) [][]byte {
 		}
 		delete(s.open, at)
 		delete(s.sent, at)
+		// The closed file reads off the disk again, so its rows come back once the tools run. [[spec/tickets/lsp-module-draws-the-tools]]
+		s.schedule(at)
 		return [][]byte{marshal(map[string]any{"jsonrpc": rpcVersion, "method": publish, "params": map[string]any{"uri": params.TextDocument.URI, "diagnostics": []diagnostic{}}})}
 	}
 	if len(in.ID) > 0 {
@@ -205,35 +261,35 @@ func (s *Server) Handle(message []byte) [][]byte {
 	return nil
 }
 
-// A publish for each open path whose diagnostics differ from the last publish, which the sweep settling after a commit calls for. [[spec/tickets/the-lsp-door-lands]]
+// A publish for each path whose diagnostics differ from the last publish, which the sweep settling after a commit calls for. A closed file publishes too, under the address the root gives it. [[spec/tickets/lsp-module-draws-the-tools]]
 func (s *Server) Republish(uris map[string]string) [][]byte {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	var out [][]byte
-	for at := range s.open {
-		if uri, ok := uris[at]; ok {
-			if body := s.publishes(uri, at, false); body != nil {
-				out = append(out, body)
-			}
-		}
+	for at, uri := range uris {
+		s.uris[at] = uri
 	}
-	return out
+	return s.publishAll(nil)
 }
 
+// Commits the buffer. The caller holds the lock, and the commit runs with it let go, since the store's hook republishes under the same lock. [[spec/tickets/reaches-keeps-the-post-fault]]
 func (s *Server) writes(at, text string) error {
+	s.mu.Unlock()
+	defer s.mu.Lock()
 	name := s.from.Bound("buffers/" + at)
 	_, err := s.from.Store.Commit(s.from.Store.Snapshot().Revision, s.from.As, map[string]any{name: text})
 	return err
 }
 
-// The publish for a path off the sweep's rows on it. With force off, a publish equal to the last one answers nil. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
-func (s *Server) publishes(uri, at string, force bool) []byte {
-	rows := strings.Split(s.open[at], "\n")
+// The publish for a path off the sweep's rows on it and the tools' rows beside them, over the buffer where an editor holds one, else the file. With force off, a publish equal to the last one answers nil. The caller holds the lock. [[spec/design_output/lsp#a-finding-is-a-diagnostic]]
+func (s *Server) drawn(uri, at string, swept []Finding, force bool) []byte {
+	text, open := s.open[at]
+	if !open && s.from.Files != nil {
+		text = s.from.Files()[at]
+	}
+	rows := strings.Split(text, "\n")
 	drawn := []diagnostic{}
-	for _, one := range s.sweep() {
-		if one.File == at {
-			drawn = append(drawn, drawsAs(one, rows))
-		}
+	for _, one := range append(append([]Finding{}, swept...), s.tools[at]...) {
+		drawn = append(drawn, drawsAs(one, rows))
 	}
 	body := marshal(map[string]any{"jsonrpc": rpcVersion, "method": publish, "params": map[string]any{"uri": uri, "diagnostics": drawn}})
 	if !force && s.sent[at] == string(body) {
@@ -392,17 +448,34 @@ func Listen(root string, server *Server) (func(), error) {
 		mu    sync.Mutex
 		conns = map[*conn]bool{}
 	)
-	server.from.Store.OnCommit(func(map[string]any) {
+	held := func() []*conn {
 		mu.Lock()
-		held := make([]*conn, 0, len(conns))
+		defer mu.Unlock()
+		out := make([]*conn, 0, len(conns))
 		for one := range conns {
-			held = append(held, one)
+			out = append(out, one)
 		}
-		mu.Unlock()
-		for _, one := range held {
-			one.send(server.Republish(one.known())...)
+		return out
+	}
+	// A run of the tools publishes to every connection. [[spec/tickets/lsp-module-draws-the-tools]]
+	server.Pushes(func(bodies ...[]byte) {
+		for _, one := range held() {
+			one.send(bodies...)
 		}
 	})
+	server.from.Store.OnCommit(func(values map[string]any) {
+		for _, one := range held() {
+			one.send(server.Republish(one.known())...)
+		}
+		go server.follows(values)
+	})
+	// The listen runs the tools over the whole tree once, so a closed file draws its rows. [[spec/tickets/lsp-module-draws-the-tools]]
+	go func() {
+		bodies := server.SweepTools()
+		for _, one := range held() {
+			one.send(bodies...)
+		}
+	}()
 	go func() {
 		for {
 			raw, err := listen.Accept()

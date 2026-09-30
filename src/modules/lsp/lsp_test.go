@@ -24,9 +24,7 @@ const recording = "../../../test/replay/lsp/one-session.jsonl"
 // A sweep that behaves: an open buffer of spec/a.md carrying a dead pointer draws one finding on its line. [[spec/tickets/the-lsp-door-lands]]
 func serverOver(t *testing.T) (*Server, *q.Store) {
 	t.Helper()
-	c := q.New()
-	as := Registers(c)
-	store := qtest.Over(t, c, as).Store()
+	store, as := catalogOf(t)
 	sweep := func() any {
 		text, _ := store.Snapshot().Read("buffers/spec/a.md").(string)
 		for i, line := range strings.Split(text, "\n") {
@@ -37,6 +35,35 @@ func serverOver(t *testing.T) (*Server, *q.Store) {
 		return []Finding{}
 	}
 	return New(Outside{Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local }, Sweep: sweep}), store
+}
+
+// A store over the module and the inputs its texts read, as a case seeds them. [[spec/tickets/lsp-module-draws-the-tools]]
+func catalogOf(t *testing.T) (*q.Store, q.Writer) {
+	t.Helper()
+	c := q.New()
+	as := Registers(c)
+	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
+	q.OutIn(c, "tracked", []string{}, q.Doc("the paths git tracks, as the case seeds them"))
+	return qtest.Over(t, c, as).Store(), as
+}
+
+// The listen writes its port and token to the door file, a name no other server stands under. [[spec/tickets/the-lsp-server-leaves]]
+func TestTheListenWritesTheDoorFile(t *testing.T) {
+	server, _ := serverOver(t)
+	root := t.TempDir()
+	stop, err := Listen(root, server)
+	if err != nil {
+		t.Fatalf("the listener stands nowhere: %v", err)
+	}
+	defer stop()
+	body, err := os.ReadFile(filepath.Join(root, ".se", ".runtime", "lsp-door.json"))
+	if err != nil {
+		t.Fatalf("the door file reads nothing: %v", err)
+	}
+	var at Standing
+	if json.Unmarshal(body, &at) != nil || at.Port == 0 || at.Token == "" {
+		t.Fatalf("the door file reads %s, and wants a port and a token", body)
+	}
 }
 
 func opened(uri, text string) []byte {
@@ -64,6 +91,22 @@ func TestAnOpenBufferWritesItsName(t *testing.T) {
 	server.Handle(opened("file:///tree/spec/b.md", "# B\n"))
 	if said := store.Snapshot().Read("buffers/spec/b.md"); said != "# B\n" {
 		t.Fatalf("buffers/spec/b.md reads %#v, and wants the text the editor opens", said)
+	}
+}
+
+// The listen hooks a republish onto every commit, and the buffer's own commit runs that hook, so an open answers while the store republishes. [[spec/tickets/reaches-keeps-the-post-fault]]
+func TestAnOpenAnswersWhileTheCommitRepublishes(t *testing.T) {
+	server, store := serverOver(t)
+	store.OnCommit(func(map[string]any) { server.Republish(nil) })
+	done := make(chan struct{})
+	go func() {
+		server.Handle(opened("file:///tree/spec/b.md", "# B\n"))
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("the open waits on the republish its own commit runs")
 	}
 }
 

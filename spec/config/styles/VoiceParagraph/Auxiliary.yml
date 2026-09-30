@@ -17,6 +17,11 @@ exceptions:
   - had settled
   - had standing
   - had switched
+  - had unjudged
+  - had unmarked
+  - had unmerged
+  - had unquoted
+  - had unsaved
   - has approved
   - has bound
   - has complicated
@@ -27,6 +32,11 @@ exceptions:
   - has settled
   - has standing
   - has switched
+  - has unjudged
+  - has unmarked
+  - has unmerged
+  - has unquoted
+  - has unsaved
   - have approved
   - have bound
   - have complicated
@@ -37,6 +47,11 @@ exceptions:
   - have settled
   - have standing
   - have switched
+  - have unjudged
+  - have unmarked
+  - have unmerged
+  - have unquoted
+  - have unsaved
 tokens:
   - pattern: '(?:have|has|had)'
     tag: VB*

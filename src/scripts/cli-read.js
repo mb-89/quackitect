@@ -5,11 +5,9 @@
 import { join } from "node:path";
 import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
-import { schemaFaults } from "../../.claude/skills/level0/lib/schema.js";
-import { treeFaults } from "../../.claude/skills/level0/lib/tree.js";
+import { surveyFindsNode } from "../../.claude/skills/level0/lib/tree.js";
 import { WARNING } from "../../.claude/skills/level0/lib/warnings.js";
 import {
-  aloneOver,
   biomeFor,
   findingsOver,
   pastHistory,
@@ -19,9 +17,9 @@ import {
 } from "../bridge/findings.js";
 import { readTools } from "../engine/tools.js";
 import { redIn } from "./battery.js";
-import { treeHere } from "./cli-check.js";
 import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
-import { serverFaults } from "./cli-served.js";
+import { treeHere } from "./cli-check.js";
+import { rowsUnder, sweepRowsOf } from "./quack-topic.js";
 
 // What the last lint left standing at warning. The stamp takes it, and `branch done` reads the stamp. [[spec/design_output/work#the-battery-answers-first]]
 let stood = [];
@@ -75,32 +73,31 @@ export function readThroughTheReader(found) {
   return readThrough({ disk: files, join, root }, found);
 }
 
-// The command line's own reading, which `lint` prints and a case counts. [[spec/design_output/lsp#one-checker-every-front-asks]]
-// The server's list comes in where a caller holds one already, so one reading of the server serves both fronts. [[spec/design_output/lsp#one-checker-every-front-asks]]
-// The server runs Vale and Biome itself, so its list stands alone beside the rules it holds nowhere yet, and each row reads once. [[spec/design_output/lsp#a-port-serves-the-list]]
-export async function readingFor(where, served) {
-  const said = served === undefined ? await serverFaults(where) : served;
-  if (said)
+// The command line's own reading, which `lint` prints and a case counts: the tools' rows, and the check module's sweep under the paths asked, which quack answers. [[spec/tickets/the-lsp-server-leaves]]
+// The sweep comes in where a caller holds it already, so one reading serves both. findingsOver draws the stop folder rule, so the sweep's row of it stays out and each row reads once. [[spec/design_output/lsp#one-checker-every-front-asks]]
+// The survey stands on this box alone, and the sweep reads the tracked files, so the rule reads the box here in place of the sweep. [[spec/tickets/the-lsp-server-leaves]]
+const BOX_BOUND = "SurveyFindsNode";
+
+export async function readingFor(where, swept) {
+  const doors = await findingsDoors();
+  const got = await findingsOver(doors, where);
+  if (got.fault)
     return {
-      found: pastHistory({ disk: files, join, root }, [
-        ...said,
-        ...aloneOver({ disk: files, join, root }, where),
-      ]),
-      fault: "",
+      found: [],
+      fault: `${got.fault}\nVale read no file, so every rule it holds stands unchecked.`,
     };
-
-  // [[spec/design_output/lsp]]
-  const got = await findingsOver(await findingsDoors(), where);
-  if (got.fault) return { found: [], fault: got.fault };
-  const found = got.found;
-
-  // [[spec/design_output/tree#when-the-sweep-runs]]
-  if (where.includes(".")) {
-    const tree = treeHere();
-    found.push(...treeFaults(tree).filter((one) => one.rule !== "StopFolderIsData"));
-    found.push(...schemaFaults(tree));
-  }
-  return { found: pastHistory({ disk: files, join, root }, found), fault: "" };
+  const rows = swept === undefined ? sweepRowsOf(doors, where) : swept;
+  if (!rows)
+    return {
+      found: [],
+      fault:
+        "quack answers no check sweep, so every rule the check module holds stands unchecked. Run ./RUNME.sh, which builds the index.",
+    };
+  const kept = rows.filter(
+    (one) => one.rule !== "StopFolderIsData" && one.rule !== BOX_BOUND,
+  );
+  const box = rowsUnder(surveyFindsNode(treeHere()), where);
+  return { found: pastHistory(doors, [...got.found, ...kept, ...box]), fault: "" };
 }
 
 // The doors the command line's own reading runs on. [[spec/design_output/lsp]]
@@ -135,7 +132,6 @@ export async function lint(where) {
   const got = await readingFor(where);
   if (got.fault) {
     console.error(got.fault);
-    console.error("Vale read no file, so every rule it holds stands unchecked.");
     return 1;
   }
   const found = got.found;

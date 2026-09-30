@@ -190,7 +190,7 @@ The retro mint names the process each class needs. Today `src/engine/retro/mint.
 - The engine resolves a note under a subfolder by tags. Each folder name is a tag, and a note adds `tags` and `env` in its frontmatter.
 - A note reaches a step that carries every tag of the note, where its `env` matches. Each step carries `tags` in its process.
 - Every note reaches some step. The check refuses a note that reaches no step, and a test pins the notes each step resolves.
-- The pull prints each resolved note as a section of the ticket, its rules numbered as the note numbers them, with its examples.
+- The pull prints each note it resolves as a section of the ticket, its rules numbered as the note numbers them, with its examples.
 - The spawn hook hands a helper the notes at the top. The gate ticket in its prompt carries the resolved ones.
 - A verb prints the guidance a step resolves, so a reader sees it without a guess.
 - The pull prints the rules into the context, so no step asks for evidence of a read.

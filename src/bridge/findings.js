@@ -107,25 +107,6 @@ export function pastHistory(it, found) {
   return found.filter((one) => !isHistory(one.file));
 }
 
-// The rules the language server holds nowhere yet, which the lint lays beside the server's list. [[spec/design_output/lsp#a-port-serves-the-list]]
-export function aloneOver(it, asked) {
-  const where = asked.filter(
-    (one) => one === WHOLE || it.disk.exists(it.join(it.root, one)),
-  );
-  const found = [];
-  for (const file of walkOver(it, where)) {
-    const shown = showOf(it, file);
-    for (const one of unreasoned(it.disk.read(file)))
-      found.push(from({ ...one, file: shown }, FROM.tree));
-  }
-  if (where.includes(WHOLE)) {
-    const tree = treeOf({ disk: it.disk, root: it.root });
-    found.push(...stopFolderIsData(tree).map((one) => from(one, FROM.tree)));
-  }
-  found.push(...gridOver(it, where).map((one) => from(one, FROM.tree)));
-  return pastHistory(it, found);
-}
-
 // One guard answers both fronts, because a tool standing nowhere is no tool. [[spec/design_output/lsp#one-checker-every-front-asks]]
 export function biomeFor(files, root, known) {
   const at = whereIs(files, root, "biome", known);

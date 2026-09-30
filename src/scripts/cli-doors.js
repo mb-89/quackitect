@@ -114,7 +114,6 @@ export const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 export const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 export const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
 export const biome = whereIs(files, root, "biome", known);
-export const lsp = whereIs(files, root, "se-lsp", known);
 export const GUIDANCE = join(root, "spec", "guidance");
 export const DOORS = join(root, "src", "doors");
 export const PLUGIN = join(".claude", "skills", "level0");

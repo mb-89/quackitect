@@ -144,4 +144,4 @@ carries names the ticket that carries it:
 | the Vale and prose rules | they stay, behind the `vale` IO module |
 | the extension and its UI | they stay in JavaScript, and the generic renderer cuts them down |
 | door contracts | ported one to one, as the contract suite of each IO module's fake |
-| the generic contract tests | new: every registered name carries a built-in value, a type and a doc. It reaches the command line, HTTP and MCP with one text, and every fake runs its contract suite |
+| the generic contract tests | new: every name the catalog registers carries a built-in value, a type and a doc. It reaches the command line, HTTP and MCP with one text, and every fake runs its contract suite |

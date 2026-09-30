@@ -1,5 +1,5 @@
 // Every twin stands as a check/ name with an empty list for its built-in
-// value. TestTwinGoldens in src/lsp holds the golden file beside each.
+// value. TestTwinGoldens in src/quack holds the golden file beside each.
 // [[spec/tickets/check-names-meet-their-goldens]]
 package check
 
