@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -148,6 +148,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 9027734c541dad152c2e01726164e5f89120b4ca
+    hash_after: 9027734c541dad152c2e01726164e5f89120b4ca
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["tui-shell-lands-in-shadow", "quack-verbs-switch-over", "read-topics-switch-over"]
 enabled_by: migration.phase6switch
 cloud: true
@@ -244,38 +256,64 @@ What I weigh:
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-work-keys-call-actions: gate, change, tests-green and view. The work tab posts its four actions and writes no file
+- the-tui-data-paths-leave: tests-red again, gate, change and tests-green. The window slice builds in as new, and the compares leave
+- the group: sync, split and accept
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the red tests the earlier box wrote named every post, so the change went green on the first build
+- the gate rows named the callers the drafts missed, so the builder fixed them in place and spent no round
+- the generators wrote the schema, the command file and the size golden, so no generated file took a hand edit
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 07:44 branch take with the work/ prefix answered no free todo, and the bare group name took it
+- 07:52 the classifier refused go vet and go test after an rm of tracked test files. The window cases built on newModel held the live index catalog, so a key could post to an index on the box
+- 07:55 the pull tool ran from a sub folder and failed to find its script, and it did so again at 08:40
+- 08:20 go test -update over quack rewrote tree.golden.json with drift from every ticket, and the shell write back stood refused
+- 08:21 a quack test refused the tracked config holding window at its built-in value
+- 08:30 the commit hook refused code in frame, log and work with no test beside it, since a deleted test counts for nothing
+- 08:40 branch review timed out one contract case that booted an index, and it passed alone
+- no owner prompt came during the run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the branch take verb takes a name with the work/ prefix as the bare name
+- the level0 plugin runs the pull tool from the tree root, whatever folder the shell stands in
+- editWindow in src/tui/workedit_test.go hands the tab a fake, and it does so now
+- src/quack/golden_test.go writes only the rows a narrow run names, so an update carries no other ticket's drift
+- the approach of a switch ticket names the tracked key leaving the file, since the schema holds the built-in
+- a draft deleting a package's last test names the case it adds beside the code
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The run weighed two costs of a large golden. A shell write back past the door breaks a rule, and a hand write of four hundred kilobytes invites an error. So the rewrite stays, named for the merge. The view step on a cloud box has no terminal, so a window-level case driving the chord stands in for the person's look.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: the key's mode stands in migration.go, and the notes point at actions.go
+- numbers: callWait names the wait in registry/v1.go, and keyWithin and postWithin name each case's wait
+- headers: each new file opens on what it is for, and counts nothing
+- the chapter carries the run's errors with their times, and no owner prompt came
+- the chapter names roles, and carries no name or path of the box
 
 ## cloud
 
