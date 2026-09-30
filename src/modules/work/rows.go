@@ -20,6 +20,7 @@ const (
 	RowsPort      = "rows"
 	OpenTasksPort = "open-tasks"
 	YoursPort     = "yours"
+	OverridesPort = "overrides"
 )
 
 // A row of the queue as ticket yours prints it. [[spec/tickets/ticket-verbs-become-actions]]
@@ -73,6 +74,8 @@ type rowsIn struct {
 	Cloud   []string          `q:"cloud"`
 	// The standing work branches, each drawn as one row of its own. [[spec/tickets/the-index-reads-standing-branches]]
 	Branches []ticket.Branch `q:"branches"`
+	// The places the plan overrides, which light the todo letter the way the front's own todo does. [[spec/tickets/rows-todo-folds-overrides]]
+	Overrides map[string]string `q:"overrides"`
 }
 
 // The module type the wiring loads as work. [[spec/tickets/open-tasks-come-from-work]]
@@ -109,18 +112,19 @@ func rowsOf(in rowsIn) []Row {
 	for _, one := range in.Branches {
 		branched[one.Name] = true
 	}
+	overridden := in.Overrides
 	out := []Row{}
 	for _, one := range in.Branches {
 		out = append(out, branchRow(one, in.Places[one.Name], cloud[one.Name]))
 		for _, child := range one.Children {
-			out = append(out, rowOf(child, in.Places[child.Name], cloud[child.Name], waits(child, state)))
+			out = append(out, rowOf(child, in.Places[child.Name], cloud[child.Name], waits(child, state), overridden[child.Name]))
 		}
 	}
 	for _, one := range in.Tickets {
 		if branched[one.Name] || branched[one.Group] {
 			continue
 		}
-		out = append(out, rowOf(one, in.Places[one.Name], cloud[one.Name], waits(one, state)))
+		out = append(out, rowOf(one, in.Places[one.Name], cloud[one.Name], waits(one, state), overridden[one.Name]))
 	}
 	loose := []string{}
 	for name := range in.Places {
@@ -136,7 +140,7 @@ func rowsOf(in rowsIn) []Row {
 }
 
 // A ticket's row, the way rowOfTicket draws it. [[spec/design_output/work#one-reading-answers-git]]
-func rowOf(one ticket.Ticket, place string, cloud, waits bool) Row {
+func rowOf(one ticket.Ticket, place string, cloud, waits bool, overridden string) Row {
 	kind := ticketKind
 	if one.Route == groupKind {
 		kind = groupKind
@@ -144,7 +148,7 @@ func rowOf(one ticket.Ticket, place string, cloud, waits bool) Row {
 	return Row{
 		Name: one.Name, Kind: kind, State: stateAt(one.State, place), Step: one.Step, Progress: one.Progress,
 		Group: one.Group, Urgent: one.Urgent, Person: one.Person, Held: one.Held, Waits: waits,
-		Todo: one.Todo, Says: one.Says, Queue: place, Cloud: cloud,
+		Todo: one.Todo || overridden != "", Says: one.Says, Queue: place, Cloud: cloud,
 	}
 }
 

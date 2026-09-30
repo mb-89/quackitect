@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: tui-shell-switches-over
 parent: the-work-tab-reads-v1
+record:
+  - step: do
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: e07dacffa4b0fa7d4c3b7eebc05248393639f30f
+    hash_after: e07dacffa4b0fa7d4c3b7eebc05248393639f30f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/work passes; green, src/modules/queue passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/work-tab-waits-sends-changes.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: a0cfc9f6e8d696ab
+        size: 262
+    def: b10bf3e839860457
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ Row.Todo in src/modules/work/rows.go reads the front's todo alone, while the bra
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/work/overrides_test.go src/modules/queue
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A ticket a hand places with the place chord lights its todo letter in `work/rows`, as the branch verb's answer lit it. The queue module answers `queue/overrides`, the places the plan file overrides, off the parser the queue already holds. The work module reads it through `work.overrides` in `spec/wiring.yaml`, the way it reads `queue/places`, since a module imports no other. `TestAPlanOverrideLightsTheTodoLetter` covers the fold.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the rows fold the override into the todo letter
+- the cleanup it reveals, the import rule, shaped the change: the overrides ride the index in place of an import
+- the plan's parse stands once, in the queue module, and the work module reads its answer
 
 # Discussion
 
