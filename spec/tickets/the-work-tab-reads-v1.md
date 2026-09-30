@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
 depends_on: [v1-watch-streams-changes]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 7a2750446de8c8074f6f3087db54b5e108de3788
+    hash_after: 7a2750446de8c8074f6f3087db54b5e108de3788
+    inputs:
+      - name: ask
+        hash: 87ed5e12d18b37a3
+        size: 788
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,77 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The tab reads three names off the catalog the window already hands it, and wakes on the watch the ticket `v1-watch-sends-changes` builds. Its implement waits on that ticket.
+
+- `work.Tab` gains `From`, the catalog the window builds, as `registry.Catalog` and `registry.Watcher` both. `main.go` hands it in place of the `Shadow`.
+- `Init` reads `files/spec/views/work.base`, `work/rows` and `work/open-tasks` once, and starts `registry.Stream` over the last two. Each `registry.Change` redraws the rows or the count off the event's value, and arms `registry.Next` again.
+- `ViewOver` in `shadow.go` becomes the one road from rows to a tree, in a file of its own. It lays the cloud letter, the todo letter and the queue off each row, and keeps the link off each row's path.
+- `Row` in `src/modules/work/rows.go` gains `path`, `route` and `changed` off the ticket, since the flags, the links and the recently done sort read them.
+- The label reads `work/open-tasks` alone.
+- `workindex.go` leaves whole. `runVerb`, `startIndex` and `postJSON` leave `door.go`. `Places`, `PlacesIn`, `PlacesAt`, `PlacesCmd`, `Placed`, `runPlaces`, `NodeAt` and `placesVerb` leave `workplaces.go`, and `Load` and `Cmd` leave `work.go`.
+- A watch that ends shows its reason in the tab's wait text, and the tab opens a new stream after `frame.Poll`.
+
+Weighed: the base file read through the index keeps the tab off the disk whole. It costs a read at start. Assumed: `files/<path...>` answers every tracked file, as `src/modules/files/watch.go` declares.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/main.go newModelOver, which builds the work tab
+- src/tui/work/work.go Tab.Init, Tab.Update, Tab.Label and Tab.takes
+- src/tui/panes_test.go and src/tui/shipped_test.go, which call work.Load and work.PlacesIn
+- src/tui/work/queuecolumn_test.go, which calls PlacesAt
+- src/modules/work/rows.go rowOf and branchRow, which build Row
+- src/modules/queue and src/quack golden cases, which read work/rows
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/work/v1_test.go TestTheWorkTabDrawsOffWorkRowsAlone
+- src/tui/work/v1_test.go TestTheWorkTabRedrawsOnAWatchedChange
+- src/tui/work/v1_test.go TestTheCountReadsWorkOpenTasks
+- src/modules/work/rows_test.go TestARowCarriesItsPathRouteAndChange
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/tui/work/work.go
+- src/tui/work/workplaces.go
+- src/tui/work/workindex.go
+- src/tui/work/door.go
+- src/tui/work/shadow.go
+- src/tui/work/view.go
+- src/tui/work/v1_test.go
+- src/tui/work/queuecolumn_test.go
+- src/tui/work/workplaces_test.go
+- src/tui/panes_test.go
+- src/tui/shipped_test.go
+- src/tui/main.go
+- src/modules/work/rows.go
+- src/modules/work/rows_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function the approach names stands opened on this branch: work.go, workplaces.go, workindex.go, door.go, shadow.go, workitems.go, main.go, the rows module and the files module's family
+- the callers list names every caller git grep finds of Load, PlacesIn, PlacesAt, Placed, askIndex, ViewOver and Row
+- each done_when line names its test: the git grep line, the v1_test.go cases, and the check
 
 ## tests-red
 
