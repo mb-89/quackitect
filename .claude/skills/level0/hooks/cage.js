@@ -44,6 +44,8 @@ export function stepOf(answer, event, { asks, served }) {
     if (kind === "result")
       return { answer: one.text ? { deny: String(one.text) } : one.result };
     if (kind === "block") return { answer: { block: String(one.text ?? "") } };
+    // An event effect answers the rewritten event, the shape the bridge's prompt answer takes. [[spec/tickets/prompt-answers-off-the-door]]
+    if (kind === "event") return { answer: { event: one.result } };
     if (kind === "rows" && asks) return { rows: String(one.call ?? "") };
     if (kind !== "after" || !one.text) continue;
     const text = String(one.text);

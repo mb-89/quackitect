@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: b0a81c2acc93e152
         size: 801
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 200a74a7fc83bd7eb8f6ee81e672f36feb0c9572
+    hash_after: 200a74a7fc83bd7eb8f6ee81e672f36feb0c9572
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -311,14 +320,19 @@ What I weigh: the approach answers each done line. The three Go cases red on the
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches fold.go, hooks.go, rows.go and cage.js, each inside the draft's size
+- the row writer writes through the module's own disk, and each case builds its own temp tree
+- each new function carries a pointer at spec/tickets/prompt-answers-off-the-door
+- the row fills the Row the log module owns, and each copied path names folders.js beside it
 
 ## tests-green
 

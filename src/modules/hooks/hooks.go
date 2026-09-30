@@ -43,6 +43,7 @@ const (
 	passKind       = "pass"
 	afterKind      = "after"
 	resultKind     = "result"
+	eventKind      = "event"
 	builtInHarness = "claude-code"
 	sessionKey     = "<id>"
 	foldsUnder     = "session/<id>/"
@@ -211,8 +212,11 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	}
 	d.drops(session, root)
 	d.marks(session, root)
+	d.rows(session, root)
 	effects := []Effect{}
-	if said, ok := d.held(session, post, root); ok {
+	if said, ok := d.rewrites(session, post); ok {
+		effects = append(effects, said)
+	} else if said, ok := d.held(session, post, root); ok {
 		effects = append(effects, said)
 	} else if said, ok := d.blocked(session, post); ok {
 		effects = append(effects, said)

@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf16"
 
 	"quackitect/src/q"
@@ -112,6 +113,9 @@ type Said struct {
 	Drops map[string]string `json:"drops,omitempty"`
 	// The handover marks the event writes and drops, which the stops fold names. [[spec/tickets/cage-stop-marks-port]]
 	Marks *Marks `json:"marks,omitempty"`
+	// The rows of the session log the event names, and the text an owner's prompt answers with, the answer-first line in front. [[spec/tickets/prompt-answers-off-the-door]]
+	Rows   []LogRow `json:"rows,omitempty"`
+	Prompt string   `json:"prompt,omitempty"`
 }
 
 // The fold's step. Every hold skips a helper's event, so a helper's event moves nothing. [[spec/design_output/level0#a-helper-ends-no-turn]]
@@ -125,7 +129,7 @@ func stepHolds(state Holds, event q.Event) Holds {
 	switch event.Kind {
 	case promptEvent:
 		state.Stood = ""
-		state.prompted(fields)
+		state.prompted(fields, event.At)
 	case displayEvent:
 		if text := strings.TrimSpace(textOf(fields, "delta")); text != "" {
 			state.Spoken = text
@@ -155,13 +159,25 @@ func (state Holds) copied() Holds {
 	return state
 }
 
-// An owner's prompt opens a demand, keyed by the newest row the bridgehead found at it. A prompt naming a note waits on the note, which the port leaves to the bridge. [[spec/design_output/level0#which-prompt-opens-a-turn]]
-func (state *Holds) prompted(fields map[string]any) {
+// A prompt names its row, a prompt row for an owner and an agent row for anything else. An owner's prompt opens a demand, keyed by the newest row the bridgehead found at it, and answers with the answer-first line in front, as onPromptSubmit in src/bridge/answer.js does. A prompt naming a note waits on the note, which the port leaves to the bridge. [[spec/design_output/level0#which-prompt-opens-a-turn]] [[spec/tickets/prompt-answers-off-the-door]]
+func (state *Holds) prompted(fields map[string]any, at time.Time) {
 	origin, _ := fields["origin"].(map[string]any)
-	if !owners[textOf(origin, "kind")] {
+	from, text := textOf(origin, "kind"), textOf(fields, "text")
+	kind := agentRow
+	if owners[from] {
+		kind = promptRow
+	}
+	state.Said.Rows = append(state.Said.Rows, rowOf(at, kind, text, from))
+	if !owners[from] {
 		return
 	}
 	state.Demand = &Demand{Why: promptWhy, Seen: state.Spoken, Prompt: true, Before: textOf(fields, "before")}
+	state.Said.Prompt = warns(promptWhy) + "\n\n" + text
+}
+
+// The answer-first line, off warns in .claude/skills/level0/lib/answer.js. [[spec/tickets/prompt-answers-off-the-door]]
+func warns(why string) string {
+	return why + ", and nothing has answered it yet. Write the answer in the chat, as text before the next tool call: what you understood and what you do next. Level zero refuses that call until an answer stands in the chat."
 }
 
 // The spoke post pays with a fresh text fitting the demand, refuses naming what the newest one lacks, and names the last text seen where none stands. [[spec/design_output/level0#the-owners-prompt-comes-first]] [[spec/tickets/cage-stop-rules-port]]
