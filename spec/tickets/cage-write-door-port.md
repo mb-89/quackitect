@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "spec/tickets/cage-write-door-port.md:349:39: Vocabulary: ticketdoor stands outside the words this tree writes. Write a c"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88f0683f2d7 · claude-code-remote
+    hash_before: f5ef9facff02539b547cee512180feb634798adf
+    hash_after: f5ef9facff02539b547cee512180feb634798adf
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/cage-write-door-port.md:381:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: a142e138d4d49227
+        size: 1604
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -387,26 +410,35 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door answers a harness Write, Edit, MultiEdit and NotebookEdit as the bridge write door does. A path outside the tree passes. The handover meets its schema and then the voice. Every other path meets the no-ticket refusal, with the text the bridge writes.
+
+The schema read goes through a Schema port, because the import rules keep the hooks module off the check module. The quack wiring answers the port off the check, and a contract test there holds the answers the hooks tests teach. The Go check now words a missing field and a missing chapter as the bridge does, so the refusal text reads the same on both sides.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the ones the import rules forced: the Schema port in src/quack, the check export and wording, and the command exports
+- every door the change reaches has a fake: taughtProse and taughtSchema, and a quack contract test holds the taught schema answers to the real check
+- each new file opens with a header naming this ticket and the bridge function it ports
+- the refusal wording stands once in src/modules/hooks/write, and the Discussion of the-bridge-server-leaves points here
 
 # accept
 
