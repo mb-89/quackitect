@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -168,6 +168,21 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d893e0ab0f106 · claude-code-remote
+    hash_before: 82785b7e8b49bfd5219b82aeb346396051e03f90
+    hash_after: 82785b7e8b49bfd5219b82aeb346396051e03f90
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+      - name: children-2
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 173248322297533c
 depends_on: ["lsp-door-lands-in-shadow", "read-topics-switch-over"]
 enabled_by: migration.phase7switch
 cloud: true
@@ -247,38 +262,60 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+[[spec/tickets/one-index-a-tree]]: a late door answer returns its fault, and starts no second index
+[[spec/tickets/reaches-keeps-the-post-fault]]: a start claim lets one caller spawn, and the lsp buffer commit lets the server lock go
+[[spec/tickets/sweep-skips-box-rules]]: the index sweep leaves out the rule that reads the survey on the box
+the retro drops the SIGTERM note and turns the survey note into its fix
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+the goroutine dump of the hung index named the deadlock in one read, since stderr went to a scratch file for one run
+the red tests came first, and each failed on its own assertion before its fix
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+20:47 the plan tool found no server twice, though the shell reached it, and the third try passed
+20:48 the sync hand-back refused the bare command, and wanted it with ./RUNME.sh in front
+20:52 the check went red on the get road, though the handover said green, and six indexes ran over one tree
+21:04 the first fix left the check red, since the index hung and callers raced a start
+21:08 pkill -f matched its own shell and ended it
+21:29 the moved claim tripped OutsideInDoors, since a door file alone may read the disk
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+src/modules/lsp/lsp.go: writes lets the lock go, so an editor open hangs no index again
+src/index/door.go: the start claim keeps callers racing a start to one index
+spec/processes/group.yaml: the sync evidence names the command as ./RUNME.sh branch sync
+the agent: stops a process by its exact name with pgrep -x, and never with pkill -f
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The red check looked like load at first, and the handover said green. The count of index processes turned it: one tree holding six indexes named a leak, and the dump of one hung index named the deadlock. Each fix revealed the next fault, so the branch grew past its first ask, and the discussion of the fix ticket says why.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each fix stands in its own ticket, and the retro points at them
+the post wait carries its name, postWait, in the const block
+the new file binary.go opens on a header that says what it holds
+the badly list carries each error of the run with its time, and the owner wrote no prompt
+the chapter names the agent and the owner, and no person, address or path
 
 ## cloud
 
