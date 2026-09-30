@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: 2c69acb21bcc64d64ee6aa39e62c1c05151f8763
+    hash_after: 5e109c07eadf58335a0218a95caaa82e5bff0252
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s); green, src/modules/hooks passes; green, src/modules/hooks/brief passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: 9ecae725e23856c1
+        size: 827
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -351,26 +374,33 @@ What I weigh: every source the draft ports stands where it cites, in both guidan
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/brief_test.go src/modules/hooks/brief/brief_test.go test/level0/brief-cases.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door now builds the brief and keeps the canary debt. A pure package, src/modules/hooks/brief, ports the counts, the canary, the tools block and the tier line. The fold brief/<id> keeps what a session read and whether its debt stands open, and Effect gains a Name so a prompt context answers one named block each. The cage step hands those blocks back in the shape level0.js reads. The bridge keeps its own brief until the-brief-leaves-the-bridge flips the doors, so until then the first passing call under new can carry the layer a second time. The shared case table meets the Go side in the hooks case walking every row, since the pure package reads no disk.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size, plus agent.go and stops.go, which read the tier table and the holds helper from one place
+- the brief package reads the tree it is handed, and each case builds its own
+- each new function carries a pointer at spec/tickets/brief-answers-off-the-door
+- each copied path names folders.js beside it, and the tier table stands once in the brief package
 
 # accept
 
