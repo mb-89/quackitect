@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: quack-verbs-switch-over
 parent: index-reads-loaded-projections
+record:
+  - step: do
+    hand: box d8888f6242d7 · claude-code-remote
+    hash_before: 6786f5cb325382f907f102f99606ae24b25d89bc
+    hash_after: 6786f5cb325382f907f102f99606ae24b25d89bc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/config passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/index-reads-loaded-projections.md:333:153: Characters: The character / stands outside the set a paragraph a"
+    inputs:
+      - name: ask
+        hash: b0ca1541d418ea23
+        size: 123
+    def: 75d8d0f2720c47bf
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the draft names a `shadow` value for the config case, and the case seeds `switch
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/config
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The parent's draft named a `shadow` value for the config case, while `TestValuesReadTheTrackedFile` seeds `migration.switch` at 3 and reads 3 at `migration/config/switch`. The engine writes the parent's draft, so the correction stands under the parent's `# Discussion`, and the case decides the claim as it stands.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: the parent's Discussion names the value the case seeds, since the door refuses a write to the passed draft
+the cleanup the change reveals: the curl key on the parent's ask stands corrected beside it in the same Discussion
+every fact stands in one place: the case owns the value, and the Discussion points at the case
 
 # Discussion
 

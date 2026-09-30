@@ -414,3 +414,6 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- the config case: `TestValuesReadTheTrackedFile` in `src/modules/config/config_test.go` seeds `migration.switch` at 3 and reads 3 at `migration/config/switch`. The draft's tests list names a `shadow` value, and the case decides this claim in its place. [[spec/tickets/loaded-projection-test-names-match]]
+- the curl line: `migration/config/config` takes `new` alone, so its reply decides nothing. The checkpoint reads `migration/config/cage`, which answers `shadow` off the tracked file over a default of `old`. [[spec/tickets/loaded-projection-curl-checkpoint]]
