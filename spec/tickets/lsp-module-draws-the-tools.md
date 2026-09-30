@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lsp-door-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 199a3aa8f4a7901b
         size: 620
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d8922c5f7ed7 · claude-code-remote
+    hash_before: b28a24cd60585ee8adcbb650dc1b8897b07c9a13
+    hash_after: b28a24cd60585ee8adcbb650dc1b8897b07c9a13
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -304,14 +313,19 @@ accept. The approach ports the old Outside runs into the module, and each done_w
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/lsp src/quack/main.go spec/wiring.yaml
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, and the wiring file that binds the texts
+- the tool runner is the one door the change reaches, and the cases hand it a fake
+- each new file opens on a header naming the ticket it implements
+- each tool name stands once in tools.go, and the door reads the survey off its owner
 
 ## tests-green
 

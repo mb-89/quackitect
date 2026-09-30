@@ -24,9 +24,7 @@ const recording = "../../../test/replay/lsp/one-session.jsonl"
 // A sweep that behaves: an open buffer of spec/a.md carrying a dead pointer draws one finding on its line. [[spec/tickets/the-lsp-door-lands]]
 func serverOver(t *testing.T) (*Server, *q.Store) {
 	t.Helper()
-	c := q.New()
-	as := Registers(c)
-	store := qtest.Over(t, c, as).Store()
+	store, as := catalogOf(t)
 	sweep := func() any {
 		text, _ := store.Snapshot().Read("buffers/spec/a.md").(string)
 		for i, line := range strings.Split(text, "\n") {
@@ -37,6 +35,16 @@ func serverOver(t *testing.T) (*Server, *q.Store) {
 		return []Finding{}
 	}
 	return New(Outside{Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local }, Sweep: sweep}), store
+}
+
+// A store over the module and the inputs its texts read, as a case seeds them. [[spec/tickets/lsp-module-draws-the-tools]]
+func catalogOf(t *testing.T) (*q.Store, q.Writer) {
+	t.Helper()
+	c := q.New()
+	as := Registers(c)
+	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
+	q.OutIn(c, "tracked", []string{}, q.Doc("the paths git tracks, as the case seeds them"))
+	return qtest.Over(t, c, as).Store(), as
 }
 
 func opened(uri, text string) []byte {
@@ -117,6 +125,12 @@ func asks(t *testing.T, root, token string) string {
 		return ""
 	}
 	return string(reply)
+}
+
+func TestTheListenWritesTheDoorFile(t *testing.T) {
+	if StandingFile != ".se/.runtime/lsp-door.json" {
+		t.Fatalf("the listen writes %s, and the old server's own file name leaves with it", StandingFile)
+	}
 }
 
 func TestAConnectionWithoutTheTokenReadsNothing(t *testing.T) {

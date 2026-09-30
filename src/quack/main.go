@@ -353,6 +353,12 @@ func listensLSP(root string, store *q.Store, one hooked) (func(), error) {
 	server := lsp.New(lsp.Outside{
 		Root: root, Store: store, As: one.as, Bound: one.bound,
 		Sweep: func() any { return store.Snapshot().Read(sweepName) },
+		// [[spec/tickets/lsp-module-draws-the-tools]]
+		Tools: lsp.ToolsAt(root), Quiet: -1,
+		Files: func() map[string]string {
+			texts, _ := store.Snapshot().Read(one.bound(lsp.TextsName)).(map[string]string)
+			return texts
+		},
 	})
 	return lsp.Listen(root, server)
 }

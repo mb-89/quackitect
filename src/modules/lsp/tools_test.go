@@ -9,9 +9,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"quackitect/src/q"
-	"quackitect/src/q/qtest"
 )
 
 // What a fake binary answers: its stdout by the binary's name, and the calls it takes. [[spec/tickets/lsp-module-draws-the-tools]]
@@ -35,9 +32,7 @@ func (one *fakeTools) run(dir, input, name string, argv ...string) (string, erro
 // A server over the files named, whose sweep answers nothing, running the fake tools with no quiet span. [[spec/tickets/lsp-module-draws-the-tools]]
 func toolsOver(t *testing.T, files map[string]string, fake *fakeTools) (*Server, *[][]byte) {
 	t.Helper()
-	c := q.New()
-	as := Registers(c)
-	store := qtest.Over(t, c, as).Store()
+	store, as := catalogOf(t)
 	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Node: "node", Config: ".vale.ini", Tense: "file:///tree/src/engine/tense.js", Run: fake.run}
 	server := New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },

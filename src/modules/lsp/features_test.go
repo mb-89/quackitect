@@ -7,9 +7,6 @@ import (
 	"encoding/json"
 	"strings"
 	"testing"
-
-	"quackitect/src/q"
-	"quackitect/src/q/qtest"
 )
 
 // The files a hover reads: the paragraph schema naming the vocabulary, the terms, the endings, and a note. [[spec/tickets/lsp-module-serves-the-features]]
@@ -26,9 +23,7 @@ const flagSchema = "kind: flag\ngoverns:\n  - spec/flags/**\nfrontmatter:\n  typ
 // A server over the files named, whose sweep answers nothing and which runs no tool. [[spec/tickets/lsp-module-serves-the-features]]
 func featuresOver(t *testing.T, files map[string]string) *Server {
 	t.Helper()
-	c := q.New()
-	as := Registers(c)
-	store := qtest.Over(t, c, as).Store()
+	store, as := catalogOf(t)
 	return New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },

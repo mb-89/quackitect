@@ -15,7 +15,25 @@ import (
 	"time"
 
 	"quackitect/src/modules/lsp"
+	"quackitect/src/q"
 )
+
+// The tools and the features read the tracked texts, so the wiring binds the lsp module's inputs to the files the index mirrors and the paths git tracks. [[spec/tickets/lsp-module-draws-the-tools]]
+func TestTheWiringHandsTheLspModuleTheTrackedFiles(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for local, want := range map[string]string{"files/<path...>": "files/<path...>", "tracked": "git/tracked"} {
+		if got := w.Bound(lspModule, local); got != want {
+			t.Errorf("the lsp module's %s binds %s, and wants %s", local, got, want)
+		}
+	}
+}
 
 func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
