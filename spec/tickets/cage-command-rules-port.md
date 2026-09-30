@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -178,6 +178,18 @@ record:
   - step: design/draft
     hand: the engine
     stale: [[spec/tickets/cage-rules-port-before-switch]]
+  - step: design/draft
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: c00fe06f420e6558acd00f834d6d77ca4974f226
+    hash_after: 5f8d393659adb9ce6ab4689d1e3bae7e1b0a5199
+    inputs:
+      - name: ask
+        hash: 36e18c6742eba22f
+        size: 908
+      - name: [[spec/tickets/cage-rules-port-before-switch]]
+        hash: 69047d049588488a
+        size: 690
+    def: 7883b3d10633c780
 ---
 
 # Ask
