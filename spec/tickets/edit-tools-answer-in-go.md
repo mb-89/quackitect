@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -145,6 +145,18 @@ record:
         hash: dd884d28441201b2
         size: 5357
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d894eee95148f · claude-code-remote
+    hash_before: 9899823e3f8f1a2ffef3d2c93ebba70c9a095fa8
+    hash_after: 9899823e3f8f1a2ffef3d2c93ebba70c9a095fa8
+    inputs:
+      - name: design/draft
+        hash: dd884d28441201b2
+        size: 5357
+      - name: design/tests-red
+        hash: ae1006c9cecc729a
+        size: 770
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -319,8 +331,14 @@ The cases drive the quack index by action name over a temp tree, so they compile
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+
+- edit-door-rules-port: the Go edit door lacks the bless file, the conflict markers, the open ticket door, the engine fields, the owner and the private rule that onWrite runs, and the bridge ticket hands them to this port, so a child ports them before the flip
+- edit-regex-names-its-limit: Go regexp takes no lookaround or backreference, so a replace naming either refuses with the construct it lacks, in a case
+- mint-keeps-nested-steps: the Go chapters stay flat, so a mint over a process with nested steps writes the chapters the JavaScript mint writes, in a case
+- flip-drops-read-tools: the flip that wires the edits module drops READ_TOOLS in level0.js, so the edit tools register once
 
 # implement
 
