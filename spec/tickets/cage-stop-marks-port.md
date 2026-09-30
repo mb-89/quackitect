@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -150,6 +150,18 @@ record:
         hash: 7907f0e68e795da1
         size: 3154
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d8901afed4d6 · claude-code-remote · helper-4
+    hash_before: 0ff7d960a8181c589205634a452909c946be42c4
+    hash_after: 0ff7d960a8181c589205634a452909c946be42c4
+    inputs:
+      - name: design/draft
+        hash: 7907f0e68e795da1
+        size: 3154
+      - name: design/tests-red
+        hash: 2fc62139bc9e88c2
+        size: 1090
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -300,8 +312,42 @@ The departure: the cases read the marks off the disk under a temp root, so they 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask, and a red case decides every done_when line no command answers.
+
+| the done_when line | what decides it | where it stands |
+|---|---|---|
+| a measure past the fill writes the due mark, and a clear drops it | `TestAMeasurePastTheFillWritesTheDueMarkAndADroppedClearDropsIt` in marks_test.go | red on `a measure past the fill writes no due mark` |
+| a retro hold of another hand leaves the session's handover due | `TestARetroHoldOfAnotherHandLeavesTheSessionsHandoverDue` in marks_test.go | red on `a helper's retro hold keeps the session from going due` |
+| `./RUNME.sh check` exits 0 | the check at implement/tests-green | open |
+
+I ran `go test ./src/modules/hooks/...` over the cases marks_test.go holds: each of the two above fails on its own assertion, and `TestARetroHoldOfTheSessionsOwnHandKeepsTheConversation` passes.
+
+The departure, weighed:
+
+| what I weigh | what I find |
+|---|---|
+| the module writes the marks through its own disk | `stoppedOf`, `holdsIn` and `isRetro` in stopfacts.go already read the tree through `disk{root}`, and hooks.go imports `os` as an IO module may, so the write lands at a seam the module already holds |
+| `Outside` gains no `Mark`, so the write stands beside `drops`, which goes out through `Outside.Drop` | one door then holds two seams for two writes. The case decides the behaviour over a temp root either way, and keeping the write in one function in marks.go leaves a later port swap one spot to touch |
+| `Outside` gains no `Hand`, so the module reads the environment itself | the drafted port reads the same process environment, so the departure carries the draft's own assumption and adds no risk to it. It gives up the hand a case could hand in, and `t.Setenv` stands in its place |
+| `src/quack/main.go` stays as it stands | the ask names the module, and a port nothing wires buys nothing |
+| the cases spell the due mark and the holds folder again | `holdsFolder` in stopfacts.go spells a folder again under a pointer at lib/folders.js, so the departure follows the practice the package holds |
+
+The departure keeps what the draft argued for: the fold decides the marks and the door writes them, so the fold stays pure.
+
+What the build fixes within its own diff:
+
+| where | what to fix |
+|---|---|
+| the draft's approach, its first point | `Said` stands in fold.go, not stops.go. `Said.Drops` there serves the holds fold alone, so `Marks` on the same type follows the standing shape |
+| the draft's `size`, `callers` and `tests` | each still names `src/quack/main.go`, `src/quack/hand.go`, `src/quack/hand_test.go` and the test `Outside`, which the departure drops. Write the lists as the change stands, since the implement checklist reads them |
+| marks.go | name the due mark's path once, under a pointer at `DUE` in lib/folders.js, and read it in the case off the module |
+| marks.go | write nothing where the root reads empty, so a post naming no root writes under no working folder |
+| `isRetro` and `stoppedOf` | a hand reading empty counts every retro as the session's own, as today, so a box naming no hand keeps what it has |
+| implement/tests-green | `TestARetroHoldOfTheSessionsOwnHandKeepsTheConversation` passes today because nothing writes a due mark at all. Say under `says` what turns it red, so the case decides the hand match |
 
 # implement
 
