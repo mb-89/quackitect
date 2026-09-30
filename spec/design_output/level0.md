@@ -409,8 +409,9 @@ and `./RUNME.sh serve`. These pass, and so does every other event:
 
 - Read, Grep, Glob and the level zero read tools
 - `./RUNME.sh serve` and `./RUNME.sh doctor`, each run alone, so a box whose
-  index stands unbuilt brings the door back For the decision, see
-[[spec/rationales/the-cage-refuses-while-down]].
+  index stands unbuilt brings the door back
+
+For the decision, see [[spec/rationales/the-cage-refuses-while-down]].
 
 ## A session says its cage
 
