@@ -215,6 +215,7 @@ func (state *Stops) measures(fill float64, held map[string]any, facts Stopped) {
 	state.Fill = fill
 	if !clearsHere(held, facts) {
 		state.Handover = nil
+		state.marks().DropDue = true
 		return
 	}
 	at := float64(facts.HandoverAt)
@@ -230,6 +231,8 @@ func (state *Stops) measures(fill float64, held map[string]any, facts Stopped) {
 		return
 	}
 	state.Handover = &Handover{Phase: dueFinish}
+	// The pull runs apart from the door, so the mark stands on disk. [[spec/design_input/the-clear-hands-ephemeral-tickets#the-ticket-ends-first]]
+	state.marks().Due = &DueMark{Tokens: fill, At: facts.HandoverAt}
 }
 
 // The queue alone clears, and a retro in hand runs to its end in one conversation. [[spec/design_output/stop#the-queue-alone-clears]]
@@ -301,6 +304,7 @@ func (state *Stops) holdsForHandover(text string, held map[string]any, facts Sto
 	if facts.Clear {
 		if !clearsHere(held, facts) {
 			state.Handover = nil
+			state.marks().DropClear = true
 			return false, ""
 		}
 		if waits {
@@ -320,6 +324,7 @@ func (state *Stops) holdsForHandover(text string, held map[string]any, facts Sto
 	// The same cap the tooth keeps, so a session that pulls nothing runs away nowhere. [[spec/design_output/stop#three-in-a-row]]
 	if facts.Most > 0 && due.Asked > facts.Most {
 		state.Handover = nil
+		state.marks().DropDue = true
 		return false, ""
 	}
 	fill := "more"

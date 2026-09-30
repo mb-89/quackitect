@@ -207,6 +207,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		return Answer{}, err
 	}
 	d.drops(session, root)
+	d.marks(session, root)
 	effects := []Effect{}
 	if said, ok := d.held(session, post, root); ok {
 		effects = append(effects, said)

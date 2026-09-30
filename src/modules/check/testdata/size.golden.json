@@ -59,7 +59,7 @@
       "file": "spec/tickets/a-down-index-refuses-calls.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 666. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 705. Split it by topic."
     },
     {
       "file": "spec/tickets/a-rename-reaches-every-note.md",

@@ -11,9 +11,9 @@ import (
 	"testing"
 )
 
-// The due mark and the holds folder, as lib/folders.js names them, and the hands a retro hold carries. [[spec/tickets/cage-stop-marks-port]]
+// The due mark the module names, the clear hold under the holds folder, and the hands a retro hold carries. [[spec/tickets/cage-stop-marks-port]]
 const (
-	dueMark   = ".se/.runtime/due.json"
+	dueMark   = dueFile
 	clearHold = ".se/.runtime/hold/s1.json"
 	myHand    = "box mine · claude-code-remote"
 	otherHand = "box other · claude-code-remote"

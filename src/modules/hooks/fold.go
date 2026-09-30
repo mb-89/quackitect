@@ -110,6 +110,8 @@ type Said struct {
 	Text string `json:"text,omitempty"`
 	// The config keys the event drops, and the value each drops to. [[spec/tickets/cage-hold-drops-port]]
 	Drops map[string]string `json:"drops,omitempty"`
+	// The handover marks the event writes and drops, which the stops fold names. [[spec/tickets/cage-stop-marks-port]]
+	Marks *Marks `json:"marks,omitempty"`
 }
 
 // The fold's step. Every hold skips a helper's event, so a helper's event moves nothing. [[spec/design_output/level0#a-helper-ends-no-turn]]

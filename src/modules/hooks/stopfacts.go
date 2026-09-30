@@ -33,6 +33,7 @@ type heldFile struct {
 	Ticket    any  `json:"ticket"`
 	Path      any  `json:"path"`
 	Step      any  `json:"step"`
+	Hand      any  `json:"hand"`
 	Ephemeral bool `json:"ephemeral"`
 }
 
@@ -47,9 +48,10 @@ func (d *Door) stoppedOf(post Post, settings Settings, root string) Stopped {
 	tree := disk{root}
 	holds := holdsIn(tree)
 	facts.Holds = len(holds)
+	hand := handIn(tree)
 	for _, one := range holds {
 		facts.Clear = facts.Clear || (one.Ephemeral && heldText(one.Ticket) == clearTicket)
-		facts.Retro = facts.Retro || isRetro(tree, one)
+		facts.Retro = facts.Retro || (isRetro(tree, one) && ownsHold(hand, one))
 	}
 	if !whole {
 		return facts
@@ -98,7 +100,7 @@ func holdsIn(tree disk) []heldFile {
 	return out
 }
 
-// A retro hold: its step opens on retro, or its ticket runs the retro route. Whose hand holds it stays with the bridge, so any retro in hand reads as the session's own. [[spec/tickets/the-retro-holds-the-clear]]
+// A retro hold: its step opens on retro, or its ticket runs the retro route. [[spec/tickets/the-retro-holds-the-clear]]
 func isRetro(tree disk, held heldFile) bool {
 	if strings.Split(heldText(held.Step), "/")[0] == retroStep {
 		return true
