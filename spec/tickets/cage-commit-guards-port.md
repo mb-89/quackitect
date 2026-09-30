@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: [cage-command-rules-port]
 record:
   - step: design/owner-read
@@ -145,6 +145,18 @@ record:
         hash: b282b0ed5f9e778a
         size: 6138
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 11a211911d0a640de4c1ff6c37ceb9faf0966daf
+    hash_after: 11a211911d0a640de4c1ff6c37ceb9faf0966daf
+    inputs:
+      - name: design/draft
+        hash: b282b0ed5f9e778a
+        size: 6138
+      - name: design/tests-red
+        hash: 93f0d9ba7da441c5
+        size: 2105
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -331,8 +343,13 @@ every door the tests reach has a fake: git through taughtGit, the voice through 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: Door.commands runs the private delta, the tested delta, the todo tag, the desk guard and the trunk guard between the command rules and the version guard, in onBash's order, and each guard ports off the lib module the ask names (heldTests, privateIn, untestedIn and refusesIn stand where the draft says)
+- done_when two meets TestTheCommitGuardsRefuseWhatTheBridgeRefuses over commit-guards-cases.json, red in each guard case; done_when three is the check the implement answers
+- fix in place: private-delta.jsonl, tested-delta.jsonl and commit-voice.jsonl carry only a bare git commit, which the git write door refuses on both sides, so the replay decides none of those three guards; the implement adds an sh -c or xargs shape to each log, so the replay goes red before the guard and clean after it
+- weighed: the case table fakes Vale's output, so a Vale rule change reads in neither test; the prose slice owns that drift and ./RUNME.sh check runs the real Vale, so it stays
 
 # implement
 
