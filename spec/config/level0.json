@@ -18,7 +18,6 @@
     "phase8shadow": true,
     "phase8switch": true,
     "phase9shadow": true,
-    "cage": "new",
     "sidebar": "new",
     "lsp": "new"
   }
