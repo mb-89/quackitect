@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -234,6 +234,15 @@ record:
         hash: e223f769451ae4b5
         size: 996
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 564f0d0651c94d9a39d1a97fa0fc56b0bfa45d20
+    hash_after: 564f0d0651c94d9a39d1a97fa0fc56b0bfa45d20
+    answered:
+      - name: lint
+        exit: 0
+        said: ".claude/skills/level0/hooks/level0.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 652. Split it by topi"
+    def: f150b8c0dc20fe45
 group: go-cage-switches-over
 ---
 
@@ -492,14 +501,19 @@ Draft-2 answers both findings of the first gate. Step 4 hands a clear answer to 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/hooks/stops.go .claude/skills/level0/hooks/cage.js .claude/skills/level0/hooks/level0.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches stops.go, cage.js and level0.js, which draft-2's size names, and hooks.go stays as it stands since blocked in stops.go answers the clear
+the Go cases run over the fake index and a temp tree, and the plugin case over a fake disk, door, command and prompt
+the fold's branch, the door's answer, stepOf's mapping and the plugin's road each point at this ticket
+the resume prompt stands in RESUME, and the Go constant names it as its owner
 
 ## tests-green
 

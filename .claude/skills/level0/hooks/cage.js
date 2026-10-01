@@ -44,6 +44,9 @@ export function stepOf(answer, event, { asks, served }) {
     if (kind === "result")
       return { answer: one.text ? { deny: String(one.text) } : one.result };
     if (kind === "block") return { answer: { block: String(one.text ?? "") } };
+    // A clear passes the turn, and the conversation clears behind it. [[spec/tickets/clear-answers-off-the-door]]
+    if (kind === "clear")
+      return { answer: { pass: true, clear: { prompt: String(one.text ?? "") } } };
     // An event effect answers the rewritten event, the shape the bridge's prompt answer takes. [[spec/tickets/prompt-answers-off-the-door]]
     if (kind === "event") return { answer: { event: one.result } };
     if (kind === "rows" && asks) return { rows: String(one.call ?? "") };

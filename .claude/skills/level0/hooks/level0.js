@@ -200,6 +200,8 @@ async function door($, event, e, next) {
     step = back ? stepOf(back, event, { asks: false, served }) : {};
   }
   if (step.answer?.spawn) return doorSpawns($, step.answer, event, served);
+  // [[spec/tickets/clear-answers-off-the-door]]
+  if (step.answer?.clear) return clears($, step.answer, e, next);
   if (step.answer !== undefined) return step.answer;
   if (step.bridge) return BRIDGE;
   return step.after ? merged(await next(e), { context: step.after }) : next(e);
