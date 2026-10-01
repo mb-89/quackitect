@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 03ab3ddbe2e00eb8
         size: 657
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: e8115c72fe7e73f296e2b0de77162c3b08f64717
+    hash_after: e8115c72fe7e73f296e2b0de77162c3b08f64717
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-bridge-server-leaves.md:366:58: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -293,14 +302,19 @@ accept. The approach answers the ask. A cold probe over a clone carrying the del
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change deletes the server, its fake and the modules only it reached, with their cases. The door also reads spread call arguments, which the deletion leaves no other reader of.
+- The kept cases run over the fakes they ran over before, and the new cases run over the fake store and the fake call.
+- Each edited function names this ticket beside it.
+- The cage event list stands in `cage.js` alone, and the spread read stands in `tool.Args` alone.
 
 ## tests-green
 

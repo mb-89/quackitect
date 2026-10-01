@@ -115,6 +115,23 @@ func TestTheInputLeavesTheWaitUnlessItDeclaresOne(t *testing.T) {
 	}
 }
 
+// A call's arguments read nested under its input, or spread on the event beside its tool, and the spread keeps the fields the input declares alone. [[spec/tickets/the-bridge-server-leaves]]
+func TestArgsReadNestedOrSpreadOnTheEvent(t *testing.T) {
+	s := storeOf(t)
+	nested := Args(s, "greet/one", map[string]any{"tool": "greet", BareArg: map[string]any{"who": "owner"}})
+	if len(nested) != 1 || nested["who"] != "owner" {
+		t.Fatalf("the nested arguments read %v, and want who alone", nested)
+	}
+	spread := Args(s, "greet/one", map[string]any{"tool": "greet", "agentId": "a1", "who": "owner", WaitArg: 2.0})
+	if len(spread) != 2 || spread["who"] != "owner" || spread[WaitArg] != 2.0 {
+		t.Fatalf("the spread arguments read %v, and want who and the wait", spread)
+	}
+	bare := Args(s, "echo", map[string]any{"tool": "echo", BareArg: "hi"})
+	if in, err := Input(s, "echo", bare); err != nil || in != "hi" {
+		t.Fatalf("the bare input reads %+v, err %v, and wants hi", in, err)
+	}
+}
+
 // The plan field and the plan tool keep the names PLAN gives them in src/bridge/plan.js, so a port renames nothing the guidance quotes. [[spec/tickets/plan-writes-off-go]]
 func TestThePlanFieldAndToolKeepTheBridgesNames(t *testing.T) {
 	if PlanArg != "plan" || PlanTool != "plan" {

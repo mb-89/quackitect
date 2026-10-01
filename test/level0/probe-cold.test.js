@@ -403,3 +403,9 @@ test("a delta the clone refuses fails the probe before the client runs", async (
   assert.match(said_.join("\n"), /FAIL delta: patch does not apply/);
   assert.ok(!proc.ran.some((one) => one.argv[0] === "claude"));
 });
+
+// [[spec/tickets/the-bridge-server-leaves]]
+test("the cold path names neither the bridge server nor its self-test", () => {
+  assert.equal(COLD_PATH.includes("src/bridge/server.js"), false);
+  assert.equal(COLD_PATH.includes("src/bridge/selftest.js"), false);
+});

@@ -10,9 +10,27 @@ import {
   stepOf,
 } from "../../.claude/skills/level0/hooks/cage.js";
 import { guidanceHere, onAgentSpawn } from "../../src/bridge/guidance.js";
-import { doorEvents, toolNames } from "../../src/bridge/server.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import LAYERS from "../replay/cage/layer-cases.json" with { type: "json" };
+
+// The events the bridge's DOORS table named before the bridge left, each one the door decides now. [[spec/tickets/the-bridge-server-leaves]]
+const BRIDGE_EVENTS = [
+  "session.start",
+  "prompt.context",
+  "prompt.submit",
+  "classic.MessageDisplay",
+  "agent.spoke",
+  "session.compact",
+  "session.end",
+  "session.measure",
+  "turn.said",
+  "turn.complete",
+  "classic.Stop",
+  "agent.spawn",
+  "tool.describe",
+  "tool.call",
+  "agent.answered",
+];
 
 // [[spec/tickets/the-brief-leaves-the-bridge]]
 test("the door decides the tool call, the Stop and the prompt, and leaves an event no table names", () => {
@@ -24,7 +42,7 @@ test("the door decides the tool call, the Stop and the prompt, and leaves an eve
 
 // [[spec/tickets/the-brief-leaves-the-bridge]]
 test("the door decides every event the bridge's DOORS table names", () => {
-  const left = doorEvents().filter((event) => !doors(event));
+  const left = BRIDGE_EVENTS.filter((event) => !doors(event));
   assert.deepEqual(left, [], `the bridge still keeps ${left.join(", ")}`);
 });
 
@@ -223,17 +241,6 @@ test("the JavaScript layer matches the case table", () => {
       wrapped,
     })),
   );
-});
-
-// [[spec/tickets/log-report-stop-in-go]]
-test("the bridge's tools table names none of log, report and stop", () => {
-  const names = toolNames();
-  for (const tool of ["log", "report", "stop"]) {
-    assert.ok(
-      !names.includes(`mcp__level0__${tool}`),
-      `the bridge still answers ${tool}`,
-    );
-  }
 });
 
 // A Go answer for the report tool reaches the harness as the tool's result. [[spec/tickets/log-report-stop-in-go]]

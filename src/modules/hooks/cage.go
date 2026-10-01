@@ -85,7 +85,7 @@ func PostsOf(text string) ([]Recorded, error) {
 	return out, lines.Err()
 }
 
-// The bridge's answer to an event as one decision word, the way letsThrough in src/bridge/server.js reads it. A block outside the Stop reaches the harness as the call's result, and so refuses it. [[spec/tickets/cage-tool-block-reads-refuse]]
+// The bridge's answer to an event as one decision word, the way the bridge's letsThrough read it. A block outside the Stop reaches the harness as the call's result, and so refuses it. [[spec/tickets/cage-tool-block-reads-refuse]]
 func OldDecisionOf(event string, answer any) string {
 	fields, _ := answer.(map[string]any)
 	if truthy(fields["needs"]) {

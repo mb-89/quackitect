@@ -317,7 +317,7 @@ func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
 	if !ok || d.from.Call == nil {
 		return Effect{}, false, nil
 	}
-	args, _ := e["input"].(map[string]any)
+	args := tool.Args(d.from.Store, action, e)
 	d.rides(session, action, args)
 	input, err := tool.Input(d.from.Store, action, args)
 	if err != nil {

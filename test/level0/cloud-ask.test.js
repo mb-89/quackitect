@@ -4,12 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { ASKS_NOBODY, holdsCloudAsk } from "../../src/bridge/cloud-ask.js";
-import { boxOf, decide } from "../../src/bridge/server.js";
-import { fakeClock } from "../../src/doors/fake/clock.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeLog } from "../../src/doors/fake/log.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
+import { holdsCloudAsk } from "../../src/bridge/cloud-ask.js";
 
 const ASK = "AskUserQuestion";
 
@@ -35,19 +30,4 @@ test("a desk lets AskUserQuestion pass", () => {
 test("a cloud box lets every other tool pass this door", () => {
   assert.equal(holdsCloudAsk({ tool: "Bash" }, boxOn(true)), null);
   assert.equal(holdsCloudAsk({ tool: "mcp__level0__report" }, boxOn(true)), null);
-});
-
-test("the server hands a cloud box's AskUserQuestion to the cloud ask door", async () => {
-  const box = boxOf("/tree", "/tree", {
-    disk: fakeDisk({}),
-    clock: fakeClock(),
-    log: fakeLog(),
-    proc: fakeProc({}),
-    index: { dead: () => "", fault: () => "", warm: () => ({ warmed: false }) },
-    vale: { stands: () => false },
-    biome: { stands: () => false },
-  });
-  box.cloud = true;
-  const said = await decide({ event: "tool.call", e: { tool: ASK } }, box);
-  assert.equal(said?.result?.deny, ASKS_NOBODY);
 });

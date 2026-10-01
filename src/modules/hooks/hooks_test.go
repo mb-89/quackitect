@@ -178,6 +178,16 @@ func TestAnActionsOwnWaitFieldKeepsItsValue(t *testing.T) {
 	}
 }
 
+// The host spreads a call's arguments on the event beside its tool, and the action takes them as it takes a nested input. [[spec/tickets/the-bridge-server-leaves]]
+func TestACallsArgumentsSpreadOnTheEventReachTheAction(t *testing.T) {
+	c := &calls{said: Called{Result: "slept", Handle: "h1"}}
+	one := doorOver(t, c, &book{})
+	hooks(t, one.door, Post{Event: "tool.call", E: map[string]any{"tool": "index_work_sleep", "wait": 2, "session_id": "s1"}})
+	if in, ok := c.inputs[0].(sleep); !ok || in.Wait != 2 {
+		t.Fatalf("the action takes %#v, and wants the spread wait of 2", c.inputs[0])
+	}
+}
+
 func TestAnOperationEndingAfterItsCallReachesTheNextTurn(t *testing.T) {
 	c := &calls{said: Called{Running: true, Handle: "h1", Fraction: 0.4, Gone: time.Second}}
 	b := &book{}

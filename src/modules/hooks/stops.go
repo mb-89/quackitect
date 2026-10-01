@@ -1,5 +1,5 @@
 // The stops fold: what the bridge keeps on its box for the turn's end, and the
-// answer to a Stop in the order classic.Stop in src/bridge/server.js runs:
+// answer to a Stop in the order the bridge's classic.Stop ran:
 // a helper's stop, holdsForHandover, then onStop in src/bridge/stop.js. The
 // fold reads the tree off the door's stamp and the holds off their own fold.
 // [[spec/tickets/cage-stop-rules-port]]

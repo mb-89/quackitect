@@ -1,5 +1,5 @@
 // The plan's answer riding a Go-answered call: the door calls the plan action
-// with the field first, as planRides in src/bridge/server.js does.
+// with the field first, as the bridge's planRides did.
 // [[spec/tickets/plan-writes-off-go]]
 package hooks
 

@@ -143,6 +143,21 @@ func Input(store *q.Store, action string, args map[string]any) (any, error) {
 	return input, err
 }
 
+// The arguments a call carries: the map nested under the input, or the fields the action's input declares where the host spreads them on the event beside its tool, with the wait, the plan and a bare input. [[spec/tickets/the-bridge-server-leaves]]
+func Args(store *q.Store, action string, e map[string]any) map[string]any {
+	if nested, ok := e[BareArg].(map[string]any); ok {
+		return nested
+	}
+	in, _, _ := store.Types(action)
+	spread := map[string]any{}
+	for key, value := range e {
+		if declares(in, key) || key == WaitArg || key == PlanArg || key == BareArg {
+			spread[key] = value
+		}
+	}
+	return spread
+}
+
 // Whether the input type carries a field its JSON names so. [[spec/tickets/hooks-wait-leaves-tool-input]]
 func declares(in reflect.Type, key string) bool {
 	if in == nil || in.Kind() != reflect.Struct {

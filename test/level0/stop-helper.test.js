@@ -6,12 +6,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { TOOLS as TOOLS_FILE } from "../../.claude/skills/level0/lib/tools.js";
-import { boxOf, decide } from "../../src/bridge/server.js";
 import { onStop } from "../../src/bridge/stop.js";
-import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
 const ROOT = "/tree";
@@ -90,26 +86,4 @@ test("the claim holds nothing once every helper has answered", () => {
     said.result.block,
     /helpers-running answers false: the harness names no helper running/,
   );
-});
-
-// The server marks a background spawn and drops the mark at the helper's stop. [[spec/tickets/helper-mark-drops-at-stop]]
-test("the server counts a background spawn and drops it at the helper's stop", async () => {
-  const box = boxOf(ROOT, ROOT, {
-    disk: fakeDisk({
-      [at("spec/config/level0.json")]: JSON.stringify({ engine: { binding: "queue" } }),
-      [at(TOOLS_FILE)]: "{}",
-    }),
-    clock: fakeClock(),
-    proc: fakeProc({}),
-    log: fakeLog(),
-    env: {},
-    index: { warm: () => ({ warmed: false }), dead: () => "" },
-  });
-  await decide(
-    { event: "agent.spawn", e: { background: true, description: "review" } },
-    box,
-  );
-  assert.equal(box.helpers, 1);
-  await decide({ event: "classic.Stop", e: { agentId: "a1" } }, box);
-  assert.equal(box.helpers, 0);
 });
