@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -188,6 +188,15 @@ record:
     hash_after: eb610ffaa28555fa29d2a2e98dba478c92601fdc
     returns: 1
     why: "the approach's answers never reach the agent as a tool result: step 5 answers Effect{Kind: resultKind, Result: text} with text a bare string, and stepOf in .claude/skills/level0/hooks/cage.js returns one.result unchanged, so door() in level0.js hands the harness a bare string where it reads {result: text}, the shape report.js, logline.js and stop.js answer today ({result: {result: text}}) and the shape cage.test.js already pins (result: {result: \\\"a line\\\"}); the door must answer Result: map[string]any{\\\"result\\\": text}; the red tests decide the wrong contract: src/quack/answers_test.go and src/modules/hooks/answers_test.go assert one.Result.(string), so they turn green on an answer the harness cannot read, and the first done_when line stays undecided; assert the {result: text} shape instead; no case drives the road from the door to the harness for the three tools: add a cage.test.js case where stepOf over a Go answer for mcp__level0__report yields {result: text}, so the client side stands decided beside the Go cases"
+  - step: design/draft-2
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: d440884e07e20fcbab4800e74b0d1d26fdf98527
+    hash_after: d440884e07e20fcbab4800e74b0d1d26fdf98527
+    inputs:
+      - name: ask
+        hash: 202a6354fc09171a
+        size: 562
+    def: 2fcb4abe3d77d8a2
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
 ---
@@ -359,38 +368,102 @@ Every new case fails on its own assertion: the folds answer no text, and the bri
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The hooks door answers the log, report and stop calls off the folds that already land them, in the shape the harness reads as a tool's result. Three actions register under the tools' own names, so the index lists them, and the door answers before any action runs.
+
+1. `Said` in `src/modules/hooks/fold.go` keeps `Result string`, the text a tool answers with.
+2. `Holds.called` sets `Result` on `reportCall`, as `pays` in `src/bridge/answer.js` words it: no text, no demand, a lack, or a pay naming the demand's why. A report with no demand also lands a reply row on `Said.Rows`.
+3. `Holds.called` gains the `log` call, as `writesLine` in `src/bridge/logline.js` answers it. It lands one row on `Said.Rows` at the level the call names, and `Result` names its kind.
+4. `Stops.claims` in `src/modules/hooks/stops.go` sets `Said.Result` the way `claims` in `src/bridge/stop.js` words it: an unknown reason lists the ids, a falling check says why, and a standing claim answers the stop line.
+5. A new `Door.answers` in `src/modules/hooks/answers.go` reads `Result` off the holds or the stops the event just landed. It answers `Effect{Kind: resultKind, Result: map[string]any{"result": text}}`, the shape `report.js`, `logline.js` and `stop.js` answer today. `stepOf` in `.claude/skills/level0/hooks/cage.js` hands `one.result` on unchanged, so the harness reads `{result: text}`. `Hook` tries `answers` after `searches` and before `calls`, and an event whose fold lands no text falls through to `calls`.
+6. `Registers` in `src/modules/hooks` adds the actions `hooks/log`, `hooks/report` and `hooks/stop`, with `q.ToolName`, `q.Doc` and the inputs the bridge's specs declare. Each lists no request, since the door answers first.
+7. `src/bridge/server.js` drops `reportTools`, `logTools` and `stopTools` from `TOOLS`, and their specs from the list. `report.js` and `logline.js` leave the tree, and `stop.js` keeps its hooks.
+
+Boundaries with sibling tickets:
+- find-and-wait-in-go owns the helper's report fold, a different thing from the report tool
+- level0-tools-leave-the-bridge drops every other tool entry of `TOOLS`
+- the-bridge-server-leaves removes `server.js` itself
+
+What I weigh: the folds already decide the pay and the claim, so the door reading their result keeps one owner of each decision. The wrap into `{result: text}` sits in `Door.answers` alone, so the folds keep a plain string their own cases read.
+
+I assume: the stop spec's reason list comes off the rules, so the Go doc names the ids at the refusal alone.
+
+Risks:
+- the stop spec lists the reasons in its description today, and a static Go doc loses that list
+- every test under `test/level0` driving the bridge's report or stop tool moves to a Go case or drops
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/fold.go: Holds.called, which sets the result for report and log
+- src/modules/hooks/fold.go: Said, whose Result stays the fold's text
+- src/modules/hooks/stops.go: Stops.claims, which sets the stop's result
+- src/modules/hooks/answers.go: Door.answers, new, which wraps the text as {result: text}
+- src/modules/hooks/hooks.go: Door.Hook, which gains the answers branch before calls
+- src/modules/hooks/hooks.go: Registers, which adds the three actions
+- .claude/skills/level0/hooks/cage.js: stepOf, which hands the result on unchanged, unchanged itself
+- src/bridge/server.js: TOOLS and the spec list, which drop the three tools
+- src/bridge/stop.js: TOOLS and claims, which leave
+- src/bridge/report.js and src/bridge/logline.js, which leave the tree
+- test/level0/stop.test.js, stop-said.test.js, answer.test.js and cage.test.js: cases calling the bridge's three tools
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/answers_test.go: TestAReportWithNoDemandAnswersTheBridgesLine
+- src/modules/hooks/answers_test.go: TestAReportPayingTheDemandNamesWhatItAnswers
+- src/modules/hooks/answers_test.go: TestAReportLackingTheDemandSaysWhatItLacks
+- src/modules/hooks/answers_test.go: TestALogCallLandsItsRowAndNamesItsKind
+- src/modules/hooks/answers_test.go: TestAStopNamingNoReasonListsTheIds
+- src/modules/hooks/answers_test.go: TestAStopWhoseCheckFallsSaysWhy
+- src/modules/hooks/answers_test.go: TestAStopThatStandsAnswersTheStopLine
+- src/modules/hooks/answers_test.go: TestTheDoorAnswersAReportWithItsText, asserting Result is {result: text}
+- src/quack/answers_test.go: TestTheLogReportAndStopToolsAnswerOffTheDoor, asserting each Result is {result: text}
+- test/level0/cage.test.js: the bridge's tools table names none of log, report and stop
+- test/level0/cage.test.js: stepOf over a Go answer for mcp__level0__report yields {result: text}
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- the answer never reaches the agent as a tool result: Door.answers answers Result: map[string]any{"result": text}, the shape stepOf hands on and cage.test.js pins
+- the red tests decide the wrong contract: the door-level cases in both answers_test.go files assert Result as {result: text}, and the fold cases keep reading Said.Result as the fold's text
+- no case drives the road from the door to the harness: cage.test.js gains a case where stepOf over a Go answer for mcp__level0__report yields {result: text}
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/fold.go
+- src/modules/hooks/stops.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/answers.go, new
+- src/modules/hooks/answers_test.go
+- src/quack/answers_test.go
+- src/bridge/server.js
+- src/bridge/stop.js
+- src/bridge/report.js, removed
+- src/bridge/logline.js, removed
+- test/level0/cage.test.js
+- test/level0/stop.test.js
+- test/level0/stop-said.test.js
+- test/level0/answer.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened stepOf in cage.js, the result shapes in report.js, logline.js and stop.js, the cage.test.js result case, Effect and the calls branch in hooks.go, the search shape in search.go, and both red answers_test.go files
+- callers come from draft-1's search plus cage.js stepOf, which the gate's finding names
+- the first line meets TestTheLogReportAndStopToolsAnswerOffTheDoor and the stepOf case, the second the cage.test.js table case, and the third the check at tests-green
 
 ## tests-red-2
 
