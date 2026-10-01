@@ -409,3 +409,14 @@ test("the cold path names neither the bridge server nor its self-test", () => {
   assert.equal(COLD_PATH.includes("src/bridge/server.js"), false);
   assert.equal(COLD_PATH.includes("src/bridge/selftest.js"), false);
 });
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("a fall past the rules fails the quiet check, and a fall before them passes", () => {
+  const fall = { level: "warn", kind: "bridge", event: "env.get", said: "the server answers nothing at http://127.0.0.1:6510/event" };
+  const late = readsCold([...whole(), fall], clean());
+  const early = readsCold([{ ...fall, event: "classic.SessionStart" }, ...whole()], clean());
+
+  assert.equal(verdict(late, "quiet").pass, false);
+  assert.match(verdict(late, "quiet").evidence, /1 row\(s\) say the server answers nothing/);
+  assert.equal(verdict(early, "quiet").pass, true);
+});

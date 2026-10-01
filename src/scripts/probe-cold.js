@@ -31,7 +31,7 @@ const CONFIG_FOLDER = ".claude";
 
 // [[spec/design_output/level0#the-cold-probe]]
 export const COLD = {
-  checks: ["hook", "server", "rules", "tools", "canary"],
+  checks: ["hook", "server", "rules", "tools", "canary", "quiet"],
   prompt: [
     "This session probes a fresh box. Make two tool calls, one after the other.",
     "First read README.md with the Read tool.",
@@ -104,7 +104,24 @@ export function readsCold(rows, steps) {
     { check: "rules", ...rulesReached(said) },
     { check: "tools", ...toolsRegistered(steps) },
     { check: "canary", ...canaryOnce(said, steps) },
+    { check: "quiet", ...quietOnce(said) },
   ];
+}
+
+// A cold start may fall once before its door stands, and no row says the server answers nothing once the rules reached the session. [[spec/tickets/level0-runs-whole-on-the-door]]
+function quietOnce(rows) {
+  const ruled = rows.findIndex((one) => one.kind === "context");
+  if (ruled < 0) return { pass: false, evidence: "no context row" };
+  const fell = rows.filter(
+    (one, at) => at > ruled && /answers nothing/.test(String(one.said ?? "")),
+  );
+  if (fell.length) {
+    return {
+      pass: false,
+      evidence: `${fell.length} row(s) say the server answers nothing after the rules reached the session, first on ${fell[0].event ?? fell[0].kind}`,
+    };
+  }
+  return { pass: true, evidence: "no row says the server answers nothing past the rules" };
 }
 
 const ours = (row) => row?.kind === "bridge" && row?.event !== undefined;

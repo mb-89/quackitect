@@ -223,3 +223,81 @@ test("under new a held call asks back on agent.spoke with the effect's call id, 
   assert.equal(posts[1].body.e.call, "s1.2", "and names the call it answers");
   assert.equal(posts[1].body.e.text, "the reply");
 });
+
+// A door answering every post, which records each address the hook reaches and hands the prompt context its named blocks. [[spec/tickets/level0-runs-whole-on-the-door]]
+function answering(box, posts) {
+  box.$.http = {
+    fetch: async (url, init) => {
+      posts.push({ url, event: JSON.parse(String(init?.body ?? "{}")).event });
+      const event = JSON.parse(String(init?.body ?? "{}")).event;
+      const effects =
+        event === "prompt.context"
+          ? [
+              { kind: "after", name: "level0-tools", text: "the tools you hold" },
+              { kind: "after", name: "level0-canary", text: "Open your FIRST answer" },
+            ]
+          : [];
+      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+    },
+  };
+}
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("under new the prompt context hands the session the door's named blocks", async () => {
+  const box = caged();
+  const posts = [];
+  answering(box, posts);
+  const context = Object.assign(async () => ({ blocks: [{ name: "own", text: "x" }] }), {
+    event: "prompt.context",
+  });
+
+  const said = await box.hooks["*"](box.$, {}, context);
+
+  assert.deepEqual(
+    (said?.blocks ?? []).map((one) => one.name),
+    ["own", "level0-tools", "level0-canary"],
+    "the door's blocks ride after the session's own",
+  );
+});
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("under new no event of a session reaches anything but the hooks door", async () => {
+  const box = caged();
+  const posts = [];
+  answering(box, posts);
+  const passing = (event) => Object.assign(async (e) => ({ handed: e }), { event });
+
+  for (const event of [
+    "session.start",
+    "tool.register",
+    "session.root",
+    "env.get",
+    "session.append",
+    "http.fetch",
+    "prompt.context",
+    "tool.call",
+    "classic.Stop",
+    "classic.SessionEnd",
+  ]) {
+    await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, passing(event));
+  }
+  const step = Object.assign(
+    async function* () {
+      yield { kind: "text", text: "an answer" };
+    },
+    { event: "turn.step" },
+  );
+  for await (const _ of box.hooks["turn.step"](box.$, { turnId: "t1", index: 0 }, step)) {
+  }
+
+  const elsewhere = posts.filter((one) => !one.url.endsWith("/hook"));
+  assert.deepEqual(elsewhere, [], "every post goes to the hooks door");
+  assert.ok(
+    posts.some((one) => one.event === "turn.said"),
+    "the step's text reaches the door as turn.said",
+  );
+  assert.ok(
+    !box.$.logged.some((one) => /ANSWERS NOTHING/.test(String(one))),
+    "the session reads no fall",
+  );
+});

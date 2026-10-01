@@ -105,7 +105,9 @@ async function seen($, e, next) {
   if (event === "engine.create") return next(e);
   await probes($, event, e);
   if (event === "session.start") await opens($, e);
-  if (doors(event) && (await caged($))) return door($, event, e, next);
+  // Under new the door decides what it names and nothing reaches the bridge, which left the tree. A host event the hook raises while it reads the cage passes untouched. [[spec/tickets/level0-runs-whole-on-the-door]]
+  if (reading) return next(e);
+  if (await caged($)) return doors(event) ? door($, event, e, next) : next(e);
   const answer = await ask($, event, await before($, event, e), next, {
     ...(await fillOf($, event, e)),
     ...(armed ? {} : { fresh: true }),
@@ -148,14 +150,20 @@ async function seen($, e, next) {
 
 // The key reads through the layers the bridge reads, so a local override moves the hook as it moves the bridge. [[spec/tickets/a-down-index-refuses-calls]]
 async function caged($) {
+  reading = true;
   try {
     return (
       String(await configOf({ read: (at) => $.fs.read(at) }).ask(CAGE_KEY)) === NEW
     );
   } catch {
     return false;
+  } finally {
+    reading = false;
   }
 }
+
+// Whether the hook reads the cage key now, so the host events that read raises pass by. [[spec/tickets/level0-runs-whole-on-the-door]]
+let reading = false;
 
 // The door answers, or the start road runs once and the door takes the post again. Still down, a guarded call meets the refusal, and every other event passes. [[spec/tickets/a-down-index-refuses-calls]]
 async function door($, event, e, next) {
@@ -186,7 +194,12 @@ async function door($, event, e, next) {
   // [[spec/tickets/clear-answers-off-the-door]]
   if (step.answer?.clear) return clears($, step.answer, e, next);
   if (step.answer !== undefined) return step.answer;
-  return step.after ? merged(await next(e), { context: step.after }) : next(e);
+  // The prompt context takes the door's named blocks, the rules and the canary among them, beside the session's own. [[spec/tickets/level0-runs-whole-on-the-door]]
+  const adds = {
+    ...(step.blocks ? { blocks: step.blocks } : {}),
+    ...(step.after ? { context: step.after } : {}),
+  };
+  return Object.keys(adds).length ? merged(await next(e), adds) : next(e);
 }
 
 async function doorAsk($, event, e, extra) {
@@ -429,12 +442,10 @@ async function* streams($, e, next) {
     stepText += textOf(chunk);
     yield chunk;
   }
-  await ask(
-    $,
-    "turn.said",
-    { turnId: e?.turnId, index: e?.index, kinds, text: stepText },
-    next,
-  );
+  const said = { turnId: e?.turnId, index: e?.index, kinds, text: stepText };
+  // The step's text reaches the door under new, which hears the canary off it. [[spec/tickets/level0-runs-whole-on-the-door]]
+  if (await caged($)) await doorAsk($, "turn.said", said, {});
+  else await ask($, "turn.said", said, next);
 }
 
 async function spoke($, e, next) {
