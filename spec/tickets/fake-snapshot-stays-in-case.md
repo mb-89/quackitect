@@ -1,7 +1,18 @@
 ---
 kind: [[ticket]]
 state: open
+point: gate
+step: person-1
 steps:
+  - name: person-1
+    does: answers the question the engine asks
+    by: anyone
+    to: engine
+    asks: "do fails back 2 times: the change stands in the tree; the check stays red on the placements ticket's approach link, which that ticket's gate fixes, so the fix waits for that gate"
+    evidence:
+      - name: answer
+        form: text
+        says: the answer, which the step behind this one reads
   - name: do
     does: makes the change, with the test that covers it
     from: the-doors-process-stands/gate
@@ -23,13 +34,8 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
-point: gate
-todo: true
-step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: module-processes-land-in-shadow
-parent: the-doors-process-stands
 record:
   - step: do
     hand: box 03ba8e0fb2d4 · claude-code-remote
@@ -44,6 +50,21 @@ record:
       - name: check
         exit: 1
         said: "spec/tickets/the-system-places-modules.md:180:1: EveryPointerResolves: This pointer names a note nobody wrote: spec/desi"
+  - step: do
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: d01ccb46b8f320faa0fb29f3459a1b49eb627498
+    hash_after: d01ccb46b8f320faa0fb29f3459a1b49eb627498
+    returns: 2
+    why: the change stands in the tree; the check stays red on the placements ticket's approach link, which that ticket's gate fixes, so the fix waits for that gate
+    answered:
+      - name: tests
+        exit: 0
+        said: ""
+      - name: check
+        exit: 1
+        said: "spec/tickets/the-system-places-modules.md:180:1: EveryPointerResolves: This pointer names a note nobody wrote: spec/desi"
+group: module-processes-land-in-shadow
+parent: the-doors-process-stands
 ---
 
 # Ask
@@ -53,6 +74,16 @@ record:
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
 src/index/procs_test.go shares the package variable fakeSnap across cases, so two cases running beside each other read each other's snapshot; until hands each case its own
+
+# person-1
+
+<!-- do fails back 2 times: the change stands in the tree; the check stays red on the placements ticket's approach link, which that ticket's gate fixes, so the fix waits for that gate -->
+
+## answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 # do
 

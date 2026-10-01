@@ -91,6 +91,12 @@
       "rule": "EveryPointerResolves",
       "line": 100,
       "message": "This pointer names a chapter nobody wrote: spec/design_output/work#a-successor-stands-on-question. Point at a heading of spec/design_output/work.md, or write the chapter."
+    },
+    {
+      "file": "spec/tickets/the-system-places-modules.md",
+      "rule": "EveryPointerResolves",
+      "line": 180,
+      "message": "This pointer names a note nobody wrote: spec/design_output/processes#the-placements. Point at a file the tree holds."
     }
   ]
 }
