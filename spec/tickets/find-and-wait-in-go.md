@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -145,6 +145,18 @@ record:
         hash: b605f79727538e7b
         size: 10103
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: b66ef68a59267ffc935017189d3f645fff00fd26
+    hash_after: b66ef68a59267ffc935017189d3f645fff00fd26
+    inputs:
+      - name: design/draft
+        hash: b605f79727538e7b
+        size: 10103
+      - name: design/tests-red
+        hash: 7677605327b18699
+        size: 1472
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -345,8 +357,9 @@ Every new test fails on its own assertion, and the tree builds and vets. The qua
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
