@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -187,6 +187,25 @@ record:
         hash: e122785976621597
         size: 10947
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: 6602866d9a5b71f6a94e8fa89838b0561b179267
+    hash_after: 5845b50d0c3fb718ac2b1a5e5e83ddb79f833075
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/go-cage-switches-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 1e40978178d2f3fd
+        size: 324
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
@@ -243,8 +262,7 @@ Done when the bridge server leaves the tree.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- the-cage-slice-stands-new: src/modules/migration/migration.go builds the cage slice in as old with old, shadow and new, while every switched slice stands at new alone. The bridgehead hands each event outside new to the bridge path, and no bridge server answers there, so a box at old or shadow runs uncaged. The slice takes new alone, built in as new, the schema and the generated config commands follow, and the bridgehead reads no cage key.
+accept
 
 # retro
 
