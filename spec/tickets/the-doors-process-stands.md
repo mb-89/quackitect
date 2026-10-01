@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -171,6 +171,15 @@ record:
         hash: 5a754c5b9e92ffff
         size: 167
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: 926f8159ba7315315430917746ce00447e5b9ad9
+    hash_after: 926f8159ba7315315430917746ce00447e5b9ad9
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -322,14 +331,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index src/quack src/q src/modules/migration spec/config
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the bus, the placed process, the standing file, the store's Up and Value, quack io, the processes slice and its tracked mode; the lint runs over those paths, since the one fault left in the tree stands in the placements ticket's approach, which its gate fixes
+- every door the change reaches has a fake: the bus runs in memory on loopback in each case, and the fake IO process is the test binary run again
+- a comment names the approach the change implements: each new function points at the model's chapter or this ticket
+- every fact the change adds stands in one place: the bus subjects and spans stand as named constants in bus.go and io.go, and the slice's modes in migration.go
 
 ## tests-green
 

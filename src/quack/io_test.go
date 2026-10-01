@@ -68,3 +68,25 @@ func TestAShadowValueApartWritesAShadowRow(t *testing.T) {
 		t.Fatalf("the shadow waits %v before it weighs, and wants the settle span", waited)
 	}
 }
+
+// A value a newer one of its name follows weighs nothing, and the weigh skips the log the shadow writes, so its own rows start no loop. [[spec/tickets/the-doors-process-stands]]
+func TestTheShadowWeighsTheNewestValueAloneAndNotItsOwnLog(t *testing.T) {
+	var rows []map[string]any
+	newest := &sends{at: map[string]int64{}}
+	var weighs shadows
+	weighs = shadows{
+		read:   func(string) any { return 3 },
+		settle: time.Second,
+		wait: func(time.Duration) {
+			if len(rows) == 0 && newest.next == 2 {
+				newest.mark([]string{"clock/minute"})
+			}
+		},
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+		newest: newest,
+	}
+	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), shadowsOwnLog: json.RawMessage(`"a row"`), "env/HOME": json.RawMessage("5")})
+	if len(rows) != 1 || rows[0]["name"] != "env/HOME" {
+		t.Fatalf("the shadow writes %v, and wants env/HOME alone: clock/minute has a newer value and the log is its own", rows)
+	}
+}
