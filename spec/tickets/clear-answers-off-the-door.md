@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -243,7 +243,33 @@ record:
         exit: 0
         said: ".claude/skills/level0/hooks/level0.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 652. Split it by topi"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: e6363005ecab4dc21c38ab139109ce5fd76cb71b
+    hash_after: e6363005ecab4dc21c38ab139109ce5fd76cb71b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s); green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "src/scripts/copilot-door.js:7:1: correctness/noUnusedFunctionParameters: This parameter it is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 5e60586e0f4fd2aa
+        size: 833
+      - name: design/tests-red-2
+        hash: e223f769451ae4b5
+        size: 996
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: go-cage-switches-over
+reason: done
 ---
 
 # Ask
@@ -522,26 +548,40 @@ the resume prompt stands in RESUME, and the Go constant names it as its owner
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/clear_test.go test/level0/door-clear.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The hooks door answers the clear at a turn's end, where the bridge's `clearsAfter` answered it before.
+
+- The stops fold says a clear word carrying the resume prompt when an answered turn ends with the handover at clear and the queue binding in force.
+- `blocked` answers that word as a clear effect on the turn's end.
+- `stepOf` in cage.js maps a clear effect to a passing answer carrying the prompt.
+- The plugin's door road hands that answer to `clears`, which runs the clear and submits the prompt.
+
+The cage's clear case passes under `node --test --test-name-pattern="clear effect" test/level0/cage.test.js`. The file as a whole still holds a red case of `log-report-stop-in-go`, so it stays on that ticket's red list until its tests-green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches stops.go, cage.js and level0.js, all inside draft-2's size
+the Go cases run over the fake index and a temp tree, and the plugin case over a fake disk, door, command and prompt
+the fold's branch, the door's answer, the mapping and the plugin's road each point at this ticket
+the resume prompt stands in RESUME, and the Go constant names it as its owner
 
 # accept
 
