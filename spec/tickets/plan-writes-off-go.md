@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -145,6 +145,18 @@ record:
         hash: 4d4080678092430e
         size: 5304
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 4eacdf88aada65b8421f6584152aea6947eef407
+    hash_after: 4eacdf88aada65b8421f6584152aea6947eef407
+    inputs:
+      - name: design/draft
+        hash: 4d4080678092430e
+        size: 5304
+      - name: design/tests-red
+        hash: ad5aa286b19adabf
+        size: 1141
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -317,8 +329,10 @@ Every new case fails on its own assertion. The module cases run against a stub t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- io-answers-take-result-shape: Door.calls in src/modules/hooks/hooks.go answers an IO action's said.Result bare, stepOf in .claude/skills/level0/hooks/cage.js hands it on unchanged, and door in level0.js returns it to the harness, which reads a tool's result as an object with a result key, the shape plan.js answers today. So the plan action's answer, a string as the waits module answers, never reaches the agent. Wrap a string result as an object under result in Door.calls once, for plans and waits alike, with a case in src/modules/hooks driving a string-answering IO action through Door.Hook
 
 # implement
 
