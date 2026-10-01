@@ -115,6 +115,13 @@ func TestTheInputLeavesTheWaitUnlessItDeclaresOne(t *testing.T) {
 	}
 }
 
+// The plan field and the plan tool keep the names PLAN gives them in src/bridge/plan.js, so a port renames nothing the guidance quotes. [[spec/tickets/plan-writes-off-go]]
+func TestThePlanFieldAndToolKeepTheBridgesNames(t *testing.T) {
+	if PlanArg != "plan" || PlanTool != "plan" {
+		t.Fatalf("the plan field reads %q and the tool %q, and both want plan", PlanArg, PlanTool)
+	}
+}
+
 // A plan field riding a call leaves the action's input, bare or whole. [[spec/tickets/plan-writes-off-go]]
 func TestInputDropsARidingPlanField(t *testing.T) {
 	s := storeOf(t)

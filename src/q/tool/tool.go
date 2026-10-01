@@ -26,7 +26,7 @@ const (
 	// The field the plan's answer rides any level zero call under, and the tool that answers it alone. [[spec/tickets/plan-writes-off-go]]
 	PlanArg  = "plan"
 	PlanTool = "plan"
-	percent = 100
+	percent  = 100
 )
 
 // The tool name of an action: the prefix, and each slash an underscore. [[spec/tickets/the-hook-registers-index-tools]]
