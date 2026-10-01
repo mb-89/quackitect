@@ -18,7 +18,7 @@ const (
 	// An action name takes lowercase segments alone, so each check registers under a plain name and keeps its tool name. [[spec/tickets/level0-tools-leave-the-bridge]]
 	proseAction  = "prose"
 	answerAction = "answer"
-	readOnly   = "a check reads a draft, and writes nothing"
+	readOnly     = "a check reads a draft, and writes nothing"
 )
 
 // What each check says of itself, off proseSpec in src/bridge/prose.js and checkSpec in lib/answer.js. [[spec/tickets/prose-tools-answer-in-go]]

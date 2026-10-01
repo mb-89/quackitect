@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -168,7 +168,30 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: a9266e51bfabdfab1487cfb4820cd0139d3c8a92
+    hash_after: 19fc4281dbdbd5f0ffcdc634a5d0e2f7f2a2cb54
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 1 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: 98a1215b3409845c
+        size: 1406
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 depends_on: ["tools-keep-their-own-names", "log-report-stop-in-go", "plan-writes-off-go", "prose-tools-answer-in-go", "edit-tools-answer-in-go", "find-and-wait-in-go", "review-spawns-off-the-door", "describe-answers-off-the-door", "grep-glob-answer-off-index"]
+reason: done
 ---
 
 # Ask
@@ -343,26 +366,40 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/tools_test.go test/level0/cage.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The level zero tools answer off the Go side. The wiring loads the edits, search, waits, plans and drafts modules. So find, wait, patch, replace, undo, mint_note, plan, check_prose and check_answer answer through the hooks door.
+
+The hooks module lists review_branch beside log, report and stop. An action name takes lowercase segments, so the drafts checks and the review register under plain names and keep their tool names.
+
+The cage hands no call to the bridge, since `stepOf` drops served. The bridgehead drops the read path and the repost after a paid reply. The pull hook registers the pull alone, since the index lists the rest.
+
+- the server keeps its TOOLS table and register answer, which nothing reaches now, and they leave with the server under the-bridge-server-leaves
+- a session running the hook it loaded before this change meets the four read tools unanswered until it starts again
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the wiring, the hooks and drafts modules, the cage hooks, the probe and the cases pinning the dropped path
+- the ported modules reach the outside through the seams accepts wires, which their own cases fake
+- each change comment names the ticket, and the level0 design note says the index registers the tools
+- each tool name stands once in its module, and the Go tool-list case reads every name off the wiring
 
 # accept
 

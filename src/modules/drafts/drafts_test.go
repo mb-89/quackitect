@@ -6,6 +6,7 @@ package drafts
 import (
 	_ "embed"
 	"encoding/json"
+	"regexp"
 	"testing"
 
 	"quackitect/src/q"
@@ -125,5 +126,11 @@ func TestEachCheckListsUnderTheNameTheAgentCalls(t *testing.T) {
 		if got, ok := tool.Action(ix.Store(), verb); !ok || got != action {
 			t.Errorf("%s resolves to %q, %v, and wants %s", verb, got, ok, action)
 		}
+		if !lowerSegments.MatchString(action) {
+			t.Errorf("%s registers as %q, and wants lowercase segments alone", verb, action)
+		}
 	}
 }
+
+// The shape an action name takes. [[spec/tickets/level0-tools-leave-the-bridge]]
+var lowerSegments = regexp.MustCompile(`^[a-z]+(/[a-z]+)*$`)
