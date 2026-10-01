@@ -135,6 +135,7 @@ record:
   - step: sync
     hand: box 40b0ad3f11a · claude-code-remote
     hash_before: 219e8f47723f7ad83ab495a483646621f37b0e12
+    hash_after: de8f39b0fb1669a01f654b19ed3a386c62db7753
   - step: sync
     hand: box 40b0ad3f11a · claude-code-remote
     hash_before: 22ea420816d2595d140f219159b6085b94b4b860
@@ -156,6 +157,9 @@ record:
         hash: e122785976621597
         size: 10947
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: de8f39b0fb1669a01f654b19ed3a386c62db7753
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
