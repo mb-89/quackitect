@@ -1,4 +1,11 @@
 {
   "javascript": [],
-  "go": []
+  "go": [
+    {
+      "file": "test/contract/start-road-starts-the-index.test.js",
+      "rule": "overLong",
+      "line": 0,
+      "message": "start-road-starts-the-index.test.js"
+    }
+  ]
 }

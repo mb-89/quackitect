@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -169,6 +169,29 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:314:450: Vocabulary: stepbrief stands outside the words this tree writes. Wr"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: eb7c59455e5db51a9f41c97fdd0e2ac108743143
+    hash_after: eb7c59455e5db51a9f41c97fdd0e2ac108743143
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 175 test(s) pass in 17 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:314:450: Vocabulary: stepbrief stands outside the words this tree writes. Wr"
+    inputs:
+      - name: design/tests-red
+        hash: d128104d243bb342
+        size: 1018
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -361,26 +384,33 @@ accept. The approach answers the ask: se-index standing starts serve where no do
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every start road now runs the index with `standing`, which starts its door where none answers. The cloud start road, the take, the serve verb, the stub and the hook button take that road, and the bridge server starts nowhere. The start road installs where the index stands nowhere, and answers 9 where the install builds none. The cold probe stops the index with its own `stop`. The bridge still runs where a hand starts it, until the next child removes it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The green commit adds the size golden and the old test name gone, and touches nothing past the change.
+- The tests reach the process and the disk through their fakes, and the cold case drives the real index.
+- Each changed function carries a comment naming a start road chapter.
+- The index path and the standing file each stand in one lib file, and each copy names it.
 
 # accept
 
