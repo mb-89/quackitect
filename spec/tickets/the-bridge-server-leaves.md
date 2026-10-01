@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: "spec/tickets/the-bridge-server-leaves.md:366:58: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: 3f848e7b18bd62a3501bb9a31dd738a31d4bdc7b
+    hash_after: 1e7ebd952fc3a52c53958d95a811c50c44bbe260
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-bridge-server-leaves.md:380:58: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 03ab3ddbe2e00eb8
+        size: 657
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -323,26 +346,33 @@ accept. The approach answers the ask. A cold probe over a clone carrying the del
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/bridge-server-leaves.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The bridge server leaves the tree, with its fake, the modules only it reached and every case whose subject it is. The hooks door now answers every event and every level zero tool. Its read of a call took arguments nested under the input alone, and the host spreads them on the event, so a write tool met no edits once the bridge stopped. `tool.Args` now reads both forms. A cold probe over a clone without the server reads its rules and every tool.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The green commit carries the deletions, which the change commit left unstaged.
+- The contract case runs git over the real tree, and the Go cases run over their fakes.
+- Each changed case names this ticket.
+- The spread read stands in one function, and the door calls it.
 
 # accept
 
