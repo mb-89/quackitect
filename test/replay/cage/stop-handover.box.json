@@ -1,0 +1,17 @@
+{
+  "cloud": false,
+  "binding": "queue",
+  "bindingLayer": "spec/config/level0.json",
+  "handoverAt": 1000,
+  "live": [
+    "spec/config/level0.schema.json",
+    "spec/config/status.yaml",
+    "spec/config/stop/level0.yml",
+    "spec/config/stop/level1.yml"
+  ],
+  "config": {
+    "context.handoverAt": 1000,
+    "engine.binding": "queue"
+  },
+  "files": {}
+}

@@ -64,7 +64,7 @@
       "type": "object",
       "properties": {
         "hook": {
-          "help": "The hook: start the server behind the bridgehead, and click again to kill it. Shift and click starts it under the debugger, paused at the return of decide.",
+          "help": "The hook: start the index behind the bridgehead, and click again to stop it.",
           "widget": "process",
           "icon": "🎣",
           "group": "agent control",
@@ -72,9 +72,7 @@
           "column": 0,
           "rowSpan": 1,
           "colSpan": 1,
-          "runs": "src/bridge/server.js",
-          "launch": "the server",
-          "pauses": "decide"
+          "runs": ".se/.runtime/bin/se-index"
         }
       }
     },
@@ -419,11 +417,9 @@
       "properties": {
         "cage": {
           "type": "string",
-          "default": "old",
-          "help": "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's.",
+          "default": "new",
+          "help": "The cage, switched over in phase 5. The hooks IO module answers each hook event.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },

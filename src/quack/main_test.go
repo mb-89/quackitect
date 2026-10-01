@@ -350,7 +350,7 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 // The root hands a request to disk through the files module, and refuses one to any other module by its name. [[spec/tickets/actions-answer-over-http]]
 func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
 	root := t.TempDir()
-	accept := accepts(root, nil)
+	accept := accepts(root, nil, nil)
 	if _, err := accept(q.Request{Module: files.DiskModule, Verb: "write", Args: files.Write{Path: "a.md", Text: "one"}}); err != nil {
 		t.Fatal(err)
 	}
@@ -369,7 +369,7 @@ func TestTheRootLandsAStoreRequest(t *testing.T) {
 	config.Registers(c)
 	store := q.NewStore(c)
 	change := config.Change{Kind: config.Overrides, Holder: "w1", Values: map[string]string{"queue/config/weight": "9"}}
-	if _, err := accepts(t.TempDir(), store)(q.Request{Module: q.StoreModule, Verb: q.StoreLand, Args: q.Landing{Name: config.HeldName, Event: change}}); err != nil {
+	if _, err := accepts(t.TempDir(), store, nil)(q.Request{Module: q.StoreModule, Verb: q.StoreLand, Args: q.Landing{Name: config.HeldName, Event: change}}); err != nil {
 		t.Fatal(err)
 	}
 	if held, _ := store.Snapshot().Read(config.HeldName).(config.Held); held.Overrides["queue/config/weight"] != "9" || held.By["queue/config/weight"] != "w1" {
@@ -396,7 +396,7 @@ func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
 	}
 }
 
-// Main hands help, --help, run and get to the tree over the base V1 answers, and every other verb to the index. [[spec/tickets/quack-main-routes-the-tree]]
+// Main hands help, --help, run and get to the tree over the base V1 answers, and every other verb to the index, hook among them since Copilot's hook answers off the hooks door. [[spec/tickets/quack-main-routes-the-tree]] [[spec/tickets/copilot-answers-off-the-door]]
 func TestMainHandsTheTreeVerbsToCliOverV1(t *testing.T) {
 	base := standingTree(t)
 	v1 := func() (string, error) { return base, nil }
@@ -406,7 +406,7 @@ func TestMainHandsTheTreeVerbsToCliOverV1(t *testing.T) {
 			t.Fatalf("main hands %v to the tree: %s%s", argv, out.String(), errs.String())
 		}
 	}
-	for _, verb := range []string{"serve", "find", "standing"} {
+	for _, verb := range []string{"serve", "find", "standing", "hook"} {
 		if cliVerbs[verb] {
 			t.Fatalf("main hands %s to the tree, not the index", verb)
 		}

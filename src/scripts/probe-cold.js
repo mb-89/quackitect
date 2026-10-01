@@ -10,12 +10,15 @@ import {
   POINTER,
   PORT_BASE,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { INSTALL_SKIP, READ_TOOLS } from "../../.claude/skills/level0/hooks/level0.js";
+import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
 import { homeIn } from "./editor.js";
 import { logRows } from "./probe.js";
 
 const SERVED = "mcp__level0__";
-const READS = new Set(READ_TOOLS.map((one) => `${SERVED}${one.name}`));
+// The one tool the hook registers itself, beside the index's. [[spec/tickets/level0-tools-leave-the-bridge]]
+const READS = new Set([PULL_CALL]);
 // The span each outside run gets, the bound the compaction probe takes. [[spec/design_output/level0#what-the-probe-does]]
 const WAIT = 900000;
 // The cold server's port stands past the base, so a server a desk runs keeps its own. [[spec/design_output/level0#the-cold-probe]]
@@ -46,8 +49,8 @@ export const COLD_PATH = [
   ".claude/skills/level0/hooks/",
   ".claude/skills/level0/lib/guidance.js",
   "src/bridge/guidance.js",
-  "src/bridge/selftest.js",
-  "src/bridge/server.js",
+  "src/modules/hooks/",
+  "src/quack/",
   "src/scripts/install.sh",
   "src/scripts/probe-cold.js",
 ];
@@ -139,7 +142,7 @@ function rulesReached(rows) {
   return { pass: true, evidence: `context row, ${whole.detail}` };
 }
 
-// The hook registers the read tools itself, so a name past them proves the server's answer reached the client. [[spec/design_output/level0#the-first-call-pays]]
+// The hook registers the pull itself, so a name past it proves the index's tools reached the client. [[spec/tickets/level0-tools-leave-the-bridge]]
 function toolsRegistered(steps) {
   const named = new Set([...steps.tools, ...steps.called]);
   for (const text of steps.texts) {
@@ -152,7 +155,7 @@ function toolsRegistered(steps) {
       evidence: "no level0 tool in the init, a call or the answer",
     };
   if (ours_.every((one) => READS.has(one))) {
-    return { pass: false, evidence: `the read tools alone: ${ours_.join(", ")}` };
+    return { pass: false, evidence: `the pull alone: ${ours_.join(", ")}` };
   }
   return { pass: true, evidence: ours_.join(", ") };
 }
@@ -213,7 +216,7 @@ export async function probeCold(root, it, client, say = console.log, delta = "")
   try {
     return coldRun(root, it, client, say, { temp, tree, port, delta });
   } finally {
-    stops(it, tree, port);
+    stops(it, tree);
     it.disk.remove(temp);
   }
 }
@@ -312,17 +315,14 @@ function clientArgv(client, plugin) {
   ];
 }
 
-// The server the start road launched stands in the clone, so the probe stops it by its port and by its path. [[spec/design_output/level0#the-cold-probe]]
-function stops(it, tree, port) {
-  const post = `fetch('http://127.0.0.1:${port}/stop',{method:'POST'}).catch(()=>{})`;
-  for (const argv of [
-    [it.node ?? "node", "-e", post],
-    ["pkill", "-f", it.join(tree, "src", "bridge", "server.js")],
-  ]) {
-    try {
-      it.proc.run(argv, { timeoutMs: WAIT });
-    } catch {}
-  }
+// The index the start road launched stands over the clone, so the probe stops it with the index's own stop. [[spec/design_output/level0#the-cold-probe]]
+function stops(it, tree) {
+  try {
+    it.proc.run([it.join(tree, ...BIN.split("/")), "stop"], {
+      cwd: tree,
+      timeoutMs: WAIT,
+    });
+  } catch {}
 }
 
 function tail(text) {

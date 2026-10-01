@@ -1,0 +1,409 @@
+{
+  "masks": { "{at}": "@", "{plus}": "+", "{home}": "/home/" },
+  "tree": {
+    "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n",
+    "spec/config/level0.json": "{\"names\": {\"words\": 5}}\n"
+  },
+  "cases": [
+    {
+      "name": "a commit with an empty delta meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a commit adding an address refuses on its shape",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+Write to quill.owner{at}mail.org for the key."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  ShapeStaysHome\n    adds: quill.owner{at}mail.org\n    An email address names a person, and git carries it to everybody. Say the role this line means, and hold the address under .se.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a commit adding an address nowhere meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+Write to someone@example.com for the key."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a commit adding a phone number refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+Call {plus}49 170 1234567 for the key."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  ShapeStaysHome\n    adds: {plus}49 170 1234567\n    A phone number reaches one person, and a tracked file reaches the world. Cut it, and hold it under .se where the box keeps its own.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a commit adding a date in prose refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+The door lands on 2026-03-14 at the latest."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  ShapeStaysHome\n    adds: 2026-03-14\n    A date in prose says when somebody looks, and a reader acts on none of it. Drop it, and name the client version where a build matters.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a commit adding a home path refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+The tool stands at {home}quill/bin/tool."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  ShapeStaysHome\n    adds: {home}quill\n    A home path names the person owning the box, and user, root, one, somebody, nobody, agent, claude, runner, ubuntu, vscode are the users naming nobody. Write the path under one of those, or say $HOME.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a home path under nobody meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+The tool stands at /home/user/bin/tool."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a commit carrying the box's user refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "env": { "USER": "quill", "HOME": "{home}quill" },
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+Ask quill about the door."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  BoxNameStaysHome\n    adds: quill\n    This box answers quill as the user of this box, so the line carries the person behind the box. Say the role, and let git carry the work alone.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a commit carrying the git name refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "config --get user.name": "Quill Feder",
+        "config --get user.email": "qf{at}mail.org",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+Quill Feder owns the door."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  BoxNameStaysHome\n    adds: Quill Feder\n    This box answers Quill Feder as the git name here, so the line carries the person behind the box. Say the role, and let git carry the work alone.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a delta under .se meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/.se/notes/mine.md b/.se/notes/mine.md\nindex 1111111..2222222 100644\n--- a/.se/notes/mine.md\n+++ b/.se/notes/mine.md\n@@ -0,0 +1,1 @@\n+Write to quill.owner{at}mail.org for the key."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a commit copying a note's run refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "files": {
+        ".se/notes/raw.md": "the owner wants the bridge to leave before the summer ends\n"
+      },
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+We hold that the owner wants the bridge to leave before the summer."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  NoteTextStaysHome\n    adds: the owner wants the bridge to leave before the summer.\n    10 words come straight out of .se/notes/raw.md, and a note holds what a person dumps there. Say what the thing is, for a reader who reads no note.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a commit carrying a note's token refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "files": { ".se/notes/raw.md": "the key sits at vault.inner/keys/door-7\n" },
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+Read vault.inner/keys/door-7 first."
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit carries something private, so the door holds it here.\n\n  spec/notes-out.md:1:1  NoteTextStaysHome\n    adds: vault.inner/keys/door-7\n    .se/notes/raw.md carries this token, and one token leaks a path, an address or a secret. Name what the line means, and leave the token home.\n\nTake the line out of the delta, stage the file again, and commit. A line the delta removes passes always, so a leak leaves this tree the same way."
+    },
+    {
+      "name": "a commit changing code with no test refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/src/engine/thing.js b/src/engine/thing.js\nindex 1111111..2222222 100644\n--- a/src/engine/thing.js\n+++ b/src/engine/thing.js\n@@ -0,0 +1,1 @@\n+export const THING = 1;"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit changes code, and it carries no test beside it.\n\n  src/engine/thing.js\n\nStage the test proving the change, and commit again. Rule five of spec/guidance/code/testing.md says why."
+    },
+    {
+      "name": "a commit changing Go code with no test refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/src/modules/thing/thing.go b/src/modules/thing/thing.go\nindex 1111111..2222222 100644\n--- a/src/modules/thing/thing.go\n+++ b/src/modules/thing/thing.go\n@@ -0,0 +1,1 @@\n+package thing"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit changes code, and it carries no test beside it.\n\n  src/modules/thing/thing.go\n\nStage the test proving the change, and commit again. Rule five of spec/guidance/code/testing.md says why."
+    },
+    {
+      "name": "a commit adding comments alone meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/src/engine/thing.js b/src/engine/thing.js\nindex 1111111..2222222 100644\n--- a/src/engine/thing.js\n+++ b/src/engine/thing.js\n@@ -0,0 +1,1 @@\n+// a line saying why"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a commit changing code beside its test meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "files": {
+        "test/engine/thing.test.js": "import { THING } from \"../../src/engine/thing.js\";\n"
+      },
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "diff --cached --unified=0": "diff --git a/src/engine/thing.js b/src/engine/thing.js\nindex 1111111..2222222 100644\n--- a/src/engine/thing.js\n+++ b/src/engine/thing.js\n@@ -0,0 +1,1 @@\n+export const THING = 1;\ndiff --git a/test/engine/thing.test.js b/test/engine/thing.test.js\nindex 1111111..2222222 100644\n--- a/test/engine/thing.test.js\n+++ b/test/engine/thing.test.js\n@@ -0,0 +1,1 @@\n+// the test"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a merge in progress meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "rev-parse -q --verify MERGE_HEAD": "0123456789abcdef0123456789abcdef01234567",
+        "diff --cached --unified=0": "diff --git a/src/engine/thing.js b/src/engine/thing.js\nindex 1111111..2222222 100644\n--- a/src/engine/thing.js\n+++ b/src/engine/thing.js\n@@ -0,0 +1,1 @@\n+export const THING = 1;"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a push carrying a tagged note refuses",
+      "command": "git push -u origin work/some-group",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "log --format= --name-only HEAD --not --remotes": "spec/tickets/a-ticket.md\nsrc/engine/thing.js",
+        "show HEAD:spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\ntodo: true\n---\n\n# Ask\n"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "A tagged note parks work on this box, and this push carries 1.\n\n  spec/tickets/a-ticket.md\n\nRun `./RUNME.sh ticket todo <name> --off` on each, and push again. A commit\ncarries the tag, because the push is the one gate the tag meets."
+    },
+    {
+      "name": "a push carrying a gate point meets the git write door",
+      "command": "git push -u origin work/some-group",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "log --format= --name-only HEAD --not --remotes": "spec/tickets/a-ticket.md",
+        "show HEAD:spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\ntodo: true\npoint: gate\n---\n\n# Ask\n"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git push -u origin work/some-group\n\n  GitWritesThroughAVerb\n    reads: git push\n    git push writes the repository, and the agent reaches git through the engine alone. Push with ./RUNME.sh push once the check answers green, or let ./RUNME.sh commit push from a cloud box.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a push carrying an untagged note meets the git write door",
+      "command": "git push -u origin work/some-group",
+      "cloud": true,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "log --format= --name-only HEAD --not --remotes": "spec/tickets/a-ticket.md",
+        "show HEAD:spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git push -u origin work/some-group\n\n  GitWritesThroughAVerb\n    reads: git push\n    git push writes the repository, and the agent reaches git through the engine alone. Push with ./RUNME.sh push once the check answers green, or let ./RUNME.sh commit push from a cloud box.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a desk commit on a work branch refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": false,
+      "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "A desk works on main alone, and a cloud box works each work/ branch, so this commit lands nowhere on work/some-group.\nRun git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
+    },
+    {
+      "name": "a desk push on a work branch refuses",
+      "command": "git push",
+      "cloud": false,
+      "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "A desk works on main alone, and a cloud box works each work/ branch, so this push lands nowhere on work/some-group.\nRun git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
+    },
+    {
+      "name": "a desk commit on the trunk refuses through the verb",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": false,
+      "git": { "rev-parse --abbrev-ref HEAD": "main" },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit lands on main past the commit verb.\n\nRun `./RUNME.sh commit \"<message>\"`, which reads the message, runs the tests,\ncommits, runs the check and pushes the branch you stand on. One helper's work\nrides one commit, so one review reads it and one undo takes it back."
+    },
+    {
+      "name": "a desk push of the trunk on a red battery refuses",
+      "command": "git push origin main",
+      "cloud": false,
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "main",
+        "rev-parse HEAD": "0123456789abcdef0123456789abcdef01234567"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "main takes a green battery, and no check has run here.\n\nRun `./RUNME.sh check` last, after your final commit. The stamp names\nthe commit it ran against, so a commit after it reads stale."
+    },
+    {
+      "name": "a desk push of the trunk on a green battery refuses through the verb",
+      "command": "git push origin main",
+      "cloud": false,
+      "files": {
+        ".se/.runtime/check.json": "{\"sha\":\"0123456789abcdef0123456789abcdef01234567\",\"clean\":true,\"ok\":true,\"warnings\":0,\"files\":[]}"
+      },
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "main",
+        "rev-parse HEAD": "0123456789abcdef0123456789abcdef01234567"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This push lands on main past the push verb.\n\nRun `./RUNME.sh push`, which reads the check's stamp and pushes the branch\nyou stand on once the check answers green on it."
+    },
+    {
+      "name": "a desk push of the trunk on a stale stamp refuses",
+      "command": "git push origin main",
+      "cloud": false,
+      "files": {
+        ".se/.runtime/check.json": "{\"sha\":\"0123456789abcdef0123456789abcdef01234567\",\"clean\":true,\"ok\":true,\"warnings\":0,\"files\":[]}"
+      },
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "main",
+        "rev-parse HEAD": "fedcba9876543210fedcba9876543210fedcba98"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "main takes a green battery, and the check ran against 01234567.\n\nRun `./RUNME.sh check` last, after your final commit. The stamp names\nthe commit it ran against, so a commit after it reads stale."
+    },
+    {
+      "name": "a cloud commit on the trunk refuses through the verb",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": { "rev-parse --abbrev-ref HEAD": "main" },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "This commit lands on main past the commit verb.\n\nRun `./RUNME.sh commit \"<message>\"`, which reads the message, runs the tests,\ncommits, runs the check and pushes the branch you stand on. One helper's work\nrides one commit, so one review reads it and one undo takes it back."
+    },
+    {
+      "name": "a cloud push of the trunk off a work branch refuses",
+      "command": "git push origin main",
+      "cloud": true,
+      "files": {
+        ".se/.runtime/check.json": "{\"sha\":\"0123456789abcdef0123456789abcdef01234567\",\"clean\":true,\"ok\":true,\"warnings\":0,\"files\":[]}"
+      },
+      "git": {
+        "rev-parse --abbrev-ref HEAD": "work/some-group",
+        "rev-parse HEAD": "0123456789abcdef0123456789abcdef01234567"
+      },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "A cloud box holding a work branch hands it back, and main stays shut here.\n\nThis pushes main, and the branch in hand goes back to the queue instead.\n\nRun `./RUNME.sh ticket pull`, which takes a branch for a cloud box and moves you onto it.\nPush that branch, run `branch done`, and a box off the cloud takes it into trunk."
+    },
+    {
+      "name": "a cloud push of its own branch meets the git write door",
+      "command": "git push -u origin work/some-group",
+      "cloud": true,
+      "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git push -u origin work/some-group\n\n  GitWritesThroughAVerb\n    reads: git push\n    git push writes the repository, and the agent reaches git through the engine alone. Push with ./RUNME.sh push once the check answers green, or let ./RUNME.sh commit push from a cloud box.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a commit message the voice refuses refuses",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
+      "voice": [
+        {
+          "rule": "level0.Private",
+          "line": 1,
+          "column": 5,
+          "said": "door",
+          "message": "A private word leaves the box.",
+          "severity": "error"
+        }
+      ],
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  level0.Private\n    reads: door\n    A private word leaves the box.\n\nHold level0.Private for the rest of this turn."
+    },
+    {
+      "name": "a commit message breaking form meets the git write door",
+      "command": "git commit -m \"the door reads the change\"",
+      "cloud": true,
+      "git": { "rev-parse --abbrev-ref HEAD": "work/some-group" },
+      "voice": [
+        {
+          "rule": "level0.Hedge",
+          "line": 1,
+          "column": 5,
+          "said": "door",
+          "message": "Say it plainly.",
+          "severity": "warning"
+        }
+      ],
+      "description": "a-ticket: land the change",
+      "decision": "refuse",
+      "text": "Level zero refuses this command.\n\n  ran: git commit -m \"the door reads the change\"\n\n  GitWritesThroughAVerb\n    reads: git commit\n    git commit writes the repository, and the agent reaches git through the engine alone. Land the change through ./RUNME.sh commit, which stages, commits and runs the check.\n\nHold GitWritesThroughAVerb for the rest of this turn."
+    },
+    {
+      "name": "a command carrying no commit meets no guard",
+      "command": "git status",
+      "cloud": false,
+      "git": { "rev-parse --abbrev-ref HEAD": "main" },
+      "description": "a-ticket: land the change",
+      "decision": "pass",
+      "text": ""
+    }
+  ]
+}

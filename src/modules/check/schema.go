@@ -134,7 +134,7 @@ func frontFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 			continue
 		}
 		out = append(out, schemaFault(key, where, 1,
-			fmt.Sprintf("A %s note names %s in its frontmatter.", kind, key)))
+			fmt.Sprintf("A %s names %s in its frontmatter.", kind, key)))
 	}
 
 	for _, key := range said.Keys() {

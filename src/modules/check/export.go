@@ -32,7 +32,9 @@ var (
 	Left                     = left
 	Listed                   = listed
 	MagicIn                  = magicIn
+	MarkerLines              = markerLines
 	Matches                  = matches
+	Minted                   = mintedNote
 	NameHoldsTheWords        = nameHoldsTheWords
 	NoConflictMarkers        = noConflictMarkers
 	NoLogDeleted             = noLogDeleted
@@ -57,6 +59,7 @@ var (
 	Slashed                  = slashed
 	SlugOf                   = slugOf
 	Sorted                   = sorted
+	StrangerFault            = strangerFault
 	SurveyFindsNode          = surveyFindsNode
 	SurveyNamesInstalls      = surveyNamesInstalls
 	TextFaults               = textFaults

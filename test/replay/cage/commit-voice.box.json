@@ -1,0 +1,16 @@
+{
+  "cloud": true,
+  "git": {
+    "rev-parse --abbrev-ref HEAD": "work/some-group"
+  },
+  "voice": [
+    {
+      "rule": "level0.Private",
+      "line": 1,
+      "column": 5,
+      "said": "door",
+      "message": "A private word leaves the box.",
+      "severity": "error"
+    }
+  ]
+}

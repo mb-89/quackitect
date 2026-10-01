@@ -33,9 +33,11 @@ there must reach a person, or the branch stalls in silence.
 
 ## 5. What still passes
 
-The bridgehead passes every call while the server stands down, and says so once.
-The index falls back to reading the files. The migration changes these
-chapters:
+Under `new`, a read passes while the hooks door stands down, and every other
+guarded call meets the refusal. The index falls back to reading the files. The
+migration changes these chapters:
+
+- [[spec/design_output/level0#the-cage-refuses-while-down]]
 
 - [[spec/design_output/level0#the-bridgehead-and-the-server]]
 - [[spec/design_output/level0#the-bridge-says-it-falls]]

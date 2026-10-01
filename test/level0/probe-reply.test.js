@@ -96,7 +96,15 @@ function bridgehead(files) {
       exists: async (rel) => files.exists(`${ROOT}/${rel}`),
       write: async (rel, text) => files.write(`${ROOT}/${rel}`, text),
     },
-    process: { run: async () => ({ exitCode: 1 }) },
+    // The bridgehead appends its row through node, and the append lands in the log the case reads. [[spec/tickets/a-down-index-refuses-calls]]
+    process: {
+      run: async (argv) => {
+        if (argv[0] !== "node" || !String(argv[2]).includes("appendFileSync"))
+          return { exitCode: 1 };
+        files.append(`${ROOT}/${argv[3]}`, String(argv[4]));
+        return { exitCode: 0 };
+      },
+    },
     http: {
       fetch: async () => {
         throw new Error("Unable to connect");
@@ -135,5 +143,14 @@ test("the bridgehead writes no probe row after a prompt carrying no marker", asy
   const fire = bridgehead(files);
   await fire("prompt.submit", { text: "Say hello." });
   await fire("tool.call", { tool: "Read" });
-  assert.equal(files.read(LOG), "");
+  // register resets the fall, so the fall's own row lands, and no probe row does. [[spec/tickets/a-down-index-refuses-calls]]
+  const rows = files
+    .read(LOG)
+    .split("\n")
+    .filter(Boolean)
+    .map((one) => JSON.parse(one));
+  assert.deepEqual(
+    rows.filter((one) => one.said === REPLY_PROBE.event),
+    [],
+  );
 });

@@ -11,11 +11,13 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/hooks/write"
 )
 
 const cageLogs = "../../../test/replay/cage"
 
-const hookRow = `{"at":"2026-09-29T12:00:01Z","level":"debug","kind":"hook","said":"tool.call Bash rm -rf /","event":"tool.call","tool":"Bash","answer":"{\"result\":{\"deny\":\"no\"}}","text":"{\"e\":{\"tool\":\"Bash\",\"command\":\"rm -rf /\",\"session_id\":\"s1\"},\"origin\":null}"}`
+const hookRow = `{"at":"2026-09-29T12:00:01Z","level":"debug","kind":"hook","said":"tool.call Bash rm -rf /","event":"tool.call","tool":"Bash","answer":"{\"result\":{\"deny\":\"no\"}}","text":"{\"e\":{\"tool\":\"Bash\",\"command\":\"rm -rf /\",\"description\":\"a-ticket: remove\",\"session_id\":\"s1\"},\"origin\":null}"}`
 
 func TestPostsOfRebuildsEveryHookRow(t *testing.T) {
 	got, err := PostsOf(hookRow + "\n")
@@ -24,7 +26,7 @@ func TestPostsOfRebuildsEveryHookRow(t *testing.T) {
 	}
 	want := []Recorded{{Line: 1, Stamp: "2026-09-29T12:00:01Z", Post: Post{
 		Event: "tool.call",
-		E:     map[string]any{"tool": "Bash", "command": "rm -rf /", "session_id": "s1"},
+		E:     map[string]any{"tool": "Bash", "command": "rm -rf /", "description": "a-ticket: remove", "session_id": "s1"},
 		Old:   map[string]any{"result": map[string]any{"deny": "no"}},
 	}}}
 	if !reflect.DeepEqual(got, want) {
@@ -78,6 +80,8 @@ func TestDecisionOfReadsTheDoorsAnswer(t *testing.T) {
 		{bash, Answer{Effects: []Effect{{Kind: passKind}}}, PassWord},
 		{bash, Answer{Effects: []Effect{{Kind: resultKind, Text: "no"}}}, RefuseWord},
 		{index, Answer{Effects: []Effect{{Kind: resultKind, Result: "done"}}}, PassWord},
+		// [[spec/tickets/grep-glob-answer-off-index]]
+		{Post{Event: "tool.call", E: map[string]any{"tool": "Grep"}}, Answer{Effects: []Effect{{Kind: resultKind, Result: map[string]any{"mode": "content"}}}}, PassWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: "block", Text: "wait"}}}, BlockWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: "rows"}}}, HoldWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: passKind}, {Kind: afterKind, Text: "ends"}}}, PassWord},
@@ -159,7 +163,20 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 				t.Fatal(err)
 			}
 			var got []Apart
-			said, err := doorOver(t, &calls{}, &book{}).door.ReplayLog(string(text), func(map[string]any) error { return nil })
+			replay := doorOver(t, &calls{}, &book{}).door
+			var reads boxReads
+			if settings, ok := boxOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json"); ok {
+				replay.from.Config = func(string) Settings { return settings }
+				reads = readsOf(t, strings.TrimSuffix(one, ".jsonl")+".box.json")
+				replay.from.Git = taughtGit(reads.Git)
+				replay.from.Voice = taughtVoice(reads.Voice)
+				replay.from.Prose = taughtProse(reads.Prose)
+				replay.from.Schema = taughtSchema(reads.Schema)
+				if len(reads.Live) > 0 {
+					replay.from.Root = stopTreeOf(t, stopTable{Live: reads.Live}, stopCase{Config: reads.Config, Files: reads.Files})
+				}
+			}
+			said, err := replay.ReplayLog(movedRoot(string(text), replay.from.Root), func(map[string]any) error { return nil })
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -170,6 +187,49 @@ func TestReplayLogAnswersEveryRecordedLog(t *testing.T) {
 			}
 		})
 	}
+}
+
+// The Settings a recorded log's box answers, off <name>.box.json where it stands, over the words the table's tree holds. [[spec/tickets/cage-call-holds-port]]
+func boxOf(t *testing.T, at string) (Settings, bool) {
+	t.Helper()
+	body, err := os.ReadFile(at)
+	if os.IsNotExist(err) {
+		return Settings{}, false
+	}
+	if err != nil {
+		t.Fatal(err)
+	}
+	settings := Settings{Words: nameWords}
+	if err := json.Unmarshal(body, &settings); err != nil {
+		t.Fatal(err)
+	}
+	return settings, true
+}
+
+// The git reads and the voice a recorded log's box answers, off the same <name>.box.json. [[spec/tickets/cage-commit-guards-port]]
+type boxReads struct {
+	Git   map[string]string `json:"git"`
+	Voice []voiced          `json:"voice"`
+	// The live files, the config and the files a stop log's tree holds. [[spec/tickets/cage-stop-rules-port]]
+	Live   []string          `json:"live"`
+	Config map[string]any    `json:"config"`
+	Files  map[string]string `json:"files"`
+	// The findings the voice keeps over a written file. [[spec/tickets/cage-write-door-port]]
+	Prose  []write.Finding         `json:"prose"`
+	Schema map[string]write.Judged `json:"schema"`
+}
+
+func readsOf(t *testing.T, at string) boxReads {
+	t.Helper()
+	body, err := os.ReadFile(at)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var reads boxReads
+	if err := json.Unmarshal(body, &reads); err != nil {
+		t.Fatal(err)
+	}
+	return reads
 }
 
 func goldenOf(t *testing.T, at string) []Apart {
@@ -202,7 +262,7 @@ func TestALivePostDecidedApartWritesAShadowRow(t *testing.T) {
 		rows = append(rows, row)
 		return nil
 	}
-	post := Post{Event: "tool.call", Harness: "copilot", E: map[string]any{"tool": "Bash", "session_id": "s1"}, Old: map[string]any{"result": map[string]any{"deny": "no"}}}
+	post := Post{Event: "tool.call", Harness: "copilot", E: map[string]any{"tool": "Bash", "command": "ls", "description": "a-ticket: list", "session_id": "s1"}, Old: map[string]any{"result": map[string]any{"deny": "no"}}}
 	if _, err := one.door.Hook(post); err != nil {
 		t.Fatal(err)
 	}

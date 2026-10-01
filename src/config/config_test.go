@@ -204,3 +204,23 @@ func TestDefaultInHoldsNothingTheSchemaLeavesOut(t *testing.T) {
 		}
 	}
 }
+
+// A drop writes its key and keeps every other key of the local layer, and makes the layer where none stands. [[spec/tickets/cage-hold-drops-port]]
+func TestDropWritesOneKeyOfTheLocalLayer(t *testing.T) {
+	root := rootWith(t, map[string]string{Local: `{"stop": {"hold": "finish", "other": "kept"}, "ask": {"wanted": "brief"}}`})
+	if err := Drop(root, "stop.hold", "off"); err != nil {
+		t.Fatal(err)
+	}
+	for key, want := range map[string]string{"stop.hold": "off", "stop.other": "kept", "ask.wanted": "brief"} {
+		if said, _, _ := Where(root, key); said != want {
+			t.Fatalf("%s reads %v after the drop, and wants %s", key, said, want)
+		}
+	}
+	bare := t.TempDir()
+	if err := Drop(bare, "ask.wanted", "quiet"); err != nil {
+		t.Fatal(err)
+	}
+	if said, layer, _ := Where(bare, "ask.wanted"); said != "quiet" || layer != Local {
+		t.Fatalf("a drop into a bare root reads %v off %s, and wants quiet off %s", said, layer, Local)
+	}
+}

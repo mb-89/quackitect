@@ -4,29 +4,39 @@
 // nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
-import { patchSpec, replaceSpec } from "../lib/apply.js";
+import { configOf } from "../lib/config.js";
 import { REPLY_PROBE } from "../lib/guidance.js";
 import { SERVE, SESSION } from "../lib/log.js";
-import { findSpec } from "../lib/search.js";
-import { undoSpec } from "../lib/undo.js";
-import { POINTER, PORT_BASE as PORT, SELF_TEST, TESTING } from "../lib/vehicle.js";
+import { POINTER, PORT_BASE as PORT } from "../lib/vehicle.js";
+import {
+  CAGE_KEY,
+  doors,
+  guarded,
+  HOOKS_FILE,
+  NEW,
+  postOf,
+  refusedText,
+  stepOf,
+} from "./cage.js";
+import { APPEND, merged, slim } from "./shape.js";
+import {
+  cageText,
+  INSTALL_SKIP,
+  INSTALLED,
+  NO_NODE,
+  reasonOf,
+  STARTING,
+  spawnTagOf,
+  START,
+} from "./start.js";
+import { beforeIn, textOf, textsOf } from "./transcript.js";
+
+export { cageText, INSTALL_SKIP, reasonOf, STARTING, spawnTagOf, START };
 
 // The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], under the runtime folder folders.js owns.
 const HAND_FILE = ".se/.runtime/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
-const SHORT = 4000;
-const TEXTS = 4;
-// The transcript rows the answer door reads past the prompt's own row. [[spec/tickets/a-reply-follows-its-prompt]]
-const ROWS = 64;
-// The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export const STARTING = 180_000;
-// The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
-export const INSTALL_SKIP = "editor-link editor-extensions editor-client go index";
-// The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const NO_NODE = 5;
-// The code REASONS reads for a road that installs the modules and then starts the server. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const INSTALLED = 7;
 let port = PORT;
 // Whether the start road launched a server this session. [[spec/design_output/level0#rules-ride-the-first-answer]]
 let launched = false;
@@ -55,81 +65,7 @@ export const CAGE_BLOCK = "level0-cage";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
-// THE CLOUD STARTS ITS OWN SERVER, AND BRINGS WHAT THE SERVER NEEDS. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the modules stand nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export const START = [
-  "const { spawn, spawnSync } = require('node:child_process');",
-  "const { existsSync, mkdirSync, openSync } = require('node:fs');",
-  "const [here, method, skip] = process.argv.slice(1);",
-  "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
-  "if (!existsSync(method)) process.exit(4);",
-  "mkdirSync(here + '/.se/.log', { recursive: true });",
-  `const out = openSync(here + '/${SERVE}', 'a');`,
-  "const brought = !existsSync(method + '/node_modules');",
-  // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-  "if (brought) {",
-  "  const env = Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' });",
-  "  spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env, stdio: ['ignore', out, out] });",
-  "}",
-  "if (!existsSync(method + '/node_modules')) process.exit(6);",
-  // The code proves it loads before a server starts on it, so a broken tree writes one line and loops nowhere. [[spec/design_output/level0#new-code-proves-it-loads]]
-  `const tested = spawnSync(process.execPath, [method + '/src/bridge/server.js', '${SELF_TEST}', method], { cwd: method, encoding: 'utf8', timeout: ${TESTING}, windowsHide: true });`,
-  "if (tested.status !== 0) {",
-  "  process.stderr.write(String(tested.stderr || tested.error || 'the self-test answers nothing').trim().split('\\n').slice(0, 4).join(' '));",
-  "  process.exit(8);",
-  "}",
-  "const argv = [method + '/src/bridge/server.js', method];",
-  "const born = spawn(process.execPath, argv, { cwd: method, detached: true, stdio: ['ignore', out, out], windowsHide: true });",
-  "born.unref();",
-  "process.exit(brought ? 7 : 0);",
-].join("\n");
-
-const REASONS = {
-  0: ["info", "no server answered, so the bridgehead starts one"],
-  1: ["warn", "the start of the server fails"],
-  3: ["", "a person starts the server here"],
-  4: ["warn", "the method root is absent, so no server starts"],
-  5: ["warn", "this box carries no node, so no server starts"],
-  6: ["warn", "the install brings no modules, so no server starts"],
-  7: [
-    "info",
-    "the modules stand nowhere, so the bridgehead installs them and starts one",
-  ],
-  8: ["warn", "the bridge code fails its self-test, so no server starts"],
-};
-
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export function reasonOf(code) {
-  return (
-    REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`]
-  );
-}
-
-// The one block a session outside the cage reads, because the agent inside it is the one reader who cannot see the fault. [[spec/design_output/level0#a-session-says-its-cage]]
-export function cageText(code, detail) {
-  return [
-    "LEVEL ZERO STANDS DOWN ON THIS BOX. No rule, no brief, no write door and no",
-    `stop hook reaches this session. The start road answers ${code}, and that`,
-    `code says: ${reasonOf(code)[1]}.`,
-    String(detail ?? "").trim() ? `The road itself says: ${String(detail).trim()}` : "",
-    "Open your first answer with one line saying level zero stands down here, and",
-    "what this box lacks. Then run ./RUNME.sh, which installs it, and start the",
-    "server with ./RUNME.sh serve.",
-  ]
-    .filter(Boolean)
-    .join(" ");
-}
-
-// [[spec/design_output/pull#a-hand-of-its-own]]
-export function spawnTagOf(held) {
-  const id = String(held?.id ?? "").trim();
-  if (!id) return "";
-  return `You are the hand of session ${id} on this box, so you pull under no --as.`;
-}
-
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
 const SERVED = "mcp__level0__";
-const CALLED = READ_TOOLS.map((one) => `${SERVED}${one.name}`);
 
 // The engine takes one session start a module and counts them in the source, so this registers none: the module wrapping this one holds the start and calls startsSession from it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function register(on, options) {
@@ -141,6 +77,10 @@ export function register(on, options) {
   held = 0;
   armed = false;
   probing = false;
+  saidDown = false;
+  toldDown = false;
+  port = PORT;
+  cage = null;
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -165,12 +105,11 @@ async function seen($, e, next) {
   if (event === "engine.create") return next(e);
   await probes($, event, e);
   if (event === "session.start") await opens($, e);
-  const answer = reading(event, e)
-    ? await reads($, event, e, next)
-    : await ask($, event, await beforeOf($, event, e), next, {
-        ...(await fillOf($, event, e)),
-        ...(armed ? {} : { fresh: true }),
-      });
+  if (doors(event) && (await caged($))) return door($, event, e, next);
+  const answer = await ask($, event, await before($, event, e), next, {
+    ...(await fillOf($, event, e)),
+    ...(armed ? {} : { fresh: true }),
+  });
   if (!answer) {
     // The session start and the conversation's first read each start the server where none answers, and the road runs once. Neither waits, and the rules ride the next event a server answers. [[spec/design_output/level0#rules-ride-the-first-answer]]
     if (event === "session.start" || event === "prompt.context") await starts($);
@@ -207,6 +146,92 @@ async function seen($, e, next) {
   return next(e);
 }
 
+// The key reads through the layers the bridge reads, so a local override moves the hook as it moves the bridge. [[spec/tickets/a-down-index-refuses-calls]]
+async function caged($) {
+  try {
+    return (
+      String(await configOf({ read: (at) => $.fs.read(at) }).ask(CAGE_KEY)) === NEW
+    );
+  } catch {
+    return false;
+  }
+}
+
+// The door answers, or the start road runs once and the door takes the post again. Still down, a guarded call meets the refusal, and every other event passes. [[spec/tickets/a-down-index-refuses-calls]]
+async function door($, event, e, next) {
+  const extra = await fillOf($, event, e);
+  let answer = await doorAsk($, event, e, extra);
+  if (!answer) {
+    await starts($);
+    answer = await doorAsk($, event, e, extra);
+  }
+  if (!answer) return guarded(event, e) ? { deny: refusedText(e) } : next(e);
+  let step = stepOf(answer, event, { asks: true });
+  // A held call asks back for the newest rows on agent.spoke, with the effect's call id. [[spec/tickets/spoke-answer-reaches-the-door]]
+  if (step.rows !== undefined) {
+    const { texts, rows } = await lastTexts($);
+    const text = stepText || texts.at(-1) || "";
+    const spoken = {
+      tool: e?.tool,
+      agentId: e?.agentId,
+      text,
+      texts,
+      rows,
+      call: step.rows,
+    };
+    const back = await doorAsk($, "agent.spoke", spoken, {});
+    step = back ? stepOf(back, event, { asks: false }) : {};
+  }
+  if (step.answer?.spawn) return doorSpawns($, step.answer, event);
+  // [[spec/tickets/clear-answers-off-the-door]]
+  if (step.answer?.clear) return clears($, step.answer, e, next);
+  if (step.answer !== undefined) return step.answer;
+  return step.after ? merged(await next(e), { context: step.after }) : next(e);
+}
+
+async function doorAsk($, event, e, extra) {
+  let where = HOOKS_FILE;
+  try {
+    const post = postOf(
+      JSON.parse(String(await $.fs.read(HOOKS_FILE))),
+      event,
+      e,
+      root,
+      extra,
+    );
+    where = post.where;
+    const said = await $.http.fetch(post.where, post.init);
+    if (!said.ok)
+      throw Object.assign(new Error(`status ${said.status}`), { status: said.status });
+    const answer = JSON.parse(said.text || "{}");
+    saidDown = false;
+    toldDown = false;
+    return answer;
+  } catch (error) {
+    await down($, event, error, where);
+    return null;
+  }
+}
+
+// [[spec/tickets/a-reply-follows-its-prompt]]
+async function lastTexts($) {
+  try {
+    return textsOf(await $.session.messages());
+  } catch {
+    return textsOf([]);
+  }
+}
+
+// [[spec/tickets/a-reply-follows-its-prompt]]
+async function before($, event, e) {
+  if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
+  try {
+    return beforeIn(e, await $.session.messages());
+  } catch {
+    return e;
+  }
+}
+
 // A door answering a vote and a hand in one: the hand runs, and the vote stands as the answer. [[spec/tickets/the-spawn-reaches-its-guidance]]
 export async function besides($, answer, e, next) {
   await spawns($, answer, next);
@@ -215,20 +240,38 @@ export async function besides($, answer, e, next) {
 }
 
 async function spawns($, answer, next) {
+  const back = await helped($, answer);
+  const done = await ask($, String(answer.back?.event ?? "agent.answered"), back, next);
+  return done?.result ?? { result: "the helper answered, and the server said nothing" };
+}
+
+// A door's answer carrying a spawn: the helper runs, its answer goes back to the door, and the door's step answers the call. [[spec/tickets/review-spawns-off-the-door]]
+async function doorSpawns($, answer, event) {
+  const back = await helped($, answer);
+  const said = await doorAsk(
+    $,
+    String(answer.back?.event ?? "agent.answered"),
+    back,
+    {},
+  );
+  const step = said ? stepOf(said, event, { asks: false }) : {};
+  return step.answer ?? { result: "the helper answered, and the door said nothing" };
+}
+
+// The helper the answer spawns, and what it says as the back post carries it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+async function helped($, answer) {
   let said;
   try {
     said = await $.agent.spawn(answer.spawn);
   } catch (error) {
     said = { deny: String(error?.message ?? error) };
   }
-  const back = {
+  return {
     ...(answer.back ?? {}),
     text: said?.text ?? "",
     isError: Boolean(said?.isError),
     deny: said?.deny ?? "",
   };
-  const done = await ask($, String(answer.back?.event ?? "agent.answered"), back, next);
-  return done?.result ?? { result: "the helper answered, and the server said nothing" };
 }
 
 async function opens($, e) {
@@ -394,50 +437,6 @@ async function* streams($, e, next) {
   );
 }
 
-async function lastTexts($) {
-  const out = [];
-  let rows = [];
-  try {
-    rows = await $.session.messages();
-    for (let at = rows.length - 1; at >= 0 && out.length < TEXTS; at--) {
-      const said = String(rows[at]?.text ?? "").trim();
-      if (rows[at]?.role === "assistant" && said) out.unshift(said);
-    }
-  } catch {}
-  return {
-    texts: out,
-    rows: (Array.isArray(rows) ? rows : []).slice(-ROWS).map(rowOf),
-  };
-}
-
-// A row as the answer door reads it: its role, its id where it carries one, and its text where the agent wrote it. [[spec/tickets/a-reply-follows-its-prompt]]
-function rowOf(row) {
-  const id = row?.id ?? row?.uuid;
-  return {
-    role: String(row?.role ?? ""),
-    ...(id ? { id: String(id) } : {}),
-    ...((row?.toolResults ?? []).length ? { results: true } : {}),
-    ...(row?.role === "assistant" ? { text: String(row?.text ?? "").trim() } : {}),
-  };
-}
-
-// The prompt carries the id of the newest transcript row, so the answer door keys on it. [[spec/tickets/a-reply-follows-its-prompt]]
-async function beforeOf($, event, e) {
-  if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
-  try {
-    const rows = await $.session.messages();
-    const id = rows.at(-1)?.id ?? rows.at(-1)?.uuid;
-    return id ? { ...e, before: String(id) } : e;
-  } catch {
-    return e;
-  }
-}
-
-function textOf(chunk) {
-  if (!chunk || typeof chunk !== "object" || chunk.kind !== "text") return "";
-  return typeof chunk.text === "string" ? chunk.text : "";
-}
-
 async function spoke($, e, next) {
   const { texts, rows } = await lastTexts($);
   const text = stepText || texts.at(-1) || "";
@@ -449,26 +448,8 @@ async function spoke($, e, next) {
   );
   if (!answer) return next(e);
   if (answer.result !== undefined) return answer.result;
-  // A tool this hook registers answers nowhere past it, so a paid reply posts the call once more and the server runs the tool. [[spec/design_output/level0#the-first-call-pays]]
-  if (reading("tool.call", e) && !again.has(e)) {
-    again.add(e);
-    return seen($, e, next);
-  }
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
-}
-
-// The calls posted once more after a paid reply, so a second demand hands the call on and loops nowhere. [[spec/design_output/level0#the-first-call-pays]]
-const again = new WeakSet();
-
-function slim(e) {
-  if (!e || typeof e !== "object") return e ?? null;
-  const out = {};
-  for (const [key, value] of Object.entries(e)) {
-    if (typeof value === "string") out[key] = value.slice(0, SHORT);
-    else if (typeof value === "number" || typeof value === "boolean") out[key] = value;
-  }
-  return out;
 }
 
 async function registers($, specs) {
@@ -477,19 +458,6 @@ async function registers($, specs) {
       await $.tool.register(spec);
     } catch {}
   }
-}
-
-// A read tool's call takes the one door every event takes, and no door of its own, so one post reaches a server that stands. [[spec/design_output/level0#the-first-call-pays]]
-function reading(event, e) {
-  return event === "tool.call" && CALLED.includes(String(e?.tool ?? ""));
-}
-
-// A read tool called before the server stands brings it up, and answers at once. The answer takes the shape the server gives, so the door reads it the way it reads every other. [[spec/design_output/level0#the-first-call-pays]]
-async function reads($, event, e, next) {
-  const first = await ask($, event, e, next);
-  if (first) return first;
-  await starts($);
-  return { result: { result: missingLine(e) } };
 }
 
 // A launch no answer has met yet reads as starting, and anything else as a dead server. [[spec/design_output/level0#the-first-call-pays]]
@@ -522,26 +490,14 @@ function deadLine(e) {
   return `no server answers at ${url()}, so ${String(e?.tool ?? "")} answers nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`;
 }
 
-function merged(said, after) {
-  const out = said && typeof said === "object" ? { ...said } : {};
-  for (const [key, value] of Object.entries(after ?? {})) {
-    if (Array.isArray(value) && Array.isArray(out[key]))
-      out[key] = [...out[key], ...value];
-    else if (typeof value === "string" && typeof out[key] === "string" && out[key])
-      out[key] = `${out[key]}\n\n${value}`;
-    else out[key] = value;
-  }
-  return out;
-}
-
 // A fall reaches the person at the moment it falls, beside the row the log takes. The session start says nothing to them, because the start road runs under it. [[spec/design_output/level0#the-bridge-says-it-falls]]
-async function down($, event, error) {
+async function down($, event, error, where = url()) {
   const why = String(error?.message ?? error);
   if (!saidDown) {
     saidDown = true;
     await wrote($, {
       level: "warn",
-      said: `the server answers nothing at ${url()}`,
+      said: `the server answers nothing at ${where}`,
       event,
       detail: why,
     });
@@ -622,6 +578,18 @@ async function probes($, event, e) {
 // One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 async function wrote($, said) {
   const row = { at: new Date().toISOString(), kind: "bridge", ...said };
+  // The loader takes $ spelled as $.noun.event alone, so a host running no process throws here, and the row falls back to the read and the write back. [[spec/design_output/log#every-writer-appends]]
+  try {
+    const file = root ? `${root}/${SESSION}` : SESSION;
+    const ran = await $.process.run([
+      "node",
+      "-e",
+      APPEND,
+      file,
+      `${JSON.stringify(row)}\n`,
+    ]);
+    return Number(ran?.exitCode ?? 1) === 0;
+  } catch {}
   try {
     let held = "";
     try {

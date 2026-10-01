@@ -23,6 +23,41 @@ const (
 	BuiltIn = "built-in"
 )
 
+// The modes the local layer's folder and file take, and the indent its JSON writes. [[spec/tickets/cage-hold-drops-port]]
+const (
+	folderMode = 0o755
+	fileMode   = 0o644
+	indent     = "  "
+)
+
+// Writes one key into the local layer under the work root and keeps every other key it holds, as writes in src/bridge/config.js does. It makes the layer's whole folder where none stands. [[spec/tickets/cage-hold-drops-port]]
+func Drop(root, key, value string) error {
+	at := filepath.Join(root, filepath.FromSlash(Local))
+	held := read(root, Local)
+	if held == nil {
+		held = map[string]any{}
+	}
+	parts := strings.Split(key, ".")
+	here := held
+	for _, part := range parts[:len(parts)-1] {
+		next, ok := here[part].(map[string]any)
+		if !ok {
+			next = map[string]any{}
+			here[part] = next
+		}
+		here = next
+	}
+	here[parts[len(parts)-1]] = value
+	body, err := json.MarshalIndent(held, "", indent)
+	if err != nil {
+		return err
+	}
+	if err := makeDir(filepath.Dir(at), folderMode); err != nil {
+		return err
+	}
+	return writeFile(at, append(body, '\n'), fileMode)
+}
+
 // [[spec/design_output/config#the-go-reader]]
 func EnvOf(key string) string {
 	said := strings.ToUpper(strings.NewReplacer(".", "_", "-", "_").Replace(key))

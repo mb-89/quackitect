@@ -10,7 +10,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { LOCAL } from "../../src/extension/lib/widgets.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import * as route from "../../src/scripts/pull-route.js";
-import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import { doors, heard, ROOT, standing } from "./pull-doors.js";
 import { v1Over } from "./v1-index.js";
@@ -100,10 +100,7 @@ test("a cloud box on trunk takes no branch at god, and says what binds it", () =
 
 test("a cloud box on trunk reaches the take at the queue", () => {
   const held = doors(standing(), onTrunk, { cloud: true, binding: "queue" });
-  for (const [argv, code] of [
-    [probeOf("node", 6510), 1],
-    [startOf(ROOT), 0],
-  ])
+  for (const [argv, code] of [[startOf(ROOT), 0]])
     held.outside.proc.teach(argv, { exitCode: code });
   const { said } = heard(() => pulling(ROOT, ["pull"], held.it));
   assert.ok(!said.includes("binds to"), said);

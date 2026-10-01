@@ -4,6 +4,7 @@
 package main
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,8 +36,8 @@ func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
 		t.Fatalf("the hooks instance binds events/s1 to %q, and wants session/s1/events", hook.bound("events/s1"))
 	}
 	s := q.NewStore(c)
-	if folds := strings.Join(s.Folds("session/<id>/"), " "); folds != "session/<id>/fill session/<id>/last" {
-		t.Fatalf("the folds under session/ read %q, and want the fill and the last", folds)
+	if folds := strings.Join(s.Folds("session/<id>/"), " "); folds != "session/<id>/fill session/<id>/last session/<id>/reports" {
+		t.Fatalf("the folds under session/ read %q, and want the fill, the last and the reports", folds)
 	}
 	door := hooks.New(hooks.Outside{Store: s, As: hook.as, Bound: hook.bound})
 	if _, err := door.Hook(hooks.Post{Event: "tool.call", E: map[string]any{"tool": "Read", "session_id": "s1"}, Fill: 900}); err != nil {
@@ -48,5 +49,57 @@ func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
 	}
 	if fill := read.Read("session/s1/fill"); fill != 900 {
 		t.Fatalf("session/s1/fill reads %v, and wants the 900 the post carries", fill)
+	}
+}
+
+// The command rules read the name cap off the root's config and the cloud flag off the environment. [[spec/tickets/cage-command-rules-port]]
+func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, "spec", "config")
+	if err := os.MkdirAll(at, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(`{"names":{"words":3}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range cloudVariables {
+		t.Setenv(name, "")
+	}
+	if said := commandSettings(root); said.Words != 3 || said.Cloud {
+		t.Fatalf("the settings read %+v, and want three words off the box's desk", said)
+	}
+	t.Setenv(cloudVariables[0], "1")
+	if said := commandSettings(root); !said.Cloud {
+		t.Fatalf("the settings read %+v, and want the cloud flag", said)
+	}
+	if said := gitRead(root, "no-such-verb"); said != "" {
+		t.Fatalf("a failing git read prints %q, and wants nothing", said)
+	}
+}
+
+// The holds read the hold, the ask, the binding, the graces, the plan's numbers and the helper tiers off the root's config. [[spec/tickets/cage-call-holds-port]]
+func TestCommandSettingsReadTheHoldKeys(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, "spec", "config")
+	if err := os.MkdirAll(at, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	config := `{"stop":{"hold":"finish"},"ask":{"wanted":"short"},"engine":{"binding":"god"},"grace":{"finish":3,"update":2},"plan":{"everyCalls":4,"grace":1,"mostOpen":5},"helper":{"find":"haiku","change":"opus","decide":"opus"}}`
+	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(config), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	body, _ := json.Marshal(commandSettings(root))
+	var said map[string]any
+	if err := json.Unmarshal(body, &said); err != nil {
+		t.Fatal(err)
+	}
+	for key, want := range map[string]any{"Hold": "finish", "Ask": "short", "Binding": "god", "FinishGrace": float64(3), "UpdateGrace": float64(2), "PlanEvery": float64(4), "PlanGrace": float64(1), "PlanMostOpen": float64(5)} {
+		if said[key] != want {
+			t.Errorf("the settings read %s=%v, and want %v", key, said[key], want)
+		}
+	}
+	helpers, _ := said["Helpers"].(map[string]any)
+	if helpers["find"] != "haiku" || helpers["change"] != "opus" || helpers["decide"] != "opus" {
+		t.Fatalf("the settings read the tiers %v, and want each tier's model", said["Helpers"])
 	}
 }

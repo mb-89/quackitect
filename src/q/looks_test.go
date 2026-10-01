@@ -22,6 +22,15 @@ func TestAPortCarriesItsLabelIconAndLook(t *testing.T) {
 	}
 }
 
+// [[spec/tickets/tools-keep-their-own-names]]
+func TestAnActionPresentsTheToolNameItKeeps(t *testing.T) {
+	c := New()
+	ActionIn(c, "plans/set", func(string) []Request { return nil }, Doc("sets the plan"), ToolName("plan"))
+	if got, ok := c.Presentation("plans/set"); !ok || got.Tool != "plan" {
+		t.Fatalf("plans/set presents %+v, %v, and wants the tool name plan", got, ok)
+	}
+}
+
 func TestTheStartRefusesAnActionWithNoDocNamingItsFileAndLine(t *testing.T) {
 	types := map[string]func(*Catalog){"puller": func(c *Catalog) {
 		ActionIn(c, "pull", func(string) []Request { return nil })

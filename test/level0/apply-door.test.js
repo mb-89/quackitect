@@ -4,76 +4,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { applied, PATCH, REPLACE } from "../../.claude/skills/level0/lib/apply.js";
-import { FOLDER, UNDO } from "../../.claude/skills/level0/lib/undo.js";
+import { UNDO } from "../../.claude/skills/level0/lib/undo.js";
 import { SPECS, TOOLS } from "../../src/bridge/apply.js";
-import { boxOf, decide } from "../../src/bridge/server.js";
 import { onWrite } from "../../src/bridge/write.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { NAMED, named } from "./fixtures.js";
-
-// A box the server builds, with doors in memory and an index that answers the sweep. [[spec/design_output/apply#the-write-tools]]
-function routed() {
-  const disk = fakeDisk({
-    "/tree/one.md": "alpha beta\n",
-    "/tree/two.md": "gamma 12\n",
-    ...named("/tree"),
-  });
-  return boxOf("/tree", "/tree", {
-    disk,
-    clock: fakeClock(),
-    log: fakeLog(),
-    proc: { run: () => ({ exitCode: 1, stdout: "", stderr: "" }) },
-    index: {
-      dead: () => "",
-      fault: () => "",
-      warm: () => ({ warmed: false }),
-      ask: () => ({ files: [{ path: "one.md" }, { path: "two.md" }] }),
-    },
-    vale: { stands: () => false },
-    biome: { stands: () => false },
-  });
-}
-
-// [[spec/design_output/apply#the-write-tools]]
-test("the server routes a patch with an exact and a regex op, and a replace, to the door", async () => {
-  const box = routed();
-  const patch = await decide(
-    {
-      event: "tool.call",
-      e: {
-        tool: `mcp__level0__${PATCH}`,
-        ticket: NAMED,
-        ops: [
-          { file: "one.md", old: "beta", new: "delta" },
-          { file: "two.md", op: "regex", pattern: "(\\d+)", replacement: "[$1]" },
-        ],
-      },
-    },
-    box,
-  );
-  assert.match(patch.result.result, /2 file\(s\) written/);
-  assert.equal(box.disk.read("/tree/one.md"), "alpha delta\n");
-  assert.equal(box.disk.read("/tree/two.md"), "gamma [12]\n");
-
-  const replace = await decide(
-    {
-      event: "tool.call",
-      e: {
-        tool: `mcp__level0__${REPLACE}`,
-        ticket: NAMED,
-        pattern: "a(lpha|mma)",
-        replacement: "A$1",
-        glob: "*.md",
-      },
-    },
-    box,
-  );
-  assert.match(replace.result.result, /2 file\(s\) written/);
-  assert.equal(box.disk.read("/tree/one.md"), "Alpha delta\n");
-  assert.equal(box.disk.read("/tree/two.md"), "gAmma [12]\n");
-});
 
 test("the door registers a tool for each write verb", () => {
   assert.deepEqual(
@@ -163,28 +100,4 @@ test("an exact edit writes a dollar sign as a dollar sign", () => {
     { file: "one.md", old: "price", new: "$& costs $$5 $' $`" },
   ]);
   assert.equal(took.files[0].made, "$& costs $$5 $' $`\n");
-});
-
-// The journal names the ticket its call serves, so a hand-back stages the files its own hand wrote. [[spec/design_output/pull#the-refused-commit]]
-test("the undo journal names the ticket the call serves", async () => {
-  const box = routed();
-  await decide(
-    {
-      event: "tool.call",
-      e: {
-        tool: `mcp__level0__${PATCH}`,
-        ticket: NAMED,
-        ops: [{ file: "one.md", old: "beta", new: "delta" }],
-      },
-    },
-    box,
-  );
-  const folder = `/tree/${FOLDER}`;
-  const [name] = box.disk.list(folder).map((one) => one.name);
-  const entry = JSON.parse(box.disk.read(`${folder}/${name}`));
-  assert.equal(entry.ticket, NAMED);
-  assert.deepEqual(
-    entry.files.map((one) => one.file),
-    ["one.md"],
-  );
 });

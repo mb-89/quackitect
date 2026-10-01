@@ -1,0 +1,7 @@
+{
+  "cloud": true,
+  "git": {
+    "rev-parse --abbrev-ref HEAD": "work/some-group",
+    "diff --cached --unified=0": "diff --git a/spec/notes-out.md b/spec/notes-out.md\nindex 1111111..2222222 100644\n--- a/spec/notes-out.md\n+++ b/spec/notes-out.md\n@@ -0,0 +1,1 @@\n+The door lands on 2026-03-14 at the latest."
+  }
+}

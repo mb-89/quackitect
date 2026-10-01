@@ -133,8 +133,9 @@ test("the commands carry the upstream, the clone folder, the work root and the v
   const serve = serveOf(CLONED);
   assert.equal(serve[0], "sh");
   assert.equal(serve.at(-1), CLONED, "the vehicle's folder is the argument");
-  assert.match(serve[2], /src\/bridge\/server\.js/);
-  assert.match(serve[2], /&\s*$/, "the server runs detached");
+  assert.match(serve[2], /\.se\/\.runtime\/bin\/se-index" standing/);
+  assert.doesNotMatch(serve[2], /server\.js/, "the bridge server starts nowhere");
+  assert.match(serve[2], /&\s*$/, "the index runs detached");
 });
 
 test("a cloud box with an empty register clones the upstream from vehicle.json, attaches, starts the server and says the vehicle stands", async () => {
@@ -352,7 +353,11 @@ function cutting(stands) {
     posts.push(JSON.parse(init.body));
     if (posts.length === 1 || !stands) throw new Error("The operation timed out.");
     const line = "The helper a1 reports.";
-    return { ok: true, status: 200, text: JSON.stringify({ result: { result: line } }) };
+    return {
+      ok: true,
+      status: 200,
+      text: JSON.stringify({ result: { result: line } }),
+    };
   };
   return { posts, fetch };
 }
@@ -373,10 +378,18 @@ test("a wait the host cuts answers its signal on a live server, and the line on 
   const $ = { ...hand(fakeDisk(), fakeGit({}, STUB)), http: { fetch: live.fetch } };
   const said = await hooks["*"]($, call, handed);
 
-  assert.equal(said?.result, "The helper a1 reports.", "the signal takes the line's place");
+  assert.equal(
+    said?.result,
+    "The helper a1 reports.",
+    "the signal takes the line's place",
+  );
   assert.equal(live.posts.length, 2, "the cut post goes again");
   assert.ok(live.posts[0].e.since > 0, "the post carries the wait's since");
-  assert.equal(live.posts[1].e.since, live.posts[0].e.since, "and the post again the same");
+  assert.equal(
+    live.posts[1].e.since,
+    live.posts[0].e.since,
+    "and the post again the same",
+  );
   assert.deepEqual($.logged, [], "a cut on a live server tells nobody it falls");
 
   const dead = cutting(false);

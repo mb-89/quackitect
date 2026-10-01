@@ -44,11 +44,29 @@ func actionOf[In any](name string, fn func(In) []Request) *registration {
 	act := func(input any) ([]Request, error) {
 		one, ok := input.(In)
 		if !ok {
-			return nil, fmt.Errorf("%s takes a %s, not a %T", name, typeOf[In](), input)
+			decoded, err := fromMap[In](input)
+			if err != nil {
+				return nil, fmt.Errorf("%s takes a %s, not a %T", name, typeOf[In](), input)
+			}
+			one = decoded
 		}
 		return fn(one), nil
 	}
 	return &registration{name: name, kind: action, typ: typeOf[[]Request](), def: []Request{}, act: act, fields: fieldsOf(typeOf[In]()), takes: typeOf[In]()}
+}
+
+// A caller in the process hands a JSON object as a map, and an action taking a struct reads it as a surface decodes a body. [[spec/tickets/edit-tools-answer-in-go]]
+func fromMap[In any](input any) (In, error) {
+	var out In
+	fields, ok := input.(map[string]any)
+	if !ok || typeOf[In]().Kind() != reflect.Struct {
+		return out, fmt.Errorf("%T reads as no %s", input, typeOf[In]())
+	}
+	body, err := json.Marshal(fields)
+	if err != nil {
+		return out, err
+	}
+	return out, json.Unmarshal(body, &out)
 }
 
 // The input type an action takes, and the type q.Answers declares, nil where it declares none, so a surface draws its schema. [[spec/tickets/actions-answer-over-http]]

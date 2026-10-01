@@ -1,18 +1,27 @@
-// The start road the bridgehead writes carries the flag and the span the
-// server reads, off one file both import.
-// [[spec/tickets/a-count-meets-the-lint]]
+// The start road the bridgehead writes carries the span it waits on the
+// index's standing, off the constant it exports, and no self-test of the
+// bridge.
+// [[spec/tickets/start-road-starts-the-index]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { START } from "../../.claude/skills/level0/hooks/level0.js";
+import { START, STANDING_WAIT } from "../../.claude/skills/level0/hooks/start.js";
 import * as vehicle from "../../.claude/skills/level0/lib/vehicle.js";
-import * as reload from "../../src/bridge/reload.js";
 
-// [[spec/tickets/a-count-meets-the-lint]]
-test("the start road spells the self-test flag and its span off the file the server reads", () => {
-  assert.equal(typeof vehicle.SELF_TEST, "string", "the flag stands in lib/vehicle.js");
-  assert.equal(typeof vehicle.TESTING, "number", "the span stands in lib/vehicle.js");
-  assert.equal(reload.SELF_TEST, vehicle.SELF_TEST, "the server reads the same flag");
-  assert.ok(START.includes(`'${vehicle.SELF_TEST}'`), "the start road carries the flag");
-  assert.ok(START.includes(`timeout: ${vehicle.TESTING}`), "the start road carries the span");
+// [[spec/tickets/start-road-starts-the-index]]
+test("the start road waits on the index's standing for the span it exports", () => {
+  assert.equal(typeof STANDING_WAIT, "number");
+  assert.ok(
+    START.includes(`timeout: ${STANDING_WAIT}`),
+    "the start road carries the span",
+  );
+  assert.ok(START.includes("['standing']"), "the start road runs the index standing");
+});
+
+// [[spec/tickets/start-road-starts-the-index]]
+test("the start road runs no self-test of the bridge", () => {
+  assert.ok(
+    !START.includes(`'${vehicle.SELF_TEST}'`),
+    "the start road carries no flag",
+  );
 });

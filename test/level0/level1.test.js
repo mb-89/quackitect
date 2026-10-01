@@ -40,9 +40,8 @@ function harness() {
 }
 
 // The engine takes one session start a module and counts them in the source. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-test("the module registers one session start, and it registers the pull tool and the read tools", async () => {
+test("the module registers one session start, and it registers the pull tool first", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
-  const { READ_TOOLS } = await import("../../.claude/skills/level0/hooks/level0.js");
   const counts = {};
   const starts = [];
   register((event, ...rest) => {
@@ -60,7 +59,6 @@ test("the module registers one session start, and it registers the pull tool and
     async (said) => said,
   );
   assert.equal(registered[0], "pull", "the pull tool registers first");
-  for (const one of READ_TOOLS) assert.ok(registered.includes(one.name), one.name);
 });
 
 // [[spec/design_output/pull#a-hand-of-its-own]]

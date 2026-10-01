@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -22,6 +23,9 @@ import (
 const recording = "../../../test/replay/hooks/one-tool-call.jsonl"
 
 var fixed = time.Date(2026, 9, 29, 12, 0, 0, 0, time.UTC)
+
+// The words a name holds in the table's tree, which its spec/config/level0.json sets. [[spec/tickets/cage-command-rules-port]]
+const nameWords = 5
 
 // The manager's call, as a case teaches it: it keeps each wait and answers what the case sets. [[spec/design_output/model#a-caller-sets-its-wait]]
 type calls struct {
@@ -70,6 +74,8 @@ func doorOver(t *testing.T, c *calls, b *book) over {
 	door := New(Outside{
 		Store: ix.Store(), As: events, Bound: func(local string) string { return local },
 		Call: c.call, Ops: b.of, Now: func() time.Time { return fixed },
+		Root:   treeOf(t, commandTableOf(t).Tree, ""),
+		Config: func(string) Settings { return Settings{Words: nameWords} },
 	})
 	return over{ix, door, resolved}
 }
@@ -145,7 +151,7 @@ func TestACallTakesTheDefaultWaitOffItsKey(t *testing.T) {
 	if len(c.waits) != 1 || c.waits[0] != time.Second {
 		t.Fatalf("the call waits %v, and wants a second with no wait set", c.waits)
 	}
-	if len(said.Effects) != 1 || said.Effects[0].Kind != "result" || said.Effects[0].Result != "pulled" {
+	if shape, _ := said.Effects[0].Result.(map[string]any); len(said.Effects) != 1 || said.Effects[0].Kind != "result" || shape["result"] != "pulled" {
 		t.Fatalf("the door answers %+v, and wants the action's result", said)
 	}
 	one.ix.SeedAs(one.resolved, map[string]any{q.ResolvedName: q.Resolved{"config/" + WaitKey: "3"}})
@@ -169,6 +175,16 @@ func TestAnActionsOwnWaitFieldKeepsItsValue(t *testing.T) {
 	}
 	if in, ok := c.inputs[0].(sleep); !ok || in.Wait != 2 {
 		t.Fatalf("the action takes %#v, and wants its own wait of 2 kept", c.inputs[0])
+	}
+}
+
+// The host spreads a call's arguments on the event beside its tool, and the action takes them as it takes a nested input. [[spec/tickets/the-bridge-server-leaves]]
+func TestACallsArgumentsSpreadOnTheEventReachTheAction(t *testing.T) {
+	c := &calls{said: Called{Result: "slept", Handle: "h1"}}
+	one := doorOver(t, c, &book{})
+	hooks(t, one.door, Post{Event: "tool.call", E: map[string]any{"tool": "index_work_sleep", "wait": 2, "session_id": "s1"}})
+	if in, ok := c.inputs[0].(sleep); !ok || in.Wait != 2 {
+		t.Fatalf("the action takes %#v, and wants the spread wait of 2", c.inputs[0])
 	}
 }
 
@@ -261,4 +277,21 @@ func TestTheListenAnswersAPostAndStandsItsPort(t *testing.T) {
 func jsonNumber(n int) string {
 	text, _ := json.Marshal(n)
 	return string(text)
+}
+
+// A string an IO action answers reaches the harness under a result key, and any other value goes on as it stands. [[spec/tickets/io-answers-take-result-shape]]
+func TestAStringResultReachesTheHarnessUnderAResultKey(t *testing.T) {
+	one := doorOver(t, &calls{said: Called{Result: "The wait reaches its cap.", Handle: "h1"}}, &book{})
+	said := hooks(t, one.door, toolCall(nil))
+	if len(said.Effects) != 1 || said.Effects[0].Kind != resultKind || said.Effects[0].Text != "" {
+		t.Fatalf("the door answers %+v, and wants one result with no text", said)
+	}
+	if shape, ok := said.Effects[0].Result.(map[string]any); !ok || len(shape) != 1 || shape["result"] != "The wait reaches its cap." {
+		t.Errorf("the door answers %#v, and wants the text under result alone", said.Effects[0].Result)
+	}
+	listed := []any{"a", "b"}
+	other := doorOver(t, &calls{said: Called{Result: listed, Handle: "h2"}}, &book{})
+	if got := hooks(t, other.door, toolCall(nil)).Effects[0].Result; !reflect.DeepEqual(got, listed) {
+		t.Errorf("the door answers %#v, and wants the list as it stands", got)
+	}
 }

@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -17,7 +18,6 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    reads: [[spec/guidance/working]]
     checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
     evidence:
       - name: children
@@ -26,8 +26,17 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    tags: ["review", "accept"]
+    input: ["ask", "children"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
-    reads: [[spec/guidance/working]]
     to: retro
     steps:
       - name: notes
@@ -72,12 +81,177 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
 process: [[spec/processes/group]]
-process_hash: 57b2cccd0445ea9a
-depends_on: [go-cage-lands-in-shadow, quack-verbs-switch-over]
+process_hash: 5d4a884bfb2491ff
+record:
+  - step: sync
+    hand: box d889b5fde3d5 · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
+    hash_after: 5cd9b931475c8b4429251d03df81620042b81d46
+  - step: sync
+    hand: box d88b829f8cd8 · claude-code-remote
+    hash_before: 5cd9b931475c8b4429251d03df81620042b81d46
+    hash_after: 20316b8ac936ae931fa32006e062a289849f9859
+  - step: sync
+    hand: box d88d1fd844dd · claude-code-remote
+    hash_before: 20316b8ac936ae931fa32006e062a289849f9859
+    hash_after: 1dc3792c8654f446acb6794a9fcd2d3502b64763
+  - step: sync
+    hand: box d88f0683f2d7 · claude-code-remote
+    hash_before: 1dc3792c8654f446acb6794a9fcd2d3502b64763
+    hash_after: d74c1b4bda7e08c7a815d7208ab09826b50aeacd
+  - step: sync
+    hand: box d8901afed4d6 · claude-code-remote
+    hash_before: d74c1b4bda7e08c7a815d7208ab09826b50aeacd
+    hash_after: be526e5ca5a9400f1ce14c516b9b30194ec3c8bc
+  - step: sync
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: be526e5ca5a9400f1ce14c516b9b30194ec3c8bc
+    hash_after: de2aeae75f2ad868443647f062b86949bf5d628c
+  - step: sync
+    hand: box d89335a442109 · claude-code-remote
+    hash_before: de2aeae75f2ad868443647f062b86949bf5d628c
+    hash_after: d471391f0f072a6b3c832b04bc8b07d3c2b3f294
+  - step: sync
+    hand: box d894eee95148f · claude-code-remote
+    hash_before: d471391f0f072a6b3c832b04bc8b07d3c2b3f294
+    hash_after: 81f2ad12c81e8d2d01386bf786201755234c495c
+  - step: sync
+    hand: box d89586721a117 · claude-code-remote
+    hash_before: 81f2ad12c81e8d2d01386bf786201755234c495c
+    hash_after: a8d83be0abe1102785cb75da020e81659ed50c67
+  - step: sync
+    hand: box 3bb3757611c · claude-code-remote
+    hash_before: a8d83be0abe1102785cb75da020e81659ed50c67
+    hash_after: 2c47a246db9a7abc9676fa8f60de9498c17379b9
+  - step: sync
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 2c47a246db9a7abc9676fa8f60de9498c17379b9
+    hash_after: d62fe0b5fcd80394bdfac747a2f05a85e653e56c
+  - step: sync
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: d62fe0b5fcd80394bdfac747a2f05a85e653e56c
+    hash_after: 219e8f47723f7ad83ab495a483646621f37b0e12
+  - step: sync
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 219e8f47723f7ad83ab495a483646621f37b0e12
+    hash_after: de8f39b0fb1669a01f654b19ed3a386c62db7753
+  - step: sync
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 22ea420816d2595d140f219159b6085b94b4b860
+    hash_after: 22ea420816d2595d140f219159b6085b94b4b860
+    answered:
+      - name: sync
+        exit: 0
+        said: work/go-cage-switches-over already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 38e92d1a21b5fc0b60f4706ef857a55853e8ede0
+    hash_after: 38e92d1a21b5fc0b60f4706ef857a55853e8ede0
+    inputs:
+      - name: ask
+        hash: 1e40978178d2f3fd
+        size: 324
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: de8f39b0fb1669a01f654b19ed3a386c62db7753
+    hash_after: c4858cc84a6c09c31e650d3647d3f13a5605dbde
+  - step: children
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: c4858cc84a6c09c31e650d3647d3f13a5605dbde
+  - step: children
+    hand: the engine
+    hash_before: 84097cbca01ac48c1a806bffde15a51addcd2afd
+    hash_after: 84097cbca01ac48c1a806bffde15a51addcd2afd
+  - step: accept
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: 9d8da72a2a57499ddcb621531dc9e8b20a0c7b5d
+    hash_after: 9d8da72a2a57499ddcb621531dc9e8b20a0c7b5d
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/go-cage-switches-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 1e40978178d2f3fd
+        size: 324
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: 6602866d9a5b71f6a94e8fa89838b0561b179267
+    hash_after: 5845b50d0c3fb718ac2b1a5e5e83ddb79f833075
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/go-cage-switches-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 1e40978178d2f3fd
+        size: 324
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: a4ffc7a4e22b8f6c4bc3330f80fbd8f36e963067
+    hash_after: a4ffc7a4e22b8f6c4bc3330f80fbd8f36e963067
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: c67020a58233debeff516ac3302a2bf1e71477a4
+    hash_after: c67020a58233debeff516ac3302a2bf1e71477a4
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: e22e44d55bd7c2e776b3536ffb5bf04135f030d7
+    hash_after: e22e44d55bd7c2e776b3536ffb5bf04135f030d7
+    inputs:
+      - name: retro/write
+        hash: e7b1de1a0ac34a72
+        size: 2331
+      - name: [[spec/tickets/the-cage-slice-stands-new]]
+        hash: 01a2a22b2aaac4a1
+        size: 415
+      - name: [[spec/design_output/level0]]
+        hash: 5f9e5b2ac795f4f6
+        size: 92421
+      - name: [[spec/tickets/node-leaves-the-boxes]]
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 4da1ca5da87d5bbc
+depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -93,8 +267,9 @@ Done when the bridge server leaves the tree.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -103,16 +278,34 @@ Done when the bridge server leaves the tree.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[start-road-starts-the-index]], standard
+- [[the-brief-leaves-the-bridge]], standard
+- [[the-bridge-server-leaves]], standard
+- the closed children of the group stand as they are
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
+- each open child moves one piece: the start road, the brief, the server, so a review reads each whole
+- the server leaving is the group's done line, and the start road and the brief clear its way, so nothing of the goal stands outside the three
+- the start road waited on the brief while the brief waited on it; the handover puts the brief after the start road, so the start road now waits on level0-tools-leave-the-bridge alone, and the server names both
+
 # children
+
+# accept
+
+<!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -123,8 +316,9 @@ Done when the bridge server leaves the tree.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -133,38 +327,59 @@ Done when the bridge server leaves the tree.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- accept read the group against its ask: the bridge server and `copilot-runtime.js` stand gone, and the check exits 0
+- [[spec/tickets/the-cage-slice-stands-new]]: the cage slice takes `new` alone, and the schema, commands and size golden follow
+- the tracked `cage` key leaves `spec/config/level0.json`, since its built-in now holds it
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the window slice's switch commit served as the template, so the slice change took one read
+- a scratch script read the cage key off the real config, which proved live boxes keep the door road
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 13:3x: the first plan call met no server at 6510, since the box starts with the index alone
+- 13:42: the first fix dropped the bridgehead's key read, and 22 bridge-road tests failed under the check
+- 13:52: the fix narrowed after an undo, so one round went to a change the ask did not need
+- 13:56: the hand-back failed on `TestDefaultFileHoldsNoBuiltIn`, a rule the window switch had already met
+- the regenerated schema, commands and golden stayed out of the close commit, and took a commit of their own
+- `test/contract/runme-road.test.js` timed out once under the full check, and passed alone
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the box's start road starts the serve server beside the index, home [[spec/design_output/level0#rules-ride-the-first-answer]]
+- a switch-over ticket reads the bridge-road tests before it touches the bridgehead, home [[spec/tickets/node-leaves-the-boxes]]
+- the switch-over's ask names the tracked key's removal, so the default-file test meets no surprise, home [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
+- the close stages what `quack schema` and `./RUNME.sh project` rewrite, home `src/scripts/verbs/commit.js`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask said the old path leaves the tree, and the bridgehead's bridge road reads as that path. Live boxes already read `new`, so the road runs only under tests. Ripping it out means rewriting the bridgehead under auto-merge, and the JS bridgehead leaves whole in phase 10. So the slice closes the door on `old`, and the road waits for phase 10.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the mode list stands in `migration.go` alone, and the schema and commands read it off their writers
+- the change adds no number
+- the change writes no header
+- each error carries its time off the run
+- the chapter names roles alone
 
 ## cloud
 
@@ -173,20 +388,26 @@ Done when the bridge server leaves the tree.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the box lacked nothing: no tool, host or right was refused
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the cage refused a git command joined to a landing verb, and a `git stash` in a probe script
+- the plan tool met no serve server until `./RUNME.sh serve` ran
+- `test/contract/runme-road.test.js` timed out once under the full check, and passed alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
+- the bridge road for doored events waits on [[spec/tickets/node-leaves-the-boxes]]
 
 # Discussion
 

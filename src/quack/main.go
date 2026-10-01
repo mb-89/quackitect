@@ -13,10 +13,13 @@ import (
 	"strings"
 	"time"
 
+	oldconfig "quackitect/src/config"
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
+	"quackitect/src/modules/drafts"
+	"quackitect/src/modules/edits"
 	"quackitect/src/modules/env"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/git"
@@ -29,12 +32,15 @@ import (
 	"quackitect/src/modules/lsp"
 	"quackitect/src/modules/mcp"
 	"quackitect/src/modules/migration"
+	"quackitect/src/modules/plans"
 	"quackitect/src/modules/queue"
+	"quackitect/src/modules/search"
 	"quackitect/src/modules/session"
 	"quackitect/src/modules/settings"
 	"quackitect/src/modules/tickets"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/views"
+	"quackitect/src/modules/waits"
 	"quackitect/src/modules/work"
 	"quackitect/src/prose"
 	"quackitect/src/q"
@@ -44,7 +50,6 @@ import (
 const (
 	dumpFolder = ".se/.dump/"
 	dumpArgs   = 3
-	hookArgs   = 3
 	schemaArgs = 3
 )
 
@@ -95,6 +100,15 @@ var modules = map[string]ioModule{
 	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
 	// [[spec/tickets/agents-call-quack-directly]]
 	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
+	// [[spec/tickets/edit-tools-answer-in-go]]
+	edits.Module: {registers: edits.Registers},
+	// [[spec/tickets/find-and-wait-in-go]]
+	search.Module: {registers: search.Registers},
+	waits.Module:  {registers: waits.Registers},
+	// [[spec/tickets/plan-writes-off-go]]
+	plans.Module: {registers: plans.Registers},
+	// [[spec/tickets/prose-tools-answer-in-go]]
+	drafts.Module: {registers: drafts.Registers},
 }
 
 // A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
@@ -184,9 +198,6 @@ func dumps(prefix string) error {
 func main() {
 	// This binary is the index, so a verb that finds no door starts this one. [[spec/design_output/index#a-door-comes-back]]
 	index.Serving()
-	if len(os.Args) == hookArgs && os.Args[1] == "hook" {
-		os.Exit(hookVerb(".", os.Args[2], os.Stdin, os.Stdout))
-	}
 	if len(os.Args) == 2 && os.Args[1] == "lsp" {
 		if err := lspVerb(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -298,15 +309,15 @@ func hookedOf(w q.Wiring, hands map[string]q.Writer, module string) hooked {
 
 // The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept, and the hooks door beside it where the wiring loads one. [[spec/design_output/model#the-index-manager]]
 func manages(as q.Writer, open doors) index.Manage {
-	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
+	return func(root string, store *q.Store, rows index.OpRows, reads index.Reads, steps func(hand func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
-			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store),
+			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store, reads),
 		})
 		if err != nil {
 			return index.Managed{}, err
 		}
-		stop, err := listens(root, store, open, served)
+		stop, err := listens(root, store, open, served, reads)
 		if err != nil {
 			served.Stop()
 			return index.Managed{}, err
@@ -319,7 +330,7 @@ func manages(as q.Writer, open doors) index.Manage {
 }
 
 // Opens the hooks door and the mcp server the wiring loads, and answers the stop of each with the manager's. The listeners stand in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
-func listens(root string, store *q.Store, open doors, served manager.Served) (func(), error) {
+func listens(root string, store *q.Store, open doors, served manager.Served, reads index.Reads) (func(), error) {
 	halts := []func(){}
 	stop := func() {
 		for _, halt := range halts {
@@ -328,7 +339,7 @@ func listens(root string, store *q.Store, open doors, served manager.Served) (fu
 		served.Stop()
 	}
 	if hook := open.hooks; hook.on {
-		halt, err := listensHooks(root, store, hook, served)
+		halt, err := listensHooks(root, store, hook, served, reads)
 		if err != nil {
 			return nil, err
 		}
@@ -373,8 +384,14 @@ func listensMCP(root string, store *q.Store, one hooked, served manager.Served) 
 }
 
 // Opens the hooks door over the manager's call and book, at the clock IO module's time. [[spec/tickets/hooks-listener-joins-io-process]]
-func listensHooks(root string, store *q.Store, hook hooked, served manager.Served) (func(), error) {
+func listensHooks(root string, store *q.Store, hook hooked, served manager.Served, reads index.Reads) (func(), error) {
+	// [[spec/tickets/grep-glob-answer-off-index]]
+	var asks func(string, map[string]any) (map[string]any, error)
+	if reads != nil {
+		asks = indexAsk(reads)
+	}
 	door := hooks.New(hooks.Outside{
+		Index: asks,
 		Store: store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
@@ -383,6 +400,8 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
 		// [[spec/tickets/copilot-meets-the-hooks-door]]
 		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
+		Root:   root, Config: commandSettings, Git: gitRead, Voice: commitVoice, Drop: oldconfig.Drop, Prose: writeProse, Schema: writeSchema,
+		Review: reviewOver(root),
 	})
 	return hooks.Listen(root, door)
 }
@@ -402,26 +421,6 @@ func opsOf(all []manager.Op, now time.Time) []hooks.Op {
 		out = append(out, hooks.Op{Handle: one.ID, Action: one.Action, State: string(one.State), Fraction: fraction, Gone: end.Sub(one.Started), Result: one.Result, Error: one.Error})
 	}
 	return out
-}
-
-// The IO modules that answer a request an action lists: disk over the root, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
-func accepts(root string, store *q.Store) func(q.Request) (any, error) {
-	disk := files.Accept(files.NewDisk(root))
-	node := nodeAccept(root)
-	return func(asked q.Request) (any, error) {
-		if asked.Module == files.DiskModule {
-			return disk(asked)
-		}
-		// [[spec/tickets/config-answers-keys-and-overrides]]
-		if landing, ok := asked.Args.(q.Landing); ok && store != nil && asked.Module == q.StoreModule && asked.Verb == q.StoreLand {
-			return nil, store.Land(landing.Name, landing.Event)
-		}
-		// [[spec/tickets/ticket-verbs-become-actions]]
-		if asked.Module == verbsmodule.NodeModule && asked.Verb == verbsmodule.NodeRun {
-			return node(asked)
-		}
-		return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
-	}
 }
 
 // The index's op table read as the manager's rows, so neither side names the other's types. [[spec/design_output/model#an-operation-outlives-callers]]

@@ -77,16 +77,17 @@ change of a door. Headless turns say so, against client 2.1.269:
 ## The cloud starts the server
 
 Nobody presses the hook button on a cloud box. So the pull that takes a
-branch there ends on the server, through `src/scripts/serve.js`. It probes
-the health answer at the port the pointer names. Where nothing answers, it
-starts the server on its own, the way the stub's bridgehead does. The pull's
-last line says which of these stands:
+branch there ends on the index, through `src/scripts/serve.js`. It runs the
+start road, which runs the index with `standing`. That verb starts the index's
+door where none answers, so one call starts it and probes it. The pull's last
+line reads the port off `.se/.runtime/hooks.json`, and says which of these
+stands:
 
 | what stands | the line says |
 |---|---|
-| the server answers | the port it answers at |
-| the start runs | that the server starts detached, and why |
-| the start fails | the shell's last line |
+| the door stands before the road runs | the port it answers at |
+| the door stands now | the port it stands at |
+| the start fails | the road's last line |
 
 A desk pull starts nothing, and a take that fails starts nothing.
 
@@ -96,15 +97,12 @@ stub's bridgehead keeps a copy, because that file imports nothing at all.
 
 ## A desk serve returns
 
-`./RUNME.sh serve` probes the same port. Where nothing answers, it starts the
-server apart from the shell through the proc door's `respawn`. It watches the
-server for the window a restart takes, and returns.
+`./RUNME.sh serve` runs the index with `standing`, which starts its door apart
+from the shell where none answers, and returns.
 
-The server stays when the shell closes, and a second run finds it standing and
-starts nothing. A start that falls inside the
-window names the line it writes to `.se/.log/serve.log`. With `--inspect` the
-verb holds the server as its own child, because the debugger holds it.
-`detachedStart` in `src/scripts/serve.js` holds it.
+The door stays when the shell closes, and a second run finds it standing and
+starts nothing. A start that falls names what the index writes to its error
+stream. `detachedStart` in `src/scripts/serve.js` holds it.
 
 ## The bridgehead starts it too
 
@@ -115,8 +113,10 @@ road runs once. That silence says nothing to the person, because the road runs
 under it. For details, see
 [[spec/design_output/level0#the-bridge-says-it-falls]].
 
-The road is one shell line, because the hook stands outside node and its own
-folder reaches no shell. The shell reads the environment itself and answers a code:
+The road is one node script, because a Windows box carries no shell. It reads
+the environment itself, and installs where the modules or the index stand
+nowhere. It then runs the index with `standing` in the work root, and answers
+a code:
 
 | the code | what stands | what the log carries |
 |---|---|---|
@@ -124,9 +124,10 @@ folder reaches no shell. The shell reads the environment itself and answers a co
 | 4 | the method root stands nowhere | one `warn` line |
 | 5 | the box carries no node | one `warn` line |
 | 6 | the install brings no modules | one `warn` line |
-| 7 | the road installs the modules, then starts the server | one `info` line |
-| 8 | the bridge code fails its self-test, so no server starts | one `warn` line naming the fault |
-| 0 | the server starts behind the session | one `info` line |
+| 7 | the road installs the modules, then starts the index | one `info` line |
+| 8 | the index fails its standing, so no door stands | one `warn` line naming the fault |
+| 9 | the install builds no index | one `warn` line |
+| 0 | the index stands behind the session | one `info` line |
 
 `CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
 cloud guidance binds on. The operating system decides nothing here, because a
@@ -194,28 +195,23 @@ events alone.
 
 ### The first call pays
 
-`READ_TOOLS` in the hook names the tools a hand reads with, and the hook
-registers each at the session's start. That registration reaches no server, so
-a box whose server answers nothing carries the tools anyway.
+The hook registers the pull at the session's start, and every other level
+zero tool off the index's tool list, which `se-index tools` answers. That list
+reaches no server, so a box whose server answers nothing carries the tools
+anyway. [[spec/tickets/level0-tools-leave-the-bridge]]
 
-A call of a read tool takes the `*` door every event takes, and no door of its
-own. So one post reaches a server that stands, and the answer rides back the
-way every other answer does, its `register` list among it. A call landing
-before the server answers takes the steps below, and waits on nothing:
-
-- it posts once, and answers where a server stands
-- it runs the start above, where the road has not run yet
-- it answers at once, with one line
+A level zero call takes the hooks door, which runs the action its name
+resolves to. While the door stands down, the call meets the refusal naming
+the command that brings the index back. Where the cage stands off, the call
+posts once to the server, and a dead server answers one line:
 
 | what stands | the line says |
 |---|---|
 | a launch stands, and no server answers this session yet | level zero starts, the call answers once the server stands, and the agent calls it again |
 | no launch stands, or a server answers once and then falls | the port and the log |
 
-`test/level0/read-tools.test.js` counts the one post over each read tool.
-
-So a hand calls `find` on its first turn, and that call starts the server. The
-call after it lands on the server, and carries the rules. For details, see
+`test/level0/read-tools.test.js` counts the one post over each of find, patch,
+replace and undo. For the rules riding the first answer, see
 [[spec/design_output/level0#rules-ride-the-first-answer]].
 
 ## A fix reaches the session
@@ -389,6 +385,29 @@ The marks stand apart, because a session start writes the row and leaves
 the line. A harness offering no `$.ui` leaves the row alone, and nothing
 throws. `./RUNME.sh doctor` names the server under `server`, where a person
 asks after it later.
+
+## The cage refuses while down
+
+Under `migration.cage` at `new`, the hooks door decides the events it ports,
+and the bridge answers the rest until [[spec/tickets/the-bridge-server-leaves]]
+moves them. `.claude/skills/level0/hooks/cage.js` holds the road.
+
+| the event | who answers |
+|---|---|
+| `tool.call`, `classic.Stop` | the hooks door, at the port and token `.se/.runtime/hooks.json` names |
+| `agent.spoke`, where the door asks back for rows | the hooks door |
+| a level zero tool the door passes | the bridge |
+| every other event | the bridge |
+
+Where the door answers nothing, the bridgehead runs its start road once and
+posts again. Still down, a guarded call meets a deny naming `session/alarms`
+and `./RUNME.sh serve`. These pass, and so does every other event:
+
+- Read, Grep, Glob and the level zero read tools
+- `./RUNME.sh serve` and `./RUNME.sh doctor`, each run alone, so a box whose
+  index stands unbuilt brings the door back
+
+For the decision, see [[spec/rationales/the-cage-refuses-while-down]].
 
 ## A session says its cage
 
@@ -2005,3 +2024,8 @@ The bridgehead stamps a wait with `since`, the moment of its first post, and
 posts it again under the same stamp where the host cuts it. The box keeps the
 watch a stamp begins, so a post again carries on its signals, and the cap
 counts from `since`. The older loop ends once a later post takes the watch.
+
+The Go twin in `src/modules/waits` stands off the wiring until the flip:
+
+- the operation outlives its caller in the manager's book, so it takes no stamp
+- a wait past the call wait answers a running handle

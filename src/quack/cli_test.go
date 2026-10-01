@@ -56,7 +56,7 @@ func standingTree(t *testing.T) string {
 	q.ActionIn(c, "t/slow", func(string) []q.Request {
 		return []q.Request{{Module: "t", Verb: "slow", NoUndo: "a sleep writes nothing"}}
 	}, q.Doc("sleeps past the wait"))
-	manage := func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
+	manage := func(root string, store *q.Store, rows index.OpRows, _ index.Reads, steps func(hand func())) (index.Managed, error) {
 		stop, call, err := manager.Serves(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps, Now: time.Now, Accept: fakeAccept,
 			Every: func(time.Duration, func(time.Time)) func() { return func() {} },

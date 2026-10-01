@@ -132,6 +132,19 @@ func TestANewActionListsANewToolWithNoChangeHere(t *testing.T) {
 	}
 }
 
+// [[spec/tickets/tools-keep-their-own-names]]
+func TestAnActionListsUnderTheToolNameItKeeps(t *testing.T) {
+	one := serverOver(t, &calls{}, func(cat *q.Catalog) {
+		q.ActionIn(cat, "plans/set", func(struct{}) []q.Request { return nil }, q.Doc("sets the plan"), q.ToolName("plan"))
+	})
+	if _, ok := toolNamed(one.server.Tools(), "plan"); !ok {
+		t.Fatalf("the tools read %+v, and want plan listed", one.server.Tools())
+	}
+	if _, ok := toolNamed(one.server.Tools(), "index_plans_set"); ok {
+		t.Fatal("plans/set lists under its generated name too, and wants its own name alone")
+	}
+}
+
 func TestAToolsDescriptionIsItsActionsDoc(t *testing.T) {
 	one := serverOver(t, &calls{}, nil)
 	tool, ok := toolNamed(one.server.Tools(), "index_work_pull")

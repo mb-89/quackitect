@@ -5,7 +5,7 @@
       "file": "spec/config/level0.schema.json",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 796. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 792. Split it by topic."
     },
     {
       "file": "spec/config/styles/VoiceParagraph/Vocabulary.yml",
@@ -29,7 +29,7 @@
       "file": "spec/design_output/level0.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 2008. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 2032. Split it by topic."
     },
     {
       "file": "spec/design_output/model.md",
@@ -41,7 +41,7 @@
       "file": "spec/design_output/pull.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 912. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 917. Split it by topic."
     },
     {
       "file": "spec/design_output/work.md",
@@ -54,6 +54,12 @@
       "rule": "FileCeiling",
       "line": 1,
       "message": "A file holds 600 lines, and the file holds 1444. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/a-down-index-refuses-calls.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 705. Split it by topic."
     },
     {
       "file": "spec/tickets/a-rename-reaches-every-note.md",
@@ -74,10 +80,28 @@
       "message": "A file holds 600 lines, and the file holds 718. Split it by topic."
     },
     {
+      "file": "spec/tickets/clear-answers-off-the-door.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 609. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/log-report-stop-in-go.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 670. Split it by topic."
+    },
+    {
       "file": "spec/tickets/lsp-module-serves-the-features.md",
       "rule": "FileCeiling",
       "line": 1,
       "message": "A file holds 600 lines, and the file holds 624. Split it by topic."
+    },
+    {
+      "file": "spec/tickets/prose-tools-answer-in-go.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 703. Split it by topic."
     },
     {
       "file": "spec/tickets/sessions-boot-from-the-repo.md",
@@ -161,7 +185,7 @@
       "file": "src/quack/testdata/readers.schema.json",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 733. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 731. Split it by topic."
     },
     {
       "file": "src/quack/testdata/tree.golden.json",

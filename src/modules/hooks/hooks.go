@@ -7,19 +7,17 @@ package hooks
 import (
 	"bufio"
 	"bytes"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"time"
 
+	"quackitect/src/modules/hooks/command"
+	"quackitect/src/modules/hooks/review"
+	"quackitect/src/modules/hooks/write"
 	"quackitect/src/q"
 	"quackitect/src/q/tool"
 )
@@ -41,6 +39,7 @@ const (
 	passKind       = "pass"
 	afterKind      = "after"
 	resultKind     = "result"
+	eventKind      = "event"
 	builtInHarness = "claude-code"
 	sessionKey     = "<id>"
 	foldsUnder     = "session/<id>/"
@@ -72,6 +71,10 @@ type Effect struct {
 	Kind   string `json:"kind"`
 	Text   string `json:"text,omitempty"`
 	Result any    `json:"result,omitempty"`
+	// The id an effect asking back carries, which the hook module's answer names. [[spec/design_output/model#an-effect-asks-back]]
+	Call string `json:"call,omitempty"`
+	// The name of the block an after carries, which a prompt context hands on as a named block. [[spec/tickets/brief-answers-off-the-door]]
+	Name string `json:"name,omitempty"`
 }
 
 // [[spec/design_output/model#a-post-and-its-answer]]
@@ -113,6 +116,45 @@ type Outside struct {
 	Now   func() time.Time
 	// Takes the shadow row of a live post the door decides apart from its old decision. None writes nothing. [[spec/tickets/copilot-meets-the-hooks-door]]
 	Shadow func(row map[string]any) error
+	// The tree a post naming no root stands in, what the config says there, and a git read's output there. None reads no tree, no cap and no git. [[spec/tickets/cage-command-rules-port]]
+	Root   string
+	Config func(root string) Settings
+	Git    func(root string, args ...string) string
+	// The findings the voice keeps over a commit message, off Vale and the prose vetoes. None reads no voice. [[spec/tickets/cage-commit-guards-port]]
+	Voice func(root, message string) []command.Row
+	// Writes one config key of the local layer under the root. None writes nothing. [[spec/tickets/cage-hold-drops-port]]
+	Drop func(root, key, value string) error
+	// The findings the voice keeps over a written file, off Vale and the prose vetoes. None reads no voice. [[spec/tickets/cage-write-door-port]]
+	Prose func(root, where, text string) []write.Finding
+	// What the schemas answer over a written note, off the check the tree holds. None reads no schema. [[spec/tickets/cage-write-door-port]]
+	Schema func(root, where, text string) write.Judged
+	// The index a Grep or a Glob asks, by method and params in the shape se-index reads, and its answer in the shape it prints. None passes every search to the harness. [[spec/tickets/grep-glob-answer-off-index]]
+	Index func(method string, params map[string]any) (map[string]any, error)
+	// What the branch verb gathers for a review under the root, or why it gathered nothing. None passes the review to the bridge. [[spec/tickets/review-spawns-off-the-door]]
+	Review func(root, branch string) (review.Material, string)
+}
+
+// What the doors read off the config and the box: the words a name holds, whether the box stands in the cloud, the owner's hold and ask, the binding, the graces, the plan's numbers, and each helper tier's model. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-call-holds-port]]
+type Settings struct {
+	Words        int
+	Cloud        bool
+	Hold         string
+	Ask          string
+	Binding      string
+	FinishGrace  int
+	UpdateGrace  int
+	PlanEvery    int
+	PlanGrace    int
+	PlanMostOpen int
+	Helpers      map[string]string
+	// The user and the home folder the box answers, which the private delta reads. [[spec/tickets/cage-commit-guards-port]]
+	User string
+	Home string
+	// The stop hook set off, the holds the tooth lets pass in a row, the fill the handover comes due at, and the layer the binding reads off. [[spec/tickets/cage-stop-rules-port]]
+	StopOff      bool
+	MostInARow   int
+	HandoverAt   int
+	BindingLayer string
 }
 
 // The door keeps each session's place, and the operations it has told the session of. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -121,6 +163,10 @@ type Door struct {
 	mu   sync.Mutex
 	seqs map[string]int64
 	told map[string]bool
+	// The session of the newest call the holds held under each root, which a spoke post meets. [[spec/tickets/cage-call-holds-port]]
+	heldIn map[string]string
+	// The material of each review in flight, under the token its spawn's back names. [[spec/tickets/review-spawns-off-the-door]]
+	reviews map[string]review.Material
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -135,6 +181,10 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
 		q.OutIn(c, EventsName, q.Event{}, q.IO(), q.Doc("the newest hook event of a session")),
 		q.CfgIn(c, WaitKey, defaultWait, q.Doc("the seconds an agent's call waits on its action, where the call sets none")),
+		q.FoldIn(c, HoldsName, Holds{}, stepHolds, q.Doc("the state the holds keep over a session, and the answer to its newest event")),
+		q.FoldIn(c, StopsName, Stops{}, stepStops, q.Doc("the state the stop keeps over a session, and the answer to its newest Stop")),
+		q.FoldIn(c, BriefName, Brief{}, stepBrief, q.Doc("the canary debt the brief keeps over a session, and the blocks its newest event hands over")),
+		toolActions(c),
 	)
 }
 
@@ -146,17 +196,46 @@ func New(from Outside) *Door {
 	if from.Ops == nil {
 		from.Ops = func(string) []Op { return nil }
 	}
-	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}}
 }
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
 func (d *Door) Hook(post Post) (Answer, error) {
-	session := sessionOf(post)
-	if err := d.writes(session, post); err != nil {
+	root := post.Root
+	if root == "" {
+		root = d.from.Root
+	}
+	var settings Settings
+	if d.from.Config != nil {
+		settings = d.from.Config(root)
+	}
+	session := d.sessionFor(post, root)
+	if err := d.writes(session, post, settings, root); err != nil {
 		return Answer{}, err
 	}
+	d.drops(session, root)
+	d.marks(session, root)
+	d.rows(session, root)
+	d.repeats(session, root)
 	effects := []Effect{}
-	if post.Event == toolEvent {
+	if said, ok := d.rewrites(session, post); ok {
+		effects = append(effects, said)
+	} else if said, ok := d.held(session, post, root); ok {
+		effects = append(effects, said)
+	} else if said, ok := d.blocked(session, post); ok {
+		effects = append(effects, said)
+	} else if said, ok := d.describes(post); ok {
+		effects = append(effects, said)
+	} else if refused := d.refuses(post, root, settings); post.Event == toolEvent && refused != "" {
+		effects = append(effects, Effect{Kind: resultKind, Text: refused})
+	} else if said, ok := d.searches(post); ok {
+		// [[spec/tickets/grep-glob-answer-off-index]]
+		effects = append(effects, said)
+	} else if said, ok := d.reviewed(post, root); ok {
+		effects = append(effects, said)
+	} else if said, ok := d.answers(session, post); ok {
+		effects = append(effects, said)
+	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)
 		if err != nil {
 			return Answer{}, err
@@ -166,7 +245,16 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		}
 	}
 	if len(effects) == 0 {
+		if said, ok := d.spawned(post, root); ok {
+			effects = append(effects, said)
+		}
+	}
+	if len(effects) == 0 {
 		effects = append(effects, Effect{Kind: passKind})
+	}
+	// A context read and a call passing on carry the brief. [[spec/tickets/brief-answers-off-the-door]]
+	if (post.Event == contextEvent || post.Event == toolEvent) && passesOn(effects) {
+		effects = append(effects, d.briefs(session, root, settings)...)
 	}
 	told := d.ended(session)
 	if post.Event == stopEvent {
@@ -180,8 +268,8 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	return said, nil
 }
 
-// Commits the event at the session's next place, and lands it on every fold over the session. [[spec/design_output/model#the-events-of-a-session]]
-func (d *Door) writes(session string, post Post) error {
+// Commits the event at the session's next place, stamped with the config its holds read, the facts the stop reads and the canary the brief reads, and lands it on every fold over the session. A pay rides more than a call, so every event carries the stamp. [[spec/design_output/model#the-events-of-a-session]] [[spec/tickets/cage-call-holds-port]] [[spec/tickets/cage-hold-drops-port]] [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/brief-answers-off-the-door]]
+func (d *Door) writes(session string, post Post, settings Settings, root string) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	store := d.from.Store
@@ -193,7 +281,11 @@ func (d *Door) writes(session string, post Post) error {
 		}
 	}
 	hand := q.Hand{Session: session, Agent: textOf(post.E, "agentId", "agent_id")}
-	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fieldsOf(post)}
+	fields := fieldsOf(post)
+	fields[heldField] = heldOf(settings, root)
+	fields[stoppedField] = d.stoppedOf(post, settings, root)
+	fields[briefField] = d.stampOf(settings, root)
+	event := q.Event{Seq: seq + 1, At: d.now(), Kind: post.Event, Harness: harnessOf(post), Hand: hand, Fields: fields}
 	if _, err := store.Commit(store.Snapshot().Revision, d.from.As, map[string]any{name: event}); err != nil {
 		return err
 	}
@@ -203,7 +295,13 @@ func (d *Door) writes(session string, post Post) error {
 			return err
 		}
 	}
-	return nil
+	if err := store.Land(d.holdsOf(session), event); err != nil {
+		return err
+	}
+	if err := d.landsStops(session, event); err != nil {
+		return err
+	}
+	return d.from.Store.Land(d.briefOf(session), d.besideHolds(session, event))
 }
 
 func (d *Door) now() time.Time {
@@ -219,7 +317,8 @@ func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
 	if !ok || d.from.Call == nil {
 		return Effect{}, false, nil
 	}
-	args, _ := e["input"].(map[string]any)
+	args := tool.Args(d.from.Store, action, e)
+	d.rides(session, action, args)
 	input, err := tool.Input(d.from.Store, action, args)
 	if err != nil {
 		return Effect{Kind: resultKind, Text: err.Error()}, true, nil
@@ -236,7 +335,126 @@ func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
 	if said.Error != "" {
 		return Effect{Kind: resultKind, Text: fmt.Sprintf("%s fails: %s", action, said.Error)}, true, nil
 	}
-	return Effect{Kind: resultKind, Result: said.Result}, true, nil
+	return Effect{Kind: resultKind, Result: harnessResult(said.Result)}, true, nil
+}
+
+// The tools the command door reads, and the git read the pull rule asks. [[spec/tickets/cage-command-rules-port]]
+const (
+	bashTool       = "Bash"
+	powerShellTool = "PowerShell"
+	subjectFormat  = "--format=%s"
+)
+
+// The refusal of a tool's own door, which the god binding lets through as letsThrough does. [[spec/tickets/cage-call-holds-port]]
+func (d *Door) refuses(post Post, root string, settings Settings) string {
+	if post.Event != toolEvent || settings.Binding == godBinding {
+		return ""
+	}
+	if textOf(post.E, "tool") == agentTool {
+		return agentRefusal(post.E, settings)
+	}
+	if write.Writes(textOf(post.E, "tool")) {
+		return d.writeDoor(post.E, root)
+	}
+	return d.commands(post, root, settings)
+}
+
+// The first refusal of a Bash call, in the bridge's order: the ticket door, the bless guard, the command rules with the voice's refusals, the commit guards, the version guard, then the git write door. PowerShell meets the ticket door alone. A post standing in no tree meets none. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-commit-guards-port]]
+func (d *Door) commands(post Post, root string, settings Settings) string {
+	tool := textOf(post.E, "tool")
+	if tool != bashTool && tool != powerShellTool || root == "" {
+		return ""
+	}
+	line, description := callField(post.E, "command"), callField(post.E, "description")
+	tree := disk{root}
+	if said := command.TicketDoor(line, description, tree); said != "" || tool == powerShellTool {
+		return said
+	}
+	if said := command.BlessGuard(line, tree.text); said != "" {
+		return said
+	}
+	var rules, writes []command.Row
+	for _, one := range command.Findings(line, settings.Words, command.It{Cloud: settings.Cloud, Script: tree.text, Subjects: d.subjects(root)}) {
+		if one.Rule == command.GitWrite {
+			writes = append(writes, one)
+		} else {
+			rules = append(rules, one)
+		}
+	}
+	rules = append(rules, d.commitVoice(line, root, tree)...)
+	if len(rules) > 0 {
+		return command.RefusedCommand(line, rules)
+	}
+	if said := d.commitGuards(line, root, settings, tree); said != "" {
+		return said
+	}
+	if said := command.VersionGuard(line); said != "" {
+		return said
+	}
+	if len(writes) > 0 {
+		return command.RefusedCommand(line, writes)
+	}
+	return ""
+}
+
+// The subjects of the commits an undo drops, off git under the root, or none where the door reaches no git. [[spec/design_output/bash#a-pull-commit-stands]]
+func (d *Door) subjects(root string) func(command.Undo) []string {
+	if d.from.Git == nil {
+		return nil
+	}
+	return func(undo command.Undo) []string {
+		args := []string{"log"}
+		if !undo.Walks {
+			args = append(args, "--no-walk")
+		}
+		args = append(append(args, subjectFormat), undo.Revs...)
+		var out []string
+		for _, one := range strings.Split(d.from.Git(root, args...), "\n") {
+			if one != "" {
+				out = append(out, one)
+			}
+		}
+		return out
+	}
+}
+
+// A field of the call, off the event or the input a harness nests it in. [[spec/tickets/copilot-meets-the-hooks-door]]
+func callField(e map[string]any, key string) string {
+	if said := textOf(e, key); said != "" {
+		return said
+	}
+	input, _ := e["input"].(map[string]any)
+	return textOf(input, key)
+}
+
+// The tree under a root, as the command rules read it: a path under the root or an absolute one. [[spec/tickets/cage-command-rules-port]]
+type disk struct{ root string }
+
+func (one disk) at(path string) string {
+	if filepath.IsAbs(path) || strings.HasPrefix(path, "/") {
+		return path
+	}
+	return filepath.Join(one.root, filepath.FromSlash(path))
+}
+
+func (one disk) Read(path string) (string, bool) {
+	body, err := os.ReadFile(one.at(path))
+	return string(body), err == nil
+}
+
+func (one disk) List(folder string) []string {
+	found, _ := os.ReadDir(one.at(folder))
+	out := make([]string, 0, len(found))
+	for _, each := range found {
+		out = append(out, each.Name())
+	}
+	return out
+}
+
+// A file's text, or nothing where it stands nowhere. [[spec/tickets/one-door-joins-a-path]]
+func (one disk) text(path string) string {
+	said, _ := one.Read(path)
+	return said
 }
 
 func (d *Door) tells(handle string) {
@@ -287,125 +505,6 @@ func (d *Door) running(session string) string {
 }
 
 func open(one Op) bool { return one.State == "queued" || one.State == "running" }
-
-// The session id where the post or its event names one, in every spelling the harnesses send. [[spec/design_output/pull#the-hand-and-the-hold]]
-func sessionOf(post Post) string {
-	if post.Session != "" {
-		return post.Session
-	}
-	if nested, ok := post.E["session"].(map[string]any); ok {
-		if id := textOf(nested, "id"); id != "" {
-			return id
-		}
-	}
-	if id := textOf(post.E, "sessionId", "session_id"); id != "" {
-		return id
-	}
-	return noSession
-}
-
-func harnessOf(post Post) string {
-	if post.Harness != "" {
-		return post.Harness
-	}
-	return builtInHarness
-}
-
-// The event's payload, with the root and the fill the post carries beside it. [[spec/design_output/model#a-post-and-its-answer]]
-func fieldsOf(post Post) map[string]any {
-	fields := make(map[string]any, len(post.E))
-	for key, value := range post.E {
-		fields[key] = value
-	}
-	if post.Root != "" {
-		fields["root"] = post.Root
-	}
-	if post.Fill != nil {
-		fields["fill"] = post.Fill
-	}
-	return fields
-}
-
-func textOf(from map[string]any, keys ...string) string {
-	for _, key := range keys {
-		if text, ok := from[key].(string); ok && text != "" {
-			return text
-		}
-	}
-	return ""
-}
-
-func textOfValue(value any) string {
-	if text, ok := value.(string); ok {
-		return text
-	}
-	body, err := json.Marshal(value)
-	if err != nil {
-		return fmt.Sprint(value)
-	}
-	return string(body)
-}
-
-// What the standing file holds: the port, and the token a post carries. [[spec/tickets/hooks-standing-file-names-token]]
-type Standing struct {
-	Port  int    `json:"port"`
-	Token string `json:"token"`
-}
-
-// Serves POST /hook on a loopback port behind a token, and writes both under the root. The listener stands in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
-func Listen(root string, door *Door) (func(), error) {
-	secret := make([]byte, tokenBytes)
-	if _, err := rand.Read(secret); err != nil {
-		return nil, err
-	}
-	token := hex.EncodeToString(secret)
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		return nil, err
-	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("POST /hook", door.serves(token))
-	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
-	go server.Serve(listen)
-	at := filepath.Join(root, filepath.FromSlash(StandingFile))
-	body, err := json.Marshal(Standing{Port: listen.Addr().(*net.TCPAddr).Port, Token: token})
-	if err == nil {
-		err = os.MkdirAll(filepath.Dir(at), 0o755)
-	}
-	if err == nil {
-		err = os.WriteFile(at, body, 0o600)
-	}
-	if err != nil {
-		server.Close()
-		return nil, err
-	}
-	return func() {
-		server.Close()
-		os.Remove(at)
-	}, nil
-}
-
-// A post short of the token answers 401, a body past the cap or short of JSON 400, and a door that fails 500. [[spec/tickets/hooks-standing-file-names-token]]
-func (d *Door) serves(token string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Authorization") != bearer+token {
-			http.Error(w, "the post carries no token the standing file names", http.StatusUnauthorized)
-			return
-		}
-		var post Post
-		if err := json.NewDecoder(io.LimitReader(r.Body, bodyCap)).Decode(&post); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		said, err := d.Hook(post)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(said)
-	}
-}
 
 // One line of a recording: the post as the harness sends it, and the answer the module gives. [[spec/design_output/model#an-inbound-fake-replays]]
 type recorded struct {

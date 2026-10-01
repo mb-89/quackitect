@@ -155,7 +155,7 @@ func (s *Server) Tools() []Tool {
 			continue
 		}
 		looks, _ := s.from.Store.Presentation(name)
-		out = append(out, Tool{Name: tool.Name(name), Description: looks.Doc, InputSchema: waits(schema, in)})
+		out = append(out, Tool{Name: tool.NameOf(s.from.Store, name), Description: looks.Doc, InputSchema: waits(schema, in)})
 	}
 	return out
 }

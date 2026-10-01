@@ -30,7 +30,6 @@ const ROOTS = [
   "src/scripts/trust.js",
   "src/scripts/copilot.js",
   "src/scripts/editor.js",
-  "src/bridge/server.js",
   "src/extension/extension.js",
   "src/extension/sidebar.js",
   ".claude/skills/level0/hooks/level0.js",

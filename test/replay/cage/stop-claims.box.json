@@ -1,0 +1,15 @@
+{
+  "cloud": true,
+  "binding": "queue",
+  "bindingLayer": "built-in",
+  "live": [
+    "spec/config/level0.schema.json",
+    "spec/config/status.yaml",
+    "spec/config/stop/level0.yml",
+    "spec/config/stop/level1.yml"
+  ],
+  "config": {},
+  "files": {
+    ".se/.runtime/plan.json": "{\"working\":\"a-ticket\",\"todos\":[{\"title\":\"Push the branch\"}]}"
+  }
+}

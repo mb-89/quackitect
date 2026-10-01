@@ -34,6 +34,25 @@ func TestAnActionAnswersItsRequests(t *testing.T) {
 	}
 }
 
+// An action taking a struct reads a map a caller in the process hands it, and refuses a map of another shape. [[spec/tickets/edit-tools-answer-in-go]]
+func TestAnActionReadsAMapAsItsStruct(t *testing.T) {
+	type save struct {
+		Path string `json:"path" doc:"the file"`
+	}
+	c := New()
+	ActionIn(c, "t/save", func(in save) []Request {
+		return []Request{{Module: "disk", Verb: "write", Args: in.Path, NoUndo: "a case"}}
+	})
+	s := NewStore(c)
+	asked, err := s.Act("t/save", map[string]any{"path": "a.md"})
+	if err != nil || len(asked) != 1 || asked[0].Args != "a.md" {
+		t.Fatalf("the map reads as %+v, %v", asked, err)
+	}
+	if _, err := s.Act("t/save", map[string]any{"path": 7}); err == nil {
+		t.Fatal("a number reads as the path")
+	}
+}
+
 // An action decodes a JSON body into the type it takes, an empty body into the zero value, and refuses a body of another shape. [[spec/tickets/actions-answer-over-http]]
 func TestAnActionDecodesItsInputOffJSON(t *testing.T) {
 	type save struct {

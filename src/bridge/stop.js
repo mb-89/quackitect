@@ -25,7 +25,6 @@ import {
   STOP_CALL,
   STOP_LINE,
   stopReasons,
-  stopSpec,
   todos,
   toothOf,
 } from "../../.claude/skills/level0/lib/stop.js";
@@ -41,7 +40,6 @@ import { holdsTurn } from "./answer.js";
 import { bindingLine } from "./binding.js";
 import { asks, writes } from "./config.js";
 import { plansHere } from "./plan.js";
-import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
 // The calls the finish hold lets pass before it refuses them the way the stop hold does. [[spec/design_output/stop#the-grace]]
@@ -49,15 +47,11 @@ const GRACE_FINISH = "grace.finish";
 const MOST = "stop.mostInARow";
 const BREAK = "SE_BREAK_ON_STOP";
 const PASS = { pass: true };
-
-export const TOOLS = { [STOP_CALL]: claims };
+// The report tool, which the hooks door answers now, spelled here for the calls that end a turn. [[spec/tickets/log-report-stop-in-go]]
+const REPORT_CALL = "mcp__level0__report";
 
 export function rulesHere(disk, method) {
   return pool(readFolder(disk, join(method, RULES), ".yml")).rules;
-}
-
-export function SPECS(box) {
-  return [stopSpec(rulesOf(box))];
 }
 
 // The three calls a turn ends with, which the hold at stop lets through. [[spec/design_output/stop#the-hold]]
@@ -133,44 +127,6 @@ export function sawPrompt(e, box) {
   if (e?.agentId) return;
   box.stood = "";
   toothOf_(box).sawPrompt(Boolean(e?.mine));
-}
-
-function claims(e, box) {
-  const reason = String(e?.reason ?? "");
-  const known = stopReasons(rulesOf(box)).some((one) => one.id === reason);
-  if (!known) {
-    const ids = stopReasons(rulesOf(box))
-      .map((one) => one.id)
-      .join(", ");
-    box.log.say("warn", "stop", `${reason} names no reason this tree holds`);
-    return {
-      result: { result: `${reason} names no reason this tree holds. The ids: ${ids}.` },
-    };
-  }
-  // The call runs the claim's own check, so a claim the turn's end refuses falls here first, and says why. [[spec/design_output/stop#a-refusal-names-its-check]]
-  const rule = stopReasons(rulesOf(box)).find((one) => one.id === reason);
-  const falls = READS_TEXT.has(rule.runs)
-    ? ""
-    : claimFalls({
-        box,
-        claimed: reason,
-        off: asks(box, ENABLED) === false,
-        hold: holdHere(box),
-        text: "",
-      });
-  if (falls) {
-    box.log.say("warn", "stop", `the claim of ${reason} falls`, { detail: falls });
-    return { result: { result: `The claim falls. ${falls}` } };
-  }
-  box.claim = reason;
-  box.log.say("info", "stop", `the agent claims ${reason}`, {
-    detail: String(e?.next ?? ""),
-  });
-  return {
-    result: {
-      result: `The claim stands. The answer before this call carries the report, so end the turn with the line stop: ${reason} alone. The owner reads the answer once.`,
-    },
-  };
 }
 
 // The answer before the stop call streams as turn.said, so a report there stands for the turn, and the line after the call comes alone. [[spec/design_output/stop#a-talk-follows-a-report]]
@@ -399,9 +355,6 @@ const FALLS = {
       ? "a cloud box that ends its turn stops its container, and every helper in it stops too, so no answer wakes this session. Wait for the helper inside this turn, or do its work yourself."
       : "the harness names no helper running at this turn's end, so its answer wakes nothing.",
 };
-
-// The checks reading the answer's text, which the stop call runs before any answer stands. [[spec/design_output/stop#a-refusal-names-its-check]]
-const READS_TEXT = new Set(["a-report-stands", "no-stop-line"]);
 
 // A rule naming a check this door holds nowhere says so in the log, once a turn, so the hand that wrote it reads its own mistake. The vote skips a claimed rule the agent claims nowhere, so the door reads every rule itself. [[spec/design_output/stop#the-mechanical-checks]]
 function warnsUnknown(rules, box) {

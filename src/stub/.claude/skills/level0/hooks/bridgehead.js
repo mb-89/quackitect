@@ -101,11 +101,12 @@ export function attachOf(vehicle, work) {
   ];
 }
 
+// The vehicle's index answers its standing by starting its door over the stub's work root. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function serveOf(vehicle) {
   return [
     "sh",
     "-c",
-    'nohup node "$1/src/bridge/server.js" "$1" >/dev/null 2>&1 &',
+    'nohup "$1/.se/.runtime/bin/se-index" standing >/dev/null 2>&1 &', // a copy of BIN, which .claude/skills/level0/lib/folders.js roots
     "sh",
     vehicle,
   ];

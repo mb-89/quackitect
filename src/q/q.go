@@ -46,6 +46,7 @@ type registration struct {
 	enum     []string
 	label    string
 	icon     string
+	tool     string
 	looks    Look
 	fields   []Field
 	out      []Field

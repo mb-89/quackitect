@@ -7,7 +7,6 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { MARKER, REGISTER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { guidanceHere } from "../../src/bridge/guidance.js";
-import { boxOf } from "../../src/bridge/server.js";
 import { registeredPort } from "../../src/bridge/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -16,19 +15,6 @@ import { registerDirs } from "../../src/scripts/vehicle.js";
 import { work } from "../../src/scripts/work.js";
 
 const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
-
-test("the box a root builds carries the environment and the node path", () => {
-  const said = boxOf("/tree", "/tree", { disk: fakeDisk(), clock: fakeClock() });
-  assert.equal(typeof said.env, "object");
-  assert.equal(typeof said.node, "string");
-  const named = boxOf("/tree", "/tree", {
-    disk: fakeDisk(),
-    clock: fakeClock(),
-    node: "/node/bin/node",
-  });
-  assert.equal(named.node, "/node/bin/node", "a case names its own node");
-  assert.equal(typeof said.pid, "number");
-});
 
 // A tree with no identity runs the road that makes one, and the pid the case hands ends it. [[spec/design_output/doors#a-door-reads-the-outside]]
 test("the port road makes an identity off the pid the root hands in", () => {

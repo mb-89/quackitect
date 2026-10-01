@@ -416,7 +416,7 @@ test("a path under a journaled folder move standing nowhere stays out of the com
 
 // [[spec/design_output/level0#the-cold-probe]]
 test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
-  const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);
+  const { it, git, asked } = cold(["src/quack/main.go", "README.md"]);
 
   const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
 

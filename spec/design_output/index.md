@@ -296,6 +296,10 @@ brace. A brace inside a string or a comment counts for nothing. The answer
 names the path and the line, then the body. A name no row defines answers
 that nothing in the index defines it.
 
+The Go twin stands in `src/modules/search`, off the wiring until the flip.
+Go regexp matches no closing quote by its opening one, so a scanner there
+skips each string.
+
 ## Where the disk still answers
 
 The index answers where it answers faithfully, and stands aside everywhere

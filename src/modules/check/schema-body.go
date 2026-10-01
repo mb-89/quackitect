@@ -49,7 +49,7 @@ func bodyFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 			continue
 		}
 		out = append(out, schemaFault(header, where, 1,
-			fmt.Sprintf("A %s note carries a %s chapter.", kind, header)))
+			fmt.Sprintf("A %s carries a %s chapter.", kind, header)))
 	}
 
 	for _, held := range standing {
