@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 623e8fb75637ff235f130a0b7b6cab61caa9dc1c
+    hash_after: 623e8fb75637ff235f130a0b7b6cab61caa9dc1c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes; green, src/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: 71b6b39a66f27536
+        size: 1074
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -375,26 +398,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/search_test.go src/modules/hooks/cage_test.go src/index/ops_test.go src/quack/searches_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Grep and Glob now answer off the index through the hooks door, in the shapes the bridge hands the harness. The door asks the index through a new Index seam, which quack wires over the reads the manager takes. A search passes to the disk where the bridge passes: no index, no ask, an absolute path, or a question the index refuses. A result with no text now reads as a pass in the shadow decision, so the cage replay reads an index answer as the bridge's pass.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's files, and src/quack/finds.go for the two methods its noReads needs
+- the hooks cases run over a fake index, the quack case over fakeReads, and the index case over a temp tree
+- src/modules/hooks/search.go and src/quack/searches.go open on headers naming what they implement
+- the limit, the modes and the type globs stand once in src/modules/hooks/search.go
 
 # accept
 
