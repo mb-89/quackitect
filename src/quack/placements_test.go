@@ -14,7 +14,7 @@ import (
 	"quackitect/src/q"
 )
 
-var placedWiring = q.Wiring{Instances: []q.Instance{{Name: "clock", Module: "clock"}, {Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}, {Name: "hooks", Module: hooksModule}, {Name: "ticket", Module: "ticket"}}}
+var placedWiring = q.Wiring{Instances: []q.Instance{{Name: "clock", Module: "clock"}, {Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}, {Name: "hooks", Module: hooksModule}, {Name: "http", Module: "http"}, {Name: "ticket", Module: "ticket"}}}
 
 func commandsOf(placed []index.Placed) []string {
 	out := []string{}
@@ -27,7 +27,7 @@ func commandsOf(placed []index.Placed) []string {
 func TestEachInstanceInNoListTakesAProcessOfItsOwn(t *testing.T) {
 	got := commandsOf(placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"ticket"}}, "quack"))
 	if strings.Join(got, " | ") != "quack module ticket | quack module tickets | quack module queue" {
-		t.Fatalf("the placements run %q, and want tickets and queue apart, with the clock left to the IO process and the hooks listener to the index", got)
+		t.Fatalf("the placements run %q, and want tickets and queue apart, with the clock left to the IO process and the hooks and http listeners to the index", got)
 	}
 }
 

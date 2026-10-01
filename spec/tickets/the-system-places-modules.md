@@ -594,3 +594,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- placements-leave-http: step 2 leaves out the `http` instance beside hooks, mcp and lsp, since it is the `/v1` door the index serves. `TestEachInstanceInNoListTakesAProcessOfItsOwn` loads one and wants it left out.
