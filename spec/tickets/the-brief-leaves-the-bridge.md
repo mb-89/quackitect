@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: bd62b8780e86dc2c
         size: 2200
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 5eed27c129863a63369579d60ce91a812b0a53b9
+    hash_after: 5eed27c129863a63369579d60ce91a812b0a53b9
+    inputs:
+      - name: design/draft
+        hash: bd62b8780e86dc2c
+        size: 2200
+      - name: design/tests-red
+        hash: e5b36c0792060d5c
+        size: 1009
+    def: dc4904ab364efa10
 depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door", "spawn-answers-off-the-door", "clear-answers-off-the-door", "level0-tools-leave-the-bridge"]
 ---
 
@@ -286,8 +298,10 @@ What surprises me: the comment over UNGUARDED in cage.js still named the read to
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- brief-owes-after-a-clear: the flip hands session.end and turn.said to the door, and the brief fold in src/modules/hooks/brief.go keeps two bridge rules nowhere. onSessionEnd in src/bridge/guidance.js opens the canary debt again after a clear, setting owes and dropping paid, and stepBrief takes no session.end. repeats in guidance.js logs HEARD.again where a paid session writes the canary line again, and the Go side logs nothing. Port both into stepBrief with a case each in brief_test.go before the flip lands
 
 # implement
 
