@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -52,6 +53,13 @@ func briefRowsOf(t *testing.T) []briefRow {
 // A door over the row's notes, with the stop hook the row names, and a sender posting each event there as the session s1. [[spec/tickets/brief-answers-off-the-door]]
 func briefDoor(t *testing.T, one briefRow) func(event string, e map[string]any) Answer {
 	t.Helper()
+	send, _ := briefDoorIn(t, one)
+	return send
+}
+
+// The same door, beside the root its tree stands at. [[spec/tickets/brief-owes-after-a-clear]]
+func briefDoorIn(t *testing.T, one briefRow) (func(event string, e map[string]any) Answer, string) {
+	t.Helper()
 	root := treeOf(t, one.Files, "")
 	door := holdDoor(t, Settings{Words: nameWords, Binding: queueBinding, BindingLayer: builtInLayer, StopOff: !one.Stop})
 	return func(event string, e map[string]any) Answer {
@@ -63,7 +71,7 @@ func briefDoor(t *testing.T, one briefRow) func(event string, e map[string]any) 
 			t.Fatal(err)
 		}
 		return said
-	}
+	}, root
 }
 
 // A call no rule of the door holds or refuses. [[spec/tickets/brief-answers-off-the-door]]
@@ -144,4 +152,50 @@ func TestACompactionOpensTheDebtAgain(t *testing.T) {
 	if said := send(toolEvent, readCall()); !afterHolds(said, one.Owes) {
 		t.Fatalf("the call after a compaction answers %+v, and wants an after carrying the owes line of %q", said.Effects, one.Sentence)
 	}
+}
+
+// A clear reopens a paid debt, and the next call carries the owes line again. [[spec/tickets/brief-owes-after-a-clear]]
+func TestAClearOpensTheDebtAgain(t *testing.T) {
+	one := briefRowsOf(t)[0]
+	send := briefDoor(t, one)
+	send(startEvent, map[string]any{})
+	send(contextPost, map[string]any{})
+	send(saidEvent, map[string]any{"text": one.Sentence + "\n\nI read the tree next."})
+	if said := send(toolEvent, readCall()); afterHolds(said, one.Owes) {
+		t.Fatalf("the call after a paid line answers %+v, and wants no owes line", said.Effects)
+	}
+	send(endEvent, map[string]any{"reason": clearReason})
+	if said := send(toolEvent, readCall()); !afterHolds(said, one.Owes) {
+		t.Fatalf("the call after a clear answers %+v, and wants an after carrying the owes line of %q", said.Effects, one.Sentence)
+	}
+}
+
+// A paid session writing the line again logs the warning once, and the paying line logs none. [[spec/tickets/brief-owes-after-a-clear]]
+func TestASecondLineLogsTheWarning(t *testing.T) {
+	one := briefRowsOf(t)[0]
+	send, root := briefDoorIn(t, one)
+	send(startEvent, map[string]any{})
+	send(contextPost, map[string]any{})
+	send(saidEvent, map[string]any{"text": one.Sentence + "\n\nI read the tree next."})
+	if got := warningsIn(t, root); got != 0 {
+		t.Fatalf("the paying line logs %d warning(s), and wants none", got)
+	}
+	send(saidEvent, map[string]any{"text": one.Sentence + "\n\nAnd again."})
+	if got := warningsIn(t, root); got != 1 {
+		t.Fatalf("the second line logs %d warning(s), and wants one", got)
+	}
+}
+
+// The warnings of a second line the session log holds. [[spec/tickets/brief-owes-after-a-clear]]
+func warningsIn(t *testing.T, root string) int {
+	t.Helper()
+	body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
+	count := 0
+	for _, line := range strings.Split(string(body), "\n") {
+		var row LogRow
+		if json.Unmarshal([]byte(line), &row) == nil && row.Kind == canaryKind && row.Said == heardAgain && row.Level == warnLevel {
+			count++
+		}
+	}
+	return count
 }

@@ -43,6 +43,7 @@ type BriefSaid struct {
 	Seq   int64 `json:"seq"`
 	Layer bool  `json:"layer,omitempty"`
 	Owes  bool  `json:"owes,omitempty"`
+	Again bool  `json:"again,omitempty"`
 }
 
 // The fold's step. A helper's event moves the stamp alone. [[spec/tickets/brief-answers-off-the-door]]
@@ -59,7 +60,15 @@ func stepBrief(state Brief, event q.Event) Brief {
 	case contextEvent:
 		state.reads()
 	case saidEvent:
-		state.pays(textOf(fields, "text"))
+		text := textOf(fields, "text")
+		// A paid session writing the line again marks the step, as repeats in src/bridge/guidance.js reads it. [[spec/tickets/brief-owes-after-a-clear]]
+		state.Said.Again = state.Paid && brief.CanaryIn(text, state.Stamp.Sentence) != brief.None
+		state.pays(text)
+	case endEvent:
+		// A clear opens the debt again, as onSessionEnd in src/bridge/guidance.js opens it. [[spec/tickets/brief-owes-after-a-clear]]
+		if textOf(fields, "reason") == clearReason {
+			state.Owes, state.Paid = true, false
+		}
 	case turnEvent:
 		state.turnEnds(fields)
 	case compactEvent:
@@ -175,6 +184,26 @@ func (d *Door) briefs(session, root string, settings Settings) []Effect {
 		out = append(out, Effect{Kind: afterKind, Text: brief.Owes(state.Stamp.Sentence)})
 	}
 	return out
+}
+
+// The kind a canary row logs under, and the warning a second line logs, which DOOR in src/bridge/guidance.js and HEARD.again in .claude/skills/level0/lib/guidance.js own, spelled again here because Go reads no JavaScript. [[spec/tickets/brief-owes-after-a-clear]]
+const (
+	canaryKind = "level0"
+	heardAgain = "the canary opens a second answer in one context"
+)
+
+// The warning a paid session writing the line again logs, as repeats in src/bridge/guidance.js logs it. [[spec/tickets/brief-owes-after-a-clear]]
+func (d *Door) repeats(session, root string) {
+	state, ok := d.from.Store.Snapshot().Read(d.briefOf(session)).(Brief)
+	d.mu.Lock()
+	seq := d.seqs[session]
+	d.mu.Unlock()
+	if !ok || state.Said.Seq != seq || !state.Said.Again {
+		return
+	}
+	row := rowOf(d.now(), canaryKind, heardAgain, state.Stamp.Sentence)
+	row.Level = warnLevel
+	d.logs(root, row)
 }
 
 // The handover reaches one read, so the read removes it, as handoverHere in src/bridge/guidance.js does. A post standing in no tree reads none. [[spec/design_output/work#one-handover-stands]]
