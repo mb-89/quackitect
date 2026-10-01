@@ -109,3 +109,20 @@ func TestThePlansModuleStandsOffTheWiring(t *testing.T) {
 		}
 	}
 }
+
+// The answer names the place the queue gives a new todo, off the ports the real wiring binds. [[spec/tickets/plan-writes-off-go]]
+func TestAPlanAnswerReadsThePlaceOffTheQueuesPorts(t *testing.T) {
+	world := waitWorldOf(t)
+	wiring, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	seedFile(t, world.root, q.WiringFile, string(wiring))
+	said, err := world.served.Call(planAction, map[string]any{"add": []any{map[string]any{"title": "placed"}}}, "s1", findWait)
+	if err != nil || said.Error != "" {
+		t.Fatalf("the plan calls with %v %q, and wants an answer", err, said.Error)
+	}
+	if text := fmt.Sprint(said.Result); !strings.Contains(text, "placed stands at ") || strings.Contains(text, "no place") {
+		t.Errorf("the plan answers %q, and wants the place the queue gives the todo", text)
+	}
+}

@@ -45,8 +45,8 @@ const (
 	builtInFail  = float64(5)
 )
 
-// What a run of places reads. [[spec/tickets/the-queue-becomes-a-module]]
-type placesIn struct {
+// What a run of places reads, which the plans module hands the plan text it writes. [[spec/tickets/the-queue-becomes-a-module]] [[spec/tickets/plan-writes-off-go]]
+type PlacesIn struct {
 	Rows   []ticket.Ticket  `q:"rows"`
 	Plan   q.Content        `q:"plan"`
 	Cloud  []string         `q:"cloud"`
@@ -63,13 +63,13 @@ func Places(c *q.Catalog) q.Writer {
 	q.CfgIn(c, "block", builtInBlock, q.Doc("the score a ticket takes for each ticket its chain holds up"))
 	q.CfgIn(c, "day", builtInDay, q.Doc("the score a ticket takes for each whole day it stands"))
 	q.CfgIn(c, "fail", builtInFail, q.Doc("the score a ticket takes for each hand-back that failed on it"))
-	places := q.DerivedIn(c, PlacesPort, map[string]string{}, placesOf, q.Doc("every open row's place in the queue, as an outline number, and ∞ for a row the cloud holds"))
+	places := q.DerivedIn(c, PlacesPort, map[string]string{}, PlacesOf, q.Doc("every open row's place in the queue, as an outline number, and ∞ for a row the cloud holds"))
 	overrides := q.DerivedIn(c, OverridesPort, map[string]string{}, overridesOf, q.Doc("every place a hand overrides in the plan file, by name"))
 	return q.Join(places, overrides)
 }
 
-// The places placesIn answers. A closed row, a note and a row the cloud holds take no place in the lists. A held row and the plan's work stand in hand, a person's step and a draft wait on a person, a ticket whose waits all stand closed goes to the agents, and every other row goes back. A row the cloud holds that stands open takes ∞. [[spec/design_output/pull#the-queue-is-an-outline]]
-func placesOf(in placesIn) map[string]string {
+// The places PlacesIn answers. A closed row, a note and a row the cloud holds take no place in the lists. A held row and the plan's work stand in hand, a person's step and a draft wait on a person, a ticket whose waits all stand closed goes to the agents, and every other row goes back. A row the cloud holds that stands open takes ∞. [[spec/design_output/pull#the-queue-is-an-outline]]
+func PlacesOf(in PlacesIn) map[string]string {
 	plan := planOf(in.Plan)
 	cloud := setOf(in.Cloud)
 	state := map[string]string{}

@@ -9,19 +9,21 @@ import (
 	"quackitect/src/index"
 	"quackitect/src/modules/edits"
 	"quackitect/src/modules/files"
+	"quackitect/src/modules/plans"
 	"quackitect/src/modules/search"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/waits"
 	"quackitect/src/q"
 )
 
-// The IO modules that answer a request an action lists: disk over the root, the edits, search and waits modules, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
+// The IO modules that answer a request an action lists: disk over the root, the edits, search, waits and plans modules, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
 func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (any, error) {
 	disk := files.Accept(files.NewDisk(root))
 	node := nodeAccept(root)
 	edit := edits.Accept(editsOutside(root))
 	find := search.Accept(searchOutside(root, reads))
 	wait := waits.Accept(waitsOutside(root, store))
+	plan := plans.Accept(plansOutside(root, store))
 	return func(asked q.Request) (any, error) {
 		// [[spec/tickets/find-and-wait-in-go]]
 		switch asked.Module {
@@ -29,6 +31,9 @@ func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (an
 			return find(asked)
 		case waits.Module:
 			return wait(asked)
+		// [[spec/tickets/plan-writes-off-go]]
+		case plans.Module:
+			return plan(asked)
 		}
 		if asked.Module == files.DiskModule {
 			return disk(asked)

@@ -31,6 +31,7 @@ import (
 	"quackitect/src/modules/lsp"
 	"quackitect/src/modules/mcp"
 	"quackitect/src/modules/migration"
+	"quackitect/src/modules/plans"
 	"quackitect/src/modules/queue"
 	"quackitect/src/modules/search"
 	"quackitect/src/modules/session"
@@ -104,6 +105,8 @@ var modules = map[string]ioModule{
 	// [[spec/tickets/find-and-wait-in-go]]
 	search.Module: {registers: search.Registers},
 	waits.Module:  {registers: waits.Registers},
+	// [[spec/tickets/plan-writes-off-go]]
+	plans.Module: {registers: plans.Registers},
 }
 
 // A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]

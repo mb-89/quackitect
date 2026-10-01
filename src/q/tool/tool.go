@@ -68,7 +68,55 @@ func Schema(registry huma.Registry, in reflect.Type) (map[string]any, bool, erro
 		return nil, false, err
 	}
 	var out map[string]any
-	return out, bare, json.Unmarshal(body, &out)
+	if err := json.Unmarshal(body, &out); err != nil {
+		return nil, bare, err
+	}
+	inlined, err := inlines(registry, out, map[string]bool{})
+	if err != nil {
+		return nil, bare, err
+	}
+	out, _ = inlined.(map[string]any)
+	return out, bare, nil
+}
+
+// A schema with each ref the registry holds written in its place, since a tool list carries no components a harness resolves a ref against. A ref inside its own schema stays a ref. [[spec/tickets/plan-writes-off-go]]
+func inlines(registry huma.Registry, value any, open map[string]bool) (any, error) {
+	switch one := value.(type) {
+	case map[string]any:
+		if ref, ok := one["$ref"].(string); ok && !open[ref] {
+			body, err := json.Marshal(registry.SchemaFromRef(ref))
+			if err != nil {
+				return nil, err
+			}
+			var held any
+			if err := json.Unmarshal(body, &held); err != nil {
+				return nil, err
+			}
+			open[ref] = true
+			defer delete(open, ref)
+			return inlines(registry, held, open)
+		}
+		out := make(map[string]any, len(one))
+		for key, inner := range one {
+			done, err := inlines(registry, inner, open)
+			if err != nil {
+				return nil, err
+			}
+			out[key] = done
+		}
+		return out, nil
+	case []any:
+		out := make([]any, len(one))
+		for at, inner := range one {
+			done, err := inlines(registry, inner, open)
+			if err != nil {
+				return nil, err
+			}
+			out[at] = done
+		}
+		return out, nil
+	}
+	return value, nil
 }
 
 // The action's input off a call's arguments: past the wait argument, which an input declaring its own wait keeps, or the bare input a tool carries under its one property. [[spec/tickets/hooks-wait-leaves-tool-input]]
@@ -76,7 +124,8 @@ func Input(store *q.Store, action string, args map[string]any) (any, error) {
 	in, _, _ := store.Types(action)
 	kept := map[string]any{}
 	for key, value := range args {
-		if key != WaitArg || declares(in, WaitArg) {
+		// A plan field riding the call leaves the input as the wait does. [[spec/tickets/plan-writes-off-go]]
+		if (key != WaitArg || declares(in, WaitArg)) && (key != PlanArg || declares(in, PlanArg)) {
 			kept[key] = value
 		}
 	}
@@ -151,11 +200,33 @@ type PlanTodo struct {
 // The answer to the engine's three questions. [[spec/design_output/stop#the-plan]]
 type Plan struct {
 	Working string     `json:"working,omitempty" doc:"The title of the todo, or the name of the ticket, you work on now."`
-	Done    []string   `json:"done,omitempty" doc:"The titles of the todos you finished, which leave the queue."`
-	Add     []PlanTodo `json:"add,omitempty" doc:"The todos you add, each with the place you do it at."`
+	Done    []string   `json:"done,omitempty" nullable:"false" doc:"The titles of the todos you finished, which leave the queue."`
+	Add     []PlanTodo `json:"add,omitempty" nullable:"false" doc:"The todos you add, each with the place you do it at."`
 }
 
-// A stub until tests-green. [[spec/tickets/plan-writes-off-go]]
+// The description the plan field carries, as planField in src/bridge/plan.js words it. [[spec/design_output/stop#the-plan]]
+const planDoc = "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add."
+
+// A tool's schema with the plan field among its properties, so the plan's answer rides any call, and the plan tool's own as it stands. [[spec/design_output/stop#the-plan]]
 func WithPlan(registry huma.Registry, schema map[string]any, name string) map[string]any {
-	return schema
+	if name == PlanTool {
+		return schema
+	}
+	plan, _, err := Schema(registry, reflect.TypeOf(Plan{}))
+	if err != nil {
+		return schema
+	}
+	properties := map[string]any{}
+	if own, ok := schema["properties"].(map[string]any); ok {
+		for key, value := range own {
+			properties[key] = value
+		}
+	}
+	properties[PlanArg] = map[string]any{"type": "object", "description": planDoc, "properties": plan["properties"]}
+	out := map[string]any{}
+	for key, value := range schema {
+		out[key] = value
+	}
+	out["properties"] = properties
+	return out
 }

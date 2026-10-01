@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -157,6 +157,15 @@ record:
         hash: ad5aa286b19adabf
         size: 1141
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 6c0bfa0ac1344ad4b53e2b58ada60e7b15eec033
+    hash_after: b7b4ba7a910002ab1877a5da569dd8dfec188e36
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/scripts/copilot-door.js:7:1: correctness/noUnusedFunctionParameters: This parameter it is unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -343,14 +352,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's size names, plus src/quack/plans.go's case beside it, src/q/tool's schema read, whose ref inlining the plan's todo items need, src/modules/hooks/rides.go with its cases, which keeps hooks.go under the file ceiling, and a queue case over the exported places
+- every door the change reaches has a fake: the module runs over a fake file, a fixed clock and fake places, the riding cases over the calls fake, and the quack cases over a temp tree
+- each new function and file carries a comment pointing at this ticket or the plan's design output, and rides.go names planRides as its source
+- every fact stands in one place: the plan's words in q/tool, the place words beside a pointer at outline.go, the most open key in command.go, and the plan tool's doc in the module alone
 
 ## tests-green
 
