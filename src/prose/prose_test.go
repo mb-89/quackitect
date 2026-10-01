@@ -30,6 +30,7 @@ func TestPastReadsTheTenseTable(t *testing.T) {
 		{"the door wrote the file", "wrote", true},
 		{"the door did the file", "did", true},
 		{"the door failed the file", "failed", true},
+		{"| the part | what it holds |", "|", false},
 	}
 	for _, one := range cases {
 		if got := ReadsAsPast(one.line, one.word); got != one.past {

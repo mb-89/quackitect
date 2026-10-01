@@ -5,7 +5,8 @@
 
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because the extension bundles alone.
 const BIN = ".se/.runtime/bin";
-const NAME = "se-lsp";
+// The index binary, whose lsp verb relays the editor to the lsp IO module. index.js owns the name, spelled again here because the extension bundles alone. [[spec/tickets/the-lsp-server-leaves]]
+const NAME = "se-index";
 const ID = "quackitect";
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -44,7 +45,7 @@ function serverAsk(root, platform) {
 // The pause before each start again, so a server falling at its start loops once a second. [[spec/design_output/lsp#the-client-starts-it-again]]
 const PAUSE = 1000;
 
-// The client the editor starts se-lsp through. The client's own handler stops at a cap of starts again, and a rebuild or a stale binary ends the server as often as the source moves. So every close starts it again. [[spec/design_output/lsp#the-client-starts-it-again]]
+// The client the editor starts quack lsp through. The client's own handler stops at a cap of starts again, and a rebuild or a stale binary ends the server as often as the source moves. So every close starts it again. [[spec/design_output/lsp#the-client-starts-it-again]]
 function clientOf(node, ask, wait = sleep) {
   return new node.LanguageClient(ask.id, ask.name, ask.server, {
     ...ask.client,

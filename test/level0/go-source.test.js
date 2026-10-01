@@ -15,18 +15,18 @@ const tree = () =>
   fakeDisk({
     [`${ROOT}/go.mod`]: "module quackitect\n",
     [`${ROOT}/go.sum`]: "",
-    [`${ROOT}/src/lsp/main.go`]:
+    [`${ROOT}/src/front/cmd/main.go`]:
       'package main\n\nimport (\n\t"fmt"\n\n\t"quackitect/src/engine/swap"\n\t"quackitect/src/yaml"\n)\n',
-    [`${ROOT}/src/lsp/main_test.go`]: 'package main\n\nimport "quackitect/src/tui"\n',
+    [`${ROOT}/src/front/cmd/main_test.go`]:
+      'package main\n\nimport "quackitect/src/tui"\n',
     [`${ROOT}/src/yaml/yaml.go`]: 'package yaml\n\nimport "quackitect/src/pointer"\n',
     [`${ROOT}/src/pointer/pointer.go`]: "package pointer\n",
     [`${ROOT}/src/engine/swap/swap.go`]: "package swap\n",
     [`${ROOT}/src/tui/main.go`]: "package main\n",
   });
 
-test("the three binaries name their folders", () => {
+test("the two binaries name their folders", () => {
   assert.deepEqual(BUILDS, {
-    "se-lsp": "src/lsp",
     "se-index": "src/quack",
     "se-front": "src/front/cmd",
   });
@@ -34,8 +34,8 @@ test("the three binaries name their folders", () => {
 
 // [[spec/tickets/go-code-shares-one-module]]
 test("a binary's folders take every tree package it imports, to the end of the chain", () => {
-  assert.deepEqual(goFoldersOf(tree(), ROOT, "src/lsp"), [
-    "src/lsp",
+  assert.deepEqual(goFoldersOf(tree(), ROOT, "src/front/cmd"), [
+    "src/front/cmd",
     "src/engine/swap",
     "src/pointer",
     "src/yaml",
@@ -44,8 +44,8 @@ test("a binary's folders take every tree package it imports, to the end of the c
 
 // [[spec/tickets/go-code-shares-one-module]]
 test("the stamp reads the folders and the root module files", () => {
-  assert.deepEqual(foldersOf(tree(), ROOT, "src/lsp"), [
-    `${ROOT}/src/lsp`,
+  assert.deepEqual(foldersOf(tree(), ROOT, "src/front/cmd"), [
+    `${ROOT}/src/front/cmd`,
     `${ROOT}/src/engine/swap`,
     `${ROOT}/src/pointer`,
     `${ROOT}/src/yaml`,
@@ -57,31 +57,31 @@ test("the stamp reads the folders and the root module files", () => {
 // [[spec/tickets/go-code-shares-one-module]]
 test("a move in the folder, an imported folder or the module rebuilds the binary, and a test file moves nothing", () => {
   const disk = tree();
-  assert.equal(fresh(disk, ROOT, "se-lsp"), false, "no stamp reads as stale");
+  assert.equal(fresh(disk, ROOT, "se-front"), false, "no stamp reads as stale");
 
-  stamps(disk, ROOT, "se-lsp");
-  assert.equal(fresh(disk, ROOT, "se-lsp"), true, "the stamp holds the source");
+  stamps(disk, ROOT, "se-front");
+  assert.equal(fresh(disk, ROOT, "se-front"), true, "the stamp holds the source");
 
-  disk.write(`${ROOT}/src/lsp/main_test.go`, "package main // moved");
+  disk.write(`${ROOT}/src/front/cmd/main_test.go`, "package main // moved");
   disk.write(`${ROOT}/src/tui/main.go`, "package main // moved");
   assert.equal(
-    fresh(disk, ROOT, "se-lsp"),
+    fresh(disk, ROOT, "se-front"),
     true,
     "a test file and a stranger move nothing",
   );
 
   disk.write(`${ROOT}/src/pointer/pointer.go`, "package pointer // moved");
   assert.equal(
-    fresh(disk, ROOT, "se-lsp"),
+    fresh(disk, ROOT, "se-front"),
     false,
     "a package two imports away moves the binary",
   );
 
-  stamps(disk, ROOT, "se-lsp");
+  stamps(disk, ROOT, "se-front");
   disk.write(`${ROOT}/go.sum`, "one\n");
-  assert.equal(fresh(disk, ROOT, "se-lsp"), false, "a moved sum moves it");
+  assert.equal(fresh(disk, ROOT, "se-front"), false, "a moved sum moves it");
 
-  stamps(disk, ROOT, "se-lsp");
-  disk.write(`${ROOT}/src/lsp/main.go`, "package main // moved");
-  assert.equal(fresh(disk, ROOT, "se-lsp"), false, "its own folder moves it");
+  stamps(disk, ROOT, "se-front");
+  disk.write(`${ROOT}/src/front/cmd/main.go`, "package main // moved");
+  assert.equal(fresh(disk, ROOT, "se-front"), false, "its own folder moves it");
 });

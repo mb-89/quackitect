@@ -7,6 +7,7 @@ package prose
 import (
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 // The modes a request reads: every veto, or the past veto alone, which the check and the push door take. [[spec/tickets/prose-checks-run-in-go]]
@@ -62,6 +63,10 @@ func ReadsAsPast(line, word string) bool {
 	wanted := strings.ToLower(strings.TrimSpace(word))
 	if wanted == "" {
 		return true
+	}
+	// A match holding no letter, such as a table bar the tagger reads as a verb, holds no tense. [[spec/design_output/level0#the-tense-reader]]
+	if !strings.ContainsFunc(wanted, unicode.IsLetter) {
+		return false
 	}
 	past := true
 	for _, one := range tokensOf(line) {

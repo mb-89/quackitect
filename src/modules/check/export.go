@@ -1,6 +1,5 @@
-// The names the LSP calls, exported off the rules that moved here, so one copy
-// answers the editor, the check and the write door. src/lsp/rules.go aliases
-// each back to the name its files call.
+// The names the lsp module and the wiring call, exported off the rules that
+// moved here, so one copy answers the editor, the check and the write door.
 // [[spec/tickets/lsp-rules-move-to-check]]
 package check
 

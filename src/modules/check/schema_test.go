@@ -9,7 +9,7 @@ import (
 	"quackitect/src/yaml"
 )
 
-const handoverSchema = `kind: handover
+const looseHandoverSchema = `kind: handover
 governs:
   - .se/HANDOVER.md
 frontmatter:
@@ -32,7 +32,7 @@ body:
 `
 
 func TestTheCheckerWordsAMissingFieldAndChapterAsTheBridge(t *testing.T) {
-	schema := yaml.AsDoc(yaml.Read(handoverSchema))
+	schema := yaml.AsDoc(yaml.Read(looseHandoverSchema))
 	found := checkNote("---\nkind: [[handover]]\n---\n\n# Where it stands\n\n- the branch\n", schema, ".se/HANDOVER.md")
 	want := map[string]string{
 		"Schema.status":    "A handover names status in its frontmatter.",
@@ -49,7 +49,7 @@ func TestTheCheckerWordsAMissingFieldAndChapterAsTheBridge(t *testing.T) {
 }
 
 func TestAStrangerNamesTheKindItReadsAs(t *testing.T) {
-	schema := yaml.AsDoc(yaml.Read(handoverSchema))
+	schema := yaml.AsDoc(yaml.Read(looseHandoverSchema))
 	found, ok := StrangerFault("---\nkind: [[rationale]]\n---\n", schema, ".se/HANDOVER.md")
 	if want := ".se/HANDOVER.md reads as a rationale, and the handover schema governs this path."; !ok || found.Message != want {
 		t.Errorf("StrangerFault answers %+v, %v, want %q", found, ok, want)

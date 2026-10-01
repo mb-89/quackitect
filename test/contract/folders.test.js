@@ -8,6 +8,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { configOf } from "../../.claude/skills/level0/lib/config.js";
+import { MOVED, RUN } from "../../.claude/skills/level0/lib/folders.js";
 import {
   INSTALL,
   installerHoldsTheNames,
@@ -142,4 +143,12 @@ test("a loop standing apart from its list is refused", () => {
     bare.some((one) => /names no list/.test(one.message)),
     "a loop naming no list",
   );
+});
+
+// The lsp module spells its door file again, because a Go module imports no JavaScript, so the name meets the runtime names here. [[spec/tickets/the-lsp-server-leaves]]
+test("the lsp module's door file stands among the runtime names", () => {
+  const source = files.read(join(root, "src", "modules", "lsp", "lsp.go"));
+  const named = /const StandingFile = "([^"]+)"/.exec(source)?.[1] ?? "";
+  assert.ok(named.startsWith(`${RUN}/`), `${named} stands under ${RUN}`);
+  assert.ok(MOVED.includes(named.slice(RUN.length + 1)), `MOVED names ${named}`);
 });

@@ -100,8 +100,8 @@ stub's bridgehead keeps a copy, because that file imports nothing at all.
 server apart from the shell through the proc door's `respawn`. It watches the
 server for the window a restart takes, and returns.
 
-The server stays when the shell closes, and a
-second run finds it standing and starts nothing. A start that falls inside the
+The server stays when the shell closes, and a second run finds it standing and
+starts nothing. A start that falls inside the
 window names the line it writes to `.se/.log/serve.log`. With `--inspect` the
 verb holds the server as its own child, because the debugger holds it.
 `detachedStart` in `src/scripts/serve.js` holds it.
@@ -944,7 +944,7 @@ the one an environment carries leans on nothing:
     print("trusted", folder, "in", merge(os.path.expanduser("~/.claude.json"), trust))
     print("auto mode in", merge(os.path.expanduser("~/.claude/settings.json"), auto))
     PY
-    SE_INSTALL_SKIP="editor-link editor-extensions editor-client go index se-lsp" \
+    SE_INSTALL_SKIP="editor-link editor-extensions editor-client go index" \
       sh "$repo/src/scripts/install.sh" || true
     exit 0
 

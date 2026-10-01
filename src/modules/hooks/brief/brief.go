@@ -40,7 +40,6 @@ var wanted = [][2]string{
 	{"vale", "the prose rules"},
 	{"biome", "formatting and linting the JavaScript"},
 	{"vale-ls", "the prose rules inside an editor"},
-	{"se-lsp", "the note shape and the names inside an editor"},
 	{"go", "building the index and the viewer"},
 	{"git", "history and diffs"},
 	{"claude", "a session of its own, and the probe"},

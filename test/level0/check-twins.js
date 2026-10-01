@@ -1,5 +1,5 @@
 // Prints the JavaScript side of every check twin as JSON, over this tree's
-// tracked files. The Go golden test in src/lsp runs it with node from the root.
+// tracked files. The Go golden test in src/quack runs it with node from the root.
 // [[spec/tickets/check-names-meet-their-goldens]]
 
 import { join } from "node:path";

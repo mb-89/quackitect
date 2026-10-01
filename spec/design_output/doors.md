@@ -41,7 +41,7 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 | `process.version` | the root alone reads it, for the survey |
 | `process.execPath` | `it.node` or `box.node`, off the root |
 | the Go import running a command | a call into the package's `door.go` |
-| the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the tree in `src/lsp` reads through a disk a case fakes |
+| the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the lsp IO module reads the box through its own `door.go` |
 
 A root stands off the rule, because it builds the hand every module past it
 reads. `.vale.ini` names each one in a section, beside the doors and their

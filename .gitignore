@@ -39,3 +39,7 @@ src/extension/icon.svg
 # The editor's command line writes its crash log into the folder it runs in,
 # and the install runs it here to link the sidebar. [[spec/design_output/editor#what-the-editor-runs]]
 debug.log
+
+# A go build of the quack program at the root writes its binary here, and a
+# box builds its own.
+/quack

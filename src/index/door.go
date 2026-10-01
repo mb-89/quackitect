@@ -6,6 +6,7 @@ package index
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -15,7 +16,6 @@ import (
 	"os/exec"
 	"os/signal"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -116,8 +116,11 @@ func starts(root string) error {
 	if _, err := statOf(bin); err != nil {
 		return fmt.Errorf("no index binary stands at %s, and ./RUNME.sh builds one: %w", bin, err)
 	}
-	if err := spawns(bin, root); err != nil {
-		return err
+	if claims(startingPath(root)) {
+		defer os.Remove(startingPath(root))
+		if err := spawns(bin, root); err != nil {
+			return err
+		}
 	}
 
 	for waited := 0; waited < startPolls; waited++ {
@@ -129,31 +132,23 @@ func starts(root string) error {
 	return errorOf("the door took longer than thirty seconds to stand")
 }
 
-// The index binary the tree builds, whose folder .claude/skills/level0/lib/folders.js owns and whose name lib/index.js owns. [[spec/design_output/index#a-door-comes-back]]
-func indexBinary(root string) string {
-	name := "se-index"
-	if runtime.GOOS == "windows" {
-		name += ".exe"
-	}
-	return filepath.Join(root, filepath.FromSlash(Runtime), "bin", name)
+// The claim a caller holds while the index it spawned comes up. [[spec/tickets/reaches-keeps-the-post-fault]]
+func startingPath(root string) string {
+	return filepath.Join(root, Runtime, "index.starting")
 }
 
-// Whether this process is the index, which Main says, and the composition root before any verb. [[spec/design_output/index#a-door-comes-back]]
-var serving atomic.Bool
-
-// Marks this process as the index, so a start it makes runs itself. [[spec/design_output/index#a-door-comes-back]]
-func Serving() { serving.Store(true) }
-
-// The binary a start runs: the index itself, and for a client the index beside it, else the tree's own. [[spec/design_output/index#a-door-comes-back]]
-func serverOf(self, root string) string {
-	if serving.Load() {
-		return self
+// The first caller claims the start, and a caller meeting a fresh claim waits on the index that claim spawns, so callers racing a start spawn one index. A claim older than the start wait stands dead. [[spec/tickets/reaches-keeps-the-post-fault]]
+func claims(marker string) bool {
+	if said, err := os.Stat(marker); err == nil && time.Since(said.ModTime()) > startPolls*startPollPause {
+		os.Remove(marker)
 	}
-	beside := filepath.Join(filepath.Dir(self), filepath.Base(indexBinary(root)))
-	if _, err := statOf(beside); err == nil {
-		return beside
+	os.MkdirAll(filepath.Dir(marker), 0o755)
+	made, err := os.OpenFile(marker, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
+	if err != nil {
+		return !errors.Is(err, fs.ErrExist)
 	}
-	return indexBinary(root)
+	made.Close()
+	return true
 }
 
 // Runs the binary with serve over the root, and a case swaps it for a fake process. [[spec/design_output/index#a-door-comes-back]]

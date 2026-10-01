@@ -20,6 +20,6 @@
     "phase9shadow": true,
     "cage": "new",
     "sidebar": "new",
-    "lsp": "shadow"
+    "lsp": "new"
   }
 }

@@ -21,7 +21,7 @@ const BROKEN =
   "if (process.argv.includes('--selftest')) { console.error('ReferenceError: dropsMoved is not defined'); process.exit(1); }\nrequire('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
 // An install standing in for the real one: it brings the folder the road looks for, in the method root the road runs it from. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const INSTALL = "mkdir -p node_modules\n";
-const SKIP = "index se-lsp";
+const SKIP = "index";
 const WAITS = 40;
 
 const nodeHere = () =>

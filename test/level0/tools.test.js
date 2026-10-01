@@ -173,15 +173,15 @@ test("the rule reads the tools the install script installs, and no link", () => 
 // A binary older than its own source runs by rules the tree no longer carries. [[spec/design_output/index#the-compiler-it-needs]]
 test("a here case asking find for a newer source names the binary that rebuilds", () => {
   const said = [
-    "lsp_here() {",
-    '  newer=$(find "$root/src/lsp" -name \'*.go\' -newer "$bin/se-lsp" -print -quit)',
+    "front_here() {",
+    '  newer=$(find "$root/src/front" -name \'*.go\' -newer "$bin/se-front" -print -quit)',
     "}",
     "vale_here() {",
     '  [ -x "$bin/vale" ]',
     "}",
   ].join("\n");
 
-  assert.deepEqual(rebuilt(said), ["lsp"]);
+  assert.deepEqual(rebuilt(said), ["front"]);
 });
 
 // A binary keys on a hash of its source and of the folders its go.mod replaces. [[spec/tickets/every-server-stands-and-answers]]

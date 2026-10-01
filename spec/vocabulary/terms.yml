@@ -5,6 +5,7 @@
 # [[spec/schemas/paragraph.schema.yaml]]
 
 terms:
+  - {word: lsp, means: "the language server protocol an editor speaks to a server for its diagnostics and its features"}
   - {word: splice, means: "to insert rows or steps into a list at a given place and push the rest along"}
   - {word: bridgehead, means: "the one hook module a project carries which posts every event to the server and finds the vehicle"}
   - {word: shim, means: "the small shell run script in a stub that finds the vehicle and hands it every argument"}
