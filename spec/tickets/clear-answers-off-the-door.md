@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -203,6 +203,19 @@ record:
         hash: 19bd52b73471bf7a
         size: 735
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: e5ca754552b1d673078da0e4e087eb22ff449980
+    hash_after: e5ca754552b1d673078da0e4e087eb22ff449980
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft-2
+        hash: 9a9409f1129baf82
+        size: 3610
+    def: 9c7cd4dd4a2dadb8
 group: go-cage-switches-over
 ---
 
@@ -409,26 +422,35 @@ the first done line meets the clear case, the second the cage case, the third th
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/clear_test.go test/level0/cage.test.js test/level0/door-clear.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/hooks/clear_test.go
+test/level0/cage.test.js
+test/level0/door-clear.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The round's new case, test/level0/door-clear.test.js, fails on its own assertion: the door's clear effect reaches the harness as no answer, so the event goes on and no clear runs. The cases of the first round stand red as before: the clear case in clear_test.go and the cage case in cage.test.js.
+
+What surprises me: cage.test.js also holds a red case of log-report-stop-in-go, which names the bridge's tools table, so that file stays out of the check until both tickets pass tests-green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done line meets the clear case, the second the cage case, the third the check at tests-green, and the gate's road finding meets the door-clear case
+the door-clear case runs over a fake disk, a fake door answering a clear, and fake command and prompt calls
 
 # gate
 
