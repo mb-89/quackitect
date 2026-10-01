@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -244,6 +244,15 @@ record:
         hash: 11056905a6577d4e
         size: 1495
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: d364e397acc53832fd8c0b7ac0bc91813e6ee001
+    hash_after: d364e397acc53832fd8c0b7ac0bc91813e6ee001
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
 ---
@@ -585,14 +594,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change commit touches the nine files the draft-2 size list names, and no other
+- the drafts module reaches the outside through its Outside seams, which the module test fakes and src/quack/drafts.go wires
+- the drafts code points at the ticket and at the level0 and stop design notes for its approach
+- the finding body stands once in src/prose/finding.go, and hooks.RefusedVoice and the drafts answer both read it
 
 ## tests-green
 
