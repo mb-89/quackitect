@@ -205,6 +205,14 @@ func main() {
 		}
 		return
 	}
+	// [[spec/tickets/the-doors-process-stands]]
+	if len(os.Args) == 2 && os.Args[1] == ioVerb {
+		if err := ioMain(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
 		os.Exit(verbRoad(os.Args[2], os.Args[3:]))
 	}
@@ -284,9 +292,10 @@ const lspModule = "lsp"
 // The name the check module's sweep stands under, which the lsp listener reads. [[spec/tickets/the-lsp-door-lands]]
 const sweepName = "check/sweep"
 
-// The instances whose listeners the manager's start opens: the hooks door, the mcp server, and the lsp listener. [[spec/tickets/the-lsp-door-lands]]
+// The instances whose listeners the manager's start opens: the hooks door, the mcp server, and the lsp listener. The IO instances are the ones a shadow IO process runs. [[spec/tickets/the-lsp-door-lands]]
 type doors struct {
 	hooks, mcp, lsp hooked
+	io              []string
 }
 
 // The hooks instance the wiring loads: its writer, and the name each local name binds to. No instance leaves on false. [[spec/tickets/the-hooks-door-lands]]
@@ -322,7 +331,12 @@ func manages(as q.Writer, open doors) index.Manage {
 			served.Stop()
 			return index.Managed{}, err
 		}
-		return index.Managed{Stop: stop, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+		bus, halt, err := ioShadow(root, store, open.io)
+		if err != nil {
+			stop()
+			return index.Managed{}, err
+		}
+		return index.Managed{Stop: func() { halt(); stop() }, Bus: bus, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil
@@ -456,7 +470,7 @@ func wired() ([]index.Start, doors, error) {
 		return nil, doors{}, err
 	}
 	starts, hands, err := loaded(w, q.Main)
-	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule)}, err
+	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule), io: ioInstances(w)}, err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]
@@ -522,19 +536,9 @@ func loaded(w q.Wiring, into *q.Catalog) ([]index.Start, map[string]q.Writer, er
 	}
 	starts := make([]index.Start, 0, len(kept.Instances))
 	for _, one := range kept.Instances {
-		instance, module := one.Name, modules[one.Module]
-		if module.starts == nil {
-			continue
+		if module := modules[one.Module]; module.starts != nil {
+			starts = append(starts, startOf(w, one.Name, module, hands[one.Name]))
 		}
-		starts = append(starts, func(root string, commit index.Commit) (func(), error) {
-			return module.starts(root, func(values map[string]any) error {
-				bound := make(map[string]any, len(values))
-				for local, value := range values {
-					bound[w.Bound(instance, local)] = value
-				}
-				return commit(hands[instance], bound)
-			})
-		})
 	}
 	return starts, hands, nil
 }

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -50,12 +50,48 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+      - name: tests-red-2
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-2
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -63,7 +99,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate"]
+    input: ["design/draft", "gate", "design/draft-2"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -75,7 +111,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: design/tests-red
+        input: ["design/tests-red", "design/tests-red-2"]
         to: retro
         evidence:
           - name: tests
@@ -114,7 +150,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: module-processes-land-in-shadow
 record:
   - step: design/draft
     hand: box 03ba8e0fb2d4 · claude-code-remote
@@ -144,6 +179,13 @@ record:
         hash: a166f2553415d2a5
         size: 402
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 03ba8e0fb2d4 · claude-code-remote · helper-6
+    hash_before: 3adb9cb20dc011cf036357299bde7f09a0a89915
+    hash_after: d1986cae28ae29f940db8d8a9eae137efa340080
+    returns: 1
+    why: "placements-link-points-at-model: the approach links [[spec/design_output/processes#the-placements]], a note that does not exist; the processes chapter stands in spec/design_output/model.md, so the link reads [[spec/design_output/model#the-placements]]. The write door refuses the ticket body at gate, so the move rides here.; placed-topics-name-module-folders: Placed.Topics carries module types (placements_test wants \\\"tickets, queue\\\"), while the watch change names a folder under src/modules/<topic>; several types share one folder (ticket, retro, branch, vehicle, stub in the verbs package), so Placements.Restart needs a map from module type to its folder, or a restart misses them.; placements-leave-door-instances: placing each instance whose module carries no start in the modules table of src/quack/main.go also places hooks, mcp, lsp, http and the settings sections, whose listeners the index manager's start opens; placementsOf leaves them out, per model#the-io-process.; placements-answer-inputs-tested: no red test decides the index side of step 3, Placements answering in.<instance> with the saved inputs and publishing run.<instance> after a commit moves an input; add a case in src/index/procs_test.go.; watch-restart-joins-switch: step 5 has the watch module call Placements.Restart on a change under src/modules/<topic>, while the assumption puts the rebuild with the switch; under shadow a restart reruns the same binary, so the watch caller (src/modules/files) belongs to the switch ticket, or the approach says why it lands now.; tests-list-matches-files: the draft's tests list names src/q/store_test.go, src/q/projection_test.go and src/quack/module_test.go, where the cases stand in src/q/start_test.go and src/quack/placements_test.go; the red list names the right files."
+group: module-processes-land-in-shadow
 ---
 
 # Ask
@@ -267,6 +309,68 @@ Each new case fails on its own assertion over stubs that compile. The two fakes 
 - every done_when line meets a test that fails: the restart line meets TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm, and go test ./... and ./RUNME.sh check run at implement
 - every door the tests reach has a fake: the module processes are the test binary run again, and the bus runs in memory on loopback
 
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -274,8 +378,15 @@ Each new case fails on its own assertion over stubs that compile. The two fakes 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- placements-link-points-at-model: the approach links [[spec/design_output/processes#the-placements]], a note that does not exist; the processes chapter stands in spec/design_output/model.md, so the link reads [[spec/design_output/model#the-placements]]. The write door refuses the ticket body at gate, so the move rides here.
+- placed-topics-name-module-folders: Placed.Topics carries module types (placements_test wants "tickets, queue"), while the watch change names a folder under src/modules/<topic>; several types share one folder (ticket, retro, branch, vehicle, stub in the verbs package), so Placements.Restart needs a map from module type to its folder, or a restart misses them.
+- placements-leave-door-instances: placing each instance whose module carries no start in the modules table of src/quack/main.go also places hooks, mcp, lsp, http and the settings sections, whose listeners the index manager's start opens; placementsOf leaves them out, per model#the-io-process.
+- placements-answer-inputs-tested: no red test decides the index side of step 3, Placements answering in.<instance> with the saved inputs and publishing run.<instance> after a commit moves an input; add a case in src/index/procs_test.go.
+- watch-restart-joins-switch: step 5 has the watch module call Placements.Restart on a change under src/modules/<topic>, while the assumption puts the rebuild with the switch; under shadow a restart reruns the same binary, so the watch caller (src/modules/files) belongs to the switch ticket, or the approach says why it lands now.
+- tests-list-matches-files: the draft's tests list names src/q/store_test.go, src/q/projection_test.go and src/quack/module_test.go, where the cases stand in src/q/start_test.go and src/quack/placements_test.go; the red list names the right files.
 
 # implement
 

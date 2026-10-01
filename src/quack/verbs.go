@@ -185,13 +185,16 @@ func capped(text string) string {
 }
 
 // The verbs slice's mode off the config under the root, old where nothing answers it. [[spec/tickets/runme-hands-verbs-to-quack]]
-func modeOf(root string) string {
+func modeOf(root string) string { return sliceMode(root, verbsKey) }
+
+// A slice's mode off the config under the root, by its dotted key, and empty where nothing answers it. [[spec/tickets/the-doors-process-stands]]
+func sliceMode(root, key string) string {
 	rows, err := configAt(root)
 	if err != nil {
 		return ""
 	}
 	var mode string
-	if json.Unmarshal(rows[verbsKey].Value, &mode) != nil {
+	if json.Unmarshal(rows[key].Value, &mode) != nil {
 		return ""
 	}
 	return mode
