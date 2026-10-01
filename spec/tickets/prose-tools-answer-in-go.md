@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -148,6 +148,19 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: design/draft
+  - step: design/tests-red
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 7747a5efb88138c16bbbcffb15d6f262e9ed8e0e
+    hash_after: de9562fa10eb7d43ef573ee942f7da37ae1bacf0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/drafts fails
+    inputs:
+      - name: design/draft
+        hash: e3591594fa1ad743
+        size: 5641
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -292,9 +305,9 @@ the Go done_when line rests on TestTheDraftCasesAnswerOffTheModule, the JS line 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-src/modules/drafts/drafts_test.go
-src/quack/drafts_test.go
-src/modules/hooks/questions_test.go
+- src/modules/drafts/drafts_test.go
+- src/quack/drafts_test.go
+- src/modules/hooks/questions_test.go
 
 ### seen
 
@@ -303,22 +316,21 @@ src/modules/hooks/questions_test.go
 
 Every new case fails on its own assertion, against a stub module that registers nothing and answers an empty text, and a `Questions` field on `Holds` that nothing sets yet.
 
-The table `src/modules/drafts/testdata/draft-cases.json` carries the bridge's own answers, read off a red run of the JS reader, and `test/level0/answer-read.test.js` answers every case green. So the JS done_when line holds from this step on, and pins the bridge the Go side ports.
+The table `src/modules/drafts/testdata/draft-cases.json` carries the bridge's own answers, and `test/level0/answer-read.test.js` answers every case green. So the JS done_when line holds from this step on, and pins the bridge the Go side ports. The table moved under the module's testdata in io-answers-take-result-shape: the module test read it through os, which the import rule refuses a module. It now rides in through embed, and the JS reader imports it as JSON.
 
 What surprises me:
 - the write door's CODE pattern names JavaScript and JSON paths alone, so a `.go` path reads as prose and Vale's rows stand. The code case takes `src/a.js`, and a case pins that a Vale running nowhere reads a `.go` path clean.
 - `check_prose` answers through `answerFindings`, so a clean note reads "No finding stands in this answer", naming an answer. The table pins that wording, and the port keeps it.
-- the table case moves to the module test over a fake Lint, as `hooks/command_test.go` reads its table, since quack's Vale is the real one. The quack cases check the wiring alone: the module loads, and a tree with no Vale answers the bridge's line.
+- the table case runs in the module test over a fake Lint, since quack's Vale is the real one. The quack cases check the wiring alone: the module loads, and a tree with no Vale answers the bridge's line.
 - `Holds.Asked` names something else already, so the count takes the name `Questions`.
-- Level zero refuses a node script under `.se/scripts` that imports the bridge, since its static read takes each import as a write. The JS reader's red run gave the answers in its place.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the Go done_when line meets TestTheDraftCasesAnswerOffTheModule, the JS line the table cases in answer-read.test.js, green already, and the check line waits for tests-green
-the module cases run over a fake Lint, question count and bands, the quack cases over a temp tree with no Vale, and the fold case over stepper
+- the Go done_when line meets TestTheDraftCasesAnswerOffTheModule, the JS line the table cases in answer-read.test.js, green already, and the check line waits for tests-green
+- the module cases run over a fake Lint, question count and bands, the quack cases over a temp tree with no Vale, and the fold case over stepper
 
 # gate
 
