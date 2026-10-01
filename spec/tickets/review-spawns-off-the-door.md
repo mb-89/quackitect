@@ -293,3 +293,11 @@ from: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- A research pass for the draft, read only and not yet checked by a gate:
+  - `spawned` in `src/modules/hooks/spawn.go` rewrites a spawn the harness makes. Nothing lets the door start one, so this ticket adds a `spawn` effect kind.
+  - `src/modules/hooks/hooks.go` stands near its line ceiling, so `Listen` and `serves` move into a new `listen.go` first.
+  - A pure package `src/modules/hooks/review` ports `readerAsks`, `readerSays` and `report` off `.claude/skills/level0/lib/review.js`.
+  - `Outside.Review` gathers the material, and `Door.reviewed` answers the spawn on the call and the report on `agent.answered`, under a token.
+  - Every answer rides `Result` with no `Text`, so `NewDecisionOf` reads a pass.
+  - One case table, `test/replay/cage/review-cases.json`, holds the prompt and report both sides answer.

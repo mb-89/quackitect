@@ -294,3 +294,11 @@ from: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- A research pass for the draft, read only and not yet checked by a gate:
+  - A new IO module `src/modules/drafts` registers `drafts/check_prose` and `drafts/check_answer` under their tool names, off the wiring until the flip, as `src/modules/search` does.
+  - `src/modules/drafts/answer.go` ports the answer shape checks off `.claude/skills/level0/lib/answer.js`, `voice.js`, `stop.js`, `refuse.js` and `src/engine/tense.js`, since a module imports q alone.
+  - `heardOver` in `src/quack/command.go` splits into `valeRows` and `keptOver`, so `src/quack/drafts.go` wires the lint seam.
+  - `Holds.prompted` in `src/modules/hooks/fold.go` keeps the owner's question count, which the answer check reads through `store.OnCommit`, as `reportsHeard` in `src/quack/finds.go` does.
+  - One case table, `test/replay/cage/draft-cases.json`, holds the bridge's answers. `src/quack/drafts_test.go` and `test/level0/answer-read.test.js` each answer it.
+  - Risk: the refusal body and `cut` then stand twice, in `hooks.RefusedVoice` and in `drafts`.

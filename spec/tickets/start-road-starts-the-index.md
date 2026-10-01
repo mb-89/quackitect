@@ -294,3 +294,12 @@ from: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- A research pass for the draft, read only and not yet checked by a gate:
+  - `START` in `.claude/skills/level0/hooks/start.js` spawns `.se/.runtime/bin/se-index serve` detached, removes a stale `hooks.json` first, and polls for it to stand. `INSTALL_SKIP` drops go and the index.
+  - `src/scripts/serve.js` probes the index's `standing` method off `index.json`, and the serve verb starts `se-index serve`.
+  - The stub's `serveOf` runs the vehicle's `se-index standing`.
+  - `src/extension/editor-process.js` respawns `se-index serve`, and `.vscode/launch.json` launches `src/quack serve`.
+  - `COLD_PATH` in `src/scripts/probe-cold.js` names `src/modules/hooks/`.
+  - A new `test/contract/start-roads-name-no-bridge.test.js` runs the ask's own `git grep`.
+  - Risk: a cold Go build may outrun the start wait on a fresh cloud box.

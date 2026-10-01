@@ -293,3 +293,10 @@ from: none
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- A research pass for the draft, read only and not yet checked by a gate:
+  - A new `src/scripts/copilot-door.js` runs `se-index hook <event>` and maps the door's effects through `stepOf`, `guarded` and `refusedText` in `.claude/skills/level0/hooks/cage.js`, unchanged.
+  - A `NAMES` table in `eventOf` in `.claude/skills/level0/lib/copilot.js` maps Copilot's tool names onto Claude's, so the door and `guarded` judge one set of names.
+  - `src/scripts/copilot.js` hook mode drops `handle` and `shadowsHook`. `copilotEvents` in `src/quack/hook.go` maps `SessionStart` to `session.start`.
+  - `copilot-runtime.js`, `copilot-shadow.js` and their tests leave the tree, with the copilot block of `test/contract/one-config.test.js`.
+  - Risk: Copilot's shell call may carry no description the ticket door reads, which refuses every shell call. A live Copilot host decides it.
