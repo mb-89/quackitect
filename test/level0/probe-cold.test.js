@@ -153,17 +153,18 @@ test("a log holding no context row fails the rules", () => {
   assert.match(verdict(checks, "rules").evidence, /no context row/);
 });
 
-test("the read tools alone fail the tools, because the server registers the rest", () => {
+// [[spec/tickets/level0-tools-leave-the-bridge]]
+test("the pull alone fails the tools, because the index registers the rest", () => {
   const steps = stepsOf(
     stream(
-      init(["Read", "mcp__level0__find", "mcp__level0__patch"]),
-      said(`${SENTENCE}\nTOOLS: mcp__level0__find`),
+      init(["Read", "mcp__level0__pull"]),
+      said(`${SENTENCE}\nTOOLS: mcp__level0__pull`),
     ),
   );
   const checks = readsCold(whole(), steps);
 
   assert.equal(verdict(checks, "tools").pass, false);
-  assert.match(verdict(checks, "tools").evidence, /read tools alone/);
+  assert.match(verdict(checks, "tools").evidence, /pull alone/);
 });
 
 test("a tool the session calls counts as registered", () => {

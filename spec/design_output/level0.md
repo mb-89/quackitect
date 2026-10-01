@@ -194,28 +194,23 @@ events alone.
 
 ### The first call pays
 
-`READ_TOOLS` in the hook names the tools a hand reads with, and the hook
-registers each at the session's start. That registration reaches no server, so
-a box whose server answers nothing carries the tools anyway.
+The hook registers the pull at the session's start, and every other level
+zero tool off the index's tool list, which `se-index tools` answers. That list
+reaches no server, so a box whose server answers nothing carries the tools
+anyway. [[spec/tickets/level0-tools-leave-the-bridge]]
 
-A call of a read tool takes the `*` door every event takes, and no door of its
-own. So one post reaches a server that stands, and the answer rides back the
-way every other answer does, its `register` list among it. A call landing
-before the server answers takes the steps below, and waits on nothing:
-
-- it posts once, and answers where a server stands
-- it runs the start above, where the road has not run yet
-- it answers at once, with one line
+A level zero call takes the hooks door, which runs the action its name
+resolves to. While the door stands down, the call meets the refusal naming
+the command that brings the index back. Where the cage stands off, the call
+posts once to the server, and a dead server answers one line:
 
 | what stands | the line says |
 |---|---|
 | a launch stands, and no server answers this session yet | level zero starts, the call answers once the server stands, and the agent calls it again |
 | no launch stands, or a server answers once and then falls | the port and the log |
 
-`test/level0/read-tools.test.js` counts the one post over each read tool.
-
-So a hand calls `find` on its first turn, and that call starts the server. The
-call after it lands on the server, and carries the rules. For details, see
+`test/level0/read-tools.test.js` counts the one post over each of find, patch,
+replace and undo. For the rules riding the first answer, see
 [[spec/design_output/level0#rules-ride-the-first-answer]].
 
 ## A fix reaches the session

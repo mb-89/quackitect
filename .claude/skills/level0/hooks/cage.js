@@ -35,8 +35,8 @@ export function postOf(standing, event, e, root, extra) {
   };
 }
 
-// The step the effects answer, in order: a result answers the call with its text as a deny, a block holds the Stop, rows ask back, and an after rides the answer as context. A tool the bridge serves and the door passes goes on to the bridge. [[spec/design_output/model#the-effects]]
-export function stepOf(answer, event, { asks, served }) {
+// The step the effects answer, in order: a result answers the call with its text as a deny, a block holds the Stop, rows ask back, and an after rides the answer as context. A call the door passes goes on to the harness, and none to the bridge. [[spec/design_output/model#the-effects]] [[spec/tickets/level0-tools-leave-the-bridge]]
+export function stepOf(answer, event, { asks }) {
   const after = [];
   const blocks = [];
   for (const one of answer?.effects ?? []) {
@@ -60,7 +60,6 @@ export function stepOf(answer, event, { asks, served }) {
     if (name && event === "prompt.context") blocks.push({ name, text });
     else after.push(name ? `# ${name}\n${text}` : text);
   }
-  if (event === "tool.call" && served) return { bridge: true };
   return {
     ...(blocks.length ? { blocks } : {}),
     ...(after.length ? { after } : {}),
@@ -68,10 +67,9 @@ export function stepOf(answer, event, { asks, served }) {
 }
 
 // A guarded call meets the refusal while the door stands down. [[spec/tickets/a-down-index-refuses-calls]]
-export function guarded(event, e, reads) {
+export function guarded(event, e) {
   const tool = String(e?.tool ?? "");
-  if (event !== "tool.call" || UNGUARDED.has(tool) || reads.includes(tool))
-    return false;
+  if (event !== "tool.call" || UNGUARDED.has(tool)) return false;
   return !(
     tool === "Bash" && REMEDY.test(String(e?.command ?? e?.input?.command ?? ""))
   );

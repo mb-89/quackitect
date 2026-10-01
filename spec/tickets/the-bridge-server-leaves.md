@@ -333,3 +333,11 @@ The hooks door answers every harness write, and `onWrite` in `src/bridge/write.j
 For details, see [[spec/tickets/cage-write-door-port]].
 
 The draft names two children by their names at the mint. They stand as [[spec/tickets/level0-tools-leave-the-bridge]] and [[spec/tickets/start-road-starts-the-index]] now, since a ticket name holds five words.
+
+The cage hands the bridge no call since [[spec/tickets/level0-tools-leave-the-bridge]]. The server still holds these, and the cases driving them through `decide`, so they leave with it:
+
+- the `TOOLS` table and `toolNames` in `src/bridge/server.js`
+- the `register` answer, from `decide` and `opensSession`
+- the tool dispatch in `onToolCall`
+
+`box.specs` stays while the bridge's brief lists the tools, until [[spec/tickets/the-brief-leaves-the-bridge]] lands.

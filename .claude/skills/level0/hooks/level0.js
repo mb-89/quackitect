@@ -4,12 +4,9 @@
 // nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
-import { patchSpec, replaceSpec } from "../lib/apply.js";
 import { configOf } from "../lib/config.js";
 import { REPLY_PROBE } from "../lib/guidance.js";
 import { SERVE, SESSION } from "../lib/log.js";
-import { findSpec } from "../lib/search.js";
-import { undoSpec } from "../lib/undo.js";
 import { POINTER, PORT_BASE as PORT } from "../lib/vehicle.js";
 import {
   CAGE_KEY,
@@ -68,10 +65,7 @@ export const CAGE_BLOCK = "level0-cage";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export const READ_TOOLS = [findSpec(), patchSpec(), replaceSpec(), undoSpec()];
 const SERVED = "mcp__level0__";
-const CALLED = READ_TOOLS.map((one) => `${SERVED}${one.name}`);
 
 // The engine takes one session start a module and counts them in the source, so this registers none: the module wrapping this one holds the start and calls startsSession from it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function register(on, options) {
@@ -111,16 +105,11 @@ async function seen($, e, next) {
   if (event === "engine.create") return next(e);
   await probes($, event, e);
   if (event === "session.start") await opens($, e);
-  if (!reading(event, e) && doors(event) && (await caged($))) {
-    const said = await door($, event, e, next);
-    if (said !== BRIDGE) return said;
-  }
-  const answer = reading(event, e)
-    ? await reads($, event, e, next)
-    : await ask($, event, await before($, event, e), next, {
-        ...(await fillOf($, event, e)),
-        ...(armed ? {} : { fresh: true }),
-      });
+  if (doors(event) && (await caged($))) return door($, event, e, next);
+  const answer = await ask($, event, await before($, event, e), next, {
+    ...(await fillOf($, event, e)),
+    ...(armed ? {} : { fresh: true }),
+  });
   if (!answer) {
     // The session start and the conversation's first read each start the server where none answers, and the road runs once. Neither waits, and the rules ride the next event a server answers. [[spec/design_output/level0#rules-ride-the-first-answer]]
     if (event === "session.start" || event === "prompt.context") await starts($);
@@ -157,10 +146,6 @@ async function seen($, e, next) {
   return next(e);
 }
 
-// [[spec/tickets/a-down-index-refuses-calls]]
-// The door passes a tool the bridge serves, and the bridge answers it. [[spec/tickets/a-down-index-refuses-calls]]
-const BRIDGE = Symbol("bridge");
-
 // The key reads through the layers the bridge reads, so a local override moves the hook as it moves the bridge. [[spec/tickets/a-down-index-refuses-calls]]
 async function caged($) {
   try {
@@ -180,10 +165,8 @@ async function door($, event, e, next) {
     await starts($);
     answer = await doorAsk($, event, e, extra);
   }
-  const tool = String(e?.tool ?? "");
-  if (!answer) return guarded(event, e, CALLED) ? { deny: refusedText(e) } : next(e);
-  const served = tool.startsWith(SERVED);
-  let step = stepOf(answer, event, { asks: true, served });
+  if (!answer) return guarded(event, e) ? { deny: refusedText(e) } : next(e);
+  let step = stepOf(answer, event, { asks: true });
   // A held call asks back for the newest rows on agent.spoke, with the effect's call id. [[spec/tickets/spoke-answer-reaches-the-door]]
   if (step.rows !== undefined) {
     const { texts, rows } = await lastTexts($);
@@ -197,13 +180,12 @@ async function door($, event, e, next) {
       call: step.rows,
     };
     const back = await doorAsk($, "agent.spoke", spoken, {});
-    step = back ? stepOf(back, event, { asks: false, served }) : {};
+    step = back ? stepOf(back, event, { asks: false }) : {};
   }
-  if (step.answer?.spawn) return doorSpawns($, step.answer, event, served);
+  if (step.answer?.spawn) return doorSpawns($, step.answer, event);
   // [[spec/tickets/clear-answers-off-the-door]]
   if (step.answer?.clear) return clears($, step.answer, e, next);
   if (step.answer !== undefined) return step.answer;
-  if (step.bridge) return BRIDGE;
   return step.after ? merged(await next(e), { context: step.after }) : next(e);
 }
 
@@ -264,7 +246,7 @@ async function spawns($, answer, next) {
 }
 
 // A door's answer carrying a spawn: the helper runs, its answer goes back to the door, and the door's step answers the call. [[spec/tickets/review-spawns-off-the-door]]
-async function doorSpawns($, answer, event, served) {
+async function doorSpawns($, answer, event) {
   const back = await helped($, answer);
   const said = await doorAsk(
     $,
@@ -272,7 +254,7 @@ async function doorSpawns($, answer, event, served) {
     back,
     {},
   );
-  const step = said ? stepOf(said, event, { asks: false, served }) : {};
+  const step = said ? stepOf(said, event, { asks: false }) : {};
   return step.answer ?? { result: "the helper answered, and the door said nothing" };
 }
 
@@ -466,17 +448,9 @@ async function spoke($, e, next) {
   );
   if (!answer) return next(e);
   if (answer.result !== undefined) return answer.result;
-  // A tool this hook registers answers nowhere past it, so a paid reply posts the call once more and the server runs the tool. [[spec/design_output/level0#the-first-call-pays]]
-  if (reading("tool.call", e) && !again.has(e)) {
-    again.add(e);
-    return seen($, e, next);
-  }
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
 }
-
-// The calls posted once more after a paid reply, so a second demand hands the call on and loops nowhere. [[spec/design_output/level0#the-first-call-pays]]
-const again = new WeakSet();
 
 async function registers($, specs) {
   for (const spec of specs) {
@@ -484,19 +458,6 @@ async function registers($, specs) {
       await $.tool.register(spec);
     } catch {}
   }
-}
-
-// A read tool's call takes the one door every event takes, and no door of its own, so one post reaches a server that stands. [[spec/design_output/level0#the-first-call-pays]]
-function reading(event, e) {
-  return event === "tool.call" && CALLED.includes(String(e?.tool ?? ""));
-}
-
-// A read tool called before the server stands brings it up, and answers at once. The answer takes the shape the server gives, so the door reads it the way it reads every other. [[spec/design_output/level0#the-first-call-pays]]
-async function reads($, event, e, next) {
-  const first = await ask($, event, e, next);
-  if (first) return first;
-  await starts($);
-  return { result: { result: missingLine(e) } };
 }
 
 // A launch no answer has met yet reads as starting, and anything else as a dead server. [[spec/design_output/level0#the-first-call-pays]]

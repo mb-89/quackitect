@@ -139,16 +139,16 @@ test("an after on the prompt context answers as named blocks, and a named after 
   });
 });
 
-test("a read passes while the door stands down, and every other call stands guarded", () => {
-  const reads = ["mcp__level0__find"];
-  assert.equal(guarded("tool.call", { tool: "Read" }, reads), false);
-  assert.equal(guarded("tool.call", { tool: "mcp__level0__find" }, reads), false);
-  assert.equal(guarded("tool.call", { tool: "Bash", command: "ls" }, reads), true);
-  assert.equal(guarded("classic.Stop", {}, reads), false);
+// [[spec/tickets/level0-tools-leave-the-bridge]]
+test("a harness read passes while the door stands down, and a level zero call stands guarded", () => {
+  assert.equal(guarded("tool.call", { tool: "Read" }), false);
+  assert.equal(guarded("tool.call", { tool: "mcp__level0__find" }), true);
+  assert.equal(guarded("tool.call", { tool: "Bash", command: "ls" }), true);
+  assert.equal(guarded("classic.Stop", {}), false);
 });
 
 test("the command the refusal names passes, so a box with no index brings it back", () => {
-  const bash = (command) => guarded("tool.call", { tool: "Bash", command }, []);
+  const bash = (command) => guarded("tool.call", { tool: "Bash", command });
   assert.equal(bash("./RUNME.sh serve"), false);
   assert.equal(bash("./RUNME.sh doctor"), false);
   assert.equal(

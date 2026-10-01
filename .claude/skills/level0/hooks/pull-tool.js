@@ -12,7 +12,7 @@ import {
 } from "../lib/index-tools.js";
 import { PULL_CALL, pullSpec, SESSION, sessionOf, spawnPromptIn } from "../lib/pull.js";
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
-import { register as bridgehead, READ_TOOLS } from "./level0.js";
+import { register as bridgehead } from "./level0.js";
 
 // The ticket program, whose folder `VERBS` in src/scripts/verb-run.js owns, spelled again here because a plugin imports its own folder alone. [[spec/tickets/cli-js-leaves]]
 const TICKET_SCRIPT = "src/scripts/verbs/ticket.js";
@@ -36,14 +36,12 @@ export function register(on, options) {
       ? { result: await callsIndexTool(doorsOf($), bin, indexTools, e) }
       : next(e),
   );
-  // The engine takes one session start a module, so the bridgehead registers none and this one registers its read tools beside the pull. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+  // The engine takes one session start a module, so the bridgehead registers none and this one registers the pull beside the index tools. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/tickets/level0-tools-leave-the-bridge]]
   bridgehead(on, options);
   on("session.start", async ($, e, next) => {
-    for (const spec of [pullSpec(), ...READ_TOOLS]) {
-      try {
-        await $.tool.register(spec);
-      } catch {}
-    }
+    try {
+      await $.tool.register(pullSpec());
+    } catch {}
     indexTools = await registersIndexTools(doorsOf($), bin);
     // [[spec/design_output/pull#the-hand-and-the-hold]]
     await wrote($, sessionOf(e));
