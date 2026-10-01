@@ -40,3 +40,41 @@ The gain is a working box that keeps its branch through a long step, while a box
 
 - `./RUNME.sh config` reads `work.staleAfter 90m`
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+`spec/config/level0.json` sets `work.staleAfter` to `90m`, over the built-in thirty minutes. `./RUNME.sh config` reads it from that file. A box now keeps its branch through a long implement step and the full check before its push. A box that left still frees its branch within an hour and a half.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: one key in spec/config/level0.json
+- the cleanup it reveals: none
+- every fact stands once: the span lives in the config file, and this ticket points at it
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
