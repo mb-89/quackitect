@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -210,6 +210,24 @@ record:
         hash: b34a479c1858d782
         size: 6056
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box 3e46c581114 · claude-code-remote · helper-7
+    hash_before: 291a9b156ccea4e4073be09a88e20a025090b7a7
+    hash_after: 291a9b156ccea4e4073be09a88e20a025090b7a7
+    inputs:
+      - name: design/draft
+        hash: 381b8a04222c1323
+        size: 4949
+      - name: design/tests-red
+        hash: d9773513793fde47
+        size: 927
+      - name: design/draft-2
+        hash: b34a479c1858d782
+        size: 6056
+      - name: design/tests-red-2
+        hash: eeec70248ba48fab
+        size: 1137
+    def: 01417e29801ecc2f
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
 ---
@@ -522,10 +540,8 @@ Every case of this ticket fails on its own assertion. The folds answer no text, 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- the approach's answers never reach the agent as a tool result: step 5 answers Effect{Kind: resultKind, Result: text} with text a bare string, and stepOf in .claude/skills/level0/hooks/cage.js returns one.result unchanged, so door() in level0.js hands the harness a bare string where it reads {result: text}, the shape report.js, logline.js and stop.js answer today ({result: {result: text}}) and the shape cage.test.js already pins (result: {result: "a line"}); the door must answer Result: map[string]any{"result": text}
-- the red tests decide the wrong contract: src/quack/answers_test.go and src/modules/hooks/answers_test.go assert one.Result.(string), so they turn green on an answer the harness cannot read, and the first done_when line stays undecided; assert the {result: text} shape instead
-- no case drives the road from the door to the harness for the three tools: add a cage.test.js case where stepOf over a Go answer for mcp__level0__report yields {result: text}, so the client side stands decided beside the Go cases
+accept with points
+- helpers-calls-answer-too: stepHolds and stepStops return before called and claims on an event whose Hand.Agent is set, so a helper's log, report or stop call lands no Said.Result, Door.answers falls through to calls, and the call meets no answer once server.js drops the three tools from TOOLS; the bridge answers a helper's call today, so answer it off the door too and add a case driving a helper's log call
 
 # implement
 
