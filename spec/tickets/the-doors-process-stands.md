@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -128,6 +128,28 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: b4593c297636a62e8a4241a7b99830a45646267a
+    hash_after: b4593c297636a62e8a4241a7b99830a45646267a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: ae24a1e131bd583f
+        size: 4169
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/watchdogs-span-the-processes]]
+        hash: b10dd6eac949de7c
+        size: 309
+      - name: [[spec/tickets/hooks-listener-joins-io-process]]
+        hash: 5a754c5b9e92ffff
+        size: 167
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +247,36 @@ The assumption: the shadow weighs commits and no requests, since the IO modules'
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/bus_test.go
+- src/index/procs_test.go
+- src/index/standing_test.go
+- src/q/start_test.go
+- src/quack/io_test.go
+- src/modules/migration/migration_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion over stubs that compile: the bus names no address, the fake IO process never commits, the standing file names no bus, Up leaves the down mark, quack io reaches no bus, the shadow writes no row, and the slices hold no processes key. The standing case stands in src/index/standing_test.go, apart from door_test.go, since it drives ServeManaged with a manager of its own. The pins surprise: nats.go at its newest asks Go 1.26, so the tree takes nats-server v2.11.9 with nats.go v1.45.0, which keep the go line at 1.24.2.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: the kill line meets TestAKilledFakeIOProcessLeavesItsNamesNotProvided, and go test ./... and ./RUNME.sh check run at implement
+- every door the tests reach has a fake: the fake IO process is the test binary run again with the bus in its environment, and the bus runs in memory on loopback
 
 # gate
 

@@ -371,6 +371,14 @@ func (s *Store) Down(instance string) error {
 	return nil
 }
 
+// Clears the down mark of an instance whose process commits again. [[spec/design_output/processes#a-process-ends]]
+func (s *Store) Up(instance string) error { return nil }
+
+// Decodes a JSON body into the type the owner of name registers, so a commit off the bus lands typed. [[spec/design_output/model#a-message-carries-types]]
+func (s *Store) Value(name string, body []byte) (any, error) {
+	return nil, fmt.Errorf("%s decodes nothing yet", name)
+}
+
 // [[spec/design_output/model#the-index-resolves-in-passes]]
 func (one Snapshot) NotProvided(name string) bool {
 	owner := one.store.owner(name)

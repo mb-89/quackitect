@@ -103,6 +103,25 @@ func TestAnInstanceThatRunsNowhereReadsTheBuiltInMarkedNotProvided(t *testing.T)
 	}
 }
 
+func TestAnInstanceUpAgainReadsItsValue(t *testing.T) {
+	w := Wiring{Instances: []Instance{{"tickets", "source"}}}
+	s, hands := started(t, w)
+	seed(t, s, hands["source"], "tickets/all", 5)
+	if err := s.Down("tickets"); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Up("tickets"); err != nil {
+		t.Fatalf("the up of tickets answers %v", err)
+	}
+	snap := s.Snapshot()
+	if got := snap.Read("tickets/all"); got != 5 || snap.NotProvided("tickets/all") {
+		t.Fatalf("tickets/all reads %v, marked not provided %v, once its instance stands up", got, snap.NotProvided("tickets/all"))
+	}
+	if value, err := s.Value("tickets/all", []byte("9")); err != nil || value != 9 {
+		t.Fatalf("9 decodes for tickets/all as %#v and %v", value, err)
+	}
+}
+
 func TestTheDownOfAnInstanceTheWiringLoadsNowhereRefuses(t *testing.T) {
 	w := Wiring{Instances: []Instance{{"tickets", "source"}}}
 	s, _ := started(t, w)

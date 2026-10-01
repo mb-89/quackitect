@@ -32,6 +32,9 @@ const CageKey = "cage"
 // The key of the lsp slice, the LSP's rules the check module answers beside it, by its local name. [[spec/tickets/lsp-rules-move-to-check]]
 const LspKey = "lsp"
 
+// The key of the processes slice, where the IO process and the module processes run, by its local name. [[spec/tickets/the-doors-process-stands]]
+const ProcessesKey = "processes"
+
 // The modes a slice takes before it switches over. [[spec/tickets/the-config-schema-gets-generated]]
 var modes = []string{"old", "shadow", "new"}
 
