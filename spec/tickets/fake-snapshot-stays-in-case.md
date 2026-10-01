@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 point: gate
 step: do
 steps:
@@ -68,8 +68,14 @@ record:
     hash_before: 2ca08f35de8ae4768ccd6d9939e131677c137ae6
     hash_after: 2ca08f35de8ae4768ccd6d9939e131677c137ae6
     def: 214654b9f289ef26
+  - step: do
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 949242ef33e5b2668228d5d89a6b0dac6907b0b3
+    hash_after: 949242ef33e5b2668228d5d89a6b0dac6907b0b3
 group: module-processes-land-in-shadow
 parent: the-doors-process-stands
+reason: became
+successors: [the-system-places-modules]
 ---
 
 # Ask
@@ -100,7 +106,7 @@ Run do again. The check exits 0 on the branch head after the sync, so the dead p
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-go vet ./src/index/
+go test -count=1 -run 'TestAKilledFakeIOProcessLeavesItsNamesNotProvided|TestTheNextCommitOfARestartedProcessClearsTheMark' ./src/index/
 
 ## check
 
@@ -114,7 +120,7 @@ go vet ./src/index/
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The placed-process cases in src/index/procs_test.go read the store through one package variable, which a case running beside another overwrote. The helper until now takes the store and hands each poll a snapshot of its own, and read answers a fresh snapshot each call, so no case reads another's. The cases stay red until the bus and the placements land, so go vet decides that the file builds. The change also points the placement stubs' links at model.md, where the processes chapter stands, and lays two files out the way gofmt writes them. The placements ticket's own approach keeps its link to processes, since the engine writes that chapter, and its gate takes it.
+The placed-process cases in src/index/procs_test.go read the store through one package variable, which a case running beside another overwrote. The helper until now takes the store and hands each poll a snapshot of its own, so no case reads another case. The two fake IO process cases drive until and pass. The placement cases stay red until the bus and the placements land. The check now exits 0, since the dead pointer on the placements ticket is gone.
 
 ## checked
 
@@ -122,8 +128,8 @@ The placed-process cases in src/index/procs_test.go read the store through one p
 <!-- the form is checklist -->
 
 - the change follows the ask: until hands each case its own snapshot, and the package variable leaves
-- the cleanup the change reveals is in the change: the dead processes links in the stubs and the gofmt layout; the placements ticket's approach link waits on that ticket's gate, which processes-links-point-at-model names
-- every fact the change adds stands in one place: the change adds no fact, and each link points at model.md
+- the cleanup the change reveals is in the change: the dead links in the stubs and the gofmt layout
+- every fact the change adds stands in one place: the change adds no fact
 
 # Discussion
 
