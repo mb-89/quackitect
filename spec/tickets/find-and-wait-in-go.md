@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -132,6 +132,19 @@ record:
         hash: e25d3cab11757f1c
         size: 527
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3bb3757611c · claude-code-remote
+    hash_before: c0cf2c68e064c07182470f2d6aada6247b2b7451
+    hash_after: c0cf2c68e064c07182470f2d6aada6247b2b7451
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: b605f79727538e7b
+        size: 10103
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -294,26 +307,36 @@ Risks:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/finds_test.go src/quack/waits_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/finds_test.go
+- src/quack/waits_test.go
+- src/modules/search/search_test.go
+- src/modules/waits/waits_test.go
+- src/modules/session/session_test.go
+- src/index/ops_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new test fails on its own assertion, and the tree builds and vets. The quack cases call search/find and waits/wait by name, and answer names no action, because the modules map loads neither module yet. The module cases run against stubs that register nothing and answer nil, and the index Reads seam finds nothing. accepts takes a third reads argument, and every caller passes nil for now. Manage keeps its four arguments, since no test needs a fifth to compile. TestATurnCompleteWithTheClearInHandAnswersTheClear in src/modules/hooks fails before this step, and it belongs to clear-answers-off-the-door. A reports fold breaks the two-fold count in TestTheModuleKeepsTheFillAndTheLastAlone and the folds line of TestTheWiringBindsTheHooksEventsAndTheSessionFolds, so tests-green updates both.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the find line meets TestAFindAnswersTheLinesTheIndexRanks, the wait line meets TestAWaitReturnsOnAHelpersReport and TestAWaitPastTheCallWaitAnswersARunningHandle, and the check line meets the check at tests-green
+- the module cases run against q/qtest and local fakes of the clock, the pause, the disk and the process, and the quack cases open a temp tree with a fake reads
 
 # gate
 

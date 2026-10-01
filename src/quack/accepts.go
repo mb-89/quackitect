@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 
+	"quackitect/src/index"
 	"quackitect/src/modules/edits"
 	"quackitect/src/modules/files"
 	verbsmodule "quackitect/src/modules/verbs"
@@ -13,7 +14,7 @@ import (
 )
 
 // The IO modules that answer a request an action lists: disk over the root, the edits module, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
-func accepts(root string, store *q.Store) func(q.Request) (any, error) {
+func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (any, error) {
 	disk := files.Accept(files.NewDisk(root))
 	node := nodeAccept(root)
 	edit := edits.Accept(editsOutside(root))

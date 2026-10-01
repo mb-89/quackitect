@@ -305,7 +305,7 @@ func manages(as q.Writer, open doors) index.Manage {
 	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
-			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store),
+			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store, nil),
 		})
 		if err != nil {
 			return index.Managed{}, err

@@ -46,7 +46,7 @@ func TestTheRootRunsANodeVerbThroughItsProgram(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(programs, "ticket.js"), []byte(program), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	accept := accepts(root, nil)
+	accept := accepts(root, nil, nil)
 	said, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"ticket", "yours"}})
 	if err != nil || said != `["yours"]` {
 		t.Fatalf("the node module answers %#v, %v", said, err)

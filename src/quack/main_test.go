@@ -350,7 +350,7 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 // The root hands a request to disk through the files module, and refuses one to any other module by its name. [[spec/tickets/actions-answer-over-http]]
 func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
 	root := t.TempDir()
-	accept := accepts(root, nil)
+	accept := accepts(root, nil, nil)
 	if _, err := accept(q.Request{Module: files.DiskModule, Verb: "write", Args: files.Write{Path: "a.md", Text: "one"}}); err != nil {
 		t.Fatal(err)
 	}
@@ -369,7 +369,7 @@ func TestTheRootLandsAStoreRequest(t *testing.T) {
 	config.Registers(c)
 	store := q.NewStore(c)
 	change := config.Change{Kind: config.Overrides, Holder: "w1", Values: map[string]string{"queue/config/weight": "9"}}
-	if _, err := accepts(t.TempDir(), store)(q.Request{Module: q.StoreModule, Verb: q.StoreLand, Args: q.Landing{Name: config.HeldName, Event: change}}); err != nil {
+	if _, err := accepts(t.TempDir(), store, nil)(q.Request{Module: q.StoreModule, Verb: q.StoreLand, Args: q.Landing{Name: config.HeldName, Event: change}}); err != nil {
 		t.Fatal(err)
 	}
 	if held, _ := store.Snapshot().Read(config.HeldName).(config.Held); held.Overrides["queue/config/weight"] != "9" || held.By["queue/config/weight"] != "w1" {

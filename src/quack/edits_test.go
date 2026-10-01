@@ -88,7 +88,7 @@ func editCall(t *testing.T, root, name string, input any) string {
 		Root: root, Store: store, As: as, Rows: opRows{heldTable{}},
 		Steps: func(func()) {}, Now: time.Now,
 		Every:  func(time.Duration, func(time.Time)) func() { return func() {} },
-		Accept: accepts(root, store),
+		Accept: accepts(root, store, nil),
 	})
 	if err != nil {
 		t.Fatal(err)

@@ -48,6 +48,18 @@ func (one *door) manages(manage Manage) (Managed, error) {
 	return manage(one.root, one.store, opKeep{one.db}, func(hand func()) { one.steps = append(one.steps, hand) })
 }
 
+// The rows the index ranks for the words, as the door hands them to the manager. [[spec/tickets/find-and-wait-in-go]]
+type Reads interface {
+	Find(words string, limit int) ([]Hit, error)
+}
+
+// The reads over the index's db. A stub until tests-green. [[spec/tickets/find-and-wait-in-go]]
+func ReadsOf(db *sql.DB) Reads { return readKeep{db} }
+
+type readKeep struct{ db *sql.DB }
+
+func (k readKeep) Find(words string, limit int) ([]Hit, error) { return nil, nil }
+
 // One row of the table op: the id, and the body the manager writes. [[spec/design_output/model#an-operation-outlives-callers]]
 type OpRow struct {
 	ID   string

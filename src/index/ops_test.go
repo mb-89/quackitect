@@ -66,3 +66,22 @@ func TestADroppedOpLeavesTheTable(t *testing.T) {
 		t.Fatalf("the table op holds %+v", all)
 	}
 }
+
+// The reads the door hands the manager find the same rows the index ranks. [[spec/tickets/find-and-wait-in-go]]
+func TestTheReadsFindTheRowsTheDoorFinds(t *testing.T) {
+	db := opened(t, tree(t))
+	want, err := Find(db, "search", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(want) == 0 {
+		t.Fatalf("the index finds no row for search, and the case wants one")
+	}
+	got, err := ReadsOf(db).Find("search", 0)
+	if err != nil {
+		t.Fatalf("the reads find with %v", err)
+	}
+	if len(got) != len(want) || got[0] != want[0] {
+		t.Errorf("the reads find %+v, and want the rows the index ranks: %+v", got, want)
+	}
+}
