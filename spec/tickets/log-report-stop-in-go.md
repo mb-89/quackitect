@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -237,8 +237,34 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: e69b95c27adbc046ab81d0a76ec17ef4ddd57a7a
+    hash_after: 927cc8380c422bd7f738e518325cffb974735317
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 15 test(s) pass in 1 file(s); green, src/modules/hooks passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: d9773513793fde47
+        size: 927
+      - name: design/tests-red-2
+        hash: eeec70248ba48fab
+        size: 1137
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
+reason: done
 ---
 
 # Ask
@@ -582,26 +608,41 @@ the tool docs and inputs stand in answers.go, and the bridge spells only the rep
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/answers_test.go src/quack/answers_test.go test/level0/cage.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The log, report and stop tools answer off the hooks door, where the bridge answered them before.
+
+- The holds fold words the report's and the log's answers, and lands their rows, as `pays` and `writesLine` did.
+- The stops fold words the stop call's three answers, as the bridge's `claims` did.
+- `Door.answers` hands the text on as the tool's result, under a `result` key.
+- A helper's log, report and stop calls answer the same way, which the child ticket `helpers-calls-answer-too` asked for.
+- The three tools register as actions, so the index lists them. The bridge drops them, and `report.js` and `logline.js` leave.
+
+The bridge cases that drove the three tools either leave or now read a tool the bridge still lists. The shared stop table runs a case claiming through the stop tool against the door alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files draft-2's size names, plus two test files whose cases drove the bridge's tools, and the size golden
+the fold cases run over the fake index, and the door cases over doorOver and the wired quack tree
+answers.go, the fold's helper branch and the stop's wording each point at this ticket or its child
+the tool docs and inputs stand in answers.go, and the bridge spells the report tool's name once, under a pointer
 
 # accept
 
