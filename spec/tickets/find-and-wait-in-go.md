@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 7e2e7564f0717a44600ad638cec1176af8dd98e3
+    hash_after: 7e2e7564f0717a44600ad638cec1176af8dd98e3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/modules/search passes; green, src/modules/waits passes; green, src/modules/session p
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: 7677605327b18699
+        size: 1472
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -400,26 +423,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/finds_test.go src/quack/waits_test.go src/modules/search/search_test.go src/modules/waits/waits_test.go src/modules/session/session_test.go src/index/ops_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The find and wait tools gain Go twins, which stand off the wiring until the flip. The module search answers a find off the rows the index ranks, and reads a function's body off the disk. The module waits returns on a helper's report, an output's end or quiet files, and at its cap. The session module folds each helper's stop into the session's reports. Manage takes the door's reads, so the find reads the rows in the process.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's files, the wiring line and the size golden, as implement/change says
+- every door the change reaches has a fake: fakeReads, the fake clock, q/qtest
+- each new file opens on a header naming this ticket
+- each fact stands once: the wait keys and the reports read in src/quack/finds.go, the reports names in the session module
 
 # accept
 
