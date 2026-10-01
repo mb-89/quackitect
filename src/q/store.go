@@ -372,10 +372,42 @@ func (s *Store) Down(instance string) error {
 }
 
 // The names an instance's providers read, off other instances. [[spec/design_output/model#the-placements]]
-func (s *Store) Inputs(instance string) []string { return nil }
+func (s *Store) Inputs(instance string) []string {
+	return s.namesOf(instance, func(one *registration) []string {
+		var read []string
+		for _, in := range one.inputs {
+			if !strings.HasPrefix(in.name, instance+"/") {
+				read = append(read, in.name)
+			}
+		}
+		return read
+	})
+}
 
 // The names an instance provides. [[spec/design_output/model#the-placements]]
-func (s *Store) Outputs(instance string) []string { return nil }
+func (s *Store) Outputs(instance string) []string {
+	return s.namesOf(instance, func(one *registration) []string { return []string{one.name} })
+}
+
+// The names of picks over each active registration of an instance, sorted once each. [[spec/design_output/model#the-placements]]
+func (s *Store) namesOf(instance string, picks func(*registration) []string) []string {
+	seen := map[string]bool{}
+	out := []string{}
+	for _, group := range s.groups {
+		one := s.active[group.name]
+		if one == nil || one.instance != instance {
+			continue
+		}
+		for _, name := range picks(one) {
+			if !seen[name] {
+				seen[name] = true
+				out = append(out, name)
+			}
+		}
+	}
+	sort.Strings(out)
+	return out
+}
 
 // Clears the down mark of an instance whose process commits again. [[spec/design_output/model#a-process-ends]]
 func (s *Store) Up(instance string) error {
