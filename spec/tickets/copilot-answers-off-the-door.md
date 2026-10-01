@@ -117,11 +117,23 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 734b272f5acb0e20521b32f5772004f33deb7720
+    hash_after: 734b272f5acb0e20521b32f5772004f33deb7720
+    inputs:
+      - name: ask
+        hash: 9a713b7a0225ec3a
+        size: 663
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +169,91 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Copilot's hook posts each call to the hooks door as the Claude call it stands for, and answers off the door's effects through the cage's own `postOf`, `stepOf`, `guarded` and `refusedText`. `handle` and the shadow leave.
+
+1. `callsOf(event, read)` in .claude/skills/level0/lib/copilot.js turns one Copilot event into the Claude posts it stands for:
+   - a shell tool of the runtime's `SHELL` set posts `Bash` with its command
+   - an edit tool posts one `Write` a changed file, with the whole text `mutations` in mutations.js answers
+   - any other tool posts its own name and arguments
+2. The events map: `SessionStart` to `session.start`, `PreToolUse` to `tool.call`, `Stop` to `classic.Stop`, and every other event to `classic.<event>`, as `copilotPost` in src/quack/hook.go names them.
+3. A new `src/scripts/copilot-door.js` reads the standing file `hooks.json`, posts each call through `postOf`, and folds the answers through `stepOf`. The first deny stands, and the afters join as context. A door that answers nothing meets `guarded`: a guarded call takes `refusedText` as its deny, and any other event passes.
+4. Hook mode in src/scripts/copilot.js calls copilot-door.js in place of `handle` and `shadowsHook`, and keeps `replyOf`, `failureOf` and its log line.
+5. These leave the tree:
+   - .claude/skills/level0/lib/copilot-runtime.js and test/level0/copilot-runtime.test.js
+   - src/scripts/copilot-shadow.js and test/level0/copilot-shadow.test.js
+   - the copilot block of test/contract/one-config.test.js
+   - `hookVerb` and `copilotPost` in src/quack/hook.go, the `hook` mode in src/quack/main.go, and src/quack/hook_test.go, since the shadow is their one caller
+
+What I weigh: posting Claude's own shapes lets the door's write door, command rules and stop judge Copilot with no Copilot branch in Go. The adapter stays in JavaScript beside `mutations`, which already reads every Copilot edit shape.
+
+I assume: the brief at `session.start` comes off the door once the-brief-leaves-the-bridge lands. Until then a Copilot session starts with no rules, which the copilot setup's own key keeps off.
+
+Risks:
+- Copilot-only guards leave with `handle`: the protected paths, the cloud branch rules, the receipt line, and the Stop pass that formats touched files. The ask trades them for the Claude cage. Each one the owner wants back is a ticket of its own.
+- an edit touching several files posts several calls, so the door's call count reads more than one a Copilot call
+- Copilot's shell call carries no description, so the ticket door may refuse every shell call. A live Copilot host decides it, and a ticket on main carries that trial
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/scripts/copilot.js: hook mode, which calls copilot-door.js
+src/scripts/copilot-door.js: answers, new
+.claude/skills/level0/lib/copilot.js: eventOf and the new callsOf
+.claude/skills/level0/lib/mutations.js: mutations, read unchanged
+.claude/skills/level0/hooks/cage.js: postOf, stepOf, guarded and refusedText, read unchanged
+src/quack/hook.go: hookVerb and copilotPost, which leave
+src/quack/main.go: the hook mode, which leaves
+test/contract/one-config.test.js: the copilot block, which leaves
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/level0/copilot.test.js: a shell call posts Bash with its command
+test/level0/copilot.test.js: an edit call posts one Write a changed file with its whole text
+test/level0/copilot.test.js: a Copilot hook answers the door's deny as its reply
+test/level0/copilot.test.js: the door's afters answer as the reply's context
+test/level0/copilot.test.js: a guarded call meets the refusal while the door stands down
+test/level0/copilot.test.js: a session start passes while the door stands down
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+.claude/skills/level0/lib/copilot.js
+src/scripts/copilot-door.js, new
+src/scripts/copilot.js
+.claude/skills/level0/lib/copilot-runtime.js, leaves
+src/scripts/copilot-shadow.js, leaves
+src/quack/hook.go, leaves
+src/quack/hook_test.go, leaves
+src/quack/main.go
+test/level0/copilot.test.js
+test/level0/copilot-runtime.test.js, leaves
+test/level0/copilot-shadow.test.js, leaves
+test/contract/one-config.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened handle, mutations, eventOf, replyOf, failureOf, the hook mode, shadowsHook, hookVerb, copilotPost, postOf, stepOf, guarded, refusedText and .github/hooks/level0.json, and each claim holds there
+the callers list names the hook mode, the adapter, the cage functions it reads, and every reader of what leaves
+the first done line meets the door and refusal cases in copilot.test.js, the second the deletes, checked by git ls-files, and the third the check
 
 ## tests-red
 
