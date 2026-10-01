@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3bb3757611c · claude-code-remote
+    hash_before: dad4ec434d69a34c0838b48e8a34359285be598f
+    hash_after: 29ff61ebbb42f7b79308ed5e7465a0f7c19851cc
+    inputs:
+      - name: ask
+        hash: c27601d44e8c7e54
+        size: 498
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +166,103 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Grep and Glob answer off the index inside the hooks door, over the `Reads` seam the sibling find-and-wait-in-go opens. The door ports `answersFromIndex`, `asked` and `said` from the bridge, and passes to the harness wherever the bridge passes.
+
+1. `src/index/ops.go`: `Reads` gains `Grep(ask GrepAsk) (GrepSaid, error)` and `Glob(ask GlobAsk) (GlobSaid, error)`. `readKeep` answers them through `Grep(k.db, ask)` and `Glob(k.db, ask)` in `src/index/grep.go`, the same calls `door.answers` makes for the methods `grep` and `glob`.
+2. `src/modules/hooks/hooks.go`: `Outside` gains `Index func(method string, params map[string]any) (map[string]any, error)`. `onlyQ` in `src/imports/imports.go` keeps a module from importing `src/index`. So the seam carries the wire shape the bridge reads off `box.index.ask`, and `src/index` keeps the one owner of the ask and answer types.
+3. A new `src/modules/hooks/search.go` ports `asked`, `grepAsked`, `globOf`, `KINDS` and `globAsked` from `.claude/skills/level0/lib/index.js`. It also ports `said`, `grepSaid`, `globSaid`, `row` and `cut`, and `globShape` and `grepShape` from `src/bridge/search.js`. Every answer line stays word for word, `HEAD_LIMIT` included.
+4. `Door.searches(e)` answers `Effect{Kind: resultKind, Result: shape}`, where shape is `globShape` or `grepShape`. It reads each field through `callField`, so a flat event and one nesting `input` both reach it. It passes in every case where `answersFromIndex` returns `PASS`: no `Index`, no ask, an absolute `path`, or an `Index` error.
+5. `Door.Hook` tries `d.searches` after `d.refuses` and before `d.calls`, on `toolEvent` alone. `tool.Action` names no action for Grep or Glob, so `d.calls` passes them today.
+6. `NewDecisionOf` in `src/modules/hooks/cage.go` reads a result effect with an empty `Text` as `PassWord`. Today it reads every result on a tool short of `tool.Prefix` as `RefuseWord`. Without the change, a live shadow and `ReplayLog` would read an index answer as a refusal, while `OldDecisionOf` reads the bridge's own answer as a pass.
+7. `src/quack/main.go`: `listens` and `listensHooks` take `reads index.Reads`, and `manages` hands them the reads the sibling's fifth `Manage` argument carries. `listensHooks` sets `Outside.Index` to `indexAsk(reads)` where reads stands, and leaves it nil otherwise.
+8. A new `src/quack/searches.go` holds `indexAsk(reads)`. It decodes the params into `index.GrepAsk` or `index.GlobAsk` through JSON and calls `reads.Grep` or `reads.Glob`. It encodes the answer back into a map, so the door reads what `se-index` prints.
+9. `src/quack/finds_test.go`: `fakeReads` gains `Grep` and `Glob`, since the wider interface stops it compiling otherwise.
+
+Boundaries with sibling tickets:
+- find-and-wait-in-go owns `ReadsOf`, `Find`, the fifth `Manage` argument and `door.manages` passing `ReadsOf(one.db)`. This ticket adds Grep and Glob to that seam alone.
+- level0-tools-leave-the-bridge owns dropping `answersFromIndex` and the Grep and Glob lines of `TOOLS` in `src/bridge/server.js`. This ticket leaves the bridge serving.
+- `warmIndex` and the bridge's `reads the rows` log line drop out on the Go side. The Go index stands up with the manager, and the door holds no session logger.
+
+What I weigh: a map seam over JSON keeps the module inside `onlyQ`, and leaves `src/index` the one owner of the ask and answer types. It costs typed fields at the door, which the bridge never had either.
+
+I assume: find-and-wait-in-go lands its fifth `Manage` argument first, so this ticket takes `depends_on` on it. The harness takes the hook's returned shape as the Grep or Glob tool result, as it does for the bridge's `answer.result`. `stepOf` in `.claude/skills/level0/hooks/cage.js` returns `one.result` unchanged, so the client needs no change.
+
+Risks:
+- `passesOn` in `src/modules/hooks/brief.go` reads a single pass alone, so a Grep answered off the index carries no brief, and its canary waits for the next pass
+- Go regexp takes no lookaround and no backreference, so such a pattern answers through the harness off the disk, as the bridge does on a refusal
+- the cage replay goldens under `cageLogs` hold while `doorOver` sets no `Index`, and a replay wiring one would need new goldens
+- `Glob` in `src/index/grep.go` orders by mtime and caps at `globPathLimit`, which the harness's own Glob may order apart
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/hooks.go: Door.Hook, which gains the searches branch after refuses and before calls
+- src/modules/hooks/hooks.go: Outside, which gains the Index field
+- src/modules/hooks/cage.go: NewDecisionOf, which reads a result with no text as pass
+- src/modules/hooks/cage.go: Door.ReplayLog, which reads NewDecisionOf for every recorded row
+- src/modules/hooks/cage.go: Door.shadows, which reads NewDecisionOf for a live post
+- src/index/ops.go: Reads and readKeep, which gain Grep and Glob
+- src/index/grep.go: Grep and Glob, which readKeep calls, unchanged
+- src/quack/main.go: manages, which hands the reads to listens
+- src/quack/main.go: listens and listensHooks, which take the reads and set Outside.Index
+- src/quack/accepts.go: accepts, which takes index.Reads and compiles against the wider interface, unchanged
+- src/quack/finds_test.go: fakeReads, which gains Grep and Glob to satisfy the wider Reads
+- src/modules/hooks/hooks_test.go: doorOver, which sets no Index, so every existing case passes Grep and Glob as today
+- src/quack/hooks_test.go, src/quack/hook_test.go, src/quack/waits_test.go and src/modules/hooks/describe_test.go: hooks.New with no Index, unchanged
+- src/bridge/server.js: TOOLS, whose Grep and Glob entries keep serving the bridge path, unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/search_test.go: TestAGrepAnswersTheIndexsLines
+- src/modules/hooks/search_test.go: TestAGlobAnswersTheIndexsPaths
+- src/modules/hooks/search_test.go: TestAGrepCountsAndListsFilesAsTheBridgeSays
+- src/modules/hooks/search_test.go: TestAGrepTypeReadsAsItsGlob
+- src/modules/hooks/search_test.go: TestAGrepTheIndexRefusesPassesToTheDisk
+- src/modules/hooks/search_test.go: TestAGrepOnAnAbsolutePathPasses
+- src/modules/hooks/search_test.go: TestADoorWithNoIndexPassesGrepAndGlob
+- src/modules/hooks/cage_test.go: TestDecisionOfReadsTheDoorsAnswer, which gains a case where a Grep answered with a result reads PassWord
+- src/index/ops_test.go: TestTheReadsGrepAndGlobTheRowsTheDoorFinds
+- src/quack/searches_test.go: TestTheIndexAskCarriesTheAskAndTheAnswer
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/index/ops.go
+- src/index/ops_test.go
+- src/modules/hooks/hooks.go
+- src/modules/hooks/cage.go
+- src/modules/hooks/cage_test.go
+- src/modules/hooks/search.go, new
+- src/modules/hooks/search_test.go, new
+- src/quack/main.go
+- src/quack/searches.go, new
+- src/quack/searches_test.go, new
+- src/quack/finds_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened src/index/ops.go (Reads, ReadsOf, the Find stub, Manage with four arguments) and src/index/grep.go (GrepAsk, GrepSaid, GlobAsk, GlobSaid, Grep, Glob). I opened src/index/glob.go (matcher, under), src/index/answers.go (the grep and glob methods) and src/quack/accepts.go (reads index.Reads). I opened src/quack/main.go (manages passing accepts(root, store, nil), listens, listensHooks). I opened src/modules/hooks/hooks.go (Outside, Hook, calls, refuses, callField), cage.go (OldDecisionOf, NewDecisionOf, shadows, ReplayLog) and brief.go (passesOn). I opened src/q/tool/tool.go (Prefix is index_), src/imports/imports.go (onlyQ), src/bridge/search.js, .claude/skills/level0/lib/index.js and .claude/skills/level0/hooks/cage.js and level0.js (stepOf, door, UNGUARDED). I also opened spec/guidance/code/testing.md and both sibling tickets, and checked each claim there.
+- Callers come from searches for hooks.New, NewDecisionOf, ReadsOf, readKeep, index.Reads, manages( and listens across src. The Outside field is optional, so the hooks.New callers with no Index stay unchanged. fakeReads in src/quack/finds_test.go is the one implementer that the wider interface breaks.
+- The Grep line meets src/modules/hooks/search_test.go: TestAGrepAnswersTheIndexsLines, decided by go test ./src/modules/hooks/... The Glob line meets src/modules/hooks/search_test.go: TestAGlobAnswersTheIndexsPaths. The check line meets ./RUNME.sh check exiting 0 at tests-green. Each hooks case runs against q/qtest and a local index fake that scans seeded texts, as rules 11 and 12 of spec/guidance/code/testing.md ask.
 
 ## tests-red
 
