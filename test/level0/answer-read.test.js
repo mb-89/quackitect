@@ -4,10 +4,12 @@
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { TOOLS as SURVEY } from "../../.claude/skills/level0/lib/tools.js";
 import { readsAnswer } from "../../src/bridge/answer-read.js";
+import { PROSE_CALL, TOOLS as PROSE_TOOLS } from "../../src/bridge/prose.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
 import { TOOLS as HAND_TOOLS } from "../../src/bridge/tools.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
@@ -74,11 +76,17 @@ test("a draft past the ceiling holds no turn, and its findings ride the next cal
   assert.deepEqual(reads, [TEXT], "the gate reads the turn's last text");
   assert.doesNotMatch(blockOf(said), REFUSES, "the gate holds no turn");
   assert.doesNotMatch(blockOf(said), /Jargon/);
-  const warned = box.log.lines().filter((one) => one.level === "warn" && one.kind === "gate");
+  const warned = box.log
+    .lines()
+    .filter((one) => one.level === "warn" && one.kind === "gate");
   assert.equal(warned.length, 1, "the log carries the warning");
   assert.match(String(warned[0].detail), /VoiceVale\.Jargon/);
 
-  const helper = await calls(box, { tool: "Read", file_path: at("one.md"), agentId: "a1" });
+  const helper = await calls(box, {
+    tool: "Read",
+    file_path: at("one.md"),
+    agentId: "a1",
+  });
   assert.doesNotMatch(contextOf(helper), RIDES, "a helper's call carries none");
   const next = await calls(box);
   assert.match(contextOf(next), RIDES);
@@ -119,7 +127,11 @@ test("the reading answers the band, the score and the findings of a draft", asyn
   assert.equal(read.found[0].rule, "VoiceVale.Jargon");
   assert.ok(read.score > CONFIG.answer.ceiling);
   const stopping = await readsAnswer(box, TEXT, true);
-  assert.equal(stopping.found.length, 2, "a stop for the owner asks for the needs table too");
+  assert.equal(
+    stopping.found.length,
+    2,
+    "a stop for the owner asks for the needs table too",
+  );
 });
 
 // The band tells the owner nothing to act on, so the line stands at debug under its own kind. [[spec/design_output/level0#the-three-bands]]
@@ -162,3 +174,44 @@ test("the stop line alone reads clean, at the stop door and in the draft tool", 
   assert.equal(blockOf(await stops(box, { last_assistant_message: "stop: done" })), "");
   assert.deepEqual(reads, [], "no line of vale reads the stop line");
 });
+
+// One case table holds what the two draft tools answer, so the Go module and the bridge read one voice. [[spec/tickets/prose-tools-answer-in-go]]
+const DRAFTS = JSON.parse(
+  readFileSync(new URL("../replay/cage/draft-cases.json", import.meta.url), "utf8"),
+);
+
+// A box whose Vale answers the case's rows, and whose owner asked the case's questions. [[spec/tickets/prose-tools-answer-in-go]]
+function drafted(one) {
+  const vale = one.vale;
+  const box = boxOf(ROOT, ROOT, {
+    disk: fakeDisk({
+      [at("spec/config/level0.json")]: JSON.stringify({
+        answer: { enabled: true, ...DRAFTS.bands },
+      }),
+      [at(SURVEY)]: "{}",
+    }),
+    clock: fakeClock(),
+    proc: fakeProc({}),
+    log: fakeLog(fakeClock(), { level: "debug" }),
+    index: { warm: () => ({ warmed: false }), dead: () => "" },
+    vale: {
+      stands: () => vale.stands,
+      lint: async () =>
+        vale.ran ? { ran: true, found: vale.found } : { ran: false, why: vale.why },
+    },
+  });
+  box.asks = one.asked ?? 0;
+  return box;
+}
+
+for (const one of DRAFTS.cases) {
+  // [[spec/tickets/prose-tools-answer-in-go]]
+  test(`the bridge answers the draft case: ${one.name}`, async () => {
+    const box = drafted(one);
+    const said =
+      one.tool === "check_prose"
+        ? await PROSE_TOOLS[PROSE_CALL](one.input, box)
+        : await HAND_TOOLS.mcp__level0__check_answer(one.input, box);
+    assert.equal(String(said.result.result), one.answer);
+  });
+}

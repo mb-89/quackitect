@@ -81,6 +81,8 @@ type Holds struct {
 	Said   Said    `json:"said"`
 	// The owner's hold the turn's end dropped, which the stop vote reads until a prompt opens the next turn. [[spec/tickets/cage-hold-drops-port]]
 	Stood string `json:"stood,omitempty"`
+	// The questions the owner's last prompt asks, which the answer check reads. [[spec/tickets/prose-tools-answer-in-go]]
+	Questions int `json:"questions,omitempty"`
 }
 
 // The engine's ask, off wants in src/bridge/grace.js. [[spec/design_output/stop#the-grace]]
