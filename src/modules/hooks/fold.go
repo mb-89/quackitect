@@ -116,6 +116,8 @@ type Said struct {
 	// The rows of the session log the event names, and the text an owner's prompt answers with, the answer-first line in front. [[spec/tickets/prompt-answers-off-the-door]]
 	Rows   []LogRow `json:"rows,omitempty"`
 	Prompt string   `json:"prompt,omitempty"`
+	// The text a log, report or stop call answers with. Set at tests-green. [[spec/tickets/log-report-stop-in-go]]
+	Result string `json:"result,omitempty"`
 }
 
 // The fold's step. Every hold skips a helper's event, so a helper's event moves nothing. [[spec/design_output/level0#a-helper-ends-no-turn]]

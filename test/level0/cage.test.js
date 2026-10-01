@@ -10,6 +10,7 @@ import {
   stepOf,
 } from "../../.claude/skills/level0/hooks/cage.js";
 import { guidanceHere, onAgentSpawn } from "../../src/bridge/guidance.js";
+import { toolNames } from "../../src/bridge/server.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import LAYERS from "../replay/cage/layer-cases.json" with { type: "json" };
 
@@ -203,4 +204,15 @@ test("the JavaScript layer matches the case table", () => {
       wrapped,
     })),
   );
+});
+
+// [[spec/tickets/log-report-stop-in-go]]
+test("the bridge's tools table names none of log, report and stop", () => {
+  const names = toolNames();
+  for (const tool of ["log", "report", "stop"]) {
+    assert.ok(
+      !names.includes(`mcp__level0__${tool}`),
+      `the bridge still answers ${tool}`,
+    );
+  }
 });

@@ -169,6 +169,9 @@ const TOOLS = {
   ...waitTools,
 };
 
+// The names of the tools the bridge still answers. [[spec/tickets/log-report-stop-in-go]]
+export const toolNames = () => Object.keys(TOOLS);
+
 export async function decide(said, box) {
   fillsBox(box);
   if (box.logLevel !== undefined) box.logLevel = asksText(box, LOG_LEVEL) ?? "";
