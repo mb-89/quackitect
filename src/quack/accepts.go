@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/drafts"
 	"quackitect/src/modules/edits"
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/plans"
@@ -16,7 +17,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The IO modules that answer a request an action lists: disk over the root, the edits, search, waits and plans modules, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
+// The IO modules that answer a request an action lists: disk over the root, the edits, search, waits, plans and drafts modules, the node module, the store's land, and a refusal naming any other. [[spec/tickets/actions-answer-over-http]]
 func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (any, error) {
 	disk := files.Accept(files.NewDisk(root))
 	node := nodeAccept(root)
@@ -24,6 +25,7 @@ func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (an
 	find := search.Accept(searchOutside(root, reads))
 	wait := waits.Accept(waitsOutside(root, store))
 	plan := plans.Accept(plansOutside(root, store))
+	draft := drafts.Accept(draftsOutside(root, store, draftsLint(root)))
 	return func(asked q.Request) (any, error) {
 		// [[spec/tickets/find-and-wait-in-go]]
 		switch asked.Module {
@@ -34,6 +36,9 @@ func accepts(root string, store *q.Store, reads index.Reads) func(q.Request) (an
 		// [[spec/tickets/plan-writes-off-go]]
 		case plans.Module:
 			return plan(asked)
+		// [[spec/tickets/prose-tools-answer-in-go]]
+		case drafts.Module:
+			return draft(asked)
 		}
 		if asked.Module == files.DiskModule {
 			return disk(asked)

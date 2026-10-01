@@ -182,7 +182,35 @@ func (state *Holds) prompted(fields map[string]any, at time.Time) {
 	}
 	state.Demand = &Demand{Why: promptWhy, Seen: state.Spoken, Prompt: true, Before: textOf(fields, "before")}
 	state.Said.Prompt = warns(promptWhy) + "\n\n" + text
+	state.Questions = questionsIn(text)
 }
+
+// The questions a prompt asks: each run of marks closing a word, outside a fence, off questionsIn in lib/answer.js. [[spec/tickets/prose-tools-answer-in-go]]
+func questionsIn(text string) int {
+	fenced, count := false, 0
+	for _, line := range lineBreak.Split(text, -1) {
+		if fenceLine.MatchString(line) {
+			fenced = !fenced
+			continue
+		}
+		if fenced {
+			continue
+		}
+		for _, at := range questionRun.FindAllStringIndex(line, -1) {
+			if at[1] == len(line) || strings.ContainsRune(" \t\f\v\r", rune(line[at[1]])) {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+// A line break, a fence's opening line, and a run of question marks. [[spec/tickets/prose-tools-answer-in-go]]
+var (
+	lineBreak   = regexp.MustCompile(`\r?\n`)
+	fenceLine   = regexp.MustCompile("^\\s*(```|~~~)")
+	questionRun = regexp.MustCompile(`\?+`)
+)
 
 // The answer-first line, off warns in .claude/skills/level0/lib/answer.js. [[spec/tickets/prompt-answers-off-the-door]]
 func warns(why string) string {

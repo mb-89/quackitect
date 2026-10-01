@@ -5,10 +5,9 @@
 package hooks
 
 import (
-	"strings"
-
 	"quackitect/src/modules/hooks/command"
 	"quackitect/src/modules/hooks/write"
+	"quackitect/src/prose"
 )
 
 // The refusal of a harness write, or nothing where it lands. A door with no Schema or Prose reads neither. [[spec/design_output/level0#a-write-names-its-ticket]]
@@ -60,31 +59,9 @@ func Judge(where string, schema func() write.Judged, voice func() []write.Findin
 
 // The refusal of a write the voice refuses, naming each finding and the rules to hold, off refusal in lib/refuse.js. [[spec/design_output/level0#the-write-door]]
 func RefusedVoice(where string, found []write.Finding) string {
-	lines := []string{"The voice rules refuse this write to " + where + ".", ""}
-	var names []string
+	refused := make([]prose.Refused, 0, len(found))
 	for _, one := range found {
-		lines = append(lines, "  "+write.PlaceOf(where, one)+"  "+one.Rule)
-		if one.Said != "" {
-			lines = append(lines, "    wrote: "+command.Cut(one.Said, command.LineCut))
-		}
-		lines = append(lines, "    "+one.Message, "")
-		if !holdsName(names, one.Rule) {
-			names = append(names, one.Rule)
-		}
+		refused = append(refused, prose.Refused{Line: one.Line, Column: one.Column, Rule: one.Rule, Message: one.Message, Said: command.Cut(one.Said, command.LineCut)})
 	}
-	named := names[len(names)-1]
-	if len(names) > 1 {
-		named = strings.Join(names[:len(names)-1], ", ") + " and " + named
-	}
-	return strings.Join(append(lines, "Hold "+named+" for the rest of this turn: apply the same rule to every line you write next, and fix the lines you already wrote if they break it."), "\n")
-}
-
-// [[spec/design_output/level0#the-write-door]]
-func holdsName(names []string, name string) bool {
-	for _, one := range names {
-		if one == name {
-			return true
-		}
-	}
-	return false
+	return "The voice rules refuse this write to " + where + ".\n\n" + prose.Body(where, refused)
 }

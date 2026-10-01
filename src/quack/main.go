@@ -18,6 +18,7 @@ import (
 	"quackitect/src/modules/check"
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
+	"quackitect/src/modules/drafts"
 	"quackitect/src/modules/edits"
 	"quackitect/src/modules/env"
 	"quackitect/src/modules/files"
@@ -106,6 +107,8 @@ var modules = map[string]ioModule{
 	waits.Module:  {registers: waits.Registers},
 	// [[spec/tickets/plan-writes-off-go]]
 	plans.Module: {registers: plans.Registers},
+	// [[spec/tickets/prose-tools-answer-in-go]]
+	drafts.Module: {registers: drafts.Registers},
 }
 
 // A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
