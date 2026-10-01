@@ -34,6 +34,7 @@ const waitConfig = `{"wait":{"most":30,"quiet":1}}`
 type waitWorld struct {
 	served manager.Served
 	door   *hooks.Door
+	root   string
 }
 
 // [[spec/tickets/find-and-wait-in-go]]
@@ -55,8 +56,11 @@ func waitWorldOf(t *testing.T) waitWorld {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if one, ok := modules[waitsModuleType]; ok {
-		one.registers(c)
+	// [[spec/tickets/plan-writes-off-go]]
+	for _, kind := range []string{waitsModuleType, plansModuleType} {
+		if one, ok := modules[kind]; ok {
+			one.registers(c)
+		}
 	}
 	config.Registers(c)
 	store := q.NewStore(c)
@@ -79,7 +83,7 @@ func waitWorldOf(t *testing.T) waitWorld {
 		},
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
 	})
-	return waitWorld{served: served, door: door}
+	return waitWorld{served: served, door: door, root: root}
 }
 
 // The hooks door lands a helper's stop, as the harness posts it. [[spec/tickets/find-and-wait-in-go]]

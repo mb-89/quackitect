@@ -133,6 +133,43 @@ func TestTheToolListNamesAnActionUnderItsOwnToolName(t *testing.T) {
 	}
 }
 
+// Every listed tool carries the plan field, so the plan's answer rides any call. [[spec/tickets/plan-writes-off-go]]
+func TestEveryListedToolCarriesThePlanField(t *testing.T) {
+	listed := listedTools(t)
+	if len(listed) == 0 {
+		t.Fatal("the list holds no tool, and wants t/add and t/echo")
+	}
+	for name, one := range listed {
+		if plan, ok := one.InputSchema.Properties[tool.PlanArg]; !ok || plan.Type != "object" {
+			t.Errorf("%s lists the properties %v, and wants the plan field as an object", name, one.InputSchema.Properties)
+		}
+	}
+}
+
+// The plan tool takes the plan as its input, and carries no plan field of its own. [[spec/tickets/plan-writes-off-go]]
+func TestThePlanToolCarriesNoPlanField(t *testing.T) {
+	body := toolsBodyWith(t, func(c *q.Catalog) {
+		q.ActionIn(c, "t/plan", func(tool.Plan) []q.Request { return nil }, q.Doc("plans the work"), q.ToolName(tool.PlanTool))
+	})
+	var list []listedTool
+	if err := json.Unmarshal(body, &list); err != nil {
+		t.Fatalf("/v1/tools answers %.300s: %v", body, err)
+	}
+	for _, one := range list {
+		if one.Name != tool.PlanTool {
+			continue
+		}
+		if _, ok := one.InputSchema.Properties[tool.PlanArg]; ok {
+			t.Errorf("the plan tool lists %v, and wants no plan field", one.InputSchema.Properties)
+		}
+		if _, ok := one.InputSchema.Properties["working"]; !ok {
+			t.Errorf("the plan tool lists %v, and wants its own input", one.InputSchema.Properties)
+		}
+		return
+	}
+	t.Fatal("the list names no plan tool")
+}
+
 func TestABareInputRidesAsOneProperty(t *testing.T) {
 	echo, ok := listedTools(t)["index_t_echo"]
 	if !ok || !echo.Bare || echo.InputSchema.Type != "object" || echo.InputSchema.Properties["input"].Type != "string" {

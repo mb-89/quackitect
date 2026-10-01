@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -132,6 +132,19 @@ record:
         hash: 6d569ad6c5be9f46
         size: 579
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: d777aed34fb400c3190138d77f21ecc8733c84d5
+    hash_after: d777aed34fb400c3190138d77f21ecc8733c84d5
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/plans fails
+    inputs:
+      - name: design/draft
+        hash: 4d4080678092430e
+        size: 5304
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -268,26 +281,34 @@ Risks:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/plans/plans_test.go src/quack/plans_test.go src/index/tools_test.go src/q/tool/tool_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/plans/plans_test.go
+- src/quack/plans_test.go
+- src/index/tools_test.go
+- src/q/tool/tool_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion. The module cases run against a stub that registers nothing, and q/tool carries PlanArg, PlanTool, Plan and a WithPlan stub so the cases compile. A bare input carrying the plan field fails today, since the fallback wants the bare property alone. The riding case reuses the wait cases' world, which now loads the plans module beside waits and hands back its root. The first module case pins the bridge's key order: working, todos and places first, then the file's other keys.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first line meets TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt, the second TestEveryListedToolCarriesThePlanField, and the third the check at tests-green
+- the module cases run over a fake file, a fixed clock and fake places, the quack cases over a temp tree and the real wiring, and the index cases over the door's own test catalog
 
 # gate
 

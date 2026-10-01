@@ -115,6 +115,20 @@ func TestTheInputLeavesTheWaitUnlessItDeclaresOne(t *testing.T) {
 	}
 }
 
+// A plan field riding a call leaves the action's input, bare or whole. [[spec/tickets/plan-writes-off-go]]
+func TestInputDropsARidingPlanField(t *testing.T) {
+	s := storeOf(t)
+	riding := map[string]any{"working": "w"}
+	in, err := Input(s, "greet/one", map[string]any{"who": "owner", PlanArg: riding})
+	if err != nil || in != (greetIn{Who: "owner"}) {
+		t.Fatalf("the input reads %+v, err %v, and wants who alone", in, err)
+	}
+	in, err = Input(s, "echo", map[string]any{BareArg: "hi", PlanArg: riding})
+	if err != nil || in != "hi" {
+		t.Fatalf("the bare input reads %+v, err %v, and wants hi past the plan field", in, err)
+	}
+}
+
 func TestTheWaitTakesTheArgumentThenTheKeyThenTheFallback(t *testing.T) {
 	if wait := Wait(map[string]any{WaitArg: json.Number("0.5")}, 3, time.Second); wait != 500*time.Millisecond {
 		t.Fatalf("the argument sets %v, and wants half a second", wait)

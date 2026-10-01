@@ -23,6 +23,9 @@ const (
 	Served  = "mcp__level0__"
 	WaitArg = "wait"
 	BareArg = "input"
+	// The field the plan's answer rides any level zero call under, and the tool that answers it alone. [[spec/tickets/plan-writes-off-go]]
+	PlanArg  = "plan"
+	PlanTool = "plan"
 	percent = 100
 )
 
@@ -136,4 +139,23 @@ func Number(value any) (float64, bool) {
 // The line an operation past its wait answers: the action, the fraction done, the time gone by and the handle. [[spec/design_output/model#a-caller-sets-its-wait]]
 func Running(action string, fraction float64, gone time.Duration, handle string) string {
 	return fmt.Sprintf("%s still running: %.0f%% done after %s, handle %s", action, fraction*percent, gone, handle)
+}
+
+// One todo a plan adds: its title, its detail line, and the place it stands at. [[spec/design_output/stop#the-plan]]
+type PlanTodo struct {
+	Title   string `json:"title" doc:"the todo's title"`
+	Details string `json:"details,omitempty" doc:"the todo's detail line"`
+	Place   int    `json:"place,omitempty" doc:"The place in the queue, 1 to 9: the todo stands before the todo at that place now. A place on a ticket or past the todos puts it after every todo, before the first ticket."`
+}
+
+// The answer to the engine's three questions. [[spec/design_output/stop#the-plan]]
+type Plan struct {
+	Working string     `json:"working,omitempty" doc:"The title of the todo, or the name of the ticket, you work on now."`
+	Done    []string   `json:"done,omitempty" doc:"The titles of the todos you finished, which leave the queue."`
+	Add     []PlanTodo `json:"add,omitempty" doc:"The todos you add, each with the place you do it at."`
+}
+
+// A stub until tests-green. [[spec/tickets/plan-writes-off-go]]
+func WithPlan(registry huma.Registry, schema map[string]any, name string) map[string]any {
+	return schema
 }
