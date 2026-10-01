@@ -48,18 +48,16 @@ func fakeStore(t *testing.T) (*q.Store, q.Writer) {
 	return store, hand
 }
 
-// Polls the store until held answers true, or fails the case past the wait. [[spec/design_output/model#a-process-ends]]
-func until(t *testing.T, what string, held func(q.Snapshot) bool) {
+// Polls the store until held answers true of a snapshot taken for that poll alone, or fails the case past the wait. [[spec/tickets/fake-snapshot-stays-in-case]]
+func until(t *testing.T, store *q.Store, what string, held func(q.Snapshot) bool) {
 	t.Helper()
 	for end := time.Now().Add(20 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
-		if held(fakeSnap) {
+		if held(store.Snapshot()) {
 			return
 		}
 	}
 	t.Fatalf("%s holds nowhere within the wait", what)
 }
-
-var fakeSnap q.Snapshot
 
 // Runs the fake IO process under a placement, and answers the store and the stop. [[spec/design_output/model#a-process-ends]]
 func placedFake(t *testing.T, restart time.Duration) (*q.Store, func()) {
@@ -78,10 +76,7 @@ func placedFake(t *testing.T, restart time.Duration) (*q.Store, func()) {
 	return store, func() { stop(); bus.Close() }
 }
 
-func read(store *q.Store, name string) any {
-	fakeSnap = store.Snapshot()
-	return fakeSnap.Read(name)
-}
+func read(store *q.Store, name string) any { return store.Snapshot().Read(name) }
 
 func kills(t *testing.T, pid any) {
 	t.Helper()
@@ -101,10 +96,10 @@ func kills(t *testing.T, pid any) {
 func TestAKilledFakeIOProcessLeavesItsNamesNotProvided(t *testing.T) {
 	store, stop := placedFake(t, time.Hour)
 	defer stop()
-	until(t, "fake/out at 7", func(q.Snapshot) bool { return read(store, "fake/out") == 7 })
+	until(t, store, "fake/out at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 })
 	kills(t, read(store, "fake/pid"))
-	until(t, "fake/out not provided", func(q.Snapshot) bool {
-		return read(store, "fake/out") == 0 && fakeSnap.NotProvided("fake/out") && fakeSnap.NotProvided("fake/pid")
+	until(t, store, "fake/out not provided", func(snap q.Snapshot) bool {
+		return snap.Read("fake/out") == 0 && snap.NotProvided("fake/out") && snap.NotProvided("fake/pid")
 	})
 	if said, err := store.Why("fake/out"); err != nil || said.State != "not provided" {
 		t.Fatalf("why fake/out reads %q and %v", said.State, err)
@@ -114,12 +109,12 @@ func TestAKilledFakeIOProcessLeavesItsNamesNotProvided(t *testing.T) {
 func TestTheNextCommitOfARestartedProcessClearsTheMark(t *testing.T) {
 	store, stop := placedFake(t, 50*time.Millisecond)
 	defer stop()
-	until(t, "fake/out at 7", func(q.Snapshot) bool { return read(store, "fake/out") == 7 })
+	until(t, store, "fake/out at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 })
 	first := read(store, "fake/pid")
 	kills(t, first)
-	until(t, "a second fake committing", func(q.Snapshot) bool {
-		pid := read(store, "fake/pid")
-		return pid != first && pid != 0 && !fakeSnap.NotProvided("fake/out") && fakeSnap.Read("fake/out") == 7
+	until(t, store, "a second fake committing", func(snap q.Snapshot) bool {
+		pid := snap.Read("fake/pid")
+		return pid != first && pid != 0 && !snap.NotProvided("fake/out") && snap.Read("fake/out") == 7
 	})
 }
 
@@ -140,7 +135,7 @@ func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
 		bus.Close()
 		t.Fatal(err)
 	}
-	until(t, "both fakes at 7", func(q.Snapshot) bool { return read(store, "fake/out") == 7 && read(store, "other/out") == 7 })
+	until(t, store, "both fakes at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 && snap.Read("other/out") == 7 })
 	return store, placements, func() { stop(); bus.Close() }
 }
 
@@ -150,9 +145,9 @@ func TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm(t *testing.T) {
 	other, first := read(store, "other/pid"), read(store, "fake/pid")
 	before := store.Snapshot().Revision
 	kills(t, first)
-	until(t, "the killed fake back", func(q.Snapshot) bool {
-		pid := read(store, "fake/pid")
-		return pid != first && pid != 0 && fakeSnap.Read("fake/out") == 7
+	until(t, store, "the killed fake back", func(snap q.Snapshot) bool {
+		pid := snap.Read("fake/pid")
+		return pid != first && pid != 0 && snap.Read("fake/out") == 7
 	})
 	snap := store.Snapshot()
 	if snap.Read("other/pid") != other || snap.NotProvided("other/out") || snap.Read("other/out") != 7 {
@@ -170,8 +165,8 @@ func TestAPlacementRestartsTheProcessesOfOneTopic(t *testing.T) {
 	if err := placements.Restart("fakeio"); err != nil {
 		t.Fatal(err)
 	}
-	until(t, "the fake restarted", func(q.Snapshot) bool {
-		pid := read(store, "fake/pid")
+	until(t, store, "the fake restarted", func(snap q.Snapshot) bool {
+		pid := snap.Read("fake/pid")
 		return pid != first && pid != 0
 	})
 	if got := read(store, "other/pid"); got != other {

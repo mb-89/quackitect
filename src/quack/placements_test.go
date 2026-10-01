@@ -1,7 +1,7 @@
 // The placements put each instance in no list in a process of its own, and a
 // list in one process. A module process commits its instance off the inputs
 // the index answers.
-// [[spec/design_output/processes#the-placements]]
+// [[spec/design_output/model#the-placements]]
 package main
 
 import (
@@ -48,8 +48,10 @@ type twiceOf struct {
 func TestAModuleProcessCommitsItsInstanceOffTheInputs(t *testing.T) {
 	w := q.Wiring{Instances: []q.Instance{{Name: "source", Module: "source"}, {Name: "doubler", Module: "doubler"}}, Wires: map[string]string{"doubler.all": "source.all"}}
 	types := map[string]func(*q.Catalog){
-		"source":  func(c *q.Catalog) { q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
-		"doubler": func(c *q.Catalog) { q.DerivedIn(c, "twice", 0, func(in twiceOf) int { return 2 * in.All }, q.Doc("twice the count")) },
+		"source": func(c *q.Catalog) { q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
+		"doubler": func(c *q.Catalog) {
+			q.DerivedIn(c, "twice", 0, func(in twiceOf) int { return 2 * in.All }, q.Doc("twice the count"))
+		},
 	}
 	indexSide, err := q.Start(w, types)
 	if err != nil {

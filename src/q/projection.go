@@ -173,7 +173,7 @@ func (s *Store) Restore(saved []byte) ([]string, error) {
 	return refused, err
 }
 
-// The bytes of a saved file holding the names it is handed, which Restore reads back. [[spec/design_output/processes#the-placements]]
+// The bytes of a saved file holding the names it is handed, which Restore reads back. [[spec/design_output/model#the-placements]]
 func (s *Store) SaveNames(names []string) ([]byte, error) { return indented(map[string]savedName{}) }
 
 // The bytes of a dump of every name under prefix. [[spec/design_output/model#everything-on-disk-mirrors]]

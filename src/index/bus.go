@@ -55,7 +55,9 @@ func (p *Peer) Runs(instance string, hand func()) (func(), error) {
 }
 
 // Asks in.<instance>, and answers the saved inputs. [[spec/design_output/model#names-become-subjects]]
-func (p *Peer) Inputs(instance string) ([]byte, error) { return nil, errors.New("the bus stands unbuilt") }
+func (p *Peer) Inputs(instance string) ([]byte, error) {
+	return nil, errors.New("the bus stands unbuilt")
+}
 
 // Answers each in.<instance> with what saved answers. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) AnswersInputs(instance string, saved func() ([]byte, error)) (func(), error) {
