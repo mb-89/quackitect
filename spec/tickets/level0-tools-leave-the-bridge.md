@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: f8b1e4aa408c05f5
         size: 2266
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: ed4da95dd0645ea750c2d81289955da59f39dd26
+    hash_after: ed4da95dd0645ea750c2d81289955da59f39dd26
+    inputs:
+      - name: design/draft
+        hash: f8b1e4aa408c05f5
+        size: 2266
+      - name: design/tests-red
+        hash: 98a1215b3409845c
+        size: 1406
+    def: dc4904ab364efa10
 depends_on: ["tools-keep-their-own-names", "log-report-stop-in-go", "plan-writes-off-go", "prose-tools-answer-in-go", "edit-tools-answer-in-go", "find-and-wait-in-go", "review-spawns-off-the-door", "describe-answers-off-the-door", "grep-glob-answer-off-index"]
 ---
 
@@ -285,8 +297,12 @@ What surprises me: the bridge TOOLS table still names Grep, Glob, Write, Edit, M
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach drops served from stepOf, the read path from level0.js, the read tools from pull-tool.js and the TOOLS table from server.js, which answers the ask once the nine closed children stand
+- the Go done line meets TestEveryToolTheBridgeServedStandsInTheWiredToolList over the level zero tools. Grep and Glob answer off the index under grep-glob-answer-off-index, and the harness guards answer on the door under the closed cage port tickets, each with its own case
+- the cage done line meets the red case stepOf hands no call to the bridge, and the check line waits for tests-green
 
 # implement
 
