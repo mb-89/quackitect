@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -204,6 +204,18 @@ record:
     skipped: true
     kept: 28834b1b612c04d55117635cb75585294b3e7fcb
     why: its red tests stand as 28834b1b6 landed them, and a later leaf passed since
+  - step: design/draft-2
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 6fa7724d7151e209ff3e74f5f991475f7540be12
+    hash_after: 6fa7724d7151e209ff3e74f5f991475f7540be12
+    inputs:
+      - name: ask
+        hash: e437528f642d7a6c
+        size: 346
+      - name: [[spec/design_input/the-index-holds-the-model]]
+        hash: 5f2da8fccb387d1f
+        size: 23680
+    def: a3dfd8c60d853590
 group: module-processes-land-in-shadow
 ---
 
@@ -395,7 +407,7 @@ The assumption: the `watch` caller of `Placements.Restart` lands with the switch
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every file, function and verb the approach names stands opened, and each claim checked there: manager.go Registers, main.go modules and listens, the bus and Placed in src/index, projection.go Save and Restore, store.go Down, and the gate's six findings
+- every file, function and verb the approach names stands opened, and each claim checked there: manager.go Registers, main.go modules and listens, the bus and Placed in src/index, projection.go Save and Restore, store.go Down, the gate's six findings, and the register function each entry of the modules table in main.go holds, whose package a runtime lookup names
 - the callers list names every caller of what the approach changes, off a grep of Placed, Peer, Save(, Restore(, manager.Registers and the modules table
 - every done_when line names the test that decides it: the restart line TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm, the go test line go test ./..., and the check line ./RUNME.sh check
 
