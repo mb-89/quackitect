@@ -11,6 +11,7 @@ import {
   PORT_BASE,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
 import { homeIn } from "./editor.js";
 import { logRows } from "./probe.js";
@@ -49,7 +50,8 @@ export const COLD_PATH = [
   ".claude/skills/level0/lib/guidance.js",
   "src/bridge/guidance.js",
   "src/bridge/selftest.js",
-  "src/bridge/server.js",
+  "src/modules/hooks/",
+  "src/quack/",
   "src/scripts/install.sh",
   "src/scripts/probe-cold.js",
 ];
@@ -215,7 +217,7 @@ export async function probeCold(root, it, client, say = console.log, delta = "")
   try {
     return coldRun(root, it, client, say, { temp, tree, port, delta });
   } finally {
-    stops(it, tree, port);
+    stops(it, tree);
     it.disk.remove(temp);
   }
 }
@@ -314,17 +316,14 @@ function clientArgv(client, plugin) {
   ];
 }
 
-// The server the start road launched stands in the clone, so the probe stops it by its port and by its path. [[spec/design_output/level0#the-cold-probe]]
-function stops(it, tree, port) {
-  const post = `fetch('http://127.0.0.1:${port}/stop',{method:'POST'}).catch(()=>{})`;
-  for (const argv of [
-    [it.node ?? "node", "-e", post],
-    ["pkill", "-f", it.join(tree, "src", "bridge", "server.js")],
-  ]) {
-    try {
-      it.proc.run(argv, { timeoutMs: WAIT });
-    } catch {}
-  }
+// The index the start road launched stands over the clone, so the probe stops it with the index's own stop. [[spec/design_output/level0#the-cold-probe]]
+function stops(it, tree) {
+  try {
+    it.proc.run([it.join(tree, ...BIN.split("/")), "stop"], {
+      cwd: tree,
+      timeoutMs: WAIT,
+    });
+  } catch {}
 }
 
 function tail(text) {

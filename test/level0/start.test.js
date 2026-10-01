@@ -28,5 +28,8 @@ test("the cage line names the code, its reason, and the command that installs", 
 test("a hand's helper carries its session id, and a session with none carries nothing", () => {
   assert.match(spawnTagOf({ id: "s1" }), /session s1/);
   assert.equal(spawnTagOf(null), "");
-  assert.match(INSTALL_SKIP, /\bindex\b/);
+});
+
+test("the install the road runs builds the index it starts", () => {
+  assert.doesNotMatch(INSTALL_SKIP, /\bindex\b/);
 });

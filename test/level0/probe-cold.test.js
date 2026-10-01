@@ -300,7 +300,11 @@ test("the runner clones, installs, runs the client, reads the log, and removes t
   assert.deepEqual(ran.slice(0, 3), ["git", "sh", "claude"]);
   const install = proc.ran.find((one) => one.argv[0] === "sh");
   assert.equal(install.init.env.SE_INSTALL_SKIP, INSTALL_SKIP);
-  assert.match(INSTALL_SKIP, /\bindex\b/);
+  assert.doesNotMatch(
+    INSTALL_SKIP,
+    /\bindex\b/,
+    "the cold clone builds the index the road starts",
+  );
   const client = proc.ran.find((one) => one.argv[0] === "claude");
   assert.ok(client.argv.includes("--plugin-dir"));
   assert.equal(client.init.env.CLAUDE_CODE_REMOTE, "true");
@@ -345,13 +349,13 @@ test("a path under the hooks folder or a named cold file sits on the cold path",
   assert.deepEqual(
     coldIn([
       ".claude/skills/level0/hooks/level0.js",
-      "src/bridge/server.js",
+      "src/quack/main.go",
       "src/scripts/install.sh",
       "src/scripts/probe-cold.js",
     ]),
     [
       ".claude/skills/level0/hooks/level0.js",
-      "src/bridge/server.js",
+      "src/quack/main.go",
       "src/scripts/install.sh",
       "src/scripts/probe-cold.js",
     ],

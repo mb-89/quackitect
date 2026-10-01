@@ -1,32 +1,40 @@
-// The server behind the bridgehead, started where nothing answers its port.
-// A cloud box has nobody to press the hook button, so the pull that takes a
-// branch there starts it detached and says so.
+// The index behind the bridgehead, started where no door answers. A cloud box
+// has nobody to press the hook button, so the pull that takes a branch there
+// starts it and says so.
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 
 import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.js";
-import {
-  FOLDER as LOG_FOLDER,
-  reasonIn,
-  SERVE,
-  wroteSince,
-} from "../../.claude/skills/level0/lib/log.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { POINTER, pointerOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import { registeredPort } from "../bridge/vehicle.js";
 
-const HEALTH_WAIT = 2000;
-// The window a desk start watches before it takes the server as standing, the span a restart watches its child. [[spec/design_output/level0#a-restart-watches-its-child]]
-const DETACH_WAIT = 3000;
-const SERVER = "src/bridge/server.js";
+// The standing file the hooks door writes once it listens. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const HOOKS = inRun("hooks.json");
 
-const answersAt = (port) => `The server answers at port ${port}.`;
-const startsAt = (port) =>
-  `The server starts detached at port ${port}, because nothing answered there.`;
+const answersAt = (port) => `The index answers at port ${port}.`;
+const startsAt = (port) => `The index starts at port ${port}, because no door stood.`;
+const standsAt = (port) => `The index stands at port ${port}.`;
+
+// What the hooks door's standing file says, or nothing where none stands. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+function doorOf(it) {
+  const at = it.join(it.root, ...HOOKS.split("/"));
+  return it.disk.exists(at) ? String(it.disk.read(at)) : "";
+}
+
+function portOf(door) {
+  try {
+    return Number(JSON.parse(door).port) || 0;
+  } catch {
+    return 0;
+  }
+}
 
 export function portIn(it) {
   try {
     return pointerOf(it.disk.read(it.join(it.root, POINTER))).port;
   } catch {
-    // A vehicle tree carries no pointer, so the probe reads the port variable, then the register, as the listen in `src/bridge/server.js` does. [[spec/tickets/serve-probes-the-register-port]]
+    // A vehicle tree carries no pointer, so the probe reads the port variable, then the register, as the bridge's listen does. [[spec/tickets/serve-probes-the-register-port]]
     const env = it.env ?? {};
     // The register stamps its entry with the clock, so a door holding none reads the base. [[spec/tickets/serve-probes-the-register-port]]
     const registered = it.clock
@@ -43,12 +51,6 @@ export function portIn(it) {
   }
 }
 
-export function probeOf(node, port) {
-  const at = `http://127.0.0.1:${port}/health`;
-  const asks = `fetch("${at}",{signal:AbortSignal.timeout(${HEALTH_WAIT})}).then((r)=>r.json()).then((b)=>process.exit(b.ok?0:1),()=>process.exit(1))`;
-  return [node, "-e", asks];
-}
-
 // One line starts the server on both roads, and the bridgehead holds it, because that hook reaches no module past its own folder and every other caller imports it there. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function startOf(root, node = "node") {
   return [node, "-e", START, root, root];
@@ -59,39 +61,32 @@ export async function servesDetached(it) {
   return (await detachedStart(it)).said;
 }
 
-// [[spec/design_output/level0#a-desk-serve-returns]]
+// The index answers its standing by starting its door where none answers, so one run starts it and probes it. [[spec/design_output/level0#a-desk-serve-returns]]
 export async function detachedStart(it) {
-  const port = portIn(it);
-  const node = it.node ?? "node";
-  if (it.proc.run(probeOf(node, port), { cwd: it.root }).exitCode === 0) {
-    return { code: 0, said: answersAt(port) };
+  const was = doorOf(it);
+  const stood = it.proc.run([it.join(it.root, ...BIN.split("/")), "standing"], {
+    cwd: it.root,
+  });
+  if (stood.exitCode !== 0) {
+    const why = String(stood.stderr ?? "").trim() || `it exits ${stood.exitCode}`;
+    return { code: 1, said: `The index falls: ${why}` };
   }
-  const out = it.join(it.root, ...SERVE.split("/"));
-  it.disk.makeDir(it.join(it.root, ...LOG_FOLDER.split("/")));
-  const was = it.disk.exists(out) ? String(it.disk.read(out)) : "";
-  const born = await it.proc.respawn(
-    [node, it.join(it.root, ...SERVER.split("/")), it.root],
-    { cwd: it.root, out, waitMs: DETACH_WAIT },
-  );
-  if (!born.fell) return { code: 0, said: startsAt(port) };
-  const now = it.disk.exists(out) ? String(it.disk.read(out)) : "";
-  return {
-    code: 1,
-    said: `The server at port ${port} falls: ${reasonIn(wroteSince(was, now))}`,
-  };
+  const door = doorOf(it);
+  const port = portOf(door);
+  return { code: 0, said: was && was === door ? answersAt(port) : startsAt(port) };
 }
 
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 export function servesHere(it) {
-  const port = portIn(it);
-  if (it.proc.run(probeOf(it.node ?? "node", port), { cwd: it.root }).exitCode === 0) {
-    return answersAt(port);
-  }
+  const was = doorOf(it);
   const started = it.proc.run(startOf(it.root, it.node ?? "node"), { cwd: it.root });
-  const [, why] = reasonOf(started.exitCode);
-  return started.exitCode === 0
-    ? startsAt(port)
-    : `No server answers at port ${port}, and the start fails: ${started.stderr.trim() || why}`;
+  if (started.exitCode !== 0) {
+    const [, why] = reasonOf(started.exitCode);
+    return `No index answers, and the start fails: ${String(started.stderr ?? "").trim() || why}`;
+  }
+  const door = doorOf(it);
+  const port = portOf(door);
+  return was && was === door ? answersAt(port) : standsAt(port);
 }
 
 // [[spec/design_output/pull#the-engine-takes-the-branch]]

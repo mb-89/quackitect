@@ -1,57 +1,58 @@
-// THE START ROAD. The script the bridgehead runs where no server answers, the codes it exits with, and the lines a session reads off them. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// THE START ROAD. The script the bridgehead runs where no index answers, the codes it exits with, and the lines a session reads off them. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 
+import { BIN } from "../lib/index.js";
 import { SERVE } from "../lib/log.js";
-import { SELF_TEST, TESTING } from "../lib/vehicle.js";
 
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const STARTING = 180_000;
 // The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports its own folder alone.
-export const INSTALL_SKIP = "editor-link editor-extensions editor-client go index";
+export const INSTALL_SKIP = "editor-link editor-extensions editor-client go";
+// The span the index takes to answer its standing, which starts its door where none answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const STANDING_WAIT = 60_000;
 // The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const NO_NODE = 5;
-// The code REASONS reads for a road that installs the modules and then starts the server. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// The code REASONS reads for a road that installs the modules and then starts the index. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const INSTALLED = 7;
 
-// THE CLOUD STARTS ITS OWN SERVER, AND BRINGS WHAT THE SERVER NEEDS. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the modules stand nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// THE CLOUD STARTS ITS OWN INDEX, AND BRINGS WHAT THE INDEX NEEDS. The index answers its standing by starting its door where none answers, so one call starts it and probes it, in the work root it serves. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the modules stand nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const START = [
-  "const { spawn, spawnSync } = require('node:child_process');",
+  "const { spawnSync } = require('node:child_process');",
   "const { existsSync, mkdirSync, openSync } = require('node:fs');",
   "const [here, method, skip] = process.argv.slice(1);",
   "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
   "if (!existsSync(method)) process.exit(4);",
   "mkdirSync(here + '/.se/.log', { recursive: true });",
   `const out = openSync(here + '/${SERVE}', 'a');`,
+  `const index = method + '/${BIN}';`,
   "const brought = !existsSync(method + '/node_modules');",
   // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-  "if (brought) {",
-  "  const env = Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' });",
-  "  spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env, stdio: ['ignore', out, out] });",
-  "}",
+  "const install = () => spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env: Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' }), stdio: ['ignore', out, out] });",
+  "if (brought) install();",
   "if (!existsSync(method + '/node_modules')) process.exit(6);",
-  // The code proves it loads before a server starts on it, so a broken tree writes one line and loops nowhere. [[spec/design_output/level0#new-code-proves-it-loads]]
-  `const tested = spawnSync(process.execPath, [method + '/src/bridge/server.js', '${SELF_TEST}', method], { cwd: method, encoding: 'utf8', timeout: ${TESTING}, windowsHide: true });`,
-  "if (tested.status !== 0) {",
-  "  process.stderr.write(String(tested.stderr || tested.error || 'the self-test answers nothing').trim().split('\\n').slice(0, 4).join(' '));",
+  // A box the setup built no index on builds it now, because the index is what the road starts. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+  "if (!existsSync(index)) install();",
+  "if (!existsSync(index)) process.exit(9);",
+  `const stood = spawnSync(index, ['standing'], { cwd: here, encoding: 'utf8', timeout: ${STANDING_WAIT}, windowsHide: true });`,
+  "if (stood.status !== 0) {",
+  "  process.stderr.write(String(stood.stderr || stood.error || 'the standing answers nothing').trim().split('\\n').slice(0, 4).join(' '));",
   "  process.exit(8);",
   "}",
-  "const argv = [method + '/src/bridge/server.js', method];",
-  "const born = spawn(process.execPath, argv, { cwd: method, detached: true, stdio: ['ignore', out, out], windowsHide: true });",
-  "born.unref();",
   "process.exit(brought ? 7 : 0);",
 ].join("\n");
 
 const REASONS = {
-  0: ["info", "no server answered, so the bridgehead starts one"],
-  1: ["warn", "the start of the server fails"],
-  3: ["", "a person starts the server here"],
-  4: ["warn", "the method root is absent, so no server starts"],
-  5: ["warn", "this box carries no node, so no server starts"],
-  6: ["warn", "the install brings no modules, so no server starts"],
+  0: ["info", "no index answered, so the bridgehead starts one"],
+  1: ["warn", "the start of the index fails"],
+  3: ["", "a person starts the index here"],
+  4: ["warn", "the method root is absent, so no index starts"],
+  5: ["warn", "this box carries no node, so no index starts"],
+  6: ["warn", "the install brings no modules, so no index starts"],
   7: [
     "info",
-    "the modules stand nowhere, so the bridgehead installs them and starts one",
+    "the modules stand nowhere, so the bridgehead installs them and starts the index",
   ],
-  8: ["warn", "the bridge code fails its self-test, so no server starts"],
+  8: ["warn", "the index fails its standing, so no door stands"],
+  9: ["warn", "the install builds no index, so no index starts"],
 };
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -70,7 +71,7 @@ export function cageText(code, detail) {
     String(detail ?? "").trim() ? `The road itself says: ${String(detail).trim()}` : "",
     "Open your first answer with one line saying level zero stands down here, and",
     "what this box lacks. Then run ./RUNME.sh, which installs it, and start the",
-    "server with ./RUNME.sh serve.",
+    "index with ./RUNME.sh serve.",
   ]
     .filter(Boolean)
     .join(" ");

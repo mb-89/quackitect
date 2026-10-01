@@ -77,16 +77,17 @@ change of a door. Headless turns say so, against client 2.1.269:
 ## The cloud starts the server
 
 Nobody presses the hook button on a cloud box. So the pull that takes a
-branch there ends on the server, through `src/scripts/serve.js`. It probes
-the health answer at the port the pointer names. Where nothing answers, it
-starts the server on its own, the way the stub's bridgehead does. The pull's
-last line says which of these stands:
+branch there ends on the index, through `src/scripts/serve.js`. It runs the
+start road, which runs the index with `standing`. That verb starts the index's
+door where none answers, so one call starts it and probes it. The pull's last
+line reads the port off `.se/.runtime/hooks.json`, and says which of these
+stands:
 
 | what stands | the line says |
 |---|---|
-| the server answers | the port it answers at |
-| the start runs | that the server starts detached, and why |
-| the start fails | the shell's last line |
+| the door stands before the road runs | the port it answers at |
+| the door stands now | the port it stands at |
+| the start fails | the road's last line |
 
 A desk pull starts nothing, and a take that fails starts nothing.
 
@@ -96,15 +97,12 @@ stub's bridgehead keeps a copy, because that file imports nothing at all.
 
 ## A desk serve returns
 
-`./RUNME.sh serve` probes the same port. Where nothing answers, it starts the
-server apart from the shell through the proc door's `respawn`. It watches the
-server for the window a restart takes, and returns.
+`./RUNME.sh serve` runs the index with `standing`, which starts its door apart
+from the shell where none answers, and returns.
 
-The server stays when the shell closes, and a second run finds it standing and
-starts nothing. A start that falls inside the
-window names the line it writes to `.se/.log/serve.log`. With `--inspect` the
-verb holds the server as its own child, because the debugger holds it.
-`detachedStart` in `src/scripts/serve.js` holds it.
+The door stays when the shell closes, and a second run finds it standing and
+starts nothing. A start that falls names what the index writes to its error
+stream. `detachedStart` in `src/scripts/serve.js` holds it.
 
 ## The bridgehead starts it too
 
@@ -115,8 +113,10 @@ road runs once. That silence says nothing to the person, because the road runs
 under it. For details, see
 [[spec/design_output/level0#the-bridge-says-it-falls]].
 
-The road is one shell line, because the hook stands outside node and its own
-folder reaches no shell. The shell reads the environment itself and answers a code:
+The road is one node script, because a Windows box carries no shell. It reads
+the environment itself, and installs where the modules or the index stand
+nowhere. It then runs the index with `standing` in the work root, and answers
+a code:
 
 | the code | what stands | what the log carries |
 |---|---|---|
@@ -124,9 +124,10 @@ folder reaches no shell. The shell reads the environment itself and answers a co
 | 4 | the method root stands nowhere | one `warn` line |
 | 5 | the box carries no node | one `warn` line |
 | 6 | the install brings no modules | one `warn` line |
-| 7 | the road installs the modules, then starts the server | one `info` line |
-| 8 | the bridge code fails its self-test, so no server starts | one `warn` line naming the fault |
-| 0 | the server starts behind the session | one `info` line |
+| 7 | the road installs the modules, then starts the index | one `info` line |
+| 8 | the index fails its standing, so no door stands | one `warn` line naming the fault |
+| 9 | the install builds no index | one `warn` line |
+| 0 | the index stands behind the session | one `info` line |
 
 `CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
 cloud guidance binds on. The operating system decides nothing here, because a

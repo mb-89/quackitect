@@ -8,7 +8,7 @@ import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import { GROUP_NOTE, remoteSaying } from "./work-doors.js";
 
@@ -41,7 +41,6 @@ function doors(cloud) {
     },
     ROOT,
   );
-  said.proc.teach(probeOf("node", 6510), { exitCode: 1 });
   said.proc.teach(startOf(ROOT), { exitCode: 0 });
   const disk = fakeDisk({
     [join(ROOT, ".se", "box.json")]: JSON.stringify({ id: "d462e994b4cef" }),

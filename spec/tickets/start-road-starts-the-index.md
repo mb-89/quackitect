@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
 depends_on: ["level0-tools-leave-the-bridge"]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -160,6 +160,15 @@ record:
         hash: d128104d243bb342
         size: 1018
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: 487f739259fca28b8eebc424bd3d3c615b3f961f
+    hash_after: 487f739259fca28b8eebc424bd3d3c615b3f961f
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:314:450: Vocabulary: stepbrief stands outside the words this tree writes. Wr"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -331,14 +340,19 @@ accept. The approach answers the ask: se-index standing starts serve where no do
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The change touches the files the draft names. It adds the tests that held the bridge road, and the size golden.
+- The road runs real node over a fake index script. The serve cases run the fake disk and process.
+- Each changed function carries a comment naming a start road chapter of the level zero design note.
+- The index path stands in `lib/index.js`, and the standing file in `lib/folders.js`. Each copy names `folders.js` beside it.
 
 ## tests-green
 

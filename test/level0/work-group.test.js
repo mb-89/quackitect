@@ -15,7 +15,7 @@ import {
   withField,
   withHashAfter,
 } from "../../src/engine/group.js";
-import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { startOf } from "../../src/scripts/serve.js";
 import * as works from "../../src/scripts/work.js";
 import {
   DONE,
@@ -68,20 +68,12 @@ test("a pull on trunk takes a group for a cloud box, the way branch take does", 
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
 
-  for (const [argv, code] of [
-    [probeOf("node", 6510), 1],
-    [startOf(ROOT), 0],
-  ])
-    outside.proc.teach(argv, { exitCode: code });
+  outside.proc.teach(startOf(ROOT), { exitCode: 0 });
   const { code, said } = heard(() =>
     pulling(ROOT, ["pull"], { ...it, cloud: true, agent: true }),
   );
   assert.equal(code, 0);
-  assert.match(
-    said,
-    /The server starts detached/,
-    "a cloud take starts the server where nothing answers",
-  );
+  assert.match(said, /The index stands at port/, "a cloud take starts the index");
   assert.ok(
     ranGit(outside).includes("git switch work/one-group") &&
       ranGit(outside).includes("git push origin work/one-group"),

@@ -49,3 +49,14 @@ test("the serve verb exits one where the index falls", async () => {
   assert.equal(code, 1);
   assert.match(said, /falls: no door/);
 });
+
+// [[spec/design_output/level0#a-desk-serve-returns]]
+test("the serve verb takes no debugger, and runs the index standing alone", async () => {
+  const held = doors({ exitCode: 0 });
+  const { code } = await heard(() => serveBridge(["--inspect"], held));
+  assert.equal(code, 0);
+  assert.deepEqual(
+    held.proc.ran.map((one) => one.argv),
+    [[INDEX_AT, "standing"]],
+  );
+});

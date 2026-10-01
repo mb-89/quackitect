@@ -9,7 +9,7 @@ import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
 import { takeable } from "../../src/scripts/pull.js";
 import { excludes } from "../../src/scripts/pull-hand.js";
-import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
   at,
@@ -50,10 +50,7 @@ const onTrunk = (extra = {}) => ({
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
 test("on trunk a cloud box's pull takes a branch, and a desk's pull takes none", () => {
   const cloud = doors(standing(), onTrunk(), { cloud: true });
-  for (const [argv, code] of [
-    [probeOf("node", 6510), 1],
-    [startOf(ROOT), 0],
-  ])
+  for (const [argv, code] of [[startOf(ROOT), 0]])
     cloud.outside.proc.teach(argv, { exitCode: code });
   const taken = heard(() => pulling(ROOT, ["pull"], cloud.it));
   assert.equal(taken.code, 0);
