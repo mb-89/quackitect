@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: sync
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -17,7 +18,6 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    reads: [[spec/guidance/working]]
     checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
     evidence:
       - name: children
@@ -26,8 +26,17 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    tags: ["review", "accept"]
+    input: ["ask", "children"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
-    reads: [[spec/guidance/working]]
     to: retro
     steps:
       - name: notes
@@ -72,12 +81,8 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
 process: [[spec/processes/group]]
-process_hash: 57b2cccd0445ea9a
-depends_on: [go-cage-lands-in-shadow, quack-verbs-switch-over]
-enabled_by: migration.phase5switch
-cloud: true
+process_hash: 5d4a884bfb2491ff
 record:
   - step: sync
     hand: box d889b5fde3d5 · claude-code-remote
@@ -130,6 +135,9 @@ record:
   - step: sync
     hand: box 40b0ad3f11a · claude-code-remote
     hash_before: 219e8f47723f7ad83ab495a483646621f37b0e12
+depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
+enabled_by: migration.phase5switch
+cloud: true
 ---
 
 # Ask
@@ -165,6 +173,16 @@ Done when the bridge server leaves the tree.
 <!-- the form is checklist -->
 
 # children
+
+# accept
+
+<!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
 
 # retro
 
