@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/modules/hooks/review"
 	"quackitect/src/modules/hooks/write"
 	"quackitect/src/q"
 	"quackitect/src/q/tool"
@@ -134,6 +135,8 @@ type Outside struct {
 	Schema func(root, where, text string) write.Judged
 	// The index a Grep or a Glob asks, by method and params in the shape se-index reads, and its answer in the shape it prints. None passes every search to the harness. [[spec/tickets/grep-glob-answer-off-index]]
 	Index func(method string, params map[string]any) (map[string]any, error)
+	// What the branch verb gathers for a review under the root, or why it gathered nothing. None passes the review to the bridge. [[spec/tickets/review-spawns-off-the-door]]
+	Review func(root, branch string) (review.Material, string)
 }
 
 // What the doors read off the config and the box: the words a name holds, whether the box stands in the cloud, the owner's hold and ask, the binding, the graces, the plan's numbers, and each helper tier's model. [[spec/tickets/cage-command-rules-port]] [[spec/tickets/cage-call-holds-port]]

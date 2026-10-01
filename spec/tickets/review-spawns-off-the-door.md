@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
 record:
   - step: design/owner-read
@@ -135,6 +135,19 @@ record:
         hash: e31e3e8fdb75c4ab
         size: 676
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 1e4231ad78d580b0412496fd79e0e5acb7eebb1c
+    hash_after: 1e4231ad78d580b0412496fd79e0e5acb7eebb1c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: cc6f95e3f9cda4bf
+        size: 5123
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -263,26 +276,43 @@ the Go done_when line rests on TestAReviewCallAnswersASpawnUnderAToken and TestT
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/review/review_test.go src/modules/hooks/review_test.go test/level0/door-spawn.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/hooks/review/review_test.go
+src/modules/hooks/review_test.go
+test/level0/door-spawn.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion:
+- the review package's cases, against stubs answering empty values
+- the door's cases, against a door that passes the review call and the answered event
+- the plugin case, whose door answers a spawn that never runs
+
+The table `test/replay/cage/review-cases.json` carries the bridge's own answers, read off a red run of `test/level0/review-cases.test.js`, which now answers green and pins the bridge.
+
+What surprises me:
+- the formatter lays a JSON file out again on write, so an exact edit has to read the file first
+- `resultOf` stands in the hooks search cases already, so the review cases take `reviewResultOf`
+- `Outside.Review` lands now as a stub field, and `hooks.go` stands a few lines under its ceiling, so the move of the listener comes first at the change
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the Go done_when line meets TestAReviewCallAnswersASpawnUnderAToken and TestTheAnsweredEventAnswersTheReport, and the check line waits for tests-green
+the door cases run over doorOver with a fake Review seam, the package cases over the table, and the plugin case over a fake disk, a fake door and a fake spawn
 
 # gate
 
