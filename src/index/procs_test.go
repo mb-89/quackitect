@@ -272,7 +272,9 @@ type twiceOf struct {
 	All int `q:"all"`
 }
 
-func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
+// A store wiring a doubler to a source, the source's writer, a bus the case closes, and the doubler placed in the idle fake. [[spec/design_output/model#the-placements]]
+func doublerPlaced(t *testing.T) (*q.Store, q.Writer, *Bus, Placed) {
+	t.Helper()
 	var source q.Writer
 	types := map[string]func(*q.Catalog){
 		"source": func(c *q.Catalog) { source = q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
@@ -289,8 +291,13 @@ func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer bus.Close()
+	t.Cleanup(bus.Close)
 	placed := Placed{Name: "doubler", Command: []string{os.Args[0], "-test.run=^TestFakeIdleProcess$"}, Instances: map[string]q.Writer{"doubler": {}}, Restart: time.Hour, Topics: []string{"doubler"}}
+	return store, source, bus, placed
+}
+
+func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
+	store, source, bus, placed := doublerPlaced(t)
 	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
@@ -326,6 +333,67 @@ func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
 	}
 	if !strings.Contains(string(saved), `"source/all"`) || !strings.Contains(string(saved), "21") {
 		t.Fatalf("the index answers the inputs of doubler with %s", saved)
+	}
+}
+
+func TestAMovedAskAnswersTheInputsMovedSinceTheLastAnswer(t *testing.T) {
+	store, source, bus, placed := doublerPlaced(t)
+	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	peer, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer peer.Close()
+	if _, err := peer.Inputs("doubler"); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 22}); err != nil {
+		t.Fatal(err)
+	}
+	moved, err := peer.Moved("doubler")
+	if err != nil || !strings.Contains(string(moved), `"source/all"`) || !strings.Contains(string(moved), "22") {
+		t.Fatalf("the moved ask answers %s and %v, and wants source/all at 22", moved, err)
+	}
+	again, err := peer.Moved("doubler")
+	if err != nil || strings.Contains(string(again), `"source/all"`) {
+		t.Fatalf("a second moved ask answers %s and %v, where nothing moved since", again, err)
+	}
+}
+
+func TestAQuietNameRunsNoPlacedProcess(t *testing.T) {
+	store, source, bus, placed := doublerPlaced(t)
+	stop, err := NewPlacements(bus, store, []Placed{placed}).Quiet("source/all").Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	peer, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer peer.Close()
+	runs := make(chan struct{}, 1)
+	done, err := peer.Runs("doubler", func() {
+		select {
+		case runs <- struct{}{}:
+		default:
+		}
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer done()
+	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 21}); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-runs:
+		t.Fatal("a commit of the quiet source/all runs doubler")
+	case <-time.After(300 * time.Millisecond):
 	}
 }
 

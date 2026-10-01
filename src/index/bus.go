@@ -33,7 +33,15 @@ const (
 const (
 	commitVerb = "commit."
 	leaseVerb  = "lease."
+	runVerb    = "run."
+	inVerb     = "in."
 )
+
+// The wait a module process gives the index to answer its inputs. [[spec/design_output/model#names-become-subjects]]
+const inputsWait = 30 * time.Second
+
+// The body of an ask for the inputs moved since the last answer, where an empty ask wants them whole. [[spec/design_output/model#names-become-subjects]]
+const askMoved = "moved"
 
 // [[spec/design_output/model#the-index-runs-nats]]
 type Bus struct {
@@ -126,11 +134,20 @@ func (p *Peer) Beat(part string) error { return p.conn.Publish(leaseVerb+part, n
 func (p *Peer) Close() { p.conn.Close() }
 
 // Publishes run.<instance>: an input of a placed instance moves. [[spec/design_output/model#names-become-subjects]]
-func (p *Peer) Run(instance string) error { return errors.New("the bus stands unbuilt") }
+func (p *Peer) Run(instance string) error {
+	if err := p.conn.Publish(runVerb+instance, nil); err != nil {
+		return err
+	}
+	return p.conn.Flush()
+}
 
 // Hands each run.<instance> to hand. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Runs(instance string, hand func()) (func(), error) {
-	return func() {}, errors.New("the bus stands unbuilt")
+	sub, err := p.conn.Subscribe(runVerb+instance, func(*nats.Msg) { hand() })
+	if err != nil {
+		return nil, err
+	}
+	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()
 }
 
 // Hands the part of each heartbeat on lease.<part> to hand. [[spec/design_output/model#names-become-subjects]]
@@ -139,11 +156,35 @@ func (p *Peer) Leases(hand func(part string)) (func(), error) {
 }
 
 // Asks in.<instance>, and answers the saved inputs. [[spec/design_output/model#names-become-subjects]]
-func (p *Peer) Inputs(instance string) ([]byte, error) {
-	return nil, errors.New("the bus stands unbuilt")
+func (p *Peer) Inputs(instance string) ([]byte, error) { return p.asks(instance, nil) }
+
+// Asks in.<instance> for the inputs moved since the last answer. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) Moved(instance string) ([]byte, error) { return p.asks(instance, []byte(askMoved)) }
+
+func (p *Peer) asks(instance string, body []byte) ([]byte, error) {
+	said, err := p.conn.Request(inVerb+instance, body, inputsWait)
+	if err != nil {
+		return nil, err
+	}
+	return said.Data, nil
 }
 
 // Answers each in.<instance> with what saved answers. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) AnswersInputs(instance string, saved func() ([]byte, error)) (func(), error) {
-	return func() {}, errors.New("the bus stands unbuilt")
+	return p.AnswersMoved(instance, func(bool) ([]byte, error) { return saved() })
+}
+
+// Answers each in.<instance> with what saved answers, told whether the ask wants the moved inputs alone. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) AnswersMoved(instance string, saved func(moved bool) ([]byte, error)) (func(), error) {
+	sub, err := p.conn.Subscribe(inVerb+instance, func(asked *nats.Msg) {
+		body, err := saved(string(asked.Data) == askMoved)
+		if err != nil {
+			body = []byte("{}")
+		}
+		_ = asked.Respond(body)
+	})
+	if err != nil {
+		return nil, err
+	}
+	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()
 }

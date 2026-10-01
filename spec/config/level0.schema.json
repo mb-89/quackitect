@@ -670,6 +670,16 @@
         }
       }
     },
+    "processes": {
+      "type": "object",
+      "properties": {
+        "placements": {
+          "type": "array",
+          "default": [],
+          "help": "the lists of module instances that share one process, where each instance in no list takes a process of its own"
+        }
+      }
+    },
     "pull": {
       "type": "object",
       "properties": {
