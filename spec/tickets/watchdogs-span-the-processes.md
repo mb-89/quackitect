@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -116,6 +116,16 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: module-processes-land-in-shadow
 depends_on: ["the-doors-process-stands"]
+record:
+  - step: design/draft
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 3fca2c158438e7e5f603ad59418d8eba9b8d6252
+    hash_after: 3fca2c158438e7e5f603ad59418d8eba9b8d6252
+    inputs:
+      - name: ask
+        hash: b10dd6eac949de7c
+        size: 309
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -147,32 +157,61 @@ A silent process then reads as silent.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The leases reach across the bus the doors process builds, per [[spec/design_output/model#the-watcher-of-the-watchdog]]. Under the `processes` slice's `shadow`, a silent process restarts and raises its alarm, and the old path keeps answering.
+
+1. The index hears each beat. `src/index/bus.go` gives `Peer` the method `Leases(hand)`, which subscribes `lease.>` and hands each part its beat.
+2. One dog holds every lease. `manager.Served` hands out the manager's `Dog`, and `manages` in `src/quack/main.go` passes it to `ioShadow` and the placements. Each placed process holds a lease under its name, at the term `config/watchdog/lease` sets, and each beat renews it.
+3. A silent process restarts. `Dog` gains `Expired(hand)`, which the manager's tick calls for each part its `Check` finds expired. `Placed` kills a process whose lease expires, and its exit path restarts it. The wait before a restart comes off `Dog.Fault`, so a run of faults raises the alarm in `session/alarms` and stops the restarts.
+4. The module process beats. `runsModule` beats `lease.<process>` as a step of its run loop, per the placements ticket. The IO process keeps its beat on `lease.io`.
+5. The index beats too. `renews` in the manager publishes `lease.index` beside its commit of `index/health`.
+6. The IO process watches the index. `ioOver` subscribes `lease.index`, and a silence past the term writes a `watchdog` row to the session log. Under `shadow` it restarts nothing, since the index spawns it, and the switch ticket lands the restart.
+7. The hook module reads the index's lease. `hooks.Outside` gains `Health`, which reads `index/health` off the store. Before a guarded call, a lease past its term writes a `shadow` row, since the port answers while the loop hangs, and the call passes as before.
+
+The assumption: the IO process beats off a ticker beside its starts, since no one loop runs its modules. A hung start goes on beating, and the switch ticket moves the beat into each start's loop.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/bus.go Peer, which gains Leases
+- src/index/procs.go Placed.Start, whose restart wait comes off the dog, and Placements.Start, which holds a lease for each process
+- src/modules/index/lease.go Dog, which gains Expired
+- src/modules/index/manager.go Serving and Served, which hand out the dog, renews, which publishes lease.index, and ticks, which calls the expired hands
+- src/quack/main.go manages, which hands the dog to ioShadow and the placements, and listensHooks, which hands the hook module its Health
+- src/quack/io.go ioShadow, which takes the dog, and ioOver, which watches lease.index
+- src/quack/placements.go runsModule, which beats its lease off its run loop
+- src/modules/hooks/hooks.go Outside, which gains Health, and the guarded call, which reads it
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/bus_test.go TestTheIndexHearsEachBeatOfALease
+- src/index/procs_test.go TestASilentModuleProcessRestartsAndRaisesAnAlarm
+- src/modules/index/lease_test.go TestAnExpiredLeaseCallsItsHand
+- src/quack/io_test.go TestASilentIOProcessReadsInTheAlarms
+- src/quack/io_test.go TestTheIOProcessWritesARowWhenTheIndexFallsSilent
+- src/modules/hooks/cage_test.go TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened, and each claim checked there: bus.go Peer and Beat, procs.go Placed and Placements, lease.go Dog, manager.go Registers, begins, renews and ticks, main.go manages and listens, io.go ioShadow and ioOver, and the JS cage
+- the callers list names every caller of what the approach changes, off a grep of Beat, Hold, Fault, Check, leaseVerb, HealthName and manages
+- every done_when line names the test that decides it: the silence line meets the module, the IO and the index cases, each reading session/alarms or the session log, and go test and the check run at implement
 
 ## tests-red
 
