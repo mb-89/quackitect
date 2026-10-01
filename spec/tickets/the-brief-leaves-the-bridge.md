@@ -159,7 +159,17 @@ record:
         hash: e5b36c0792060d5c
         size: 1009
     def: dc4904ab364efa10
-depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door", "spawn-answers-off-the-door", "clear-answers-off-the-door", "level0-tools-leave-the-bridge"]
+  - step: implement/change
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 93d3054fd0980c7485392d1979afd4d49dc0193c
+    hash_after: 4a6f6e742dab8a999127fcf2289824fc910bf003
+    returns: 1
+    why: "the flip waits on start-road-starts-the-index: the cold probe found no hooks door in a fresh box, so the brief never reached the session. The Discussion carries the change that lands once the start road stands"
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:304:450: Vocabulary: stepbrief stands outside the words this tree writes. Wr"
+depends_on: ["brief-answers-off-the-door","prompt-answers-off-the-door","spawn-answers-off-the-door","clear-answers-off-the-door","level0-tools-leave-the-bridge","start-road-starts-the-index"]
 ---
 
 # Ask
@@ -312,14 +322,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the landed part touches the brief fold and its cases alone, and the flip stands back out of the tree
+- the brief fold logs through the door, whose cases drive a temp tree
+- each comment names the ticket, and the Discussion names the change the flip carries
+- the canary words stand once on the Go side, pointing at HEARD in the plugin
 
 ## tests-green
 
