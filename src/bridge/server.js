@@ -60,7 +60,6 @@ import {
   measures,
   onSessionMeasure,
 } from "./handover.js";
-import { SPECS as logSpecs, TOOLS as logTools } from "./logline.js";
 import {
   asksForPlan,
   PLAN,
@@ -73,7 +72,6 @@ import {
 import { freshens } from "./projection.js";
 import { SPECS as proseSpecs, TOOLS as proseTools } from "./prose.js";
 import { movedCode, provesCode, SELF_TEST } from "./reload.js";
-import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {
   ANSWERED,
   onAgentAnswered,
@@ -91,8 +89,6 @@ import {
   saidReport,
   sawCall,
   sawPrompt,
-  SPECS as stopSpecs,
-  TOOLS as stopTools,
 } from "./stop.js";
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
@@ -161,11 +157,8 @@ const TOOLS = {
   ...applyTools,
   ...handTools,
   ...reviewTools,
-  ...stopTools,
-  ...reportTools,
   ...planTools,
   ...proseTools,
-  ...logTools,
   ...waitTools,
 };
 
@@ -202,11 +195,8 @@ function specsOf(box) {
     ...applySpecs(),
     ...toolSpecs(box),
     ...reviewSpecs(),
-    ...stopSpecs(box),
-    ...reportSpecs(),
     ...planSpecs(),
     ...proseSpecs(),
-    ...logSpecs(),
     ...waitSpecs(),
   ].map(withPlanField);
 }

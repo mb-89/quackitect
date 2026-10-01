@@ -5,10 +5,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { boxOf, decide } from "../../src/bridge/server.js";
-import { TOOLS as CALLS } from "../../src/bridge/stop.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
@@ -66,13 +64,6 @@ function served() {
 
 const stops = (box) =>
   decide({ event: "classic.Stop", e: { last_assistant_message: LINE } }, box);
-
-test("a claim that stands asks for the stop line alone, and for no second answer", () => {
-  const said = CALLS[STOP_CALL]({ reason: "the-owner-asks-to-talk" }, served()).result
-    .result;
-  assert.match(said, /the line stop: the-owner-asks-to-talk alone/);
-  assert.doesNotMatch(said, /Write the answer/);
-});
 
 test("a report the answer before the stop call streams stands, so the line alone ends the turn", async () => {
   const box = served();

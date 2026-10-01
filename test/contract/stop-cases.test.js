@@ -63,7 +63,12 @@ function decision(event, said) {
   return "pass";
 }
 
-for (const one of TABLE.cases) {
+// The hooks door alone answers the stop tool, so a case claiming through it runs against the door in src/modules/hooks/stops_test.go. [[spec/tickets/log-report-stop-in-go]]
+const STOP_TOOL = "mcp__level0__stop";
+const claimsThroughTheTool = (one) =>
+  one.events.some((each) => each?.e?.tool === STOP_TOOL);
+
+for (const one of TABLE.cases.filter((each) => !claimsThroughTheTool(each))) {
   test(`the bridge answers the shared stop case: ${one.name}`, async () => {
     const made = box(one);
     for (const each of one.events) await decide(each, made);

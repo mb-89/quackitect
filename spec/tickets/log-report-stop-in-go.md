@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -228,6 +228,15 @@ record:
         hash: eeec70248ba48fab
         size: 1137
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: d46b5ead2bc6e66c27984b967834b4928e5e1527
+    hash_after: d46b5ead2bc6e66c27984b967834b4928e5e1527
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
 ---
@@ -552,14 +561,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/hooks/answers.go src/modules/hooks/fold.go src/modules/hooks/stops.go src/modules/hooks/hooks.go src/bridge/server.js src/bridge/stop.js test/level0/stop-door.test.js test/level0/stop-helper.test.js test/level0/stop-said.test.js test/level0/stop-hold.test.js test/level0/restart-box.test.js test/contract/stop-cases.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files draft-2's size names, plus restart-box.test.js and stop-cases.test.js, whose cases drove the bridge's tools, and the size golden
+the fold cases run over the fake index, and the door cases over doorOver and the wired quack tree
+answers.go, the fold's helper branch and the stop's wording each point at this ticket or its child
+the tool docs and inputs stand in answers.go, and the bridge spells only the report tool's name, under a pointer
 
 ## tests-green
 

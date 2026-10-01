@@ -6,16 +6,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
 import { leafBy } from "../../.claude/skills/level0/lib/ticket.js";
 import { onPromptSubmit } from "../../src/bridge/answer.js";
-import {
-  dropsHold,
-  onStop,
-  reportStands,
-  sawPrompt,
-  TOOLS,
-} from "../../src/bridge/stop.js";
+import { dropsHold, onStop, reportStands, sawPrompt } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -275,7 +268,7 @@ test("a claim of done holds while the plan holds a todo or a thing in hand", () 
 });
 
 // A refusal names the check that falls and what it sees, so a stop line standing whole hears no claim of a missing reason. [[spec/design_output/stop#a-refusal-names-its-check]]
-test("a claim of done over a thing in hand hears the check and the thing, at the call and at the turn's end", () => {
+test("a claim of done over a thing in hand hears the check and the thing at the turn's end", () => {
   const plan = {
     [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "the door", todos: [] }),
   };
@@ -289,23 +282,6 @@ test("a claim of done over a thing in hand hears the check and the thing, at the
     /check the-plan-is-empty answers false: the plan still holds "the door"/,
   );
   assert.doesNotMatch(block, /names no stop reason/);
-
-  const called = box(plan);
-  const refused = TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, called.box);
-  assert.match(refused.result.result, /^The claim falls\. .*"the door".*under done/);
-  assert.equal(
-    called.box.claim,
-    undefined,
-    "a claim that falls stands nowhere for the turn's end",
-  );
-
-  const clear = box({
-    [at(".se/.runtime/plan.json")]: JSON.stringify({ working: "", todos: [] }),
-  });
-  assert.match(
-    TOOLS[STOP_CALL]({ reason: "the-work-stands-complete" }, clear.box).result.result,
-    /^The claim stands/,
-  );
 });
 
 test("a line naming a reason nobody holds hears that, and a turn with no line hears the plain rule", () => {
@@ -500,68 +476,8 @@ test("a prompt opens a turn, so the hold of the turn before ends nothing", () =>
   );
 });
 
-// A turn waiting on the owner's step ends on a reason naming that step. [[spec/tickets/the-stop-reads-the-state]]
-const STEP_RULES = `
-- id: the-owner-holds-the-step
-  side: stop
-  priority: 88
-  decides: claimed
-  waits: owner
-  runs: step-waits-on-person
-  asks: Does the ticket in hand, or its group, stand at a step a person takes?
-  says: The ticket in hand waits on the owner's step, so this turn ends and waits.
-`;
-
 const ticketAt = (step, by, more = "") =>
   `---\nkind: [[ticket]]\nstate: open\n${more}steps:\n  - name: design\n    steps:\n      - name: draft\n        by: anyone\n      - name: person-1\n        by: ${by}\nstep: ${step}\n---\n\n# Ask\n\nA thing.\n`;
-
-function stepBox(files) {
-  const it = box({ [at("spec/config/stop/level0.yml")]: STEP_RULES, ...files });
-  return it.box;
-}
-
-const hold = (ticket) =>
-  JSON.stringify({
-    ticket,
-    path: `spec/tickets/${ticket}.md`,
-    step: "design/person-1",
-    hand: "box b1",
-  });
-
-// [[spec/tickets/the-stop-reads-the-state]]
-test("a ticket in hand at a person's step stands the owner-step claim", () => {
-  const it = stepBox({
-    [at(".se/.runtime/hold/b1.json")]: hold("a-ticket"),
-    [at("spec/tickets/a-ticket.md")]: ticketAt("design/person-1", "person"),
-  });
-  const said = TOOLS[STOP_CALL]({ reason: "the-owner-holds-the-step" }, it);
-  assert.match(said.result.result, /The claim stands/);
-});
-
-// [[spec/tickets/the-stop-reads-the-state]]
-test("a ticket in hand at an agent's step refuses the owner-step claim", () => {
-  const it = stepBox({
-    [at(".se/.runtime/hold/b1.json")]: hold("a-ticket"),
-    [at("spec/tickets/a-ticket.md")]: ticketAt("design/draft", "person"),
-  });
-  const said = TOOLS[STOP_CALL]({ reason: "the-owner-holds-the-step" }, it);
-  assert.match(said.result.result, /The claim falls/);
-});
-
-// [[spec/tickets/the-stop-reads-the-state]]
-test("a ticket in hand whose group stands at a person's step stands the owner-step claim", () => {
-  const it = stepBox({
-    [at(".se/.runtime/hold/b1.json")]: hold("a-child"),
-    [at("spec/tickets/a-child.md")]: ticketAt(
-      "design/draft",
-      "anyone",
-      "group: a-group\n",
-    ),
-    [at("spec/tickets/a-group.md")]: ticketAt("design/person-1", "person"),
-  });
-  const said = TOOLS[STOP_CALL]({ reason: "the-owner-holds-the-step" }, it);
-  assert.match(said.result.result, /The claim stands/);
-});
 
 // A group whose work branch stands is taken, so the queue holds nothing of it for this box. [[spec/tickets/the-stop-reads-the-state]]
 test("an urgent group whose work branch stands leaves the queue with no wait", () => {

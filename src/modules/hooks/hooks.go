@@ -184,6 +184,7 @@ func Registers(c *q.Catalog) q.Writer {
 		q.FoldIn(c, HoldsName, Holds{}, stepHolds, q.Doc("the state the holds keep over a session, and the answer to its newest event")),
 		q.FoldIn(c, StopsName, Stops{}, stepStops, q.Doc("the state the stop keeps over a session, and the answer to its newest Stop")),
 		q.FoldIn(c, BriefName, Brief{}, stepBrief, q.Doc("the canary debt the brief keeps over a session, and the blocks its newest event hands over")),
+		toolActions(c),
 	)
 }
 
@@ -230,6 +231,8 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		// [[spec/tickets/grep-glob-answer-off-index]]
 		effects = append(effects, said)
 	} else if said, ok := d.reviewed(post, root); ok {
+		effects = append(effects, said)
+	} else if said, ok := d.answers(session, post); ok {
 		effects = append(effects, said)
 	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)

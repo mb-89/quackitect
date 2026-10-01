@@ -61,8 +61,8 @@ test("a plan field on a level zero call answers the ask, and every such call tak
   const box = restarted();
   const said = await reads(box);
   assert.ok(
-    specNamed(said.register, "report").inputSchema.properties.plan,
-    "the report call takes the field",
+    specNamed(said.register, "review_branch").inputSchema.properties.plan,
+    "the review call takes the field",
   );
   await decide(
     {

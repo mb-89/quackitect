@@ -36,6 +36,7 @@ const (
 	levelZero    = "mcp__level0__"
 	planCall     = levelZero + "plan"
 	reportCall   = levelZero + "report"
+	logCall      = levelZero + "log"
 	askTool      = "AskUserQuestion"
 	promptWhy    = "The owner sent a prompt"
 	planReact    = "call " + planCall + " with the answers"
@@ -126,10 +127,14 @@ type Said struct {
 func stepHolds(state Holds, event q.Event) Holds {
 	state = state.copied()
 	state.Said = Said{Seq: event.Seq}
+	fields := event.Fields
 	if event.Hand.Agent != "" {
+		// A helper's log and report answer as the main agent's do, as the bridge answers them. [[spec/tickets/helpers-calls-answer-too]]
+		if event.Kind == toolEvent {
+			state.answers(fields, heldIn(fields), event.At)
+		}
 		return state
 	}
-	fields := event.Fields
 	switch event.Kind {
 	case promptEvent:
 		state.Stood = ""
@@ -146,7 +151,7 @@ func stepHolds(state Holds, event q.Event) Holds {
 	case turnEvent:
 		state.turnEnds(fields)
 	case toolEvent:
-		state.called(fields)
+		state.called(fields, event.At)
 	}
 	return state
 }
@@ -255,7 +260,7 @@ func heldIn(fields map[string]any) map[string]any {
 }
 
 // A call meets the update ask and the plan's count, then the chain onToolCall runs: the owner's hold, the cloud ask, the grace, then the answer door. The first that answers ends the chain, and a call the chain lets through meets its tool's own door. [[spec/tickets/cage-call-holds-port]]
-func (state *Holds) called(fields map[string]any) {
+func (state *Holds) called(fields map[string]any, at time.Time) {
 	held := heldIn(fields)
 	tool := textOf(fields, "tool")
 	state.asksForUpdate(held)
@@ -272,18 +277,10 @@ func (state *Holds) called(fields map[string]any) {
 	if word == RefuseWord || word == HoldWord {
 		return
 	}
-	switch tool {
-	case planCall:
+	if tool == planCall {
 		state.planned()
-	case reportCall:
-		if said := strings.TrimSpace(textOf(fields, "text")); said != "" && state.Demand != nil {
-			if state.Demand.lacks(said) == "" {
-				state.paid(said, held)
-			}
-		} else if said != "" {
-			state.Spoken = said
-		}
 	}
+	state.answers(fields, held, at)
 }
 
 // The update ask opens a demand whose block rides its grace, unless an unpaid prompt stands or the same ask stands already. A full update's demand carries the chapters the door stamps. [[spec/design_output/extension#the-ask-is-a-line]] [[spec/tickets/cage-stop-rules-port]]

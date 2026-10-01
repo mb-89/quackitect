@@ -118,6 +118,10 @@ func stepStops(state Stops, event q.Event) Stops {
 		if event.Kind == stopEvent && state.Helpers > 0 {
 			state.Helpers--
 		}
+		// A helper's stop call answers as the main agent's does. [[spec/tickets/helpers-calls-answer-too]]
+		if event.Kind == toolEvent && textOf(fields, "tool") == stopCall {
+			state.claims(fields, held, facts, holdsOf(fields))
+		}
 		return state
 	}
 	switch event.Kind {
@@ -256,15 +260,25 @@ func (state *Stops) claims(fields, held map[string]any, facts Stopped, holds Hol
 	if holds.Said.Word == RefuseWord || holds.Said.Word == HoldWord {
 		return
 	}
-	reason := textOf(fields, "reason")
+	reason := callField(fields, "reason")
 	rule, known := stop.ReasonOf(facts.Rules, reason)
+	// The call words its answer as claims in src/bridge/stop.js does. [[spec/tickets/log-report-stop-in-go]]
 	if !known {
+		var ids []string
+		for _, one := range stop.StopReasons(rulesOr(facts.Rules)) {
+			ids = append(ids, one.ID)
+		}
+		state.Said.Result = reason + " names no reason this tree holds. The ids: " + strings.Join(ids, ", ") + "."
 		return
 	}
-	if !stop.ReadsText[rule.Runs] && stop.ClaimFalls(state.factsOf(held, facts, holds, reason, "")) != "" {
-		return
+	if !stop.ReadsText[rule.Runs] {
+		if falls := stop.ClaimFalls(state.factsOf(held, facts, holds, reason, "")); falls != "" {
+			state.Said.Result = "The claim falls. " + falls
+			return
+		}
 	}
 	state.Claim = reason
+	state.Said.Result = "The claim stands. The answer before this call carries the report, so end the turn with the line stop: " + reason + " alone. The owner reads the answer once."
 }
 
 // The turn's end, in the bridge's order: the handover, the full update's shape, then the vote and the tooth. [[spec/tickets/cage-stop-rules-port]]
