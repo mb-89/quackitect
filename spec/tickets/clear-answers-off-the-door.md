@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -191,6 +191,18 @@ record:
     hash_after: 455604d60a7ba74166a56ffb02d1d8b45ae5a360
     returns: 1
     why: "step 3 of the approach falls: `door` in .claude/skills/level0/hooks/level0.js hands a step's answer straight to the harness, and `clears` runs on the bridge's answer alone, at the `answer.clear` line of `seen`. Add the door road's clear to level0.js and the size list, with a case driving it to `$.prompt.submit`, as test/level0/caged-door.test.js drives the door.; `turn.complete` stands outside `DOORED` in .claude/skills/level0/hooks/cage.js, so the door never meets the event the approach answers. Name the ticket that adds it, or add it here with a case."
+  - step: design/draft-2
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 5dd78f1182e51eb5962fd08bb226d08074b05947
+    hash_after: 5dd78f1182e51eb5962fd08bb226d08074b05947
+    inputs:
+      - name: ask
+        hash: 347f33be92470662
+        size: 650
+      - name: [[spec/tickets/the-brief-leaves-the-bridge]]
+        hash: 19bd52b73471bf7a
+        size: 735
+    def: 2fcb4abe3d77d8a2
 group: go-cage-switches-over
 ---
 
@@ -326,38 +338,69 @@ The case off the queue passes today, and it holds the edge: a binding moved off 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The stops fold decides the clear at the turn's end, and the door answers it as a clear effect, as `clearsAfter` in src/bridge/handover.js does. The plugin's door road runs the clear the effect carries.
+
+1. At a turn complete of the main agent whose reason reads answer and whose handover stands at clear, `stepStops` in src/modules/hooks/stops.go drops the handover as today. Where `clearsHere` holds, it also says a clear word carrying the resume prompt. The prompt is `RESUME` in handover.js, spelled again under a pointer.
+2. `Door.Hook` in hooks.go answers that word as a clear effect whose text holds the prompt. It follows the stops fold's block answer, which reads a Stop alone.
+3. `stepOf` in .claude/skills/level0/hooks/cage.js maps a clear effect to an answer carrying pass and the clear prompt.
+4. `door` in .claude/skills/level0/hooks/level0.js hands an answer carrying `clear` to `clears`, as `seen` does with the bridge's answer. Today `door` returns a step's answer to the harness, so no clear runs.
+
+The event: `turn.complete` stands in the bridge's `DOORS` table, and the-brief-leaves-the-bridge makes `doors` in cage.js answer true for every event that table names. So this ticket answers the event once it reaches the door, and adds no event to `DOORED` itself.
+
+The bridge keeps answering the turn's end until that flip, so this lands alone. What I weigh: the fold already holds the handover phase and the binding at the turn's end, so the decision stays pure and one effect carries it. I assume the turn complete event carries the facts the stops fold reads, since `stoppedOf` reads the holds on it today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/hooks/stops.go: stepStops, at the turn complete
+src/modules/hooks/hooks.go: Door.Hook, which answers the clear
+.claude/skills/level0/hooks/cage.js: stepOf
+.claude/skills/level0/hooks/level0.js: door, which hands a clear answer to clears
+.claude/skills/level0/hooks/level0.js: clears, which runs the clear and the resume prompt, unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/hooks/clear_test.go: TestATurnCompleteWithTheClearInHandAnswersTheClear
+src/modules/hooks/clear_test.go: TestATurnCompleteOffTheQueueKeepsTheConversation
+test/level0/cage.test.js: a clear effect answers the clear prompt
+test/level0/door-clear.test.js: a door answer carrying a clear runs the clear and submits the resume prompt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+the gate's first finding, that door returns a step's answer and never runs clears: step 4 hands a clear answer to clears, and door-clear.test.js drives the door road to $.command.run and $.prompt.submit
+the gate's second finding, that turn.complete stands outside DOORED: the-brief-leaves-the-bridge adds every event of the bridge's DOORS table, turn.complete among them, so this ticket names that ticket and adds no event. The door-clear case posts a tool call, which the door meets today, since the clear call reads no event
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/hooks/stops.go
+src/modules/hooks/hooks.go
+src/modules/hooks/clear_test.go, new
+.claude/skills/level0/hooks/cage.js
+.claude/skills/level0/hooks/level0.js
+test/level0/cage.test.js
+test/level0/door-clear.test.js, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened door, seen and clears in level0.js, doors and DOORED in cage.js, DOORS and endsTurn in server.js, clearsAfter in handover.js, and the ask of the-brief-leaves-the-bridge, and each claim holds there
+the callers list names the fold, the door, the cage's step, and the plugin's door road and its clear
+the first done line meets the clear case, the second the cage case, the third the check, and the door-clear case holds the road the gate found missing
 
 ## tests-red-2
 
