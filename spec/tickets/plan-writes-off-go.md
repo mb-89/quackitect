@@ -117,12 +117,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: e0bbc332414b0e73b55e2cdb2c6a7b1cb1cecd58
+    hash_after: e0bbc332414b0e73b55e2cdb2c6a7b1cb1cecd58
+    inputs:
+      - name: ask
+        hash: 6d569ad6c5be9f46
+        size: 579
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,99 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new IO module `plans` carries the plan tool in Go. Like `waits`, it stays off `spec/wiring.yaml` until the flip. `q/tool` owns the plan field, and the index lists it on every tool.
+
+1. `src/q/tool/tool.go` gains `PlanArg`, `PlanTool`, a `Plan` input type and `WithPlan(schema, name)`. `Plan` carries `working`, `done` and `add`, with the doc text of `planSpec` in `src/bridge/plan.js`. `WithPlan` adds `plan` to a schema, and skips the tool named `plan`, as `withPlanField` does.
+2. `tool.Input` drops `plan` the way it drops `wait`, unless the input declares it.
+3. `door.servesTools` in `src/index/tools.go` passes each schema through `WithPlan`, and `src/index/testdata/tools.golden.json` is regenerated.
+4. A new `src/modules/plans` registers `plans/set` with `q.ToolName("plan")` and `q.IO()`, over `tool.Plan`. The module name keeps clear of the wired settings section `plan`, which would answer the live tool at once. `Accept` ports `plans`, `planned`, `plansHere`, `writes`, `placeWord` and `placesSaid`, every answer line word for word. It writes the file in the bridge's key order, indented by two spaces, with no HTML escape and a trailing newline.
+5. `plans.Outside` holds `Read` and `Write` over the plan path, `Now`, `Most` off `plan.mostOpen`, and `Places(planText)`, the queue's outline places over a plan text.
+6. `placesIn` and `placesOf` in `src/modules/queue/places.go` take exported names, so `Places` answers before the derived settles.
+7. A new `src/quack/plans.go` wires `plansOutside`, whose `Places` reads the snapshot values bound to the queue's ports. `accepts` gains the plans case, and `modules` gains the module.
+8. `Door.calls` in `src/modules/hooks/hooks.go` calls the plan action first where a Go-answered call carries a plan field, as `planRides` does. The fold already resets the count, so the door writes the file alone.
+
+Boundaries with sibling tickets:
+- level0-tools-leave-the-bridge drops `planTools`, `withPlanField` and `planRides` from the bridge, and the flip wires `plans`
+- the engine's ask and its grace already stand in `src/modules/hooks/fold.go`, and this ticket leaves them alone
+- log-report-stop-in-go owns the log, report and stop tools
+- find-and-wait-in-go set the shape of an IO module off the wiring, which this ticket copies
+
+What I weigh: one `Places` seam that recomputes the outline costs exporting `placesOf`. In return, a todo's place and the answer match the bridge without a wait for the derived.
+
+I assume the Go places equal the queue field the bridge reads, since `places.go` ports `placesIn`. I assume the agent's level zero tools reach it through the index list.
+
+Risks:
+- a wrong binding of the queue's ports places every todo at the end with no error
+- the bridge's debug line on the plan's todo count gets no Go twin
+- Go's encoder differs from `JSON.stringify` on escapes, so a case seeds a non-ASCII title and an extra key
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/q/tool/tool.go: Input, which drops a riding plan field
+- src/index/tools.go: door.servesTools, which lists each schema through WithPlan
+- src/modules/hooks/hooks.go: Door.calls, which calls the plan action with a riding field
+- src/modules/mcp/mcp.go: the server call, which reads tool.Input and drops the field too
+- src/modules/queue/places.go: Places, placesOf and placesIn, which take exported names
+- src/quack/accepts.go: accepts, which gains the plans case
+- src/quack/main.go: modules, which gains plans, and manages, which hands accepts the queue bindings
+- src/index/testdata/tools.golden.json: read by test/level0/index-tools.test.js, and regenerated
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/plans_test.go: TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt
+- src/quack/plans_test.go: TestAPlanFieldRidingAGoCallWritesThePlanFile
+- src/quack/plans_test.go: TestThePlansModuleStandsOffTheWiring
+- src/index/tools_test.go: TestEveryListedToolCarriesThePlanField
+- src/index/tools_test.go: TestThePlanToolCarriesNoPlanField
+- src/q/tool/tool_test.go: TestInputDropsARidingPlanField
+- src/modules/plans/plans_test.go: TestAPlanWritesTheFileTheBridgeWrites
+- src/modules/plans/plans_test.go: TestATodoAtADigitAnchorsBeforeTheRowAtThatPlace
+- src/modules/plans/plans_test.go: TestTodosPastTheMostOpenStayOut
+- src/modules/plans/plans_test.go: TestAHandoverTodoStaysOut
+- src/modules/plans/plans_test.go: TestTheAnswerNamesEachNewTodosPlace
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/plans/plans.go, new
+- src/modules/plans/plans_test.go, new
+- src/q/tool/tool.go
+- src/q/tool/tool_test.go
+- src/index/tools.go
+- src/index/tools_test.go
+- src/index/testdata/tools.golden.json
+- src/modules/hooks/hooks.go
+- src/modules/queue/places.go
+- src/quack/accepts.go
+- src/quack/main.go
+- src/quack/plans.go, new
+- src/quack/plans_test.go, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened plan.js plans, planned, plansHere, placesSaid and placeWord, server.js withPlanField and planRides, fold.go called and planned, hooks.go calls, tool.go Input, index tools.go, queue places.go, and the waits module
+- callers come from a search for plans, withPlanField, planRides, tool.Input, tool.Action, placesOf and the readers of the tools golden
+- the first line meets TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt, the second TestEveryListedToolCarriesThePlanField, and the third the check at tests-green
 
 ## tests-red
 
