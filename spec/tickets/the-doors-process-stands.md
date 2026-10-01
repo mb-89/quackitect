@@ -396,3 +396,7 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The change's code in `src/index`, `src/q`, `src/quack` and `src/modules/migration` stands under the cases the tests-red step committed. The line below names them, so the commit door reads the tests the change carries:
+
+./RUNME.sh test src/index/bus_test.go src/index/procs_test.go src/index/standing_test.go src/q/start_test.go src/quack/io_test.go src/modules/migration/migration_test.go

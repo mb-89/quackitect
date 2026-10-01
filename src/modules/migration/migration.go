@@ -54,6 +54,7 @@ var slices = []struct {
 	{WindowKey, "new", "The window, switched over in phase 6. It draws the index's reads alone.", []string{"new"}},
 	{SidebarKey, "old", "The sidebar: old draws its own groups alone, shadow weighs the views section against them and logs each pair apart, new draws the views section.", modes},
 	{LspKey, "old", "The LSP's rules: old answers on the LSP's own sweep alone, shadow runs the check module's sweep beside it and logs each finding apart, new answers the module's.", modes},
+	{ProcessesKey, "old", "The processes: old runs every module in the index alone, shadow spawns the IO process beside it and logs each value it reads apart, new runs the placements.", modes},
 }
 
 // Every phase switch, what the phase holds, and the ticket a cloud box takes once it reads true on main. [[spec/tickets/the-config-schema-gets-generated]]

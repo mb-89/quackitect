@@ -39,7 +39,7 @@ func fakeStore(t *testing.T) (*q.Store, q.Writer) {
 	t.Helper()
 	var hand q.Writer
 	types := map[string]func(*q.Catalog){"fakeio": func(c *q.Catalog) {
-		hand = q.Join(q.OutIn(c, "pid", 0, q.IO(), q.Doc("the fake's pid")), q.OutIn(c, "out", 0, q.IO(), q.Doc("the fake's value")))
+		hand = q.Join(hand, q.OutIn(c, "pid", 0, q.IO(), q.Doc("the fake's pid")), q.OutIn(c, "out", 0, q.IO(), q.Doc("the fake's value")))
 	}}
 	store, err := q.Start(q.Wiring{Instances: []q.Instance{{Name: "fake", Module: "fakeio"}, {Name: "other", Module: "fakeio"}}}, types)
 	if err != nil {

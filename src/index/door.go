@@ -66,6 +66,8 @@ type answer struct {
 }
 
 type door struct {
+	// The bus the manager runs, which the standing file names. [[spec/design_output/model#the-standing-file]]
+	bus   *Bus
 	db    *sql.DB
 	v1    net.Listener
 	root  string
@@ -251,6 +253,7 @@ func opensOn(listens func(network, address string) (net.Listener, error), root, 
 	}
 	undo = append(undo, managed.Stop)
 	one.call = managed.Call
+	one.bus = managed.Bus
 	stops, err := one.starts(starts)
 	if err != nil {
 		return failed(err)
@@ -324,14 +327,18 @@ func (one *door) stands(listen net.Listener) error {
 		return err
 	}
 	self, _ := os.Executable()
-	said, err := json.Marshal(Standing{
+	standing := Standing{
 		Port:  listen.Addr().(*net.TCPAddr).Port,
 		V1:    one.v1.Addr().(*net.TCPAddr).Port,
 		Pid:   os.Getpid(),
 		Root:  one.root,
 		Stamp: stampOf(self),
 		Bin:   self,
-	})
+	}
+	if one.bus != nil {
+		standing.Bus, standing.Token = one.bus.Port(), one.bus.Token()
+	}
+	said, err := json.Marshal(standing)
 	if err != nil {
 		return err
 	}

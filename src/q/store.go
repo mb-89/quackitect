@@ -378,11 +378,30 @@ func (s *Store) Inputs(instance string) []string { return nil }
 func (s *Store) Outputs(instance string) []string { return nil }
 
 // Clears the down mark of an instance whose process commits again. [[spec/design_output/model#a-process-ends]]
-func (s *Store) Up(instance string) error { return nil }
+func (s *Store) Up(instance string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	next := make(map[*registration]bool, len(s.down))
+	for held := range s.down {
+		if held.instance != instance {
+			next[held] = true
+		}
+	}
+	s.down = next
+	return nil
+}
 
 // Decodes a JSON body into the type the owner of name registers, so a commit off the bus lands typed. [[spec/design_output/model#a-message-carries-types]]
 func (s *Store) Value(name string, body []byte) (any, error) {
-	return nil, fmt.Errorf("%s decodes nothing yet", name)
+	owner := s.owner(name)
+	if owner == nil {
+		return nil, fmt.Errorf("the catalog registers no %s", name)
+	}
+	value := reflect.New(owner.typ)
+	if err := json.Unmarshal(body, value.Interface()); err != nil {
+		return nil, fmt.Errorf("%s decodes as no %s: %w", name, owner.typ, err)
+	}
+	return value.Elem().Interface(), nil
 }
 
 // [[spec/design_output/model#the-index-resolves-in-passes]]
