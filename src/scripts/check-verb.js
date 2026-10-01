@@ -9,6 +9,7 @@ import { batteryOf, spawnsIn } from "./battery.js";
 import {
   doorsHold,
   goHolds,
+  level0Runs,
   pluginHolds,
   projectionsHold,
   serverHolds,
@@ -35,18 +36,7 @@ export async function check(words) {
   if (errors) console.log = () => {};
   let ran;
   try {
-    ran = await batteryRun(
-      [
-        ["tests", () => test(errors)],
-        ["go", () => goHolds(errors, redHere())],
-        ["doors", () => doorsHold()],
-        ["projections", () => projectionsHold()],
-        ["plugin", () => pluginHolds()],
-        ["server", () => serverHolds()],
-        ["rules", () => lint(whereOf(words))],
-      ],
-      it.clock,
-    );
+    ran = await batteryRun(partsOf(words, errors), it.clock);
   } finally {
     console.log = loud;
   }
@@ -54,6 +44,20 @@ export async function check(words) {
   if (errors)
     for (const row of errorsSaid(timesHere(), errorsStood())) console.log(row);
   return stamped(code, batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }));
+}
+
+// The battery's parts in the order they run, and a red part leaves the rest unrun. Level zero runs on a fresh box before the rules, so a tree whose hook runs nothing reads red. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-whole-on-the-door]]
+export function partsOf(words, errors = false) {
+  return [
+    ["tests", () => test(errors)],
+    ["go", () => goHolds(errors, redHere())],
+    ["doors", () => doorsHold()],
+    ["projections", () => projectionsHold()],
+    ["plugin", () => pluginHolds()],
+    ["server", () => serverHolds()],
+    ["level0", () => level0Runs()],
+    ["rules", () => lint(whereOf(words))],
+  ];
 }
 
 // The runner's flags after the node path: the spec report to the screen, and the battery's reporter to its file. [[spec/design_output/work#the-battery-answers-first]]

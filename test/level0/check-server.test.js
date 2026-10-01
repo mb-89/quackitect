@@ -155,3 +155,41 @@ test("the Go test names read each test function once, in order, and pass over a 
     ["TestOne", "TestTwo"],
   );
 });
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("the check is red where level zero does not run whole on a fresh box, and says why", async () => {
+  const said = [];
+  const shouted = [];
+  const red = async (_root, _it, say) => {
+    say("FAIL rules: the context read hands the client no block");
+    return 1;
+  };
+  const green = async (_root, _it, say) => {
+    say("PASS rules: the context read hands the client level0-canary");
+    return 0;
+  };
+
+  assert.equal(
+    await check.level0Runs(red, "linux", (one) => said.push(one), (one) => shouted.push(one)),
+    1,
+  );
+  assert.match(shouted.join("\n"), /FAIL rules/);
+  assert.match(shouted.join("\n"), /this tree is red/);
+  assert.equal(await check.level0Runs(green, "linux", (one) => said.push(one), () => {}), 0);
+  assert.match(said.join("\n"), /PASS rules/);
+  let ran = false;
+  const untouched = async () => {
+    ran = true;
+    return 1;
+  };
+  assert.equal(await check.level0Runs(untouched, "win32", () => {}, () => {}), 0);
+  assert.equal(ran, false, "a Windows box runs no dry session");
+});
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("the battery runs level zero on a fresh box before the rules", async () => {
+  const { partsOf } = await import("../../src/scripts/check-verb.js");
+  const names = partsOf([]).map(([name]) => name);
+  assert.ok(names.includes("level0"), names.join(" "));
+  assert.ok(names.indexOf("level0") < names.indexOf("rules"));
+});
