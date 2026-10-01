@@ -149,6 +149,20 @@ func TestTheManagerWritesItsNames(t *testing.T) {
 	}
 }
 
+func TestTheManagerDeclaresThePlacementsUnderTheirDottedName(t *testing.T) {
+	c := q.New()
+	Registers(c)
+	for _, key := range c.Keys() {
+		if key.Dotted() == PlacementsDotted {
+			if key.Default != "[]" {
+				t.Fatalf("%s stands built in at %v", PlacementsDotted, key.Default)
+			}
+			return
+		}
+	}
+	t.Fatalf("the manager declares no %s", PlacementsDotted)
+}
+
 func TestTheManagerRunsOverTheFakeIndex(t *testing.T) {
 	var as q.Writer
 	ix := qtest.New(t, func(c *q.Catalog) { as = Registers(c) })

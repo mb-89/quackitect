@@ -60,55 +60,60 @@ var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers, vi
 type ioModule struct {
 	registers func(*q.Catalog) q.Writer
 	starts    func(root string, commit func(values map[string]any) error) (func(), error)
+	// The folder under src/modules registering a module the placements put in a process. A door, an IO module and a settings section carry none, and stay where they run. [[spec/design_output/model#a-module-rebuilds-alone]]
+	topic string
 }
 
+// The folder registering the verb topics, which share it. [[spec/design_output/model#a-module-rebuilds-alone]]
+const verbsTopic = "verbs"
+
 var modules = map[string]ioModule{
-	"watch": {files.Registers, func(root string, commit func(map[string]any) error) (func(), error) {
+	"watch": {registers: files.Registers, starts: func(root string, commit func(map[string]any) error) (func(), error) {
 		return files.Seeds(root, files.NewWatch(root), commit)
 	}},
-	"clock": {clock.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
+	"clock": {registers: clock.Registers, starts: func(_ string, commit func(map[string]any) error) (func(), error) {
 		return clock.Start(clock.New(), commit), nil
 	}},
-	"env": {env.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
+	"env": {registers: env.Registers, starts: func(_ string, commit func(map[string]any) error) (func(), error) {
 		return func() {}, env.Start(env.New(), commit)
 	}},
 	// [[spec/tickets/the-index-reads-standing-branches]]
-	"git": {git.Registers, func(root string, commit func(map[string]any) error) (func(), error) {
+	"git": {registers: git.Registers, starts: func(root string, commit func(map[string]any) error) (func(), error) {
 		return git.Start(git.New(root), clock.New().Every, commit), nil
 	}},
-	"tickets":   {registers: withActions(tickets.Registers, verbsmodule.TicketsActions)},
-	"queue":     {registers: queue.Places},
-	"work":      {registers: withActions(work.Registers, verbsmodule.WorkActions)},
-	"migration": {registers: migration.Registers},
-	"check":     {registers: check.Registers},
-	"guidance":  {registers: guidance.Registers},
-	"log":       {registers: logmodule.Registers},
+	"tickets":   {registers: withActions(tickets.Registers, verbsmodule.TicketsActions), topic: "tickets"},
+	"queue":     {registers: queue.Places, topic: "queue"},
+	"work":      {registers: withActions(work.Registers, verbsmodule.WorkActions), topic: "work"},
+	"migration": {registers: migration.Registers, topic: "migration"},
+	"check":     {registers: check.Registers, topic: "check"},
+	"guidance":  {registers: guidance.Registers, topic: "guidance"},
+	"log":       {registers: logmodule.Registers, topic: "log"},
 	"http":      {registers: httpmodule.Registers},
 	// [[spec/tickets/the-hooks-door-lands]]
 	hooksModule: {registers: hooks.Registers},
-	"session":   {registers: session.Registers},
+	"session":   {registers: session.Registers, topic: "session"},
 	// [[spec/tickets/the-mcp-module-lands]]
 	mcpModule: {registers: mcp.Registers},
 	// [[spec/tickets/the-lsp-door-lands]]
 	lspModule: {registers: lsp.Registers},
 	// [[spec/tickets/ticket-verbs-become-actions]]
-	"ticket":  {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
-	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
-	"vehicle": {registers: verbsmodule.Topic("vehicle", verbsmodule.VehicleVerbs)},
-	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
+	"ticket":  {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs), topic: verbsTopic},
+	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs), topic: verbsTopic},
+	"vehicle": {registers: verbsmodule.Topic("vehicle", verbsmodule.VehicleVerbs), topic: verbsTopic},
+	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs), topic: verbsTopic},
 	// [[spec/tickets/work-verbs-become-actions]]
-	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
+	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs), topic: verbsTopic},
 	// [[spec/tickets/agents-call-quack-directly]]
-	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
+	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs), topic: verbsTopic},
 	// [[spec/tickets/edit-tools-answer-in-go]]
-	edits.Module: {registers: edits.Registers},
+	edits.Module: {registers: edits.Registers, topic: "edits"},
 	// [[spec/tickets/find-and-wait-in-go]]
-	search.Module: {registers: search.Registers},
-	waits.Module:  {registers: waits.Registers},
+	search.Module: {registers: search.Registers, topic: "search"},
+	waits.Module:  {registers: waits.Registers, topic: "waits"},
 	// [[spec/tickets/plan-writes-off-go]]
-	plans.Module: {registers: plans.Registers},
+	plans.Module: {registers: plans.Registers, topic: "plans"},
 	// [[spec/tickets/prose-tools-answer-in-go]]
-	drafts.Module: {registers: drafts.Registers},
+	drafts.Module: {registers: drafts.Registers, topic: "drafts"},
 }
 
 // A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
@@ -213,6 +218,14 @@ func main() {
 		}
 		return
 	}
+	// [[spec/design_output/model#one-binary-many-processes]]
+	if len(os.Args) > 2 && os.Args[1] == moduleVerb {
+		if err := moduleMain(os.Args[2:]); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
 		os.Exit(verbRoad(os.Args[2], os.Args[3:]))
 	}
@@ -296,6 +309,9 @@ const sweepName = "check/sweep"
 type doors struct {
 	hooks, mcp, lsp hooked
 	io              []string
+	// The wiring and each instance's writer, which the placements read under the processes slice's shadow. [[spec/design_output/model#the-placements]]
+	wiring q.Wiring
+	hands  map[string]q.Writer
 }
 
 // The hooks instance the wiring loads: its writer, and the name each local name binds to. No instance leaves on false. [[spec/tickets/the-hooks-door-lands]]
@@ -336,7 +352,13 @@ func manages(as q.Writer, open doors) index.Manage {
 			stop()
 			return index.Managed{}, err
 		}
-		return index.Managed{Stop: func() { halt(); stop() }, Bus: bus, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+		bus, unplace, err := placesShadow(root, store, bus, open)
+		if err != nil {
+			halt()
+			stop()
+			return index.Managed{}, err
+		}
+		return index.Managed{Stop: func() { unplace(); halt(); stop() }, Bus: bus, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil
@@ -470,7 +492,7 @@ func wired() ([]index.Start, doors, error) {
 		return nil, doors{}, err
 	}
 	starts, hands, err := loaded(w, q.Main)
-	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule), io: ioInstances(w)}, err
+	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule), io: ioInstances(w), wiring: w, hands: hands}, err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]

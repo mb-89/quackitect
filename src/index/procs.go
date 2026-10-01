@@ -59,7 +59,7 @@ func (p *Placements) Start() (func(), error) {
 	if err != nil {
 		return nil, err
 	}
-	reads := map[string][]string{}
+	reads, kicks, quit := map[string][]string{}, map[string]chan struct{}{}, make(chan struct{})
 	for _, one := range p.placed {
 		for instance := range one.Instances {
 			inputs := p.store.Inputs(instance)
@@ -68,9 +68,11 @@ func (p *Placements) Start() (func(), error) {
 				peer.Close()
 				return nil, err
 			}
+			kicks[instance] = make(chan struct{}, 1)
+			go publishes(peer, instance, kicks[instance], quit)
 		}
 	}
-	p.store.OnCommit(func(values map[string]any) { p.runs(peer, reads, values) })
+	p.store.OnCommit(func(values map[string]any) { p.runs(kicks, reads, values) })
 	p.stops = make([]func(), len(p.placed))
 	for i, one := range p.placed {
 		stop, err := one.Start(p.bus, p.store)
@@ -85,13 +87,28 @@ func (p *Placements) Start() (func(), error) {
 	return func() {
 		once.Do(func() {
 			p.stop()
+			close(quit)
 			peer.Close()
 		})
 	}, nil
 }
 
-// Publishes run.<instance> for each placed instance reading a name the commit moves. [[spec/design_output/model#the-placements]]
-func (p *Placements) runs(peer *Peer, reads map[string][]string, values map[string]any) {
+// Publishes run.<instance> once for each kick, and the kicks a publish meets fold into one. [[spec/design_output/model#the-placements]]
+func publishes(peer *Peer, instance string, kicks <-chan struct{}, quit <-chan struct{}) {
+	for {
+		select {
+		case <-quit:
+			return
+		case <-kicks:
+			if err := peer.Run(instance); err != nil {
+				fmt.Fprintln(stderr, instance, "runs nowhere:", err)
+			}
+		}
+	}
+}
+
+// Kicks the run of each placed instance reading a name the commit moves, and waits on no bus. [[spec/design_output/model#the-placements]]
+func (p *Placements) runs(kicks map[string]chan struct{}, reads map[string][]string, values map[string]any) {
 	p.mu.Lock()
 	stopped := p.stopped
 	p.mu.Unlock()
@@ -101,8 +118,9 @@ func (p *Placements) runs(peer *Peer, reads map[string][]string, values map[stri
 	for instance, inputs := range reads {
 		for _, name := range inputs {
 			if _, moved := values[name]; moved {
-				if err := peer.Run(instance); err != nil {
-					fmt.Fprintln(stderr, instance, "runs nowhere:", err)
+				select {
+				case kicks[instance] <- struct{}{}:
+				default:
 				}
 				break
 			}

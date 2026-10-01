@@ -329,6 +329,65 @@ func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
 	}
 }
 
+func TestTheLastMoveOfABurstMeetsARun(t *testing.T) {
+	var source q.Writer
+	types := map[string]func(*q.Catalog){
+		"source": func(c *q.Catalog) { source = q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
+		"doubler": func(c *q.Catalog) {
+			q.DerivedIn(c, "twice", 0, func(in twiceOf) int { return 2 * in.All }, q.Doc("twice the count"))
+		},
+	}
+	w := q.Wiring{Instances: []q.Instance{{Name: "source", Module: "source"}, {Name: "doubler", Module: "doubler"}}, Wires: map[string]string{"doubler.all": "source.all"}}
+	store, err := q.Start(w, types)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	placed := Placed{Name: "doubler", Command: []string{os.Args[0], "-test.run=^TestFakeIdleProcess$"}, Instances: map[string]q.Writer{"doubler": {}}, Restart: time.Hour}
+	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	peer, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer peer.Close()
+	runs := make(chan struct{}, 1)
+	done, err := peer.Runs("doubler", func() {
+		select {
+		case runs <- struct{}{}:
+		default:
+		}
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer done()
+	const last = 300
+	for count := 1; count <= last; count++ {
+		if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": count}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for end := time.Now().Add(10 * time.Second); time.Now().Before(end); {
+		select {
+		case <-runs:
+			saved, err := peer.Inputs("doubler")
+			if err == nil && strings.Contains(string(saved), "300") {
+				return
+			}
+		case <-time.After(time.Second):
+		}
+	}
+	t.Fatal("no run meets the last move of the burst")
+}
+
 func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 	bus, err := StartBus()
 	if err != nil {

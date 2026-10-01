@@ -41,6 +41,28 @@ func TestAListOfInstancesSharesOneProcess(t *testing.T) {
 	}
 }
 
+type logOf struct {
+	Session q.Content `q:"session"`
+}
+
+func TestTheShadowLeavesAnInstanceReadingItsOwnLogUnweighed(t *testing.T) {
+	w := q.Wiring{Instances: []q.Instance{{Name: "files", Module: "files"}, {Name: "log", Module: "log"}, {Name: "queue", Module: "queue"}}, Wires: map[string]string{"log.session": shadowsOwnLog, "queue.session": "files/spec/queue.md"}}
+	types := map[string]func(*q.Catalog){
+		"files": func(c *q.Catalog) { q.OutIn(c, "<path...>", q.Content{}, q.IO(), q.Doc("every file")) },
+		"log":   func(c *q.Catalog) { q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the log's length")) },
+		"queue": func(c *q.Catalog) { q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the queue's length")) },
+	}
+	w.Wires["files.<path...>"] = "files/<path...>"
+	store, err := q.Start(w, types)
+	if err != nil {
+		t.Fatal(err)
+	}
+	placed := []index.Placed{{Instances: map[string]q.Writer{"log": {}}}, {Instances: map[string]q.Writer{"queue": {}}}}
+	if got := feedsItsLog(store, placed); !got["log"] || got["queue"] {
+		t.Fatalf("the shadow reads %v as feeding its own log, and wants log alone", got)
+	}
+}
+
 type twiceOf struct {
 	All int `q:"all"`
 }

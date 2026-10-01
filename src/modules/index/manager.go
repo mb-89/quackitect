@@ -26,6 +26,9 @@ const (
 	LeaseKey = "config/watchdog/lease"
 )
 
+// The key listing the instances each module process shares, read under its dotted name before the store settles. [[spec/design_output/model#the-placements]]
+const PlacementsDotted = "processes.placements"
+
 // One row of the op table: the id, and the body it holds. [[spec/design_output/model#an-operation-outlives-callers]]
 type Row struct {
 	ID   string
@@ -64,6 +67,7 @@ func Registers(c *q.Catalog) q.Writer {
 		q.OutIn(c, DocsName, []DocRow{}, q.Doc("each name, action and key, with its doc"), q.Looks(q.Rows)),
 		q.CfgIn(c, "watchdog/beat", int(builtInBeat/time.Second), q.Doc("the seconds between two ticks of the manager")),
 		q.CfgIn(c, "watchdog/lease", int(builtInLease/time.Second), q.Doc("the seconds the index's own lease holds past a renewal")),
+		q.CfgIn(c, "processes/placements", [][]string{}, q.Doc("the lists of instances that share one module process, where every other instance takes a process of its own")),
 	)
 }
 
