@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 212b445c2b1033b9b2692eaca1b34cd9d86cc14c
+    hash_after: f69ebc138d728192adb817ae2bd8337433b2ac03
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f8b1e4aa408c05f5
+        size: 2266
+    def: 08e16d07b0de477c
 depends_on: ["tools-keep-their-own-names", "log-report-stop-in-go", "plan-writes-off-go", "prose-tools-answer-in-go", "edit-tools-answer-in-go", "find-and-wait-in-go", "review-spawns-off-the-door", "describe-answers-off-the-door", "grep-glob-answer-off-index"]
 ---
 
@@ -235,26 +248,35 @@ The tool registration moves to the Go tool list, which the hook already register
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/tools_test.go test/level0/cage.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/tools_test.go
+- test/level0/cage.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestEveryToolTheBridgeServedStandsInTheWiredToolList fails on its own assertion: the wiring registers no find, wait, patch, replace, undo, check_answer, check_prose, mint_note, plan or review_branch. Their modules stand off the wiring until this flip. The log, report and stop rows already pass under their own names. The cage case stepOf hands no call to the bridge fails on its own assertion, since a served tool the door passes still steps to the bridge.
+
+What surprises me: the bridge TOOLS table still names Grep, Glob, Write, Edit, MultiEdit, NotebookEdit, Bash, PowerShell and Agent. Those are harness tools, which the cage port tickets guard on the door, so they belong to no tool list, and the Go case names the level zero tools alone. The registered helper read tool.Name, which misses the own name a tool keeps, so the load moves into wiredStore and the new case reads tool.NameOf.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the draft names the cage case and the Go tool-list case, and both stand red on their own assertion
+- the Go case runs over the real wiring through wiredStore, which the verb case already loaded, and the cage case over stepOf alone
+- the first done line meets the Go tool-list case, the second the cage case, and the third waits for tests-green
 
 # gate
 

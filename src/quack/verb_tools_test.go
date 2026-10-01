@@ -42,7 +42,7 @@ func programTable(t *testing.T) []string {
 	return out
 }
 
-func registered(t *testing.T) map[string]bool {
+func wiredStore(t *testing.T) *q.Store {
 	t.Helper()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
@@ -56,7 +56,12 @@ func registered(t *testing.T) map[string]bool {
 	if _, _, err := loaded(w, c); err != nil {
 		t.Fatal(err)
 	}
-	store := q.NewStore(c)
+	return q.NewStore(c)
+}
+
+func registered(t *testing.T) map[string]bool {
+	t.Helper()
+	store := wiredStore(t)
 	out := map[string]bool{}
 	for _, name := range store.Names() {
 		if _, _, ok := store.Types(name); ok {

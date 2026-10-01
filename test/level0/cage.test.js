@@ -92,7 +92,7 @@ test("a result's text answers as a deny, its result as the tool result, and a bl
   );
 });
 
-test("rows ask back once, an after rides as context, and a served tool the door passes goes to the bridge", () => {
+test("rows ask back once, and an after rides as context", () => {
   const rows = { effects: [{ kind: "rows", call: "s1.2" }] };
   assert.deepEqual(stepOf(rows, "tool.call", { asks: true, served: false }), {
     rows: "s1.2",
@@ -102,10 +102,21 @@ test("rows ask back once, an after rides as context, and a served tool the door 
   assert.deepEqual(stepOf(after, "classic.Stop", { asks: true, served: false }), {
     after: ["a note"],
   });
-  assert.deepEqual(
-    stepOf({ effects: [{ kind: "pass" }] }, "tool.call", { asks: true, served: true }),
-    { bridge: true },
-  );
+});
+
+// [[spec/tickets/level0-tools-leave-the-bridge]]
+test("stepOf hands no call to the bridge", () => {
+  for (const served of [true, false]) {
+    const step = stepOf({ effects: [{ kind: "pass" }] }, "tool.call", {
+      asks: true,
+      served,
+    });
+    assert.equal(
+      step.bridge,
+      undefined,
+      `a call the door passes, served ${served}, goes to the bridge`,
+    );
+  }
 });
 
 test("an after on the prompt context answers as named blocks, and a named after on a call opens on its name", () => {
