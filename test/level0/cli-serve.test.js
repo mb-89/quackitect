@@ -1,5 +1,5 @@
-// The serve verb on a desk: without the debugger it starts the server
-// detached and returns, and its exit code says whether the server stands.
+// The serve verb on a desk: it runs the index standing and returns, and its
+// exit code says whether the hooks door stands.
 // [[spec/design_output/level0#a-desk-serve-returns]]
 
 import assert from "node:assert/strict";
@@ -8,17 +8,19 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { serveBridge } from "../../src/scripts/verbs/serve.js";
-import { probeOf } from "../../src/scripts/serve.js";
 
 const ROOT = "/tree";
-const SERVER_AT = join(ROOT, "src", "bridge", "server.js");
+const INDEX_AT = join(ROOT, ".se", ".runtime", "bin", "se-index");
+const HOOKS_AT = join(ROOT, ".se", ".runtime", "hooks.json");
 
-function doors(probe, start) {
-  const proc = fakeProc({
-    [probeOf("node", 6510).join(" ")]: { exitCode: probe },
-    [["node", SERVER_AT, ROOT].join(" ")]: start,
+function doors(answer) {
+  const disk = fakeDisk();
+  const proc = fakeProc({ node: { exitCode: 1 } });
+  proc.teach([INDEX_AT, "standing"], () => {
+    if (!answer.exitCode) disk.write(HOOKS_AT, '{"port":7001,"token":"t"}');
+    return answer;
   });
-  return { proc, disk: fakeDisk(), env: {}, root: ROOT, join, node: "node" };
+  return { proc, disk, env: {}, root: ROOT, join, node: "node" };
 }
 
 async function heard(what) {
@@ -33,15 +35,17 @@ async function heard(what) {
 }
 
 // [[spec/design_output/level0#a-desk-serve-returns]]
-test("the serve verb starts a detached server, exits zero, and says the port", async () => {
-  const { code, said } = await heard(() => serveBridge([], doors(1, { stands: true })));
+test("the serve verb starts the index, exits zero, and says the port", async () => {
+  const { code, said } = await heard(() => serveBridge([], doors({ exitCode: 0 })));
   assert.equal(code, 0);
-  assert.match(said, /starts detached at port 6510/);
+  assert.match(said, /index starts at port 7001/);
 });
 
 // [[spec/design_output/level0#a-desk-serve-returns]]
-test("the serve verb exits one where the start falls", async () => {
-  const { code, said } = await heard(() => serveBridge([], doors(1, { exitCode: 1 })));
+test("the serve verb exits one where the index falls", async () => {
+  const { code, said } = await heard(() =>
+    serveBridge([], doors({ exitCode: 1, stderr: "no door" })),
+  );
   assert.equal(code, 1);
-  assert.match(said, /falls:/);
+  assert.match(said, /falls: no door/);
 });

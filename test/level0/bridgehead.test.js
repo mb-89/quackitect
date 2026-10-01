@@ -133,8 +133,9 @@ test("the commands carry the upstream, the clone folder, the work root and the v
   const serve = serveOf(CLONED);
   assert.equal(serve[0], "sh");
   assert.equal(serve.at(-1), CLONED, "the vehicle's folder is the argument");
-  assert.match(serve[2], /src\/bridge\/server\.js/);
-  assert.match(serve[2], /&\s*$/, "the server runs detached");
+  assert.match(serve[2], /\.se\/\.runtime\/bin\/se-index" standing/);
+  assert.doesNotMatch(serve[2], /server\.js/, "the bridge server starts nowhere");
+  assert.match(serve[2], /&\s*$/, "the index runs detached");
 });
 
 test("a cloud box with an empty register clones the upstream from vehicle.json, attaches, starts the server and says the vehicle stands", async () => {

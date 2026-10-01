@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
 depends_on: ["level0-tools-leave-the-bridge"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,19 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: c33dacc84f08b2d6d12b59ea43eb1a961cfe7d0b
+    hash_after: c33dacc84f08b2d6d12b59ea43eb1a961cfe7d0b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 14 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 4fcf6bcca651be1f
+        size: 4130
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -256,26 +269,35 @@ What I weigh: the bridge still answers the brief until the next child flips it. 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/cloud-start.test.js
+- test/contract/start-road-starts-the-index.test.js
+- test/level0/serve.test.js
+- test/level0/cli-serve.test.js
+- test/level0/bridgehead.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cloud-start cases fail on their assertions, since the road still self-tests and spawns the bridge server. The serve fakes answer a node run as nothing answering, so the old bridge probe fails on the case's own assertion. The cold case drives the real index over a fresh temp root, and stops it after with the index's own stop verb. The command field reads the first word of the last line, so a bare node run reads as its duration and the branch test verb answers it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the grep line meets the new contract test, the cold start meets its cloud-start case, and the check stays the green leaf's command
+- the road runs the real node and a fake index script, the serve cases run the fake disk and process, and the cold case drives the real index as a contract test
 
 # gate
 
