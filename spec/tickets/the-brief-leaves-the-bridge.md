@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -169,6 +169,15 @@ record:
       - name: lint
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:304:450: Vocabulary: stepbrief stands outside the words this tree writes. Wr"
+  - step: implement/change
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: 370f138e582ca15f96f400ed3adb8ba4ea210aaa
+    hash_after: 370f138e582ca15f96f400ed3adb8ba4ea210aaa
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:314:450: Vocabulary: stepbrief stands outside the words this tree writes. Wr"
+    def: f150b8c0dc20fe45
 depends_on: ["brief-answers-off-the-door","prompt-answers-off-the-door","spawn-answers-off-the-door","clear-answers-off-the-door","level0-tools-leave-the-bridge","start-road-starts-the-index"]
 ---
 
@@ -331,10 +340,10 @@ accept with points
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the landed part touches the brief fold and its cases alone, and the flip stands back out of the tree
-- the brief fold logs through the door, whose cases drive a temp tree
-- each comment names the ticket, and the Discussion names the change the flip carries
-- the canary words stand once on the Go side, pointing at HEARD in the plugin
+- The change touches `cage.js` and its case, and the twin goldens the moved test name shifts.
+- The cage case reads `doors` alone, over no server and no disk.
+- The set in `cage.js` names the ticket it implements beside it.
+- The event list stands in the bridge table until the next child removes it, and the cage set takes it over.
 
 ## tests-green
 

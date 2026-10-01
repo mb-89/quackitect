@@ -14,10 +14,12 @@ import { doorEvents, toolNames } from "../../src/bridge/server.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import LAYERS from "../replay/cage/layer-cases.json" with { type: "json" };
 
-test("the door decides the tool call and the Stop, and the bridge keeps the prompt", () => {
+// [[spec/tickets/the-brief-leaves-the-bridge]]
+test("the door decides the tool call, the Stop and the prompt, and leaves an event no table names", () => {
   assert.equal(doors("tool.call"), true);
   assert.equal(doors("classic.Stop"), true);
-  assert.equal(doors("prompt.context"), false);
+  assert.equal(doors("prompt.context"), true);
+  assert.equal(doors("engine.create"), false);
 });
 
 // [[spec/tickets/the-brief-leaves-the-bridge]]
