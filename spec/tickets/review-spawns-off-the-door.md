@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
 record:
   - step: design/owner-read
@@ -151,6 +151,19 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: design/draft
+  - step: design/tests-red
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 8a272d3d2b40cb1e87406b1adafa9ebb49f80b0e
+    hash_after: 8a272d3d2b40cb1e87406b1adafa9ebb49f80b0e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 9385ff0769bc1f1a
+        size: 5140
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -297,17 +310,14 @@ test/level0/door-spawn.test.js
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Every new case fails on its own assertion:
-- the review package's cases, against stubs answering empty values
+The tests stand unchanged since the first tests-red, and every case still fails on its own assertion:
+- the review package's cases, now reading `src/modules/hooks/review/testdata/review-cases.json`, against stubs answering empty values
 - the door's cases, against a door that passes the review call and the answered event
 - the plugin case, whose door answers a spawn that never runs
 
-The table `src/modules/hooks/review/testdata/review-cases.json` carries the bridge's own answers, read off a red run of `test/level0/review-cases.test.js`, which now answers green and pins the bridge.
-
 What surprises me:
-- the formatter lays a JSON file out again on write, so an exact edit has to read the file first
-- `resultOf` stands in the hooks search cases already, so the review cases take `reviewResultOf`
-- `Outside.Review` lands now as a stub field, and `hooks.go` stands a few lines under its ceiling, so the move of the listener comes first at the change
+- the test verb's summary counts the plugin case alone, so `go test ./src/modules/hooks/...` shows the Go cases red
+- the hooks package also carries the red cases of `log-report-stop-in-go` and `clear-answers-off-the-door`, so a tests-green here reads the review cases by name
 
 ### checked
 
