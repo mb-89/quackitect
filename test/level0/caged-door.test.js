@@ -301,3 +301,140 @@ test("under new no event of a session reaches anything but the hooks door", asyn
     "the session reads no fall",
   );
 });
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("under new a prompt the door rewrites goes on to the harness rewritten", async () => {
+  const box = caged();
+  const rewritten = { text: "the owner's prompt, with the answer-first line" };
+  box.$.http = {
+    fetch: async () => ({
+      ok: true,
+      status: 200,
+      text: JSON.stringify({ effects: [{ kind: "event", result: rewritten }] }),
+    }),
+  };
+  const handed = [];
+  const submit = Object.assign(
+    async (e) => {
+      handed.push(e);
+      return { handed: e };
+    },
+    { event: "prompt.submit" },
+  );
+
+  const said = await box.hooks["*"](box.$, { text: "the owner's prompt" }, submit);
+
+  assert.deepEqual(handed, [rewritten], "the harness reads the rewritten prompt");
+  assert.deepEqual(said, { handed: rewritten }, "and its answer stands");
+});
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("under new a prompt context raised while another event reads the cage still reaches the door", async () => {
+  const box = caged();
+  const posts = [];
+  answering(box, posts);
+  const read = box.$.fs.read;
+  let release;
+  const held = new Promise((done) => {
+    release = done;
+  });
+  let first = true;
+  box.$.fs.read = async (rel) => {
+    if (first) {
+      first = false;
+      await held;
+    }
+    return read(rel);
+  };
+  const passing = (event) => Object.assign(async (e) => ({ handed: e }), { event });
+  const context = Object.assign(async () => ({ blocks: [] }), {
+    event: "prompt.context",
+  });
+
+  const slow = box.hooks["*"](box.$, {}, passing("env.get"));
+  const said = box.hooks["*"](box.$, {}, context);
+  await new Promise((done) => setTimeout(done, 10));
+  release();
+  await slow;
+
+  assert.deepEqual(
+    ((await said)?.blocks ?? []).map((one) => one.name),
+    ["level0-tools", "level0-canary"],
+    "the context takes the door's blocks while the other read stands open",
+  );
+});
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("under new a prompt context finding the door down while the session start raises it waits, and takes the rules", async () => {
+  const box = caged();
+  const posts = [];
+  let standing = false;
+  box.$.http = {
+    fetch: async (url, init) => {
+      if (!standing) throw new Error("Unable to connect");
+      const event = JSON.parse(String(init?.body ?? "{}")).event;
+      posts.push({ url, event });
+      const effects =
+        event === "prompt.context"
+          ? [{ kind: "after", name: "level0-canary", text: "Open your FIRST answer" }]
+          : [];
+      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+    },
+  };
+  const run = box.$.process.run;
+  let road;
+  const roads = new Promise((done) => {
+    road = done;
+  });
+  box.$.process.run = async (argv, init) => {
+    if (argv[1] === "-e" && !String(argv[2]).includes("appendFileSync")) {
+      road();
+      await new Promise((done) => setTimeout(done, 20));
+      standing = true;
+    }
+    return run(argv, init);
+  };
+  const start = Object.assign(async (e) => e, { event: "session.start" });
+  const context = Object.assign(async () => ({ blocks: [] }), {
+    event: "prompt.context",
+  });
+
+  const opening = box.hooks["*"](box.$, { cwd: STUB }, start);
+  await roads;
+  const said = await box.hooks["*"](box.$, {}, context);
+  await opening;
+
+  assert.deepEqual(
+    (said?.blocks ?? []).map((one) => one.name),
+    ["level0-canary"],
+    "the context waits on the one start and reads the rules off the door",
+  );
+});
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("under new a prompt reaches the door with its origin and the newest row before it, and the harness reads it bare", async () => {
+  const box = caged();
+  const bodies = [];
+  box.$.session = { messages: async () => [{ role: "assistant", id: "row-9" }] };
+  box.$.http = {
+    fetch: async (_url, init) => {
+      bodies.push(JSON.parse(String(init?.body ?? "{}")));
+      return { ok: true, status: 200, text: JSON.stringify({ effects: [] }) };
+    },
+  };
+  const handed = [];
+  const submit = Object.assign(
+    async (e) => {
+      handed.push(e);
+      return e;
+    },
+    { event: "prompt.submit", origin: { kind: "composer" } },
+  );
+
+  await box.hooks["*"](box.$, { text: "the owner's prompt" }, submit);
+
+  const posted = bodies.find((one) => one.event === "prompt.submit");
+  assert.deepEqual(posted?.e?.origin, { kind: "composer" }, "the door reads who sent it");
+  assert.equal(posted?.e?.before, "row-9", "and the newest row before it");
+  assert.deepEqual(handed, [{ text: "the owner's prompt" }], "the harness reads the prompt bare");
+});

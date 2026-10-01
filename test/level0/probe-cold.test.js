@@ -16,6 +16,7 @@ import {
   coldIn,
   coldLines,
   coldPort,
+  coldTree,
   probeCold,
   readsCold,
   stepsOf,
@@ -419,4 +420,28 @@ test("a fall past the rules fails the quiet check, and a fall before them passes
   assert.equal(verdict(late, "quiet").pass, false);
   assert.match(verdict(late, "quiet").evidence, /1 row\(s\) say the server answers nothing/);
   assert.equal(verdict(early, "quiet").pass, true);
+});
+
+// The box both probes stand on. [[spec/tickets/level0-runs-whole-on-the-door]]
+test("the fresh box clones, installs and points the hook at a port of its own, and a refused clone stands nothing", () => {
+  const { disk, proc, it } = runner(() => ({ exitCode: 0 }));
+  const box = { temp: "/t", tree: "/t/tree", port: 6900, delta: "" };
+
+  const config = coldTree("/repo", it, () => {}, box);
+
+  assert.equal(config, "/t/config");
+  assert.deepEqual(
+    proc.ran.map((one) => one.argv[0]),
+    ["git", "sh"],
+  );
+  assert.equal(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")).port, 6900);
+
+  const refused = runner(() => ({ exitCode: 0 }));
+  const lines = [];
+  const bare = {
+    ...refused.it,
+    proc: { run: () => ({ exitCode: 128, stdout: "", stderr: "no such repo" }) },
+  };
+  assert.equal(coldTree("/repo", bare, (one) => lines.push(one), box), "");
+  assert.match(lines.join("\n"), /FAIL clone: no such repo/);
 });

@@ -238,7 +238,8 @@ export async function probeCold(root, it, client, say = console.log, delta = "")
   }
 }
 
-function coldRun(root, it, client, say, { temp, tree, port, delta }) {
+// The fresh box both probes stand on: the clone of the commit, the staged delta, the install a cloud setup runs, and the pointer to a port of its own. It answers the config folder, or nothing where the clone or the delta falls. [[spec/design_output/level0#the-cold-probe]] [[spec/tickets/level0-runs-whole-on-the-door]]
+export function coldTree(root, it, say, { temp, tree, port, delta }) {
   const cloned = it.proc.run(
     ["git", "clone", "--quiet", "--no-hardlinks", root, tree],
     {
@@ -247,9 +248,9 @@ function coldRun(root, it, client, say, { temp, tree, port, delta }) {
   );
   if (cloned.exitCode !== 0) {
     say(`FAIL clone: ${tail(cloned.stderr)}`);
-    return 1;
+    return "";
   }
-  if (!takesDelta(it, temp, tree, delta, say)) return 1;
+  if (!takesDelta(it, temp, tree, delta, say)) return "";
   const installed = it.proc.run(["sh", it.join(tree, "src", "scripts", "install.sh")], {
     cwd: tree,
     env: { SE_INSTALL_SKIP: INSTALL_SKIP },
@@ -262,6 +263,12 @@ function coldRun(root, it, client, say, { temp, tree, port, delta }) {
   it.disk.write(it.join(tree, POINTER), `${JSON.stringify({ method: tree, port })}\n`);
   const config = it.join(temp, "config");
   it.disk.makeDir(config);
+  return config;
+}
+
+function coldRun(root, it, client, say, { temp, tree, port, delta }) {
+  const config = coldTree(root, it, say, { temp, tree, port, delta });
+  if (!config) return 1;
   carriesLogin(it, config);
 
   let ran = { exitCode: 1, stdout: "", stderr: "" };
@@ -333,7 +340,7 @@ function clientArgv(client, plugin) {
 }
 
 // The index the start road launched stands over the clone, so the probe stops it with the index's own stop. [[spec/design_output/level0#the-cold-probe]]
-function stops(it, tree) {
+export function stops(it, tree) {
   try {
     it.proc.run([it.join(tree, ...BIN.split("/")), "stop"], {
       cwd: tree,
@@ -342,7 +349,7 @@ function stops(it, tree) {
   } catch {}
 }
 
-function tail(text) {
+export function tail(text) {
   return String(text ?? "")
     .trim()
     .split("\n")
