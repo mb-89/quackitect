@@ -6,6 +6,8 @@ package main
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -31,6 +33,20 @@ func TestEachInstanceInNoListTakesAProcessOfItsOwn(t *testing.T) {
 	}
 }
 
+func TestThePlacementsKeyReadsItsListsOffTheTree(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, "spec", "config", "level0.json")
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(at, []byte(`{"processes": {"placements": [["tickets", "queue"]]}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := placementLists(root); len(got) != 1 || strings.Join(got[0], ", ") != "tickets, queue" {
+		t.Fatalf("the placements key reads %v, and wants one list of tickets and queue", got)
+	}
+}
+
 func TestAListOfInstancesSharesOneProcess(t *testing.T) {
 	placed := placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"tickets", "queue", "ticket"}}, "quack")
 	if got := commandsOf(placed); strings.Join(got, " | ") != "quack module tickets queue ticket" {
@@ -41,47 +57,19 @@ func TestAListOfInstancesSharesOneProcess(t *testing.T) {
 	}
 }
 
-type logOf struct {
-	Session q.Content `q:"session"`
-}
-
-func TestTheShadowLeavesAnInstanceReadingItsOwnLogUnweighed(t *testing.T) {
-	w := q.Wiring{Instances: []q.Instance{{Name: "files", Module: "files"}, {Name: "log", Module: "log"}, {Name: "queue", Module: "queue"}}, Wires: map[string]string{"log.session": shadowsOwnLog, "queue.session": "files/spec/queue.md"}}
-	types := map[string]func(*q.Catalog){
-		"files": func(c *q.Catalog) { q.OutIn(c, "<path...>", q.Content{}, q.IO(), q.Doc("every file")) },
-		"log": func(c *q.Catalog) {
-			q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the log's length"))
-		},
-		"queue": func(c *q.Catalog) {
-			q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the queue's length"))
-		},
-	}
-	w.Wires["files.<path...>"] = "files/<path...>"
-	store, err := q.Start(w, types)
-	if err != nil {
-		t.Fatal(err)
-	}
-	placed := []index.Placed{{Instances: map[string]q.Writer{"log": {}}}, {Instances: map[string]q.Writer{"queue": {}}}}
-	if got := feedsItsLog(store, placed); !got["log"] || got["queue"] {
-		t.Fatalf("the shadow reads %v as feeding its own log, and wants log alone", got)
-	}
-}
-
 type twiceOf struct {
 	All int `q:"all"`
 }
 
-func TestAModuleProcessCommitsItsInstanceOffTheInputs(t *testing.T) {
+// A module process running a doubler wired to a source, whose inputs the index's side answers at 21, the index's side, and each commit the process publishes. [[spec/design_output/model#the-placements]]
+func doublerRuns(t *testing.T) (*index.Peer, chan map[string]json.RawMessage) {
+	t.Helper()
 	w := q.Wiring{Instances: []q.Instance{{Name: "source", Module: "source"}, {Name: "doubler", Module: "doubler"}}, Wires: map[string]string{"doubler.all": "source.all"}}
 	types := map[string]func(*q.Catalog){
 		"source": func(c *q.Catalog) { q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
 		"doubler": func(c *q.Catalog) {
 			q.DerivedIn(c, "twice", 0, func(in twiceOf) int { return 2 * in.All }, q.Doc("twice the count"))
 		},
-	}
-	indexSide, err := q.Start(w, types)
-	if err != nil {
-		t.Fatal(err)
 	}
 	moduleSide, err := q.Start(w, types)
 	if err != nil {
@@ -91,30 +79,54 @@ func TestAModuleProcessCommitsItsInstanceOffTheInputs(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer bus.Close()
+	t.Cleanup(bus.Close)
 	peer, err := index.Dial(bus.URL(), bus.Token())
 	if err != nil {
 		t.Fatalf("the index's side meets %v", err)
 	}
-	defer peer.Close()
+	t.Cleanup(peer.Close)
 	saved := []byte(`{"source/all": {"type": "int", "value": 21}}`)
 	answered, err := peer.AnswersInputs("doubler", func() ([]byte, error) { return saved, nil })
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer answered()
-	heard := make(chan map[string]json.RawMessage, 1)
+	t.Cleanup(answered)
+	heard := make(chan map[string]json.RawMessage, 4)
 	done, err := peer.Commits("doubler", func(values map[string]json.RawMessage) { heard <- values })
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer done()
-	_ = indexSide
+	t.Cleanup(done)
 	stop, err := runsModule(bus.URL(), bus.Token(), moduleSide, []string{"doubler"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer stop()
+	t.Cleanup(stop)
+	return peer, heard
+}
+
+func TestAModuleProcessCommitsNothingWhereNothingMoved(t *testing.T) {
+	peer, heard := doublerRuns(t)
+	if err := peer.Run("doubler"); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-heard:
+	case <-time.After(10 * time.Second):
+		t.Fatal("the first run commits nothing")
+	}
+	if err := peer.Run("doubler"); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case values := <-heard:
+		t.Fatalf("a second run over the same inputs commits %s", values)
+	case <-time.After(500 * time.Millisecond):
+	}
+}
+
+func TestAModuleProcessCommitsItsInstanceOffTheInputs(t *testing.T) {
+	peer, heard := doublerRuns(t)
 	if err := peer.Run("doubler"); err != nil {
 		t.Fatal(err)
 	}

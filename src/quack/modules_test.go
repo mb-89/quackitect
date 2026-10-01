@@ -1,24 +1,27 @@
-// Each topic the modules table names stands as a folder under src/modules,
-// which a change there restarts.
-// [[spec/design_output/model#a-module-rebuilds-alone]]
+// Each module type names the folder under src/modules registering it, which a
+// placement restarts on, and a settings section alone names none.
+// [[spec/tickets/topic-folder-in-the-table]]
 package main
 
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
+
+	"quackitect/src/modules/settings"
 )
 
-func TestEachTopicNamesAFolderUnderModules(t *testing.T) {
+func TestEachModuleTypeNamesAFolderThatStands(t *testing.T) {
 	for name, module := range modules {
-		if module.topic == "" {
+		if module.folder == "" {
+			if !slices.Contains(settings.Sections(), name) {
+				t.Errorf("%s names no folder, and stands no settings section", name)
+			}
 			continue
 		}
-		if module.starts != nil {
-			t.Fatalf("%s carries a start and the topic %s, where an IO module stays in the IO process", name, module.topic)
-		}
-		if info, err := os.Stat(filepath.Join("..", "modules", module.topic)); err != nil || !info.IsDir() {
-			t.Fatalf("%s names the topic %s, which stands as no folder under src/modules", name, module.topic)
+		if info, err := os.Stat(filepath.Join("..", "modules", module.folder)); err != nil || !info.IsDir() {
+			t.Errorf("%s names the folder %s, which stands nowhere under src/modules", name, module.folder)
 		}
 	}
 }

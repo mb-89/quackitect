@@ -373,37 +373,57 @@ func (s *Store) Down(instance string) error {
 
 // The names an instance's providers read, off other instances. [[spec/design_output/model#the-placements]]
 func (s *Store) Inputs(instance string) []string {
-	return s.namesOf(instance, func(one *registration) []string {
-		var read []string
+	seen := map[string]bool{}
+	for _, group := range s.groups {
+		one := s.active[group.name]
+		if one.instance != instance {
+			continue
+		}
 		for _, in := range one.inputs {
-			if !strings.HasPrefix(in.name, instance+"/") {
-				read = append(read, in.name)
+			if owner := s.owner(in.name); owner == nil || owner.instance != instance {
+				seen[in.name] = true
 			}
 		}
-		return read
-	})
+	}
+	return sortedKeys(seen)
 }
 
 // The names an instance provides. [[spec/design_output/model#the-placements]]
 func (s *Store) Outputs(instance string) []string {
-	return s.namesOf(instance, func(one *registration) []string { return []string{one.name} })
+	seen := map[string]bool{}
+	for _, group := range s.groups {
+		if s.active[group.name].instance == instance {
+			seen[group.name] = true
+		}
+	}
+	return sortedKeys(seen)
 }
 
-// The names of picks over each active registration of an instance, sorted once each. [[spec/design_output/model#the-placements]]
-func (s *Store) namesOf(instance string, picks func(*registration) []string) []string {
-	seen := map[string]bool{}
-	out := []string{}
-	for _, group := range s.groups {
-		one := s.active[group.name]
-		if one == nil || one.instance != instance {
+// The value of each name, and of each concrete name a family among them holds. [[spec/design_output/model#the-placements]]
+func (s *Store) Values(names []string) map[string]any {
+	snap := s.Snapshot()
+	out := map[string]any{}
+	for _, name := range names {
+		if !keyed(name) {
+			out[name] = snap.Read(name)
 			continue
 		}
-		for _, name := range picks(one) {
-			if !seen[name] {
-				seen[name] = true
-				out = append(out, name)
+		for held, at := range snap.values {
+			if matches(name, held) {
+				out[held] = at.value
 			}
 		}
+	}
+	return out
+}
+
+// Whether the name stands under the pattern, a family such as files/<path...> among them. [[spec/design_output/model#a-name]]
+func Matches(pattern, name string) bool { return matches(pattern, name) }
+
+func sortedKeys(seen map[string]bool) []string {
+	out := make([]string, 0, len(seen))
+	for name := range seen {
+		out = append(out, name)
 	}
 	sort.Strings(out)
 	return out

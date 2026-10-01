@@ -19,60 +19,63 @@ import (
 	"quackitect/src/q"
 )
 
-// The verb a module process runs under, the mark joining its instances into its part on the bus, and the wait before a restart. [[spec/design_output/model#one-binary-many-processes]]
+// The verb a module process runs under, the mark joining its instances into its part on the bus, the span between two beats, and the wait before a restart. [[spec/design_output/model#one-binary-many-processes]]
 const (
 	moduleVerb    = "module"
-	partJoin      = "-"
+	partJoin      = "+"
+	moduleBeat    = 5 * time.Second
 	moduleRestart = 5 * time.Second
 )
 
-// Each list's instances share one process, and every other instance a module topic names takes one of its own, in the wiring's order. An IO instance, a door and a settings section carry no topic, and stay where they run. [[spec/design_output/model#the-placements]]
+// The module types whose listener the index opens, which a placement leaves to it: the hooks door, the mcp server, the lsp listener and the /v1 door. [[spec/tickets/placements-leave-http]]
+var doorModules = []string{hooksModule, mcpModule, lspModule, "http"}
+
+// One process a list the key names, then one a process for each instance in no list, in the wiring's order. [[spec/design_output/model#the-placements]]
 func placementsOf(w q.Wiring, hands map[string]q.Writer, lists [][]string, self string) []index.Placed {
-	topics := map[string]string{}
+	placeable := map[string]string{}
 	for _, one := range w.Instances {
-		if module, ok := modules[one.Module]; ok && module.starts == nil && module.topic != "" {
-			topics[one.Name] = module.topic
+		if module, ok := modules[one.Module]; ok && module.starts == nil && module.folder != "" && !slices.Contains(doorModules, one.Module) {
+			placeable[one.Name] = module.folder
 		}
 	}
-	taken := map[string]bool{}
 	var out []index.Placed
-	for _, list := range lists {
+	taken := map[string]bool{}
+	place := func(instances []string) {
 		var kept []string
-		for _, instance := range list {
-			if topics[instance] != "" && !taken[instance] {
-				taken[instance] = true
-				kept = append(kept, instance)
+		for _, one := range instances {
+			if _, ok := placeable[one]; ok && !taken[one] {
+				kept, taken[one] = append(kept, one), true
 			}
 		}
 		if len(kept) > 0 {
-			out = append(out, placedOf(kept, topics, hands, self))
+			out = append(out, placedOf(kept, placeable, hands, self))
 		}
 	}
+	for _, list := range lists {
+		place(list)
+	}
 	for _, one := range w.Instances {
-		if topics[one.Name] != "" && !taken[one.Name] {
-			out = append(out, placedOf([]string{one.Name}, topics, hands, self))
-		}
+		place([]string{one.Name})
 	}
 	return out
 }
 
-// One module process: quack module over its instances, under the topics their modules stand in. [[spec/design_output/model#the-placements]]
-func placedOf(instances []string, topics map[string]string, hands map[string]q.Writer, self string) index.Placed {
+func placedOf(instances []string, folders map[string]string, hands map[string]q.Writer, self string) index.Placed {
 	held := make(map[string]q.Writer, len(instances))
-	var under []string
-	for _, instance := range instances {
-		held[instance] = hands[instance]
-		if !slices.Contains(under, topics[instance]) {
-			under = append(under, topics[instance])
+	var topics []string
+	for _, one := range instances {
+		held[one] = hands[one]
+		if !slices.Contains(topics, folders[one]) {
+			topics = append(topics, folders[one])
 		}
 	}
 	return index.Placed{
 		Name: strings.Join(instances, partJoin), Command: append([]string{self, moduleVerb}, instances...),
-		Instances: held, Restart: moduleRestart, Topics: under,
+		Instances: held, Restart: moduleRestart, Topics: topics,
 	}
 }
 
-// quack module: a module process the index spawns, which loads the whole wiring with no IO start and runs its instances until the bus goes. [[spec/design_output/model#one-binary-many-processes]]
+// quack module <instance>...: the process a placement spawns, which runs its instances until the bus goes. [[spec/design_output/model#one-binary-many-processes]]
 func moduleMain(instances []string) error {
 	url, token := os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv)
 	if url == "" {
@@ -82,27 +85,22 @@ func moduleMain(instances []string) error {
 	if err != nil {
 		return err
 	}
-	text, err := wiringOf(root, vehicleOf(os.Executable()))
+	w, err := spawnedWiring(root)
 	if err != nil {
 		return err
 	}
-	w := q.Wiring{}
-	if text != "" {
-		if w, err = q.ReadWiring(text); err != nil {
-			return err
-		}
-	}
-	c := q.New()
-	if _, _, err := loaded(w, c); err != nil {
+	catalog := q.New()
+	manager.Registers(catalog)
+	if _, _, err := loaded(w, catalog); err != nil {
 		return err
 	}
-	config.Registers(c)
+	config.Registers(catalog)
 	peer, err := index.Dial(url, token)
 	if err != nil {
 		return err
 	}
 	defer peer.Close()
-	stop, err := moduleOver(peer, q.NewStore(c), instances)
+	stop, err := moduleOver(peer, q.NewStore(catalog), instances)
 	if err != nil {
 		return err
 	}
@@ -128,46 +126,46 @@ func runsModule(url, token string, store *q.Store, instances []string) (func(), 
 	}, nil
 }
 
-// On each run.<instance> the process asks the index for the instance's inputs, restores them, settles its scheduler, and commits the instance's out-ports. It beats its lease while it runs. [[spec/design_output/model#the-placements]]
+// On each run.<instance> the process restores the inputs the index answers, settles its scheduler, and commits the instance's names, and it beats its lease while it runs. The runs heard while one runs fold into one, so a burst of commits costs one read of the inputs. [[spec/design_output/model#the-placements]]
 func moduleOver(peer *index.Peer, store *q.Store, instances []string) (func(), error) {
 	scheduler := q.NewScheduler(store, func(run func()) { go run() }, func(name string, err error) {
-		fmt.Fprintln(os.Stderr, "the run of", name, "did not commit:", err)
+		fmt.Fprintln(os.Stderr, name, "runs not:", err)
 	})
-	var stops []func()
+	var dones []func()
 	quit := make(chan struct{})
 	halt := func() {
-		for _, one := range stops {
-			one()
+		for _, done := range dones {
+			done()
 		}
-		close(quit)
 		scheduler.Stop()
 	}
 	for _, instance := range instances {
-		kicks := make(chan struct{}, 1)
+		waiting, run := make(chan struct{}, 1), &moduleRun{instance: instance, sent: map[string]string{}}
 		go func() {
 			for {
 				select {
 				case <-quit:
 					return
-				case <-kicks:
-					runsOnce(peer, store, scheduler, instance)
+				case <-waiting:
+					run.once(peer, store, scheduler)
 				}
 			}
 		}()
-		stop, err := peer.Runs(instance, func() {
+		done, err := peer.Runs(instance, func() {
 			select {
-			case kicks <- struct{}{}:
+			case waiting <- struct{}{}:
 			default:
 			}
 		})
 		if err != nil {
+			close(quit)
 			halt()
-			return nil, fmt.Errorf("%s hears no run: %w", instance, err)
+			return nil, err
 		}
-		stops = append(stops, stop)
+		dones = append(dones, done)
 	}
 	part := strings.Join(instances, partJoin)
-	beats := time.NewTicker(ioBeat)
+	beats := time.NewTicker(moduleBeat)
 	go func() {
 		for {
 			select {
@@ -180,109 +178,52 @@ func moduleOver(peer *index.Peer, store *q.Store, instances []string) (func(), e
 	}()
 	return func() {
 		beats.Stop()
+		close(quit)
 		halt()
 	}, nil
 }
 
-// One run of an instance off the inputs the index saves. [[spec/design_output/model#the-placements]]
-func runsOnce(peer *index.Peer, store *q.Store, scheduler *q.Scheduler, instance string) {
-	saved, err := peer.Inputs(instance)
+// One instance's runs: whether it read its inputs whole yet, and the JSON of each name it last committed. [[spec/design_output/model#the-placements]]
+type moduleRun struct {
+	instance string
+	read     bool
+	sent     map[string]string
+}
+
+// The first run reads the inputs whole, and each later one the moved ones alone, and a run commits the names that moved since the last. [[spec/design_output/model#the-placements]]
+func (r *moduleRun) once(peer *index.Peer, store *q.Store, scheduler *q.Scheduler) {
+	instance := r.instance
+	asks := peer.Moved
+	if !r.read {
+		asks = peer.Inputs
+	}
+	saved, err := asks(instance)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, instance, "reads no inputs:", err)
 		return
 	}
 	refused, err := store.Restore(saved)
-	for _, one := range refused {
-		fmt.Fprintln(os.Stderr, instance, "restores not:", one)
+	for _, line := range refused {
+		fmt.Fprintln(os.Stderr, instance, "restores", line)
 	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, instance, "restores nothing:", err)
 		return
 	}
+	r.read = true
 	scheduler.Settle()
-	snap := store.Snapshot()
-	values := map[string]any{}
-	for _, name := range store.Outputs(instance) {
-		if !strings.Contains(name, "<") {
-			values[name] = snap.Read(name)
+	moved := map[string]any{}
+	for name, value := range store.Values(store.Outputs(instance)) {
+		body, err := json.Marshal(value)
+		if err != nil || r.sent[name] == string(body) {
+			continue
 		}
+		moved[name], r.sent[name] = value, string(body)
 	}
-	if err := peer.Commit(instance, values); err != nil {
+	if len(moved) == 0 {
+		return
+	}
+	if err := peer.Commit(instance, moved); err != nil {
 		fmt.Fprintln(os.Stderr, instance, "commits nothing:", err)
 	}
-}
-
-// Under the processes slice's shadow, the index spawns a module process for each placement over the bus the IO process shares, and weighs each value it commits. Under any other mode it spawns nothing. [[spec/tickets/the-system-places-modules]]
-func placesShadow(root string, store *q.Store, bus *index.Bus, open doors) (*index.Bus, func(), error) {
-	if sliceMode(root, processesKey) != modeShadow {
-		return bus, func() {}, nil
-	}
-	self, err := os.Executable()
-	if err != nil {
-		return nil, nil, err
-	}
-	placed := placementsOf(open.wiring, open.hands, listsAt(root), self)
-	if len(placed) == 0 {
-		return bus, func() {}, nil
-	}
-	owned := bus == nil
-	if owned {
-		if bus, err = index.StartBus(); err != nil {
-			return nil, nil, err
-		}
-	}
-	weighs := shadows{
-		read:   func(name string) any { return store.Snapshot().Read(name) },
-		settle: shadowSettle,
-		wait:   time.Sleep,
-		say:    appendsRow(root, time.Now),
-		newest: &sends{at: map[string]int64{}},
-	}
-	feeds := feedsItsLog(store, placed)
-	for i := range placed {
-		placed[i].Heard = func(instance string, values map[string]json.RawMessage) {
-			if !feeds[instance] {
-				go weighs.weigh(values)
-			}
-		}
-	}
-	stop, err := index.NewPlacements(bus, store, placed).Start()
-	if err != nil {
-		if owned {
-			bus.Close()
-		}
-		return nil, nil, err
-	}
-	return bus, func() {
-		stop()
-		if owned {
-			bus.Close()
-		}
-	}, nil
-}
-
-// Each placed instance reading the log the shadow writes to, which moves on each row the shadow writes, so a weigh of it feeds itself. [[spec/tickets/the-system-places-modules]]
-func feedsItsLog(store *q.Store, placed []index.Placed) map[string]bool {
-	feeds := map[string]bool{}
-	for _, one := range placed {
-		for instance := range one.Instances {
-			if slices.Contains(store.Inputs(instance), shadowsOwnLog) {
-				feeds[instance] = true
-			}
-		}
-	}
-	return feeds
-}
-
-// The lists of processes/placements off the config files, which the index reads before its store settles. [[spec/design_output/model#the-placements]]
-func listsAt(root string) [][]string {
-	rows, err := configAt(root)
-	if err != nil {
-		return nil
-	}
-	var lists [][]string
-	if json.Unmarshal(rows[manager.PlacementsDotted].Value, &lists) != nil {
-		return nil
-	}
-	return lists
 }

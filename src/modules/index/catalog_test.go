@@ -12,6 +12,20 @@ import (
 	"quackitect/src/q/qtest"
 )
 
+func TestThePlacementsKeyHoldsNoListBuiltIn(t *testing.T) {
+	c := q.New()
+	Registers(c)
+	for _, key := range c.Keys() {
+		if key.Local == "processes/placements" {
+			if key.Default != "[]" || key.Type != "array" {
+				t.Fatalf("processes/placements holds %s as a %s built in, and wants an empty array", key.Default, key.Type)
+			}
+			return
+		}
+	}
+	t.Fatal("the manager registers no processes/placements key")
+}
+
 func TestAnActionRegisteringNoLabelWritesNoLabel(t *testing.T) {
 	ix := qtest.New(t, func(c *q.Catalog) {
 		q.ActionIn(c, "t/bare", func(askIn) []q.Request { return nil }, q.Doc("asks nothing"))

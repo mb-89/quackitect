@@ -676,7 +676,7 @@
         "placements": {
           "type": "array",
           "default": [],
-          "help": "the lists of instances that share one module process, where every other instance takes a process of its own"
+          "help": "the lists of module instances that share one process, where each instance in no list takes a process of its own"
         }
       }
     },

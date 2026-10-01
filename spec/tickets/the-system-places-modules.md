@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-step: implement/change
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -281,7 +281,42 @@ record:
         hash: a4432019dfba878d
         size: 74940
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box 5ebffe916bed · claude-code-remote
+    hash_before: fac27e51027eae82509239eabb5d07de53b922fd
+    hash_after: 8977aad4d908546dc82e903e0a51926265cb7f81
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 5ebffe916bed · claude-code-remote
+    hash_before: a33323e5867453d5d818ff46278b62733e7cd1c9
+    hash_after: bd1a24bdedbb97a74893c525a28c2066654d722b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/q passes; green, src/quack passes; green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/watchdogs-span-the-processes.md:286:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 2ab3d6eb6a4c64ce
+        size: 1078
+      - name: design/tests-red-2
+        hash: d15727cddba38168
+        size: 1122
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: module-processes-land-in-shadow
+reason: done
 ---
 
 # Ask
@@ -534,14 +569,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/store.go src/q/projection.go src/index/bus.go src/index/procs.go src/quack/placements.go src/quack/io.go src/quack/main.go src/quack/modules.go src/modules/index/manager.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: q, the bus and procs in src/index, the placements, io and modules files in src/quack, the manager key, its schema, its projected command and the size golden it moves
+- every door the change reaches has a fake: the module processes are this test binary run again, and the bus runs in memory on loopback
+- a comment names the approach the change implements: each new function points at the model placements chapter or this ticket
+- every fact the change adds stands in one place: the folder of each module type stands in the modules table alone, and the placements key in the manager alone
 
 ## tests-green
 
@@ -550,26 +590,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/placements_test.go src/q/start_test.go src/quack/placements_test.go src/quack/modules_test.go src/modules/index/catalog_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Under the processes slice's shadow, the index places each module instance that computes in a process of its own, quack module, beside the IO process, and weighs each value it commits against its own. The processes/placements key groups instances into one process. The modules table carries each type's folder, so a restart of one topic restarts its processes alone, and a killed process restarts alone while the index stays warm. A module process reads its inputs whole once and the moved ones after, and commits only what moved, since a whole read a run shipped every file and held the live index past a get's wait. The shadow's own log runs no placed process, since each shadow row ran its readers again. The placements wait out a start window before the first spawn and spawn a gap apart, so a probe's short-lived index spawns none and its stop reaches it. The cases for the moved read, the quiet log, the window and the gap came after the code, from the measurements on the live index. go test ./... passes past the watchdogs ticket's red cases, which its own red list keeps out until it closes. The watch caller of Placements.Restart lands with the switch ticket.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: q, the bus, procs and placements in src/index, the placements, io and modules files in src/quack, the manager key with its schema and projected command, and the size golden the ticket moves
+- every door the change reaches has a fake: the module processes are this test binary run again, and the bus runs in memory on loopback
+- a comment names the approach the change implements: each new function points at the model's placements chapter or this ticket
+- every fact the change adds stands in one place: each module type's folder in the modules table, the placements key in the manager, and the start window and gap as constants beside their use
 
 # accept
 

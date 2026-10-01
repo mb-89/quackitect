@@ -1,5 +1,5 @@
 ---
-description: "config / processes / placements: sets processes.placements to what you type. the lists of instances that share one module process, where every other instance takes a process of its own"
+description: "config / processes / placements: sets processes.placements to what you type. the lists of module instances that share one process, where each instance in no list takes a process of its own"
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

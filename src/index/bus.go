@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net"
-	"strings"
 	"time"
 
 	"github.com/nats-io/nats-server/v2/server"
@@ -38,8 +37,11 @@ const (
 	inVerb     = "in."
 )
 
-// The wait for the index to answer the inputs of an instance. [[spec/design_output/model#names-become-subjects]]
-const inputsWait = 10 * time.Second
+// The wait a module process gives the index to answer its inputs. [[spec/design_output/model#names-become-subjects]]
+const inputsWait = 30 * time.Second
+
+// The body of an ask for the inputs moved since the last answer, where an empty ask wants them whole. [[spec/design_output/model#names-become-subjects]]
+const askMoved = "moved"
 
 // [[spec/design_output/model#the-index-runs-nats]]
 type Bus struct {
@@ -111,12 +113,19 @@ func (p *Peer) Commit(instance string, values map[string]any) error {
 
 // Hands each commit an instance publishes to hand, its values still JSON. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Commits(instance string, hand func(values map[string]json.RawMessage)) (func(), error) {
-	return p.hears(commitVerb+instance, func(said *nats.Msg) {
+	sub, err := p.conn.Subscribe(commitVerb+instance, func(said *nats.Msg) {
 		var values map[string]json.RawMessage
 		if json.Unmarshal(said.Data, &values) == nil {
 			hand(values)
 		}
 	})
+	if err != nil {
+		return nil, err
+	}
+	if err := sub.SetPendingLimits(-1, -1); err != nil {
+		return nil, err
+	}
+	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()
 }
 
 // Publishes a heartbeat on lease.<part>. [[spec/design_output/model#a-lease]]
@@ -134,41 +143,47 @@ func (p *Peer) Run(instance string) error {
 
 // Hands each run.<instance> to hand. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Runs(instance string, hand func()) (func(), error) {
-	return p.hears(runVerb+instance, func(*nats.Msg) { hand() })
+	sub, err := p.conn.Subscribe(runVerb+instance, func(*nats.Msg) { hand() })
+	if err != nil {
+		return nil, err
+	}
+	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()
 }
 
 // Hands the part of each heartbeat on lease.<part> to hand. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Leases(hand func(part string)) (func(), error) {
-	return p.hears(leaseVerb+">", func(said *nats.Msg) { hand(strings.TrimPrefix(said.Subject, leaseVerb)) })
+	return func() {}, errors.New("the bus stands unbuilt")
 }
 
 // Asks in.<instance>, and answers the saved inputs. [[spec/design_output/model#names-become-subjects]]
-func (p *Peer) Inputs(instance string) ([]byte, error) {
-	reply, err := p.conn.Request(inVerb+instance, nil, inputsWait)
+func (p *Peer) Inputs(instance string) ([]byte, error) { return p.asks(instance, nil) }
+
+// Asks in.<instance> for the inputs moved since the last answer. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) Moved(instance string) ([]byte, error) { return p.asks(instance, []byte(askMoved)) }
+
+func (p *Peer) asks(instance string, body []byte) ([]byte, error) {
+	said, err := p.conn.Request(inVerb+instance, body, inputsWait)
 	if err != nil {
 		return nil, err
 	}
-	return reply.Data, nil
+	return said.Data, nil
 }
 
 // Answers each in.<instance> with what saved answers. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) AnswersInputs(instance string, saved func() ([]byte, error)) (func(), error) {
-	return p.hears(inVerb+instance, func(said *nats.Msg) {
-		body, err := saved()
-		if err != nil {
-			return
-		}
-		_ = said.Respond(body)
-	})
+	return p.AnswersMoved(instance, func(bool) ([]byte, error) { return saved() })
 }
 
-// Subscribes hand to a subject with no pending limit, and answers the unsubscribe once the bus holds the subscription. [[spec/design_output/model#names-become-subjects]]
-func (p *Peer) hears(subject string, hand nats.MsgHandler) (func(), error) {
-	sub, err := p.conn.Subscribe(subject, hand)
+// Answers each in.<instance> with what saved answers, told whether the ask wants the moved inputs alone. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) AnswersMoved(instance string, saved func(moved bool) ([]byte, error)) (func(), error) {
+	sub, err := p.conn.Subscribe(inVerb+instance, func(asked *nats.Msg) {
+		body, err := saved(string(asked.Data) == askMoved)
+		if err != nil {
+			body = []byte("{}")
+		}
+		_ = asked.Respond(body)
+	})
 	if err != nil {
-		return nil, err
-	}
-	if err := sub.SetPendingLimits(-1, -1); err != nil {
 		return nil, err
 	}
 	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()

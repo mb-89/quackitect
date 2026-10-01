@@ -18,9 +18,12 @@ import (
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
 	"quackitect/src/modules/files"
+	"quackitect/src/modules/holds"
 	"quackitect/src/modules/hooks"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/mcp"
+	"quackitect/src/modules/queue"
+	"quackitect/src/modules/views"
 	"quackitect/src/prose"
 	"quackitect/src/q"
 )
@@ -31,6 +34,9 @@ const (
 	dumpArgs   = 3
 	schemaArgs = 3
 )
+
+// The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
+var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers, views.Registers}
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
 type projection struct {
@@ -110,7 +116,7 @@ func main() {
 		}
 		return
 	}
-	// [[spec/design_output/model#one-binary-many-processes]]
+	// [[spec/tickets/the-system-places-modules]]
 	if len(os.Args) > 2 && os.Args[1] == moduleVerb {
 		if err := moduleMain(os.Args[2:]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -201,7 +207,7 @@ const sweepName = "check/sweep"
 type doors struct {
 	hooks, mcp, lsp hooked
 	io              []string
-	// The wiring and each instance's writer, which the placements read under the processes slice's shadow. [[spec/design_output/model#the-placements]]
+	// The wiring and each instance's writer, which the placements read. [[spec/tickets/the-system-places-modules]]
 	wiring q.Wiring
 	hands  map[string]q.Writer
 }
@@ -239,18 +245,12 @@ func manages(as q.Writer, open doors) index.Manage {
 			served.Stop()
 			return index.Managed{}, err
 		}
-		bus, halt, err := ioShadow(root, store, open.io)
+		bus, halt, err := ioShadow(root, store, open)
 		if err != nil {
 			stop()
 			return index.Managed{}, err
 		}
-		bus, unplace, err := placesShadow(root, store, bus, open)
-		if err != nil {
-			halt()
-			stop()
-			return index.Managed{}, err
-		}
-		return index.Managed{Stop: func() { unplace(); halt(); stop() }, Bus: bus, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+		return index.Managed{Stop: func() { halt(); stop() }, Bus: bus, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil

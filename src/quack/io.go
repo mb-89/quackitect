@@ -19,14 +19,16 @@ import (
 	"quackitect/src/q"
 )
 
-// The verb the IO process runs under, the slice's dotted key and its name in a row, the IO process's part on the bus, the span between two beats, the span a shadow value settles in, and the wait before a restart. [[spec/design_output/model#the-io-process]]
+// The verb the IO process runs under, the slice's dotted key and its name in a row, the IO process's part on the bus, the span between two beats, the span a shadow value settles in, the start window a shadow waits out before its first spawn, and the wait before a restart. [[spec/design_output/model#the-io-process]]
 const (
 	ioVerb         = "io"
 	processesKey   = "migration." + migration.ProcessesKey
 	processesSlice = migration.ProcessesKey
+	placementsKey  = "processes.placements"
 	ioPart         = "io"
 	ioBeat         = 5 * time.Second
 	shadowSettle   = 2 * time.Second
+	shadowAfter    = 30 * time.Second
 	ioRestart      = 5 * time.Second
 )
 
@@ -40,15 +42,9 @@ func ioMain() error {
 	if err != nil {
 		return err
 	}
-	text, err := wiringOf(root, vehicleOf(os.Executable()))
+	w, err := spawnedWiring(root)
 	if err != nil {
 		return err
-	}
-	w := q.Wiring{}
-	if text != "" {
-		if w, err = q.ReadWiring(text); err != nil {
-			return err
-		}
 	}
 	peer, err := index.Dial(url, token)
 	if err != nil {
@@ -62,6 +58,15 @@ func ioMain() error {
 	defer stop()
 	<-peer.Done()
 	return nil
+}
+
+// The wiring a process the index spawns reads: the work root's, then its vehicle's, and none where neither stands. [[spec/design_output/model#the-wiring-file]]
+func spawnedWiring(root string) (q.Wiring, error) {
+	text, err := wiringOf(root, vehicleOf(os.Executable()))
+	if err != nil || text == "" {
+		return q.Wiring{}, err
+	}
+	return q.ReadWiring(text)
 }
 
 // The start of each instance whose module carries one, keyed by the instance. [[spec/design_output/model#the-io-process]]
@@ -162,14 +167,18 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 	}, nil
 }
 
-// Under the processes slice's shadow, the index spawns quack io beside its own IO starts, and weighs each value it commits. Under any other mode it spawns nothing. [[spec/tickets/the-doors-process-stands]]
-func ioShadow(root string, store *q.Store, instances []string) (*index.Bus, func(), error) {
-	if sliceMode(root, processesKey) != modeShadow || len(instances) == 0 {
+// Under the processes slice's shadow, the index spawns quack io beside its own IO starts, and a module process for each placement beside its own providers, and weighs each value they commit. Under any other mode it spawns nothing. [[spec/tickets/the-doors-process-stands]] [[spec/tickets/the-system-places-modules]]
+func ioShadow(root string, store *q.Store, open doors) (*index.Bus, func(), error) {
+	if sliceMode(root, processesKey) != modeShadow {
 		return nil, func() {}, nil
 	}
 	self, err := os.Executable()
 	if err != nil {
 		return nil, nil, err
+	}
+	instances, placed := open.io, placementsOf(open.wiring, open.hands, placementLists(root), self)
+	if len(instances) == 0 && len(placed) == 0 {
+		return nil, func() {}, nil
 	}
 	bus, err := index.StartBus()
 	if err != nil {
@@ -186,11 +195,14 @@ func ioShadow(root string, store *q.Store, instances []string) (*index.Bus, func
 	for _, one := range instances {
 		held[one] = q.Writer{}
 	}
-	placed := index.Placed{
-		Name: ioPart, Command: []string{self, ioVerb}, Instances: held, Restart: ioRestart,
-		Heard: func(_ string, values map[string]json.RawMessage) { go weighs.weigh(values) },
+	heard := func(_ string, values map[string]json.RawMessage) { go weighs.weigh(values) }
+	if len(instances) > 0 {
+		placed = append(placed, index.Placed{Name: ioPart, Command: []string{self, ioVerb}, Instances: held, Restart: ioRestart})
 	}
-	stop, err := placed.Start(bus, store)
+	for i := range placed {
+		placed[i].Heard = heard
+	}
+	stop, err := index.NewPlacements(bus, store, placed).Quiet(shadowsOwnLog).After(shadowAfter).Start()
 	if err != nil {
 		bus.Close()
 		return nil, nil, err
@@ -199,6 +211,19 @@ func ioShadow(root string, store *q.Store, instances []string) (*index.Bus, func
 		stop()
 		bus.Close()
 	}, nil
+}
+
+// The lists of instances the processes/placements key holds, each list one process. [[spec/design_output/model#the-placements]]
+func placementLists(root string) [][]string {
+	rows, err := configAt(root)
+	if err != nil {
+		return nil
+	}
+	var lists [][]string
+	if json.Unmarshal(rows[placementsKey].Value, &lists) != nil {
+		return nil
+	}
+	return lists
 }
 
 // The index's side of the shadow: what the store holds for a name, the span a value settles in, and where a row goes. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
