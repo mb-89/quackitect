@@ -59,9 +59,12 @@ test("the check verb under --errors runs its parts quiet, and prints what errors
   const check =
     /^export async function check\(words\) \{[\s\S]*?^\}/m.exec(source)?.[0] ?? "";
   assert.match(check, /words\.includes\("--errors"\)/, "the check reads the flag");
-  assert.match(check, /test\(errors\)/, "the tests run quiet");
+  assert.match(check, /partsOf\(words, errors\)/, "and hands it to the parts");
+  const parts =
+    /^export function partsOf\(words, errors = false\) \{[\s\S]*?^\}/m.exec(source)?.[0] ?? "";
+  assert.match(parts, /test\(errors\)/, "the tests run quiet");
   assert.match(
-    check,
+    parts,
     /goHolds\(errors, redHere\(\)\)/,
     "and the Go tests, the red list apart",
   );

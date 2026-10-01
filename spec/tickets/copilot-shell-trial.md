@@ -47,7 +47,7 @@ The commands, in order:
 3. In Copilot's agent chat on this tree, ask: Run ls in the terminal.
 4. `./RUNME.sh log --kind copilot --last 5`
 
-- `./RUNME.sh log --kind copilot --last 5` names the `PreToolUse` row of the `ls` call, as complete or as the refusal it met
+- `./RUNME.sh log --kind copilot --last 5` names the `PreToolUse` row of the `ls` call, complete or refused
 
 # do
 

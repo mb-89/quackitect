@@ -62,6 +62,7 @@ export function holds(
   engine = true,
   stale = () => false,
   atTip = () => null,
+  checkedThrough = () => false,
 ) {
   // [[spec/design_output/work#a-version-branch-stands]]
   const versions = refs
@@ -93,6 +94,17 @@ export function holds(
     };
   }
 
+  // AN AGENT PUSHES NOTHING THE CHECK HAS NOT PASSED. Every branch an agent pushes carries a tip the green stamp reaches: the commit the check ran on, or one past it whose commits change ticket state alone, as a hand-back writes after its check. [[spec/tickets/level0-runs-on-the-door]]
+  const stamp = stampOf(stampText);
+  for (const one of engine ? refs : []) {
+    if (one.remote === `refs/heads/${TRUNK}` || ZEROS.test(String(one.sha ?? ""))) continue;
+    const battery = saysGreen(stamp, stamp.sha);
+    const covered = stamp.sha === one.sha || checkedThrough(stamp.sha, one.sha);
+    if (battery.green && covered) continue;
+    const branch = String(one.remote ?? "").replace(HEADS, "");
+    return { code: 1, said: unchecked(branch, battery.green ? "" : battery.says) };
+  }
+
   // A hold past work.staleAfter names a box that left, so its branch takes the push that moves the hold, and no other. [[spec/tickets/stale-hold-moves-by-take]]
   for (const one of refs) {
     const branch = String(one.remote ?? "").replace(HEADS, "");
@@ -112,6 +124,36 @@ export function holds(
 
   // A warning reads red in the battery, so the stamp holds the push here and in the session's door alike. [[spec/design_output/work#the-battery-answers-first]]
   return { code: 0, said: "" };
+}
+
+// The refusal an unchecked push meets. [[spec/tickets/level0-runs-on-the-door]]
+export function unchecked(branch, says) {
+  return [
+    `${branch} takes a push the check has passed, and ${says || "the green check ran on no commit this tip stands on, or code changed since"}.`,
+    "",
+    "Run `./RUNME.sh check` after your last code commit. It runs level zero on a",
+    "fresh box beside the tests, and a red check pushes nothing.",
+  ].join("\n");
+}
+
+// The stamp reaches a tip standing on its commit, where every file changed since lies under the tickets folder. [[spec/tickets/level0-runs-on-the-door]]
+export function checkedThroughBy(repo) {
+  return (from, to) => {
+    if (!from || !to) return false;
+    if (!repo.run(["merge-base", "--is-ancestor", from, to], true).ok) return false;
+    const said = repo.run(["diff", "--name-only", from, to], true);
+    if (!said.ok) return false;
+    return String(said.out)
+      .split("\n")
+      .map((row) => row.trim())
+      .filter(Boolean)
+      .every((name) => name.startsWith(`${TICKETS}/`));
+  };
+}
+
+// An agent's push: a cloud box, a session the engine runs, or a Claude Code session on a desk. The owner's own terminal pushes ungated. [[spec/tickets/push-gate-needs-the-engine]] [[spec/tickets/level0-runs-on-the-door]]
+export function agentPushes(env) {
+  return env?.[ENGINE] === "1" || inCloud(env ?? {}) || Boolean(env?.CLAUDECODE);
 }
 
 // [[spec/tickets/cloud-boxes-leave-trunk-alone]]
@@ -259,9 +301,10 @@ async function main() {
     inCloud(process.env),
     heldBy(git(outside, root)),
     boxIdHere({ root, method: root, join, disk: files }),
-    process.env[ENGINE] === "1",
+    agentPushes(process.env),
     staleBy(git(outside, root), await spanHere(files, root), clock().now().getTime()),
     heldAtTip(git(outside, root)),
+    checkedThroughBy(git(outside, root)),
   );
   if (said.code !== 0) console.error(said.said);
   return said.code;
