@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 point: gate
-step: person-1
+step: do
 steps:
   - name: person-1
     does: answers the question the engine asks
@@ -63,6 +63,11 @@ record:
       - name: check
         exit: 1
         said: "spec/tickets/the-system-places-modules.md:180:1: EveryPointerResolves: This pointer names a note nobody wrote: spec/desi"
+  - step: person-1
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 2ca08f35de8ae4768ccd6d9939e131677c137ae6
+    hash_after: 2ca08f35de8ae4768ccd6d9939e131677c137ae6
+    def: 214654b9f289ef26
 group: module-processes-land-in-shadow
 parent: the-doors-process-stands
 ---
@@ -82,8 +87,9 @@ src/index/procs_test.go shares the package variable fakeSnap across cases, so tw
 ## answer
 
 <!-- the answer, which the step behind this one reads -->
-
 <!-- the form is text -->
+
+Run do again. The check exits 0 on the branch head after the sync, so the dead pointer on the placements ticket no longer holds the check red, and nothing waits on that gate.
 
 # do
 
