@@ -146,6 +146,12 @@
       "message": "A file holds 600 lines, and the file holds 681. Split it by topic."
     },
     {
+      "file": "spec/tickets/the-system-places-modules.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 601. Split it by topic."
+    },
+    {
       "file": "spec/tickets/the-window-splits-by-tab.md",
       "rule": "FileCeiling",
       "line": 1,
