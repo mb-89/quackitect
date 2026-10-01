@@ -10,7 +10,7 @@ import {
   stepOf,
 } from "../../.claude/skills/level0/hooks/cage.js";
 import { guidanceHere, onAgentSpawn } from "../../src/bridge/guidance.js";
-import { toolNames } from "../../src/bridge/server.js";
+import { doorEvents, toolNames } from "../../src/bridge/server.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import LAYERS from "../replay/cage/layer-cases.json" with { type: "json" };
 
@@ -18,6 +18,12 @@ test("the door decides the tool call and the Stop, and the bridge keeps the prom
   assert.equal(doors("tool.call"), true);
   assert.equal(doors("classic.Stop"), true);
   assert.equal(doors("prompt.context"), false);
+});
+
+// [[spec/tickets/the-brief-leaves-the-bridge]]
+test("the door decides every event the bridge's DOORS table names", () => {
+  const left = doorEvents().filter((event) => !doors(event));
+  assert.deepEqual(left, [], `the bridge still keeps ${left.join(", ")}`);
 });
 
 test("the post goes to the standing port with its token as a bearer", () => {

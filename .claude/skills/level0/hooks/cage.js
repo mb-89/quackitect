@@ -8,7 +8,7 @@ export const NEW = "new";
 // The standing file the hooks door writes, which StandingFile in src/modules/hooks/hooks.go owns, spelled again here because this hook imports its own folder alone. [[spec/tickets/a-down-index-refuses-calls]]
 export const HOOKS_FILE = `${RUN}/hooks.json`;
 const DOORED = new Set(["tool.call", "classic.Stop"]);
-// The calls that pass while the door stands down: the harness reads, beside the level zero read tools. [[spec/tickets/a-down-index-refuses-calls]]
+// The calls that pass while the door stands down: the harness reads. [[spec/tickets/a-down-index-refuses-calls]] [[spec/tickets/level0-tools-leave-the-bridge]]
 const UNGUARDED = new Set(["Read", "Grep", "Glob"]);
 // The commands the refusal names, which pass while the door stands down, so a box whose index stands unbuilt brings it back. [[spec/rationales/the-cage-refuses-while-down]]
 const REMEDY = /^\s*\.\/RUNME\.sh (serve|doctor)(\s+--[\w-]+)*\s*$/;

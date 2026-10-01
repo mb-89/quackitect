@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 1f6b4296871cc195d1cf3dfcb725227bc3986d2e
+    hash_after: 1f6b4296871cc195d1cf3dfcb725227bc3986d2e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: bd62b8780e86dc2c
+        size: 2200
+    def: 08e16d07b0de477c
 depends_on: ["brief-answers-off-the-door", "prompt-answers-off-the-door", "spawn-answers-off-the-door", "clear-answers-off-the-door", "level0-tools-leave-the-bridge"]
 ---
 
@@ -235,26 +248,36 @@ What I weigh: each port lands alone and keeps the bridge answering its event unt
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/cage.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/cage.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cage case fails on its own assertion: the door decides two events, and the bridge keeps the other thirteen its DOORS table names. The case reads the table through doorEvents, which server.js exports as it exports toolNames, so the list stands once.
+
+The second done line rests on TestAPromptContextAfterAStartAnswersTheCanary in src/modules/hooks, which brief-answers-off-the-door landed and which stands green. The draft takes the prompt context form, since the session start answers no brief.
+
+What surprises me: the comment over UNGUARDED in cage.js still named the read tools the last ticket dropped, so it now names the harness reads alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cage case decides the first done line over the real DOORS table, and stands red
+- the canary case decides the second line, green already, and the check line waits for tests-green
+- the case reads doors alone, over no server and no disk
 
 # gate
 

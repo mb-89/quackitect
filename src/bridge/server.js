@@ -142,6 +142,9 @@ const DOORS = {
   [ANSWERED]: onAgentAnswered,
 };
 
+// The events the bridge still answers, which the cage's doors take over. [[spec/tickets/the-brief-leaves-the-bridge]]
+export const doorEvents = () => Object.keys(DOORS);
+
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
