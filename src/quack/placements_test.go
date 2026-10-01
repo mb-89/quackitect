@@ -49,8 +49,12 @@ func TestTheShadowLeavesAnInstanceReadingItsOwnLogUnweighed(t *testing.T) {
 	w := q.Wiring{Instances: []q.Instance{{Name: "files", Module: "files"}, {Name: "log", Module: "log"}, {Name: "queue", Module: "queue"}}, Wires: map[string]string{"log.session": shadowsOwnLog, "queue.session": "files/spec/queue.md"}}
 	types := map[string]func(*q.Catalog){
 		"files": func(c *q.Catalog) { q.OutIn(c, "<path...>", q.Content{}, q.IO(), q.Doc("every file")) },
-		"log":   func(c *q.Catalog) { q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the log's length")) },
-		"queue": func(c *q.Catalog) { q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the queue's length")) },
+		"log": func(c *q.Catalog) {
+			q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the log's length"))
+		},
+		"queue": func(c *q.Catalog) {
+			q.DerivedIn(c, "rows", 0, func(in logOf) int { return len(in.Session.Text) }, q.Doc("the queue's length"))
+		},
 	}
 	w.Wires["files.<path...>"] = "files/<path...>"
 	store, err := q.Start(w, types)
