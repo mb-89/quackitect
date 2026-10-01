@@ -438,3 +438,35 @@ test("under new a prompt reaches the door with its origin and the newest row bef
   assert.equal(posted?.e?.before, "row-9", "and the newest row before it");
   assert.deepEqual(handed, [{ text: "the owner's prompt" }], "the harness reads the prompt bare");
 });
+
+// [[spec/tickets/level0-runs-whole-on-the-door]]
+test("under new a door the start road stands up says no fall to the session, and one still down names the door", async () => {
+  const box = caged();
+  let standing = false;
+  box.$.http = {
+    fetch: async () => {
+      if (!standing) throw new Error("Unable to connect");
+      return { ok: true, status: 200, text: JSON.stringify({ effects: [] }) };
+    },
+  };
+  const run = box.$.process.run;
+  box.$.process.run = async (argv, init) => {
+    if (argv[1] === "-e" && !String(argv[2]).includes("appendFileSync")) standing = true;
+    return run(argv, init);
+  };
+  const submit = Object.assign(async (e) => e, { event: "prompt.submit" });
+
+  await box.hooks["*"](box.$, { text: "the owner's prompt" }, submit);
+
+  assert.deepEqual(box.$.logged, [], "the session reads no fall");
+  const rows = String(box.files.read(LOG)).split("\n").filter(Boolean);
+  assert.ok(
+    !rows.some((one) => /answers nothing/.test(one)),
+    "and the log keeps no fall row",
+  );
+
+  const down = caged();
+  await down.hooks["*"](down.$, { text: "the owner's prompt" }, submit);
+  assert.equal(down.$.logged.length, 1, "a door still down past the road says so once");
+  assert.match(down.$.logged[0], /answers nothing at http:\/\/127\.0\.0\.1:7001\/hook/);
+});

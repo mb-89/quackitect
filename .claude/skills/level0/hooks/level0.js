@@ -171,7 +171,8 @@ let reading = 0;
 async function door($, event, e, next) {
   const extra = await fillOf($, event, e);
   const sent = await promptOf($, event, e, next);
-  let answer = await doorAsk($, event, sent, extra);
+  // A door the start road has yet to stand answers nothing, and only a post still falling once the road ran says so. [[spec/tickets/level0-runs-whole-on-the-door]]
+  let answer = await doorAsk($, event, sent, extra, { quiet: true });
   if (!answer) {
     await starts($);
     answer = await doorAsk($, event, sent, extra);
@@ -214,7 +215,7 @@ async function promptOf($, event, e, next) {
   return next?.origin ? { ...said, origin: next.origin } : said;
 }
 
-async function doorAsk($, event, e, extra) {
+async function doorAsk($, event, e, extra, { quiet = false } = {}) {
   let where = HOOKS_FILE;
   try {
     const post = postOf(
@@ -233,7 +234,7 @@ async function doorAsk($, event, e, extra) {
     toldDown = false;
     return answer;
   } catch (error) {
-    await down($, event, error, where);
+    if (!quiet) await down($, event, error, where);
     return null;
   }
 }
@@ -527,13 +528,13 @@ async function down($, event, error, where = url()) {
   }
   if (toldDown || event === "session.start") return;
   toldDown = true;
-  says($, fellText(why));
+  says($, fellText(why, where));
 }
 
 // The one line a person reads where the bridge falls. [[spec/design_output/level0#the-bridge-says-it-falls]]
-export function fellText(why) {
+export function fellText(why, where = url()) {
   return [
-    `LEVEL ZERO ANSWERS NOTHING. The server answers nothing at ${url()}, so no`,
+    `LEVEL ZERO ANSWERS NOTHING. The server answers nothing at ${where}, so no`,
     "rule, no write door and no stop hook reaches this session. It says:",
     `${String(why ?? "").trim()}.`,
     "Say so in your next answer, and run ./RUNME.sh serve to start it again.",

@@ -141,19 +141,23 @@ async function session(it, tree) {
   const opening = raise("session.start", { session_id: `dry-${it.pid}`, cwd: tree });
   const prompt = { text: COLD.prompt };
   const submitted = await raise("prompt.submit", prompt, async (said) => said, OWNER);
+  // The client's transcript keeps each row as the session runs, which the answer door reads the reply off. [[spec/tickets/a-reply-follows-its-prompt]]
+  seen.held.push({ role: "user", id: "u1", text: String(submitted?.text ?? "") });
   const context = await raise("prompt.context", {}, async () => ({ blocks: [] }));
   await opening;
   const blocks = context?.blocks ?? [];
   const sentence = CANARY_LINE.exec(blocks.map((one) => one.text).join("\n"))?.[0] ?? "";
+  const answer = `${sentence}\nThis session probes a fresh box, so it reads README.md and runs git log.`;
   for await (const _ of engine.raise(
     $,
     "turn.step",
     { turnId: "t1", index: 0 },
     async function* () {
-      yield { kind: "text", text: `${sentence}\nREADME.md reads, and git log answers.` };
+      yield { kind: "text", text: answer };
     },
   )) {
   }
+  seen.held.push({ role: "assistant", id: "a1", text: answer });
   const read = await raise("tool.call", { tool: "Read", file_path: it.join(tree, "README.md") });
   const guarded = await raise("tool.call", {
     tool: "Bash",

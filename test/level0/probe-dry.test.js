@@ -5,7 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
-import { DRY, engineOf, readsDry } from "../../src/scripts/probe-dry.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { DRY, engineOf, harnessOf, readsDry } from "../../src/scripts/probe-dry.js";
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
 
@@ -134,4 +135,30 @@ test("the engine wraps each registration around the ones after it, reads a filte
   assert.deepEqual(heard, origin, "the origin rides the next a hook reads");
   assert.deepEqual(chunks, [{ kind: "text", through: true }]);
   assert.deepEqual(order, ["all:tool.call", "all:tool.call", "all:prompt.submit"]);
+});
+
+test("the harness reads the clone's files, records each post and tool, and hands back the transcript the session keeps", async () => {
+  const disk = fakeDisk({ "/t/tree/a.md": "a" });
+  const it = {
+    disk,
+    join: (...parts) => parts.join("/").replace(/\/[^/]+\/\.\.(?=\/|$)/g, ""),
+    http: { send: async () => ({ status: 503, text: "" }) },
+  };
+  const { $, seen } = harnessOf(it, "/t/tree", { CLAUDE_CODE_REMOTE: "true" });
+
+  assert.equal(await $.fs.read("a.md"), "a");
+  await $.fs.write(".se/x.json", "{}");
+  assert.equal(disk.read("/t/tree/.se/x.json"), "{}");
+  assert.equal(await $.env.get("CLAUDE_CODE_REMOTE"), "true");
+  const said = await $.http.fetch("http://127.0.0.1:1/hook", {
+    method: "POST",
+    body: JSON.stringify({ event: "tool.call" }),
+  });
+  assert.equal(said.ok, false, "a 503 reads as no answer");
+  await $.tool.register({ name: "find" });
+  seen.held.push({ role: "assistant", id: "a1", text: "said" });
+
+  assert.deepEqual(seen.posts, [{ url: "http://127.0.0.1:1/hook", event: "tool.call" }]);
+  assert.deepEqual(seen.registered, ["find"]);
+  assert.deepEqual(await $.session.messages(), [{ role: "assistant", id: "a1", text: "said" }]);
 });
