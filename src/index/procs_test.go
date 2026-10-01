@@ -249,6 +249,27 @@ func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
 	return store, placements, func() { stop(); bus.Close() }
 }
 
+func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	one := func(instance string) Placed {
+		return Placed{Name: instance, Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", instance}, Instances: map[string]q.Writer{instance: hand}, Restart: time.Hour}
+	}
+	stop, err := NewPlacements(bus, store, []Placed{one("fake"), one("other")}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	stop()
+	time.Sleep(4 * spawnGap)
+	if got := read(store, "other/out"); got != 0 {
+		t.Fatalf("other/out reads %v after a stop before its spawn, where no process of other starts", got)
+	}
+}
+
 func TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm(t *testing.T) {
 	store, _, stop := placedTwo(t)
 	defer stop()

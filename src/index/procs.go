@@ -48,9 +48,14 @@ type Placements struct {
 	stopped bool
 	// The names each instance reads that a commit moved since its last answer. [[spec/design_output/model#the-placements]]
 	moved map[string]map[string]bool
-	// The names whose commit runs nothing, such as the log a shadow writes its rows to, which would run its readers again on each row. [[spec/tickets/the-system-places-modules]]
+	// The names whose commit runs nothing, such as the log a shadow writes its rows to, since each row runs its readers again. [[spec/tickets/the-system-places-modules]]
 	quiet map[string]bool
+	// One answer saves at a time, so the first runs of every process read the inputs one after another. [[spec/tickets/the-system-places-modules]]
+	saving sync.Mutex
 }
+
+// The gap between two spawns, so a start of every process leaves the index's door room to stand. [[spec/tickets/the-system-places-modules]]
+const spawnGap = 250 * time.Millisecond
 
 // Marks names whose commit runs no placed process. [[spec/tickets/the-system-places-modules]]
 func (p *Placements) Quiet(names ...string) *Placements {
@@ -93,7 +98,11 @@ func (p *Placements) Start() (func(), error) {
 		for instance := range placed.Instances {
 			names := p.store.Inputs(instance)
 			inputs[instance] = names
-			done, err := peer.AnswersMoved(instance, func(moved bool) ([]byte, error) { return p.store.SaveNames(p.answer(instance, names, moved)) })
+			done, err := peer.AnswersMoved(instance, func(moved bool) ([]byte, error) {
+				p.saving.Lock()
+				defer p.saving.Unlock()
+				return p.store.SaveNames(p.answer(instance, names, moved))
+			})
 			if err != nil {
 				halt()
 				return nil, err
@@ -102,18 +111,30 @@ func (p *Placements) Start() (func(), error) {
 		}
 	}
 	p.store.OnCommit(func(values map[string]any) { p.runs(peer, inputs, values) })
-	for _, placed := range p.placed {
-		stop, err := placed.Start(p.bus, p.store)
-		if err != nil {
-			halt()
-			return nil, err
+	go p.spawns()
+	var once sync.Once
+	return func() { once.Do(halt) }, nil
+}
+
+// Starts each placed process a gap after the last, and none past the stop. A start that fails stands as a stop that does nothing, so the restart of its topic tries again. [[spec/tickets/the-system-places-modules]]
+func (p *Placements) spawns() {
+	for i, placed := range p.placed {
+		if i > 0 {
+			time.Sleep(spawnGap)
 		}
 		p.mu.Lock()
+		if p.stopped {
+			p.mu.Unlock()
+			return
+		}
+		stop, err := placed.Start(p.bus, p.store)
+		if err != nil {
+			fmt.Fprintln(stderr, placed.Name, "starts not:", err)
+			stop = func() {}
+		}
 		p.stops = append(p.stops, stop)
 		p.mu.Unlock()
 	}
-	var once sync.Once
-	return func() { once.Do(halt) }, nil
 }
 
 // Publishes run.<instance> for each placed instance reading a name the commit lands. [[spec/design_output/model#the-placements]]
