@@ -117,12 +117,21 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 73023d1f42ba477dfdcf5e373fd1d175c9fdf5f0
+    hash_after: 73023d1f42ba477dfdcf5e373fd1d175c9fdf5f0
+    inputs:
+      - name: ask
+        hash: 776b5067add31866
+        size: 564
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,98 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new IO module `src/modules/drafts` answers `check_prose` and `check_answer` under their tool names, off the wiring until the flip, as `src/modules/search` does. The quack side hands it Vale through a seam, so a case feeds it rows.
+
+1. `src/modules/drafts/drafts.go` registers `drafts/check_prose` and `drafts/check_answer` with `q.ToolName`, `q.Doc`, `q.IO()` and the inputs `proseSpec` and `checkSpec` declare. Each lists one request to the module.
+2. `Outside` holds the seams: `Lint(text, name)` answering the kept rows with message and severity, whether a Vale stands and whether it ran; `Asked()` answering the owner's question count; `Bands()` answering `answer.words`, `answer.warnAt` and `answer.ceiling`.
+3. `src/modules/drafts/prose.go` answers `check_prose` as `readsDraft` does: no path, no text, a code path reading nothing, a missing Vale, a Vale that ran nowhere, then the findings framed as `answerFindings` frames them.
+4. `src/modules/drafts/answer.go` ports `stopsAlone`, `tableFaults`, `needsFaults`, `lengthFaults`, `proseWordsIn`, `wordsIn`, `scoreOf` and `bandOf` off `.claude/skills/level0/lib/answer.js` and `stop.js`, and answers `check_answer` as `checksAnswer` in `src/bridge/tools.js` does. Each finding takes its trimmed line as context, as `withContext` gives it.
+5. The finding body moves into `src/modules/hooks/write` as one function beside `PlaceOf`, with the context line optional. `hooks.RefusedVoice` and the drafts answer both read it, so the body stands once.
+6. `src/quack/drafts.go` wires the seams: `Lint` reads `heardOver` as it stands, since it already answers the kept rows with message and severity. `Bands` reads the settings. `Asked` reads the count through `store.OnCommit`, as `reportsHeard` in `src/quack/finds.go` does.
+7. `Holds.prompted` in `src/modules/hooks/fold.go` keeps `Asked`, the question count of the owner's prompt, off `questionsIn` in `answer.js`, ported once into the hooks package.
+8. One case table, `test/replay/cage/draft-cases.json`, holds each case: the tool, its input, the rows Vale answers past the vetoes, the question count, and the text the bridge answers. `src/quack/drafts_test.go` and `test/level0/answer-read.test.js` each answer it.
+
+Boundaries with sibling tickets:
+- level0-tools-leave-the-bridge drops `check_prose` and `check_answer` from the bridge's `TOOLS`, and wires the module
+- `gatesAnswer` and `answerRides` stay in the bridge, since the turn's end gate is no tool call
+
+What I weigh: Vale runs once, in `heardOver`, so the commit voice, the write door and the drafts read one lint. The case table holds rows past the vetoes, so it tests the answer shape and leaves the vetoes to `src/prose` tests.
+
+I assume: a module may import the hooks subpackages and `src/yaml`, as `hooks/stop` and `views` do. The research pass says a module imports q alone, and the tree says otherwise.
+
+Risks:
+- the JS cases feed raw rows to a fake Vale and the vetoes run over them, so a table row a veto drops reads differently on the two sides. Every table row carries a rule no veto reads.
+- `questionsIn` ports beside its JS twin until the bridge leaves, so two readers stand for one release
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/hooks/writes.go: RefusedVoice, which reads the moved finding body
+src/modules/hooks/write: PlaceOf's file, which gains the finding body
+src/modules/hooks/fold.go: Holds.prompted, which keeps Asked
+src/quack/command.go: heardOver, which the drafts seam reads, unchanged
+src/quack/accepts.go: accepts, which gains the drafts case
+src/quack/main.go: modules, which gains drafts.Module
+src/bridge/prose.js: readsDraft, which the table checks, unchanged
+src/bridge/tools.js: checksAnswer, which the table checks, unchanged
+test/level0/answer-read.test.js: the cases, which read the shared table
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/drafts_test.go: TestTheDraftCasesAnswerOffTheModule
+src/modules/drafts/drafts_test.go: TestAProseCheckNamingNoPathSaysWhy
+src/modules/drafts/drafts_test.go: TestAProseCheckOverCodeReadsClean
+src/modules/drafts/drafts_test.go: TestAProseCheckWithNoValeReadsClean
+src/modules/drafts/drafts_test.go: TestAnAnswerCheckOnTheStopLineReadsClean
+src/modules/drafts/drafts_test.go: TestAnAnswerMissingTheQuestionTableNamesIt
+src/modules/drafts/drafts_test.go: TestAnAnswerStoppingWithoutTheNeedsTableNamesIt
+src/modules/drafts/drafts_test.go: TestAnAnswerPastTheCeilingReadsRewrite
+src/modules/hooks/fold_test.go: TestAnOwnersPromptKeepsItsQuestionCount
+src/modules/hooks/writes_test.go: TestTheRefusalBodyReadsAsBefore
+test/level0/answer-read.test.js: the bridge answers every case of draft-cases.json
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/drafts/drafts.go, new
+src/modules/drafts/prose.go, new
+src/modules/drafts/answer.go, new
+src/modules/drafts/drafts_test.go, new
+src/modules/hooks/write/ the file holding PlaceOf
+src/modules/hooks/writes.go
+src/modules/hooks/fold.go
+src/modules/hooks/fold_test.go
+src/quack/drafts.go, new
+src/quack/drafts_test.go, new
+src/quack/accepts.go
+src/quack/main.go
+test/replay/cage/draft-cases.json, new
+test/level0/answer-read.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every name the approach carries stands opened: readsDraft, readsAnswer, checksAnswer, answerFindings, withContext, heardOver, RefusedVoice, Holds.prompted, reportsHeard, search.Registers and accepts, and two research claims fell there
+the callers list names each reader of the moved body, the fold, the seam and the wiring, and the two bridge readers the table checks
+the Go done_when line rests on TestTheDraftCasesAnswerOffTheModule, the JS line on answer-read.test.js, and the check line on ./RUNME.sh check
 
 ## tests-red
 
