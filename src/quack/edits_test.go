@@ -286,8 +286,8 @@ func TestAMintRefusesAPathAnotherKindGoverns(t *testing.T) {
 	}
 }
 
-// [[spec/tickets/edit-tools-answer-in-go]]
-func TestTheEditModuleStandsOffTheWiring(t *testing.T) {
+// [[spec/tickets/edit-tools-answer-in-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
+func TestTheEditModuleStandsOnTheWiring(t *testing.T) {
 	if _, ok := modules[editModuleType]; !ok {
 		t.Errorf("the root loads no module type %s", editModuleType)
 	}
@@ -299,9 +299,7 @@ func TestTheEditModuleStandsOffTheWiring(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for _, one := range w.Instances {
-		if one.Module == editModuleType {
-			t.Errorf("the wiring loads %s as %s before the flip", editModuleType, one.Name)
-		}
+	if !wiresType(w, editModuleType) {
+		t.Errorf("the wiring loads no %s", editModuleType)
 	}
 }

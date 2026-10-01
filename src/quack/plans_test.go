@@ -90,8 +90,8 @@ func TestAPlanFieldRidingAGoCallWritesThePlanFile(t *testing.T) {
 	}
 }
 
-// [[spec/tickets/plan-writes-off-go]]
-func TestThePlansModuleStandsOffTheWiring(t *testing.T) {
+// [[spec/tickets/plan-writes-off-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
+func TestThePlansModuleStandsOnTheWiring(t *testing.T) {
 	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -103,10 +103,8 @@ func TestThePlansModuleStandsOffTheWiring(t *testing.T) {
 	if _, ok := modules[plansModuleType]; !ok {
 		t.Errorf("the root loads no module type %s", plansModuleType)
 	}
-	for _, one := range w.Instances {
-		if one.Module == plansModuleType {
-			t.Errorf("the wiring loads %s as %s before the flip", plansModuleType, one.Name)
-		}
+	if !wiresType(w, plansModuleType) {
+		t.Errorf("the wiring loads no %s", plansModuleType)
 	}
 }
 

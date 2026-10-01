@@ -15,6 +15,9 @@ const (
 	Module     = "drafts"
 	ProseVerb  = "check_prose"
 	AnswerVerb = "check_answer"
+	// An action name takes lowercase segments alone, so each check registers under a plain name and keeps its tool name. [[spec/tickets/level0-tools-leave-the-bridge]]
+	proseAction  = "prose"
+	answerAction = "answer"
 	readOnly   = "a check reads a draft, and writes nothing"
 )
 
@@ -71,10 +74,10 @@ type Outside struct {
 // [[spec/tickets/prose-tools-answer-in-go]]
 func Registers(c *q.Catalog) q.Writer {
 	return q.Join(
-		q.ActionIn(c, Module+"/"+ProseVerb, func(in Prose) []q.Request {
+		q.ActionIn(c, Module+"/"+proseAction, func(in Prose) []q.Request {
 			return []q.Request{{Module: Module, Verb: ProseVerb, Args: in, NoUndo: readOnly}}
 		}, q.Doc(proseDoc), q.ToolName(ProseVerb), q.IO()),
-		q.ActionIn(c, Module+"/"+AnswerVerb, func(in Answer) []q.Request {
+		q.ActionIn(c, Module+"/"+answerAction, func(in Answer) []q.Request {
 			return []q.Request{{Module: Module, Verb: AnswerVerb, Args: in, NoUndo: readOnly}}
 		}, q.Doc(answerDoc), q.ToolName(AnswerVerb), q.IO()),
 	)

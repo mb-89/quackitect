@@ -6,6 +6,7 @@ package main
 import (
 	"testing"
 
+	"quackitect/src/q"
 	"quackitect/src/q/tool"
 )
 
@@ -16,6 +17,15 @@ var bridgeServed = []string{
 	"patch", "replace", "undo",
 	"check_answer", "check_prose",
 	"mint_note", "plan", "review_branch",
+}
+
+func wiresType(w q.Wiring, kind string) bool {
+	for _, one := range w.Instances {
+		if one.Module == kind {
+			return true
+		}
+	}
+	return false
 }
 
 func calledNames(t *testing.T) map[string]bool {

@@ -38,7 +38,12 @@ type StopInput struct {
 	Next   string `json:"next" doc:"What the owner does next, in one sentence."`
 }
 
-// The three tools list off the index, and the door answers each before its action runs, so none lists a request. [[spec/tickets/log-report-stop-in-go]]
+// The review tool's input, as reviewSpec in .claude/skills/level0/lib/review.js declared it. [[spec/tickets/level0-tools-leave-the-bridge]]
+type ReviewInput struct {
+	Branch string `json:"branch" doc:"The branch to read, such as the-config-holds-numbers."`
+}
+
+// The four tools list off the index, and the door answers each before its action runs, so none lists a request. [[spec/tickets/log-report-stop-in-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
 func toolActions(c *q.Catalog) q.Writer {
 	none := func() []q.Request { return nil }
 	return q.Join(
@@ -48,6 +53,8 @@ func toolActions(c *q.Catalog) q.Writer {
 			q.Doc("Answers the owner between calls: a prompt sent mid-turn, or an ask from the sidebar. The text lands in the log as your reply at once, and the work goes on. A short ask takes a line or two. A full ask takes four chapters as headings, each with text under it: Done, Now, Open, ETA."), q.ToolName("report"), q.IO()),
 		q.ActionIn(c, toolsModule+"/stop", func(StopInput) []q.Request { return none() },
 			q.Doc("Ends this turn, every turn of a session alike. Call it last, once your answer stands, and write nothing after it. The result says whether the stop stands, and where it falls, the result names the fact, so carry on. A reason no rule holds answers the ids this tree holds."), q.ToolName("stop"), q.IO()),
+		q.ActionIn(c, toolsModule+"/review", func(ReviewInput) []q.Request { return none() },
+			q.Doc("Reads a work branch against the ask its group ticket carries, and answers a short report: what the branch does, what it touches beyond the ask, which rules it adds without a test, whether the check passes, and whether the handback carries a retro. It holds no merge back. Takes one branch name, with or without the work/ prefix."), q.ToolName("review_branch"), q.IO()),
 	)
 }
 

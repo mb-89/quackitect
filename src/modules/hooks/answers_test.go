@@ -9,6 +9,8 @@ import (
 
 	"quackitect/src/modules/hooks/stop"
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
+	"quackitect/src/q/tool"
 )
 
 // The log tool's call, and the reason no rule names. [[spec/tickets/log-report-stop-in-go]]
@@ -134,4 +136,12 @@ func TestTheDoorAnswersAReportWithItsText(t *testing.T) {
 		}
 	}
 	t.Errorf("the door answers %+v, and wants the report's text as the tool's result, under result", said.Effects)
+}
+
+// [[spec/tickets/level0-tools-leave-the-bridge]]
+func TestTheReviewToolListsUnderTheNameTheAgentCalls(t *testing.T) {
+	ix := qtest.New(t, func(cat *q.Catalog) { Registers(cat) })
+	if action, ok := tool.Action(ix.Store(), "review_branch"); !ok || action != toolsModule+"/review" {
+		t.Errorf("review_branch resolves to %q, %v, and wants %s/review", action, ok, toolsModule)
+	}
 }

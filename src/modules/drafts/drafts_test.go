@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"quackitect/src/q"
+	"quackitect/src/q/qtest"
+	"quackitect/src/q/tool"
 )
 
 // The name an answer lints as. [[spec/tickets/prose-tools-answer-in-go]]
@@ -113,5 +115,15 @@ func TestEachCheckLintsAsTheFileItReads(t *testing.T) {
 func TestAnotherVerbMeetsARefusal(t *testing.T) {
 	if _, err := Accept(Outside{})(q.Request{Module: Module, Verb: "mint", Args: Prose{}}); err == nil {
 		t.Errorf("the module answers the verb mint, and wants a refusal naming its two checks")
+	}
+}
+
+// [[spec/tickets/level0-tools-leave-the-bridge]]
+func TestEachCheckListsUnderTheNameTheAgentCalls(t *testing.T) {
+	ix := qtest.New(t, func(cat *q.Catalog) { Registers(cat) })
+	for verb, action := range map[string]string{ProseVerb: Module + "/" + proseAction, AnswerVerb: Module + "/" + answerAction} {
+		if got, ok := tool.Action(ix.Store(), verb); !ok || got != action {
+			t.Errorf("%s resolves to %q, %v, and wants %s", verb, got, ok, action)
+		}
 	}
 }

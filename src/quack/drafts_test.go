@@ -14,6 +14,7 @@ import (
 	"quackitect/src/modules/drafts"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
+	"quackitect/src/q/tool"
 )
 
 // [[spec/tickets/prose-tools-answer-in-go]]
@@ -96,7 +97,11 @@ func TestTheDraftCasesAnswerOffTheWiredModule(t *testing.T) {
 			if one.Tool == drafts.ProseVerb {
 				input = map[string]any{"path": one.Input.Path, "text": one.Input.Text}
 			}
-			said, err := served.Call(drafts.Module+"/"+one.Tool, input, "s1", findWait)
+			action, ok := tool.Action(store, one.Tool)
+			if !ok {
+				t.Fatalf("no action answers the tool %s", one.Tool)
+			}
+			said, err := served.Call(action, input, "s1", findWait)
 			if err != nil || said.Error != "" || fmt.Sprint(said.Result) != one.Answer {
 				t.Errorf("the wired check answers %v, err %v %q, and the bridge answers %q", said.Result, err, said.Error, one.Answer)
 			}

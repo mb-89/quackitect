@@ -78,6 +78,16 @@ instances:
     module: stop
   wait:
     module: wait
+  edits:
+    module: edits
+  search:
+    module: search
+  waits:
+    module: waits
+  plans:
+    module: plans
+  drafts:
+    module: drafts
   watchdog:
     module: watchdog
 wires:

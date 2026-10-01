@@ -137,8 +137,8 @@ func TestAFindOverAFailingReadSaysTheIndexIsDead(t *testing.T) {
 	}
 }
 
-// [[spec/tickets/find-and-wait-in-go]]
-func TestTheFindAndWaitModulesStandOffTheWiring(t *testing.T) {
+// [[spec/tickets/find-and-wait-in-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
+func TestTheFindAndWaitModulesStandOnTheWiring(t *testing.T) {
 	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -151,10 +151,8 @@ func TestTheFindAndWaitModulesStandOffTheWiring(t *testing.T) {
 		if _, ok := modules[kind]; !ok {
 			t.Errorf("the root loads no module type %s", kind)
 		}
-		for _, one := range w.Instances {
-			if one.Module == kind {
-				t.Errorf("the wiring loads %s as %s before the flip", kind, one.Name)
-			}
+		if !wiresType(w, kind) {
+			t.Errorf("the wiring loads no %s", kind)
 		}
 	}
 }
