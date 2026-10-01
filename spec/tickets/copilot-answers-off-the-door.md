@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 03881a3414394283310949a52c9485ae1e7b6e3e
+    hash_after: fd38b3603bf2170d9c2a7dc0592df1988a5e3af2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/bridge/server.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 603. Split it by topic."
+    inputs:
+      - name: design/tests-red
+        hash: c749736e2298d85e
+        size: 960
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -368,26 +391,40 @@ the adapter, the door module and the hook road each point at this ticket
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/copilot.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Copilot's hook answers off the hooks door, and the JavaScript runtime that decided it leaves.
+
+- `callsOf` turns a Copilot tool call into the Claude calls it stands for: a shell call as `Bash`, an edit as one `Write` a changed file, and any other tool as itself.
+- `answers` in `copilot-door.js` posts each call to the door, and folds the effects through the cage's `stepOf`. A door that answers nothing refuses a guarded call.
+- `copilot-runtime.js`, the shadow and quack's hook mode leave with their cases. `git ls-files .claude/skills/level0/lib/copilot-runtime.js` answers nothing.
+- `TOOL_WAIT` leaves with the runtime, since hook mode runs no process now. The fetch waits on Copilot's own deadline instead.
+
+Copilot's own guards leave with `handle`: the protected paths, the cloud branch rules, the receipt line and the Stop format pass. Each one the owner wants back is a ticket of its own. `copilot-shell-trial` stands loose for a person: it reads whether the door refuses a Copilot shell call, which carries no description.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft's size names, plus the size golden and a main_test.go case
+the copilot cases run over a fake standing file and a fake door
+the adapter, the door module and the hook road each point at this ticket
+the cage's functions and HOOKS_FILE stand in cage.js, and the door module imports them
 
 # accept
 
