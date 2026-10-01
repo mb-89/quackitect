@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
 depends_on: ["level0-tools-leave-the-bridge"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -148,6 +148,18 @@ record:
         hash: 4fcf6bcca651be1f
         size: 4130
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: 6b31cd5bc5df722ede11c56c5827cf8a887c834b
+    hash_after: 6b31cd5bc5df722ede11c56c5827cf8a887c834b
+    inputs:
+      - name: design/draft
+        hash: 4fcf6bcca651be1f
+        size: 4130
+      - name: design/tests-red
+        hash: d128104d243bb342
+        size: 1018
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -306,8 +318,9 @@ The cloud-start cases fail on their assertions, since the road still self-tests 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask: se-index standing starts serve where no door answers (src/index/main.go reaches), and serve stands the hooks door (src/quack/main.go hooks.Listen). Every done_when line meets a test red on its own assertion: the grep line in test/contract/start-road-starts-the-index.test.js, the cold start in test/contract/cloud-start.test.js, the check at tests-green. The implementer regenerates src/quack/testdata/readers.golden.json, which step 6 names and size leaves out.
 
 # implement
 
