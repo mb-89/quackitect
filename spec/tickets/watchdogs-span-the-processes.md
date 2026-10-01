@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -161,6 +161,21 @@ record:
         hash: a4432019dfba878d
         size: 74940
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 18c40653fe79 · claude-code-remote
+    hash_before: 0ea42a8c56c6eb15f9c25a5acb637a3d5ea3aee0
+    hash_after: 0ea42a8c56c6eb15f9c25a5acb637a3d5ea3aee0
+    inputs:
+      - name: design/draft
+        hash: e6c71b34bd87d89d
+        size: 3899
+      - name: design/tests-red
+        hash: 29fb6b88d0e8db57
+        size: 1091
+      - name: [[spec/design_output/model]]
+        hash: a4432019dfba878d
+        size: 74940
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -292,8 +307,10 @@ Each case fails on its own assertion over stubs that build. The bus refuses the 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- module-silence-reads-alarms: the silent module case counts faults on a fake dog. Run it over the manager's dog, and read session/alarms as the IO case does.
 
 # implement
 
