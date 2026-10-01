@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -281,6 +281,15 @@ record:
         hash: a4432019dfba878d
         size: 74940
     def: 01417e29801ecc2f
+  - step: implement/change
+    hand: box 5ebffe916bed · claude-code-remote
+    hash_before: fac27e51027eae82509239eabb5d07de53b922fd
+    hash_after: 8977aad4d908546dc82e903e0a51926265cb7f81
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 group: module-processes-land-in-shadow
 ---
 
@@ -534,14 +543,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/q/store.go src/q/projection.go src/index/bus.go src/index/procs.go src/quack/placements.go src/quack/io.go src/quack/main.go src/quack/modules.go src/modules/index/manager.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: q, the bus and procs in src/index, the placements, io and modules files in src/quack, the manager key, its schema, its projected command and the size golden it moves
+- every door the change reaches has a fake: the module processes are this test binary run again, and the bus runs in memory on loopback
+- a comment names the approach the change implements: each new function points at the model placements chapter or this ticket
+- every fact the change adds stands in one place: the folder of each module type stands in the modules table alone, and the placements key in the manager alone
 
 ## tests-green
 
