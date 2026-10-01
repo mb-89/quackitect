@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,19 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: module-processes-land-in-shadow
+record:
+  - step: design/draft
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: b434f51a588b1b5807a1d111f421a7b185b2f28b
+    hash_after: b434f51a588b1b5807a1d111f421a7b185b2f28b
+    inputs:
+      - name: ask
+        hash: a166f2553415d2a5
+        size: 402
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -146,32 +159,64 @@ The operating system then holds the boundary.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`quack io` runs in shadow beside the index, per [[spec/design_output/model#the-io-process]] and [[spec/design_output/model#the-inner-protocol]].
+
+1. The bus. `src/index/bus.go` runs `nats-server/v2` inside the index on `127.0.0.1`, on a port the system picks, with a token off `crypto/rand`, no JetStream and no disk. `Standing` in `src/index/door.go` gains `bus` and `token`, which `stands` writes. A peer dials it with `nats.go`.
+2. A placed process. `src/index/procs.go` adds `Placed`: a name, the command, and the instances it runs. `Placed.Start` answers an `index.Start`. It spawns the command with the bus and the token in its environment, and commits each `commit.<instance>` message through the start's `Commit`. On the child's exit it marks each instance down through `Store.Down`, and the next commit clears the mark through a new `Store.Up`. The restart waits on the dog, and [[spec/tickets/watchdogs-span-the-processes]] carries the leases and alarms across.
+3. `quack io`. `src/quack/io.go` dials the bus off the environment, runs the start of each IO instance placed in the IO process, and publishes each commit on `commit.<instance>`. Its work loop beats `lease.io`.
+4. The shadow. `migration/config/slices/processes` takes `old`, `shadow` or `new`, built-in `old`, and the tracked file sets `shadow`. Under `shadow` the index keeps every start in its own process, and spawns `quack io` over the IO instances holding no port: watch, clock, env and git. The index lands none of the shadow's commits. It weighs each name the shadow commits against the value the store holds once a settle span passes, and a value apart writes a `shadow` row naming the slice, the name, the old and the new. Under `new`, the switch ticket places those instances in the IO process alone.
+5. The listeners of hooks, mcp and lsp stay in the index under `shadow`, the interim [[spec/tickets/hooks-listener-joins-io-process]] names, since two processes hold no one port. The switch moves them.
+
+The assumption: the shadow weighs commits and no requests, since the IO modules' requests write the disk, and a second answer to a write writes twice.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/door.go stands, which writes Standing
+- src/index/main.go standingOf and stands, which read Standing
+- src/index/door.go starts, which runs each Start, a placed one among them
+- src/quack/main.go main, whose dispatch gains io
+- src/quack/main.go manages and wired, which hand the index its starts and spawn the shadow
+- src/q/store.go Down, Snapshot.Read and Snapshot.NotProvided, beside the new Up
+- src/q/why.go Why, which reads NotProvided
+- src/modules/migration/migration.go Registers, whose slices gain processes
+- spec/config/level0.json and spec/config/level0.schema.json, which quack schema --write regenerates
+- src/quack/testdata/readers.schema.json, readers.tracked.json and readers.golden.json
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/bus_test.go TestTheBusAnswersALoopbackPeerShowingItsToken
+- src/index/bus_test.go TestTheBusRefusesAPeerWithoutTheToken
+- src/index/door_test.go TestTheStandingFileNamesTheBusAndItsToken
+- src/index/procs_test.go TestAKilledFakeIOProcessLeavesItsNamesNotProvided
+- src/index/procs_test.go TestTheNextCommitOfARestartedProcessClearsTheMark
+- src/q/start_test.go TestAnInstanceUpAgainReadsItsValue
+- src/quack/io_test.go TestQuackIOCommitsItsInstancesOverTheBus
+- src/quack/io_test.go TestAShadowValueApartWritesAShadowRow
+- src/modules/migration/migration_test.go TestTheProcessesSliceTakesThreeModes
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened, and each claim checked there: door.go stands and Standing, store.go Down and NotProvided, why.go, main.go manages, wired and loaded, migration.go, level0.json, and the go proxy answering nats-server v2.15
+- the callers list names every caller of what the approach changes, off a grep of Standing, standingPath, .Down(, manages(, wired() and migration.Registers
+- every done_when line names the test that decides it: the kill line TestAKilledFakeIOProcessLeavesItsNamesNotProvided, the go test line go test ./..., and the check line ./RUNME.sh check
 
 ## tests-red
 
