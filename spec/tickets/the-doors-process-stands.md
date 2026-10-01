@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -180,6 +180,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: 3adb9cb20dc011cf036357299bde7f09a0a89915
+    hash_after: f2860c6b832469de042ddd39cdf47682e5ef6edc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/quack passes; green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-system-places-modules.md:438:211: Characters: The character ; stands outside the set a paragraph admits"
+    inputs:
+      - name: design/tests-red
+        hash: c2dddd9a990e87a9
+        size: 1134
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -352,26 +375,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/bus_test.go src/index/standing_test.go src/quack/io_test.go src/modules/migration/migration_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index runs a NATS server inside itself on loopback, with a token, and the standing file names its port and the token. A placed process is a command the index spawns with the bus in its environment: it lands each commit the process publishes as the instance's writer, marks the instance down when the process exits, so its names read their built-in values marked not provided, and the next commit clears the mark. quack io dials the bus and runs the wiring's IO instances, publishing each commit and beating its lease. Under the processes slice's shadow, which the tracked file now sets, the index spawns quack io beside its own IO starts and weighs each value it publishes against the store's, after a settle span, writing a shadow row for each value apart. The weigh reads a name's newest value alone and skips the session log it writes, since the first live run fed its own rows back into a loop. The listeners stay in the index until the switch. The kill cases stand in src/index/procs_test.go beside the placements ticket red cases, so the test verb leaves that file out until those turn green, and go test -run KilledFakeIO and RestartedProcess passes them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the bus, the placed process, the standing file, the store, quack io, the processes slice, its tracked mode and its projections
+- every door the change reaches has a fake: the bus runs in memory on loopback in each case, and the fake IO process is the test binary run again
+- a comment names the approach the change implements: each new function points at the model chapter or this ticket
+- every fact the change adds stands in one place: the subjects, spans and payload cap stand as named constants in bus.go and io.go, and the slice modes in migration.go
 
 # accept
 
