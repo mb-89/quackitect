@@ -91,12 +91,6 @@
       "rule": "EveryPointerResolves",
       "line": 100,
       "message": "This pointer names a chapter nobody wrote: spec/design_output/work#a-successor-stands-on-question. Point at a heading of spec/design_output/work.md, or write the chapter."
-    },
-    {
-      "file": "test/contract/start-road-starts-the-index.test.js",
-      "rule": "NameHoldsTheWords",
-      "line": 1,
-      "message": "start-road-starts-the-index.test.js holds more than 5 words. Rename it shorter."
     }
   ]
 }

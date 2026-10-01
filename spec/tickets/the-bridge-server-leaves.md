@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: c5e802135594045d
         size: 2682
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: 18f45e3bd700827a7fe4ece9b204b86aa18be00b
+    hash_after: 18f45e3bd700827a7fe4ece9b204b86aa18be00b
+    inputs:
+      - name: design/draft
+        hash: c5e802135594045d
+        size: 2682
+      - name: design/tests-red
+        hash: 03ab3ddbe2e00eb8
+        size: 657
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -268,8 +280,9 @@ The case fails on its own assertion, because `git ls-files` still names the brid
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask. A cold probe over a clone carrying the deletion of `src/bridge/server.js` passes the hook, server, rules and tools rows, so a fresh session reads its rules and every level0 tool off the hooks door. The new case decides the first done line and stands red. The check decides the second at the green leaf. This live session routes calls to the bridge only because its plugin loaded before the flip.
 
 # implement
 
