@@ -254,4 +254,3 @@ func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 		t.Fatalf("the dog counts %d fault(s) of the silent fake, and wants the second that raises the alarm", got)
 	}
 }
-
