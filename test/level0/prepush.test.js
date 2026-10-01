@@ -8,7 +8,9 @@ import test from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
+  agentPushes,
   carriedBy,
+  checkedThroughBy,
   holds,
   lintedBy,
   namesIn,
@@ -70,12 +72,65 @@ test("git's lines read as refs, and a blank line reads as nothing", () => {
   ]);
 });
 
-test("a push to a work branch meets no door, whatever the stamp says", () => {
-  assert.deepEqual(holds(refsIn(toWork), ""), { code: 0, said: "" });
-  assert.deepEqual(holds(refsIn(toWork), stamp({ ok: false })), {
-    code: 0,
-    said: "",
+// The owner's own terminal push meets no stamp. [[spec/tickets/push-gate-needs-the-engine]]
+test("an owner's push to a work branch meets no door, whatever the stamp says", () => {
+  const owner = (text) => holds(refsIn(toWork), text, () => [], false, () => "", "", false);
+  assert.deepEqual(owner(""), { code: 0, said: "" });
+  assert.deepEqual(owner(stamp({ ok: false })), { code: 0, said: "" });
+});
+
+// [[spec/tickets/level0-runs-on-the-door]]
+test("an agent's push to a work branch takes the green stamp, and a red, absent or unclean one refuses", () => {
+  assert.deepEqual(holds(refsIn(toWork), stamp()), { code: 0, said: "" });
+  for (const [text, says] of [
+    ["", /no check has run here/],
+    [stamp({ ok: false }), /answered red/],
+    [stamp({ clean: false }), /unclean tree/],
+  ]) {
+    const said = holds(refsIn(toWork), text);
+    assert.equal(said.code, 1);
+    assert.match(said.said, says);
+    assert.match(said.said, /work\/x takes a push the check has passed/);
+    assert.match(said.said, /\.\/RUNME\.sh check/);
+  }
+});
+
+// [[spec/tickets/level0-runs-on-the-door]]
+test("an agent's push past the checked commit lands where ticket state alone changed since, and refuses where code did", () => {
+  const past = stamp({ sha: WAS });
+  const reaches = (from, to) => from === WAS && to === SHA;
+  const args = (through) => [() => [], false, () => "", "", true, () => false, () => null, through];
+
+  assert.deepEqual(holds(refsIn(toWork), past, ...args(reaches)), { code: 0, said: "" });
+  const said = holds(refsIn(toWork), past, ...args(() => false));
+  assert.equal(said.code, 1);
+  assert.match(said.said, /or code changed since/);
+});
+
+// [[spec/tickets/level0-runs-on-the-door]]
+test("the stamp reaches a tip on its commit whose changes lie under the tickets folder alone", () => {
+  const repo = (ancestor, names) => ({
+    run: (args) =>
+      args[0] === "merge-base"
+        ? { ok: ancestor, out: "" }
+        : { ok: true, out: names.join("\n") },
   });
+
+  assert.equal(checkedThroughBy(repo(true, ["spec/tickets/a.md"]))(WAS, SHA), true);
+  assert.equal(
+    checkedThroughBy(repo(true, ["spec/tickets/a.md", "src/x.js"]))(WAS, SHA),
+    false,
+  );
+  assert.equal(checkedThroughBy(repo(false, []))(WAS, SHA), false);
+  assert.equal(checkedThroughBy(repo(true, []))("", SHA), false);
+});
+
+// [[spec/tickets/level0-runs-on-the-door]]
+test("a cloud box, the engine and a Claude Code session push as agents, and a bare terminal as the owner", () => {
+  assert.equal(agentPushes({ CLAUDE_CODE_REMOTE: "true" }), true);
+  assert.equal(agentPushes({ SE_ENGINE: "1" }), true);
+  assert.equal(agentPushes({ CLAUDECODE: "1" }), true);
+  assert.equal(agentPushes({}), false);
 });
 
 // [[spec/tickets/cloud-boxes-leave-trunk-alone]]
@@ -259,10 +314,11 @@ test("a push to trunk over a stamp counting warnings refuses, and names the lint
   assert.equal(said.code, 1);
   assert.match(said.said, /2 warning\(s\) stand in 2 file\(s\)/);
   assert.match(said.said, /RUNME\.sh lint/);
-  assert.deepEqual(holds(refsIn(toWork), stamp({ warnings: 2 })), {
-    code: 0,
-    said: "",
-  });
+  assert.equal(
+    holds(refsIn(toWork), stamp({ warnings: 2 })).code,
+    1,
+    "an agent's work branch takes no warning either",
+  );
   assert.deepEqual(holds(refsIn(toTrunk), stamp({ warnings: 0 })), {
     code: 0,
     said: "",
@@ -275,7 +331,7 @@ test("a push whose delta carries a tagged note refuses, and names the file", () 
     { name: "src/scripts/work.js", text: "// code" },
     { name: "spec/tickets/slow-lint.md", text: TAGGED },
   ];
-  const said = holds(refsIn(toWork), "", carried);
+  const said = holds(refsIn(toWork), stamp(), carried);
   assert.equal(said.code, 1);
   assert.match(said.said, /spec\/tickets\/slow-lint\.md/);
   assert.match(said.said, /ticket todo <name> --off/);
@@ -285,12 +341,12 @@ test("a push whose delta carries a tagged note refuses, and names the file", () 
 test("a push whose delta carries a tagged gate point lands, and a bare tag still refuses", () => {
   const point = TAGGED.replace("todo: true", "todo: true\npoint: gate");
   const landing = () => [{ name: "spec/tickets/cut-the-line.md", text: point }];
-  assert.deepEqual(holds(refsIn(toWork), "", landing), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), stamp(), landing), { code: 0, said: "" });
   const mixed = () => [
     { name: "spec/tickets/cut-the-line.md", text: point },
     { name: "spec/tickets/slow-lint.md", text: TAGGED },
   ];
-  const said = holds(refsIn(toWork), "", mixed);
+  const said = holds(refsIn(toWork), stamp(), mixed);
   assert.equal(said.code, 1);
   assert.match(said.said, /slow-lint\.md/);
   assert.doesNotMatch(said.said, /cut-the-line/);
@@ -299,7 +355,7 @@ test("a push whose delta carries a tagged gate point lands, and a bare tag still
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 test("a push whose delta carries an untagged note lands", () => {
   const carried = () => [{ name: "spec/tickets/slow-lint.md", text: FREE }];
-  assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), stamp(), carried), { code: 0, said: "" });
   // A warning holds no push, so the door takes no lint. [[spec/design_output/config#the-engine-controls]]
   assert.equal(
     holds.length,

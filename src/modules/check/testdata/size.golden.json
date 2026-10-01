@@ -29,7 +29,7 @@
       "file": "spec/design_output/level0.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 2032. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 2030. Split it by topic."
     },
     {
       "file": "spec/design_output/model.md",

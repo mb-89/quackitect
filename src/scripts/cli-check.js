@@ -24,6 +24,7 @@ import { guidanceHere } from "../bridge/guidance.js";
 import { vale } from "../doors/vale.js";
 import { whereIs, writeSurvey } from "../engine/tools.js";
 import { browserSays } from "./browser.js";
+import { probeDry } from "./probe-dry.js";
 import {
   bin,
   biome,
@@ -326,6 +327,25 @@ export function pluginHolds() {
     return 1;
   }
   return 0;
+}
+
+// LEVEL ZERO RUNS, OR THE CHECK IS RED. A fresh clone of this tree, the working change on it, takes the install a cloud box takes, and the hook module the client loads runs a scripted session against the door the start road stands up, with no model and no key. The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
+export async function level0Runs(
+  dry = probeDry,
+  platform = process.platform,
+  say = console.log,
+  shout = console.error,
+) {
+  if (platform === "win32") {
+    say("The start road stands a cloud box alone, so this Windows box runs no dry session.");
+    return 0;
+  }
+  const delta = it.git.run(["diff", "HEAD", "--binary", "--no-renames"], true);
+  const lines = [];
+  const code = await dry(root, it, (one) => lines.push(one), delta.ok ? delta.out : "");
+  for (const one of lines) (code ? shout : say)(one);
+  if (code) shout("Level zero does not run whole on a fresh box, so this tree is red.");
+  return code;
 }
 
 // What the probe found, and whether the check carries on past it. A box running no server reads every rule, and a server standing and failing its health call is red. [[spec/design_output/level0#the-check-reads-the-server]]
