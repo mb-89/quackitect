@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: design/tests-red
 depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
 record:
   - step: design/owner-read
@@ -148,6 +148,9 @@ record:
         hash: cc6f95e3f9cda4bf
         size: 5123
     def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
 ---
 
 # Ask
