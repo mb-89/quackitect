@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -185,6 +185,29 @@ record:
         exit: 0
         said: ".claude/skills/level0/hooks/level0.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 650. Split it by topi"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 73b506dcd0b08f995b5801b3c8183df843b8698a
+    hash_after: f4aef273ea6ef009d64a45133302a8402c9e9c52
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s); green, src/modules/hooks/review passes; green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "src/scripts/copilot-door.js:7:1: correctness/noUnusedFunctionParameters: This parameter it is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 99f6837f0e33014d
+        size: 1264
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -391,26 +414,41 @@ the report's words stand in src/modules/hooks/review alone, and the door and the
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/review/review_test.go src/modules/hooks/review_test.go test/level0/door-spawn.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The review tool answers off the hooks door, where the bridge answered it before.
+
+- `src/modules/hooks/review` ports the reader's prompt, the reading of its answer and the report off `lib/review.js`, and answers the bridge's own case table.
+- `Door.reviewed` answers a `review_branch` call with the reader's spawn and a back under a token. It answers `agent.answered` with the report the token names.
+- The quack seam in `src/quack/review.go` runs the branch verb, as `reviewsBranch` runs it.
+- The plugin runs a spawn the door answers, and posts the helper's answer back to the door.
+- The listener moves into `listen.go`, so `hooks.go` stays under its ceiling.
+
+The size golden now counts `prose-tools-answer-in-go.md`, which passed the ceiling at its draft-2.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft's size names, plus the size golden the prose ticket's growth moves
+the door cases fake the Review seam, and the plugin case fakes the disk, the door and the spawn
+every new file and function points at this ticket or its design section
+the report's words stand in the review package alone, and the door calls it
 
 # accept
 
