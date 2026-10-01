@@ -158,6 +158,8 @@ async function session(it, tree) {
   )) {
   }
   seen.held.push({ role: "assistant", id: "a1", text: answer });
+  // The chat shows the text, which pays the answer the owner's prompt asks for. [[spec/design_output/level0#the-owners-prompt-comes-first]]
+  await raise("classic.MessageDisplay", { delta: answer });
   const read = await raise("tool.call", { tool: "Read", file_path: it.join(tree, "README.md") });
   const guarded = await raise("tool.call", {
     tool: "Bash",

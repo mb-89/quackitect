@@ -98,6 +98,14 @@ test("a door that never stood, and a canary nobody heard, fail their checks", ()
   assert.deepEqual(failing([rows[0]], seen), ["canary"]);
 });
 
+test("a read the door holds for an answer the chat never showed fails the guard", () => {
+  const { rows, seen } = whole();
+  assert.deepEqual(
+    failing(rows, { ...seen, read: { deny: "The owner sent a prompt, and nothing has answered it." } }),
+    ["guard"],
+  );
+});
+
 test("the engine wraps each registration around the ones after it, reads a filter, and keeps a stream to its own", async () => {
   const order = [];
   const engine = engineOf((on) => {
