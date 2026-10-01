@@ -596,3 +596,5 @@ accept with points
 <!-- what anybody adds, at any time, on this ticket -->
 
 - placements-leave-http: step 2 leaves out the `http` instance beside hooks, mcp and lsp, since it is the `/v1` door the index serves. `TestEachInstanceInNoListTakesAProcessOfItsOwn` loads one and wants it left out.
+- placements-select-off-the-table: step 2 picks the placed instances off the `modules` table in `src/quack/main.go`, in place of `Store.Inputs`. An instance whose module carries no start and stands no door takes a process, and the settings sections stay with the index. `placementsOf` keeps its signature, and the red cases stand as written.
+- topic-folder-in-the-table: step 3 reads a topic off a `folder` field the `modules` table carries beside `registers`, in place of a runtime lookup. `withActions` and the settings init wrap `tickets`, `work` and `log` in closures of package `main`, which a lookup names `main`.

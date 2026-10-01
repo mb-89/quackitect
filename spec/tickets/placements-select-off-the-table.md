@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: module-processes-land-in-shadow
 parent: the-system-places-modules
+record:
+  - step: do
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 1e651b9caade74df7a587623d44e2cd17be2541b
+    hash_after: 1e651b9caade74df7a587623d44e2cd17be2541b
+reason: became
+successors: [the-system-places-modules]
 ---
 
 # Ask
