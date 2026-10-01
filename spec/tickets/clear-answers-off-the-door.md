@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -52,12 +53,51 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-2
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-2
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -65,7 +105,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate"]
+    input: ["design/draft", "gate", "design/draft-2"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -77,7 +117,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: design/tests-red
+        input: ["design/tests-red", "design/tests-red-2"]
         to: retro
         evidence:
           - name: tests
@@ -116,8 +156,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: go-cage-switches-over
-step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +185,13 @@ record:
         hash: 33c98a0ec2e70d0b
         size: 2292
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 455604d60a7ba74166a56ffb02d1d8b45ae5a360
+    hash_after: 455604d60a7ba74166a56ffb02d1d8b45ae5a360
+    returns: 1
+    why: "step 3 of the approach falls: `door` in .claude/skills/level0/hooks/level0.js hands a step's answer straight to the harness, and `clears` runs on the bridge's answer alone, at the `answer.clear` line of `seen`. Add the door road's clear to level0.js and the size list, with a case driving it to `$.prompt.submit`, as test/level0/caged-door.test.js drives the door.; `turn.complete` stands outside `DOORED` in .claude/skills/level0/hooks/cage.js, so the door never meets the event the approach answers. Name the ticket that adds it, or add it here with a case."
+group: go-cage-switches-over
 ---
 
 # Ask
@@ -274,6 +319,74 @@ The case off the queue passes today, and it holds the edge: a binding moved off 
 - the first done line meets the clear case, the second the cage case, and the third the check at tests-green
 - the cases reach a temp tree and the fake index the package already uses, and the cage case reaches no door
 
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -281,8 +394,11 @@ The case off the queue passes today, and it holds the edge: a binding moved off 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- step 3 of the approach falls: `door` in .claude/skills/level0/hooks/level0.js hands a step's answer straight to the harness, and `clears` runs on the bridge's answer alone, at the `answer.clear` line of `seen`. Add the door road's clear to level0.js and the size list, with a case driving it to `$.prompt.submit`, as test/level0/caged-door.test.js drives the door.
+- `turn.complete` stands outside `DOORED` in .claude/skills/level0/hooks/cage.js, so the door never meets the event the approach answers. Name the ticket that adds it, or add it here with a case.
 
 # implement
 
