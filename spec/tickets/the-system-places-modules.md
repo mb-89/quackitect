@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft-2
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -185,6 +185,18 @@ record:
     hash_after: d1986cae28ae29f940db8d8a9eae137efa340080
     returns: 1
     why: "placements-link-points-at-model: the approach links [[spec/design_output/processes#the-placements]], a note that does not exist; the processes chapter stands in spec/design_output/model.md, so the link reads [[spec/design_output/model#the-placements]]. The write door refuses the ticket body at gate, so the move rides here.; placed-topics-name-module-folders: Placed.Topics carries module types (placements_test wants \\\"tickets, queue\\\"), while the watch change names a folder under src/modules/<topic>; several types share one folder (ticket, retro, branch, vehicle, stub in the verbs package), so Placements.Restart needs a map from module type to its folder, or a restart misses them.; placements-leave-door-instances: placing each instance whose module carries no start in the modules table of src/quack/main.go also places hooks, mcp, lsp, http and the settings sections, whose listeners the index manager's start opens; placementsOf leaves them out, per model#the-io-process.; placements-answer-inputs-tested: no red test decides the index side of step 3, Placements answering in.<instance> with the saved inputs and publishing run.<instance> after a commit moves an input; add a case in src/index/procs_test.go.; watch-restart-joins-switch: step 5 has the watch module call Placements.Restart on a change under src/modules/<topic>, while the assumption puts the rebuild with the switch; under shadow a restart reruns the same binary, so the watch caller (src/modules/files) belongs to the switch ticket, or the approach says why it lands now.; tests-list-matches-files: the draft's tests list names src/q/store_test.go, src/q/projection_test.go and src/quack/module_test.go, where the cases stand in src/q/start_test.go and src/quack/placements_test.go; the red list names the right files."
+  - step: design/draft-2
+    hand: box 03ba8e0fb2d4 · claude-code-remote · helper-7
+    hash_before: 578a003a43ed613d92e6cb77f7faaca2c1404e36
+    hash_after: 578a003a43ed613d92e6cb77f7faaca2c1404e36
+    inputs:
+      - name: ask
+        hash: e437528f642d7a6c
+        size: 346
+      - name: [[spec/design_input/the-index-holds-the-model]]
+        hash: 5f2da8fccb387d1f
+        size: 23680
+    def: a3dfd8c60d853590
 group: module-processes-land-in-shadow
 ---
 
@@ -316,32 +328,69 @@ Each new case fails on its own assertion over stubs that compile. The two fakes 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The index places each module instance that computes in a process over the bus [[spec/tickets/the-doors-process-stands]] builds, per [[spec/design_output/model#the-placements]]. Under the `processes` slice's `shadow`, the old path keeps every provider in the index, and the module processes compute beside it.
+
+1. The placements. The index manager registers `processes/placements` in `src/modules/index/manager.go`, a list of instance lists, built-in empty. `src/quack/placements.go` turns the wiring and the key into one `index.Placed` a list, and one a process for each instance in no list.
+2. What it places. `placementsOf` places an instance whose providers read an input, by `Store.Inputs(instance)`. It leaves out each instance whose module carries a start, which the IO process runs. It leaves out the instances whose listener the manager's start opens: hooks, mcp and lsp.
+3. A topic names a folder. `Placed.Topics` holds the folder under `src/modules` that registers each instance's module type. `placementsOf` reads it off the package path of the type's registration, so the five types the verbs package registers share the topic `verbs`.
+4. `quack module <instance>...`. `src/quack/placements.go` loads the whole wiring into a catalog of its own, with no IO start, and dials the bus. On each `run.<instance>` it asks `in.<instance>`, restores the values through `Store.Restore`, settles its scheduler, and publishes the instance's out-port values on `commit.<instance>`. Its loop beats `lease.<process>`.
+5. The index's side. `src/index/procs.go` gains `Placements`, which starts each `Placed`. It publishes `run.<instance>` once a commit moves an input of a placed instance, and answers `in.<instance>` with the saved inputs. `src/q` gains `Store.Inputs(instance)`, `Store.Outputs(instance)` and `Store.SaveNames(names)`, beside `Save`.
+6. The shadow. Under `shadow` each placed commit goes to the shadow weigh [[spec/tickets/the-doors-process-stands]] adds, and nothing lands. Under `new` the switch ticket lands it, and takes the provider off the index.
+7. A crash stays in one process. `Placed` restarts its own process alone after its wait, and the index and every other process keep running, so the index stays warm. `Placements.Restart(topic)` restarts the processes holding a topic's instances.
+
+The assumption: the `watch` caller of `Placements.Restart` lands with the switch ticket, beside the rebuild under `.se/.runtime/bin` and `processes.rebuild`. Under `shadow` a restart reruns the binary the index runs, and a shadow process lands nothing a stale binary could break.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/modules/index/manager.go Registers, which gains processes/placements
+- src/index/procs.go Placed, which gains its topics, and Placements, which starts and restarts each one
+- src/index/bus.go Peer, which gains Run, Runs, Inputs and AnswersInputs
+- src/quack/main.go main, whose dispatch gains module
+- src/quack/main.go manages, which hands the index its placements under shadow
+- src/quack/io.go shadows.weigh, which weighs each placed commit
+- src/q/projection.go Save and Restore, beside the new SaveNames
+- src/q/store.go Down and Up, beside the new Inputs and Outputs
+- spec/config/level0.schema.json, which quack schema --write regenerates
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/procs_test.go TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm
+- src/index/procs_test.go TestAPlacementRestartsTheProcessesOfOneTopic
+- src/index/procs_test.go TestPlacementsAnswerInputsAndRunOnAMove
+- src/q/start_test.go TestAnInstanceNamesItsInputsAndOutputs
+- src/q/start_test.go TestSaveNamesSavesTheNamesItIsHanded
+- src/quack/placements_test.go TestEachInstanceInNoListTakesAProcessOfItsOwn
+- src/quack/placements_test.go TestAListOfInstancesSharesOneProcess
+- src/quack/placements_test.go TestAModuleProcessCommitsItsInstanceOffTheInputs
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- placements-link-points-at-model: the approach links the model's placements chapter
+- placed-topics-name-module-folders: step 3 names a topic by the folder under src/modules that registers the type, read off its registration's package path
+- placements-leave-door-instances: step 2 places an instance that reads an input, and leaves out the IO instances and the hooks, mcp and lsp listeners
+- placements-answer-inputs-tested: TestPlacementsAnswerInputsAndRunOnAMove in src/index/procs_test.go decides step 5
+- watch-restart-joins-switch: the assumption moves the watch caller to the switch ticket, and Placements.Restart stands tested for it
+- tests-list-matches-files: the tests list names the files the cases stand in
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened, and each claim checked there: manager.go Registers, main.go modules and listens, the bus and Placed in src/index, projection.go Save and Restore, store.go Down, and the gate's six findings
+- the callers list names every caller of what the approach changes, off a grep of Placed, Peer, Save(, Restore(, manager.Registers and the modules table
+- every done_when line names the test that decides it: the restart line TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm, the go test line go test ./..., and the check line ./RUNME.sh check
 
 ## tests-red-2
 
