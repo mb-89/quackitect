@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -52,12 +53,51 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: draft-2
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red-2
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft-2
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
   - name: gate
     gate: does the approach answer the ask, and does a red test decide every done_when line
     does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
     not: design/draft
     tags: ["review"]
-    input: ["design/draft", "design/tests-red"]
+    input: ["design/draft", "design/tests-red", "design/draft-2", "design/tests-red-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -65,7 +105,7 @@ steps:
   - name: implement
     tags: ["code", "testing"]
     needs: ["branch test"]
-    input: ["design/draft", "gate"]
+    input: ["design/draft", "gate", "design/draft-2"]
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     steps:
       - name: change
@@ -77,7 +117,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: design/tests-red
+        input: ["design/tests-red", "design/tests-red-2"]
         to: retro
         evidence:
           - name: tests
@@ -116,9 +156,6 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: go-cage-switches-over
-step: gate
-depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
     skipped: true
@@ -161,6 +198,14 @@ record:
         hash: e3591594fa1ad743
         size: 5641
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 1b2dd2482b42e850107cef2158e2615e313cd7b9
+    hash_after: 1b2dd2482b42e850107cef2158e2615e313cd7b9
+    returns: 1
+    why: "step 5 clashes with the import rule: noModule in src/imports/imports.go refuses one module importing another, and ownModule passes a module's own subpackages alone, so src/modules/drafts reading the finding body out of src/modules/hooks/write fails TestTheTreeHoldsTheImportRules. The draft's assumption names hooks/stop and views, and neither imports another module. Give the body a home outside src/modules that both IO modules reach, such as src/prose, and name it in the size; the first done_when line names a case of src/quack, and go test ./src/quack/... runs no case over the table: TestTheDraftCasesAnswerOffTheModule stands in src/modules/drafts, and the quack cases check the wiring alone. Run the table through the wired module in a quack case, with the Lint seam handed in so the case fakes Vale, or say which case decides the line; the draft names Holds.Asked where the tests name Questions, and its tests list names fold_test.go where the red list names questions_test.go. Match the draft to the tests"
+group: go-cage-switches-over
+depends_on: ["tools-keep-their-own-names"]
 ---
 
 # Ask
@@ -332,6 +377,74 @@ What surprises me:
 - the Go done_when line meets TestTheDraftCasesAnswerOffTheModule, the JS line the table cases in answer-read.test.js, green already, and the check line waits for tests-green
 - the module cases run over a fake Lint, question count and bands, the quack cases over a temp tree with no Vale, and the fold case over stepper
 
+## draft-2
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+
+<!-- the form is list -->
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+
+<!-- the form is list -->
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+
+<!-- the form is list -->
+
+### size
+
+<!-- every file the approach touches, one a line -->
+
+<!-- the form is list -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-red-2
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+
+<!-- the form is list -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # gate
 
 <!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
@@ -339,8 +452,12 @@ What surprises me:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- step 5 clashes with the import rule: noModule in src/imports/imports.go refuses one module importing another, and ownModule passes a module's own subpackages alone, so src/modules/drafts reading the finding body out of src/modules/hooks/write fails TestTheTreeHoldsTheImportRules. The draft's assumption names hooks/stop and views, and neither imports another module. Give the body a home outside src/modules that both IO modules reach, such as src/prose, and name it in the size
+- the first done_when line names a case of src/quack, and go test ./src/quack/... runs no case over the table: TestTheDraftCasesAnswerOffTheModule stands in src/modules/drafts, and the quack cases check the wiring alone. Run the table through the wired module in a quack case, with the Lint seam handed in so the case fakes Vale, or say which case decides the line
+- the draft names Holds.Asked where the tests name Questions, and its tests list names fold_test.go where the red list names questions_test.go. Match the draft to the tests
 
 # implement
 
