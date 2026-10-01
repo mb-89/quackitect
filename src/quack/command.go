@@ -6,6 +6,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -136,18 +137,43 @@ type heard struct {
 	severity string
 }
 
-// What Vale answers over a text read as the named file: the rows the Go prose vetoes keep, in place order, whether a Vale stands, and whether it answered JSON. [[spec/tickets/cage-write-door-port]]
+// What Vale answers over a text read as the named file: the rows the Go prose vetoes keep, in place order, whether a Vale stands, whether it answered JSON, and why where it did not. [[spec/tickets/cage-write-door-port]] [[spec/tickets/drafts-lint-seam-carries-why]]
 type valeHeard struct {
 	rows   []heard
 	stands bool
 	ran    bool
+	why    string
+}
+
+// The reasons an unread Vale names, worded as lintText in .claude/skills/level0/lib/vale.js words them. [[spec/tickets/drafts-lint-seam-carries-why]]
+const (
+	noValeWhy    = "no vale stands here"
+	valeQuietWhy = "vale answered nothing"
+	valeNoJSON   = "vale answered no JSON: "
+)
+
+// Why a Vale answer reads as no JSON: its stderr where it exits on one, else the run's error, else what it answered. [[spec/tickets/drafts-lint-seam-carries-why]]
+func unreadWhy(said []byte, err error) string {
+	var exit *exec.ExitError
+	if errors.As(err, &exit) {
+		if stderr := strings.TrimSpace(string(exit.Stderr)); stderr != "" {
+			return stderr
+		}
+	}
+	if err != nil {
+		return err.Error()
+	}
+	if answer := strings.TrimSpace(string(said)); answer != "" {
+		return valeNoJSON + answer
+	}
+	return valeQuietWhy
 }
 
 // Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
 func heardOver(root, name, text string) valeHeard {
 	vale := valeAt(root)
 	if vale == "" {
-		return valeHeard{}
+		return valeHeard{why: noValeWhy}
 	}
 	config := valeOwn
 	if !standsUnder(root, valeOwn) && standsUnder(root, valeBuilt) {
@@ -157,7 +183,7 @@ func heardOver(root, name, text string) valeHeard {
 	defer stop()
 	run := exec.CommandContext(span, vale, "--config="+config, "--path="+name, "--output=JSON", "--no-exit")
 	run.Dir, run.Stdin = root, strings.NewReader(text)
-	said, _ := run.Output()
+	said, err := run.Output()
 	var read map[string][]struct {
 		Check    string `json:"Check"`
 		Line     int    `json:"Line"`
@@ -167,7 +193,7 @@ func heardOver(root, name, text string) valeHeard {
 		Severity string `json:"Severity"`
 	}
 	if json.Unmarshal(said, &read) != nil {
-		return valeHeard{stands: true}
+		return valeHeard{stands: true, why: unreadWhy(said, err)}
 	}
 	body := func(path string) string {
 		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
