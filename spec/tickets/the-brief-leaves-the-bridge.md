@@ -372,3 +372,15 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The flip waits on [[spec/tickets/start-road-starts-the-index]]. The commit door's cold probe ran the flip in a fresh box. The tools reached the session, and the rules and the canary did not. The start road there brings up the bridge alone, and no hooks door answers at `.se/.runtime/hooks.json`, so the prompt context passes with no brief.
+
+The change landing once the start road stands:
+
+- `DOORED` in `cage.js` takes every event of the bridge's `DOORS` table
+- `door` in `level0.js` hands an event effect on through `next`, and merges a describe's named after
+- `door` merges the step's blocks and afters into the harness's answer
+- `caged-door.test.js` gains a case for each of the three, and its prompt case reads the prompt reaching the door
+- the doors case in `cage.test.js` reads the prompt context as the door's
+
+The brief fold's log rows land ahead of the flip. The cold probe reads the context row naming the blocks, and the canary rows.

@@ -339,5 +339,6 @@ The cage hands the bridge no call since [[spec/tickets/level0-tools-leave-the-br
 - the `TOOLS` table and `toolNames` in `src/bridge/server.js`
 - the `register` answer, from `decide` and `opensSession`
 - the tool dispatch in `onToolCall`
+- the `DOORS` table and its handlers in `server.js` and `guidance.js`, which no event reaches since [[spec/tickets/the-brief-leaves-the-bridge]]
 
 `box.specs` stays while the bridge's brief lists the tools, until [[spec/tickets/the-brief-leaves-the-bridge]] lands.

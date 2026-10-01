@@ -189,13 +189,64 @@ func TestASecondLineLogsTheWarning(t *testing.T) {
 // The warnings of a second line the session log holds. [[spec/tickets/brief-owes-after-a-clear]]
 func warningsIn(t *testing.T, root string) int {
 	t.Helper()
-	body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
 	count := 0
-	for _, line := range strings.Split(string(body), "\n") {
-		var row LogRow
-		if json.Unmarshal([]byte(line), &row) == nil && row.Kind == canaryKind && row.Said == heardAgain && row.Level == warnLevel {
+	for _, row := range loggedIn(t, root) {
+		if row.Kind == canaryKind && row.Said == heard[heardTwice] && row.Level == warnLevel {
 			count++
 		}
 	}
 	return count
+}
+
+// The rows the session log under the root holds. [[spec/tickets/the-brief-leaves-the-bridge]]
+func loggedIn(t *testing.T, root string) []LogRow {
+	t.Helper()
+	body, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(sessionLog)))
+	var out []LogRow
+	for _, line := range strings.Split(string(body), "\n") {
+		var row LogRow
+		if json.Unmarshal([]byte(line), &row) == nil {
+			out = append(out, row)
+		}
+	}
+	return out
+}
+
+// Whether the log holds a row of the kind, saying the words, at the level. [[spec/tickets/the-brief-leaves-the-bridge]]
+func logHolds(t *testing.T, root, kind, said, level string) bool {
+	t.Helper()
+	for _, row := range loggedIn(t, root) {
+		if row.Kind == kind && row.Said == said && row.Level == level {
+			return true
+		}
+	}
+	return false
+}
+
+// A context read logs the row naming the blocks, the canary block among them, as the cold probe reads it. [[spec/tickets/the-brief-leaves-the-bridge]]
+func TestAContextReadLogsTheBlocksItHands(t *testing.T) {
+	one := briefRowsOf(t)[0]
+	send, root := briefDoorIn(t, one)
+	send(startEvent, map[string]any{})
+	send(contextPost, map[string]any{})
+	for _, row := range loggedIn(t, root) {
+		if row.Kind == contextKind && strings.Contains(" "+row.Detail+" ", " level0-canary ") {
+			return
+		}
+	}
+	t.Fatalf("the log holds %+v, and wants a context row naming level0-canary", loggedIn(t, root))
+}
+
+// The paying line logs the info row, and a first turn ending on no line logs the warning. [[spec/tickets/the-brief-leaves-the-bridge]]
+func TestTheCanaryRowsSayWhatTheStepHeard(t *testing.T) {
+	one := briefRowsOf(t)[0]
+	send, root := briefDoorIn(t, one)
+	owedAfterATurn(send)
+	if !logHolds(t, root, canaryKind, heard["none"], warnLevel) {
+		t.Fatalf("an unpaid first turn logs %+v, and wants the warning saying no line opens the answer", loggedIn(t, root))
+	}
+	send(saidEvent, map[string]any{"text": one.Sentence + "\n\nI read the tree next."})
+	if !logHolds(t, root, canaryKind, heard["same"], infoLevel) {
+		t.Fatalf("the paying line logs %+v, and wants the info row", loggedIn(t, root))
+	}
 }

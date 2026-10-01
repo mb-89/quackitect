@@ -6,6 +6,7 @@ package hooks
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"strings"
 
@@ -38,12 +39,12 @@ type Brief struct {
 	Said   BriefSaid `json:"said"`
 }
 
-// The answer the brief gives one event: its place, whether the layer rides it, and whether the debt line does. [[spec/tickets/brief-answers-off-the-door]]
+// The answer the brief gives one event: its place, whether the layer rides it, whether the debt line does, and the canary line the step heard. [[spec/tickets/brief-answers-off-the-door]] [[spec/tickets/the-brief-leaves-the-bridge]]
 type BriefSaid struct {
-	Seq   int64 `json:"seq"`
-	Layer bool  `json:"layer,omitempty"`
-	Owes  bool  `json:"owes,omitempty"`
-	Again bool  `json:"again,omitempty"`
+	Seq   int64  `json:"seq"`
+	Layer bool   `json:"layer,omitempty"`
+	Owes  bool   `json:"owes,omitempty"`
+	Heard string `json:"heard,omitempty"`
 }
 
 // The fold's step. A helper's event moves the stamp alone. [[spec/tickets/brief-answers-off-the-door]]
@@ -62,7 +63,9 @@ func stepBrief(state Brief, event q.Event) Brief {
 	case saidEvent:
 		text := textOf(fields, "text")
 		// A paid session writing the line again marks the step, as repeats in src/bridge/guidance.js reads it. [[spec/tickets/brief-owes-after-a-clear]]
-		state.Said.Again = state.Paid && brief.CanaryIn(text, state.Stamp.Sentence) != brief.None
+		if state.Paid && brief.CanaryIn(text, state.Stamp.Sentence) != brief.None {
+			state.Said.Heard = heardTwice
+		}
 		state.pays(text)
 	case endEvent:
 		// A clear opens the debt again, as onSessionEnd in src/bridge/guidance.js opens it. [[spec/tickets/brief-owes-after-a-clear]]
@@ -96,6 +99,7 @@ func (state *Brief) pays(text string) bool {
 		return false
 	}
 	state.Paid, state.Owes = true, false
+	state.Said.Heard = brief.Same
 	return true
 }
 
@@ -106,6 +110,7 @@ func (state *Brief) turnEnds(fields map[string]any) {
 	}
 	if !state.pays(textOf(fields, "answer")) && !state.Turned {
 		state.Owes = true
+		state.Said.Heard = brief.CanaryIn(textOf(fields, "answer"), state.Stamp.Sentence)
 	}
 	state.Turned = true
 }
@@ -176,9 +181,13 @@ func (d *Door) briefs(session, root string, settings Settings) []Effect {
 		if root != "" {
 			tools = brief.ToolsText(disk{root}.text(brief.ToolsFile), brief.TiersLine(settings.Helpers))
 		}
+		var names []string
 		for _, one := range brief.BlocksOf(tools, state.Stamp.Counts, state.Stamp.Sentence, handoverAt(root)) {
 			out = append(out, Effect{Kind: afterKind, Name: one.Name, Text: one.Text})
+			names = append(names, one.Name)
 		}
+		// The row naming the blocks that reach the session, as layerOf in src/bridge/guidance.js logs it. [[spec/tickets/the-brief-leaves-the-bridge]]
+		d.logs(root, rowOf(d.now(), contextKind, fmt.Sprintf("%d block(s) reach the session", len(names)), strings.Join(names, " ")))
 	}
 	if state.Said.Owes {
 		out = append(out, Effect{Kind: afterKind, Text: brief.Owes(state.Stamp.Sentence)})
@@ -188,21 +197,32 @@ func (d *Door) briefs(session, root string, settings Settings) []Effect {
 
 // The kind a canary row logs under, and the warning a second line logs, which DOOR in src/bridge/guidance.js and HEARD.again in .claude/skills/level0/lib/guidance.js own, spelled again here because Go reads no JavaScript. [[spec/tickets/brief-owes-after-a-clear]]
 const (
-	canaryKind = "level0"
-	heardAgain = "the canary opens a second answer in one context"
+	canaryKind  = "level0"
+	heardTwice  = "again"
+	contextKind = "context"
 )
 
-// The warning a paid session writing the line again logs, as repeats in src/bridge/guidance.js logs it. [[spec/tickets/brief-owes-after-a-clear]]
+// What each canary row says, which HEARD in .claude/skills/level0/lib/guidance.js owns, spelled again here because Go reads no JavaScript. [[spec/tickets/the-brief-leaves-the-bridge]]
+var heard = map[string]string{
+	brief.Same:  "the canary opens the answer whole",
+	brief.Other: "the canary opens the answer with other counts",
+	brief.None:  "the canary opens no answer",
+	heardTwice:  "the canary opens a second answer in one context",
+}
+
+// The canary row the newest step heard, as paid, onTurnComplete and repeats in src/bridge/guidance.js log it: info where the line pays, and warn otherwise. [[spec/tickets/brief-owes-after-a-clear]] [[spec/tickets/the-brief-leaves-the-bridge]]
 func (d *Door) repeats(session, root string) {
 	state, ok := d.from.Store.Snapshot().Read(d.briefOf(session)).(Brief)
 	d.mu.Lock()
 	seq := d.seqs[session]
 	d.mu.Unlock()
-	if !ok || state.Said.Seq != seq || !state.Said.Again {
+	if !ok || state.Said.Seq != seq || state.Said.Heard == "" {
 		return
 	}
-	row := rowOf(d.now(), canaryKind, heardAgain, state.Stamp.Sentence)
-	row.Level = warnLevel
+	row := rowOf(d.now(), canaryKind, heard[state.Said.Heard], state.Stamp.Sentence)
+	if state.Said.Heard != brief.Same {
+		row.Level = warnLevel
+	}
 	d.logs(root, row)
 }
 
