@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -253,8 +253,34 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 1076fcc206ed50c90987b897a866bfe10fb32231
+    hash_after: 0bdb1400161c8328475317509a3f27ae61507992
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/drafts passes; green, src/quack passes; green, src/modules/hooks passes; green, src/prose passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: 67a4d3893b76330a
+        size: 1937
+      - name: design/tests-red-2
+        hash: 11056905a6577d4e
+        size: 1495
+    def: a72af3702416676c
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
+reason: done
 ---
 
 # Ask
@@ -615,26 +641,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/drafts/drafts_test.go src/quack/drafts_test.go src/modules/hooks/questions_test.go src/prose/finding_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new IO module, src/modules/drafts, answers check_prose and check_answer in Go under their tool names. It stands off the wiring until level0-tools-leave-the-bridge flips it. Vale reaches it through the Lint seam that src/quack/drafts.go wires off heardOver, so the commit voice, the write door and the drafts read one lint. The finding body moves into src/prose/finding.go, so the write door refusal and the drafts answer read one body. Holds keeps the owner prompt question count as Questions. One case table, src/modules/drafts/testdata/draft-cases.json, holds the bridge answers, and the Go module, the wired quack module and the JS bridge each answer it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change commit touches the files the draft-2 size list names, plus the size golden the ticket length moves
+- the drafts module reaches the outside through its Outside seams, which the module test fakes and src/quack/drafts.go wires
+- the drafts code points at the ticket and at the level0 and stop design notes for its approach
+- the finding body stands once in src/prose/finding.go, and hooks.RefusedVoice and the drafts answer both read it
 
 # accept
 
