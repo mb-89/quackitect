@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -164,6 +164,10 @@ record:
   - step: children
     hand: box 4388ca41f5 · claude-code-remote
     hash_before: c4858cc84a6c09c31e650d3647d3f13a5605dbde
+  - step: children
+    hand: the engine
+    hash_before: 84097cbca01ac48c1a806bffde15a51addcd2afd
+    hash_after: 84097cbca01ac48c1a806bffde15a51addcd2afd
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
