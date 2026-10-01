@@ -1287,7 +1287,7 @@ own. A placement changes where an instance runs, and no file of its module.
 |---|---|
 | a module process exits | its names stand at their built-in values, with the mark `not provided`, until the restart |
 | a lease expires while the process lives | its names stand stale, per [[spec/design_output/model#a-stale-mark]] |
-| the IO process exits | the index manager restarts it, and every request going out meanwhile fails |
+| the IO process exits | its names stand at their built-in values, with the mark `not provided`. The index manager restarts it, and every request going out meanwhile fails |
 
 The restarts follow [[spec/design_output/model#restarts]].
 
