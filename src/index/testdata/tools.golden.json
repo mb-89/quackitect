@@ -15,6 +15,49 @@
           "description": "the second term",
           "format": "int64",
           "type": "integer"
+        },
+        "plan": {
+          "description": "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add.",
+          "properties": {
+            "add": {
+              "description": "The todos you add, each with the place you do it at.",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "details": {
+                    "description": "the todo's detail line",
+                    "type": "string"
+                  },
+                  "place": {
+                    "description": "The place in the queue, 1 to 9: the todo stands before the todo at that place now. A place on a ticket or past the todos puts it after every todo, before the first ticket.",
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "title": {
+                    "description": "the todo's title",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "done": {
+              "description": "The titles of the todos you finished, which leave the queue.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "working": {
+              "description": "The title of the todo, or the name of the ticket, you work on now.",
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       },
       "required": [
@@ -33,6 +76,49 @@
       "properties": {
         "input": {
           "type": "string"
+        },
+        "plan": {
+          "description": "The answer to the engine's three questions, riding this call: what you work on, which todos you finished, which you add.",
+          "properties": {
+            "add": {
+              "description": "The todos you add, each with the place you do it at.",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "details": {
+                    "description": "the todo's detail line",
+                    "type": "string"
+                  },
+                  "place": {
+                    "description": "The place in the queue, 1 to 9: the todo stands before the todo at that place now. A place on a ticket or past the todos puts it after every todo, before the first ticket.",
+                    "format": "int64",
+                    "type": "integer"
+                  },
+                  "title": {
+                    "description": "the todo's title",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "done": {
+              "description": "The titles of the todos you finished, which leave the queue.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "working": {
+              "description": "The title of the todo, or the name of the ticket, you work on now.",
+              "type": "string"
+            }
+          },
+          "type": "object"
         }
       },
       "required": [
