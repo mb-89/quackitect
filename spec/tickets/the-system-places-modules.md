@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: design/tests-red-2
 steps:
   - name: design
     steps:
@@ -235,6 +235,9 @@ record:
         hash: 3e2cd8b099700681
         size: 74868
     def: 9c7cd4dd4a2dadb8
+  - step: design/tests-red-2
+    hand: the engine
+    stale: [[spec/design_output/model]]
 group: module-processes-land-in-shadow
 ---
 
