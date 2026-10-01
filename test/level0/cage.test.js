@@ -216,3 +216,15 @@ test("the bridge's tools table names none of log, report and stop", () => {
     );
   }
 });
+
+// A Go answer for the report tool reaches the harness as the tool's result. [[spec/tickets/log-report-stop-in-go]]
+test("the step hands a Go report answer on as the tool's result", () => {
+  const text = "The line stands in the log under port.";
+  assert.deepEqual(
+    stepOf({ effects: [{ kind: "result", result: { result: text } }] }, "tool.call", {
+      asks: true,
+      served: true,
+    }),
+    { answer: { result: text } },
+  );
+});

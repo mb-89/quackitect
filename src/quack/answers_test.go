@@ -10,7 +10,7 @@ import (
 	"quackitect/src/modules/hooks"
 )
 
-// What the door answers a level zero call with, as the tool's result. [[spec/tickets/log-report-stop-in-go]]
+// What the door answers a level zero call with, read off the tool's result in the shape the harness reads. [[spec/tickets/log-report-stop-in-go]]
 func answeredBy(t *testing.T, door *hooks.Door, tool string, input map[string]any) string {
 	t.Helper()
 	answer, err := door.Hook(hooks.Post{Event: "tool.call", E: map[string]any{"tool": tool, "input": input, "session_id": waitSession}})
@@ -18,7 +18,8 @@ func answeredBy(t *testing.T, door *hooks.Door, tool string, input map[string]an
 		t.Fatal(err)
 	}
 	for _, one := range answer.Effects {
-		if said, ok := one.Result.(string); ok && one.Kind == "result" && one.Text == "" {
+		shape, _ := one.Result.(map[string]any)
+		if said, ok := shape["result"].(string); ok && one.Kind == "result" && one.Text == "" {
 			return said
 		}
 	}

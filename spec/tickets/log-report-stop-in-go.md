@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -197,6 +197,19 @@ record:
         hash: 202a6354fc09171a
         size: 562
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: e9b536d68cfa73b529699afae91f27ba08c1d45f
+    hash_after: e9b536d68cfa73b529699afae91f27ba08c1d45f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft-2
+        hash: b34a479c1858d782
+        size: 6056
+    def: 9c7cd4dd4a2dadb8
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
 ---
@@ -472,26 +485,33 @@ Risks:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/answers_test.go src/quack/answers_test.go test/level0/cage.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/answers_test.go
+- src/quack/answers_test.go
+- test/level0/cage.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case of this ticket fails on its own assertion. The folds answer no text, the door passes the report call, and the bridge's table still names the three tools. The door cases now read the text under a result key, so a bare string turns none of them green. The new step case in the cage file passes today, since the step already hands a result on. It pins the road from the door to the harness, and the file stays red on the table case. Four other hooks cases fail beside mine, and they stand in the red files of sibling tickets.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done_when line meets TestTheLogReportAndStopToolsAnswerOffTheDoor and the step case, the second the table case in the cage file, and the third the check at tests-green
+- the hooks cases run over the fold steppers and doorOver with its fakes, the quack case over the wait world the wait cases build, and the cage cases over plain answers with no door
 
 # gate
 

@@ -111,14 +111,16 @@ func TestAStopThatStandsAnswersTheStopLine(t *testing.T) {
 	}
 }
 
-// The door answers a report call with the fold's text as the tool's result. [[spec/tickets/log-report-stop-in-go]]
+// The door answers a report call with the fold's text as the tool's result, in the shape the harness reads. [[spec/tickets/log-report-stop-in-go]]
 func TestTheDoorAnswersAReportWithItsText(t *testing.T) {
 	world := doorOver(t, &calls{}, &book{})
 	said := hooks(t, world.door, Post{Event: toolEvent, E: map[string]any{"tool": reportCall, "input": map[string]any{"text": "Done."}, "session_id": "s1"}})
 	for _, one := range said.Effects {
-		if one.Kind == resultKind && one.Text == "" && strings.HasPrefix(one.Result.(string), "The reply stands in the log.") {
+		shape, _ := one.Result.(map[string]any)
+		said, _ := shape["result"].(string)
+		if one.Kind == resultKind && one.Text == "" && strings.HasPrefix(said, "The reply stands in the log.") {
 			return
 		}
 	}
-	t.Errorf("the door answers %+v, and wants the report's text as the tool's result", said.Effects)
+	t.Errorf("the door answers %+v, and wants the report's text as the tool's result, under result", said.Effects)
 }
