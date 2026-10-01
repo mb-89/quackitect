@@ -32,11 +32,13 @@ import (
 	"quackitect/src/modules/mcp"
 	"quackitect/src/modules/migration"
 	"quackitect/src/modules/queue"
+	"quackitect/src/modules/search"
 	"quackitect/src/modules/session"
 	"quackitect/src/modules/settings"
 	"quackitect/src/modules/tickets"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/views"
+	"quackitect/src/modules/waits"
 	"quackitect/src/modules/work"
 	"quackitect/src/prose"
 	"quackitect/src/q"
@@ -99,6 +101,9 @@ var modules = map[string]ioModule{
 	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
 	// [[spec/tickets/edit-tools-answer-in-go]]
 	edits.Module: {registers: edits.Registers},
+	// [[spec/tickets/find-and-wait-in-go]]
+	search.Module: {registers: search.Registers},
+	waits.Module:  {registers: waits.Registers},
 }
 
 // A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
@@ -302,10 +307,10 @@ func hookedOf(w q.Wiring, hands map[string]q.Writer, module string) hooked {
 
 // The index manager's start, over the store and the op table the index hands it, the wall clock, its writer and the IO modules' accept, and the hooks door beside it where the wiring loads one. [[spec/design_output/model#the-index-manager]]
 func manages(as q.Writer, open doors) index.Manage {
-	return func(root string, store *q.Store, rows index.OpRows, steps func(hand func())) (index.Managed, error) {
+	return func(root string, store *q.Store, rows index.OpRows, reads index.Reads, steps func(hand func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
 			Root: root, Store: store, As: as, Rows: opRows{rows}, Steps: steps,
-			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store, nil),
+			Now: time.Now, Every: clock.New().Every, Accept: accepts(root, store, reads),
 		})
 		if err != nil {
 			return index.Managed{}, err

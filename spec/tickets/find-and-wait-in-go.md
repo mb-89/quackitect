@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: ["tools-keep-their-own-names"]
 record:
   - step: design/owner-read
@@ -157,6 +157,15 @@ record:
         hash: 7677605327b18699
         size: 1472
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 4f2f2a8de79f8fd7f53ec3e35c2927f4264547a6
+    hash_after: 4f2f2a8de79f8fd7f53ec3e35c2927f4264547a6
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -370,14 +379,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays in the draft's size list, past two files: spec/wiring.yaml gains the wire session.<id>/reports, since the derived's family input refuses to start with no wire, and src/modules/check/testdata/size.golden.json takes the new line count of spec/design_output/level0.md
+- the module cases run over q/qtest, a fake clock and a temp disk, and the quack cases run over fakeReads
+- each new file's header and each function's pointer name this ticket or the design-output section it implements
+- the reports read lives in session.ReportsPort and the wait keys in src/quack/finds.go alone. A derived settles in the index's wave alone, so the wait hears each reports fold through store.OnCommit, the fallback the draft names
 
 ## tests-green
 

@@ -6,6 +6,8 @@ package search
 import (
 	"strings"
 	"testing"
+
+	"quackitect/src/q"
 )
 
 // [[spec/tickets/find-and-wait-in-go]]
@@ -52,5 +54,21 @@ func TestBodyFromSkipsBracesInStringsAndComments(t *testing.T) {
 	}
 	if got := bodyFrom([]string{"func open() {", "\tx := 1"}, 0); len(got) != 2 {
 		t.Errorf("a body with no close reads %q, and wants every line to the end", got)
+	}
+}
+
+// A find with neither words nor a function says what it takes, and asks the index nothing. [[spec/tickets/find-and-wait-in-go]]
+func TestAFindWithNoWordsSaysWhatItTakes(t *testing.T) {
+	asked := 0
+	from := Outside{Root: t.TempDir(), Find: func(string) ([]Row, error) { asked++; return nil, nil }}
+	said, err := Accept(from)(q.Request{Module: Module, Verb: findVerb, Args: Find{Words: "  "}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "find takes the words to look for, or a function name."; said != want {
+		t.Errorf("the find answers %q, and wants %q", said, want)
+	}
+	if asked != 0 {
+		t.Errorf("the find asks the index %d times, and wants none", asked)
 	}
 }

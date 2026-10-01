@@ -18,7 +18,7 @@ const v1Listen = 2
 func TestAFailedV1StartStopsThePartsItReached(t *testing.T) {
 	root := tree(t)
 	var managed, started atomic.Bool
-	manage := func(string, *q.Store, OpRows, func(func())) (Managed, error) {
+	manage := func(string, *q.Store, OpRows, Reads, func(func())) (Managed, error) {
 		return Managed{Stop: func() { managed.Store(true) }}, nil
 	}
 	start := func(string, Commit) (func(), error) {

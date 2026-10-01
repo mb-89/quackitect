@@ -13,7 +13,7 @@ import (
 )
 
 // Starts the index manager over the store, the op table and a step of the work loop, and answers its stop and its call. [[spec/design_output/model#the-index-manager]]
-type Manage func(root string, store *q.Store, rows OpRows, steps func(hand func())) (Managed, error)
+type Manage func(root string, store *q.Store, rows OpRows, reads Reads, steps func(hand func())) (Managed, error)
 
 // What the manager's start answers: its stop, and the call an action takes through it. [[spec/tickets/actions-answer-over-http]]
 type Managed struct {
@@ -45,7 +45,7 @@ func (one *door) manages(manage Manage) (Managed, error) {
 	if manage == nil {
 		return Managed{Stop: func() {}}, nil
 	}
-	return manage(one.root, one.store, opKeep{one.db}, func(hand func()) { one.steps = append(one.steps, hand) })
+	return manage(one.root, one.store, opKeep{one.db}, ReadsOf(one.db), func(hand func()) { one.steps = append(one.steps, hand) })
 }
 
 // The rows the index ranks for the words, as the door hands them to the manager. [[spec/tickets/find-and-wait-in-go]]
@@ -53,12 +53,12 @@ type Reads interface {
 	Find(words string, limit int) ([]Hit, error)
 }
 
-// The reads over the index's db. A stub until tests-green. [[spec/tickets/find-and-wait-in-go]]
+// The reads over the index's db. [[spec/tickets/find-and-wait-in-go]]
 func ReadsOf(db *sql.DB) Reads { return readKeep{db} }
 
 type readKeep struct{ db *sql.DB }
 
-func (k readKeep) Find(words string, limit int) ([]Hit, error) { return nil, nil }
+func (k readKeep) Find(words string, limit int) ([]Hit, error) { return Find(k.db, words, limit) }
 
 // One row of the table op: the id, and the body the manager writes. [[spec/design_output/model#an-operation-outlives-callers]]
 type OpRow struct {

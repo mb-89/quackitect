@@ -2028,3 +2028,8 @@ The bridgehead stamps a wait with `since`, the moment of its first post, and
 posts it again under the same stamp where the host cuts it. The box keeps the
 watch a stamp begins, so a post again carries on its signals, and the cap
 counts from `since`. The older loop ends once a later post takes the watch.
+
+The Go twin in `src/modules/waits` stands off the wiring until the flip:
+
+- the operation outlives its caller in the manager's book, so it takes no stamp
+- a wait past the call wait answers a running handle

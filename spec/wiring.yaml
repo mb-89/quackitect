@@ -82,6 +82,7 @@ instances:
     module: watchdog
 wires:
   hooks.events/<id>: session/<id>/events
+  session.<id>/reports: session/<id>/reports
   watch.files/<path...>: files/<path...>
   clock.minute: clock/minute
   env.vars/<name>: env/<name>

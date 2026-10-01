@@ -137,6 +137,20 @@ func TestAnOutputEndsWithItsProcess(t *testing.T) {
 	}
 }
 
+// An output whose process lives on returns the wait once it stands quiet for the span. [[spec/tickets/find-and-wait-in-go]]
+func TestAnOutputStandsQuiet(t *testing.T) {
+	from, clock := outsideOf(t, time.Minute, 2*time.Second)
+	seed(t, from.Root, "out.log", "working\n")
+	pid := float64(7)
+	said := waited(t, from, Wait{Output: "out.log", Pid: &pid})
+	if want := "The output out.log stands quiet for 2s."; said != want {
+		t.Errorf("the wait answers %q, and wants %q", said, want)
+	}
+	if clock.gone() != 2*time.Second {
+		t.Errorf("the wait returns after %s, and wants the quiet span of 2s", clock.gone())
+	}
+}
+
 // [[spec/tickets/find-and-wait-in-go]]
 func TestAWaitWithNoSignalSaysWhatItTakes(t *testing.T) {
 	from, clock := outsideOf(t, time.Minute, time.Second)

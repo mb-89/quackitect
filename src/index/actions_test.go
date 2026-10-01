@@ -41,7 +41,7 @@ type postedOut struct {
 
 // A fake manager: its call runs the action through accept, commits the operation under ops/<id> once it ends, and answers within the wait. The index imports no module, so the real manager's own cases stand beside it. [[spec/design_output/model#the-index-meets-fake-modules]]
 func fakeManager(ops q.Writer, accept func(q.Request) (any, error)) Manage {
-	return func(_ string, store *q.Store, _ OpRows, _ func(func())) (Managed, error) {
+	return func(_ string, store *q.Store, _ OpRows, _ Reads, _ func(func())) (Managed, error) {
 		var ids atomic.Int64
 		call := func(name string, input any, _ string, wait time.Duration) (Called, error) {
 			id, started := strconv.FormatInt(ids.Add(1), 10), time.Now()
