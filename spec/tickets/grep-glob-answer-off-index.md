@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: b554f8da3399cec8
         size: 8434
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 476d3fee4249e650b56e51ada30a9833449421fb
+    hash_after: 476d3fee4249e650b56e51ada30a9833449421fb
+    inputs:
+      - name: design/draft
+        hash: b554f8da3399cec8
+        size: 8434
+      - name: design/tests-red
+        hash: 71b6b39a66f27536
+        size: 1074
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -320,8 +332,9 @@ Six hooks cases fail on their own assertion, with the door passing every Grep an
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
