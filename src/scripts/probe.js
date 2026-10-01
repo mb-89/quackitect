@@ -55,7 +55,7 @@ export async function probe(root, argv, it, client) {
   const said = argv[0] ?? "";
   // [[spec/design_output/level0#the-cold-probe]]
   if (said === "cold") return probeCold(root, it, client);
-  // Level zero runs on a fresh box with no model and no key. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // Level zero runs on a fresh box with no model and no key. [[spec/tickets/level0-runs-on-the-door]]
   if (said === "dry") return probeDry(root, it);
   // [[spec/tickets/the-reply-probe-runs]]
   if (said === "reply") return probeReply(root, it, client);

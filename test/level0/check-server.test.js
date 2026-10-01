@@ -156,7 +156,7 @@ test("the Go test names read each test function once, in order, and pass over a 
   );
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("the check is red where level zero does not run whole on a fresh box, and says why", async () => {
   const said = [];
   const shouted = [];
@@ -186,7 +186,7 @@ test("the check is red where level zero does not run whole on a fresh box, and s
   assert.equal(ran, false, "a Windows box runs no dry session");
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("the battery runs level zero on a fresh box before the rules", async () => {
   const { partsOf } = await import("../../src/scripts/check-verb.js");
   const names = partsOf([]).map(([name]) => name);

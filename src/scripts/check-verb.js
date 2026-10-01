@@ -46,7 +46,7 @@ export async function check(words) {
   return stamped(code, batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }));
 }
 
-// The battery's parts in the order they run, and a red part leaves the rest unrun. Level zero runs on a fresh box before the rules, so a tree whose hook runs nothing reads red. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-whole-on-the-door]]
+// The battery's parts in the order they run, and a red part leaves the rest unrun. Level zero runs on a fresh box before the rules, so a tree whose hook runs nothing reads red. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]]
 export function partsOf(words, errors = false) {
   return [
     ["tests", () => test(errors)],

@@ -50,7 +50,7 @@ let method = "";
 let saidDown = false;
 // The chat line stands apart from the row, so a session start writing the row still leaves the line to say. [[spec/design_output/level0#the-bridge-says-it-falls]]
 let toldDown = false;
-// The one run of the start road a session takes, which every event finding the door down awaits. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The one run of the start road a session takes, which every event finding the door down awaits. [[spec/tickets/level0-runs-on-the-door]]
 let road = null;
 // The span a post runs before a fall with no status reads as the host's cut. The host cuts at its own timeout, well past this, and a fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]
 const CUT = 1000;
@@ -107,7 +107,7 @@ async function seen($, e, next) {
   if (event === "engine.create") return next(e);
   await probes($, event, e);
   if (event === "session.start") await opens($, e);
-  // Under new the door decides what it names and nothing reaches the bridge, which left the tree. A host event the hook raises while it reads the cage passes untouched, and no door event is one. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // Under new the door decides what it names and nothing reaches the bridge, which left the tree. A host event the hook raises while it reads the cage passes untouched, and no door event is one. [[spec/tickets/level0-runs-on-the-door]]
   if (reading > 0 && !doors(event)) return next(e);
   if (await caged($)) return doors(event) ? door($, event, e, next) : next(e);
   const answer = await ask($, event, await before($, event, e), next, {
@@ -164,14 +164,14 @@ async function caged($) {
   }
 }
 
-// How many reads of the cage key stand open now, so the host events those reads raise pass by. [[spec/tickets/level0-runs-whole-on-the-door]]
+// How many reads of the cage key stand open now, so the host events those reads raise pass by. [[spec/tickets/level0-runs-on-the-door]]
 let reading = 0;
 
 // The door answers, or the start road runs once and the door takes the post again. Still down, a guarded call meets the refusal, and every other event passes. [[spec/tickets/a-down-index-refuses-calls]]
 async function door($, event, e, next) {
   const extra = await fillOf($, event, e);
   const sent = await promptOf($, event, e, next);
-  // A door the start road has yet to stand answers nothing, and only a post still falling once the road ran says so. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // A door the start road has yet to stand answers nothing, and only a post still falling once the road ran says so. [[spec/tickets/level0-runs-on-the-door]]
   let answer = await doorAsk($, event, sent, extra, { quiet: true });
   if (!answer) {
     await starts($);
@@ -197,10 +197,10 @@ async function door($, event, e, next) {
   if (step.answer?.spawn) return doorSpawns($, step.answer, event);
   // [[spec/tickets/clear-answers-off-the-door]]
   if (step.answer?.clear) return clears($, step.answer, e, next);
-  // A rewritten event goes on to the harness in place of the one it read, as the bridge's answer did. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // A rewritten event goes on to the harness in place of the one it read, as the bridge's answer did. [[spec/tickets/level0-runs-on-the-door]]
   if (step.answer?.event !== undefined) return next(step.answer.event);
   if (step.answer !== undefined) return step.answer;
-  // The prompt context takes the door's named blocks, the rules and the canary among them, beside the session's own. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // The prompt context takes the door's named blocks, the rules and the canary among them, beside the session's own. [[spec/tickets/level0-runs-on-the-door]]
   const adds = {
     ...(step.blocks ? { blocks: step.blocks } : {}),
     ...(step.after ? { context: step.after } : {}),
@@ -208,7 +208,7 @@ async function door($, event, e, next) {
   return Object.keys(adds).length ? merged(await next(e), adds) : next(e);
 }
 
-// A prompt reaches the door with who sent it and the newest row before it, which the door reads an owner's turn off, as the bridge's body carried them. [[spec/tickets/level0-runs-whole-on-the-door]]
+// A prompt reaches the door with who sent it and the newest row before it, which the door reads an owner's turn off, as the bridge's body carried them. [[spec/tickets/level0-runs-on-the-door]]
 async function promptOf($, event, e, next) {
   if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
   const said = await before($, event, e);
@@ -456,7 +456,7 @@ async function* streams($, e, next) {
     yield chunk;
   }
   const said = { turnId: e?.turnId, index: e?.index, kinds, text: stepText };
-  // The step's text reaches the door under new, which hears the canary off it. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // The step's text reaches the door under new, which hears the canary off it. [[spec/tickets/level0-runs-on-the-door]]
   if (await caged($)) await doorAsk($, "turn.said", said, {});
   else await ask($, "turn.said", said, next);
 }
@@ -549,7 +549,7 @@ function says($, line) {
   } catch {}
 }
 
-// An event finding the door down while another starts it waits on that start, so the rules reach it once the door stands. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/tickets/level0-runs-whole-on-the-door]]
+// An event finding the door down while another starts it waits on that start, so the rules reach it once the door stands. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/tickets/level0-runs-on-the-door]]
 function starts($) {
   road ??= startsOnce($);
   return road;

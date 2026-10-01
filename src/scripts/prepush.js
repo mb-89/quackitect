@@ -94,7 +94,7 @@ export function holds(
     };
   }
 
-  // AN AGENT PUSHES NOTHING THE CHECK HAS NOT PASSED. Every branch an agent pushes carries a tip the green stamp reaches: the commit the check ran on, or one past it whose commits change ticket state alone, as a hand-back writes after its check. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // AN AGENT PUSHES NOTHING THE CHECK HAS NOT PASSED. Every branch an agent pushes carries a tip the green stamp reaches: the commit the check ran on, or one past it whose commits change ticket state alone, as a hand-back writes after its check. [[spec/tickets/level0-runs-on-the-door]]
   const stamp = stampOf(stampText);
   for (const one of engine ? refs : []) {
     if (one.remote === `refs/heads/${TRUNK}` || ZEROS.test(String(one.sha ?? ""))) continue;
@@ -126,7 +126,7 @@ export function holds(
   return { code: 0, said: "" };
 }
 
-// The refusal an unchecked push meets. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The refusal an unchecked push meets. [[spec/tickets/level0-runs-on-the-door]]
 export function unchecked(branch, says) {
   return [
     `${branch} takes a push the check has passed, and ${says || "the green check ran on no commit this tip stands on, or code changed since"}.`,
@@ -136,7 +136,7 @@ export function unchecked(branch, says) {
   ].join("\n");
 }
 
-// The stamp reaches a tip standing on its commit, where every file changed since lies under the tickets folder. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The stamp reaches a tip standing on its commit, where every file changed since lies under the tickets folder. [[spec/tickets/level0-runs-on-the-door]]
 export function checkedThroughBy(repo) {
   return (from, to) => {
     if (!from || !to) return false;
@@ -151,7 +151,7 @@ export function checkedThroughBy(repo) {
   };
 }
 
-// An agent's push: a cloud box, a session the engine runs, or a Claude Code session on a desk. The owner's own terminal pushes ungated. [[spec/tickets/push-gate-needs-the-engine]] [[spec/tickets/level0-runs-whole-on-the-door]]
+// An agent's push: a cloud box, a session the engine runs, or a Claude Code session on a desk. The owner's own terminal pushes ungated. [[spec/tickets/push-gate-needs-the-engine]] [[spec/tickets/level0-runs-on-the-door]]
 export function agentPushes(env) {
   return env?.[ENGINE] === "1" || inCloud(env ?? {}) || Boolean(env?.CLAUDECODE);
 }

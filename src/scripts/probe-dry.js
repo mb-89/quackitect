@@ -2,7 +2,7 @@
 // zero on it with no model and no key: the hook module the client loads,
 // under a harness raising a session's events the way a client raises them,
 // against the index the start road brings up. It asks whether level zero runs.
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
@@ -13,19 +13,19 @@ import { logRows } from "./probe.js";
 
 // The module the plugin manifest names, which the client loads. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 const MODULE = "hooks/pull-tool.js";
-// The span one event of the scripted session takes before the probe reads it as hung. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The span one event of the scripted session takes before the probe reads it as hung. [[spec/tickets/level0-runs-on-the-door]]
 const EVENT_WAIT = 240_000;
 // The owner's prompt reaches the hook as the client's composer sends it. [[spec/design_output/level0#which-prompt-opens-a-turn]]
 const OWNER = { kind: "composer" };
 const STREAMS = new Set(["turn.step"]);
 const CANARY_LINE = /level0 holds this session: \d+ rules?, \d+ notes?, the stop hook (?:on|off)\./;
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 export const DRY = {
   checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet"],
 };
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 export async function probeDry(root, it, say = console.log, delta = "") {
   const temp = it.disk.tempDir("se-dry-");
   const tree = it.join(temp, "tree");
@@ -42,7 +42,7 @@ export async function probeDry(root, it, say = console.log, delta = "") {
   }
 }
 
-// The harness a client hands the hook, over the clone: its files, its processes, its posts, and what the hook says and registers. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The harness a client hands the hook, over the clone: its files, its processes, its posts, and what the hook says and registers. [[spec/tickets/level0-runs-on-the-door]]
 export function harnessOf(it, tree, env) {
   const at = (rel) => (String(rel).startsWith("/") ? String(rel) : it.join(tree, rel));
   const seen = { registered: [], said: [], posts: [], held: [] };
@@ -106,13 +106,13 @@ function bounded(promise, ms) {
   return Promise.race([promise, cut]).finally(() => clearTimeout(timer));
 }
 
-// The engine the client runs: each registration wraps the ones after it, a filter names the fields an event must carry, and the client's own answer stands last. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The engine the client runs: each registration wraps the ones after it, a filter names the fields an event must carry, and the client's own answer stands last. [[spec/tickets/level0-runs-on-the-door]]
 export function engineOf(register, options = {}) {
   const held = [];
   register((event, filter, made) => {
     held.push({ event, filter: made ? filter : null, run: made ?? filter });
   }, options);
-  // A stream event takes its own registrations alone, since the catch-all answers once and a stream yields many. [[spec/tickets/level0-runs-whole-on-the-door]]
+  // A stream event takes its own registrations alone, since the catch-all answers once and a stream yields many. [[spec/tickets/level0-runs-on-the-door]]
   const takes = (one, event, e) =>
     (one.event === event || (one.event === "*" && !STREAMS.has(event))) &&
     Object.entries(one.filter ?? {}).every(([key, value]) => e?.[key] === value);
@@ -129,7 +129,7 @@ export function engineOf(register, options = {}) {
   };
 }
 
-// The session a client runs on a cold box: it starts, the owner's prompt arrives while the start road stands the door, the context reads, the answer opens on the canary, a read and a guarded call run, and the turn stops. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The session a client runs on a cold box: it starts, the owner's prompt arrives while the start road stands the door, the context reads, the answer opens on the canary, a read and a guarded call run, and the turn stops. [[spec/tickets/level0-runs-on-the-door]]
 async function session(it, tree) {
   const env = { CLAUDE_CODE_REMOTE: "true", CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1" };
   const { $, seen } = harnessOf(it, tree, env);
@@ -183,7 +183,7 @@ function fileUrl(path) {
   return `file://${path.startsWith("/") ? "" : "/"}${path.replaceAll("\\", "/")}`;
 }
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 export function readsDry(rows, seen) {
   return [
     { check: "door", ...doorStood(seen) },
@@ -252,7 +252,7 @@ function canaryHeard(rows) {
   return { pass: true, evidence: `the door hears: ${heard.said}` };
 }
 
-// Nothing posts past the hooks door, and no line or row says level zero answers nothing. [[spec/tickets/level0-runs-whole-on-the-door]]
+// Nothing posts past the hooks door, and no line or row says level zero answers nothing. [[spec/tickets/level0-runs-on-the-door]]
 function quietRun(rows, seen) {
   const astray = (seen.posts ?? []).filter((one) => !one.url.endsWith("/hook"));
   if (astray.length)

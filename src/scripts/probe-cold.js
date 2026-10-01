@@ -108,7 +108,7 @@ export function readsCold(rows, steps) {
   ];
 }
 
-// A cold start may fall once before its door stands, and no row says the server answers nothing once the rules reached the session. [[spec/tickets/level0-runs-whole-on-the-door]]
+// A cold start may fall once before its door stands, and no row says the server answers nothing once the rules reached the session. [[spec/tickets/level0-runs-on-the-door]]
 function quietOnce(rows) {
   const ruled = rows.findIndex((one) => one.kind === "context");
   if (ruled < 0) return { pass: false, evidence: "no context row" };
@@ -238,7 +238,7 @@ export async function probeCold(root, it, client, say = console.log, delta = "")
   }
 }
 
-// The fresh box both probes stand on: the clone of the commit, the staged delta, the install a cloud setup runs, and the pointer to a port of its own. It answers the config folder, or nothing where the clone or the delta falls. [[spec/design_output/level0#the-cold-probe]] [[spec/tickets/level0-runs-whole-on-the-door]]
+// The fresh box both probes stand on: the clone of the commit, the staged delta, the install a cloud setup runs, and the pointer to a port of its own. It answers the config folder, or nothing where the clone or the delta falls. [[spec/design_output/level0#the-cold-probe]] [[spec/tickets/level0-runs-on-the-door]]
 export function coldTree(root, it, say, { temp, tree, port, delta }) {
   const cloned = it.proc.run(
     ["git", "clone", "--quiet", "--no-hardlinks", root, tree],

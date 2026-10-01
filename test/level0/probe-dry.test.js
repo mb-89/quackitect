@@ -1,6 +1,6 @@
 // The dry probe's pure half: the engine it raises a session's events through,
 // and the checks it reads off what the run leaves.
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -10,7 +10,7 @@ import { DRY, engineOf, harnessOf, readsDry } from "../../src/scripts/probe-dry.
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
 
-// What a whole run leaves: the door stands, the context hands the canary, the prompt reads rewritten, the tools register, the read passes and the guarded call comes back refused. [[spec/tickets/level0-runs-whole-on-the-door]]
+// What a whole run leaves: the door stands, the context hands the canary, the prompt reads rewritten, the tools register, the read passes and the guarded call comes back refused. [[spec/tickets/level0-runs-on-the-door]]
 function whole() {
   return {
     rows: [

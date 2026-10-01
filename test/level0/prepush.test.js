@@ -79,7 +79,7 @@ test("an owner's push to a work branch meets no door, whatever the stamp says", 
   assert.deepEqual(owner(stamp({ ok: false })), { code: 0, said: "" });
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("an agent's push to a work branch takes the green stamp, and a red, absent or unclean one refuses", () => {
   assert.deepEqual(holds(refsIn(toWork), stamp()), { code: 0, said: "" });
   for (const [text, says] of [
@@ -95,7 +95,7 @@ test("an agent's push to a work branch takes the green stamp, and a red, absent 
   }
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("an agent's push past the checked commit lands where ticket state alone changed since, and refuses where code did", () => {
   const past = stamp({ sha: WAS });
   const reaches = (from, to) => from === WAS && to === SHA;
@@ -107,7 +107,7 @@ test("an agent's push past the checked commit lands where ticket state alone cha
   assert.match(said.said, /or code changed since/);
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("the stamp reaches a tip on its commit whose changes lie under the tickets folder alone", () => {
   const repo = (ancestor, names) => ({
     run: (args) =>
@@ -125,7 +125,7 @@ test("the stamp reaches a tip on its commit whose changes lie under the tickets 
   assert.equal(checkedThroughBy(repo(true, []))("", SHA), false);
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("a cloud box, the engine and a Claude Code session push as agents, and a bare terminal as the owner", () => {
   assert.equal(agentPushes({ CLAUDE_CODE_REMOTE: "true" }), true);
   assert.equal(agentPushes({ SE_ENGINE: "1" }), true);

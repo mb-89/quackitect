@@ -224,7 +224,7 @@ test("under new a held call asks back on agent.spoke with the effect's call id, 
   assert.equal(posts[1].body.e.text, "the reply");
 });
 
-// A door answering every post, which records each address the hook reaches and hands the prompt context its named blocks. [[spec/tickets/level0-runs-whole-on-the-door]]
+// A door answering every post, which records each address the hook reaches and hands the prompt context its named blocks. [[spec/tickets/level0-runs-on-the-door]]
 function answering(box, posts) {
   box.$.http = {
     fetch: async (url, init) => {
@@ -242,7 +242,7 @@ function answering(box, posts) {
   };
 }
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("under new the prompt context hands the session the door's named blocks", async () => {
   const box = caged();
   const posts = [];
@@ -260,7 +260,7 @@ test("under new the prompt context hands the session the door's named blocks", a
   );
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("under new no event of a session reaches anything but the hooks door", async () => {
   const box = caged();
   const posts = [];
@@ -302,7 +302,7 @@ test("under new no event of a session reaches anything but the hooks door", asyn
   );
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("under new a prompt the door rewrites goes on to the harness rewritten", async () => {
   const box = caged();
   const rewritten = { text: "the owner's prompt, with the answer-first line" };
@@ -328,7 +328,7 @@ test("under new a prompt the door rewrites goes on to the harness rewritten", as
   assert.deepEqual(said, { handed: rewritten }, "and its answer stands");
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("under new a prompt context raised while another event reads the cage still reaches the door", async () => {
   const box = caged();
   const posts = [];
@@ -364,7 +364,7 @@ test("under new a prompt context raised while another event reads the cage still
   );
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("under new a prompt context finding the door down while the session start raises it waits, and takes the rules", async () => {
   const box = caged();
   const posts = [];
@@ -411,7 +411,7 @@ test("under new a prompt context finding the door down while the session start r
   );
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("under new a prompt reaches the door with its origin and the newest row before it, and the harness reads it bare", async () => {
   const box = caged();
   const bodies = [];
@@ -439,7 +439,7 @@ test("under new a prompt reaches the door with its origin and the newest row bef
   assert.deepEqual(handed, [{ text: "the owner's prompt" }], "the harness reads the prompt bare");
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("under new a door the start road stands up says no fall to the session, and one still down names the door", async () => {
   const box = caged();
   let standing = false;

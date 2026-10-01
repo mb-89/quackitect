@@ -411,7 +411,7 @@ test("the cold path names neither the bridge server nor its self-test", () => {
   assert.equal(COLD_PATH.includes("src/bridge/selftest.js"), false);
 });
 
-// [[spec/tickets/level0-runs-whole-on-the-door]]
+// [[spec/tickets/level0-runs-on-the-door]]
 test("a fall past the rules fails the quiet check, and a fall before them passes", () => {
   const fall = { level: "warn", kind: "bridge", event: "env.get", said: "the server answers nothing at http://127.0.0.1:6510/event" };
   const late = readsCold([...whole(), fall], clean());
@@ -422,7 +422,7 @@ test("a fall past the rules fails the quiet check, and a fall before them passes
   assert.equal(verdict(early, "quiet").pass, true);
 });
 
-// The box both probes stand on. [[spec/tickets/level0-runs-whole-on-the-door]]
+// The box both probes stand on. [[spec/tickets/level0-runs-on-the-door]]
 test("the fresh box clones, installs and points the hook at a port of its own, and a refused clone stands nothing", () => {
   const { disk, proc, it } = runner(() => ({ exitCode: 0 }));
   const box = { temp: "/t", tree: "/t/tree", port: 6900, delta: "" };
