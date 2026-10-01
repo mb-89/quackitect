@@ -86,6 +86,12 @@
       "message": "A file holds 600 lines, and the file holds 624. Split it by topic."
     },
     {
+      "file": "spec/tickets/prose-tools-answer-in-go.md",
+      "rule": "FileCeiling",
+      "line": 1,
+      "message": "A file holds 600 lines, and the file holds 640. Split it by topic."
+    },
+    {
       "file": "spec/tickets/sessions-boot-from-the-repo.md",
       "rule": "FileCeiling",
       "line": 1,
