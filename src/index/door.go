@@ -48,7 +48,7 @@ type Standing struct {
 	Stamp string `json:"stamp"`
 	// The binary that stands the door, whose stamp a caller reads on disk. [[spec/design_output/index#a-door-comes-back]]
 	Bin string `json:"bin,omitempty"`
-	// The port of the bus and the token each peer shows. [[spec/design_output/processes#the-standing-file]]
+	// The port of the bus and the token each peer shows. [[spec/design_output/model#the-standing-file]]
 	Bus   int    `json:"bus,omitempty"`
 	Token string `json:"token,omitempty"`
 }

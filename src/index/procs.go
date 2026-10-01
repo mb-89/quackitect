@@ -1,6 +1,6 @@
 // A placed process: the index spawns it over the bus, lands what it commits,
 // and marks its instances not provided while it runs nowhere.
-// [[spec/design_output/processes#a-process-ends]]
+// [[spec/design_output/model#a-process-ends]]
 package index
 
 import (
@@ -9,7 +9,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The process's name, the command that runs it, the writer each instance it runs commits as, and the wait before a restart. [[spec/design_output/processes#a-process-ends]]
+// The process's name, the command that runs it, the writer each instance it runs commits as, and the wait before a restart. [[spec/design_output/model#a-process-ends]]
 type Placed struct {
 	Name      string
 	Command   []string
@@ -37,5 +37,5 @@ func (p *Placements) Start() (func(), error) { return func() {}, nil }
 // Restarts the processes holding an instance of the topic, and no other. [[spec/design_output/processes#a-module-rebuilds-alone]]
 func (p *Placements) Restart(topic string) error { return nil }
 
-// Spawns the process, and answers its stop. [[spec/design_output/processes#a-process-ends]]
+// Spawns the process, and answers its stop. [[spec/design_output/model#a-process-ends]]
 func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) { return func() {}, nil }

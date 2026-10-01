@@ -1,7 +1,7 @@
 // A placed process that dies leaves its names at their built-in values,
 // marked not provided, and its next commit clears the mark. The fake IO
 // process is this test binary, run again with the bus in its environment.
-// [[spec/design_output/processes#a-process-ends]]
+// [[spec/design_output/model#a-process-ends]]
 package index
 
 import (
@@ -13,7 +13,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The fake IO process: it commits its pid and a value, and runs until a kill. It runs only where a placed process spawns it. [[spec/design_output/processes#a-process-ends]]
+// The fake IO process: it commits its pid and a value, and runs until a kill. It runs only where a placed process spawns it. [[spec/design_output/model#a-process-ends]]
 func TestFakeIOProcess(t *testing.T) {
 	if os.Getenv(BusEnv) == "" {
 		return
@@ -34,7 +34,7 @@ func TestFakeIOProcess(t *testing.T) {
 	}
 }
 
-// A store whose wiring loads the fake instance, and the writer it commits as. [[spec/design_output/processes#a-process-ends]]
+// A store whose wiring loads the fake instance, and the writer it commits as. [[spec/design_output/model#a-process-ends]]
 func fakeStore(t *testing.T) (*q.Store, q.Writer) {
 	t.Helper()
 	var hand q.Writer
@@ -48,7 +48,7 @@ func fakeStore(t *testing.T) (*q.Store, q.Writer) {
 	return store, hand
 }
 
-// Polls the store until held answers true, or fails the case past the wait. [[spec/design_output/processes#a-process-ends]]
+// Polls the store until held answers true, or fails the case past the wait. [[spec/design_output/model#a-process-ends]]
 func until(t *testing.T, what string, held func(q.Snapshot) bool) {
 	t.Helper()
 	for end := time.Now().Add(20 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
@@ -61,7 +61,7 @@ func until(t *testing.T, what string, held func(q.Snapshot) bool) {
 
 var fakeSnap q.Snapshot
 
-// Runs the fake IO process under a placement, and answers the store and the stop. [[spec/design_output/processes#a-process-ends]]
+// Runs the fake IO process under a placement, and answers the store and the stop. [[spec/design_output/model#a-process-ends]]
 func placedFake(t *testing.T, restart time.Duration) (*q.Store, func()) {
 	t.Helper()
 	bus, err := StartBus()
@@ -123,7 +123,7 @@ func TestTheNextCommitOfARestartedProcessClearsTheMark(t *testing.T) {
 	})
 }
 
-// Two fakes placed apart, each its own process, and the store they commit to. [[spec/design_output/processes#the-placements]]
+// Two fakes placed apart, each its own process, and the store they commit to. [[spec/design_output/model#the-placements]]
 func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
 	t.Helper()
 	bus, err := StartBus()

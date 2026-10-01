@@ -377,7 +377,7 @@ func (s *Store) Inputs(instance string) []string { return nil }
 // The names an instance provides. [[spec/design_output/processes#the-placements]]
 func (s *Store) Outputs(instance string) []string { return nil }
 
-// Clears the down mark of an instance whose process commits again. [[spec/design_output/processes#a-process-ends]]
+// Clears the down mark of an instance whose process commits again. [[spec/design_output/model#a-process-ends]]
 func (s *Store) Up(instance string) error { return nil }
 
 // Decodes a JSON body into the type the owner of name registers, so a commit off the bus lands typed. [[spec/design_output/model#a-message-carries-types]]

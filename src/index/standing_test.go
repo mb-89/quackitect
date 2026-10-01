@@ -1,6 +1,6 @@
 // The standing file names the bus the manager runs and the token a peer
 // shows.
-// [[spec/design_output/processes#the-standing-file]]
+// [[spec/design_output/model#the-standing-file]]
 package index
 
 import (

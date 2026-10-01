@@ -19,7 +19,7 @@ type Manage func(root string, store *q.Store, rows OpRows, reads Reads, steps fu
 type Managed struct {
 	Stop func()
 	Call Call
-	// The bus the manager runs, which the standing file names. [[spec/design_output/processes#the-standing-file]]
+	// The bus the manager runs, which the standing file names. [[spec/design_output/model#the-standing-file]]
 	Bus *Bus
 }
 
