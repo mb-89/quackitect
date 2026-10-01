@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -215,6 +215,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: c67020a58233debeff516ac3302a2bf1e71477a4
+    hash_after: c67020a58233debeff516ac3302a2bf1e71477a4
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
@@ -293,38 +305,59 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- accept read the group against its ask: the bridge server and `copilot-runtime.js` stand gone, and the check exits 0
+- [[spec/tickets/the-cage-slice-stands-new]]: the cage slice takes `new` alone, and the schema, commands and size golden follow
+- the tracked `cage` key leaves `spec/config/level0.json`, since its built-in now holds it
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the window slice's switch commit served as the template, so the slice change took one read
+- a scratch script read the cage key off the real config, which proved live boxes keep the door road
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 13:3x: the first plan call met no server at 6510, since the box starts with the index alone
+- 13:42: the first fix dropped the bridgehead's key read, and 22 bridge-road tests failed under the check
+- 13:52: the fix narrowed after an undo, so one round went to a change the ask did not need
+- 13:56: the hand-back failed on `TestDefaultFileHoldsNoBuiltIn`, a rule the window switch had already met
+- the regenerated schema, commands and golden stayed out of the close commit, and took a commit of their own
+- `test/contract/runme-road.test.js` timed out once under the full check, and passed alone
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the box's start road starts the serve server beside the index, home [[spec/design_output/level0#rules-ride-the-first-answer]]
+- a switch-over ticket reads the bridge-road tests before it touches the bridgehead, home [[spec/tickets/node-leaves-the-boxes]]
+- the switch-over's ask names the tracked key's removal, so the default-file test meets no surprise, home [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
+- the close stages what `quack schema` and `./RUNME.sh project` rewrite, home `src/scripts/verbs/commit.js`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The ask said the old path leaves the tree, and the bridgehead's bridge road reads as that path. Live boxes already read `new`, so the road runs only under tests. Ripping it out means rewriting the bridgehead under auto-merge, and the JS bridgehead leaves whole in phase 10. So the slice closes the door on `old`, and the road waits for phase 10.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the mode list stands in `migration.go` alone, and the schema and commands read it off their writers
+- the change adds no number
+- the change writes no header
+- each error carries its time off the run
+- the chapter names roles alone
 
 ## cloud
 
