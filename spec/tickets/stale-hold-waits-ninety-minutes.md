@@ -50,7 +50,7 @@ The gain is a working box that keeps its branch through a long step, while a box
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-./RUNME.sh check
+./RUNME.sh test test/level0/work-held.test.js test/level0/stand.test.js
 
 ## check
 
