@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -226,6 +226,24 @@ record:
         hash: 9b32ce8fa7ec4a81
         size: 6746
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box 3e46c581114 · claude-code-remote · helper-9
+    hash_before: 88da69d4b37cc6f83c07a0e6b96074bbf40add37
+    hash_after: 88da69d4b37cc6f83c07a0e6b96074bbf40add37
+    inputs:
+      - name: design/draft
+        hash: e3591594fa1ad743
+        size: 5641
+      - name: design/tests-red
+        hash: 67a4d3893b76330a
+        size: 1937
+      - name: design/draft-2
+        hash: 9b32ce8fa7ec4a81
+        size: 6746
+      - name: design/tests-red-2
+        hash: 11056905a6577d4e
+        size: 1495
+    def: 01417e29801ecc2f
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
 ---
@@ -555,10 +573,8 @@ What surprises me: src/prose already holds a Finding, Vale's own row with no mes
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- step 5 clashes with the import rule: noModule in src/imports/imports.go refuses one module importing another, and ownModule passes a module's own subpackages alone, so src/modules/drafts reading the finding body out of src/modules/hooks/write fails TestTheTreeHoldsTheImportRules. The draft's assumption names hooks/stop and views, and neither imports another module. Give the body a home outside src/modules that both IO modules reach, such as src/prose, and name it in the size
-- the first done_when line names a case of src/quack, and go test ./src/quack/... runs no case over the table: TestTheDraftCasesAnswerOffTheModule stands in src/modules/drafts, and the quack cases check the wiring alone. Run the table through the wired module in a quack case, with the Lint seam handed in so the case fakes Vale, or say which case decides the line
-- the draft names Holds.Asked where the tests name Questions, and its tests list names fold_test.go where the red list names questions_test.go. Match the draft to the tests
+accept with points
+- drafts-lint-seam-carries-why: step 6 says accepts hands heardOver to draftsOutside as it stands, but heardOver in src/quack/command.go takes (root, name, text) and answers valeHeard with rows, stands and ran and no why, where the seam takes func(text, name) drafts.Linted with Why. So the wiring needs an adapter, and a Vale whose JSON fails to read answers "Vale read nothing: " with an empty reason, where readsAnswer in src/bridge/answer-read.js names ran.why. Give valeHeard the reason, or say the reason the seam answers, while building the seam in tests-green
 
 # implement
 
