@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
 record:
   - step: design/owner-read
@@ -176,6 +176,15 @@ record:
         hash: 99f6837f0e33014d
         size: 1264
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: ddafa9e5bce186e780e75b2bfb46ae0b46540182
+    hash_after: ddafa9e5bce186e780e75b2bfb46ae0b46540182
+    answered:
+      - name: lint
+        exit: 0
+        said: ".claude/skills/level0/hooks/level0.js:1:1: FileCeiling: A file holds 600 lines, and the file holds 650. Split it by topi"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -361,14 +370,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/modules/hooks/review/review.go src/modules/hooks/review.go src/modules/hooks/listen.go src/modules/hooks/hooks.go src/quack/review.go src/quack/review_test.go .claude/skills/level0/hooks/level0.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft's size names, with the seam in a new src/quack/review.go since main.go stands under its ceiling, plus the size golden, which counts the prose ticket past its ceiling
+the door's Review seam has its fake in the door cases, and the quack seam's reading has its own cases over printed text
+each new file opens on a header naming this ticket, and each function points at its design section
+the report's words stand in src/modules/hooks/review alone, and the door and the quack seam call it
 
 ## tests-green
 

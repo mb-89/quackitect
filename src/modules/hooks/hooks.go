@@ -7,13 +7,8 @@ package hooks
 import (
 	"bufio"
 	"bytes"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net"
-	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -170,6 +165,8 @@ type Door struct {
 	told map[string]bool
 	// The session of the newest call the holds held under each root, which a spoke post meets. [[spec/tickets/cage-call-holds-port]]
 	heldIn map[string]string
+	// The material of each review in flight, under the token its spawn's back names. [[spec/tickets/review-spawns-off-the-door]]
+	reviews map[string]review.Material
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -198,7 +195,7 @@ func New(from Outside) *Door {
 	if from.Ops == nil {
 		from.Ops = func(string) []Op { return nil }
 	}
-	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}}
+	return &Door{from: from, seqs: map[string]int64{}, told: map[string]bool{}, heldIn: map[string]string{}, reviews: map[string]review.Material{}}
 }
 
 // Writes the event, calls the action a tool names, and answers the effects: pass where nothing answers the call, and the operations the session meets as added context. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -231,6 +228,8 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		effects = append(effects, Effect{Kind: resultKind, Text: refused})
 	} else if said, ok := d.searches(post); ok {
 		// [[spec/tickets/grep-glob-answer-off-index]]
+		effects = append(effects, said)
+	} else if said, ok := d.reviewed(post, root); ok {
 		effects = append(effects, said)
 	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)
@@ -502,67 +501,6 @@ func (d *Door) running(session string) string {
 }
 
 func open(one Op) bool { return one.State == "queued" || one.State == "running" }
-
-// What the standing file holds: the port, and the token a post carries. [[spec/tickets/hooks-standing-file-names-token]]
-type Standing struct {
-	Port  int    `json:"port"`
-	Token string `json:"token"`
-}
-
-// Serves POST /hook on a loopback port behind a token, and writes both under the root. The listener stands in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
-func Listen(root string, door *Door) (func(), error) {
-	secret := make([]byte, tokenBytes)
-	if _, err := rand.Read(secret); err != nil {
-		return nil, err
-	}
-	token := hex.EncodeToString(secret)
-	listen, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		return nil, err
-	}
-	mux := http.NewServeMux()
-	mux.HandleFunc("POST /hook", door.serves(token))
-	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
-	go server.Serve(listen)
-	at := filepath.Join(root, filepath.FromSlash(StandingFile))
-	body, err := json.Marshal(Standing{Port: listen.Addr().(*net.TCPAddr).Port, Token: token})
-	if err == nil {
-		err = os.MkdirAll(filepath.Dir(at), 0o755)
-	}
-	if err == nil {
-		err = os.WriteFile(at, body, 0o600)
-	}
-	if err != nil {
-		server.Close()
-		return nil, err
-	}
-	return func() {
-		server.Close()
-		os.Remove(at)
-	}, nil
-}
-
-// A post short of the token answers 401, a body past the cap or short of JSON 400, and a door that fails 500. [[spec/tickets/hooks-standing-file-names-token]]
-func (d *Door) serves(token string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Authorization") != bearer+token {
-			http.Error(w, "the post carries no token the standing file names", http.StatusUnauthorized)
-			return
-		}
-		var post Post
-		if err := json.NewDecoder(io.LimitReader(r.Body, bodyCap)).Decode(&post); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		said, err := d.Hook(post)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(said)
-	}
-}
 
 // One line of a recording: the post as the harness sends it, and the answer the module gives. [[spec/design_output/model#an-inbound-fake-replays]]
 type recorded struct {

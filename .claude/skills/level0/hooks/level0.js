@@ -199,6 +199,7 @@ async function door($, event, e, next) {
     const back = await doorAsk($, "agent.spoke", spoken, {});
     step = back ? stepOf(back, event, { asks: false, served }) : {};
   }
+  if (step.answer?.spawn) return doorSpawns($, step.answer, event, served);
   if (step.answer !== undefined) return step.answer;
   if (step.bridge) return BRIDGE;
   return step.after ? merged(await next(e), { context: step.after }) : next(e);
@@ -255,20 +256,38 @@ export async function besides($, answer, e, next) {
 }
 
 async function spawns($, answer, next) {
+  const back = await helped($, answer);
+  const done = await ask($, String(answer.back?.event ?? "agent.answered"), back, next);
+  return done?.result ?? { result: "the helper answered, and the server said nothing" };
+}
+
+// A door's answer carrying a spawn: the helper runs, its answer goes back to the door, and the door's step answers the call. [[spec/tickets/review-spawns-off-the-door]]
+async function doorSpawns($, answer, event, served) {
+  const back = await helped($, answer);
+  const said = await doorAsk(
+    $,
+    String(answer.back?.event ?? "agent.answered"),
+    back,
+    {},
+  );
+  const step = said ? stepOf(said, event, { asks: false, served }) : {};
+  return step.answer ?? { result: "the helper answered, and the door said nothing" };
+}
+
+// The helper the answer spawns, and what it says as the back post carries it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+async function helped($, answer) {
   let said;
   try {
     said = await $.agent.spawn(answer.spawn);
   } catch (error) {
     said = { deny: String(error?.message ?? error) };
   }
-  const back = {
+  return {
     ...(answer.back ?? {}),
     text: said?.text ?? "",
     isError: Boolean(said?.isError),
     deny: said?.deny ?? "",
   };
-  const done = await ask($, String(answer.back?.event ?? "agent.answered"), back, next);
-  return done?.result ?? { result: "the helper answered, and the server said nothing" };
 }
 
 async function opens($, e) {
