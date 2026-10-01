@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -213,6 +213,19 @@ record:
         hash: 776b5067add31866
         size: 564
     def: 2fcb4abe3d77d8a2
+  - step: design/tests-red-2
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 96c07b0773afbcf62e9612ec51e032cf172c5a63
+    hash_after: 96c07b0773afbcf62e9612ec51e032cf172c5a63
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/drafts fails
+    inputs:
+      - name: design/draft-2
+        hash: 9b32ce8fa7ec4a81
+        size: 6746
+    def: 9c7cd4dd4a2dadb8
 group: go-cage-switches-over
 depends_on: ["tools-keep-their-own-names"]
 ---
@@ -498,26 +511,40 @@ Risks:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/drafts/drafts_test.go src/quack/drafts_test.go src/modules/hooks/questions_test.go src/prose/finding_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/drafts/drafts_test.go
+- src/quack/drafts_test.go
+- src/modules/hooks/questions_test.go
+- src/prose/finding_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case of the four red files fails on its own assertion. The module stub registers nothing, so the wired quack case meets no action. The stub draftsOutside answers an empty outside, and the stub Body an empty text.
+
+The wired case builds the outside through draftsOutside with a Lint the case fakes, then sets the question count and the caps off the table. So it decides that quack hands its Lint seam through, and the module answers the table over the wiring.
+
+TestTheRefusalBodyReadsAsBefore in src/modules/hooks/writes_test.go stands green: it pins the write door's voice refusal as it reads today, so the move into src/prose changes no word of it.
+
+What surprises me: src/prose already holds a Finding, Vale's own row with no message, so the body's finding takes the name Refused beside it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the Go done_when line meets TestTheDraftCasesAnswerOffTheWiredModule in src/quack, the JS line the table cases in answer-read.test.js, green already, and the check line waits for tests-green
+- the module cases run over a fake Lint, question count and caps, the wired quack case over a faked Lint and a temp tree, the body case over plain findings, and the fold case over stepper
 
 # gate
 
