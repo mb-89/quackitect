@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -144,6 +144,18 @@ record:
         exit: 0
         said: work/go-cage-switches-over already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 38e92d1a21b5fc0b60f4706ef857a55853e8ede0
+    hash_after: 38e92d1a21b5fc0b60f4706ef857a55853e8ede0
+    inputs:
+      - name: ask
+        hash: 1e40978178d2f3fd
+        size: 324
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
@@ -173,14 +185,21 @@ Done when the bridge server leaves the tree.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[start-road-starts-the-index]], standard
+- [[the-brief-leaves-the-bridge]], standard
+- [[the-bridge-server-leaves]], standard
+- the closed children of the group stand as they are
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each open child moves one piece: the start road, the brief, the server, so a review reads each whole
+- the server leaving is the group's done line, and the start road and the brief clear its way, so nothing of the goal stands outside the three
+- the start road waited on the brief while the brief waited on it; the handover puts the brief after the start road, so the start road now waits on level0-tools-leave-the-bridge alone, and the server names both
 
 # children
 

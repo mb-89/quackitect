@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-depends_on: ["level0-tools-leave-the-bridge", "the-brief-leaves-the-bridge"]
+depends_on: ["level0-tools-leave-the-bridge"]
 step: design/owner-read
 ---
 
