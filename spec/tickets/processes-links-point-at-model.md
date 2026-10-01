@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -29,6 +29,13 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: module-processes-land-in-shadow
 parent: the-doors-process-stands
+record:
+  - step: do
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 713d52b63c29b01a724e00d30536bf658933c435
+    hash_after: 713d52b63c29b01a724e00d30536bf658933c435
+    why: fake-snapshot-stays-in-case answers this ask
+reason: answered
 ---
 
 # Ask
