@@ -1,6 +1,24 @@
 // Copilot events and replies, without harness state or I/O.
 // [[spec/design_output/copilot#events-and-feedback]]
 
+import { mutations } from "./mutations.js";
+
+// The shell tools a Copilot host names, which post as Bash. [[spec/tickets/copilot-answers-off-the-door]]
+const SHELL = new Set([
+  "Bash",
+  "bash",
+  "powershell",
+  "run_in_terminal",
+  "send_to_terminal",
+]);
+
+// The hooks door's event a Copilot event stands for, as the Claude harness names it. [[spec/tickets/copilot-answers-off-the-door]]
+const POSTED = {
+  SessionStart: "session.start",
+  PreToolUse: "tool.call",
+  Stop: "classic.Stop",
+};
+
 const EVENTS = {
   sessionStart: "SessionStart",
   preToolUse: "PreToolUse",
@@ -76,7 +94,21 @@ export function failureOf(event, reason) {
   return { context: `${reason} The cage is not ready; do not claim otherwise.` };
 }
 
-// The Claude calls one Copilot event stands for, which the hooks door judges. It answers none until the change lands. [[spec/tickets/copilot-answers-off-the-door]]
+// The hooks door's event a Copilot event posts as. [[spec/tickets/copilot-answers-off-the-door]]
+export function postedAs(event) {
+  return POSTED[event] ?? `classic.${event}`;
+}
+
+// The Claude calls one Copilot tool call stands for, which the hooks door judges: a shell call as Bash, an edit as one Write a changed file, and any other tool as itself. [[spec/tickets/copilot-answers-off-the-door]]
 export function callsOf(event, read) {
-  return [];
+  const { tool, args } = event;
+  if (SHELL.has(tool)) return [{ tool: "Bash", command: String(args?.command ?? "") }];
+  const changed = mutations(event, read);
+  if (changed.length)
+    return changed.map(({ path, text }) => ({
+      tool: "Write",
+      file_path: path,
+      content: text,
+    }));
+  return [{ tool, ...args }];
 }

@@ -396,7 +396,7 @@ func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
 	}
 }
 
-// Main hands help, --help, run and get to the tree over the base V1 answers, and every other verb to the index. [[spec/tickets/quack-main-routes-the-tree]]
+// Main hands help, --help, run and get to the tree over the base V1 answers, and every other verb to the index, hook among them since Copilot's hook answers off the hooks door. [[spec/tickets/quack-main-routes-the-tree]] [[spec/tickets/copilot-answers-off-the-door]]
 func TestMainHandsTheTreeVerbsToCliOverV1(t *testing.T) {
 	base := standingTree(t)
 	v1 := func() (string, error) { return base, nil }
@@ -406,7 +406,7 @@ func TestMainHandsTheTreeVerbsToCliOverV1(t *testing.T) {
 			t.Fatalf("main hands %v to the tree: %s%s", argv, out.String(), errs.String())
 		}
 	}
-	for _, verb := range []string{"serve", "find", "standing"} {
+	for _, verb := range []string{"serve", "find", "standing", "hook"} {
 		if cliVerbs[verb] {
 			t.Fatalf("main hands %s to the tree, not the index", verb)
 		}

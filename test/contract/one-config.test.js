@@ -1,6 +1,6 @@
 // One config on every road. A project's own rule refuses a write at the door,
-// and this holds the answer gate, the findings road and the copilot road to the
-// same config the assembly writes, through the real Vale.
+// and this holds the answer gate and the findings road to the same config the
+// assembly writes, through the real Vale.
 // [[spec/tickets/every-road-reads-one-config]]
 
 import assert from "node:assert/strict";
@@ -13,7 +13,7 @@ import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { vale } from "../../src/doors/vale.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
-import { assemble, STYLES } from "../../src/scripts/styles.js";
+import { STYLES } from "../../src/scripts/styles.js";
 
 const method = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -86,23 +86,6 @@ ifVale("a rule a project alone carries refuses on every road", async () => {
       findings.found.some((one) => one.rule === RULE),
       "the findings road refuses the word",
     );
-
-    const runtime = await import("../../.claude/skills/level0/lib/copilot-runtime.js");
-    assert.equal(
-      typeof runtime.check,
-      "function",
-      "the copilot road's check stands exported",
-    );
-    const run = async (argv, init) => outside.run(argv, { ...init, cwd: work });
-    const config = assemble(files, { method, work, itself: false }).config;
-    const copilot = await runtime.check(TEXT, NOTE, {
-      vale: bin,
-      biome: "",
-      run,
-      config,
-      cwd: work,
-    });
-    assert.match(copilot, new RegExp(RULE), "the copilot road refuses the word");
   } finally {
     files.remove(work);
   }

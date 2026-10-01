@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: c749736e2298d85e
         size: 960
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: c0cf3436edccf120f1d17669de518d60dbbb7bb9
+    hash_after: c0cf3436edccf120f1d17669de518d60dbbb7bb9
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -338,14 +347,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/copilot.js src/scripts/copilot-door.js .claude/skills/level0/lib/copilot.js test/contract/one-config.test.js src/quack/main.go src/quack/main_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft's size names, plus the size golden and main_test.go, whose case hands hook to the index now quack holds no hook mode
+the copilot cases run over a fake standing file and a fake door, and the hook script's own fetch is the one real door
+the adapter, the door module and the hook road each point at this ticket
+`postOf`, `stepOf`, `guarded`, `refusedText` and `HOOKS_FILE` stand in cage.js, and the door module imports them
 
 ## tests-green
 
