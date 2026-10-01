@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
 record:
   - step: design/owner-read
@@ -164,6 +164,18 @@ record:
         hash: 9385ff0769bc1f1a
         size: 5140
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 8262e81e61f32168a421bab90f81c01355b9d0bb
+    hash_after: 8262e81e61f32168a421bab90f81c01355b9d0bb
+    inputs:
+      - name: design/draft
+        hash: 9385ff0769bc1f1a
+        size: 5140
+      - name: design/tests-red
+        hash: 99f6837f0e33014d
+        size: 1264
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -334,8 +346,11 @@ the door cases run over doorOver with a fake Review seam, the package cases over
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- review-reads-branch-off-input: `reviewed` reads the branch through `callField`, so a call carrying it under `input` meets the same answer as the bridge's top-level `e.branch`, and a door case drives the `input` shape
+- review-spawn-pins-helper-layer: TestAReviewCallAnswersASpawnUnderAToken wants `ReaderAsks(gathered, "")`, so the case seeds a helper layer through the fake tree and wants the prompt over the layer `brief.LayerFor` answers
 
 # implement
 
