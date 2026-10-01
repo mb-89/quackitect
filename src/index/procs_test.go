@@ -7,6 +7,7 @@ package index
 import (
 	"flag"
 	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -28,6 +29,19 @@ func TestFakeIOProcess(t *testing.T) {
 	}
 	if err := peer.Commit(instance, map[string]any{instance + "/pid": os.Getpid(), instance + "/out": 7}); err != nil {
 		os.Exit(4)
+	}
+	for {
+		time.Sleep(time.Hour)
+	}
+}
+
+// The fake module process: it dials the bus and commits nothing, so the index's side alone decides a case. [[spec/design_output/model#the-placements]]
+func TestFakeIdleProcess(t *testing.T) {
+	if os.Getenv(BusEnv) == "" {
+		return
+	}
+	if _, err := Dial(os.Getenv(BusEnv), os.Getenv(TokenEnv)); err != nil {
+		os.Exit(3)
 	}
 	for {
 		time.Sleep(time.Hour)
@@ -155,6 +169,67 @@ func TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm(t *testing.T) {
 	}
 	if snap.Revision <= before {
 		t.Fatalf("the store stands at revision %d after the restart, where it stood at %d", snap.Revision, before)
+	}
+}
+
+type twiceOf struct {
+	All int `q:"all"`
+}
+
+func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
+	var source q.Writer
+	types := map[string]func(*q.Catalog){
+		"source": func(c *q.Catalog) { source = q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
+		"doubler": func(c *q.Catalog) {
+			q.DerivedIn(c, "twice", 0, func(in twiceOf) int { return 2 * in.All }, q.Doc("twice the count"))
+		},
+	}
+	w := q.Wiring{Instances: []q.Instance{{Name: "source", Module: "source"}, {Name: "doubler", Module: "doubler"}}, Wires: map[string]string{"doubler.all": "source.all"}}
+	store, err := q.Start(w, types)
+	if err != nil {
+		t.Fatal(err)
+	}
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	placed := Placed{Name: "doubler", Command: []string{os.Args[0], "-test.run=^TestFakeIdleProcess$"}, Instances: map[string]q.Writer{"doubler": {}}, Restart: time.Hour, Topics: []string{"doubler"}}
+	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	peer, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer peer.Close()
+	runs := make(chan struct{}, 1)
+	done, err := peer.Runs("doubler", func() {
+		select {
+		case runs <- struct{}{}:
+		default:
+		}
+	})
+	if err != nil {
+		t.Fatalf("the run subject meets %v", err)
+	}
+	defer done()
+	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 21}); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-runs:
+	case <-time.After(10 * time.Second):
+		t.Fatal("a move of source/all publishes no run of doubler")
+	}
+	saved, err := peer.Inputs("doubler")
+	if err != nil {
+		t.Fatalf("the inputs of doubler meet %v", err)
+	}
+	if !strings.Contains(string(saved), `"source/all"`) || !strings.Contains(string(saved), "21") {
+		t.Fatalf("the index answers the inputs of doubler with %s", saved)
 	}
 }
 

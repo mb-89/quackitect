@@ -14,7 +14,7 @@ import (
 	"quackitect/src/q"
 )
 
-var placedWiring = q.Wiring{Instances: []q.Instance{{Name: "clock", Module: "clock"}, {Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}}}
+var placedWiring = q.Wiring{Instances: []q.Instance{{Name: "clock", Module: "clock"}, {Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}, {Name: "hooks", Module: hooksModule}, {Name: "ticket", Module: "ticket"}}}
 
 func commandsOf(placed []index.Placed) []string {
 	out := []string{}
@@ -25,18 +25,18 @@ func commandsOf(placed []index.Placed) []string {
 }
 
 func TestEachInstanceInNoListTakesAProcessOfItsOwn(t *testing.T) {
-	got := commandsOf(placementsOf(placedWiring, map[string]q.Writer{}, nil, "quack"))
-	if strings.Join(got, " | ") != "quack module tickets | quack module queue" {
-		t.Fatalf("the placements run %q, and want tickets and queue apart, with the clock left to the IO process", got)
+	got := commandsOf(placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"ticket"}}, "quack"))
+	if strings.Join(got, " | ") != "quack module ticket | quack module tickets | quack module queue" {
+		t.Fatalf("the placements run %q, and want tickets and queue apart, with the clock left to the IO process and the hooks listener to the index", got)
 	}
 }
 
 func TestAListOfInstancesSharesOneProcess(t *testing.T) {
-	placed := placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"tickets", "queue"}}, "quack")
-	if got := commandsOf(placed); strings.Join(got, " | ") != "quack module tickets queue" {
-		t.Fatalf("the placements run %q, and want tickets and queue in one process", got)
+	placed := placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"tickets", "queue", "ticket"}}, "quack")
+	if got := commandsOf(placed); strings.Join(got, " | ") != "quack module tickets queue ticket" {
+		t.Fatalf("the placements run %q, and want tickets, queue and ticket in one process", got)
 	}
-	if len(placed[0].Instances) != 2 || strings.Join(placed[0].Topics, ", ") != "tickets, queue" {
+	if len(placed[0].Instances) != 3 || strings.Join(placed[0].Topics, ", ") != "tickets, queue, verbs" {
 		t.Fatalf("the one process holds %v over topics %v", placed[0].Instances, placed[0].Topics)
 	}
 }

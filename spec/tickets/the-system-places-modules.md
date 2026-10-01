@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -216,6 +216,25 @@ record:
         hash: 5f2da8fccb387d1f
         size: 23680
     def: a3dfd8c60d853590
+  - step: design/tests-red-2
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 3bcfffedd4aecf678237c45396601802120d8b33
+    hash_after: 3bcfffedd4aecf678237c45396601802120d8b33
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft-2
+        hash: 5dba2a0c6b222866
+        size: 5322
+      - name: [[spec/tickets/the-doors-process-stands]]
+        hash: a166f2553415d2a5
+        size: 402
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 9c7cd4dd4a2dadb8
 group: module-processes-land-in-shadow
 ---
 
@@ -418,26 +437,33 @@ The assumption: the `watch` caller of `Placements.Restart` lands with the switch
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/procs_test.go
+- src/q/start_test.go
+- src/quack/placements_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over stubs that build. TestPlacementsAnswerInputsAndRunOnAMove meets the unbuilt bus at its run subject. The placements cases want the hooks listener left out, and the ticket instance under the topic verbs. One surprise: tickets and work register through withActions, a closure in package main, so a runtime lookup of their register function names main and no module folder. The implement step reads the topic off the inner register function, or the modules table carries the folder beside it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: the restart line meets TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm, and go test and the check run at implement
+- every door the tests reach has a fake: the module processes are this test binary run again, the idle fake commits nothing, and the bus runs in memory on loopback
 
 # gate
 
