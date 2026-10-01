@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -178,7 +178,30 @@ record:
         exit: 0
         said: "spec/tickets/the-brief-leaves-the-bridge.md:314:450: Vocabulary: stepbrief stands outside the words this tree writes. Wr"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: c00a2b08d314a1d09831dca7ff23b7c0719ef582
+    hash_after: c00a2b08d314a1d09831dca7ff23b7c0719ef582
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 597 test(s) pass in 72 file(s); green, src/imports passes; green, src/index passes; green, src/modules/check pass
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:346:1: ListItem: A sentence in a list item holds 20 words, and this one hold"
+    inputs:
+      - name: design/tests-red
+        hash: e5b36c0792060d5c
+        size: 1009
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 depends_on: ["brief-answers-off-the-door","prompt-answers-off-the-door","spawn-answers-off-the-door","clear-answers-off-the-door","level0-tools-leave-the-bridge","start-road-starts-the-index"]
+reason: done
 ---
 
 # Ask
@@ -352,26 +375,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The cage set now names every event the bridge table names, so under the `new` key each one posts to the hooks door. The brief, the canary debt, the clear and the helper layer answer there, off the five ports this group landed before. The bridge table still stands, and the next child removes it with the server.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The green commit adds the caged door case, which now sends the prompt to the hooks door.
+- The cage cases post over a fake fetch, and touch no server.
+- Each changed case names this ticket beside it.
+- The event list stands once in the cage set, and the bridge table leaves next.
 
 # accept
 

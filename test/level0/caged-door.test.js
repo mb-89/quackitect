@@ -147,8 +147,8 @@ test("a row another writer appends while the index falls stays in the session lo
   );
 });
 
-// [[spec/tickets/a-down-index-refuses-calls]]
-test("under new a tool call takes the hooks door effects, and a prompt still reaches the bridge", async () => {
+// [[spec/tickets/a-down-index-refuses-calls]] [[spec/tickets/the-brief-leaves-the-bridge]]
+test("under new a tool call takes the hooks door effects, and a prompt reaches the hooks door too", async () => {
   const box = caged();
   const posts = [];
   box.$.http = {
@@ -184,7 +184,12 @@ test("under new a tool call takes the hooks door effects, and a prompt still rea
     "with the token it names",
   );
   assert.equal(JSON.parse(posts[0].init.body).event, "tool.call");
-  assert.match(posts[1].url, /\/event$/, "and the prompt goes to the bridge");
+  assert.equal(
+    posts[1].url,
+    "http://127.0.0.1:7001/hook",
+    "and the prompt goes there too",
+  );
+  assert.equal(JSON.parse(posts[1].init.body).event, "prompt.context");
 });
 
 // [[spec/tickets/spoke-answer-reaches-the-door]]
