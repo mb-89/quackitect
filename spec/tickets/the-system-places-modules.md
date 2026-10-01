@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red-2
+step: gate
 steps:
   - name: design
     steps:
@@ -238,6 +238,25 @@ record:
   - step: design/tests-red-2
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/tests-red-2
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 3da46d7cb02e89689f5d31b614f939a6de05fbbe
+    hash_after: 3da46d7cb02e89689f5d31b614f939a6de05fbbe
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft-2
+        hash: 5dba2a0c6b222866
+        size: 5322
+      - name: [[spec/tickets/the-doors-process-stands]]
+        hash: a166f2553415d2a5
+        size: 402
+      - name: [[spec/design_output/model]]
+        hash: a4432019dfba878d
+        size: 74940
+    def: 9c7cd4dd4a2dadb8
 group: module-processes-land-in-shadow
 ---
 
@@ -458,7 +477,7 @@ The assumption: the `watch` caller of `Placements.Restart` lands with the switch
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-Each case fails on its own assertion over stubs that build. TestPlacementsAnswerInputsAndRunOnAMove meets the unbuilt bus at its run subject. The placements cases want the hooks listener left out, and the ticket instance under the topic verbs. One surprise: tickets and work register through withActions, a closure in package main, so a runtime lookup of their register function names main and no module folder. The implement step reads the topic off the inner register function, or the modules table carries the folder beside it.
+Each case fails on its own assertion over stubs that build. TestPlacementsAnswerInputsAndRunOnAMove meets the unbuilt bus at its run subject. The placements cases want the hooks listener left out, and the ticket instance under the topic verbs. One surprise: tickets and work register through withActions, a closure in package main, so a runtime lookup of their register function names main and no module folder. The implement step reads the topic off the inner register function, or the modules table carries the folder beside it. The model row the IO process ticket changed since touches no placement, so the cases stand as written.
 
 ### checked
 
