@@ -22,7 +22,7 @@ type Placed struct {
 	Restart   time.Duration
 	// Where a shadow hands each commit, which then lands nothing and marks nothing down. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
 	Heard func(instance string, values map[string]json.RawMessage)
-	// The module types of its instances, which a change under src/modules restarts. [[spec/design_output/model#a-module-rebuilds-alone]]
+	// The folders under src/modules registering its instances' module types, which a change there restarts. [[spec/design_output/model#a-module-rebuilds-alone]]
 	Topics []string
 	// The dog the process's lease stands with, and the term past a beat. A nil holds no lease. [[spec/tickets/watchdogs-span-the-processes]]
 	Watch Leases

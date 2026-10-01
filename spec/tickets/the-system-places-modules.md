@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -257,6 +257,30 @@ record:
         hash: a4432019dfba878d
         size: 74940
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box 36586c1b4c37 · claude-code-remote · helper-11
+    hash_before: 7e68426cafa15c8422c44b1e475907034fc629ae
+    hash_after: 7e68426cafa15c8422c44b1e475907034fc629ae
+    inputs:
+      - name: design/draft
+        hash: 4af7a4857425f5cc
+        size: 4143
+      - name: design/tests-red
+        hash: 2ab3d6eb6a4c64ce
+        size: 1078
+      - name: design/draft-2
+        hash: 5dba2a0c6b222866
+        size: 5322
+      - name: design/tests-red-2
+        hash: d15727cddba38168
+        size: 1122
+      - name: [[spec/tickets/the-doors-process-stands]]
+        hash: a166f2553415d2a5
+        size: 402
+      - name: [[spec/design_output/model]]
+        hash: a4432019dfba878d
+        size: 74940
+    def: 01417e29801ecc2f
 group: module-processes-land-in-shadow
 ---
 
@@ -496,13 +520,10 @@ Each case fails on its own assertion over stubs that build. TestPlacementsAnswer
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- placements-link-points-at-model: the approach links [[spec/design_output/model#the-placements]], a note that does not exist; the processes chapter stands in spec/design_output/model.md, so the link reads [[spec/design_output/model#the-placements]]. The write door refuses the ticket body at gate, so the move rides here.
-- placed-topics-name-module-folders: Placed.Topics carries module types (placements_test wants "tickets, queue"), while the watch change names a folder under src/modules/<topic>; several types share one folder (ticket, retro, branch, vehicle, stub in the verbs package), so Placements.Restart needs a map from module type to its folder, or a restart misses them.
-- placements-leave-door-instances: placing each instance whose module carries no start in the modules table of src/quack/main.go also places hooks, mcp, lsp, http and the settings sections, whose listeners the index manager's start opens; placementsOf leaves them out, per model#the-io-process.
-- placements-answer-inputs-tested: no red test decides the index side of step 3, Placements answering in.<instance> with the saved inputs and publishing run.<instance> after a commit moves an input; add a case in src/index/procs_test.go.
-- watch-restart-joins-switch: step 5 has the watch module call Placements.Restart on a change under src/modules/<topic>, while the assumption puts the rebuild with the switch; under shadow a restart reruns the same binary, so the watch caller (src/modules/files) belongs to the switch ticket, or the approach says why it lands now.
-- tests-list-matches-files: the draft's tests list names src/q/store_test.go, src/q/projection_test.go and src/quack/module_test.go, where the cases stand in src/q/start_test.go and src/quack/placements_test.go; the red list names the right files.
+accept with points
+- placements-select-off-the-table: step 2 places an instance that reads an input by Store.Inputs, but placementsOf takes no store, and the test wiring carries no wires, so queue.Places loads unwired and the ticket topic registers actions alone; the red placements cases want ticket, tickets and queue placed. Pick placed instances off the modules table (no start, not a door), and leave the config-only settings sections to the index.
+- placements-leave-http: step 2 leaves out hooks, mcp and lsp, while the http module is the /v1 door the index serves; leave http out beside them, as the first gate named.
+- topic-folder-in-the-table: a runtime lookup of the register function names main for tickets and work through withActions, and for log and work too, since the settings init wraps each section that shares a module's name in a closure of main; carry the folder in the modules table of src/quack/main.go beside registers, which the red case wanting topic verbs for ticket accepts.
 
 # implement
 
