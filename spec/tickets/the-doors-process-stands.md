@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -150,6 +150,27 @@ record:
         hash: 5a754c5b9e92ffff
         size: 167
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 03ba8e0fb2d4 · claude-code-remote · helper-3
+    hash_before: 28834b1b612c04d55117635cb75585294b3e7fcb
+    hash_after: 1a41464c2c8bbcffc11ab788612b050ecf7f9cf4
+    inputs:
+      - name: design/draft
+        hash: ae24a1e131bd583f
+        size: 4169
+      - name: design/tests-red
+        hash: c2dddd9a990e87a9
+        size: 1134
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/watchdogs-span-the-processes]]
+        hash: b10dd6eac949de7c
+        size: 309
+      - name: [[spec/tickets/hooks-listener-joins-io-process]]
+        hash: 5a754c5b9e92ffff
+        size: 167
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -285,8 +306,12 @@ Each new case fails on its own assertion over stubs that compile: the bus names 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- processes-links-point-at-model: the processes chapter now stands in model.md, and the-system-places-modules' lines still link spec/design_output/processes, in src/q/store.go, src/q/projection.go, src/index/procs.go and its ticket's approach; the gate pointed this ticket's own lines at model.md
+- fake-snapshot-stays-in-case: src/index/procs_test.go shares the package variable fakeSnap across cases, so two cases running beside each other read each other's snapshot; until hands each case its own
+- model-marks-io-names: model#a-process-ends says the IO process's exit restarts it, and names none of its names; the ask reads them at their built-in values marked not provided, so the table gains that row
 
 # implement
 
