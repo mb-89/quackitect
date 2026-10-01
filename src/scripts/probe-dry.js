@@ -18,6 +18,11 @@ const EVENT_WAIT = 240_000;
 // The owner's prompt reaches the hook as the client's composer sends it. [[spec/design_output/level0#which-prompt-opens-a-turn]]
 const OWNER = { kind: "composer" };
 const STREAMS = new Set(["turn.step"]);
+// The statuses a post answers with where it lands. [[spec/tickets/level0-runs-on-the-door]]
+const OK_FROM = 200;
+const OK_PAST = 300;
+// The characters a line of evidence shows. [[spec/tickets/level0-runs-on-the-door]]
+const SHOWN = 160;
 const CANARY_LINE = /level0 holds this session: \d+ rules?, \d+ notes?, the stop hook (?:on|off)\./;
 
 // [[spec/tickets/level0-runs-on-the-door]]
@@ -70,7 +75,7 @@ export function harnessOf(it, tree, env) {
         seen.posts.push({ url: String(url), event: eventOf(init.body) });
         const said = await it.http.send(String(url), init);
         return {
-          ok: said.status >= 200 && said.status < 300,
+          ok: said.status >= OK_FROM && said.status < OK_PAST,
           status: said.status,
           text: said.text,
         };
@@ -133,7 +138,7 @@ export function engineOf(register, options = {}) {
 async function session(it, tree) {
   const env = { CLAUDE_CODE_REMOTE: "true", CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1" };
   const { $, seen } = harnessOf(it, tree, env);
-  const loaded = await import(`${fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE))}?dry=${Date.now()}`);
+  const loaded = await import(fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE)));
   const engine = engineOf(loaded.register, {});
   const raise = (event, e, last = async (said) => ({ passed: said }), origin) =>
     bounded(engine.raise($, event, e, last, origin), EVENT_WAIT);
@@ -267,5 +272,5 @@ function quietRun(rows, seen) {
   return { pass: true, evidence: `${seen.posts.length} post(s), every one to the hooks door` };
 }
 
-const firstOf = (text) => tail(String(text ?? "").split("\n")[0]).slice(0, 160);
+const firstOf = (text) => tail(String(text ?? "").split("\n")[0]).slice(0, SHOWN);
 const shown = (said) => firstOf(JSON.stringify(said ?? null));

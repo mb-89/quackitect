@@ -109,12 +109,12 @@ test("a read the door holds for an answer the chat never showed fails the guard"
 test("the engine wraps each registration around the ones after it, reads a filter, and keeps a stream to its own", async () => {
   const order = [];
   const engine = engineOf((on) => {
-    on("*", async ($, e, next) => {
+    on("*", async (_$, e, next) => {
       order.push(`all:${next.event}`);
       return next({ ...e, seen: true });
     });
     on("tool.call", { tool: "pull" }, async () => ({ result: "pulled" }));
-    on("turn.step", async function* ($, e, next) {
+    on("turn.step", async function* (_$, e, next) {
       for await (const one of next(e)) yield { ...one, through: true };
     });
   });

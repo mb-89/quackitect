@@ -108,7 +108,7 @@ export function readsCold(rows, steps) {
   ];
 }
 
-// A cold start may fall once before its door stands, and no row says the server answers nothing once the rules reached the session. [[spec/tickets/level0-runs-on-the-door]]
+// A cold start falls at most once before its door stands, and no row says the server answers nothing once the rules reached the session. [[spec/tickets/level0-runs-on-the-door]]
 function quietOnce(rows) {
   const ruled = rows.findIndex((one) => one.kind === "context");
   if (ruled < 0) return { pass: false, evidence: "no context row" };

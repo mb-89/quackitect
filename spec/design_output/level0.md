@@ -2018,9 +2018,7 @@ the span counts from the last change the wait sees. The process door's
 
 `wait.most` in `spec/config/level0.json` caps the wait in seconds. The wait
 looks at its signals once a second, and the clock decides the rest, so a case
-drives it on the fake clock.
-
-The bridgehead stamps a wait with `since`, the moment of its first post, and
+drives it on the fake clock. The bridgehead stamps a wait with `since`, the moment of its first post, and
 posts it again under the same stamp where the host cuts it. The box keeps the
 watch a stamp begins, so a post again carries on its signals, and the cap
 counts from `since`. The older loop ends once a later post takes the watch.
