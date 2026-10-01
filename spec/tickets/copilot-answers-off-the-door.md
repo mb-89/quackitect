@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: a84f8bf83eb50a08
         size: 4588
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 56761736cd8ab80959714816d6de1d2fcc1d279b
+    hash_after: 56761736cd8ab80959714816d6de1d2fcc1d279b
+    inputs:
+      - name: design/draft
+        hash: a84f8bf83eb50a08
+        size: 4588
+      - name: design/tests-red
+        hash: c749736e2298d85e
+        size: 960
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -312,8 +324,10 @@ the cases reach a fake standing file and a fake door through the it the adapter 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- copilot-tool-wait-moves: src/scripts/copilot.js imports `TOOL_WAIT` from copilot-runtime.js beside `handle`, so the wait moves into lib/copilot.js before the runtime leaves
 
 # implement
 
