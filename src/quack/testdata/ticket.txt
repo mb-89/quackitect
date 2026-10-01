@@ -1,0 +1,1 @@
+A seeded private ticket, which the round trip reads.

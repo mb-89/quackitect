@@ -13,7 +13,7 @@ import * as findings from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
 // The whole module, so a name the command line answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
 import * as reading from "../../src/scripts/cli-read.js";
-import { privateRow, serverFaults } from "../../src/scripts/cli-served.js";
+import { sweepRowsOf } from "../../src/scripts/quack-topic.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -47,8 +47,8 @@ test("the guard hands nothing where no binary stands, and the path where one doe
   assert.equal(findings.biomeFor(standing, "/tree", {}), at);
 });
 
-// The lint reads the server's list and the rules it holds nowhere yet, and each row once. [[spec/design_output/lsp#a-port-serves-the-list]]
-test("the lint reads each row of the server's list once", async () => {
+// The lint reads the tools' rows and the check module's sweep, and each row once. [[spec/tickets/the-lsp-server-leaves]]
+test("the lint reads each row of the sweep once", async () => {
   assert.equal(typeof findings.linesNamed, "function", "the reader answers linesNamed");
   assert.equal(
     typeof reading.readingFor,
@@ -56,14 +56,15 @@ test("the lint reads each row of the server's list once", async () => {
     "the command line answers readingFor",
   );
 
-  // One file proves the contract, and the language server reads it once, because a sweep over a folder costs the battery seconds and proves no more. [[spec/tickets/one-reading-proves-one-file]]
+  // One file proves the contract, and quack reads the sweep once, because a sweep over a folder costs the battery seconds and proves no more. [[spec/tickets/one-reading-proves-one-file]]
   const file = "spec/guidance/working.md";
-  const served = (await serverFaults([file])) ?? [];
-  const printed = await reading.readingFor([file], served);
-  const alone = findings.aloneOver({ disk: files, join, root }, [file]);
+  const doors = await reading.findingsDoors();
+  const swept = sweepRowsOf(doors, [file]) ?? [];
+  const printed = await reading.readingFor([file], swept);
+  const tools = await findings.findingsOver(doors, [file]);
 
   const check = findings.linesNamed(printed.found);
-  assert.deepEqual(check, findings.linesNamed([...served, ...alone]));
+  assert.deepEqual(check, findings.linesNamed([...tools.found, ...swept]));
   assert.equal(new Set(check).size, check.length, "no row reads twice");
 });
 
@@ -97,7 +98,10 @@ test("a closed ticket carrying when returned meets the schema, and its rows leav
     .names("spec/tickets", ".md")
     .map((name) => `spec/tickets/${name}`)
     .filter((path) => /^\s+when: returned$/m.test(tree.read(path)));
-  assert.ok(carrying.length > 0, "the tree holds closed tickets carrying when returned");
+  assert.ok(
+    carrying.length > 0,
+    "the tree holds closed tickets carrying when returned",
+  );
   const rows = carrying.flatMap((path) =>
     checkNote(tree.read(path), ticket, path, schemas),
   );
@@ -110,14 +114,6 @@ test("a closed ticket carrying when returned meets the schema, and its rows leav
     assert.match(tree.read(path), /^state: closed$/m, `${path} stands closed`);
   }
   assert.deepEqual(findings.pastHistory(at, rows), []);
-});
-
-// [[spec/design_output/lsp#a-port-serves-the-list]]
-test("a row on a private note holds no push", () => {
-  assert.equal(privateRow(".se/tickets/a-note.md"), true);
-  assert.equal(privateRow(".se\\tickets\\a-note.md"), true);
-  assert.equal(privateRow("spec/tickets/a-note.md"), false);
-  assert.equal(privateRow(".semantic/a.md"), false);
 });
 
 // The rule the ask asks for, read off the note that ships. [[spec/tickets/a-claim-meets-the-view]]

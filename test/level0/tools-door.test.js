@@ -13,6 +13,8 @@ import {
   onSessionStart,
   TOOLS_BLOCK,
 } from "../../src/bridge/guidance.js";
+import { onDescribe } from "../../src/bridge/bash.js";
+import { indexToolsOf } from "../../src/bridge/index-tools.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -70,39 +72,52 @@ test("a surveyed box reads the file and runs nothing", () => {
 
   const tools = blocksOf(it).find((one) => one.name === TOOLS_BLOCK);
 
-  const surveyed = it.proc.ran.filter((one) => !one.argv.includes("help"));
+  const surveyed = it.proc.ran.filter((one) => !one.argv.includes("tools"));
   assert.equal(surveyed.length, 0, "the survey stays as it stands");
   assert.match(tools.text, /- `vale` 3\.20\.0, for the prose rules/);
   assert.doesNotMatch(tools.text, /`node`/);
 });
 
-// The help rows stand as the one source of the verbs, so a fresh session reads each verb's usage in the block. [[spec/tickets/the-verbs-need-no-wrapper]]
-test("the tools block names each verb of the command line with its usage line", () => {
+// The index's tool list stands as the one source of the verbs, so a fresh session reads each verb as the tool it calls. [[spec/tickets/agents-call-quack-directly]]
+test("the tools block names each verb as the index tool standing for it", () => {
   const survey = JSON.stringify({ vale: { path: "/usr/bin/vale", version: "3.20.0" } });
-  const help = [
-    "Usage: ./RUNME.sh <verb> [path ...]",
-    "",
-    "  check      the tests, the doors, the server, then the rules over the tree",
-    "  lint       the rules over the tree, or over what you name",
-  ].join("\n");
+  const listed = JSON.stringify([
+    {
+      name: "index_verb_check",
+      description: "the tests, the doors, the server, then the rules over the tree",
+    },
+    { name: "index_ticket_pull", description: "take the next leaf of this group" },
+  ]);
   const it = box(
     { [at(TOOLS)]: survey },
-    { [`node ${ROOT}/src/scripts/cli.js help`]: { stdout: help } },
+    { [`${ROOT}/.se/.runtime/bin/se-index tools`]: { stdout: listed } },
   );
-  it.node = "node";
 
   const tools = blocksOf(it).find((one) => one.name === TOOLS_BLOCK);
 
   assert.match(tools.text, /# The verbs/);
   assert.match(
     tools.text,
-    /- `\.\/RUNME\.sh check`: the tests, the doors, the server, then the rules over the tree/,
+    /- `mcp__level0__index_verb_check`: the tests, the doors, the server, then the rules over the tree/,
   );
   assert.match(
     tools.text,
-    /- `\.\/RUNME\.sh lint`: the rules over the tree, or over what you name/,
+    /- `mcp__level0__index_ticket_pull`: take the next leaf of this group/,
   );
-  assert.doesNotMatch(tools.text, /Usage:/, "the usage head stays out");
+  assert.doesNotMatch(tools.text, /\.\/RUNME\.sh/, "the block names no shell verb");
+});
+
+// A binary answering no list leaves the part out, since the hook registers no tool there. [[spec/tickets/agents-call-quack-directly]]
+test("the tools block leaves the verbs out where the index lists no tool", () => {
+  const survey = JSON.stringify({ vale: { path: "/usr/bin/vale", version: "3.20.0" } });
+  const it = box(
+    { [at(TOOLS)]: survey },
+    { [`${ROOT}/.se/.runtime/bin/se-index tools`]: { exitCode: 1 } },
+  );
+
+  const tools = blocksOf(it).find((one) => one.name === TOOLS_BLOCK);
+
+  assert.doesNotMatch(tools.text, /# The verbs/);
 });
 
 // [[spec/design_output/level0#a-spawn-names-its-tier]]
@@ -137,4 +152,34 @@ test("a helper's spawn writes the model it runs on to the log", () => {
   assert.equal(row?.[0], "info");
   assert.match(row?.[2] ?? "", /spawns on haiku/);
   assert.equal(row?.[3]?.detail, "find the callers");
+});
+
+// The Bash description reads the box's tool list, so it names the tool the session holds. [[spec/tickets/describe-reaches-the-tool-list]]
+test("the Bash description names the tools the box's index lists", () => {
+  const listed = JSON.stringify([
+    { name: "index_verb_check", description: "the check" },
+  ]);
+  const it = box(
+    {},
+    { [`${ROOT}/.se/.runtime/bin/se-index tools`]: { stdout: listed } },
+  );
+
+  const said = onDescribe({ tool: "Bash" }, it).after.description;
+
+  assert.match(said, /mcp__level0__index_verb_check/);
+  assert.doesNotMatch(said, /\.\/RUNME\.sh check/);
+});
+
+// The list reads once a box, so a second surface asks no second process. [[spec/tickets/describe-reaches-the-tool-list]]
+test("the tool list reads once a box", () => {
+  const listed = JSON.stringify([
+    { name: "index_verb_check", description: "the check" },
+  ]);
+  const it = box(
+    {},
+    { [`${ROOT}/.se/.runtime/bin/se-index tools`]: { stdout: listed } },
+  );
+
+  assert.equal(indexToolsOf(it), indexToolsOf(it));
+  assert.equal(it.proc.ran.length, 1);
 });

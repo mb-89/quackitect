@@ -40,9 +40,8 @@ function harness() {
 }
 
 // The engine takes one session start a module and counts them in the source. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-test("the module registers one session start, and it registers the pull tool and the read tools", async () => {
+test("the module registers one session start, and it registers the pull tool first", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
-  const { READ_TOOLS } = await import("../../.claude/skills/level0/hooks/level0.js");
   const counts = {};
   const starts = [];
   register((event, ...rest) => {
@@ -60,7 +59,6 @@ test("the module registers one session start, and it registers the pull tool and
     async (said) => said,
   );
   assert.equal(registered[0], "pull", "the pull tool registers first");
-  for (const one of READ_TOOLS) assert.ok(registered.includes(one.name), one.name);
 });
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -232,7 +230,11 @@ test("the pull hook matches the level zero call, and runs the script the method 
     },
   };
   assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
-  assert.deepEqual(ran[0].slice(0, 2), ["node", "/vehicle/src/scripts/cli.js"]);
+  assert.deepEqual(ran[0].slice(0, 3), [
+    "node",
+    "/vehicle/src/scripts/verbs/ticket.js",
+    "pull",
+  ]);
 });
 
 // The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]

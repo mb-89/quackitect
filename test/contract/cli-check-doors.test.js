@@ -7,7 +7,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { PANEL, PORT_WAIT } from "../../src/scripts/cli-served.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const source = disk().read(join(root, "src", "scripts", "cli-check.js"));
@@ -32,36 +31,17 @@ test("the commit verb's doors carry the client and the pid the cold probe takes"
 // Under `check --errors` the Go run stays quiet, and each failing Go test reaches the error stream. [[spec/tickets/the-verbs-need-no-wrapper]]
 test("the Go part runs quiet under --errors, and names each failing Go test on the error stream", () => {
   const part =
-    /export function goHolds\(quiet = false, red = \[\]\)[\s\S]*?\n}\n/.exec(source)?.[0] ?? "";
+    /export function goHolds\(quiet = false, red = \[\]\)[\s\S]*?\n}\n/.exec(
+      source,
+    )?.[0] ?? "";
   assert.match(part, /inherit: !quiet/, "a quiet run keeps its output");
   assert.match(part, /--- FAIL/, "and reads the failing tests off it");
   assert.match(part, /console\.error\(/, "onto the error stream");
-});
-
-// One place owns the server's list, and the check's module reads it from there. [[spec/design_output/lsp#a-port-serves-the-list]]
-test("the server's list stands in cli-served alone", () => {
-  assert.doesNotMatch(source, /function serverFaults\(/, "the check holds no copy");
-  const served = disk().read(join(root, "src", "scripts", "cli-served.js"));
-  assert.match(served, /export async function serverFaults\(/);
-});
-
-// A Go module exports nothing to JavaScript, so the copies in cli-served meet their owners in port.go here. [[spec/tickets/each-fact-keeps-one-owner]]
-test("the panel pointer and the port wait match pointerPath and settleWait in port.go", () => {
-  const port = disk().read(join(root, "src", "lsp", "port.go"));
-  const joined =
-    /func pointerPath\(root string\) string \{\s*return filepath\.Join\(root, ([^)]*)\)/.exec(
-      port,
-    );
-  assert.ok(joined, "pointerPath joins its segments onto the root");
-  const segments = [...joined[1].matchAll(/"([^"]+)"/g)].map((one) => one[1]);
-  assert.equal(segments.join("/"), PANEL, "PANEL spells the path pointerPath writes");
-  const wait = /settleWait\s*=\s*(\d+)\s*\*\s*time\.(Minute|Second)/.exec(port);
-  assert.ok(wait, "settleWait reads as a count of minutes or seconds");
-  const unit = { Minute: 60_000, Second: 1_000 }[wait[2]];
-  assert.equal(
-    Number(wait[1]) * unit,
-    PORT_WAIT,
-    "PORT_WAIT waits as long as settleWait",
+  // [[spec/tickets/go-checks-need-go]]
+  assert.match(
+    part,
+    /goGate\(\{[^}]*\bskip\b[^}]*\}\)/,
+    "and hands the gate the skip of the red tests",
   );
 });
 

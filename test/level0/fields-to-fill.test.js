@@ -1,23 +1,19 @@
 // The marks over the fields a person's hold still wants: the host over a fake
-// door, and the editor door over a stand-in for vscode. The host reads the
-// route, the chapter and the headings through the real modules the door
-// imports, so every case reads what a take leaves on the ticket.
-// [[spec/design_output/extension#a-take-marks-the-fields]]
+// index, and the editor door over a stand-in for vscode. The fake index draws
+// the saved ticket as tickets/drawn does, so every case reads what a take
+// leaves on the ticket.
+// [[spec/tickets/the-lens-reads-v1]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import * as schema from "../../.claude/skills/level0/lib/schema.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { editorRequire } from "../../src/doors/fake/vscode.js";
 import { activate } from "../../src/extension/extension.js";
-import { EMITTER } from "../../src/extension/lib/drawing.js";
-import { CHAPTER, ROUTE, fieldMarksOf } from "../../src/extension/lib/fields.js";
-import { HOLDS } from "../../src/extension/lib/lens.js";
-import { SCHEMA } from "../../src/extension/lib/route-host.js";
-import * as emitter from "../../src/scripts/graph.js";
-import * as chapter from "../../src/scripts/pull-chapter.js";
-import * as route from "../../src/scripts/pull-route.js";
+import { fieldMarksOf } from "../../src/extension/lib/fields.js";
+import { v1Over } from "./v1-index.js";
 
+const HOLDS = ".se/.runtime/hold";
+const STANDING = "holds/standing";
 const PATH = "spec/tickets/one.md";
 const HOLD = { ticket: "one", step: "implement/tests-red", hand: "person a-desk" };
 const HOLD_FILE = `${HOLDS}/person-a-desk.json`;
@@ -78,28 +74,16 @@ const TEXT = [
 ].join("\n");
 
 const lineOf = (text, heading) => text.split("\n").indexOf(heading) + 1;
-const MODULES = {
-  [ROUTE]: route,
-  [CHAPTER]: chapter,
-  [SCHEMA]: schema,
-  [EMITTER]: emitter,
-};
 
+// The saved ticket stands on the disk, since the index draws the file. [[spec/tickets/the-lens-reads-v1]]
 function doorOf(seed = {}) {
-  const files = fakeDisk(seed);
+  const files = fakeDisk({ [PATH]: TEXT, ...seed });
   const said = { marks: [], jumps: [] };
   return {
     files,
     said,
-    list: async (folder) =>
-      [...files.files.keys()]
-        .filter((one) => one.startsWith(`${folder}/`))
-        .map((one) => one.slice(folder.length + 1)),
+    index: v1Over(files),
     read: async (path) => (files.exists(path) ? files.read(path) : ""),
-    imports: async (path) => {
-      if (!MODULES[path]) throw new Error(`no module stands at ${path}`);
-      return MODULES[path];
-    },
     marksFields: (path, marks) => said.marks.push([path, marks]),
     jumps: async (path, line) => said.jumps.push([path, line]),
   };
@@ -326,6 +310,7 @@ test("a field filled in loses its mark", async () => {
     "<!-- the tests you write fail on their own assertion -->\n",
     "<!-- the tests you write fail on their own assertion -->\n\n    node --test test/level0/fields-to-fill.test.js\n",
   );
+  door.files.write(PATH, filled);
   await host.sees(PATH, filled);
   assert.deepEqual(named(lastMarks(door)), [
     ["checked", lineOf(filled, "## tests-red")],
@@ -346,22 +331,15 @@ test("the door lists nothing in the Problems panel", async () => {
 });
 
 // [[spec/design_output/extension#a-take-marks-the-fields]]
-test("a start hands the marks the ticket text and the hold watch", async () => {
-  const disk = fakeDisk({
+test("a start hands the marks the ticket and the hold watch", async () => {
+  const door = doorOf({
     "spec/config/level0.schema.json": JSON.stringify({
       type: "object",
       properties: {},
     }),
     ...held(),
   });
-  const door = doorOf();
-  door.files = disk;
-  door.list = async (folder) =>
-    [...disk.files.keys()]
-      .filter((one) => one.startsWith(`${folder}/`))
-      .map((one) => one.slice(folder.length + 1));
-  door.read = async (path) => (disk.exists(path) ? disk.read(path) : "");
-  const watched = [];
+  const disk = door.files;
   const events = { editors: [], changes: [] };
   Object.assign(door, {
     holds: () => true,
@@ -371,7 +349,6 @@ test("a start hands the marks the ticket text and the hold watch", async () => {
     shows: () => {},
     toasts: () => {},
     write: async (path, text) => disk.write(path, text),
-    watch: (paths, run) => watched.push({ paths, run }),
     registerView: () => {},
     page: () => null,
     panel: () => ({
@@ -388,12 +365,20 @@ test("a start hands the marks the ticket text and the hold watch", async () => {
 
   await events.editors[0](PATH, TEXT);
   assert.equal(named(lastMarks(door)).length, 2, "an opened ticket takes its marks");
-  await events.changes[0](PATH, TEXT.replace("### tests", "### tested"));
-  assert.equal(lastMarks(door)[0].name, "tests", "a change draws the marks again");
+  const renamed = TEXT.replace("### tests", "### tested");
+  disk.write(PATH, renamed);
+  await events.changes[0](PATH, renamed);
+  assert.deepEqual(
+    named(lastMarks(door))[0],
+    ["tests", lineOf(renamed, "## tests-red")],
+    "a change draws the marks again, off the saved file",
+  );
 
-  const holds = watched.find((one) => one.paths.some((path) => path.startsWith(HOLDS)));
-  assert.ok(holds, "the marks watch the holds");
+  assert.ok(
+    door.index.watches.some((one) => one.names.includes(STANDING)),
+    "the marks watch the holds",
+  );
   disk.remove(HOLD_FILE);
-  await holds.run();
+  await door.index.fire(STANDING);
   assert.deepEqual(lastMarks(door), []);
 });

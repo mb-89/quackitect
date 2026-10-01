@@ -1,5 +1,5 @@
 // The stamp the check leaves: the battery run in order, each part timed, and
-// the record a door reads before a push. The check verb in cli.js calls it.
+// the record a door reads before a push. The check verb in check-verb.js calls it.
 // [[spec/design_output/work#the-battery-answers-first]]
 
 import { join } from "node:path";

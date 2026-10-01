@@ -119,17 +119,16 @@ two-way watching carries.
 
 ## A click writes the file
 
-The sidebar writes `.se/.runtime/config.json` and that file alone. A row under the
-tracked file shows the team's value. Typing there writes an override, so the
-tracked file stays as the team holds it.
+A click posts `config/override` with the key, the typed value and the window,
+and the sidebar writes no file. A row under the tracked file shows the team's
+value, and the tracked file stays as the team holds it.
 
-`withValue` reads the file, sets one key, and writes the whole text back. The
-shape it writes is the shape the tracked file holds. The value takes the type
-the schema says, so `"5"` from a select lands as the number `5`. That keeps
-`"5" > 3` a bug nobody files. A key the schema leaves alone lands as the text a
-person types.
+The config module holds the override for the window. `literalOfText` in
+`src/modules/config/config.go` reads the value as JSON where it parses, so `5`
+from a select lands as the number `5`, and other text lands as text.
+[[spec/tickets/the-sidebar-writes-through-actions]]
 
-## The local file dies
+## A new window drops overrides
 
 A session is one window. The main process of the editor outlives a window
 reload and dies on a quit, so `process.ppid` draws that line:
@@ -140,14 +139,13 @@ reload and dies on a quit, so `process.ppid` draws that line:
 | Developer, Reload Window | no |
 | the engine restarts | no |
 
-The id stands beside the values as `session.pid`. A view opening under an id
-that differs writes a file holding the new id and `engine.binding` alone. So a
-hold lasts as long as the window a person sets it in, and the binding holds
-until the owner changes it.
+A view opening under a new id posts `config/opened` with that id. The config
+module drops every override another window holds, and writes no file. So a
+click lasts as long as its window, and a value the owner writes into the local
+file by hand survives a new window.
 
-A cloud box proves the rule and a person proves the id. `opened` answers what
-one id clears, and the reload row above waits for the first person to open the
-folder.
+A cloud box proves the rule and a person proves the id. The reload row above
+waits for the first person to open the folder.
 
 # Declaration to HTML
 
@@ -342,8 +340,9 @@ the keys that program needs, and the declaration carries them beside the
 
 The hook stands before the log in the agent control, and it is a `process`
 widget: a button for a program the extension itself runs. A click starts the
-server behind the bridgehead as a child of the extension, and a click on a
-running one kills it. Shift and click starts it under the editor's debugger,
+server behind the bridgehead apart from the window, through the proc door's `respawn`. A
+click on a running one stops it over the wire. The server outlives the
+window, and the next window adopts it. Shift and click starts it under the editor's debugger,
 through the launch config the declaration names. The light says which: dark
 for nothing, green for the server, amber for the server under the debugger.
 
@@ -361,14 +360,13 @@ server. For details, see
 
 ## The light follows the server
 
-A server restarts itself when its code moves, and the child the button starts
-ends there. A person or an agent starts one by hand too. So the light reads the
-server, and no child alone:
+A server restarts itself when its code moves, and a person or an agent starts
+one by hand too. So the light reads the server, and no start alone:
 
 | what happens | what the light does |
 |---|---|
 | a line lands in `.se/.log/serve.log`, which every start writes | asks `/health`, takes a server that answers, and drops an adopted one that answers nothing |
-| the button's own child ends | goes dark, and asks again after the respawn's grace |
+| the button's own start falls inside its window | goes dark, and a warning names the log |
 | a debug session ends | goes dark, the way the debugger says |
 
 `rechecks` in `src/extension/editor-process.js` holds it, and one watch on the
@@ -634,7 +632,7 @@ counts, the way [[spec/design_output/pull#the-hand-rule]] reads it.
 
 ## A button runs the pull
 
-Each button runs `ticket pull` through `src/scripts/cli.js` of the method, as a
+Each button runs `pull` through `src/scripts/verbs/ticket.js` of the method, as a
 child of the extension:
 
 | the button | the line |
@@ -651,6 +649,23 @@ of [[spec/design_output/pull#the-answers]] stands in a notification, and a
 refusal takes the warning colour. The whole answer stands in the output
 channel `quackitect`. Then the buttons draw again, and a change under
 `.se/.runtime/hold` draws them too.
+
+## The views section
+
+The sidebar draws one section for each base file under `spec/views`, below the
+groups. The base file names what shows. The catalog says how each thing reads.
+For the keys, see [[spec/design_output/model#views]].
+
+| part | reads off |
+|---|---|
+| the badge and its icon | the `index/names` row of the name under `badge` |
+| a button's label, doc and icon | the `index/actions` row of its action |
+| a form's fields | the input fields of that row, where the button carries `edits: form` |
+
+The index door in `src/extension/editor-index.js` reads both rows over `/v1`,
+at the port the index's standing file names. A click posts the kind `call`, and
+the door posts the action with the fields of its row. Where no index stands,
+each section draws its base names alone, and the groups above stand whole.
 
 ## The child names no harness
 

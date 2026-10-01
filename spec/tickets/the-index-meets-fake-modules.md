@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -114,11 +114,109 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
+step: implement/tests-green
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-foundation-closes-its-gaps
 depends_on: [commits-name-their-writer]
+record:
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 96ea8711eb32c62c8b2d3bae76e8f7f64bf2a4e9
+    hash_after: 96ea8711eb32c62c8b2d3bae76e8f7f64bf2a4e9
+    inputs:
+      - name: ask
+        hash: 19410b7019023e83
+        size: 834
+      - name: [[spec/design_output/model]]
+        hash: eb315d7a681bc4e4
+        size: 74362
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 6dd7f9919826ca01c96a0207d2f8678625e7be45
+    hash_after: 6dd7f9919826ca01c96a0207d2f8678625e7be45
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q/qtest fails
+    inputs:
+      - name: design/draft
+        hash: f01d0e05c0bba219
+        size: 2745
+    def: 08e16d07b0de477c
+  - step: design/draft
+    hand: the engine
+    stale: [[spec/design_output/model]]
+  - step: design/draft
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0d4a5dfc38607b03fc6249d821d531a70722c187
+    hash_after: 0d4a5dfc38607b03fc6249d821d531a70722c187
+    inputs:
+      - name: ask
+        hash: 19410b7019023e83
+        size: 834
+      - name: [[spec/design_output/model]]
+        hash: 1717325681c1003e
+        size: 74654
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 0417f8c70166e0264d5407c88ddf415cfa9883fd
+    hash_after: 0417f8c70166e0264d5407c88ddf415cfa9883fd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/q/qtest fails
+    inputs:
+      - name: design/draft
+        hash: f01d0e05c0bba219
+        size: 2745
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2ac6b84cc · claude-code-remote · helper-6
+    hash_before: b0d1c74b368279ff0ca4d53063bc3f9e675614f2
+    hash_after: b0d1c74b368279ff0ca4d53063bc3f9e675614f2
+    inputs:
+      - name: design/draft
+        hash: f01d0e05c0bba219
+        size: 2745
+      - name: design/tests-red
+        hash: 61906c0f6f79e944
+        size: 968
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: 435505e00df89daa7ed844c70f5e0006632dac4d
+    hash_after: 435505e00df89daa7ed844c70f5e0006632dac4d
+    answered:
+      - name: lint
+        exit: 0
+        said: green, src/q/qtest passes; green, src/modules/index passes
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2ac6b84cc · claude-code-remote
+    hash_before: c9c24baa843f327d220f1e3f7427c1a69ba3d2fd
+    hash_after: c9c24baa843f327d220f1e3f7427c1a69ba3d2fd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q/qtest passes; green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-index-meets-fake-modules.md:340:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 61906c0f6f79e944
+        size: 968
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -155,38 +253,65 @@ The index then tests against the contract its modules see. A change to the core 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A scripted fake module stands in src/q/qtest/module.go. A script names an instance, its type, its out-ports with their built-in values, its in-ports, and its actions with their writes flag and the requests each answers.
+Its types map hands q.Start the registration of each type, so the wiring loads fake modules the way it loads real ones. Each out-port registers through q.OutIn, each in-port through a derived provider that echoes it, and each action through q.ActionIn.
+The cases of the q core stand in src/q/qtest/module_test.go, since package q cannot import qtest. They drive q.Start, Store.Commit, Store.Run, Store.OnCommit and Store.Down over the fake.
+The cases of the manager stand in src/modules/index/module_test.go. They drive Call and the Book's writer queue, and the dog's lease, over the same fake.
+Weighed: a scripted module in qtest against ad-hoc types per case, as src/q/start_test.go writes them now. One script keeps every transaction on one contract, so a change to the core shows across the cases at once.
+Assumed: a port holds an int, since the cases read transactions and no value shape. Assumed: the fake module fakes no outside world, so it keeps no contract suite of its own.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/q/qtest/module.go: Module and its Types, which the new cases call
+src/q/wiring.go: Start, which loads the fake's types, unchanged
+src/modules/index/call.go: Call, which runs the fake's actions, unchanged
+src/modules/index/lease.go: NewDog, which marks the fake's part stale, unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+./...: go test ./... from the root
+src/q/qtest/module_test.go: TestTheWiringResolvesFakeModulesInTwoPasses
+src/q/qtest/module_test.go: TestAnOpenInPortRefusesNamingTheReaderAndTheName
+src/q/qtest/module_test.go: TestAWriteOfAPortTheModuleRegistersNowhereRefuses
+src/q/qtest/module_test.go: TestARunReadsOneSnapshotCommitsAndPushes
+src/q/qtest/module_test.go: TestAFakeModuleRunningNowhereReadsNotProvided
+src/modules/index/module_test.go: TestAnExpiredLeaseMarksTheFakeModulesPortStale
+src/modules/index/module_test.go: TestWritingActionsOfAFakeModuleRunOneAtATime
+src/modules/index/module_test.go: TestAReadAnswersWhileAFakeWriterRuns
+RUNME.sh: ./RUNME.sh check
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/q/qtest/module.go
+src/q/qtest/module_test.go
+src/modules/index/module_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+I opened wiring.go for Start and Load, store.go for Commit, Run, OnCommit, Down and Stale, action.go, ops.go for Next, call.go for Call, lease.go for NewDog, and qtest, and checked each claim there.
+The approach changes no production function, so the callers list names the functions the new cases drive.
+Each done_when line names its case in the tests list, and go test and the check decide the first and the last.
 
 ## tests-red
 
@@ -195,26 +320,34 @@ The index then tests against the contract its modules see. A change to the core 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/qtest/module_test.go src/modules/index/module_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/q/qtest/module_test.go
+src/modules/index/module_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each of the eight cases fails on its own assertion over the stub, which registers nothing. The q cases read no active provider of w/out, the open in-port case reads no refusal, and the manager cases read no action named save.
+The surprise: go vet refuses an unkeyed q.Instance outside package q, so the fake's wiring names its fields where start_test.go leaves them bare.
+The fake's names stand unbound where no wiring loads it, so the manager cases read out and save, where the q cases read w/out and r/seen.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+Each of the six middle done_when lines meets its case in the two red files, and go test and the check decide the first and the last.
+The store, the book and the dog stand in memory, and the fake module stands in for every module, so no door needs a fake of its own.
 
 # gate
 
@@ -223,8 +356,11 @@ The index then tests against the contract its modules see. A change to the core 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- fake-registrations-carry-a-doc: q.Start runs c.Undescribed, so each out-port, derived seen and action the fake registers carries a q.Doc, or the start refuses with NoDoc; the builder adds it in src/q/qtest/module.go
+- the-reader-hand-holds-its-seen: Register answers the hand of the script's out-port alone, so Hands["reader"] stands empty and the write-refusal case reads a bare hand; Register answers the reader the hand of its derived seen, so the refusal reads a module registering other ports and no w/out
 
 # implement
 
@@ -235,14 +371,19 @@ The index then tests against the contract its modules see. A change to the core 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+    go vet ./... && ./RUNME.sh branch test src/q/qtest/module_test.go src/modules/index/module_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q/qtest/module.go alone, the file the draft names
+- the fake module is itself the fake, and it reaches no door
+- the file's header points at the model section the fake module implements
+- every registration carries its doc once, and the fake adds no fact another file holds
 
 ## tests-green
 
@@ -251,26 +392,33 @@ The index then tests against the contract its modules see. A change to the core 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test src/q/qtest/module_test.go src/modules/index/module_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The fake module in `src/q/qtest/module.go` now registers what its script names. Each module registers an output `out`, a derived `seen` reading its in-port, and each scripted action, each with a doc. `Modules` hands each type the writer its registration answers, so the reader holds the writer of `seen` and no writer of the writer's `out`. The index's own cases now drive the wiring passes, the open in-port refusal, a refused write, one snapshot a run, a stale port past a lease, and one writing action at a time over it. No production code changes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches src/q/qtest/module.go alone
+- the fake module reaches no door
+- the file's header points at the model section it implements
+- no fact the change adds stands in a second place
 
 # accept
 

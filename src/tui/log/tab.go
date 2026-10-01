@@ -1,5 +1,5 @@
-// The log tab. It reads the session log the window is handed, follows every
-// line that lands, starts again when a new session rotates the file, and
+// The log tab. It reads the session rows log/rows answers, follows every row
+// the watch hands over, starts again when a new session rotates the file, and
 // draws the rows under the column names with a floor, a filter and an order.
 // [[spec/design_output/tui#the-viewer]]
 
@@ -16,6 +16,7 @@ import (
 
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
+	"quackitect/src/tui/registry"
 )
 
 const (
@@ -40,35 +41,33 @@ type Tab struct {
 	SortAt   int
 	SortDown bool
 	Filter   draw.Filter
-	Tailer   *tailer
 	Err      error
+	// The catalog and the watch the tab reads through. [[spec/tickets/the-log-tab-reads-v1]]
+	From   Watched
+	stream <-chan tea.Msg
 }
 
 // The tab over the log at that path, following it from its first line. [[spec/design_output/tui#how-a-line-arrives]]
 func New(path string, zone *time.Location) *Tab {
-	return &Tab{Path: path, Zone: zone, Sel: -1, Follow: true, Floor: "info", SortAt: SortNone, Tailer: newTailer(path)}
+	return &Tab{Path: path, Zone: zone, Sel: -1, Follow: true, Floor: "info", SortAt: SortNone}
 }
 
 func (*Tab) Name() string { return "log" }
 
 func (*Tab) Label(_ *frame.Model) string { return "log" }
 
-func (t *Tab) Init(_ *frame.Model) tea.Cmd { return t.Tailer.cmd() }
+// The watch's first event carries every row, so the tab draws off it. [[spec/tickets/the-log-tab-reads-v1]]
+func (t *Tab) Init(_ *frame.Model) tea.Cmd { return t.watches() }
 
-// The lines that arrive and the error that stops them are this tab's, and every key mode is the frame's. [[spec/design_output/tui#how-a-line-arrives]]
+// The rows the watch hands over and its end are this tab's, and every key mode is the frame's. [[spec/design_output/tui#how-a-line-arrives]]
 func (t *Tab) Update(m *frame.Model, msg tea.Msg) (bool, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tailErrMsg:
-		t.Err = msg.err
-		return true, t.Tailer.cmd()
-	case LinesMsg:
-		if msg.Restarted {
-			t.All, t.Sel, t.Top, t.Follow = nil, -1, 0, true
-		}
-		t.All = append(t.All, msg.Recs...)
-		t.Rebuild(m.Rows())
-		m.LoadPane()
-		return true, t.Tailer.cmd()
+	case registry.Change:
+		return t.changes(m, msg)
+	case watchEnded:
+		return true, t.ended(msg)
+	case watchAgain:
+		return true, t.watches()
 	}
 	return false, nil
 }

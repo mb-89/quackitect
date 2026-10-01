@@ -1,0 +1,8 @@
+{
+  "cloud": true,
+  "git": {
+    "rev-parse --abbrev-ref HEAD": "work/some-group",
+    "log --format= --name-only HEAD --not --remotes": "spec/tickets/a-ticket.md",
+    "show HEAD:spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\ntodo: true\n---\n\n# Ask\n"
+  }
+}

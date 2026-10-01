@@ -1,0 +1,102 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: do
+    does: makes the change, with the test that covers it
+    from: anyone
+    by: anyone
+    to: retro
+    input: ask
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    evidence:
+      - name: tests
+        form: command
+        expects: green
+        says: the tests that cover the change, or the check where it touches no code
+      - name: check
+        form: command
+        expects: 0
+        says: the check is green on the commit
+      - name: says
+        form: text
+        says: what changes and why, for a reader who was not there
+process: [[spec/processes/trivial]]
+process_hash: 2b5ab398855a1aba
+step: do
+record:
+  - step: do
+    hand: box d856e248e31998 · claude-code-remote
+    hash_before: 425b3ad721abe16d4a3c96b2d19166a653de4368
+    hash_after: 3c33fae04cd2fc38fabb927b62d2abbae5f77d24
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/migration passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: 12e775d1e4b29fe9
+        size: 616
+      - name: [[spec/tickets/read-topics-switch-over]]
+        hash: 476bf861982c1130
+        size: 5700
+    def: df12650931d480c9
+reason: done
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+<!-- breaks, as text: what breaks if it is never done -->
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+
+The phase-3 shadow ran against this tree, and the config, log and check topics and the prose checks read the same on the old path and the new, so `./RUNME.sh log --kind shadow` names no mismatch. Turning `migration.phase3switch` on lets a box take [[spec/tickets/read-topics-switch-over]], and the groups that wait on phase 3.
+
+While the switch reads false, `branch take` passes those groups over.
+
+- `./RUNME.sh config` reads `migration.phase3switch true spec/config/level0.json`
+- `./RUNME.sh log --kind shadow` names no mismatch of the read topics after a run of config, log and check
+- `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test src/modules/migration src/quack
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The phase-3 read topics stand at shadow in spec/config/level0.json (config, log, guidance, check, prose). I ran config, log, branch list and check against this tree with those keys at shadow, and ./RUNME.sh log --kind shadow named no row. The shadow writes nothing on a match, so the empty log is the evidence, and the shadow tests prove a mismatch writes a row. The guidance verb has no entry point to drive in this tree, so that topic is judged on its tests alone. So migration.phase3switch turns true, and a box may take read-topics-switch-over.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: one key in spec/config/level0.json
+- the cleanup it reveals: an empty shadow log proves little alone; the gap stands as the phase 2 note left it
+- every fact stands once: the run lives on this ticket and the pull request
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

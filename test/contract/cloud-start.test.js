@@ -1,43 +1,60 @@
-// The cloud starts its own server: the node script the bridgehead runs, what it
+// The cloud starts its own index: the node script the bridgehead runs, what it
 // answers where a piece is missing, and the line each code writes.
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import test from "node:test";
-import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import {
+  INSTALL_SKIP,
+  reasonOf,
+  START,
+} from "../../.claude/skills/level0/hooks/level0.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 
 const files = disk();
+const METHOD = join(import.meta.dirname, "..", "..");
 
 const MARKER = "started.txt";
+const HOOKS = join(".se", ".runtime", "hooks.json");
 const LOCAL = { CLAUDE_CODE_REMOTE: "", SE_CLOUD: "" };
 const CLOUD = { CLAUDE_CODE_REMOTE: "true", SE_CLOUD: "" };
-// The stub answers the self-test the road runs first, and starts on the plain call. [[spec/design_output/level0#new-code-proves-it-loads]]
-const SERVER =
-  "if (process.argv.includes('--selftest')) process.exit(0);\nrequire('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
+// The fake index answers standing the way the real one does: it writes the standing file of the hooks door, in the work root it runs in. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const INDEX = `#!/bin/sh
+[ "$1" = standing ] || exit 2
+mkdir -p .se/.runtime
+printf '{"port":7001,"token":"t"}' > ${HOOKS}
+echo up > ${MARKER}
+`;
 const BROKEN =
-  "if (process.argv.includes('--selftest')) { console.error('ReferenceError: dropsMoved is not defined'); process.exit(1); }\nrequire('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
-// An install standing in for the real one: it brings the folder the road looks for, in the method root the road runs it from. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-const INSTALL = "mkdir -p node_modules\n";
-const SKIP = "index se-lsp";
+  "#!/bin/sh\necho 'the index door does not answer, and one would not start' >&2\nexit 1\n";
+// An install standing in for the real one: it brings the modules, and builds the index unless the skip list names it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const INSTALL = `mkdir -p node_modules
+case " $SE_INSTALL_SKIP " in *" index "*) exit 0 ;; esac
+mkdir -p ${BIN.split("/").slice(0, -1).join("/")}
+cat > ${BIN} <<'EOF'
+${INDEX}EOF
+chmod +x ${BIN}
+`;
 const WAITS = 40;
+const SHELL = process.platform === "win32" ? "the fake index is a shell script" : false;
 
-const nodeHere = () =>
-  proc().run(["node", "-e", "process.exit(0)"], { timeoutMs: 5000 }).exitCode === 0;
-
-function runs(where, env) {
-  return proc().run(["node", "-e", START, where, where, SKIP], {
+function runs(where, env, method = where) {
+  return proc().run(["node", "-e", START, where, method, INSTALL_SKIP], {
     env,
-    timeoutMs: 30_000,
+    timeoutMs: 60_000,
   });
 }
 
-function tree(modules, install = false) {
+function tree({ modules = true, install = false, index = INDEX } = {}) {
   const where = files.tempDir("level0-start-");
-  files.makeDir(join(where, "src", "bridge"));
-  files.write(join(where, "src", "bridge", "server.js"), SERVER);
+  if (index) {
+    files.makeDir(join(where, ...BIN.split("/").slice(0, -1)));
+    files.write(join(where, ...BIN.split("/")), index);
+    proc().run(["chmod", "+x", join(where, ...BIN.split("/"))], { timeoutMs: 5000 });
+  }
   if (install) {
     files.makeDir(join(where, "src", "scripts"));
     files.write(join(where, "src", "scripts", "install.sh"), INSTALL);
@@ -55,25 +72,12 @@ function waitsFor(at) {
   return files.exists(at);
 }
 
-// The marker lands while the detached node still holds the folder as its cwd, and Windows answers EPERM to a remove under a live process, so the retry gives the child the moment it takes to exit. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-function gone(where) {
-  const held = new Int32Array(new SharedArrayBuffer(4));
-  for (let step = 0; step < WAITS; step++) {
-    try {
-      files.remove(where);
-      return;
-    } catch {
-      Atomics.wait(held, 0, 0, 100);
-    }
-  }
-}
-
 test("a box outside the cloud starts nothing, because a person stands beside it", () => {
-  const where = tree(true);
+  const where = tree();
   try {
     const said = runs(where, LOCAL);
     assert.equal(said.exitCode, 3);
-    assert.equal(files.exists(join(where, MARKER)), false, "no server stands");
+    assert.equal(files.exists(join(where, MARKER)), false, "no index stands");
     assert.equal(reasonOf(said.exitCode)[0], "", "and no line lands in the log");
   } finally {
     files.remove(where);
@@ -81,35 +85,68 @@ test("a box outside the cloud starts nothing, because a person stands beside it"
 });
 
 test("a cloud box whose install brings no modules says so and starts nothing", () => {
-  const where = tree(false);
+  const where = tree({ modules: false });
   try {
     const said = runs(where, CLOUD);
     assert.equal(said.exitCode, 6);
     const [level, why] = reasonOf(said.exitCode);
     assert.equal(level, "warn");
     assert.match(why, /modules/);
-    assert.equal(files.exists(join(where, MARKER)), false, "no server stands");
+    assert.equal(files.exists(join(where, MARKER)), false, "no index stands");
   } finally {
     files.remove(where);
   }
 });
 
-test("a fresh clone carrying no modules installs them, then starts the server", {
-  skip: nodeHere() ? false : "this box carries no node on the PATH",
+test("a fresh clone carrying no modules installs them, then starts the index", {
+  skip: SHELL,
 }, () => {
-  const where = tree(false, true);
+  const where = tree({ modules: false, install: true });
   try {
     const said = runs(where, CLOUD);
-    assert.equal(said.exitCode, 7);
+    assert.equal(said.exitCode, 7, said.stderr);
     assert.equal(reasonOf(said.exitCode)[0], "info");
     assert.equal(
       files.exists(join(where, "node_modules")),
       true,
-      "the install brought the modules the server imports",
+      "the install brought the modules",
     );
-    assert.equal(waitsFor(join(where, MARKER)), true, "and the server ran after it");
+    assert.equal(
+      files.exists(join(where, MARKER)),
+      true,
+      "and the index stood after it",
+    );
   } finally {
-    gone(where);
+    files.remove(where);
+  }
+});
+
+test("a box with no index builds it, then starts it", { skip: SHELL }, () => {
+  const where = tree({ index: "", install: true });
+  try {
+    const said = runs(where, CLOUD);
+    assert.equal(said.exitCode, 0, said.stderr);
+    assert.equal(
+      files.exists(join(where, ...BIN.split("/"))),
+      true,
+      "the install built the index",
+    );
+    assert.equal(files.exists(join(where, HOOKS)), true, "and the hooks door stands");
+  } finally {
+    files.remove(where);
+  }
+});
+
+test("a box whose install builds no index says so", { skip: SHELL }, () => {
+  const where = tree({ index: "" });
+  try {
+    const said = runs(where, CLOUD);
+    assert.equal(said.exitCode, 9);
+    const [level, why] = reasonOf(said.exitCode);
+    assert.equal(level, "warn");
+    assert.match(why, /index/);
+  } finally {
+    files.remove(where);
   }
 });
 
@@ -119,44 +156,73 @@ test("a root that stands nowhere says so", () => {
   assert.equal(reasonOf(said.exitCode)[0], "warn");
 });
 
-test("a cloud box starts the server, and the call comes back before it stands", {
-  skip: nodeHere() ? false : "this box carries no node on the PATH",
+test("a cloud box starts the index standing, and the log folder stands", {
+  skip: SHELL,
 }, () => {
-  const where = tree(true);
+  const where = tree();
   try {
     const said = runs(where, CLOUD);
-    assert.equal(said.exitCode, 0);
+    assert.equal(said.exitCode, 0, said.stderr);
     assert.equal(reasonOf(said.exitCode)[0], "info");
-    assert.equal(waitsFor(join(where, MARKER)), true, "the server ran on its own");
+    assert.equal(files.exists(join(where, HOOKS)), true, "the hooks door stands");
     assert.equal(
       files.exists(join(where, ".se", ".log")),
       true,
-      "the log folder stands for the server to write into",
+      "the log folder stands",
     );
   } finally {
-    gone(where);
+    files.remove(where);
   }
 });
 
-// A tree whose bridge fails its self-test starts no server, and the road says why once. [[spec/design_output/level0#new-code-proves-it-loads]]
-test("a cloud box whose bridge fails its self-test starts nothing, and names the fault", {
-  skip: nodeHere() ? false : "this box carries no node on the PATH",
+test("a cloud box whose index fails its standing starts nothing, and names the fault", {
+  skip: SHELL,
 }, () => {
-  const where = tree(true);
-  files.write(join(where, "src", "bridge", "server.js"), BROKEN);
+  const where = tree({ index: BROKEN });
   try {
     const said = runs(where, CLOUD);
     assert.equal(said.exitCode, 8);
     assert.equal(reasonOf(said.exitCode)[0], "warn");
-    assert.match(said.stderr, /dropsMoved is not defined/);
-    assert.equal(files.exists(join(where, MARKER)), false, "no server stands");
+    assert.match(said.stderr, /the index door does not answer/);
+    assert.equal(files.exists(join(where, HOOKS)), false, "no hooks door stands");
   } finally {
-    gone(where);
+    files.remove(where);
+  }
+});
+
+// The real index over a fresh work root: the road returns, and the door the standing file names answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+test("a cold start on a cloud box reaches the hooks door", {
+  skip: files.exists(join(METHOD, ...BIN.split("/")))
+    ? SHELL
+    : "this box carries no built index",
+}, async () => {
+  const where = files.tempDir("level0-cold-");
+  try {
+    const said = runs(where, CLOUD, METHOD);
+    assert.equal(said.exitCode, 0, said.stderr);
+    assert.equal(
+      waitsFor(join(where, HOOKS)),
+      true,
+      "the hooks door writes its standing file",
+    );
+    const { port } = JSON.parse(String(files.read(join(where, HOOKS))));
+    const answer = await fetch(`http://127.0.0.1:${port}/`, {
+      method: "POST",
+      body: "{}",
+      signal: AbortSignal.timeout(5000),
+    });
+    assert.ok(answer.status > 0, "the hooks door answers over the wire");
+  } finally {
+    proc().run([join(METHOD, ...BIN.split("/")), "stop"], {
+      cwd: where,
+      timeoutMs: 10_000,
+    });
+    files.remove(where);
   }
 });
 
 test("a code nobody names reads as a warning", () => {
-  const [level, why] = reasonOf(9);
+  const [level, why] = reasonOf(11);
   assert.equal(level, "warn");
-  assert.match(why, /9/);
+  assert.match(why, /11/);
 });

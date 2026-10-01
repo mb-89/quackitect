@@ -10,6 +10,7 @@ const { fileDoor } = require("./editor-files.js");
 const { lensDoor } = require("./editor-lens.js");
 const { insetDoor } = require("./editor-inset.js");
 const { fieldDoor } = require("./editor-fields.js");
+const { indexDoor } = require("./editor-index.js");
 const { clientOf } = require("./lib/lsp.js");
 
 const NAME = "quackitect";
@@ -23,6 +24,7 @@ const QUIET = [
 // [[spec/design_output/extension#the-editor-is-a-door]]
 function editorDoor(context) {
   const folder = vscode.workspace.workspaceFolders?.[0];
+  const index = indexDoor(folder?.uri?.fsPath ?? "");
   let page = null;
   const bars = new Map();
 
@@ -34,6 +36,15 @@ function editorDoor(context) {
     ...lensDoor(context, folder),
     ...insetDoor(context, folder),
     ...fieldDoor(context, folder),
+    // A verb's action a person presses carries a progress toast. [[spec/tickets/the-lens-calls-actions]]
+    index: {
+      ...index,
+      acts: (name, input) =>
+        vscode.window.withProgress(
+          { location: vscode.ProgressLocation.Notification, title: name },
+          () => index.acts(name, input),
+        ),
+    },
 
     holds: () => Boolean(folder),
     root: () => folder?.uri?.fsPath ?? "",

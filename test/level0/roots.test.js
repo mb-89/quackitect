@@ -12,7 +12,6 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
-import { probeOf } from "../../src/scripts/serve.js";
 import { NOTES, ticket } from "../../src/scripts/ticket.js";
 import { pulling } from "../../src/scripts/work.js";
 import { NOTE_PROCESS, TICKET_SCHEMA as SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
@@ -162,8 +161,6 @@ const onBranch = (extra = {}) => ({
   "git rev-parse HEAD": { stdout: `${SHA}\n` },
   [`git rev-list --count HEAD..origin/${BRANCH}`]: { stdout: "0\n" },
   "git status --porcelain": { stdout: "" },
-  // Nothing answers the port, so a cloud take starts the server detached. [[spec/design_output/level0#the-cloud-starts-the-server]]
-  [probeOf("node", 6510).join(" ")]: { exitCode: 1 },
   node: { exitCode: 0, stdout: "" },
   sh: { exitCode: 0, stdout: "" },
   ...extra,

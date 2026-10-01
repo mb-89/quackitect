@@ -1,23 +1,16 @@
 // The buttons over a ticket: the lens provider, the box asking why a step
-// fails, and the child process running the pull. editor.js holds every other
-// call into the editor.
+// fails, and the pick and the toast around the pull. editor.js holds every
+// other call into the editor.
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 
 const vscode = require("vscode");
-const { spawn } = require("node:child_process");
-const { realpathSync } = require("node:fs");
-const { join } = require("node:path");
-
-const { CLI, personEnv } = require("./lib/lens.js");
 
 const TICKETS = "{spec/tickets,.se/tickets}/*.md";
-const NODE = "node";
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 function lensDoor(context, folder) {
   const changed = new vscode.EventEmitter();
   context.subscriptions.push(changed);
-  const root = folder?.uri?.fsPath ?? "";
   const pathOf = (uri) =>
     vscode.workspace.asRelativePath(uri, false).replace(/\\/g, "/");
 
@@ -41,14 +34,6 @@ function lensDoor(context, folder) {
           },
         ),
       );
-      for (const path of lens.watches) {
-        const one = vscode.workspace.createFileSystemWatcher(
-          new vscode.RelativePattern(folder, path),
-        );
-        for (const on of [one.onDidChange, one.onDidCreate, one.onDidDelete])
-          on.call(one, () => changed.fire());
-        context.subscriptions.push(one);
-      }
     },
 
     // A save under the ticket folders hands its path and text on. [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
@@ -62,7 +47,9 @@ function lensDoor(context, folder) {
 
     // A closed pick answers empty. [[spec/tickets/the-host-runs-the-verbs]]
     async picks(prompt, options) {
-      return (await vscode.window.showQuickPick(options, { placeHolder: prompt })) ?? "";
+      return (
+        (await vscode.window.showQuickPick(options, { placeHolder: prompt })) ?? ""
+      );
     },
 
     async asksLine(prompt) {
@@ -82,51 +69,7 @@ function lensDoor(context, folder) {
       if (refused) vscode.window.showWarningMessage(said);
       else vscode.window.showInformationMessage(said);
     },
-
-    // A verb a draw runs, so no progress toast rides it. [[spec/tickets/the-work-group-draws-buttons]]
-    asksVerb(argv) {
-      const home = join(realpathSync.native(context.extensionPath), "..", "..");
-      return ranOf(join(home, ...CLI.split("/")), argv, root);
-    },
-
-    runsVerb(argv) {
-      const home = join(realpathSync.native(context.extensionPath), "..", "..");
-      return vscode.window.withProgress(
-        {
-          location: vscode.ProgressLocation.Notification,
-          title: argv.join(" "),
-        },
-        () => ranOf(join(home, ...CLI.split("/")), argv, root),
-      );
-    },
   };
-}
-
-// [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-function ranOf(cli, argv, root) {
-  return new Promise((resolve) => {
-    let out = "";
-    let err = "";
-    const child = spawn(NODE, [cli, ...argv], {
-      cwd: root,
-      env: personEnv(process.env, root),
-      windowsHide: true,
-    });
-    child.stdout.on("data", (chunk) => {
-      out += chunk;
-    });
-    child.stderr.on("data", (chunk) => {
-      err += chunk;
-    });
-    child.on("error", (error) =>
-      resolve({
-        code: 1,
-        out,
-        err: `${err}${NODE} runs nowhere: ${error.message}`,
-      }),
-    );
-    child.on("close", (code) => resolve({ code, out, err }));
-  });
 }
 
 module.exports = { lensDoor };

@@ -1,5 +1,5 @@
 ---
-description: "config / plan / mostOpen: sets plan.mostOpen to what you type."
+description: "config / plan / mostOpen: sets plan.mostOpen to what you type. The todos the plan holds open, past which the third question stays away."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

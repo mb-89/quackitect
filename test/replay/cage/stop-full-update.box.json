@@ -1,0 +1,16 @@
+{
+  "cloud": false,
+  "binding": "queue",
+  "bindingLayer": "built-in",
+  "ask": "full",
+  "live": [
+    "spec/config/level0.schema.json",
+    "spec/config/status.yaml",
+    "spec/config/stop/level0.yml",
+    "spec/config/stop/level1.yml"
+  ],
+  "config": {
+    "ask.wanted": "full"
+  },
+  "files": {}
+}

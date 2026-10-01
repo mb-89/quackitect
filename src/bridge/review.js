@@ -24,7 +24,7 @@ async function reviewsBranch(e, box) {
 
   // The node path comes off the box the server root builds. [[spec/design_output/doors#a-door-reads-the-outside]]
   const ran = box.proc.run(
-    [box.node, `${box.method}/src/scripts/cli.js`, "branch", "review", name, "--json"],
+    [box.node, `${box.method}/src/scripts/verbs/branch.js`, "review", name, "--json"],
     {
       cwd: box.work,
       timeoutMs: GATHERING,

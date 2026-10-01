@@ -1,0 +1,55 @@
+# The forms where golem's English dictionary and wink part, and wink reads
+# right. Lemma reads this list before golem, so a form here takes the lemma
+# it names.
+# [[spec/tickets/prose-checks-run-in-go]]
+
+forms:
+  standing: stand
+  found: find
+  left: leave
+  fell: fall
+  felt: feel
+  saw: see
+  rose: rise
+  broke: break
+  bore: bear
+  given: give
+  known: know
+  first: first
+  third: third
+  also: also
+  as: as
+  an: an
+  ai: ai
+  calling: call
+  capping: cap
+  catching: catch
+  coming: come
+  covering: cover
+  drawing: draw
+  driving: drive
+  ending: end
+  failing: fail
+  following: follow
+  holding: hold
+  living: live
+  marking: mark
+  matching: match
+  meaning: mean
+  reopening: reopen
+  rising: rise
+  saving: save
+  saying: say
+  showing: show
+  taking: take
+  weighing: weigh
+  working: work
+  dying: die
+  lints: lint
+  lowercases: lowercase
+  todos: todo
+  ls: ls
+  mjs: mjs
+  mts: mts
+  ts: ts
+  rs: rs

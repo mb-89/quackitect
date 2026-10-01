@@ -30,7 +30,6 @@ const ROOTS = [
   "src/scripts/trust.js",
   "src/scripts/copilot.js",
   "src/scripts/editor.js",
-  "src/bridge/server.js",
   "src/extension/extension.js",
   "src/extension/sidebar.js",
   ".claude/skills/level0/hooks/level0.js",
@@ -54,7 +53,7 @@ ifVale(
       reads: at(READS, MODULE),
       argv: at(ARGV, MODULE),
       platform: at(PLATFORM, MODULE),
-      spawn: at(SPAWN, "src/lsp/check.go"),
+      spawn: at(SPAWN, "src/index/answers.go"),
       node: at(NODE, EXTENSION),
     },
     (said) => {
@@ -72,7 +71,7 @@ const off = (path) => ruleAt(sections, `VoiceVale.${RULE}`, path) === "NO";
 
 test("the config holds the rule over a module and a Go file", () => {
   assert.equal(off(MODULE), false, MODULE);
-  assert.equal(off("src/lsp/check.go"), false, "src/lsp/check.go");
+  assert.equal(off("src/index/answers.go"), false, "src/index/answers.go");
   assert.equal(ruleAt(sections, `VoiceVale.${GUARD}`, EXTENSION), "YES", EXTENSION);
 });
 
@@ -86,7 +85,6 @@ test("the config stands the rule off a door, a case, a Go door file and a note",
     "src/doors/fake/proc.js",
     "test/level0/work.test.js",
     "test/contract/proc.test.js",
-    "src/lsp/door.go",
     "src/index/door.go",
     "notes.md",
   ]) {
@@ -122,7 +120,7 @@ ifVale(
   "the rule refuses a Go import of os outside the package's door, and a module past a root reading the pid, the version or the exec path",
   proves(
     {
-      os: at(OS, "src/lsp/tree.go"),
+      os: at(OS, "src/front/mint.go"),
       signal: at(OS_SIGNAL, "src/index/main.go"),
       swap: at(OS, "src/engine/swap/swap.go"),
       pid: at(PID, "src/scripts/vehicle.js"),
@@ -139,7 +137,7 @@ ifVale(
 test("the config stands the rule off every Go door, a Go case, and every door reading the pid, the version or the exec path", () => {
   for (const where of [
     "src/engine/swap/door.go",
-    "src/lsp/tree_test.go",
+    "src/front/front_test.go",
     "src/doors/session.js",
   ]) {
     assert.ok(off(where), where);

@@ -64,16 +64,35 @@ function linksIn(said) {
   return [...said.matchAll(LINK)].map((found) => found[1].trim());
 }
 
-// The hash of each note, off the index, and off the disk where the index stands dead. [[spec/design_output/pull#an-input-marks-its-steps]]
+const TICKET = /^(spec|\.se)\/tickets\//;
+
+// A linked ticket reads as its Ask, which no pass writes, so two tickets linking each other stale neither. [[spec/design_output/pull#ticket-links-read-the-ask]]
 function noteHashes(it, asks) {
+  const tickets = asks.filter((one) => TICKET.test(one.path));
+  return {
+    ...diskHashes(it, tickets, (text) => chapterText(text, ASK)),
+    ...indexHashes(
+      it,
+      asks.filter((one) => !TICKET.test(one.path)),
+    ),
+  };
+}
+
+// The hash of each note, off the index, and off the disk where the index stands dead. [[spec/design_output/pull#an-input-marks-its-steps]]
+function indexHashes(it, asks) {
   if (!asks.length) return {};
   const said = it.index?.ask?.("hashes", { asks });
   if (said && typeof said === "object") return said;
+  return diskHashes(it, asks, (text) => text);
+}
+
+// [[spec/design_output/pull#an-input-marks-its-steps]]
+function diskHashes(it, asks, read) {
   const out = {};
   for (const one of asks) {
     const at = it.join(it.root, ...one.path.split("/"));
     if (!it.disk.exists(at)) continue;
-    const text = String(it.disk.read(at));
+    const text = read(String(it.disk.read(at)));
     const size = Number(one.size ?? 0);
     out[one.path] = {
       hash: hashText(text),

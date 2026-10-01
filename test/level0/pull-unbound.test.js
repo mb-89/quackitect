@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
   doorsSaying,
@@ -24,7 +24,6 @@ function onTrunk() {
     { ...groupRemote(SOON), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: SOON, ...HAND },
   );
-  said.outside.proc.teach(probeOf("node", 6510), { exitCode: 1 });
   said.outside.proc.teach(startOf(ROOT), { exitCode: 0 });
   return said;
 }

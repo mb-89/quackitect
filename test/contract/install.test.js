@@ -14,7 +14,7 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
 test("every binary this tree builds rebuilds when its source moves ahead", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
-  for (const one of ["lsp", "index"]) {
+  for (const one of ["front", "index"]) {
     assert.ok(
       rebuilt(said).includes(one),
       `${one} never rebuilds when its source moves`,
@@ -46,7 +46,7 @@ test("the install fetches the Go modules as a want, after go and before the buil
   const at = wants.indexOf("go-modules");
   assert.ok(at > wants.indexOf("go"), "the modules follow Go");
   assert.ok(
-    at < wants.indexOf("index") && at < wants.indexOf("se-lsp"),
+    at < wants.indexOf("index") && at < wants.indexOf("se-front"),
     "the builds follow the modules",
   );
   assert.match(

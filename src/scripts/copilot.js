@@ -1,7 +1,7 @@
 // The Copilot entry point. All decisions stay inside level zero.
 // [[spec/design_output/copilot#setup-and-discovery]]
 
-import { dirname, join, relative } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   eventOf,
@@ -9,7 +9,6 @@ import {
   replyOf,
 } from "../../.claude/skills/level0/lib/copilot.js";
 import { dispatch } from "../../.claude/skills/level0/lib/copilot-dispatch.js";
-import { handle, TOOL_WAIT } from "../../.claude/skills/level0/lib/copilot-runtime.js";
 import { setup } from "../../.claude/skills/level0/lib/copilot-setup.js";
 import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
@@ -19,11 +18,11 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { session } from "../doors/session.js";
+import { answers } from "./copilot-door.js";
 import { assemble } from "./styles.js";
 import { rootsHere } from "./vehicle.js";
 
 const DEADLINE = 20000;
-const LEAST_LEFT = 100;
 const LIST_WAIT = 5000;
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -41,6 +40,8 @@ let currentEvent = { surface, event: name, retry: false };
 const it = {
   root,
   work: roots.work,
+  // The tracked config stands under the root, where the config reader looks for it. [[spec/tickets/copilot-shadow-carries-method]]
+  method: root,
   styles: () => assemble(files, roots).config,
   disk: files,
   proc: outside,
@@ -85,21 +86,16 @@ try {
     const input = JSON.parse(files.read(0));
     const event = eventOf(input, name, surface);
     currentEvent = event;
-    const deadline = time.now().getTime() + DEADLINE;
-    it.proc = {
-      run(argv, init = {}) {
-        const left = deadline - time.now().getTime();
-        if (left < LEAST_LEFT)
-          throw new Error(
-            "The level-zero deadline expires. Retry with a smaller change.",
-          );
-        return outside.run(argv, {
-          ...init,
-          timeoutMs: Math.min(init.timeoutMs ?? TOOL_WAIT, left),
-        });
+    // The hook asks the hooks door, within the deadline Copilot's hook holds. [[spec/tickets/copilot-answers-off-the-door]]
+    const signal = AbortSignal.timeout(DEADLINE);
+    const result = await answers(event, {
+      root,
+      read: (rel) => files.read(resolve(root, rel)),
+      fetch: async (url, init) => {
+        const said = await fetch(url, { ...init, signal });
+        return { ok: said.ok, status: said.status, text: await said.text() };
       },
-    };
-    const result = await handle(event, it);
+    });
     await book.say(
       result.deny || result.block || result.failed ? "warn" : "info",
       "copilot",

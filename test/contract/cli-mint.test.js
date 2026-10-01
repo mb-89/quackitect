@@ -20,8 +20,7 @@ test("a mint under --from=handover writes the from line at the head of the Ask",
     const ran = proc().run(
       [
         process.execPath,
-        join(root, "src", "scripts", "cli.js"),
-        "mint",
+        join(root, "src", "scripts", "verbs", "mint.js"),
         "ticket",
         PATH,
         "--process=standard",

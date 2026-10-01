@@ -1,33 +1,39 @@
-// The server start behind a cloud take, over a fake process: a silent port
-// records one start, an answering port records none, and a desk starts nothing.
+// The index start behind a cloud take and a desk serve, over a fake process:
+// the take runs the start road once, and a desk runs the index standing.
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { START } from "../../.claude/skills/level0/hooks/level0.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import {
-  portIn,
-  probeOf,
-  servesDetached,
-  serving,
-  startOf,
-} from "../../src/scripts/serve.js";
+import { portIn, servesDetached, serving, startOf } from "../../src/scripts/serve.js";
 
 const ROOT = "/tree";
+const INDEX_AT = join(ROOT, ".se", ".runtime", "bin", "se-index");
+const HOOKS_AT = join(ROOT, ".se", ".runtime", "hooks.json");
+const DOOR = '{"port":7001,"token":"t"}';
 
 function box(answers, files = {}, cloud = true) {
-  const proc = fakeProc({
-    [probeOf("node", 6510).join(" ")]: { exitCode: answers.probe },
-    [startOf(ROOT).join(" ")]: {
-      exitCode: answers.start ?? 0,
-      stderr: answers.stderr ?? "",
-    },
+  const disk = fakeDisk(files);
+  const proc = fakeProc({ node: { exitCode: 1 } });
+  proc.teach(startOf(ROOT), () => {
+    if (!answers.start) disk.write(HOOKS_AT, DOOR);
+    return { exitCode: answers.start ?? 0, stderr: answers.stderr ?? "" };
   });
   return {
-    it: { proc, disk: fakeDisk(files), root: ROOT, join, cloud, node: "node" },
+    it: {
+      proc,
+      disk,
+      clock: fakeClock(),
+      env: {},
+      root: ROOT,
+      join,
+      cloud,
+      node: "node",
+    },
     proc,
   };
 }
@@ -43,38 +49,31 @@ function heard(what) {
   }
 }
 
-// The probe runs node too, so the start is the run carrying the script. [[spec/design_output/level0#the-cloud-starts-the-server]]
 const started = (proc) => proc.ran.filter((one) => one.argv.includes(START)).length;
 
-test("a silent port starts the server once, and the line says so", () => {
-  const { it, proc } = box({ probe: 1 });
+// [[spec/design_output/level0#the-cloud-starts-the-server]]
+test("a cloud take runs the start road once, and names the port of the hooks door", () => {
+  const { it, proc } = box({});
   const { code, said } = heard(() => serving(it, 0));
   assert.equal(code, 0);
   assert.equal(started(proc), 1);
-  assert.match(said, /starts detached at port 6510/);
-});
-
-test("an answering port starts nothing", () => {
-  const { it, proc } = box({ probe: 0 });
-  const { said } = heard(() => serving(it, 0));
-  assert.equal(started(proc), 0);
-  assert.match(said, /answers at port 6510/);
+  assert.match(said, /index stands at port 7001/);
 });
 
 test("a desk and a failed take start nothing", () => {
-  const desk = box({ probe: 1 }, {}, false);
+  const desk = box({}, {}, false);
   heard(() => serving(desk.it, 0));
   assert.equal(desk.proc.ran.length, 0);
-  const failed = box({ probe: 1 });
+  const failed = box({});
   assert.equal(heard(() => serving(failed.it, 1)).code, 1);
   assert.equal(failed.proc.ran.length, 0);
 });
 
 test("a failed start names the last thing the start said", () => {
-  const { it } = box({ probe: 1, start: 1, stderr: "Error: EACCES, open serve.log\n" });
+  const { it } = box({ start: 8, stderr: "the index door does not answer\n" });
   assert.match(
     heard(() => serving(it, 0)).said,
-    /start fails: Error: EACCES, open serve.log/,
+    /start fails: the index door does not answer/,
   );
 });
 
@@ -85,57 +84,46 @@ test("the take runs the line the bridgehead runs, and no copy of it", () => {
 
 test("the port reads off the pointer, and stands at the base without one", () => {
   const pointed = box(
-    { probe: 1 },
+    {},
     {
       [join(ROOT, ".se", ".runtime", "vehicle.json")]: '{"method":"/tree","port":6512}',
     },
   );
   assert.equal(portIn(pointed.it), 6512);
-  assert.equal(portIn(box({ probe: 1 }).it), 6510);
+  assert.equal(portIn(box({}).it), 6510);
 });
 
-const SERVER_AT = join(ROOT, "src", "bridge", "server.js");
-const SERVE_LOG = join(ROOT, ".se", ".log", "serve.log");
-
-function desk(answers, files = {}) {
-  const proc = fakeProc({
-    [probeOf("node", 6510).join(" ")]: { exitCode: answers.probe },
-    [["node", SERVER_AT, ROOT].join(" ")]: answers.stands
-      ? { stands: true }
-      : { exitCode: answers.exitCode ?? 1 },
+function desk(answer, files = {}) {
+  const disk = fakeDisk(files);
+  const proc = fakeProc({ node: { exitCode: 1 } });
+  proc.teach([INDEX_AT, "standing"], () => {
+    if (!answer.exitCode) disk.write(HOOKS_AT, DOOR);
+    return answer;
   });
-  return { it: { proc, disk: fakeDisk(files), root: ROOT, join, node: "node" }, proc };
+  return { it: { proc, disk, root: ROOT, join, node: "node" }, proc };
 }
 
-const detached = (proc) =>
+const standings = (proc) =>
   proc.ran.filter((one) =>
-    one.argv.join(" ").split("\\").join("/").includes("src/bridge/server.js"),
+    one.argv.join(" ").split("\\").join("/").includes("bin/se-index standing"),
   ).length;
 
-// A desk start stands detached, so the shell returns and the server stays. [[spec/tickets/the-bridge-outlives-its-starter]]
-test("a desk serve starts the server detached where nothing answers, and returns", async () => {
-  const { it, proc } = desk({ probe: 1, stands: true });
+// [[spec/design_output/level0#a-desk-serve-returns]]
+test("a desk serve runs the index standing where no door stands, and names its port", async () => {
+  const { it, proc } = desk({ exitCode: 0 });
   const said = await servesDetached(it);
-  assert.equal(detached(proc), 1, "one detached start");
-  assert.match(said, /starts detached at port 6510/);
+  assert.equal(standings(proc), 1, "one standing");
+  assert.match(said, /index starts at port 7001/);
 });
 
-// [[spec/tickets/the-bridge-outlives-its-starter]]
-test("a desk serve finds a standing server and starts nothing", async () => {
-  const { it, proc } = desk({ probe: 0 });
-  const said = await servesDetached(it);
-  assert.equal(detached(proc), 0, "no start over a standing server");
-  assert.match(said, /answers at port 6510/);
+// [[spec/design_output/level0#a-desk-serve-returns]]
+test("a desk serve over a standing door says it answers", async () => {
+  const { it } = desk({ exitCode: 0 }, { [HOOKS_AT]: DOOR });
+  assert.match(await servesDetached(it), /index answers at port 7001/);
 });
 
-// [[spec/tickets/the-bridge-outlives-its-starter]]
-test("a detached start that falls names what the server wrote", async () => {
-  const { it } = desk(
-    { probe: 1, exitCode: 1 },
-    {
-      [SERVE_LOG]:
-        "the server stands at http://127.0.0.1:6510\nError: listen EADDRINUSE\n",
-    },
-  );
-  assert.match(await servesDetached(it), /falls: Error: listen EADDRINUSE/);
+// [[spec/design_output/level0#a-desk-serve-returns]]
+test("a desk serve whose index falls names what the index said", async () => {
+  const { it } = desk({ exitCode: 1, stderr: "the index door does not answer\n" });
+  assert.match(await servesDetached(it), /index falls: the index door does not answer/);
 });

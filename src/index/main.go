@@ -1,12 +1,14 @@
 // The command line over the door. Every verb here asks the resident process,
 // and starts one where none stands.
 // [[spec/design_output/index#the-door-owns-the-database]]
-package main
+package index
 
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -19,16 +21,21 @@ import (
 
 const (
 	reachTries         = 3
-	postTimeout        = 30 * time.Second
 	callArgsWithParams = 3
 	startPolls         = 300
 	startPollPause     = 100 * time.Millisecond
+	postWait           = 30 * time.Second
 )
 
-func main() {
+// How long a client waits on the door's answer, which a test cuts short. [[spec/tickets/one-index-a-tree]]
+var postTimeout = postWait
+
+// The command line the composition root runs, with the IO modules it starts in the served index. [[spec/design_output/model#io-modules-are-modules]]
+func Main(manage Manage, starts ...Start) {
+	Serving()
 	argv := argsOf()[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why> [words]\n       se-index call <method> <json params>")
+		fmt.Fprintln(stderr, "usage: se-index <serve|find|notes|links|dangling|same|tickets|changes|reindex|standing|why|dump> [words]\n       se-index call <method> <json params>")
 		exits(2)
 	}
 
@@ -39,9 +46,31 @@ func main() {
 	}
 
 	if argv[0] == "serve" {
-		exits(serves(root))
+		exits(serves(root, manage, starts))
 	}
 	exits(asks(root, argv))
+}
+
+// The root every verb works in, which the composition root reads its wiring off. [[spec/design_output/index#a-door-comes-back]]
+func Root() (string, error) { return rootHere() }
+
+// The base of /v1 on the door standing over the root, which it starts where none answers, so a client reaches the index the way every other client does. [[spec/tickets/the-quack-cli-gets-generated]]
+func V1() (string, error) {
+	root, err := rootHere()
+	if err != nil {
+		return "", err
+	}
+	if _, err := reaches(root, []string{"standing"}); err != nil {
+		return "", err
+	}
+	standing, err := standingOf(root)
+	if err != nil {
+		return "", err
+	}
+	if standing.V1 == 0 {
+		return "", errorOf("the standing door names no /v1 port")
+	}
+	return fmt.Sprintf("http://127.0.0.1:%d/v1", standing.V1), nil
 }
 
 func rootHere() (string, error) {
@@ -66,13 +95,13 @@ func rooted(path string) string {
 	return path
 }
 
-func serves(root string) int {
+func serves(root string, manage Manage, starts []Start) int {
 	// A fresh tree holds no runtime folder yet, and the database needs one to open in. [[spec/design_output/index#the-door-owns-the-database]]
 	if err := makeDir(filepath.Join(root, Runtime), 0o755); err != nil {
 		fmt.Fprintln(stderr, "the runtime folder did not stand:", err)
 		return 1
 	}
-	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"), q.Main)
+	stop, _, err := ServeManaged(root, filepath.Join(root, Runtime, "index.db"), q.Main, manage, starts...)
 	if err != nil {
 		fmt.Fprintln(stderr, "the index door did not stand:", err)
 		return 1
@@ -82,6 +111,22 @@ func serves(root string) int {
 	<-stops(swap.Watches)
 	stop()
 	return 0
+}
+
+// Asks the index standing over the root, and answers its result, so the composition root runs a verb that writes through a module. [[spec/design_output/model#everything-on-disk-mirrors]]
+func Ask(argv ...string) (any, error) {
+	root, err := rootHere()
+	if err != nil {
+		return nil, err
+	}
+	said, err := reaches(root, argv)
+	if err != nil {
+		return nil, err
+	}
+	if said.Error != "" {
+		return nil, errorOf(said.Error)
+	}
+	return said.Result, nil
 }
 
 func asks(root string, argv []string) int {
@@ -114,9 +159,13 @@ func reaches(root string, argv []string) (answer, error) {
 	for try := 0; try < reachTries; try++ {
 		standing, err := standingOf(root)
 		if err == nil && stands(standing, root) {
-			said, err := posts(standing, argv)
-			if err == nil {
+			said, posted := posts(standing, argv)
+			if posted == nil {
 				return said, nil
+			}
+			// A door past its answer time is busy, and its process still runs, so a second index sweeps beside it. [[spec/tickets/one-index-a-tree]]
+			if late(posted) {
+				return answer{}, posted
 			}
 		}
 		if err == nil && standing.Port != 0 && !stands(standing, root) {
@@ -130,12 +179,23 @@ func reaches(root string, argv []string) (answer, error) {
 	return answer{}, errorOf("the index door does not answer, and one would not start")
 }
 
-// [[spec/design_output/index#a-door-comes-back]]
+// Whether a post ran out its answer time, where a refused connection names a door that stands dead. [[spec/tickets/reaches-keeps-the-post-fault]]
+func late(err error) bool {
+	var timed net.Error
+	return errors.As(err, &timed) && timed.Timeout()
+}
+
+// A door stands while the build that stands it lies unchanged on disk, whatever build the caller runs. [[spec/design_output/index#a-door-comes-back]]
 func stands(said Standing, root string) bool {
 	if said.Root != "" && rooted(said.Root) != rooted(root) {
 		return false
 	}
-	return said.Stamp == stampHere()
+	bin := said.Bin
+	if bin == "" {
+		self, _ := executableOf()
+		bin = serverOf(self, root)
+	}
+	return said.Stamp != "" && said.Stamp == stampOf(bin)
 }
 
 func standingOf(root string) (Standing, error) {
@@ -194,7 +254,7 @@ func asked(argv []string) (string, json.RawMessage) {
 			}
 		case "links":
 			params["target"] = argv[1]
-		case "why":
+		case "why", "dump", "value":
 			params["name"] = argv[1]
 		case "same":
 			params["path"] = argv[1]

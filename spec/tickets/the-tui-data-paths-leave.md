@@ -1,10 +1,19 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -24,35 +33,41 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -60,7 +75,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -74,10 +89,264 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 9d870e3fd3c577a6
+process_hash: 22b42ea1501e8967
 group: tui-shell-switches-over
+record:
+  - step: design/draft
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 559950a8fa50a4ed33a7c39e86a35bc710810963
+    hash_after: 2fda61bb40d775d2172c4006fc2eabb5f3ddba0e
+    inputs:
+      - name: ask
+        hash: 55e3dcccd4ae2c25
+        size: 276
+    def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 42849f666ee11cead27a8022d0c7e3bd93e35691
+    hash_after: 42849f666ee11cead27a8022d0c7e3bd93e35691
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 713ca59bcb9fe911
+        size: 12950
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: cd951631732229fe
+        size: 8612
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: a3a12f8afbc43705
+        size: 8428
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: edbcb9b1a3bb9473
+        size: 8311
+    def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/tickets/v1-watch-streams-changes]]
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: c13f4c4346052c910c307ea4432747dd5d10c44f
+    hash_after: c13f4c4346052c910c307ea4432747dd5d10c44f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 77ef4c68b5d9831f
+        size: 13429
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: cd951631732229fe
+        size: 8612
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: a3a12f8afbc43705
+        size: 8428
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: edbcb9b1a3bb9473
+        size: 8311
+    def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: "[[spec/tickets/v1-watch-streams-changes]], [[spec/tickets/the-work-tab-reads-v1]]"
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: 623152c81bc1a7e24526166c1e860f357e0f277e
+    hash_after: 623152c81bc1a7e24526166c1e860f357e0f277e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 7343295707d8c3c4
+        size: 13099
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: a3a12f8afbc43705
+        size: 8428
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: edbcb9b1a3bb9473
+        size: 8311
+    def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/tickets/the-log-tab-reads-v1]]
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: e8919e321c70b7f3ac70aac4ffe9466af0410dcd
+    hash_after: e8919e321c70b7f3ac70aac4ffe9466af0410dcd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 7343295707d8c3c4
+        size: 13099
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: a3a12f8afbc43705
+        size: 8428
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: 0d7bd743bbc7dc89
+        size: 11159
+    def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/tickets/the-log-tab-reads-v1]]
+  - step: design/tests-red
+    hand: box d889b5fc6cd8 · claude-code-remote
+    hash_before: d4b7cd57888119250e3e81e4319f8e7e1015ae54
+    hash_after: d4b7cd57888119250e3e81e4319f8e7e1015ae54
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 7343295707d8c3c4
+        size: 13099
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: a3a12f8afbc43705
+        size: 8428
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: 651e262af2241535
+        size: 12121
+    def: 08e16d07b0de477c
+  - step: design/tests-red
+    hand: the engine
+    stale: "[[spec/tickets/the-work-tab-reads-v1]], [[spec/tickets/the-work-keys-call-actions]], [[spec/tickets/the-log-tab-reads-v1]]"
+  - step: design/tests-red
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 31907719d689737155dc9fb4e32d485cf8cc49a6
+    hash_after: 31907719d689737155dc9fb4e32d485cf8cc49a6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/tui fails
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 365df2fa0fabfadf
+        size: 19014
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: d86d10e8babf3c95
+        size: 21078
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: f8d74dda24c97d66
+        size: 17093
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 936f3fa84f9814dc31af76a1a25dea711c6e8611
+    hash_after: 936f3fa84f9814dc31af76a1a25dea711c6e8611
+    inputs:
+      - name: design/draft
+        hash: daedefef3b76c374
+        size: 3003
+      - name: design/tests-red
+        hash: b41ceddb426778c6
+        size: 696
+      - name: [[spec/tickets/v1-watch-streams-changes]]
+        hash: 814d41b71fd1d41e
+        size: 13774
+      - name: [[spec/tickets/the-work-tab-reads-v1]]
+        hash: 365df2fa0fabfadf
+        size: 19014
+      - name: [[spec/tickets/the-work-keys-call-actions]]
+        hash: d86d10e8babf3c95
+        size: 21078
+      - name: [[spec/tickets/the-log-tab-reads-v1]]
+        hash: f8d74dda24c97d66
+        size: 17093
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: ab59dbdff099654bd6b70fa8ccddcc9da27e6ba9
+    hash_after: ab59dbdff099654bd6b70fa8ccddcc9da27e6ba9
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-tui-data-paths-leave.md:447:23: Vocabulary: appendfile stands outside the words this tree writes. Write"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d88cc0681fd4 · claude-code-remote
+    hash_before: 3faf231f9295b082a3d9b159f5d2dd40dd113e72
+    hash_after: 3faf231f9295b082a3d9b159f5d2dd40dd113e72
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/tui passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-tui-data-paths-leave.md:485:14: Vocabulary: testthewindowslicestandsswitchedovertonew stands outside th"
+    inputs:
+      - name: design/tests-red
+        hash: b41ceddb426778c6
+        size: 696
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+depends_on: [the-work-tab-reads-v1, the-work-keys-call-actions, the-log-tab-reads-v1]
+reason: done
 ---
 
 # Ask
@@ -91,6 +360,16 @@ The window stops computing a second copy of any value.
 
 # design
 
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -98,44 +377,54 @@ The window stops computing a second copy of any value.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The ask splits into four pieces, each small enough to read whole, and this ticket takes the last one. Each piece is a child of this group, minted and open.
+
+- [[spec/tickets/v1-watch-streams-changes]]: the door answers `GET /v1/watch`, and the window gets its client. The JSON-RPC `changes` call is the window's only wake today, so the index client leaves only after this stands.
+- [[spec/tickets/the-work-tab-reads-v1]]: the work tab reads `work/rows` and `work/open-tasks` off `/v1`, and wakes on the watch. `workindex.go`, `runVerb`, `startIndex`, `NodeAt` and the `branch.js list --json` spawn in `workplaces.go` leave, since `work/rows` carries the places, the cloud flag and the todos.
+- [[spec/tickets/the-work-keys-call-actions]]: the keys post `work/place`, `tickets/flip-urgent`, `tickets/set-field` and `work/pull` to `/v1/actions`. The writes in `workplace.go` and `workedit.go` leave.
+- [[spec/tickets/the-log-tab-reads-v1]]: the log tab reads `log/rows` off `/v1`. `tail.go` and its `fsnotify` watcher leave.
+
+This ticket lands once the three before it close. `migration.window` in `spec/config/level0.json` reads `new`. The compares leave with the mode that runs them. `src/tui/work/shadow.go`, `src/tui/log/shadow.go` and `src/tui/frame/shadow.go` lose `Shadow`, `Check`, `Apart`, `BadgeApart` and `WriteShadow`, and `main.go` loses `windowMode` and the `Shadow` wiring. A draw function a piece moves onto the index path stays with that piece. The door keeps this ticket's front closed while it stands in hand, so its wait on the three rides here. The pull hands the pieces first by their own `depends_on`.
+
+Weighed: one ticket over the whole cutover spares three reviews. It costs a diff across three packages and the door, which nobody reads whole. Assumed: `/v1/watch` belongs to this group, since the design names it and the window's switch lands only on it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/tui/main.go newModelOver, which hands each tab its Shadow
+- src/tui/main.go windowMode, which reads migration.window
+- src/tui/work/work.go Tab.Update and Tab.takes, which call Tab.check
+- src/tui/log/tab.go Tab, which calls Shadow.Check off its snapshot
+- src/tui/window_test.go, which reads the mode and the shadows the window holds
+- spec/config/level0.json migration.window, which the index and quack read
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/tui/window_test.go TestTheWindowHoldsNoCompare: the window builds every tab with no compare
+- src/tui/window_test.go TestTheWindowModeReadsNew: migration.window reads new off the tracked config
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
+- every file, function and verb the approach names stands opened on this branch: main.go, work.go, workplaces.go, workindex.go, door.go, log/tab.go, the three shadow.go files, registry/v1.go, index/actions.go and work/rows.go
+- the callers list names every caller git grep finds of Shadow, WriteShadow, windowMode and migration.window
+- each done_when line names its decider: git grep for the spawn string, and ./RUNME.sh check
 
 ## tests-red
 
@@ -144,20 +433,52 @@ The window stops computing a second copy of any value.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/switched_test.go
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/tui/switched_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases still fail on their own assertion: the tracked config reads shadow for the window, and work.Tab and log.Tab each hold a Shadow. The three pieces before this one now stand closed, so this ticket's own part is all that is left: the key, the compares and windowMode.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the key line meets TestTheWindowModeReadsNew, and the compares leaving meet TestTheWindowHoldsNoCompare. The grep line meets the work tab piece's own done_when, and the check decides the last line
+- the cases read the tracked config and the tab types alone, so no door is reached and none needs a fake
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
+
+What I weigh: the three pieces this ticket waits on stand closed, the grep line answers nothing on this branch, and phase6switch reads true in the tracked config. The approach moves the key and takes the compares out, which the two red cases decide, and the check decides the last line.
+
+Fixed in place, no round:
+
+- the callers list misses src/modules/migration/migration.go, whose WindowKey row takes new as its default and its one value, the way the switched slices read, and migration_test.go beside it
+- the three shadow_test.go files leave with the compares they test
+- frame/door.go loses appendFile once WriteShadow leaves
+
+# implement
 
 ## change
 
@@ -166,14 +487,26 @@ The window stops computing a second copy of any value.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the files: the draft's list and the gate's rows, plus these, each forced by the change:
+- log/view.go leaves, since the compare was its one user
+- work/badge_test.go leaves with BadgeOf
+- level0.json drops window, since a built-in value stands out of the tracked file
+- views.js drops a comment naming BadgeOf
+- the schema, the command file and size.golden.json come off their generators
+- tree.golden.json comes off its generator too, and the drift it carries from other tickets is for the merge to read
+- a case in frame, log and work each holds that the window writes nothing of its own
+the doors: the change adds no door, and it takes out the append the shadow row took
+the comment: TestTheWindowSliceStandsSwitchedOverToNew names this ticket, and the migration row says the window switched in phase 6
+one place: the key's mode stands in migration.go alone, and the schema and the command file come off it
 
 ## tests-green
 
@@ -182,26 +515,60 @@ The window stops computing a second copy of any value.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/tui/switched_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The window slice switches to new. The window now draws off the index alone, and keeps no second copy to compare.
+
+- migration.go builds window in as new, with no other mode, so the tracked config drops the key
+- the work and log tabs lose their Shadow, and main.go loses windowMode and the wiring
+- the three shadow.go files leave, and so do log/view.go and BadgeOf, the second drawings the compare read
+- frame/door.go loses the append the shadow row wrote through
+
+The schema, its command file and the size golden come off their generators.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the files: the change's own, plus the generated files and the three cases holding that the window writes nothing
+the doors: the change adds no door
+the comment: the migration row and the new tests name the switch
+one place: the key's mode stands in migration.go alone
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
 
 # Discussion
 

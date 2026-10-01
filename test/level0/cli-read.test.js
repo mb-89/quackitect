@@ -4,7 +4,18 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { lintRows, version, warningsStood } from "../../src/scripts/cli-read.js";
+import {
+  findingsDoors,
+  lintRows,
+  version,
+  warningsStood,
+} from "../../src/scripts/cli-read.js";
+
+// The lint's prose reader asks its slice's mode off the doors it runs on. [[spec/tickets/read-topics-switch-over]]
+test("the check's own reading carries the slices the prose reader asks", async () => {
+  const doors = await findingsDoors();
+  assert.equal(typeof doors.slices?.prose, "string");
+});
 
 // A warning lands under every door, and the stamp carries the list. [[spec/design_output/config#the-engine-controls]]
 test("the warnings stand as a list, empty before any lint, and the version reads as text", () => {

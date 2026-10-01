@@ -1,11 +1,10 @@
-// The read tools registering at session start, and the first call bringing the
-// server up. The hook reaches the outside through the engine's own doors, so
-// this drives it over a fake session.
-// [[spec/design_output/level0#the-first-call-pays]]
+// A level zero call where the cage stands off: it posts to the server, and a
+// dead server says so. The hook reaches the outside through the engine's own
+// doors, so this drives it over a fake session.
+// [[spec/design_output/level0#the-first-call-pays]] [[spec/tickets/level0-tools-leave-the-bridge]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { READ_TOOLS } from "../../.claude/skills/level0/hooks/level0.js";
 import { POINTER } from "../../.claude/skills/level0/lib/vehicle.js";
 // The plugin loads the pull module, which holds the one session start and calls the bridgehead's register. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 import { register } from "../../.claude/skills/level0/hooks/pull-tool.js";
@@ -22,7 +21,11 @@ function engine(answers = {}) {
   const $ = {
     tool: { register: (spec) => void registered.push(spec) },
     process: {
-      run: (argv) => void ran.push(argv) || (answers.start ?? { exitCode: 0 }),
+      // The bridgehead appends its row through node, and a case counts the start runs apart from it. [[spec/tickets/a-down-index-refuses-calls]]
+      run: (argv) =>
+        String(argv?.[2]).includes("appendFileSync")
+          ? { exitCode: 0 }
+          : void ran.push(argv) || (answers.start ?? { exitCode: 0 }),
     },
     http: {
       fetch: (where, init) => {
@@ -50,35 +53,6 @@ const opened = (answers) => {
   return it;
 };
 
-// [[spec/design_output/level0#the-bridgehead-and-the-server]]
-test("the hook names every read tool, so a reader knows what registers", () => {
-  assert.ok(Array.isArray(READ_TOOLS), "the hook names the tools it registers");
-  assert.deepEqual(
-    READ_TOOLS.map((one) => one.name).sort(),
-    ["find", "patch", "replace", "undo"],
-    "the four read tools stand",
-  );
-});
-
-// [[spec/design_output/level0#the-first-call-pays]]
-test("the session start registers every read tool, whatever the server answers", async () => {
-  const it = opened();
-
-  const start = firing(it, "session.start");
-  assert.ok(start, "the hook takes the session start");
-  await start.run(it.$, {}, (e) => e);
-
-  const reads = READ_TOOLS.map((one) => one.name);
-  assert.deepEqual(
-    it.registered
-      .map((one) => one.name)
-      .filter((one) => reads.includes(one))
-      .sort(),
-    ["find", "patch", "replace", "undo"],
-    "every read tool registers with no server standing, beside the pull",
-  );
-});
-
 // The engine hands the `*` door every event, and its `next` names the event. A call of a read tool runs through that door, and `next` chains into a door filtered on the tool where the hook holds one, the way the engine chains. So the count reads true whichever shape the hook takes. [[spec/design_output/level0#the-first-call-pays]]
 function calls(it, called) {
   const chained = Object.assign(
@@ -95,11 +69,11 @@ function calls(it, called) {
 const SAID = '{"result":{"result":"a line"}}';
 const posts = (it) => it.asked.filter((one) => one.where.endsWith("/event")).length;
 
-// The ask asks a case a tool, so the loop names each one the hook registers. [[spec/design_output/level0#the-first-call-pays]]
-for (const spec of READ_TOOLS) {
-  const called = `mcp__level0__${spec.name}`;
+// The ask asks a case a tool, so the loop names each one the bridge's read path served. [[spec/tickets/level0-tools-leave-the-bridge]]
+for (const name of ["find", "patch", "replace", "undo"]) {
+  const called = `mcp__level0__${name}`;
 
-  test(`a ${spec.name} call meeting a server posts once, and answers what it says`, async () => {
+  test(`a ${name} call meeting a server posts once, and answers what it says`, async () => {
     const it = opened({
       fetch: (where) =>
         where.endsWith("/event") ? { ok: true, status: 200, text: SAID } : null,
@@ -112,27 +86,7 @@ for (const spec of READ_TOOLS) {
     assert.equal(said.result, "a line", "the answer rides back as the tool's own");
   });
 
-  test(`a ${spec.name} call meeting no server starts one, and says at once that level zero starts`, async () => {
-    const it = opened({ fetch: () => null });
-
-    const said = await calls(it, called);
-
-    assert.ok(it.ran.length, "the start runs where the server answers nothing");
-    assert.equal(
-      it.asked.some((one) => one.where.endsWith("/health")),
-      false,
-      "the call reads no health, so it waits on nothing",
-    );
-    assert.equal(posts(it), 1, "one post, before the start");
-    assert.match(
-      String(said.result),
-      /Level zero is starting/,
-      "the line says it starts",
-    );
-    assert.match(String(said.result), /Call it again/, "and what the reader does");
-  });
-
-  test(`a ${spec.name} call where the road launched nothing names the port and the log`, async () => {
+  test(`a ${name} call where the road launched nothing names the port and the log`, async () => {
     const it = opened({ fetch: () => null, start: { exitCode: 3 } });
 
     const said = await calls(it, called);
@@ -144,17 +98,6 @@ for (const spec of READ_TOOLS) {
 }
 
 const healths = (it) => it.asked.filter((one) => one.where.endsWith("/health")).length;
-
-// [[spec/design_output/level0#the-first-call-pays]]
-test("a second call before the server answers says it starts again, and runs no second road", async () => {
-  const it = opened({ fetch: () => null });
-  await calls(it, "mcp__level0__find");
-
-  const said = await calls(it, "mcp__level0__find");
-  assert.equal(healths(it), 0, "no call reads the health");
-  assert.equal(it.ran.length, 1, "the road runs once");
-  assert.match(String(said.result), /Level zero is starting/);
-});
 
 // [[spec/design_output/level0#the-first-call-pays]]
 test("a start road starting no server leaves the call nothing to wait on", async () => {
@@ -177,30 +120,6 @@ test("a post nobody takes reads the pointer again, and lands on the port it name
   assert.equal(said.result, "a line", "the moved server answers");
   assert.equal(it.ran.length, 0, "no start runs where the server moved");
 });
-
-// A tool the hook registers answers nowhere past it, so a reply paid on the call posts the call again. [[spec/design_output/level0#the-first-call-pays]]
-for (const tool of ["patch", "replace"]) {
-  test(`a ${tool} call meeting an owed reply runs the tool once the reply pays`, async () => {
-    const events = [];
-    const it = opened({
-      fetch: (where, _count) => {
-        if (!where.endsWith("/event")) return null;
-        const event = JSON.parse(it.asked.at(-1).init.body).event;
-        events.push(event);
-        const tools = events.filter((one) => one === "tool.call").length;
-        if (event === "agent.spoke")
-          return { ok: true, status: 200, text: '{"pass":true}' };
-        return tools === 1
-          ? { ok: true, status: 200, text: '{"needs":"reply"}' }
-          : { ok: true, status: 200, text: SAID };
-      },
-    });
-    it.$.session = { messages: async () => [] };
-    const said = await calls(it, `mcp__level0__${tool}`);
-    assert.equal(said.result, "a line", "the tool answers, and no call falls through");
-    assert.deepEqual(events, ["tool.call", "agent.spoke", "tool.call"]);
-  });
-}
 
 // The answer door keys a prompt on the newest transcript row, so the spoke post carries each row's role and id. [[spec/tickets/a-reply-follows-its-prompt]]
 test("a reply the door asks for posts the transcript rows with their ids", async () => {

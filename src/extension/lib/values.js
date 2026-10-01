@@ -36,4 +36,15 @@ function valueAt(text, key) {
   return parsed(text)?.[section]?.[leaf];
 }
 
-module.exports = { asType, parsed, valueAt, withValue };
+// A projection as /v1 hands it, q.Ordered field by field, read back as the JSON its file holds. [[spec/tickets/the-sidebar-reads-v1]]
+function plainOf(said) {
+  if (!said || typeof said !== "object") return said;
+  if (said.Object)
+    return Object.fromEntries(
+      (said.Keys ?? []).map((key, at) => [key, plainOf(said.Fields?.[at])]),
+    );
+  if (said.Array) return (said.Items ?? []).map(plainOf);
+  return said.Literal ? JSON.parse(said.Literal) : undefined;
+}
+
+module.exports = { asType, parsed, plainOf, valueAt, withValue };
