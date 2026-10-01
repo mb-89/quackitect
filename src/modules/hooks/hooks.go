@@ -331,7 +331,7 @@ func (d *Door) calls(session string, e map[string]any) (Effect, bool, error) {
 	if said.Error != "" {
 		return Effect{Kind: resultKind, Text: fmt.Sprintf("%s fails: %s", action, said.Error)}, true, nil
 	}
-	return Effect{Kind: resultKind, Result: said.Result}, true, nil
+	return Effect{Kind: resultKind, Result: harnessResult(said.Result)}, true, nil
 }
 
 // The tools the command door reads, and the git read the pull rule asks. [[spec/tickets/cage-command-rules-port]]

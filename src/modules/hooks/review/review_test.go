@@ -4,13 +4,13 @@
 package review
 
 import (
+	_ "embed"
 	"encoding/json"
-	"os"
 	"testing"
 )
 
-// The case table the bridge answers alike. [[spec/tickets/review-spawns-off-the-door]]
-const reviewCases = "../../../../test/replay/cage/review-cases.json"
+//go:embed testdata/review-cases.json
+var reviewCases []byte // The case table the bridge answers alike, riding in through embed so the package imports no os. [[spec/tickets/io-answers-take-result-shape]]
 
 type reviewTable struct {
 	Material Material `json:"material"`
@@ -36,12 +36,8 @@ type reviewTable struct {
 
 func readTable(t *testing.T) reviewTable {
 	t.Helper()
-	body, err := os.ReadFile(reviewCases)
-	if err != nil {
-		t.Fatal(err)
-	}
 	var table reviewTable
-	if err := json.Unmarshal(body, &table); err != nil {
+	if err := json.Unmarshal(reviewCases, &table); err != nil {
 		t.Fatal(err)
 	}
 	return table

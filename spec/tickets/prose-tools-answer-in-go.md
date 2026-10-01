@@ -191,7 +191,7 @@ A new IO module `src/modules/drafts` answers `check_prose` and `check_answer` un
 5. The finding body moves into `src/modules/hooks/write` as one function beside `PlaceOf`, with the context line optional. `hooks.RefusedVoice` and the drafts answer both read it, so the body stands once.
 6. `src/quack/drafts.go` wires the seams: `Lint` reads `heardOver` as it stands, since it already answers the kept rows with message and severity. `Bands` reads the settings. `Asked` reads the count through `store.OnCommit`, as `reportsHeard` in `src/quack/finds.go` does.
 7. `Holds.prompted` in `src/modules/hooks/fold.go` keeps `Asked`, the question count of the owner's prompt, off `questionsIn` in `answer.js`, ported once into the hooks package.
-8. One case table, `test/replay/cage/draft-cases.json`, holds each case: the tool, its input, the rows Vale answers past the vetoes, the question count, and the text the bridge answers. `src/quack/drafts_test.go` and `test/level0/answer-read.test.js` each answer it.
+8. One case table, `src/modules/drafts/testdata/draft-cases.json`, holds each case: the tool, its input, the rows Vale answers past the vetoes, the question count, and the text the bridge answers. `src/quack/drafts_test.go` and `test/level0/answer-read.test.js` each answer it.
 
 Boundaries with sibling tickets:
 - level0-tools-leave-the-bridge drops `check_prose` and `check_answer` from the bridge's `TOOLS`, and wires the module
@@ -261,7 +261,7 @@ src/quack/drafts.go, new
 src/quack/drafts_test.go, new
 src/quack/accepts.go
 src/quack/main.go
-test/replay/cage/draft-cases.json, new
+src/modules/drafts/testdata/draft-cases.json, new
 test/level0/answer-read.test.js
 
 ### checked
@@ -300,7 +300,7 @@ src/modules/hooks/questions_test.go
 
 Every new case fails on its own assertion, against a stub module that registers nothing and answers an empty text, and a `Questions` field on `Holds` that nothing sets yet.
 
-The table `test/replay/cage/draft-cases.json` carries the bridge's own answers, read off a red run of the JS reader, and `test/level0/answer-read.test.js` answers every case green. So the JS done_when line holds from this step on, and pins the bridge the Go side ports.
+The table `src/modules/drafts/testdata/draft-cases.json` carries the bridge's own answers, read off a red run of the JS reader, and `test/level0/answer-read.test.js` answers every case green. So the JS done_when line holds from this step on, and pins the bridge the Go side ports.
 
 What surprises me:
 - the write door's CODE pattern names JavaScript and JSON paths alone, so a `.go` path reads as prose and Vale's rows stand. The code case takes `src/a.js`, and a case pins that a Vale running nowhere reads a `.go` path clean.
@@ -402,5 +402,5 @@ the module cases run over a fake Lint, question count and bands, the quack cases
   - `src/modules/drafts/answer.go` ports the answer shape checks off `.claude/skills/level0/lib/answer.js`, `voice.js`, `stop.js`, `refuse.js` and `src/engine/tense.js`, since a module imports q alone.
   - `heardOver` in `src/quack/command.go` splits into `valeRows` and `keptOver`, so `src/quack/drafts.go` wires the lint seam.
   - `Holds.prompted` in `src/modules/hooks/fold.go` keeps the owner's question count, which the answer check reads through `store.OnCommit`, as `reportsHeard` in `src/quack/finds.go` does.
-  - One case table, `test/replay/cage/draft-cases.json`, holds the bridge's answers. `src/quack/drafts_test.go` and `test/level0/answer-read.test.js` each answer it.
+  - One case table, `src/modules/drafts/testdata/draft-cases.json`, holds the bridge's answers. `src/quack/drafts_test.go` and `test/level0/answer-read.test.js` each answer it.
   - Risk: the refusal body and `cut` then stand twice, in `hooks.RefusedVoice` and in `drafts`.

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -150,7 +151,7 @@ func TestACallTakesTheDefaultWaitOffItsKey(t *testing.T) {
 	if len(c.waits) != 1 || c.waits[0] != time.Second {
 		t.Fatalf("the call waits %v, and wants a second with no wait set", c.waits)
 	}
-	if len(said.Effects) != 1 || said.Effects[0].Kind != "result" || said.Effects[0].Result != "pulled" {
+	if shape, _ := said.Effects[0].Result.(map[string]any); len(said.Effects) != 1 || said.Effects[0].Kind != "result" || shape["result"] != "pulled" {
 		t.Fatalf("the door answers %+v, and wants the action's result", said)
 	}
 	one.ix.SeedAs(one.resolved, map[string]any{q.ResolvedName: q.Resolved{"config/" + WaitKey: "3"}})
@@ -266,4 +267,21 @@ func TestTheListenAnswersAPostAndStandsItsPort(t *testing.T) {
 func jsonNumber(n int) string {
 	text, _ := json.Marshal(n)
 	return string(text)
+}
+
+// A string an IO action answers reaches the harness under a result key, and any other value goes on as it stands. [[spec/tickets/io-answers-take-result-shape]]
+func TestAStringResultReachesTheHarnessUnderAResultKey(t *testing.T) {
+	one := doorOver(t, &calls{said: Called{Result: "The wait reaches its cap.", Handle: "h1"}}, &book{})
+	said := hooks(t, one.door, toolCall(nil))
+	if len(said.Effects) != 1 || said.Effects[0].Kind != resultKind || said.Effects[0].Text != "" {
+		t.Fatalf("the door answers %+v, and wants one result with no text", said)
+	}
+	if shape, ok := said.Effects[0].Result.(map[string]any); !ok || len(shape) != 1 || shape["result"] != "The wait reaches its cap." {
+		t.Errorf("the door answers %#v, and wants the text under result alone", said.Effects[0].Result)
+	}
+	listed := []any{"a", "b"}
+	other := doorOver(t, &calls{said: Called{Result: listed, Handle: "h2"}}, &book{})
+	if got := hooks(t, other.door, toolCall(nil)).Effects[0].Result; !reflect.DeepEqual(got, listed) {
+		t.Errorf("the door answers %#v, and wants the list as it stands", got)
+	}
 }

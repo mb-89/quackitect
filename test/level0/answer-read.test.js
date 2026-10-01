@@ -4,12 +4,15 @@
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { TOOLS as SURVEY } from "../../.claude/skills/level0/lib/tools.js";
 import { readsAnswer } from "../../src/bridge/answer-read.js";
 import { PROSE_CALL, TOOLS as PROSE_TOOLS } from "../../src/bridge/prose.js";
+// One case table holds what the two draft tools answer, so the Go module and the bridge read one voice. [[spec/tickets/prose-tools-answer-in-go]]
+import DRAFTS from "../../src/modules/drafts/testdata/draft-cases.json" with {
+  type: "json",
+};
 import { boxOf, decide } from "../../src/bridge/server.js";
 import { TOOLS as HAND_TOOLS } from "../../src/bridge/tools.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
@@ -174,11 +177,6 @@ test("the stop line alone reads clean, at the stop door and in the draft tool", 
   assert.equal(blockOf(await stops(box, { last_assistant_message: "stop: done" })), "");
   assert.deepEqual(reads, [], "no line of vale reads the stop line");
 });
-
-// One case table holds what the two draft tools answer, so the Go module and the bridge read one voice. [[spec/tickets/prose-tools-answer-in-go]]
-const DRAFTS = JSON.parse(
-  readFileSync(new URL("../replay/cage/draft-cases.json", import.meta.url), "utf8"),
-);
 
 // A box whose Vale answers the case's rows, and whose owner asked the case's questions. [[spec/tickets/prose-tools-answer-in-go]]
 function drafted(one) {

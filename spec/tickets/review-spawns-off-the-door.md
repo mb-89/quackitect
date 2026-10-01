@@ -256,7 +256,7 @@ src/modules/hooks/review/review.go, new
 src/modules/hooks/review/review_test.go, new
 src/quack/main.go
 .claude/skills/level0/hooks/level0.js
-test/replay/cage/review-cases.json, new
+src/modules/hooks/review/testdata/review-cases.json, new
 test/level0/review-cases.test.js, new
 test/level0/door-spawn.test.js, new
 
@@ -299,7 +299,7 @@ Every new case fails on its own assertion:
 - the door's cases, against a door that passes the review call and the answered event
 - the plugin case, whose door answers a spawn that never runs
 
-The table `test/replay/cage/review-cases.json` carries the bridge's own answers, read off a red run of `test/level0/review-cases.test.js`, which now answers green and pins the bridge.
+The table `src/modules/hooks/review/testdata/review-cases.json` carries the bridge's own answers, read off a red run of `test/level0/review-cases.test.js`, which now answers green and pins the bridge.
 
 What surprises me:
 - the formatter lays a JSON file out again on write, so an exact edit has to read the file first
@@ -400,4 +400,4 @@ the door cases run over doorOver with a fake Review seam, the package cases over
   - A pure package `src/modules/hooks/review` ports `readerAsks`, `readerSays` and `report` off `.claude/skills/level0/lib/review.js`.
   - `Outside.Review` gathers the material, and `Door.reviewed` answers the spawn on the call and the report on `agent.answered`, under a token.
   - Every answer rides `Result` with no `Text`, so `NewDecisionOf` reads a pass.
-  - One case table, `test/replay/cage/review-cases.json`, holds the prompt and report both sides answer.
+  - One case table, `src/modules/hooks/review/testdata/review-cases.json`, holds the prompt and report both sides answer.

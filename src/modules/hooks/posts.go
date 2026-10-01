@@ -65,3 +65,14 @@ func textOfValue(value any) string {
 	}
 	return string(body)
 }
+
+// The key a tool's result rides under, which the harness reads. [[spec/tickets/io-answers-take-result-shape]]
+const resultKey = "result"
+
+// A string an action answers reaches the harness under a result key, the shape it reads as a tool's result, and any other value goes on as it stands. [[spec/tickets/io-answers-take-result-shape]]
+func harnessResult(value any) any {
+	if text, ok := value.(string); ok {
+		return map[string]any{resultKey: text}
+	}
+	return value
+}

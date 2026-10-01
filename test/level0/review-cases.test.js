@@ -4,16 +4,15 @@
 // [[spec/tickets/review-spawns-off-the-door]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { readerAsks, readerSays } from "../../.claude/skills/level0/lib/review.js";
 import { onAgentAnswered } from "../../src/bridge/review.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
+import TABLE from "../../src/modules/hooks/review/testdata/review-cases.json" with {
+  type: "json",
+};
 
-const TABLE = JSON.parse(
-  readFileSync(new URL("../replay/cage/review-cases.json", import.meta.url), "utf8"),
-);
 const TOKEN = "review-1";
 
 // [[spec/tickets/review-spawns-off-the-door]]

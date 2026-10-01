@@ -4,18 +4,18 @@
 package drafts
 
 import (
+	_ "embed"
 	"encoding/json"
-	"os"
 	"testing"
 
 	"quackitect/src/q"
 )
 
-// The case table the bridge answers alike, and the name an answer lints as. [[spec/tickets/prose-tools-answer-in-go]]
-const (
-	draftCases = "../../../test/replay/cage/draft-cases.json"
-	answerFile = "level0-answer.md"
-)
+// The name an answer lints as. [[spec/tickets/prose-tools-answer-in-go]]
+const answerFile = "level0-answer.md"
+
+//go:embed testdata/draft-cases.json
+var draftCases []byte // The case table the bridge answers alike, riding in through embed so the module imports no os. [[spec/tickets/io-answers-take-result-shape]]
 
 // One case: the tool, its input, what Vale answers, the owner's question count, and the text the bridge answers. [[spec/tickets/prose-tools-answer-in-go]]
 type draftCase struct {
@@ -44,12 +44,8 @@ type draftTable struct {
 // The table, read once a case. [[spec/tickets/prose-tools-answer-in-go]]
 func readTable(t *testing.T) draftTable {
 	t.Helper()
-	body, err := os.ReadFile(draftCases)
-	if err != nil {
-		t.Fatal(err)
-	}
 	var table draftTable
-	if err := json.Unmarshal(body, &table); err != nil {
+	if err := json.Unmarshal(draftCases, &table); err != nil {
 		t.Fatal(err)
 	}
 	return table
