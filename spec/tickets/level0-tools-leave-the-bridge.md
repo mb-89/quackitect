@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -159,6 +159,15 @@ record:
         hash: 98a1215b3409845c
         size: 1406
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 3eb2d70603d4203ea46a40b1156e61792d6eb289
+    hash_after: a2619988df82e1cacd4ffbf8cc4660876fe03938
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
 depends_on: ["tools-keep-their-own-names", "log-report-stop-in-go", "plan-writes-off-go", "prose-tools-answer-in-go", "edit-tools-answer-in-go", "find-and-wait-in-go", "review-spawns-off-the-door", "describe-answers-off-the-door", "grep-glob-answer-off-index"]
 ---
 
@@ -313,14 +322,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the wiring, the hooks module and drafts names, the three cage hooks and the probe, and the cases pinning the read path. The server table it leaves to the-bridge-server-leaves, noted on that ticket
+- the edits, search, waits, plans and drafts modules reach the outside through their fakes and the seams accepts wires, and the hooks keep the fake engine their cases drive
+- each change comment names the ticket, and the first-call section of the level0 design note says what stands
+- the tool names stand once in each module, and the Go tool-list case reads them off the wiring
 
 ## tests-green
 
