@@ -117,8 +117,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/owner-read
+step: design/draft
 depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
 ---
 
 # Ask
