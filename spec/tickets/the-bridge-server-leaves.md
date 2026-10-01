@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 424e8436113 · claude-code-remote
+    hash_before: 48ece2cc7de935dafe3db46741c28874c676f478
+    hash_after: 48ece2cc7de935dafe3db46741c28874c676f478
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: c5e802135594045d
+        size: 2682
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -222,26 +235,31 @@ The files this ticket touches:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/bridge-server-leaves.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/bridge-server-leaves.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The case fails on its own assertion, because `git ls-files` still names the bridge server. The Copilot runtime has already left with an earlier child. The draft names a second case for the start roads. The start road child landed it as `test/contract/no-road-names-server.test.js`, which stands green, so no copy is written.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- The first done line meets the new case, which stands red. The check line waits for the green leaf.
+- The case runs git over the real tree as a contract test, and needs no fake.
 
 # gate
 
