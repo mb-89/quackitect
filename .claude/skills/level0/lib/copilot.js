@@ -75,3 +75,8 @@ export function failureOf(event, reason) {
     return event.retry ? { failed: reason } : { block: reason };
   return { context: `${reason} The cage is not ready; do not claim otherwise.` };
 }
+
+// The Claude calls one Copilot event stands for, which the hooks door judges. It answers none until the change lands. [[spec/tickets/copilot-answers-off-the-door]]
+export function callsOf(event, read) {
+  return [];
+}

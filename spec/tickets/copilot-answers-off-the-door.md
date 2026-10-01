@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -134,6 +134,19 @@ record:
         hash: f6037bc7affa843e
         size: 247
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 0fa030b5e9eb8435a45157af2c5a745e1c058127
+    hash_after: 0fa030b5e9eb8435a45157af2c5a745e1c058127
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: a84f8bf83eb50a08
+        size: 4588
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -262,26 +275,35 @@ the first done line meets the door and refusal cases in copilot.test.js, the sec
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/copilot.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/level0/copilot.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every new case fails on its own assertion, against a `callsOf` stub answering no call and an `answers` stub in src/scripts/copilot-door.js answering an empty result. The cases run over a fake standing file and a fake door, which answers the effects a case hands it or falls.
+
+The second done_when line, that `git ls-files` names no runtime file, takes no test: tests-green answers it as a checkpoint, by the command itself.
+
+What surprises me: `refusedText` reads the tool name alone, so the refusal a Copilot write meets names `Write`, the Claude call it stands for, and never the Copilot tool.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets the door and refusal cases, the second a checkpoint by git ls-files at tests-green, and the third the check
+the cases reach a fake standing file and a fake door through the it the adapter takes, and no real door
 
 # gate
 
