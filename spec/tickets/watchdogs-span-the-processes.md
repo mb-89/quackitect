@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -145,6 +145,22 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: [[spec/design_output/model]]
+  - step: design/tests-red
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 0f32b1143ab049a8d159d031f879e5adff5ea9e7
+    hash_after: 0f32b1143ab049a8d159d031f879e5adff5ea9e7
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: e6c71b34bd87d89d
+        size: 3899
+      - name: [[spec/design_output/model]]
+        hash: a4432019dfba878d
+        size: 74940
+    def: 08e16d07b0de477c
 ---
 
 # Ask
