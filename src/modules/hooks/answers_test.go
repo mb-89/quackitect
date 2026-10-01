@@ -74,6 +74,17 @@ func TestALogCallLandsItsRowAndNamesItsKind(t *testing.T) {
 	}
 }
 
+// [[spec/tickets/helpers-calls-answer-too]]
+func TestAHelpersLogCallLandsItsRowToo(t *testing.T) {
+	state := stepper()(toolEvent, "a1", map[string]any{"tool": logCallName, "kind": "port", "said": "The helper's find lands."})
+	if want := "The line stands in the log under port."; state.Said.Result != want {
+		t.Errorf("a helper's log answers %q, and wants %q", state.Said.Result, want)
+	}
+	if rows := state.Said.Rows; len(rows) != 1 || rows[0].Kind != "port" || rows[0].Said != "The helper's find lands." {
+		t.Errorf("a helper's log lands the rows %+v, and wants one row of kind port", rows)
+	}
+}
+
 // The facts a stop call reads: the case's rules and the queue's binding. [[spec/tickets/log-report-stop-in-go]]
 func stopFields(t *testing.T, reason string, facts Stopped) map[string]any {
 	t.Helper()
