@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 71b6b39a66f27536
         size: 1074
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 2e6ebf4dd3570d1d9acef7cf24783e77517e51f7
+    hash_after: 2e6ebf4dd3570d1d9acef7cf24783e77517e51f7
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -345,14 +354,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size list alone, with src/quack/finds.go gaining the two methods its noReads needs
+- the hooks cases run over a fake index scanning seeded texts, and the quack case over fakeReads
+- src/modules/hooks/search.go opens on a header naming the design-output section it implements, and each function points at it
+- the Grep limit, the modes and the type globs stand once in src/modules/hooks/search.go, and the ask and answer types stay in src/index
 
 ## tests-green
 

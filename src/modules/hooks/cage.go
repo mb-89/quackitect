@@ -113,7 +113,8 @@ func NewDecisionOf(post Post, said Answer) string {
 		if one.Kind == rowsKind {
 			return HoldWord
 		}
-		if one.Kind == resultKind && !strings.HasPrefix(textOf(post.E, "tool"), tool.Prefix) {
+		// A result carrying no text answers the tool off the index, and passes. [[spec/tickets/grep-glob-answer-off-index]]
+		if one.Kind == resultKind && one.Text != "" && !strings.HasPrefix(textOf(post.E, "tool"), tool.Prefix) {
 			return RefuseWord
 		}
 	}

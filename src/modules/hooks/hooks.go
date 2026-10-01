@@ -226,6 +226,9 @@ func (d *Door) Hook(post Post) (Answer, error) {
 		effects = append(effects, said)
 	} else if refused := d.refuses(post, root, settings); post.Event == toolEvent && refused != "" {
 		effects = append(effects, Effect{Kind: resultKind, Text: refused})
+	} else if said, ok := d.searches(post); ok {
+		// [[spec/tickets/grep-glob-answer-off-index]]
+		effects = append(effects, said)
 	} else if post.Event == toolEvent {
 		said, ok, err := d.calls(session, post.E)
 		if err != nil {

@@ -62,11 +62,11 @@ type readKeep struct{ db *sql.DB }
 
 func (k readKeep) Find(words string, limit int) ([]Hit, error) { return Find(k.db, words, limit) }
 
-// A stub until tests-green. [[spec/tickets/grep-glob-answer-off-index]]
-func (k readKeep) Grep(ask GrepAsk) (GrepSaid, error) { return GrepSaid{}, nil }
+// [[spec/tickets/grep-glob-answer-off-index]]
+func (k readKeep) Grep(ask GrepAsk) (GrepSaid, error) { return Grep(k.db, ask) }
 
-// A stub until tests-green. [[spec/tickets/grep-glob-answer-off-index]]
-func (k readKeep) Glob(ask GlobAsk) (GlobSaid, error) { return GlobSaid{}, nil }
+// [[spec/tickets/grep-glob-answer-off-index]]
+func (k readKeep) Glob(ask GlobAsk) (GlobSaid, error) { return Glob(k.db, ask) }
 
 // One row of the table op: the id, and the body the manager writes. [[spec/design_output/model#an-operation-outlives-callers]]
 type OpRow struct {

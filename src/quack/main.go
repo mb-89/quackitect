@@ -315,7 +315,7 @@ func manages(as q.Writer, open doors) index.Manage {
 		if err != nil {
 			return index.Managed{}, err
 		}
-		stop, err := listens(root, store, open, served)
+		stop, err := listens(root, store, open, served, reads)
 		if err != nil {
 			served.Stop()
 			return index.Managed{}, err
@@ -328,7 +328,7 @@ func manages(as q.Writer, open doors) index.Manage {
 }
 
 // Opens the hooks door and the mcp server the wiring loads, and answers the stop of each with the manager's. The listeners stand in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
-func listens(root string, store *q.Store, open doors, served manager.Served) (func(), error) {
+func listens(root string, store *q.Store, open doors, served manager.Served, reads index.Reads) (func(), error) {
 	halts := []func(){}
 	stop := func() {
 		for _, halt := range halts {
@@ -337,7 +337,7 @@ func listens(root string, store *q.Store, open doors, served manager.Served) (fu
 		served.Stop()
 	}
 	if hook := open.hooks; hook.on {
-		halt, err := listensHooks(root, store, hook, served)
+		halt, err := listensHooks(root, store, hook, served, reads)
 		if err != nil {
 			return nil, err
 		}
@@ -382,8 +382,14 @@ func listensMCP(root string, store *q.Store, one hooked, served manager.Served) 
 }
 
 // Opens the hooks door over the manager's call and book, at the clock IO module's time. [[spec/tickets/hooks-listener-joins-io-process]]
-func listensHooks(root string, store *q.Store, hook hooked, served manager.Served) (func(), error) {
+func listensHooks(root string, store *q.Store, hook hooked, served manager.Served, reads index.Reads) (func(), error) {
+	// [[spec/tickets/grep-glob-answer-off-index]]
+	var asks func(string, map[string]any) (map[string]any, error)
+	if reads != nil {
+		asks = indexAsk(reads)
+	}
 	door := hooks.New(hooks.Outside{
+		Index: asks,
 		Store: store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
