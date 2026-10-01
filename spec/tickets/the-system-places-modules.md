@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: design/draft-2
 steps:
   - name: design
     steps:
@@ -200,6 +200,10 @@ record:
   - step: design/tests-red
     hand: the engine
     stale: design/draft
+  - step: design/tests-red
+    skipped: true
+    kept: 28834b1b612c04d55117635cb75585294b3e7fcb
+    why: its red tests stand as 28834b1b6 landed them, and a later leaf passed since
 group: module-processes-land-in-shadow
 ---
 
