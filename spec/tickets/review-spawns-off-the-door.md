@@ -117,12 +117,24 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/draft
+step: design/tests-red
 depends_on: ["tools-keep-their-own-names", "spawn-answers-off-the-door"]
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 742a0a0b1792969d6436683b5642a897e04d5236
+    hash_after: 742a0a0b1792969d6436683b5642a897e04d5236
+    inputs:
+      - name: ask
+        hash: e9c9e022659be7a6
+        size: 503
+      - name: [[spec/tickets/spawn-answers-off-the-door]]
+        hash: e31e3e8fdb75c4ab
+        size: 676
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -157,38 +169,92 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The hooks door answers `review_branch` with a spawn and its token, and answers the reader's report on `agent.answered`. The plugin carries the door's spawn and posts the report back to the door.
+
+1. `Listen` and `serves` move out of `src/modules/hooks/hooks.go` into a new `src/modules/hooks/listen.go`, unchanged, since `hooks.go` stands at the edge of `code.fileLines`.
+2. A pure package `src/modules/hooks/review` ports `readerAsks`, `fence`, `readerSays`, `line`, `report`, `redly` and `closing` off `.claude/skills/level0/lib/review.js`. `Material` holds the fields `branch review --json` prints: branch, ask, handback, stat, diff, check and retro. The sample answer prints through a struct, so its keys keep the order `JSON.stringify` gives them.
+3. `Outside.Review(root, branch)` answers the material, or why the verb gathered nothing, the way `reviewsBranch` runs `src/scripts/verbs/branch.js review <name> --json`. None answers nothing, and the call goes on to the bridge.
+4. A new `Door.reviewed` in `src/modules/hooks/review.go` answers two events.
+   - On a `tool.call` naming `mcp__level0__review_branch`, it asks `Outside.Review`, keeps the material under a token off `Now` in hex, and answers `Effect{Kind: resultKind, Result: {spawn, back}}`. The spawn's prompt takes `readerAsks` over the helper layer `brief.LayerFor` answers.
+   - On `agent.answered`, it takes the material its token names, drops it, reads a deny, an error or `readerSays`, logs the read, and answers `Effect{Kind: resultKind, Result: {result: report}}`. A token nobody holds answers the bridge's line.
+5. `Door.Hook` tries `reviewed` after `searches` and before `calls`.
+6. In `.claude/skills/level0/hooks/level0.js`, `door()` hands an answer carrying `spawn` to a new `doorSpawns`, which spawns as `spawns` does and posts the back event through `doorAsk`. The step that back answers stands as the tool's answer.
+
+Boundaries with sibling tickets:
+- spawn-answers-off-the-door owns the wrap of a spawn the harness makes, which this spawn meets as any spawn does
+- level0-tools-leave-the-bridge drops `review_branch` from the bridge's `TOOLS`
+- log-report-stop-in-go adds its own branch to `Door.Hook`, so the two merges meet in that chain
+
+What I weigh: a result carrying `{spawn, back}` is the shape the plugin already spawns from, so the door needs no new effect kind, against the research pass's spawn kind. The tokens stand in the door's memory, as `box.reviews` stands in the bridge's, so a restart loses a review in flight on both sides.
+
+I assume: the door's `Now` gives the token its uniqueness, as the bridge's clock does.
+
+Risks:
+- the plugin change runs only where the cage reads new, and a plugin test drives it with a fake door
+- the reader prompt is long, so the case table pins its frame with a short material, and a drift in the rules text shows there
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/hooks/hooks.go: Door.Hook, which gains the reviewed branch
+src/modules/hooks/hooks.go: Outside, which gains Review
+src/modules/hooks/hooks.go: Listen and Door.serves, which move to listen.go
+src/quack/main.go: the hooks.Outside it builds, which gains the Review seam, which runs the branch verb
+.claude/skills/level0/hooks/level0.js: door, which hands a spawn to doorSpawns
+.claude/skills/level0/hooks/level0.js: spawns, whose spawn call doorSpawns shares
+.claude/skills/level0/hooks/cage.js: stepOf, which hands the result on unchanged
+src/bridge/review.js: reviewsBranch and onAgentAnswered, which the table checks, unchanged
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/modules/hooks/review/review_test.go: TestTheReviewCasesAnswerAsTheBridge
+src/modules/hooks/review/review_test.go: TestAReaderAnswerOutsideJSONCountsOneFix
+src/modules/hooks/review_test.go: TestAReviewCallAnswersASpawnUnderAToken
+src/modules/hooks/review_test.go: TestTheAnsweredEventAnswersTheReport
+src/modules/hooks/review_test.go: TestATokenNobodyHoldsAnswersTheBridgesLine
+src/modules/hooks/review_test.go: TestAReviewNamingNoBranchSaysWhatItTakes
+test/level0/review-cases.test.js: the bridge answers every case of review-cases.json
+test/level0/door-spawn.test.js: a door's spawn answer spawns, and its back post reaches the door
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/modules/hooks/hooks.go
+src/modules/hooks/listen.go, new
+src/modules/hooks/review.go, new
+src/modules/hooks/review_test.go, new
+src/modules/hooks/review/review.go, new
+src/modules/hooks/review/review_test.go, new
+src/quack/main.go
+.claude/skills/level0/hooks/level0.js
+test/replay/cage/review-cases.json, new
+test/level0/review-cases.test.js, new
+test/level0/door-spawn.test.js, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every name stands opened: reviewsBranch, onAgentAnswered, readerAsks, readerSays, report, stepOf, door, spawns, doorAsk, Door.Hook, Effect, Outside, LayerFor and ForHelper, and the research pass's spawn kind and plugin claims fell there
+the callers list names the hook chain, the outside, the moved listener, the quack seam, and the plugin's door and spawn paths
+the Go done_when line rests on TestAReviewCallAnswersASpawnUnderAToken and TestTheAnsweredEventAnswersTheReport, and the check line on ./RUNME.sh check
 
 ## tests-red
 
