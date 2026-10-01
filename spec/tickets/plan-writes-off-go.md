@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "src/scripts/copilot-door.js:7:1: correctness/noUnusedFunctionParameters: This parameter it is unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 5f42ff848f16cef38be33204760f3b221f5ef304
+    hash_after: 5f42ff848f16cef38be33204760f3b221f5ef304
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/plans passes; green, src/quack passes; green, src/index passes; green, src/q/tool passes; green, src/
+      - name: check
+        exit: 0
+        said: "src/scripts/copilot-door.js:7:1: correctness/noUnusedFunctionParameters: This parameter it is unused."
+    inputs:
+      - name: design/tests-red
+        hash: ad5aa286b19adabf
+        size: 1141
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -373,26 +396,41 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/plans/plans_test.go src/quack/plans_test.go src/index/tools_test.go src/q/tool/tool_test.go src/modules/hooks/rides_test.go src/modules/queue/places_plan_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The plan tool answers in Go, off the plans module, and every tool the index lists carries the plan field. The module stays off the wiring until the flip, so the bridge still answers the live tool.
+
+- src/modules/plans ports plans and planned from src/bridge/plan.js. It writes the plan file in the bridge's key order, two spaces deep, with no HTML escape, and answers each line word for word.
+- q/tool's WithPlan adds the plan field to each listed schema, the plan tool's own aside, and Input drops a riding plan field as it drops the wait.
+- tool.Schema now inlines each ref it meets, since the plan's todo items rode as a ref into components the tool list never carries. The plan's arrays take nullable false, so they read as arrays as the bridge writes them.
+- quack wires the module, and its places read the queue's bound ports off the wiring at each call, through the exported PlacesOf.
+- Door.calls hands a riding plan field to the action under the plan tool's name before the call, in rides.go.
+
+What I weigh: reading the wiring at each plan call costs a file read, and in return a wiring edit reaches the places with no restart. I assume the plan file stands the box's runtime state, so the action lists no undo.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the schema read in q/tool, rides.go and its cases, and the queue case, each named in the implement step
+- every door has a fake: a fake file, clock and places for the module, the calls fake for the riding cases, a temp tree for quack
+- each new function and file points at this ticket or at spec/design_output/stop#the-plan
+- every fact stands in one place: the plan's words in q/tool, the place words beside a pointer at outline.go, the most open key in command.go, and the plan path beside a pointer at folders.js
 
 # accept
 
