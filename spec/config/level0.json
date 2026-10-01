@@ -20,5 +20,8 @@
     "phase9shadow": true,
     "sidebar": "new",
     "lsp": "new"
+  },
+  "work": {
+    "staleAfter": "90m"
   }
 }
