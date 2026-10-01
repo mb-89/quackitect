@@ -109,6 +109,9 @@ func (d *Dog) Check() []string {
 	return expired
 }
 
+// Hands each part a later Check finds expired to hand. [[spec/tickets/watchdogs-span-the-processes]]
+func (d *Dog) Expired(hand func(part string)) {}
+
 // The parts whose lease still holds, in order. [[spec/design_output/model#a-context-holds-a-lease]]
 func (d *Dog) Live() []string {
 	d.mu.Lock()

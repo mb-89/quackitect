@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
 	"quackitect/src/modules/hooks/write"
 )
@@ -272,6 +273,23 @@ func TestALivePostDecidedApartWritesAShadowRow(t *testing.T) {
 	row := rows[0]
 	if row["kind"] != "shadow" || row["slice"] != "cage" || row["old"] != RefuseWord || row["new"] != PassWord || row["harness"] != "copilot" || row["tool"] != "Bash" {
 		t.Fatalf("the shadow row reads %+v, and wants the cage slice, refuse on the old path, pass off the door, copilot and Bash", row)
+	}
+}
+
+func TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown(t *testing.T) {
+	one := doorOver(t, &calls{}, &book{})
+	var rows []map[string]any
+	one.door.from.Shadow = func(row map[string]any) error {
+		rows = append(rows, row)
+		return nil
+	}
+	one.door.from.Health = func() (time.Time, time.Duration, bool) { return time.Now().Add(-time.Minute), 30 * time.Second, true }
+	post := Post{Event: "tool.call", E: map[string]any{"tool": "Bash", "command": "ls", "description": "a-ticket: list", "session_id": "s1"}}
+	if _, err := one.door.Hook(post); err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 || rows[0]["kind"] != "shadow" || rows[0]["slice"] != "processes" || rows[0]["part"] != "index" {
+		t.Fatalf("the guarded call writes %+v, and wants one shadow row of the processes slice naming the index down", rows)
 	}
 }
 

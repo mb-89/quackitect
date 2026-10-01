@@ -133,6 +133,11 @@ func (p *Peer) Runs(instance string, hand func()) (func(), error) {
 	return func() {}, errors.New("the bus stands unbuilt")
 }
 
+// Hands the part of each heartbeat on lease.<part> to hand. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) Leases(hand func(part string)) (func(), error) {
+	return func() {}, errors.New("the bus stands unbuilt")
+}
+
 // Asks in.<instance>, and answers the saved inputs. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Inputs(instance string) ([]byte, error) {
 	return nil, errors.New("the bus stands unbuilt")

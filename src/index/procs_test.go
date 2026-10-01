@@ -8,6 +8,7 @@ import (
 	"flag"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -46,6 +47,101 @@ func TestFakeIdleProcess(t *testing.T) {
 	for {
 		time.Sleep(time.Hour)
 	}
+}
+
+// The fake silent process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
+func TestFakeSilentProcess(t *testing.T) {
+	if os.Getenv(BusEnv) == "" {
+		return
+	}
+	peer, err := Dial(os.Getenv(BusEnv), os.Getenv(TokenEnv))
+	if err != nil {
+		os.Exit(3)
+	}
+	instance := flag.Arg(0)
+	if err := peer.Commit(instance, map[string]any{instance + "/pid": os.Getpid(), instance + "/out": 7}); err != nil {
+		os.Exit(4)
+	}
+	_ = peer.Beat(instance)
+	for {
+		time.Sleep(time.Hour)
+	}
+}
+
+// A dog over the wall clock: a lease expires past its term, and a second fault raises the alarm, which stops the restarts. [[spec/design_output/model#restarts]]
+type fakeLeases struct {
+	mu      sync.Mutex
+	terms   map[string]time.Duration
+	renewed map[string]time.Time
+	faults  map[string]int
+	hands   []func(string)
+	stop    chan struct{}
+}
+
+func newFakeLeases() *fakeLeases {
+	one := &fakeLeases{terms: map[string]time.Duration{}, renewed: map[string]time.Time{}, faults: map[string]int{}, stop: make(chan struct{})}
+	go func() {
+		for {
+			select {
+			case <-one.stop:
+				return
+			case <-time.After(10 * time.Millisecond):
+				one.check()
+			}
+		}
+	}()
+	return one
+}
+
+func (f *fakeLeases) Hold(part string, term time.Duration) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.terms[part], f.renewed[part] = term, time.Now()
+}
+
+func (f *fakeLeases) Beat(part string) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if _, held := f.terms[part]; held {
+		f.renewed[part] = time.Now()
+	}
+}
+
+func (f *fakeLeases) Fault(part string, _ error) (time.Duration, bool) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.faults[part]++
+	return 10 * time.Millisecond, f.faults[part] < 2
+}
+
+func (f *fakeLeases) Expired(hand func(part string)) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.hands = append(f.hands, hand)
+}
+
+func (f *fakeLeases) check() {
+	f.mu.Lock()
+	expired := []string{}
+	for part, term := range f.terms {
+		if time.Since(f.renewed[part]) > term {
+			expired = append(expired, part)
+			f.renewed[part] = time.Now()
+		}
+	}
+	hands := append([]func(string){}, f.hands...)
+	f.mu.Unlock()
+	for _, part := range expired {
+		for _, hand := range hands {
+			hand(part)
+		}
+	}
+}
+
+func (f *fakeLeases) faultsOf(part string) int {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	return f.faults[part]
 }
 
 // A store whose wiring loads the fake instance, and the writer it commits as. [[spec/design_output/model#a-process-ends]]
@@ -230,6 +326,34 @@ func TestPlacementsAnswerInputsAndRunOnAMove(t *testing.T) {
 	}
 	if !strings.Contains(string(saved), `"source/all"`) || !strings.Contains(string(saved), "21") {
 		t.Fatalf("the index answers the inputs of doubler with %s", saved)
+	}
+}
+
+func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	leases := newFakeLeases()
+	defer close(leases.stop)
+	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Watch: leases, Term: 200 * time.Millisecond}
+	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	until(t, store, "fake/out at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 })
+	first := read(store, "fake/pid")
+	until(t, store, "the silent fake restarted", func(snap q.Snapshot) bool {
+		pid := snap.Read("fake/pid")
+		return pid != first && pid != 0
+	})
+	for end := time.Now().Add(10 * time.Second); leases.faultsOf("fake") < 2 && time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
+	}
+	if got := leases.faultsOf("fake"); got < 2 {
+		t.Fatalf("the dog counts %d fault(s) of the silent fake, and wants the second that raises the alarm", got)
 	}
 }
 

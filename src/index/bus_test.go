@@ -48,6 +48,41 @@ func TestTheBusAnswersALoopbackPeerShowingItsToken(t *testing.T) {
 	}
 }
 
+func TestTheIndexHearsEachBeatOfALease(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	listener, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	heard := make(chan string, 1)
+	stop, err := listener.Leases(func(part string) { heard <- part })
+	if err != nil {
+		t.Fatalf("the lease subject meets %v", err)
+	}
+	defer stop()
+	sender, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer sender.Close()
+	if err := sender.Beat("io"); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case part := <-heard:
+		if part != "io" {
+			t.Fatalf("the beat arrives under the part %q", part)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("no beat arrives over the bus")
+	}
+}
+
 func TestTheBusRefusesAPeerWithoutTheToken(t *testing.T) {
 	bus, err := StartBus()
 	if err != nil {

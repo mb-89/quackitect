@@ -24,6 +24,17 @@ type Placed struct {
 	Heard func(instance string, values map[string]json.RawMessage)
 	// The module types of its instances, which a change under src/modules restarts. [[spec/design_output/model#a-module-rebuilds-alone]]
 	Topics []string
+	// The dog the process's lease stands with, and the term past a beat. A nil holds no lease. [[spec/tickets/watchdogs-span-the-processes]]
+	Watch Leases
+	Term  time.Duration
+}
+
+// What a placed process's lease reaches: the dog that holds and renews it, counts its faults, and calls each expiry. [[spec/design_output/model#a-lease]]
+type Leases interface {
+	Hold(part string, term time.Duration)
+	Beat(part string)
+	Fault(part string, err error) (time.Duration, bool)
+	Expired(hand func(part string))
 }
 
 // Every placed process the index runs over one bus. [[spec/design_output/model#the-placements]]

@@ -5,12 +5,97 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
+	"os"
 	"testing"
 	"time"
 
 	"quackitect/src/index"
+	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 )
+
+// The fake silent IO process: it commits a value, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
+func TestFakeSilentIO(t *testing.T) {
+	if os.Getenv(index.BusEnv) == "" {
+		return
+	}
+	peer, err := index.Dial(os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv))
+	if err != nil {
+		os.Exit(3)
+	}
+	if err := peer.Commit("fake", map[string]any{"fake/out": 7}); err != nil {
+		os.Exit(4)
+	}
+	_ = peer.Beat(flag.Arg(0))
+	for {
+		time.Sleep(time.Hour)
+	}
+}
+
+func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
+	c := q.New()
+	as := manager.Registers(c)
+	fake := q.OutIn(c, "fake/out", 0, q.IO(), q.Doc("the fake's value"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	placed := index.Placed{Name: ioPart, Command: []string{os.Args[0], "-test.run=^TestFakeSilentIO$", "--", ioPart}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
+	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	for end := time.Now().Add(10 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
+		dog.Check()
+		if alarms, _ := store.Snapshot().Read(manager.AlarmsName).([]manager.Alarm); len(alarms) == 1 && alarms[0].Part == ioPart {
+			return
+		}
+	}
+	t.Fatalf("session/alarms reads %v, and wants the silent IO process", store.Snapshot().Read(manager.AlarmsName))
+}
+
+func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	watcher, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer watcher.Close()
+	rows := make(chan map[string]any, 4)
+	stop, err := watchesIndex(watcher, 100*time.Millisecond, func(row map[string]any) error { rows <- row; return nil })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	indexSide, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer indexSide.Close()
+	if err := indexSide.Beat("index"); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case row := <-rows:
+		if row["kind"] != "watchdog" || row["part"] != "index" {
+			t.Fatalf("the IO process writes %v, and wants a watchdog row naming the index", row)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the IO process writes no row where the index falls silent")
+	}
+}
 
 func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
 	bus, err := index.StartBus()

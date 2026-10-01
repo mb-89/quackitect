@@ -32,6 +32,19 @@ func alarmsIn(store *q.Store) []Alarm {
 	return said
 }
 
+func TestAnExpiredLeaseCallsItsHand(t *testing.T) {
+	dog, _, now := dogOf(t, DogSettings{}, nil)
+	var expired []string
+	dog.Expired(func(part string) { expired = append(expired, part) })
+	dog.Hold("io", 10*time.Second)
+	dog.Hold("tickets", time.Minute)
+	now.pass(11 * time.Second)
+	dog.Check()
+	if !slices.Equal(expired, []string{"io"}) {
+		t.Fatalf("the expired hand hears %v, and wants io alone", expired)
+	}
+}
+
 func TestAnExpiredLeaseMarksEachNameOfItsPartStale(t *testing.T) {
 	var items, count q.Writer
 	dog, store, now := dogOf(t, DogSettings{}, func(c *q.Catalog) {

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,22 @@ record:
         hash: b10dd6eac949de7c
         size: 309
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 36586c1b4c37 · claude-code-remote
+    hash_before: 9aa7ff8319402acc965a1d048444dac376bdc042
+    hash_after: 9aa7ff8319402acc965a1d048444dac376bdc042
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: e6c71b34bd87d89d
+        size: 3899
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -220,26 +236,35 @@ The assumption: the IO process beats off a ticker beside its starts, since no on
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/bus_test.go
+- src/index/procs_test.go
+- src/modules/index/lease_test.go
+- src/quack/io_test.go
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over stubs that build. The bus refuses the lease subject, the dog calls no expired hand, the IO process writes no row, and the hook module writes no shadow row. The silent module case waits on the placements, since Placements.Start stands a stub until the placements ticket builds it, so its implement follows that ticket. The IO case runs the real dog of the index manager over a store, so it reads session/alarms itself, and the module case runs a fake dog over the wall clock.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: the silence line meets the module case, the IO case reading session/alarms, and the index case on both watchers, and go test and the check run at implement
+- every door the tests reach has a fake: the processes are the test binary run again, the bus runs in memory on loopback, and the module case runs a fake dog
 
 # gate
 

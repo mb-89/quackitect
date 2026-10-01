@@ -123,6 +123,11 @@ func runsIO(url, token string, starts map[string]index.Start) (func(), error) {
 	}, nil
 }
 
+// Watches the index's beat on lease.index, and writes a watchdog row where it falls silent past the term. [[spec/design_output/model#the-watcher-of-the-watchdog]]
+func watchesIndex(peer *index.Peer, term time.Duration, say func(row map[string]any) error) (func(), error) {
+	return func() {}, nil
+}
+
 // Each start commits over the peer under its instance, and the IO process beats its lease while it runs. [[spec/design_output/model#a-lease]]
 func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(), error) {
 	var stops []func()

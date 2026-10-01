@@ -128,6 +128,8 @@ type Outside struct {
 	Prose func(root, where, text string) []write.Finding
 	// What the schemas answer over a written note, off the check the tree holds. None reads no schema. [[spec/tickets/cage-write-door-port]]
 	Schema func(root, where, text string) write.Judged
+	// The index's own lease off index/health: its last renewal, its term, and whether it stands. None reads the index as up. [[spec/design_output/model#the-watcher-of-the-watchdog]]
+	Health func() (renewed time.Time, term time.Duration, held bool)
 	// The index a Grep or a Glob asks, by method and params in the shape se-index reads, and its answer in the shape it prints. None passes every search to the harness. [[spec/tickets/grep-glob-answer-off-index]]
 	Index func(method string, params map[string]any) (map[string]any, error)
 	// What the branch verb gathers for a review under the root, or why it gathered nothing. None passes the review to the bridge. [[spec/tickets/review-spawns-off-the-door]]
