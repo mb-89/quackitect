@@ -13,6 +13,9 @@ import (
 // The module a wait action lists its request to. [[spec/tickets/find-and-wait-in-go]]
 const Module = "waits"
 
+// The IO flag the registration carries at tests-green, which lets the module's test read the disk. [[spec/design_output/model#io-modules-are-modules]]
+var _ = q.IO()
+
 // A wait: the helper whose report returns it, the output whose end returns it, and the files whose quiet returns it. [[spec/design_output/level0#the-wait-returns-on-signals]]
 type Wait struct {
 	Agent  string   `json:"agent,omitempty" doc:"the helper's agent id, whose report returns the wait"`

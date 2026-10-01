@@ -6,6 +6,9 @@ package waits
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"path/filepath"
 	"testing"
@@ -14,7 +17,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The most pauses a case takes before it calls the wait a loop that never ends. [[spec/tickets/find-and-wait-in-go]]
+// The most pauses a case takes before it calls the wait an endless loop. [[spec/tickets/find-and-wait-in-go]]
 const mostPauses = 600
 
 // A clock standing still until a pause moves it on, and a hook each pause runs first. [[spec/tickets/find-and-wait-in-go]]
@@ -143,5 +146,29 @@ func TestAWaitWithNoSignalSaysWhatItTakes(t *testing.T) {
 	}
 	if clock.pauses != 0 {
 		t.Errorf("the wait pauses %d times with no signal, and wants none", clock.pauses)
+	}
+}
+
+// The module reads the disk, so its source calls q.IO(), the flag the import rules read. [[spec/design_output/model#io-modules-are-modules]]
+func TestTheModuleCarriesTheIOFlag(t *testing.T) {
+	file, err := parser.ParseFile(token.NewFileSet(), "waits.go", nil, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	found := false
+	ast.Inspect(file, func(node ast.Node) bool {
+		call, ok := node.(*ast.CallExpr)
+		if !ok {
+			return true
+		}
+		if pick, ok := call.Fun.(*ast.SelectorExpr); ok && pick.Sel.Name == "IO" {
+			if named, ok := pick.X.(*ast.Ident); ok && named.Name == "q" {
+				found = true
+			}
+		}
+		return true
+	})
+	if !found {
+		t.Error("waits.go calls no q.IO(), and the module reads the disk")
 	}
 }
