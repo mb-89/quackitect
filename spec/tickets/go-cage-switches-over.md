@@ -168,6 +168,25 @@ record:
     hand: the engine
     hash_before: 84097cbca01ac48c1a806bffde15a51addcd2afd
     hash_after: 84097cbca01ac48c1a806bffde15a51addcd2afd
+  - step: accept
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: 9d8da72a2a57499ddcb621531dc9e8b20a0c7b5d
+    hash_after: 9d8da72a2a57499ddcb621531dc9e8b20a0c7b5d
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/go-cage-switches-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 1e40978178d2f3fd
+        size: 324
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
@@ -222,8 +241,10 @@ Done when the bridge server leaves the tree.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- the-cage-slice-stands-new: src/modules/migration/migration.go builds the cage slice in as old with old, shadow and new, while every switched slice stands at new alone. The bridgehead hands each event outside new to the bridge path, and no bridge server answers there, so a box at old or shadow runs uncaged. The slice takes new alone, built in as new, the schema and the generated config commands follow, and the bridgehead reads no cage key.
 
 # retro
 
