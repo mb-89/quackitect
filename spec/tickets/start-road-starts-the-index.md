@@ -118,11 +118,23 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
 depends_on: ["level0-tools-leave-the-bridge"]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 6b0076dabc754f21a1104f6338c36cd2b7895dad
+    hash_after: 6b0076dabc754f21a1104f6338c36cd2b7895dad
+    inputs:
+      - name: ask
+        hash: 5f7a3192a0b5560c
+        size: 635
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +170,84 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Every road runs the index binary at `BIN` under the method root, with `standing`. That verb starts `serve` where no door answers, and `serve` listens on the hooks door and writes `.se/.runtime/hooks.json`. So `standing` is the start and the probe in one call.
+
+1. The start road in `start.js` keeps its guards and its install. It drops the server self-test and the spawn. Where no binary stands, it runs the install again with `go index` off the skip list, so a cloud box builds the index. It then runs the binary with `standing` in the work root, and exits 8 with the binary's stderr where that fails. Code 9 reads: the install builds no index.
+2. `INSTALL_SKIP` drops `go index`, since the index is now what the road starts.
+3. The serve verb's `detachedStart` and `servesHere` run the same `standing`, and name the hooks door's port off the standing file. The `--inspect` road leaves, since a Go door takes no node inspector.
+4. The stub's `serveOf` runs the vehicle's binary with `standing`, detached as before.
+5. The extension's `startProcess` respawns the binary with `serve`, adopts a door the standing file names, and stops it with `stop`. Its debug road leaves with the node launch. A window reload adopts the standing door, which is the reload watcher the ask names.
+6. The hook button in `draws.json`, `level0.schema.json` and the readers golden names the binary under `runs`, and drops `pauses`.
+7. `.vscode/launch.json` drops the node launch of the server.
+8. The cold probe's `COLD_PATH` names `src/quack/` and `src/modules/hooks/` in place of the server.
+
+What I weigh: the bridge still answers the brief until the next child flips it. Both land in this group's one pull request, so `main` never holds the gap. I assume the gap on the branch costs this box's sessions their brief for one commit.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/start.js: START, REASONS, INSTALL_SKIP
+- .claude/skills/level0/hooks/level0.js: starts, which runs START
+- src/scripts/serve.js: portIn, probeOf, detachedStart, servesHere, serving
+- src/scripts/verbs/serve.js: serveBridge
+- src/scripts/pull.js and the take: serving, after a branch take
+- src/stub/.claude/skills/level0/hooks/bridgehead.js: serveOf
+- src/extension/editor-process.js: startProcess, adoptsProcess, stopProcess
+- spec/config/draws.json: bridge.hook.runs
+- spec/config/level0.schema.json and src/quack/testdata/readers.schema.json: the runs example
+- .vscode/launch.json: the server launch
+- src/scripts/probe-cold.js: COLD_PATH
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/cloud-start.test.js: a cold start on a cloud box reaches the hooks door
+- test/contract/cloud-start.test.js: a box with no index builds it, then starts it
+- test/contract/cloud-start.test.js: an index failing its standing answers 8 with its stderr
+- test/level0/serve.test.js: the serve verb runs the index standing and names the door's port
+- test/level0/bridgehead.test.js: serveOf runs the vehicle's index standing
+- test/contract/start-road-starts-the-index.test.js: no start road names src/bridge/server.js
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .claude/skills/level0/hooks/start.js
+- src/scripts/serve.js
+- src/scripts/verbs/serve.js
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- src/extension/editor-process.js
+- spec/config/draws.json
+- spec/config/level0.schema.json
+- src/quack/testdata/readers.schema.json
+- .vscode/launch.json
+- src/scripts/probe-cold.js
+- spec/design_output/level0.md, the start road chapters
+- test/contract/cloud-start.test.js, test/level0/serve.test.js, test/level0/cli-serve.test.js, test/level0/bridgehead.test.js, test/level0/start-constants.test.js
+- test/contract/start-road-starts-the-index.test.js, new
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened start.js, level0.js starts, serve.js, verbs/serve.js, serveOf, editor-process.js, draws.json, probe-cold.js, src/index answers.go standing and stop, and quack main.go Listen
+- the callers list comes off git grep for server.js and for each changed export across src, .claude and spec/config
+- the grep line is decided by the new contract test, the cold start by its cloud-start case, the check by ./RUNME.sh check
 
 ## tests-red
 
