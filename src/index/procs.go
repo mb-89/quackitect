@@ -52,6 +52,15 @@ type Placements struct {
 	quiet map[string]bool
 	// One answer saves at a time, so the first runs of every process read the inputs one after another. [[spec/tickets/the-system-places-modules]]
 	saving sync.Mutex
+	// The wait before the first spawn, and the stop that ends it. [[spec/tickets/the-system-places-modules]]
+	after time.Duration
+	quit  chan struct{}
+}
+
+// Waits the span before the first spawn, so an index stopped inside it spawns nothing. [[spec/tickets/the-system-places-modules]]
+func (p *Placements) After(span time.Duration) *Placements {
+	p.after = span
+	return p
 }
 
 // The gap between two spawns, so a start of every process leaves the index's door room to stand. [[spec/tickets/the-system-places-modules]]
@@ -69,7 +78,7 @@ func (p *Placements) Quiet(names ...string) *Placements {
 
 // [[spec/design_output/model#the-placements]]
 func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	return &Placements{bus: bus, store: store, placed: placed, moved: map[string]map[string]bool{}, quiet: map[string]bool{}}
+	return &Placements{bus: bus, store: store, placed: placed, moved: map[string]map[string]bool{}, quiet: map[string]bool{}, quit: make(chan struct{})}
 }
 
 // Starts every placed process, and answers the stop of them all. [[spec/design_output/model#the-placements]]
@@ -81,6 +90,7 @@ func (p *Placements) Start() (func(), error) {
 	inputs := map[string][]string{}
 	var answers []func()
 	halt := func() {
+		close(p.quit)
 		p.mu.Lock()
 		p.stopped = true
 		stops := p.stops
@@ -119,8 +129,14 @@ func (p *Placements) Start() (func(), error) {
 // Starts each placed process a gap after the last, and none past the stop. A start that fails stands as a stop that does nothing, so the restart of its topic tries again. [[spec/tickets/the-system-places-modules]]
 func (p *Placements) spawns() {
 	for i, placed := range p.placed {
-		if i > 0 {
-			time.Sleep(spawnGap)
+		wait := spawnGap
+		if i == 0 {
+			wait = p.after
+		}
+		select {
+		case <-p.quit:
+			return
+		case <-time.After(wait):
 		}
 		p.mu.Lock()
 		if p.stopped {

@@ -19,7 +19,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The verb the IO process runs under, the slice's dotted key and its name in a row, the IO process's part on the bus, the span between two beats, the span a shadow value settles in, and the wait before a restart. [[spec/design_output/model#the-io-process]]
+// The verb the IO process runs under, the slice's dotted key and its name in a row, the IO process's part on the bus, the span between two beats, the span a shadow value settles in, the start window a shadow waits out before its first spawn, and the wait before a restart. [[spec/design_output/model#the-io-process]]
 const (
 	ioVerb         = "io"
 	processesKey   = "migration." + migration.ProcessesKey
@@ -28,6 +28,7 @@ const (
 	ioPart         = "io"
 	ioBeat         = 5 * time.Second
 	shadowSettle   = 2 * time.Second
+	shadowAfter    = 30 * time.Second
 	ioRestart      = 5 * time.Second
 )
 
@@ -201,7 +202,7 @@ func ioShadow(root string, store *q.Store, open doors) (*index.Bus, func(), erro
 	for i := range placed {
 		placed[i].Heard = heard
 	}
-	stop, err := index.NewPlacements(bus, store, placed).Quiet(shadowsOwnLog).Start()
+	stop, err := index.NewPlacements(bus, store, placed).Quiet(shadowsOwnLog).After(shadowAfter).Start()
 	if err != nil {
 		bus.Close()
 		return nil, nil, err

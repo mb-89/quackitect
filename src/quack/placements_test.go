@@ -6,6 +6,8 @@ package main
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -28,6 +30,20 @@ func TestEachInstanceInNoListTakesAProcessOfItsOwn(t *testing.T) {
 	got := commandsOf(placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"ticket"}}, "quack"))
 	if strings.Join(got, " | ") != "quack module ticket | quack module tickets | quack module queue" {
 		t.Fatalf("the placements run %q, and want tickets and queue apart, with the clock left to the IO process and the hooks and http listeners to the index", got)
+	}
+}
+
+func TestThePlacementsKeyReadsItsListsOffTheTree(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, "spec", "config", "level0.json")
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(at, []byte(`{"processes": {"placements": [["tickets", "queue"]]}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if got := placementLists(root); len(got) != 1 || strings.Join(got[0], ", ") != "tickets, queue" {
+		t.Fatalf("the placements key reads %v, and wants one list of tickets and queue", got)
 	}
 }
 

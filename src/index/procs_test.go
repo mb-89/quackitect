@@ -270,6 +270,25 @@ func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 	}
 }
 
+func TestAStopInsideTheStartWindowSpawnsNothing(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
+	stop, err := NewPlacements(bus, store, []Placed{placed}).After(time.Hour).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	time.Sleep(4 * spawnGap)
+	stop()
+	if got := read(store, "fake/out"); got != 0 {
+		t.Fatalf("fake/out reads %v inside the start window, where nothing spawns", got)
+	}
+}
+
 func TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm(t *testing.T) {
 	store, _, stop := placedTwo(t)
 	defer stop()
