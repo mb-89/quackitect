@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/nats-io/nats-server/v2/server"
@@ -33,7 +34,12 @@ const (
 const (
 	commitVerb = "commit."
 	leaseVerb  = "lease."
+	runVerb    = "run."
+	inVerb     = "in."
 )
+
+// The wait for the index to answer the inputs of an instance. [[spec/design_output/model#names-become-subjects]]
+const inputsWait = 10 * time.Second
 
 // [[spec/design_output/model#the-index-runs-nats]]
 type Bus struct {
@@ -105,19 +111,12 @@ func (p *Peer) Commit(instance string, values map[string]any) error {
 
 // Hands each commit an instance publishes to hand, its values still JSON. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Commits(instance string, hand func(values map[string]json.RawMessage)) (func(), error) {
-	sub, err := p.conn.Subscribe(commitVerb+instance, func(said *nats.Msg) {
+	return p.hears(commitVerb+instance, func(said *nats.Msg) {
 		var values map[string]json.RawMessage
 		if json.Unmarshal(said.Data, &values) == nil {
 			hand(values)
 		}
 	})
-	if err != nil {
-		return nil, err
-	}
-	if err := sub.SetPendingLimits(-1, -1); err != nil {
-		return nil, err
-	}
-	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()
 }
 
 // Publishes a heartbeat on lease.<part>. [[spec/design_output/model#a-lease]]
@@ -126,24 +125,51 @@ func (p *Peer) Beat(part string) error { return p.conn.Publish(leaseVerb+part, n
 func (p *Peer) Close() { p.conn.Close() }
 
 // Publishes run.<instance>: an input of a placed instance moves. [[spec/design_output/model#names-become-subjects]]
-func (p *Peer) Run(instance string) error { return errors.New("the bus stands unbuilt") }
+func (p *Peer) Run(instance string) error {
+	if err := p.conn.Publish(runVerb+instance, nil); err != nil {
+		return err
+	}
+	return p.conn.Flush()
+}
 
 // Hands each run.<instance> to hand. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Runs(instance string, hand func()) (func(), error) {
-	return func() {}, errors.New("the bus stands unbuilt")
+	return p.hears(runVerb+instance, func(*nats.Msg) { hand() })
 }
 
 // Hands the part of each heartbeat on lease.<part> to hand. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Leases(hand func(part string)) (func(), error) {
-	return func() {}, errors.New("the bus stands unbuilt")
+	return p.hears(leaseVerb+">", func(said *nats.Msg) { hand(strings.TrimPrefix(said.Subject, leaseVerb)) })
 }
 
 // Asks in.<instance>, and answers the saved inputs. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Inputs(instance string) ([]byte, error) {
-	return nil, errors.New("the bus stands unbuilt")
+	reply, err := p.conn.Request(inVerb+instance, nil, inputsWait)
+	if err != nil {
+		return nil, err
+	}
+	return reply.Data, nil
 }
 
 // Answers each in.<instance> with what saved answers. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) AnswersInputs(instance string, saved func() ([]byte, error)) (func(), error) {
-	return func() {}, errors.New("the bus stands unbuilt")
+	return p.hears(inVerb+instance, func(said *nats.Msg) {
+		body, err := saved()
+		if err != nil {
+			return
+		}
+		_ = said.Respond(body)
+	})
+}
+
+// Subscribes hand to a subject with no pending limit, and answers the unsubscribe once the bus holds the subscription. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) hears(subject string, hand nats.MsgHandler) (func(), error) {
+	sub, err := p.conn.Subscribe(subject, hand)
+	if err != nil {
+		return nil, err
+	}
+	if err := sub.SetPendingLimits(-1, -1); err != nil {
+		return nil, err
+	}
+	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()
 }

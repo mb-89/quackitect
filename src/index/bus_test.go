@@ -97,3 +97,38 @@ func TestTheBusRefusesAPeerWithoutTheToken(t *testing.T) {
 		t.Fatal("a peer showing no token reaches the bus")
 	}
 }
+
+func TestALeaseListenerHearsThePartEachBeatNames(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	listener, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	heard := make(chan string, 1)
+	stop, err := listener.Leases(func(part string) { heard <- part })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	beater, err := Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer beater.Close()
+	if err := beater.Beat("queue"); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case part := <-heard:
+		if part != "queue" {
+			t.Fatalf("the listener hears the part %q, and wants queue", part)
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("the listener hears no beat")
+	}
+}

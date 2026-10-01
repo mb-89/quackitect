@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"      // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
 	"os/exec" // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
+	"slices"
 	"sync"
 	"time"
 
@@ -39,9 +40,12 @@ type Leases interface {
 
 // Every placed process the index runs over one bus. [[spec/design_output/model#the-placements]]
 type Placements struct {
-	bus    *Bus
-	store  *q.Store
-	placed []Placed
+	bus     *Bus
+	store   *q.Store
+	placed  []Placed
+	mu      sync.Mutex
+	stops   []func()
+	stopped bool
 }
 
 // [[spec/design_output/model#the-placements]]
@@ -49,11 +53,97 @@ func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
 	return &Placements{bus: bus, store: store, placed: placed}
 }
 
-// Starts every placed process, and answers the stop of them all. [[spec/design_output/model#the-placements]]
-func (p *Placements) Start() (func(), error) { return func() {}, nil }
+// Starts every placed process, answers each instance's inputs, publishes a run once a commit moves one, and answers the stop of them all. [[spec/design_output/model#the-placements]]
+func (p *Placements) Start() (func(), error) {
+	peer, err := Dial(p.bus.URL(), p.bus.Token())
+	if err != nil {
+		return nil, err
+	}
+	reads := map[string][]string{}
+	for _, one := range p.placed {
+		for instance := range one.Instances {
+			inputs := p.store.Inputs(instance)
+			reads[instance] = inputs
+			if _, err := peer.AnswersInputs(instance, func() ([]byte, error) { return p.store.SaveNames(inputs) }); err != nil {
+				peer.Close()
+				return nil, err
+			}
+		}
+	}
+	p.store.OnCommit(func(values map[string]any) { p.runs(peer, reads, values) })
+	p.stops = make([]func(), len(p.placed))
+	for i, one := range p.placed {
+		stop, err := one.Start(p.bus, p.store)
+		if err != nil {
+			p.stop()
+			peer.Close()
+			return nil, err
+		}
+		p.stops[i] = stop
+	}
+	var once sync.Once
+	return func() {
+		once.Do(func() {
+			p.stop()
+			peer.Close()
+		})
+	}, nil
+}
+
+// Publishes run.<instance> for each placed instance reading a name the commit moves. [[spec/design_output/model#the-placements]]
+func (p *Placements) runs(peer *Peer, reads map[string][]string, values map[string]any) {
+	p.mu.Lock()
+	stopped := p.stopped
+	p.mu.Unlock()
+	if stopped {
+		return
+	}
+	for instance, inputs := range reads {
+		for _, name := range inputs {
+			if _, moved := values[name]; moved {
+				if err := peer.Run(instance); err != nil {
+					fmt.Fprintln(stderr, instance, "runs nowhere:", err)
+				}
+				break
+			}
+		}
+	}
+}
+
+func (p *Placements) stop() {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.stopped = true
+	for _, stop := range p.stops {
+		if stop != nil {
+			stop()
+		}
+	}
+}
 
 // Restarts the processes holding an instance of the topic, and no other. [[spec/design_output/model#a-module-rebuilds-alone]]
-func (p *Placements) Restart(topic string) error { return nil }
+func (p *Placements) Restart(topic string) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.stopped {
+		return fmt.Errorf("the placements stand stopped, and restart no %s", topic)
+	}
+	for i, one := range p.placed {
+		if !slices.Contains(one.Topics, topic) {
+			continue
+		}
+		if p.stops[i] != nil {
+			p.stops[i]()
+		}
+		stop, err := one.Start(p.bus, p.store)
+		if err != nil {
+			p.stops[i] = nil
+			return err
+		}
+		p.stops[i] = stop
+	}
+	return nil
+}
 
 // Spawns the process, lands what it commits, and spawns it again after its wait once it exits. [[spec/design_output/model#a-process-ends]]
 func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
@@ -67,10 +157,30 @@ func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
 			return nil, err
 		}
 	}
+	expired := make(chan struct{}, 1)
+	if p.Watch != nil {
+		if _, err := peer.Leases(func(part string) {
+			if part == p.Name {
+				p.Watch.Beat(part)
+			}
+		}); err != nil {
+			peer.Close()
+			return nil, err
+		}
+		p.Watch.Expired(func(part string) {
+			if part != p.Name {
+				return
+			}
+			select {
+			case expired <- struct{}{}:
+			default:
+			}
+		})
+	}
 	stopping, ended := make(chan struct{}), make(chan struct{})
 	go func() {
 		defer close(ended)
-		p.runs(bus, store, stopping)
+		p.runs(bus, store, stopping, expired)
 	}()
 	var once sync.Once
 	return func() {
@@ -106,10 +216,14 @@ func (p Placed) heard(store *q.Store, instance string, hand q.Writer, values map
 	}
 }
 
-// The process runs until the stop, and each exit marks its instances down until the next run commits. [[spec/design_output/model#a-process-ends]]
-func (p Placed) runs(bus *Bus, store *q.Store, stopping <-chan struct{}) {
+// The process runs until the stop, and each exit marks its instances down until the next run commits. A lease past its term kills the process, and the dog's fault count decides the wait, or the alarm that ends the restarts. [[spec/design_output/model#a-process-ends]]
+func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}) {
 	for {
+		if p.Watch != nil {
+			p.Watch.Hold(p.Name, p.Term)
+		}
 		cmd, exited := p.spawn(bus)
+		var err error
 		select {
 		case <-stopping:
 			if cmd != nil {
@@ -117,14 +231,29 @@ func (p Placed) runs(bus *Bus, store *q.Store, stopping <-chan struct{}) {
 				<-exited
 			}
 			return
-		case err := <-exited:
-			fmt.Fprintln(stderr, p.Name, "exits:", err)
-			p.down(store)
+		case <-expired:
+			if cmd != nil {
+				_ = cmd.Process.Kill()
+				<-exited
+			}
+			err = fmt.Errorf("its lease runs past %s", p.Term)
+		case err = <-exited:
+		}
+		fmt.Fprintln(stderr, p.Name, "exits:", err)
+		p.down(store)
+		wait, again := p.Restart, true
+		if p.Watch != nil {
+			wait, again = p.Watch.Fault(p.Name, err)
+		}
+		if !again {
+			fmt.Fprintln(stderr, p.Name, "raises the alarm, and restarts no more")
+			<-stopping
+			return
 		}
 		select {
 		case <-stopping:
 			return
-		case <-time.After(p.Restart):
+		case <-time.After(wait):
 		}
 	}
 }
