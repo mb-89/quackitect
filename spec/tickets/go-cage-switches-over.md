@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -135,6 +135,15 @@ record:
   - step: sync
     hand: box 40b0ad3f11a · claude-code-remote
     hash_before: 219e8f47723f7ad83ab495a483646621f37b0e12
+  - step: sync
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 22ea420816d2595d140f219159b6085b94b4b860
+    hash_after: 22ea420816d2595d140f219159b6085b94b4b860
+    answered:
+      - name: sync
+        exit: 0
+        said: work/go-cage-switches-over already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
@@ -153,8 +162,9 @@ Done when the bridge server leaves the tree.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
