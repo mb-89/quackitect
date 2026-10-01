@@ -114,3 +114,13 @@ func TestAReviewTheVerbGathersNothingForSaysWhy(t *testing.T) {
 		t.Errorf("the door answers %v, and wants %q", said["result"], want)
 	}
 }
+
+// [[spec/tickets/review-reads-branch-off-input]]
+func TestAReviewCallCarryingItsBranchUnderInputAnswersTheSameSpawn(t *testing.T) {
+	call := Post{Event: toolEvent, E: map[string]any{"tool": reviewTool, "input": map[string]any{"branch": reviewBranch}, "session_id": "s1"}}
+	said := reviewResultOf(t, hooks(t, reviewDoor(t, ""), call))
+	spawn, _ := said["spawn"].(map[string]any)
+	if spawn["description"] != "read "+reviewBranch {
+		t.Errorf("the spawn reads %v, and wants read %s off the input", spawn, reviewBranch)
+	}
+}
