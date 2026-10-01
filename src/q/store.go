@@ -371,6 +371,12 @@ func (s *Store) Down(instance string) error {
 	return nil
 }
 
+// The names an instance's providers read, off other instances. [[spec/design_output/processes#the-placements]]
+func (s *Store) Inputs(instance string) []string { return nil }
+
+// The names an instance provides. [[spec/design_output/processes#the-placements]]
+func (s *Store) Outputs(instance string) []string { return nil }
+
 // Clears the down mark of an instance whose process commits again. [[spec/design_output/processes#a-process-ends]]
 func (s *Store) Up(instance string) error { return nil }
 

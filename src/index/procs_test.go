@@ -5,6 +5,7 @@
 package index
 
 import (
+	"flag"
 	"os"
 	"testing"
 	"time"
@@ -21,7 +22,11 @@ func TestFakeIOProcess(t *testing.T) {
 	if err != nil {
 		os.Exit(3)
 	}
-	if err := peer.Commit("fake", map[string]any{"fake/pid": os.Getpid(), "fake/out": 7}); err != nil {
+	instance := "fake"
+	if flag.NArg() > 0 {
+		instance = flag.Arg(0)
+	}
+	if err := peer.Commit(instance, map[string]any{instance + "/pid": os.Getpid(), instance + "/out": 7}); err != nil {
 		os.Exit(4)
 	}
 	for {
@@ -36,7 +41,7 @@ func fakeStore(t *testing.T) (*q.Store, q.Writer) {
 	types := map[string]func(*q.Catalog){"fakeio": func(c *q.Catalog) {
 		hand = q.Join(q.OutIn(c, "pid", 0, q.IO(), q.Doc("the fake's pid")), q.OutIn(c, "out", 0, q.IO(), q.Doc("the fake's value")))
 	}}
-	store, err := q.Start(q.Wiring{Instances: []q.Instance{{Name: "fake", Module: "fakeio"}}}, types)
+	store, err := q.Start(q.Wiring{Instances: []q.Instance{{Name: "fake", Module: "fakeio"}, {Name: "other", Module: "fakeio"}}}, types)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,4 +121,60 @@ func TestTheNextCommitOfARestartedProcessClearsTheMark(t *testing.T) {
 		pid := read(store, "fake/pid")
 		return pid != first && pid != 0 && !fakeSnap.NotProvided("fake/out") && fakeSnap.Read("fake/out") == 7
 	})
+}
+
+// Two fakes placed apart, each its own process, and the store they commit to. [[spec/design_output/processes#the-placements]]
+func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
+	t.Helper()
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	store, hand := fakeStore(t)
+	one := func(instance, topic string) Placed {
+		return Placed{Name: instance, Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", instance}, Instances: map[string]q.Writer{instance: hand}, Restart: 50 * time.Millisecond, Topics: []string{topic}}
+	}
+	placements := NewPlacements(bus, store, []Placed{one("fake", "fakeio"), one("other", "otherio")})
+	stop, err := placements.Start()
+	if err != nil {
+		bus.Close()
+		t.Fatal(err)
+	}
+	until(t, "both fakes at 7", func(q.Snapshot) bool { return read(store, "fake/out") == 7 && read(store, "other/out") == 7 })
+	return store, placements, func() { stop(); bus.Close() }
+}
+
+func TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm(t *testing.T) {
+	store, _, stop := placedTwo(t)
+	defer stop()
+	other, first := read(store, "other/pid"), read(store, "fake/pid")
+	before := store.Snapshot().Revision
+	kills(t, first)
+	until(t, "the killed fake back", func(q.Snapshot) bool {
+		pid := read(store, "fake/pid")
+		return pid != first && pid != 0 && fakeSnap.Read("fake/out") == 7
+	})
+	snap := store.Snapshot()
+	if snap.Read("other/pid") != other || snap.NotProvided("other/out") || snap.Read("other/out") != 7 {
+		t.Fatalf("the other process reads pid %v and out %v, where it ran %v throughout", snap.Read("other/pid"), snap.Read("other/out"), other)
+	}
+	if snap.Revision <= before {
+		t.Fatalf("the store stands at revision %d after the restart, where it stood at %d", snap.Revision, before)
+	}
+}
+
+func TestAPlacementRestartsTheProcessesOfOneTopic(t *testing.T) {
+	store, placements, stop := placedTwo(t)
+	defer stop()
+	other, first := read(store, "other/pid"), read(store, "fake/pid")
+	if err := placements.Restart("fakeio"); err != nil {
+		t.Fatal(err)
+	}
+	until(t, "the fake restarted", func(q.Snapshot) bool {
+		pid := read(store, "fake/pid")
+		return pid != first && pid != 0
+	})
+	if got := read(store, "other/pid"); got != other {
+		t.Fatalf("the other process runs as %v, where the restart of fakeio leaves it at %v", got, other)
+	}
 }

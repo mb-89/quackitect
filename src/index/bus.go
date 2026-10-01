@@ -45,3 +45,19 @@ func (p *Peer) Commits(instance string, hand func(values map[string]json.RawMess
 }
 
 func (p *Peer) Close() {}
+
+// Publishes run.<instance>: an input of a placed instance moves. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) Run(instance string) error { return errors.New("the bus stands unbuilt") }
+
+// Hands each run.<instance> to hand. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) Runs(instance string, hand func()) (func(), error) {
+	return func() {}, errors.New("the bus stands unbuilt")
+}
+
+// Asks in.<instance>, and answers the saved inputs. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) Inputs(instance string) ([]byte, error) { return nil, errors.New("the bus stands unbuilt") }
+
+// Answers each in.<instance> with what saved answers. [[spec/design_output/model#names-become-subjects]]
+func (p *Peer) AnswersInputs(instance string, saved func() ([]byte, error)) (func(), error) {
+	return func() {}, errors.New("the bus stands unbuilt")
+}

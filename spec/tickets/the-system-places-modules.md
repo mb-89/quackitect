@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -128,6 +128,22 @@ record:
         hash: 5f2da8fccb387d1f
         size: 23680
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: 6618daaeb49688c71c08f5ee4d5a7e7ddef015aa
+    hash_after: 6618daaeb49688c71c08f5ee4d5a7e7ddef015aa
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: 3656ed69f13bbe52
+        size: 4147
+      - name: [[spec/tickets/the-doors-process-stands]]
+        hash: a166f2553415d2a5
+        size: 402
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +239,33 @@ The assumption: under `shadow` a restart runs the index's own binary again. The 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/index/procs_test.go
+- src/q/start_test.go
+- src/quack/placements_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion over stubs that compile. The two fakes never commit, the store names no inputs, SaveNames saves nothing, and the placements run no process. The module process reaches no bus. The store cases stand in src/q/start_test.go beside the down cases, and the module process case stands in src/quack/placements_test.go, where the draft names store_test.go, projection_test.go and module_test.go. One file a topic keeps each case beside the helper it reuses. The fake IO process now takes its instance off the argument after the double dash, so one fake serves both placements.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: the restart line meets TestAKilledModuleProcessRestartsAloneAndTheIndexStaysWarm, and go test ./... and ./RUNME.sh check run at implement
+- every door the tests reach has a fake: the module processes are the test binary run again, and the bus runs in memory on loopback
 
 # gate
 
