@@ -1,5 +1,5 @@
 ---
-description: "config / migration / cage: sets migration.cage to new. The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's."
+description: "config / migration / cage: sets migration.cage to new. The cage, switched over in phase 5. The hooks IO module answers each hook event."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

@@ -417,11 +417,9 @@
       "properties": {
         "cage": {
           "type": "string",
-          "default": "old",
-          "help": "The cage: old answers on the bridge alone, shadow posts each hook event to the hooks IO module beside it, new answers the module's.",
+          "default": "new",
+          "help": "The cage, switched over in phase 5. The hooks IO module answers each hook event.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },
