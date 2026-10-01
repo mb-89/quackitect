@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -227,9 +227,31 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 4388ca41f5 · claude-code-remote
+    hash_before: e22e44d55bd7c2e776b3536ffb5bf04135f030d7
+    hash_after: e22e44d55bd7c2e776b3536ffb5bf04135f030d7
+    inputs:
+      - name: retro/write
+        hash: e7b1de1a0ac34a72
+        size: 2331
+      - name: [[spec/tickets/the-cage-slice-stands-new]]
+        hash: 01a2a22b2aaac4a1
+        size: 415
+      - name: [[spec/design_output/level0]]
+        hash: 5f9e5b2ac795f4f6
+        size: 92421
+      - name: [[spec/tickets/node-leaves-the-boxes]]
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 4da1ca5da87d5bbc
 depends_on: ["go-cage-lands-in-shadow", "quack-verbs-switch-over"]
 enabled_by: migration.phase5switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -366,20 +388,26 @@ The ask said the old path leaves the tree, and the bridgehead's bridge road read
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the box lacked nothing: no tool, host or right was refused
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the cage refused a git command joined to a landing verb, and a `git stash` in a probe script
+- the plan tool met no serve server until `./RUNME.sh serve` ran
+- `test/contract/runme-road.test.js` timed out once under the full check, and passed alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
+- the bridge road for doored events waits on [[spec/tickets/node-leaves-the-boxes]]
 
 # Discussion
 
