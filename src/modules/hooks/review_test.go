@@ -6,8 +6,10 @@ package hooks
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 
+	"quackitect/src/modules/hooks/brief"
 	"quackitect/src/modules/hooks/review"
 )
 
@@ -122,5 +124,22 @@ func TestAReviewCallCarryingItsBranchUnderInputAnswersTheSameSpawn(t *testing.T)
 	spawn, _ := said["spawn"].(map[string]any)
 	if spawn["description"] != "read "+reviewBranch {
 		t.Errorf("the spawn reads %v, and wants read %s off the input", spawn, reviewBranch)
+	}
+}
+
+// [[spec/tickets/review-spawn-pins-helper-layer]]
+func TestTheReadersPromptTakesTheHelperLayer(t *testing.T) {
+	row := layerRowsOf(t)[0]
+	root := treeOf(t, row.Files, "")
+	door := reviewDoor(t, "")
+	layer := brief.LayerFor(door.treeAt(root), os.Getenv, "")
+	if layer == "" {
+		t.Fatalf("the row %q answers no helper layer", row.Name)
+	}
+	call := reviewCall(reviewBranch)
+	call.Root = root
+	spawn, _ := reviewResultOf(t, hooks(t, door, call))["spawn"].(map[string]any)
+	if spawn["prompt"] != review.ReaderAsks(gathered, layer) {
+		t.Errorf("the reader's prompt reads %v, and wants the reader's asks over the helper layer", spawn["prompt"])
 	}
 }

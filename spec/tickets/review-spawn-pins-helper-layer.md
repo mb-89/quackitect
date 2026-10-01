@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: go-cage-switches-over
 parent: review-spawns-off-the-door
+record:
+  - step: do
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 1ec50f01fac0d7c16b63a1f7ef680d8c2c24a712
+    hash_after: 1ec50f01fac0d7c16b63a1f7ef680d8c2c24a712
+    why: review-spawns-off-the-door answers this ask
+reason: answered
 ---
 
 # Ask
