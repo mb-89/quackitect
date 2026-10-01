@@ -5,6 +5,7 @@ package index
 
 import (
 	"path/filepath"
+	"reflect"
 	"testing"
 
 	"quackitect/src/q"
@@ -83,5 +84,40 @@ func TestTheReadsFindTheRowsTheDoorFinds(t *testing.T) {
 	}
 	if len(got) != len(want) || got[0] != want[0] {
 		t.Errorf("the reads find %+v, and want the rows the index ranks: %+v", got, want)
+	}
+}
+
+// The reads the door hands the manager grep and glob the same lines and paths the door's own methods answer. [[spec/tickets/grep-glob-answer-off-index]]
+func TestTheReadsGrepAndGlobTheRowsTheDoorFinds(t *testing.T) {
+	db := opened(t, tree(t))
+	grepAsk := GrepAsk{Pattern: "search finds", Limit: 250}
+	wantGrep, err := Grep(db, grepAsk)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(wantGrep.Files) == 0 {
+		t.Fatalf("the index greps no line for the search finds, and the case wants one")
+	}
+	gotGrep, err := ReadsOf(db).Grep(grepAsk)
+	if err != nil {
+		t.Fatalf("the reads grep with %v", err)
+	}
+	if !reflect.DeepEqual(gotGrep, wantGrep) {
+		t.Errorf("the reads grep %+v, and want the lines the index answers: %+v", gotGrep, wantGrep)
+	}
+	globAsk := GlobAsk{Pattern: "**/*.md"}
+	wantGlob, err := Glob(db, globAsk)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(wantGlob.Paths) == 0 {
+		t.Fatalf("the index globs no path for **/*.md, and the case wants one")
+	}
+	gotGlob, err := ReadsOf(db).Glob(globAsk)
+	if err != nil {
+		t.Fatalf("the reads glob with %v", err)
+	}
+	if !reflect.DeepEqual(gotGlob, wantGlob) {
+		t.Errorf("the reads glob %+v, and want the paths the index answers: %+v", gotGlob, wantGlob)
 	}
 }

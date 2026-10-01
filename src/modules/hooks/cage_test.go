@@ -80,6 +80,8 @@ func TestDecisionOfReadsTheDoorsAnswer(t *testing.T) {
 		{bash, Answer{Effects: []Effect{{Kind: passKind}}}, PassWord},
 		{bash, Answer{Effects: []Effect{{Kind: resultKind, Text: "no"}}}, RefuseWord},
 		{index, Answer{Effects: []Effect{{Kind: resultKind, Result: "done"}}}, PassWord},
+		// [[spec/tickets/grep-glob-answer-off-index]]
+		{Post{Event: "tool.call", E: map[string]any{"tool": "Grep"}}, Answer{Effects: []Effect{{Kind: resultKind, Result: map[string]any{"mode": "content"}}}}, PassWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: "block", Text: "wait"}}}, BlockWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: "rows"}}}, HoldWord},
 		{prompt(), Answer{Effects: []Effect{{Kind: passKind}, {Kind: afterKind, Text: "ends"}}}, PassWord},

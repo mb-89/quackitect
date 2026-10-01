@@ -109,3 +109,7 @@ func readsOf(reads index.Reads) index.Reads {
 type noReads struct{}
 
 func (noReads) Find(string, int) ([]index.Hit, error) { return nil, nil }
+
+func (noReads) Grep(index.GrepAsk) (index.GrepSaid, error) { return index.GrepSaid{}, nil }
+
+func (noReads) Glob(index.GlobAsk) (index.GlobSaid, error) { return index.GlobSaid{}, nil }

@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: go-cage-switches-over
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: c27601d44e8c7e54
         size: 498
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 3cd847cb11c · claude-code-remote
+    hash_before: 491b20f90139c4de92eb1c2ecfba4c7b47ee6b8e
+    hash_after: 491b20f90139c4de92eb1c2ecfba4c7b47ee6b8e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: b554f8da3399cec8
+        size: 8434
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -271,26 +284,34 @@ Risks:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/hooks/search_test.go src/modules/hooks/cage_test.go src/index/ops_test.go src/quack/searches_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/hooks/search_test.go
+- src/modules/hooks/cage_test.go
+- src/index/ops_test.go
+- src/quack/searches_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Six hooks cases fail on their own assertion, with the door passing every Grep and Glob. The absolute path case and the no index case hold today, and stand as guards the change keeps. The index reads and the quack index ask fail against their stubs. Reads now carries Grep and Glob, so fakeReads and the noReads of find-and-wait-in-go gain both methods to compile. The hooks fake index sends each answer through JSON, so the door meets float64 numbers, as se-index prints them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the Grep line meets TestAGrepAnswersTheIndexsLines, the Glob line meets TestAGlobAnswersTheIndexsPaths, and the check line meets the check at tests-green
+- the hooks cases run over q/qtest and a fake index scanning seeded texts, the quack case over fakeReads, and the index case over a temp tree
 
 # gate
 

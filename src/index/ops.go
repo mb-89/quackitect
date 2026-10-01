@@ -48,9 +48,11 @@ func (one *door) manages(manage Manage) (Managed, error) {
 	return manage(one.root, one.store, opKeep{one.db}, ReadsOf(one.db), func(hand func()) { one.steps = append(one.steps, hand) })
 }
 
-// The rows the index ranks for the words, as the door hands them to the manager. [[spec/tickets/find-and-wait-in-go]]
+// The rows the index ranks for the words, and the lines and paths a Grep and a Glob read, as the door hands them to the manager. [[spec/tickets/find-and-wait-in-go]] [[spec/tickets/grep-glob-answer-off-index]]
 type Reads interface {
 	Find(words string, limit int) ([]Hit, error)
+	Grep(ask GrepAsk) (GrepSaid, error)
+	Glob(ask GlobAsk) (GlobSaid, error)
 }
 
 // The reads over the index's db. [[spec/tickets/find-and-wait-in-go]]
@@ -59,6 +61,12 @@ func ReadsOf(db *sql.DB) Reads { return readKeep{db} }
 type readKeep struct{ db *sql.DB }
 
 func (k readKeep) Find(words string, limit int) ([]Hit, error) { return Find(k.db, words, limit) }
+
+// A stub until tests-green. [[spec/tickets/grep-glob-answer-off-index]]
+func (k readKeep) Grep(ask GrepAsk) (GrepSaid, error) { return GrepSaid{}, nil }
+
+// A stub until tests-green. [[spec/tickets/grep-glob-answer-off-index]]
+func (k readKeep) Glob(ask GlobAsk) (GlobSaid, error) { return GlobSaid{}, nil }
 
 // One row of the table op: the id, and the body the manager writes. [[spec/design_output/model#an-operation-outlives-callers]]
 type OpRow struct {

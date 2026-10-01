@@ -26,11 +26,29 @@ const (
 	findWait         = 10 * time.Second
 )
 
-// Reads that answer the rows the case hands them, or its fault, and keep the words each find asks. [[spec/tickets/find-and-wait-in-go]]
+// Reads that answer the rows, lines and paths the case hands them, or its fault, and keep the words each find asks and each grep and glob ask. [[spec/tickets/find-and-wait-in-go]] [[spec/tickets/grep-glob-answer-off-index]]
 type fakeReads struct {
-	hits  []index.Hit
-	fault error
-	asked *[]string
+	hits     []index.Hit
+	fault    error
+	asked    *[]string
+	grep     index.GrepSaid
+	glob     index.GlobSaid
+	grepAsks *[]index.GrepAsk
+	globAsks *[]index.GlobAsk
+}
+
+func (one fakeReads) Grep(ask index.GrepAsk) (index.GrepSaid, error) {
+	if one.grepAsks != nil {
+		*one.grepAsks = append(*one.grepAsks, ask)
+	}
+	return one.grep, one.fault
+}
+
+func (one fakeReads) Glob(ask index.GlobAsk) (index.GlobSaid, error) {
+	if one.globAsks != nil {
+		*one.globAsks = append(*one.globAsks, ask)
+	}
+	return one.glob, one.fault
 }
 
 func (one fakeReads) Find(words string, _ int) ([]index.Hit, error) {
