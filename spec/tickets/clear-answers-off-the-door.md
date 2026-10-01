@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -216,6 +216,24 @@ record:
         hash: 9a9409f1129baf82
         size: 3610
     def: 9c7cd4dd4a2dadb8
+  - step: gate
+    hand: box 3e46c581114 · claude-code-remote
+    hash_before: 520c2cd10464dc2b7bf5eefa71ab3967a061bfea
+    hash_after: 520c2cd10464dc2b7bf5eefa71ab3967a061bfea
+    inputs:
+      - name: design/draft
+        hash: 33c98a0ec2e70d0b
+        size: 2292
+      - name: design/tests-red
+        hash: 5e60586e0f4fd2aa
+        size: 833
+      - name: design/draft-2
+        hash: 9a9409f1129baf82
+        size: 3610
+      - name: design/tests-red-2
+        hash: e223f769451ae4b5
+        size: 996
+    def: 01417e29801ecc2f
 group: go-cage-switches-over
 ---
 
@@ -461,9 +479,9 @@ the door-clear case runs over a fake disk, a fake door answering a clear, and fa
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- step 3 of the approach falls: `door` in .claude/skills/level0/hooks/level0.js hands a step's answer straight to the harness, and `clears` runs on the bridge's answer alone, at the `answer.clear` line of `seen`. Add the door road's clear to level0.js and the size list, with a case driving it to `$.prompt.submit`, as test/level0/caged-door.test.js drives the door.
-- `turn.complete` stands outside `DOORED` in .claude/skills/level0/hooks/cage.js, so the door never meets the event the approach answers. Name the ticket that adds it, or add it here with a case.
+accept
+
+Draft-2 answers both findings of the first gate. Step 4 hands a clear answer to `clears`, and door-clear.test.js drives that road. The event's reach rides on the-brief-leaves-the-bridge, which no done_when line here needs. Each done_when line meets a case failing on its own assertion: the clear case in clear_test.go, the cage case, and the check at tests-green.
 
 # implement
 
