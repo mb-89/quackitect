@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: node-leaves-the-boxes
 parent: install-drops-node
+record:
+  - step: do
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 2d0893183b83ead0b4a4a9c3b9b5ee481c4db236
+    hash_after: ef362b63601a5bca765d4662cc9e844faf7a22e5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/install-names-the-index-binary.md:41:130: Characters: The character $ stands outside the set a paragraph ad"
+    inputs:
+      - name: ask
+        hash: c4a4d456be5e9418
+        size: 133
+    def: 7406f0bc9df1ebf5
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the stamp case builds a module with no go.sum and no git. go-stamp.sh hashes whi
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/go-stamp.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`go-stamp.sh` reads no git, and hashes `go.mod` and `go.sum` where each stands, so a module with no `go.sum` stamps too. The stamp case builds such a module in a temporary folder, stamps it, reads it fresh, changes an imported package and reads it stale.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the stamp skips a module file that stands nowhere, and calls no git
+- the cleanup stands in the change: an empty name from the list skips too
+- the files a build reads stand once, in what go list names
 
 # Discussion
 
