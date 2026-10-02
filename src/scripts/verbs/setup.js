@@ -4,6 +4,7 @@
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { RUN } from "../../../.claude/skills/level0/lib/folders.js";
 import { EXTENSIONS } from "../../../.claude/skills/level0/lib/servers.js";
 import { disk } from "../../doors/disk.js";
 import { proc } from "../../doors/proc.js";
@@ -11,7 +12,7 @@ import { homeIn } from "../editor.js";
 import { verbMain } from "../verb-run.js";
 
 const CLIENT = ["src", "extension", "node_modules", "vscode-languageclient"];
-const TOOLS = [".se", ".runtime", "tools.json"];
+const TOOLS = [RUN, "tools.json"];
 
 const ITEMS = {
   "editor-client": {

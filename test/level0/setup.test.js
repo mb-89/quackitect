@@ -3,6 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { EXTENSIONS } from "../../.claude/skills/level0/lib/servers.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
@@ -11,7 +12,7 @@ import { setup } from "../../src/scripts/verbs/setup.js";
 const ROOT = "/tree";
 const HOME = "/home/nobody";
 const CLIENT = `${ROOT}/src/extension/node_modules/vscode-languageclient/package.json`;
-const TOOLS = `${ROOT}/.se/.runtime/tools.json`;
+const TOOLS = `${ROOT}/${RUN}/tools.json`;
 
 function itOf(seed, answers, env = {}) {
   const said = [];
