@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/the-webview-ships-prebuilt.md:277:3: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 9012f21ef3b97d2706d3dd3caddbc2827b880a6f
+    hash_after: 9012f21ef3b97d2706d3dd3caddbc2827b880a6f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-webview-ships-prebuilt.md:319:1: ListItem: A sentence in a list item holds 20 words, and this one holds"
+    inputs:
+      - name: design/tests-red
+        hash: ff0bf1224659119a
+        size: 773
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -328,26 +351,33 @@ The approach answers the ask: the drawing ships under `src/extension/drawing`, g
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/drawing-shipped.test.js test/contract/install.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The route drawing ships in git under `src/extension/drawing`, so a box builds none of it. The bundle's first line names a hash of the sources it reads, and a contract case fails the check where a source changes and nobody rebuilds. The inset reads the drawing off the extension, and the install drops its drawing item, the npm install and the bundle step. A maintainer who changes the drawing runs `node src/scripts/bundle.js` and commits the output.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and nothing past them
+- `bundle.js` reads through the disk door, and its fake stands under `src/doors/fake`
+- the comments point at the drawing chapter's prebuilt section
+- `OUT` holds the folder once, and the inset's copy says why it stands
 
 # accept
 
