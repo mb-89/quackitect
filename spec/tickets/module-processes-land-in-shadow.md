@@ -99,6 +99,7 @@ record:
   - step: sync
     hand: box 23776eae9f68 · claude-code-remote
     hash_before: cf52e9e8b2231f7228398e4239407260b182945c
+    hash_after: 740bcdb8442197d1438bbbf48b57e1db65c49f16
   - step: sync
     hand: box 23776eae9f68 · claude-code-remote
     hash_before: 28f2be8745fee81f658d84ebb3bd0ba24b51a619
@@ -175,7 +176,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["go-cage-switches-over", "lsp-door-switches-over", "sidebar-switches-over"]
 enabled_by: migration.phase9shadow
-cloud: true
 reason: done
 ---
 
