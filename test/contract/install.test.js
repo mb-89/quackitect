@@ -80,20 +80,15 @@ test("both announcement lines wait on a missing want, so a warm tree runs silent
   );
 });
 
-// The drawing and its browser are wants, so a box with no registry and no browser still runs every verb. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-test("the install bundles the drawing and resolves a browser, both as wants", () => {
+// The browser is a want, so a box with no browser still runs every verb, and the drawing ships in git, so the install bundles none. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
+test("the install resolves a browser as a want, and bundles no drawing", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
   const list = /^for one in (.+?)\s*\\\n\s*(.+?); do/m.exec(said);
   const wants = `${list[1]} ${list[2]}`.split(/\s+/);
-  for (const one of ["drawing", "browser"]) {
-    assert.ok(wants.includes(one), `the loop names ${one}`);
-    assert.match(
-      said,
-      new RegExp(`\\[ "\\$1" = "${one}" \\]`),
-      `a missing ${one} stops no verb`,
-    );
-  }
-  assert.match(said, /node src\/scripts\/bundle\.js/, "the want runs the bundle step");
+  assert.ok(wants.includes("browser"), "the loop names browser");
+  assert.ok(!wants.includes("drawing"), "the loop names no drawing");
+  assert.match(said, /\[ "\$1" = "browser" \]/, "a missing browser stops no verb");
+  assert.doesNotMatch(said, /bundle\.js/, "no step bundles the drawing");
   assert.match(said, /node src\/scripts\/browser\.js/, "the want asks the resolver");
 });
 

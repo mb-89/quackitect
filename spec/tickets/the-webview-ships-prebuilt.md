@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,22 @@ record:
         hash: 3fb4091882eab748
         size: 178
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 77f4c295c43a · claude-code-remote
+    hash_before: f9f420eeca428c39e26f2d6cbefcbd7cf2412478
+    hash_after: f9f420eeca428c39e26f2d6cbefcbd7cf2412478
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: ed6fdc47ea2d140c
+        size: 2716
+      - name: [[spec/tickets/install-drops-node]]
+        hash: 83575bda3f482f6c
+        size: 216
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -218,26 +234,32 @@ The `browser` item stays for [[spec/tickets/install-drops-node]].
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/drawing-shipped.test.js test/contract/install.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/drawing-shipped.test.js
+- test/contract/install.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. Git tracks nothing under the runtime folder `OUT` names now, the bundle's first line holds minified code and no banner, and the install loop still names the drawing. The shipped case reads `bundle.js` through a namespace, so a missing `stampOf` fails the assertion and leaves the import standing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fresh-clone line rides the two shipped cases, and the check decides the second line
+- the cases read git, the disk and the source text, which are the real things a contract case drives, and no door they reach takes a fake here
 
 # gate
 
