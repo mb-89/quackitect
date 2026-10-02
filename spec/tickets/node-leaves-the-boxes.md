@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -198,9 +198,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 1721b1305e813db11790b07434ef24afc5fa5f08
+    hash_after: 1721b1305e813db11790b07434ef24afc5fa5f08
+    inputs:
+      - name: retro/write
+        hash: 86f909f9edfd2280
+        size: 2457
+    def: 4da1ca5da87d5bbc
 depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -353,20 +363,29 @@ The red cases from tests-red planned the moved steps as sh, and the gate's point
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the pull tool over the bridge: the hook answers no call, so every hand-back runs through the shell
+- the proxy refuses one host during a commit's check, and no case needs it
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at the take: three files from main, resolved into one batch reader
+- a conflict at sync: main changes a test this branch deletes, and the test leaves
+- the hooks: the ticket name on each shell call, the plan questions, the landing gate after a pipe, and the shell-write guard
+- an EPIPE in a check under load, which a proc door fix ends
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- the-verbs-port-takes-a-phase stands on the person route with no group, asking the owner whether the verb port becomes a migration phase
+- no person step stands parked inside the group
+- the retro carries what a handover carries, since the private folder dies with the box
 
 # Discussion
 
