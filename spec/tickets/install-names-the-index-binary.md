@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: node-leaves-the-boxes
 parent: install-drops-node
+record:
+  - step: do
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: fea6972166a5849c006ca9f57a33c4a06be6bf07
+    hash_after: fea6972166a5849c006ca9f57a33c4a06be6bf07
+    why: install-drops-node answers this ask
+reason: answered
 ---
 
 # Ask
