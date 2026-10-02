@@ -51,8 +51,11 @@ export const COLD_PATH = [
   "src/bridge/guidance.js",
   "src/modules/hooks/",
   "src/quack/",
+  "src/scripts/go-stamp.sh",
   "src/scripts/install.sh",
   "src/scripts/probe-cold.js",
+  "src/scripts/setup.sh",
+  "src/scripts/verbs/setup.js",
 ];
 
 // A folder entry ends on a slash and takes every path under it, and a file entry takes itself alone. [[spec/design_output/level0#the-cold-probe]]
