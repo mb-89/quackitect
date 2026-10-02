@@ -14,6 +14,8 @@ import { verbMain } from "../verb-run.js";
 const CLIENT = ["src", "extension", "node_modules", "vscode-languageclient"];
 const TOOLS = [RUN, "tools.json"];
 const SHIMS = ["npm", "npx", "code"];
+// The exit cmd answers where the command it runs stands nowhere. [[spec/tickets/windows-missing-code-reads-absent]]
+const CMD_MISSING = 9009;
 
 const ITEMS = {
   "editor-client": {
@@ -99,6 +101,7 @@ function editorHere(it) {
 function listedOf(it) {
   try {
     const said = it.proc.run(shimmed(it, ["code", "--list-extensions"]));
+    if (it.windows && said.exitCode === CMD_MISSING) return null;
     if (said.exitCode !== 0) return [];
     return said.stdout.toLowerCase().split(/\r?\n/).map((one) => one.trim());
   } catch {

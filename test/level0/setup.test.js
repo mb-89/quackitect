@@ -127,6 +127,20 @@ test("on Windows the setup reaches npm, npx and code through cmd, and node itsel
   assert.ok(lines.includes(`node ${ROOT}/src/scripts/browser.js`), "node runs as it stands");
 });
 
+// cmd answers its own exit where no code stands, and that reads as no code. [[spec/tickets/windows-missing-code-reads-absent]]
+test("on Windows a cmd answering no such command reads as no code, and the setup installs no extension", () => {
+  const it = itOf(
+    { [CLIENT]: "{}", [TOOLS]: "{}" },
+    { node: { exitCode: 0 }, "cmd /c code --list-extensions": { exitCode: 9009 }, cmd: { exitCode: 0 } },
+  );
+  it.windows = true;
+
+  setup(it, []);
+
+  assert.ok(!it.proc.ran.some((one) => lineOf(one).includes("--install-extension")), "no extension installs");
+  assert.ok(!it.said.some((one) => one.startsWith("editor-extensions:")), "the item stands here");
+});
+
 // The setup runs before every verb, so a step that stops says a warning and the next one runs. [[spec/design_output/copilot#setup-and-discovery]]
 test("a Copilot setup that stops says a warning, and the brand still runs", () => {
   const it = itOf({ [CLIENT]: "{}", [TOOLS]: "{}" }, { ...HELD, node: failing("copilot.js") });
