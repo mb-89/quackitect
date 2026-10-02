@@ -171,6 +171,27 @@ func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
 	}
 }
 
+// A run sent to a process that exited holds no reader, since nothing answers it until the restart. [[spec/tickets/the-split-deployment-takes-over]]
+func TestASettleWaitsOnNoProcessStandingDown(t *testing.T) {
+	store, source, bus, placed := doublerPlaced(t)
+	placed.Command = []string{os.Args[0], "-test.run=^$"}
+	placements := NewPlacements(bus, store, []Placed{placed})
+	stop, err := placements.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	placements.Settle(20 * time.Second)
+	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 21}); err != nil {
+		t.Fatal(err)
+	}
+	began := time.Now()
+	placements.Settle(5 * time.Second)
+	if gone := time.Since(began); gone > time.Second {
+		t.Fatalf("a run of the exited doubler holds the settle for %v", gone)
+	}
+}
+
 // A dog that counts holds and faults, and refuses every restart. [[spec/tickets/watchdogs-span-the-processes]]
 type refusingDog struct {
 	mu     sync.Mutex

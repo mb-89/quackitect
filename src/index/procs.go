@@ -27,8 +27,8 @@ type Placed struct {
 	// The dog the process's lease stands with, and the term past a beat. A nil holds no lease. [[spec/tickets/watchdogs-span-the-processes]]
 	Watch Leases
 	Term  time.Duration
-	// Where the placements hear that an instance answers, by a commit or an exit. A nil hears nothing. [[spec/tickets/the-split-deployment-takes-over]]
-	answered func(instance string)
+	// Where the placements hear that an instance answers, up by a commit or down by an exit. A nil hears nothing. [[spec/tickets/the-split-deployment-takes-over]]
+	answered func(instance string, up bool)
 }
 
 // What a placed process's lease reaches: the dog that holds and renews it, counts its faults, and calls each expiry. [[spec/design_output/model#a-lease]]
@@ -60,6 +60,8 @@ type Placements struct {
 	// The instances a reader waits on: each until its first answer, and again from each run sent until the next. idle wakes the wait. [[spec/tickets/the-split-deployment-takes-over]]
 	pending map[string]bool
 	idle    *sync.Cond
+	// The instances whose process exited and commits nothing since, so a run sent there holds no reader. [[spec/tickets/the-split-deployment-takes-over]]
+	gone map[string]bool
 }
 
 // Waits until every instance answers what it was sent, an exit counting as an answer, or the wait passes. So a read after a commit reads what the processes compute off it. [[spec/tickets/the-split-deployment-takes-over]]
@@ -78,11 +80,16 @@ func (p *Placements) Settle(wait time.Duration) {
 	}
 }
 
-// Clears the instance's wait once its process commits or exits. [[spec/tickets/the-split-deployment-takes-over]]
-func (p *Placements) answered(instance string) {
+// Clears the instance's wait once its process commits or exits, and marks it gone on an exit until it commits again. [[spec/tickets/the-split-deployment-takes-over]]
+func (p *Placements) answered(instance string, up bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	delete(p.pending, instance)
+	if up {
+		delete(p.gone, instance)
+	} else {
+		p.gone[instance] = true
+	}
 	p.idle.Broadcast()
 }
 
@@ -97,7 +104,7 @@ const spawnGap = 250 * time.Millisecond
 
 // [[spec/design_output/model#the-placements]]
 func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	p := &Placements{bus: bus, store: store, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}}
+	p := &Placements{bus: bus, store: store, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}}
 	p.idle = sync.NewCond(&p.mu)
 	p.placed = make([]Placed, len(placed))
 	for i, one := range placed {
@@ -202,7 +209,9 @@ func (p *Placements) runs(peer *Peer, inputs map[string][]string, values map[str
 		for _, name := range read {
 			p.moved[instance][name] = true
 		}
-		p.pending[instance] = true
+		if !p.gone[instance] {
+			p.pending[instance] = true
+		}
 		run = append(run, instance)
 	}
 	p.mu.Unlock()
@@ -316,7 +325,7 @@ func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
 // A commit lands typed as the instance's writer, and clears its down mark. [[spec/design_output/model#a-process-ends]]
 func (p Placed) heard(store *q.Store, instance string, hand q.Writer, values map[string]json.RawMessage) {
 	if p.answered != nil {
-		defer p.answered(instance)
+		defer p.answered(instance, true)
 	}
 	// An empty commit answers a run that moved nothing. [[spec/tickets/the-split-deployment-takes-over]]
 	if len(values) == 0 {
@@ -415,7 +424,7 @@ func (p Placed) down(store *q.Store) {
 			fmt.Fprintln(stderr, p.Name, "stands", instance, "down nowhere:", err)
 		}
 		if p.answered != nil {
-			p.answered(instance)
+			p.answered(instance, false)
 		}
 	}
 }

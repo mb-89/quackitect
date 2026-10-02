@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -138,6 +138,18 @@ record:
         hash: b0d415a0971c4dff
         size: 3778
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box b1311a2beaed · claude-code-remote · helper-3
+    hash_before: 19b1b97e218516be02ebaa6c01376f67774d5d84
+    hash_after: 19b1b97e218516be02ebaa6c01376f67774d5d84
+    inputs:
+      - name: design/draft
+        hash: b0d415a0971c4dff
+        size: 3778
+      - name: design/tests-red
+        hash: 3d2641011a3238aa
+        size: 798
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -272,8 +284,13 @@ The slice test and the lease row test fail on their assertions. The kill case in
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- mid-run-commit-clears-early: the pending mark is a bool, so a commit answering an earlier run clears a run sent while the process computes, and a reader then reads before the second answer
+- quack-io-answers-no-run: quack io commits once a start and answers no run.<instance>, so an IO instance wired to an input holds every reader for answerWait. Watch, clock, env and git read no wire today, so a case or a guard should hold that
+- kill-case-drives-live-split: TestAKilledPlacedProcessLeavesTheOthersAnswering stood green before the switch and drives index.Placements alone. No case kills one process under ioProcesses with the wiring's placements
+- callers-name-drains-readers: the callers list leaves out src/index/answers.go value and tickets and src/index/v1.go, which read one.drains, which now waits on the placements
 
 # implement
 
@@ -350,3 +367,4 @@ The slice test and the lease row test fail on their assertions. The kill case in
 - A module process answers every run, an empty commit where nothing moved, and `quack io` acks each start after its seed.
 - I weigh a reader that reads stale values and waits on nothing. It fails the contract case and every verb reading right after a start, so I take the wait.
 - The cage passes a call on a lease past its term, and writes a `watchdog` row. During this box's sync the lease ran past its term while the door answered. A refusal there locks the agent out at every large sync.
+- The gate, fixed in place: `Placements.runs` marked a down instance pending, so a reader's drain waited out `answerWait` while that process stood dead. The `gone` set in `src/index/procs.go` now skips it, and `TestASettleWaitsOnNoProcessStandingDown` goes red without the guard.
