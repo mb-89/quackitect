@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -108,6 +108,18 @@ record:
         exit: 0
         said: work/module-processes-land-in-shadow already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: 76a2fda275dd443e32a80d6cb1c45942e7c681f2
+    hash_after: 76a2fda275dd443e32a80d6cb1c45942e7c681f2
+    inputs:
+      - name: ask
+        hash: 392420b7addb5a7e
+        size: 548
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["go-cage-switches-over", "lsp-door-switches-over", "sidebar-switches-over"]
 enabled_by: migration.phase9shadow
 cloud: true
@@ -137,14 +149,27 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-doors-process-stands]], standard
+- [[spec/tickets/the-system-places-modules]], standard
+- [[spec/tickets/watchdogs-span-the-processes]], standard
+- [[spec/tickets/fake-snapshot-stays-in-case]], trivial
+- [[spec/tickets/model-marks-io-names]], trivial
+- [[spec/tickets/module-silence-reads-alarms]], trivial
+- [[spec/tickets/placements-leave-http]], trivial
+- [[spec/tickets/placements-select-off-the-table]], trivial
+- [[spec/tickets/processes-links-point-at-model]], trivial
+- [[spec/tickets/topic-folder-in-the-table]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: each standard child carries one process piece, and each trivial child one fix
+- the children add up to the goal: the IO process, the placed module processes and the watchdogs, under the processes key the default file sets to shadow
+- no child waits on another past its depends_on: watchdogs-span-the-processes names the-doors-process-stands, and every child stands closed
 
 # children
 
