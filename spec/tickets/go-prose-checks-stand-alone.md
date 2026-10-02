@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -144,6 +144,24 @@ record:
         hash: 1e27277f7647141a
         size: 231
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 77f4c295c43a · claude-code-remote · helper-3
+    hash_before: 333da1aa3153d02766c81e967cc294dc2823aef7
+    hash_after: 333da1aa3153d02766c81e967cc294dc2823aef7
+    inputs:
+      - name: design/draft
+        hash: b3ef1bbfc1fd7c4e
+        size: 3711
+      - name: design/tests-red
+        hash: 6621abd2f0e7c57f
+        size: 885
+      - name: [[spec/tickets/install-drops-node]]
+        hash: 83575bda3f482f6c
+        size: 216
+      - name: [[spec/tickets/readers-take-the-go-topics]]
+        hash: 1e27277f7647141a
+        size: 231
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -283,8 +301,14 @@ Each case fails on its own assertion. The start road answers 0 where the case wa
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- readers-tests-carry-quack: test/level0/one-reader.test.js hands readsText rows, and its fake disk holds no quack binary.
+- boot-fixture-drops-wink: test/level0/hooks.test.js plants node_modules/wink-nlp as its boot fixture, and that fixture leaves with wink.
+- lsp-fixture-drops-node: src/modules/lsp/tools_test.go fills Node and Tense in its shared Tools fixture.
+- tense-notes-follow: spec/design_output/lsp.md, spec/vocabulary/terms.yml and four Go comments still name tense.js or wink-nlp.
+- widenings-stand-needed: the start road and the modules item both read wink's folder, so both changes stay.
 
 # implement
 
