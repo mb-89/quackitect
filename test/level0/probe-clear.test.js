@@ -37,6 +37,17 @@ test("a pull that falls shows its last line, cut short", () => {
   assert.ok(said.evidence.length < 400, "the evidence stays one short line");
 });
 
+// [[spec/tickets/the-clear-runs-live-remote]]
+test("a pull that falls names what each pull before it answers", () => {
+  const runs = [
+    { words: "", exit: 0, said: "Call branch done." },
+    { words: "handover --pass", exit: 1, said: "nothing stands in your hand." },
+  ];
+  const said = clearHeld([], run({ runs }));
+  assert.equal(said.pass, false);
+  assert.match(said.evidence, /^the pull alone answers Call branch done\.; the pull handover --pass answers 1: nothing stands/);
+});
+
 test("a clear the plugin meets refused names the refusal", () => {
   const said = clearHeld([FELL], run({ commands: [] }));
   assert.equal(said.pass, false);

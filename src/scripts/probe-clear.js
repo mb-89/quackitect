@@ -17,6 +17,8 @@ const SHOWN = 160;
 const HANDOVER_FILE = ".se/HANDOVER.md";
 const HANDOVER_TEXT = "# Handover\n\nThe dry probe stands nothing in hand, and the queue holds what waits.\n";
 const ANSWER = "The handover stands, and the clear ends this turn.";
+// The ticket the probe's own work branch carries, so the pull reads a group still open whatever the clone stands on. [[spec/tickets/the-clear-runs-live-remote]]
+const GROUP = "dry-probe-clears";
 
 // The turn's two ends, in the order the probe raises them. The design reads both orders. [[spec/design_output/stop#the-hold-outlives-its-drop]]
 export const ENDS = ["turn.complete", "classic.Stop"];
@@ -33,6 +35,8 @@ export async function clearRun(it, tree, raise, seen, env) {
     runs.push({ words: words.join(" "), exit: ran.exitCode, said: `${ran.stdout}${ran.stderr}` });
     return `${ran.stdout}${ran.stderr}`;
   };
+  const own = grouped(it, tree, env);
+  if (own) runs.push(own);
   keyed(it, tree);
   seen.commands.length = 0;
   seen.prompts.length = 0;
@@ -47,6 +51,19 @@ export async function clearRun(it, tree, raise, seen, env) {
   }
   await settled(seen);
   return { runs, commands: [...seen.commands], prompts: [...seen.prompts] };
+}
+
+function grouped(it, tree, env) {
+  const minted = it.proc.run(
+    [it.join(tree, "RUNME.sh"), "mint", "ticket", `spec/tickets/${GROUP}.md`, "--process=trivial"],
+    { cwd: tree, env, timeoutMs: PULL_WAIT },
+  );
+  const branched = it.proc.run(["git", "checkout", "-q", "-B", `work/${GROUP}`], {
+    cwd: tree,
+    timeoutMs: PULL_WAIT,
+  });
+  const fell = [minted, branched].find((one) => one.exitCode !== 0);
+  return fell ? { words: `mint ${GROUP}`, exit: fell.exitCode, said: `${fell.stdout}${fell.stderr}` } : null;
 }
 
 function keyed(it, tree) {
@@ -70,7 +87,13 @@ export function clearHeld(rows, seen) {
   const run = seen.cleared;
   if (!run) return { pass: false, evidence: "the session never reaches the clear" };
   const failed = run.runs.find((one) => one.exit !== 0);
-  if (failed) return { pass: false, evidence: `the pull ${failed.words} answers ${failed.exit}: ${firstLine(failed.said)}` };
+  if (failed) {
+    const before = run.runs
+      .slice(0, run.runs.indexOf(failed))
+      .map((one) => `the pull ${one.words || "alone"} answers ${firstLine(one.said)}; `)
+      .join("");
+    return { pass: false, evidence: `${before}the pull ${failed.words} answers ${failed.exit}: ${firstLine(failed.said)}` };
+  }
   if (!run.commands.includes("clear")) {
     const fell = rows.find((one) => /the clear the handover asks for fails/.test(String(one.said ?? "")));
     return {
