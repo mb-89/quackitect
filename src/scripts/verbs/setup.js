@@ -60,6 +60,8 @@ const ITEMS = {
   },
 };
 
+export const WANTS = Object.keys(ITEMS);
+
 // Every item stands a want, so a miss names what the box loses and the setup goes on. [[spec/tickets/install-drops-node]]
 export function setup(it, words) {
   const skipped = String(it.env.SE_INSTALL_SKIP ?? "").split(/\s+/);

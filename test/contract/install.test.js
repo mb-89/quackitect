@@ -14,6 +14,8 @@ import {
 } from "../../.claude/skills/level0/lib/servers.js";
 import { rebuilt } from "../../.claude/skills/level0/lib/tools.js";
 import { disk } from "../../src/doors/disk.js";
+import { WANTS } from "../../src/scripts/verbs/setup.js";
+import { FETCHING } from "./fetching.js";
 
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -100,6 +102,14 @@ test("both announcement lines wait on a missing want, so a warm tree runs silent
     /^\[ -n "\$missing" \] && say "Ready\./,
     "the closing line carries the same test on its own row",
   );
+});
+
+// A vehicle case skips every want past the box, so the skip list names each one the install and the setup reach. [[spec/tickets/fetching-skip-list-stale]]
+test("the skip list names every want of the install and the setup, and nothing else", () => {
+  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  const list = /^for one in (.+?)\s*\\\n\s*(.+?); do/m.exec(said);
+  const wants = [...`${list[1]} ${list[2]}`.split(/\s+/), ...WANTS];
+  assert.deepEqual(FETCHING.split(" ").sort(), wants.sort());
 });
 
 // The index builds with Go alone. [[spec/design_output/index#the-compiler-it-needs]]
