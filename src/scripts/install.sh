@@ -257,14 +257,15 @@ swap_in() {
 # [[spec/design_output/lsp#the-build-beside-the-index]]
 front_here() {
   if [ ! -x "$bin/se-front${exe}" ]; then return 1; fi
-  (cd "$root" && node src/scripts/go-source.js fresh se-front) 2>/dev/null
+  have go || return 0
+  sh "$root/src/scripts/go-stamp.sh" fresh se-front 2>/dev/null
 }
 
 get_front() {
   say "  building the front writer"
   (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-front${exe}.new" ./src/front/cmd) || return 1
   swap_in "$bin/se-front${exe}.new" "$bin/se-front${exe}" || return 1
-  (cd "$root" && node src/scripts/go-source.js stamp se-front) || return 1
+  sh "$root/src/scripts/go-stamp.sh" stamp se-front || return 1
   front_here
 }
 
@@ -295,7 +296,8 @@ get_modules() {
 # [[spec/design_output/lsp#the-build-beside-the-index]]
 index_here() {
   if [ ! -x "$bin/se-index${exe}" ]; then return 1; fi
-  (cd "$root" && node src/scripts/go-source.js fresh se-index) 2>/dev/null
+  have go || return 0
+  sh "$root/src/scripts/go-stamp.sh" fresh se-index 2>/dev/null
 }
 
 # [[spec/design_output/index#the-compiler-it-needs]]
@@ -303,7 +305,7 @@ get_index() {
   say "  building the index"
   (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/quack) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
-  (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
+  sh "$root/src/scripts/go-stamp.sh" stamp se-index || return 1
   index_here
 }
 
