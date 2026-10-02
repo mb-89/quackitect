@@ -37,9 +37,9 @@ type twoOf struct {
 
 func TestANameTwiceRefusesTheStart(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", 0)
-	GivenIn(c, "t/n", 0)
-	found := faultsOf(t, c.Check(nil), Twice)
+	OutIn(c, "t/n", 0)
+	OutIn(c, "t/n", 0)
+	found := faultsOf(t, c.Check(), Twice)
 	if len(found) != 1 || found[0].Name != "t/n" {
 		t.Fatalf("the check answers %+v", found)
 	}
@@ -48,56 +48,20 @@ func TestANameTwiceRefusesTheStart(t *testing.T) {
 
 func TestAMissingDefaultRefusesTheStart(t *testing.T) {
 	c := New()
-	GivenIn[map[string]int](c, "t/map", nil)
-	GivenIn[[]int](c, "t/list", nil)
-	GivenIn(c, "t/full", map[string]int{})
-	found := faultsOf(t, c.Check(nil), NoDefault)
+	OutIn[map[string]int](c, "t/map", nil)
+	OutIn[[]int](c, "t/list", nil)
+	OutIn(c, "t/full", map[string]int{})
+	found := faultsOf(t, c.Check(), NoDefault)
 	if len(found) != 2 || found[0].Name != "t/map" || found[1].Name != "t/list" {
 		t.Fatalf("the check answers %+v", found)
 	}
 	wherePoints(t, found[0], 1)
 }
 
-func TestTwoActiveProvidersRefuseTheStart(t *testing.T) {
-	c := New()
-	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N }, Alt("t.local"))
-	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N * 2 }, Alt("t.remote"))
-	GivenIn(c, "t/n", 0)
-	found := faultsOf(t, c.Check(nil), TwoActive)
-	if len(found) != 1 || found[0].Name != "t/two" || !strings.Contains(found[0].Says, "providers.t/two") {
-		t.Fatalf("the check answers %+v", found)
-	}
-	wherePoints(t, found[0], 2)
-}
-
-func TestTheKeyPicksOneAlt(t *testing.T) {
-	c := New()
-	GivenIn(c, "t/n", 0)
-	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N }, Alt("t.local"))
-	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N * 2 }, Alt("t.remote"))
-	if faults := c.Check(map[string]string{"providers.t/two": "t.remote"}); len(faults) != 0 {
-		t.Fatalf("the key picks one, and the check answers %+v", faults)
-	}
-	found := faultsOf(t, c.Check(map[string]string{"providers.t/two": "t.nobody"}), NoAlt)
-	if len(found) != 1 || found[0].Name != "t/two" {
-		t.Fatalf("a key naming no alt answers %+v", found)
-	}
-}
-
-func TestAPlainRegistrationStandsBesideAnAlt(t *testing.T) {
-	c := New()
-	GivenIn(c, "t/n", 0)
-	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N })
-	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N * 2 }, Alt("t.remote"))
-	if faults := c.Check(nil); len(faults) != 0 {
-		t.Fatalf("the plain one stands, and the check answers %+v", faults)
-	}
-}
-
 func TestAnInputNamingNoNameRefuses(t *testing.T) {
 	c := New()
 	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N })
-	found := faultsOf(t, c.Check(nil), NoName)
+	found := faultsOf(t, c.Check(), NoName)
 	if len(found) != 1 || found[0].Name != "t/two" || !strings.Contains(found[0].Says, "t/n") {
 		t.Fatalf("the check answers %+v", found)
 	}
@@ -105,9 +69,9 @@ func TestAnInputNamingNoNameRefuses(t *testing.T) {
 
 func TestAnInputOfAnotherTypeRefuses(t *testing.T) {
 	c := New()
-	GivenIn(c, "t/n", "a string")
+	OutIn(c, "t/n", "a string")
 	DerivedIn(c, "t/two", 0, func(in twoOf) int { return in.N })
-	found := faultsOf(t, c.Check(nil), OtherType)
+	found := faultsOf(t, c.Check(), OtherType)
 	if len(found) != 1 || !strings.Contains(found[0].Says, "int") || !strings.Contains(found[0].Says, "string") {
 		t.Fatalf("the check answers %+v", found)
 	}
@@ -125,7 +89,7 @@ func TestADerivedCycleRefuses(t *testing.T) {
 	c := New()
 	DerivedIn(c, "t/a", 0, func(in readsB) int { return in.B })
 	DerivedIn(c, "t/b", 0, func(in readsA) int { return in.A })
-	found := faultsOf(t, c.Check(nil), Cycle)
+	found := faultsOf(t, c.Check(), Cycle)
 	if len(found) != 1 || !strings.Contains(found[0].Says, "t/a") || !strings.Contains(found[0].Says, "t/b") {
 		t.Fatalf("the check answers %+v", found)
 	}
@@ -133,10 +97,10 @@ func TestADerivedCycleRefuses(t *testing.T) {
 
 func TestANameOfOtherThanLowercaseSegmentsRefuses(t *testing.T) {
 	c := New()
-	GivenIn(c, "T/Big", 0)
-	GivenIn(c, "t//gap", 0)
-	GivenIn(c, "ops/<id>", 0)
-	found := faultsOf(t, c.Check(nil), BadName)
+	OutIn(c, "T/Big", 0)
+	OutIn(c, "t//gap", 0)
+	OutIn(c, "ops/<id>", 0)
+	found := faultsOf(t, c.Check(), BadName)
 	if len(found) != 2 || found[0].Name != "T/Big" || found[1].Name != "t//gap" {
 		t.Fatalf("the check answers %+v", found)
 	}
@@ -145,10 +109,50 @@ func TestANameOfOtherThanLowercaseSegmentsRefuses(t *testing.T) {
 // [[spec/tickets/files-topic-reads-the-rows]]
 func TestAKeyOfManySegmentsStandsLast(t *testing.T) {
 	c := New()
-	GivenIn(c, "files/<path...>", "")
-	GivenIn(c, "t/<rest...>/tail", "")
-	found := faultsOf(t, c.Check(nil), BadName)
+	OutIn(c, "files/<path...>", "")
+	OutIn(c, "t/<rest...>/tail", "")
+	found := faultsOf(t, c.Check(), BadName)
 	if len(found) != 1 || found[0].Name != "t/<rest...>/tail" {
 		t.Fatalf("the check answers %+v", found)
+	}
+}
+
+type optionalOf struct {
+	N int `q:"t/absent,optional"`
+}
+
+// An input tagged optional passes the check with no writer, and reads its zero value. [[spec/tickets/the-config-module-resolves-layers]]
+func TestAnOptionalInputWithNoWriterPassesTheCheck(t *testing.T) {
+	c := New()
+	DerivedIn(c, "t/m", 0, func(in optionalOf) int { return in.N + 1 }, Doc("one past the absent name"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the check refuses an optional input with no writer: %v", faults)
+	}
+	if got := run(t, NewStore(c), "t/m"); got != 1 {
+		t.Fatalf("t/m reads %v off the zero value of t/absent", got)
+	}
+}
+
+type countsOf struct {
+	Counts map[string]int `q:"files/<path...>"`
+}
+
+// A map over a family takes the family's own type, so a map of another fails the check, and the family map reads no key of another family. [[spec/tickets/tickets-becomes-a-module]]
+func TestAFamilyMapOfAnotherTypeFailsTheCheck(t *testing.T) {
+	c := New()
+	OutIn(c, "files/<path...>", Content{}, Doc("a file"))
+	DerivedIn(c, "t/counts", 0, func(in countsOf) int { return len(in.Counts) }, Doc("the count"))
+	if found := faultsOf(t, c.Check(), OtherType); len(found) != 1 {
+		t.Fatalf("a map of int over a family of Content reads %v", found)
+	}
+	one := New()
+	hand := OutIn(one, "files/<path...>", Content{}, Doc("a file"))
+	other := OutIn(one, "buffers/<path...>", Content{}, Doc("a buffer"))
+	DerivedIn(one, "t/texts", 0, func(in filesOf) int { return len(in.Files) }, Doc("the count of files"))
+	s := NewStore(one)
+	seed(t, s, hand, "files/a.md", Content{Hash: "a"})
+	seed(t, s, other, "buffers/b.md", Content{Hash: "b"})
+	if got := run(t, s, "t/texts"); got != 1 {
+		t.Fatalf("the family map reads %v keys", got)
 	}
 }

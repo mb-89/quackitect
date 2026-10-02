@@ -7,22 +7,13 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
-import {
-  PATCH,
-  patchSpec,
-  REPLACE,
-  replaceSpec,
-} from "../../.claude/skills/level0/lib/apply.js";
+import { patchSpec, replaceSpec } from "../../.claude/skills/level0/lib/apply.js";
 import { findings } from "../../.claude/skills/level0/lib/bash.js";
-import { MINT_TOOL, schemasFrom } from "../../.claude/skills/level0/lib/schema.js";
 import { UNDO } from "../../.claude/skills/level0/lib/undo.js";
 import { SPECS } from "../../src/bridge/apply.js";
-import { boxOf, decide } from "../../src/bridge/server.js";
 import { onToolWrite } from "../../src/bridge/write.js";
-import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { fakeLog } from "../../src/doors/fake/log.js";
 import { ticketFault, ticketOf } from "../../src/engine/named.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
 
@@ -34,108 +25,6 @@ const TICKETS = {
   "/tree/spec/tickets/done-one.md": ticket("closed"),
   "/tree/.se/tickets/private-one.md": ticket("open"),
 };
-
-const NOTE_SCHEMA = `kind: note
-
-frontmatter:
-  additionalProperties: false
-  required:
-    - kind
-  properties:
-    kind:
-      const: note
-      x-link: true
-
-body:
-  headingLevel: 1
-  extraSections: false
-  sections:
-    - header: Scope
-      required: true
-      description: what this note covers
-`;
-
-function routed(seed = {}) {
-  const disk = fakeDisk({ "/tree/one.md": "alpha beta\n", ...TICKETS, ...seed });
-  const box = boxOf(ROOT, ROOT, {
-    disk,
-    clock: fakeClock(),
-    log: fakeLog(),
-    front: fakeFront(),
-    proc: { run: () => ({ exitCode: 1, stdout: "", stderr: "" }) },
-    index: {
-      dead: () => "",
-      fault: () => "",
-      warm: () => ({ warmed: false }),
-      ask: () => ({ files: [{ path: "one.md" }] }),
-    },
-    vale: { stands: () => false },
-    biome: { stands: () => false },
-  });
-  box.schemas = schemasFrom([{ name: "note.schema.yaml", text: NOTE_SCHEMA }]);
-  return box;
-}
-
-const called = (box, e) => decide({ event: "tool.call", e }, box);
-const patch = (more = {}) => ({
-  tool: `mcp__level0__${PATCH}`,
-  ops: [{ file: "one.md", old: "beta", new: "delta" }],
-  ...more,
-});
-const answered = (said) => String(said?.result?.result ?? "");
-const refused = (said) => String(said?.result?.deny ?? "");
-
-test("a patch naming no ticket writes nothing, and says to name one in the ticket field", async () => {
-  const box = routed();
-  const said = answered(await called(box, patch()));
-  assert.match(said, /names no ticket/);
-  assert.match(said, /ticket field/);
-  assert.equal(box.disk.read("/tree/one.md"), "alpha beta\n");
-});
-
-test("a patch naming a ticket nobody holds writes nothing, and names the ticket", async () => {
-  const box = routed();
-  const said = answered(await called(box, patch({ ticket: "no-such-one" })));
-  assert.match(said, /no-such-one/);
-  assert.match(said, /No ticket named no-such-one stands/);
-  assert.equal(box.disk.read("/tree/one.md"), "alpha beta\n");
-});
-
-test("a patch naming a closed ticket writes nothing, and says it stands closed", async () => {
-  const box = routed();
-  const said = answered(await called(box, patch({ ticket: "done-one" })));
-  assert.match(said, /done-one stands closed/);
-  assert.equal(box.disk.read("/tree/one.md"), "alpha beta\n");
-});
-
-test("a patch naming an open ticket, public or private, writes", async () => {
-  const box = routed();
-  assert.match(answered(await called(box, patch({ ticket: "open-one" }))), /written/);
-  assert.equal(box.disk.read("/tree/one.md"), "alpha delta\n");
-  const again = patch({
-    ticket: "private-one",
-    ops: [{ file: "one.md", old: "delta", new: "gamma" }],
-  });
-  assert.match(answered(await called(box, again)), /written/);
-  assert.equal(box.disk.read("/tree/one.md"), "alpha gamma\n");
-});
-
-test("a replace naming no ticket writes nothing, and one naming an open ticket writes", async () => {
-  const box = routed();
-  const sweep = {
-    tool: `mcp__level0__${REPLACE}`,
-    pattern: "beta",
-    replacement: "zeta",
-    glob: "*.md",
-  };
-  assert.match(answered(await called(box, sweep)), /names no ticket/);
-  assert.equal(box.disk.read("/tree/one.md"), "alpha beta\n");
-  assert.match(
-    answered(await called(box, { ...sweep, ticket: "open-one" })),
-    /written/,
-  );
-  assert.equal(box.disk.read("/tree/one.md"), "alpha zeta\n");
-});
 
 test("the patch and replace specs require the ticket field", () => {
   for (const spec of [patchSpec(), replaceSpec()]) {
@@ -149,68 +38,8 @@ test("the patch and replace specs require the ticket field", () => {
   );
 });
 
-test("an undo names no ticket, and puts the patch back", async () => {
-  const box = routed();
-  await called(box, patch({ ticket: "open-one" }));
-  assert.match(
-    answered(await called(box, { tool: `mcp__level0__${UNDO}` })),
-    /come back/,
-  );
-  assert.equal(box.disk.read("/tree/one.md"), "alpha beta\n");
-});
-
-test("Edit, Write, MultiEdit and NotebookEdit refuse a path in the tree, and name the patch tool and its ticket field", async () => {
-  const at = join(ROOT, "one.md");
-  const calls = [
-    { tool: "Edit", file_path: at, old_string: "beta", new_string: "delta" },
-    { tool: "Write", file_path: at, content: "fresh\n" },
-    {
-      tool: "MultiEdit",
-      file_path: at,
-      edits: [{ old_string: "beta", new_string: "delta" }],
-    },
-    { tool: "NotebookEdit", notebook_path: join(ROOT, "one.ipynb"), new_source: "x" },
-  ];
-  for (const e of calls) {
-    const said = refused(await called(routed(), e));
-    assert.match(said, new RegExp(`^${e.tool} carries no ticket field`), e.tool);
-    assert.match(said, /mcp__level0__patch/, e.tool);
-    assert.match(said, /ticket field/, e.tool);
-  }
-});
-
-test("a Write of the handover passes with no ticket, through the tool and through a patch", async () => {
-  const box = routed();
-  const at = join(ROOT, ".se", "HANDOVER.md");
-  assert.equal(
-    refused(
-      await called(box, {
-        tool: "Write",
-        file_path: at,
-        content: "# Where it stands\n",
-      }),
-    ),
-    "",
-  );
-  assert.deepEqual(
-    await onToolWrite(
-      { tool: "Write", file_path: at, content: "# Where it stands\n" },
-      box,
-    ),
-    { pass: true },
-  );
-  const said = answered(
-    await called(box, {
-      tool: `mcp__level0__${PATCH}`,
-      ops: [{ file: ".se/HANDOVER.md", op: "create", new: "# Where\n" }],
-    }),
-  );
-  assert.match(said, /written/);
-  assert.equal(box.disk.read("/tree/.se/HANDOVER.md"), "# Where\n");
-});
-
 test("a Write outside the tree passes, since the write door reads the tree alone", async () => {
-  const box = routed();
+  const box = { root: ROOT, disk: fakeDisk(TICKETS) };
   assert.deepEqual(
     await onToolWrite(
       { tool: "Write", file_path: "/elsewhere/a.md", content: "x" },
@@ -218,32 +47,6 @@ test("a Write outside the tree passes, since the write door reads the tree alone
     ),
     { pass: true },
   );
-});
-
-test("a mint names no ticket, and writes its note", async () => {
-  const box = routed();
-  const said = answered(
-    await called(box, {
-      tool: `mcp__level0__${MINT_TOOL}`,
-      kind: "note",
-      path: "spec/notes/fresh.md",
-    }),
-  );
-  assert.match(said, /stands, in the shape note names/);
-  assert.equal(box.disk.exists("/tree/spec/notes/fresh.md"), true);
-});
-
-test("the ticket note and ticket mint verbs pass the shell door with no ticket named", async () => {
-  for (const command of [
-    './RUNME.sh ticket note a-thought "a line to keep"',
-    "./RUNME.sh mint ticket spec/tickets/fresh.md --process=standard",
-  ]) {
-    assert.equal(
-      refused(await called(routed(), { tool: "Bash", command })),
-      "",
-      command,
-    );
-  }
 });
 
 test("the shell door's refusal names the patch tool and its ticket field, and no road the door refuses", () => {
@@ -292,7 +95,7 @@ function commitDoors() {
     env: {},
   };
   for (const verb of ["test", "check"]) {
-    git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), verb], {
+    git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", `${verb}.js`)], {
       exitCode: 0,
       stdout: "ok\n",
     });
@@ -336,23 +139,6 @@ test("a commit message opening with an open ticket lands", async () => {
       (one) => one.argv.join(" ") === "git commit -m open-one: the change lands",
     ),
   );
-});
-
-// [[spec/design_output/level0#a-shell-names-its-ticket]]
-test("a PowerShell call naming no open ticket refuses, and one naming an open ticket passes", async () => {
-  const box = routed();
-  const bare = await called(box, {
-    tool: "PowerShell",
-    command: "Get-ChildItem",
-    description: "List the files",
-  });
-  assert.match(refused(bare), /Open the description with <ticket>:/);
-  const named = await called(box, {
-    tool: "PowerShell",
-    command: "Get-ChildItem",
-    description: "open-one: list the files",
-  });
-  assert.equal(refused(named), "");
 });
 
 // A write names what stands in hand: a held ticket or the plan's working todo. [[spec/tickets/the-todo-joins-the-queue]]
@@ -403,19 +189,4 @@ test("an ephemeral hold's ticket passes with no file behind it", () => {
 test("with nothing in hand, any open ticket passes and a closed one fails", () => {
   assert.equal(fault("open-one", {}), "");
   assert.match(fault("done-one", {}), /closed/);
-});
-
-// A module the client loads again holds no tools, so a post marked fresh takes the tools back from a server that registered once already. [[spec/design_output/level0#the-first-call-pays]]
-test("a fresh post takes the tools again from a server that registered once", async () => {
-  const box = routed();
-  box.registered = true;
-
-  const plain = await decide({ event: "tool.call", e: { tool: "Read" } }, box);
-  const fresh = await decide(
-    { event: "tool.call", e: { tool: "Read" }, fresh: true },
-    box,
-  );
-
-  assert.equal(plain.register, undefined, "a plain post takes no tools twice");
-  assert.ok(Array.isArray(fresh.register), "a fresh post takes them back");
 });

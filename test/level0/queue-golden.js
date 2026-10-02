@@ -8,7 +8,7 @@ import { it as doors } from "../../src/scripts/cli-doors.js";
 import { failsOn } from "../../src/scripts/pull-queue.js";
 import { answerOf } from "../../src/scripts/work-answer.js";
 
-const GOLDEN = ["src", "plan", "testdata"];
+const GOLDEN = ["src", "modules", "queue", "testdata"];
 const FILE = "queue.golden.json";
 const WEIGHTS = ["block", "day", "fail"];
 

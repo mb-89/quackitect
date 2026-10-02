@@ -9,11 +9,13 @@ import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
+import { http } from "../doors/http.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { front } from "../doors/front.js";
 import { index } from "../doors/index.js";
 import { homeIn } from "./editor.js";
+import { SLICES } from "../bridge/config.js";
 import { handDoors } from "./pull-hand-of.js";
 import { readTools, whereIs } from "../engine/tools.js";
 import { rootsHere } from "./vehicle.js";
@@ -51,6 +53,8 @@ export async function doorsHere() {
     disk: files,
     clock: time,
     git: git(outside, roots.work),
+    // The dispatch fires the work routine and opens issues through it. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
+    http: http(),
     // [[spec/tickets/go-writes-the-frontmatter]]
     front: front(files, outside, roots.method),
     // The stale read asks the index for the hash of a note. [[spec/design_output/pull#an-input-marks-its-steps]]
@@ -60,6 +64,12 @@ export async function doorsHere() {
       level: await said.ask("log.level"),
     }),
     config: said,
+    // The mode each migration slice reads, taken once at startup so a sync reader asks no door. [[spec/tickets/readers-name-one-mode-source]]
+    slices: Object.fromEntries(
+      await Promise.all(
+        SLICES.map(async (one) => [one, await said.ask(`migration.${one}`)]),
+      ),
+    ),
     method: roots.method,
     work: roots.work,
     words: await said.ask("names.words"),
@@ -71,9 +81,9 @@ export async function doorsHere() {
     personSigns: await said.ask("work.personSigns"),
     // [[spec/design_output/pull#the-queue-is-a-score]]
     weights: {
-      block: await said.ask("work.blockScore"),
-      day: await said.ask("work.dayScore"),
-      fail: await said.ask("work.failScore"),
+      block: await said.ask("queue.block"),
+      day: await said.ask("queue.day"),
+      fail: await said.ask("queue.fail"),
     },
     // A name on the pull asks for one ticket, and the queue binding refuses the ask. [[spec/design_output/pull#the-hand-out]]
     binding: await said.ask("engine.binding"),
@@ -82,6 +92,8 @@ export async function doorsHere() {
     ...handDoors(process.env),
     node: process.execPath,
     pid: process.pid,
+    // The register splits its folders by the platform's separator. [[spec/tickets/serve-probes-the-register-port]]
+    windows: process.platform === "win32",
     // The retro's collect reads the transcripts and the memory under home, and the scratchpads under temp. [[spec/guidance/retro/collect]]
     home: homeIn(process.env),
     temp: process.env.TEMP || process.env.TMP || process.env.TMPDIR || "",
@@ -102,7 +114,6 @@ export const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 export const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 export const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
 export const biome = whereIs(files, root, "biome", known);
-export const lsp = whereIs(files, root, "se-lsp", known);
 export const GUIDANCE = join(root, "spec", "guidance");
 export const DOORS = join(root, "src", "doors");
 export const PLUGIN = join(".claude", "skills", "level0");

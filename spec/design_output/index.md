@@ -99,9 +99,17 @@ asks the door on every question, so nothing caches a decision made at start.
 | a door stands over another tree | the same, because the root rides in the file |
 | no binary stands yet | the disk answers, and the index joins the moment it builds |
 
-The standing file carries a stamp: the build's own time and size. A caller
-whose stamp disagrees asks that door to stop, drops the file, and starts one of
-its own. So fixing a bug in the index costs a rebuild and the next question.
+The standing file carries the path of the build that stands the door, and a
+stamp: that build's time and size. A caller reads the stamp of that path on
+disk, whatever build it runs itself. So the window and every other client keep
+a live door. Where the stamp disagrees, the build stands rebuilt: the caller
+asks that door to stop, drops the file, and starts an index. So fixing a bug in
+the index costs a rebuild and the next question.
+
+| the caller | the index it starts |
+|---|---|
+| the index itself | itself |
+| a client, the window among them | the index beside its own binary, else the one under the tree |
 
 A root takes one spelling where it enters: cleaned, with the drive letter upper
 case. A hook hands `c:\` and a shell hands `C:\`, and both name one tree. So
@@ -287,6 +295,10 @@ The disk hands the body from that line to the close balancing its first
 brace. A brace inside a string or a comment counts for nothing. The answer
 names the path and the line, then the body. A name no row defines answers
 that nothing in the index defines it.
+
+The Go twin stands in `src/modules/search`, off the wiring until the flip.
+Go regexp matches no closing quote by its opening one, so a scanner there
+skips each string.
 
 ## Where the disk still answers
 

@@ -1,0 +1,54 @@
+{
+  "cases": [
+    {
+      "name": "a spawn naming no kind takes the helper layer",
+      "files": {
+        "spec/guidance/voice.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n2. Put the bottom line first. *\n",
+        "spec/guidance/working.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Answer the owner first.\n\n# Examples\n\n| do | do not |\n|---|---|\n| the answer | the tool call |\n",
+        "spec/guidance/refactor/refactoring.md": "---\nkind: [[guidance]]\nscope: [\"refactor: the hand a refactor spawns\"]\n---\n\n# Actionables\n\n1. Take the one file your prompt names.\n"
+      },
+      "kind": "",
+      "prompt": "Read the tree, and report.",
+      "layer": "helper",
+      "pass": false,
+      "wrapped": "# How this tree is worked\n\nThese rules reach you before your task does, and they hold over what you\nwrite. Vale holds the mechanical ones at the write door, so a write\nbreaking one comes back with the reason and the line.\n\n### voice\n\n1. Say what is.\n2. Put the bottom line first.\n\n### working\n\n1. Answer the owner first.\n\n| do | do not |\n|---|---|\n| the answer | the tool call |\n\n# Your task\n\nRead the tree, and report."
+    },
+    {
+      "name": "a spawn naming a kind takes that kind's layer",
+      "files": {
+        "spec/guidance/voice.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n2. Put the bottom line first. *\n",
+        "spec/guidance/working.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Answer the owner first.\n\n# Examples\n\n| do | do not |\n|---|---|\n| the answer | the tool call |\n",
+        "spec/guidance/refactor/refactoring.md": "---\nkind: [[guidance]]\nscope: [\"refactor: the hand a refactor spawns\"]\n---\n\n# Actionables\n\n1. Take the one file your prompt names.\n"
+      },
+      "kind": "refactor",
+      "prompt": "Rename the one function.",
+      "layer": "refactor",
+      "pass": false,
+      "wrapped": "# How this tree is worked\n\nThese rules reach you before your task does, and they hold over what you\nwrite. Vale holds the mechanical ones at the write door, so a write\nbreaking one comes back with the reason and the line.\n\n### voice\n\n1. Say what is.\n2. Put the bottom line first.\n\n### working\n\n1. Answer the owner first.\n\n| do | do not |\n|---|---|\n| the answer | the tool call |\n\n### refactor/refactoring\n\n1. Take the one file your prompt names.\n\n# Your task\n\nRename the one function."
+    },
+    {
+      "name": "a spawn naming a kind with no layer takes the helper layer",
+      "files": {
+        "spec/guidance/voice.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is.\n2. Put the bottom line first. *\n",
+        "spec/guidance/working.md": "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Answer the owner first.\n\n# Examples\n\n| do | do not |\n|---|---|\n| the answer | the tool call |\n",
+        "spec/guidance/refactor/refactoring.md": "---\nkind: [[guidance]]\nscope: [\"refactor: the hand a refactor spawns\"]\n---\n\n# Actionables\n\n1. Take the one file your prompt names.\n"
+      },
+      "kind": "nobody",
+      "prompt": "Read the tree, and report.",
+      "layer": "helper",
+      "pass": false,
+      "wrapped": "# How this tree is worked\n\nThese rules reach you before your task does, and they hold over what you\nwrite. Vale holds the mechanical ones at the write door, so a write\nbreaking one comes back with the reason and the line.\n\n### voice\n\n1. Say what is.\n2. Put the bottom line first.\n\n### working\n\n1. Answer the owner first.\n\n| do | do not |\n|---|---|\n| the answer | the tool call |\n\n# Your task\n\nRead the tree, and report."
+    },
+    {
+      "name": "a tree holding no rule passes the spawn",
+      "files": {
+        "spec/guidance/empty.md": "---\nkind: [[guidance]]\n---\n\n# Motivation\n\nA note with no rule.\n"
+      },
+      "kind": "",
+      "prompt": "Read the tree, and report.",
+      "layer": "none",
+      "pass": true,
+      "wrapped": ""
+    }
+  ]
+}

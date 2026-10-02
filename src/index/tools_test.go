@@ -1,0 +1,205 @@
+// The index generates one tool an action off the registry: its name, its doc
+// and its input schema, with a bare input carried as one property.
+// [[spec/tickets/the-hook-registers-index-tools]]
+package index
+
+import (
+	"encoding/json"
+	"flag"
+	"net/http"
+	"os"
+	"path/filepath"
+	"reflect"
+	"testing"
+
+	"quackitect/src/q"
+	"quackitect/src/q/tool"
+)
+
+// One tool as the list reads it. [[spec/tickets/the-hook-registers-index-tools]]
+type listedTool struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Action      string `json:"action"`
+	Bare        bool   `json:"bare"`
+	InputSchema struct {
+		Type       string `json:"type"`
+		Properties map[string]struct {
+			Type        string `json:"type"`
+			Description string `json:"description"`
+		} `json:"properties"`
+	} `json:"inputSchema"`
+}
+
+// The golden file test/level0/index-tools.test.js reads as the list se-index tools prints. [[spec/tickets/tool-list-shape-held-once]]
+const toolsGoldenAt = "testdata/tools.golden.json"
+
+var update = flag.Bool("update", false, "write the golden file again off the index")
+
+// The body /v1/tools answers over a door holding t/add and t/echo. [[spec/tickets/the-hook-registers-index-tools]]
+func toolsBody(t *testing.T) []byte {
+	t.Helper()
+	return toolsBodyWith(t, func(*q.Catalog) {})
+}
+
+// The same body over a catalog the case adds its own actions to. [[spec/tickets/tools-keep-their-own-names]]
+func toolsBodyWith(t *testing.T, adds func(*q.Catalog)) []byte {
+	t.Helper()
+	root := tree(t)
+	c := q.New()
+	adds(c)
+	ops := q.OutIn(c, "ops/<id>", map[string]any{}, q.Doc("the fake manager's operations"))
+	q.ActionIn(c, "t/add", func(in addIn) []q.Request {
+		return []q.Request{{Module: "t", Verb: "add", Args: in, NoUndo: "a sum writes nothing"}}
+	}, q.Doc("adds two terms"))
+	q.ActionIn(c, "t/echo", func(in string) []q.Request {
+		return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "an echo writes nothing"}}
+	}, q.Doc("echoes its input"))
+	accept := func(asked q.Request) (any, error) { return asked.Args, nil }
+	_, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), c, fakeManager(ops, accept))
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(stop)
+	standing, err := standingOf(root)
+	if err != nil {
+		t.Fatal(err)
+	}
+	said, body := getV1(t, standing, "/v1/tools")
+	if said.StatusCode != http.StatusOK {
+		t.Fatalf("/v1/tools answers %d: %.300s", said.StatusCode, body)
+	}
+	return body
+}
+
+// The tools a door over t/add and t/echo lists, by name. [[spec/tickets/the-hook-registers-index-tools]]
+func listedTools(t *testing.T) map[string]listedTool {
+	t.Helper()
+	body := toolsBody(t)
+	var list []listedTool
+	if err := json.Unmarshal(body, &list); err != nil {
+		t.Fatalf("/v1/tools answers %.300s: %v", body, err)
+	}
+	out := map[string]listedTool{}
+	for _, one := range list {
+		out[one.Name] = one
+	}
+	return out
+}
+
+func TestV1ListsEachActionAsATool(t *testing.T) {
+	add, ok := listedTools(t)["index_t_add"]
+	if !ok || add.Action != "t/add" || add.Description != "adds two terms" || add.Bare || add.InputSchema.Type != "object" {
+		t.Fatalf("the list holds %+v for t/add", add)
+	}
+	if a := add.InputSchema.Properties["a"]; a.Type != "integer" || a.Description != "the first term" {
+		t.Fatalf("the input schema of t/add reads %+v", add.InputSchema)
+	}
+}
+
+// Every tool the list names spells its action as the shared surface does, so the hooks door and the mcp module read it back. [[spec/tickets/tool-surface-moves-into-q]]
+func TestEveryListedNameIsTheSharedToolName(t *testing.T) {
+	listed := listedTools(t)
+	if len(listed) == 0 {
+		t.Fatal("the list holds no tool, and wants t/add and t/echo")
+	}
+	for name, one := range listed {
+		if name != tool.Name(one.Action) {
+			t.Fatalf("%s lists as %q, and wants the shared name %q", one.Action, name, tool.Name(one.Action))
+		}
+	}
+}
+
+// An action carrying its own tool name lists under that name, and still names its action. [[spec/tickets/tools-keep-their-own-names]]
+func TestTheToolListNamesAnActionUnderItsOwnToolName(t *testing.T) {
+	body := toolsBodyWith(t, func(c *q.Catalog) {
+		q.ActionIn(c, "t/plan", func(in string) []q.Request {
+			return []q.Request{{Module: "t", Verb: "echo", Args: in, NoUndo: "a plan writes nothing here"}}
+		}, q.Doc("plans the work"), q.ToolName("plan"))
+	})
+	var list []listedTool
+	if err := json.Unmarshal(body, &list); err != nil {
+		t.Fatalf("/v1/tools answers %.300s: %v", body, err)
+	}
+	names := map[string]string{}
+	for _, one := range list {
+		names[one.Name] = one.Action
+	}
+	if names["plan"] != "t/plan" {
+		t.Fatalf("the list names %v, and wants plan for t/plan", names)
+	}
+	if _, ok := names["index_t_plan"]; ok {
+		t.Fatal("t/plan lists under its generated name too, and wants its own name alone")
+	}
+}
+
+// Every listed tool carries the plan field, so the plan's answer rides any call. [[spec/tickets/plan-writes-off-go]]
+func TestEveryListedToolCarriesThePlanField(t *testing.T) {
+	listed := listedTools(t)
+	if len(listed) == 0 {
+		t.Fatal("the list holds no tool, and wants t/add and t/echo")
+	}
+	for name, one := range listed {
+		if plan, ok := one.InputSchema.Properties[tool.PlanArg]; !ok || plan.Type != "object" {
+			t.Errorf("%s lists the properties %v, and wants the plan field as an object", name, one.InputSchema.Properties)
+		}
+	}
+}
+
+// The plan tool takes the plan as its input, and carries no plan field of its own. [[spec/tickets/plan-writes-off-go]]
+func TestThePlanToolCarriesNoPlanField(t *testing.T) {
+	body := toolsBodyWith(t, func(c *q.Catalog) {
+		q.ActionIn(c, "t/plan", func(tool.Plan) []q.Request { return nil }, q.Doc("plans the work"), q.ToolName(tool.PlanTool))
+	})
+	var list []listedTool
+	if err := json.Unmarshal(body, &list); err != nil {
+		t.Fatalf("/v1/tools answers %.300s: %v", body, err)
+	}
+	for _, one := range list {
+		if one.Name != tool.PlanTool {
+			continue
+		}
+		if _, ok := one.InputSchema.Properties[tool.PlanArg]; ok {
+			t.Errorf("the plan tool lists %v, and wants no plan field", one.InputSchema.Properties)
+		}
+		if _, ok := one.InputSchema.Properties["working"]; !ok {
+			t.Errorf("the plan tool lists %v, and wants its own input", one.InputSchema.Properties)
+		}
+		return
+	}
+	t.Fatal("the list names no plan tool")
+}
+
+func TestABareInputRidesAsOneProperty(t *testing.T) {
+	echo, ok := listedTools(t)["index_t_echo"]
+	if !ok || !echo.Bare || echo.InputSchema.Type != "object" || echo.InputSchema.Properties["input"].Type != "string" {
+		t.Fatalf("the list holds %+v for t/echo", echo)
+	}
+}
+
+// The list /v1/tools generates reads as the golden file, so the hook's case holds the one shape the index answers. [[spec/tickets/tool-list-shape-held-once]]
+func TestTheToolListReadsAsItsGoldenFile(t *testing.T) {
+	var said, held any
+	if err := json.Unmarshal(toolsBody(t), &said); err != nil {
+		t.Fatal(err)
+	}
+	if *update {
+		body, err := json.MarshalIndent(said, "", "  ")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(toolsGoldenAt, append(body, '\n'), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	body, err := os.ReadFile(toolsGoldenAt)
+	if err != nil {
+		t.Fatalf("%v: run go test ./src/index -run TestTheToolListReadsAsItsGoldenFile -update", err)
+	}
+	if err := json.Unmarshal(body, &held); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(said, held) {
+		t.Fatalf("/v1/tools lists %v, and %s holds %v", said, toolsGoldenAt, held)
+	}
+}

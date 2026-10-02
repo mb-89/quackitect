@@ -17,5 +17,10 @@ exceptions:
   - settled
   - standing
   - switched
+  - unjudged
+  - unmarked
+  - unmerged
+  - unquoted
+  - unsaved
 tokens:
   - tag: VBD

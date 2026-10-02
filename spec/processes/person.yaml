@@ -1,0 +1,48 @@
+# Work a person alone can do: a trial on the owner's machine, a secret, a
+# setting on GitHub or claude.ai. It is the one ticket that leaves a group
+# loose on main, and the dispatch hands it to no box. A question an agent can
+# answer stands on the question route, inside the group that meets it.
+# [[spec/design_output/work#a-person-step-leaves]]
+for: work a person alone can do, and the step that carries the result into the tree
+ask:
+  - name: work
+    form: text
+    says: what the person does, why no box can do it, and the ticket the work comes from
+  - name: commands
+    form: list
+    says: every command the person runs, one a line, in order
+  - name: done_when
+    form: list
+    says: one line each, decidable, naming the command that decides it
+steps:
+  - name: do
+    does: does the work the ask names, and says what came back
+    by: person
+    to: engine
+    input: ask
+    evidence:
+      - name: result
+        form: text
+        says: what came back, which the step behind this one reads
+  - name: follow
+    does: carries the result into the tree, with the test that covers it
+    from: anyone
+    by: anyone
+    to: retro
+    input: result
+    needs: [branch test]
+    checklist:
+      - the change follows the result, or the discussion says why it departs
+      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
+    evidence:
+      - name: tests
+        form: command
+        expects: green
+        says: the tests that cover the change, or the check where it touches no code
+      - name: check
+        form: command
+        expects: 0
+        says: the check is green on the commit
+      - name: says
+        form: text
+        says: what changes and why, for a reader who was not there

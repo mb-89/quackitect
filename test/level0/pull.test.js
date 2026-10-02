@@ -8,7 +8,8 @@ import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/engine/group.js";
 import { takeable } from "../../src/scripts/pull.js";
-import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { excludes } from "../../src/scripts/pull-hand.js";
+import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
   at,
@@ -36,7 +37,7 @@ test("a pull off trunk and off a work branch refuses, and names the pull from tr
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 2);
-  assert.match(said, /ticket pull from main/);
+  assert.match(said, /index_ticket_pull from main/);
   assert.ok(!said.includes("branch take"), "no hand takes a branch");
 });
 
@@ -49,10 +50,7 @@ const onTrunk = (extra = {}) => ({
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
 test("on trunk a cloud box's pull takes a branch, and a desk's pull takes none", () => {
   const cloud = doors(standing(), onTrunk(), { cloud: true });
-  for (const [argv, code] of [
-    [probeOf("node", 6510), 1],
-    [startOf(ROOT), 0],
-  ])
+  for (const [argv, code] of [[startOf(ROOT), 0]])
     cloud.outside.proc.teach(argv, { exitCode: code });
   const taken = heard(() => pulling(ROOT, ["pull"], cloud.it));
   assert.equal(taken.code, 0);
@@ -162,7 +160,7 @@ test("the pull hands out the child's first leaf, writes the hold, and the answer
   assert.match(said, /One piece of it\./);
   assert.match(said, /\n {2}approach {2}text: the approach/);
   assert.match(said, /# Reads spec\/guidance\/voice\n\n1\. Say what is\./);
-  assert.match(said, /ticket pull a-child --pass/);
+  assert.match(said, /index_ticket_pull with args \["a-child","--pass"/);
   const hold = JSON.parse(disk.read(HOLD));
   assert.equal(hold.ticket, "a-child");
   assert.equal(hold.step, "design/draft");
@@ -328,6 +326,25 @@ test("a pass writes the record, moves the step, commits by ticket and step, push
   );
 });
 
+// [[spec/design_output/pull#the-hand-rule]]
+test("a gate waits for a hand other than the one writing a copy of the leaf it names", () => {
+  const walk = [
+    { path: "design", parent: "", name: "design" },
+    { path: "design/draft", parent: "design", name: "draft" },
+    { path: "design/draft-2", parent: "design", name: "draft-2" },
+    { path: "gate", parent: "", name: "gate" },
+  ];
+  const front = {
+    record: [
+      { step: "design/draft", hand: "box first" },
+      { step: "design/draft-2", hand: HAND },
+    ],
+  };
+  const gate = { path: "gate", parent: "", not: "design/draft", walk };
+  assert.match(excludes(front, gate, HAND), /waits for a hand other than/);
+  assert.equal(excludes(front, gate, "box third"), "");
+});
+
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("a step that excludes the only hand answers spawn, with the helper's name and its prompt", () => {
   const took = withEntry(
@@ -352,10 +369,10 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
     /^spawn\n {2}a-child at design\/review waits for a hand other than box d462e994b4cef/,
   );
   assert.match(said, /named helper-2, and you work one step of one ticket/);
-  assert.match(said, /ticket pull --as helper-2/);
+  assert.match(said, /index_ticket_pull with args \["--as","helper-2"\]/);
   assert.match(
     said,
-    /ticket pull a-child --as helper-2 --fields '<json>'`\. It checks/,
+    /index_ticket_pull with args \["a-child","--as","helper-2","--fields","<json>"\]\. It checks/,
   );
   assert.equal(disk.exists(HOLD), false, "the spawn answer holds nothing");
   assert.equal(

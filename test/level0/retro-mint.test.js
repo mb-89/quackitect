@@ -20,7 +20,8 @@ const ROOT = "/tree";
 // The command line stands under the method root, apart from the work root, as in a stub. [[spec/design_output/vehicle#the-work-root-inherits]]
 const METHOD = "/method";
 const NODE = "/bin/node";
-const CLI = `${NODE} ${join(METHOD, "src", "scripts", "cli.js")}`;
+const verbAt = (verb) =>
+  `${NODE} ${join(METHOD, "src", "scripts", "verbs", `${verb}.js`)}`;
 const RETRO = "retro-a1b2c3";
 const at = (path) => join(ROOT, ".se", ".retro", RETRO, ...path.split("/"));
 const TICKET = join(ROOT, "spec", "tickets", "the-land-verb-lands.md");
@@ -63,18 +64,19 @@ function doors(classes, promotions = []) {
     [at("classes.json")]: JSON.stringify({ classes, dispositions: {}, promotions }),
   });
   const proc = fakeProc({
-    [`${CLI} mint ticket spec/tickets/the-land-verb-lands.md --process=standard`]:
+    [`${verbAt("mint")} ticket spec/tickets/the-land-verb-lands.md --process=standard`]:
       () => {
         disk.write(TICKET, DRAFT);
         return { exitCode: 0 };
       },
-    [`${CLI} ticket open the-land-verb-lands`]: { exitCode: 0 },
-    [`${CLI} mint ticket spec/tickets/the-rule-lands.md --process=trivial`]: () => {
-      disk.write(PROMOTED, DRAFT);
-      return { exitCode: 0 };
-    },
-    [`${CLI} ticket open the-rule-lands`]: { exitCode: 0 },
-    [`${CLI} mint ticket spec/tickets/a-second-ticket.md --process=standard`]: {
+    [`${verbAt("ticket")} open the-land-verb-lands`]: { exitCode: 0 },
+    [`${verbAt("mint")} ticket spec/tickets/the-rule-lands.md --process=trivial`]:
+      () => {
+        disk.write(PROMOTED, DRAFT);
+        return { exitCode: 0 };
+      },
+    [`${verbAt("ticket")} open the-rule-lands`]: { exitCode: 0 },
+    [`${verbAt("mint")} ticket spec/tickets/a-second-ticket.md --process=standard`]: {
       exitCode: 2,
       stderr: "the ask names a word outside the vocabulary",
     },

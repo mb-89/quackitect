@@ -1,10 +1,19 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -24,35 +33,41 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -60,7 +75,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -74,10 +89,99 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 9d870e3fd3c577a6
+process_hash: 22b42ea1501e8967
 group: lsp-door-lands-in-shadow
+record:
+  - step: design/draft
+    hand: box 5c8055bbc025 · claude-code-remote
+    hash_before: cd89a9fa15affa8a670a676fb3ac1a9bfc6e428b
+    hash_after: cd89a9fa15affa8a670a676fb3ac1a9bfc6e428b
+    inputs:
+      - name: ask
+        hash: 8ae6e5341e97a787
+        size: 320
+    def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 5c8055bbc025 · claude-code-remote
+    hash_before: e0aecd37cc0aeb86ecb60df9d836a7896b6ee6c1
+    hash_after: e0aecd37cc0aeb86ecb60df9d836a7896b6ee6c1
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: 4b2bf176b63e20be
+        size: 3663
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 659763b656de24f80cf4c7da7513223354c5db79
+    hash_after: 659763b656de24f80cf4c7da7513223354c5db79
+    inputs:
+      - name: design/draft
+        hash: 4b2bf176b63e20be
+        size: 3663
+      - name: design/tests-red
+        hash: f547f05bfa96d6f2
+        size: 1015
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 073167fad9e91db1a294e2f15b85c84e73cc4234
+    hash_after: 073167fad9e91db1a294e2f15b85c84e73cc4234
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d856596c7410d · claude-code-remote
+    hash_before: 0a65097bd12e1a5a9da73855dd88d97d5499d1cd
+    hash_after: 0a65097bd12e1a5a9da73855dd88d97d5499d1cd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes; green, src/modules/migration passes; green, src/imports passes; green, src/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/vale-ls-windows-trial.md:41:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: f547f05bfa96d6f2
+        size: 1015
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -92,6 +196,16 @@ One copy of each rule then answers the editor, the check and the write door.
 
 # design
 
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -99,44 +213,64 @@ One copy of each rule then answers the editor, the check and the write door.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The rules move whole, as one copy, into the check module, and the LSP keeps the protocol.
+
+| the part | lands in | why |
+|---|---|---|
+| the tree, the checker, the note parse, the schema reader and every rule file: anchor, check, conflict, finding, group, history, install, marked, names, note, owned, parsed, paths, pointer, restated, schema-body, schema, syntax, textfaults, tree, and the pure half of private | `src/modules/check`, package `check`, exported where the LSP calls them | one copy answers the editor, the check and the write door |
+| the tree's disk | a `Source` of slash paths and text in `check`: `Read`, `Paths`, `Folder` | `onlyq` refuses `io/fs`, which the LSP's `Disk` speaks |
+| the `Disk`, the index client, the walk, the config and box reads, the outside tools, the protocol and the command line | stay in `src/lsp`, which adapts its `Disk` to a `Source` | they reach the outside, and the `lsp` IO module keeps them |
+| the names the LSP calls | one file, `src/lsp/rules.go`, aliasing each moved name | the protocol files and their tests stay untouched, so the diff reads as a move |
+| `src/pointer` | joins `pureTree` in `src/imports` | it imports the pure standard library alone |
+
+The new path: the check module registers the port `sweep`, derived off `files/<path...>` and `env/<name>`. It answers `Checker.Sweep` over a `Source` on the files map, with the name words and the restated runs resolved local file over variable over default file, the order `src/config` holds. The wiring binds `check.files/<path...>` and `check.env/<name>`.
+
+The shadow: the `migration` module declares `lsp`, built in as `old`, and the default file sets `migration.lsp` to `shadow`. Where it reads `shadow`, `se-lsp check` over the whole tree reads `check/sweep` off `/v1` and writes one `shadow` row, slice `lsp`, for each finding one side holds alone. The rules reading the box, `NothingPrivateTravels` and `SurveyFindsNode`, stand outside the compare, since the index reads no user, no git identity and no node. The old answer prints as it stands, and a fault on the new road writes nothing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/lsp: every protocol file and case calling a moved name, through src/lsp/rules.go
+- src/lsp/main.go: checks, which runs the shadow after its answer
+- src/lsp/twins_test.go: goTwins, through the aliases
+- src/quack/main.go: the module table loading check.Registers
+- src/quack/main_test.go: the check twins case
+- spec/wiring.yaml: the check instance, which gains its two wires
+- src/modules/migration/migration.go: Registers, which gains the lsp key
+- src/imports/imports.go: pastQ, through pureTree
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/check/sweep_test.go: TestTheSweepAnswersADeadPointerOffTheFiles
+- src/modules/check/sweep_test.go: TestTheSweepReadsTheWordsOffTheLocalLayer
+- src/modules/migration/migration_test.go: TestTheLspSliceStandsOld
+- src/lsp/shadow_test.go: TestTheShadowWritesARowForEachFindingApart
+- src/lsp/shadow_test.go: TestTheShadowLeavesTheBoxRulesOut
+- src/lsp/shadow_test.go: TestTheShadowWritesNothingUnderOld
+- src/imports/imports_test.go: TestAModuleImportsThePointerReader
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
+- every file named stands opened: the rule files and their imports, door.go, holds.go, indexed.go, main.go, check.go, the check and migration modules, imports.go, the wiring, and verbs.go for the row
+- the callers list names every package importing check and every file calling a moved name, which the alias file holds in one place
+- `go test ./...` meets every case above, `./RUNME.sh log --kind shadow` meets the shadow cases, and `./RUNME.sh check` runs the analyzers over the moved package
 
 ## tests-red
 
@@ -145,20 +279,47 @@ One copy of each rule then answers the editor, the check and the write door.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check src/modules/migration src/imports src/lsp
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/modules/check/sweep_test.go
+- src/modules/migration/migration_test.go
+- src/imports/imports_test.go
+- src/lsp/shadow_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Six cases fail on their own assertion: both sweep cases read an empty list, the lsp key stands nowhere, the pointer reader reads as past q, and the stub shadow writes no row. TestTheShadowLeavesTheBoxRulesOut passes against the stub, since a stub writing nothing leaves every rule out. It guards the compare once tests-green writes rows. The shadow cases needed a stub of shadowsSweep in src/lsp/shadow.go, so the package builds and each case reaches its assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a red case: go test ./... meets all four files, the shadow rows meet shadow_test.go, and the check meets the pointer case the analyzer reads
+- the one door the tests reach, the new road to /v1, takes a function the case hands in, and the session log takes one too
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
+
+# implement
 
 ## change
 
@@ -167,14 +328,19 @@ One copy of each rule then answers the editor, the check and the write door.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/lsp ./src/modules/check ./src/modules/migration ./src/imports
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names. The rename verb also rewrote comment reaches in the design output and three code files, and three contract cases now name a Go file of `src/lsp` the rule still reaches
+- the new doors, the sweep off `/v1` and the log append, reach `shadowsSweep` as functions, so each case hands in its own
+- each new file opens on a header pointing at this ticket
+- the layer order stands in `src/config`, and `sweep.go` spells it again with a comment saying why
 
 ## tests-green
 
@@ -183,26 +349,53 @@ One copy of each rule then answers the editor, the check and the write door.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/modules/check/sweep_test.go src/modules/migration src/imports src/lsp
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The LSP rules and schema checks now stand once, in `src/modules/check`, and the LSP calls them through `src/lsp/rules.go`. The tree reads a `Source` of slash paths, so the module imports no `io/fs`. The LSP hands in its disk, and the sweep hands in the files the index mirrors. The module answers `check/sweep` off `files/` and `env/`, with the word cap and the restated runs read off the layers in the order `src/config` reads them. The migration module adds the shared key `lsp`, built in as old, and the default file sets it to shadow. Under shadow, `se-lsp check` over the whole tree reads `check/sweep` off `/v1`, and each finding one side holds alone writes a `shadow` row, slice `lsp`. The rules reading the box stand outside the compare. The words case wanted no finding with the local cap at two, against the order its own message names, so it now wants the finding.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the contract cases the rename moved
+- the new doors reach the shadow as functions, so each case hands in a fake
+- each new file opens on a header pointing at this ticket
+- each fact the change adds stands once, and `sweep.go` says why it spells the layer order again
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
 
 # Discussion
 

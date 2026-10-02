@@ -17,6 +17,11 @@ exceptions:
   - am settled
   - am standing
   - am switched
+  - am unjudged
+  - am unmarked
+  - am unmerged
+  - am unquoted
+  - am unsaved
   - are approved
   - are bound
   - are complicated
@@ -27,6 +32,11 @@ exceptions:
   - are settled
   - are standing
   - are switched
+  - are unjudged
+  - are unmarked
+  - are unmerged
+  - are unquoted
+  - are unsaved
   - be approved
   - be bound
   - be complicated
@@ -37,6 +47,11 @@ exceptions:
   - be settled
   - be standing
   - be switched
+  - be unjudged
+  - be unmarked
+  - be unmerged
+  - be unquoted
+  - be unsaved
   - been approved
   - been bound
   - been complicated
@@ -47,6 +62,11 @@ exceptions:
   - been settled
   - been standing
   - been switched
+  - been unjudged
+  - been unmarked
+  - been unmerged
+  - been unquoted
+  - been unsaved
   - being approved
   - being bound
   - being complicated
@@ -57,6 +77,11 @@ exceptions:
   - being settled
   - being standing
   - being switched
+  - being unjudged
+  - being unmarked
+  - being unmerged
+  - being unquoted
+  - being unsaved
   - is approved
   - is bound
   - is complicated
@@ -67,6 +92,11 @@ exceptions:
   - is settled
   - is standing
   - is switched
+  - is unjudged
+  - is unmarked
+  - is unmerged
+  - is unquoted
+  - is unsaved
   - was approved
   - was bound
   - was complicated
@@ -77,6 +107,11 @@ exceptions:
   - was settled
   - was standing
   - was switched
+  - was unjudged
+  - was unmarked
+  - was unmerged
+  - was unquoted
+  - was unsaved
   - were approved
   - were bound
   - were complicated
@@ -87,6 +122,11 @@ exceptions:
   - were settled
   - were standing
   - were switched
+  - were unjudged
+  - were unmarked
+  - were unmerged
+  - were unquoted
+  - were unsaved
 tokens:
   - pattern: '(?:am|are|is|was|were|be|been|being)'
     tag: VB*

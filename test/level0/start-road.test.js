@@ -53,6 +53,13 @@ function harness({
     },
     process: {
       run: async (argv) => {
+        // The bridgehead appends its row through node, and the append lands in the log the case reads. [[spec/tickets/a-down-index-refuses-calls]]
+        if (argv[0] === "node" && String(argv[2]).includes("appendFileSync")) {
+          tries.push(String(argv[4]));
+          if (!logs) return { exitCode: 1, stderr: "the log stands read only" };
+          wrote.set(argv[3], `${wrote.get(argv[3]) ?? ""}${argv[4]}`);
+          return { exitCode: 0, stderr: "" };
+        }
         ran.push(argv);
         return { exitCode, stderr };
       },
@@ -102,7 +109,7 @@ test("the start road runs node, and reaches no shell to read its guards", async 
   );
 });
 
-test("the script reads every guard the shell read, and puts node behind it", async () => {
+test("the script reads every guard the shell read, and runs the index standing behind it", async () => {
   const hook = await hookHere();
   const box = harness({ exitCode: 3 });
   await opensThen(hook, box);
@@ -112,7 +119,7 @@ test("the script reads every guard the shell read, and puts node behind it", asy
   assert.match(script, /SE_CLOUD/);
   assert.match(script, /existsSync\(method\)/, "the method root");
   assert.match(script, /node_modules/, "the modules");
-  assert.match(script, /detached: true/, "and the server stands behind it");
+  assert.match(script, /\['standing'\]/, "and the index stands behind it");
 });
 
 test("a desk box reads no line off the start road, because a person starts it there", async () => {

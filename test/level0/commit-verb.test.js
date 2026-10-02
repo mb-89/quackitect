@@ -54,11 +54,11 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
     proc: git.proc,
     env,
   };
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "check"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "check.js")], {
     exitCode: 0,
     stdout: "The rules pass.\n",
   });
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "test"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "test.js")], {
     exitCode: 0,
     stdout: "ok\n",
   });
@@ -129,7 +129,7 @@ test("a clean message lands, runs the check, and pushes on green", async () => {
 test("a red check holds the push back, and names what the check refuses", async () => {
   const { it, git } = doors();
   // The check writes its faults to the error stream, and its last passing line to the other. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "check"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "check.js")], {
     exitCode: 1,
     stdout: "The server stands at http://127.0.0.1:6510/health.\n",
     stderr: "src/a.js:1:1: Passive: Write in the active voice.\n",
@@ -218,7 +218,7 @@ test("the no-push flag leaves the branch where it stands", async () => {
 // The tests gate the commit, so a red run stages nothing and commits nothing. [[spec/design_output/work#the-battery-answers-first]]
 test("a red test run commits nothing, and names what the run says", async () => {
   const { it, git } = doors();
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "test"], {
+  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "test.js")], {
     exitCode: 1,
     stdout: "not ok 1 - the door refuses\n",
   });
@@ -239,11 +239,11 @@ test("the tests run before the staging, and the check after the commit", async (
   await heard(() => commitVerb(it, [CLEAN]));
 
   const ran = git.ran.map((one) => one.argv.join(" "));
-  const cli = join(ROOT, "src", "scripts", "cli.js");
-  const tests = ran.indexOf(`node ${cli} test`);
+  const verbAt = (verb) => join(ROOT, "src", "scripts", "verbs", `${verb}.js`);
+  const tests = ran.indexOf(`node ${verbAt("test")}`);
   const staged = ran.indexOf("git add -A");
   const committed = ran.indexOf(`git commit -m ${CLEAN}`);
-  const checked = ran.indexOf(`node ${cli} check`);
+  const checked = ran.indexOf(`node ${verbAt("check")}`);
   assert.ok(tests >= 0 && tests < staged, "the tests run first");
   assert.ok(committed < checked, "the check stamps the commit");
 });
@@ -349,9 +349,74 @@ test("a journaled old path the index still holds stages with the new path", asyn
   assert.ok(ran.includes(`git commit -m ${CLEAN} ${both}`), "the commit takes both");
 });
 
+// A rename that landed long ago leaves its old path nowhere, and git refuses a pathspec matching nothing. [[spec/tickets/commit-skips-landed-moves]]
+test("a journaled old path standing nowhere stays out of the commit", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": { stdout: "M\tspec/tickets/new-name.md\n" },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "spec/tickets/old-name.md", to: "spec/tickets/new-name.md" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "spec/tickets/new-name.md", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- spec/tickets/new-name.md`),
+    ran.join("\n"),
+  );
+  const lands = ran.filter((one) => /^git (add|commit) /.test(one));
+  assert.ok(
+    !lands.some((one) => one.includes("old-name")),
+    "the old path joins no pathspec",
+  );
+});
+
+// A move an earlier commit lands leaves its journal behind, and its old path stands nowhere, so the commit names the new path alone. [[spec/tickets/commit-stages-a-moved-path]]
+test("a path under a journaled folder move standing nowhere stays out of the commit", async () => {
+  const { it, git } = doors([], {
+    "git diff --cached --name-status -M": {
+      stdout: "M\tsrc/modules/index/lease_test.go\n",
+    },
+  });
+  it.disk.makeDir(join(ROOT, ".se", ".runtime", "undo"));
+  it.disk.write(
+    join(ROOT, ".se", ".runtime", "undo", "20260101000000000000.json"),
+    JSON.stringify({
+      by: "rename",
+      files: [],
+      moved: { from: "src/watchdog", to: "src/modules/index" },
+    }),
+  );
+
+  const { code } = await heard(() =>
+    commitVerb(it, [CLEAN, "src/modules/index/lease_test.go", "--no-push"]),
+  );
+
+  assert.equal(code, 0);
+  const ran = ranGit(git);
+  assert.ok(
+    ran.includes(`git commit -m ${CLEAN} -- src/modules/index/lease_test.go`),
+    "the commit names the new path alone",
+  );
+  assert.ok(
+    !ran.some((one) => /^git (add|commit)/.test(one) && one.includes("src/watchdog")),
+    "the old path stays out of the add and the commit",
+  );
+});
+
 // [[spec/design_output/level0#the-cold-probe]]
 test("a staged file on the cold path runs the probe after the tests and before the commit", async () => {
-  const { it, git, asked } = cold(["src/bridge/server.js", "README.md"]);
+  const { it, git, asked } = cold(["src/quack/main.go", "README.md"]);
 
   const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
 
@@ -360,8 +425,8 @@ test("a staged file on the cold path runs the probe after the tests and before t
   assert.equal(asked[0].via, CLIENT);
   assert.match(said, /The cold probe passes/);
   const ran = ranGit(git);
-  const cli = join(ROOT, "src", "scripts", "cli.js");
-  assert.ok(ran.indexOf(`node ${cli} test`) < ran.indexOf(LISTED));
+  const verbAt = (verb) => join(ROOT, "src", "scripts", "verbs", `${verb}.js`);
+  assert.ok(ran.indexOf(`node ${verbAt("test")}`) < ran.indexOf(LISTED));
   assert.ok(
     ran.includes("git diff --cached --binary --no-renames"),
     "the delta reaches the probe",

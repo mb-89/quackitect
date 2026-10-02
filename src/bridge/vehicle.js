@@ -74,10 +74,11 @@ export function attachTo(disk, env, time, work, vehicle, pid, windows = false) {
   return settles(disk, env, time, work, vehicle, pid, windows);
 }
 
+// The vehicle carries the plugin's manifest and the binary's source, and a project carries the manifest alone. [[spec/tickets/the-bridge-server-leaves]]
 export function isVehicle(disk, folder) {
   return (
     disk.exists(join(folder, MARKER)) &&
-    disk.exists(join(folder, "src", "bridge", "server.js"))
+    disk.exists(join(folder, "src", "quack", "main.go"))
   );
 }
 

@@ -20,7 +20,12 @@ const files = disk();
 const outside = proc();
 const PLUGIN = ".claude/skills/level0";
 const MARKER = `${PLUGIN}/.claude-plugin/plugin.json`;
-const METHOD = ["package.json", "src/scripts/cli.js", "spec/guidance/voice.md", ".se"];
+const METHOD = [
+  "package.json",
+  "src/scripts/verbs/check.js",
+  "spec/guidance/voice.md",
+  ".se",
+];
 const quoted = (said) => String(said).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const either = (path) => `(?:${quoted(path)}|${quoted(path.split("\\").join("/"))})`;
 const UPSTREAM = "https://host/a/b.git";
@@ -259,8 +264,7 @@ test("the command line writes a stub where it says, under the upstream it names"
     const said = outside.run(
       [
         process.execPath,
-        "src/scripts/cli.js",
-        "stub",
+        "src/scripts/verbs/stub.js",
         "into",
         dest,
         "--upstream",

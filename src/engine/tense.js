@@ -31,6 +31,8 @@ export function withoutFalsePast(text, found) {
 export function readsAsPast(line, word) {
   const wanted = word.trim().toLowerCase();
   if (!wanted) return true;
+  // A match holding no letter, such as a table bar the tagger reads as a verb, holds no tense. [[spec/design_output/level0#the-tense-reader]]
+  if (!/\p{L}/u.test(wanted)) return false;
   let past = true;
   const nlp = nlpOf();
   const its = nlp.its;

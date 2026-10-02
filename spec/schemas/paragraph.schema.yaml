@@ -154,6 +154,16 @@ layers:
         reason: an adjective here, and the progressive rule reads it after is
       - word: standing
         reason: a gerund here, and the progressive rule reads it after is
+      - word: unmerged
+        reason: an adjective, as every un- participle is
+      - word: unsaved
+        reason: an adjective, as every un- participle is
+      - word: unquoted
+        reason: an adjective, as every un- participle is
+      - word: unjudged
+        reason: an adjective, as every un- participle is
+      - word: unmarked
+        reason: an adjective, as every un- participle is
     presentOnItsFace: a form that is its own lemma, or its -s or -ing form, stands, and the tense reader vetoes the tagger
 
   vocabulary:

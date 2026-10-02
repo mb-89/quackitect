@@ -191,3 +191,5 @@ Done when `install.sh` installs no Node.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The JavaScript check twins the write door, the bash guard, the pull and the mint import leave with this group. The write door checks a draft the index holds nowhere yet, so a `check/` name answers it nothing, and those callers stay JavaScript until Node leaves. The twins row of [[spec/design_output/migration#what-goes-with-no-successor]] lists them, and [[spec/tickets/lsp-door-switches-over]] hands them on.

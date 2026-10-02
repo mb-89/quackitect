@@ -20,12 +20,19 @@ const ifBuilt = built ? test : skip;
 ifBuilt(
   "the door stands where the binary is built, and a glob comes out of the rows",
   () => {
-    const it = index(files, proc(), clock(), root, root);
-    assert.equal(it.stands(), true);
-    assert.deepEqual(it.warm(), { warmed: true, dead: "" });
-    const answer = it.ask("glob", { pattern: "src/doors/*.js", path: "" });
-    assert.ok(Array.isArray(answer?.paths), "a glob answers paths");
-    assert.ok(answer.paths.includes("src/doors/index.js"), "the door finds itself");
+    const work = files.tempDir("glob-");
+    files.makeDir(join(work, "src", "doors"));
+    files.write(join(work, "src", "doors", "index.js"), "export {};\n");
+    const it = index(files, proc(), clock(), root, work);
+    try {
+      assert.equal(it.stands(), true);
+      assert.deepEqual(it.warm(), { warmed: true, dead: "" });
+      const answer = it.ask("glob", { pattern: "src/doors/*.js", path: "" });
+      assert.ok(Array.isArray(answer?.paths), "a glob answers paths");
+      assert.ok(answer.paths.includes("src/doors/index.js"), "the door finds the file");
+    } finally {
+      it.ask("stop", {});
+    }
   },
 );
 
@@ -91,6 +98,8 @@ One piece of it.
 ifBuilt("a ticket's standing reads off its group's branch through the ticket", () => {
   const work = files.tempDir("tickets-");
   files.makeDir(join(work, "spec", "tickets"));
+  // The tickets module answers the list, so the tree carries the wiring that loads it. [[spec/tickets/tickets-becomes-a-module]]
+  files.copy(join(root, "spec", "wiring.yaml"), join(work, "spec", "wiring.yaml"));
   for (const [at, text] of [
     ["one-group.md", HELD_GROUP],
     ["a-child.md", child("one-group")],
@@ -101,9 +110,21 @@ ifBuilt("a ticket's standing reads off its group's branch through the ticket", (
   const it = index(files, proc(), clock(), root, work);
   try {
     const rows = new Map(it.ask("tickets", {}).map((one) => [one.name, one]));
-    assert.equal(rows.get("one-group").standing, "held", "an open record entry holds the group");
-    assert.equal(rows.get("a-child").standing, "held", "a child stands where its group's branch stands");
-    assert.equal(rows.get("a-loose-one").standing, "", "a ticket in no group carries no standing");
+    assert.equal(
+      rows.get("one-group").standing,
+      "held",
+      "an open record entry holds the group",
+    );
+    assert.equal(
+      rows.get("a-child").standing,
+      "held",
+      "a child stands where its group's branch stands",
+    );
+    assert.equal(
+      rows.get("a-loose-one").standing,
+      "",
+      "a ticket in no group carries no standing",
+    );
     assert.equal(rows.get("a-child").group, "one-group");
     assert.equal(rows.get("a-child").state, "open");
     assert.equal(rows.get("a-child").step, "do");
@@ -121,7 +142,10 @@ ifBuilt("a changes call fires within a second of a ticket write", () => {
   const it = index(files, proc(), time, root, work);
   try {
     const first = it.ask("changes", { since: 0 });
-    assert.ok(first?.tick >= 1, `the walk on the way up counts one, and the tick reads ${first?.tick}`);
+    assert.ok(
+      first?.tick >= 1,
+      `the walk on the way up counts one, and the tick reads ${first?.tick}`,
+    );
     files.write(join(work, "spec", "tickets", "late.md"), child(""));
     const started = time.now().getTime();
     const next = it.ask("changes", { since: first.tick });
@@ -131,4 +155,36 @@ ifBuilt("a changes call fires within a second of a ticket write", () => {
   } finally {
     it.ask("stop", {});
   }
+});
+
+// A leaked index holds its port and its database into the next run. [[spec/tickets/windows-ci-turns-green]]
+ifBuilt("a stopped index leaves no se-index process past the case", () => {
+  const work = files.tempDir("leak-");
+  files.makeDir(join(work, "spec", "tickets"));
+  const time = clock();
+  const it = index(files, proc(), time, root, work);
+  it.ask("changes", { since: 0 });
+  const { pid } = JSON.parse(files.read(join(work, ".se", ".runtime", "index.json")));
+  assert.ok(pid > 0, `the standing file names pid ${pid}`);
+  it.ask("stop", {});
+  const until = time.now().getTime() + 5000;
+  let alive = true;
+  while (alive && time.now().getTime() < until) {
+    try {
+      process.kill(pid, 0);
+    } catch {
+      alive = false;
+    }
+  }
+  assert.equal(alive, false, `se-index at pid ${pid} stands past its stop`);
+});
+
+// The Windows runner ends a battery by killing an orphan se-index, so a case starting one leaves it behind. [[spec/tickets/windows-ci-turns-green]]
+test("every case starting the index asks it to stop", () => {
+  const source = files.read(fileURLToPath(import.meta.url));
+  const cases = source.split(/\nifBuilt\(/).slice(1);
+  const loose = cases
+    .filter((body) => /index\(files, proc\(\)/.test(body) && !/ask\("stop"/.test(body))
+    .map((body) => body.split("\n")[0].trim());
+  assert.deepEqual(loose, [], "these cases start an index and leave it standing");
 });

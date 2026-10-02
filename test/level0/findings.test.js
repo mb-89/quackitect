@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import * as findingsModule from "../../src/bridge/findings.js";
 import { FROM, findingsOver } from "../../src/bridge/findings.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
@@ -81,4 +82,9 @@ test("valeArgvOf opens Vale on the assembled config, and readsText names a marke
     found.some((one) => /Exemption/.test(String(one.rule))),
     "the marker with no reason stands named",
   );
+});
+
+// The shadow's doors leave with the verbs shadow, their last reader. [[spec/tickets/agents-call-quack-directly]]
+test("findings hands no shadow doors, since no shadow reads them", () => {
+  assert.equal(findingsModule.shadowDoorsOf, undefined);
 });

@@ -1,0 +1,6 @@
+{
+  "cloud": true,
+  "planEvery": 4,
+  "planGrace": 1,
+  "helpers": { "find": "haiku", "change": "opus", "decide": "opus" }
+}

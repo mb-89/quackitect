@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -35,6 +36,16 @@ steps:
           - name: size
             form: list
             says: every file the approach touches, one a line
+      - name: person-1
+        does: answers the question the engine asks
+        by: anyone
+        to: engine
+        asks: On a Windows desk, run ./RUNME.sh branch test test/contract/index.test.js on work/the-foundation-closes-its-gaps. Does the case a stopped index leaves no se-index process past the case pass there? The Windows job of check.yml passes on main at run 36322578200, and the case passes on Linux.
+        evidence:
+          - name: answer
+            form: choice
+            says: the answer, which the step behind this one reads
+            options: ["passes", "fails"]
       - name: tests-red
         does: writes the tests the ask calls for
         tags: ["code", "testing"]
@@ -114,10 +125,104 @@ steps:
       - name: seen
         form: verdict
         says: pass where the view shows the ask's number, or fail with what it shows
-step: design/draft
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
+record:
+  - step: design/draft
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 2fa661bb371637d0ef61a638a05371c0a575d832
+    hash_after: 2fa661bb371637d0ef61a638a05371c0a575d832
+    inputs:
+      - name: ask
+        hash: 99b403a86cb2dc33
+        size: 536
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 679a566c766fd01511c2bfd072683a330fc584f5
+    hash_after: 679a566c766fd01511c2bfd072683a330fc584f5
+    returns: 1
+    why: "The fault stands on Windows alone, and no Linux box turns it red: the Windows job passes on main at run 36322578200, and the new leak case passes here."
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+  - step: design/person-1
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 8408a922065a92982ea01eaa7671f08e158b7fb5
+    hash_after: 8408a922065a92982ea01eaa7671f08e158b7fb5
+    def: 99d61fd78ece9ad4
+  - step: design/tests-red
+    hand: box d7dd59fe93d6 · claude-code-remote
+    hash_before: 72b7150569fabe24058e6527e1a54359a9d7662a
+    hash_after: 72b7150569fabe24058e6527e1a54359a9d7662a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 41f1af84a07bf38f
+        size: 1533
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: c0b36d7336a75a2a31535011530d16e51d25b57c
+    hash_after: c0b36d7336a75a2a31535011530d16e51d25b57c
+    inputs:
+      - name: design/draft
+        hash: 41f1af84a07bf38f
+        size: 1533
+      - name: design/tests-red
+        hash: 84472a113fb13fb0
+        size: 805
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: 0d7c8a95778b0dba4b217e7adf7930c9557a5143
+    hash_after: 0d7c8a95778b0dba4b217e7adf7930c9557a5143
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7dfbbf7a2d0 · claude-code-remote
+    hash_before: 26d0032c0093d05369cc9db663775676e7086143
+    hash_after: 26d0032c0093d05369cc9db663775676e7086143
+    returns: 1
+    why: "the check stands red on red Go tests of sibling tickets that wait on their implement steps: qtest-holds-a-module, ops-keeps-one-state, the onlyq rule and commits-name-their-writer. This change passes its own tests and lint, and needs only the check green"
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 1
+        said: FAIL
+  - step: implement/tests-green
+    hand: box d7e10c2f00cd · claude-code-remote
+    hash_before: 86c96507eed7623d287ac0a8ac2a9fb645ee3128
+    hash_after: 86c96507eed7623d287ac0a8ac2a9fb645ee3128
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "src/scripts/work-answer.js:120:1: correctness/noUnusedFunctionParameters: This parameter all is unused."
+    inputs:
+      - name: design/tests-red
+        hash: 84472a113fb13fb0
+        size: 805
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: the-foundation-closes-its-gaps
+reason: done
 ---
 
 # Ask
@@ -149,38 +254,57 @@ A red job trains every reader to skip it, so a Windows fault lands unseen. A lea
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The Windows job of check.yml passes on main at run 36322578200, so the first done_when line holds once the branch takes main in. The work left is the leak. A contract case in test/contract/index.test.js starts the index on a temporary work tree, reads the pid off the standing file under .se/.runtime/index.json, asks stop, and polls until process.kill(pid, 0) throws, or fails past a few seconds naming the pid. Where the case goes red, the stop call in src/index/door.go closes the listeners and exits the process, and the index door gains nothing. Weighed: a case per start over one sweep of the box after the battery, since a sweep reads the box index too, and that one stays warm by design. Assumed: every case that starts the index on a temporary tree asks stop in a finally, as the two standing cases do.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js: the tickets and changes cases, which start the index on a temporary tree and ask stop,src/index/door.go: the stop call
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js: a stopped index leaves no se-index process past the case
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js,src/index/door.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+opened check.yml runs on main, the index door, the contract cases, and the Standing struct and stop call in door.go, and checked each claim there
+the callers come off a grep for index( and stop over test and src/index
+the first done_when line meets the Windows job of check.yml, the second meets the new contract case, and the check decides the third
+
+## person-1
+
+<!-- On a Windows desk, run ./RUNME.sh branch test test/contract/index.test.js on work/the-foundation-closes-its-gaps. Does the case a stopped index leaves no se-index process past the case pass there? The Windows job of check.yml passes on main at run 36322578200, and the case passes on Linux. -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+<!-- the form is choice -->
+
+passes
 
 ## tests-red
 
@@ -189,26 +313,31 @@ A red job trains every reader to skip it, so a Windows fault lands unseen. A lea
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/index.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+test/contract/index.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The Windows job of run 36322960902 passes every JS case, the new leak case among them, and its cleanup kills an orphan se-index at pid 7408. The first contract case warms the index on the real tree and asks no stop, so the new source case, every case starting the index asks it to stop, names it and fails on its assertion. The surprise: the leak comes from a case, and the index stop itself holds on both systems.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the leak line meets the source case, red on its assertion, and the Windows job line meets check.yml, whose JS battery passes on Windows
+the cases start the real index on temporary trees, which the contract folder allows, and the source case reads the file alone
 
 # gate
 
@@ -217,8 +346,9 @@ A red job trains every reader to skip it, so a Windows fault lands unseen. A lea
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the leak case and the source case stand in test/contract/index.test.js, the source case fails on its assertion, the Windows job line meets check.yml, and the check decides the last line
 
 # implement
 
@@ -229,14 +359,19 @@ A red job trains every reader to skip it, so a Windows fault lands unseen. A lea
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint test/contract/index.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches test/contract/index.test.js alone, which the approach names
+the glob case reaches the real index, which the contract folder drives, and the disk, process and clock doors each have a fake under src/doors/fake
+the glob case header in the test file points at spec/tickets/windows-ci-turns-green through the source case beside it
+the temporary tree holds one file the case writes, and no note repeats it
 
 ## tests-green
 
@@ -245,26 +380,33 @@ A red job trains every reader to skip it, so a Windows fault lands unseen. A lea
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/index.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The glob case starts its index on a temporary tree and asks it to stop in a finally, so no case leaves an se-index standing, and the box index on the real tree stays warm.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches test/contract/index.test.js alone
+the case reaches the real index, which the contract folder drives, and the disk, process and clock doors each have a fake
+the source case beside it points at spec/tickets/windows-ci-turns-green
+the temporary tree holds one file the case writes, and no note repeats it
 
 # accept
 

@@ -3,15 +3,23 @@
 // here. The tool asks no model, so a hand-back answers the same way twice.
 // [[spec/tickets/the-judge-leaves-the-code]]
 
+import {
+  binaryOf,
+  callsIndexTool,
+  isIndexTool,
+  registersIndexTools,
+  windowsOf,
+} from "../lib/index-tools.js";
 import { PULL_CALL, pullSpec, SESSION, sessionOf, spawnPromptIn } from "../lib/pull.js";
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
-import { register as bridgehead, READ_TOOLS } from "./level0.js";
+import { register as bridgehead } from "./level0.js";
 
-const CLI_SCRIPT = "src/scripts/cli.js";
+// The ticket program, whose folder `VERBS` in src/scripts/verb-run.js owns, spelled again here because a plugin imports its own folder alone. [[spec/tickets/cli-js-leaves]]
+const TICKET_SCRIPT = "src/scripts/verbs/ticket.js";
 // The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
-let cli = ["node", CLI_SCRIPT];
-// The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
-const PULL = ["ticket", "pull"];
+let cli = ["node", TICKET_SCRIPT];
+// The word and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
+const PULL = ["pull"];
 const TOOL = "--tool";
 const RUNNING = 600000;
 const BACKGROUND =
@@ -19,15 +27,22 @@ const BACKGROUND =
 
 export function register(on, options) {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
-  cli = ["node", method ? `${method}/${CLI_SCRIPT}` : CLI_SCRIPT];
-  // The engine takes one session start a module, so the bridgehead registers none and this one registers its read tools beside the pull. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+  cli = ["node", method ? `${method}/${TICKET_SCRIPT}` : TICKET_SCRIPT];
+  const bin = binaryOf(method || ".", windowsOf(method));
+  let indexTools = [];
+  // The index tools answer here, before the bridgehead routes a served tool to the server. [[spec/tickets/the-hook-registers-index-tools]]
+  on("tool.call", async ($, e, next) =>
+    isIndexTool(e?.tool)
+      ? { result: await callsIndexTool(doorsOf($), bin, indexTools, e) }
+      : next(e),
+  );
+  // The engine takes one session start a module, so the bridgehead registers none and this one registers the pull beside the index tools. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/tickets/level0-tools-leave-the-bridge]]
   bridgehead(on, options);
   on("session.start", async ($, e, next) => {
-    for (const spec of [pullSpec(), ...READ_TOOLS]) {
-      try {
-        await $.tool.register(spec);
-      } catch {}
-    }
+    try {
+      await $.tool.register(pullSpec());
+    } catch {}
+    indexTools = await registersIndexTools(doorsOf($), bin);
     // [[spec/design_output/pull#the-hand-and-the-hold]]
     await wrote($, sessionOf(e));
     return next(e);
@@ -41,6 +56,14 @@ export function register(on, options) {
     const said = (await spawned($, prompt)) || BACKGROUND;
     return { result: `${answer}\n\n${said}` };
   });
+}
+
+// The process and tool doors the index tools read, since the engine follows $ across no import. [[spec/tickets/the-hook-registers-index-tools]]
+function doorsOf($) {
+  return {
+    process: { run: (argv) => $.process.run(argv) },
+    tool: { register: (spec) => $.tool.register(spec) },
+  };
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
@@ -63,7 +86,7 @@ function says($, line) {
   } catch {}
 }
 
-// The hook hands the raw input over, and the CLI reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
+// The hook hands the raw input over, and the ticket program reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
 function toolCall(e) {
   return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }

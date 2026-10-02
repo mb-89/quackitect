@@ -1,0 +1,576 @@
+// The tree handed in. Every check reads the disk through this, so a test drives
+// the same code over a folder it writes itself, and the editor drives it over
+// the buffer a person is typing into.
+// [[spec/design_output/tree#the-tree-handed-in]]
+package check
+
+import (
+	"quackitect/src/yaml"
+
+	"encoding/json"
+	"sort"
+	"strconv"
+	"strings"
+	"sync"
+)
+
+type Box struct {
+	User  string
+	Home  string
+	Name  string
+	Email string
+}
+
+type Tree struct {
+	Root string
+	// The files the tree reads through, so a case hands it a memory one and the LSP its disk. [[spec/tickets/lsp-rules-move-to-check]]
+	source Source
+	Words  int
+	Node   string
+	Box    Box
+	// The tool survey, a runtime file the index walks past, read once at the start the way the node is. [[spec/design_output/lsp#the-server-reads-the-index]]
+	Survey string
+
+	guard    sync.Mutex
+	overlay  map[string]string
+	held     []string
+	restated []Finding
+	passed   bool
+	// Each note's parse by its text, and the guidance pairs by the guidance texts. [[spec/design_output/lsp#a-change-reads-one-note]]
+	parses    map[string]parse
+	ruleKey   string
+	ruleFound []Finding
+}
+
+// The restated rules read every note, so the tree holds the one pass and each front pays it once. [[spec/design_output/lsp#a-second-copy-draws]]
+func (one *Tree) Restated(pass func() []Finding) []Finding {
+	one.guard.Lock()
+	found, passed := one.restated, one.passed
+	one.guard.Unlock()
+	if passed {
+		return found
+	}
+	found = pass()
+	one.guard.Lock()
+	one.restated, one.passed = found, true
+	one.guard.Unlock()
+	return found
+}
+
+// [[spec/tickets/lsp-rules-move-to-check]]
+func TreeOver(root string, source Source) *Tree {
+	return &Tree{Root: root, source: source, overlay: map[string]string{}, parses: map[string]parse{}}
+}
+
+// The files the tree reads through, which the LSP asks for the index behind them. [[spec/tickets/lsp-rules-move-to-check]]
+func (one *Tree) Source() Source { return one.source }
+
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
+func (one *Tree) Holds(path, text string) {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	one.overlay[slashed(path)] = text
+	// Typing into a file the list holds adds no path, so the list stands. [[spec/design_output/lsp#a-change-reads-one-note]]
+	if !listed(one.held, slashed(path)) {
+		one.held = nil
+	}
+	one.restated, one.passed = nil, false
+}
+
+func (one *Tree) Drops(path string) {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	delete(one.overlay, slashed(path))
+	one.held, one.restated, one.passed = nil, nil, false
+}
+
+// Whether an editor holds the file's text, which stands in for the disk. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func (one *Tree) Held(path string) bool {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	_, open := one.overlay[slashed(path)]
+	return open
+}
+
+// The paths an editor holds a buffer of, in order. [[spec/design_output/lsp#the-panel-lints-as-typed]]
+func (one *Tree) Buffers() []string {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	out := []string{}
+	for path := range one.overlay {
+		out = append(out, path)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func (one *Tree) Read(path string) string {
+	said := slashed(path)
+	one.guard.Lock()
+	text, open := one.overlay[said]
+	one.guard.Unlock()
+	if open {
+		return text
+	}
+	read, _ := one.source.Read(said)
+	return read
+}
+
+func (one *Tree) Exists(path string) bool {
+	return one.source.Exists(slashed(path))
+}
+
+func (one *Tree) Names(folder, end string) []string {
+	out := []string{}
+	for _, name := range one.source.Names(slashed(folder)) {
+		if strings.HasSuffix(name, end) {
+			out = append(out, name)
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// [[spec/design_output/tree#the-tree-handed-in]]
+func (one *Tree) Paths() []string {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	if one.held != nil {
+		return one.held
+	}
+
+	out := []string{}
+	for _, path := range one.source.Paths() {
+		if !isDraft(path) {
+			out = append(out, path)
+		}
+	}
+	one.held = out
+	return out
+}
+
+// Whether a path names a folder of the tree. [[spec/design_output/lsp#one-checker-every-front-asks]]
+func (one *Tree) Folder(path string) bool {
+	return one.source.Folder(slashed(path))
+}
+
+// [[spec/design_output/tree#the-tree-handed-in]]
+func (one *Tree) Forgets() {
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	one.held, one.restated, one.passed = nil, nil, false
+}
+
+const (
+	Install = "src/scripts/install.sh"
+	ValeIni = ".vale.ini"
+	// The config the Vale extension reads, which turns on no style. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+	EditorIni = "spec/config/editor.vale.ini"
+	Settings  = ".vscode/settings.json"
+	Offered   = ".vscode/extensions.json"
+	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
+	ToolsAt = ".se/.runtime/tools.json"
+	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
+	Bin = ".se/.runtime/bin"
+)
+
+// [[spec/design_output/editor#what-the-editor-runs]]
+var Extensions = []string{"chrischinchilla.vale-vscode", "biomejs.biome", "bierner.markdown-mermaid"}
+
+// [[spec/design_output/tools#what-the-survey-writes]]
+var Wanted = []string{"node", "vale", "biome", "vale-ls", "go", "git", "claude", "sh", "python"}
+
+// [[spec/design_output/editor#what-the-tracked-settings-say]]
+func settingsNameBinaries(tree *Tree) []Finding {
+	rule := "SettingsNameBinaries"
+	text := tree.Read(Settings)
+	said := parsedJSON(text)
+	if said == nil {
+		return []Finding{unread(rule, Settings)}
+	}
+
+	out := []Finding{}
+	for _, one := range namesTheBinaries(said) {
+		if one.holds {
+			continue
+		}
+		out = append(out, fault(rule, Settings, lineOf(text, one.key), one.key+" names something else. "+one.why))
+	}
+
+	installs := installedTools(tree.Read(Install))
+	for _, name := range []string{"vale", "biome"} {
+		if has(installs, name) {
+			continue
+		}
+		out = append(out, fault(rule, Install, 1,
+			Settings+" runs "+Bin+"/"+name+", and this script installs no "+name+"."))
+	}
+	return out
+}
+
+type binaryCheck struct {
+	key   string
+	why   string
+	holds bool
+}
+
+func namesTheBinaries(said map[string]any) []binaryCheck {
+	biome, holdsBiome := said["biome.lsp.bin"]
+	paths := []string{}
+	switch one := biome.(type) {
+	case string:
+		paths = append(paths, one)
+	case map[string]any:
+		for _, key := range keysOf(one) {
+			paths = append(paths, asText(one[key]))
+		}
+	}
+	named := len(paths) > 0
+	for _, one := range paths {
+		if !strings.HasPrefix(one, Bin+"/biome") {
+			named = false
+		}
+	}
+	_ = holdsBiome
+
+	return []binaryCheck{
+		{"vale.valeCLI.path", "The editor runs " + Bin + "/vale, which " + Install + " writes.",
+			valeNamed(asText(said["vale.valeCLI.path"]))},
+		{"vale.valeCLI.config", "The editor reads " + EditorIni + ", which turns on no style, so the panel draws Vale off the battery.",
+			asText(said["vale.valeCLI.config"]) == EditorIni},
+		{"vale.valeCLI.installVale", Install + " pins Vale, so the extension installs none of its own.",
+			said["vale.valeCLI.installVale"] == false},
+		{"biome.lsp.bin", "The editor runs " + Bin + "/biome, which " + Install + " writes.", named},
+		{"biome.configurationPath", "Biome reads spec/config/biome.json, which this tree tracks.",
+			asText(said["biome.configurationPath"]) == "spec/config/biome.json"},
+	}
+}
+
+// The install writes vale.exe on Windows, so either name holds. [[spec/tickets/the-small-faults-land]]
+func valeNamed(path string) bool {
+	return path == Bin+"/vale" || path == Bin+"/vale.exe"
+}
+
+// [[spec/design_output/editor#what-the-editor-runs]]
+func editorDrawsWriteRules(tree *Tree) []Finding {
+	rule := "EditorDrawsWriteRules"
+	text := tree.Read(Settings)
+	said := parsedJSON(text)
+	if said == nil {
+		return []Finding{unread(rule, Settings)}
+	}
+
+	out := []Finding{}
+	where := asText(said["vale.valeCLI.config"])
+	ini := ""
+	if where != "" {
+		ini = tree.Read(where)
+	}
+	if ini == "" {
+		names := where
+		if names == "" {
+			names = "nothing"
+		}
+		return append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.config"),
+			"vale.valeCLI.config names "+names+", and the editor reads "+EditorIni+"."))
+	}
+
+	if basedOnStyles.MatchString(ini) {
+		out = append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.config"),
+			where+" turns on a style, so the editor draws raw Vale beside the battery's list."))
+	}
+	level := valeLevel(ini)
+	if asText(said["vale.valeCLI.minAlertLevel"]) != "inherited" {
+		drawn := level
+		if drawn == "" {
+			drawn = "its own level"
+		}
+		out = append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.minAlertLevel"),
+			where+" draws at "+drawn+". Set vale.valeCLI.minAlertLevel to inherited."))
+	}
+	if !spellingStyle(ini) && said["vale.enableSpellcheck"] != false {
+		out = append(out, fault(rule, Settings, lineOf(text, "vale.enableSpellcheck"),
+			where+" names no spelling style. Set vale.enableSpellcheck to false."))
+	}
+	if said["vale.valeCLI.lintOnChange"] != true {
+		out = append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.lintOnChange"),
+			"Set vale.valeCLI.lintOnChange to true, so a rule draws while a person types."))
+	}
+	return out
+}
+
+// [[spec/design_output/editor#what-the-tracked-settings-say]]
+func biomeOnWindows(tree *Tree) []Finding {
+	rule := "BiomeOnWindows"
+	text := tree.Read(Settings)
+	said := parsedJSON(text)
+	if said == nil {
+		return []Finding{unread(rule, Settings)}
+	}
+
+	held, named := said["biome.lsp.bin"].(map[string]any)
+	if !named {
+		return []Finding{fault(rule, Settings, lineOf(text, "biome.lsp.bin"),
+			"biome.lsp.bin names one path per platform, under "+Bin+".")}
+	}
+
+	out := []Finding{}
+	for _, platform := range keysOf(held) {
+		path := asText(held[platform])
+		wants := Bin + "/biome"
+		if strings.HasPrefix(platform, "win32") {
+			wants = Bin + "/biome.exe"
+		}
+		if path == wants {
+			continue
+		}
+		out = append(out, fault(rule, Settings, lineOf(text, platform),
+			platform+" runs "+path+", and this tree installs "+wants+" there."))
+	}
+	return out
+}
+
+// [[spec/design_output/editor#what-the-tracked-settings-say]]
+func extensionsOnOffer(tree *Tree) []Finding {
+	rule := "ExtensionsOnOffer"
+	text := tree.Read(Offered)
+	said := parsedJSON(text)
+	if said == nil {
+		return []Finding{unread(rule, Offered)}
+	}
+
+	out := []Finding{}
+	offered := []string{}
+	for _, one := range listOf(said["recommendations"]) {
+		offered = append(offered, asText(one))
+	}
+	where := lineOf(text, "recommendations")
+	for _, one := range Extensions {
+		if !has(offered, one) {
+			out = append(out, fault(rule, Offered, where, "A clone opens without "+one+" on offer."))
+		}
+	}
+	for _, one := range offered {
+		if !has(Extensions, one) {
+			out = append(out, fault(rule, Offered, where, one+" holds no rule this tree reads."))
+		}
+	}
+
+	settings := tree.Read(Settings)
+	held := parsedJSON(settings)
+	for _, key := range keysOf(held) {
+		under, nested := held[key].(map[string]any)
+		if !nested {
+			continue
+		}
+		formatter := asText(under["editor.defaultFormatter"])
+		if formatter == "" || has(offered, formatter) {
+			continue
+		}
+		out = append(out, fault(rule, Settings, lineOf(settings, formatter),
+			key+" formats through "+formatter+", and "+Offered+" offers no such extension."))
+	}
+	return out
+}
+
+// [[spec/design_output/log#nothing-here-deletes-a-log]]
+func noLogDeleted(tree *Tree) []Finding {
+	rule := "NoLogDeleted"
+	out := []Finding{}
+	for _, path := range tree.Paths() {
+		if !sourceFile(path) {
+			continue
+		}
+		for i, line := range yaml.SplitLines(tree.Read(path)) {
+			if !deletesAt.MatchString(line) || !loggedAt.MatchString(line) {
+				continue
+			}
+			out = append(out, fault(rule, path, i+1,
+				"This line reaches a log file. The log is the record of what every door does, so nothing here takes one away."))
+		}
+	}
+	return out
+}
+
+// [[spec/design_output/level0#a-name-meets-the-cap]]
+func nameHoldsTheWords(tree *Tree) []Finding {
+	rule := "NameHoldsTheWords"
+	out := []Finding{}
+	if tree.Words == 0 {
+		return out
+	}
+	for _, path := range tree.Paths() {
+		part := overLong(path, tree.Words)
+		if part == "" {
+			continue
+		}
+		out = append(out, fault(rule, path, 1,
+			part+" holds more than "+strconv.Itoa(tree.Words)+" words. Rename it shorter."))
+	}
+	return out
+}
+
+// [[spec/design_output/private#the-box-names-the-owner]]
+func nothingPrivateTravels(tree *Tree) []Finding {
+	rule := "NothingPrivateTravels"
+	home := strings.TrimRight(slashed(tree.Box.Home), "/")
+	if !homeNames(home) {
+		home = ""
+	}
+
+	type wanted struct{ what, said string }
+	held := []wanted{}
+	for _, one := range []wanted{
+		{"the user this box runs as", tree.Box.User},
+		{"the home folder on this box", home},
+		{"the git name on this box", tree.Box.Name},
+		{"the git address on this box", tree.Box.Email},
+	} {
+		if namesAPerson(one.said) {
+			held = append(held, one)
+		}
+	}
+	if len(held) == 0 {
+		return nil
+	}
+
+	out := []Finding{}
+	for _, path := range tree.Paths() {
+		if !textFile(path) {
+			continue
+		}
+		for i, line := range yaml.SplitLines(tree.Read(path)) {
+			for _, one := range held {
+				if !carriesTheName(line, one.said) {
+					continue
+				}
+				out = append(out, fault(rule, path, i+1,
+					"This line carries "+one.what+", and git carries this file everywhere. "+
+						"Say what the thing is, in words a reader outside this box acts on."))
+			}
+		}
+	}
+	return out
+}
+
+// [[spec/design_output/tools#what-the-survey-names]]
+func surveyNamesInstalls(tree *Tree) []Finding {
+	rule := "SurveyNamesInstalls"
+	text := tree.Read(Install)
+	installs := installedTools(text)
+	if len(installs) == 0 {
+		return []Finding{fault(rule, Install, 1, "This script names no tool the survey reads back.")}
+	}
+
+	out := []Finding{}
+	for _, name := range installs {
+		if has(Wanted, name) {
+			continue
+		}
+		out = append(out, fault(rule, Install, lineOf(text, name+")"),
+			"The survey names no "+name+", so every caller guesses its path. Add it to WANTED."))
+	}
+	return out
+}
+
+// [[spec/design_output/tools#what-the-survey-writes]]
+func surveyFindsNode(tree *Tree) []Finding {
+	rule := "SurveyFindsNode"
+	text := tree.Survey
+	if text == "" {
+		return []Finding{fault(rule, Install, 1,
+			ToolsAt+" stands nowhere, so every caller guesses a path. Run ./RUNME.sh tools.")}
+	}
+	// [[spec/design_output/tools#what-the-survey-writes]]
+	if tree.Node == "" {
+		return nil
+	}
+
+	said := ""
+	if node, held := parsedJSON(text)["node"].(map[string]any); held {
+		said = asText(node["version"])
+	}
+	if said == tree.Node {
+		return nil
+	}
+	names := said
+	if names == "" {
+		names = "nothing"
+	}
+	return []Finding{fault(rule, ToolsAt, lineOf(text, "version"),
+		"The survey names node "+names+", and node "+tree.Node+" runs this sweep. Run ./RUNME.sh tools.")}
+}
+
+// [[spec/design_output/tree#what-a-rule-answers]]
+func unread(rule, where string) Finding {
+	return fault(rule, where, 1,
+		"This file reads as no JSON, so every rule over it stands unchecked.")
+}
+
+func parsedJSON(text string) map[string]any {
+	if strings.TrimSpace(text) == "" {
+		return nil
+	}
+	var said map[string]any
+	if err := json.Unmarshal([]byte(text), &said); err != nil {
+		return nil
+	}
+	return said
+}
+
+func keysOf(said map[string]any) []string {
+	out := make([]string, 0, len(said))
+	for key := range said {
+		out = append(out, key)
+	}
+	sort.Strings(out)
+	return out
+}
+
+func listOf(said any) []any {
+	one, held := said.([]any)
+	if !held {
+		return nil
+	}
+	return one
+}
+
+func asText(said any) string {
+	one, held := said.(string)
+	if !held {
+		return ""
+	}
+	return one
+}
+
+func itoa(said int) string { return strconv.Itoa(said) }
+
+func has(said []string, one string) bool {
+	for _, each := range said {
+		if each == one {
+			return true
+		}
+	}
+	return false
+}
+
+func lineOf(text, needle string) int {
+	if needle == "" {
+		return 1
+	}
+	for i, line := range yaml.SplitLines(text) {
+		if strings.Contains(line, needle) {
+			return i + 1
+		}
+	}
+	return 1
+}
+
+func listed(paths []string, path string) bool {
+	for _, one := range paths {
+		if one == path {
+			return true
+		}
+	}
+	return false
+}

@@ -1,5 +1,5 @@
 ---
-description: "config / watchdog / deadlineAction: sets watchdog.deadlineAction to what you type. The span an action answers within."
+description: "config / watchdog / deadlineAction: sets watchdog.deadlineAction to what you type. The span an action's operation ends within."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true

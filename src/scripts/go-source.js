@@ -10,8 +10,7 @@ import { goFoldersOf } from "./cli-go.js";
 import { MODULE_FILES, sourceHash } from "./tui-build.js";
 
 export const BUILDS = {
-  "se-lsp": "src/lsp",
-  "se-index": "src/index",
+  "se-index": "src/quack",
   "se-front": "src/front/cmd",
 };
 

@@ -4,10 +4,14 @@
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 
 const FOLDERS = ["spec/tickets", ".se/tickets"];
-// The hold folder of [[spec/design_output/pull#the-hand-and-the-hold]], owned by .claude/skills/level0/lib/folders.js and spelled again here because the extension bundles alone.
-const HOLDS = ".se/.runtime/hold";
-const HOLD_WATCHES = [`${HOLDS}/*.json`];
-const CLI = "src/scripts/cli.js";
+// The marker of [[spec/tickets/marked-groups-stay-cloud]], owned by `CLOUD_MARK` in src/scripts/work-merge.js and spelled again here because the extension bundles alone.
+const CLOUD = "cloud";
+// The index values the lens reads: the standing holds, the tickets the cloud holds, and every ticket, whose change draws a ticket again. [[spec/tickets/the-lens-reads-v1]]
+const STANDING = "holds/standing";
+const CLOUDS = "tickets/cloud";
+const TICKETS = "tickets/all";
+// The verb programs, whose folder `VERBS` in src/scripts/verb-run.js owns, spelled again here because the extension bundles alone. [[spec/tickets/cli-js-leaves]]
+const PROGRAMS = "src/scripts/verbs";
 const COMMAND = "quackitect.ticket";
 // The names the pull reads a harness off, from [[spec/design_output/pull#the-hand-rule]].
 const HARNESS = ["CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"];
@@ -121,9 +125,11 @@ function lens(title, act, ticket, path) {
 }
 
 // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-function lensesOf({ path, text, holds }) {
+function lensesOf({ path, text, holds, cloud }) {
   const ticket = ticketOf(path);
   if (!ticket) return [];
+  // A ticket the cloud holds, by its own marker or its group's off tickets/cloud, takes no hand here. [[spec/tickets/the-lens-reads-v1]]
+  if (cloud || fieldOf(text, CLOUD) === "true") return [];
   // A hold is a state of the ticket, so a ticket past open draws no held button. [[spec/design_output/pull#the-hand-and-the-hold]]
   if (fieldOf(text, "state") !== "open") return [];
   const naming = (holds ?? []).filter((one) => one?.ticket === ticket);
@@ -177,6 +183,18 @@ function fillArgvOf(path, text) {
   return ["ticket", "fill", String(path).replace(/\\/g, "/")];
 }
 
+// The action a verb's words post to, with the words past the verb and the person mark. [[spec/tickets/the-lens-calls-actions]]
+function actionOf(argv) {
+  const [topic, verb, ...args] = argv;
+  return { name: `${topic}/${verb}`, input: { args, person: true } };
+}
+
+// [[spec/tickets/the-lens-calls-actions]]
+function actsOn(door, argv) {
+  const one = actionOf(argv);
+  return door.index.acts(one.name, one.input);
+}
+
 // The child runs as a person, so the names a harness sets stay behind. [[spec/design_output/pull#the-hand-rule]]
 function personEnv(env, root) {
   const out = { ...(env ?? {}) };
@@ -197,40 +215,25 @@ function answerOf(ran) {
   return { word, detail: lines[0] ?? "", lines };
 }
 
-// [[spec/design_output/extension#a-ticket-carries-its-buttons]]
-async function holdsIn(names, readOf) {
-  const paths = (names ?? [])
-    .filter((one) => one.endsWith(".json"))
-    .map((one) => `${HOLDS}/${one}`);
-  const holds = (await Promise.all(paths.map(readOf)))
-    .map(parsedOrNull)
-    .filter(Boolean);
-  const stands = await Promise.all(holds.map((one) => stillHeld(one, readOf)));
-  return holds.filter((_, at) => stands[at]);
-}
-
-// A hold stands while its ticket does, as the engine's stillHeld reads it. [[spec/design_output/pull#the-hand-and-the-hold]]
-async function stillHeld(hold, readOf) {
-  const path = String(hold?.path ?? "").trim();
-  if (!path) return true;
-  const text = await readOf(path);
-  return !text || fieldOf(text, "state") !== "closed";
-}
-
-function parsedOrNull(text) {
-  try {
-    return text ? JSON.parse(text) : null;
-  } catch {
-    return null;
-  }
+// The standing holds off the index, one row a hold whose ticket stands. [[spec/tickets/the-lens-reads-v1]]
+async function standingOf(door) {
+  const said = await door.index?.values(STANDING);
+  return Array.isArray(said) ? said : [];
 }
 
 // The lenses and the click behind them, with the editor handed in. [[spec/design_output/extension#a-ticket-carries-its-buttons]]
 function ticketLensOf(door) {
-  const holds = async () => holdsIn(await door.list(HOLDS), (path) => door.read(path));
   return {
-    watches: HOLD_WATCHES,
-    lenses: async (path, text) => lensesOf({ path, text, holds: await holds() }),
+    names: [STANDING, CLOUDS],
+    // The holds and the cloud read off the index, and no verb runs on a draw. [[spec/tickets/the-lens-reads-v1]]
+    lenses: async (path, text) => {
+      const [holds, clouds] = await Promise.all([
+        standingOf(door),
+        door.index?.values(CLOUDS),
+      ]);
+      const cloud = Array.isArray(clouds) && clouds.includes(ticketOf(path));
+      return lensesOf({ path, text, holds, cloud });
+    },
     async took(act, ticket, path) {
       let reason = "";
       if (act === "fail") {
@@ -240,7 +243,7 @@ function ticketLensOf(door) {
       if (HANDS_BACK.has(act)) await door.saves(path);
       const argv = argvOf(act, ticket, reason);
       if (!argv.length) return undefined;
-      const said = answerOf(await door.runsVerb(argv));
+      const said = answerOf(await actsOn(door, argv));
       door.says([`./RUNME.sh ${argv.join(" ")}`, "", ...said.lines]);
       door.tells(`${ticket}: ${said.word}`, said.detail, said.word === "refused");
       door.lensChanged?.();
@@ -250,7 +253,7 @@ function ticketLensOf(door) {
     async saved(path, text) {
       const argv = fillArgvOf(path, text);
       if (!argv.length) return undefined;
-      const ran = await door.runsVerb(argv);
+      const ran = await actsOn(door, argv);
       const lines = `${ran?.out ?? ""}\n${ran?.err ?? ""}`
         .split(/\r?\n/)
         .filter((one) => one.trim());
@@ -264,19 +267,22 @@ function ticketLensOf(door) {
 }
 
 module.exports = {
-  CLI,
+  PROGRAMS,
   COMMAND,
+  FOLDERS,
   HARNESS,
-  HOLDS,
-  HOLD_WATCHES,
+  STANDING,
+  TICKETS,
+  actionOf,
+  actsOn,
   answerOf,
   argvOf,
   fillArgvOf,
-  holdsIn,
   lensesOf,
   personEnv,
   personHolds,
   routeArgvOf,
+  standingOf,
   stepsIn,
   ticketLensOf,
   ticketOf,

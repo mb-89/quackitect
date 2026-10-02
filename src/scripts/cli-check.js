@@ -20,8 +20,11 @@ import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
-import { vale } from "../doors/vale.js";
 import { guidanceHere } from "../bridge/guidance.js";
+import { vale } from "../doors/vale.js";
+import { whereIs, writeSurvey } from "../engine/tools.js";
+import { browserSays } from "./browser.js";
+import { probeDry } from "./probe-dry.js";
 import {
   bin,
   biome,
@@ -45,16 +48,15 @@ import {
   STYLES,
   settings,
 } from "./cli-doors.js";
-import { browserSays } from "./browser.js";
-import { namesIn, show, walk } from "./cli-read.js";
-import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { FIX_USAGE, fixFlags } from "./cli-fix.js";
-import { formatFaults, goEnvOf, goModulesIn } from "./cli-go.js";
-import { HOOKS } from "./precommit.js";
-import { whereIs, writeSurvey } from "../engine/tools.js";
-import { viewerOf } from "./tui-build.js";
-import { lspProbe } from "./lsp-probe.js";
+import { goEnvOf, goGate, goTestNames } from "./cli-go.js";
 import { hookRows, hooksNamed } from "./cli-hooks.js";
+import { namesIn, show, walk } from "./cli-read.js";
+import { answerOf, configRowsOf, quackAt, readsNew, topicOf } from "./quack-topic.js";
+import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
+import { lspProbe } from "./lsp-probe.js";
+import { HOOKS } from "./precommit.js";
+import { viewerOf } from "./tui-build.js";
 
 export function treeHere() {
   return treeOf({
@@ -80,6 +82,9 @@ export function tuiDoors() {
     show,
     // The log verb reads a span against now, and a door answers the clock. [[spec/guidance/code/testing]]
     clock: it.clock,
+    // The log verb reads its slice's mode, and runs quack under the method root. [[spec/tickets/readers-take-the-go-topics]]
+    slices: it.slices,
+    method: it.method,
   };
 }
 
@@ -119,64 +124,34 @@ export function viewerHere() {
 // Every Go module's tests run in the battery, the import rules among them. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
 // Under `check --errors` the run stays quiet, and each failing Go test reaches the error stream alone. [[spec/tickets/the-verbs-need-no-wrapper]]
 export function goHolds(quiet = false, red = []) {
-  const at = { disk: files, join, root };
-  const env = goEnvOf(at);
   const skip = skipOf(red, (path) => files.read(join(root, path)));
-  let worst = 0;
-  for (const folder of goModulesIn(at)) {
-    let ran;
-    try {
-      ran = outside.run([go, "test", ...skip, "./..."], {
-        cwd: join(root, folder),
-        env,
-        inherit: !quiet,
-      });
-    } catch {
-      console.log("go stands nowhere, so the Go tests go unrun here.");
-      return 0;
-    }
+  // The gate names each run as quiet or not, and a quiet one keeps its output for the reader. [[spec/tickets/go-checks-need-go]]
+  const run = (argv, asked) => {
+    const ran = outside.run(argv, {
+      cwd: root,
+      env: goEnvOf(),
+      inherit: !quiet && !asked.quiet,
+    });
     if (quiet && ran.exitCode) {
       for (const row of String(ran.stdout ?? "").split("\n")) {
-        if (/^\s*--- FAIL/.test(row)) console.error(`${folder}: ${row.trim()}`);
+        if (/^\s*--- FAIL/.test(row)) console.error(row.trim());
       }
     }
-    worst = worst || ran.exitCode || goFormat(folder, env);
-  }
-  return worst;
+    return ran;
+  };
+  return goGate({ go, run, say: (line) => console.log(line), quiet, skip });
 }
 
 // A red Go test file stands apart until its tests-green closes, as a red JavaScript one does, so the Go run skips the tests it names. [[spec/design_output/pull#the-gate]]
 export function skipOf(red, read) {
-  const names = [];
   // A ticket names its red files in one comma-separated line. [[spec/design_output/pull#the-gate]]
   const paths = red.flatMap((one) => String(one).split(",")).map((one) => one.trim());
-  for (const path of paths.filter((one) => one.endsWith("_test.go"))) {
-    let text = "";
-    try {
-      text = read(path);
-    } catch {}
-    for (const found of text.matchAll(/^func (Test\w+)\(/gm)) names.push(found[1]);
-  }
-  return names.length ? ["-skip", `^(${[...new Set(names)].sort().join("|")})$`] : [];
-}
-
-// Go's own format rides in no other gate, so the check holds it. [[spec/design_output/index#the-compiler-it-needs]]
-function goFormat(folder, env) {
-  let ran;
-  try {
-    // The root holds more than Go, so the formatter reads src alone there. [[spec/tickets/go-code-shares-one-module]]
-    const over = folder === "." ? "src" : ".";
-    ran = outside.run(["gofmt", "-l", over], { cwd: join(root, folder), env });
-  } catch {
-    return 0;
-  }
-  const faults = formatFaults(folder, ran.stdout);
-  for (const one of faults) console.log(one);
-  return faults.length ? 1 : 0;
+  const names = goTestNames(paths, read);
+  return names.length ? ["-skip", `^(${names.join("|")})$`] : [];
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
-export async function readConfig(argv) {
+export async function readConfig(argv, here = it) {
   const [key, ...said] = argv.filter((one) => !one.startsWith("-"));
 
   if (key && said.length) {
@@ -189,7 +164,10 @@ export async function readConfig(argv) {
     return 0;
   }
 
-  const rows = await settings.all();
+  // The rows come off quack config where the config slice reads new. [[spec/tickets/topic-fallback-leaves-the-readers]]
+  const rows = readsNew(here, "config")
+    ? answerOf(configRowsOf(topicOf(here, ["config"])), "config")
+    : await settings.all();
   const wanted = key ? rows.filter((one) => one.key === key) : rows;
   if (key && !wanted.length) {
     console.error(`No layer answers ${key}. Run ./RUNME.sh config to see every key.`);
@@ -351,6 +329,32 @@ export function pluginHolds() {
   return 0;
 }
 
+// LEVEL ZERO RUNS, OR THE CHECK IS RED. A fresh clone of this tree, the working change on it, takes the install a cloud box takes, and the hook module the client loads runs a scripted session against the door the start road stands up, with no model and no key. The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
+export async function level0Runs(
+  dry = probeDry,
+  platform = process.platform,
+  say = console.log,
+  shout = console.error,
+) {
+  if (platform === "win32") {
+    say("The start road stands a cloud box alone, so this Windows box runs no dry session.");
+    return 0;
+  }
+  const lines = [];
+  const code = await dry(root, it, (one) => lines.push(one), deltaOf(it, root));
+  for (const one of lines) (code ? shout : say)(one);
+  if (code) shout("Level zero does not run whole on a fresh box, so this tree is red.");
+  return code;
+}
+
+// The working change as a patch, read through the process door untrimmed, since a trim cuts the blank context line a hunk ends on and git apply reads the rest as corrupt. [[spec/tickets/model-marks-io-names]]
+export function deltaOf(here, at) {
+  const ran = here.proc.run(["git", "diff", "HEAD", "--binary", "--no-renames"], {
+    cwd: at,
+  });
+  return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
+}
+
 // What the probe found, and whether the check carries on past it. A box running no server reads every rule, and a server standing and failing its health call is red. [[spec/design_output/level0#the-check-reads-the-server]]
 export function serverRead(said) {
   if (said?.ok) return { code: 0, line: `The server stands at ${said.where}.` };
@@ -494,12 +498,19 @@ export function sidebarSays() {
   return "unlinked: run ./RUNME.sh";
 }
 
+// The index binary where the install built it, and nothing where it stands unbuilt. [[spec/tickets/the-lsp-server-leaves]]
+function indexBuilt() {
+  const at = quackAt(files, join, root);
+  return files.exists(at) ? at : "";
+}
+
 export async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
     ...WANTED.map((one) => [one.name, standsAt(found[one.name])]),
     ["biome lsp-proxy", files.exists(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
-    ["se-lsp lsp", lspProbe(outside, found["se-lsp"]?.path ?? "", root)],
+    // The editor starts quack lsp off the index binary, so the probe starts the same. [[spec/tickets/the-lsp-server-leaves]]
+    ["quack lsp", lspProbe(outside, indexBuilt(), root)],
     [
       "editor",
       files.exists(join(root, EDITOR_SETTINGS))

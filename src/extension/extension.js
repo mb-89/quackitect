@@ -8,6 +8,7 @@ const { fieldMarksOf } = require("./lib/fields.js");
 const { COMMAND, ticketLensOf } = require("./lib/lens.js");
 const { serverAsk } = require("./lib/lsp.js");
 const { FLIP, routeHostOf } = require("./lib/route-host.js");
+const { BURST, settled, timer } = require("./lib/settle.js");
 const { toastsOf } = require("./lib/states.js");
 
 const VIEW = "quackitect.sidebar";
@@ -28,7 +29,8 @@ async function activate(context, given) {
   let shown = await sidebar.states();
   door.registers(REST, (key, value) => sidebar.took({ kind: "set", key, value }));
   door.shows(shown, REST);
-  door.watch(sidebar.watches, async () => {
+  // [[spec/tickets/the-sidebar-reads-v1]]
+  door.index?.watch(sidebar.names, async () => {
     const now = await sidebar.states();
     door.shows(now, REST);
     for (const one of toastsOf(shown, now)) door.toasts(one, REST);
@@ -38,8 +40,11 @@ async function activate(context, given) {
   // [[spec/design_output/extension#a-ticket-carries-its-buttons]]
   const tickets = ticketLensOf(door);
   door.registers(COMMAND, tickets.took);
+  // The lens, the marks and the drawing wake on the index values they read. [[spec/tickets/the-lens-reads-v1]]
+  door.index?.watch(tickets.names, () => door.lensChanged?.());
   // The drawing over a ticket, and its flip beside the ticket's buttons. [[spec/tickets/the-inset-folds-the-frontmatter]]
   const route = routeHostOf(door);
+  door.index?.watch(route.names, () => route.refreshed());
   door.registers(FLIP, (path) => {
     route.flipped(path);
     door.lensChanged?.();
@@ -55,7 +60,7 @@ async function activate(context, given) {
   const fields = door.marksFields ? fieldMarksOf(door) : null;
   if (fields) {
     await fields.starts();
-    door.watch(fields.watches, () => fields.held());
+    door.index?.watch(fields.names, () => fields.held());
   }
   door.onEditors?.(async (path, text) => {
     await Promise.all([route.opened(path, text), fields?.sees(path, text)]);
@@ -81,7 +86,8 @@ async function activate(context, given) {
     page.onMessage((message) => sidebar.took(message));
     await sidebar.opened(door.pid());
     await draw();
-    door.watch(sidebar.watches, draw);
+    // A burst of index events draws the panel once it settles. [[spec/tickets/the-sidebar-reads-v1]]
+    door.index?.watch(sidebar.names, settled(draw, BURST, door.later ?? timer));
     // [[spec/design_output/extension#the-hook-button]]
     door.onProcess?.(draw);
     await door.adoptsProcess?.("bridge.hook");

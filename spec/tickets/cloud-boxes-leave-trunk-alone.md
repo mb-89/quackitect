@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 steps:
   - name: design
     steps:
@@ -117,6 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-engine-fixes-its-faults
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: a35f3ec45b7a093d1a54b414463d558a50e88bf3
+    hash_after: a35f3ec45b7a093d1a54b414463d558a50e88bf3
+    inputs:
+      - name: ask
+        hash: ec90a86efbfacd2b
+        size: 629
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box d7e124b659cd · claude-code-remote
+    hash_before: 3278daa60e7999129cfe1ea3568177d127f2e7ec
+    hash_after: 3278daa60e7999129cfe1ea3568177d127f2e7ec
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 33ddc7cac7b78a33
+        size: 1980
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: a2560f830ca68e9409b7dbc78c551a8f1c615573
+    hash_after: a2560f830ca68e9409b7dbc78c551a8f1c615573
+    inputs:
+      - name: design/draft
+        hash: 33ddc7cac7b78a33
+        size: 1980
+      - name: design/tests-red
+        hash: c22c9f5e28a58838
+        size: 623
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: 824e4494c2aa9bc8b22f8cb7cf1a359e5fd94cbf
+    hash_after: 824e4494c2aa9bc8b22f8cb7cf1a359e5fd94cbf
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box d7e2385398cd · claude-code-remote
+    hash_before: eea325d3fdfff38dec2e5b4a381feb4ce422f13f
+    hash_after: eea325d3fdfff38dec2e5b4a381feb4ce422f13f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 21 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "spec/tickets/sync-takes-its-own-branch.md:282:1: ListItem: A sentence in a list item holds 20 words, and this one holds "
+    inputs:
+      - name: design/tests-red
+        hash: c22c9f5e28a58838
+        size: 623
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -158,38 +229,64 @@ The source: none.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The push door every push meets refuses `main` on a cloud box, before it reads the battery.
+
+| part | where | what it does |
+|---|---|---|
+| the refusal | `holds(refs, stampText, carried, cloud)` in `src/scripts/prepush.js` | where `cloud` holds and a ref names `refs/heads/main`, answers code 1 with `cloudLeavesTrunk()` |
+| the words | `cloudLeavesTrunk` in the same file | says a cloud box pushes its own work branch alone, and `main` takes its work through `./RUNME.sh branch merge <name>` on a desk |
+| the read | `main` in the same file | passes `inCloud(process.env)` out of `.claude/skills/level0/lib/cloud.js`, the one answer to where the session runs |
+
+The hook stands at `.githooks/pre-push`, and `install.sh` points `core.hooksPath` there, so a raw `git push`, `./RUNME.sh push` and a push from a verb all meet it. The session's Bash door already sends a trunk push through the verb, and `trunkGuard` in `src/bridge/bash.js` stands unchanged. A desk passes `cloud` false, so its green push to `main` lands as today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/scripts/prepush.js`, `main`, the one caller of `holds` in `src`
+- `.githooks/pre-push`, which runs `prepush.js`
+- `test/level0/prepush.test.js`, which calls `holds` with the stamp alone, and reads `cloud` as false
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/prepush.test.js`, a cloud box pushing main meets the refusal, whatever the battery says
+- `test/level0/prepush.test.js`, a cloud box pushes its own work branch
+
+The done lines and the case deciding each:
+
+- the refusal of main: the first case
+- the work branch: the second case
+- the check: `./RUNME.sh check`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/scripts/prepush.js`
+- `test/level0/prepush.test.js`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `holds`, `main`, `.githooks/pre-push`, `trunkGuard`, `inCloud` and the hooks path in `install.sh` stand opened, and each reads as the table says
+- a search for `holds(` over `src` and `test` names the callers
+- each done line names the case deciding it
 
 ## tests-red
 
@@ -198,26 +295,31 @@ The source: none.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh test test/level0/prepush.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/prepush.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cloud refusal fails on its own assertion: `holds` reads no fourth argument yet, so a green stamp lets the push to main through. The work branch case passes, because it guards the side a cloud box keeps. The refusal holds on an empty stamp too, so the cloud rule answers before the battery.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done line meets a case: the refusal of main fails red, and the work branch case guards the other side
+- the door reaches no outside: the case hands `holds` the refs, the stamp and an empty delta
 
 # gate
 
@@ -226,8 +328,10 @@ The source: none.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- prepush-reds-land-together: three tickets hold red cases in `test/level0/prepush.test.js`. So each `tests-green` waits on the other two. The first builder lands every `holds` change the three drafts name in one change, and the others pass their change on it
 
 # implement
 
@@ -238,14 +342,19 @@ The source: none.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `src/scripts/prepush.js` alone. Under prepush-reds-land-together, `holds` also takes the hold and engine reads the other two drafts name, and their wiring in `main` stays with them
+- `holds` reads its outside through arguments, and the cases hand it every one
+- each new read points at the ticket it serves
+- the refusal words stand once, in `cloudLeavesTrunk` and `heldElsewhere`
 
 ## tests-green
 
@@ -254,26 +363,33 @@ The source: none.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/prepush.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A cloud box could push `main`, so unread work landed there. The push door `holds` in `src/scripts/prepush.js` now takes a `cloud` flag, and refuses a push to `main` where it holds. The refusal names the work branch and `./RUNME.sh branch merge` on a desk. `main` passes `inCloud(process.env)`. `holds` also takes the hold and engine reads that one-writer-holds-a-branch and push-gate-needs-the-engine name, since the three share one red test file.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches `prepush.js` alone
+- the cases hand `holds` every read
+- each read points at its ticket
+- the words stand once
 
 # accept
 
@@ -298,3 +414,5 @@ The source: none.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft reads [[spec/design_input/the-cloud-runs-itself]] first. There a cloud group lands through a pull request, per [[spec/tickets/groups-land-through-pull-requests]]. A rule on `main` takes pull requests alone, and its last chapter leaves that rule open. This ticket holds the refusal on the cloud box itself, so it holds while the rule stands open.

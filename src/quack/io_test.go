@@ -1,0 +1,372 @@
+// quack io publishes what its instances commit over the bus, and a value the
+// shadow commits apart from the store's writes a shadow row.
+// [[spec/design_output/model#the-io-process]]
+package main
+
+import (
+	"encoding/json"
+	"flag"
+	"os"
+	"path/filepath"
+	"testing"
+	"time"
+
+	"quackitect/src/config"
+	"quackitect/src/index"
+	manager "quackitect/src/modules/index"
+	"quackitect/src/q"
+)
+
+// The fake silent IO process: it commits a value, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
+func TestFakeSilentIO(t *testing.T) {
+	if os.Getenv(index.BusEnv) == "" {
+		return
+	}
+	peer, err := index.Dial(os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv))
+	if err != nil {
+		os.Exit(3)
+	}
+	if err := peer.Commit("fake", map[string]any{"fake/out": 7}); err != nil {
+		os.Exit(4)
+	}
+	_ = peer.Beat(flag.Arg(0))
+	for {
+		time.Sleep(time.Hour)
+	}
+}
+
+func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
+	c := q.New()
+	as := manager.Registers(c)
+	fake := q.OutIn(c, "fake/out", 0, q.IO(), q.Doc("the fake's value"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	placed := index.Placed{Name: ioPart, Command: []string{os.Args[0], "-test.run=^TestFakeSilentIO$", "--", ioPart}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
+	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	for end := time.Now().Add(10 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
+		dog.Check()
+		if alarms, _ := store.Snapshot().Read(manager.AlarmsName).([]manager.Alarm); len(alarms) == 1 && alarms[0].Part == ioPart {
+			return
+		}
+	}
+	t.Fatalf("session/alarms reads %v, and wants the silent IO process", store.Snapshot().Read(manager.AlarmsName))
+}
+
+// The fake silent module process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/module-silence-reads-alarms]]
+func TestFakeSilentModule(t *testing.T) {
+	if os.Getenv(index.BusEnv) == "" {
+		return
+	}
+	peer, err := index.Dial(os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv))
+	if err != nil {
+		os.Exit(3)
+	}
+	if err := peer.Commit("fake", map[string]any{"fake/pid": os.Getpid()}); err != nil {
+		os.Exit(4)
+	}
+	_ = peer.Beat(flag.Arg(0))
+	for {
+		time.Sleep(time.Hour)
+	}
+}
+
+func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
+	c := q.New()
+	as := manager.Registers(c)
+	fake := q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	placed := index.Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentModule$", "--", "fake"}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
+	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	pids := map[any]bool{}
+	for end := time.Now().Add(20 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
+		dog.Check()
+		snap := store.Snapshot()
+		if pid := snap.Read("fake/pid"); pid != 0 {
+			pids[pid] = true
+		}
+		if alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm); len(pids) > 1 && len(alarms) == 1 && alarms[0].Part == "fake" {
+			return
+		}
+	}
+	t.Fatalf("the silent fake runs as %d process(es), and session/alarms reads %v: wants a restart, then the alarm", len(pids), store.Snapshot().Read(manager.AlarmsName))
+}
+
+func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	watcher, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer watcher.Close()
+	rows := make(chan map[string]any, 4)
+	stop, err := watchesIndex(watcher, 100*time.Millisecond, func(row map[string]any) error { rows <- row; return nil })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	indexSide, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer indexSide.Close()
+	if err := indexSide.Beat("index"); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case row := <-rows:
+		if row["kind"] != "watchdog" || row["part"] != "index" {
+			t.Fatalf("the IO process writes %v, and wants a watchdog row naming the index", row)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the IO process writes no row where the index falls silent")
+	}
+}
+
+func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
+	c := q.New()
+	as := manager.Registers(c)
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	listener, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	heard := make(chan string, 4)
+	stop, err := listener.Leases(func(part string) { heard <- part })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	beating, err := beatsIndex(bus, store)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer beating.Close()
+	if _, err := store.Commit(store.Snapshot().Revision, as, map[string]any{manager.HealthName: manager.Lease{Part: indexPart, Renewed: time.Now(), Term: time.Minute}}); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case part := <-heard:
+		if part != indexPart {
+			t.Fatalf("the health commit beats %q, and wants the index", part)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the health commit beats nothing")
+	}
+}
+
+func TestTheHooksDoorReadsNoHealthOutsideTheProcessesShadow(t *testing.T) {
+	if health := healthOf(t.TempDir(), q.NewStore(q.New())); health != nil {
+		t.Fatal("a root with no processes shadow hands the hooks door a health read")
+	}
+}
+
+func TestTheHooksDoorReadsTheIndexLeaseUnderTheProcessesShadow(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, filepath.FromSlash(config.Tracked))
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(at, []byte(`{"migration":{"processes":"shadow"}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	c := q.New()
+	as := manager.Registers(c)
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	renewed := time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC)
+	if _, err := store.Commit(store.Snapshot().Revision, as, map[string]any{manager.HealthName: manager.Lease{Part: indexPart, Renewed: renewed, Term: time.Minute}}); err != nil {
+		t.Fatal(err)
+	}
+	health := healthOf(root, store)
+	if health == nil {
+		t.Fatal("a root under the processes shadow hands the hooks door no health read")
+	}
+	if at, term, held := health(); !held || !at.Equal(renewed) || term != time.Minute {
+		t.Fatalf("the health read answers %v, %v and %v, and wants the committed lease", at, term, held)
+	}
+}
+
+func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	listener, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatalf("the index's side meets %v", err)
+	}
+	defer listener.Close()
+	heard := make(chan map[string]json.RawMessage, 1)
+	done, err := listener.Commits("fake", func(values map[string]json.RawMessage) { heard <- values })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer done()
+	start := func(_ string, commit index.Commit) (func(), error) {
+		return func() {}, commit(q.Writer{}, map[string]any{"fake/out": 7})
+	}
+	stop, err := runsIO(bus.URL(), bus.Token(), map[string]index.Start{"fake": start})
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	select {
+	case values := <-heard:
+		if string(values["fake/out"]) != "7" {
+			t.Fatalf("the commit arrives as %s", values)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("quack io publishes no commit")
+	}
+}
+
+func TestAShadowValueApartWritesAShadowRow(t *testing.T) {
+	var rows []map[string]any
+	waited := time.Duration(0)
+	weighs := shadows{
+		read:   func(name string) any { return map[string]any{"clock/minute": 3, "env/HOME": "/home"}[name] },
+		settle: time.Second,
+		wait:   func(span time.Duration) { waited += span },
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+	}
+	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), "env/HOME": json.RawMessage(`"/home"`)})
+	if len(rows) != 1 {
+		t.Fatalf("the shadow writes %d rows, and wants one for clock/minute alone: %v", len(rows), rows)
+	}
+	row := rows[0]
+	if row["kind"] != "shadow" || row["slice"] != "processes" || row["name"] != "clock/minute" || row["old"] != "3" || row["new"] != "4" {
+		t.Fatalf("the shadow row reads %v", row)
+	}
+	if waited != time.Second {
+		t.Fatalf("the shadow waits %v before it weighs, and wants the settle span", waited)
+	}
+}
+
+// A value apart that comes together inside the patience writes no row, and one still apart past it writes one, so a path polling on another phase reads as no difference. [[spec/tickets/process-shadow-reads-clean]]
+func TestAShadowValueThatComesTogetherWritesNoRow(t *testing.T) {
+	var rows []map[string]any
+	waited := time.Duration(0)
+	weighs := shadows{
+		read: func(name string) any {
+			if name == "clock/minute" && waited >= 3*time.Second {
+				return 4
+			}
+			return 3
+		},
+		settle:   time.Second,
+		patience: 5 * time.Second,
+		wait:     func(span time.Duration) { waited += span },
+		say:      func(row map[string]any) error { rows = append(rows, row); return nil },
+	}
+	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), "git/stood": json.RawMessage("5")})
+	if len(rows) != 1 || rows[0]["name"] != "git/stood" {
+		t.Fatalf("the shadow writes %v, and wants git/stood alone: clock/minute comes together inside the patience", rows)
+	}
+	if waited != 5*time.Second {
+		t.Fatalf("the shadow waits %v before the row, and wants the patience", waited)
+	}
+}
+
+// A file value with the hash and the text the store holds reads as the same, whatever time each path stamps it with. [[spec/tickets/process-shadow-reads-clean]]
+func TestAFileValueReadsByItsHashAndText(t *testing.T) {
+	var rows []map[string]any
+	weighs := shadows{
+		read: func(name string) any {
+			return map[string]any{"files/a.md": q.Content{Hash: "h", Text: "a", Changed: 1}, "files/b.md": q.Content{Hash: "h", Text: "b", Changed: 1}}[name]
+		},
+		settle: time.Second,
+		wait:   func(time.Duration) {},
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+	}
+	weighs.weigh(map[string]json.RawMessage{
+		"files/a.md": json.RawMessage(`{"hash":"h","text":"a","changed":2}`),
+		"files/b.md": json.RawMessage(`{"hash":"h","text":"c","changed":1}`),
+	})
+	if len(rows) != 1 || rows[0]["name"] != "files/b.md" {
+		t.Fatalf("the shadow writes %v, and wants files/b.md alone: files/a.md differs in its stamp alone", rows)
+	}
+}
+
+// A value the bus hands first weighs nothing once a later one stands marked, even where its weigh runs last, so a file made and removed at once writes no row. [[spec/tickets/process-shadow-reads-clean]]
+func TestTheShadowWeighsInTheOrderTheBusHands(t *testing.T) {
+	var rows []map[string]any
+	weighs := shadows{
+		read:   func(string) any { return q.Content{} },
+		settle: time.Second,
+		wait:   func(time.Duration) {},
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+		newest: &sends{at: map[string]int64{}},
+	}
+	made := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"h","text":"a"}`)}
+	gone := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"","text":""}`)}
+	madeNames, madeMarks := weighs.marks(made)
+	goneNames, goneMarks := weighs.marks(gone)
+	weighs.weighs(gone, goneNames, goneMarks)
+	weighs.weighs(made, madeNames, madeMarks)
+	if len(rows) != 0 {
+		t.Fatalf("the shadow writes %v off the file's first value, which the removal follows", rows)
+	}
+}
+
+// A value a newer one of its name follows weighs nothing, and the weigh skips the log the shadow writes, so its own rows start no loop. [[spec/tickets/the-doors-process-stands]]
+func TestTheShadowWeighsTheNewestValueAloneAndNotItsOwnLog(t *testing.T) {
+	var rows []map[string]any
+	newest := &sends{at: map[string]int64{}}
+	var weighs shadows
+	weighs = shadows{
+		read:   func(string) any { return 3 },
+		settle: time.Second,
+		wait: func(time.Duration) {
+			if len(rows) == 0 && newest.next == 2 {
+				newest.mark([]string{"clock/minute"})
+			}
+		},
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+		newest: newest,
+	}
+	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), shadowsOwnLog: json.RawMessage(`"a row"`), "env/HOME": json.RawMessage("5")})
+	if len(rows) != 1 || rows[0]["name"] != "env/HOME" {
+		t.Fatalf("the shadow writes %v, and wants env/HOME alone: clock/minute has a newer value and the log is its own", rows)
+	}
+}

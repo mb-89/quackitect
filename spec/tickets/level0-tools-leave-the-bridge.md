@@ -1,0 +1,430 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: design
+    steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        checklist: ["every file, function and verb the approach names stands opened, and each claim checked there", "the callers list names every caller of what the approach changes", "every done_when line names the test that decides it"]
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+          - name: callers
+            form: list
+            says: every caller of what the approach changes, one a line, as a file and a function
+          - name: tests
+            form: list
+            says: every test the change adds, one a line, as a file and a test name
+          - name: answers
+            form: list
+            says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
+          - name: size
+            form: list
+            says: every file the approach touches, one a line
+      - name: tests-red
+        does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
+      - name: change
+        does: makes the change
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: design/tests-red
+        to: retro
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
+process: [[spec/processes/standard]]
+process_hash: 22b42ea1501e8967
+group: go-cage-switches-over
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box d891eb165fd6 · claude-code-remote
+    hash_before: ca70b6cd3b91d4d91bfb89be6d248c46e6522e7d
+    hash_after: 487fa18ad2938528a302f54d7046aed0803ca39f
+    inputs:
+      - name: ask
+        hash: 21eb9ef6b92405e7
+        size: 654
+      - name: [[spec/tickets/the-bridge-server-leaves]]
+        hash: f6037bc7affa843e
+        size: 247
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 212b445c2b1033b9b2692eaca1b34cd9d86cc14c
+    hash_after: f69ebc138d728192adb817ae2bd8337433b2ac03
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f8b1e4aa408c05f5
+        size: 2266
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: ed4da95dd0645ea750c2d81289955da59f39dd26
+    hash_after: ed4da95dd0645ea750c2d81289955da59f39dd26
+    inputs:
+      - name: design/draft
+        hash: f8b1e4aa408c05f5
+        size: 2266
+      - name: design/tests-red
+        hash: 98a1215b3409845c
+        size: 1406
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: 3eb2d70603d4203ea46a40b1156e61792d6eb289
+    hash_after: a2619988df82e1cacd4ffbf8cc4660876fe03938
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 40b0ad3f11a · claude-code-remote
+    hash_before: a9266e51bfabdfab1487cfb4820cd0139d3c8a92
+    hash_after: 19fc4281dbdbd5f0ffcdc634a5d0e2f7f2a2cb54
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 1 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-brief-leaves-the-bridge.md:227:92: Vocabulary: openssession stands outside the words this tree writes. "
+    inputs:
+      - name: design/tests-red
+        hash: 98a1215b3409845c
+        size: 1406
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+depends_on: ["tools-keep-their-own-names", "log-report-stop-in-go", "plan-writes-off-go", "prose-tools-answer-in-go", "edit-tools-answer-in-go", "find-and-wait-in-go", "review-spawns-off-the-door", "describe-answers-off-the-door", "grep-glob-answer-off-index"]
+reason: done
+---
+
+# Ask
+
+The level zero tools answer off the Go side, so the bridge serves no tool.
+
+The `TOOLS` table in `src/bridge/server.js` serves every `mcp__level0__` tool, and `stepOf` in the cage hands each such call back to the bridge. So the server stays, and [[spec/tickets/the-bridge-server-leaves]] waits.
+
+- every tool the bridge's `TOOLS` table names answers off the Go side, in a case of `src/quack`. `go test ./src/quack/...` decides it
+- `stepOf` in `.claude/skills/level0/hooks/cage.js` hands no call to the bridge, in a case of `test/level0/cage.test.js`. `node --test test/level0/cage.test.js` decides it
+- `./RUNME.sh check` exits 0
+
+view: none
+
+from: none
+
+# design
+
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+<!-- the form is text -->
+
+This ticket closes the tools port once nine children move each tool to the Go side. `Action` in src/q/tool/tool.go resolves an `index_` name alone, and the bridge's TOOLS table also answers Grep and Glob. So the port splits by tool family, and the names child lands first.
+
+1. tools-keep-their-own-names: an action answers under the tool name the agent calls.
+2. log-report-stop-answer-in-go, plan-writes-off-go, prose-tools-answer-in-go, edit-tools-answer-in-go and find-and-wait-in-go: each family answers off the Go side, and drops its entries from the bridge.
+3. review-spawns-off-the-door, after the spawn port, and describe-answers-off-the-door: the review and describe events.
+4. grep-glob-answer-off-index: Grep and Glob off the index.
+5. This ticket then drops `served` and the bridge branch from `stepOf` in cage.js, the bridge's read path and repost from level0.js, the read tools pull-tool.js registers, and the TOOLS table with its register answer from server.js.
+
+The tool registration moves to the Go tool list, which the hook already registers through `se-index tools`. What I weigh: each family lands while the bridge serves the rest, since a Go result answers before `stepOf` reaches the bridge. I assume the new cage stays off until every child lands.
+
+### callers
+
+<!-- every caller of what the approach changes, one a line, as a file and a function -->
+<!-- the form is list -->
+
+- .claude/skills/level0/hooks/cage.js: stepOf
+- .claude/skills/level0/hooks/level0.js: door, seen, reads, spoke
+- .claude/skills/level0/hooks/pull-tool.js: register
+- src/bridge/server.js: TOOLS, onToolCall, decide, opensSession
+
+### tests
+
+<!-- every test the change adds, one a line, as a file and a test name -->
+<!-- the form is list -->
+
+- test/level0/cage.test.js: stepOf hands no call to the bridge
+- src/quack/tools_test.go: every tool the bridge listed stands in the index's tool list
+
+### answers
+
+<!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
+<!-- the form is list -->
+
+- first
+
+### size
+
+<!-- every file the approach touches, one a line -->
+<!-- the form is list -->
+
+- .claude/skills/level0/hooks/cage.js
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/hooks/pull-tool.js
+- src/bridge/server.js
+- test/level0/cage.test.js
+- src/quack/tools_test.go, new
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the helper opened server.js, cage.js, level0.js, pull-tool.js, tool.go and tools.go, and I checked Action and the TOOLS table myself
+- the callers list names what this ticket touches, and the nine children carry the rest
+- the first done line meets the tool list case, the second the cage case, and the third the check
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+<!-- the form is command -->
+
+./RUNME.sh test src/quack/tools_test.go test/level0/cage.test.js
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/quack/tools_test.go
+- test/level0/cage.test.js
+
+### seen
+
+<!-- what you see, and what surprises you -->
+<!-- the form is text -->
+
+TestEveryToolTheBridgeServedStandsInTheWiredToolList fails on its own assertion: the wiring registers no find, wait, patch, replace, undo, check_answer, check_prose, mint_note, plan or review_branch. Their modules stand off the wiring until this flip. The log, report and stop rows already pass under their own names. The cage case stepOf hands no call to the bridge fails on its own assertion, since a served tool the door passes still steps to the bridge.
+
+What surprises me: the bridge TOOLS table still names Grep, Glob, Write, Edit, MultiEdit, NotebookEdit, Bash, PowerShell and Agent. Those are harness tools, which the cage port tickets guard on the door, so they belong to no tool list, and the Go case names the level zero tools alone. The registered helper read tool.Name, which misses the own name a tool keeps, so the load moves into wiredStore and the new case reads tool.NameOf.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the draft names the cage case and the Go tool-list case, and both stand red on their own assertion
+- the Go case runs over the real wiring through wiredStore, which the verb case already loaded, and the cage case over stepOf alone
+- the first done line meets the Go tool-list case, the second the cage case, and the third waits for tests-green
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
+- the approach drops served from stepOf, the read path from level0.js, the read tools from pull-tool.js and the TOOLS table from server.js, which answers the ask once the nine closed children stand
+- the Go done line meets TestEveryToolTheBridgeServedStandsInTheWiredToolList over the level zero tools. Grep and Glob answer off the index under grep-glob-answer-off-index, and the harness guards answer on the door under the closed cage port tickets, each with its own case
+- the cage done line meets the red case stepOf hands no call to the bridge, and the check line waits for tests-green
+
+# implement
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+<!-- the form is command -->
+
+./RUNME.sh lint
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches the wiring, the hooks module and drafts names, the three cage hooks and the probe, and the cases pinning the read path. The server table it leaves to the-bridge-server-leaves, noted on that ticket
+- the edits, search, waits, plans and drafts modules reach the outside through their fakes and the seams accepts wires, and the hooks keep the fake engine their cases drive
+- each change comment names the ticket, and the first-call section of the level0 design note says what stands
+- the tool names stand once in each module, and the Go tool-list case reads them off the wiring
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+<!-- the form is command -->
+
+./RUNME.sh test src/quack/tools_test.go test/level0/cage.test.js
+
+### check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The level zero tools answer off the Go side. The wiring loads the edits, search, waits, plans and drafts modules. So find, wait, patch, replace, undo, mint_note, plan, check_prose and check_answer answer through the hooks door.
+
+The hooks module lists review_branch beside log, report and stop. An action name takes lowercase segments, so the drafts checks and the review register under plain names and keep their tool names.
+
+The cage hands no call to the bridge, since `stepOf` drops served. The bridgehead drops the read path and the repost after a paid reply. The pull hook registers the pull alone, since the index lists the rest.
+
+- the server keeps its TOOLS table and register answer, which nothing reaches now, and they leave with the server under the-bridge-server-leaves
+- a session running the hook it loaded before this change meets the four read tools unanswered until it starts again
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change touches the wiring, the hooks and drafts modules, the cage hooks, the probe and the cases pinning the dropped path
+- the ported modules reach the outside through the seams accepts wires, which their own cases fake
+- each change comment names the ticket, and the level0 design note says the index registers the tools
+- each tool name stands once in its module, and the Go tool-list case reads every name off the wiring
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
+
+The tool describe event and the agent answered event read the bridge's tool and review state, so this port answers both off the door too. The split of [[spec/tickets/the-brief-leaves-the-bridge]] leaves them here.
+
+The flip that wires the edits module drops patch, replace and undo from `READ_TOOLS` in `.claude/skills/level0/hooks/level0.js` in the same change, so each edit tool registers once. [[spec/tickets/flip-drops-read-tools]] becomes this line, since a drop before the flip leaves the three tools served nowhere.

@@ -1,7 +1,7 @@
 // The rows a reader of the whole tree takes: the list with its hashes and the
 // tracked flag, and the texts it names.
 // [[spec/design_output/index#a-reader-takes-the-tree]]
-package main
+package index
 
 import (
 	"os/exec"

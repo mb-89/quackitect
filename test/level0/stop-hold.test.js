@@ -8,7 +8,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
-import { REPORT_CALL } from "../../src/bridge/report.js";
+// The report tool, which the hooks door answers now. [[spec/tickets/log-report-stop-in-go]]
+const REPORT_CALL = "mcp__level0__report";
 import {
   dropsHold,
   holdsCall,

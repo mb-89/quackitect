@@ -3,7 +3,7 @@
 // projection is an entry there and no code change.
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
-import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
+import { builtInsOf, flatten, keysOf, LOCAL, TRACKED } from "./config.js";
 import { actionables, rulesOf } from "./guidance.js";
 import { faultsOf, grouped, PARAGRAPH, RULES, rulesFrom } from "./paragraph.js";
 
@@ -117,7 +117,12 @@ export function writesOf(entry, texts) {
     return { ...schema.find((each) => each.key === key), help };
   };
 
-  for (const [key, value] of said) {
+  // A key the file leaves to its built-in keeps its command, where the schema names it under a section. [[spec/tickets/the-config-schema-gets-generated]]
+  const keys = new Map(
+    [...builtInsOf(raw)].filter(([key]) => schema.some((each) => each.key === key)),
+  );
+  for (const [key, value] of said) keys.set(key, value);
+  for (const [key, value] of keys) {
     put(commandsFor(key, value, declared(key), entry, configPath(key)));
   }
   // [[spec/design_output/projection#a-widget-takes-its-path]]
