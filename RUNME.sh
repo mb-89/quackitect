@@ -29,6 +29,11 @@ bin="$here/.se/.runtime/bin/se-index"
 program="$here/src/scripts/verbs/$1.js"
 if [ -f "$program" ]; then
   shift
+  # The install brings no Node, so a box lacking it hears so in one line. [[spec/tickets/bare-desk-names-missing-node]]
+  command -v node >/dev/null 2>&1 || {
+    printf '%s\n' "No node stands on the PATH, and every verb without a Go twin runs on it. Install node, and run this again." >&2
+    exit 2
+  }
   exec node "$program" "$@"
 fi
 printf '%s\n' "No quack binary stands at $bin, so help and $1 answer nothing. Run sh src/scripts/install.sh." >&2

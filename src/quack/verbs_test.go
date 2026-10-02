@@ -114,6 +114,17 @@ func TestTheOldDoorHandsStdinAndAnswersTheExitCode(t *testing.T) {
 	}
 }
 
+// A box with no runtime for the verb's program hears which one to install, in one line. [[spec/tickets/bare-desk-names-missing-node]]
+func TestTheOldDoorNamesAMissingRuntime(t *testing.T) {
+	var out, errs strings.Builder
+	old := oldDoor([]string{"no-such-runtime", "verbs/help.js"}, strings.NewReader(""), &errs, nil)
+	code := old(&out)
+	said := errs.String()
+	if code != exitFailed || strings.Count(said, "\n") != 1 || !strings.Contains(said, "No no-such-runtime stands on the PATH") {
+		t.Fatalf("the old door answers %d, %q", code, said)
+	}
+}
+
 // A signal the road takes reaches the child, which ends on it as under exec. [[spec/tickets/verb-road-keeps-the-terminal]]
 func TestTheOldDoorForwardsASignalToTheChild(t *testing.T) {
 	if runtime.GOOS == "windows" {
