@@ -9,7 +9,7 @@ import { faultIn } from "../../.claude/skills/level0/lib/vale.js";
 
 // Where the lint keeps the rows it read. [[spec/tickets/the-check-runs-fast-again]]
 export const CACHE = `${RUN}/vale-rows.json`;
-// Past this many changed files, or past this many characters of their names, Vale walks the paths asked itself, so a cold box and a Windows command line read as before. [[spec/tickets/the-check-runs-fast-again]]
+// Past this many changed files, or past this many characters of their names, Vale walks the paths asked itself, so a cold box and a Windows command line read the way a walk reads them. [[spec/tickets/the-check-runs-fast-again]]
 export const NAMED_MOST = 200;
 export const ARGV_MOST = 20000;
 // The folders Vale's glob parks at any depth, the way PARKED in findings.js names them. [[spec/design_output/tree#the-tree-handed-in]]

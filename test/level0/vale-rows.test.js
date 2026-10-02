@@ -152,7 +152,7 @@ test("a lint over a path asked reads the files under it alone, and keeps the res
   assert.ok(kept["notes.md"], "a file outside the path stays kept");
 });
 
-// The tense reader over many files answers each file as a call of its own answers it, in one quack run. [[spec/tickets/the-check-runs-fast-again]]
+// The tense reader over many files answers each file as a call of its own answers it, in one quack run. The fake quack keeps every row but a doc's first. [[spec/tickets/the-check-runs-fast-again]]
 test("the tense reader reads many files in one quack call, and keeps what one call a file keeps", () => {
   const quack = join(ROOT, BIN);
   const calls = [];
@@ -160,7 +160,6 @@ test("the tense reader reads many files in one quack call, and keeps what one ca
     [quack]: (_argv, init) => {
       const asked = JSON.parse(init.stdin);
       calls.push(asked.docs.length);
-      // This quack keeps every row but the first of a doc.
       return {
         stdout: JSON.stringify({
           docs: asked.docs.map((one) => ({ kept: one.found.slice(1) })),
