@@ -78,6 +78,10 @@ process_hash: 57b2cccd0445ea9a
 depends_on: [module-processes-switch-over]
 enabled_by: migration.phase10
 cloud: true
+record:
+  - step: sync
+    hand: box 77f4c295c43a · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
 ---
 
 # Ask
