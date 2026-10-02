@@ -34,6 +34,16 @@ func TestEveryTreeVerbHoldsADoc(t *testing.T) {
 	}
 }
 
+// The install hands its JavaScript steps to the setup verb, so the table lists it. [[spec/tickets/setup-verb-stands-red]]
+func TestTheTreeVerbsListSetup(t *testing.T) {
+	for _, one := range TreeVerbs {
+		if one.Name == "setup" {
+			return
+		}
+	}
+	t.Fatal("the tree verbs list no setup")
+}
+
 // A tree verb names no topic, so no verb stands as two tools. [[spec/tickets/agents-call-quack-directly]]
 func TestNoTreeVerbNamesATopic(t *testing.T) {
 	for _, one := range TreeVerbs {
