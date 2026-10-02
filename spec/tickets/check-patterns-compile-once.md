@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: check-patterns-compile-once
 step: do
+record:
+  - step: do
+    hand: box 819347f31bce · claude-code-remote
+    hash_before: 37c72714005f7ad312aedcf1ef2d7ce89c3690a5
+    hash_after: 37c72714005f7ad312aedcf1ef2d7ce89c3690a5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/check passes
+      - name: check
+        exit: 0
+        said: "    2.4  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index"
+    inputs:
+      - name: ask
+        hash: b941e4488dcd7ff5
+        size: 807
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +67,32 @@ The check module's sweep runs three functions on every line of the tree. `carrie
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/textfaults_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check module compiles the word pattern for a name once, and skips it on a line missing the name. functionNamed and plainCode skip their patterns on a line missing the text every pattern needs. Each prefilter answers what its patterns answer, and TestTwinGoldens holds the findings over the whole tree.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the three prefilters stand, and the twin test reads 5.6s against 11.5s
+- the cleanup: the whole-tree tests in src/quack bust its Go cache, and the ticket says why they stay
+- one place: each prefilter names the pattern it guards, and the test holds the two together
 
 # Discussion
 
@@ -83,6 +107,15 @@ The measure before, on a cloud box with four cores, wall seconds:
 | `sizeFaults`, in its profile | 3.2 |
 | `quack sweep` through `sweepRowsOf`, an idle box | 3.3 |
 | `go test ./src/quack`, uncached | 35.1 |
+
+The measure after, on the same box, wall seconds:
+
+| run | before | after |
+|---|---|---|
+| `TestTwinGoldens`, one test binary each, run back to back | 11.5 | 5.6 |
+| `go test ./src/quack`, uncached | 35.1 | 30.4 |
+
+The twin goldens pass unchanged over the whole tree, so the sweep reads the same findings.
 
 The calls I took, with nobody to ask:
 
