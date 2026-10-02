@@ -8,6 +8,7 @@ import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { PLUGIN_FOLDER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { HOOKS_FILE } from "../../.claude/skills/level0/hooks/cage.js";
+import { clearHeld, clearRun } from "./probe-clear.js";
 import { COLD, coldLines, coldPort, coldTree, stops, tail } from "./probe-cold.js";
 import { logRows } from "./probe.js";
 
@@ -18,6 +19,8 @@ const EVENT_WAIT = 240_000;
 // The owner's prompt reaches the hook as the client's composer sends it. [[spec/design_output/level0#which-prompt-opens-a-turn]]
 const OWNER = { kind: "composer" };
 const STREAMS = new Set(["turn.step"]);
+// The one hook the host runs a plugin's command from. [[spec/tickets/the-clear-runs-live-remote]]
+const TURN_END = "turn.complete";
 // The statuses a post answers with where it lands. [[spec/tickets/level0-runs-on-the-door]]
 const OK_FROM = 200;
 const OK_PAST = 300;
@@ -27,7 +30,7 @@ const CANARY_LINE = /level0 holds this session: \d+ rules?, \d+ notes?, the stop
 
 // [[spec/tickets/level0-runs-on-the-door]]
 export const DRY = {
-  checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet"],
+  checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet", "clear"],
 };
 
 // [[spec/tickets/level0-runs-on-the-door]]
@@ -50,7 +53,11 @@ export async function probeDry(root, it, say = console.log, delta = "") {
 // The harness a client hands the hook, over the clone: its files, its processes, its posts, and what the hook says and registers. [[spec/tickets/level0-runs-on-the-door]]
 export function harnessOf(it, tree, env) {
   const at = (rel) => (String(rel).startsWith("/") ? String(rel) : it.join(tree, rel));
-  const seen = { registered: [], said: [], posts: [], held: [] };
+  const seen = { registered: [], said: [], posts: [], held: [], commands: [], prompts: [], depth: 0 };
+  // The client refuses a plugin's command and prompt inside a hook the turn waits on, and lets the turn's completion run them, as the live host says. [[spec/tickets/the-clear-runs-live-remote]]
+  const idle = (call) => {
+    if (seen.depth > 0) throw new Error(`${call} rejects inside a hook the turn is waiting on`);
+  };
   const $ = {
     fs: {
       read: async (rel) => it.disk.read(at(rel)),
@@ -89,8 +96,26 @@ export function harnessOf(it, tree, env) {
       usage: async () => ({ context: { tokens: 1000 } }),
     },
     agent: { spawn: async () => ({ text: "" }) },
-    command: { run: async () => ({}) },
-    prompt: { submit: async () => ({}) },
+    command: {
+      run: async ({ command } = {}) => {
+        idle("command.run");
+        seen.commands.push(String(command));
+        return {};
+      },
+    },
+    prompt: {
+      submit: async ({ text } = {}) => {
+        idle("prompt.submit");
+        seen.prompts.push(String(text));
+        return {};
+      },
+    },
+    clock: {
+      after: (ms, fn) => {
+        const timer = setTimeout(fn, ms);
+        return { cancel: () => clearTimeout(timer) };
+      },
+    },
   };
   return { $, seen };
 }
@@ -140,8 +165,15 @@ async function session(it, tree) {
   const { $, seen } = harnessOf(it, tree, env);
   const loaded = await import(fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE)));
   const engine = engineOf(loaded.register, {});
-  const raise = (event, e, last = async (said) => ({ passed: said }), origin) =>
-    bounded(engine.raise($, event, e, last, origin), EVENT_WAIT);
+  const raise = async (event, e, last = async (said) => ({ passed: said }), origin) => {
+    const holds = event === TURN_END ? 0 : 1;
+    seen.depth += holds;
+    try {
+      return await bounded(engine.raise($, event, e, last, origin), EVENT_WAIT);
+    } finally {
+      seen.depth -= holds;
+    }
+  };
 
   const opening = raise("session.start", { session_id: `dry-${it.pid}`, cwd: tree });
   const prompt = { text: COLD.prompt };
@@ -172,7 +204,9 @@ async function session(it, tree) {
     description: "show the newest commit",
   });
   await raise("classic.Stop", {}, async () => ({}));
+  const cleared = await clearRun(it, tree, raise, seen, env);
   return {
+    cleared,
     door: it.disk.exists(it.join(tree, HOOKS_FILE)),
     blocks,
     sentence,
@@ -198,6 +232,7 @@ export function readsDry(rows, seen) {
     { check: "guard", ...guardHeld(seen) },
     { check: "canary", ...canaryHeard(rows) },
     { check: "quiet", ...quietRun(rows, seen) },
+    { check: "clear", ...clearHeld(rows, seen) },
   ];
 }
 

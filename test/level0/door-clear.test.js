@@ -1,6 +1,8 @@
 // The hook's door road runs the clear a door answer carries: the event goes
 // on, the conversation clears, and the resume prompt opens the next turn.
-// [[spec/tickets/clear-answers-off-the-door]]
+// The client refuses a command inside a hook the turn waits on, so the clear
+// runs on a timer, past the hook.
+// [[spec/tickets/clear-answers-off-the-door]] [[spec/tickets/the-clear-continues-the-session]]
 
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -21,6 +23,11 @@ function caged() {
   const at = (rel) => (String(rel).startsWith("/") ? String(rel) : `${STUB}/${rel}`);
   const commands = [];
   const prompts = [];
+  const timers = [];
+  const hook = { open: false };
+  const idle = (call) => {
+    if (hook.open) throw new Error(`${call} rejects inside a hook the turn is waiting on`);
+  };
   const $ = {
     ui: { log: () => {} },
     fs: {
@@ -29,8 +36,19 @@ function caged() {
       write: async (rel, text) => files.write(at(rel), text),
     },
     process: { run: async () => ({ exitCode: 0, stdout: "", stderr: "" }) },
-    command: { run: async (asked) => commands.push(asked) },
-    prompt: { submit: async (asked) => prompts.push(asked) },
+    command: {
+      run: async (asked) => {
+        idle("command.run");
+        commands.push(asked);
+      },
+    },
+    prompt: {
+      submit: async (asked) => {
+        idle("prompt.submit");
+        prompts.push(asked);
+      },
+    },
+    clock: { after: (_ms, fn) => void timers.push(fn) },
     http: {
       fetch: async () => {
         const effects = [{ kind: "clear", text: RESUME }];
@@ -43,7 +61,7 @@ function caged() {
     hooks[event] = fn;
   }, {});
   const handed = Object.assign(async (e) => ({ handed: e }), { event: "tool.call" });
-  return { $, hooks, handed, commands, prompts };
+  return { $, hooks, handed, commands, prompts, timers, hook };
 }
 
 // [[spec/tickets/clear-answers-off-the-door]]
@@ -51,7 +69,11 @@ test("under new a door answer carrying a clear runs the clear, and the resume pr
   const box = caged();
   const e = { tool: "Bash", command: "ls" };
 
+  box.hook.open = true;
   const said = await box.hooks["*"](box.$, e, box.handed);
+  box.hook.open = false;
+  assert.deepEqual(box.commands, [], "nothing runs inside the hook");
+  for (const fn of box.timers) await fn();
 
   assert.deepEqual(box.commands, [{ command: "clear" }], "the conversation clears");
   assert.deepEqual(
@@ -60,4 +82,22 @@ test("under new a door answer carrying a clear runs the clear, and the resume pr
     "and the resume prompt opens the next turn",
   );
   assert.deepEqual(said, { handed: e }, "the event goes on");
+});
+
+// [[spec/tickets/the-clear-runs-live-remote]]
+test("a clear the Stop answers waits for the turn's completion, runs inside it, and the timer runs nothing more", async () => {
+  const box = caged();
+  const stop = Object.assign(async () => ({}), { event: "classic.Stop" });
+  const ends = Object.assign(async () => ({ text: "done" }), { event: "turn.complete" });
+
+  box.hook.open = true;
+  await box.hooks["*"](box.$, {}, stop);
+  box.hook.open = false;
+  assert.deepEqual(box.commands, [], "nothing runs inside the Stop");
+  const said = await box.hooks["turn.complete"](box.$, { reason: "answer" }, ends);
+  for (const fn of box.timers) await fn();
+
+  assert.deepEqual(box.commands, [{ command: "clear" }], "the conversation clears once");
+  assert.deepEqual(box.prompts, [{ text: RESUME }], "and the resume prompt opens the next turn");
+  assert.deepEqual(said, { text: "done" }, "the turn's completion answers as before");
 });
