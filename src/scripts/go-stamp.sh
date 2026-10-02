@@ -7,7 +7,8 @@
 # `stamp <name>` writes it. [[spec/design_output/lsp#the-build-beside-the-index]]
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-# The folder install.sh builds into, spelled again here because a shell script
+# The runtime folder .claude/skills/level0/lib/folders.js owns, and the bin
+# folder install.sh builds into, spelled again here because a shell script
 # imports nothing.
 bin="$root/.se/.runtime/bin"
 
