@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -151,6 +151,15 @@ record:
         hash: 8fec6f44c8b36c4d
         size: 828
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: b9e3ef8de4cc6784eafd07af2ee583853671deb7
+    hash_after: cbcbc975bf1fdf2099e63d0723d288d0bb76049b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -303,14 +312,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/install.sh src/scripts/verbs/setup.js src/doors/proc.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the installer, the setup verb, the cold probe's road and the tests the draft names; the proc door's start takes a fix because the check meets its EPIPE under load
+- every door the change reaches has a fake: the setup verb runs on the disk and proc doors, and its cases take fakeDisk and fakeProc
+- the hand-off comment in install.sh links the setup verb's ticket, and setup.js links this ticket in its header
+- servers.js owns the vale-ls pin and table, and the install.sh copy carries a comment naming it beside a contract case holding the two equal
 
 ## tests-green
 
