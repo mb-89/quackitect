@@ -78,6 +78,10 @@ process_hash: 57b2cccd0445ea9a
 depends_on: [module-processes-land-in-shadow]
 enabled_by: migration.phase9switch
 cloud: true
+record:
+  - step: sync
+    hand: box b1311a2beaed · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
 ---
 
 # Ask
