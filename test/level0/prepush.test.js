@@ -11,6 +11,8 @@ import {
   agentPushes,
   carriedBy,
   checkedThroughBy,
+  CI,
+  ciGuardsIn,
   holds,
   lintedBy,
   namesIn,
@@ -106,6 +108,25 @@ test("an agent's push past the checked commit lands where ticket state alone cha
   const said = holds(refsIn(toWork), past, ...args(() => false));
   assert.equal(said.code, 1);
   assert.match(said.said, /or code changed since/);
+});
+
+// [[spec/tickets/work-branches-push-red]]
+test("where CI guards the tree, an agent's red push to a work branch lands, and its red push to main still refuses", () => {
+  const ci = (refs, text) =>
+    holds(refsIn(refs), text, () => [], false, () => "", "", true, () => false, () => null, () => false, true);
+
+  for (const text of ["", stamp({ ok: false }), stamp({ clean: false }), stamp({ sha: WAS })]) {
+    assert.deepEqual(ci(toWork, text), { code: 0, said: "" });
+  }
+  const said = ci(toTrunk, stamp({ ok: false }));
+  assert.equal(said.code, 1);
+  assert.match(said.said, /main takes a green battery/);
+});
+
+// [[spec/tickets/work-branches-push-red]]
+test("CI guards a tree carrying the check workflow, and no other", () => {
+  assert.equal(ciGuardsIn(fakeDisk({ [join("/t", CI)]: "on: push\n" }), "/t"), true);
+  assert.equal(ciGuardsIn(fakeDisk({}), "/t"), false);
 });
 
 // [[spec/tickets/level0-runs-on-the-door]]

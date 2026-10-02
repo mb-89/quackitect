@@ -16,8 +16,8 @@ import {
 } from "../bridge/findings.js";
 import { readTools } from "../engine/tools.js";
 import { redIn } from "./battery.js";
-import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
 import { treeHere } from "./cli-check.js";
+import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
 import { rowsUnder, sweepRowsOf } from "./quack-topic.js";
 
 // What the last lint left standing at warning. The stamp takes it, and `branch done` reads the stamp. [[spec/design_output/work#the-battery-answers-first]]
@@ -103,6 +103,8 @@ export async function findingsDoors() {
     root,
     vale: bin,
     biome: biomeFor(files, root, readTools(files, root)),
+    // The command line's lint keeps Vale's rows a file, so a file unchanged since the last lint takes no Vale run. [[spec/tickets/the-check-runs-fast-again]]
+    valeCache: true,
     // The prose reader reads its slice's mode, and runs quack under the method root. [[spec/tickets/readers-take-the-go-topics]]
     slices: it.slices,
     method: it.method,

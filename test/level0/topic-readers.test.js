@@ -8,20 +8,21 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { readsText, readThrough } from "../../src/bridge/findings.js";
 import { readsProse } from "../../src/bridge/prose.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { readsText, readThrough } from "../../src/bridge/findings.js";
 import { readConfig } from "../../src/scripts/cli-check.js";
 import { guidance } from "../../src/scripts/guidance-verb.js";
+import { logVerb } from "../../src/scripts/log-verb.js";
 import { handed } from "../../src/scripts/pull-hand.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
-import { logVerb } from "../../src/scripts/log-verb.js";
 import {
   configRowsOf,
   keptOf,
+  keptOver,
   notesOf,
   readsNew,
   topicOf,
@@ -292,6 +293,32 @@ test("keptOf answers a list holding no finding with no process", () => {
   const it = itOf("new", {}, {});
   assert.deepEqual(keptOf(it, "the door reads the write\n", [], "all"), []);
   assert.deepEqual(it.proc.ran, []);
+});
+
+// One text's reading is a reading of many with one text in it, and a short answer reads as none. [[spec/tickets/the-check-runs-fast-again]]
+test("keptOf answers what keptOver answers for its one text, and a short answer reads as nothing", () => {
+  const one = { rule: "Voice.One", line: 1, column: 1, said: "one", file: "n.md" };
+  const two = { rule: "Voice.Two", line: 2, column: 1, said: "two", file: "n.md" };
+  const kept = { stdout: JSON.stringify({ docs: [{ kept: [two] }] }) };
+  const it = itOf("new", {}, { [`${QUACK} prose`]: kept });
+
+  assert.deepEqual(keptOf(it, "one\ntwo\n", [one, two], "past"), [two]);
+  assert.deepEqual(keptOver(it, [{ text: "one\ntwo\n", found: [one, two] }], "past"), [
+    [two],
+  ]);
+  assert.equal(
+    keptOver(
+      it,
+      [
+        { text: "a\n", found: [one] },
+        { text: "b\n", found: [two] },
+      ],
+      "past",
+    ),
+    null,
+    "one doc answered for two reads as nothing",
+  );
+  assert.deepEqual(keptOver(it, [], "past"), [], "no text asks no quack");
 });
 
 test("readConfig prints the rows quack config answers where the config slice reads new", async () => {

@@ -39,6 +39,21 @@ func TestAKeyTakesTheTypeOfItsBuiltIn(t *testing.T) {
 	}
 }
 
+// The check's budget stands under battery, near the run the owner remembers. [[spec/tickets/the-check-runs-fast-again]]
+func TestTheCheckBudgetReadsItsBuiltIn(t *testing.T) {
+	c := q.New()
+	Of("battery")(c)
+	for _, key := range c.Keys() {
+		if key.Local == "budget" {
+			if key.Default != "120000" {
+				t.Fatalf("budget reads the built-in %s, and wants 120000", key.Default)
+			}
+			return
+		}
+	}
+	t.Fatal("battery registers no budget key")
+}
+
 // A named built-in reads the same number through the catalog, so the constants block changes no key. [[spec/design_output/config#the-magic-numbers-take-names]]
 func TestANamedBuiltInReadsItsNumber(t *testing.T) {
 	c := q.New()

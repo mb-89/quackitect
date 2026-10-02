@@ -22,6 +22,7 @@ import {
 } from "../extension/lib/grid.js";
 import { answerOf, keptOf, keptOver, PAST } from "../scripts/quack-topic.js";
 import { assemble } from "../scripts/styles.js";
+import { valeRowsOver } from "./vale-rows.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
 export const PARKED = [
@@ -43,9 +44,11 @@ export async function findingsOver(it, asked) {
     (one) => one === WHOLE || it.disk.exists(it.join(it.root, one)),
   );
   if (!where.length) return { found: [], fault: "" };
-  const ran = await it.proc.start([...valeArgvOf(it), OURS, ...where], {
-    cwd: it.root,
-  });
+  // The lint keeps Vale's rows a file, so a file unchanged since the last lint takes no Vale run. [[spec/tickets/the-check-runs-fast-again]]
+  const argv = [...valeArgvOf(it), OURS];
+  const ran = it.valeCache
+    ? await valeRowsOver(it, argv, where)
+    : await it.proc.start([...argv, ...where], { cwd: it.root });
   const fault =
     faultIn(ran.stdout) ||
     (ran.exitCode !== 0 && !ran.stdout ? String(ran.stderr ?? "").trim() : "");
@@ -59,13 +62,13 @@ export async function findingsOver(it, asked) {
   const found = [];
   const docs = [];
   // The pull reads its ticket through readsText too, so both name one list. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-  for (const file of walkOver(it, where)) {
+  const texts = walkOver(it, where).map((file) => {
     const shown = showOf(it, file);
-    found.push(
-      ...readsText(it, shown, it.disk.read(file), rows.get(shown) ?? [], docs),
-    );
+    const one = { file: shown, text: it.disk.read(file), rows: rows.get(shown) ?? [] };
     rows.delete(shown);
-  }
+    return one;
+  });
+  found.push(...readsTexts(it, texts, docs));
   // Vale reads a file the walk passes, and the tense reader alone reads its rows. [[spec/design_output/level0#the-tense-reader]]
   const rest = readThrough(it, [...rows.values()].flat(), docs);
   found.push(...rest.map((one) => from(one, FROM.vale)));
@@ -143,9 +146,9 @@ export function valeArgvOf(it) {
 }
 
 // One file's reading past Vale: the tense reader over Vale's rows, then every marker naming no reason. The lint and the pull both read a file here. [[spec/design_output/pull#the-voice-reads-the-evidence]]
-export function readsText(it, file, text, rows, docs) {
-  // The Go past veto alone answers. [[spec/tickets/go-prose-checks-stand-alone]]
-  const kept = answerOf(keptOf(it, text, rows, PAST), "prose");
+export function readsText(it, file, text, rows, docs, read) {
+  // The Go past veto alone answers, and a caller reading many files hands their answer in. [[spec/tickets/go-prose-checks-stand-alone]]
+  const kept = read ?? answerOf(keptOf(it, text, rows, PAST), "prose");
   docs?.push({ file: showOf(it, file), text, found: rows, kept });
   return [
     ...kept.map((one) => from(one, FROM.vale)),
@@ -153,6 +156,24 @@ export function readsText(it, file, text, rows, docs) {
       from({ ...one, file: showOf(it, file) }, FROM.tree),
     ),
   ];
+}
+
+// Many files' readings past Vale, as readsText reads each, with one quack call for the tense reader over every file carrying a row. [[spec/tickets/the-check-runs-fast-again]]
+export function readsTexts(it, texts, docs) {
+  // The reader keeps a subset of a file's rows, so a file carrying none takes no place in the call. [[spec/tickets/the-check-runs-fast-again]]
+  const asked = texts.filter((one) => one.rows.length);
+  const kept = answerOf(
+    keptOver(
+      it,
+      asked.map((one) => ({ text: one.text, found: one.rows })),
+      PAST,
+    ),
+    "prose",
+  );
+  const keptBy = new Map(asked.map((one, at) => [one, kept[at]]));
+  return texts.flatMap((one) =>
+    readsText(it, one.file, one.text, one.rows, docs, keptBy.get(one) ?? []),
+  );
 }
 
 // Every road hands Vale the config the assembly writes over the pair of roots, so a project's own rule reads here as it does at the door. [[spec/design_output/vehicle#the-styles-assemble-once]]

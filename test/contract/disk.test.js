@@ -37,6 +37,9 @@ function through(door) {
     copied: door.read(join(at, "copy.md")),
     size: door.size(file),
     wide: door.size(join(under, "wide.md")),
+    // A hash keys on the bytes, so two doors holding one text answer one hash. [[spec/tickets/the-check-runs-fast-again]]
+    hash: door.hash(join(under, "wide.md")),
+    same: door.hash(file) === door.hash(join(at, "copy.md")),
     tail: door.readFrom(join(under, "wide.md"), 3),
     past: door.readFrom(file, 99),
     moved: door.read(join(under, "box", "one.md")),
@@ -182,7 +185,10 @@ test("both doors throw on a list of a file, and read an empty folder as empty", 
     try {
       door.write(join(at, "one.md"), "one\n");
       door.makeDir(join(at, "empty"));
-      assert.throws(() => door.list(join(at, "one.md")), (err) => err.code === "ENOTDIR");
+      assert.throws(
+        () => door.list(join(at, "one.md")),
+        (err) => err.code === "ENOTDIR",
+      );
       assert.deepEqual(door.list(join(at, "empty")), []);
     } finally {
       door.remove(at);

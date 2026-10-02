@@ -63,6 +63,7 @@ export function holds(
   stale = () => false,
   atTip = () => null,
   checkedThrough = () => false,
+  ciGuards = false,
 ) {
   // [[spec/design_output/work#a-version-branch-stands]]
   const versions = refs
@@ -95,8 +96,9 @@ export function holds(
   }
 
   // AN AGENT PUSHES NOTHING THE CHECK HAS NOT PASSED. Every branch an agent pushes carries a tip the green stamp reaches: the commit the check ran on, or one past it whose commits change ticket state alone, as a hand-back writes after its check. [[spec/tickets/level0-runs-on-the-door]]
+  // Where CI guards the tree, a work branch takes red work, because its pull request takes a green CI run before it merges, and trunk keeps its gate above. [[spec/tickets/work-branches-push-red]]
   const stamp = stampOf(stampText);
-  for (const one of engine ? refs : []) {
+  for (const one of engine && !ciGuards ? refs : []) {
     if (one.remote === `refs/heads/${TRUNK}` || ZEROS.test(String(one.sha ?? ""))) continue;
     const battery = saysGreen(stamp, stamp.sha);
     const covered = stamp.sha === one.sha || checkedThrough(stamp.sha, one.sha);
@@ -149,6 +151,14 @@ export function checkedThroughBy(repo) {
       .filter(Boolean)
       .every((name) => name.startsWith(`${TICKETS}/`));
   };
+}
+
+// The workflow whose run a pull request takes before it merges. [[spec/tickets/work-branches-push-red]]
+export const CI = ".github/workflows/check.yml";
+
+// Whether CI guards the tree, so a work branch takes red work. [[spec/tickets/work-branches-push-red]]
+export function ciGuardsIn(files, root) {
+  return files.exists(join(root, CI));
 }
 
 // An agent's push: a cloud box, a session the engine runs, or a Claude Code session on a desk. The owner's own terminal pushes ungated. [[spec/tickets/push-gate-needs-the-engine]] [[spec/tickets/level0-runs-on-the-door]]
@@ -305,6 +315,7 @@ async function main() {
     staleBy(git(outside, root), await spanHere(files, root), clock().now().getTime()),
     heldAtTip(git(outside, root)),
     checkedThroughBy(git(outside, root)),
+    ciGuardsIn(files, root),
   );
   if (said.code !== 0) console.error(said.said);
   return said.code;

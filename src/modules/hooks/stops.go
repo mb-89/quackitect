@@ -32,7 +32,6 @@ const (
 	clearReason  = "clear"
 	stopCall     = levelZero + "stop"
 	dueFinish    = "finish"
-	dueClear     = "clear"
 	handoverKey  = "context.handoverAt"
 	taskMade     = "TaskCreate"
 	taskEnded    = "TaskUpdate"
@@ -143,15 +142,6 @@ func stepStops(state Stops, event q.Event) Stops {
 		context, _ := fields["context"].(map[string]any)
 		if fill, ok := fillOf(context["tokens"]); ok {
 			state.measures(fill, held, facts)
-		}
-	case turnEvent:
-		// The turn the handover ends asks for the clear, and the mark drops. [[spec/design_output/stop#the-context-hands-over]]
-		if textOf(fields, "reason") == answerReason && state.Handover != nil && state.Handover.Phase == dueClear {
-			state.Handover = nil
-			// A binding changed while the clear stood keeps the conversation. [[spec/design_output/stop#the-queue-alone-clears]]
-			if clearsHere(held, facts) {
-				state.Said.Word, state.Said.Text = ClearWord, resumePrompt
-			}
 		}
 	case toolEvent:
 		state.sawCall(fields)
@@ -335,10 +325,9 @@ func (state *Stops) holdsForHandover(text string, held map[string]any, facts Sto
 		if waits {
 			return false, ""
 		}
-		if state.Handover == nil {
-			state.Handover = &Handover{}
-		}
-		state.Handover.Phase = dueClear
+		// The Stop answers the clear, since `turn.complete` lands before it or after it, and the plugin runs it once the session stands idle. [[spec/tickets/the-clear-continues-the-session]]
+		state.Handover = nil
+		state.Said.Word, state.Said.Text = ClearWord, resumePrompt
 		return true, ""
 	}
 	due := state.Handover
@@ -458,9 +447,9 @@ func (d *Door) landsStops(session string, event q.Event) error {
 	return d.from.Store.Land(d.stopsOf(session), d.besideHolds(session, event))
 }
 
-// The block the stops fold answers the newest Stop with, where it blocks, and the clear it answers the turn's end with, where the conversation clears. [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/clear-answers-off-the-door]]
+// The block the stops fold answers the newest Stop with, where it blocks, or the clear, where the conversation clears. [[spec/tickets/cage-stop-rules-port]] [[spec/tickets/the-clear-continues-the-session]]
 func (d *Door) blocked(session string, post Post) (Effect, bool) {
-	if post.Event != stopEvent && post.Event != turnEvent {
+	if post.Event != stopEvent {
 		return Effect{}, false
 	}
 	state, ok := d.from.Store.Snapshot().Read(d.stopsOf(session)).(Stops)
@@ -470,10 +459,10 @@ func (d *Door) blocked(session string, post Post) (Effect, bool) {
 	if !ok || state.Said.Seq != seq {
 		return Effect{}, false
 	}
-	if post.Event == stopEvent && state.Said.Word == BlockWord {
+	if state.Said.Word == BlockWord {
 		return Effect{Kind: blockKind, Text: state.Said.Text}, true
 	}
-	if post.Event == turnEvent && state.Said.Word == ClearWord {
+	if state.Said.Word == ClearWord {
 		return Effect{Kind: clearKind, Text: state.Said.Text}, true
 	}
 	return Effect{}, false

@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { RESUME } from "../../src/bridge/handover.js";
 import { DRY, engineOf, harnessOf, readsDry } from "../../src/scripts/probe-dry.js";
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
@@ -31,6 +32,11 @@ function whole() {
       guarded: { deny: "The door wants a ticket name opening the description." },
       posts: [{ url: "http://127.0.0.1:7001/hook", event: "session.start" }],
       said: [],
+      cleared: {
+        runs: [{ words: "handover --pass", exit: 0, said: "Level zero clears the conversation." }],
+        commands: ["clear"],
+        prompts: [RESUME],
+      },
     },
   };
 }
@@ -165,6 +171,14 @@ test("the harness reads the clone's files, records each post and tool, and hands
   assert.equal(said.ok, false, "a 503 reads as no answer");
   await $.tool.register({ name: "find" });
   seen.held.push({ role: "assistant", id: "a1", text: "said" });
+
+  seen.depth = 1;
+  await assert.rejects($.command.run({ command: "clear" }), /inside a hook the turn is waiting on/);
+  seen.depth = 0;
+  await $.command.run({ command: "clear" });
+  await $.prompt.submit({ text: "resume" });
+  assert.deepEqual(seen.commands, ["clear"], "a command runs outside a hook the turn holds");
+  assert.deepEqual(seen.prompts, ["resume"]);
 
   assert.deepEqual(seen.posts, [{ url: "http://127.0.0.1:1/hook", event: "tool.call" }]);
   assert.deepEqual(seen.registered, ["find"]);
