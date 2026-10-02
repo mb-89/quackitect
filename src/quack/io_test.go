@@ -190,6 +190,12 @@ func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
 	}
 }
 
+func TestTheHooksDoorReadsNoHealthOutsideTheProcessesShadow(t *testing.T) {
+	if health := healthOf(t.TempDir(), q.NewStore(q.New())); health != nil {
+		t.Fatal("a root with no processes shadow hands the hooks door a health read")
+	}
+}
+
 func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
 	bus, err := index.StartBus()
 	if err != nil {

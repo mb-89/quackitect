@@ -283,7 +283,7 @@ func TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown(t *testing.T) {
 		rows = append(rows, row)
 		return nil
 	}
-	one.door.from.Health = func() (time.Time, time.Duration, bool) { return time.Now().Add(-time.Minute), 30 * time.Second, true }
+	one.door.from.Health = func() (time.Time, time.Duration, bool) { return fixed.Add(-time.Minute), 30 * time.Second, true }
 	post := Post{Event: "tool.call", E: map[string]any{"tool": "Bash", "command": "ls", "description": "a-ticket: list", "session_id": "s1"}}
 	if _, err := one.door.Hook(post); err != nil {
 		t.Fatal(err)

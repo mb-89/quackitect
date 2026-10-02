@@ -319,7 +319,8 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		asks = indexAsk(reads)
 	}
 	door := hooks.New(hooks.Outside{
-		Index: asks,
+		Index:  asks,
+		Health: healthOf(root, store),
 		Store: store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
@@ -332,6 +333,17 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Review: reviewOver(root),
 	})
 	return hooks.Listen(root, door)
+}
+
+// The index's lease off index/health under the processes slice's shadow, and none under any other mode. [[spec/tickets/watchdogs-span-the-processes]]
+func healthOf(root string, store *q.Store) func() (time.Time, time.Duration, bool) {
+	if sliceMode(root, processesKey) != modeShadow {
+		return nil
+	}
+	return func() (time.Time, time.Duration, bool) {
+		lease, held := store.Snapshot().Read(manager.HealthName).(manager.Lease)
+		return lease.Renewed, lease.Term, held && lease.Term > 0
+	}
 }
 
 // The book's operations as the hooks door reads them: the fraction done, and the time gone by to its end or to now. [[spec/design_output/model#the-agent-does-not-poll]]
