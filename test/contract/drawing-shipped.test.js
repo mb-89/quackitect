@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { basename, dirname, join, relative } from "node:path";
 import { test } from "node:test";
 import { disk } from "../../src/doors/disk.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import * as bundled from "../../src/scripts/bundle.js";
 
@@ -29,4 +30,13 @@ test("git tracks the drawing the inset loads, off the extension's own folder", (
 test("the shipped drawing's banner names the hash of the sources it reads", () => {
   const first = files.read(OUT).split("\n")[0];
   assert.equal(first, `// sources ${bundled.stampOf?.(files)}`, "run node src/scripts/bundle.js");
+});
+
+// The stamp reads every source, so a moved source asks for the bundle again. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
+test("the stamp moves when a source under the webview moves", () => {
+  const entry = bundled.ENTRY;
+  const lock = join(bundled.WEBVIEW, "package-lock.json");
+  const tree = (text) => fakeDisk({ [entry]: text, [lock]: "{}" });
+  assert.notEqual(bundled.stampOf(tree("one")), bundled.stampOf(tree("two")));
+  assert.equal(bundled.stampOf(tree("one")), bundled.stampOf(tree("one")));
 });

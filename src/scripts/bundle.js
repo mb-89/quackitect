@@ -4,9 +4,9 @@
 // build, and a banner names the hash of the sources it was built from.
 // [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
 
-import { createHash } from "node:crypto";
 import { dirname, join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { hashText } from "../../.claude/skills/level0/lib/hash.js";
 import { disk } from "../doors/disk.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -31,16 +31,10 @@ function sourcesOf(folder, files) {
 
 // The hash of the sources, each under its path from the root in forward slashes, so every box reads one stamp. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
 export function stampOf(files = disk()) {
-  const hash = createHash("sha256");
   const named = [...sourcesOf(dirname(ENTRY), files), LOCK]
     .map((at) => ({ at, path: relative(root, at).split("\\").join("/") }))
     .sort((a, b) => (a.path < b.path ? -1 : 1));
-  for (const one of named) {
-    hash.update(`${one.path}\n`);
-    hash.update(String(files.read(one.at)));
-    hash.update("\n");
-  }
-  return hash.digest("hex");
+  return hashText(named.map((one) => `${one.path}\n${files.read(one.at)}`).join("\n"));
 }
 
 // Whether the shipped banner names the stamp the sources give now. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
