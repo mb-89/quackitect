@@ -404,18 +404,23 @@ async function fillOf($, event, e) {
 // The turn the handover ends: the turn completes, the conversation clears, and the prompt opens the next one, which reads the handover. [[spec/design_output/stop#the-context-hands-over]]
 async function clears($, answer, e, next) {
   const out = await next(e);
+  // The client refuses a command inside a hook the turn waits on, so the clear runs in a dispatch of its own, once the session stands idle. [[spec/tickets/the-clear-continues-the-session]]
+  $.clock.after(0, () => cleared($, String(answer.clear?.prompt ?? ""), next.event));
+  return out;
+}
+
+async function cleared($, prompt, event) {
   try {
     await $.command.run({ command: "clear" });
-    await $.prompt.submit({ text: String(answer.clear?.prompt ?? "") });
+    await $.prompt.submit({ text: prompt });
   } catch (error) {
     await wrote($, {
       level: "warn",
       said: "the clear the handover asks for fails",
-      event: "turn.complete",
+      event: String(event ?? ""),
       detail: String(error?.message ?? error),
     });
   }
-  return out;
 }
 
 async function posted($, body) {

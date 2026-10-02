@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { RESUME } from "../../src/bridge/handover.js";
 import { DRY, engineOf, harnessOf, readsDry } from "../../src/scripts/probe-dry.js";
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
@@ -31,6 +32,11 @@ function whole() {
       guarded: { deny: "The door wants a ticket name opening the description." },
       posts: [{ url: "http://127.0.0.1:7001/hook", event: "session.start" }],
       said: [],
+      cleared: {
+        runs: [{ words: "handover --pass", exit: 0, said: "Level zero clears the conversation." }],
+        commands: ["clear"],
+        prompts: [RESUME],
+      },
     },
   };
 }
