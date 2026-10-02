@@ -283,6 +283,72 @@ func TestAShadowValueApartWritesAShadowRow(t *testing.T) {
 	}
 }
 
+// A value apart that comes together inside the patience writes no row, and one still apart past it writes one, so a path polling on another phase reads as no difference. [[spec/tickets/process-shadow-reads-clean]]
+func TestAShadowValueThatComesTogetherWritesNoRow(t *testing.T) {
+	var rows []map[string]any
+	waited := time.Duration(0)
+	weighs := shadows{
+		read: func(name string) any {
+			if name == "clock/minute" && waited >= 3*time.Second {
+				return 4
+			}
+			return 3
+		},
+		settle:   time.Second,
+		patience: 5 * time.Second,
+		wait:     func(span time.Duration) { waited += span },
+		say:      func(row map[string]any) error { rows = append(rows, row); return nil },
+	}
+	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), "git/stood": json.RawMessage("5")})
+	if len(rows) != 1 || rows[0]["name"] != "git/stood" {
+		t.Fatalf("the shadow writes %v, and wants git/stood alone: clock/minute comes together inside the patience", rows)
+	}
+	if waited != 5*time.Second {
+		t.Fatalf("the shadow waits %v before the row, and wants the patience", waited)
+	}
+}
+
+// A file value with the hash and the text the store holds reads as the same, whatever time each path stamps it with. [[spec/tickets/process-shadow-reads-clean]]
+func TestAFileValueReadsByItsHashAndText(t *testing.T) {
+	var rows []map[string]any
+	weighs := shadows{
+		read: func(name string) any {
+			return map[string]any{"files/a.md": q.Content{Hash: "h", Text: "a", Changed: 1}, "files/b.md": q.Content{Hash: "h", Text: "b", Changed: 1}}[name]
+		},
+		settle: time.Second,
+		wait:   func(time.Duration) {},
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+	}
+	weighs.weigh(map[string]json.RawMessage{
+		"files/a.md": json.RawMessage(`{"hash":"h","text":"a","changed":2}`),
+		"files/b.md": json.RawMessage(`{"hash":"h","text":"c","changed":1}`),
+	})
+	if len(rows) != 1 || rows[0]["name"] != "files/b.md" {
+		t.Fatalf("the shadow writes %v, and wants files/b.md alone: files/a.md differs in its stamp alone", rows)
+	}
+}
+
+// A value the bus hands first weighs nothing once a later one stands marked, even where its weigh runs last, so a file made and removed at once writes no row. [[spec/tickets/process-shadow-reads-clean]]
+func TestTheShadowWeighsInTheOrderTheBusHands(t *testing.T) {
+	var rows []map[string]any
+	weighs := shadows{
+		read:   func(string) any { return q.Content{} },
+		settle: time.Second,
+		wait:   func(time.Duration) {},
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+		newest: &sends{at: map[string]int64{}},
+	}
+	made := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"h","text":"a"}`)}
+	gone := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"","text":""}`)}
+	madeNames, madeMarks := weighs.marks(made)
+	goneNames, goneMarks := weighs.marks(gone)
+	weighs.weighs(gone, goneNames, goneMarks)
+	weighs.weighs(made, madeNames, madeMarks)
+	if len(rows) != 0 {
+		t.Fatalf("the shadow writes %v off the file's first value, which the removal follows", rows)
+	}
+}
+
 // A value a newer one of its name follows weighs nothing, and the weigh skips the log the shadow writes, so its own rows start no loop. [[spec/tickets/the-doors-process-stands]]
 func TestTheShadowWeighsTheNewestValueAloneAndNotItsOwnLog(t *testing.T) {
 	var rows []map[string]any

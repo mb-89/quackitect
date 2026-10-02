@@ -15,6 +15,9 @@ const Port = "minute"
 
 const secondsAMinute = 60
 
+// The span between two reads of the time, so two clocks started apart turn the minute within it of each other. [[spec/tickets/process-shadow-reads-clean]]
+const poll = time.Second
+
 // [[spec/design_output/model#io-modules-and-their-fakes]]
 type Clock interface {
 	Now() time.Time
@@ -111,10 +114,17 @@ func Registers(c *q.Catalog) q.Writer {
 	return q.OutIn(c, Port, int64(0), q.Doc("the minute, counted from the Unix epoch"), q.IO())
 }
 
-// Commits the minute at start and at each minute after. [[spec/design_output/model#io-modules-are-modules]]
+// Commits the minute at start, and again as the minute turns, read each poll, so the index and the IO process commit the same minute within a poll of each other. [[spec/design_output/model#io-modules-are-modules]] [[spec/tickets/process-shadow-reads-clean]]
 func Start(from Clock, commit func(values map[string]any) error) (stop func()) {
-	_ = commit(map[string]any{Port: Minute(from.Now())})
-	return from.Every(time.Minute, func(at time.Time) {
-		_ = commit(map[string]any{Port: Minute(at)})
+	var mu sync.Mutex
+	last := Minute(from.Now())
+	_ = commit(map[string]any{Port: last})
+	return from.Every(poll, func(at time.Time) {
+		mu.Lock()
+		defer mu.Unlock()
+		if minute := Minute(at); minute != last {
+			last = minute
+			_ = commit(map[string]any{Port: minute})
+		}
 	})
 }

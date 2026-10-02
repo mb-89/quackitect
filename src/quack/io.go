@@ -20,7 +20,7 @@ import (
 	"quackitect/src/q"
 )
 
-// The verb the IO process runs under, the slice's dotted key and its name in a row, the IO process's part on the bus, the span between two beats, the span a shadow value settles in, the start window a shadow waits out before its first spawn, and the wait before a restart. [[spec/design_output/model#the-io-process]]
+// The verb the IO process runs under, the slice's dotted key and its name in a row, the IO process's part on the bus, the span between two beats, the span a shadow value settles in, the span a value apart takes to come together before it writes a row, the start window a shadow waits out before its first spawn, and the wait before a restart. [[spec/design_output/model#the-io-process]]
 const (
 	ioVerb         = "io"
 	processesKey   = "migration." + migration.ProcessesKey
@@ -31,6 +31,7 @@ const (
 	watchSteps     = 4
 	ioBeat         = 5 * time.Second
 	shadowSettle   = 2 * time.Second
+	shadowPatience = 90 * time.Second
 	shadowAfter    = 30 * time.Second
 	ioRestart      = 5 * time.Second
 )
@@ -230,17 +231,22 @@ func ioShadow(root string, store *q.Store, open doors, dog *manager.Dog) (*index
 		return nil, nil, err
 	}
 	weighs := shadows{
-		read:   func(name string) any { return store.Snapshot().Read(name) },
-		settle: shadowSettle,
-		wait:   time.Sleep,
-		say:    appendsRow(root, time.Now),
-		newest: &sends{at: map[string]int64{}},
+		read:     func(name string) any { return store.Snapshot().Read(name) },
+		settle:   shadowSettle,
+		patience: shadowPatience,
+		wait:     time.Sleep,
+		say:      appendsRow(root, time.Now),
+		newest:   &sends{at: map[string]int64{}},
 	}
 	held := make(map[string]q.Writer, len(instances))
 	for _, one := range instances {
 		held[one] = q.Writer{}
 	}
-	heard := func(_ string, values map[string]json.RawMessage) { go weighs.weigh(values) }
+	// The mark lands before the goroutine, so a value the bus hands later stands newer whatever goroutine runs first. [[spec/tickets/process-shadow-reads-clean]]
+	heard := func(_ string, values map[string]json.RawMessage) {
+		names, marks := weighs.marks(values)
+		go weighs.weighs(values, names, marks)
+	}
 	if len(instances) > 0 {
 		placed = append(placed, index.Placed{Name: ioPart, Command: []string{self, ioVerb}, Instances: held, Restart: ioRestart})
 	}
@@ -300,8 +306,10 @@ func placementLists(root string) [][]string {
 type shadows struct {
 	read   func(name string) any
 	settle time.Duration
-	wait   func(time.Duration)
-	say    func(row map[string]any) error
+	// The span a value apart takes to come together, re-read each settle, since each path polls the clock, git and the files on its own phase. A zero writes the row on the first weigh. [[spec/tickets/process-shadow-reads-clean]]
+	patience time.Duration
+	wait     func(time.Duration)
+	say      func(row map[string]any) error
 	// The count each name's newest value carries, so a value a newer one follows weighs nothing. A nil weighs every value. [[spec/tickets/the-doors-process-stands]]
 	newest *sends
 }
@@ -341,8 +349,14 @@ func (s *sends) still(name string, at int64) bool {
 	return s.at[name] == at
 }
 
-// Weighs each value the IO process commits against the store's, once the span passes, and writes a shadow row for each value apart. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
+// Weighs each value the IO process commits against the store's, once the span passes, and again each span while the two stand apart and the patience lasts. It writes a shadow row for each value still apart past the patience, and none for a value a newer one follows. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]] [[spec/tickets/process-shadow-reads-clean]]
 func (s shadows) weigh(values map[string]json.RawMessage) {
+	names, marks := s.marks(values)
+	s.weighs(values, names, marks)
+}
+
+// The names a commit weighs, its own log aside, each marked as the newest of its name. [[spec/tickets/process-shadow-reads-clean]]
+func (s shadows) marks(values map[string]json.RawMessage) ([]string, map[string]int64) {
 	names := make([]string, 0, len(values))
 	for name := range values {
 		if name != shadowsOwnLog {
@@ -350,27 +364,59 @@ func (s shadows) weigh(values map[string]json.RawMessage) {
 		}
 	}
 	sort.Strings(names)
-	marks := s.newest.mark(names)
-	s.wait(s.settle)
-	for _, name := range names {
-		if !s.newest.still(name, marks[name]) {
-			continue
+	return names, s.newest.mark(names)
+}
+
+// Weighs the names marked, and skips each a newer mark follows. [[spec/tickets/process-shadow-reads-clean]]
+func (s shadows) weighs(values map[string]json.RawMessage, names []string, marks map[string]int64) {
+	for waited := time.Duration(0); len(names) > 0; {
+		s.wait(s.settle)
+		waited += s.settle
+		var apart []string
+		for _, name := range names {
+			if !s.newest.still(name, marks[name]) {
+				continue
+			}
+			if old, now, differ := s.apart(name, values[name]); differ && waited >= s.patience {
+				s.row(name, old, now)
+			} else if differ {
+				apart = append(apart, name)
+			}
 		}
-		old, err := json.Marshal(s.read(name))
-		if err != nil {
-			continue
-		}
-		var now bytes.Buffer
-		if json.Compact(&now, values[name]) != nil || bytes.Equal(old, now.Bytes()) {
-			continue
-		}
-		row := map[string]any{
-			"level": "info", "kind": shadowKind, "slice": processesSlice, "name": name,
-			"said": fmt.Sprintf("%s in shadow: %s reads apart in the IO process", processesSlice, name),
-			"old":  capped(string(old)), "new": capped(now.String()),
-		}
-		if err := s.say(row); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
+		names = apart
+	}
+}
+
+// The store's value and the IO process's, compact, and whether they read apart. A value either side fails to read weighs as no difference. [[spec/tickets/process-shadow-reads-clean]]
+func (s shadows) apart(name string, value json.RawMessage) (string, string, bool) {
+	old, err := json.Marshal(s.read(name))
+	if err != nil {
+		return "", "", false
+	}
+	var now bytes.Buffer
+	if json.Compact(&now, value) != nil || bytes.Equal(old, now.Bytes()) || sameContent(old, now.Bytes()) {
+		return "", "", false
+	}
+	return string(old), now.String(), true
+}
+
+// Whether two file values hold the same hash and text. Each path stamps the time it read the file at, and a write landing twice with one text moves that stamp alone. [[spec/tickets/process-shadow-reads-clean]]
+func sameContent(old, now []byte) bool {
+	var left, right q.Content
+	if json.Unmarshal(old, &left) != nil || json.Unmarshal(now, &right) != nil || left.Hash == "" {
+		return false
+	}
+	return left.Hash == right.Hash && left.Text == right.Text
+}
+
+// Writes the shadow row for a value apart. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
+func (s shadows) row(name, old, now string) {
+	row := map[string]any{
+		"level": "info", "kind": shadowKind, "slice": processesSlice, "name": name,
+		"said": fmt.Sprintf("%s in shadow: %s reads apart in the IO process", processesSlice, name),
+		"old":  capped(old), "new": capped(now),
+	}
+	if err := s.say(row); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 	}
 }

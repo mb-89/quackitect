@@ -131,6 +131,8 @@ func moduleOver(peer *index.Peer, store *q.Store, instances []string) (func(), e
 	scheduler := q.NewScheduler(store, func(run func()) { go run() }, func(name string, err error) {
 		fmt.Fprintln(os.Stderr, name, "runs not:", err)
 	})
+	// The catalog holds the whole wiring, and the index answers every name another instance provides. [[spec/tickets/process-shadow-reads-clean]]
+	scheduler.Only(instances...)
 	var dones []func()
 	quit := make(chan struct{})
 	halt := func() {

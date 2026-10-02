@@ -137,6 +137,61 @@ func TestAClientReachesALiveDoorAndStopsNothing(t *testing.T) {
 	}
 }
 
+// A serve meets the live door on its build and stands no second one, and a door on another build hears a stop and stands live no more. [[spec/tickets/process-shadow-reads-clean]]
+func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
+	root := t.TempDir()
+	bin := builtIndex(t, root, "the index build")
+	door, heard := heardDoor(t)
+	port := door.Listener.Addr().(*net.TCPAddr).Port
+	standsAt(t, root, Standing{Port: port, Pid: 1, Root: root, Stamp: stampOf(bin)})
+	if _, live := liveDoor(root); !live {
+		t.Fatal("a serve reads the live door on its build as gone")
+	}
+	standsAt(t, root, Standing{Port: port, Pid: 1, Root: root, Stamp: "another build"})
+	if _, live := liveDoor(root); live {
+		t.Fatal("a serve reads a door on another build as live")
+	}
+	standsAt(t, root, Standing{Port: port, Pid: pidOf(), Root: root, Stamp: stampOf(bin)})
+	if _, live := liveDoor(root); live {
+		t.Fatal("a serve reads the file naming itself as another live door")
+	}
+	if got := heard(); len(got) != 2 || got[0] != "standing" || got[1] != "stop" {
+		t.Fatalf("the doors hear %q, and want a standing, then a stop for the other build", got)
+	}
+}
+
+// A door leaving drops the standing file while it names that door, and leaves another door's file standing. [[spec/tickets/process-shadow-reads-clean]]
+func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
+	root := t.TempDir()
+	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
+	dropsOwn(root, 3)
+	if _, err := standingOf(root); err != nil {
+		t.Fatalf("a door drops another door's standing file: %v", err)
+	}
+	dropsOwn(root, 2)
+	if _, err := os.Stat(standingPath(root)); err == nil {
+		t.Fatal("a door leaving keeps its own standing file")
+	}
+}
+
+// A door stays while the standing file names it, and leaves once the file names another door. [[spec/tickets/process-shadow-reads-clean]]
+func TestADisplacedDoorLeaves(t *testing.T) {
+	root := t.TempDir()
+	standsAt(t, root, Standing{Port: 1, Pid: 2, Root: root})
+	gone := displaced(root, 2, time.Millisecond)
+	select {
+	case <-gone:
+		t.Fatal("a door the standing file names leaves")
+	case <-time.After(20 * time.Millisecond):
+	}
+	standsAt(t, root, Standing{Port: 4, Pid: 5, Root: root})
+	select {
+	case <-gone:
+	case <-time.After(time.Second):
+		t.Fatal("a door the standing file no longer names stays")
+	}
+}
+
 func TestADoorNamingItsBuildStandsWhileThatBuildLies(t *testing.T) {
 	root := t.TempDir()
 	built := filepath.Join(t.TempDir(), "another-index")

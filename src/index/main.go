@@ -25,6 +25,9 @@ const (
 	startPolls         = 300
 	startPollPause     = 100 * time.Millisecond
 	postWait           = 30 * time.Second
+	// The span between two looks at the standing file, and the misses in a row that tell a door another stands in its place. [[spec/tickets/process-shadow-reads-clean]]
+	displacedEvery = 5 * time.Second
+	displacedLooks = 2
 )
 
 // How long a client waits on the door's answer, which a test cuts short. [[spec/tickets/one-index-a-tree]]
@@ -96,6 +99,11 @@ func rooted(path string) string {
 }
 
 func serves(root string, manage Manage, starts []Start) int {
+	// A second serve beside a live door places every module again, and the first door's file goes with whichever leaves first. [[spec/tickets/process-shadow-reads-clean]]
+	if said, live := liveDoor(root); live {
+		fmt.Fprintf(stderr, "an index stands over this tree already, at port %d\n", said.Port)
+		return 0
+	}
 	// A fresh tree holds no runtime folder yet, and the database needs one to open in. [[spec/design_output/index#the-door-owns-the-database]]
 	if err := makeDir(filepath.Join(root, Runtime), 0o755); err != nil {
 		fmt.Fprintln(stderr, "the runtime folder did not stand:", err)
@@ -106,11 +114,56 @@ func serves(root string, manage Manage, starts []Start) int {
 		fmt.Fprintln(stderr, "the index door did not stand:", err)
 		return 1
 	}
-	defer removeFile(standingPath(root))
+	pid := pidOf()
+	defer dropsOwn(root, pid)
 
-	<-stops(swap.Watches)
+	select {
+	case <-stops(swap.Watches):
+	case <-displaced(root, pid, displacedEvery):
+	}
 	stop()
 	return 0
+}
+
+// The door standing over the root, and whether it answers on this build. A door on another build takes a stop, so the serve after it stands alone. [[spec/tickets/process-shadow-reads-clean]]
+func liveDoor(root string) (Standing, bool) {
+	said, err := standingOf(root)
+	if err != nil || said.Pid == pidOf() {
+		return said, false
+	}
+	if !stands(said, root) {
+		posts(said, []string{"stop"})
+		return said, false
+	}
+	_, err = posts(said, []string{"standing"})
+	return said, err == nil || late(err)
+}
+
+// Removes the standing file while it names this door, so a door leaving takes no other door's file with it. [[spec/tickets/process-shadow-reads-clean]]
+func dropsOwn(root string, pid int) {
+	if said, err := standingOf(root); err == nil && said.Pid != pid {
+		return
+	}
+	removeFile(standingPath(root))
+}
+
+// Closes once the standing file names another door, or none, on two looks in a row, so a door no caller reaches leaves and takes its placements with it. [[spec/tickets/process-shadow-reads-clean]]
+func displaced(root string, pid int, every time.Duration) <-chan struct{} {
+	out := make(chan struct{})
+	go func() {
+		misses := 0
+		for range time.Tick(every) {
+			if said, err := standingOf(root); err == nil && said.Pid == pid {
+				misses = 0
+				continue
+			}
+			if misses++; misses >= displacedLooks {
+				close(out)
+				return
+			}
+		}
+	}()
+	return out
 }
 
 // Asks the index standing over the root, and answers its result, so the composition root runs a verb that writes through a module. [[spec/design_output/model#everything-on-disk-mirrors]]
