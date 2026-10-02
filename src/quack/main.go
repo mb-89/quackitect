@@ -245,7 +245,7 @@ func manages(as q.Writer, open doors) index.Manage {
 			served.Stop()
 			return index.Managed{}, err
 		}
-		bus, halt, err := ioShadow(root, store, open)
+		bus, halt, err := ioShadow(root, store, open, served.Dog)
 		if err != nil {
 			stop()
 			return index.Managed{}, err

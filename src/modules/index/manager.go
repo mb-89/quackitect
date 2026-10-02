@@ -97,6 +97,8 @@ func Serves(from Outside) (stop func(), call func(name string, input any, caller
 
 // What a start answers: its stop, the call an action takes through it, and every operation of a caller. [[spec/tickets/the-hooks-door-lands]]
 type Served struct {
+	// The dog every placed process's lease stands with. [[spec/tickets/watchdogs-span-the-processes]]
+	Dog  *Dog
 	Stop func()
 	Call func(name string, input any, caller string, wait time.Duration) (Answer, error)
 	Of   func(caller string) []Op
@@ -114,7 +116,7 @@ func Serving(from Outside) (Served, error) {
 			return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
 		}
 	}
-	return Served{Stop: one.stops, Of: one.book.Of, Call: func(name string, input any, caller string, wait time.Duration) (Answer, error) {
+	return Served{Dog: one.dog, Stop: one.stops, Of: one.book.Of, Call: func(name string, input any, caller string, wait time.Duration) (Answer, error) {
 		return Call(one.book, from.Store, name, input, caller, wait, accept)
 	}}, nil
 }

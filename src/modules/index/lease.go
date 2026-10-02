@@ -62,6 +62,14 @@ func dogSettingsOf(root string) DogSettings {
 	}
 }
 
+// The config key of the lease's term, as a process outside the store reads it. [[spec/tickets/watchdogs-span-the-processes]]
+const leaseCount = "watchdog.lease"
+
+// The term a lease holds past a beat, off the config a process outside the store reads. [[spec/tickets/watchdogs-span-the-processes]]
+func LeaseTerm(root string) time.Duration {
+	return spanIn(config.Count(root, leaseCount), builtInLease)
+}
+
 // The dog commits its alarms as the writer Registers hands back. [[spec/tickets/commits-name-their-writer]]
 func NewDog(now func() time.Time, store *q.Store, as q.Writer, settings DogSettings) *Dog {
 	return &Dog{

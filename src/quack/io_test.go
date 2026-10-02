@@ -149,6 +149,47 @@ func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
 	}
 }
 
+func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
+	c := q.New()
+	as := manager.Registers(c)
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	listener, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer listener.Close()
+	heard := make(chan string, 4)
+	stop, err := listener.Leases(func(part string) { heard <- part })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	beating, err := beatsIndex(bus, store)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer beating.Close()
+	if _, err := store.Commit(store.Snapshot().Revision, as, map[string]any{manager.HealthName: manager.Lease{Part: indexPart, Renewed: time.Now(), Term: time.Minute}}); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case part := <-heard:
+		if part != indexPart {
+			t.Fatalf("the health commit beats %q, and wants the index", part)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("the health commit beats nothing")
+	}
+}
+
 func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
 	bus, err := index.StartBus()
 	if err != nil {

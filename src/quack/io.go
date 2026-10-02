@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"quackitect/src/index"
+	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/migration"
 	"quackitect/src/q"
 )
@@ -26,6 +27,8 @@ const (
 	processesSlice = migration.ProcessesKey
 	placementsKey  = "processes.placements"
 	ioPart         = "io"
+	indexPart      = "index"
+	watchSteps     = 4
 	ioBeat         = 5 * time.Second
 	shadowSettle   = 2 * time.Second
 	shadowAfter    = 30 * time.Second
@@ -130,7 +133,43 @@ func runsIO(url, token string, starts map[string]index.Start) (func(), error) {
 
 // Watches the index's beat on lease.index, and writes a watchdog row where it falls silent past the term. [[spec/design_output/model#the-watcher-of-the-watchdog]]
 func watchesIndex(peer *index.Peer, term time.Duration, say func(row map[string]any) error) (func(), error) {
-	return func() {}, nil
+	var mu sync.Mutex
+	last, said := time.Now(), false
+	stop, err := peer.Leases(func(part string) {
+		if part != indexPart {
+			return
+		}
+		mu.Lock()
+		last, said = time.Now(), false
+		mu.Unlock()
+	})
+	if err != nil {
+		return nil, err
+	}
+	ticks, quit := time.NewTicker(term/watchSteps), make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-quit:
+				return
+			case <-ticks.C:
+				mu.Lock()
+				silent, since := !said && time.Since(last) > term, last
+				if silent {
+					said = true
+				}
+				mu.Unlock()
+				if silent {
+					_ = say(map[string]any{"kind": "watchdog", "part": indexPart, "since": since.UTC().Format(time.RFC3339Nano)})
+				}
+			}
+		}
+	}()
+	return func() {
+		ticks.Stop()
+		close(quit)
+		stop()
+	}, nil
 }
 
 // Each start commits over the peer under its instance, and the IO process beats its lease while it runs. [[spec/design_output/model#a-lease]]
@@ -149,6 +188,11 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 		}
 		stops = append(stops, stop)
 	}
+	watching, err := watchesIndex(peer, manager.LeaseTerm(root), appendsRow(root, time.Now))
+	if err != nil {
+		halt()
+		return nil, err
+	}
 	beats, quit := time.NewTicker(ioBeat), make(chan struct{})
 	go func() {
 		for {
@@ -163,12 +207,13 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 	return func() {
 		beats.Stop()
 		close(quit)
+		watching()
 		halt()
 	}, nil
 }
 
 // Under the processes slice's shadow, the index spawns quack io beside its own IO starts, and a module process for each placement beside its own providers, and weighs each value they commit. Under any other mode it spawns nothing. [[spec/tickets/the-doors-process-stands]] [[spec/tickets/the-system-places-modules]]
-func ioShadow(root string, store *q.Store, open doors) (*index.Bus, func(), error) {
+func ioShadow(root string, store *q.Store, open doors, dog *manager.Dog) (*index.Bus, func(), error) {
 	if sliceMode(root, processesKey) != modeShadow {
 		return nil, func() {}, nil
 	}
@@ -199,18 +244,43 @@ func ioShadow(root string, store *q.Store, open doors) (*index.Bus, func(), erro
 	if len(instances) > 0 {
 		placed = append(placed, index.Placed{Name: ioPart, Command: []string{self, ioVerb}, Instances: held, Restart: ioRestart})
 	}
+	term := manager.LeaseTerm(root)
 	for i := range placed {
 		placed[i].Heard = heard
+		if dog != nil {
+			placed[i].Watch, placed[i].Term = dog, term
+		}
+	}
+	beating, err := beatsIndex(bus, store)
+	if err != nil {
+		bus.Close()
+		return nil, nil, err
 	}
 	stop, err := index.NewPlacements(bus, store, placed).Quiet(shadowsOwnLog).After(shadowAfter).Start()
 	if err != nil {
+		beating.Close()
 		bus.Close()
 		return nil, nil, err
 	}
 	return bus, func() {
 		stop()
+		beating.Close()
 		bus.Close()
 	}, nil
+}
+
+// Each commit of index/health beats lease.index, and only the work loop's renew commits it, so a hung loop beats nothing. [[spec/tickets/watchdogs-span-the-processes]]
+func beatsIndex(bus *index.Bus, store *q.Store) (*index.Peer, error) {
+	peer, err := index.Dial(bus.URL(), bus.Token())
+	if err != nil {
+		return nil, err
+	}
+	store.OnCommit(func(values map[string]any) {
+		if _, renewed := values[manager.HealthName]; renewed {
+			_ = peer.Beat(indexPart)
+		}
+	})
+	return peer, nil
 }
 
 // The lists of instances the processes/placements key holds, each list one process. [[spec/design_output/model#the-placements]]
