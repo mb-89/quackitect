@@ -123,9 +123,11 @@ func (s *Store) under(prefix string) map[string]any {
 }
 
 // The bytes of a saved file: every name under prefix, with its type and value. [[spec/design_output/model#everything-on-disk-mirrors]]
-func (s *Store) Save(prefix string) ([]byte, error) {
+func (s *Store) Save(prefix string) ([]byte, error) { return s.saved(s.under(prefix)) }
+
+func (s *Store) saved(values map[string]any) ([]byte, error) {
 	saved := map[string]savedName{}
-	for name, value := range s.under(prefix) {
+	for name, value := range values {
 		body, err := json.Marshal(value)
 		if err != nil {
 			return nil, fmt.Errorf("%s saves as no JSON: %w", name, err)
@@ -172,6 +174,9 @@ func (s *Store) Restore(saved []byte) ([]string, error) {
 	_, err := s.Commit(s.Snapshot().Revision, hand, values)
 	return refused, err
 }
+
+// The bytes of a saved file holding the names it is handed, which Restore reads back. [[spec/design_output/model#the-placements]]
+func (s *Store) SaveNames(names []string) ([]byte, error) { return s.saved(s.Values(names)) }
 
 // The bytes of a dump of every name under prefix. [[spec/design_output/model#everything-on-disk-mirrors]]
 func (s *Store) Dump(prefix string) ([]byte, error) {

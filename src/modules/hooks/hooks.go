@@ -128,6 +128,8 @@ type Outside struct {
 	Prose func(root, where, text string) []write.Finding
 	// What the schemas answer over a written note, off the check the tree holds. None reads no schema. [[spec/tickets/cage-write-door-port]]
 	Schema func(root, where, text string) write.Judged
+	// The index's own lease off index/health: its last renewal, its term, and whether it stands. None reads the index as up. [[spec/design_output/model#the-watcher-of-the-watchdog]]
+	Health func() (renewed time.Time, term time.Duration, held bool)
 	// The index a Grep or a Glob asks, by method and params in the shape se-index reads, and its answer in the shape it prints. None passes every search to the harness. [[spec/tickets/grep-glob-answer-off-index]]
 	Index func(method string, params map[string]any) (map[string]any, error)
 	// What the branch verb gathers for a review under the root, or why it gathered nothing. None passes the review to the bridge. [[spec/tickets/review-spawns-off-the-door]]
@@ -167,6 +169,8 @@ type Door struct {
 	heldIn map[string]string
 	// The material of each review in flight, under the token its spawn's back names. [[spec/tickets/review-spawns-off-the-door]]
 	reviews map[string]review.Material
+	// The end of the index lease a shadow row already names, so one silence writes one row. [[spec/tickets/health-row-once-a-silence]]
+	downSince time.Time
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]
@@ -217,6 +221,7 @@ func (d *Door) Hook(post Post) (Answer, error) {
 	d.marks(session, root)
 	d.rows(session, root)
 	d.repeats(session, root)
+	d.readsHealth(post)
 	effects := []Effect{}
 	if said, ok := d.rewrites(session, post); ok {
 		effects = append(effects, said)

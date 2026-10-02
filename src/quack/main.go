@@ -15,33 +15,15 @@ import (
 
 	oldconfig "quackitect/src/config"
 	"quackitect/src/index"
-	"quackitect/src/modules/check"
 	"quackitect/src/modules/clock"
 	"quackitect/src/modules/config"
-	"quackitect/src/modules/drafts"
-	"quackitect/src/modules/edits"
-	"quackitect/src/modules/env"
 	"quackitect/src/modules/files"
-	"quackitect/src/modules/git"
-	"quackitect/src/modules/guidance"
 	"quackitect/src/modules/holds"
 	"quackitect/src/modules/hooks"
-	httpmodule "quackitect/src/modules/http"
 	manager "quackitect/src/modules/index"
-	logmodule "quackitect/src/modules/log"
-	"quackitect/src/modules/lsp"
 	"quackitect/src/modules/mcp"
-	"quackitect/src/modules/migration"
-	"quackitect/src/modules/plans"
 	"quackitect/src/modules/queue"
-	"quackitect/src/modules/search"
-	"quackitect/src/modules/session"
-	"quackitect/src/modules/settings"
-	"quackitect/src/modules/tickets"
-	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/views"
-	"quackitect/src/modules/waits"
-	"quackitect/src/modules/work"
 	"quackitect/src/prose"
 	"quackitect/src/q"
 )
@@ -55,85 +37,6 @@ const (
 
 // The modules projecting files/, which the root loads beside the watch that provides it. [[spec/design_output/model#everything-on-disk-mirrors]]
 var projected = []func(*q.Catalog) q.Writer{queue.Registers, holds.Registers, views.Registers}
-
-// A module type the wiring loads: its registration, and for an IO module the start that runs it under the names its instance binds. A module with no start runs on the scheduler alone. [[spec/tickets/tickets-becomes-a-module]]
-type ioModule struct {
-	registers func(*q.Catalog) q.Writer
-	starts    func(root string, commit func(values map[string]any) error) (func(), error)
-}
-
-var modules = map[string]ioModule{
-	"watch": {files.Registers, func(root string, commit func(map[string]any) error) (func(), error) {
-		return files.Seeds(root, files.NewWatch(root), commit)
-	}},
-	"clock": {clock.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
-		return clock.Start(clock.New(), commit), nil
-	}},
-	"env": {env.Registers, func(_ string, commit func(map[string]any) error) (func(), error) {
-		return func() {}, env.Start(env.New(), commit)
-	}},
-	// [[spec/tickets/the-index-reads-standing-branches]]
-	"git": {git.Registers, func(root string, commit func(map[string]any) error) (func(), error) {
-		return git.Start(git.New(root), clock.New().Every, commit), nil
-	}},
-	"tickets":   {registers: withActions(tickets.Registers, verbsmodule.TicketsActions)},
-	"queue":     {registers: queue.Places},
-	"work":      {registers: withActions(work.Registers, verbsmodule.WorkActions)},
-	"migration": {registers: migration.Registers},
-	"check":     {registers: check.Registers},
-	"guidance":  {registers: guidance.Registers},
-	"log":       {registers: logmodule.Registers},
-	"http":      {registers: httpmodule.Registers},
-	// [[spec/tickets/the-hooks-door-lands]]
-	hooksModule: {registers: hooks.Registers},
-	"session":   {registers: session.Registers},
-	// [[spec/tickets/the-mcp-module-lands]]
-	mcpModule: {registers: mcp.Registers},
-	// [[spec/tickets/the-lsp-door-lands]]
-	lspModule: {registers: lsp.Registers},
-	// [[spec/tickets/ticket-verbs-become-actions]]
-	"ticket":  {registers: verbsmodule.Topic("ticket", verbsmodule.TicketVerbs)},
-	"retro":   {registers: verbsmodule.Topic("retro", verbsmodule.RetroVerbs)},
-	"vehicle": {registers: verbsmodule.Topic("vehicle", verbsmodule.VehicleVerbs)},
-	"stub":    {registers: verbsmodule.Topic("stub", verbsmodule.StubVerbs)},
-	// [[spec/tickets/work-verbs-become-actions]]
-	"branch": {registers: verbsmodule.Topic("branch", verbsmodule.BranchVerbs)},
-	// [[spec/tickets/agents-call-quack-directly]]
-	verbsmodule.TreeTopic: {registers: verbsmodule.Tree(verbsmodule.TreeVerbs)},
-	// [[spec/tickets/edit-tools-answer-in-go]]
-	edits.Module: {registers: edits.Registers},
-	// [[spec/tickets/find-and-wait-in-go]]
-	search.Module: {registers: search.Registers},
-	waits.Module:  {registers: waits.Registers},
-	// [[spec/tickets/plan-writes-off-go]]
-	plans.Module: {registers: plans.Registers},
-	// [[spec/tickets/prose-tools-answer-in-go]]
-	drafts.Module: {registers: drafts.Registers},
-}
-
-// A module type taking the view actions its instance answers beside its own registration. [[spec/tickets/view-actions-run-through-verbs]]
-func withActions(own, actions func(*q.Catalog) q.Writer) func(*q.Catalog) q.Writer {
-	return func(c *q.Catalog) q.Writer { return q.Join(own(c), actions(c)) }
-}
-
-// A settings section loads as a module type of its own name, and a module of that name takes the section's keys beside its own. [[spec/tickets/the-config-schema-gets-generated]]
-func init() {
-	for _, section := range settings.Sections() {
-		keys := settings.Of(section)
-		own, ok := modules[section]
-		if !ok {
-			modules[section] = ioModule{registers: keys}
-			continue
-		}
-		registers := own.registers
-		own.registers = func(c *q.Catalog) q.Writer {
-			first := registers(c)
-			keys(c)
-			return first
-		}
-		modules[section] = own
-	}
-}
 
 // A loaded projection the root wires: its glob, and the round trip of its codec. [[spec/design_output/model#everything-on-disk-mirrors]]
 type projection struct {
@@ -200,6 +103,22 @@ func main() {
 	index.Serving()
 	if len(os.Args) == 2 && os.Args[1] == "lsp" {
 		if err := lspVerb(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	// [[spec/tickets/the-doors-process-stands]]
+	if len(os.Args) == 2 && os.Args[1] == ioVerb {
+		if err := ioMain(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		return
+	}
+	// [[spec/tickets/the-system-places-modules]]
+	if len(os.Args) > 2 && os.Args[1] == moduleVerb {
+		if err := moduleMain(os.Args[2:]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
@@ -284,9 +203,13 @@ const lspModule = "lsp"
 // The name the check module's sweep stands under, which the lsp listener reads. [[spec/tickets/the-lsp-door-lands]]
 const sweepName = "check/sweep"
 
-// The instances whose listeners the manager's start opens: the hooks door, the mcp server, and the lsp listener. [[spec/tickets/the-lsp-door-lands]]
+// The instances whose listeners the manager's start opens: the hooks door, the mcp server, and the lsp listener. The IO instances are the ones a shadow IO process runs. [[spec/tickets/the-lsp-door-lands]]
 type doors struct {
 	hooks, mcp, lsp hooked
+	io              []string
+	// The wiring and each instance's writer, which the placements read. [[spec/tickets/the-system-places-modules]]
+	wiring q.Wiring
+	hands  map[string]q.Writer
 }
 
 // The hooks instance the wiring loads: its writer, and the name each local name binds to. No instance leaves on false. [[spec/tickets/the-hooks-door-lands]]
@@ -322,7 +245,12 @@ func manages(as q.Writer, open doors) index.Manage {
 			served.Stop()
 			return index.Managed{}, err
 		}
-		return index.Managed{Stop: stop, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+		bus, halt, err := ioShadow(root, store, open, served.Dog)
+		if err != nil {
+			stop()
+			return index.Managed{}, err
+		}
+		return index.Managed{Stop: func() { halt(); stop() }, Bus: bus, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil
@@ -391,8 +319,9 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		asks = indexAsk(reads)
 	}
 	door := hooks.New(hooks.Outside{
-		Index: asks,
-		Store: store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
+		Index:  asks,
+		Health: healthOf(root, store),
+		Store:  store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return hooks.Called(said), err
@@ -404,6 +333,17 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Review: reviewOver(root),
 	})
 	return hooks.Listen(root, door)
+}
+
+// The index's lease off index/health under the processes slice's shadow, and none under any other mode. [[spec/tickets/watchdogs-span-the-processes]]
+func healthOf(root string, store *q.Store) func() (time.Time, time.Duration, bool) {
+	if sliceMode(root, processesKey) != modeShadow {
+		return nil
+	}
+	return func() (time.Time, time.Duration, bool) {
+		lease, held := store.Snapshot().Read(manager.HealthName).(manager.Lease)
+		return lease.Renewed, lease.Term, held && lease.Term > 0
+	}
 }
 
 // The book's operations as the hooks door reads them: the fraction done, and the time gone by to its end or to now. [[spec/design_output/model#the-agent-does-not-poll]]
@@ -456,7 +396,7 @@ func wired() ([]index.Start, doors, error) {
 		return nil, doors{}, err
 	}
 	starts, hands, err := loaded(w, q.Main)
-	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule)}, err
+	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule), io: ioInstances(w), wiring: w, hands: hands}, err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]
@@ -522,19 +462,9 @@ func loaded(w q.Wiring, into *q.Catalog) ([]index.Start, map[string]q.Writer, er
 	}
 	starts := make([]index.Start, 0, len(kept.Instances))
 	for _, one := range kept.Instances {
-		instance, module := one.Name, modules[one.Module]
-		if module.starts == nil {
-			continue
+		if module := modules[one.Module]; module.starts != nil {
+			starts = append(starts, startOf(w, one.Name, module, hands[one.Name]))
 		}
-		starts = append(starts, func(root string, commit index.Commit) (func(), error) {
-			return module.starts(root, func(values map[string]any) error {
-				bound := make(map[string]any, len(values))
-				for local, value := range values {
-					bound[w.Bound(instance, local)] = value
-				}
-				return commit(hands[instance], bound)
-			})
-		})
 	}
 	return starts, hands, nil
 }

@@ -1,10 +1,19 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -24,35 +33,41 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -60,7 +75,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -74,10 +89,120 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 9d870e3fd3c577a6
+process_hash: 22b42ea1501e8967
 group: module-processes-land-in-shadow
+record:
+  - step: design/draft
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: b434f51a588b1b5807a1d111f421a7b185b2f28b
+    hash_after: b434f51a588b1b5807a1d111f421a7b185b2f28b
+    inputs:
+      - name: ask
+        hash: a166f2553415d2a5
+        size: 402
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+    def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: b4593c297636a62e8a4241a7b99830a45646267a
+    hash_after: b4593c297636a62e8a4241a7b99830a45646267a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/index fails
+    inputs:
+      - name: design/draft
+        hash: ae24a1e131bd583f
+        size: 4169
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/watchdogs-span-the-processes]]
+        hash: b10dd6eac949de7c
+        size: 309
+      - name: [[spec/tickets/hooks-listener-joins-io-process]]
+        hash: 5a754c5b9e92ffff
+        size: 167
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 03ba8e0fb2d4 · claude-code-remote · helper-3
+    hash_before: 28834b1b612c04d55117635cb75585294b3e7fcb
+    hash_after: 1a41464c2c8bbcffc11ab788612b050ecf7f9cf4
+    inputs:
+      - name: design/draft
+        hash: ae24a1e131bd583f
+        size: 4169
+      - name: design/tests-red
+        hash: c2dddd9a990e87a9
+        size: 1134
+      - name: [[spec/design_output/model]]
+        hash: 3e2cd8b099700681
+        size: 74868
+      - name: [[spec/tickets/watchdogs-span-the-processes]]
+        hash: b10dd6eac949de7c
+        size: 309
+      - name: [[spec/tickets/hooks-listener-joins-io-process]]
+        hash: 5a754c5b9e92ffff
+        size: 167
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: 926f8159ba7315315430917746ce00447e5b9ad9
+    hash_after: 926f8159ba7315315430917746ce00447e5b9ad9
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 03ba8e0fb2d4 · claude-code-remote
+    hash_before: 3adb9cb20dc011cf036357299bde7f09a0a89915
+    hash_after: f2860c6b832469de042ddd39cdf47682e5ef6edc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/quack passes; green, src/modules/migration passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-system-places-modules.md:438:211: Characters: The character ; stands outside the set a paragraph admits"
+    inputs:
+      - name: design/tests-red
+        hash: c2dddd9a990e87a9
+        size: 1134
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -92,6 +217,16 @@ The operating system then holds the boundary.
 
 # design
 
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -99,44 +234,64 @@ The operating system then holds the boundary.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`quack io` runs in shadow beside the index, per [[spec/design_output/model#the-io-process]] and [[spec/design_output/model#the-inner-protocol]].
+
+1. The bus. `src/index/bus.go` runs `nats-server/v2` inside the index on `127.0.0.1`, on a port the system picks, with a token off `crypto/rand`, no JetStream and no disk. `Standing` in `src/index/door.go` gains `bus` and `token`, which `stands` writes. A peer dials it with `nats.go`.
+2. A placed process. `src/index/procs.go` adds `Placed`: a name, the command, and the instances it runs. `Placed.Start` answers an `index.Start`. It spawns the command with the bus and the token in its environment, and commits each `commit.<instance>` message through the start's `Commit`. On the child's exit it marks each instance down through `Store.Down`, and the next commit clears the mark through a new `Store.Up`. The restart waits on the dog, and [[spec/tickets/watchdogs-span-the-processes]] carries the leases and alarms across.
+3. `quack io`. `src/quack/io.go` dials the bus off the environment, runs the start of each IO instance placed in the IO process, and publishes each commit on `commit.<instance>`. Its work loop beats `lease.io`.
+4. The shadow. `migration/config/slices/processes` takes `old`, `shadow` or `new`, built-in `old`, and the tracked file sets `shadow`. Under `shadow` the index keeps every start in its own process, and spawns `quack io` over the IO instances holding no port: watch, clock, env and git. The index lands none of the shadow's commits. It weighs each name the shadow commits against the value the store holds once a settle span passes, and a value apart writes a `shadow` row naming the slice, the name, the old and the new. Under `new`, the switch ticket places those instances in the IO process alone.
+5. The listeners of hooks, mcp and lsp stay in the index under `shadow`, the interim [[spec/tickets/hooks-listener-joins-io-process]] names, since two processes hold no one port. The switch moves them.
+
+The assumption: the shadow weighs commits and no requests, since the IO modules' requests write the disk, and a second answer to a write writes twice.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/door.go stands, which writes Standing
+- src/index/main.go standingOf and stands, which read Standing
+- src/index/door.go starts, which runs each Start, a placed one among them
+- src/quack/main.go main, whose dispatch gains io
+- src/quack/main.go manages and wired, which hand the index its starts and spawn the shadow
+- src/q/store.go Down, Snapshot.Read and Snapshot.NotProvided, beside the new Up
+- src/q/why.go Why, which reads NotProvided
+- src/modules/migration/migration.go Registers, whose slices gain processes
+- spec/config/level0.json and spec/config/level0.schema.json, which quack schema --write regenerates
+- src/quack/testdata/readers.schema.json, readers.tracked.json and readers.golden.json
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/bus_test.go TestTheBusAnswersALoopbackPeerShowingItsToken
+- src/index/bus_test.go TestTheBusRefusesAPeerWithoutTheToken
+- src/index/door_test.go TestTheStandingFileNamesTheBusAndItsToken
+- src/index/procs_test.go TestAKilledFakeIOProcessLeavesItsNamesNotProvided
+- src/index/procs_test.go TestTheNextCommitOfARestartedProcessClearsTheMark
+- src/q/start_test.go TestAnInstanceUpAgainReadsItsValue
+- src/quack/io_test.go TestQuackIOCommitsItsInstancesOverTheBus
+- src/quack/io_test.go TestAShadowValueApartWritesAShadowRow
+- src/modules/migration/migration_test.go TestTheProcessesSliceTakesThreeModes
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
+- every file, function and verb the approach names stands opened, and each claim checked there: door.go stands and Standing, store.go Down and NotProvided, why.go, main.go manages, wired and loaded, migration.go, level0.json, and the go proxy answering nats-server v2.15
+- the callers list names every caller of what the approach changes, off a grep of Standing, standingPath, .Down(, manages(, wired() and migration.Registers
+- every done_when line names the test that decides it: the kill line TestAKilledFakeIOProcessLeavesItsNamesNotProvided, the go test line go test ./..., and the check line ./RUNME.sh check
 
 ## tests-red
 
@@ -145,20 +300,52 @@ The operating system then holds the boundary.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- src/index/bus_test.go
+- src/index/procs_test.go
+- src/index/standing_test.go
+- src/q/start_test.go
+- src/quack/io_test.go
+- src/modules/migration/migration_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each new case fails on its own assertion over stubs that compile: the bus names no address, the fake IO process never commits, the standing file names no bus, Up leaves the down mark, quack io reaches no bus, the shadow writes no row, and the slices hold no processes key. The standing case stands in src/index/standing_test.go, apart from door_test.go, since it drives ServeManaged with a manager of its own. The pins surprise: nats.go at its newest asks Go 1.26, so the tree takes nats-server v2.11.9 with nats.go v1.45.0, which keep the go line at 1.24.2.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test that fails: the kill line meets TestAKilledFakeIOProcessLeavesItsNamesNotProvided, and go test ./... and ./RUNME.sh check run at implement
+- every door the tests reach has a fake: the fake IO process is the test binary run again with the bus in its environment, and the bus runs in memory on loopback
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept with points
+- processes-links-point-at-model: the processes chapter now stands in model.md, and the-system-places-modules' lines still link spec/design_output/processes, in src/q/store.go, src/q/projection.go, src/index/procs.go and its ticket's approach; the gate pointed this ticket's own lines at model.md
+- fake-snapshot-stays-in-case: src/index/procs_test.go shares the package variable fakeSnap across cases, so two cases running beside each other read each other's snapshot; until hands each case its own
+- model-marks-io-names: model#a-process-ends says the IO process's exit restarts it, and names none of its names; the ask reads them at their built-in values marked not provided, so the table gains that row
+
+# implement
 
 ## change
 
@@ -167,14 +354,19 @@ The operating system then holds the boundary.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index src/quack src/q src/modules/migration spec/config
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the bus, the placed process, the standing file, the store's Up and Value, quack io, the processes slice and its tracked mode; the lint runs over those paths, since the one fault left in the tree stands in the placements ticket's approach, which its gate fixes
+- every door the change reaches has a fake: the bus runs in memory on loopback in each case, and the fake IO process is the test binary run again
+- a comment names the approach the change implements: each new function points at the model's chapter or this ticket
+- every fact the change adds stands in one place: the bus subjects and spans stand as named constants in bus.go and io.go, and the slice's modes in migration.go
 
 ## tests-green
 
@@ -183,27 +375,58 @@ The operating system then holds the boundary.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/bus_test.go src/index/standing_test.go src/quack/io_test.go src/modules/migration/migration_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index runs a NATS server inside itself on loopback, with a token, and the standing file names its port and the token. A placed process is a command the index spawns with the bus in its environment: it lands each commit the process publishes as the instance's writer, marks the instance down when the process exits, so its names read their built-in values marked not provided, and the next commit clears the mark. quack io dials the bus and runs the wiring's IO instances, publishing each commit and beating its lease. Under the processes slice's shadow, which the tracked file now sets, the index spawns quack io beside its own IO starts and weighs each value it publishes against the store's, after a settle span, writing a shadow row for each value apart. The weigh reads a name's newest value alone and skips the session log it writes, since the first live run fed its own rows back into a loop. The listeners stay in the index until the switch. The kill cases stand in src/index/procs_test.go beside the placements ticket red cases, so the test verb leaves that file out until those turn green, and go test -run KilledFakeIO and RestartedProcess passes them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the bus, the placed process, the standing file, the store, quack io, the processes slice, its tracked mode and its projections
+- every door the change reaches has a fake: the bus runs in memory on loopback in each case, and the fake IO process is the test binary run again
+- a comment names the approach the change implements: each new function points at the model chapter or this ticket
+- every fact the change adds stands in one place: the subjects, spans and payload cap stand as named constants in bus.go and io.go, and the slice modes in migration.go
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The change's code in `src/index`, `src/q`, `src/quack` and `src/modules/migration` stands under the cases the tests-red step committed. The line below names them, so the commit door reads the tests the change carries:
+
+./RUNME.sh test src/index/bus_test.go src/index/procs_test.go src/index/standing_test.go src/q/start_test.go src/quack/io_test.go src/modules/migration/migration_test.go

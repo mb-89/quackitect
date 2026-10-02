@@ -424,6 +424,18 @@ func TestServingAnswersEveryOperationOfACaller(t *testing.T) {
 	}
 }
 
+func TestServingHandsOutTheDogHoldingTheIndexLease(t *testing.T) {
+	_, _, from, _ := manager(t)
+	served, err := Serving(from)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(served.Stop)
+	if lease, held := served.Dog.Lease(leasePart); !held || lease.Term != builtInLease {
+		t.Fatalf("the served dog holds %+v for the index, and wants its lease at the built-in term", lease)
+	}
+}
+
 // The row carries what the registration declares for a renderer. [[spec/tickets/the-work-view-gains-actions]]
 func TestANameRowCarriesItsLabelAndLook(t *testing.T) {
 	ix := catalogued(t)

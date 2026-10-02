@@ -371,6 +371,91 @@ func (s *Store) Down(instance string) error {
 	return nil
 }
 
+// The names an instance's providers read, off other instances. [[spec/design_output/model#the-placements]]
+func (s *Store) Inputs(instance string) []string {
+	seen := map[string]bool{}
+	for _, group := range s.groups {
+		one := s.active[group.name]
+		if one.instance != instance {
+			continue
+		}
+		for _, in := range one.inputs {
+			if owner := s.owner(in.name); owner == nil || owner.instance != instance {
+				seen[in.name] = true
+			}
+		}
+	}
+	return sortedKeys(seen)
+}
+
+// The names an instance provides. [[spec/design_output/model#the-placements]]
+func (s *Store) Outputs(instance string) []string {
+	seen := map[string]bool{}
+	for _, group := range s.groups {
+		if s.active[group.name].instance == instance {
+			seen[group.name] = true
+		}
+	}
+	return sortedKeys(seen)
+}
+
+// The value of each name, and of each concrete name a family among them holds. [[spec/design_output/model#the-placements]]
+func (s *Store) Values(names []string) map[string]any {
+	snap := s.Snapshot()
+	out := map[string]any{}
+	for _, name := range names {
+		if !keyed(name) {
+			out[name] = snap.Read(name)
+			continue
+		}
+		for held, at := range snap.values {
+			if matches(name, held) {
+				out[held] = at.value
+			}
+		}
+	}
+	return out
+}
+
+// Whether the name stands under the pattern, a family such as files/<path...> among them. [[spec/design_output/model#a-name]]
+func Matches(pattern, name string) bool { return matches(pattern, name) }
+
+func sortedKeys(seen map[string]bool) []string {
+	out := make([]string, 0, len(seen))
+	for name := range seen {
+		out = append(out, name)
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Clears the down mark of an instance whose process commits again. [[spec/design_output/model#a-process-ends]]
+func (s *Store) Up(instance string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	next := make(map[*registration]bool, len(s.down))
+	for held := range s.down {
+		if held.instance != instance {
+			next[held] = true
+		}
+	}
+	s.down = next
+	return nil
+}
+
+// Decodes a JSON body into the type the owner of name registers, so a commit off the bus lands typed. [[spec/design_output/model#a-message-carries-types]]
+func (s *Store) Value(name string, body []byte) (any, error) {
+	owner := s.owner(name)
+	if owner == nil {
+		return nil, fmt.Errorf("the catalog registers no %s", name)
+	}
+	value := reflect.New(owner.typ)
+	if err := json.Unmarshal(body, value.Interface()); err != nil {
+		return nil, fmt.Errorf("%s decodes as no %s: %w", name, owner.typ, err)
+	}
+	return value.Elem().Interface(), nil
+}
+
 // [[spec/design_output/model#the-index-resolves-in-passes]]
 func (one Snapshot) NotProvided(name string) bool {
 	owner := one.store.owner(name)

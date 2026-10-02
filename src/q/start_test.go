@@ -103,6 +103,62 @@ func TestAnInstanceThatRunsNowhereReadsTheBuiltInMarkedNotProvided(t *testing.T)
 	}
 }
 
+func TestAnInstanceUpAgainReadsItsValue(t *testing.T) {
+	w := Wiring{Instances: []Instance{{"tickets", "source"}}}
+	s, hands := started(t, w)
+	seed(t, s, hands["source"], "tickets/all", 5)
+	if err := s.Down("tickets"); err != nil {
+		t.Fatal(err)
+	}
+	if err := s.Up("tickets"); err != nil {
+		t.Fatalf("the up of tickets answers %v", err)
+	}
+	snap := s.Snapshot()
+	if got := snap.Read("tickets/all"); got != 5 || snap.NotProvided("tickets/all") {
+		t.Fatalf("tickets/all reads %v, marked not provided %v, once its instance stands up", got, snap.NotProvided("tickets/all"))
+	}
+	if value, err := s.Value("tickets/all", []byte("9")); err != nil || value != 9 {
+		t.Fatalf("9 decodes for tickets/all as %#v and %v", value, err)
+	}
+}
+
+func TestAnInstanceNamesItsInputsAndOutputs(t *testing.T) {
+	w := Wiring{
+		Instances: []Instance{{"tickets", "source"}, {"queue", "counter"}},
+		Wires:     map[string]string{"queue.rows": "tickets.all"},
+	}
+	s, _ := started(t, w)
+	if got := strings.Join(s.Inputs("queue"), ", "); got != "tickets/all" {
+		t.Fatalf("queue reads %q, and wants tickets/all", got)
+	}
+	if got := strings.Join(s.Outputs("queue"), ", "); got != "queue/count" {
+		t.Fatalf("queue provides %q, and wants queue/count", got)
+	}
+	if got := s.Inputs("tickets"); len(got) != 0 {
+		t.Fatalf("tickets reads %q, and reads nothing", got)
+	}
+}
+
+func TestSaveNamesSavesTheNamesItIsHanded(t *testing.T) {
+	w := Wiring{
+		Instances: []Instance{{"tickets", "source"}, {"queue", "counter"}},
+		Wires:     map[string]string{"queue.rows": "tickets.all"},
+	}
+	s, hands := started(t, w)
+	seed(t, s, hands["source"], "tickets/all", 5)
+	saved, err := s.SaveNames([]string{"tickets/all"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	other, _ := started(t, w)
+	if refused, err := other.Restore(saved); err != nil || len(refused) > 0 {
+		t.Fatalf("the restore refuses %v and %v", refused, err)
+	}
+	if got := other.Snapshot().Read("tickets/all"); got != 5 {
+		t.Fatalf("tickets/all restores as %v off %s", got, saved)
+	}
+}
+
 func TestTheDownOfAnInstanceTheWiringLoadsNowhereRefuses(t *testing.T) {
 	w := Wiring{Instances: []Instance{{"tickets", "source"}}}
 	s, _ := started(t, w)

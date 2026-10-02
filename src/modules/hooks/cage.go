@@ -30,6 +30,8 @@ const (
 	blockKind   = "block"
 	rowsKind    = "rows"
 	cageSlice   = "cage"
+	procsSlice  = "processes"
+	indexPart   = "index"
 	shadowLevel = "info"
 	stampLayout = "2006-01-02T15:04:05.000Z07:00"
 )
@@ -160,6 +162,33 @@ func (d *Door) shadows(post Post, said Answer) {
 	row := d.ShadowRowOf(Apart{Event: post.Event, Tool: textOf(post.E, "tool"), Old: old, New: now})
 	row["harness"] = harnessOf(post)
 	_ = d.from.Shadow(row)
+}
+
+// A guarded call reads the index's lease, and one past its term writes a shadow row, since the port answers while the loop hangs. The call passes on. [[spec/tickets/watchdogs-span-the-processes]]
+func (d *Door) readsHealth(post Post) {
+	if post.Event != toolEvent || d.from.Health == nil || d.from.Shadow == nil {
+		return
+	}
+	renewed, term, held := d.from.Health()
+	now, ends := d.now(), renewed.Add(term)
+	if !held || !now.After(ends) {
+		return
+	}
+	d.mu.Lock()
+	told := d.downSince.Equal(ends)
+	d.downSince = ends
+	d.mu.Unlock()
+	if told {
+		return
+	}
+	_ = d.from.Shadow(map[string]any{
+		"at":    now.UTC().Format(stampLayout),
+		"level": shadowLevel,
+		"kind":  shadowKind,
+		"said":  fmt.Sprintf("%s in shadow: the index's lease stands past its term since %s, and the call passes", procsSlice, ends.UTC().Format(stampLayout)),
+		"slice": procsSlice,
+		"part":  indexPart,
+	})
 }
 
 // The shadow row an Apart writes, so ./RUNME.sh log --kind shadow names it. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]

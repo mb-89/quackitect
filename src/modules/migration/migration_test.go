@@ -36,6 +36,16 @@ func TestTheLspSliceStandsOld(t *testing.T) {
 	t.Fatalf("the slices read %+v, and want lsp built in as old", slices)
 }
 
+// The processes slice takes old, shadow and new, built in as old, so a box with no tracked mode spawns no process. [[spec/tickets/the-doors-process-stands]]
+func TestTheProcessesSliceTakesThreeModes(t *testing.T) {
+	for _, one := range slices {
+		if one.key == ProcessesKey && one.mode == "old" && strings.Join(one.enum, ", ") == "old, shadow, new" && one.doc != "" {
+			return
+		}
+	}
+	t.Fatalf("the slices read %+v, and want processes built in as old, taking old, shadow and new", slices)
+}
+
 // The verbs slice stands switched over to new, so a box with no tracked mode runs every twin alone. [[spec/tickets/agents-call-quack-directly]]
 func TestTheVerbsSliceStandsNew(t *testing.T) {
 	for _, one := range slices {

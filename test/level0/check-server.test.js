@@ -186,6 +186,21 @@ test("the check is red where level zero does not run whole on a fresh box, and s
   assert.equal(ran, false, "a Windows box runs no dry session");
 });
 
+// [[spec/tickets/model-marks-io-names]]
+test("the delta keeps the blank context line a hunk ends on, and a refused diff hands none", () => {
+  const patch = "@@ -1,2 +1,2 @@\n-a\n+b\n \n";
+  const asked = [];
+  const proc = (exitCode) => ({
+    run: (args, opts) => {
+      asked.push([args, opts.cwd]);
+      return { exitCode, stdout: patch, stderr: "" };
+    },
+  });
+  assert.equal(check.deltaOf({ proc: proc(0) }, "/tree"), patch);
+  assert.deepEqual(asked[0], [["git", "diff", "HEAD", "--binary", "--no-renames"], "/tree"]);
+  assert.equal(check.deltaOf({ proc: proc(1) }, "/tree"), "");
+});
+
 // [[spec/tickets/level0-runs-on-the-door]]
 test("the battery runs level zero on a fresh box before the rules", async () => {
   const { partsOf } = await import("../../src/scripts/check-verb.js");

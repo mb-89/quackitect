@@ -573,6 +573,16 @@
           "default": false,
           "help": "Phase 9 switched over. true in the tracked file on main lets a cloud box take module-processes-switch-over. A write on this box turns nothing on in the cloud."
         },
+        "processes": {
+          "type": "string",
+          "default": "old",
+          "help": "The processes: old runs every module in the index alone, shadow spawns the IO process beside it and logs each value it reads apart, new runs the placements.",
+          "enum": [
+            "old",
+            "shadow",
+            "new"
+          ]
+        },
         "prose": {
           "type": "string",
           "default": "new",
@@ -657,6 +667,16 @@
           "default": 5,
           "help": "The todos the plan holds open, past which the third question stays away.",
           "unit": "todos"
+        }
+      }
+    },
+    "processes": {
+      "type": "object",
+      "properties": {
+        "placements": {
+          "type": "array",
+          "default": [],
+          "help": "the lists of module instances that share one process, where each instance in no list takes a process of its own"
         }
       }
     },

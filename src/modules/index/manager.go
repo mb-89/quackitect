@@ -64,6 +64,7 @@ func Registers(c *q.Catalog) q.Writer {
 		q.OutIn(c, DocsName, []DocRow{}, q.Doc("each name, action and key, with its doc"), q.Looks(q.Rows)),
 		q.CfgIn(c, "watchdog/beat", int(builtInBeat/time.Second), q.Doc("the seconds between two ticks of the manager")),
 		q.CfgIn(c, "watchdog/lease", int(builtInLease/time.Second), q.Doc("the seconds the index's own lease holds past a renewal")),
+		q.CfgIn(c, "processes/placements", [][]string{}, q.Doc("the lists of module instances that share one process, where each instance in no list takes a process of its own")),
 	)
 }
 
@@ -96,6 +97,8 @@ func Serves(from Outside) (stop func(), call func(name string, input any, caller
 
 // What a start answers: its stop, the call an action takes through it, and every operation of a caller. [[spec/tickets/the-hooks-door-lands]]
 type Served struct {
+	// The dog every placed process's lease stands with. [[spec/tickets/watchdogs-span-the-processes]]
+	Dog  *Dog
 	Stop func()
 	Call func(name string, input any, caller string, wait time.Duration) (Answer, error)
 	Of   func(caller string) []Op
@@ -113,7 +116,7 @@ func Serving(from Outside) (Served, error) {
 			return nil, fmt.Errorf("no IO module accepts %s.%s", asked.Module, asked.Verb)
 		}
 	}
-	return Served{Stop: one.stops, Of: one.book.Of, Call: func(name string, input any, caller string, wait time.Duration) (Answer, error) {
+	return Served{Dog: one.dog, Stop: one.stops, Of: one.book.Of, Call: func(name string, input any, caller string, wait time.Duration) (Answer, error) {
 		return Call(one.book, from.Store, name, input, caller, wait, accept)
 	}}, nil
 }

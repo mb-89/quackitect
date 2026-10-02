@@ -32,6 +32,9 @@ const CageKey = "cage"
 // The key of the lsp slice, the LSP's rules the check module answers beside it, by its local name. [[spec/tickets/lsp-rules-move-to-check]]
 const LspKey = "lsp"
 
+// The key of the processes slice, where the IO process and the module processes run, by its local name. [[spec/tickets/the-doors-process-stands]]
+const ProcessesKey = "processes"
+
 // The modes a slice takes before it switches over. [[spec/tickets/the-config-schema-gets-generated]]
 var modes = []string{"old", "shadow", "new"}
 
@@ -51,6 +54,7 @@ var slices = []struct {
 	{WindowKey, "new", "The window, switched over in phase 6. It draws the index's reads alone.", []string{"new"}},
 	{SidebarKey, "old", "The sidebar: old draws its own groups alone, shadow weighs the views section against them and logs each pair apart, new draws the views section.", modes},
 	{LspKey, "old", "The LSP's rules: old answers on the LSP's own sweep alone, shadow runs the check module's sweep beside it and logs each finding apart, new answers the module's.", modes},
+	{ProcessesKey, "old", "The processes: old runs every module in the index alone, shadow spawns the IO process beside it and logs each value it reads apart, new runs the placements.", modes},
 }
 
 // Every phase switch, what the phase holds, and the ticket a cloud box takes once it reads true on main. [[spec/tickets/the-config-schema-gets-generated]]
