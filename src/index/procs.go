@@ -68,17 +68,19 @@ type Placements struct {
 }
 
 // Waits until every instance answers what it was sent, an exit counting as an answer, or the wait passes. So a read after a commit reads what the processes compute off it. [[spec/tickets/the-split-deployment-takes-over]]
+// The timer marks the wait spent under the lock it wakes, so no clock read between the two leaves the reader waiting on a broadcast that already went. [[spec/tickets/settle-timer-races-deadline]]
 func (p *Placements) Settle(wait time.Duration) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	spent := false
 	timer := time.AfterFunc(wait, func() {
 		p.mu.Lock()
+		spent = true
 		p.idle.Broadcast()
 		p.mu.Unlock()
 	})
 	defer timer.Stop()
-	ends := time.Now().Add(wait)
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	for len(p.pending) > 0 && !p.stopped && time.Now().Before(ends) {
+	for len(p.pending) > 0 && !p.stopped && !spent {
 		p.idle.Wait()
 	}
 }

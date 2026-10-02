@@ -255,6 +255,24 @@ func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
 	}
 }
 
+// A settle on a process that never answers ends at its wait, every time. [[spec/tickets/settle-timer-races-deadline]]
+func TestASettleOnASilentProcessEndsAtItsWait(t *testing.T) {
+	store, _, bus, placed := doublerPlaced(t)
+	placements := NewPlacements(bus, store, []Placed{placed})
+	stop, err := placements.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	for range 200 {
+		began := time.Now()
+		placements.Settle(time.Millisecond)
+		if gone := time.Since(began); gone > time.Second {
+			t.Fatalf("a settle of a millisecond on the silent doubler holds for %v", gone)
+		}
+	}
+}
+
 func TestAPlacementRestartsTheProcessesOfOneTopic(t *testing.T) {
 	store, placements, stop := placedTwo(t)
 	defer stop()
