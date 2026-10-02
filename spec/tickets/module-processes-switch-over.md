@@ -91,6 +91,7 @@ record:
   - step: sync
     hand: box 09eeff3afa7c · claude-code-remote
     hash_before: 6f6790863026f71fd441b6ca2eac17f1d824f909
+    hash_after: db39bc3e93b56e28a116b3298197ab31a5d61945
   - step: sync
     hand: box 09eeff3afa7c · claude-code-remote
     hash_before: 6f6790863026f71fd441b6ca2eac17f1d824f909
@@ -186,7 +187,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
-cloud: true
 reason: done
 ---
 
