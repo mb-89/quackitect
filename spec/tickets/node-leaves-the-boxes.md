@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -186,6 +186,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 8660371826a7a9b4790ee5d4d26a1d94a076c3e1
+    hash_after: 8660371826a7a9b4790ee5d4d26a1d94a076c3e1
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
 cloud: true
@@ -275,38 +287,64 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the merge from main resolves three conflicts, and one batch reader keeps the Go past veto alone
+- setup-verb-stands-red: the setup verb carries the install's JavaScript steps, with cases on fake doors
+- the-verbs-leave-node: the port goes to the owner as the-verbs-port-takes-a-phase
+- install-drops-node: the installer names no node, and hands its JavaScript steps to the setup verb
+- the proc door's start takes an input its program leaves unread
+- the second sync drops the tense test with its module
+- the accept gate mints five points over two rounds, and each closes
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the commit verb's check names each fault before a push, so no red commit reaches origin
+- the fake doors carry the setup cases, so each runs in memory
+- a second reader at the accept gate finds gaps the author's own cases miss
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 17:20 UTC: the take's push comes back refused until a check runs on the box
+- 17:42 UTC: the first commit of the setup verb meets the home-path rule, then the folder-owner rule, and costs two more checks
+- 18:05 UTC: a regex op in the patch reads each dollar sign as a capture group and blanks the hand-off block
+- 18:08 UTC: a check meets an EPIPE under load in a case the change never touches
+- the pull tool over the bridge answers nothing, so every hand-back runs through the shell
+- no owner prompt reaches this run, since a schedule starts it
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the patch door's regex op names the dollar escape in its description, in the level0 plugin
+- the work skill names the check before the first take, in the work skill
+- the bridge registers a hook answering index_ticket_pull, in the level0 plugin
+- the proc door's start keeps its stdin guard, with the contract case beside it
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The red cases from tests-red planned the moved steps as sh, and the gate's point planned them as a JavaScript verb. The verb won, because a fake door tests it and a shell script takes no test. The verb port is the owner's call, since it adds a migration phase.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact the change adds stands once, and the vale-ls copy in the installer names its owner beside it
+- the cmd exit for a missing command carries a name at the top of the setup verb
+- the setup verb's header says what the file is for, and counts nothing
+- the bad lines carry the run's errors with their times, and no owner prompt reaches this run
+- the chapter names roles alone, and carries no name, address or path of the box
 
 ## cloud
 
