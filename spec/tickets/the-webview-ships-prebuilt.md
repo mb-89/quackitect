@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: node-leaves-the-boxes
+record:
+  - step: design/draft
+    hand: box 77f4c295c43a · claude-code-remote
+    hash_before: 0c0ed9c7d1e03f8d7b1fe003d3b64ae840a9b63a
+    hash_after: 0c0ed9c7d1e03f8d7b1fe003d3b64ae840a9b63a
+    inputs:
+      - name: ask
+        hash: 3fb4091882eab748
+        size: 178
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -145,32 +155,61 @@ A box then needs no Node to draw the route.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The drawing lands in git, in a folder of the extension, and no box bundles it.
+
+- `OUT` in `src/scripts/bundle.js` moves to `src/extension/drawing/route.mjs`, and esbuild writes `route.css` beside it.
+- `bundle` stamps a banner line naming a hash of the sources it reads: every file under `webview/route` and the webview's lock file.
+- `stampOf` in `bundle.js` computes that hash, and `fresh` replaces `bundled`: the shipped banner names the hash the sources give now.
+- `insetDoor` in `src/extension/editor-inset.js` reads the drawing off `context.extensionUri`, and the resource roots narrow to the extension alone.
+- The `drawing` item leaves `src/scripts/install.sh`, with `drawing_here`, `get_drawing` and its rows under `wanted`, `missed`, `here`, `why` and `get`.
+- The case in `test/contract/install.test.js` names the browser alone, and `drawing-page.test.js` loads the shipped bundle and builds nothing.
+- A line in `.gitattributes` marks the folder as generated, so a diff view folds it.
+- `spec/design_output/drawing.md` follows.
+
+Weighed: the bundle takes `.mjs`. It is built output, and the rules over hand-written `src/**/*.js` read it nowhere: the test-first rule, the source spells and Biome. The stamp holds it to its sources in their place. A `.js` name costs an exemption in each rule's own list.
+
+Weighed: the page test and the bundle test run where a maintainer installs the webview's modules by hand, and skip elsewhere. The stamp case runs on every box, so a stale bundle meets the check.
+
+Assumed: a webview serves `.mjs` as JavaScript, and the bundle stays a classic script.
+
+The `browser` item stays for [[spec/tickets/install-drops-node]].
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/extension/editor-inset.js`: `insetDoor` reads `DRAWING`
+- `src/scripts/install.sh`: `drawing_here` and `get_drawing` run `bundle.js`
+- `test/contract/drawing-page.test.js`: the `before` hook calls `bundled`, `bundle` and `OUT`
+- `test/contract/drawing-bundle.test.js`: the stub case calls `bundle`
+- `test/contract/install.test.js`: the case naming the drawing and the browser as wants
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/contract/drawing-shipped.test.js`: git tracks the drawing the inset loads, and its banner names the hash of the sources it reads
+- `test/contract/install.test.js`: the install resolves a browser as a want, and bundles no drawing
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I open `bundle.js`, `editor-inset.js`, `install.sh` and both drawing tests, and each name stands where the draft says
+- a search for `bundle.js`, `bundled`, `OUT` and the runtime drawing folder over `src`, `test` and `.claude` gives the callers list
+- the fresh-clone line rides the shipped case, and the check decides the second
 
 ## tests-red
 
