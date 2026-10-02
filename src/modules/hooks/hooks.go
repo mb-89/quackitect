@@ -169,6 +169,8 @@ type Door struct {
 	heldIn map[string]string
 	// The material of each review in flight, under the token its spawn's back names. [[spec/tickets/review-spawns-off-the-door]]
 	reviews map[string]review.Material
+	// The end of the index lease a shadow row already names, so one silence writes one row. [[spec/tickets/health-row-once-a-silence]]
+	downSince time.Time
 }
 
 // One line of a recording whose answer differs from the door's. [[spec/design_output/model#an-inbound-fake-replays]]

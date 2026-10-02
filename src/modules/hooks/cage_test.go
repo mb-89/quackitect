@@ -293,6 +293,25 @@ func TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown(t *testing.T) {
 	}
 }
 
+func TestTwoGuardedCallsInOneSilenceWriteOneRow(t *testing.T) {
+	one := doorOver(t, &calls{}, &book{})
+	var rows []map[string]any
+	one.door.from.Shadow = func(row map[string]any) error {
+		rows = append(rows, row)
+		return nil
+	}
+	one.door.from.Health = func() (time.Time, time.Duration, bool) { return fixed.Add(-time.Minute), 30 * time.Second, true }
+	post := Post{Event: "tool.call", E: map[string]any{"tool": "Bash", "command": "ls", "description": "a-ticket: list", "session_id": "s1"}}
+	for range 2 {
+		if _, err := one.door.Hook(post); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(rows) != 1 {
+		t.Fatalf("two calls in one silence write %d row(s), and want one", len(rows))
+	}
+}
+
 // A live post the door decides as the old path did writes no row. [[spec/tickets/copilot-meets-the-hooks-door]]
 func TestALivePostDecidedAlikeWritesNothing(t *testing.T) {
 	one := doorOver(t, &calls{}, &book{})

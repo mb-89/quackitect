@@ -174,6 +174,13 @@ func (d *Door) readsHealth(post Post) {
 	if !held || !now.After(ends) {
 		return
 	}
+	d.mu.Lock()
+	told := d.downSince.Equal(ends)
+	d.downSince = ends
+	d.mu.Unlock()
+	if told {
+		return
+	}
 	_ = d.from.Shadow(map[string]any{
 		"at":    now.UTC().Format(stampLayout),
 		"level": shadowLevel,
