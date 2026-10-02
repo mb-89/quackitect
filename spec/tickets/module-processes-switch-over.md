@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -175,9 +175,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 4ad1b4ec2d0754970c63106a8b220d75673e9e86
+    hash_after: 4ad1b4ec2d0754970c63106a8b220d75673e9e86
+    inputs:
+      - name: retro/write
+        hash: 7a833aed473e2cc4
+        size: 3204
+    def: 4da1ca5da87d5bbc
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -323,20 +333,28 @@ Most of the hour went to the doors around the work, and little to the work. The 
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: the install ran whole, and every host the run reached answered
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the hold guard at 09:36: a release push waits for work.staleAfter, so the box pushed first at 10:54
+- the shell guard at 09:40 and 09:58: the index stood down, and serve brought it back each time
+- the cold probe's canary at 10:28, which failed once and passed on the retry
+- a contract test at 10:58 that failed once under branch review alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step: the group's children all close done
+- no ticket minted outside the group
+- the handover: the branch stands at done, and its pull request against main carries auto-merge
 
 # Discussion
 
