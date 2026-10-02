@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: node-leaves-the-boxes
 parent: node-leaves-the-boxes
+record:
+  - step: do
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 1117284d87e8431755970032be4e7d0607bd780e
+    hash_after: 0a51768e28d26d4f60731b034095838114a2dff6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "   88.0  in all"
+    inputs:
+      - name: ask
+        hash: 3ceee18367d832f5
+        size: 145
+    def: 22963c491c71f419
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ a code --list-extensions exiting non-zero reads as here in setup.js. A spawn fai
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/setup.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The setup reads a code list that exits past zero as an empty list. So the extensions read as missing, and the setup installs them, as the old installer did. A box with no code on the PATH still skips them.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the point the accept gate names
+- the change reveals no cleanup past itself
+- the case names the claim once, beside the line it holds
 
 # Discussion
 
