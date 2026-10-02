@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -163,6 +163,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: a866df80b6e90e176734d9ef5968170230fb6231
+    hash_after: a866df80b6e90e176734d9ef5968170230fb6231
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
 cloud: true
@@ -242,38 +254,67 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-split-deployment-takes-over: the change and tests-green leaves passed, and the group switch stands closed
+- kill-case-drives-live-split: a case kills guidance under ioProcesses, and tickets answers on with no restart
+- mid-run-commit-clears-early: the placements number each run, and a commit clears the wait only off an ask covering the last run
+- quack-io-answers-no-run: ioProcesses refuses an IO instance on a wire, and a case holds the tracked wiring clean
+- live-split-raises-the-alarm: two crashes of guidance under a real dog raise its alarm
+- settle-timer-races-deadline: Settle ends on the timer's own flag
+- start-refuses-wired-io: a case drives the guard through ioProcesses
+- one-reading-flakes-under-load: dropped, since it failed once in code this branch leaves alone
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a TestMain routing the io and module verbs to main let a test drive the real split, with no binary build
+- a pid file each spawn leaves let the cases kill one process and read a restart
+- an independent review at the accept found two real faults the box had read past
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 09:36: the release committed the handover, and the push door refused it, since the hold reads stale only past work.staleAfter. The box worked an hour on local commits
+- 09:40 and 09:58: the index answered nothing, and the guard refused every shell call until serve brought it back
+- 09:45: the engine refused calls, ToolSearch among them, until a plan stood, so the plan tool ran before its schema loaded
+- 10:17 and 11:28: the pull handed out nothing while the plan named the ticket it was to hand, and the box cleared the plan file through the door
+- 10:28: the cold probe's canary failed once on a commit, and the retry passed
+- 10:58: the one-reading contract test failed once under branch review, and passed on every run since
+- 10:20: the hand-back refused a go test line as tests evidence, and branch test answered missing for a commit made before the leaf
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- src/scripts/prepush.js: a release commit the dispatch orders moves the hold at once, or the dispatch hands a branch over only past work.staleAfter
+- src/scripts/pull.js: a working entry naming an open leaf of the group hands that leaf out
+- the plans module: an empty working clears the entry
+- the index: each death writes a row naming its cause, so the next box reads why
+- spec/design_output/pull#the-test-verb: the tests field says it takes branch test, with files named where the commit predates the leaf
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+Most of the hour went to the doors around the work, and little to the work. The code changes stand small, and each child closed in a few calls. The hold, the plan and the dead index each stopped the box with a refusal that named a cure, and every cure worked. The review at the accept earned its cost: the settle race and the missing alarm case are faults the box's own reading passed.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: each fix links its ticket, and the retro points at homes
+- no number past the times the errors carry
+- no header changes in this chapter
+- the run took no owner prompt past the dispatch at its start, and each error carries its time
+- the chapter names roles and holds no path of the box
 
 ## cloud
 
