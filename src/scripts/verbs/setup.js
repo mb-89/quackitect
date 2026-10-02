@@ -96,7 +96,7 @@ function editorHere(it) {
 function listedOf(it) {
   try {
     const said = it.proc.run(["code", "--list-extensions"]);
-    if (said.exitCode !== 0) return null;
+    if (said.exitCode !== 0) return [];
     return said.stdout.toLowerCase().split(/\r?\n/).map((one) => one.trim());
   } catch {
     return null;

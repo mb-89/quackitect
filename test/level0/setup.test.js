@@ -91,6 +91,21 @@ test("the setup writes the survey, then runs the Copilot setup and the brand", (
   );
 });
 
+// A box with no code on the PATH skips the extensions, and a code that answers an error still installs them. [[spec/tickets/code-failure-reads-missing]]
+test("a code list exiting past zero reads as missing, and the setup installs the extensions", () => {
+  const it = itOf(
+    { [CLIENT]: "{}", [TOOLS]: "{}" },
+    { node: { exitCode: 0 }, "code --list-extensions": { exitCode: 1 }, code: { exitCode: 0 } },
+  );
+
+  setup(it, []);
+
+  const lines = it.proc.ran.map(lineOf);
+  for (const id of EXTENSIONS) {
+    assert.ok(lines.includes(`code --install-extension ${id} --force`), `${id} installs`);
+  }
+});
+
 // The setup runs before every verb, so a step that stops says a warning and the next one runs. [[spec/design_output/copilot#setup-and-discovery]]
 test("a Copilot setup that stops says a warning, and the brand still runs", () => {
   const it = itOf({ [CLIENT]: "{}", [TOOLS]: "{}" }, { ...HELD, node: failing("copilot.js") });
