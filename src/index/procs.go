@@ -62,6 +62,9 @@ type Placements struct {
 	idle    *sync.Cond
 	// The instances whose process exited and commits nothing since, so a run sent there holds no reader. [[spec/tickets/the-split-deployment-takes-over]]
 	gone map[string]bool
+	// The runs sent each instance, and how many of them its last inputs ask covered, so a commit answering an earlier run clears no wait a later run holds. [[spec/tickets/mid-run-commit-clears-early]]
+	sent    map[string]int
+	covered map[string]int
 }
 
 // Waits until every instance answers what it was sent, an exit counting as an answer, or the wait passes. So a read after a commit reads what the processes compute off it. [[spec/tickets/the-split-deployment-takes-over]]
@@ -80,16 +83,19 @@ func (p *Placements) Settle(wait time.Duration) {
 	}
 }
 
-// Clears the instance's wait once its process commits or exits, and marks it gone on an exit until it commits again. [[spec/tickets/the-split-deployment-takes-over]]
+// Clears the instance's wait once its process exits, or commits off an ask covering every run sent, and marks it gone on an exit until it commits again. [[spec/tickets/the-split-deployment-takes-over]] [[spec/tickets/mid-run-commit-clears-early]]
 func (p *Placements) answered(instance string, up bool) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	delete(p.pending, instance)
 	if up {
 		delete(p.gone, instance)
 	} else {
 		p.gone[instance] = true
 	}
+	if up && p.covered[instance] < p.sent[instance] {
+		return
+	}
+	delete(p.pending, instance)
 	p.idle.Broadcast()
 }
 
@@ -104,7 +110,7 @@ const spawnGap = 250 * time.Millisecond
 
 // [[spec/design_output/model#the-placements]]
 func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	p := &Placements{bus: bus, store: store, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}}
+	p := &Placements{bus: bus, store: store, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}, gone: map[string]bool{}, sent: map[string]int{}, covered: map[string]int{}}
 	p.idle = sync.NewCond(&p.mu)
 	p.placed = make([]Placed, len(placed))
 	for i, one := range placed {
@@ -209,6 +215,7 @@ func (p *Placements) runs(peer *Peer, inputs map[string][]string, values map[str
 		for _, name := range read {
 			p.moved[instance][name] = true
 		}
+		p.sent[instance]++
 		if !p.gone[instance] {
 			p.pending[instance] = true
 		}
@@ -228,6 +235,7 @@ func (p *Placements) answer(instance string, inputs []string, moved bool) []stri
 	defer p.mu.Unlock()
 	held := p.moved[instance]
 	delete(p.moved, instance)
+	p.covered[instance] = p.sent[instance]
 	if !moved {
 		return inputs
 	}
