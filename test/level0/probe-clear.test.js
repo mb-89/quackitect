@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { RESUME } from "../../src/bridge/handover.js";
-import { clearHeld } from "../../src/scripts/probe-clear.js";
+import { clearHeld, ENDS } from "../../src/scripts/probe-clear.js";
 
 const FELL = { kind: "hook", said: "the clear the handover asks for fails", detail: "refused" };
 
@@ -19,6 +19,11 @@ function run(over = {}) {
     },
   };
 }
+
+// [[spec/tickets/the-clear-runs-live-remote]]
+test("the probe raises the Stop before the turn's completion, the order the live host names", () => {
+  assert.deepEqual(ENDS, ["classic.Stop", "turn.complete"]);
+});
 
 test("a /clear followed by the resume prompt passes the clear", () => {
   assert.equal(clearHeld([], run()).pass, true);

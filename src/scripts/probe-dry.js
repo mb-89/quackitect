@@ -19,6 +19,8 @@ const EVENT_WAIT = 240_000;
 // The owner's prompt reaches the hook as the client's composer sends it. [[spec/design_output/level0#which-prompt-opens-a-turn]]
 const OWNER = { kind: "composer" };
 const STREAMS = new Set(["turn.step"]);
+// The one hook the host runs a plugin's command from. [[spec/tickets/the-clear-runs-live-remote]]
+const TURN_END = "turn.complete";
 // The statuses a post answers with where it lands. [[spec/tickets/level0-runs-on-the-door]]
 const OK_FROM = 200;
 const OK_PAST = 300;
@@ -52,7 +54,7 @@ export async function probeDry(root, it, say = console.log, delta = "") {
 export function harnessOf(it, tree, env) {
   const at = (rel) => (String(rel).startsWith("/") ? String(rel) : it.join(tree, rel));
   const seen = { registered: [], said: [], posts: [], held: [], commands: [], prompts: [], depth: 0 };
-  // The client queues a plugin's command and prompt until the session stands idle, so a hook the turn waits on meets a refusal. [[spec/tickets/the-clear-continues-the-session]]
+  // The client refuses a plugin's command and prompt inside a hook the turn waits on, and lets the turn's completion run them, as the live host says. [[spec/tickets/the-clear-runs-live-remote]]
   const idle = (call) => {
     if (seen.depth > 0) throw new Error(`${call} rejects inside a hook the turn is waiting on`);
   };
@@ -164,11 +166,12 @@ async function session(it, tree) {
   const loaded = await import(fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE)));
   const engine = engineOf(loaded.register, {});
   const raise = async (event, e, last = async (said) => ({ passed: said }), origin) => {
-    seen.depth += 1;
+    const holds = event === TURN_END ? 0 : 1;
+    seen.depth += holds;
     try {
       return await bounded(engine.raise($, event, e, last, origin), EVENT_WAIT);
     } finally {
-      seen.depth -= 1;
+      seen.depth -= holds;
     }
   };
 

@@ -172,6 +172,14 @@ test("the harness reads the clone's files, records each post and tool, and hands
   await $.tool.register({ name: "find" });
   seen.held.push({ role: "assistant", id: "a1", text: "said" });
 
+  seen.depth = 1;
+  await assert.rejects($.command.run({ command: "clear" }), /inside a hook the turn is waiting on/);
+  seen.depth = 0;
+  await $.command.run({ command: "clear" });
+  await $.prompt.submit({ text: "resume" });
+  assert.deepEqual(seen.commands, ["clear"], "a command runs outside a hook the turn holds");
+  assert.deepEqual(seen.prompts, ["resume"]);
+
   assert.deepEqual(seen.posts, [{ url: "http://127.0.0.1:1/hook", event: "tool.call" }]);
   assert.deepEqual(seen.registered, ["find"]);
   assert.deepEqual(await $.session.messages(), [{ role: "assistant", id: "a1", text: "said" }]);

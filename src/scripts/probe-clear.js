@@ -20,8 +20,8 @@ const ANSWER = "The handover stands, and the clear ends this turn.";
 // The ticket the probe's own work branch carries, so the pull reads a group still open whatever the clone stands on. [[spec/tickets/the-clear-runs-live-remote]]
 const GROUP = "dry-probe-clears";
 
-// The turn's two ends, in the order the probe raises them. The design reads both orders. [[spec/design_output/stop#the-hold-outlives-its-drop]]
-export const ENDS = ["turn.complete", "classic.Stop"];
+// The turn's two ends, in the order the live host names: the Stop, then the turn's completion. [[spec/tickets/the-clear-runs-live-remote]]
+export const ENDS = ["classic.Stop", "turn.complete"];
 
 // The session runs on past the key: due, the handover ticket, the clear ticket, and the turn's end. [[spec/tickets/the-clear-continues-the-session]]
 export async function clearRun(it, tree, raise, seen, env) {

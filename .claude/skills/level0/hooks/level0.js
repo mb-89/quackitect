@@ -18,6 +18,7 @@ import {
   refusedText,
   stepOf,
 } from "./cage.js";
+import { CLEAR_FALLBACK_MS, holdsClear, takesClear } from "./clear.js";
 import { APPEND, merged, slim } from "./shape.js";
 import {
   cageText,
@@ -83,6 +84,9 @@ export function register(on, options) {
   toldDown = false;
   port = PORT;
   cage = null;
+  takesClear();
+  // It wraps the door road, so a clear the turn's own hooks leave waiting runs once they answer. [[spec/tickets/the-clear-runs-live-remote]]
+  on("turn.complete", clearsAtTurnEnd);
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -401,15 +405,26 @@ async function fillOf($, event, e) {
   }
 }
 
-// The turn the handover ends: the turn completes, the conversation clears, and the prompt opens the next one, which reads the handover. [[spec/design_output/stop#the-context-hands-over]]
+
+// The turn the handover ends: the event goes on, and the conversation clears at the turn's completion, or on a timer where it came first. [[spec/tickets/the-clear-runs-live-remote]]
 async function clears($, answer, e, next) {
   const out = await next(e);
-  // The client refuses a command inside a hook the turn waits on, so the clear runs in a dispatch of its own, once the session stands idle. [[spec/tickets/the-clear-continues-the-session]]
-  $.clock.after(0, () => cleared($, String(answer.clear?.prompt ?? ""), next.event));
+  holdsClear(String(answer.clear?.prompt ?? ""));
+  if (next.event === "turn.complete" && !e?.agentId) await cleared($, "turn.complete");
+  else $.clock.after(CLEAR_FALLBACK_MS, () => cleared($, "clock.after"));
   return out;
 }
 
-async function cleared($, prompt, event) {
+// The main agent's turn completes, the hooks inside it answer, and a clear left waiting runs. [[spec/tickets/the-clear-runs-live-remote]]
+async function clearsAtTurnEnd($, e, next) {
+  const out = await next(e);
+  if (!e?.agentId) await cleared($, "turn.complete");
+  return out;
+}
+
+async function cleared($, from) {
+  const prompt = takesClear();
+  if (prompt === null) return;
   try {
     await $.command.run({ command: "clear" });
     await $.prompt.submit({ text: prompt });
@@ -417,7 +432,7 @@ async function cleared($, prompt, event) {
     await wrote($, {
       level: "warn",
       said: "the clear the handover asks for fails",
-      event: String(event ?? ""),
+      event: from,
       detail: String(error?.message ?? error),
     });
   }
