@@ -109,4 +109,5 @@ The standing hang did not reproduce on this box. It follows from the doubled ind
 <!-- what anybody adds, at any time, on this ticket -->
 
 - The ten-minute run found two causes beside the three the ask names. A module process computed names other instances own, off defaults. A file value differed in its `changed` stamp alone.
+- After the pass, a check's probe file wrote one more row: the IO process held the file's text, the store held none. Each commit's weigh took its newest mark inside its own goroutine, so a removal the bus handed second could mark first. `src/quack/io.go` now marks in `heard`, in the order the bus hands each commit.
 - The box pushed nothing before the pass: the commit verb pushes `main` alone from here, and the gate refuses it. A verb that pushes the work branch before the pass closes that gap.

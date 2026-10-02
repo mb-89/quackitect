@@ -242,7 +242,11 @@ func ioShadow(root string, store *q.Store, open doors, dog *manager.Dog) (*index
 	for _, one := range instances {
 		held[one] = q.Writer{}
 	}
-	heard := func(_ string, values map[string]json.RawMessage) { go weighs.weigh(values) }
+	// The mark lands before the goroutine, so a value the bus hands later stands newer whatever goroutine runs first. [[spec/tickets/process-shadow-reads-clean]]
+	heard := func(_ string, values map[string]json.RawMessage) {
+		names, marks := weighs.marks(values)
+		go weighs.weighs(values, names, marks)
+	}
 	if len(instances) > 0 {
 		placed = append(placed, index.Placed{Name: ioPart, Command: []string{self, ioVerb}, Instances: held, Restart: ioRestart})
 	}
@@ -347,6 +351,12 @@ func (s *sends) still(name string, at int64) bool {
 
 // Weighs each value the IO process commits against the store's, once the span passes, and again each span while the two stand apart and the patience lasts. It writes a shadow row for each value still apart past the patience, and none for a value a newer one follows. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]] [[spec/tickets/process-shadow-reads-clean]]
 func (s shadows) weigh(values map[string]json.RawMessage) {
+	names, marks := s.marks(values)
+	s.weighs(values, names, marks)
+}
+
+// The names a commit weighs, its own log aside, each marked as the newest of its name. [[spec/tickets/process-shadow-reads-clean]]
+func (s shadows) marks(values map[string]json.RawMessage) ([]string, map[string]int64) {
 	names := make([]string, 0, len(values))
 	for name := range values {
 		if name != shadowsOwnLog {
@@ -354,7 +364,11 @@ func (s shadows) weigh(values map[string]json.RawMessage) {
 		}
 	}
 	sort.Strings(names)
-	marks := s.newest.mark(names)
+	return names, s.newest.mark(names)
+}
+
+// Weighs the names marked, and skips each a newer mark follows. [[spec/tickets/process-shadow-reads-clean]]
+func (s shadows) weighs(values map[string]json.RawMessage, names []string, marks map[string]int64) {
 	for waited := time.Duration(0); len(names) > 0; {
 		s.wait(s.settle)
 		waited += s.settle

@@ -328,6 +328,27 @@ func TestAFileValueReadsByItsHashAndText(t *testing.T) {
 	}
 }
 
+// A value the bus hands first weighs nothing once a later one stands marked, even where its weigh runs last, so a file made and removed at once writes no row. [[spec/tickets/process-shadow-reads-clean]]
+func TestTheShadowWeighsInTheOrderTheBusHands(t *testing.T) {
+	var rows []map[string]any
+	weighs := shadows{
+		read:   func(string) any { return q.Content{} },
+		settle: time.Second,
+		wait:   func(time.Duration) {},
+		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
+		newest: &sends{at: map[string]int64{}},
+	}
+	made := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"h","text":"a"}`)}
+	gone := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"","text":""}`)}
+	madeNames, madeMarks := weighs.marks(made)
+	goneNames, goneMarks := weighs.marks(gone)
+	weighs.weighs(gone, goneNames, goneMarks)
+	weighs.weighs(made, madeNames, madeMarks)
+	if len(rows) != 0 {
+		t.Fatalf("the shadow writes %v off the file's first value, which the removal follows", rows)
+	}
+}
+
 // A value a newer one of its name follows weighs nothing, and the weigh skips the log the shadow writes, so its own rows start no loop. [[spec/tickets/the-doors-process-stands]]
 func TestTheShadowWeighsTheNewestValueAloneAndNotItsOwnLog(t *testing.T) {
 	var rows []map[string]any
