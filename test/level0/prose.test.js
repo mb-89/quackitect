@@ -15,7 +15,8 @@ const box = (found = []) => ({
     stands: () => true,
     lint: async () => ({ ran: true, found }),
   },
-  disk: { exists: (path) => path.endsWith(BIN), read: () => "" },
+  // The reader joins the binary under the root, so a Windows box reads back slashes. [[spec/tickets/go-prose-checks-stand-alone]]
+  disk: { exists: (path) => path.replaceAll("\\", "/").endsWith(BIN), read: () => "" },
   // quack prose keeps every finding it reads, so the tool's own answer speaks. [[spec/tickets/go-prose-checks-stand-alone]]
   proc: {
     run: (_argv, { stdin }) => ({

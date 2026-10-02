@@ -2,6 +2,7 @@
 // [[spec/tickets/setup-verb-stands-red]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { EXTENSIONS } from "../../.claude/skills/level0/lib/servers.js";
@@ -10,6 +11,8 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import { setup } from "../../src/scripts/verbs/setup.js";
 
 const ROOT = "/tree";
+// A script under the tree, joined the way the setup joins it, so the line reads alike on Windows. [[spec/tickets/setup-reaches-windows-shims]]
+const script = (...parts) => join(ROOT, "src", "scripts", ...parts);
 const HOME = "/home/nobody";
 const CLIENT = `${ROOT}/src/extension/node_modules/vscode-languageclient/package.json`;
 const TOOLS = `${ROOT}/${RUN}/tools.json`;
@@ -77,9 +80,9 @@ test("the setup writes the survey, then runs the Copilot setup and the brand", (
   setup(it, ["--landed"]);
 
   assert.deepEqual(it.proc.ran.slice(-3).map(lineOf), [
-    `node ${ROOT}/src/scripts/verbs/tools.js`,
-    `node ${ROOT}/src/scripts/copilot.js setup auto`,
-    `node ${ROOT}/src/scripts/brand.js`,
+    `node ${script("verbs", "tools.js")}`,
+    `node ${script("copilot.js")} setup auto`,
+    `node ${script("brand.js")}`,
   ]);
   assert.deepEqual(it.said, [], "a box holding every item says nothing");
 
@@ -124,7 +127,7 @@ test("on Windows the setup reaches npm, npx and code through cmd, and node itsel
   assert.ok(lines.includes("cmd /c npm install --no-audit --no-fund --silent"), "npm runs through cmd");
   assert.ok(lines.includes("cmd /c npx --yes playwright-core install chromium"), "npx runs through cmd");
   assert.ok(lines.includes(`cmd /c code --install-extension ${EXTENSIONS[0]} --force`), "code runs through cmd");
-  assert.ok(lines.includes(`node ${ROOT}/src/scripts/browser.js`), "node runs as it stands");
+  assert.ok(lines.includes(`node ${script("browser.js")}`), "node runs as it stands");
 });
 
 // cmd answers its own exit where no code stands, and that reads as no code. [[spec/tickets/windows-missing-code-reads-absent]]
@@ -147,7 +150,7 @@ test("a Copilot setup that stops says a warning, and the brand still runs", () =
 
   assert.equal(setup(it, []), 0);
   assert.ok(it.said.some((one) => one.includes("the copilot setup stopped")), "the stop names itself");
-  assert.equal(lineOf(it.proc.ran.at(-1)), `node ${ROOT}/src/scripts/brand.js`);
+  assert.equal(lineOf(it.proc.ran.at(-1)), `node ${script("brand.js")}`);
 });
 
 // The browser is a want, so a box with no browser still runs every verb, and the drawing ships in git. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
@@ -159,9 +162,9 @@ test("the setup resolves a browser as a want, and bundles no drawing", () => {
 
   assert.equal(setup(it, []), 0);
   const lines = it.proc.ran.map(lineOf);
-  assert.ok(lines.includes(`node ${ROOT}/src/scripts/browser.js`), "the want asks the resolver");
+  assert.ok(lines.includes(`node ${script("browser.js")}`), "the want asks the resolver");
   assert.ok(lines.includes("npx --yes playwright-core install chromium"), "the want downloads");
   assert.ok(it.said.some((one) => one.includes("no browser here")), "the miss names what the box loses");
   assert.ok(!lines.some((one) => one.includes("bundle.js")), "no step bundles the drawing");
-  assert.equal(lineOf(it.proc.ran.at(-1)), `node ${ROOT}/src/scripts/brand.js`, "the setup goes on");
+  assert.equal(lineOf(it.proc.ran.at(-1)), `node ${script("brand.js")}`, "the setup goes on");
 });
