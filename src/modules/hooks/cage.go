@@ -164,7 +164,7 @@ func (d *Door) shadows(post Post, said Answer) {
 	_ = d.from.Shadow(row)
 }
 
-// A guarded call reads the index's lease, and one past its term writes a shadow row, since the port answers while the loop hangs. The call passes as before. [[spec/tickets/watchdogs-span-the-processes]]
+// A guarded call reads the index's lease, and one past its term writes a shadow row, since the port answers while the loop hangs. The call passes on. [[spec/tickets/watchdogs-span-the-processes]]
 func (d *Door) readsHealth(post Post) {
 	if post.Event != toolEvent || d.from.Health == nil || d.from.Shadow == nil {
 		return
