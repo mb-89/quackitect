@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: module-processes-land-in-shadow
 step: do
+record:
+  - step: do
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: 9ee0de56dad4202c19865e2692354d677cbb5d9e
+    hash_after: 65173118046db9f4757c3d0d964efa6131087fdc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/module-processes-land-in-shadow.md:194:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: ask
+        hash: c01cf4061db65112
+        size: 468
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -51,26 +69,32 @@ What breaks: each restart of a topic adds a hand that every tick calls for the l
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/procs_test.go src/modules/index/lease_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Dog.Expired now answers a stop, and the Leases interface carries it. A placed process drops its expiry hand when it stops, so a restart of its topic leaves no stale hand for each tick to call. A dog case reads no call to a stopped hand, and the placements case reads one drop at the stop.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: Expired answers a stop, and the stop of a placed process calls it
+- the cleanup the change reveals is in the change: the fake dog in procs_test.go counts its drops
+- every fact the change adds stands in one place: the hand map lives on the dog alone
 
 # Discussion
 
