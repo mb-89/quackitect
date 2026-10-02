@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -164,9 +164,19 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: 28e31355f8aeef1e44d9c654b02ef9a58116fa2b
+    hash_after: 28e31355f8aeef1e44d9c654b02ef9a58116fa2b
+    inputs:
+      - name: retro/write
+        hash: 25a8d15261ca518d
+        size: 3117
+    def: 4da1ca5da87d5bbc
 depends_on: ["go-cage-switches-over", "lsp-door-switches-over", "sidebar-switches-over"]
 enabled_by: migration.phase9shadow
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -319,20 +329,26 @@ The design put the index's beat in the manager, which reaches no bus. The run mo
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 01:28 the take tool over MCP answered no handler, so the shell verb took its place
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 01:28 the trunk guard held the take's push until a check ran on the box
+- 01:30 a conflict at sync in level0.json, which kept both sides
+- the write door's server fell after each quack test run, and serve brought it back
+- the plan hook refused calls until the plan named the work in hand
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked, no ticket stands minted outside the group, and the handover names none
 
 # Discussion
 
