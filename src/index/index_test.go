@@ -5,6 +5,7 @@ package index
 
 import (
 	"database/sql"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -317,6 +318,32 @@ func TestAnIndexUnderAnotherRootIsDropped(t *testing.T) {
 	}
 	if count != 0 {
 		t.Fatalf("the index kept %d row(s) from the tree before it", count)
+	}
+}
+
+// The sweep writes a row for every line holding text, under the line's own number, across two files of one sweep. [[spec/tickets/the-sweep-prepares-once]]
+func TestTheSweepWritesEveryLineHoldingTextUnderItsNumber(t *testing.T) {
+	root := t.TempDir()
+	write(t, root, "src/a.js", "one\n\n  \nfour\nfive\n")
+	write(t, root, "src/b.js", "\nsecond\n")
+	db := opened(t, root)
+	rows, err := db.Query(`SELECT path, n, text FROM line_text ORDER BY path, n`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rows.Close()
+	var said []string
+	for rows.Next() {
+		var path, text string
+		var n int
+		if err := rows.Scan(&path, &n, &text); err != nil {
+			t.Fatal(err)
+		}
+		said = append(said, fmt.Sprintf("%s:%d:%s", path, n, text))
+	}
+	want := []string{"src/a.js:1:one", "src/a.js:4:four", "src/a.js:5:five", "src/b.js:2:second"}
+	if strings.Join(said, " ") != strings.Join(want, " ") {
+		t.Fatalf("the sweep writes the rows %v, and wants %v", said, want)
 	}
 }
 

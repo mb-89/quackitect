@@ -190,13 +190,18 @@ func one(tx *sql.Tx, abs, rel string, info fs.FileInfo, tracked bool) error {
 	return note(tx, rel, text)
 }
 
+// The insert stands prepared once a file, since a file carries many lines and a fresh statement a line costs the sweep its time. [[spec/tickets/the-sweep-prepares-once]]
 func lines(tx *sql.Tx, rel, text string) error {
+	insert, err := tx.Prepare(`INSERT INTO line_text (path, n, text) VALUES (?, ?, ?)`)
+	if err != nil {
+		return err
+	}
+	defer insert.Close()
 	for n, line := range strings.Split(text, "\n") {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
-		if _, err := tx.Exec(
-			`INSERT INTO line_text (path, n, text) VALUES (?, ?, ?)`, rel, n+1, line); err != nil {
+		if _, err := insert.Exec(rel, n+1, line); err != nil {
 			return err
 		}
 	}
