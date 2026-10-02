@@ -41,3 +41,43 @@ The gate on every branch kept work inside the box for hours at a time. A box tha
 - `./RUNME.sh test test/level0/prepush.test.js` passes a case where an agent pushes a red work branch under CI
 - the same file passes a case where an agent's red push to main still comes back refused
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test test/level0/prepush.test.js
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The pre-push hook held every branch an agent pushed to the green stamp. A box mid-change stands red, so its work stayed on the box for hours. A box that stopped while red lost its commits when the coordinator archived it.
+
+Now `holds` skips the stamp for work branches where `.github/workflows/check.yml` stands. The pull request takes a green CI run before auto-merge lands it, so red work reaches main nowhere. A push to main still takes the green stamp, and a cloud box still pushes main nowhere.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: the agent gate reads ciGuards, and the trunk gate stands as it was
+- the cleanup it reveals: none
+- every fact stands once: the workflow path lives in `CI` in prepush.js
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
