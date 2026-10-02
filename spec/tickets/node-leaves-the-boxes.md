@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: 03d378d1f13d40b2b3b2c01f8cd5840fe5fde3c1
     hash_after: 03d378d1f13d40b2b3b2c01f8cd5840fe5fde3c1
+  - step: accept
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 0f2fc9f1afe78322e35b5024c25ee422dfab096b
+    hash_after: 0f2fc9f1afe78322e35b5024c25ee422dfab096b
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/node-leaves-the-boxes already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
 cloud: true
@@ -185,8 +204,13 @@ Done when `install.sh` installs no Node.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- setup-reaches-windows-shims: the proc door spawns with shell false, so on Windows the npm, npx and code calls in setup.js reach no cmd shim. The setup resolves the shim on win32.
+- code-failure-reads-missing: a code --list-extensions exiting non-zero reads as here in setup.js. A spawn failure alone reads as here, and an exit past zero reads as missing.
+- setup-runs-without-an-index: install.sh runs the survey, the Copilot setup and the brand only where the index binary stands. The setup verb's ticket names that cost, or the steps reach a box with no Go.
+- fetching-skip-list-stale: test/contract/fetching.js still names the modules item and leaves out browser. The list takes the items the install and the setup name.
 
 # retro
 
