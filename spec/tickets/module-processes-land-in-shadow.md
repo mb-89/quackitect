@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -124,6 +124,25 @@ record:
     hand: the engine
     hash_before: 5ce7a9878c36dbdba15316f6762971e7387c4d4f
     hash_after: 5ce7a9878c36dbdba15316f6762971e7387c4d4f
+  - step: accept
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: 1c97a1ef1a1217ff7e92013d1ba43718c562d838
+    hash_after: deeb93da9c375e113b816ef8dc2ee4f394de0dc2
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/module-processes-land-in-shadow already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 392420b7addb5a7e
+        size: 548
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["go-cage-switches-over", "lsp-door-switches-over", "sidebar-switches-over"]
 enabled_by: migration.phase9shadow
 cloud: true
@@ -184,8 +203,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
