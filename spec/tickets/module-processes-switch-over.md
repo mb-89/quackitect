@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -135,6 +135,25 @@ record:
         hash: e122785976621597
         size: 10947
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: c0b4f16e80a4ce279f6642d43069f758b8d7b560
+    hash_after: c0b4f16e80a4ce279f6642d43069f758b8d7b560
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/module-processes-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 0a32db0c3452e5e4
+        size: 357
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
 cloud: true
@@ -192,10 +211,7 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- settle-timer-races-deadline: Settle in src/index/procs.go starts its timer before it computes the deadline, so a timer firing in that gap leaves the wait with no broadcast to wake it
-- live-split-raises-the-alarm: the live kill case passes a nil dog, so no case holds that a crash under ioProcesses raises session/alarms
-- start-refuses-wired-io: no case holds that ioProcesses itself refuses an IO instance that reads a wire
+accept
 
 # retro
 
@@ -274,3 +290,7 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The box, at the accept: a review found that `src/index/door.go` sets `Except` once the manager starts. So a commit inside that window lets a wave in the index compute an away instance's names.
+- I mint no ticket for it. The wave runs the same provider over the same inputs as the process, and the process's commit lands over it. The cost is one wave of work at the start.
+- A fix hands the manager the scheduler before it starts. That reshapes `Manage`, which the ask leaves alone.
