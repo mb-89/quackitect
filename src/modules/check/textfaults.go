@@ -157,6 +157,22 @@ func functionsIn(lines []string) []braced {
 
 // The name a line opens a function on, or nothing. A keyword opens no function. [[spec/design_output/level0#the-size-ceiling]]
 func functionNamed(line string) string {
+	if !opensMaybe(line) {
+		return ""
+	}
+	return namedBy(line)
+}
+
+// Whether a line holds the text every opening pattern needs: func, or a closing brace past its spaces. [[spec/tickets/check-patterns-compile-once]]
+func opensMaybe(line string) bool {
+	return strings.Contains(line, "func") || strings.HasSuffix(strings.TrimRight(line, spaces), "{")
+}
+
+// The characters a pattern's \s reads. [[spec/tickets/check-patterns-compile-once]]
+const spaces = " \t\n\f\r"
+
+// The name the opening patterns read off a line, or nothing. [[spec/design_output/level0#the-size-ceiling]]
+func namedBy(line string) string {
 	for _, opens := range opensAt {
 		found := opens.FindStringSubmatchIndex(line)
 		if found == nil {
@@ -176,6 +192,17 @@ func functionNamed(line string) string {
 
 // A line with its comment and its strings cut, so a brace there counts nothing. [[spec/design_output/level0#the-size-ceiling]]
 func plainCode(line string) string {
+	if !strings.ContainsAny(line, cutMarks) {
+		return line
+	}
+	return codeCut(line)
+}
+
+// The characters a comment or a string opens on, so a line holding none of them stands as it is. [[spec/tickets/check-patterns-compile-once]]
+const cutMarks = "\"'`/"
+
+// A line with its comment and its strings cut by the patterns. [[spec/design_output/level0#the-size-ceiling]]
+func codeCut(line string) string {
 	return quotedAt.ReplaceAllString(trailAt.ReplaceAllString(line, ""), `""`)
 }
 
