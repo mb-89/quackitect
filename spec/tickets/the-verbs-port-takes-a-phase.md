@@ -46,7 +46,7 @@ The commands, in order:
 2. Write the answer under `result`: a new phase with its key under `migration`, or a wait with its reason.
 3. `./RUNME.sh ticket pull the-verbs-port-takes-a-phase --pass`
 
-- `./RUNME.sh ticket pull` hands the follow step to a box, and `result` names the phase and its key, or the wait
+- `./RUNME.sh ticket pull` hands the follow step out, and `result` names the phase and its key, or the wait
 
 # do
 
