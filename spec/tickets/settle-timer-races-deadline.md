@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: module-processes-switch-over
 parent: module-processes-switch-over
+record:
+  - step: do
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 946de768681040a16692d2a02dcb827892edc025
+    hash_after: f4f3dcd497bbb3b157eb8f9a00e501685c29855f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes
+      - name: check
+        exit: 0
+        said: "src/index/placements_test.go:258:31: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    inputs:
+      - name: ask
+        hash: edca01aa8e8d4ff5
+        size: 153
+    def: 0d4f9b5a406ad30a
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ Settle in src/index/procs.go starts its timer before it computes the deadline, s
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/placements_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Placements.Settle in src/index/procs.go took its deadline off the clock after it started its timer. A timer firing in that gap broadcast before the deadline passed, and the reader then waited on with nothing left to wake it. The timer now sets a flag under the lock it wakes, and the wait ends on that flag, so no clock read stands between the two. The gap spans nanoseconds, so no case turns red on it reliably. TestASettleOnASilentProcessEndsAtItsWait runs two hundred short settles on a silent process, and each ends at its wait. The settle cases pass under the race detector.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the wait ends on the timer's mark, not on a clock the timer races
+- the cleanup: none revealed
+- one place: the flag lives inside Settle alone
 
 # Discussion
 
