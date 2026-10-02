@@ -104,6 +104,37 @@ export function batteryOf(
   };
 }
 
+// The cases a budget warning names. [[spec/tickets/the-check-runs-fast-again]]
+const NAMED = 5;
+const SECOND = 1000;
+const WIDE = 7;
+
+// The rows the check prints last: each part's seconds, the slowest first, their sum, and a warning past the budget naming the slowest part and cases. A budget of 0 names none. [[spec/tickets/the-check-runs-fast-again]]
+export function partsSaid(battery, budget = 0) {
+  const row = (ms, what) => `${seconds(ms).padStart(WIDE)}  ${what}`;
+  const parts = Object.entries(battery?.parts ?? {}).sort((a, b) => b[1] - a[1]);
+  const total = battery?.total ?? 0;
+  const rows = [
+    "",
+    "The check's parts, in seconds:",
+    ...parts.map(([name, ms]) => row(ms, name)),
+  ];
+  rows.push(row(total, "in all"));
+  if (!(Number(budget) > 0) || total <= budget || !parts.length) return rows;
+  rows.push(
+    "",
+    `Warning: the check took ${seconds(total)}s, past its budget of ${seconds(budget)}s under battery.budget. ${parts[0][0]} took the most. The slowest cases:`,
+    ...(battery.slowest ?? [])
+      .slice(0, NAMED)
+      .map((one) => row(one.ms, `${one.file} ${one.name}`.trim())),
+  );
+  return rows;
+}
+
+function seconds(ms) {
+  return (Math.round((Number(ms) || 0) / (SECOND / 10)) / 10).toFixed(1);
+}
+
 // Each part's median over the runs that reached it, because a red run leaves the parts past it unrun. [[spec/guidance/retro/effect]]
 export function medianParts(runs) {
   const held = new Map();

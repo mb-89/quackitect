@@ -16,6 +16,7 @@ const (
 	answerCeiling           = 15
 	answerWords             = 150
 	batteryRuns             = 5
+	batteryBudget           = 120000
 	budgetPull              = 1000
 	budgetHandBack          = 1000
 	budgetResolver          = 10
@@ -72,6 +73,7 @@ var sections = map[string][]key{
 	},
 	"battery": {
 		{local: "runs", def: float64(batteryRuns), doc: "The check's runs the stamp keeps at one commit. A retro reads each part's median over them.", unit: "runs"},
+		{local: "budget", def: float64(batteryBudget), doc: "The time the whole check takes at most. Past it, the check prints a warning naming its slowest part and its slowest cases. 0 switches it off.", unit: "milliseconds"},
 	},
 	"budget": {
 		{local: "pull", def: float64(budgetPull), doc: "The median time the pull takes to hand out a leaf over a group of many tickets, with about ten times headroom over a box's measure, and 10 where that stays under a millisecond.", unit: "milliseconds"},
