@@ -77,7 +77,7 @@ test("every slash command a button's hover names stands in .claude/commands", ()
 });
 
 // [[spec/design_output/extension#the-sidebar-draws-the-tree]]
-test("npm reaches the extension and the tense reader, and nothing else at the root", () => {
+test("npm reaches the extension alone, and the root names no dependency", () => {
   const said = proc().run(["git", "ls-files", "*package.json"], { cwd: root });
   const paths = said.stdout.split(/\r?\n/).filter(Boolean);
 
@@ -94,10 +94,7 @@ test("npm reaches the extension and the tense reader, and nothing else at the ro
   }
 
   const bare = read("package.json");
-  assert.deepEqual(Object.keys(bare.dependencies ?? {}).sort(), [
-    "wink-eng-lite-web-model",
-    "wink-nlp",
-  ]);
+  assert.deepEqual(Object.keys(bare.dependencies ?? {}), []);
   assert.equal(bare.devDependencies, undefined);
 });
 

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,25 @@ record:
         hash: 8e11a8a438953a0e
         size: 250
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 77f4c295c43a · claude-code-remote
+    hash_before: bcdfdc8117db81740d39c049a6e60e1ccc8fa31b
+    hash_after: bcdfdc8117db81740d39c049a6e60e1ccc8fa31b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: b3ef1bbfc1fd7c4e
+        size: 3711
+      - name: [[spec/tickets/install-drops-node]]
+        hash: 83575bda3f482f6c
+        size: 216
+      - name: [[spec/tickets/readers-take-the-go-topics]]
+        hash: 1e27277f7647141a
+        size: 231
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -228,26 +247,34 @@ Assumed: the quack binary stands wherever a reader runs, as [[spec/tickets/reade
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/topic-readers.test.js test/contract/tree-extension.test.js test/contract/cloud-start.test.js src/modules/lsp/tools_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/level0/topic-readers.test.js
+- test/contract/tree-extension.test.js
+- test/contract/cloud-start.test.js
+- src/modules/lsp/tools_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The start road answers 0 where the case wants 7, since it still reads `node_modules`. The LSP case keeps the past row, because the fake answers node nothing and the veto lets every row stand there. `keptOf` asks quack on an empty list and answers null.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the second done line rides the tree-extension case, the first rides the Go case, and the check decides the third
+- the reader cases run over the fake disk and the fake proc, the LSP case over its fake tools, and the start road over a temporary tree
 
 # gate
 

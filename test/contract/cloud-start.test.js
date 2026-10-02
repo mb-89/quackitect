@@ -84,54 +84,28 @@ test("a box outside the cloud starts nothing, because a person stands beside it"
   }
 });
 
-test("a cloud box whose install brings no modules says so and starts nothing", () => {
-  const where = tree({ modules: false });
-  try {
-    const said = runs(where, CLOUD);
-    assert.equal(said.exitCode, 6);
-    const [level, why] = reasonOf(said.exitCode);
-    assert.equal(level, "warn");
-    assert.match(why, /modules/);
-    assert.equal(files.exists(join(where, MARKER)), false, "no index stands");
-  } finally {
-    files.remove(where);
-  }
-});
-
-test("a fresh clone carrying no modules installs them, then starts the index", {
+// A fresh clone carries no index, so the index binary says the install ran. [[spec/tickets/go-prose-checks-stand-alone]]
+test("a fresh clone carrying no index installs the tree, then starts the index", {
   skip: SHELL,
 }, () => {
-  const where = tree({ modules: false, install: true });
-  try {
-    const said = runs(where, CLOUD);
-    assert.equal(said.exitCode, 7, said.stderr);
-    assert.equal(reasonOf(said.exitCode)[0], "info");
-    assert.equal(
-      files.exists(join(where, "node_modules")),
-      true,
-      "the install brought the modules",
-    );
-    assert.equal(
-      files.exists(join(where, MARKER)),
-      true,
-      "and the index stood after it",
-    );
-  } finally {
-    files.remove(where);
-  }
-});
-
-test("a box with no index builds it, then starts it", { skip: SHELL }, () => {
   const where = tree({ index: "", install: true });
   try {
     const said = runs(where, CLOUD);
-    assert.equal(said.exitCode, 0, said.stderr);
+    assert.equal(said.exitCode, 7, said.stderr);
+    const [level, why] = reasonOf(said.exitCode);
+    assert.equal(level, "info");
+    assert.doesNotMatch(why, /modules/);
     assert.equal(
       files.exists(join(where, ...BIN.split("/"))),
       true,
       "the install built the index",
     );
     assert.equal(files.exists(join(where, HOOKS)), true, "and the hooks door stands");
+    assert.equal(
+      files.exists(join(where, MARKER)),
+      true,
+      "and the index stood after it",
+    );
   } finally {
     files.remove(where);
   }

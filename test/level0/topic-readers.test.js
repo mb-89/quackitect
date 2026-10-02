@@ -13,7 +13,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { readsText } from "../../src/bridge/findings.js";
+import { readsText, readThrough } from "../../src/bridge/findings.js";
 import { readConfig } from "../../src/scripts/cli-check.js";
 import { guidance } from "../../src/scripts/guidance-verb.js";
 import { handed } from "../../src/scripts/pull-hand.js";
@@ -21,6 +21,7 @@ import { leafOf } from "../../src/scripts/pull-route.js";
 import { logVerb } from "../../src/scripts/log-verb.js";
 import {
   configRowsOf,
+  keptOf,
   notesOf,
   readsNew,
   topicOf,
@@ -264,6 +265,41 @@ test("readsText keeps the findings quack prose keeps where the prose slice reads
   );
   const found = readsText(it, "n.md", "the door set the write\n", [set]);
   assert.equal(found.filter((one) => one.rule === "Voice.Other").length, 0);
+});
+
+// The check reads every file in one request, so it pays one process. [[spec/tickets/go-prose-checks-stand-alone]]
+test("readThrough runs quack prose once over every file it reads, and keeps what each document keeps", () => {
+  const one = { rule: "Voice.PastTense", line: 1, column: 10, said: "set", file: "a.md" };
+  const two = { ...one, file: "b.md" };
+  const { file: _, ...bare } = two;
+  const it = itOf(
+    "new",
+    {
+      [join(ROOT, "a.md")]: "the door set the write\n",
+      [join(ROOT, "b.md")]: "the door set the write\n",
+    },
+    {
+      [`${QUACK} prose`]: {
+        stdout: JSON.stringify({ docs: [{ kept: [] }, { kept: [bare] }] }),
+      },
+    },
+  );
+  const kept = readThrough(it, [one, two]);
+  assert.deepEqual(
+    kept.map((found) => found.file),
+    ["b.md"],
+  );
+  assert.deepEqual(
+    it.proc.ran.map((ran) => ran.argv.slice(1).join(" ")),
+    ["prose"],
+  );
+});
+
+// A list holding no finding answers itself, so a clean file costs no process. [[spec/tickets/go-prose-checks-stand-alone]]
+test("keptOf answers a list holding no finding with no process", () => {
+  const it = itOf("new", {}, {});
+  assert.deepEqual(keptOf(it, "the door reads the write\n", [], "all"), []);
+  assert.deepEqual(it.proc.ran, []);
 });
 
 test("readConfig prints the rows quack config answers where the config slice reads new", async () => {
