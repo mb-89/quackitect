@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box 3f5d7b2a1399 · claude-code-remote
     hash_before: ab21fcd8cf7f8bb302ed181b55e8b9bfe689fdc5
+  - step: sync
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 1b260eed3bd53ef40dcad5f8f46d634441ce32fb
+    hash_after: bf4cb0d8d9bc03ea89e1187b0217f22b11a2bfe1
+    answered:
+      - name: sync
+        exit: 0
+        said: work/node-leaves-the-boxes already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
 cloud: true
@@ -113,8 +122,9 @@ Done when `install.sh` installs no Node.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
