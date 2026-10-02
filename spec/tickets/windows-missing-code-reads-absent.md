@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: node-leaves-the-boxes
 parent: node-leaves-the-boxes
+record:
+  - step: do
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 52bd72c6a837525a4d2c1be2fb335f239e890d9f
+    hash_after: 2087030d5a99696f8c521f51dab39a2fba3db8e6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "   73.7  in all"
+    inputs:
+      - name: ask
+        hash: 3b39fe8b86891e4f
+        size: 160
+    def: 22963c491c71f419
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ on Windows cmd answers exit 9009 where no code stands, and the setup reads that 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/setup.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+On Windows the setup reaches the editor command through cmd, and cmd answers its own exit where no such command stands. The setup reads that exit as no editor, so a Windows box with none skips the extensions, as a Linux box does.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the point the accept gate names
+- the change reveals no cleanup past itself
+- the exit cmd answers carries a name once, at the top of the setup verb
 
 # Discussion
 
