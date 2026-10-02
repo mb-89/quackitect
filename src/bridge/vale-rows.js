@@ -4,10 +4,11 @@
 // [[spec/tickets/the-check-runs-fast-again]]
 
 import { dirname } from "node:path";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { faultIn } from "../../.claude/skills/level0/lib/vale.js";
 
 // Where the lint keeps the rows it read. [[spec/tickets/the-check-runs-fast-again]]
-export const CACHE = ".se/.runtime/vale-rows.json";
+export const CACHE = `${RUN}/vale-rows.json`;
 // Past this many changed files, or past this many characters of their names, Vale walks the paths asked itself, so a cold box and a Windows command line read as before. [[spec/tickets/the-check-runs-fast-again]]
 export const NAMED_MOST = 200;
 export const ARGV_MOST = 20000;
