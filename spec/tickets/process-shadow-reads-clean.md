@@ -51,7 +51,7 @@ The gain is a shadow that writes a row only where the two paths disagree in subs
 
 <!-- the form is command -->
 
-go test ./src/modules/clock ./src/index -run 'Minute|Serve|Displaced|Drops|Reaches|Door' && go test ./src/quack -run Shadow
+./RUNME.sh test src/modules/clock src/index src/q src/quack
 
 ## check
 
@@ -67,12 +67,14 @@ go test ./src/modules/clock ./src/index -run 'Minute|Serve|Displaced|Drops|Reach
 
 <!-- the form is text -->
 
-Each value mismatch is timing. The index and the IO process each run their own clock and git poller, on their own phase, and the shadow weighed a value once, two seconds after the IO process committed it.
+Two of the mismatches are timing, and one is a real disagreement on the new path. The index and the IO process each run their own clock and git poller. The shadow weighed a value once, two seconds after the IO process committed it.
 
 | finding | cause | change |
 |---|---|---|
 | `clock/minute` one apart | each clock ticked a minute from its own start, so one path held the old minute up to a minute longer | `src/modules/clock/clock.go` reads the time each second and commits as the minute turns |
 | `queue/places` order | one path read a moved `git/stood` before the other. The old order is the all-zero score of a shallow clone, the new one the day score | `src/quack/io.go`: the shadow weighs a value apart again each settle, and writes a row only once it stays apart past `shadowPatience` |
+| `queue/places` and `work/*` stay apart | every module process loads the whole wiring. Its scheduler computed names other instances own off defaults, such as places with no stood and no plan | `src/q/scheduler.go`: `Only` keeps a module process's waves to its own instances, and `src/quack/placements.go` calls it |
+| `files/<path>` apart | each path stamps `changed` with the change time it read, and a write landing twice with one text moves the stamp alone | `src/quack/io.go`: a file value with the same hash and text reads as the same |
 | doubled placement | a second `serve` stood a door beside the live one, and the first door kept its modules after its standing file went | `src/index/main.go`: a serve beside a live door stands none, a door drops only its own standing file, and a door the file no longer names leaves |
 
 The standing hang did not reproduce on this box. It follows from the doubled index, which the guards close. The places order reproduced on a checkout and on a clone that took its whole history, and came together within one git poll.
@@ -83,10 +85,13 @@ The standing hang did not reproduce on this box. It follows from the doubled ind
 
 <!-- the form is checklist -->
 
-- the change follows the ask: a timing mismatch gets a tolerant compare, and the doubled placement a guard, each with its test
+- the change follows the ask: a timing mismatch gets a tolerant compare, a real one a fix, each a test
 - the cleanup it reveals: the stop path removed whichever standing file stood, and now drops its own alone
 - every fact stands once: the spans live in the constants of `src/quack/io.go`, `src/modules/clock/clock.go` and `src/index/main.go`
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The ten-minute run found two causes beside the three the ask names. A module process computed names other instances own, off defaults. A file value differed in its `changed` stamp alone.
+- The box pushed nothing before the pass: the commit verb pushes `main` alone from here, and the gate refuses it. A verb that pushes the work branch before the pass closes that gap.
