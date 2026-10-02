@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: waves-match-each-file-once
 step: do
+record:
+  - step: do
+    hand: box 819347f31bce · claude-code-remote
+    hash_before: ae900f21db9e1f992225b62b187a76528bbe1e8b
+    hash_after: ae900f21db9e1f992225b62b187a76528bbe1e8b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/q passes
+      - name: check
+        exit: 0
+        said: "    2.7  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    inputs:
+      - name: ask
+        hash: b21a9d7cae4d3101
+        size: 801
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +67,32 @@ A wave in `src/q/scheduler.go` asks a loaded family for its concrete names once 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/q/scheduler_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A wave asks each loaded family for its concrete names once, where it asked once for every name the wave carries. The second ask answered names the wave had seen, so the order stands as it stood, and a wave over the whole tree stops paying the square of its files under the lock.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the guard stands in waves, and the dry probe past its install reads 25.8s against 42.5s
+- the cleanup: the probe also reruns the install on each RUNME call in its clone, and that is the next ticket
+- one place: the guard sits beside the call it guards, and the ticket holds the measure
 
 # Discussion
 
