@@ -3,9 +3,9 @@
 // [[spec/design_output/drawing#the-layout-reads-the-graph]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
+import { disk } from "../../src/doors/disk.js";
 import {
   classOf,
   HEIGHT,
@@ -76,7 +76,7 @@ test("the label carries the returns, and an empty graph draws nothing", () => {
 
 // A box installs no Node modules, so the layout a node test drives imports none; dagre rides in the placer the bundle carries. [[spec/design_output/drawing#the-layout-reads-the-graph]]
 test("the layout imports no package, and the placer hands it every node and the edges that reach one", () => {
-  const imports = readFileSync(LAYOUT, "utf8").match(/^import .* from "([^"]+)";$/gm) ?? [];
+  const imports = String(disk().read(LAYOUT)).match(/^import .* from "([^"]+)";$/gm) ?? [];
   assert.deepEqual(imports.filter((one) => !/from "\.\.?\//.test(one)), []);
   let seen;
   laidOut(GRAPH, (nodes, edges) => {
