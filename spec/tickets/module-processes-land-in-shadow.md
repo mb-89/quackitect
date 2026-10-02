@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -99,6 +99,15 @@ record:
   - step: sync
     hand: box 23776eae9f68 · claude-code-remote
     hash_before: cf52e9e8b2231f7228398e4239407260b182945c
+  - step: sync
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: 28f2be8745fee81f658d84ebb3bd0ba24b51a619
+    hash_after: 28f2be8745fee81f658d84ebb3bd0ba24b51a619
+    answered:
+      - name: sync
+        exit: 0
+        said: work/module-processes-land-in-shadow already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["go-cage-switches-over", "lsp-door-switches-over", "sidebar-switches-over"]
 enabled_by: migration.phase9shadow
 cloud: true
@@ -117,8 +126,9 @@ Done when the new path runs in shadow on `main`, and `./RUNME.sh log --kind shad
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
