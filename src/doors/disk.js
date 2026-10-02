@@ -1,6 +1,7 @@
 // The filesystem. The one place this tree reaches disk.
 // [[spec/design_output/doors#one-door-per-outside-thing]]
 
+import { createHash } from "node:crypto";
 import {
   appendFileSync,
   chmodSync,
@@ -37,6 +38,8 @@ export function disk() {
     // A folder lands in one call, bytes and all, and `keeps` prunes a path and everything under it. [[spec/tickets/disk-door-copies-a-folder]]
     copyFolder,
     size: (path) => statSync(path).size,
+    // A file's bytes as one key, so a reader holding a file's answer knows the file unchanged. [[spec/tickets/the-check-runs-fast-again]]
+    hash: (path) => createHash("sha256").update(readFileSync(path)).digest("hex"),
     // The text past a byte offset, so a reader of a growing file reads what it has yet to see. [[spec/design_output/log#a-reader-reads-new-rows]]
     readFrom,
     // A move keeps the bytes and leaves nothing behind, where a copy doubles the file. [[spec/guidance/retro/collect]]

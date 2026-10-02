@@ -1,6 +1,7 @@
 // A filesystem in memory. It behaves: what a test writes, it reads back.
 // [[spec/design_output/doors#a-fake-behaves]]
 
+import { createHash } from "node:crypto";
 import { behaves } from "./behaves.js";
 
 const HOPS = 8;
@@ -90,6 +91,12 @@ export function fakeDisk(seed = {}) {
       // The fake counts bytes, the way the real door does, so an offset means one thing on both. [[spec/design_output/log#a-reader-reads-new-rows]]
       size(path) {
         return Buffer.byteLength(String(this.read(path)));
+      },
+      // The fake hashes the bytes it holds, the way the real door hashes the file. [[spec/tickets/the-check-runs-fast-again]]
+      hash(path) {
+        return createHash("sha256")
+          .update(Buffer.from(String(this.read(path))))
+          .digest("hex");
       },
       readFrom(path, at) {
         const bytes = Buffer.from(String(this.read(path)));
