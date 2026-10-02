@@ -64,7 +64,7 @@ Phase 9 stands switched over now that [[spec/tickets/module-processes-switch-ove
 
 Phase 9 closed on main at 7568989, with every child of module-processes-switch-over closed and the check green on Linux and Windows. The coordinator stood the index on that commit. It placed the IO process and twenty module processes, one each, and the standing answered.
 
-Phase 9 is done when a crash in one part leaves the others running and raises an alarm. Two cases in src/quack/split_test.go hold that on the live split. One kills the guidance process, and the tickets process keeps answering, never restarted. The other kills guidance twice, and session/alarms names guidance alone. Both pass on main, so migration.phase10 turns true.
+Phase 9 asks that a crash in one part leaves the others running and raises an alarm. Two cases in src/quack/split_test.go hold that on the live split. One kills the guidance process, and the tickets process keeps answering under the pid it started with. The other kills guidance twice, and session/alarms names guidance alone. Both pass on main, so migration.phase10 turns true.
 
 ## checked
 
