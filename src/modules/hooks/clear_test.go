@@ -1,6 +1,6 @@
 // The clear the door answers at a turn's end, off clearsAfter in
-// src/bridge/handover.js. The Stop answers it, whichever of the turn's two
-// ends lands first.
+// src/bridge/handover.js. The Stop answers it, whichever end of the turn
+// lands first.
 // [[spec/tickets/clear-answers-off-the-door]] [[spec/tickets/the-clear-continues-the-session]]
 package hooks
 

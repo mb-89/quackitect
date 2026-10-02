@@ -31,6 +31,12 @@ test("no /clear, no resume prompt, a pull that falls, or no clear reached fails 
   assert.equal(clearHeld([], {}).pass, false);
 });
 
+test("a pull that falls shows its last line, cut short", () => {
+  const said = clearHeld([], run({ runs: [{ words: "", exit: 1, said: `first\n${"x".repeat(400)}` }] }));
+  assert.match(said.evidence, /answers 1: x+$/);
+  assert.ok(said.evidence.length < 400, "the evidence stays one short line");
+});
+
 test("a clear the plugin meets refused names the refusal", () => {
   const said = clearHeld([FELL], run({ commands: [] }));
   assert.equal(said.pass, false);

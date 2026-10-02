@@ -12,6 +12,8 @@ const PULL_WAIT = 240_000;
 // The span the clear the plugin queues takes to reach the harness. [[spec/tickets/the-clear-continues-the-session]]
 const SETTLE = 3000;
 const TICK = 50;
+// The characters a line of evidence shows. [[spec/tickets/the-clear-continues-the-session]]
+const SHOWN = 160;
 const HANDOVER_FILE = ".se/HANDOVER.md";
 const HANDOVER_TEXT = "# Handover\n\nThe dry probe stands nothing in hand, and the queue holds what waits.\n";
 const ANSWER = "The handover stands, and the clear ends this turn.";
@@ -81,4 +83,4 @@ export function clearHeld(rows, seen) {
   return { pass: true, evidence: "/clear runs, then the resume prompt opens the next conversation" };
 }
 
-const firstLine = (text) => String(text ?? "").trim().split("\n").at(-1).slice(0, 160);
+const firstLine = (text) => String(text ?? "").trim().split("\n").at(-1).slice(0, SHOWN);
