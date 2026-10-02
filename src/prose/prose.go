@@ -41,7 +41,7 @@ var (
 	codeSpan = regexp.MustCompile("`[^`\n]*`")
 	linkSpan = regexp.MustCompile(`\[\[[^\]]*\]\]|\[[^\]]*\]\([^)]*\)`)
 	marker   = regexp.MustCompile(`^[ \t]*(?:[-*+]|[0-9]+[.)])\s+`)
-	// A token carries a letter or a digit, the way wink tags every token outside PUNCT, SYM and SPACE; an apostrophe opens a token of its own, as wink splits door's. [[spec/tickets/prose-checks-run-in-go]]
+	// A token carries a letter or a digit, so punctuation, symbols and space count as no word; an apostrophe opens a token of its own, so door's splits in two. [[spec/tickets/prose-checks-run-in-go]]
 	tokenAt   = regexp.MustCompile(`['’]?[\p{L}\p{N}]+(?:[.\-_/][\p{L}\p{N}]+)*`)
 	sentences = regexp.MustCompile(`[.!?]+(?:\s+|$)`)
 	closesAt  = regexp.MustCompile(`[.!?](?:\s|$)`)
