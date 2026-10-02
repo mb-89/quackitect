@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -141,6 +141,21 @@ record:
         hash: 83575bda3f482f6c
         size: 216
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 78ad9ef83b38fd471c39e1e5b6ba2bfb572a6e69
+    hash_after: 78ad9ef83b38fd471c39e1e5b6ba2bfb572a6e69
+    inputs:
+      - name: design/draft
+        hash: ed6fdc47ea2d140c
+        size: 2716
+      - name: design/tests-red
+        hash: ff0bf1224659119a
+        size: 773
+      - name: [[spec/tickets/install-drops-node]]
+        hash: 83575bda3f482f6c
+        size: 216
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -268,8 +283,11 @@ Each case fails on its own assertion. Git tracks nothing under the runtime folde
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: the drawing ships under `src/extension/drawing`, git tracks it, and its banner names the hash of its sources. `insetDoor` reads it off the extension, and the install loop names no drawing. The shipped case decides the fresh-clone line, and the check decides the second. Nothing in the phase contradicts the code: `.gitattributes` folds the folder, and no caller of the old runtime folder stands.
 
 # implement
 
