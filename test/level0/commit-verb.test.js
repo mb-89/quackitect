@@ -9,6 +9,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
 import { conflicted, NAMED, named } from "./fixtures.js";
+import { carryQuack } from "./quack-doors.js";
 
 const ROOT = "/tree";
 const CLEAN = `${NAMED}: the message reads clean`;
@@ -54,6 +55,7 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
     proc: git.proc,
     env,
   };
+  carryQuack(it);
   git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "check.js")], {
     exitCode: 0,
     stdout: "The rules pass.\n",
@@ -65,7 +67,8 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
   return { it, git };
 };
 
-const ranGit = (git) => git.ran.map((one) => one.argv.join(" "));
+const ranGit = (git) =>
+  git.ran.filter((one) => one.argv[0] === "git").map((one) => one.argv.join(" "));
 
 // The cold gate's doors: a staged list, a client on the disk, and a probe answering a code and its lines. [[spec/design_output/level0#the-cold-probe]]
 const CLIENT = "/bin/claude";

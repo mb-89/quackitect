@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { frontOf } from "../../src/engine/group.js";
 import {
@@ -18,6 +19,7 @@ import {
 } from "../../src/scripts/pull-chapter.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import { at, doors, ROOT } from "./pull-doors.js";
+import { carryQuack } from "./quack-doors.js";
 import { CHARACTERS, semicolonVale } from "./semicolon-vale.js";
 
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
@@ -41,7 +43,8 @@ test("a semicolon on the leaf's chapter warns, naming Characters at its file lin
     text: "---\nkind: [[ticket]]\n---\n\n# Ask\n\nOne; two.\n\n# do\n\n## says\n\nA line; and more.\n",
   };
   const warned = [];
-  const found = voiceFaults({ vale: VALE, proc, root: "/tree" }, one, leaf, warned);
+  const it = carryQuack({ vale: VALE, proc, root: "/tree", disk: fakeDisk() });
+  const found = voiceFaults(it, one, leaf, warned);
   assert.deepEqual(found, [], "a break of form refuses nothing");
   assert.equal(warned.length, 1, warned.join("\n"));
   assert.match(warned[0], /^do breaks Characters at line 13 of spec\/tickets\/one\.md/);
@@ -62,7 +65,8 @@ test("a private name on the leaf's chapter refuses, and warns on nothing", () =>
     text: "---\nkind: [[ticket]]\n---\n\n# do\n\n## says\n\nA line; and more.\n",
   };
   const warned = [];
-  const found = voiceFaults({ vale: VALE, proc, root: "/tree" }, one, leaf, warned);
+  const it = carryQuack({ vale: VALE, proc, root: "/tree", disk: fakeDisk() });
+  const found = voiceFaults(it, one, leaf, warned);
   assert.equal(found.length, 1, found.join("\n"));
   assert.match(found[0], /^do breaks Private at line 9/);
   assert.deepEqual(warned, []);

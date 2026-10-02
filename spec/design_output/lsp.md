@@ -148,11 +148,11 @@ rows. `Tools` in `src/modules/lsp/tools.go` holds the runs:
 
 | what | where the server reads it |
 |---|---|
-| each binary, and node | `.se/.runtime/tools.json`, else the runtime binary folder |
+| each binary | `.se/.runtime/tools.json`, else the runtime binary folder |
 | the Vale config | `.vale.ini` at the root, else the one the assembly writes under `.se/vale` |
 | the folders Vale skips | `PARKED` in `src/bridge/findings.js` |
 | the Biome config | `CONFIG_DIR` in `.claude/skills/level0/lib/code.js` |
-| a past tense row | the tense reader in `src/engine/tense.js`, run through node |
+| a past tense row | `prose.ReadsAsPast` in `src/prose` |
 | the code ceilings | `code.functionLines` and `code.fileLines`, through the config reader |
 
 `src/modules/check/textfaults.go` reads the code faults and the exemption markers the
@@ -172,7 +172,6 @@ Biome extension:
 |---|---|
 | a row names a file the index holds nowhere, or a draft | nothing |
 | Vale answers a fault, or stands nowhere | `ValeRuns` on the config, in Vale's own words, so a broken rule stands in the panel |
-| no node, or no tense reader | every past tense row |
 | no Biome | no Biome row |
 
 `StopFolderIsData` and `GridHolds` read JavaScript modules, so this server

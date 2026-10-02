@@ -11,10 +11,10 @@ export const INSTALL_SKIP = "editor-link editor-extensions editor-client go";
 export const STANDING_WAIT = 60_000;
 // The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const NO_NODE = 5;
-// The code REASONS reads for a road that installs the modules and then starts the index. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// The code REASONS reads for a road that installs the tree and then starts the index. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const INSTALLED = 7;
 
-// THE CLOUD STARTS ITS OWN INDEX, AND BRINGS WHAT THE INDEX NEEDS. The index answers its standing by starting its door where none answers, so one call starts it and probes it, in the work root it serves. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the modules stand nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// THE CLOUD STARTS ITS OWN INDEX, AND BRINGS WHAT THE INDEX NEEDS. The index answers its standing by starting its door where none answers, so one call starts it and probes it, in the work root it serves. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the index binary stands nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const START = [
   "const { spawnSync } = require('node:child_process');",
   "const { existsSync, mkdirSync, openSync } = require('node:fs');",
@@ -24,13 +24,11 @@ export const START = [
   "mkdirSync(here + '/.se/.log', { recursive: true });",
   `const out = openSync(here + '/${SERVE}', 'a');`,
   `const index = method + '/${BIN}';`,
-  "const brought = !existsSync(method + '/node_modules');",
+  // A fresh clone carries no index, because git tracks no binary. [[spec/tickets/go-prose-checks-stand-alone]]
+  "const brought = !existsSync(index);",
   // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   "const install = () => spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env: Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' }), stdio: ['ignore', out, out] });",
   "if (brought) install();",
-  "if (!existsSync(method + '/node_modules')) process.exit(6);",
-  // A box the setup built no index on builds it now, because the index is what the road starts. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-  "if (!existsSync(index)) install();",
   "if (!existsSync(index)) process.exit(9);",
   `const stood = spawnSync(index, ['standing'], { cwd: here, encoding: 'utf8', timeout: ${STANDING_WAIT}, windowsHide: true });`,
   "if (stood.status !== 0) {",
@@ -46,11 +44,7 @@ const REASONS = {
   3: ["", "a person starts the index here"],
   4: ["warn", "the method root is absent, so no index starts"],
   5: ["warn", "this box carries no node, so no index starts"],
-  6: ["warn", "the install brings no modules, so no index starts"],
-  7: [
-    "info",
-    "the modules stand nowhere, so the bridgehead installs them and starts the index",
-  ],
+  7: ["info", "the index stands nowhere, so the bridgehead installs the tree and starts it"],
   8: ["warn", "the index fails its standing, so no door stands"],
   9: ["warn", "the install builds no index, so no index starts"],
 };

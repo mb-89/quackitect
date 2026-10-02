@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -17,7 +18,6 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    reads: [[spec/guidance/working]]
     checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
     evidence:
       - name: children
@@ -26,8 +26,17 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    tags: ["review", "accept"]
+    input: ["ask", "children"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
-    reads: [[spec/guidance/working]]
     to: retro
     steps:
       - name: notes
@@ -72,12 +81,136 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
 process: [[spec/processes/group]]
-process_hash: 57b2cccd0445ea9a
-depends_on: [module-processes-switch-over]
+process_hash: 5d4a884bfb2491ff
+record:
+  - step: sync
+    hand: box 77f4c295c43a · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
+    hash_after: 7bdbf2d2a46ef34c56f0003d31a0413154587477
+  - step: sync
+    hand: box e35da0f81f06 · claude-code-remote
+    hash_before: 09e58639cf07b3c7d2d386e22c1b057387fbc51b
+    hash_after: b34d02e763293b0826eb8af63c49251d0a325e3b
+  - step: sync
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: ab21fcd8cf7f8bb302ed181b55e8b9bfe689fdc5
+    hash_after: 6f3f098f15ddc8b29895e7b801e75dd309d352a8
+  - step: sync
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 1b260eed3bd53ef40dcad5f8f46d634441ce32fb
+    hash_after: bf4cb0d8d9bc03ea89e1187b0217f22b11a2bfe1
+    answered:
+      - name: sync
+        exit: 0
+        said: work/node-leaves-the-boxes already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 89b61c6ab99d7877d2fa797b6594aaedbd09dd0c
+    hash_after: 89b61c6ab99d7877d2fa797b6594aaedbd09dd0c
+    inputs:
+      - name: ask
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 03d378d1f13d40b2b3b2c01f8cd5840fe5fde3c1
+    hash_after: 03d378d1f13d40b2b3b2c01f8cd5840fe5fde3c1
+  - step: accept
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 0f2fc9f1afe78322e35b5024c25ee422dfab096b
+    hash_after: 0f2fc9f1afe78322e35b5024c25ee422dfab096b
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/node-leaves-the-boxes already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 00aba546ad01c03eba3ffefd081fea51aaa92e0a
+    hash_after: 42e69be693ce6da6755bfb9e1371ca2abf97ae94
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/node-leaves-the-boxes took 8 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 9c8eef5584f9e0070674d696a21ba90f62b5188b
+    hash_after: 9c8eef5584f9e0070674d696a21ba90f62b5188b
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/node-leaves-the-boxes already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 2b196dd03b36895ada01e41876424c45e94a458c
+    hash_after: 2b196dd03b36895ada01e41876424c45e94a458c
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 8660371826a7a9b4790ee5d4d26a1d94a076c3e1
+    hash_after: 8660371826a7a9b4790ee5d4d26a1d94a076c3e1
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 1721b1305e813db11790b07434ef24afc5fa5f08
+    hash_after: 1721b1305e813db11790b07434ef24afc5fa5f08
+    inputs:
+      - name: retro/write
+        hash: 86f909f9edfd2280
+        size: 2457
+    def: 4da1ca5da87d5bbc
+depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
-cloud: true
+reason: done
 ---
 
 # Ask
@@ -93,8 +226,9 @@ Done when `install.sh` installs no Node.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -103,16 +237,45 @@ Done when `install.sh` installs no Node.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/go-prose-checks-stand-alone]], standard
+- [[spec/tickets/the-webview-ships-prebuilt]], standard
+- [[spec/tickets/install-drops-node]], standard
+- [[spec/tickets/install-callers-cover-the-tests]], trivial
+- [[spec/tickets/cold-probe-reads-the-setup]], trivial
+- [[spec/tickets/setup-verb-stands-red]], trivial
+- [[spec/tickets/install-names-the-index-binary]], trivial
+- [[spec/tickets/go-stamp-takes-bare-modules]], trivial
+- [[spec/tickets/bare-desk-names-missing-node]], trivial
+- [[spec/tickets/the-verbs-leave-node]], trivial
+- [[spec/tickets/boot-fixture-drops-wink]], trivial
+- [[spec/tickets/lsp-fixture-drops-node]], trivial
+- [[spec/tickets/readers-tests-carry-quack]], trivial
+- [[spec/tickets/tense-notes-follow]], trivial
+- [[spec/tickets/widenings-stand-needed]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
+- each child is a single change a reviewer reads whole, and every one stands closed
+- the Go prose checks, the prebuilt webview and the installer cut each have a child, so the goal stands covered
+- the children ran in order on one branch, so none waits on another
+
 # children
+
+# accept
+
+<!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -123,8 +286,9 @@ Done when `install.sh` installs no Node.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -133,38 +297,64 @@ Done when `install.sh` installs no Node.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the merge from main resolves three conflicts, and one batch reader keeps the Go past veto alone
+- setup-verb-stands-red: the setup verb carries the install's JavaScript steps, with cases on fake doors
+- the-verbs-leave-node: the port goes to the owner as the-verbs-port-takes-a-phase
+- install-drops-node: the installer names no node, and hands its JavaScript steps to the setup verb
+- the proc door's start takes an input its program leaves unread
+- the second sync drops the tense test with its module
+- the accept gate mints five points over two rounds, and each closes
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the commit verb's check names each fault before a push, so no red commit reaches origin
+- the fake doors carry the setup cases, so each runs in memory
+- a second reader at the accept gate finds gaps the author's own cases miss
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 17:20 UTC: the take's push comes back refused until a check runs on the box
+- 17:42 UTC: the first commit of the setup verb meets the home-path rule, then the folder-owner rule, and costs two more checks
+- 18:05 UTC: a regex op in the patch reads each dollar sign as a capture group and blanks the hand-off block
+- 18:08 UTC: a check meets an EPIPE under load in a case the change never touches
+- the pull tool over the bridge answers nothing, so every hand-back runs through the shell
+- no owner prompt reaches this run, since a schedule starts it
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the patch door's regex op names the dollar escape in its description, in the level0 plugin
+- the work skill names the check before the first take, in the work skill
+- the bridge registers a hook answering index_ticket_pull, in the level0 plugin
+- the proc door's start keeps its stdin guard, with the contract case beside it
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The red cases from tests-red planned the moved steps as sh, and the gate's point planned them as a JavaScript verb. The verb won, because a fake door tests it and a shell script takes no test. The verb port is the owner's call, since it adds a migration phase.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact the change adds stands once, and the vale-ls copy in the installer names its owner beside it
+- the cmd exit for a missing command carries a name at the top of the setup verb
+- the setup verb's header says what the file is for, and counts nothing
+- the bad lines carry the run's errors with their times, and no owner prompt reaches this run
+- the chapter names roles alone, and carries no name, address or path of the box
 
 ## cloud
 
@@ -173,20 +363,29 @@ Done when `install.sh` installs no Node.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the pull tool over the bridge: the hook answers no call, so every hand-back runs through the shell
+- the proxy refuses one host during a commit's check, and no case needs it
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at the take: three files from main, resolved into one batch reader
+- a conflict at sync: main changes a test this branch deletes, and the test leaves
+- the hooks: the ticket name on each shell call, the plan questions, the landing gate after a pipe, and the shell-write guard
+- an EPIPE in a check under load, which a proc door fix ends
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- the-verbs-port-takes-a-phase stands on the person route with no group, asking the owner whether the verb port becomes a migration phase
+- no person step stands parked inside the group
+- the retro carries what a handover carries, since the private folder dies with the box
 
 # Discussion
 

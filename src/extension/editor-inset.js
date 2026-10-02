@@ -6,9 +6,9 @@
 
 const vscode = require("vscode");
 
-// The bundle folder of src/scripts/bundle.js, under the runtime folder .claude/skills/level0/lib/folders.js owns, spelled again here because the extension bundles alone. [[spec/design_input/the-editor-draws-the-ticket#the-owner-rules]]
-const DRAWING = ".se/.runtime/drawing";
-const SCRIPT = "route.js";
+// The folder of OUT in src/scripts/bundle.js, under the extension, spelled again here because the extension imports no script of the tree. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
+const DRAWING = "drawing";
+const SCRIPT = "route.mjs";
 const STYLE = "route.css";
 const PANEL = "quackitect.route";
 const NAME = "quackitect";
@@ -19,16 +19,13 @@ function insetDoor(context, folder) {
     vscode.workspace.asRelativePath(uri, false).replace(/\\/g, "/");
   const editorOf = (path) =>
     vscode.window.visibleTextEditors.find((one) => pathOf(one.document.uri) === path);
-  const roots = () => [
-    context.extensionUri,
-    vscode.Uri.joinPath(folder.uri, ...DRAWING.split("/")),
-  ];
-  const options = () => ({ enableScripts: true, localResourceRoots: roots() });
+  const options = () => ({
+    enableScripts: true,
+    localResourceRoots: [context.extensionUri],
+  });
   const drawn = (webview) => {
     const at = (name) =>
-      webview.asWebviewUri(
-        vscode.Uri.joinPath(folder.uri, ...DRAWING.split("/"), name),
-      );
+      webview.asWebviewUri(vscode.Uri.joinPath(context.extensionUri, DRAWING, name));
     return pageHtml({
       nonce: globalThis.crypto.randomUUID().split("-").join(""),
       source: webview.cspSource,

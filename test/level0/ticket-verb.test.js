@@ -16,6 +16,7 @@ import {
   ticket,
   updated,
 } from "../../src/scripts/ticket.js";
+import { carryQuack } from "./quack-doors.js";
 import { semicolonVale } from "./semicolon-vale.js";
 import { at, heard, ROOT, treeWithProcesses } from "./ticket-doors.js";
 
@@ -178,7 +179,7 @@ test("ticket note writes a line the lint warns on, and names Characters at its l
   const said = treeWithProcesses();
   const proc = fakeProc();
   proc.teach([VALE], semicolonVale(ran));
-  const it = { ...said.it, proc, root: ROOT, vale: VALE };
+  const it = carryQuack({ ...said.it, proc, root: ROOT, vale: VALE });
 
   const warned = heard(() => ticket(ROOT, ["note", "a-name", "one; two"], it));
 
@@ -224,7 +225,7 @@ test("routedTicket mints a draft off the route, and a line carrying a private na
   const said = treeWithProcesses();
   const proc = fakeProc();
   proc.teach([VALE], privateVale);
-  const it = { ...said.it, proc, root: ROOT, vale: VALE };
+  const it = carryQuack({ ...said.it, proc, root: ROOT, vale: VALE });
   const held = processAt(said.disk, ROOT, join, "trivial");
   const mint = (line) =>
     routedTicket(it, "spec/tickets/a-child.md", held, {

@@ -11,9 +11,9 @@ host, and the test driving it. The plan stands in
 
 # The page draws a route
 
-`src/extension/webview/route/drawing.js` is the entry, and install bundles it
-into the one script a webview loads. For details, see
-[[spec/design_input/the-editor-draws-the-ticket#the-owner-rules]].
+`src/extension/webview/route/drawing.js` is the entry, and esbuild bundles it
+into the one script a webview loads. For the shipped pair, see
+[[spec/design_output/drawing#the-drawing-ships-prebuilt]].
 
 The page mounts on the element `route`, and draws nothing until a graph
 arrives. It holds no file and reads no disk: the host hands it every graph.
@@ -42,6 +42,30 @@ moves, so a return reads apart from the road ahead.
 The page draws in the editor's colours, and the variables the editor sets on a
 webview carry them. A `theme` message picks the light or the dark scheme React
 Flow draws its own parts in.
+
+## The drawing ships prebuilt
+
+The bundle lands in git, so a fresh clone draws with no build and no Node.
+
+| the file | what it holds |
+|---|---|
+| `src/extension/drawing/route.mjs` | the script, its first line the banner `// sources <hash>` |
+| `src/extension/drawing/route.css` | the style sheet esbuild writes beside it |
+
+`editor-inset.js` reads both off `context.extensionUri`, and the webview's
+resource roots hold the extension alone. `.gitattributes` marks the folder as
+generated, so a diff view folds it.
+
+The hash covers every file under `src/extension/webview/route` and the
+webview's lock file. `stampOf` in `src/scripts/bundle.js` computes it, and
+`fresh` answers whether the banner names it.
+
+1. Change a source under the webview.
+2. Run `node src/scripts/bundle.js` where the webview's modules stand.
+3. Commit the pair beside the change.
+
+`test/contract/drawing-shipped.test.js` reads the banner against the sources
+on every box, so a stale bundle meets the check.
 
 # The page speaks in messages
 

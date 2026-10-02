@@ -8,6 +8,7 @@ import { onBash } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import MASKED from "../replay/cage/commit-guards-cases.json" with { type: "json" };
+import { carryQuack } from "./quack-doors.js";
 
 const ROOT = "/tree";
 
@@ -35,7 +36,7 @@ function box(one) {
     Object.entries(one.git ?? {}).map(([args, stdout]) => [`git ${args}`, { stdout }]),
   );
   const found = one.voice ?? null;
-  return {
+  return carryQuack({
     env: one.env ?? {},
     cloud: one.cloud,
     disk: fakeDisk(files),
@@ -46,7 +47,7 @@ function box(one) {
     vale: found
       ? { stands: () => true, lint: async () => ({ ran: true, found }) }
       : { stands: () => false },
-  };
+  });
 }
 
 // The decision word the Go door's OldDecisionOf reads off an answer. [[spec/tickets/cage-command-rules-port]]

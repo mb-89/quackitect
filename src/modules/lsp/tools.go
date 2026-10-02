@@ -11,6 +11,8 @@ import (
 	"slices"
 	"sort"
 	"strings"
+
+	"quackitect/src/prose"
 )
 
 // The names the lint spells in src/bridge/findings.js and .claude/skills/level0/lib/code.js, spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -23,12 +25,10 @@ const (
 	fromVale  = "vale"
 	fromBiome = "biome"
 	fromTree  = "tree"
-	// The tense reader, asked over each past tense row. It reads its module and its rows off the input, so the call names nothing of the box. [[spec/design_output/lsp#the-server-runs-the-tools]]
-	tenseScript = `let s="";process.stdin.on("data",(d)=>{s+=d});process.stdin.on("end",async()=>{const a=JSON.parse(s);const t=await import(a.module);process.stdout.write(JSON.stringify(a.asks.map((x)=>t.readsAsPast(x.line,x.word))))});`
 )
 
 // The files the tools read beside the tree, so a change to one runs them over the whole tree again. A name closing on a slash names a folder. [[spec/design_output/lsp#the-panel-follows-the-index]]
-var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec/config/level0.json", "src/engine/tense.js"}
+var toolInputs = []string{"spec/config/styles/", "spec/config/biome.json", "spec/config/level0.json"}
 
 // The folders Vale skips, as PARKED in src/bridge/findings.js names them. [[spec/design_output/lsp#the-server-runs-the-tools]]
 var parkedFolders = []string{".se", "node_modules", ".git", ".claude/types", ".claude/worktrees"}
@@ -43,13 +43,10 @@ type Runner func(dir, input, name string, argv ...string) (string, error)
 
 // The tools a run takes, where the box holds them, and the ceilings the code faults read. [[spec/tickets/lsp-module-draws-the-tools]]
 type Tools struct {
-	Root   string
-	Vale   string
-	Biome  string
-	Node   string
-	Config string
-	// The tense reader's module as a file address, or nothing where the tree holds none. [[spec/tickets/lsp-module-draws-the-tools]]
-	Tense    string
+	Root     string
+	Vale     string
+	Biome    string
+	Config   string
 	Function int
 	File     int
 	Run      Runner
@@ -281,12 +278,13 @@ func (one *Tools) valeRowsOf(stdout string) ([]valeHeard, string) {
 	return out, ""
 }
 
-// A past tense row stands where the tense reader reads the word as the past, the veto withoutFalsePast holds in src/engine/tense.js. [[spec/design_output/level0#the-tense-reader]]
+// A past tense row stands where the Go tense reader reads the word as the past. [[spec/tickets/go-prose-checks-stand-alone]]
 func (one *Tools) vetoes(tree Tree, heard []valeHeard) []Finding {
-	asks := []map[string]string{}
 	texts := map[string][]string{}
+	out := []Finding{}
 	for _, row := range heard {
 		if !strings.HasSuffix(row.Rule, pastRule) {
+			out = append(out, row.Finding)
 			continue
 		}
 		if _, read := texts[row.File]; !read {
@@ -296,42 +294,11 @@ func (one *Tools) vetoes(tree Tree, heard []valeHeard) []Finding {
 		if lines := texts[row.File]; row.Line >= 1 && row.Line <= len(lines) {
 			line = lines[row.Line-1]
 		}
-		asks = append(asks, map[string]string{"line": line, "word": row.said})
-	}
-	past := one.pastReads(asks)
-	out := []Finding{}
-	asked := 0
-	for _, row := range heard {
-		if strings.HasSuffix(row.Rule, pastRule) {
-			keeps := past == nil || past[asked]
-			asked++
-			if !keeps {
-				continue
-			}
+		if prose.ReadsAsPast(line, row.said) {
+			out = append(out, row.Finding)
 		}
-		out = append(out, row.Finding)
 	}
 	return out
-}
-
-// The tense reader's verdict on each ask, or nothing where no node or no reader answers, so every row stands. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func (one *Tools) pastReads(asks []map[string]string) []bool {
-	if len(asks) == 0 || one.Tense == "" || one.Node == "" {
-		return nil
-	}
-	input, err := json.Marshal(map[string]any{"module": one.Tense, "asks": asks})
-	if err != nil {
-		return nil
-	}
-	out, err := one.Run(one.Root, string(input), one.Node, "-e", tenseScript)
-	if err != nil {
-		return nil
-	}
-	var past []bool
-	if json.Unmarshal([]byte(out), &past) != nil || len(past) != len(asks) {
-		return nil
-	}
-	return past
 }
 
 // Biome over the paths named, as the lint runs it. A box carrying no Biome draws no Biome row. [[spec/design_output/lsp#the-server-runs-the-tools]]

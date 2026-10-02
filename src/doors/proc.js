@@ -69,6 +69,8 @@ export function proc() {
         });
         child.on("error", fail);
         child.on("close", (code) => done({ exitCode: code ?? 1, stdout, stderr }));
+        // A program exiting before it reads its input closes the pipe, and its exit answers. [[spec/design_output/lsp]]
+        child.stdin.on("error", () => {});
         child.stdin.end(init.stdin ?? "");
       });
     },

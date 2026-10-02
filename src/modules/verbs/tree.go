@@ -21,6 +21,7 @@ var Commands = []Verb{
 	{Name: "standing", Doc: "what level zero hands the agent every session"},
 	{Name: "doctor", Doc: "what is installed, and what level zero found"},
 	{Name: "tools", Doc: "ask this box where every tool stands, and write it down"},
+	{Name: "setup", Doc: "the install's steps that run JavaScript: the editor, the browser, the survey, the Copilot setup and the brand"},
 	{Name: "doors", Doc: "every door, and the contract test that holds it"},
 	{Name: "project", Doc: "write every projection again, from the source it names"},
 	{Name: "config", Doc: "every key, its value, and the layer answering it"},

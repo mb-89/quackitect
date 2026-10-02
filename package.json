@@ -3,9 +3,5 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Level zero: the rules that shape how an agent works.",
-  "dependencies": {
-    "wink-eng-lite-web-model": "^1.8.1",
-    "wink-nlp": "^2.4.0"
-  }
+  "description": "Level zero: the rules that shape how an agent works."
 }

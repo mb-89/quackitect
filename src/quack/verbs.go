@@ -241,13 +241,21 @@ func verbRoad(scripts string, argv []string) int {
 	}, argv)
 }
 
+// The line a failed start says: a runtime missing from the PATH names itself, since the install brings none. [[spec/tickets/bare-desk-names-missing-node]]
+func startFault(runtime string, err error) string {
+	if errors.Is(err, exec.ErrNotFound) {
+		return fmt.Sprintf("No %s stands on the PATH, and every verb without a Go twin runs on it. Install %s, and run this again.", runtime, runtime)
+	}
+	return err.Error()
+}
+
 // The old road: the verb's program as a child holding the caller's stdin and error stream, its standard output written to out, each signal forwarded, and its exit code answered. An out that is the caller's own file hands the child the terminal itself. [[spec/tickets/verb-road-keeps-the-terminal]]
 func oldDoor(command []string, stdin io.Reader, errs io.Writer, signals <-chan os.Signal) func(out io.Writer) int {
 	return func(out io.Writer) int {
 		child := exec.Command(command[0], command[1:]...)
 		child.Stdin, child.Stdout, child.Stderr = stdin, out, errs
 		if err := child.Start(); err != nil {
-			fmt.Fprintln(errs, err)
+			fmt.Fprintln(errs, startFault(command[0], err))
 			return exitFailed
 		}
 		ended := make(chan struct{})

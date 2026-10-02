@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { readsText } from "../../src/bridge/findings.js";
+import { readsText, readThrough } from "../../src/bridge/findings.js";
 import { readsProse } from "../../src/bridge/prose.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -22,7 +22,7 @@ import { leafOf } from "../../src/scripts/pull-route.js";
 import {
   configRowsOf,
   keptOf,
-  keptOfAll,
+  keptOver,
   notesOf,
   readsNew,
   topicOf,
@@ -162,14 +162,6 @@ test("each reader runs quack once, and no shadow runs beside it", async () => {
   );
 });
 
-// An old slice reads the old vetoes alone, and no shadow runs beside them. [[spec/tickets/read-topics-switch-over]]
-test("readsProse on an old slice keeps what the old vetoes keep, and runs no quack", () => {
-  const set = { rule: "Voice.Other", line: 1, column: 10, said: "set", file: "n.md" };
-  const box = { ...itOf("old", {}, {}), config: { ask: async () => "shadow" } };
-  assert.equal(readsProse(box, "the door set the write\n", [set]).length, 1);
-  assert.deepEqual(box.proc.ran, []);
-});
-
 test("a leaf the guidance topic names no notes for reads no notes", () => {
   const it = itOf("new", {}, { [`${QUACK} guidance`]: { stdout: "{}" } });
   assert.deepEqual(
@@ -268,19 +260,54 @@ test("readsText keeps the findings quack prose keeps where the prose slice reads
   assert.equal(found.filter((one) => one.rule === "Voice.Other").length, 0);
 });
 
+// The check reads every file in one request, so it pays one process. [[spec/tickets/go-prose-checks-stand-alone]]
+test("readThrough runs quack prose once over every file it reads, and keeps what each document keeps", () => {
+  const one = { rule: "Voice.PastTense", line: 1, column: 10, said: "set", file: "a.md" };
+  const two = { ...one, file: "b.md" };
+  const { file: _, ...bare } = two;
+  const it = itOf(
+    "new",
+    {
+      [join(ROOT, "a.md")]: "the door set the write\n",
+      [join(ROOT, "b.md")]: "the door set the write\n",
+    },
+    {
+      [`${QUACK} prose`]: {
+        stdout: JSON.stringify({ docs: [{ kept: [] }, { kept: [bare] }] }),
+      },
+    },
+  );
+  const kept = readThrough(it, [one, two]);
+  assert.deepEqual(
+    kept.map((found) => found.file),
+    ["b.md"],
+  );
+  assert.deepEqual(
+    it.proc.ran.map((ran) => ran.argv.slice(1).join(" ")),
+    ["prose"],
+  );
+});
+
+// A list holding no finding answers itself, so a clean file costs no process. [[spec/tickets/go-prose-checks-stand-alone]]
+test("keptOf answers a list holding no finding with no process", () => {
+  const it = itOf("new", {}, {});
+  assert.deepEqual(keptOf(it, "the door reads the write\n", [], "all"), []);
+  assert.deepEqual(it.proc.ran, []);
+});
+
 // One text's reading is a reading of many with one text in it, and a short answer reads as none. [[spec/tickets/the-check-runs-fast-again]]
-test("keptOf answers what keptOfAll answers for its one text, and a short answer reads as nothing", () => {
+test("keptOf answers what keptOver answers for its one text, and a short answer reads as nothing", () => {
   const one = { rule: "Voice.One", line: 1, column: 1, said: "one", file: "n.md" };
   const two = { rule: "Voice.Two", line: 2, column: 1, said: "two", file: "n.md" };
   const kept = { stdout: JSON.stringify({ docs: [{ kept: [two] }] }) };
   const it = itOf("new", {}, { [`${QUACK} prose`]: kept });
 
   assert.deepEqual(keptOf(it, "one\ntwo\n", [one, two], "past"), [two]);
-  assert.deepEqual(keptOfAll(it, [{ text: "one\ntwo\n", found: [one, two] }], "past"), [
+  assert.deepEqual(keptOver(it, [{ text: "one\ntwo\n", found: [one, two] }], "past"), [
     [two],
   ]);
   assert.equal(
-    keptOfAll(
+    keptOver(
       it,
       [
         { text: "a\n", found: [one] },
@@ -291,7 +318,7 @@ test("keptOf answers what keptOfAll answers for its one text, and a short answer
     null,
     "one doc answered for two reads as nothing",
   );
-  assert.deepEqual(keptOfAll(it, [], "past"), [], "no text asks no quack");
+  assert.deepEqual(keptOver(it, [], "past"), [], "no text asks no quack");
 });
 
 test("readConfig prints the rows quack config answers where the config slice reads new", async () => {

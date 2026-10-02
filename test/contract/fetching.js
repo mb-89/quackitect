@@ -4,7 +4,6 @@
 // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
 
 export const FETCHING = [
-  "modules",
   "vale",
   "biome",
   "vale-ls",
@@ -13,6 +12,7 @@ export const FETCHING = [
   "index",
   "se-front",
   "editor-client",
+  "browser",
   "editor-link",
   "editor-extensions",
   "git-hooks",

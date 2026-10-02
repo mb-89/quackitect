@@ -1,7 +1,6 @@
 // quack prose: the findings the Go vetoes leave, read off one JSON request on
-// stdin. The bridge reads it beside wink's answer while the prose slice runs
-// in shadow.
-// [[spec/tickets/prose-checks-run-in-go]]
+// stdin. Every prose reader in the bridge and the scripts asks here.
+// [[spec/tickets/go-prose-checks-stand-alone]]
 package main
 
 import (

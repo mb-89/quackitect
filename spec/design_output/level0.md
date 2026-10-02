@@ -114,8 +114,7 @@ under it. For details, see
 [[spec/design_output/level0#the-bridge-says-it-falls]].
 
 The road is one node script, because a Windows box carries no shell. It reads
-the environment itself, and installs where the modules or the index stand
-nowhere. It then runs the index with `standing` in the work root, and answers
+the environment itself, and installs where the index stands nowhere. It then runs the index with `standing` in the work root, and answers
 a code:
 
 | the code | what stands | what the log carries |
@@ -123,8 +122,7 @@ a code:
 | 3 | no cloud variable, so a person starts it | nothing |
 | 4 | the method root stands nowhere | one `warn` line |
 | 5 | the box carries no node | one `warn` line |
-| 6 | the install brings no modules | one `warn` line |
-| 7 | the road installs the modules, then starts the index | one `info` line |
+| 7 | the road installs the tree, then starts the index | one `info` line |
 | 8 | the index fails its standing, so no door stands | one `warn` line naming the fault |
 | 9 | the install builds no index | one `warn` line |
 | 0 | the index stands behind the session | one `info` line |
@@ -133,20 +131,20 @@ a code:
 cloud guidance binds on. The operating system decides nothing here, because a
 person at a local box wants the button and a cloud box wants the server.
 
-The call comes back in milliseconds where the modules stand. The line
+The call comes back in milliseconds where the index stands. The line
 backgrounds the server and sends its output to `.se/.log/serve.log`, so a
 session start waits for nothing. The rules ride the first event the server
 answers, and nothing waits for it to stand. For details, see
 [[spec/design_output/level0#rules-ride-the-first-answer]].
 
-The road brings the modules where they stand nowhere. A cloud box clones the
+The road builds the index where it stands nowhere. A cloud box clones the
 repository fresh when the container starts. The half of the setup writing into
 the tree goes with the old one:
 
 | what the setup writes | where it lands | what the clone does |
 |---|---|---|
 | the trust flag and the mode | the home of the box | leaves them standing |
-| the modules and the installed binaries | the tree | replaces the tree |
+| the installed binaries | the tree | replaces the tree |
 
 So the road runs `src/scripts/install.sh` itself, under the skip list the setup
 names, and answers `7` where it does. That install waits, because a session
@@ -1924,15 +1922,16 @@ stands behind Vale's finding with one general veto:
 | its -s or -ing form, `skips`, `standing` | present on its face, and the finding falls |
 | another form, `wrote`, `did`, `failed` | past, and the finding stands |
 
-`src/engine/tense.js` reads the line the finding stands in through wink-nlp,
-which hands a lemma a token. More vetoes ride the same reader, in
-`src/bridge/prose.js`. The doors reading prose call that one entry: the
-write door, the draft check and the commit message. The check and the terminal
-push door take the tense veto alone, through `readThrough` in
-`src/bridge/findings.js`, so a push carries the list the check reads. A `vale`
-line at debug counts what the reader lets stand. The model's build costs half
-the load, so the first read builds it, and a verb reading no prose skips the
-build.
+`src/prose` reads the line the finding stands in, and hands each token a lemma
+off golem and the exception list in `src/prose/lemmas.yml`. More vetoes ride
+the same package. `quack prose` answers them, and every reader asks there.
+
+| the reader | the vetoes it asks |
+|---|---|
+| `readsProse` in `src/bridge/prose.js`: the write door, the draft check and the commit message | all |
+| `readsText` in `src/bridge/findings.js`: the pull and the lint, one file a request | past |
+| `readThrough` in `src/bridge/findings.js`: the check and the terminal push door, every file in one request | past |
+| the LSP module, through `prose.ReadsAsPast` | past |
 
 | Vale finds | the reader says |
 |---|---|
@@ -1942,13 +1941,8 @@ build.
 
 The tagger carries no more than that. It reads a participle standing as an
 adjective, `a refused call`, as a verb like any other. So those stay on the
-rule's exception list in `spec/schemas/paragraph.schema.yaml`. A bench under
-`.se/scripts` runs both readers over every note, and it is the way to read a
-change to either.
-
-The dependency is one node package and its English model, named in
-`package.json`. The install fetches them under `modules`, and the server
-loads them once.
+rule's exception list in `spec/schemas/paragraph.schema.yaml`. The tables in
+`src/prose/prose_test.go` read a change to the reader.
 
 # What the cage loads
 

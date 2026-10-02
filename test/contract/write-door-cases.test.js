@@ -9,6 +9,7 @@ import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { projectionsHere } from "../../src/engine/projection.js";
+import { carryQuack } from "../level0/quack-doors.js";
 
 const TREE = disk();
 const TABLE = JSON.parse(
@@ -28,7 +29,7 @@ function box(one) {
   );
   const disk = fakeDisk(files);
   const found = one.voice ?? null;
-  return {
+  return carryQuack({
     root: TABLE.root,
     work: TABLE.root,
     method: TABLE.root,
@@ -40,7 +41,7 @@ function box(one) {
     vale: found
       ? { stands: () => true, lint: async () => ({ ran: true, found }) }
       : { stands: () => false },
-  };
+  });
 }
 
 // The decision word the Go door's OldDecisionOf reads off an answer. [[spec/tickets/cage-command-rules-port]]

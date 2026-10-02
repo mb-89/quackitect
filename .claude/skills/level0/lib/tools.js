@@ -72,13 +72,13 @@ export function guesses(name) {
   return [`${BIN}/${name}.exe`, `${BIN}/${name}`];
 }
 
-// The binaries whose `here` case asks after their source: find for a newer file, or the hash `go-source.js fresh` keeps. [[spec/design_output/lsp#the-build-beside-the-index]]
+// The binaries whose `here` case asks after their source: find for a newer file, or the hash `go-stamp.sh fresh` keeps. [[spec/design_output/lsp#the-build-beside-the-index]]
 export function rebuilt(text) {
   const out = [];
   for (const found of String(text ?? "").matchAll(
     /^(\w+)_here\(\)\s*\{([\s\S]*?)^\}/gm,
   )) {
-    if (/-newer|go-source\.js fresh/.test(found[2])) out.push(found[1]);
+    if (/-newer|go-stamp\.sh"? fresh/.test(found[2])) out.push(found[1]);
   }
   return out;
 }

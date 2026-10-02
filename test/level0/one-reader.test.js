@@ -14,8 +14,10 @@ import { withPayload } from "../../src/scripts/pull-chapter.js";
 import { assemble } from "../../src/scripts/styles.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, CHILD, doors, heard, ROOT, standing } from "./pull-doors.js";
+import { keepsProse, quackUnder } from "./quack-doors.js";
 
 const VALE = "/tree/.se/.runtime/bin/vale";
+const QUACK = quackUnder(ROOT);
 const TICKET = "spec/tickets/a-child.md";
 const LEAF = "design/review";
 const RULE = "VoiceParagraph.Characters";
@@ -166,10 +168,10 @@ const NOTES = "notes/one.md";
 const NOTE_TEXT = `# One\n\n${OFF}\nOne; two.\n${ON}\nThree; four.\n`;
 
 function lintDoors(ran) {
-  const disk = fakeDisk({ [join(ROOT, NOTES)]: NOTE_TEXT });
+  const disk = fakeDisk({ [join(ROOT, NOTES)]: NOTE_TEXT, [QUACK]: "" });
   return {
     disk,
-    proc: fakeProc({ vale: behavingVale(disk, ran) }),
+    proc: fakeProc({ vale: behavingVale(disk, ran), [`${QUACK} prose`]: keepsProse() }),
     join,
     root: ROOT,
     method: ROOT,

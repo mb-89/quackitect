@@ -52,6 +52,15 @@ test("a start answers what a run answers, in the real door and the fake alike", 
   assert.deepEqual(fake, real);
 });
 
+// A program can exit before it reads its input, and its exit still answers. [[spec/design_output/lsp]]
+test("a start whose program exits unread answers its exit, in the real door and the fake alike", async () => {
+  const stdin = "quack\n".repeat(1 << 20);
+  const real = shaped(await proc().start(FAILS, { stdin }));
+  const fake = shaped(await fakeProc({ [FAILS.join(" ")]: { exitCode: 3 } }).start(FAILS, { stdin }));
+  assert.deepEqual(real, { exitCode: 3, stdout: "", stderr: "" });
+  assert.deepEqual(fake, real);
+});
+
 // The tally the check names, one line a spawn, off the real door. [[spec/design_output/work#the-battery-answers-first]]
 test("a door told to tally writes the program's name, one line a spawn", () => {
   const folder = disk().tempDir("tally-");

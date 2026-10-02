@@ -3,13 +3,25 @@
 // a webview loads.
 // [[spec/design_output/drawing#the-page-draws-a-route]]
 
+import dagre from "@dagrejs/dagre";
 import { ReactFlow } from "@xyflow/react";
 import { createElement, useCallback, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "@xyflow/react/dist/style.css";
 import "./drawing.css";
 import { dropped, moved, reachedIn } from "./edit.js";
-import { laidOut } from "./layout.js";
+import { GAP, HEIGHT, laidOut, WIDTH } from "./layout.js";
+
+// Each node's centre by its id, as dagre places the graph top to bottom. The layout takes it as its placer, so the layout imports no package and a node test drives it on a box with no Node modules. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+function placed(nodes, edges) {
+  const place = new dagre.graphlib.Graph({ multigraph: true });
+  place.setGraph({ rankdir: "TB", nodesep: GAP, ranksep: GAP });
+  place.setDefaultEdgeLabel(() => ({}));
+  for (const one of nodes) place.setNode(one.id, { width: WIDTH, height: HEIGHT });
+  for (const [at, one] of edges.entries()) place.setEdge(one.from, one.to, {}, String(at));
+  dagre.layout(place);
+  return new Map(nodes.map((one) => [one.id, place.node(one.id)]));
+}
 
 const EMPTY = { nodes: [], edges: [] };
 const SCHEMES = new Set(["light", "dark"]);
@@ -115,7 +127,7 @@ function Route({ host }) {
 
   const post = useCallback((one) => host.postMessage(one), [host]);
   const flow = useMemo(
-    () => withLabels(laidOut(state.graph), state, post),
+    () => withLabels(laidOut(state.graph, placed), state, post),
     [state, post],
   );
   const press = useCallback(
