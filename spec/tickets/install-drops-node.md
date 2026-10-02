@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -160,6 +160,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 5b1c4b8d9c48e7b1aaa9f04cfee36d3338a2ed56
+    hash_after: 5b1c4b8d9c48e7b1aaa9f04cfee36d3338a2ed56
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "    2.4  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes"
+    inputs:
+      - name: design/tests-red
+        hash: 8fec6f44c8b36c4d
+        size: 828
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -333,26 +356,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/install.test.js test/level0/setup.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The installer installs no Node and runs none. The `node` item leaves its loop. The vale-ls download spells its asset table in sh, and a contract case holds it equal to `servers.js`. The editor client, the browser, the editor link and the editor extensions leave the installer for the setup verb. So do the survey, the Copilot setup and the brand. The installer runs that verb last, through the index binary, and a stop costs one warning line. The two red cases that read `setup.sh` now read the verb, in `test/level0/setup.test.js`, because the steps stand in JavaScript on the doors. The proc door's start also takes an input its program leaves unread. Without that, the check meets an EPIPE under load.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays on the install road, past one door fix the check needs
+- the setup verb takes the disk and proc doors, and its cases run on their fakes
+- the hand-off comment in the installer links the setup verb's ticket
+- servers.js owns the vale-ls pin, and a contract case holds the shell copy equal
 
 # accept
 
