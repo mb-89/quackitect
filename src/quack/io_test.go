@@ -1,5 +1,5 @@
-// quack io publishes what its instances commit over the bus, and a value the
-// shadow commits apart from the store's writes a shadow row.
+// quack io publishes what its instances commit over the bus, and the watchdogs
+// span the processes.
 // [[spec/design_output/model#the-io-process]]
 package main
 
@@ -7,11 +7,9 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
-	"quackitect/src/config"
 	"quackitect/src/index"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
@@ -192,21 +190,8 @@ func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
 	}
 }
 
-func TestTheHooksDoorReadsNoHealthOutsideTheProcessesShadow(t *testing.T) {
-	if health := healthOf(t.TempDir(), q.NewStore(q.New())); health != nil {
-		t.Fatal("a root with no processes shadow hands the hooks door a health read")
-	}
-}
-
-func TestTheHooksDoorReadsTheIndexLeaseUnderTheProcessesShadow(t *testing.T) {
-	root := t.TempDir()
-	at := filepath.Join(root, filepath.FromSlash(config.Tracked))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte(`{"migration":{"processes":"shadow"}}`), 0o644); err != nil {
-		t.Fatal(err)
-	}
+// The hooks door reads the index's lease off index/health. [[spec/tickets/the-split-deployment-takes-over]]
+func TestTheHooksDoorReadsTheIndexLease(t *testing.T) {
 	c := q.New()
 	as := manager.Registers(c)
 	if faults := c.Check(); len(faults) > 0 {
@@ -217,10 +202,7 @@ func TestTheHooksDoorReadsTheIndexLeaseUnderTheProcessesShadow(t *testing.T) {
 	if _, err := store.Commit(store.Snapshot().Revision, as, map[string]any{manager.HealthName: manager.Lease{Part: indexPart, Renewed: renewed, Term: time.Minute}}); err != nil {
 		t.Fatal(err)
 	}
-	health := healthOf(root, store)
-	if health == nil {
-		t.Fatal("a root under the processes shadow hands the hooks door no health read")
-	}
+	health := healthOf(store)
 	if at, term, held := health(); !held || !at.Equal(renewed) || term != time.Minute {
 		t.Fatalf("the health read answers %v, %v and %v, and wants the committed lease", at, term, held)
 	}
@@ -258,115 +240,5 @@ func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
 		}
 	case <-time.After(5 * time.Second):
 		t.Fatal("quack io publishes no commit")
-	}
-}
-
-func TestAShadowValueApartWritesAShadowRow(t *testing.T) {
-	var rows []map[string]any
-	waited := time.Duration(0)
-	weighs := shadows{
-		read:   func(name string) any { return map[string]any{"clock/minute": 3, "env/HOME": "/home"}[name] },
-		settle: time.Second,
-		wait:   func(span time.Duration) { waited += span },
-		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
-	}
-	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), "env/HOME": json.RawMessage(`"/home"`)})
-	if len(rows) != 1 {
-		t.Fatalf("the shadow writes %d rows, and wants one for clock/minute alone: %v", len(rows), rows)
-	}
-	row := rows[0]
-	if row["kind"] != "shadow" || row["slice"] != "processes" || row["name"] != "clock/minute" || row["old"] != "3" || row["new"] != "4" {
-		t.Fatalf("the shadow row reads %v", row)
-	}
-	if waited != time.Second {
-		t.Fatalf("the shadow waits %v before it weighs, and wants the settle span", waited)
-	}
-}
-
-// A value apart that comes together inside the patience writes no row, and one still apart past it writes one, so a path polling on another phase reads as no difference. [[spec/tickets/process-shadow-reads-clean]]
-func TestAShadowValueThatComesTogetherWritesNoRow(t *testing.T) {
-	var rows []map[string]any
-	waited := time.Duration(0)
-	weighs := shadows{
-		read: func(name string) any {
-			if name == "clock/minute" && waited >= 3*time.Second {
-				return 4
-			}
-			return 3
-		},
-		settle:   time.Second,
-		patience: 5 * time.Second,
-		wait:     func(span time.Duration) { waited += span },
-		say:      func(row map[string]any) error { rows = append(rows, row); return nil },
-	}
-	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), "git/stood": json.RawMessage("5")})
-	if len(rows) != 1 || rows[0]["name"] != "git/stood" {
-		t.Fatalf("the shadow writes %v, and wants git/stood alone: clock/minute comes together inside the patience", rows)
-	}
-	if waited != 5*time.Second {
-		t.Fatalf("the shadow waits %v before the row, and wants the patience", waited)
-	}
-}
-
-// A file value with the hash and the text the store holds reads as the same, whatever time each path stamps it with. [[spec/tickets/process-shadow-reads-clean]]
-func TestAFileValueReadsByItsHashAndText(t *testing.T) {
-	var rows []map[string]any
-	weighs := shadows{
-		read: func(name string) any {
-			return map[string]any{"files/a.md": q.Content{Hash: "h", Text: "a", Changed: 1}, "files/b.md": q.Content{Hash: "h", Text: "b", Changed: 1}}[name]
-		},
-		settle: time.Second,
-		wait:   func(time.Duration) {},
-		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
-	}
-	weighs.weigh(map[string]json.RawMessage{
-		"files/a.md": json.RawMessage(`{"hash":"h","text":"a","changed":2}`),
-		"files/b.md": json.RawMessage(`{"hash":"h","text":"c","changed":1}`),
-	})
-	if len(rows) != 1 || rows[0]["name"] != "files/b.md" {
-		t.Fatalf("the shadow writes %v, and wants files/b.md alone: files/a.md differs in its stamp alone", rows)
-	}
-}
-
-// A value the bus hands first weighs nothing once a later one stands marked, even where its weigh runs last, so a file made and removed at once writes no row. [[spec/tickets/process-shadow-reads-clean]]
-func TestTheShadowWeighsInTheOrderTheBusHands(t *testing.T) {
-	var rows []map[string]any
-	weighs := shadows{
-		read:   func(string) any { return q.Content{} },
-		settle: time.Second,
-		wait:   func(time.Duration) {},
-		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
-		newest: &sends{at: map[string]int64{}},
-	}
-	made := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"h","text":"a"}`)}
-	gone := map[string]json.RawMessage{"files/probe.md": json.RawMessage(`{"hash":"","text":""}`)}
-	madeNames, madeMarks := weighs.marks(made)
-	goneNames, goneMarks := weighs.marks(gone)
-	weighs.weighs(gone, goneNames, goneMarks)
-	weighs.weighs(made, madeNames, madeMarks)
-	if len(rows) != 0 {
-		t.Fatalf("the shadow writes %v off the file's first value, which the removal follows", rows)
-	}
-}
-
-// A value a newer one of its name follows weighs nothing, and the weigh skips the log the shadow writes, so its own rows start no loop. [[spec/tickets/the-doors-process-stands]]
-func TestTheShadowWeighsTheNewestValueAloneAndNotItsOwnLog(t *testing.T) {
-	var rows []map[string]any
-	newest := &sends{at: map[string]int64{}}
-	var weighs shadows
-	weighs = shadows{
-		read:   func(string) any { return 3 },
-		settle: time.Second,
-		wait: func(time.Duration) {
-			if len(rows) == 0 && newest.next == 2 {
-				newest.mark([]string{"clock/minute"})
-			}
-		},
-		say:    func(row map[string]any) error { rows = append(rows, row); return nil },
-		newest: newest,
-	}
-	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), shadowsOwnLog: json.RawMessage(`"a row"`), "env/HOME": json.RawMessage("5")})
-	if len(rows) != 1 || rows[0]["name"] != "env/HOME" {
-		t.Fatalf("the shadow writes %v, and wants env/HOME alone: clock/minute has a newer value and the log is its own", rows)
 	}
 }

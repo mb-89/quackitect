@@ -575,11 +575,9 @@
         },
         "processes": {
           "type": "string",
-          "default": "old",
-          "help": "The processes: old runs every module in the index alone, shadow spawns the IO process beside it and logs each value it reads apart, new runs the placements.",
+          "default": "new",
+          "help": "The processes, switched over in phase 9. The index spawns the IO process and one process a placement.",
           "enum": [
-            "old",
-            "shadow",
             "new"
           ]
         },

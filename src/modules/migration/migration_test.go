@@ -39,11 +39,11 @@ func TestTheLspSliceStandsOld(t *testing.T) {
 // The processes slice stands switched over, built in as new with no other mode, so every box runs the split. [[spec/tickets/the-split-deployment-takes-over]]
 func TestTheProcessesSliceStandsSwitchedOverToNew(t *testing.T) {
 	for _, one := range slices {
-		if one.key == ProcessesKey && one.mode == "new" && strings.Join(one.enum, ", ") == "new" && strings.Contains(one.doc, "switched over") {
+		if one.key == ProcessesKey && one.mode == "new" && strings.Join(one.enum, ", ") == "new" && strings.Contains(one.doc, "switched over in phase 9") {
 			return
 		}
 	}
-	t.Fatalf("the slices read %+v, and want processes built in as new alone", slices)
+	t.Fatalf("the slices read %+v, and want processes built in as new alone, switched over in phase 9", slices)
 }
 
 // The verbs slice stands switched over to new, so a box with no tracked mode runs every twin alone. [[spec/tickets/agents-call-quack-directly]]

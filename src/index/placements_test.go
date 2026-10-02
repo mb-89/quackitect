@@ -196,29 +196,6 @@ func TestAMovedAskAnswersTheInputsMovedSinceTheLastAnswer(t *testing.T) {
 	}
 }
 
-func TestAQuietNameRunsNoPlacedProcess(t *testing.T) {
-	store, source, bus, placed := doublerPlaced(t)
-	stop, err := NewPlacements(bus, store, []Placed{placed}).Quiet("source/all").Start()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	peer, err := Dial(bus.URL(), bus.Token())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer peer.Close()
-	runs := runsOf(t, peer)
-	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 21}); err != nil {
-		t.Fatal(err)
-	}
-	select {
-	case <-runs:
-		t.Fatal("a commit of the quiet source/all runs doubler")
-	case <-time.After(300 * time.Millisecond):
-	}
-}
-
 func TestAPlacementRestartsTheProcessesOfOneTopic(t *testing.T) {
 	store, placements, stop := placedTwo(t)
 	defer stop()

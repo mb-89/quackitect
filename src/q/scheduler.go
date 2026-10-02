@@ -28,6 +28,18 @@ type Scheduler struct {
 	runs      sync.Mutex
 	// The instances whose providers a wave runs, and every instance where it stands nil. [[spec/tickets/process-shadow-reads-clean]]
 	only map[string]bool
+	// The instances a process of their own runs, whose providers no wave here runs. [[spec/tickets/the-split-deployment-takes-over]]
+	except map[string]bool
+}
+
+// Leaves the providers of the instances named to the processes that run them, so the index lands their commits and computes none of their names. [[spec/tickets/the-split-deployment-takes-over]]
+func (one *Scheduler) Except(instances ...string) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	one.except = map[string]bool{}
+	for _, instance := range instances {
+		one.except[instance] = true
+	}
 }
 
 // Keeps the waves to the providers of the instances named, so a process holding some instances takes every other name as the value it restores, as the index computed it. [[spec/tickets/process-shadow-reads-clean]]
@@ -42,11 +54,14 @@ func (one *Scheduler) Only(instances ...string) {
 
 // Whether a wave runs the provider, which the caller asks under the lock. [[spec/tickets/process-shadow-reads-clean]]
 func (one *Scheduler) runsHere(name string) bool {
-	if one.only == nil {
+	if one.only == nil && one.except == nil {
 		return true
 	}
 	owner := one.store.owner(name)
-	return owner != nil && one.only[owner.instance]
+	if owner == nil {
+		return false
+	}
+	return (one.only == nil || one.only[owner.instance]) && !one.except[owner.instance]
 }
 
 // A wave starts through spawn, so a case controls it. A run that errs reaches failed. [[spec/design_output/model#one-wave-settles-a-change]]

@@ -252,6 +252,17 @@ func opensOn(listens func(network, address string) (net.Listener, error), root, 
 		return failed(err)
 	}
 	undo = append(undo, managed.Stop)
+	if len(managed.Away) > 0 {
+		scheduler.Except(managed.Away...)
+	}
+	// A reader drains the index's waves, then the processes' runs, then the waves their answers start. [[spec/tickets/the-split-deployment-takes-over]]
+	if settle := managed.Settle; settle != nil {
+		one.drains = func() {
+			scheduler.Settle()
+			settle()
+			scheduler.Settle()
+		}
+	}
 	one.call = managed.Call
 	one.bus = managed.Bus
 	stops, err := one.starts(starts)

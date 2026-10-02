@@ -22,13 +22,13 @@ type Placed struct {
 	Command   []string
 	Instances map[string]q.Writer
 	Restart   time.Duration
-	// Where a shadow hands each commit, which then lands nothing and marks nothing down. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
-	Heard func(instance string, values map[string]json.RawMessage)
 	// The folders under src/modules registering its instances' module types, which a change there restarts. [[spec/design_output/model#a-module-rebuilds-alone]]
 	Topics []string
 	// The dog the process's lease stands with, and the term past a beat. A nil holds no lease. [[spec/tickets/watchdogs-span-the-processes]]
 	Watch Leases
 	Term  time.Duration
+	// Where the placements hear that an instance answers, by a commit or an exit. A nil hears nothing. [[spec/tickets/the-split-deployment-takes-over]]
+	answered func(instance string)
 }
 
 // What a placed process's lease reaches: the dog that holds and renews it, counts its faults, and calls each expiry. [[spec/design_output/model#a-lease]]
@@ -52,13 +52,38 @@ type Placements struct {
 	stopped bool
 	// The names each instance reads that a commit moved since its last answer. [[spec/design_output/model#the-placements]]
 	moved map[string]map[string]bool
-	// The names whose commit runs nothing, such as the log a shadow writes its rows to, since each row runs its readers again. [[spec/tickets/the-system-places-modules]]
-	quiet map[string]bool
 	// One answer saves at a time, so the first runs of every process read the inputs one after another. [[spec/tickets/the-system-places-modules]]
 	saving sync.Mutex
 	// The wait before the first spawn, and the stop that ends it. [[spec/tickets/the-system-places-modules]]
 	after time.Duration
 	quit  chan struct{}
+	// The instances a reader waits on: each until its first answer, and again from each run sent until the next. idle wakes the wait. [[spec/tickets/the-split-deployment-takes-over]]
+	pending map[string]bool
+	idle    *sync.Cond
+}
+
+// Waits until every instance answers what it was sent, an exit counting as an answer, or the wait passes. So a read after a commit reads what the processes compute off it. [[spec/tickets/the-split-deployment-takes-over]]
+func (p *Placements) Settle(wait time.Duration) {
+	timer := time.AfterFunc(wait, func() {
+		p.mu.Lock()
+		p.idle.Broadcast()
+		p.mu.Unlock()
+	})
+	defer timer.Stop()
+	ends := time.Now().Add(wait)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	for len(p.pending) > 0 && !p.stopped && time.Now().Before(ends) {
+		p.idle.Wait()
+	}
+}
+
+// Clears the instance's wait once its process commits or exits. [[spec/tickets/the-split-deployment-takes-over]]
+func (p *Placements) answered(instance string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	delete(p.pending, instance)
+	p.idle.Broadcast()
 }
 
 // Waits the span before the first spawn, so an index stopped inside it spawns nothing. [[spec/tickets/the-system-places-modules]]
@@ -70,19 +95,19 @@ func (p *Placements) After(span time.Duration) *Placements {
 // The gap between two spawns, so a start of every process leaves the index's door room to stand. [[spec/tickets/the-system-places-modules]]
 const spawnGap = 250 * time.Millisecond
 
-// Marks names whose commit runs no placed process. [[spec/tickets/the-system-places-modules]]
-func (p *Placements) Quiet(names ...string) *Placements {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	for _, name := range names {
-		p.quiet[name] = true
-	}
-	return p
-}
-
 // [[spec/design_output/model#the-placements]]
 func NewPlacements(bus *Bus, store *q.Store, placed []Placed) *Placements {
-	return &Placements{bus: bus, store: store, placed: placed, moved: map[string]map[string]bool{}, quiet: map[string]bool{}, quit: make(chan struct{})}
+	p := &Placements{bus: bus, store: store, moved: map[string]map[string]bool{}, quit: make(chan struct{}), pending: map[string]bool{}}
+	p.idle = sync.NewCond(&p.mu)
+	p.placed = make([]Placed, len(placed))
+	for i, one := range placed {
+		one.answered = p.answered
+		for instance := range one.Instances {
+			p.pending[instance] = true
+		}
+		p.placed[i] = one
+	}
+	return p
 }
 
 // Starts every placed process, and answers the stop of them all. [[spec/design_output/model#the-placements]]
@@ -97,6 +122,7 @@ func (p *Placements) Start() (func(), error) {
 		close(p.quit)
 		p.mu.Lock()
 		p.stopped = true
+		p.idle.Broadcast()
 		stops := p.stops
 		p.stops = nil
 		p.mu.Unlock()
@@ -166,7 +192,7 @@ func (p *Placements) runs(peer *Peer, inputs map[string][]string, values map[str
 	}
 	var run []string
 	for instance, names := range inputs {
-		read := reads(names, values, p.quiet)
+		read := reads(names, values)
 		if len(read) == 0 {
 			continue
 		}
@@ -176,6 +202,7 @@ func (p *Placements) runs(peer *Peer, inputs map[string][]string, values map[str
 		for _, name := range read {
 			p.moved[instance][name] = true
 		}
+		p.pending[instance] = true
 		run = append(run, instance)
 	}
 	p.mu.Unlock()
@@ -203,12 +230,9 @@ func (p *Placements) answer(instance string, inputs []string, moved bool) []stri
 }
 
 // The names of the commit an instance reads. [[spec/design_output/model#the-placements]]
-func reads(inputs []string, values map[string]any, quiet map[string]bool) []string {
+func reads(inputs []string, values map[string]any) []string {
 	var out []string
 	for name := range values {
-		if quiet[name] {
-			continue
-		}
 		for _, input := range inputs {
 			if q.Matches(input, name) {
 				out = append(out, name)
@@ -291,8 +315,14 @@ func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
 
 // A commit lands typed as the instance's writer, and clears its down mark. [[spec/design_output/model#a-process-ends]]
 func (p Placed) heard(store *q.Store, instance string, hand q.Writer, values map[string]json.RawMessage) {
-	if p.Heard != nil {
-		p.Heard(instance, values)
+	if p.answered != nil {
+		defer p.answered(instance)
+	}
+	// An empty commit answers a run that moved nothing. [[spec/tickets/the-split-deployment-takes-over]]
+	if len(values) == 0 {
+		if err := store.Up(instance); err != nil {
+			fmt.Fprintln(stderr, p.Name, "stands", instance, "up nowhere:", err)
+		}
 		return
 	}
 	typed := make(map[string]any, len(values))
@@ -380,12 +410,12 @@ func (p Placed) spawn(bus *Bus) (*exec.Cmd, <-chan error) {
 }
 
 func (p Placed) down(store *q.Store) {
-	if p.Heard != nil {
-		return
-	}
 	for instance := range p.Instances {
 		if err := store.Down(instance); err != nil {
 			fmt.Fprintln(stderr, p.Name, "stands", instance, "down nowhere:", err)
+		}
+		if p.answered != nil {
+			p.answered(instance)
 		}
 	}
 }

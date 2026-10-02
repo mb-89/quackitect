@@ -23,17 +23,17 @@ const (
 	HoldWord   = "hold"
 )
 
-// The row kinds the replay reads and writes, the slice it names, the level a shadow row takes, and the stamp the JS clock writes. src/doors/log.js owns the hook row, and the shadow row stands in [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]].
+// The row kinds the replay and the lease read write, the slice the replay names, the level a shadow row takes, and the stamp the JS clock writes. src/doors/log.js owns the hook row, and the shadow row stands in [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]].
 const (
-	hookKind    = "hook"
-	shadowKind  = "shadow"
-	blockKind   = "block"
-	rowsKind    = "rows"
-	cageSlice   = "cage"
-	procsSlice  = "processes"
-	indexPart   = "index"
-	shadowLevel = "info"
-	stampLayout = "2006-01-02T15:04:05.000Z07:00"
+	hookKind     = "hook"
+	shadowKind   = "shadow"
+	blockKind    = "block"
+	rowsKind     = "rows"
+	cageSlice    = "cage"
+	watchdogKind = "watchdog"
+	indexPart    = "index"
+	shadowLevel  = "info"
+	stampLayout  = "2006-01-02T15:04:05.000Z07:00"
 )
 
 // One hook row that a box writes at debug, as src/doors/log.js event writes it. [[spec/tickets/cage-rules-replay-session-logs]]
@@ -164,7 +164,7 @@ func (d *Door) shadows(post Post, said Answer) {
 	_ = d.from.Shadow(row)
 }
 
-// A guarded call reads the index's lease, and one past its term writes a shadow row, since the port answers while the loop hangs. The call passes on. [[spec/tickets/watchdogs-span-the-processes]]
+// A guarded call reads the index's lease, and one past its term writes a watchdog row, since the port answers while the loop hangs. The call passes on, since this door runs in the index and a busy sweep runs the lease past its term too. [[spec/tickets/watchdogs-span-the-processes]] [[spec/tickets/the-split-deployment-takes-over]]
 func (d *Door) readsHealth(post Post) {
 	if post.Event != toolEvent || d.from.Health == nil || d.from.Shadow == nil {
 		return
@@ -183,10 +183,9 @@ func (d *Door) readsHealth(post Post) {
 	}
 	_ = d.from.Shadow(map[string]any{
 		"at":    now.UTC().Format(stampLayout),
-		"level": shadowLevel,
-		"kind":  shadowKind,
-		"said":  fmt.Sprintf("%s in shadow: the index's lease stands past its term since %s, and the call passes", procsSlice, ends.UTC().Format(stampLayout)),
-		"slice": procsSlice,
+		"level": warnLevel,
+		"kind":  watchdogKind,
+		"said":  fmt.Sprintf("the index's lease stands past its term since %s, and the call passes", ends.UTC().Format(stampLayout)),
 		"part":  indexPart,
 	})
 }

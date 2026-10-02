@@ -145,6 +145,32 @@ func TestAKilledPlacedProcessLeavesTheOthersAnswering(t *testing.T) {
 	}
 }
 
+// A reader settling the placements reads what a process just spawned commits, and a stopped placement waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
+func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	fake := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
+	placements := NewPlacements(bus, store, []Placed{fake})
+	stop, err := placements.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	placements.Settle(20 * time.Second)
+	if got := read(store, "fake/out"); got != 7 {
+		t.Fatalf("fake/out reads %v once the settle ends, and wants 7", got)
+	}
+	stop()
+	began := time.Now()
+	placements.Settle(time.Hour)
+	if gone := time.Since(began); gone > time.Second {
+		t.Fatalf("a stopped placement holds the settle for %v", gone)
+	}
+}
+
 // A dog that counts holds and faults, and refuses every restart. [[spec/tickets/watchdogs-span-the-processes]]
 type refusingDog struct {
 	mu     sync.Mutex

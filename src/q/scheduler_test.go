@@ -74,6 +74,26 @@ func TestASchedulerKeptToAnInstanceRunsItsOwnProvidersAlone(t *testing.T) {
 	}
 }
 
+// A scheduler leaving an instance to its own process runs none of its providers, and every other instance's. [[spec/tickets/the-split-deployment-takes-over]]
+func TestAWaveRunsNoProviderOfAnInstanceExcepted(t *testing.T) {
+	w := Wiring{
+		Instances: []Instance{{"tickets", "source"}, {"queue", "counter"}, {"board", "counter"}},
+		Wires:     map[string]string{"queue.rows": "tickets.all", "board.rows": "tickets.all"},
+	}
+	types := map[string]func(*Catalog, map[string]Writer){"source": source, "counter": counter}
+	store, hands := loaded(t, w, types)
+	scheduler := NewScheduler(store, spawned, failOn(t))
+	scheduler.Except("queue")
+	seed(t, store, hands["source"], "tickets/all", 5)
+	scheduler.Settle()
+	if got := store.Snapshot().Read("queue/count"); got != 0 {
+		t.Fatalf("a scheduler leaving queue runs it, and queue/count reads %v", got)
+	}
+	if got := store.Snapshot().Read("board/count"); got != 5 {
+		t.Fatalf("board/count reads %v, and wants 5", got)
+	}
+}
+
 func TestTwoMovesDuringARunLeaveOnePendingRunAndNoOverlap(t *testing.T) {
 	c := New()
 	hand := OutIn(c, "t/n", 0)
