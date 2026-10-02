@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -120,6 +120,10 @@ record:
         hash: e122785976621597
         size: 10947
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 5ce7a9878c36dbdba15316f6762971e7387c4d4f
+    hash_after: 5ce7a9878c36dbdba15316f6762971e7387c4d4f
 depends_on: ["go-cage-switches-over", "lsp-door-switches-over", "sidebar-switches-over"]
 enabled_by: migration.phase9shadow
 cloud: true
