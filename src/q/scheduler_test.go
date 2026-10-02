@@ -286,6 +286,35 @@ func TestOneWaveRunsEveryKeyItsFilesCover(t *testing.T) {
 	}
 }
 
+// One commit moving many files under two loaded families settles every key in one wave, each family's names read once. [[spec/tickets/waves-match-each-file-once]]
+func TestOneWaveOverManyFilesSettlesEveryKeyOfEachFamily(t *testing.T) {
+	c := New()
+	files := OutIn(c, "files/<path...>", Content{})
+	ProjectIn(c, "queue", ".se/.runtime/*.txt", Codec[[]string](linesCodec{}), Loaded, []string{})
+	ProjectIn(c, "notes", "spec/*.md", Codec[[]string](linesCodec{}), Loaded, []string{})
+	s := NewStore(c)
+	scheduler := NewScheduler(s, spawned, failOn(t))
+	moved := map[string]any{}
+	for i := range manyFiles {
+		moved[fmt.Sprintf("files/.se/.runtime/%d.txt", i)] = Content{Hash: fmt.Sprint(i), Text: strings.Repeat("a\n", i%3+1)}
+		moved[fmt.Sprintf("files/spec/%d.md", i)] = Content{Hash: fmt.Sprint(i), Text: strings.Repeat("b\n", i%2+1)}
+	}
+	if _, err := s.Commit(s.Snapshot().Revision, files, moved); err != nil {
+		t.Fatal(err)
+	}
+	scheduler.Settle()
+	for i := range manyFiles {
+		queue, _ := s.Snapshot().Read(fmt.Sprintf("queue/.se/.runtime/%d.txt", i)).([]string)
+		notes, _ := s.Snapshot().Read(fmt.Sprintf("notes/spec/%d.md", i)).([]string)
+		if len(queue) != i%3+1 || len(notes) != i%2+1 {
+			t.Fatalf("key %d reads %v and %v after one commit moves every file", i, queue, notes)
+		}
+	}
+}
+
+// The files one commit moves in the wave above. [[spec/tickets/waves-match-each-file-once]]
+const manyFiles = 400
+
 func TestAKeyOutsideTheGlobsRunsNothing(t *testing.T) {
 	s, scheduler, files := loadedPlan(t)
 	seed(t, s, files, "files/.se/.runtime/plan.json", Content{Hash: "h", Text: "a\n"})

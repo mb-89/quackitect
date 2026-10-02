@@ -226,6 +226,8 @@ func (one *Scheduler) waves() {
 		}
 		moved := map[string]bool{}
 		seen := map[string]bool{}
+		// A loaded family's concrete names hang on the wave's names alone, so the wave reads them once a family. [[spec/tickets/waves-match-each-file-once]]
+		families := map[string]bool{}
 		var order []string
 		for _, name := range names {
 			owner := resolve(one.store.groups, name)
@@ -240,6 +242,10 @@ func (one *Scheduler) waves() {
 				// A loaded family runs as the concrete names the wave's files cover. [[spec/tickets/index-reads-loaded-projections]]
 				runs := []string{reader}
 				if keyed(reader) {
+					if families[reader] {
+						continue
+					}
+					families[reader] = true
 					runs = one.concreteOf(reader, names)
 				}
 				for _, run := range runs {
