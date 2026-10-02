@@ -7,10 +7,10 @@ package index
 import (
 	"flag"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
+	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 )
 
@@ -65,82 +65,6 @@ func TestFakeSilentProcess(t *testing.T) {
 	for {
 		time.Sleep(time.Hour)
 	}
-}
-
-// A dog over the wall clock: a lease expires past its term, and a second fault raises the alarm, which stops the restarts. [[spec/design_output/model#restarts]]
-type fakeLeases struct {
-	mu      sync.Mutex
-	terms   map[string]time.Duration
-	renewed map[string]time.Time
-	faults  map[string]int
-	hands   []func(string)
-	stop    chan struct{}
-}
-
-func newFakeLeases() *fakeLeases {
-	one := &fakeLeases{terms: map[string]time.Duration{}, renewed: map[string]time.Time{}, faults: map[string]int{}, stop: make(chan struct{})}
-	go func() {
-		for {
-			select {
-			case <-one.stop:
-				return
-			case <-time.After(10 * time.Millisecond):
-				one.check()
-			}
-		}
-	}()
-	return one
-}
-
-func (f *fakeLeases) Hold(part string, term time.Duration) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.terms[part], f.renewed[part] = term, time.Now()
-}
-
-func (f *fakeLeases) Beat(part string) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	if _, held := f.terms[part]; held {
-		f.renewed[part] = time.Now()
-	}
-}
-
-func (f *fakeLeases) Fault(part string, _ error) (time.Duration, bool) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.faults[part]++
-	return 10 * time.Millisecond, f.faults[part] < 2
-}
-
-func (f *fakeLeases) Expired(hand func(part string)) {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	f.hands = append(f.hands, hand)
-}
-
-func (f *fakeLeases) check() {
-	f.mu.Lock()
-	expired := []string{}
-	for part, term := range f.terms {
-		if time.Since(f.renewed[part]) > term {
-			expired = append(expired, part)
-			f.renewed[part] = time.Now()
-		}
-	}
-	hands := append([]func(string){}, f.hands...)
-	f.mu.Unlock()
-	for _, part := range expired {
-		for _, hand := range hands {
-			hand(part)
-		}
-	}
-}
-
-func (f *fakeLeases) faultsOf(part string) int {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	return f.faults[part]
 }
 
 // A store whose wiring loads the fake instance, and the writer it commits as. [[spec/design_output/model#a-process-ends]]
@@ -233,10 +157,27 @@ func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer bus.Close()
-	store, hand := fakeStore(t)
-	leases := newFakeLeases()
-	defer close(leases.stop)
-	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Watch: leases, Term: 200 * time.Millisecond}
+	c := q.New()
+	as := manager.Registers(c)
+	hand := q.Join(q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid")), q.OutIn(c, "fake/out", 0, q.IO(), q.Doc("the fake's value")))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
+	ticking := make(chan struct{})
+	defer close(ticking)
+	go func() {
+		for {
+			select {
+			case <-ticking:
+				return
+			case <-time.After(10 * time.Millisecond):
+				dog.Check()
+			}
+		}
+	}()
+	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
 	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
 	if err != nil {
 		t.Fatal(err)
@@ -248,9 +189,8 @@ func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 		pid := snap.Read("fake/pid")
 		return pid != first && pid != 0
 	})
-	for end := time.Now().Add(10 * time.Second); leases.faultsOf("fake") < 2 && time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
-	}
-	if got := leases.faultsOf("fake"); got < 2 {
-		t.Fatalf("the dog counts %d fault(s) of the silent fake, and wants the second that raises the alarm", got)
-	}
+	until(t, store, "session/alarms naming the silent fake", func(snap q.Snapshot) bool {
+		alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm)
+		return len(alarms) == 1 && alarms[0].Part == "fake"
+	})
 }
