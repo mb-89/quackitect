@@ -72,7 +72,7 @@ func (from Outside) proseFaults(text, where string) []prose.Refused {
 	return withContext(text, linted.Found)
 }
 
-// Each row Vale keeps, with its trimmed line as context, off withContext in src/engine/tense.js. [[spec/tickets/prose-tools-answer-in-go]]
+// Each row Vale keeps, with its trimmed line as context, off withContext in src/bridge/prose.js. [[spec/tickets/prose-tools-answer-in-go]]
 func withContext(text string, found []Finding) []prose.Refused {
 	lines := strings.Split(text, "\n")
 	out := make([]prose.Refused, 0, len(found))

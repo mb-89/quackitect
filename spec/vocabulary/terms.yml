@@ -263,8 +263,7 @@ terms:
   - {word: glitch, means: "a value computed off a mix of new and old inputs that no settled state ever held"}
   - {word: dataflow, means: "a way to compute where values flow along declared links from the ones that feed them"}
   - {word: jitter, means: "a spread in how long each cycle of a timed loop takes"}
-  - {word: golem, means: "a Go language library the prose checks use to find the base form of each word in place of wink-nlp", source: "https://github.com/aaaton/golem"}
-  - {word: wink-nlp, means: "a language library the tense reader uses to find the base form of each word", source: "https://github.com/winkjs/wink-nlp"}
+  - {word: golem, means: "a Go language library the prose checks use to find the base form of each word", source: "https://github.com/aaaton/golem"}
   - {word: adjective, means: "a word that describes a noun which the tense reader must not mistake for a past verb"}
   - {word: starfish, means: "the retro form that asks what to start and stop and keep and do more and less"}
   - {word: mechanize, means: "to turn a lesson into a check or a tool so it holds without anyone remembering it"}

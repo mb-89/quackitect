@@ -84,7 +84,7 @@ func known(w string) bool {
 	return lemmer != nil && lemmer.InDict(w)
 }
 
-// A word the dictionary misses sheds its ending the way wink's rules shed it, so an unknown -ed form still reads past. [[spec/tickets/prose-checks-run-in-go]]
+// A word the dictionary misses sheds its ending by rule, so an unknown -ed form still reads past. [[spec/tickets/prose-checks-run-in-go]]
 func byEndings(w string) string {
 	if !letters.MatchString(w) || keepsEnd.MatchString(w) {
 		return w

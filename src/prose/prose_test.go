@@ -1,5 +1,5 @@
-// The Go vetoes answer the tables of the tense reader, the way the wink
-// reader in src/engine/tense.js and src/bridge/prose.js answers them.
+// The Go vetoes answer the tables of the tense reader, and every prose reader
+// asks them through quack prose.
 // [[spec/tickets/prose-checks-run-in-go]]
 package prose
 
