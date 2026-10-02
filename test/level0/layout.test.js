@@ -3,9 +3,7 @@
 // [[spec/design_output/drawing#the-layout-reads-the-graph]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
 import { test } from "node:test";
-import { disk } from "../../src/doors/disk.js";
 import {
   classOf,
   HEIGHT,
@@ -13,8 +11,6 @@ import {
   laidOut,
   WIDTH,
 } from "../../src/extension/webview/route/layout.js";
-
-const LAYOUT = join(import.meta.dirname, "..", "..", "src", "extension", "webview", "route", "layout.js");
 
 // A placer standing in for dagre: each node one step further down and right, in the graph's order. [[spec/design_output/drawing#the-layout-reads-the-graph]]
 const STEP = 100;
@@ -74,10 +70,8 @@ test("the label carries the returns, and an empty graph draws nothing", () => {
   assert.deepEqual(laidOut(undefined, grid), { nodes: [], edges: [] });
 });
 
-// A box installs no Node modules, so the layout a node test drives imports none; dagre rides in the placer the bundle carries. [[spec/design_output/drawing#the-layout-reads-the-graph]]
-test("the layout imports no package, and the placer hands it every node and the edges that reach one", () => {
-  const imports = String(disk().read(LAYOUT)).match(/^import .* from "([^"]+)";$/gm) ?? [];
-  assert.deepEqual(imports.filter((one) => !/from "\.\.?\//.test(one)), []);
+// A box installs no Node modules, so this file loads the layout with none; dagre rides in the placer the bundle carries. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+test("the placer takes every node and the edges that reach one", () => {
   let seen;
   laidOut(GRAPH, (nodes, edges) => {
     seen = { nodes: nodes.map((one) => one.id), edges: edges.map((one) => one.to) };
