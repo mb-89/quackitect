@@ -179,7 +179,7 @@ record:
   - step: retro/cloud
     hand: box 09eeff3afa7c · claude-code-remote
     hash_before: 4ad1b4ec2d0754970c63106a8b220d75673e9e86
-    hash_after: 4ad1b4ec2d0754970c63106a8b220d75673e9e86
+    hash_after: 3e59a784c626017e07c1295a06dd2250a244d292
     inputs:
       - name: retro/write
         hash: 7a833aed473e2cc4
