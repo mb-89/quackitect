@@ -74,7 +74,7 @@ Now `holds` skips the stamp for work branches where `.github/workflows/check.yml
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change follows the ask: the agent gate skips work branches under CI, and the trunk gate stands as it was
+- the change follows the ask: the agent gate skips work branches under CI, and trunk keeps its gate
 - the cleanup it reveals: none
 - every fact stands once: the workflow path lives in `CI` in prepush.js
 
