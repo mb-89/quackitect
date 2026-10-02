@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -176,6 +176,15 @@ record:
         hash: a4432019dfba878d
         size: 74940
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: f78681ad583afd4b302b4850b30b65086f47c4e7
+    hash_after: 66ce2180eb9fb86ffc16fadd05564290d43aaf7b
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/watchdogs-span-the-processes.md:301:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -321,14 +330,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the bus, the placements, the dog, the manager, quack's IO and wiring, and the hooks door, each one the callers list names
+- every door the change reaches has a fake: the dog's cases run over the fake clock, the placements over a local dog and the test binary as the process, and the hooks door over its fixed clock
+- a comment names the approach the change implements: each new function points at spec/tickets/watchdogs-span-the-processes
+- every fact the change adds stands in one place: LeaseTerm in lease.go owns the term both processes read, and indexPart names the index's part in each package that writes it
 
 ## tests-green
 
