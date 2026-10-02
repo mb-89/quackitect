@@ -4,6 +4,7 @@
 package index
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -357,6 +358,30 @@ func TestTheIndexLeaseRenewsOffItsWorkLoop(t *testing.T) {
 		time.Sleep(200 * time.Millisecond)
 	}
 	t.Fatal("the work loop runs no step the manager hands it")
+}
+
+// The value answer drains through the manager's settle, so a reader reads what the placed processes answer before it. [[spec/tickets/callers-name-drains-readers]]
+func TestTheValueAnswerWaitsOnTheManagersSettle(t *testing.T) {
+	root := tree(t)
+	catalog := q.New()
+	hand := q.OutIn(catalog, "t/n", 4, q.Doc("a count"))
+	manage := func(_ string, store *q.Store, _ OpRows, _ Reads, _ func(func())) (Managed, error) {
+		settle := func() {
+			if _, err := store.Commit(store.Snapshot().Revision, hand, map[string]any{"t/n": 9}); err != nil {
+				t.Error(err)
+			}
+		}
+		return Managed{Stop: func() {}, Settle: settle}, nil
+	}
+	one, stop, _, err := opens(root, filepath.Join(t.TempDir(), "index.db"), catalog, manage)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	said, err := one.answers(call{Method: "value", Params: json.RawMessage(`{"name":"t/n"}`)})
+	if err != nil || said != 9 {
+		t.Fatalf("the value answer reads %v and %v, and wants the 9 the settle commits", said, err)
+	}
 }
 
 // The door answers the dump text, and the root writes it. [[spec/design_output/model#everything-on-disk-mirrors]]
