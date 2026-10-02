@@ -6,6 +6,7 @@ package check
 import (
 	"regexp"
 	"strings"
+	"sync"
 )
 
 // [[spec/design_output/private#the-box-names-the-owner]]
@@ -23,15 +24,24 @@ func namesAPerson(said string) bool {
 }
 
 // [[spec/design_output/private#the-box-names-the-owner]]
+// A line missing the name meets no pattern, so the sweep compiles nothing for it. [[spec/tickets/check-patterns-compile-once]]
 func carriesTheName(line, name string) bool {
-	if name == "" {
+	if name == "" || !strings.Contains(line, name) {
 		return false
 	}
-	found, err := regexp.Compile(`(^|[^A-Za-z0-9])` + regexp.QuoteMeta(name) + `([^A-Za-z0-9]|$)`)
-	if err != nil {
-		return false
+	return namePattern(name).MatchString(line)
+}
+
+// The pattern a name matches as a word, compiled once a name, since the sweep asks it of every line. [[spec/tickets/check-patterns-compile-once]]
+var namePatterns sync.Map
+
+func namePattern(name string) *regexp.Regexp {
+	if held, ok := namePatterns.Load(name); ok {
+		return held.(*regexp.Regexp)
 	}
-	return found.MatchString(line)
+	found := regexp.MustCompile(`(^|[^A-Za-z0-9])` + regexp.QuoteMeta(name) + `([^A-Za-z0-9]|$)`)
+	namePatterns.Store(name, found)
+	return found
 }
 
 func homeNames(home string) bool {
