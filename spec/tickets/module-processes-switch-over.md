@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -112,6 +112,10 @@ record:
         hash: e122785976621597
         size: 10947
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 372a0cd8de7540212b363afbe72d01445760f539
+    hash_after: 372a0cd8de7540212b363afbe72d01445760f539
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
 cloud: true
