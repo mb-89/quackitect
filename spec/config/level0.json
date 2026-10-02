@@ -18,6 +18,7 @@
     "phase8shadow": true,
     "phase8switch": true,
     "phase9shadow": true,
+    "phase9switch": true,
     "sidebar": "new",
     "lsp": "new",
     "processes": "shadow"
