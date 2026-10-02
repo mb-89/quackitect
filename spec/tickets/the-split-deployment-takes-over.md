@@ -367,4 +367,4 @@ accept with points
 - A module process answers every run, an empty commit where nothing moved, and `quack io` acks each start after its seed.
 - I weigh a reader that reads stale values and waits on nothing. It fails the contract case and every verb reading right after a start, so I take the wait.
 - The cage passes a call on a lease past its term, and writes a `watchdog` row. During this box's sync the lease ran past its term while the door answered. A refusal there locks the agent out at every large sync.
-- The gate, fixed in place: `Placements.runs` marked a down instance pending, so a reader's drain waited out `answerWait` while that process stood dead. The `gone` set in `src/index/procs.go` now skips it, and `TestASettleWaitsOnNoProcessStandingDown` goes red without the guard.
+- The gate, fixed in place: `Placements.runs` marked a down instance pending. A reader's drain then waited out `answerWait` while that process stood dead. The `gone` set in `src/index/procs.go` now skips it, and `TestASettleWaitsOnNoProcessStandingDown` goes red without the guard.
