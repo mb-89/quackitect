@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -158,6 +158,25 @@ record:
         hash: e122785976621597
         size: 10947
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 9c8eef5584f9e0070674d696a21ba90f62b5188b
+    hash_after: 9c8eef5584f9e0070674d696a21ba90f62b5188b
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/node-leaves-the-boxes already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
 cloud: true
@@ -225,8 +244,7 @@ Done when `install.sh` installs no Node.
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- windows-missing-code-reads-absent: on Windows cmd answers exit 9009 where no code stands, and the setup reads that as missing. The setup reads 9009 as no code, so the extensions skip as on Linux.
+accept
 
 # retro
 
