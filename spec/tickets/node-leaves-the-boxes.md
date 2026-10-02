@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/node-leaves-the-boxes already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 89b61c6ab99d7877d2fa797b6594aaedbd09dd0c
+    hash_after: 89b61c6ab99d7877d2fa797b6594aaedbd09dd0c
+    inputs:
+      - name: ask
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
 cloud: true
@@ -133,14 +145,32 @@ Done when `install.sh` installs no Node.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/go-prose-checks-stand-alone]], standard
+- [[spec/tickets/the-webview-ships-prebuilt]], standard
+- [[spec/tickets/install-drops-node]], standard
+- [[spec/tickets/install-callers-cover-the-tests]], trivial
+- [[spec/tickets/cold-probe-reads-the-setup]], trivial
+- [[spec/tickets/setup-verb-stands-red]], trivial
+- [[spec/tickets/install-names-the-index-binary]], trivial
+- [[spec/tickets/go-stamp-takes-bare-modules]], trivial
+- [[spec/tickets/bare-desk-names-missing-node]], trivial
+- [[spec/tickets/the-verbs-leave-node]], trivial
+- [[spec/tickets/boot-fixture-drops-wink]], trivial
+- [[spec/tickets/lsp-fixture-drops-node]], trivial
+- [[spec/tickets/readers-tests-carry-quack]], trivial
+- [[spec/tickets/tense-notes-follow]], trivial
+- [[spec/tickets/widenings-stand-needed]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is a single change a reviewer reads whole, and every one stands closed
+- the Go prose checks, the prebuilt webview and the installer cut each have a child, so the goal stands covered
+- the children ran in order on one branch, so none waits on another
 
 # children
 
