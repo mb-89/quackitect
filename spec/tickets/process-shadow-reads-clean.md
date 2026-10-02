@@ -30,7 +30,7 @@ record:
   - step: do
     hand: box 290b6d3e66c7 · claude-code-remote · session
     hash_before: 609feaacebaf1e572ceb34ca9cba45187cf54131
-    hash_after: 609feaacebaf1e572ceb34ca9cba45187cf54131
+    hash_after: 1f3191fb1ae6783f8d43d9c812907e3468bc838c
     answered:
       - name: tests
         exit: 0
