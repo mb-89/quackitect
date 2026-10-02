@@ -51,11 +51,15 @@ The gain is a shadow that writes a row only where the two paths disagree in subs
 
 <!-- the form is command -->
 
+go test ./src/modules/clock ./src/index -run 'Minute|Serve|Displaced|Drops|Reaches|Door' && go test ./src/quack -run Shadow
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -63,11 +67,25 @@ The gain is a shadow that writes a row only where the two paths disagree in subs
 
 <!-- the form is text -->
 
+Each value mismatch is timing. The index and the IO process each run their own clock and git poller, on their own phase, and the shadow weighed a value once, two seconds after the IO process committed it.
+
+| finding | cause | change |
+|---|---|---|
+| `clock/minute` one apart | each clock ticked a minute from its own start, so one path held the old minute up to a minute longer | `src/modules/clock/clock.go` reads the time each second and commits as the minute turns |
+| `queue/places` order | one path read a moved `git/stood` before the other. The old order is the all-zero score of a shallow clone, the new one the day score | `src/quack/io.go`: the shadow weighs a value apart again each settle, and writes a row only once it stays apart past `shadowPatience` |
+| doubled placement | a second `serve` stood a door beside the live one, and the first door kept its modules after its standing file went | `src/index/main.go`: a serve beside a live door stands none, a door drops only its own standing file, and a door the file no longer names leaves |
+
+The standing hang did not reproduce on this box. It follows from the doubled index, which the guards close. The places order reproduced on a checkout and on a clone that took its whole history, and came together within one git poll.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: a timing mismatch gets a tolerant compare, and the doubled placement a guard, each with its test
+- the cleanup it reveals: the stop path removed whichever standing file stood, and now drops its own alone
+- every fact stands once: the spans live in the constants of `src/quack/io.go`, `src/modules/clock/clock.go` and `src/index/main.go`
 
 # Discussion
 

@@ -26,6 +26,27 @@ type Scheduler struct {
 	busy      int
 	stopped   bool
 	runs      sync.Mutex
+	// The instances whose providers a wave runs, and every instance where it stands nil. [[spec/tickets/process-shadow-reads-clean]]
+	only map[string]bool
+}
+
+// Keeps the waves to the providers of the instances named, so a process holding some instances takes every other name as the value it restores, and computes none of them again off inputs it never reads. [[spec/tickets/process-shadow-reads-clean]]
+func (one *Scheduler) Only(instances ...string) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	one.only = map[string]bool{}
+	for _, instance := range instances {
+		one.only[instance] = true
+	}
+}
+
+// Whether a wave runs the provider, which the caller asks under the lock. [[spec/tickets/process-shadow-reads-clean]]
+func (one *Scheduler) runsHere(name string) bool {
+	if one.only == nil {
+		return true
+	}
+	owner := one.store.owner(name)
+	return owner != nil && one.only[owner.instance]
 }
 
 // A wave starts through spawn, so a case controls it. A run that errs reaches failed. [[spec/design_output/model#one-wave-settles-a-change]]
@@ -198,6 +219,9 @@ func (one *Scheduler) waves() {
 			}
 			moved[owner.name] = true
 			for _, reader := range one.listOf(owner.name) {
+				if !one.runsHere(reader) {
+					continue
+				}
 				// A loaded family runs as the concrete names the wave's files cover. [[spec/tickets/index-reads-loaded-projections]]
 				runs := []string{reader}
 				if keyed(reader) {

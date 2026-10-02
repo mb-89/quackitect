@@ -380,10 +380,19 @@ func (s shadows) apart(name string, value json.RawMessage) (string, string, bool
 		return "", "", false
 	}
 	var now bytes.Buffer
-	if json.Compact(&now, value) != nil || bytes.Equal(old, now.Bytes()) {
+	if json.Compact(&now, value) != nil || bytes.Equal(old, now.Bytes()) || sameContent(old, now.Bytes()) {
 		return "", "", false
 	}
 	return string(old), now.String(), true
+}
+
+// Whether two file values hold the same hash and text. Each path stamps the time it read the file at, and a write landing twice with one text moves that stamp alone. [[spec/tickets/process-shadow-reads-clean]]
+func sameContent(old, now []byte) bool {
+	var left, right q.Content
+	if json.Unmarshal(old, &left) != nil || json.Unmarshal(now, &right) != nil || left.Hash == "" {
+		return false
+	}
+	return left.Hash == right.Hash && left.Text == right.Text
 }
 
 // Writes the shadow row for a value apart. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]

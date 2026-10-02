@@ -35,6 +35,45 @@ func TestAMovedInputRunsItsProvider(t *testing.T) {
 	}
 }
 
+// A scheduler kept to one instance runs that instance's providers alone, and takes another instance's name as the value restored, so a module process computes no name off inputs it never reads. [[spec/tickets/process-shadow-reads-clean]]
+func TestASchedulerKeptToAnInstanceRunsItsOwnProvidersAlone(t *testing.T) {
+	w := Wiring{
+		Instances: []Instance{{"tickets", "source"}, {"queue", "counter"}, {"board", "counter"}},
+		Wires:     map[string]string{"queue.rows": "tickets.all", "board.rows": "queue.count"},
+	}
+	types := map[string]func(*Catalog, map[string]Writer){"source": source, "counter": counter}
+	index, indexHands := loaded(t, w, types)
+	NewScheduler(index, spawned, failOn(t))
+	seed(t, index, indexHands["source"], "tickets/all", 7)
+	if got := run(t, index, "queue/count"); got != 7 {
+		t.Fatalf("queue/count reads %v in the whole store", got)
+	}
+	placed, hands := loaded(t, w, types)
+	scheduler := NewScheduler(placed, spawned, failOn(t))
+	scheduler.Only("board")
+	seed(t, placed, hands["source"], "tickets/all", 3)
+	scheduler.Settle()
+	if got := placed.Snapshot().Read("queue/count"); got != 0 {
+		t.Fatalf("a scheduler kept to board runs queue, and queue/count reads %v", got)
+	}
+	saved, err := index.SaveNames([]string{"queue/count"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := placed.Restore(saved); err != nil {
+		t.Fatal(err)
+	}
+	scheduler.Settle()
+	if got := placed.Snapshot().Read("board/count"); got != 7 {
+		t.Fatalf("board/count reads %v off the restored queue/count, and wants 7", got)
+	}
+	seed(t, placed, hands["source"], "tickets/all", 4)
+	scheduler.Settle()
+	if got := placed.Snapshot().Read("queue/count"); got != 7 {
+		t.Fatalf("a move under queue writes over the restored queue/count with %v", got)
+	}
+}
+
 func TestTwoMovesDuringARunLeaveOnePendingRunAndNoOverlap(t *testing.T) {
 	c := New()
 	hand := OutIn(c, "t/n", 0)
