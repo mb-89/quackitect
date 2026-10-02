@@ -30,7 +30,7 @@ type Scheduler struct {
 	only map[string]bool
 }
 
-// Keeps the waves to the providers of the instances named, so a process holding some instances takes every other name as the value it restores, and computes none of them again off inputs it never reads. [[spec/tickets/process-shadow-reads-clean]]
+// Keeps the waves to the providers of the instances named, so a process holding some instances takes every other name as the value it restores, as the index computed it. [[spec/tickets/process-shadow-reads-clean]]
 func (one *Scheduler) Only(instances ...string) {
 	one.mu.Lock()
 	defer one.mu.Unlock()

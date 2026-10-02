@@ -35,7 +35,7 @@ func TestAMovedInputRunsItsProvider(t *testing.T) {
 	}
 }
 
-// A scheduler kept to one instance runs that instance's providers alone, and takes another instance's name as the value restored, so a module process computes no name off inputs it never reads. [[spec/tickets/process-shadow-reads-clean]]
+// A scheduler kept to one instance runs that instance's providers alone, and takes another instance's name as the value restored, so a module process keeps the value the index computed. [[spec/tickets/process-shadow-reads-clean]]
 func TestASchedulerKeptToAnInstanceRunsItsOwnProvidersAlone(t *testing.T) {
 	w := Wiring{
 		Instances: []Instance{{"tickets", "source"}, {"queue", "counter"}, {"board", "counter"}},
