@@ -59,21 +59,6 @@ test("the vale-ls assets the install spells match the ones servers.js names", ()
   }
 });
 
-// The setup runs under set -eu before every verb, so a node step it calls carries a fallback line. [[spec/design_output/copilot#setup-and-discovery]]
-test("a node step the setup calls says a warning where it stops, and the setup goes on", () => {
-  const said = disk().read(join(root, "src", "scripts", "setup.sh"));
-  const rows = said.split("\n");
-  for (const one of ["copilot.js", "brand.js"]) {
-    const at = rows.findIndex((row) => /^node /.test(row) && row.includes(one));
-    assert.ok(at >= 0, `the script calls ${one}`);
-    assert.match(
-      `${rows[at]}\n${rows[at + 1] ?? ""}`,
-      /\|\|\s*\n?\s*say /,
-      `${one} carries a fallback line, so a refusal stops no verb`,
-    );
-  }
-});
-
 // The modules land after Go and before the builds, so the first check fetches nothing, and a skip names the want. [[spec/tickets/the-install-fetches-go-modules]]
 test("the install fetches the Go modules as a want, after go and before the builds", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
@@ -115,18 +100,6 @@ test("both announcement lines wait on a missing want, so a warm tree runs silent
     /^\[ -n "\$missing" \] && say "Ready\./,
     "the closing line carries the same test on its own row",
   );
-});
-
-// The browser is a want, so a box with no browser still runs every verb, and the drawing ships in git, so the install bundles none. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
-test("the setup resolves a browser as a want, and bundles no drawing", () => {
-  const said = disk().read(join(root, "src", "scripts", "setup.sh"));
-  const list = /^for one in (.+?); do/m.exec(said);
-  const wants = list[1].split(/\s+/);
-  assert.ok(wants.includes("browser"), "the loop names browser");
-  assert.ok(!wants.includes("drawing"), "the loop names no drawing");
-  assert.match(said, /\[ "\$1" = "browser" \]/, "a missing browser stops no verb");
-  assert.doesNotMatch(said, /bundle\.js/, "no step bundles the drawing");
-  assert.match(said, /node src\/scripts\/browser\.js/, "the want asks the resolver");
 });
 
 // The index builds with Go alone. [[spec/design_output/index#the-compiler-it-needs]]

@@ -54,7 +54,6 @@ export const COLD_PATH = [
   "src/scripts/go-stamp.sh",
   "src/scripts/install.sh",
   "src/scripts/probe-cold.js",
-  "src/scripts/setup.sh",
   "src/scripts/verbs/setup.js",
 ];
 

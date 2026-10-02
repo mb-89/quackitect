@@ -80,7 +80,10 @@ done
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0
 biome_version=2.5.12
-# vale-ls pins itself in .claude/skills/level0/lib/servers.js, which a test drives.
+# vale-ls pins itself in .claude/skills/level0/lib/servers.js. A shell script
+# imports nothing, so it spells the same pin, and a contract case holds the two equal.
+vale_ls_version=0.5.1
+vale_ls_releases=https://github.com/vale-cli/vale-ls/releases/download
 
 say() { printf '%s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
@@ -118,30 +121,6 @@ case "$(uname -m)" in
   arm64|aarch64) arch=arm64 ;;
   *)             arch=64-bit ;;
 esac
-
-# Windows carries no package manager this script can name, and winget ships
-# with the operating system. A program installed a moment ago is on the machine
-# and not in this shell, so the usual node folder joins the PATH here.
-get_node() {
-  if [ "$os" != "Windows" ]; then
-    if [ "$pm" = "brew" ]; then install_with_pm node; else install_with_pm nodejs; fi
-    return 0
-  fi
-
-  have winget || {
-    say "winget is missing, so node cannot be installed." >&2
-    say "Install App Installer from the Microsoft Store and run this again." >&2
-    exit 1
-  }
-
-  say "  installing node through winget"
-  # winget answers a non-zero code where the package already stands current,
-  # and the check after this reads what the box carries either way.
-  winget install --id OpenJS.NodeJS.LTS --exact --silent \
-    --accept-source-agreements --accept-package-agreements || true
-  PATH="$PATH:/c/Program Files/nodejs"
-  export PATH
-}
 
 get_vale() {
   if [ "$os" = "Windows" ]; then
@@ -215,10 +194,17 @@ unpack() {
 # The editor wants this one, and the doors hold without it, so a failure here
 # costs a line and the tree goes on.
 get_vale_ls() {
-  from=$(cd "$root" && node --input-type=module -e \
-    "import { valeLsUrl } from './.claude/skills/level0/lib/servers.js';
-     process.stdout.write(valeLsUrl('$os', '$arch'));") || return 1
-  [ -n "$from" ] || return 1
+  # [[spec/design_output/editor#the-asset-matrix]]
+  case "$os-$arch" in
+    Linux-64-bit) target=x86_64-unknown-linux-gnu ;;
+    Linux-arm64) target=aarch64-unknown-linux-gnu ;;
+    macOS-64-bit) target=x86_64-apple-darwin ;;
+    macOS-arm64) target=aarch64-apple-darwin ;;
+    Windows-64-bit) target=x86_64-pc-windows-gnu ;;
+    Windows-arm64) target=aarch64-pc-windows-msvc ;;
+    *) return 1 ;;
+  esac
+  from="$vale_ls_releases/v$vale_ls_version/vale-ls-$target.zip"
 
   say "  downloading vale-ls"
   mkdir -p "$bin"
@@ -309,77 +295,6 @@ get_index() {
   index_here
 }
 
-# THE EDITOR FINDS WHAT ITS OWN LIST NAMES, AND A LINKED FOLDER IS NOT ON IT.
-# So the link goes in beside an entry in extensions.json, and node writes that
-# file: it keeps every entry it cannot read and refuses a write losing an id.
-# The link points at the tree, so an edit draws without a second install.
-# THE LANGUAGE CLIENT IS THE EXTENSION'S ONE DEPENDENCY, PINNED IN ITS MANIFEST.
-# The link points at the tree, so the modules land beside the extension and no
-# copy travels. A box with no registry keeps the sidebar and loses the server.
-# [[spec/design_output/lsp#one-checker-every-front-asks]]
-client_folder="$root/src/extension/node_modules/vscode-languageclient"
-
-get_client() {
-  say "  installing the language client"
-  (cd "$root/src/extension" && npm install --no-audit --no-fund --silent) || return 1
-  [ -d "$client_folder" ]
-}
-
-# THE WEBVIEW'S FOLDER, where the browser's driver lands. The drawing ships
-# in git, so the install builds none. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
-webview_folder="$root/src/extension/webview"
-
-# THE BROWSER THE DRAWING'S TEST DRIVES. browser.js holds the order, and the
-# download is the last rung. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-browser_here() {
-  (cd "$root" && node src/scripts/browser.js) >/dev/null 2>&1
-}
-
-get_browser() {
-  say "  downloading chromium through playwright"
-  (cd "$webview_folder" && npx --yes playwright-core install chromium) || return 1
-}
-
-editor_folder="$HOME/.vscode/extensions"
-
-# A COPY IS A STALE EXTENSION, AND THAT IS THE ONE THING THIS CANNOT BE. A copy
-# draws the tree as it stood at the install, so an edit reaches nobody. Node
-# makes the link, a junction on Windows, and node answers whether it stands.
-editor_linked() {
-  [ -d "$editor_folder" ] || return 0
-  (cd "$root" && node src/scripts/editor.js linked) >/dev/null 2>&1
-}
-
-link_editor() {
-  [ -d "$editor_folder" ] || return 0
-  say "  linking the sidebar into the editor"
-  (cd "$root" && node src/scripts/editor.js link) || return 1
-}
-
-# The two the tracked settings point at. servers.js holds the ids, so the shell
-# names none of its own and one list serves the editor and the recommendation.
-extension_ids() {
-  (cd "$root" && node --input-type=module -e \
-    "import { EXTENSIONS } from './.claude/skills/level0/lib/servers.js';
-     process.stdout.write(EXTENSIONS.join('\n'));") 2>/dev/null
-}
-
-extensions_here() {
-  have code || return 0
-  listed=$(code --list-extensions 2>/dev/null) || return 1
-  for id in $(extension_ids); do
-    printf '%s\n' "$listed" | grep -qix "$id" || return 1
-  done
-}
-
-get_extensions() {
-  have code || return 0
-  for id in $(extension_ids); do
-    say "  installing $id"
-    code --install-extension "$id" --force >/dev/null 2>&1 || return 1
-  done
-}
-
 # THE COMMIT DOOR A PERSON MEETS. Git reads a hook out of core.hooksPath, and
 # .githooks holds this tree's own, so one line points git at it. The Bash door
 # holds the same check for a session, and each stands without the other.
@@ -400,9 +315,7 @@ set_hooks() {
 # A want, rather than a need: the tree still lints and tests without it.
 wanted() {
   [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
-    [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] ||
-    [ "$1" = "index" ] || [ "$1" = "se-front" ] || [ "$1" = "editor-client" ] ||
-    [ "$1" = "browser" ]
+    [ "$1" = "index" ] || [ "$1" = "se-front" ]
 }
 
 missed() {
@@ -412,17 +325,12 @@ missed() {
     go-modules) say "  the Go modules stay unfetched, so the first check downloads them." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     se-front) say "  the front writer stays unbuilt, so every ticket write refuses until Go stands here." >&2 ;;
-    editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
-    browser) say "  no browser here, so the check skips the drawing's test." >&2 ;;
-    editor-link) say "  the sidebar stays unlinked, so the editor draws no panel here." >&2 ;;
-    editor-extensions) say "  no code on the PATH, so a person takes the recommendation." >&2 ;;
     git-hooks) say "  git reads its own hooks here, so a hand commit meets no privacy check." >&2 ;;
   esac
 }
 
 here() {
   case $1 in
-    node)    have node ;;
     vale)    [ -x "$bin/vale${exe}" ] ;;
     biome)   [ -x "$bin/biome${exe}" ] ;;
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
@@ -430,17 +338,12 @@ here() {
     go-modules) modules_here ;;
     index) index_here ;;
     se-front) front_here || ! have go ;;
-    editor-client) [ -d "$client_folder" ] ;;
-    browser) browser_here ;;
-    editor-link) editor_linked ;;
-    editor-extensions) extensions_here ;;
     git-hooks) hooks_here ;;
   esac
 }
 
 why() {
   case $1 in
-    node) say "node: the command line and the level zero rules are JavaScript" ;;
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
@@ -448,17 +351,12 @@ why() {
     go-modules) say "go-modules: the modules every Go module names, so the first check fetches nothing" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
     se-front) say "se-front: the one writer of frontmatter, which every ticket write reaches" ;;
-    editor-client) say "editor-client: the language client the extension starts the server through" ;;
-    browser) say "browser: the chromium the drawing's test drives" ;;
-    editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
-    editor-extensions) say "editor-extensions: the Vale, Biome and Mermaid extensions the tracked settings point at" ;;
     git-hooks) say "git-hooks: the pre-commit and pre-push doors, so a commit by hand meets the privacy check and a push to main meets the battery" ;;
   esac
 }
 
 get() {
   case $1 in
-    node) get_node ;;
     vale) get_vale ;;
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;
@@ -466,10 +364,6 @@ get() {
     go-modules) get_modules ;;
     index) get_index ;;
     se-front) get_front ;;
-    editor-client) get_client ;;
-    browser) get_browser ;;
-    editor-link) link_editor ;;
-    editor-extensions) get_extensions ;;
     git-hooks) set_hooks ;;
   esac
 }
@@ -477,8 +371,8 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
-for one in node vale biome vale-ls go go-modules index se-front editor-client browser editor-link \
-  editor-extensions git-hooks; do
+for one in vale biome vale-ls go go-modules \
+  index se-front git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"
 done
@@ -500,21 +394,18 @@ if [ -n "$missing" ]; then
   done
 fi
 
-# The survey names where each tool stands, and every caller reads it in place
-# of guessing. It runs where anything landed, and where the file is absent.
-if [ -n "$missing" ] || [ ! -f "$run/tools.json" ]; then
-  (cd "$root" && node src/scripts/verbs/tools.js >/dev/null) ||
-    say "  the survey wrote no tools.json under $run, so every caller guesses again." >&2
+# The steps that run JavaScript stand behind the setup verb, which the index
+# runs, so this script names no runtime of its own. A box with no index skips
+# them. [[spec/tickets/setup-verb-stands-red]]
+index="$bin/se-index${exe}"
+landed=""
+[ -n "$missing" ] && landed="--landed"
+if [ -x "$index" ]; then
+  "$index" verb "$root/src/scripts" setup $landed ||
+    say "  the setup stopped, so the editor, the survey, the Copilot setup and the brand stand as they stood." >&2
+elif [ -n "$missing" ]; then
+  say "  no index here, so the setup waits for a run that builds one." >&2
 fi
-
-# A setup refusing a file the owner keeps says so, and the install goes on,
-# because every verb runs through here. [[spec/design_output/copilot#setup-and-discovery]]
-node "$root/src/scripts/copilot.js" setup auto ||
-  say "  the copilot setup stopped, so the files it writes stand as they stood." >&2
-
-# The brand this folder carries reaches the marketplace, the plugin's author
-# and the extension's icon. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-node "$root/src/scripts/brand.js" || say "  the brand reached no name, so the marketplace keeps the one it holds." >&2
 
 [ -n "$missing" ] && say "Ready."
 exit 0
