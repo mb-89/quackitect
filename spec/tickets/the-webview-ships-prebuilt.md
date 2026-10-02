@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -156,6 +156,15 @@ record:
         hash: 83575bda3f482f6c
         size: 216
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 1c710d18e2ec502eb5f5975bc021c3e05b84f154
+    hash_after: 1c710d18e2ec502eb5f5975bc021c3e05b84f154
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-webview-ships-prebuilt.md:277:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -298,14 +307,19 @@ The approach answers the ask: the drawing ships under `src/extension/drawing`, g
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the bundle, the inset, the install, the drawing tests, `.gitattributes` and the drawing chapter, each named in the approach
+- `bundle.js` reads through the disk door, and `src/doors/fake` holds its fake
+- the comments in `bundle.js` and `editor-inset.js` point at the drawing chapter's prebuilt section
+- the folder stands once as `OUT` in `bundle.js`, and the inset names it again with a comment saying why
 
 ## tests-green
 
