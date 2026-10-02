@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -126,6 +126,19 @@ record:
         hash: 83575bda3f482f6c
         size: 216
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: eb9b0775880f63e66343baaa7c9b837bd60786cd
+    hash_after: eb9b0775880f63e66343baaa7c9b837bd60786cd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f9255a679e84ad76
+        size: 3908
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +238,31 @@ Assumed: a box running the verbs carries Node already. A cloud box carries it un
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/install.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/install.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The installer still names node in its loop, its helpers and its comments. No line hands the steps to the setup verb, no sh table spells the vale-ls assets, and neither `go-stamp.sh` nor `setup.sh` stands yet. One cut departs from the draft: the moved steps keep their sh form in `src/scripts/setup.sh`, and `verbs/setup.js` runs that script. Moving the steps as sh keeps each line as it ran, so the move risks no change of behaviour.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the no-node case, and the check decides the second
+- the cases read the real script and run the real stamp in a temporary module, as a contract case drives the real thing, so no door takes a fake here
 
 # gate
 
