@@ -17,6 +17,12 @@ test("the check's own reading carries the slices the prose reader asks", async (
   assert.equal(typeof doors.slices?.prose, "string");
 });
 
+// The command line's lint keeps Vale's rows a file, and the other fronts read Vale fresh. [[spec/tickets/the-check-runs-fast-again]]
+test("the check's own reading keeps Vale's rows a file", async () => {
+  const doors = await findingsDoors();
+  assert.equal(doors.valeCache, true);
+});
+
 // A warning lands under every door, and the stamp carries the list. [[spec/design_output/config#the-engine-controls]]
 test("the warnings stand as a list, empty before any lint, and the version reads as text", () => {
   assert.deepEqual(

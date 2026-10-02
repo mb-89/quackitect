@@ -7,7 +7,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 
-const { batteryDelta, batteryOf, filesIn, partsTimed, redIn, slowestIn, spawnsIn } = battery;
+const { batteryDelta, batteryOf, filesIn, partsTimed, redIn, slowestIn, spawnsIn } =
+  battery;
+
 import * as battery from "../../src/scripts/battery.js";
 
 test("the clock over the parts holds what each took, and hands each answer through", async () => {
@@ -31,11 +33,41 @@ test("the clock over the parts holds what each took, and hands each answer throu
 // The lines the runner's reporter writes, one a case. [[spec/design_output/work#the-battery-answers-first]]
 const line = (row) => JSON.stringify(row);
 const LINES = [
-  line({ file: "test/level0/one.test.js", name: "a fast case", nesting: 0, ms: 2.5, ok: true }),
-  line({ file: "test/level0/one.test.js", name: "a slow case", nesting: 0, ms: 900.25, ok: true }),
-  line({ file: "test/level0/one.test.js", name: "inside a group", nesting: 1, ms: 30, ok: true }),
-  line({ file: "test/level0/one.test.js", name: "a group", nesting: 0, ms: 47.25, ok: true }),
-  line({ file: "test/level0/two.test.js", name: "a case", nesting: 0, ms: 40, ok: true }),
+  line({
+    file: "test/level0/one.test.js",
+    name: "a fast case",
+    nesting: 0,
+    ms: 2.5,
+    ok: true,
+  }),
+  line({
+    file: "test/level0/one.test.js",
+    name: "a slow case",
+    nesting: 0,
+    ms: 900.25,
+    ok: true,
+  }),
+  line({
+    file: "test/level0/one.test.js",
+    name: "inside a group",
+    nesting: 1,
+    ms: 30,
+    ok: true,
+  }),
+  line({
+    file: "test/level0/one.test.js",
+    name: "a group",
+    nesting: 0,
+    ms: 47.25,
+    ok: true,
+  }),
+  line({
+    file: "test/level0/two.test.js",
+    name: "a case",
+    nesting: 0,
+    ms: 40,
+    ok: true,
+  }),
   "",
   "not a row",
 ].join("\n");
@@ -66,7 +98,13 @@ const RED_LINES = [
     ok: false,
     said: "ENOENT: no such file or directory, open '/tree/plugin.json'",
   }),
-  line({ file: "test/contract/stub.test.js", name: "the shim hands a verb", nesting: 0, ms: 6.2, ok: true }),
+  line({
+    file: "test/contract/stub.test.js",
+    name: "the shim hands a verb",
+    nesting: 0,
+    ms: 6.2,
+    ok: true,
+  }),
 ].join("\n");
 
 // [[spec/guidance/retro/effect]]
@@ -95,11 +133,11 @@ test("the tally counts a line a spawn, and the ones that are Vale", () => {
 });
 
 test("a report carries each part rounded, their sum, the slowest cases, the files, the parts unrun, the red and the spawns", () => {
-  const said = batteryOf(
-    { tests: 1200.6, go: 300.2, rules: 0 },
-    RED_LINES,
-    { most: 1, unrun: ["go", "rules"], spawns: { all: 4, vale: 2 } },
-  );
+  const said = batteryOf({ tests: 1200.6, go: 300.2, rules: 0 }, RED_LINES, {
+    most: 1,
+    unrun: ["go", "rules"],
+    spawns: { all: 4, vale: 2 },
+  });
   assert.deepEqual(said.parts, { tests: 1201, go: 300, rules: 0 });
   assert.equal(said.total, 1501);
   assert.equal(said.slowest.length, 1);
@@ -189,4 +227,38 @@ test("three runs keep each part's median, and a part reads only off the runs tha
   assert.deepEqual(battery.medianParts(runs), { tests: 200, go: 50, rules: 20 });
   assert.deepEqual(battery.medianParts([{ tests: 7 }]), { tests: 7 });
   assert.deepEqual(battery.medianParts([]), {});
+});
+
+// The check prints its parts last, and a run past its budget names the slowest part and cases. [[spec/tickets/the-check-runs-fast-again]]
+test("the parts print the slowest first, and a run under its budget warns nothing", () => {
+  const report = battery.batteryOf({ go: 4200, tests: 61000, rules: 950 }, "");
+  const rows = battery.partsSaid(report, 120000);
+
+  assert.deepEqual(rows.slice(2), [
+    "   61.0  tests",
+    "    4.2  go",
+    "    1.0  rules",
+    "   66.2  in all",
+  ]);
+  assert.ok(!rows.some((one) => /budget/.test(one)));
+});
+
+test("a run past its budget names the part that took the most and its slowest cases", () => {
+  const lines = [
+    JSON.stringify({ name: "slow", ms: 9000, file: "test/contract/a.test.js" }),
+    JSON.stringify({ name: "quick", ms: 10, file: "test/level0/b.test.js" }),
+  ].join("\n");
+  const report = battery.batteryOf({ tests: 90000, rules: 40000 }, lines);
+  const rows = battery.partsSaid(report, 120000);
+  const warned = rows.findIndex((one) => one.startsWith("Warning:"));
+
+  assert.match(
+    rows[warned],
+    /took 130\.0s, past its budget of 120\.0s under battery\.budget\. tests took the most/,
+  );
+  assert.equal(rows[warned + 1], "    9.0  test/contract/a.test.js slow");
+  assert.ok(
+    !battery.partsSaid(report, 0).some((one) => one.startsWith("Warning:")),
+    "a budget of 0 warns nothing",
+  );
 });

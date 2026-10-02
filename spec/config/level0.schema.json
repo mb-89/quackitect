@@ -265,6 +265,12 @@
     "battery": {
       "type": "object",
       "properties": {
+        "budget": {
+          "type": "number",
+          "default": 120000,
+          "help": "The time the whole check takes at most. Past it, the check prints a warning naming its slowest part and its slowest cases. 0 switches it off.",
+          "unit": "milliseconds"
+        },
         "runs": {
           "type": "number",
           "default": 5,

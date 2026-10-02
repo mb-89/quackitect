@@ -5,7 +5,7 @@
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { RUN } from "../../.claude/skills/level0/lib/folders.js";
-import { batteryOf, spawnsIn } from "./battery.js";
+import { batteryOf, partsSaid, spawnsIn } from "./battery.js";
 import {
   doorsHold,
   goHolds,
@@ -43,7 +43,32 @@ export async function check(words) {
   const { code, parts, unrun } = ran;
   if (errors)
     for (const row of errorsSaid(timesHere(), errorsStood())) console.log(row);
-  return stamped(code, batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() }));
+  const battery = batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() });
+  // The parts print last, so a slow part shows on the run that grew it. [[spec/tickets/the-check-runs-fast-again]]
+  if (!errors) await saysParts(battery);
+  return stamped(code, battery);
+}
+
+// The budget the check holds its run to, off the config door, and 0 where no key answers. [[spec/tickets/the-check-runs-fast-again]]
+export async function budgetOf(config) {
+  return Number(await config.ask("battery.budget")) || 0;
+}
+
+async function saysParts(battery) {
+  const budget = await budgetOf(it.config);
+  for (const row of partsSaid(battery, budget)) console.log(row);
+  if (budget > 0 && battery.total > budget)
+    await it.log.say(
+      "warn",
+      "check",
+      `the check took ${battery.total}ms, past its budget`,
+      {
+        ms: battery.total,
+        detail: (battery.slowest ?? [])
+          .map((one) => `${one.file} ${one.name}`)
+          .join(", "),
+      },
+    );
 }
 
 // The battery's parts in the order they run, and a red part leaves the rest unrun. Level zero runs on a fresh box before the rules, so a tree whose hook runs nothing reads red. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]]
