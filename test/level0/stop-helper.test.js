@@ -6,13 +6,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
-import { TOOLS as TOOLS_FILE } from "../../.claude/skills/level0/lib/tools.js";
-import { boxOf, decide } from "../../src/bridge/server.js";
-import { helperEnds, helperSpawns, onStop, TOOLS } from "../../src/bridge/stop.js";
-import { fakeClock } from "../../src/doors/fake/clock.js";
+import { onStop } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
 const ROOT = "/tree";
@@ -91,67 +86,4 @@ test("the claim holds nothing once every helper has answered", () => {
     said.result.block,
     /helpers-running answers false: the harness names no helper running/,
   );
-});
-
-// The stop call carries no background_tasks, so the box marks a helper spawned in the background. [[spec/tickets/the-stop-reads-the-state]] [[spec/tickets/helper-mark-drops-at-stop]]
-test("the stop call with no background_tasks stands while a spawned helper runs", () => {
-  const box = helperBox("queue");
-  helperSpawns({ background: true, description: "review" }, box);
-  const said = TOOLS[STOP_CALL]({ reason: "your-helpers-still-run" }, box);
-  assert.match(said.result.result, /The claim stands/);
-});
-
-// [[spec/tickets/helper-mark-drops-at-stop]]
-test("a helper's stop takes its mark off, and the stop call's claim falls", () => {
-  const box = helperBox("queue");
-  helperSpawns({ background: true, description: "review" }, box);
-  helperEnds({ agentId: "a1" }, box);
-  const said = TOOLS[STOP_CALL]({ reason: "your-helpers-still-run" }, box);
-  assert.match(said.result.result, /The claim falls/);
-});
-
-// A cloud box that ends its turn loses its container and its helpers, so the wait wakes nothing there. [[spec/design_output/stop#a-helper-still-runs]]
-test("a cloud box's claim of a running helper falls, and the refusal says the container stops", () => {
-  const box = { ...helperBox("queue"), cloud: true };
-  helperSpawns({ background: true, description: "review" }, box);
-  const said = TOOLS[STOP_CALL]({ reason: "your-helpers-still-run" }, box);
-  assert.match(said.result.result, /The claim falls/);
-  assert.match(
-    said.result.result,
-    /a cloud box that ends its turn stops its container/,
-  );
-  assert.match(
-    said.result.result,
-    /Wait for the helper inside this turn, or do its work yourself/,
-  );
-});
-
-// [[spec/tickets/the-stop-reads-the-state]]
-test("a helper spawned in the foreground leaves no mark", () => {
-  const box = helperBox("queue");
-  helperSpawns({ description: "review" }, box);
-  const said = TOOLS[STOP_CALL]({ reason: "your-helpers-still-run" }, box);
-  assert.match(said.result.result, /The claim falls/);
-});
-
-// The server marks a background spawn and drops the mark at the helper's stop. [[spec/tickets/helper-mark-drops-at-stop]]
-test("the server counts a background spawn and drops it at the helper's stop", async () => {
-  const box = boxOf(ROOT, ROOT, {
-    disk: fakeDisk({
-      [at("spec/config/level0.json")]: JSON.stringify({ engine: { binding: "queue" } }),
-      [at(TOOLS_FILE)]: "{}",
-    }),
-    clock: fakeClock(),
-    proc: fakeProc({}),
-    log: fakeLog(),
-    env: {},
-    index: { warm: () => ({ warmed: false }), dead: () => "" },
-  });
-  await decide(
-    { event: "agent.spawn", e: { background: true, description: "review" } },
-    box,
-  );
-  assert.equal(box.helpers, 1);
-  await decide({ event: "classic.Stop", e: { agentId: "a1" } }, box);
-  assert.equal(box.helpers, 0);
 });

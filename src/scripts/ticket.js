@@ -28,13 +28,14 @@ import {
 } from "../engine/group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
-import { bless } from "./pull-bless.js";
+import { bless, blessDesk, DESK } from "./pull-bless.js";
 import { emptyGroup } from "./pull-hand.js";
 import { landedAlone } from "./pull-landed.js";
 import { COMMENT } from "./pull-route.js";
 import { baseOf, driftOf } from "./ticket-drift.js";
 import { filled } from "./ticket-fill.js";
 import { reachedOf, routed } from "./ticket-route.js";
+import { place, set, urgent } from "./ticket-edit.js";
 import { yours } from "./ticket-yours.js";
 import { askFaults, askRefusal, askWarning, lineRefusal } from "./ticket-ask-lint.js";
 
@@ -47,6 +48,16 @@ const TALK = "talk";
 const OVER = "--over";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
+// The bare ticket new writes: a kind, an empty process the completion offers, and an ask to fill. [[spec/tickets/the-sidebar-writes-through-actions]] [[spec/design_input/the-editor-draws-the-ticket#a-ticket-picks-a-process]]
+export const NEW_TICKET = [
+  "---",
+  "kind: [[ticket]]",
+  'process: ""',
+  "---",
+  "",
+  "# Ask",
+  "",
+].join("\n");
 
 export function ticket(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
@@ -60,7 +71,14 @@ export function ticket(root, argv, doors) {
     route,
     fill,
     yours: (it, _name, argv) => yours(it, argv),
-    bless: (it, name) => bless(it, name ? ticketAt(it, name) : null, name),
+    new: bare,
+    bless: (it, name) =>
+      String(name ?? "").startsWith(DESK)
+        ? blessDesk(it, String(name).slice(DESK.length))
+        : bless(it, name ? ticketAt(it, name) : null, name),
+    place,
+    urgent: (it, name) => urgent(it, name ? ticketAt(it, name) : null, name),
+    set: (it, name, argv) => set(it, name ? ticketAt(it, name) : null, name, argv),
   };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
@@ -86,10 +104,18 @@ export function ticket(root, argv, doors) {
       "  yours               the tickets waiting on a person as JSON, or --next",
     );
     console.log(
-      "  bless <ticket>      bless the verdict a gate asking one holds, and move the step on",
+      "  bless <ticket>      bless the verdict a gate asking one holds, and move the step on, or --desk=<true|false> the desk's word",
     );
+    console.log("  new <path>          write the bare ticket where no file stands");
     console.log(
       "  fill <path>         write the route a saved ticket's process names, or print it under --stdout",
+    );
+    console.log(
+      "  place <ticket> <n>  place the ticket at 1 to 9 in its queue level, and the same place again clears it",
+    );
+    console.log("  urgent <ticket>     flip the ticket's urgent mark");
+    console.log(
+      "  set <ticket> <field> <value>  write one field of the ticket's front, as the schema takes it",
     );
     console.log(
       `                      note takes --${TALK} where a person decides it, and --${TODO} to park it`,
@@ -97,6 +123,24 @@ export function ticket(root, argv, doors) {
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
+}
+
+// The bare ticket where no file stands, and a standing one keeps what it holds. [[spec/tickets/the-sidebar-writes-through-actions]]
+function bare(it, path) {
+  const parts = String(path ?? "").split("/");
+  const folder = parts.slice(0, -1).join("/");
+  if (![NOTES, TRAVELS].includes(folder) || !/^[a-z0-9-]+\.md$/.test(parts.at(-1))) {
+    console.error(
+      "ticket new needs a ticket path: ./RUNME.sh ticket new spec/tickets/slow-lint.md",
+    );
+    return 2;
+  }
+  const at = it.join(it.root, ...parts);
+  if (it.disk.exists(at)) return 0;
+  it.disk.makeDir?.(it.join(it.root, ...parts.slice(0, -1)));
+  it.disk.write(at, NEW_TICKET);
+  console.log(`${path} stands bare`);
+  return 0;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -196,7 +240,7 @@ function longWords(text) {
 }
 
 // The first words of a name, as many as the cap holds, joined by a hyphen. [[spec/tickets/prose-verbs-land-first-try]]
-function cutTo(name, most) {
+export function cutTo(name, most) {
   if (!overLong(name, most)) return name;
   return name
     .split(/[-_.]+/)

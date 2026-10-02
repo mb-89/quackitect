@@ -7,6 +7,7 @@ import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, withField } from "../../src/engine/group.js";
 import { withPayload } from "../../src/scripts/pull.js";
+import { expectedRed } from "../../src/scripts/red-list.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
   at,
@@ -164,4 +165,39 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
   assert.equal(whole.code, 0, whole.said);
   assert.ok(ranVale.length, "the voice reads the verdict");
   assert.doesNotMatch(ranVale.at(-1), /vale\.ini/, "the voice skips the files field");
+});
+
+// The child at its tests-red, its red list a field of the leaf. [[spec/tickets/list-fields-split-lines]]
+const RED_CHILD = (more = "") =>
+  CHILD("open", "implement/tests-red", more)
+    .replace(
+      "            says: the tests fail on their own assertion\n",
+      "            says: the tests fail on their own assertion\n          - name: red\n            form: list\n            says: the test files standing red\n",
+    )
+    .replace("## tests-red\n\n### tests\n", "## tests-red\n\n### tests\n\n### red\n");
+const FILES = ["test/level0/a.test.js", "test/level0/b.test.js"];
+
+// [[spec/tickets/list-fields-split-lines]]
+test("a list field handed back as an array lands on the ticket one item a line", () => {
+  const put = withPayload(
+    RED_CHILD(),
+    "implement/tests-red",
+    JSON.stringify({ red: FILES }),
+  );
+  assert.equal(put.why, undefined);
+  assert.match(
+    put.text,
+    /### red\n\n- test\/level0\/a\.test\.js\n- test\/level0\/b\.test\.js\n/,
+  );
+});
+
+// [[spec/tickets/list-fields-split-lines]]
+test("a red list handed back as an array names each file to expectedRed", () => {
+  const past = "record:\n  - step: implement/tests-red\n    hand: box one\n";
+  const put = withPayload(
+    RED_CHILD(past),
+    "implement/tests-red",
+    JSON.stringify({ red: FILES }),
+  );
+  assert.deepEqual(expectedRed([{ name: "a-child", text: put.text }]), FILES);
 });

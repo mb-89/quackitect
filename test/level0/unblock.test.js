@@ -96,6 +96,7 @@ const SUCCESSOR = `---
 kind: [[ticket]]
 state: open
 urgency: soon
+process: [[spec/processes/person]]
 steps:
   - name: do
     does: answers the question the person step asks
@@ -382,6 +383,25 @@ test("the placeholder mint writes goes, so the chapter reads as what a hand wrot
   assert.match(successor, /no test drives the hook/, "the question still rides along");
 });
 
+// A question an agent can answer stays in the group, so a successor off any route but the person route stays out. [[spec/tickets/a-box-keeps-its-tickets]]
+test("unblock refuses a successor off the person route, and names the mint onto it", () => {
+  const question = SUCCESSOR.replace(
+    "[[spec/processes/person]]",
+    "[[spec/processes/question]]",
+  );
+  const { it, disk } = doors(
+    standing(CHILD(), { [at("spec/tickets/a-successor.md")]: question }),
+  );
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
+
+  assert.equal(code, 2, said);
+  assert.match(said, /--process=person/);
+  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "state"), "open");
+});
+
 // [[spec/design_output/work#a-person-step-leaves]]
 test("unblock refuses a child standing at a step an agent can take", () => {
   const { it, disk } = doors(standing(CHILD("implement/change")));
@@ -488,41 +508,41 @@ test("a sibling waiting on the child it unblocks becomes takeable, so the chain 
   );
 });
 
-// The route a successor stands on, which test/contract/process.test.js holds to the shipped file. [[spec/design_output/work#a-successor-stands-on-question]]
-const QUESTION_ROUTE = `for: a question only a person answers
+// The route a successor stands on, which test/contract/process.test.js holds to the shipped file. [[spec/design_output/work#a-successor-is-person-work]]
+const PERSON_ROUTE = `for: work a person alone can do
 ask:
-  - name: question
+  - name: work
     form: text
-    says: what a person decides
+    says: what the person does
 steps:
-  - name: answer
-    does: answers the question the ask carries
+  - name: do
+    does: does the work the ask names
     by: person
     to: engine
     input: ask
     evidence:
-      - name: answer
+      - name: result
         form: text
-        says: the answer
-  - name: do
-    does: carries the answer out
+        says: what came back
+  - name: follow
+    does: carries the result into the tree
     from: anyone
     by: anyone
     to: retro
-    input: answer
+    input: result
     evidence:
       - name: says
         form: text
         says: what changes and why
 `;
 
-// The mint copies the route onto the ticket, the way the verb tells a desk to write one. [[spec/design_output/work#a-successor-stands-on-question]]
-function mintedOffQuestion() {
-  const held = fakeDisk({ [at("spec/processes/question.yaml")]: QUESTION_ROUTE });
+// The mint copies the route onto the ticket, the way the verb tells a desk to write one. [[spec/design_output/work#a-successor-is-person-work]]
+function mintedOffPerson() {
+  const held = fakeDisk({ [at("spec/processes/person.yaml")]: PERSON_ROUTE });
   const schemas = schemasFrom([{ text: TICKET_SCHEMA }]);
   const copied = withRoute(held, ROOT, join, schemas.get("ticket"), {
     state: "open",
-    process: "question",
+    process: "person",
   });
   assert.equal(copied.why, undefined, "the route copies onto the ticket");
 
@@ -539,10 +559,10 @@ function mintedOffQuestion() {
   return made.text;
 }
 
-// A successor off this route opens at a person step, so the verb takes it. A route opening where an agent works closes the road again, and this case reads it. [[spec/design_output/work#a-successor-stands-on-question]]
-test("the verb takes a successor the mint writes off the question route", () => {
+// A successor off this route opens at a person step, so the verb takes it. A route opening where an agent works closes the road again, and this case reads it. [[spec/design_output/work#a-successor-is-person-work]]
+test("the verb takes a successor the mint writes off the person route", () => {
   const { it, disk } = doors(
-    standing(CHILD(), { [at("spec/tickets/a-successor.md")]: mintedOffQuestion() }),
+    standing(CHILD(), { [at("spec/tickets/a-successor.md")]: mintedOffPerson() }),
   );
 
   const { code, said } = heard(() =>

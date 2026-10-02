@@ -33,7 +33,7 @@ mkdir -p "$run"
 # The log stays out of the move, because the retro collects it.
 # folders.js owns these names as MOVED.
 for one in bin hold review undo measure copilot box.json session.json \
-  tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
+  tools.json hold.json check.json index.db index.json lsp-door.json copilot-cloud \
   show-panel config.json identity.json project.json vehicle.json; do
   old="$root/.se/$one"
   new="$run/$one"
@@ -237,16 +237,6 @@ get_vale_ls() {
 
 # THE SERVER AND THE INDEX ARE PURE GO, SO THEY NEED NO COMPILER.
 # [[spec/design_output/index#the-compiler-it-needs]]
-# A binary built off other source lints against rules the tree no longer
-# carries, so a hash of its folder, of each tree package it imports and of the
-# root go.mod and go.sum
-# stands beside it, and a hash that moves asks for the build again.
-# [[spec/design_output/lsp#the-build-beside-the-index]]
-lsp_here() {
-  if [ ! -x "$bin/se-lsp${exe}" ]; then return 1; fi
-  (cd "$root" && node src/scripts/go-source.js fresh se-lsp) 2>/dev/null
-}
-
 # A running server holds its binary open, and Windows refuses a write over it
 # and allows a rename. So a build lands beside the binary and swaps in, the old
 # one steps aside until the next install clears it, and a server running it
@@ -260,16 +250,11 @@ swap_in() {
   mv -f "$1" "$2"
 }
 
-get_lsp() {
-  say "  building the language server"
-  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}.new" ./src/lsp) || return 1
-  swap_in "$bin/se-lsp${exe}.new" "$bin/se-lsp${exe}" || return 1
-  (cd "$root" && node src/scripts/go-source.js stamp se-lsp) || return 1
-  lsp_here
-}
-
-# The one writer of frontmatter, which every ticket write reaches, builds the
-# way the language server does. [[spec/tickets/go-writes-the-frontmatter]]
+# The one writer of frontmatter, which every ticket write reaches. A binary
+# built off other source lints against rules the tree no longer carries, so a
+# hash of its folder, of each tree package it imports and of the root go.mod
+# and go.sum stands beside it, and a hash that moves asks for the build again.
+# [[spec/design_output/lsp#the-build-beside-the-index]]
 front_here() {
   if [ ! -x "$bin/se-front${exe}" ]; then return 1; fi
   (cd "$root" && node src/scripts/go-source.js fresh se-front) 2>/dev/null
@@ -316,7 +301,7 @@ index_here() {
 # [[spec/design_output/index#the-compiler-it-needs]]
 get_index() {
   say "  building the index"
-  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/index) || return 1
+  (cd "$root" && CGO_ENABLED=0 go build -o "$bin/se-index${exe}.new" ./src/quack) || return 1
   swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   (cd "$root" && node src/scripts/go-source.js stamp se-index) || return 1
   index_here
@@ -425,7 +410,7 @@ set_hooks() {
 wanted() {
   [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "go-modules" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] ||
-    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "se-front" ] || [ "$1" = "editor-client" ] ||
+    [ "$1" = "index" ] || [ "$1" = "se-front" ] || [ "$1" = "editor-client" ] ||
     [ "$1" = "drawing" ] || [ "$1" = "browser" ]
 }
 
@@ -435,7 +420,6 @@ missed() {
     go)      say "  go stays missing, so ./RUNME.sh tui prints plain rows." >&2 ;;
     go-modules) say "  the Go modules stay unfetched, so the first check downloads them." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
-    se-lsp) say "  the language server stays unbuilt, so lint reads the node rules." >&2 ;;
     se-front) say "  the front writer stays unbuilt, so every ticket write refuses until Go stands here." >&2 ;;
     editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
     drawing) say "  the drawing stays unbundled, so the editor draws no route." >&2 ;;
@@ -456,7 +440,6 @@ here() {
     go)      have go ;;
     go-modules) modules_here ;;
     index) index_here ;;
-    se-lsp) lsp_here || ! have go ;;
     se-front) front_here || ! have go ;;
     editor-client) [ -d "$client_folder" ] ;;
     drawing) drawing_here ;;
@@ -477,7 +460,6 @@ why() {
     go) say "go: it builds the viewer ./RUNME.sh tui opens the door log in, and the index" ;;
     go-modules) say "go-modules: the modules every Go module names, so the first check fetches nothing" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
-    se-lsp) say "se-lsp: this tree's own language server, which draws the note shape and the names" ;;
     se-front) say "se-front: the one writer of frontmatter, which every ticket write reaches" ;;
     editor-client) say "editor-client: the language client the extension starts the server through" ;;
     drawing) say "drawing: the modules the route drawing takes, bundled into the one script a webview loads" ;;
@@ -498,7 +480,6 @@ get() {
     go) get_go ;;
     go-modules) get_modules ;;
     index) get_index ;;
-    se-lsp) get_lsp ;;
     se-front) get_front ;;
     editor-client) get_client ;;
     drawing) get_drawing ;;
@@ -512,7 +493,7 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the vehicle stands alone.
 missing=""
-for one in node modules vale biome vale-ls go go-modules index se-lsp se-front editor-client drawing browser editor-link \
+for one in node modules vale biome vale-ls go go-modules index se-front editor-client drawing browser editor-link \
   editor-extensions git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"
@@ -538,7 +519,7 @@ fi
 # The survey names where each tool stands, and every caller reads it in place
 # of guessing. It runs where anything landed, and where the file is absent.
 if [ -n "$missing" ] || [ ! -f "$run/tools.json" ]; then
-  (cd "$root" && node src/scripts/cli.js tools >/dev/null) ||
+  (cd "$root" && node src/scripts/verbs/tools.js >/dev/null) ||
     say "  the survey wrote no tools.json under $run, so every caller guesses again." >&2
 fi
 

@@ -40,7 +40,7 @@ function box() {
     disk: fakeDisk({
       [join(ROOT, "spec", "config", "level0.json")]: JSON.stringify({
         plan: { everyCalls: 10, mostOpen: 4, grace: 1 },
-        work: { blockScore: 1, dayScore: 1, failScore: 1 },
+        queue: { block: 1, day: 1, fail: 1 },
       }),
     }),
     proc: git.proc,
@@ -53,7 +53,8 @@ function box() {
 }
 
 const plan = TOOLS[PLAN_CALL];
-const todoOf = (it, title) => plansHere(it).todos.find((one) => one.title === title)?.todo;
+const todoOf = (it, title) =>
+  plansHere(it).todos.find((one) => one.title === title)?.todo;
 
 // A digit names the row at that place in the queue, whatever the plan's own todos say. [[spec/design_output/pull#a-todo-forces-a-place]]
 test("a digit of two anchors the todo before the ticket at place two", () => {
@@ -62,7 +63,11 @@ test("a digit of two anchors the todo before the ticket at place two", () => {
 
   plan({ add: [{ title: "read the note", place: 2 }] }, it);
 
-  assert.equal(todoOf(it, "read the note"), "a-first", "the row at place two, past the first todo");
+  assert.equal(
+    todoOf(it, "read the note"),
+    "a-first",
+    "the row at place two, past the first todo",
+  );
 });
 
 // [[spec/design_output/pull#a-todo-forces-a-place]]

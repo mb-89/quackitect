@@ -1,0 +1,7 @@
+{
+  "cloud": false,
+  "git": {
+    "rev-parse --abbrev-ref HEAD": "main",
+    "rev-parse HEAD": "0123456789abcdef0123456789abcdef01234567"
+  }
+}

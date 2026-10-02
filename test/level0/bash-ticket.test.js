@@ -31,7 +31,7 @@ function box(seed = {}) {
 const denied = (said) => String(said?.result?.deny ?? "");
 const opens = (ticket, what) => `${ticket}: ${what}`;
 
-test("freeOfTicket reads a pull, a mint and a note as free, and every other command as bound", () => {
+test("freeOfTicket reads a take, a sync, a pull, a mint and a note as free, and every other command as bound", () => {
   for (const command of [
     "./RUNME.sh ticket pull",
     "./RUNME.sh ticket pull a-child --pass",
@@ -39,6 +39,7 @@ test("freeOfTicket reads a pull, a mint and a note as free, and every other comm
     './RUNME.sh ticket note a-thought "a line to keep"',
     "./RUNME.sh branch take",
     "./RUNME.sh branch list",
+    "./RUNME.sh branch sync",
     "cd /home/user/quackitect && ./RUNME.sh branch take",
     "cd quackitect; ./RUNME.sh ticket pull",
     "./RUNME.sh branch take 2>&1 | tail -20",

@@ -26,7 +26,7 @@ ifAsked(
   { timeout: WAIT },
   () => {
     const ran = outside.run(
-      [process.execPath, join(root, "src", "scripts", "cli.js"), "probe", "compact"],
+      [process.execPath, join(root, "src", "scripts", "verbs", "probe.js"), "compact"],
       { cwd: root, timeoutMs: WAIT },
     );
 

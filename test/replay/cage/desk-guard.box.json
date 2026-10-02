@@ -1,0 +1,6 @@
+{
+  "cloud": false,
+  "git": {
+    "rev-parse --abbrev-ref HEAD": "work/some-group"
+  }
+}

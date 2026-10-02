@@ -1,10 +1,8 @@
-// The editor's reader of the graph. The emitter stands beside the verbs, this
-// hands it the file, and the drawing derives at every open. No copy of the
-// graph stands here, so nothing drifts, and no colour and no coordinate either:
-// the style sheet holds both, and that is desk work with the owner.
-// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+// Which files the editor draws: a process or a ticket. The index draws a
+// ticket's graph, so no copy of the graph stands here, and no colour and no
+// coordinate either: the style sheet holds both.
+// [[spec/tickets/the-lens-reads-v1]]
 
-const EMITTER = "src/scripts/graph.js";
 const PROCESSES = "spec/processes/";
 const TICKETS = ["spec/tickets/", ".se/tickets/"];
 
@@ -19,13 +17,4 @@ function drawable(path) {
   return "";
 }
 
-// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-async function graphAt(door, path) {
-  if (!drawable(path)) return null;
-  const text = await door.read(path);
-  if (!String(text ?? "").trim()) return null;
-  const { graphIn } = await door.imports(EMITTER);
-  return graphIn(text);
-}
-
-module.exports = { EMITTER, PROCESSES, TICKETS, drawable, graphAt };
+module.exports = { PROCESSES, TICKETS, drawable };

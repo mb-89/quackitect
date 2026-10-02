@@ -1,44 +1,112 @@
-// The table op, behind the seam ops.Keep, so an operation outlives the door.
-// [[spec/design_output/model#an-operation-outlives-callers]]
-package main
+// The seam the index manager stands behind: the start the door takes, the step
+// it hands the work loop, and the table op it keeps its operations in, which
+// holds each body as bytes and names no type of the manager's.
+// [[spec/design_output/model#the-index-manager]]
+package index
 
 import (
 	"database/sql"
-	"encoding/json"
+	"net"
 	"time"
 
-	"quackitect/src/ops"
+	"quackitect/src/q"
 )
+
+// Starts the index manager over the store, the op table and a step of the work loop, and answers its stop and its call. [[spec/design_output/model#the-index-manager]]
+type Manage func(root string, store *q.Store, rows OpRows, reads Reads, steps func(hand func())) (Managed, error)
+
+// What the manager's start answers: its stop, and the call an action takes through it. [[spec/tickets/actions-answer-over-http]]
+type Managed struct {
+	Stop func()
+	Call Call
+	// The bus the manager runs, which the standing file names. [[spec/design_output/model#the-standing-file]]
+	Bus *Bus
+	// The instances a process of their own runs, whose providers the index's scheduler leaves, and the wait until those processes answer every run sent. A nil Settle waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
+	Away   []string
+	Settle func()
+}
+
+// Calls an action within the wait its caller sets. [[spec/design_output/model#a-caller-sets-its-wait]]
+type Call func(name string, input any, caller string, wait time.Duration) (Called, error)
+
+// The result within the wait, or the operation still running past it, field for field as the manager answers it. [[spec/design_output/model#a-caller-sets-its-wait]]
+type Called struct {
+	Result   any           `json:"result,omitempty"`
+	Error    string        `json:"error,omitempty"`
+	Running  bool          `json:"running"`
+	Handle   string        `json:"handle"`
+	Fraction float64       `json:"fraction"`
+	Gone     time.Duration `json:"gone"`
+}
+
+// [[spec/design_output/model#the-index-manager]]
+func ServeManaged(root, at string, catalog *q.Catalog, manage Manage, starts ...Start) (func(), net.Listener, error) {
+	_, stop, listen, err := opens(root, at, catalog, manage, starts...)
+	return stop, listen, err
+}
+
+// The manager starts over the op table and the store, and each hand it gives joins the work loop's step. A door with no manager stops nothing and calls nothing. [[spec/design_output/model#the-index-manager]]
+func (one *door) manages(manage Manage) (Managed, error) {
+	if manage == nil {
+		return Managed{Stop: func() {}}, nil
+	}
+	return manage(one.root, one.store, opKeep{one.db}, ReadsOf(one.db), func(hand func()) { one.steps = append(one.steps, hand) })
+}
+
+// The rows the index ranks for the words, and the lines and paths a Grep and a Glob read, as the door hands them to the manager. [[spec/tickets/find-and-wait-in-go]] [[spec/tickets/grep-glob-answer-off-index]]
+type Reads interface {
+	Find(words string, limit int) ([]Hit, error)
+	Grep(ask GrepAsk) (GrepSaid, error)
+	Glob(ask GlobAsk) (GlobSaid, error)
+}
+
+// The reads over the index's db. [[spec/tickets/find-and-wait-in-go]]
+func ReadsOf(db *sql.DB) Reads { return readKeep{db} }
+
+type readKeep struct{ db *sql.DB }
+
+func (k readKeep) Find(words string, limit int) ([]Hit, error) { return Find(k.db, words, limit) }
+
+// [[spec/tickets/grep-glob-answer-off-index]]
+func (k readKeep) Grep(ask GrepAsk) (GrepSaid, error) { return Grep(k.db, ask) }
+
+// [[spec/tickets/grep-glob-answer-off-index]]
+func (k readKeep) Glob(ask GlobAsk) (GlobSaid, error) { return Glob(k.db, ask) }
+
+// One row of the table op: the id, and the body the manager writes. [[spec/design_output/model#an-operation-outlives-callers]]
+type OpRow struct {
+	ID   string
+	Body []byte
+}
+
+// The table op, as the door hands it to the manager. [[spec/design_output/model#an-operation-outlives-callers]]
+type OpRows interface {
+	Save(id string, body []byte) error
+	All() ([]OpRow, error)
+	Drop(id string) error
+}
 
 type opKeep struct{ db *sql.DB }
 
-func (k opKeep) Save(one ops.Op) error {
-	body, err := json.Marshal(one)
-	if err != nil {
-		return err
-	}
-	_, err = k.db.Exec(`INSERT INTO op (id, body) VALUES (?, ?)
-		 ON CONFLICT (id) DO UPDATE SET body = excluded.body`, one.ID, string(body))
+func (k opKeep) Save(id string, body []byte) error {
+	_, err := k.db.Exec(`INSERT INTO op (id, body) VALUES (?, ?)
+		 ON CONFLICT (id) DO UPDATE SET body = excluded.body`, id, string(body))
 	return err
 }
 
-func (k opKeep) All() ([]ops.Op, error) {
-	rows, err := k.db.Query(`SELECT body FROM op ORDER BY id`)
+func (k opKeep) All() ([]OpRow, error) {
+	rows, err := k.db.Query(`SELECT id, body FROM op ORDER BY id`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	out := []ops.Op{}
+	out := []OpRow{}
 	for rows.Next() {
-		var body string
-		if err := rows.Scan(&body); err != nil {
+		var id, body string
+		if err := rows.Scan(&id, &body); err != nil {
 			return nil, err
 		}
-		var one ops.Op
-		if err := json.Unmarshal([]byte(body), &one); err != nil {
-			return nil, err
-		}
-		out = append(out, one)
+		out = append(out, OpRow{ID: id, Body: []byte(body)})
 	}
 	return out, rows.Err()
 }
@@ -46,17 +114,4 @@ func (k opKeep) All() ([]ops.Op, error) {
 func (k opKeep) Drop(id string) error {
 	_, err := k.db.Exec(`DELETE FROM op WHERE id = ?`, id)
 	return err
-}
-
-// The door opens the book on its database, pushes each move under ops/<id>, and fails every operation in flight. [[spec/design_output/model#an-operation-outlives-callers]]
-func (one *door) opensBook() error {
-	book, err := ops.New(time.Now, opKeep{one.db}, ops.SettingsOf(one.root))
-	if err != nil {
-		return err
-	}
-	book.OnMove(func(moved ops.Op) {
-		one.store.Commit(one.store.Snapshot().Revision, map[string]any{ops.Name(moved.ID): moved})
-	})
-	one.book = book
-	return book.Restart()
 }

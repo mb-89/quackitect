@@ -19,6 +19,8 @@ import { holds, refsIn } from "../../src/scripts/prepush.js";
 const SHA = "a1b2c3d4e5f6a7b8";
 const ZEROS = "0000000000000000";
 const toWork = `refs/heads/work/x ${SHA} refs/heads/work/x ${ZEROS}\n`;
+// A green check on the pushed tip, which an agent's push takes. [[spec/tickets/level0-runs-on-the-door]]
+const GREEN = JSON.stringify({ sha: SHA, ok: true, clean: true, at: "now" });
 
 const found = (file, severity, rule = "Hedge") => ({
   file,
@@ -74,8 +76,8 @@ test("a push carrying a file at warning lands, and the door reads no lint", () =
   const carried = () => [{ name: "a.md", text: "" }];
   const warned = () => [found("a.md", "warning")];
 
-  assert.deepEqual(holds(refsIn(toWork), "", carried, warned), { code: 0, said: "" });
-  assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), GREEN, carried, warned), { code: 0, said: "" });
+  assert.deepEqual(holds(refsIn(toWork), GREEN, carried), { code: 0, said: "" });
 });
 
 // A warning outside the files a push carries holds no push. [[spec/tickets/one-list-holds-the-warnings]]
@@ -83,7 +85,7 @@ test("a warning on a file the push leaves alone holds no push", () => {
   const carried = () => [{ name: "a.md", text: "" }];
   const elsewhere = () => [found("spec/tickets/old.md", "warning")];
 
-  assert.deepEqual(holds(refsIn(toWork), "", carried, elsewhere), {
+  assert.deepEqual(holds(refsIn(toWork), GREEN, carried, elsewhere), {
     code: 0,
     said: "",
   });

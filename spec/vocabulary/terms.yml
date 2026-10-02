@@ -5,6 +5,7 @@
 # [[spec/schemas/paragraph.schema.yaml]]
 
 terms:
+  - {word: lsp, means: "the language server protocol an editor speaks to a server for its diagnostics and its features"}
   - {word: splice, means: "to insert rows or steps into a list at a given place and push the rest along"}
   - {word: bridgehead, means: "the one hook module a project carries which posts every event to the server and finds the vehicle"}
   - {word: shim, means: "the small shell run script in a stub that finds the vehicle and hands it every argument"}
@@ -62,6 +63,7 @@ terms:
   - {word: funnel, means: "a note that holds an open question the owner weighs with the options and what each costs"}
   - {word: gate, means: "the end of turn check that scores an answer and asks for a rewrite past a limit"}
   - {word: git, means: "the version control program that records commits and branches of this tree", source: "https://git-scm.com"}
+  - {word: github, means: "the host that carries origin and lands a pull request once its check stands green", source: "https://github.com"}
   - {word: glob, means: "a file name pattern with wildcards that names a family of files"}
   - {word: god mode, means: "the binding that lets every refusal and hold through and leaves only a debug line"}
   - {word: grammar, means: "the rules for how a sentence may be built such as which tenses and modals it may use"}
@@ -163,6 +165,9 @@ terms:
   - {word: watcher, means: "the part that watches the folders for writes and keeps the index rows level with the files"}
   - {word: webview, means: "a panel inside the editor that shows a web page drawn by the extension"}
   - {word: widget, means: "one control on the settings page such as a toggle or a text box that draws a value"}
+  - {word: work editor, means: "the editor panel a button in the sidebar opens which draws every ticket"}
+  - {word: work tab, means: "the tab of the window the tui verb opens which lists the work and the tickets"}
+  - {word: brackets, means: "the marks on the work tab title which hold the count of tickets a hand can take"}
   - {word: worker, means: "the remote agent that does the work on one branch inside its own sandbox"}
   - {word: workspace, means: "the folder the editor opens as a project and which relative paths start from"}
   - {word: worktree, means: "a second checkout of a branch in its own folder beside the main one", source: "https://git-scm.com/docs/git-worktree"}
@@ -199,6 +204,7 @@ terms:
   - {word: openste, means: "an open seed list of simple technical english words that the core word list builds on"}
   - {word: participle, means: "the verb form ending in ed or ing that the grammar rules read to find tense"}
   - {word: placeholder, means: "the stand-in text mint writes for a field left out which the checker names until someone fills it"}
+  - {word: quack, means: "the one binary this tree builds which serves the index and answers the verbs on the command line"}
   - {word: quackitect, means: "this tree as a whole which holds the method and the tools that check and draw it"}
   - {word: redraw, means: "to draw the whole panel again from the state after a click or a change on disk"}
   - {word: regex, means: "a text pattern that finds and replaces matching words across the files a glob reaches"}

@@ -5,11 +5,15 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import * as stop from "../../src/bridge/stop.js";
-import { opened } from "../../src/extension/lib/session.js";
+import schema from "../../spec/config/level0.schema.json" with { type: "json" };
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { LOCAL } from "../../src/extension/lib/widgets.js";
+import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
 import * as route from "../../src/scripts/pull-route.js";
-import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import { doors, heard, ROOT, standing } from "./pull-doors.js";
+import { v1Over } from "./v1-index.js";
 
 const { handsOut } = route;
 const { ENGINE_CHECKS, standsDown } = stop;
@@ -96,10 +100,7 @@ test("a cloud box on trunk takes no branch at god, and says what binds it", () =
 
 test("a cloud box on trunk reaches the take at the queue", () => {
   const held = doors(standing(), onTrunk, { cloud: true, binding: "queue" });
-  for (const [argv, code] of [
-    [probeOf("node", 6510), 1],
-    [startOf(ROOT), 0],
-  ])
+  for (const [argv, code] of [[startOf(ROOT), 0]])
     held.outside.proc.teach(argv, { exitCode: code });
   const { said } = heard(() => pulling(ROOT, ["pull"], held.it));
   assert.ok(!said.includes("binds to"), said);
@@ -114,17 +115,20 @@ test("a pull at unbound hands nothing out, and names the road back", () => {
   assert.match(said, /Name a ticket/);
 });
 
-// The binding holds until the owner changes it, so a new window carries it over. [[spec/tickets/the-window-keeps-the-binding]]
-test("a window opening under a new id keeps the binding and takes the rest", () => {
-  const text = JSON.stringify({
-    engine: { binding: "god" },
-    stop: { hold: "stop" },
-    session: { pid: 7 },
-  });
-  const said = opened(text, 42);
-  assert.deepEqual(said.cleared, ["stop.hold"]);
-  const kept = JSON.parse(said.text);
-  assert.equal(kept.engine.binding, "god");
-  assert.equal(kept.stop, undefined);
-  assert.equal(kept.session.pid, 42);
+// The binding holds until the owner changes it, so a new window carries it over, and drops the overrides the last window held. [[spec/tickets/the-window-keeps-the-binding]] [[spec/tickets/the-sidebar-writes-through-actions]]
+test("a window opening under a new id keeps the binding and takes the rest", async () => {
+  const text = JSON.stringify({ engine: { binding: "god" } });
+  const files = fakeDisk({ [SCHEMA]: JSON.stringify(schema), [LOCAL]: text });
+  const door = { index: v1Over(files), now: () => 0, pid: () => 7 };
+  const before = sidebarOf(door);
+  await before.opened(7);
+  await before.took({ kind: "set", key: "stop.hold", value: "stop" });
+  await sidebarOf(door).opened(42);
+
+  const keys = new Map(
+    (await door.index.values("config/keys")).map((one) => [one.key, one]),
+  );
+  assert.equal(keys.get("engine.binding").value, "god");
+  assert.notEqual(keys.get("stop.hold").layer, "override");
+  assert.equal(files.read(LOCAL), text);
 });

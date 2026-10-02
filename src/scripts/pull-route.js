@@ -24,6 +24,9 @@ import {
 } from "./guidance-hand.js";
 import { cutRefusal, printPart } from "./pull-cap.js";
 import { agentOf, BOX, handOf, roleOf } from "./pull-hand-of.js";
+import { notesOf, processNameOf } from "./quack-topic.js";
+import { callOf } from "./tool-call.js";
+import { WORK_VERBS } from "./work.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const WORK = "work";
@@ -39,26 +42,14 @@ export const ANSWERED = /^\s*answered:/;
 export const FENCE = /^\s*(```|~~~)/;
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
-export const BRANCH = [
-  "new",
-  "take",
-  "sync",
-  "done",
-  "release",
-  "merge",
-  "close",
-  "read",
-  "review",
-  "list",
-  "escalate",
-  "guidance",
-  "test",
-];
-
-// [[spec/design_output/pull#a-need-is-a-verb]]
+// The branch verbs read the table work answers when a need asks, since work.js imports the pull, and a read at load meets its table unbuilt. [[spec/tickets/branch-list-reads-work-table]]
 export const VERBS = {
-  branch: BRANCH,
-  work: BRANCH,
+  get branch() {
+    return Object.keys(WORK_VERBS);
+  },
+  get work() {
+    return Object.keys(WORK_VERBS);
+  },
   ticket: ["pull", "note", "update", "open"],
   retro: [
     "notes",
@@ -102,19 +93,17 @@ export function stillHeld(it, held) {
   const now = readsOf(it, stepReads(it, held));
   const why = handsAgain(held, now);
   if (why) writeHold(it, held.hand, { ...held, reads: now });
-  const again = `  Read them whole with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`;
+  const as = asOf(it, held) ? ["--as", asOf(it, held)] : [];
+  const again = `  Read them whole with ${callOf("branch", "guidance", as)}.`;
   const rows = [
     `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
-    `Hand it back: ./RUNME.sh ticket pull ${held.ticket}${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""} --pass, or --fail "why".`,
+    `Hand it back: ${callOf("ticket", "pull", [held.ticket, ...as, "--pass"])}, or --fail "why" in place of --pass.`,
     ...(why
       ? notesSaid(
           it,
           now.map((one) => one.name),
         )
-      : [
-          "",
-          `Read them again with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`,
-        ]),
+      : ["", `Read them again with ${callOf("branch", "guidance", as)}.`]),
   ];
   // A refusal reprinting the notes stays under the cap too. [[spec/design_input/level-two#the-size-cap]]
   console.error(
@@ -123,11 +112,14 @@ export function stillHeld(it, held) {
   return 1;
 }
 
+// The step's notes come off quack guidance where the guidance slice reads new. [[spec/tickets/readers-take-the-go-topics]]
 export function stepReads(it, held) {
   const at = it.join(it.root, ...String(held.path ?? "").split("/"));
   if (!held.path || !it.disk.exists(at))
     return (held.reads ?? []).map((one) => one.name);
-  return readsFor(it, leafOf(frontOf(it.disk.read(at)), held.step));
+  const text = it.disk.read(at);
+  const key = `${processNameOf(text)}:${held.step}`;
+  return notesOf(it, key, () => readsFor(it, leafOf(frontOf(text), held.step)));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]

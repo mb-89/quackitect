@@ -11,15 +11,6 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { conflicted, TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
-import {
-  edits,
-  NUMBERED,
-  realDisk,
-  refused,
-  served,
-  TREE,
-  wrote,
-} from "./mark-doors.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -153,19 +144,6 @@ test("a group's ask naming a child of its own comes back refused", async () => {
     it,
   );
   assert.deepEqual(quiet, { pass: true });
-});
-
-// No door reads a mark, so a write over a file the hand has read none of meets the rules alone. [[spec/tickets/every-road-has-a-caller]]
-test("a write over a standing file lands whether or not the hand read it", async () => {
-  const at = join(WORK, "spec", "tickets", "good.md");
-  assert.deepEqual(await onWrite(write(at, DRAFT), box({ [at]: DRAFT })), {
-    pass: true,
-  });
-
-  const numbered = join(TREE, "notes.txt");
-  const it = served(realDisk({ [numbered]: NUMBERED }));
-  const said = await wrote(it, edits(numbered, "line 30\n", "thirty\n"));
-  assert.equal(refused(said), "", "an edit nobody read lands");
 });
 
 test("the same bad ticket written into the vehicle's own tree is refused the same way", async () => {

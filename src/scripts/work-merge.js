@@ -3,6 +3,7 @@
 // [[spec/design_output/work#a-merged-branch-closes]]
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { verbArgv } from "./verb-run.js";
 import {
   CLOSED,
   fieldOf,
@@ -14,6 +15,7 @@ import {
   withField,
   withoutField,
 } from "../engine/group.js";
+import { addedHere, onPersonRoute } from "./work-fix.js";
 import {
   baseOnTrunk,
   childrenHere,
@@ -73,7 +75,7 @@ export function offTrunk(it, verb) {
   return dirty(it);
 }
 
-export function merge(it, name) {
+export function merge(it, name, argv) {
   if (CLOUD.test(name ?? "")) return mergeCloud(it, name);
   if (dirty(it)) return 2;
   const branch = name ? `work/${name}` : "";
@@ -100,6 +102,18 @@ export function merge(it, name) {
     return 1;
   }
 
+  // A closed pull keeps its head ref on origin, and git reads no pull state, so the person who sees it closed passes --closed. [[spec/tickets/merge-reads-open-pulls]]
+  const pull = (argv ?? []).includes("--closed") ? "" : pullCarrying(it, branch);
+  if (pull) {
+    console.error(
+      `${branch} stands in pull request #${pull}, and GitHub lands it once the check passes.`,
+    );
+    console.error(
+      `Where #${pull} stands closed unmerged, run ./RUNME.sh branch merge ${name} --closed.`,
+    );
+    return 1;
+  }
+
   const moved = movedOnTrunk(it, branch);
   if (moved.length) {
     console.error(
@@ -115,7 +129,14 @@ export function merge(it, name) {
 
   const was = it.git.run(["rev-parse", "HEAD"], true).out;
   if (!it.git.run(["merge", "--no-ff", "--no-edit", `origin/${branch}`]).ok) {
+    // The resolving commit takes the branch out of the cloud as the clean merge does, so it carries the dropped marker. [[spec/tickets/conflicts-drop-the-marker]]
+    const held = conflicted(it, ticketAt(name));
+    if (!held) marks(it, name, false);
     console.error(`${branch} conflicts. Resolve it, commit, then run branch close.`);
+    if (held)
+      console.error(
+        `Drop ${CLOUD_MARK}: true from ${ticketAt(name)} as you resolve it.`,
+      );
     return 1;
   }
 
@@ -146,8 +167,28 @@ export function merge(it, name) {
     return 0;
   }
   // A remote refusing the delete leaves the branch, and trunk's closed ticket frees what waits. [[spec/design_output/work#a-dependency-waits-for-trunk]]
-  if (close(it, name, [])) console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
+  if (close(it, name, []))
+    console.log(`${branch} stands on the remote, and trunk carries its ticket closed.`);
   return 0;
+}
+
+// A staged write of a conflicted file marks it resolved, so the marker waits for the person's resolution there. [[spec/tickets/conflicts-drop-the-marker]]
+function conflicted(it, at) {
+  return it.git
+    .run(["diff", "--name-only", "--diff-filter=U"], true)
+    .out.split("\n")
+    .includes(at);
+}
+
+// The number of the pull request whose head stands at the branch tip, or nothing. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+function pullCarrying(it, branch) {
+  const tip = it.git.run(["rev-parse", `origin/${branch}`], true).out;
+  if (!tip) return "";
+  const row = it.git
+    .run(["ls-remote", "origin", "refs/pull/*/head"], true)
+    .out.split("\n")
+    .find((one) => one.split("\t")[0] === tip);
+  return row ? (row.split("\t")[1] ?? "").split("/")[2] : "";
 }
 
 // [[spec/design_output/work#a-cloud-branch-comes-in]]
@@ -219,17 +260,43 @@ function movedOnTrunk(it, branch) {
   return out;
 }
 
-// branch done frees them on the branch, and the merge frees what an older branch still holds. [[spec/design_output/work#the-merge-frees-the-tickets]]
-export function freeChildren(it, name) {
+// branch done frees them on the branch, and the merge frees what an older branch still holds. A parent named takes them in place of the top. [[spec/design_output/work#the-merge-frees-the-tickets]]
+export function freeChildren(it, name, parent = "") {
   const out = [];
   for (const one of childrenHere(it, name)) {
     if (fieldOf(one.text, "state") === CLOSED) continue;
-    const at = ticketAt(one.name);
-    it.disk.write(it.join(it.root, at), withoutField(one.text, GROUP, it.front));
-    it.git.run(["add", at], true);
+    filed(it, one, parent);
     out.push(one.name);
   }
   return out;
+}
+
+// branch done leaves the person route loose on main, and files each open child group into the group's parent. [[spec/design_output/work#a-box-leaves]]
+export function filesUp(it, name, text) {
+  const parent = fieldOf(text, GROUP);
+  const out = [];
+  for (const one of childrenHere(it, name)) {
+    if (fieldOf(one.text, "state") === CLOSED) continue;
+    filed(it, one, onPersonRoute(one.text) ? "" : parent);
+    out.push(one.name);
+  }
+  if (!parent) return out;
+  for (const one of addedHere(it)) {
+    if (one.name === name || fieldOf(one.text, GROUP)) continue;
+    if (fieldOf(one.text, "state") === CLOSED || onPersonRoute(one.text)) continue;
+    filed(it, one, parent);
+    out.push(one.name);
+  }
+  return out;
+}
+
+function filed(it, one, parent) {
+  const at = ticketAt(one.name);
+  const text = parent
+    ? withField(one.text, GROUP, parent, it.front)
+    : withoutField(one.text, GROUP, it.front);
+  it.disk.write(it.join(it.root, at), text);
+  it.git.run(["add", at], true);
 }
 
 // The install RUNME.sh runs before every verb, run again over the merged tree. [[spec/design_output/work#the-merge-lands-the-truth]]
@@ -242,12 +309,9 @@ function installs(it) {
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 // The check under --errors prints the red cases alone, so the merge hands on every row. [[spec/tickets/the-verbs-need-no-wrapper]]
 function checkSays(it) {
-  const ran = it.proc.run(
-    [it.node, it.join(it.root, "src", "scripts", "cli.js"), "check", "--errors"],
-    {
-      cwd: it.root,
-    },
-  );
+  const ran = it.proc.run(verbArgv(it.node, it.root, ["check", "--errors"], it.join), {
+    cwd: it.root,
+  });
   return { ok: ran.exitCode === 0, says: String(ran.stdout ?? "").trim() };
 }
 

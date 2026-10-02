@@ -6,7 +6,13 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 // The whole module, so the stamp's move out of it holds. [[spec/design_output/work#the-battery-answers-first]]
 import * as check from "../../src/scripts/cli-check.js";
-import { serverHolds, serverLine, serverRead, skipOf } from "../../src/scripts/cli-check.js";
+import {
+  serverHolds,
+  serverLine,
+  serverRead,
+  skipOf,
+} from "../../src/scripts/cli-check.js";
+import { goTestNames } from "../../src/scripts/cli-go.js";
 import { stamped } from "../../src/scripts/cli-stamp.js";
 
 const WHERE = "http://127.0.0.1:6510/health";
@@ -29,6 +35,13 @@ test("the check answers no hook probe of its own, and cli-hooks.js answers it", 
     "cli-check.js hands the hook probe to cli-hooks.js",
   );
   assert.equal(check.hookRows, undefined, "and the rows it answers");
+});
+
+// The log verb asks its slice's mode off the doors the window's verbs share. [[spec/tickets/read-topics-switch-over]]
+test("the doors the log verb runs on carry the slices and the method root", () => {
+  const doors = check.tuiDoors();
+  assert.equal(typeof doors.slices?.log, "string");
+  assert.equal(typeof doors.method, "string");
 });
 
 // A fetch door answering the health call, so the probe runs off the wire. [[spec/design_output/doors#a-fake-behaves]]
@@ -100,18 +113,98 @@ test("the doctor names a bridge standing down, and one standing up", async () =>
 // A red Go file stands apart as a red JavaScript one does. [[spec/design_output/pull#the-gate]]
 test("the Go run skips every test a red Go file names, and nothing where no Go file stands red", () => {
   const files = {
-    "src/q/a_test.go": "package q\n\nfunc TestOne(t *testing.T) {}\n\nfunc helper() {}\n\nfunc TestTwo(t *testing.T) {}\n",
+    "src/q/a_test.go":
+      "package q\n\nfunc TestOne(t *testing.T) {}\n\nfunc helper() {}\n\nfunc TestTwo(t *testing.T) {}\n",
     "src/q/b_test.go": "package q\n\nfunc TestOne(t *testing.T) {}\n",
   };
   const read = (path) => files[path];
-  assert.deepEqual(skipOf(["src/q/a_test.go", "src/q/b_test.go", "test/level0/x.test.js"], read), [
-    "-skip",
-    "^(TestOne|TestTwo)$",
-  ]);
-  assert.deepEqual(skipOf(["src/q/b_test.go, test/level0/x.test.js,src/q/a_test.go"], read), [
-    "-skip",
-    "^(TestOne|TestTwo)$",
-  ], "a ticket's line of red files, commas between");
+  assert.deepEqual(
+    skipOf(["src/q/a_test.go", "src/q/b_test.go", "test/level0/x.test.js"], read),
+    ["-skip", "^(TestOne|TestTwo)$"],
+  );
+  assert.deepEqual(
+    skipOf(["src/q/b_test.go, test/level0/x.test.js,src/q/a_test.go"], read),
+    ["-skip", "^(TestOne|TestTwo)$"],
+    "a ticket's line of red files, commas between",
+  );
   assert.deepEqual(skipOf(["test/level0/x.test.js"], read), []);
-  assert.deepEqual(skipOf(["src/q/gone_test.go"], () => { throw new Error("gone"); }), []);
+  assert.deepEqual(
+    skipOf(["src/q/gone_test.go"], () => {
+      throw new Error("gone");
+    }),
+    [],
+  );
+});
+
+// The skip of the check and the named run of the test verb read one list of names. [[spec/design_output/pull#the-test-verb]]
+test("the Go test names read each test function once, in order, and pass over a helper and a file that reads nowhere", () => {
+  const files = {
+    "src/q/a_test.go":
+      "package q\n\nfunc TestTwo(t *testing.T) {}\n\nfunc helper() {}\n\nfunc TestOne(t *testing.T) {}\n",
+    "src/q/b_test.go": "package q\n\nfunc TestOne(t *testing.T) {}\n",
+  };
+  const read = (path) => {
+    if (!(path in files)) throw new Error("gone");
+    return files[path];
+  };
+  assert.deepEqual(
+    goTestNames(
+      ["src/q/a_test.go", "src/q/b_test.go", "src/q/gone_test.go", "src/q/q.go"],
+      read,
+    ),
+    ["TestOne", "TestTwo"],
+  );
+});
+
+// [[spec/tickets/level0-runs-on-the-door]]
+test("the check is red where level zero does not run whole on a fresh box, and says why", async () => {
+  const said = [];
+  const shouted = [];
+  const red = async (_root, _it, say) => {
+    say("FAIL rules: the context read hands the client no block");
+    return 1;
+  };
+  const green = async (_root, _it, say) => {
+    say("PASS rules: the context read hands the client level0-canary");
+    return 0;
+  };
+
+  assert.equal(
+    await check.level0Runs(red, "linux", (one) => said.push(one), (one) => shouted.push(one)),
+    1,
+  );
+  assert.match(shouted.join("\n"), /FAIL rules/);
+  assert.match(shouted.join("\n"), /this tree is red/);
+  assert.equal(await check.level0Runs(green, "linux", (one) => said.push(one), () => {}), 0);
+  assert.match(said.join("\n"), /PASS rules/);
+  let ran = false;
+  const untouched = async () => {
+    ran = true;
+    return 1;
+  };
+  assert.equal(await check.level0Runs(untouched, "win32", () => {}, () => {}), 0);
+  assert.equal(ran, false, "a Windows box runs no dry session");
+});
+
+// [[spec/tickets/model-marks-io-names]]
+test("the delta keeps the blank context line a hunk ends on, and a refused diff hands none", () => {
+  const patch = "@@ -1,2 +1,2 @@\n-a\n+b\n \n";
+  const asked = [];
+  const proc = (exitCode) => ({
+    run: (args, opts) => {
+      asked.push([args, opts.cwd]);
+      return { exitCode, stdout: patch, stderr: "" };
+    },
+  });
+  assert.equal(check.deltaOf({ proc: proc(0) }, "/tree"), patch);
+  assert.deepEqual(asked[0], [["git", "diff", "HEAD", "--binary", "--no-renames"], "/tree"]);
+  assert.equal(check.deltaOf({ proc: proc(1) }, "/tree"), "");
+});
+
+// [[spec/tickets/level0-runs-on-the-door]]
+test("the battery runs level zero on a fresh box before the rules", async () => {
+  const { partsOf } = await import("../../src/scripts/check-verb.js");
+  const names = partsOf([]).map(([name]) => name);
+  assert.ok(names.includes("level0"), names.join(" "));
+  assert.ok(names.indexOf("level0") < names.indexOf("rules"));
 });

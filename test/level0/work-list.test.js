@@ -9,7 +9,9 @@ import { work } from "../../src/scripts/work.js";
 import {
   CHILD,
   doorsSaying,
+  GROUP_AT,
   GROUP_NOTE,
+  groupRemote,
   heard,
   remoteSaying,
   ROOT,
@@ -30,7 +32,11 @@ function listed(flag = []) {
         { branch: "work/landed", tip: "bbb", merged: true },
       ],
       {
-        "work/one-group:spec/tickets/one-group.md": GROUP_NOTE,
+        // The marker, and no branch, puts a group on the cloud. [[spec/tickets/the-queue-reads-the-marker]]
+        "work/one-group:spec/tickets/one-group.md": GROUP_NOTE.replace(
+          "state: open\n",
+          "state: open\ncloud: true\n",
+        ),
         "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open"),
         "work/one-group:spec/tickets/a-done-child.md": CHILD("one-group", "closed"),
         "work/landed:spec/tickets/landed.md": GROUP_NOTE,
@@ -56,14 +62,32 @@ test("the queue listing reads git once, and writes no file under the runtime fol
 test("the queue listing prints the placed rows in outline order and leaves the unplaced out", () => {
   const { said } = listed(["--queue"]);
   const rows = said.split("\n").filter(Boolean);
-  const places = new Map(rows.map((row) => row.trim().split(/\s+/)).map(([place, name]) => [name, place]));
+  const places = new Map(
+    rows.map((row) => row.trim().split(/\s+/)).map(([place, name]) => [name, place]),
+  );
   // The group stands on a cloud branch, so it and its ticket stay off this box's listing. [[spec/design_output/pull#the-queue-is-an-outline]]
-  assert.equal(places.has("one-group"), false, "a group the cloud holds stands off the listing");
+  assert.equal(
+    places.has("one-group"),
+    false,
+    "a group the cloud holds stands off the listing",
+  );
   assert.equal(places.has("a-child"), false, "and its ticket with it");
-  assert.match(places.get("a-loose-one"), /^\d+$/, "the loose one takes a number of its own");
-  assert.equal(places.has("a-done-child"), false, "a closed ticket stands off the listing");
+  assert.match(
+    places.get("a-loose-one"),
+    /^\d+$/,
+    "the loose one takes a number of its own",
+  );
+  assert.equal(
+    places.has("a-done-child"),
+    false,
+    "a closed ticket stands off the listing",
+  );
   assert.equal(places.has("landed"), false, "a merged group stands off the listing");
-  assert.equal(places.has("a-closed-one"), false, "a closed loose one stands off the listing");
+  assert.equal(
+    places.has("a-closed-one"),
+    false,
+    "a closed loose one stands off the listing",
+  );
 });
 
 // The work tab parses the one answer, so the flag prints it as JSON on one line. [[spec/design_output/work#one-reading-answers-git]]
@@ -102,4 +126,16 @@ test("the listing shows everything under --all", () => {
   assert.match(said, /^ {2}a-done-child\s+ticket\s+closed/m);
   assert.match(said, /^a-closed-one\s+ticket\s+closed/m);
   assert.match(said, /work\/landed\s+merged/);
+});
+
+// [[spec/tickets/the-queue-views-agree]]
+test("a group row behind main keeps its mark after the behind", () => {
+  const { it } = doorsSaying({
+    ...groupRemote(GROUP_NOTE),
+    ...remoteSaying([{ branch: "work/one-group", tip: "aaa", base: "older" }], {
+      [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+    }),
+  });
+  const { said } = heard(() => work(ROOT, ["list"], it));
+  assert.match(said, /work\/one-group\s+todo\s+behind main, urgent/);
 });

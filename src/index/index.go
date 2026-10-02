@@ -1,7 +1,7 @@
 // The shape, the walk, and the rows it writes. The files stay the truth, and
 // every row here comes out of them.
 // [[spec/design_output/index#the-rows-the-walk-writes]]
-package main
+package index
 
 import (
 	"crypto/sha256"

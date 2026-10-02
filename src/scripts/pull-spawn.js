@@ -3,6 +3,8 @@
 // decides and this stays the place that words it.
 // [[spec/design_output/pull#a-hand-of-its-own]]
 
+import { callOf } from "./tool-call.js";
+
 export const SPAWN = "spawn";
 export const HELPER = "helper";
 
@@ -10,14 +12,14 @@ export const HELPER = "helper";
 export function spawnPrompt(ticket, leaf, helper) {
   const verdict = leaf.evidence.some((field) => field.form === "verdict");
   const back = verdict
-    ? `./RUNME.sh ticket pull ${ticket} --as ${helper} --fields '<json>'`
-    : `./RUNME.sh ticket pull ${ticket} --as ${helper} --pass --fields '<json>', or --fail "why"`;
+    ? callOf("ticket", "pull", [ticket, "--as", helper, "--fields", "<json>"])
+    : `${callOf("ticket", "pull", [ticket, "--as", helper, "--pass", "--fields", "<json>"])}, or --fail "why" in place of --pass`;
   return [
     `You are a hand of your own on this box, named ${helper}, and you work one step of one ticket.`,
     "",
-    `1. Run \`./RUNME.sh ticket pull --as ${helper}\` from the root. It hands you ${ticket} at ${leaf.path}, with its fields and its guidance.`,
+    `1. Call ${callOf("ticket", "pull", ["--as", helper])}. It hands you ${ticket} at ${leaf.path}, with its fields and its guidance.`,
     "2. Answer each field the pull names as a key of one JSON object, and pass it as --fields to the hand-back below. The engine writes the ticket.",
-    `3. Run \`${back}\`. It checks the hand-back and answers done, or refused with what to fix.`,
+    `3. Call ${back}. It checks the hand-back and answers done, or refused with what to fix.`,
     "4. Answer with what the last pull said, word for word.",
   ].join("\n");
 }

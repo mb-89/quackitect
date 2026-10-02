@@ -1,4 +1,4 @@
-// The probe behind the doctor's `se-lsp lsp` row. It starts the server the
+// The probe behind the doctor's `quack lsp` row. It starts the server the
 // editor starts, opens one note, and reads back what the server draws.
 // [[spec/design_output/lsp#the-doctor-probes-the-server]]
 
@@ -16,15 +16,21 @@ function framed(said) {
   return `Content-Length: ${Buffer.byteLength(body)}\r\n\r\n${body}`;
 }
 
-// The row `se-lsp lsp` draws: the probe starts the server the editor starts, opens one note, and names each diagnostic code the server sends back. [[spec/design_output/lsp#the-doctor-probes-the-server]]
+// The row `quack lsp` draws: the probe starts the server the editor starts, opens one note, and names each diagnostic code the server sends back. [[spec/design_output/lsp#the-doctor-probes-the-server]]
 export function lspProbe(door, exe, at) {
   if (!exe) return "missing, run ./RUNME.sh";
   const uri = pathToFileURL(join(at, ...PROBE_NOTE.split("/"))).href;
   const stdin = [
-    framed({ id: 1, method: "initialize", params: { rootUri: pathToFileURL(at).href, capabilities: {} } }),
+    framed({
+      id: 1,
+      method: "initialize",
+      params: { rootUri: pathToFileURL(at).href, capabilities: {} },
+    }),
     framed({
       method: "textDocument/didOpen",
-      params: { textDocument: { uri, languageId: "markdown", version: 1, text: PROBE_TEXT } },
+      params: {
+        textDocument: { uri, languageId: "markdown", version: 1, text: PROBE_TEXT },
+      },
     }),
     framed({ id: 2, method: "shutdown" }),
     framed({ method: "exit" }),
@@ -37,10 +43,15 @@ export function lspProbe(door, exe, at) {
   }
   const drawn = diagnosticsIn(ran.stdout);
   if (ran.exitCode !== 0 || !drawn) {
-    const why = String(ran.stderr ?? "").trim().split("\n")[0] || "it says nothing";
-    return `warn: se-lsp lsp exits with ${ran.exitCode} before it answers: ${why}`;
+    const why =
+      String(ran.stderr ?? "")
+        .trim()
+        .split("\n")[0] || "it says nothing";
+    return `warn: quack lsp exits with ${ran.exitCode} before it answers: ${why}`;
   }
-  const codes = [...new Set(drawn.map((one) => String(one?.code ?? "")).filter(Boolean))];
+  const codes = [
+    ...new Set(drawn.map((one) => String(one?.code ?? "")).filter(Boolean)),
+  ];
   return codes.length
     ? `answers, and draws ${codes.join(", ")} on the probe note`
     : "answers, and draws no diagnostic on the probe note";

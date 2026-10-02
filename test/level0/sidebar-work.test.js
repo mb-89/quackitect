@@ -8,15 +8,16 @@ import { test } from "node:test";
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { SCHEMA, sidebarOf } from "../../src/extension/sidebar.js";
+import { v1Over } from "./v1-index.js";
 
-const NEXT = JSON.stringify({ ticket: "one", path: "spec/tickets/one.md", step: "do" });
+const NEXT = { ticket: "one", path: "spec/tickets/one.md", step: "do" };
 
-function doorOf({ seed = {}, answers = {}, typed = "" } = {}) {
+function doorOf({ seed = {}, answers = {}, typed = "", given = {} } = {}) {
   const files = fakeDisk({ [SCHEMA]: JSON.stringify(schema), ...seed });
+  const index = v1Over(files, given);
   const said = {
     asked: [],
     ran: [],
-    quiet: [],
     opened: [],
     told: [],
     saved: [],
@@ -31,6 +32,16 @@ function doorOf({ seed = {}, answers = {}, typed = "" } = {}) {
   return {
     files,
     said,
+    index: {
+      ...index,
+      // A verb's action answers off the table, and an action taking no words, as tickets/new, does what its module does. [[spec/tickets/the-sidebar-writes-through-actions]]
+      acts: async (name, input) => {
+        if (!input?.args) return index.acts(name, input);
+        const argv = [...name.split("/"), ...input.args];
+        said.ran.push(argv);
+        return answer(argv);
+      },
+    },
     read: async (path) => (files.exists(path) ? files.read(path) : ""),
     write: async (path, text) => files.write(path, text),
     list: async () => [],
@@ -41,14 +52,6 @@ function doorOf({ seed = {}, answers = {}, typed = "" } = {}) {
     asksLine: async (prompt) => {
       said.asked.push(prompt);
       return typed;
-    },
-    asksVerb: async (argv) => {
-      said.quiet.push(argv);
-      return answer(argv);
-    },
-    runsVerb: async (argv) => {
-      said.ran.push(argv);
-      return answer(argv);
     },
     runs: (line) => said.ran.push(line),
     opens: async (path) => said.opened.push(path),
@@ -73,31 +76,25 @@ test("the work group draws the three buttons the config declares", async () => {
     assert.ok(section.includes(`data-key="${key}"`), key);
 });
 
-test("the work editor's button carries the number in the work tab's brackets", async () => {
-  const door = doorOf({
-    answers: { "tui work": { code: 0, out: '{"count":3}\n', err: "" } },
-  });
+// The views section draws the work badge, so the grid's button carries no copy. [[spec/tickets/the-extension-reads-no-files]]
+test("the work editor's button carries no count, and spawns no verb", async () => {
+  const door = doorOf({ given: { "work/open-tasks": 3 } });
   const html = await sidebarOf(door).html();
-  assert.deepEqual(door.said.quiet, [["tui", "work", "--count"]]);
   assert.deepEqual(door.said.ran, []);
   const button = html.slice(html.indexOf('data-key="work.editor"'));
-  assert.match(
-    button.slice(0, button.indexOf("</button>")),
-    /<span class="count">3<\/span>/,
-  );
+  assert.doesNotMatch(button.slice(0, button.indexOf("</button>")), /class="count"/);
 });
 
 test("pull for me takes the ticket the queue names, and opens it", async () => {
-  const door = doorOf({ answers: { "ticket yours": { code: 0, out: NEXT, err: "" } } });
+  const door = doorOf({ given: { "work/yours": [NEXT] } });
   await press(door, "work.pull");
-  assert.deepEqual(door.said.quiet, [["ticket", "yours", "--next"]]);
   assert.deepEqual(door.said.ran, [["ticket", "pull", "one"]]);
   assert.deepEqual(door.said.opened, ["spec/tickets/one.md"]);
 });
 
 test("pull for me over an empty queue says so, and pulls nothing", async () => {
   const door = doorOf({
-    answers: { "ticket yours": { code: 0, out: '{"ticket":null}', err: "" } },
+    given: { "work/yours": [] },
   });
   await press(door, "work.pull");
   assert.deepEqual(door.said.ran, []);
@@ -111,6 +108,7 @@ test("new ticket asks a name, writes a ticket with an empty process, and opens i
   await press(door, "work.new");
   assert.equal(door.said.asked.length, 1);
   const path = "spec/tickets/slow-lint.md";
+  assert.deepEqual(door.index.called, [{ name: "tickets/new", input: { path } }]);
   assert.match(door.files.read(path), /^process: ""$/m);
   assert.deepEqual(door.said.opened, [path]);
   assert.deepEqual(door.said.ran, []);

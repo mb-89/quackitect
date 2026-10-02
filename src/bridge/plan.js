@@ -192,9 +192,9 @@ export function readDoorOf(box) {
     join,
     git: git(box.proc, box.work),
     weights: {
-      block: asks(box, "work.blockScore"),
-      day: asks(box, "work.dayScore"),
-      fail: asks(box, "work.failScore"),
+      block: asks(box, "queue.block"),
+      day: asks(box, "queue.day"),
+      fail: asks(box, "queue.fail"),
     },
     stale: asks(box, "work.staleAfter"),
     ...handDoors(box.env ?? {}),

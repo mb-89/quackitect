@@ -16,6 +16,7 @@ import {
   coldIn,
   coldLines,
   coldPort,
+  coldTree,
   probeCold,
   readsCold,
   stepsOf,
@@ -153,17 +154,18 @@ test("a log holding no context row fails the rules", () => {
   assert.match(verdict(checks, "rules").evidence, /no context row/);
 });
 
-test("the read tools alone fail the tools, because the server registers the rest", () => {
+// [[spec/tickets/level0-tools-leave-the-bridge]]
+test("the pull alone fails the tools, because the index registers the rest", () => {
   const steps = stepsOf(
     stream(
-      init(["Read", "mcp__level0__find", "mcp__level0__patch"]),
-      said(`${SENTENCE}\nTOOLS: mcp__level0__find`),
+      init(["Read", "mcp__level0__pull"]),
+      said(`${SENTENCE}\nTOOLS: mcp__level0__pull`),
     ),
   );
   const checks = readsCold(whole(), steps);
 
   assert.equal(verdict(checks, "tools").pass, false);
-  assert.match(verdict(checks, "tools").evidence, /read tools alone/);
+  assert.match(verdict(checks, "tools").evidence, /pull alone/);
 });
 
 test("a tool the session calls counts as registered", () => {
@@ -299,7 +301,11 @@ test("the runner clones, installs, runs the client, reads the log, and removes t
   assert.deepEqual(ran.slice(0, 3), ["git", "sh", "claude"]);
   const install = proc.ran.find((one) => one.argv[0] === "sh");
   assert.equal(install.init.env.SE_INSTALL_SKIP, INSTALL_SKIP);
-  assert.match(INSTALL_SKIP, /\bindex\b/);
+  assert.doesNotMatch(
+    INSTALL_SKIP,
+    /\bindex\b/,
+    "the cold clone builds the index the road starts",
+  );
   const client = proc.ran.find((one) => one.argv[0] === "claude");
   assert.ok(client.argv.includes("--plugin-dir"));
   assert.equal(client.init.env.CLAUDE_CODE_REMOTE, "true");
@@ -344,13 +350,13 @@ test("a path under the hooks folder or a named cold file sits on the cold path",
   assert.deepEqual(
     coldIn([
       ".claude/skills/level0/hooks/level0.js",
-      "src/bridge/server.js",
+      "src/quack/main.go",
       "src/scripts/install.sh",
       "src/scripts/probe-cold.js",
     ]),
     [
       ".claude/skills/level0/hooks/level0.js",
-      "src/bridge/server.js",
+      "src/quack/main.go",
       "src/scripts/install.sh",
       "src/scripts/probe-cold.js",
     ],
@@ -397,4 +403,45 @@ test("a delta the clone refuses fails the probe before the client runs", async (
   assert.equal(code, 1);
   assert.match(said_.join("\n"), /FAIL delta: patch does not apply/);
   assert.ok(!proc.ran.some((one) => one.argv[0] === "claude"));
+});
+
+// [[spec/tickets/the-bridge-server-leaves]]
+test("the cold path names neither the bridge server nor its self-test", () => {
+  assert.equal(COLD_PATH.includes("src/bridge/server.js"), false);
+  assert.equal(COLD_PATH.includes("src/bridge/selftest.js"), false);
+});
+
+// [[spec/tickets/level0-runs-on-the-door]]
+test("a fall past the rules fails the quiet check, and a fall before them passes", () => {
+  const fall = { level: "warn", kind: "bridge", event: "env.get", said: "the server answers nothing at http://127.0.0.1:6510/event" };
+  const late = readsCold([...whole(), fall], clean());
+  const early = readsCold([{ ...fall, event: "classic.SessionStart" }, ...whole()], clean());
+
+  assert.equal(verdict(late, "quiet").pass, false);
+  assert.match(verdict(late, "quiet").evidence, /1 row\(s\) say the server answers nothing/);
+  assert.equal(verdict(early, "quiet").pass, true);
+});
+
+// The box both probes stand on. [[spec/tickets/level0-runs-on-the-door]]
+test("the fresh box clones, installs and points the hook at a port of its own, and a refused clone stands nothing", () => {
+  const { disk, proc, it } = runner(() => ({ exitCode: 0 }));
+  const box = { temp: "/t", tree: "/t/tree", port: 6900, delta: "" };
+
+  const config = coldTree("/repo", it, () => {}, box);
+
+  assert.equal(config, "/t/config");
+  assert.deepEqual(
+    proc.ran.map((one) => one.argv[0]),
+    ["git", "sh"],
+  );
+  assert.equal(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")).port, 6900);
+
+  const refused = runner(() => ({ exitCode: 0 }));
+  const lines = [];
+  const bare = {
+    ...refused.it,
+    proc: { run: () => ({ exitCode: 128, stdout: "", stderr: "no such repo" }) },
+  };
+  assert.equal(coldTree("/repo", bare, (one) => lines.push(one), box), "");
+  assert.match(lines.join("\n"), /FAIL clone: no such repo/);
 });

@@ -9,7 +9,7 @@ import { IDENTITY } from "../../.claude/skills/level0/lib/vehicle.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { byPerson, handOf } from "../../src/scripts/pull-hand-of.js";
+import { BOX, boxIdHere, byPerson, handOf } from "../../src/scripts/pull-hand-of.js";
 
 const METHOD = "/method";
 const WORK = "/work";
@@ -46,4 +46,20 @@ test("a person's hand and the owner's word pass as a person, and an agent's hand
   assert.equal(byPerson({}, "person somebody"), true);
   assert.equal(byPerson({ ownerSays: true }, "box d462e994b4cef · claude-code"), true);
   assert.equal(byPerson({}, "box d462e994b4cef · claude-code"), false);
+});
+
+// [[spec/tickets/one-writer-holds-a-branch]]
+test("the box id read answers the box file, then the identity, and writes nothing where neither stands", () => {
+  const it = (files) => ({ root: WORK, method: METHOD, join, disk: fakeDisk(files) });
+  assert.equal(
+    boxIdHere(it({ [at(WORK, BOX)]: JSON.stringify({ id: "b0x" }) })),
+    "b0x",
+  );
+  assert.equal(
+    boxIdHere(it({ [at(METHOD, IDENTITY)]: JSON.stringify({ id: "1d" }) })),
+    "1d",
+  );
+  const bare = it({});
+  assert.equal(boxIdHere(bare), "");
+  assert.equal(bare.disk.exists(at(WORK, BOX)), false, "the read writes no box file");
 });

@@ -1,0 +1,490 @@
+{
+  "now": "2026-01-01T00:00:00.000Z",
+  "live": [
+    "spec/config/level0.schema.json",
+    "spec/config/status.yaml",
+    "spec/config/stop/level0.yml",
+    "spec/config/stop/level1.yml"
+  ],
+  "cases": [
+    {
+      "name": "a helper's stop passes",
+      "events": [],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "done", "session_id": "s1", "agentId": "a1" }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a new chat on a desk ends on its claim",
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The chat opens.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-chat-is-new",
+          "session_id": "s1"
+        }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a turn naming no stop line holds",
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "The tests stand green.", "session_id": "s1" }
+      },
+      "cloud": false,
+      "decision": "block",
+      "text": "The last line names no stop reason, so this turn holds open. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    },
+    {
+      "name": "a claim of done over an empty plan ends",
+      "cloud": true,
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-work-stands-complete",
+          "session_id": "s1"
+        }
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a claim of done over an open plan holds and names the plan",
+      "cloud": true,
+      "files": {
+        ".se/.runtime/plan.json": "{\"working\":\"a-ticket\",\"todos\":[{\"title\":\"Push the branch\"}]}"
+      },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-work-stands-complete",
+          "session_id": "s1"
+        }
+      },
+      "decision": "block",
+      "text": "The line claims the-work-stands-complete, and its check the-plan-is-empty answers false: the plan still holds \"Push the branch\", \"a-ticket\". Name each under done in mcp__level0__plan, then claim again. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    },
+    {
+      "name": "a claim naming no reason holds",
+      "cloud": true,
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-moon-is-full",
+          "session_id": "s1"
+        }
+      },
+      "decision": "block",
+      "text": "The line claims the-moon-is-full, which names no reason this tree holds. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    },
+    {
+      "name": "a cloud box claiming a person sits here holds",
+      "cloud": true,
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "A question.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: a-wrong-answer-leaves-the-box",
+          "session_id": "s1"
+        }
+      },
+      "decision": "block",
+      "text": "The line claims a-wrong-answer-leaves-the-box, and its check a-person-sits-here answers false. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    },
+    {
+      "name": "the owner's stop hold ends the turn",
+      "config": { "stop.hold": "stop" },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "Put down.", "session_id": "s1" }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "the owner's finish hold ends the turn",
+      "config": { "stop.hold": "finish" },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "Finished.", "session_id": "s1" }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "the stop hook off ends the turn",
+      "config": { "stop.enabled": false },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "The tests stand green.", "session_id": "s1" }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "the tooth lets go past its cap",
+      "config": { "stop.mostInARow": 2 },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "classic.Stop",
+          "e": { "last_assistant_message": "one", "session_id": "s1" }
+        },
+        {
+          "event": "classic.Stop",
+          "e": { "last_assistant_message": "two", "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "three", "session_id": "s1" }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a cloud box holding its group stays past the cap",
+      "cloud": true,
+      "config": { "stop.mostInARow": 1 },
+      "git": { "rev-parse --abbrev-ref HEAD": "work/a-group" },
+      "files": {
+        "spec/tickets/a-group.md": "---\nkind: [[ticket]]\nstate: open\nrecord:\n  - step: design\n    hash_before: abc123\n---\n\n# Ask\n"
+      },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "classic.Stop",
+          "e": { "last_assistant_message": "one", "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "two", "session_id": "s1" }
+      },
+      "decision": "block",
+      "text": "This box holds a group, so run ./RUNME.sh ticket pull, spawn the hand a spawn answer names, and run ./RUNME.sh branch done once the pull answers wait. A step the harness refuses stays on its ticket, and branch done hands that ticket back. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    },
+    {
+      "name": "a helper still running lets a desk end on its claim",
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "A helper runs.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: your-helpers-still-run",
+          "session_id": "s1",
+          "background_tasks": [{ "type": "subagent", "status": "running" }]
+        }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a helper claimed where none runs holds",
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "A helper runs.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: your-helpers-still-run",
+          "session_id": "s1"
+        }
+      },
+      "cloud": false,
+      "decision": "block",
+      "text": "The line claims your-helpers-still-run, and its check helpers-running answers false: the harness names no helper running at this turn's end, so its answer wakes nothing. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    },
+    {
+      "name": "a ticket in hand holds a claim of done",
+      "cloud": true,
+      "files": {
+        "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n",
+        ".se/.runtime/hold/s1.json": "{\"ticket\":\"a-ticket\",\"path\":\"spec/tickets/a-ticket.md\",\"hand\":\"s1\"}"
+      },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-work-stands-complete",
+          "session_id": "s1"
+        }
+      },
+      "decision": "block",
+      "text": "A ticket stands in your hand, so work its step and hand it back with ./RUNME.sh ticket pull. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    },
+    {
+      "name": "a step a person takes lets a desk end on its claim",
+      "files": {
+        "spec/tickets/a-ticket.md": "---\nkind: [[ticket]]\nstate: open\nstep: accept\nsteps:\n  - name: accept\n    by: person\n---\n\n# Ask\n",
+        ".se/.runtime/hold/s1.json": "{\"ticket\":\"a-ticket\",\"path\":\"spec/tickets/a-ticket.md\",\"hand\":\"s1\"}"
+      },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "It waits.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-owner-holds-the-step",
+          "session_id": "s1"
+        }
+      },
+      "cloud": false,
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a session due holds for the handover",
+      "config": { "context.handoverAt": 1000, "engine.binding": "queue" },
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "session.measure",
+          "e": { "context": { "tokens": 5000 }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-work-stands-complete",
+          "session_id": "s1"
+        }
+      },
+      "cloud": false,
+      "decision": "block",
+      "text": "# The context hands over\n\nThe context holds 5000 tokens, past `context.handoverAt` at 1000.\nRun `./RUNME.sh ticket pull`. It hands the handover ticket, then the clear,\nand the clear ends the turn."
+    },
+    {
+      "name": "a session under its handover mark votes",
+      "config": { "context.handoverAt": 100000, "engine.binding": "queue" },
+      "cloud": true,
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "session.measure",
+          "e": { "context": { "tokens": 5000 }, "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-work-stands-complete",
+          "session_id": "s1"
+        }
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "a report said before the stop line stands for the turn",
+      "cloud": true,
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "turn.said",
+          "e": {
+            "text": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n",
+            "session_id": "s1"
+          }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "stop: the-work-stands-complete",
+          "session_id": "s1"
+        }
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {
+      "name": "the stop call's claim stands for the line",
+      "cloud": true,
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "classic.MessageDisplay",
+          "e": { "delta": "Understood: the work stands.", "session_id": "s1" }
+        },
+        {
+          "event": "tool.call",
+          "e": {
+            "tool": "mcp__level0__stop",
+            "reason": "the-work-stands-complete",
+            "next": "read it",
+            "session_id": "s1"
+          }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": {
+          "last_assistant_message": "The work stands.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n",
+          "session_id": "s1"
+        }
+      },
+      "decision": "pass",
+      "text": ""
+    },
+    {"name":"a full update lacking its chapters holds the turn","config":{"ask.wanted":"full"},"events":[{"event":"tool.call","e":{"tool":"Read","file_path":"a.md","session_id":"s1"}}],"call":{"event":"classic.Stop","e":{"last_assistant_message":"# Done\n\nThe tests.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-work-stands-complete","session_id":"s1"}},"cloud":false,"decision":"block","text":"The status update lacks Now, Open, ETA. Write every chapter as a heading with text under it. The owner asks for a full update, and the turn ends when it stands."},
+    {"name":"a full update carrying its chapters lets the vote decide","config":{"ask.wanted":"full"},"cloud":true,"events":[{"event":"tool.call","e":{"tool":"Read","file_path":"a.md","session_id":"s1"}}],"call":{"event":"classic.Stop","e":{"last_assistant_message":"# Done\n\nThe tests.\n\n# Now\n\nThe port.\n\n# Open\n\nThe logs.\n\n# ETA\n\nThis turn.\n\n## What the agent needs\n\n| No. | question | proposed answer |\n|---|---|---|\n| 1 | none | none |\n\nstop: the-work-stands-complete","session_id":"s1"}},"decision":"pass","text":""},
+    {
+      "name": "an answered turn then a second stop reads the tooth",
+      "events": [
+        {
+          "event": "prompt.submit",
+          "e": { "text": "carry on", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "prompt.submit",
+          "e": { "text": "and the next", "origin": { "kind": "composer" }, "session_id": "s1" }
+        },
+        {
+          "event": "turn.complete",
+          "e": { "reason": "answer", "answer": "done", "session_id": "s1" }
+        }
+      ],
+      "call": {
+        "event": "classic.Stop",
+        "e": { "last_assistant_message": "The tests stand green.", "session_id": "s1" }
+      },
+      "cloud": false,
+      "decision": "block",
+      "text": "The last line names no stop reason, so this turn holds open. This turn holds open. Carry on, or end the turn with one last line, alone: stop: <reason>, with one of these reasons:\n  the-chat-is-new: Is this the opening turn of a chat where nobody has said what to do yet?\n  a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.\n  the-owner-holds-the-step: Does the ticket in hand, or its group, stand at a step a person takes, so the work waits on the owner?\n  your-helpers-still-run: Does a helper you started still run, so its answer wakes this session?\n  the-work-stands-complete: Does the work stand complete, with no todo open in the plan and nothing in hand there?\nThis session binds to queue, set in built-in, read so at 2026-01-01T00:00:00.000Z."
+    }
+  ]
+}

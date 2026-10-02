@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -17,7 +18,6 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    reads: [[spec/guidance/working]]
     checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
     evidence:
       - name: children
@@ -26,8 +26,17 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    tags: ["review", "accept"]
+    input: ["ask", "children"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
-    reads: [[spec/guidance/working]]
     to: retro
     steps:
       - name: notes
@@ -72,12 +81,98 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
 process: [[spec/processes/group]]
-process_hash: 57b2cccd0445ea9a
-depends_on: [read-topics-land-in-shadow]
+process_hash: 5d4a884bfb2491ff
+record:
+  - step: sync
+    hand: box d856f55387d6 · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
+    hash_after: 0775c9d0263bd9a490ee4a977fd8268c128e59b6
+  - step: sync
+    hand: box d857a59f27d6 · claude-code-remote
+    hash_before: 0775c9d0263bd9a490ee4a977fd8268c128e59b6
+    hash_after: 44d6fc076e9a256554192e329f1dfec8377e177d
+  - step: sync
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 44d6fc076e9a256554192e329f1dfec8377e177d
+    hash_after: 6b5882ac6bed5f089dbc19a04255b668d90924dc
+  - step: sync
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 48e1294af73914448d0fb73bb4149e7679420e03
+    hash_after: 5149e7697e0a24d898f39f419f7a24914100127b
+    answered:
+      - name: sync
+        exit: 0
+        said: work/read-topics-switch-over already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: cd93579b85142499c5f765070b0aad17cbae5db9
+    hash_after: cd93579b85142499c5f765070b0aad17cbae5db9
+    inputs:
+      - name: ask
+        hash: bf36b714071714b6
+        size: 330
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: b7ef17b730c092d9e2644216a86a452083839f6b
+    hash_after: b7ef17b730c092d9e2644216a86a452083839f6b
+  - step: accept
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 18ffcbfca6748e880d735759904cd1dafbc56ced
+    hash_after: bc3378e88579704cbcc2c9d4e0d28a3a11c88686
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/read-topics-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: bf36b714071714b6
+        size: 330
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: dfbce56bb6f6d25c555c75728d3235e80f03046a
+    hash_after: dfbce56bb6f6d25c555c75728d3235e80f03046a
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 6cfc8cfc78b18c1c7585aa694728c7d082d86af1
+    hash_after: 6cfc8cfc78b18c1c7585aa694728c7d082d86af1
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box d857c176ced7 · claude-code-remote
+    hash_before: 369f1fb580447d1ee06aa7b97b5d694ef78d01fa
+    hash_after: 369f1fb580447d1ee06aa7b97b5d694ef78d01fa
+    inputs:
+      - name: retro/write
+        hash: 49b368531ff8023d
+        size: 2603
+    def: 4da1ca5da87d5bbc
+depends_on: ["read-topics-land-in-shadow"]
 enabled_by: migration.phase3switch
-cloud: true
+reason: done
 ---
 
 # Ask
@@ -93,8 +188,9 @@ Done when no JavaScript twin of a Go check stands.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -103,16 +199,39 @@ Done when no JavaScript twin of a Go check stands.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/readers-take-the-go-topics]], standard
+- [[spec/tickets/the-js-twins-leave]], standard
+- [[spec/tickets/readers-name-one-mode-source]], trivial
+- [[spec/tickets/handed-meets-its-own-case]], trivial
+- [[spec/tickets/read-text-meets-its-case]], trivial
+- [[spec/tickets/read-config-meets-its-case]], trivial
+- [[spec/tickets/check-twins-leave-phase-seven]], trivial
+- [[spec/tickets/topic-fallback-leaves-the-readers]], trivial
+- [[spec/tickets/twins-leave-misses-some-callers]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
+- every child is small enough to review whole: each trivial child touches a handful of files
+- the children add up to the goal: the readers take the Go topics, and the comparison twins leave; the check twins leave with phase 7
+- the-js-twins-leave names readers-take-the-go-topics under depends_on, and the gate's children hang off their parent
+
 # children
+
+# accept
+
+<!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept. A helper read the diff since the last verdict and named three gaps. The log verb's doors and the lint's doors carried no slices, so both readers stayed on the old path, and no case held the real door builders. The gate fixed all three in its own diff: both builders now hand the slices and the method root, and a case holds each. Weighed: the done line reads over the Go topics, and the check twins leave with phase 7, as the group's Discussion says. The twins are gone, nothing imports one, and every reader on a new slice takes its topic or faults. The check answers green.
 
 # retro
 
@@ -123,8 +242,9 @@ Done when no JavaScript twin of a Go check stands.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -133,38 +253,60 @@ Done when no JavaScript twin of a Go check stands.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- check-twins-leave-phase-seven: the group's Discussion narrows the done line to the Go topics, and the phase 7 switch carries the check twins
+- topic-fallback-leaves-the-readers: a reader on a new slice takes its topic or faults, and the config rows read the values quack prints
+- twins-leave-misses-some-callers: the gate's callers change, and the twins' wiring leaves
+- the-js-twins-leave: the four comparison twins and their seven test files leave, and the five keys take new alone
+- the accept gate: the log verb's and the lint's doors carry the slices
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- A fault stood out once the fallback left: the config topic's values read twice, hidden behind the old path
+- A helper read the diff at the gate and found two door builders with no slices, which no case covered
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 18:52 UTC: the take found the hold fresh, so the box waited until the hold went stale
+- 19:13 UTC: every note write threw, since the topic helper read a join the write door's box never carries
+- 19:28 UTC: the commit verb refused a staged deletion, since the tree read a path git tracks and the disk no longer holds
+- 19:40 UTC: the ticket pass staged the modified files alone, and left the deletions and the projection loose
+- the server fell away after each check, and the level-zero tools answered nothing until a restart
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the topic helper takes the join of node:path where the doors carry none, and a case holds it
+- the tree's paths leave out a file the disk no longer holds, and a case holds it
+- a ticket pass stages deletions as the commit verb does: a finding for the engine, which owns the pass
+- the old-path readers leave with the last caller of each, in the phases that own those callers
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The last box stopped on Vale findings in prose it never pushed, so this box wrote that step fresh. Once the check ran, the one finding at error was a header that counted keys. The deeper stop was the write door itself: it threw on every note write, so each Discussion line failed until the topic helper found its join. The remaining findings sit at warning, and the hand-backs land over them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in one place: each line points at the ticket owning it
+- the change adds no number
+- every header the change writes says what its file is for: the contract test's header counts nothing now
+- the chapter carries the run's errors with their times, and the owner sent no prompt during the run
+- the chapter names roles alone, with no name, address or box path; the scripts under the private scripts folder hold the hand-back fields alone
 
 ## cloud
 
@@ -173,21 +315,31 @@ Done when no JavaScript twin of a Go check stands.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 19:10 UTC onward: the level-zero server fell away after each check, and a restart brought it back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a hold still fresh at the take, until it went stale
+- a conflict at sync on the size golden, written again by its own test
+- the git write guard, which sent the staging through the commit verb
+- the commit door's test-beside rule, met with a case on the readers
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked
+- the box minted no ticket outside the group
+- the flip of migration.phase3switch stays with the merge coordinator
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The done line reads over the Go topics: the config, log, guidance and prose comparison twins leave here. The JavaScript twins of the Go checks leave with phase 7, since every check name answers an empty list until then. [[spec/tickets/check-twins-leave-phase-seven]]

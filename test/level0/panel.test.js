@@ -244,3 +244,32 @@ test("the bless button draws held where an agent at this desk blesses, and plain
   assert.match(plain, /class="widget bless" data-key="bless" data-widget="bless"/);
   assert.match(plain, /data-value="false"/);
 });
+
+// [[spec/design_output/extension#the-views-section]]
+test("a view section draws below the groups, its texts escaped and its button carrying the action it calls", () => {
+  const said = panelHtml({
+    groups: [],
+    views: [
+      {
+        name: "work",
+        badge: "work <3>",
+        icon: "💼",
+        buttons: [
+          {
+            name: "new",
+            calls: "tickets/open",
+            label: "New & ticket",
+            doc: "opens a ticket",
+            icon: "📝",
+            form: { fields: [{ key: "name", label: "name", doc: "the name" }] },
+          },
+        ],
+      },
+    ],
+  });
+  assert.match(said, /<summary>💼 work &lt;3&gt;<\/summary>/);
+  assert.match(said, /data-calls="tickets\/open" title="opens a ticket"/);
+  assert.match(said, /New &amp; ticket/);
+  assert.match(said, /<input class="field" data-field="name">/);
+  assert.ok(said.indexOf('class="top"') < said.indexOf('class="section view"'));
+});

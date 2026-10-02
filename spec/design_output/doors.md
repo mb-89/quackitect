@@ -19,6 +19,7 @@ function answering an object of verbs, and `./RUNME.sh doors` names every one:
 | `git` | a repository | `src/doors/git.js` |
 | `clock` | the time now | `src/doors/clock.js` |
 | `log` | the log every door writes | `src/doors/log.js` |
+| `http` | a server over the network | `src/doors/http.js` |
 
 Everything above a door takes it as an argument. The command line builds every
 door once and hands them on, so a caller names what it reaches and a test hands
@@ -40,7 +41,7 @@ nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 | `process.version` | the root alone reads it, for the survey |
 | `process.execPath` | `it.node` or `box.node`, off the root |
 | the Go import running a command | a call into the package's `door.go` |
-| the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the tree in `src/lsp` reads through a disk a case fakes |
+| the Go import of `os`, or a package under it | a call into the package's `door.go`, which names each read once, and the lsp IO module reads the box through its own `door.go` |
 
 A root stands off the rule, because it builds the hand every module past it
 reads. `.vale.ini` names each one in a section, beside the doors and their

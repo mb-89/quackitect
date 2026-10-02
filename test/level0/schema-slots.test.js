@@ -15,6 +15,7 @@ import {
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import {
   processHash,
+  ROUND,
   slotFaults,
 } from "../../.claude/skills/level0/lib/schema-route.js";
 import { GOVERNED, ROUTED, routed, treeWith } from "./schema-notes.js";
@@ -162,6 +163,54 @@ steps:
   - name: second
     does: reads it
     input: says
+    to: retro
+`),
+    [],
+  );
+});
+
+test("the round suffix names a reject's copy, and leaves its origin bare", () => {
+  assert.equal("design/draft-2".replace(ROUND, ""), "design/draft");
+  assert.equal("design/tests-red".replace(ROUND, ""), "design/tests-red");
+});
+
+test("a reject's copies read as read where a later step reads the leaves they copy", () => {
+  assert.deepEqual(
+    slotted(`
+steps:
+  - name: design
+    steps:
+      - name: draft
+        does: writes it
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach
+      - name: tests-red
+        does: writes the tests
+        input: draft
+        evidence:
+          - name: seen
+            form: text
+            says: what you see
+      - name: draft-2
+        does: writes it
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach
+      - name: tests-red-2
+        does: writes the tests
+        input: draft
+        evidence:
+          - name: seen
+            form: text
+            says: what you see
+  - name: gate
+    does: reads the design
+    input: ["design/draft", "design/tests-red"]
     to: retro
 `),
     [],

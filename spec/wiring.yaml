@@ -1,0 +1,128 @@
+# The instances the index loads, and the wire binding each port to a name.
+# io-modules-own-their-names wires the first instances.
+# [[spec/design_output/model#the-wiring-file]]
+instances:
+  watch:
+    module: watch
+  clock:
+    module: clock
+  env:
+    module: env
+  git:
+    module: git
+  tickets:
+    module: tickets
+  queue:
+    module: queue
+  work:
+    module: work
+  migration:
+    module: migration
+  check:
+    module: check
+  guidance:
+    module: guidance
+  log:
+    module: log
+  http:
+    module: http
+  ticket:
+    module: ticket
+  retro:
+    module: retro
+  vehicle:
+    module: vehicle
+  stub:
+    module: stub
+  branch:
+    module: branch
+  verb:
+    module: verb
+  hooks:
+    module: hooks
+  session:
+    module: session
+  mcp:
+    module: mcp
+  lsp:
+    module: lsp
+  answer:
+    module: answer
+  ask:
+    module: ask
+  battery:
+    module: battery
+  budget:
+    module: budget
+  code:
+    module: code
+  context:
+    module: context
+  engine:
+    module: engine
+  grace:
+    module: grace
+  helper:
+    module: helper
+  names:
+    module: names
+  ops:
+    module: ops
+  plan:
+    module: plan
+  pull:
+    module: pull
+  restated:
+    module: restated
+  stop:
+    module: stop
+  wait:
+    module: wait
+  edits:
+    module: edits
+  search:
+    module: search
+  waits:
+    module: waits
+  plans:
+    module: plans
+  drafts:
+    module: drafts
+  watchdog:
+    module: watchdog
+wires:
+  hooks.events/<id>: session/<id>/events
+  session.<id>/reports: session/<id>/reports
+  watch.files/<path...>: files/<path...>
+  clock.minute: clock/minute
+  env.vars/<name>: env/<name>
+  tickets.files/<path...>: files/<path...>
+  guidance.files/<path...>: files/<path...>
+  check.files/<path...>: files/<path...>
+  check.env/<name>: env/<name>
+  lsp.buffers/<path...>: buffers/<path...>
+  lsp.files/<path...>: files/<path...>
+  lsp.tracked: git/tracked
+  check.buffers/<path...>: buffers/<path...>
+  log.session: files/.se/.log/session.jsonl
+  git.tips: git/tips
+  git.trunk: git/trunk
+  git.stood: git/stood
+  git.tracked: git/tracked
+  check.tracked: git/tracked
+  tickets.tips: git/tips
+  tickets.trunk: git/trunk
+  tickets.all: tickets/all
+  tickets.cloud: tickets/cloud
+  tickets.branched: tickets/branched
+  tickets.branches: tickets/branches
+  queue.rows: tickets/branched
+  queue.plan: files/.se/.runtime/plan.json
+  queue.cloud: tickets/cloud
+  queue.stood: git/stood
+  queue.minute: clock/minute
+  work.tickets: tickets/branched
+  work.branches: tickets/branches
+  work.places: queue.places
+  work.cloud: tickets/cloud
+  work.overrides: queue.overrides
