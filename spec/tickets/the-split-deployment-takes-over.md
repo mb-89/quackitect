@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -125,6 +125,19 @@ record:
         hash: 227259d439bc87b6
         size: 238
     def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box b1311a2beaed · claude-code-remote
+    hash_before: 30d3a868463fc39088918795e0b0f94e0c0b667d
+    hash_after: 30d3a868463fc39088918795e0b0f94e0c0b667d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/hooks fails
+    inputs:
+      - name: design/draft
+        hash: b0d415a0971c4dff
+        size: 3778
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -225,26 +238,32 @@ What I weigh, and what I assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/migration/migration_test.go
+- src/modules/hooks/cage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The slice test and the lease row test fail on their assertions. The kill case in src/index/procs_test.go passes already: the index's placements land each process's commits apart, and an exit marks the dead process's names alone. The switch puts that runner on the live path, so the case holds the done line from here on. The scheduler's Except test and the io test land with the change, since each calls a function the change adds.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the kill case decides the first done line, and ./RUNME.sh check the second
+- the bus and the spawned fake process stand in for every door the kill case reaches, and the hooks door's Health and Shadow seams take fakes
 
 # gate
 

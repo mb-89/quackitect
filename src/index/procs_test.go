@@ -120,6 +120,31 @@ func TestAKilledFakeIOProcessLeavesItsNamesNotProvided(t *testing.T) {
 	}
 }
 
+// A crash in one placed process leaves every other one running and answering. [[spec/tickets/the-split-deployment-takes-over]]
+func TestAKilledPlacedProcessLeavesTheOthersAnswering(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	fake := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
+	other := Placed{Name: "other", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "other"}, Instances: map[string]q.Writer{"other": hand}, Restart: time.Hour}
+	stop, err := NewPlacements(bus, store, []Placed{fake, other}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	until(t, store, "both fakes at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 && snap.Read("other/out") == 7 })
+	kills(t, read(store, "fake/pid"))
+	until(t, store, "fake/out not provided", func(snap q.Snapshot) bool { return snap.NotProvided("fake/out") })
+	// An exit marks a process's names down, so other's names standing provided past a wait say its process runs. [[spec/design_output/model#a-process-ends]]
+	time.Sleep(300 * time.Millisecond)
+	if snap := store.Snapshot(); snap.Read("other/out") != 7 || snap.NotProvided("other/out") || snap.NotProvided("other/pid") {
+		t.Fatalf("other/out reads %v after the kill of fake, and wants 7, provided", snap.Read("other/out"))
+	}
+}
+
 // A dog that counts holds and faults, and refuses every restart. [[spec/tickets/watchdogs-span-the-processes]]
 type refusingDog struct {
 	mu     sync.Mutex
