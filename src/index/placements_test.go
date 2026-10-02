@@ -34,6 +34,22 @@ func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
 	return store, placements, func() { stop(); bus.Close() }
 }
 
+// The span a case watches for a process that should not start. [[spec/tickets/the-modules-start-together]]
+const spawnWatch = time.Second
+
+// The placements wait the gap they name between two spawns, and the default gap stays short. [[spec/tickets/the-modules-start-together]]
+func TestThePlacementsWaitTheGapTheyName(t *testing.T) {
+	if got := NewPlacements(nil, nil, nil).gap; got != spawnGap {
+		t.Fatalf("new placements wait %v between spawns, and want %v", got, spawnGap)
+	}
+	if got := NewPlacements(nil, nil, nil).Gap(time.Hour).gap; got != time.Hour {
+		t.Fatalf("placements naming an hour wait %v", got)
+	}
+	if spawnGap > 50*time.Millisecond {
+		t.Fatalf("the spawn gap stands at %v, and a read waits on every spawn of a fresh index", spawnGap)
+	}
+}
+
 func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 	bus, err := StartBus()
 	if err != nil {
@@ -44,12 +60,13 @@ func TestAStopDuringTheSpawnsStartsNoFurtherProcess(t *testing.T) {
 	one := func(instance string) Placed {
 		return Placed{Name: instance, Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "--", instance}, Instances: map[string]q.Writer{instance: hand}, Restart: time.Hour}
 	}
-	stop, err := NewPlacements(bus, store, []Placed{one("fake"), one("other")}).Start()
+	// The case names a gap past its stop, so the stop lands between the two spawns on any box. [[spec/tickets/the-modules-start-together]]
+	stop, err := NewPlacements(bus, store, []Placed{one("fake"), one("other")}).Gap(time.Hour).Start()
 	if err != nil {
 		t.Fatal(err)
 	}
 	stop()
-	time.Sleep(4 * spawnGap)
+	time.Sleep(spawnWatch)
 	if got := read(store, "other/out"); got != 0 {
 		t.Fatalf("other/out reads %v after a stop before its spawn, where no process of other starts", got)
 	}
@@ -67,7 +84,7 @@ func TestAStopInsideTheStartWindowSpawnsNothing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	time.Sleep(4 * spawnGap)
+	time.Sleep(spawnWatch)
 	stop()
 	if got := read(store, "fake/out"); got != 0 {
 		t.Fatalf("fake/out reads %v inside the start window, where nothing spawns", got)
