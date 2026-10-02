@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -150,6 +150,15 @@ record:
         hash: 3d2641011a3238aa
         size: 798
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: e654e418df6bff1d4c52965045747c2d322295bd
+    hash_after: e654e418df6bff1d4c52965045747c2d322295bd
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-split-deployment-takes-over.md:293:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the gate's points add src/quack/split_test.go, src/index/procs.go and the guard in src/quack/io.go. The cage's shadow row stays, since it belongs to the cage slice
+- every door the change reaches has a fake: the bus and the spawned test binary stand in for the processes, and the hooks door's Health and Shadow seams take fakes
+- a comment names the approach: each changed function links this ticket or the child it serves
+- one place: the slice's mode stands in migration.go alone, with new the one value its enum admits, so spec/config/level0.json carries no processes key
 
 ## tests-green
 
