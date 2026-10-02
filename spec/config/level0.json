@@ -19,6 +19,7 @@
     "phase8switch": true,
     "phase9shadow": true,
     "phase9switch": true,
+    "phase10": true,
     "sidebar": "new",
     "lsp": "new"
   },
