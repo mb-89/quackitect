@@ -13,6 +13,7 @@ import { verbMain } from "../verb-run.js";
 
 const CLIENT = ["src", "extension", "node_modules", "vscode-languageclient"];
 const TOOLS = [RUN, "tools.json"];
+const SHIMS = ["npm", "npx", "code"];
 
 const ITEMS = {
   "editor-client": {
@@ -97,7 +98,7 @@ function editorHere(it) {
 
 function listedOf(it) {
   try {
-    const said = it.proc.run(["code", "--list-extensions"]);
+    const said = it.proc.run(shimmed(it, ["code", "--list-extensions"]));
     if (said.exitCode !== 0) return [];
     return said.stdout.toLowerCase().split(/\r?\n/).map((one) => one.trim());
   } catch {
@@ -107,10 +108,15 @@ function listedOf(it) {
 
 function ran(it, argv, under = [], quiet = false) {
   try {
-    return it.proc.run(argv, { cwd: join(it.root, ...under), inherit: !quiet }).exitCode === 0;
+    return it.proc.run(shimmed(it, argv), { cwd: join(it.root, ...under), inherit: !quiet }).exitCode === 0;
   } catch {
     return false;
   }
+}
+
+// Windows ships npm, npx and code as cmd shims, which a spawn with no shell reaches through cmd alone. [[spec/tickets/setup-reaches-windows-shims]]
+function shimmed(it, argv) {
+  return it.windows && SHIMS.includes(argv[0]) ? ["cmd", "/c", ...argv] : argv;
 }
 
 export const run = async (words) =>
@@ -119,6 +125,7 @@ export const run = async (words) =>
       root: dirname(dirname(dirname(dirname(fileURLToPath(import.meta.url))))),
       node: process.execPath,
       env: process.env,
+      windows: process.platform === "win32",
       disk: disk(),
       proc: proc(),
       say: (line) => console.log(line),

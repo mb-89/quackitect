@@ -106,6 +106,27 @@ test("a code list exiting past zero reads as missing, and the setup installs the
   }
 });
 
+// Windows ships the three as cmd shims, so the setup reaches each through cmd. [[spec/tickets/setup-reaches-windows-shims]]
+test("on Windows the setup reaches npm, npx and code through cmd, and node itself", () => {
+  const it = itOf(
+    {},
+    {
+      node: failing("browser.js"),
+      "cmd /c code --list-extensions": { stdout: "" },
+      cmd: { exitCode: 0 },
+    },
+  );
+  it.windows = true;
+
+  setup(it, []);
+
+  const lines = it.proc.ran.map(lineOf);
+  assert.ok(lines.includes("cmd /c npm install --no-audit --no-fund --silent"), "npm runs through cmd");
+  assert.ok(lines.includes("cmd /c npx --yes playwright-core install chromium"), "npx runs through cmd");
+  assert.ok(lines.includes(`cmd /c code --install-extension ${EXTENSIONS[0]} --force`), "code runs through cmd");
+  assert.ok(lines.includes(`node ${ROOT}/src/scripts/browser.js`), "node runs as it stands");
+});
+
 // The setup runs before every verb, so a step that stops says a warning and the next one runs. [[spec/design_output/copilot#setup-and-discovery]]
 test("a Copilot setup that stops says a warning, and the brand still runs", () => {
   const it = itOf({ [CLIENT]: "{}", [TOOLS]: "{}" }, { ...HELD, node: failing("copilot.js") });
