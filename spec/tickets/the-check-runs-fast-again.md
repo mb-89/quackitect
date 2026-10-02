@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-check-runs-fast-again
 step: do
+record:
+  - step: do
+    hand: box 806847876737 · claude-code-remote
+    hash_before: b6e95acbfab891ab9cbb4f70b473794de299b4cd
+    hash_after: b6e95acbfab891ab9cbb4f70b473794de299b4cd
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 62 test(s) pass in 8 file(s); green, src/modules/settings passes
+      - name: check
+        exit: 0
+        said: "  100.9  in all"
+    inputs:
+      - name: ask
+        hash: 3e7e9b9965733d3a
+        size: 939
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +67,32 @@ Every agent push and every hand-back waits on `./RUNME.sh check`, so its length 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/vale-rows.test.js test/level0/battery.test.js test/level0/check-verb.test.js test/level0/cli-read.test.js test/level0/topic-readers.test.js test/level0/findings.test.js test/contract/disk.test.js test/contract/one-reading.test.js src/modules/settings/settings_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The rules part of the check read the tree in two costly ways. The tense reader spawned quack once a prose file, and Vale read every file whether it changed or not. `readsTexts` in `src/bridge/findings.js` hands every file carrying a Vale row to one `quack prose` call through `keptOfAll`, and keeps the rows the call a file keeps. `src/bridge/vale-rows.js` keeps Vale's rows a file under the file's content hash, beside a key over the config, the styles and the Vale binary. A lint hands Vale the files whose hash moved, by name, and walks the paths asked where the names outgrow a command line. The disk door answers the hash, and its contract holds the fake to it. A run over the tree named every row the same with no cache, a cold cache and a warm one. The check prints its parts last, and `battery.budget` names the slowest part and cases where a run passes it. On this box the rules part reads in seconds where it took a minute and a half.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the cache keys on content in place of a diff against the merge base, and the Discussion says why
+- the cleanup: `keptOf` reads through `keptOfAll`, so one function parses the prose topic
+- one place: the parked folders in `src/bridge/vale-rows.js` point at `PARKED` in `src/bridge/findings.js`
 
 # Discussion
 
