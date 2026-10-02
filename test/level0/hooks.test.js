@@ -66,16 +66,14 @@ test("an edit to a file nobody wrote yet reads as the new text alone", () => {
   assert.equal(wholeAfter(e, { path: PATH, text: "b" }, disk), "b");
 });
 
-// The session start brings the manifest to a cloud box lacking it, and the bridgehead the manifest loads brings the modules. [[spec/design_input/the-cloud-runs-itself#the-boot]]
+// The session start brings the manifest to a cloud box lacking it, and the bridgehead the manifest loads brings the rest. [[spec/design_input/the-cloud-runs-itself#the-boot]]
 const BOOT_ROOT = "/tree";
 const INSTALL = `${BOOT_ROOT}/src/scripts/install.sh`;
 const MANIFEST = `${BOOT_ROOT}/.claude/skills/level0/.claude-plugin/plugin.json`;
-const MODULE = `${BOOT_ROOT}/node_modules/wink-nlp/package.json`;
 const CLOUD = { CLAUDE_CODE_REMOTE: "true" };
 const STANDING = {
   [INSTALL]: "#!/usr/bin/env sh\necho installs\n",
   [MANIFEST]: "{}",
-  [MODULE]: "{}",
 };
 
 function booting(files, env = CLOUD) {
@@ -115,7 +113,7 @@ test("the boot hook waits out the span the start road allows the same install", 
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
-test("boot runs no install where the manifest and the modules stand", () => {
+test("boot runs no install where the manifest stands", () => {
   const { it, proc } = booting(STANDING);
   assert.equal(boots(it), 0);
   assert.deepEqual(proc.ran, []);
@@ -130,13 +128,6 @@ test("boot runs the install under the skip list where the manifest stands nowher
     [`sh ${INSTALL}`],
   );
   assert.equal(proc.ran[0].init.env.SE_INSTALL_SKIP, INSTALL_SKIP);
-});
-
-// [[spec/design_input/the-cloud-runs-itself#the-boot]]
-test("boot leaves the install to the bridgehead where the manifest stands and the modules stand nowhere", () => {
-  const { it, proc } = booting(without(MODULE));
-  assert.equal(boots(it), 0);
-  assert.deepEqual(proc.ran, []);
 });
 
 // [[spec/design_input/the-cloud-runs-itself#the-boot]]
