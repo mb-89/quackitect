@@ -1,14 +1,12 @@
 // The graph the emitter answers, turned into the nodes and edges React Flow
-// draws, placed top to bottom by dagre. It reads no page, so a test in node
-// drives it the way the page does.
+// draws, placed by the placer the caller hands it. It reads no page and imports
+// no package, so a test in node drives it on a box that installs no Node modules.
 // [[spec/design_output/drawing#the-layout-reads-the-graph]]
 
-import dagre from "@dagrejs/dagre";
-
-// The box a node takes, so dagre places each one before the page measures it. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+// The box a node takes, so the placer places each one before the page measures it. [[spec/design_output/drawing#the-layout-reads-the-graph]]
 export const WIDTH = 180;
 export const HEIGHT = 44;
-const GAP = 36;
+export const GAP = 36;
 const HALF = 2;
 
 // The flags a node carries, each one a class the style sheet reads. [[spec/design_output/drawing#the-layout-reads-the-graph]]
@@ -35,24 +33,17 @@ function titleOf(node) {
     .join(" · ");
 }
 
-// [[spec/design_output/drawing#the-layout-reads-the-graph]]
-export function laidOut(graph) {
+// The placer answers each node's centre by its id, off the nodes and the edges that reach a node. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+export function laidOut(graph, place) {
   const nodes = graph?.nodes ?? [];
   const edges = graph?.edges ?? [];
   const known = new Set(nodes.map((one) => one.id));
   const kept = edges.filter((one) => known.has(one.from) && known.has(one.to));
-
-  const place = new dagre.graphlib.Graph({ multigraph: true });
-  place.setGraph({ rankdir: "TB", nodesep: GAP, ranksep: GAP });
-  place.setDefaultEdgeLabel(() => ({}));
-  for (const one of nodes) place.setNode(one.id, { width: WIDTH, height: HEIGHT });
-  for (const [at, one] of kept.entries())
-    place.setEdge(one.from, one.to, {}, String(at));
-  dagre.layout(place);
+  const centres = nodes.length ? place(nodes, kept) : new Map();
 
   return {
     nodes: nodes.map((one) => {
-      const at = place.node(one.id);
+      const at = centres.get(one.id);
       return {
         id: one.id,
         position: { x: at.x - WIDTH / HALF, y: at.y - HEIGHT / HALF },

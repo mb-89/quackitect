@@ -116,6 +116,9 @@ test("a graph message draws every node and edge the graph carries", {
   assert.ok((await classes("design")).includes("phase"), "design is a phase");
   assert.match(await page.locator('[data-id="design/draft"]').innerText(), /↺2/);
   assert.equal(await page.locator(".react-flow__edge.fail").count(), 1);
+  // dagre places the nodes in route/drawing.js, which hands the layout its placer, so the bundle places the nodes apart. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+  const places = await page.$$eval(".react-flow__node", (all) => all.map((one) => one.style.transform));
+  assert.equal(new Set(places).size, graph.nodes.length, "no two nodes share a place");
 });
 
 test("a theme message turns the scheme, and a stray kind changes nothing", {

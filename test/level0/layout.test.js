@@ -3,8 +3,22 @@
 // [[spec/design_output/drawing#the-layout-reads-the-graph]]
 
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { test } from "node:test";
-import { classOf, labelOf, laidOut } from "../../src/extension/webview/route/layout.js";
+import {
+  classOf,
+  HEIGHT,
+  labelOf,
+  laidOut,
+  WIDTH,
+} from "../../src/extension/webview/route/layout.js";
+
+const LAYOUT = join(import.meta.dirname, "..", "..", "src", "extension", "webview", "route", "layout.js");
+
+// A placer standing in for dagre: each node one step further down and right, in the graph's order. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+const STEP = 100;
+const grid = (nodes) => new Map(nodes.map((one, at) => [one.id, { x: at * STEP, y: at * STEP }]));
 
 const GRAPH = {
   nodes: [
@@ -21,7 +35,7 @@ const GRAPH = {
 };
 
 test("every node draws once, placed apart, with its marks as classes", () => {
-  const flow = laidOut(GRAPH);
+  const flow = laidOut(GRAPH, grid);
   assert.deepEqual(
     flow.nodes.map((one) => [one.id, one.className]),
     [
@@ -30,16 +44,17 @@ test("every node draws once, placed apart, with its marks as classes", () => {
       ["c", "phase skipped"],
     ],
   );
-  const places = new Set(
-    flow.nodes.map((one) => `${one.position.x},${one.position.y}`),
+  assert.deepEqual(
+    flow.nodes.map((one) => one.position),
+    [0, 1, 2].map((at) => ({ x: at * STEP - WIDTH / 2, y: at * STEP - HEIGHT / 2 })),
+    "each node stands at the centre its placer answers, less half its box",
   );
-  assert.equal(places.size, flow.nodes.length, "no two nodes share a place");
   assert.equal(flow.nodes[1].data.title, "when cloud");
   assert.equal(flow.nodes[2].data.title, "a desk box");
 });
 
 test("an edge wears its kind, a fail edge moves, and an edge to no node draws nothing", () => {
-  const flow = laidOut(GRAPH);
+  const flow = laidOut(GRAPH, grid);
   assert.deepEqual(
     flow.edges.map((one) => [one.source, one.target, one.className, one.animated]),
     [
@@ -56,5 +71,17 @@ test("the label carries the returns, and an empty graph draws nothing", () => {
   assert.equal(labelOf({ id: "x" }), "x");
   assert.equal(classOf({}), "leaf");
   assert.equal(classOf({ kind: "leaf", reached: true }), "leaf reached");
-  assert.deepEqual(laidOut(undefined), { nodes: [], edges: [] });
+  assert.deepEqual(laidOut(undefined, grid), { nodes: [], edges: [] });
+});
+
+// A box installs no Node modules, so the layout a node test drives imports none; dagre rides in the placer the bundle carries. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+test("the layout imports no package, and the placer hands it every node and the edges that reach one", () => {
+  const imports = readFileSync(LAYOUT, "utf8").match(/^import .* from "([^"]+)";$/gm) ?? [];
+  assert.deepEqual(imports.filter((one) => !/from "\.\.?\//.test(one)), []);
+  let seen;
+  laidOut(GRAPH, (nodes, edges) => {
+    seen = { nodes: nodes.map((one) => one.id), edges: edges.map((one) => one.to) };
+    return grid(nodes);
+  });
+  assert.deepEqual(seen, { nodes: ["a", "b", "c"], edges: ["b", "a", "a"] });
 });
