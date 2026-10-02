@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -152,6 +152,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: 9457b28da7508236d56f4178e46139490aecd8c3
+    hash_after: 9457b28da7508236d56f4178e46139490aecd8c3
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 depends_on: ["go-cage-switches-over", "lsp-door-switches-over", "sidebar-switches-over"]
 enabled_by: migration.phase9shadow
 cloud: true
@@ -236,38 +248,69 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- module-silence-reads-alarms: the silent module case runs over the manager's dog in quack, and reads session/alarms
+- watchdogs-span-the-processes: the leases, the restarts and the alarms reach across the processes under the shadow
+- expired-hands-leave-on-stop: a stopped placed process drops its expiry hand
+- health-row-once-a-silence: a guarded call writes one shadow row a silence of the index
+- the take at 01:30 took main in, and level0.json keeps both the processes slice and work.staleAfter
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the red cases decided each piece, so each push carried one green package
+- an independent review at accept found the hand leak and the row flood, and both closed in the group
+- the race detector ran clean over the four changed packages before the accept
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 01:28 the take came back refused, since no check had run on the box, and the check took a turn
+- 01:28 the shell door refused calls until the server ran again, and it fell again after each quack test run
+- 01:30 the take met a conflict in level0.json at sync
+- 01:43 the check refused the silent module case in src/index, since the index imports no module
+- 02:05 the hand-back read a warning line of the check as red, and then go test's ok as red
+- 02:36 the commit door refused code with no staged test, twice in one package each
+- 02:46 manager.go named config, which lease.go imports alone
+- 02:58 gofmt refused an alignment, and a format fix then needed a staged test
+- 03:13 a code comment carried history, and the check refused it at error
+- 03:34 I minted the fix tickets before the accept, and the verdict refused to mint them twice
+- no owner prompt reached the run past the dispatch prompt and two stop-hook notes
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the cloud guidance: run the check before branch take on a fresh box
+- the doors process: keep the server up past a quack test run, or say why it falls
+- the testing guidance: a test that crosses a module boundary goes to the package wiring both
+- the trivial route: name branch test with the changed files as the tests evidence
+- the code guidance: put a constant beside the import that reads it
+- the accept leaf: say the verdict mints its points, so no hand mints them first
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The design put the index's beat in the manager, which reaches no bus. The run moved it to quack, off each commit of index/health, since only the work loop's renew commits it, so a hung loop still beats nothing. The hooks case read the wall clock while the door reads its own, and the run moved the case onto the fixed clock. The reviewer's point that a shadow process raises a real alarm stands as the design asks.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place: the lease term in lease.go, the told end on the door
+- every number the change adds carries a name: watchSteps in io.go, and the term reads off config
+- every header the change writes says what its file is for: no new file opened
+- the chapter carries the run's errors with their times, and names no owner prompt past the dispatch
+- the chapter says the role, and carries no name, address or path of the box
 
 ## cloud
 
