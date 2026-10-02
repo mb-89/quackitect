@@ -255,7 +255,7 @@ func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
 	}
 }
 
-// A settle on a process that never answers ends at its wait, every time. [[spec/tickets/settle-timer-races-deadline]]
+// A settle on a silent process ends at its wait, every time. [[spec/tickets/settle-timer-races-deadline]]
 func TestASettleOnASilentProcessEndsAtItsWait(t *testing.T) {
 	store, _, bus, placed := doublerPlaced(t)
 	placements := NewPlacements(bus, store, []Placed{placed})
