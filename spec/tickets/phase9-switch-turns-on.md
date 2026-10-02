@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,30 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d8921a909c1fa5 · claude-code-remote
+    hash_before: b616a73be9d6c209bf3a9d97977c709aa81fc935
+    hash_after: b616a73be9d6c209bf3a9d97977c709aa81fc935
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 15 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+    inputs:
+      - name: ask
+        hash: c2a6954d3414683b
+        size: 407
+      - name: [[spec/tickets/process-shadow-reads-clean]]
+        hash: 36ed1c35ade71afa
+        size: 656
+      - name: [[spec/tickets/module-processes-switch-over]]
+        hash: 0a32db0c3452e5e4
+        size: 357
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
