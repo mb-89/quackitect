@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/tests-red
 steps:
   - name: design
     steps:
@@ -115,6 +115,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: module-processes-switch-over
+record:
+  - step: design/draft
+    hand: box b1311a2beaed · claude-code-remote
+    hash_before: 84aae9b9453f7ecf36ffd5b5b0ad2c15bdb58a2a
+    hash_after: 84aae9b9453f7ecf36ffd5b5b0ad2c15bdb58a2a
+    inputs:
+      - name: ask
+        hash: 227259d439bc87b6
+        size: 238
+    def: 71651f49796eeda4
 ---
 
 # Ask
@@ -145,32 +155,68 @@ The model's isolation then holds on every box.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The processes slice moves to `new` alone: the built-in mode in `src/modules/migration/migration.go` and the tracked `spec/config/level0.json` read `new`, and the enum holds `new` alone, as every switched slice before it does. Then the shadow path leaves the tree.
+
+| the part | the change |
+|---|---|
+| `src/quack/io.go` | `ioShadow` becomes `ioProcesses`, which runs under every mode. It spawns `quack io` with each IO instance's own writer, and one process a placement. No `Heard` stands, so `index.Placed.heard` lands each commit in the store and clears the down mark. The weigh, `shadows`, `sends`, `sameContent` and the `shadowsOwnLog` quiet name leave. The first spawn waits no start window, since the IO values reach the store through the IO process alone now |
+| `src/quack/main.go` | `wired` hands `index.Main` no IO start, since `quack io` runs them. `loaded` answers the writers alone. `healthOf` reads the index lease under every mode |
+| `src/index/ops.go`, `src/index/door.go` | `Managed` carries `Away`, the instances a process of their own runs. The door calls `Scheduler.Except` with them once the manager starts, so no wave in the index runs a provider a placement runs |
+| `src/q/scheduler.go` | `Except(instances...)` beside `Only`, and `runsHere` refuses an instance it names |
+| `src/index/procs.go` | the `Heard` seam and `Placements.Quiet` leave, with the old path |
+| `src/modules/hooks/cage.go` | a lease past its term writes a row of kind `watchdog`, per the model's watcher of the watchdog, in place of the `shadow` row. The call passes on |
+
+What I weigh, and what I assume:
+
+- The cage refusing on a stale lease, as the model's watcher chapter reads, stays out. The hooks door runs in the index process, and the session log on this box shows the lease past its term during a busy sync with the index answering. A refusal there locks the agent out of every tool. The row keeps the alarm, and the call passes.
+- Actions keep running in the index, since `act.<name>` stands unbuilt on the bus, and the module code links into the one binary. The split moves the providers and the IO starts, which the shadow weighed.
+- The alarm stands already: each exit hands the dog a fault, and a run of faults in the window writes `session/alarms`, which `TestASilentModuleProcessRestartsAndRaisesAnAlarm` holds.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/main.go: manages, calls ioShadow, renamed ioProcesses
+- src/quack/main.go: main, calls wired and index.Main with the IO starts
+- src/quack/main.go: wired, calls loaded
+- src/quack/main.go: listensHooks, calls healthOf
+- src/quack/placements.go: moduleMain, calls loaded
+- src/index/door.go: opensOn, reads Managed and builds the scheduler
+- src/index/procs.go: Placed.heard and Placed.down, read Heard
+- src/index/procs.go: Placements.runs, reads quiet
+- src/modules/hooks/hooks.go: Door.handle, calls readsHealth
+- src/modules/migration/migration.go: Registers, declares the processes slice
+- spec/config/level0.json: migration.processes
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/procs_test.go: TestAKilledPlacedProcessLeavesTheOthersAnswering
+- src/q/scheduler_test.go: TestAWaveRunsNoProviderOfAnInstanceExcepted
+- src/quack/io_test.go: TestTheProcessesLandWhatQuackIOCommits
+- src/modules/hooks/cage_test.go: the lease case reads a watchdog row
+- src/modules/migration/migration_test.go: the processes slice reads new alone
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened io.go, placements.go, main.go, procs.go, door.go, ops.go, scheduler.go, store.go, cage.go and migration.go, and checked each claim above there
+- the callers come off a grep for ioShadow, healthOf, loaded, wired, Heard, Quiet, readsHealth and the processes key
+- the kill case decides the first done_when line, and ./RUNME.sh check decides the second
 
 ## tests-red
 
