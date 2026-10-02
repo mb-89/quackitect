@@ -8,6 +8,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { SCHEMA } from "./pull-schema.js";
+import { carryQuack } from "./quack-doors.js";
 export const ROOT = "/tree",
   SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 export const BRANCH = "work/one-group";
@@ -63,6 +64,8 @@ export function doors(files, answers = {}, more = {}) {
     node: "node",
     ...more,
   };
+  // The voice reads Vale's rows through quack, so every pull box carries it. [[spec/tickets/go-prose-checks-stand-alone]]
+  carryQuack(it);
   return { it, outside: said, disk };
 }
 

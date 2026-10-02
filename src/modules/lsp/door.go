@@ -8,7 +8,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,7 +22,6 @@ import (
 const (
 	toolWait  = 3 * time.Minute
 	valeBuilt = ".se/vale/.vale.ini"
-	tenseAt   = "src/engine/tense.js"
 )
 
 // The tools the box names in its survey, else the runtime binary folder, each read again before a whole run. [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -39,21 +37,9 @@ func reads(one *Tools) {
 	bin := filepath.Join(one.Root, filepath.FromSlash(one.Check.Bin))
 	one.Vale = toolAt(bin, known, "vale")
 	one.Biome = toolAt(bin, known, "biome")
-	one.Node = toolAt(bin, known, "node")
-	if one.Node == "" {
-		one.Node = "node"
-	}
 	one.Config = one.Check.ValeIni
 	if !standsAt(filepath.Join(one.Root, one.Check.ValeIni)) && standsAt(filepath.Join(one.Root, filepath.FromSlash(valeBuilt))) {
 		one.Config = valeBuilt
-	}
-	one.Tense = ""
-	if module := filepath.Join(one.Root, filepath.FromSlash(tenseAt)); standsAt(module) {
-		at := filepath.ToSlash(module)
-		if !strings.HasPrefix(at, "/") {
-			at = "/" + at
-		}
-		one.Tense = "file://" + (&url.URL{Path: at}).EscapedPath()
 	}
 	one.Function = config.Count(one.Root, "code.functionLines")
 	one.File = config.Count(one.Root, "code.fileLines")

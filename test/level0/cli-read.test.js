@@ -4,12 +4,18 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import * as read from "../../src/scripts/cli-read.js";
 import {
   findingsDoors,
   lintRows,
   version,
   warningsStood,
 } from "../../src/scripts/cli-read.js";
+
+// readThrough in src/bridge/findings.js is the one road past Vale, so the command line exports no reader of its own. [[spec/tickets/go-prose-checks-stand-alone]]
+test("the command line exports no prose reader beside findings.js", () => {
+  assert.equal(read.readThroughTheReader, undefined);
+});
 
 // The lint's prose reader asks its slice's mode off the doors it runs on. [[spec/tickets/read-topics-switch-over]]
 test("the check's own reading carries the slices the prose reader asks", async () => {

@@ -39,14 +39,27 @@ const keyOf = (one) => Object.values(bareOf(one)).join("\u0000");
 
 // The findings Go's vetoes keep over one text, each as the caller holds it, or null where quack answers nothing a reader takes. [[spec/tickets/prose-checks-run-in-go]]
 export function keptOf(it, text, found, mode) {
+  return keptOver(it, [{ text, found }], mode)?.[0] ?? null;
+}
+
+// The findings Go's vetoes keep over each document, in one request, so a check pays one process. A document list holding no finding answers itself. [[spec/tickets/go-prose-checks-stand-alone]]
+export function keptOver(it, docs, mode) {
+  const asked = docs.map((one) => ({ text: one.text, found: one.found ?? [] }));
+  if (asked.every((one) => one.found.length === 0)) return asked.map(() => []);
   const said = topicOf(
     it,
     ["prose"],
-    JSON.stringify({ mode, docs: [{ text, found: (found ?? []).map(bareOf) }] }),
+    JSON.stringify({
+      mode,
+      docs: asked.map((one) => ({ text: one.text, found: one.found.map(bareOf) })),
+    }),
   );
-  if (said?.docs?.length !== 1 || !Array.isArray(said.docs[0]?.kept)) return null;
-  const keep = new Set(said.docs[0].kept.map(keyOf));
-  return (found ?? []).filter((one) => keep.has(keyOf(one)));
+  if (said?.docs?.length !== asked.length) return null;
+  if (!said.docs.every((one) => Array.isArray(one?.kept))) return null;
+  return asked.map((one, at) => {
+    const keep = new Set(said.docs[at].kept.map(keyOf));
+    return one.found.filter((row) => keep.has(keyOf(row)));
+  });
 }
 
 // The parsed JSON `quack` prints for the topic, or null where the binary stands missing, exits non-zero or prints what no reader takes. [[spec/tickets/readers-take-the-go-topics]]

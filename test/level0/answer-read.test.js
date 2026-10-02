@@ -10,6 +10,7 @@ import { answerRides, gatesAnswer, readsAnswer } from "../../src/bridge/answer-r
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
+import { carryQuack } from "./quack-doors.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
@@ -46,6 +47,7 @@ function boxed(found) {
       },
     },
   };
+  carryQuack(box);
   return { box, reads };
 }
 

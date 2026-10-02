@@ -11,6 +11,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { askFaults } from "../../src/scripts/ticket-ask-lint.js";
 import { askLines, ticket } from "../../src/scripts/ticket.js";
+import { carryQuack } from "./quack-doors.js";
 import { semicolonVale } from "./semicolon-vale.js";
 
 const ROOT = "/tree";
@@ -101,7 +102,16 @@ function box(said) {
   );
   const proc = git.proc;
   return {
-    it: { disk, proc, git, root: ROOT, join, words: 5, vale: VALE, front: fakeFront() },
+    it: carryQuack({
+      disk,
+      proc,
+      git,
+      root: ROOT,
+      join,
+      words: 5,
+      vale: VALE,
+      front: fakeFront(),
+    }),
     disk,
     proc,
   };

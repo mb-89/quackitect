@@ -8,6 +8,7 @@ import { onBash } from "../../src/bridge/bash.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { NAMED, named, VERB_ALONE } from "./fixtures.js";
+import { carryQuack } from "./quack-doors.js";
 
 const ROOT = "/tree";
 const COMMIT = 'git commit -m "the door reads the delta"';
@@ -24,7 +25,7 @@ const call = (command) => ({ command, description: `${NAMED}: drives the door` }
 
 // The box carries the environment, so a case sets one on it and touches nothing outside. [[spec/design_output/doors#a-door-reads-the-outside]]
 function box(merging, seed = {}) {
-  return {
+  return carryQuack({
     env: {},
     disk: fakeDisk({ ...named(ROOT), ...seed }),
     proc: fakeProc({
@@ -38,7 +39,7 @@ function box(merging, seed = {}) {
     method: ROOT,
     log: { say: () => {} },
     vale: { stands: () => false },
-  };
+  });
 }
 
 const denied = (said) => String(said?.result?.deny ?? "");

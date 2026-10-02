@@ -7,7 +7,9 @@
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { withoutFalsePast } from "../../src/engine/tense.js";
+import { disk } from "../../src/doors/disk.js";
+import { proc } from "../../src/doors/proc.js";
+import { keptOf, PAST } from "../../src/scripts/quack-topic.js";
 import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -367,7 +369,9 @@ ifVale(
     },
     (said) => {
       const tensed = (key) =>
-        withoutFalsePast(said.text(key), said.found(key)).map((one) => one.rule);
+        keptOf({ disk: disk(), proc: proc(), root }, said.text(key), said.found(key), PAST).map(
+          (one) => one.rule,
+        );
       assert.ok(tensed("past").includes("PastTense"), "a real past tense fires");
       for (const key of ["present", "skips", "held", "bound", "settled", "refused"]) {
         const found = tensed(key);

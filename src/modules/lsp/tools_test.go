@@ -159,7 +159,7 @@ func fakeFolds(tree Tree, path string, line, character int) any {
 func toolsOver(t *testing.T, files map[string]string, fake *fakeTools) (*Server, *[][]byte) {
 	t.Helper()
 	store, as := catalogOf(t)
-	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Node: "node", Config: ".vale.ini", Tense: "file:///tree/src/engine/tense.js", Run: fake.run, Check: fakeCheck}
+	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: fake.run, Check: fakeCheck}
 	server := New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },
@@ -246,13 +246,15 @@ func TestAClosedFileDrawsItsRowsAtTheListen(t *testing.T) {
 
 func TestTheTenseReaderDropsAPastRow(t *testing.T) {
 	fake := &fakeTools{says: map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.PastTense", "read")}}
-	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nWe read it\n"}, fake)
+	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\nWe read it\n"}, fake)
 	bodies := server.SweepTools()
 	if drawn := drawnOn(bodies, "file:///tree/spec/b.md"); holds(drawn, "vale", "PastTense") {
 		t.Fatalf("the file draws %+v, and the tense reader reads the word as no past", drawn)
 	}
-	if strings.Contains(strings.Join(fake.calls, "\n"), "node") {
-		t.Fatalf("the runs %q ask node, and the tense reader runs in Go", fake.calls)
+	for _, call := range fake.calls {
+		if strings.HasPrefix(call, "node ") {
+			t.Fatalf("the runs %q ask node, and the tense reader runs in Go", fake.calls)
+		}
 	}
 }
 

@@ -1,7 +1,6 @@
-// The prose checks in Go: the past, length and outside vetoes over Vale's
-// findings, which src/bridge/prose.js runs on wink while the prose slice
-// stands in shadow.
-// [[spec/tickets/prose-checks-run-in-go]]
+// The prose checks: the past, length and outside vetoes over Vale's
+// findings, and the one copy every reader asks through quack prose.
+// [[spec/tickets/go-prose-checks-stand-alone]]
 package prose
 
 import (
@@ -77,7 +76,7 @@ func ReadsAsPast(line, word string) bool {
 	return past
 }
 
-// The rule isPast in src/engine/tense.js holds. [[spec/design_output/level0#the-tense-reader]]
+// A form other than its lemma, its -s and its -ing reads past. [[spec/design_output/level0#the-tense-reader]]
 func isPast(word, lemma string) bool {
 	if lemma == "" || word == lemma || strings.HasSuffix(word, "ing") {
 		return false

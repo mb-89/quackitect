@@ -5,15 +5,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import {
-  longest,
-  PROSE_CALL,
-  readsDraft,
-  SPECS,
-  TOOLS,
-  withoutFalseLength,
-  withoutFalseOutside,
-} from "../../src/bridge/prose.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import { PROSE_CALL, readsDraft, SPECS, TOOLS } from "../../src/bridge/prose.js";
 
 const LONG = "This one sentence runs on past the ceiling a draft holds.";
 
@@ -22,7 +15,16 @@ const box = (found = []) => ({
     stands: () => true,
     lint: async () => ({ ran: true, found }),
   },
-  disk: { exists: () => false, read: () => "" },
+  disk: { exists: (path) => path.endsWith(BIN), read: () => "" },
+  // quack prose keeps every finding it reads, so the tool's own answer speaks. [[spec/tickets/go-prose-checks-stand-alone]]
+  proc: {
+    run: (_argv, { stdin }) => ({
+      exitCode: 0,
+      stdout: JSON.stringify({
+        docs: JSON.parse(stdin).docs.map((one) => ({ kept: one.found })),
+      }),
+    }),
+  },
   log: { say: () => {} },
   root: "/tree",
   method: "/tree",
@@ -79,51 +81,4 @@ test("the module registers the pair the server imports for each bridge module", 
     "text",
   ]);
   assert.equal(TOOLS[PROSE_CALL], readsDraft, "the pair names the handler");
-});
-
-// [[spec/design_output/level0#the-tense-reader]]
-const CAPS = { sentence: 25, listItem: 20 };
-
-const finding = (rule, line, column = 1, said = "") => ({
-  rule,
-  line,
-  column,
-  said,
-  message: "a message",
-});
-
-test("the measure counts the words a sentence holds, past a code span", () => {
-  assert.equal(longest("The door reads the file."), 5);
-  assert.ok(longest("The `one/two/three.js` door reads the file.") < 7);
-});
-
-test("a sentence inside the cap lets its finding go", () => {
-  const text = "The door reads the file.\n";
-
-  assert.deepEqual(
-    withoutFalseLength(text, [finding("VoiceParagraph.Sentence", 1)], CAPS),
-    [],
-  );
-});
-
-test("a sentence past the cap keeps its finding", () => {
-  const long = `The door ${"and the reader ".repeat(12)}meet here.\n`;
-  const kept = withoutFalseLength(long, [finding("VoiceParagraph.Sentence", 1)], CAPS);
-
-  assert.equal(kept.length, 1);
-});
-
-test("a rule the caps say nothing about stands as it reads", () => {
-  const said = [finding("VoiceVale.Antithesis", 1)];
-
-  assert.deepEqual(withoutFalseLength("A line stands.\n", said, CAPS), said);
-});
-
-test("a word the list holds lets its finding go, and another keeps it", () => {
-  const text = "The door reads the widget.\n";
-  const words = () => new Set(["widget"]);
-  const said = [finding("VoiceParagraph.Vocabulary", 1, 22, "widget")];
-
-  assert.deepEqual(withoutFalseOutside(text, said, words), []);
-  assert.equal(withoutFalseOutside(text, said, () => new Set()).length, 1);
 });

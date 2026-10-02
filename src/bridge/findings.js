@@ -14,14 +14,13 @@ import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { SIZED } from "../../.claude/skills/level0/lib/size.js";
 import { stopFolderIsData, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { faultIn, fromJson, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
-import { withoutFalsePast } from "../engine/tense.js";
 import { whereIs } from "../engine/tools.js";
 import {
   faultsIn as faultsInGrid,
   RULE as GRID,
   lineOf,
 } from "../extension/lib/grid.js";
-import { answerOf, keptOf, PAST, readsNew } from "../scripts/quack-topic.js";
+import { answerOf, keptOf, keptOver, PAST } from "../scripts/quack-topic.js";
 import { assemble } from "../scripts/styles.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-tree-handed-in]]
@@ -145,10 +144,8 @@ export function valeArgvOf(it) {
 
 // One file's reading past Vale: the tense reader over Vale's rows, then every marker naming no reason. The lint and the pull both read a file here. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 export function readsText(it, file, text, rows, docs) {
-  // The Go vetoes answer where the prose slice reads new. [[spec/tickets/readers-take-the-go-topics]]
-  const kept = readsNew(it, "prose")
-    ? answerOf(keptOf(it, text, rows, PAST), "prose")
-    : withoutFalsePast(text, rows);
+  // The Go past veto alone answers. [[spec/tickets/go-prose-checks-stand-alone]]
+  const kept = answerOf(keptOf(it, text, rows, PAST), "prose");
   docs?.push({ file: showOf(it, file), text, found: rows, kept });
   return [
     ...kept.map((one) => from(one, FROM.vale)),
@@ -214,17 +211,19 @@ export function readThrough(it, found, docs) {
   for (const one of found) {
     byFile.set(one.file, [...(byFile.get(one.file) ?? []), one]);
   }
-  const kept = [];
-  for (const [file, list] of byFile) {
+  const read = [...byFile].map(([file, found]) => {
     let text = "";
     try {
       text = it.disk.read(it.join(it.root, file));
     } catch {}
-    const past = withoutFalsePast(text, list);
-    docs?.push({ file, text, found: list, kept: past });
-    kept.push(...past);
-  }
-  return kept;
+    return { file, text, found };
+  });
+  // Every file rides one request, so a check pays one process. [[spec/tickets/go-prose-checks-stand-alone]]
+  const past = answerOf(keptOver(it, read, PAST), "prose");
+  return read.flatMap((one, at) => {
+    docs?.push({ ...one, kept: past[at] });
+    return past[at];
+  });
 }
 
 // [[spec/design_output/extension#the-grid-check]]
