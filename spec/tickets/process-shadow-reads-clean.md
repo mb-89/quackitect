@@ -29,9 +29,13 @@ process_hash: 2b5ab398855a1aba
 
 # Ask
 
-The phase 9 shadow names three faults on main: the person-trial tickets place in another order on the new path, the two paths read the clock minute one apart, and a second index start hangs its standing verb and places every module process twice.
+The phase 9 shadow names three faults on main:
 
-The gain is a shadow that writes a row only where the two paths disagree in substance, so migration.phase9switch can turn on. Left undone, the switch never turns on, and a box running the index hangs.
+- the person-trial tickets place in another order on the new path
+- the two paths read the clock minute one apart
+- a second index start hangs its standing verb and places every module process twice
+
+The gain is a shadow that writes a row only where the two paths disagree in substance, so migration.phase9switch can turn on. Left undone, the switch stays off, and a box running the index hangs.
 
 - `./RUNME.sh log --kind shadow` adds no processes row over a ten-minute index run with activity
 - `.se/.runtime/bin/se-index standing` answers at once with the index already running

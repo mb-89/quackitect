@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -115,7 +114,7 @@ func serves(root string, manage Manage, starts []Start) int {
 		fmt.Fprintln(stderr, "the index door did not stand:", err)
 		return 1
 	}
-	pid := os.Getpid()
+	pid := pidOf()
 	defer dropsOwn(root, pid)
 
 	select {
@@ -129,7 +128,7 @@ func serves(root string, manage Manage, starts []Start) int {
 // The door standing over the root, and whether it answers on this build. A door on another build takes a stop, so the serve after it stands alone. [[spec/tickets/process-shadow-reads-clean]]
 func liveDoor(root string) (Standing, bool) {
 	said, err := standingOf(root)
-	if err != nil || said.Pid == os.Getpid() {
+	if err != nil || said.Pid == pidOf() {
 		return said, false
 	}
 	if !stands(said, root) {

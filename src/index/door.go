@@ -538,7 +538,7 @@ func stampOf(bin string) string {
 // [[spec/design_output/index#a-door-comes-back]]
 func stopsSoon(root string) {
 	time.Sleep(stopGraceDelay)
-	dropsOwn(root, os.Getpid())
+	dropsOwn(root, pidOf())
 	os.Exit(0)
 }
 

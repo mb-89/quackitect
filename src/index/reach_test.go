@@ -151,6 +151,10 @@ func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
 	if _, live := liveDoor(root); live {
 		t.Fatal("a serve reads a door on another build as live")
 	}
+	standsAt(t, root, Standing{Port: port, Pid: pidOf(), Root: root, Stamp: stampOf(bin)})
+	if _, live := liveDoor(root); live {
+		t.Fatal("a serve reads the file naming itself as another live door")
+	}
 	if got := heard(); len(got) != 2 || got[0] != "standing" || got[1] != "stop" {
 		t.Fatalf("the doors hear %q, and want a standing, then a stop for the other build", got)
 	}
