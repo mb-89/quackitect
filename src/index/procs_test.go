@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
 )
 
@@ -43,25 +42,6 @@ func TestFakeIdleProcess(t *testing.T) {
 	if _, err := Dial(os.Getenv(BusEnv), os.Getenv(TokenEnv)); err != nil {
 		os.Exit(3)
 	}
-	for {
-		time.Sleep(time.Hour)
-	}
-}
-
-// The fake silent process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
-func TestFakeSilentProcess(t *testing.T) {
-	if os.Getenv(BusEnv) == "" {
-		return
-	}
-	peer, err := Dial(os.Getenv(BusEnv), os.Getenv(TokenEnv))
-	if err != nil {
-		os.Exit(3)
-	}
-	instance := flag.Arg(0)
-	if err := peer.Commit(instance, map[string]any{instance + "/pid": os.Getpid(), instance + "/out": 7}); err != nil {
-		os.Exit(4)
-	}
-	_ = peer.Beat(instance)
 	for {
 		time.Sleep(time.Hour)
 	}
@@ -148,49 +128,5 @@ func TestTheNextCommitOfARestartedProcessClearsTheMark(t *testing.T) {
 	until(t, store, "a second fake committing", func(snap q.Snapshot) bool {
 		pid := snap.Read("fake/pid")
 		return pid != first && pid != 0 && !snap.NotProvided("fake/out") && snap.Read("fake/out") == 7
-	})
-}
-
-func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
-	bus, err := StartBus()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer bus.Close()
-	c := q.New()
-	as := manager.Registers(c)
-	hand := q.Join(q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid")), q.OutIn(c, "fake/out", 0, q.IO(), q.Doc("the fake's value")))
-	if faults := c.Check(); len(faults) > 0 {
-		t.Fatalf("the catalog refuses: %v", faults)
-	}
-	store := q.NewStore(c)
-	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
-	ticking := make(chan struct{})
-	defer close(ticking)
-	go func() {
-		for {
-			select {
-			case <-ticking:
-				return
-			case <-time.After(10 * time.Millisecond):
-				dog.Check()
-			}
-		}
-	}()
-	placed := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentProcess$", "--", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
-	stop, err := NewPlacements(bus, store, []Placed{placed}).Start()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer stop()
-	until(t, store, "fake/out at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 })
-	first := read(store, "fake/pid")
-	until(t, store, "the silent fake restarted", func(snap q.Snapshot) bool {
-		pid := snap.Read("fake/pid")
-		return pid != first && pid != 0
-	})
-	until(t, store, "session/alarms naming the silent fake", func(snap q.Snapshot) bool {
-		alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm)
-		return len(alarms) == 1 && alarms[0].Part == "fake"
 	})
 }

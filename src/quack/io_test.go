@@ -62,6 +62,58 @@ func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
 	t.Fatalf("session/alarms reads %v, and wants the silent IO process", store.Snapshot().Read(manager.AlarmsName))
 }
 
+// The fake silent module process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/module-silence-reads-alarms]]
+func TestFakeSilentModule(t *testing.T) {
+	if os.Getenv(index.BusEnv) == "" {
+		return
+	}
+	peer, err := index.Dial(os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv))
+	if err != nil {
+		os.Exit(3)
+	}
+	if err := peer.Commit("fake", map[string]any{"fake/pid": os.Getpid()}); err != nil {
+		os.Exit(4)
+	}
+	_ = peer.Beat(flag.Arg(0))
+	for {
+		time.Sleep(time.Hour)
+	}
+}
+
+func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
+	c := q.New()
+	as := manager.Registers(c)
+	fake := q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid"))
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	dog := manager.NewDog(time.Now, store, as, manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute})
+	bus, err := index.StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	placed := index.Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeSilentModule$", "--", "fake"}, Instances: map[string]q.Writer{"fake": fake}, Restart: time.Hour, Watch: dog, Term: 200 * time.Millisecond}
+	stop, err := index.NewPlacements(bus, store, []index.Placed{placed}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	pids := map[any]bool{}
+	for end := time.Now().Add(20 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
+		dog.Check()
+		snap := store.Snapshot()
+		if pid := snap.Read("fake/pid"); pid != 0 {
+			pids[pid] = true
+		}
+		if alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm); len(pids) > 1 && len(alarms) == 1 && alarms[0].Part == "fake" {
+			return
+		}
+	}
+	t.Fatalf("the silent fake runs as %d process(es), and session/alarms reads %v: wants a restart, then the alarm", len(pids), store.Snapshot().Read(manager.AlarmsName))
+}
+
 func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
 	bus, err := index.StartBus()
 	if err != nil {

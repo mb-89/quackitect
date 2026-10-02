@@ -381,3 +381,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- module-silence-reads-alarms moves `TestASilentModuleProcessRestartsAndRaisesAnAlarm` to `src/quack/io_test.go`, beside the IO case, since the index imports no module and the manager's dog lives in one. It runs over the manager's dog and reads `session/alarms`, and the red list keeps it out of the check until tests-green.
