@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -162,6 +162,15 @@ record:
         hash: 1e27277f7647141a
         size: 231
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 7b0ad8331244187326b7e156354856caf97c734d
+    hash_after: 7b0ad8331244187326b7e156354856caf97c734d
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-webview-ships-prebuilt.md:262:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -319,14 +328,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the prose readers, their tests, the install and the notes naming wink, each a file the ask's wink line reaches
+- the readers reach quack through the process door, and `test/level0/quack-doors.js` holds its fake
+- a comment in `src/bridge/prose.js` names the Go checks as the one copy, and points at this ticket
+- the veto stands once in `src/quack/prose.go`, and the JavaScript readers call it
 
 ## tests-green
 
