@@ -116,6 +116,25 @@ record:
     hand: the engine
     hash_before: 372a0cd8de7540212b363afbe72d01445760f539
     hash_after: 372a0cd8de7540212b363afbe72d01445760f539
+  - step: accept
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 3b81d663f6182488f1a0913df3c9bb4ddbac0bf9
+    hash_after: 3b81d663f6182488f1a0913df3c9bb4ddbac0bf9
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/module-processes-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 0a32db0c3452e5e4
+        size: 357
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
 cloud: true
@@ -171,8 +190,12 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- settle-timer-races-deadline: Settle in src/index/procs.go starts its timer before it computes the deadline, so a timer firing in that gap leaves the wait with no broadcast to wake it
+- live-split-raises-the-alarm: the live kill case passes a nil dog, so no case holds that a crash under ioProcesses raises session/alarms
+- start-refuses-wired-io: no case holds that ioProcesses itself refuses an IO instance that reads a wire
 
 # retro
 
