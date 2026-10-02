@@ -21,6 +21,9 @@ type Managed struct {
 	Call Call
 	// The bus the manager runs, which the standing file names. [[spec/design_output/model#the-standing-file]]
 	Bus *Bus
+	// The instances a process of their own runs, whose providers the index's scheduler leaves, and the wait until those processes answer every run sent. A nil Settle waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
+	Away   []string
+	Settle func()
 }
 
 // Calls an action within the wait its caller sets. [[spec/design_output/model#a-caller-sets-its-wait]]

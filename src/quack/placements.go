@@ -165,6 +165,8 @@ func moduleOver(peer *index.Peer, store *q.Store, instances []string) (func(), e
 			return nil, err
 		}
 		dones = append(dones, done)
+		// The first run follows the subscription and needs no run.<instance>, so a process spawned after the commits it reads computes off them. [[spec/tickets/the-split-deployment-takes-over]]
+		waiting <- struct{}{}
 	}
 	part := strings.Join(instances, partJoin)
 	beats := time.NewTicker(moduleBeat)
@@ -192,9 +194,18 @@ type moduleRun struct {
 	sent     map[string]string
 }
 
-// The first run reads the inputs whole, and each later one the moved ones alone, and a run commits the names that moved since the last. [[spec/design_output/model#the-placements]]
+// The first run reads the inputs whole, and each later one the moved ones alone, and a run commits the names that moved since the last. Every run commits, an empty commit where nothing moved, so the index hears each run answered. [[spec/design_output/model#the-placements]] [[spec/tickets/the-split-deployment-takes-over]]
 func (r *moduleRun) once(peer *index.Peer, store *q.Store, scheduler *q.Scheduler) {
 	instance := r.instance
+	if err := peer.Commit(instance, r.computes(peer, store, scheduler)); err != nil {
+		fmt.Fprintln(os.Stderr, instance, "commits nothing:", err)
+	}
+}
+
+// The names of the instance that moved since the last run, and none where the inputs read nowhere. [[spec/design_output/model#the-placements]]
+func (r *moduleRun) computes(peer *index.Peer, store *q.Store, scheduler *q.Scheduler) map[string]any {
+	instance := r.instance
+	moved := map[string]any{}
 	asks := peer.Moved
 	if !r.read {
 		asks = peer.Inputs
@@ -202,7 +213,7 @@ func (r *moduleRun) once(peer *index.Peer, store *q.Store, scheduler *q.Schedule
 	saved, err := asks(instance)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, instance, "reads no inputs:", err)
-		return
+		return moved
 	}
 	refused, err := store.Restore(saved)
 	for _, line := range refused {
@@ -210,11 +221,10 @@ func (r *moduleRun) once(peer *index.Peer, store *q.Store, scheduler *q.Schedule
 	}
 	if err != nil {
 		fmt.Fprintln(os.Stderr, instance, "restores nothing:", err)
-		return
+		return moved
 	}
 	r.read = true
 	scheduler.Settle()
-	moved := map[string]any{}
 	for name, value := range store.Values(store.Outputs(instance)) {
 		body, err := json.Marshal(value)
 		if err != nil || r.sent[name] == string(body) {
@@ -222,10 +232,5 @@ func (r *moduleRun) once(peer *index.Peer, store *q.Store, scheduler *q.Schedule
 		}
 		moved[name], r.sent[name] = value, string(body)
 	}
-	if len(moved) == 0 {
-		return
-	}
-	if err := peer.Commit(instance, moved); err != nil {
-		fmt.Fprintln(os.Stderr, instance, "commits nothing:", err)
-	}
+	return moved
 }

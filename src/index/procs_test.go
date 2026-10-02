@@ -120,6 +120,78 @@ func TestAKilledFakeIOProcessLeavesItsNamesNotProvided(t *testing.T) {
 	}
 }
 
+// A crash in one placed process leaves every other one running and answering. [[spec/tickets/the-split-deployment-takes-over]]
+func TestAKilledPlacedProcessLeavesTheOthersAnswering(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	fake := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
+	other := Placed{Name: "other", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "other"}, Instances: map[string]q.Writer{"other": hand}, Restart: time.Hour}
+	stop, err := NewPlacements(bus, store, []Placed{fake, other}).Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	until(t, store, "both fakes at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 && snap.Read("other/out") == 7 })
+	kills(t, read(store, "fake/pid"))
+	until(t, store, "fake/out not provided", func(snap q.Snapshot) bool { return snap.NotProvided("fake/out") })
+	// An exit marks a process's names down, so other's names standing provided past a wait say its process runs. [[spec/design_output/model#a-process-ends]]
+	time.Sleep(300 * time.Millisecond)
+	if snap := store.Snapshot(); snap.Read("other/out") != 7 || snap.NotProvided("other/out") || snap.NotProvided("other/pid") {
+		t.Fatalf("other/out reads %v after the kill of fake, and wants 7, provided", snap.Read("other/out"))
+	}
+}
+
+// A reader settling the placements reads what a process commits at its spawn, and a stopped placement waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
+func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	fake := Placed{Name: "fake", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$", "fake"}, Instances: map[string]q.Writer{"fake": hand}, Restart: time.Hour}
+	placements := NewPlacements(bus, store, []Placed{fake})
+	stop, err := placements.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	placements.Settle(20 * time.Second)
+	if got := read(store, "fake/out"); got != 7 {
+		t.Fatalf("fake/out reads %v once the settle ends, and wants 7", got)
+	}
+	stop()
+	began := time.Now()
+	placements.Settle(time.Hour)
+	if gone := time.Since(began); gone > time.Second {
+		t.Fatalf("a stopped placement holds the settle for %v", gone)
+	}
+}
+
+// A run sent to a process that exited holds no reader, since nothing answers it until the restart. [[spec/tickets/the-split-deployment-takes-over]]
+func TestASettleWaitsOnNoProcessStandingDown(t *testing.T) {
+	store, source, bus, placed := doublerPlaced(t)
+	placed.Command = []string{os.Args[0], "-test.run=^$"}
+	placements := NewPlacements(bus, store, []Placed{placed})
+	stop, err := placements.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	placements.Settle(20 * time.Second)
+	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 21}); err != nil {
+		t.Fatal(err)
+	}
+	began := time.Now()
+	placements.Settle(5 * time.Second)
+	if gone := time.Since(began); gone > time.Second {
+		t.Fatalf("a run of the exited doubler holds the settle for %v", gone)
+	}
+}
+
 // A dog that counts holds and faults, and refuses every restart. [[spec/tickets/watchdogs-span-the-processes]]
 type refusingDog struct {
 	mu     sync.Mutex

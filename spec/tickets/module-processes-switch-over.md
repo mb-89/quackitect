@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -17,7 +18,6 @@ steps:
     from: anyone
     by: anyone
     input: ask
-    reads: [[spec/guidance/working]]
     checklist: ["every child is small enough to review whole, or is a group itself", "the children add up to the goal, and nothing of the goal stands outside them", "a child that waits on another names it under depends_on"]
     evidence:
       - name: children
@@ -26,8 +26,17 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: accept
+    gate: does the work of every child add up to the goal, and does every command of the route pass
+    final: true
+    does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
+    tags: ["review", "accept"]
+    input: ["ask", "children"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
   - name: retro
-    reads: [[spec/guidance/working]]
     to: retro
     steps:
       - name: notes
@@ -72,12 +81,113 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: sync
 process: [[spec/processes/group]]
-process_hash: 57b2cccd0445ea9a
-depends_on: [module-processes-land-in-shadow]
+process_hash: 5d4a884bfb2491ff
+record:
+  - step: sync
+    hand: box b1311a2beaed · claude-code-remote
+    hash_before: 29658dea603ac6cbf84d805c464b7e6e53cb920a
+    hash_after: 75375d96fba6a70720d36797a14bc48c859fb59c
+  - step: sync
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 6f6790863026f71fd441b6ca2eac17f1d824f909
+    hash_after: db39bc3e93b56e28a116b3298197ab31a5d61945
+  - step: sync
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 6f6790863026f71fd441b6ca2eac17f1d824f909
+    hash_after: 24d289657980e1748bf530e1d5775920dc506e1e
+    answered:
+      - name: sync
+        exit: 0
+        said: work/module-processes-switch-over already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 9bdc20709130b5bf612873ad4da1c3950c880e43
+    hash_after: 9bdc20709130b5bf612873ad4da1c3950c880e43
+    inputs:
+      - name: ask
+        hash: 0a32db0c3452e5e4
+        size: 357
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 372a0cd8de7540212b363afbe72d01445760f539
+    hash_after: 372a0cd8de7540212b363afbe72d01445760f539
+  - step: accept
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 3b81d663f6182488f1a0913df3c9bb4ddbac0bf9
+    hash_after: 3b81d663f6182488f1a0913df3c9bb4ddbac0bf9
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/module-processes-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 0a32db0c3452e5e4
+        size: 357
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: c0b4f16e80a4ce279f6642d43069f758b8d7b560
+    hash_after: c0b4f16e80a4ce279f6642d43069f758b8d7b560
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/module-processes-switch-over already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 0a32db0c3452e5e4
+        size: 357
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: b0772b5144520df12587646a0ee4a3c96ed9fc92
+    hash_after: b0772b5144520df12587646a0ee4a3c96ed9fc92
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: a866df80b6e90e176734d9ef5968170230fb6231
+    hash_after: a866df80b6e90e176734d9ef5968170230fb6231
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 4ad1b4ec2d0754970c63106a8b220d75673e9e86
+    hash_after: 4ad1b4ec2d0754970c63106a8b220d75673e9e86
+    inputs:
+      - name: retro/write
+        hash: 7a833aed473e2cc4
+        size: 3204
+    def: 4da1ca5da87d5bbc
+depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
-cloud: true
+reason: done
 ---
 
 # Ask
@@ -93,8 +203,9 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -103,16 +214,35 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-split-deployment-takes-over]] standard
+- [[spec/tickets/callers-name-drains-readers]] trivial
+- [[spec/tickets/kill-case-drives-live-split]] trivial
+- [[spec/tickets/mid-run-commit-clears-early]] trivial
+- [[spec/tickets/quack-io-answers-no-run]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
+- each child is small enough to review whole: the switch in one standard ticket, and each gate point as a trivial of its own
+- the children add up to the goal: the switch moves the slice and kills the old path, and the four points close what the gate found short, the alarm among them through the dog's faults
+- no child waits on another: the four points name the switch as parent, and each closed after it
+
 # children
+
+# accept
+
+<!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -123,8 +253,9 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -133,38 +264,67 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the-split-deployment-takes-over: the change and tests-green leaves passed, and the group switch stands closed
+- kill-case-drives-live-split: a case kills guidance under ioProcesses, and tickets answers on with no restart
+- mid-run-commit-clears-early: the placements number each run, and a commit clears the wait only off an ask covering the last run
+- quack-io-answers-no-run: ioProcesses refuses an IO instance on a wire, and a case holds the tracked wiring clean
+- live-split-raises-the-alarm: two crashes of guidance under a real dog raise its alarm
+- settle-timer-races-deadline: Settle ends on the timer's own flag
+- start-refuses-wired-io: a case drives the guard through ioProcesses
+- one-reading-flakes-under-load: dropped, since it failed once in code this branch leaves alone
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a TestMain routing the io and module verbs to main let a test drive the real split, with no binary build
+- a pid file each spawn leaves let the cases kill one process and read a restart
+- an independent review at the accept found two real faults the box had read past
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 09:36: the release committed the handover, and the push door refused it, since the hold reads stale only past work.staleAfter. The box worked an hour on local commits
+- 09:40 and 09:58: the index answered nothing, and the guard refused every shell call until serve brought it back
+- 09:45: the engine refused calls, ToolSearch among them, until a plan stood, so the plan tool ran before its schema loaded
+- 10:17 and 11:28: the pull handed out nothing while the plan named the ticket it was to hand, and the box cleared the plan file through the door
+- 10:28: the cold probe's canary failed once on a commit, and the retry passed
+- 10:58: the one-reading contract test failed once under branch review, and passed on every run since
+- 10:20: the hand-back refused a go test line as tests evidence, and branch test answered missing for a commit made before the leaf
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- src/scripts/prepush.js: a release commit the dispatch orders moves the hold at once, or the dispatch hands a branch over only past work.staleAfter
+- src/scripts/pull.js: a working entry naming an open leaf of the group hands that leaf out
+- the plans module: an empty working clears the entry
+- the index: each death writes a row naming its cause, so the next box reads why
+- spec/design_output/pull#the-test-verb: the tests field says it takes branch test, with files named where the commit predates the leaf
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+Most of the hour went to the doors around the work, and little to the work. The code changes stand small, and each child closed in a few calls. The hold, the plan and the dead index each stopped the box with a refusal that named a cure, and every cure worked. The review at the accept earned its cost: the settle race and the missing alarm case are faults the box's own reading passed.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: each fix links its ticket, and the retro points at homes
+- no number past the times the errors carry
+- no header changes in this chapter
+- the run took no owner prompt past the dispatch at its start, and each error carries its time
+- the chapter names roles and holds no path of the box
 
 ## cloud
 
@@ -173,21 +333,33 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: the install ran whole, and every host the run reached answered
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the hold guard at 09:36: a release push waits for work.staleAfter, so the box pushed first at 10:54
+- the shell guard at 09:40 and 09:58: the index stood down, and serve brought it back each time
+- the cold probe's canary at 10:28, which failed once and passed on the retry
+- a contract test at 10:58 that failed once under branch review alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step: the group's children all close done
+- no ticket minted outside the group
+- the handover: the branch stands at done, and its pull request against main carries auto-merge
 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The box, at the accept: a review found that `src/index/door.go` sets `Except` once the manager starts. So a commit inside that window lets a wave in the index compute an away instance's names.
+- I mint no ticket for it. The wave runs the same provider over the same inputs as the process, and the process's commit lands over it. The cost is one wave of work at the start.
+- A fix hands the manager the scheduler before it starts. That reshapes `Manage`, which the ask leaves alone.

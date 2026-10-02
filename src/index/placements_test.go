@@ -196,9 +196,11 @@ func TestAMovedAskAnswersTheInputsMovedSinceTheLastAnswer(t *testing.T) {
 	}
 }
 
-func TestAQuietNameRunsNoPlacedProcess(t *testing.T) {
+// A commit answering an earlier run leaves the reader waiting on a run sent while the process computed. [[spec/tickets/mid-run-commit-clears-early]]
+func TestACommitAnsweringAnEarlierRunHoldsTheSettleForTheLater(t *testing.T) {
 	store, source, bus, placed := doublerPlaced(t)
-	stop, err := NewPlacements(bus, store, []Placed{placed}).Quiet("source/all").Start()
+	placements := NewPlacements(bus, store, []Placed{placed})
+	stop, err := placements.Start()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,13 +211,65 @@ func TestAQuietNameRunsNoPlacedProcess(t *testing.T) {
 	}
 	defer peer.Close()
 	runs := runsOf(t, peer)
-	if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": 21}); err != nil {
+	answers := func(ask func(string) ([]byte, error)) {
+		t.Helper()
+		if _, err := ask("doubler"); err != nil {
+			t.Fatal(err)
+		}
+	}
+	commits := func(all int) {
+		t.Helper()
+		if _, err := store.Commit(store.Snapshot().Revision, source, map[string]any{"source/all": all}); err != nil {
+			t.Fatal(err)
+		}
+		select {
+		case <-runs:
+		case <-time.After(10 * time.Second):
+			t.Fatal("a move of source/all publishes no run of doubler")
+		}
+	}
+	answers(peer.Inputs)
+	if err := peer.Commit("doubler", map[string]any{}); err != nil {
 		t.Fatal(err)
 	}
-	select {
-	case <-runs:
-		t.Fatal("a commit of the quiet source/all runs doubler")
-	case <-time.After(300 * time.Millisecond):
+	placements.Settle(10 * time.Second)
+	commits(21)
+	answers(peer.Moved)
+	commits(22)
+	if err := peer.Commit("doubler", map[string]any{}); err != nil {
+		t.Fatal(err)
+	}
+	began := time.Now()
+	placements.Settle(time.Second)
+	if gone := time.Since(began); gone < 900*time.Millisecond {
+		t.Fatalf("the settle ends after %v on the answer to the first run, and wants the second answered", gone)
+	}
+	answers(peer.Moved)
+	if err := peer.Commit("doubler", map[string]any{}); err != nil {
+		t.Fatal(err)
+	}
+	began = time.Now()
+	placements.Settle(10 * time.Second)
+	if gone := time.Since(began); gone > 5*time.Second {
+		t.Fatalf("the answer to the second run holds the settle for %v", gone)
+	}
+}
+
+// A settle on a silent process ends at its wait, every time. [[spec/tickets/settle-timer-races-deadline]]
+func TestASettleOnASilentProcessEndsAtItsWait(t *testing.T) {
+	store, _, bus, placed := doublerPlaced(t)
+	placements := NewPlacements(bus, store, []Placed{placed})
+	stop, err := placements.Start()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	for range 200 {
+		began := time.Now()
+		placements.Settle(time.Millisecond)
+		if gone := time.Since(began); gone > time.Second {
+			t.Fatalf("a settle of a millisecond on the silent doubler holds for %v", gone)
+		}
 	}
 }
 

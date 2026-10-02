@@ -288,8 +288,8 @@ func TestAGuardedCallReadsAnIndexLeasePastItsTermAsDown(t *testing.T) {
 	if _, err := one.door.Hook(post); err != nil {
 		t.Fatal(err)
 	}
-	if len(rows) != 1 || rows[0]["kind"] != "shadow" || rows[0]["slice"] != "processes" || rows[0]["part"] != "index" {
-		t.Fatalf("the guarded call writes %+v, and wants one shadow row of the processes slice naming the index down", rows)
+	if len(rows) != 1 || rows[0]["kind"] != "watchdog" || rows[0]["level"] != "warn" || rows[0]["part"] != "index" || rows[0]["slice"] != nil {
+		t.Fatalf("the guarded call writes %+v, and wants one watchdog row naming the index down", rows)
 	}
 }
 

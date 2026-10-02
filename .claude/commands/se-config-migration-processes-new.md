@@ -1,5 +1,5 @@
 ---
-description: "config / migration / processes: sets migration.processes to new. The processes: old runs every module in the index alone, shadow spawns the IO process beside it and logs each value it reads apart, new runs the placements."
+description: "config / migration / processes: sets migration.processes to new. The processes, switched over in phase 9. The index spawns the IO process and one process a placement."
 allowed-tools: Bash(./RUNME.sh config:*)
 disable-model-invocation: true
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

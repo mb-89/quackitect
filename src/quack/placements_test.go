@@ -105,23 +105,27 @@ func doublerRuns(t *testing.T) (*index.Peer, chan map[string]json.RawMessage) {
 	return peer, heard
 }
 
-func TestAModuleProcessCommitsNothingWhereNothingMoved(t *testing.T) {
+// The process runs once at its start with no run sent, and a run over the same inputs answers an empty commit. [[spec/tickets/the-split-deployment-takes-over]]
+func TestAModuleProcessAnswersAnEmptyCommitWhereNothingMoved(t *testing.T) {
 	peer, heard := doublerRuns(t)
-	if err := peer.Run("doubler"); err != nil {
-		t.Fatal(err)
-	}
 	select {
-	case <-heard:
+	case values := <-heard:
+		if string(values["doubler/twice"]) != "42" {
+			t.Fatalf("the run at the start commits %s", values)
+		}
 	case <-time.After(10 * time.Second):
-		t.Fatal("the first run commits nothing")
+		t.Fatal("the run at the start commits nothing")
 	}
 	if err := peer.Run("doubler"); err != nil {
 		t.Fatal(err)
 	}
 	select {
 	case values := <-heard:
-		t.Fatalf("a second run over the same inputs commits %s", values)
-	case <-time.After(500 * time.Millisecond):
+		if len(values) != 0 {
+			t.Fatalf("a second run over the same inputs commits %s", values)
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("a second run answers nothing")
 	}
 }
 

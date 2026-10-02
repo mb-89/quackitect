@@ -181,14 +181,15 @@ func main() {
 		os.Exit(routes(os.Stdout, os.Stderr, index.V1, os.Args[1:]))
 	}
 	as := manager.Registers(q.Main)
-	starts, doors, err := wired()
+	doors, err := wired()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 	// The config module loads always, after the wiring, so it resolves every key the wiring declares. [[spec/design_output/model#the-config-module]]
 	config.Registers(q.Main)
-	index.Main(manages(as, doors), starts...)
+	// The IO process runs the IO starts, so the index runs none. [[spec/tickets/the-split-deployment-takes-over]]
+	index.Main(manages(as, doors))
 }
 
 // The module type the wiring loads as hooks, whose door the manager's start opens. [[spec/tickets/the-hooks-door-lands]]
@@ -203,7 +204,7 @@ const lspModule = "lsp"
 // The name the check module's sweep stands under, which the lsp listener reads. [[spec/tickets/the-lsp-door-lands]]
 const sweepName = "check/sweep"
 
-// The instances whose listeners the manager's start opens: the hooks door, the mcp server, and the lsp listener. The IO instances are the ones a shadow IO process runs. [[spec/tickets/the-lsp-door-lands]]
+// The instances whose listeners the manager's start opens: the hooks door, the mcp server, and the lsp listener. The IO instances are the ones the IO process runs. [[spec/tickets/the-lsp-door-lands]]
 type doors struct {
 	hooks, mcp, lsp hooked
 	io              []string
@@ -245,12 +246,12 @@ func manages(as q.Writer, open doors) index.Manage {
 			served.Stop()
 			return index.Managed{}, err
 		}
-		bus, halt, err := ioShadow(root, store, open, served.Dog)
+		split, err := ioProcesses(root, store, open, served.Dog)
 		if err != nil {
 			stop()
 			return index.Managed{}, err
 		}
-		return index.Managed{Stop: func() { halt(); stop() }, Bus: bus, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
+		return index.Managed{Stop: func() { split.Stop(); stop() }, Bus: split.Bus, Away: split.Away, Settle: split.Settle, Call: func(name string, input any, caller string, wait time.Duration) (index.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return index.Called(said), err
 		}}, nil
@@ -320,7 +321,7 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 	}
 	door := hooks.New(hooks.Outside{
 		Index:  asks,
-		Health: healthOf(root, store),
+		Health: healthOf(store),
 		Store:  store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
@@ -335,11 +336,8 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 	return hooks.Listen(root, door)
 }
 
-// The index's lease off index/health under the processes slice's shadow, and none under any other mode. [[spec/tickets/watchdogs-span-the-processes]]
-func healthOf(root string, store *q.Store) func() (time.Time, time.Duration, bool) {
-	if sliceMode(root, processesKey) != modeShadow {
-		return nil
-	}
+// The index's lease off index/health. [[spec/tickets/watchdogs-span-the-processes]]
+func healthOf(store *q.Store) func() (time.Time, time.Duration, bool) {
 	return func() (time.Time, time.Duration, bool) {
 		lease, held := store.Snapshot().Read(manager.HealthName).(manager.Lease)
 		return lease.Renewed, lease.Term, held && lease.Term > 0
@@ -382,21 +380,21 @@ func (one opRows) All() ([]manager.Row, error) {
 }
 
 // The module instances of the wiring file, loaded into q.Main. A tree with no wiring file loads its vehicle's, and where neither stands the index runs none. [[spec/design_output/model#the-wiring-file]]
-func wired() ([]index.Start, doors, error) {
+func wired() (doors, error) {
 	root, err := index.Root()
 	if err != nil {
-		return nil, doors{}, err
+		return doors{}, err
 	}
 	text, err := wiringOf(root, vehicleOf(os.Executable()))
 	if text == "" || err != nil {
-		return nil, doors{}, err
+		return doors{}, err
 	}
 	w, err := q.ReadWiring(text)
 	if err != nil {
-		return nil, doors{}, err
+		return doors{}, err
 	}
-	starts, hands, err := loaded(w, q.Main)
-	return starts, doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule), io: ioInstances(w), wiring: w, hands: hands}, err
+	_, hands, err := loaded(w, q.Main)
+	return doors{hooks: hookedOf(w, hands, hooksModule), mcp: hookedOf(w, hands, mcpModule), lsp: hookedOf(w, hands, lspModule), io: ioInstances(w), wiring: w, hands: hands}, err
 }
 
 // The text of the first wiring file standing: the work root's, then the vehicle's. [[spec/design_output/model#the-wiring-file]]
