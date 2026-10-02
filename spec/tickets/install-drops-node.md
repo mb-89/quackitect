@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -139,6 +139,18 @@ record:
         hash: f9255a679e84ad76
         size: 3908
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 10b884eb9cae · claude-code-remote · helper-3
+    hash_before: f89534798ea7957d3d973c9899e69cad27f40405
+    hash_after: f89534798ea7957d3d973c9899e69cad27f40405
+    inputs:
+      - name: design/draft
+        hash: f9255a679e84ad76
+        size: 3908
+      - name: design/tests-red
+        hash: 8fec6f44c8b36c4d
+        size: 828
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -271,8 +283,16 @@ Each case fails on its own assertion. The installer still names node in its loop
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- install-callers-cover-the-tests: test/level0/go-source.test.js imports foldersOf, fresh and stamps, and test/level0/tools.test.js drives rebuilt on go-source.js fresh. The draft strips go-source.js to BUILDS and moves rebuilt to go-stamp.sh, so both break the check. The builder updates both in place.
+- cold-probe-reads-the-setup: COLD_PATH in src/scripts/probe-cold.js names install.sh alone. go-stamp.sh, setup.sh and verbs/setup.js join the install road, so the list takes all three.
+- setup-verb-stands-red: the draft names two cases in test/level0/setup.test.js, and tests-red writes neither. A red case proves setup.js honours SE_INSTALL_SKIP and runs the survey, then the Copilot setup and the brand.
+- install-names-the-index-binary: the red case matches "$index" verb "$root/src/scripts" setup, and the draft spells "$bin/se-index". The builder names the binary $index.
+- go-stamp-takes-bare-modules: the stamp case builds a module with no go.sum and no git. go-stamp.sh hashes whichever of go.mod and go.sum stands, and reads no git.
+- bare-desk-names-missing-node: the doctor runs on Node, so a box with no Node never reaches it. RUNME.sh and the verb road meet a bare spawn error. RUNME.sh or quack names the missing Node in one line, since the no-node case bars that line from install.sh.
+- the-verbs-leave-node: the draft keeps Node as the verbs' runtime and leaves the port outside this group. The call holds: the group's done_when names install.sh alone, and the port belongs to phase 4. Phase 4 closed with three twins, so the port has no owner. This ticket gives it one, and the ask's second sentence waits on it.
 
 # implement
 
