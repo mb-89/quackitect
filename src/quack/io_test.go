@@ -8,6 +8,7 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -119,8 +120,9 @@ type readsAll struct {
 	All int `q:"all"`
 }
 
-// quack io answers no run, so an IO instance reading a wire reads as wired, and one reading nothing does not. [[spec/tickets/quack-io-answers-no-run]]
-func TestAnIOInstanceReadingAWireReadsAsWired(t *testing.T) {
+// A store where reader reads the wire source provides. [[spec/tickets/quack-io-answers-no-run]]
+func ioOnAWire(t *testing.T) *q.Store {
+	t.Helper()
 	w := q.Wiring{Instances: []q.Instance{{Name: "source", Module: "source"}, {Name: "reader", Module: "reader"}}, Wires: map[string]string{"reader.all": "source.all"}}
 	types := map[string]func(*q.Catalog){
 		"source": func(c *q.Catalog) { q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
@@ -132,8 +134,25 @@ func TestAnIOInstanceReadingAWireReadsAsWired(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got := wiredIO(store, []string{"source", "reader"}); len(got) != 1 || got[0] != "reader" {
+	return store
+}
+
+// quack io answers no run, so an IO instance reading a wire reads as wired, and one reading nothing does not. [[spec/tickets/quack-io-answers-no-run]]
+func TestAnIOInstanceReadingAWireReadsAsWired(t *testing.T) {
+	if got := wiredIO(ioOnAWire(t), []string{"source", "reader"}); len(got) != 1 || got[0] != "reader" {
 		t.Fatalf("the wired IO instances read %v, and want reader alone", got)
+	}
+}
+
+// The split refuses to start an IO instance on a wire, and names it. [[spec/tickets/start-refuses-wired-io]]
+func TestTheSplitRefusesAnIOInstanceOnAWire(t *testing.T) {
+	split, err := ioProcesses(t.TempDir(), ioOnAWire(t), doors{io: []string{"source", "reader"}}, nil)
+	if err == nil {
+		split.Stop()
+		t.Fatal("the split starts an IO instance that reads a wire")
+	}
+	if !strings.Contains(err.Error(), "reader") || strings.Contains(err.Error(), "source") {
+		t.Fatalf("the refusal reads %q, and wants reader named alone", err)
 	}
 }
 
