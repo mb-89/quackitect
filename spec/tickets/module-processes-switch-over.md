@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -100,6 +100,18 @@ record:
         exit: 0
         said: work/module-processes-switch-over already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 9bdc20709130b5bf612873ad4da1c3950c880e43
+    hash_after: 9bdc20709130b5bf612873ad4da1c3950c880e43
+    inputs:
+      - name: ask
+        hash: 0a32db0c3452e5e4
+        size: 357
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: e122785976621597
+        size: 10947
+    def: cb8f90bc86fc7d39
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
 cloud: true
@@ -129,14 +141,22 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-split-deployment-takes-over]] standard
+- [[spec/tickets/callers-name-drains-readers]] trivial
+- [[spec/tickets/kill-case-drives-live-split]] trivial
+- [[spec/tickets/mid-run-commit-clears-early]] trivial
+- [[spec/tickets/quack-io-answers-no-run]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is small enough to review whole: the switch in one standard ticket, and each gate point as a trivial of its own
+- the children add up to the goal: the switch moves the slice and kills the old path, and the four points close what the gate found short, the alarm among them through the dog's faults
+- no child waits on another: the four points name the switch as parent, and each closed after it
 
 # children
 
