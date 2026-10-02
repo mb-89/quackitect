@@ -283,6 +283,31 @@ func TestAShadowValueApartWritesAShadowRow(t *testing.T) {
 	}
 }
 
+// A value apart that comes together inside the patience writes no row, and one still apart past it writes one, so a path polling on another phase reads as no difference. [[spec/tickets/process-shadow-reads-clean]]
+func TestAShadowValueThatComesTogetherWritesNoRow(t *testing.T) {
+	var rows []map[string]any
+	waited := time.Duration(0)
+	weighs := shadows{
+		read: func(name string) any {
+			if name == "clock/minute" && waited >= 3*time.Second {
+				return 4
+			}
+			return 3
+		},
+		settle:   time.Second,
+		patience: 5 * time.Second,
+		wait:     func(span time.Duration) { waited += span },
+		say:      func(row map[string]any) error { rows = append(rows, row); return nil },
+	}
+	weighs.weigh(map[string]json.RawMessage{"clock/minute": json.RawMessage("4"), "git/stood": json.RawMessage("5")})
+	if len(rows) != 1 || rows[0]["name"] != "git/stood" {
+		t.Fatalf("the shadow writes %v, and wants git/stood alone: clock/minute comes together inside the patience", rows)
+	}
+	if waited != 5*time.Second {
+		t.Fatalf("the shadow waits %v before the row, and wants the patience", waited)
+	}
+}
+
 // A value a newer one of its name follows weighs nothing, and the weigh skips the log the shadow writes, so its own rows start no loop. [[spec/tickets/the-doors-process-stands]]
 func TestTheShadowWeighsTheNewestValueAloneAndNotItsOwnLog(t *testing.T) {
 	var rows []map[string]any

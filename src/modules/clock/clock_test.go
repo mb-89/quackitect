@@ -47,6 +47,25 @@ func TestAStoppedClockCommitsNoMinute(t *testing.T) {
 	}
 }
 
+// The minute commits as it turns, and a poll inside the same minute commits nothing, so two clocks started apart agree within a poll. [[spec/tickets/process-shadow-reads-clean]]
+func TestTheMinuteCommitsAsItTurns(t *testing.T) {
+	fake := NewFake(time.Date(2026, 1, 1, 0, 0, 30, 0, time.UTC))
+	var minutes []any
+	stop := Start(fake, func(values map[string]any) error {
+		minutes = append(minutes, values[Port])
+		return nil
+	})
+	defer stop()
+	fake.Tick(29 * time.Second)
+	if len(minutes) != 1 {
+		t.Fatalf("the clock commits %v before the minute turns, and wants the one at start", minutes)
+	}
+	fake.Tick(time.Second)
+	if len(minutes) != 2 || minutes[1] != minutes[0].(int64)+1 {
+		t.Fatalf("the clock commits %v as the minute turns, and wants the next minute", minutes)
+	}
+}
+
 // Only the clock's own writer commits the minute. [[spec/tickets/commits-name-their-writer]]
 func TestTheMinuteRefusesAnotherWriter(t *testing.T) {
 	c := q.New()
