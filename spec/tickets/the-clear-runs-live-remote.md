@@ -69,3 +69,21 @@ Without the trial, a box past the key may still stand idle, and nobody reads why
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+## The first trial, on a cloud box
+
+A cloud session ran the trial with `context.handoverAt` at 1000. The door ran the fold of [[spec/tickets/the-clear-continues-the-session]], and the plugin ran the module the session loaded at its start, which awaited `/clear` inside the hook. The pull handed `handover`, then `clear`, and the turn ended. The session log read:
+
+    {"kind":"bridge","level":"warn","said":"the clear the handover asks for fails","event":"turn.complete","detail":"level0: command.run: called from a classic.Stop hook, it would wait on the turn this hook is holding; run it from a later event (turn.complete) (host check)"}
+
+The `event` field names the hook the old module wrote on every row. The detail names the hook the call came from.
+
+| question | what the row settles |
+|---|---|
+| does the door answer the clear | yes: the Stop answers it, and the plugin calls `/clear` |
+| does a remote host clear at all | the host refuses a command inside a Stop hook alone, and names the turn's completion as the place |
+| does the conversation clear | no: the refusal leaves it as it stood, with `clear` in hand |
+
+So the plugin now runs a clear the Stop answers at the main agent's next `turn.complete`, after that event's hooks answer, and a timer covers a turn that completed before its Stop. The dry probe raises the Stop first, as the host names, and its fake host refuses a command inside every hook but the turn's completion.
+
+What stands open: the next session past the key loads the new module, and proves the clear live. Run it as the ask says, with the key at 1000 in `.se/.runtime/config.json`, on a branch whose group ticket stands open. A pull on a work branch whose group ticket stands closed answers `done` before it reaches the due mark, so the handover never comes. The trial dropped its `clear` hold and due mark by hand, since only the clear's `session.end` drops them, and the verb refuses to hand `clear` back.
