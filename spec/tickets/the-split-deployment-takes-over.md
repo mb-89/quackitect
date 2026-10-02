@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -159,6 +159,29 @@ record:
         exit: 0
         said: "spec/tickets/the-split-deployment-takes-over.md:293:3: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: ed4c65c3bd4289a2094c46db085b7d62fd132046
+    hash_after: ed4c65c3bd4289a2094c46db085b7d62fd132046
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/migration passes; green, src/modules/hooks passes; green, src/index passes; green, src/q passes; gree
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-split-deployment-takes-over.md:325:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 3d2641011a3238aa
+        size: 798
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/migration/migration_test.go src/modules/hooks/cage_test.go src/index/procs_test.go src/q/scheduler_test.go src/quack/split_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The processes slice reads new alone. The index spawns quack io for the IO instances and one module process a placement. It runs none of their providers in its own waves, and lands each commit they make. The two red tests pass: the slice reads new alone, and a lease past its term writes a watchdog row. TestAKilledModuleProcessUnderTheSplitLeavesTheOthersAnswering holds the first done line on the live path. It kills the guidance process under ioProcesses, and the tickets process answers a new file without a restart. The gate's points closed as children: the drains callers, the run sequence the settle waits on, the guard on a wired IO instance and the live kill case.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, and the files the gate's children name
+- every door has a fake: the bus and the spawned test binary for the processes, and the hooks door's seams
+- a comment names the approach: each changed function links this ticket or its child
+- one place: the slice mode stands in migration.go, and each child's rule in the function it guards
 
 # accept
 
