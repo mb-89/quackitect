@@ -45,6 +45,25 @@ func TestAnExpiredLeaseCallsItsHand(t *testing.T) {
 	}
 }
 
+func TestAnExpiredLeaseCallsItsHandOnceUntilABeatRenewsIt(t *testing.T) {
+	dog, _, now := dogOf(t, DogSettings{}, nil)
+	calls := 0
+	dog.Expired(func(string) { calls++ })
+	dog.Hold("io", 10*time.Second)
+	now.pass(11 * time.Second)
+	dog.Check()
+	dog.Check()
+	if calls != 1 {
+		t.Fatalf("two checks over one expiry call the hand %d time(s), and want one", calls)
+	}
+	dog.Beat("io")
+	now.pass(11 * time.Second)
+	dog.Check()
+	if calls != 2 {
+		t.Fatalf("an expiry after a beat calls the hand %d time(s) in all, and wants two", calls)
+	}
+}
+
 func TestAnExpiredLeaseMarksEachNameOfItsPartStale(t *testing.T) {
 	var items, count q.Writer
 	dog, store, now := dogOf(t, DogSettings{}, func(c *q.Catalog) {

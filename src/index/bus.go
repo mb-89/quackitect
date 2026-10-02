@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/nats-io/nats-server/v2/server"
@@ -129,7 +130,12 @@ func (p *Peer) Commits(instance string, hand func(values map[string]json.RawMess
 }
 
 // Publishes a heartbeat on lease.<part>. [[spec/design_output/model#a-lease]]
-func (p *Peer) Beat(part string) error { return p.conn.Publish(leaseVerb+part, nil) }
+func (p *Peer) Beat(part string) error {
+	if err := p.conn.Publish(leaseVerb+part, nil); err != nil {
+		return err
+	}
+	return p.conn.Flush()
+}
 
 func (p *Peer) Close() { p.conn.Close() }
 
@@ -152,7 +158,11 @@ func (p *Peer) Runs(instance string, hand func()) (func(), error) {
 
 // Hands the part of each heartbeat on lease.<part> to hand. [[spec/design_output/model#names-become-subjects]]
 func (p *Peer) Leases(hand func(part string)) (func(), error) {
-	return func() {}, errors.New("the bus stands unbuilt")
+	sub, err := p.conn.Subscribe(leaseVerb+">", func(said *nats.Msg) { hand(strings.TrimPrefix(said.Subject, leaseVerb)) })
+	if err != nil {
+		return nil, err
+	}
+	return func() { _ = sub.Unsubscribe() }, p.conn.Flush()
 }
 
 // Asks in.<instance>, and answers the saved inputs. [[spec/design_output/model#names-become-subjects]]

@@ -5,6 +5,7 @@ package index
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"      // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
 	"os/exec" // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
@@ -37,6 +38,9 @@ type Leases interface {
 	Fault(part string, err error) (time.Duration, bool)
 	Expired(hand func(part string))
 }
+
+// The fault a process whose lease expires hands the dog. [[spec/tickets/watchdogs-span-the-processes]]
+var errSilent = errors.New("the lease expires with no beat")
 
 // Every placed process the index runs over one bus. [[spec/design_output/model#the-placements]]
 type Placements struct {
@@ -249,10 +253,30 @@ func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
 			return nil, err
 		}
 	}
+	expired := make(chan struct{}, 1)
+	if p.Watch != nil {
+		if _, err := peer.Leases(func(part string) {
+			if part == p.Name {
+				p.Watch.Beat(part)
+			}
+		}); err != nil {
+			peer.Close()
+			return nil, err
+		}
+		p.Watch.Expired(func(part string) {
+			if part != p.Name {
+				return
+			}
+			select {
+			case expired <- struct{}{}:
+			default:
+			}
+		})
+	}
 	stopping, ended := make(chan struct{}), make(chan struct{})
 	go func() {
 		defer close(ended)
-		p.runs(bus, store, stopping)
+		p.runs(bus, store, stopping, expired)
 	}()
 	var once sync.Once
 	return func() {
@@ -288,10 +312,12 @@ func (p Placed) heard(store *q.Store, instance string, hand q.Writer, values map
 	}
 }
 
-// The process runs until the stop, and each exit marks its instances down until the next run commits. [[spec/design_output/model#a-process-ends]]
-func (p Placed) runs(bus *Bus, store *q.Store, stopping <-chan struct{}) {
+// The process runs until the stop, and each exit marks its instances down until the next run commits. A silence past the lease kills it, and the dog's fault decides the wait, or stops the restarts. [[spec/design_output/model#a-process-ends]] [[spec/tickets/watchdogs-span-the-processes]]
+func (p Placed) runs(bus *Bus, store *q.Store, stopping, expired <-chan struct{}) {
 	for {
+		p.holds(expired)
 		cmd, exited := p.spawn(bus)
+		var err error
 		select {
 		case <-stopping:
 			if cmd != nil {
@@ -299,16 +325,43 @@ func (p Placed) runs(bus *Bus, store *q.Store, stopping <-chan struct{}) {
 				<-exited
 			}
 			return
-		case err := <-exited:
+		case err = <-exited:
 			fmt.Fprintln(stderr, p.Name, "exits:", err)
-			p.down(store)
+		case <-expired:
+			fmt.Fprintln(stderr, p.Name, "exits:", errSilent)
+			if cmd != nil {
+				_ = cmd.Process.Kill()
+			}
+			<-exited
+			err = errSilent
+		}
+		p.down(store)
+		wait, again := p.Restart, true
+		if p.Watch != nil {
+			wait, again = p.Watch.Fault(p.Name, err)
+		}
+		if !again {
+			<-stopping
+			return
 		}
 		select {
 		case <-stopping:
 			return
-		case <-time.After(p.Restart):
+		case <-time.After(wait):
 		}
 	}
+}
+
+// Each spawn takes its lease afresh, and drops an expiry the last run left. [[spec/tickets/watchdogs-span-the-processes]]
+func (p Placed) holds(expired <-chan struct{}) {
+	if p.Watch == nil || p.Term <= 0 {
+		return
+	}
+	select {
+	case <-expired:
+	default:
+	}
+	p.Watch.Hold(p.Name, p.Term)
 }
 
 // A spawn that fails answers its fault as an exit, so the restart takes it. [[spec/design_output/model#a-process-ends]]

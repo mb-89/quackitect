@@ -48,6 +48,8 @@ type Dog struct {
 	faults   map[string][]time.Time
 	waits    map[string]time.Duration
 	alarms   map[string]Alarm
+	hands    []func(part string)
+	fired    map[string]bool
 }
 
 // [[spec/design_output/model#restarts]]
@@ -66,6 +68,7 @@ func NewDog(now func() time.Time, store *q.Store, as q.Writer, settings DogSetti
 		now: now, store: store, as: as, settings: settings,
 		leases: map[string]Lease{}, faults: map[string][]time.Time{},
 		waits: map[string]time.Duration{}, alarms: map[string]Alarm{},
+		fired: map[string]bool{},
 	}
 }
 
@@ -74,6 +77,7 @@ func (d *Dog) Hold(part string, term time.Duration) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	d.leases[part] = Lease{Part: part, Renewed: d.now(), Term: term}
+	delete(d.fired, part)
 }
 
 func (d *Dog) Beat(part string) {
@@ -82,6 +86,7 @@ func (d *Dog) Beat(part string) {
 	if one, ok := d.leases[part]; ok {
 		one.Renewed = d.now()
 		d.leases[part] = one
+		delete(d.fired, part)
 	}
 }
 
@@ -96,21 +101,36 @@ func (d *Dog) Lease(part string) (Lease, bool) {
 // An expired lease marks its part stale where a provider owns the part, and the next commit of the part clears it. A part with no provider, as the index, still reads expired. [[spec/design_output/model#a-stale-mark]]
 func (d *Dog) Check() []string {
 	d.mu.Lock()
-	defer d.mu.Unlock()
-	now, expired := d.now(), []string{}
+	now, expired, fresh := d.now(), []string{}, []string{}
 	for part, one := range d.leases {
 		since := one.Renewed.Add(one.Term)
 		if now.After(since) {
 			d.store.Stale(part, since)
 			expired = append(expired, part)
+			if !d.fired[part] {
+				d.fired[part] = true
+				fresh = append(fresh, part)
+			}
 		}
 	}
+	hands := append([]func(string){}, d.hands...)
+	d.mu.Unlock()
 	sort.Strings(expired)
+	sort.Strings(fresh)
+	for _, part := range fresh {
+		for _, hand := range hands {
+			hand(part)
+		}
+	}
 	return expired
 }
 
-// Hands each part a later Check finds expired to hand. [[spec/tickets/watchdogs-span-the-processes]]
-func (d *Dog) Expired(hand func(part string)) {}
+// Hands each part a later Check finds expired to hand, once an expiry, until a beat or a hold renews the lease. [[spec/tickets/watchdogs-span-the-processes]]
+func (d *Dog) Expired(hand func(part string)) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.hands = append(d.hands, hand)
+}
 
 // The parts whose lease still holds, in order. [[spec/design_output/model#a-context-holds-a-lease]]
 func (d *Dog) Live() []string {

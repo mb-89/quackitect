@@ -7,6 +7,7 @@ package index
 import (
 	"flag"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -116,6 +117,52 @@ func TestAKilledFakeIOProcessLeavesItsNamesNotProvided(t *testing.T) {
 	})
 	if said, err := store.Why("fake/out"); err != nil || said.State != "not provided" {
 		t.Fatalf("why fake/out reads %q and %v", said.State, err)
+	}
+}
+
+// A dog that counts holds and faults, and refuses every restart. [[spec/tickets/watchdogs-span-the-processes]]
+type refusingDog struct {
+	mu     sync.Mutex
+	holds  int
+	faults int
+}
+
+func (d *refusingDog) Hold(string, time.Duration) { d.mu.Lock(); d.holds++; d.mu.Unlock() }
+func (d *refusingDog) Beat(string)                {}
+func (d *refusingDog) Expired(func(string))       {}
+func (d *refusingDog) Fault(string, error) (time.Duration, bool) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	d.faults++
+	return 0, false
+}
+
+func (d *refusingDog) counts() (int, int) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	return d.holds, d.faults
+}
+
+func TestAPlacedProcessHoldsItsLeaseAndStaysDownWhereTheDogRefusesARestart(t *testing.T) {
+	bus, err := StartBus()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer bus.Close()
+	store, hand := fakeStore(t)
+	dog := &refusingDog{}
+	placed := Placed{Name: "io", Command: []string{os.Args[0], "-test.run=^TestFakeIOProcess$"}, Instances: map[string]q.Writer{"fake": hand}, Restart: 10 * time.Millisecond, Watch: dog, Term: time.Hour}
+	stop, err := placed.Start(bus, store)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stop()
+	until(t, store, "fake/out at 7", func(snap q.Snapshot) bool { return snap.Read("fake/out") == 7 })
+	kills(t, read(store, "fake/pid"))
+	until(t, store, "fake/out not provided", func(snap q.Snapshot) bool { return snap.NotProvided("fake/out") })
+	time.Sleep(200 * time.Millisecond)
+	if holds, faults := dog.counts(); holds != 1 || faults != 1 || !store.Snapshot().NotProvided("fake/out") {
+		t.Fatalf("the dog hears %d hold(s) and %d fault(s), and wants one of each with the process left down", holds, faults)
 	}
 }
 
