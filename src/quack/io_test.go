@@ -7,9 +7,11 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
+	"quackitect/src/config"
 	"quackitect/src/index"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/q"
@@ -193,6 +195,34 @@ func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
 func TestTheHooksDoorReadsNoHealthOutsideTheProcessesShadow(t *testing.T) {
 	if health := healthOf(t.TempDir(), q.NewStore(q.New())); health != nil {
 		t.Fatal("a root with no processes shadow hands the hooks door a health read")
+	}
+}
+
+func TestTheHooksDoorReadsTheIndexLeaseUnderTheProcessesShadow(t *testing.T) {
+	root := t.TempDir()
+	at := filepath.Join(root, filepath.FromSlash(config.Tracked))
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(at, []byte(`{"migration":{"processes":"shadow"}}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	c := q.New()
+	as := manager.Registers(c)
+	if faults := c.Check(); len(faults) > 0 {
+		t.Fatalf("the catalog refuses: %v", faults)
+	}
+	store := q.NewStore(c)
+	renewed := time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC)
+	if _, err := store.Commit(store.Snapshot().Revision, as, map[string]any{manager.HealthName: manager.Lease{Part: indexPart, Renewed: renewed, Term: time.Minute}}); err != nil {
+		t.Fatal(err)
+	}
+	health := healthOf(root, store)
+	if health == nil {
+		t.Fatal("a root under the processes shadow hands the hooks door no health read")
+	}
+	if at, term, held := health(); !held || !at.Equal(renewed) || term != time.Minute {
+		t.Fatalf("the health read answers %v, %v and %v, and wants the committed lease", at, term, held)
 	}
 }
 

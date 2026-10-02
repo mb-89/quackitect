@@ -321,7 +321,7 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 	door := hooks.New(hooks.Outside{
 		Index:  asks,
 		Health: healthOf(root, store),
-		Store: store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
+		Store:  store, As: hook.as, Bound: hook.bound, Now: clock.New().Now,
 		Call: func(name string, input any, caller string, wait time.Duration) (hooks.Called, error) {
 			said, err := served.Call(name, input, caller, wait)
 			return hooks.Called(said), err
