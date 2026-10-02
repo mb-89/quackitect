@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -112,6 +113,48 @@ func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 		}
 	}
 	t.Fatalf("the silent fake runs as %d process(es), and session/alarms reads %v: wants a restart, then the alarm", len(pids), store.Snapshot().Read(manager.AlarmsName))
+}
+
+type readsAll struct {
+	All int `q:"all"`
+}
+
+// quack io answers no run, so an IO instance reading a wire reads as wired, and one reading nothing does not. [[spec/tickets/quack-io-answers-no-run]]
+func TestAnIOInstanceReadingAWireReadsAsWired(t *testing.T) {
+	w := q.Wiring{Instances: []q.Instance{{Name: "source", Module: "source"}, {Name: "reader", Module: "reader"}}, Wires: map[string]string{"reader.all": "source.all"}}
+	types := map[string]func(*q.Catalog){
+		"source": func(c *q.Catalog) { q.OutIn(c, "all", 0, q.IO(), q.Doc("the source's count")) },
+		"reader": func(c *q.Catalog) {
+			q.DerivedIn(c, "twice", 0, func(in readsAll) int { return 2 * in.All }, q.Doc("twice the count"))
+		},
+	}
+	store, err := q.Start(w, types)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := wiredIO(store, []string{"source", "reader"}); len(got) != 1 || got[0] != "reader" {
+		t.Fatalf("the wired IO instances read %v, and want reader alone", got)
+	}
+}
+
+// The tracked wiring places no IO instance on a wire, so quack io holds no reader. [[spec/tickets/quack-io-answers-no-run]]
+func TestTheTrackedWiringWiresNoIOInstance(t *testing.T) {
+	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := q.ReadWiring(string(text))
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := q.New()
+	manager.Registers(c)
+	if _, _, err := loaded(w, c); err != nil {
+		t.Fatal(err)
+	}
+	if got := wiredIO(q.NewStore(c), ioInstances(w)); len(got) > 0 {
+		t.Fatalf("the tracked wiring wires the IO instances %v", got)
+	}
 }
 
 func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -221,6 +222,9 @@ func ioProcesses(root string, store *q.Store, open doors, dog *manager.Dog) (ind
 	if len(instances) == 0 && len(placed) == 0 {
 		return index.Managed{Stop: func() {}}, nil
 	}
+	if wired := wiredIO(store, instances); len(wired) > 0 {
+		return index.Managed{}, fmt.Errorf("quack io answers no run, so the IO instances %s read no wire", strings.Join(wired, ", "))
+	}
 	bus, err := index.StartBus()
 	if err != nil {
 		return index.Managed{}, err
@@ -260,6 +264,17 @@ func ioProcesses(root string, store *q.Store, open doors, dog *manager.Dog) (ind
 		beating.Close()
 		bus.Close()
 	}}, nil
+}
+
+// The IO instances reading a wired name. quack io answers no run, so a reader settling on one waits out answerWait. [[spec/tickets/quack-io-answers-no-run]]
+func wiredIO(store *q.Store, instances []string) []string {
+	var out []string
+	for _, one := range instances {
+		if len(store.Inputs(one)) > 0 {
+			out = append(out, one)
+		}
+	}
+	return out
 }
 
 // Each commit of index/health beats lease.index, and only the work loop's renew commits it, so a hung loop beats nothing. [[spec/tickets/watchdogs-span-the-processes]]
