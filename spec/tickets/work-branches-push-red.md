@@ -1,0 +1,43 @@
+---
+kind: [[ticket]]
+state: open
+steps:
+  - name: do
+    does: makes the change, with the test that covers it
+    from: anyone
+    by: anyone
+    to: retro
+    input: ask
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    evidence:
+      - name: tests
+        form: command
+        expects: green
+        says: the tests that cover the change, or the check where it touches no code
+      - name: check
+        form: command
+        expects: 0
+        says: the check is green on the commit
+      - name: says
+        form: text
+        says: what changes and why, for a reader who was not there
+process: [[spec/processes/trivial]]
+process_hash: 2b5ab398855a1aba
+step: do
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+<!-- breaks, as text: what breaks if it is never done -->
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+
+An agent pushes its work branch while its check stands red, where CI guards the tree. The pull request still takes a green CI run before it merges, and the push to main still takes the green stamp. So red work leaves the box every half hour, and a box that stops mid-change loses nothing.
+
+The gate on every branch kept work inside the box for hours at a time. A box that stopped while red took its commits with it, and the gate added nothing CI does not already hold.
+
+- `./RUNME.sh test test/level0/prepush.test.js` passes a case where an agent pushes a red work branch under CI
+- the same file passes a case where an agent's red push to main still comes back refused
+- `./RUNME.sh check` exits 0
