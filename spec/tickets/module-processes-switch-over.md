@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -91,6 +91,15 @@ record:
   - step: sync
     hand: box 09eeff3afa7c · claude-code-remote
     hash_before: 6f6790863026f71fd441b6ca2eac17f1d824f909
+  - step: sync
+    hand: box 09eeff3afa7c · claude-code-remote
+    hash_before: 6f6790863026f71fd441b6ca2eac17f1d824f909
+    hash_after: 24d289657980e1748bf530e1d5775920dc506e1e
+    answered:
+      - name: sync
+        exit: 0
+        said: work/module-processes-switch-over already carries every commit on main.
+    def: 8a9850a81227554b
 depends_on: ["module-processes-land-in-shadow"]
 enabled_by: migration.phase9switch
 cloud: true
@@ -109,8 +118,9 @@ Done when a crash in one part leaves the others running, and raises an alarm.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
