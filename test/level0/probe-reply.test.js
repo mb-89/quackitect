@@ -6,10 +6,14 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { REPLY_PROBE } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { register } from "../../.claude/skills/level0/hooks/level0.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { PROMPT_WHY } from "../../src/bridge/answer.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { probeReply, readsReply } from "../../src/scripts/probe-reply.js";
+
+// The unit tests share one process, and the hook module holds the session in module state, so these cases take a module of their own. [[spec/tickets/the-tests-start-fewer-processes]]
+const { register } = await import(
+  "../../.claude/skills/level0/hooks/level0.js?probe-reply"
+);
 
 const AT = "2026-09-27T08:00:00.000Z";
 const ROOT = "/tree";
