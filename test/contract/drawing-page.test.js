@@ -8,7 +8,7 @@ import { after, before, test } from "node:test";
 import { pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { browserFrom } from "../../src/scripts/browser.js";
-import { bundle, bundled, OUT, WEBVIEW } from "../../src/scripts/bundle.js";
+import { OUT, WEBVIEW } from "../../src/scripts/bundle.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { graphIn } from "../../src/scripts/graph.js";
 import { aheadOnly } from "../../src/scripts/ticket-route.js";
@@ -60,12 +60,11 @@ let page;
 
 before(async () => {
   if (why) return;
-  if (!bundled(files)) await bundle();
   const { chromium } = await import(pathToFileURL(DRIVER).href);
   driven = await chromium.launch({ executablePath: browser, headless: true });
   page = await driven.newPage();
   await page.setContent(PAGE);
-  await page.addStyleTag({ path: OUT.replace(/\.js$/, ".css") });
+  await page.addStyleTag({ path: OUT.replace(/\.mjs$/, ".css") });
   await page.addScriptTag({ path: OUT });
 });
 
