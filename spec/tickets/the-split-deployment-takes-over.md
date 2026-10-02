@@ -344,3 +344,9 @@ The slice test and the lease row test fail on their assertions. The kill case in
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The box, at the change: the contract case on the tickets list read nothing on a fresh index. Its reader drained the index's waves alone, and the tickets process had not answered yet.
+- So the placements count each run they send, the start among them, until the process commits or exits. A reader's drain waits on that, up to `answerWait` in `src/quack/io.go`. A hung process costs a reader that span, and its lease then kills it.
+- A module process answers every run, an empty commit where nothing moved, and `quack io` acks each start after its seed.
+- I weigh a reader that reads stale values and waits on nothing. It fails the contract case and every verb reading right after a start, so I take the wait.
+- The cage passes a call on a lease past its term, and writes a `watchdog` row. During this box's sync the lease ran past its term while the door answered. A refusal there locks the agent out at every large sync.

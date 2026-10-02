@@ -145,7 +145,7 @@ func TestAKilledPlacedProcessLeavesTheOthersAnswering(t *testing.T) {
 	}
 }
 
-// A reader settling the placements reads what a process just spawned commits, and a stopped placement waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
+// A reader settling the placements reads what a process commits at its spawn, and a stopped placement waits on nothing. [[spec/tickets/the-split-deployment-takes-over]]
 func TestASettleWaitsForThePlacedProcessToAnswer(t *testing.T) {
 	bus, err := StartBus()
 	if err != nil {
