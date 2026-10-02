@@ -36,7 +36,7 @@ type Leases interface {
 	Hold(part string, term time.Duration)
 	Beat(part string)
 	Fault(part string, err error) (time.Duration, bool)
-	Expired(hand func(part string))
+	Expired(hand func(part string)) (stop func())
 }
 
 // The fault a process whose lease expires hands the dog. [[spec/tickets/watchdogs-span-the-processes]]
@@ -253,7 +253,7 @@ func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
 			return nil, err
 		}
 	}
-	expired := make(chan struct{}, 1)
+	expired, drop := make(chan struct{}, 1), func() {}
 	if p.Watch != nil {
 		if _, err := peer.Leases(func(part string) {
 			if part == p.Name {
@@ -263,7 +263,7 @@ func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
 			peer.Close()
 			return nil, err
 		}
-		p.Watch.Expired(func(part string) {
+		drop = p.Watch.Expired(func(part string) {
 			if part != p.Name {
 				return
 			}
@@ -283,6 +283,7 @@ func (p Placed) Start(bus *Bus, store *q.Store) (func(), error) {
 		once.Do(func() {
 			close(stopping)
 			<-ended
+			drop()
 			peer.Close()
 		})
 	}, nil

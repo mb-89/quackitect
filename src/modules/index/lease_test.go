@@ -64,6 +64,19 @@ func TestAnExpiredLeaseCallsItsHandOnceUntilABeatRenewsIt(t *testing.T) {
 	}
 }
 
+func TestAStoppedExpiredHandHearsNothing(t *testing.T) {
+	dog, _, now := dogOf(t, DogSettings{}, nil)
+	calls := 0
+	stop := dog.Expired(func(string) { calls++ })
+	stop()
+	dog.Hold("io", 10*time.Second)
+	now.pass(11 * time.Second)
+	dog.Check()
+	if calls != 0 {
+		t.Fatalf("a stopped hand hears %d expiry(ies), and wants none", calls)
+	}
+}
+
 func TestAnExpiredLeaseMarksEachNameOfItsPartStale(t *testing.T) {
 	var items, count q.Writer
 	dog, store, now := dogOf(t, DogSettings{}, func(c *q.Catalog) {

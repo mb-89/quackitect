@@ -125,11 +125,14 @@ type refusingDog struct {
 	mu     sync.Mutex
 	holds  int
 	faults int
+	drops  int
 }
 
 func (d *refusingDog) Hold(string, time.Duration) { d.mu.Lock(); d.holds++; d.mu.Unlock() }
 func (d *refusingDog) Beat(string)                {}
-func (d *refusingDog) Expired(func(string))       {}
+func (d *refusingDog) Expired(func(string)) func() {
+	return func() { d.mu.Lock(); d.drops++; d.mu.Unlock() }
+}
 func (d *refusingDog) Fault(string, error) (time.Duration, bool) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
@@ -163,6 +166,12 @@ func TestAPlacedProcessHoldsItsLeaseAndStaysDownWhereTheDogRefusesARestart(t *te
 	time.Sleep(200 * time.Millisecond)
 	if holds, faults := dog.counts(); holds != 1 || faults != 1 || !store.Snapshot().NotProvided("fake/out") {
 		t.Fatalf("the dog hears %d hold(s) and %d fault(s), and wants one of each with the process left down", holds, faults)
+	}
+	stop()
+	dog.mu.Lock()
+	defer dog.mu.Unlock()
+	if dog.drops != 1 {
+		t.Fatalf("the stop drops %d expiry hand(s), and wants one", dog.drops)
 	}
 }
 

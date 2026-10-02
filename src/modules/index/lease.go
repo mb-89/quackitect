@@ -48,7 +48,8 @@ type Dog struct {
 	faults   map[string][]time.Time
 	waits    map[string]time.Duration
 	alarms   map[string]Alarm
-	hands    []func(part string)
+	hands    map[int]func(part string)
+	nextHand int
 	fired    map[string]bool
 }
 
@@ -76,7 +77,7 @@ func NewDog(now func() time.Time, store *q.Store, as q.Writer, settings DogSetti
 		now: now, store: store, as: as, settings: settings,
 		leases: map[string]Lease{}, faults: map[string][]time.Time{},
 		waits: map[string]time.Duration{}, alarms: map[string]Alarm{},
-		fired: map[string]bool{},
+		fired: map[string]bool{}, hands: map[int]func(part string){},
 	}
 }
 
@@ -121,7 +122,10 @@ func (d *Dog) Check() []string {
 			}
 		}
 	}
-	hands := append([]func(string){}, d.hands...)
+	hands := make([]func(string), 0, len(d.hands))
+	for _, hand := range d.hands {
+		hands = append(hands, hand)
+	}
 	d.mu.Unlock()
 	sort.Strings(expired)
 	sort.Strings(fresh)
@@ -133,11 +137,18 @@ func (d *Dog) Check() []string {
 	return expired
 }
 
-// Hands each part a later Check finds expired to hand, once an expiry, until a beat or a hold renews the lease. [[spec/tickets/watchdogs-span-the-processes]]
-func (d *Dog) Expired(hand func(part string)) {
+// Hands each part a later Check finds expired to hand, once an expiry, until a beat or a hold renews the lease, and answers the stop that drops the hand. [[spec/tickets/watchdogs-span-the-processes]] [[spec/tickets/expired-hands-leave-on-stop]]
+func (d *Dog) Expired(hand func(part string)) func() {
 	d.mu.Lock()
 	defer d.mu.Unlock()
-	d.hands = append(d.hands, hand)
+	d.nextHand++
+	id := d.nextHand
+	d.hands[id] = hand
+	return func() {
+		d.mu.Lock()
+		defer d.mu.Unlock()
+		delete(d.hands, id)
+	}
 }
 
 // The parts whose lease still holds, in order. [[spec/design_output/model#a-context-holds-a-lease]]
