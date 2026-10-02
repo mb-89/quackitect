@@ -34,6 +34,9 @@ if [ -f "$program" ]; then
     printf '%s\n' "No node stands on the PATH, and every verb without a Go twin runs on it. Install node, and run this again." >&2
     exit 2
   }
+  # The install hands its JavaScript steps to the index, and this road stands where no index does. [[spec/tickets/setup-runs-without-an-index]]
+  node "$here/src/scripts/verbs/setup.js" >&2 ||
+    printf '%s\n' "  the setup stopped, so the editor, the survey, the Copilot setup and the brand stand as they stood." >&2
   exec node "$program" "$@"
 fi
 printf '%s\n' "No quack binary stands at $bin, so help and $1 answer nothing. Run sh src/scripts/install.sh." >&2
