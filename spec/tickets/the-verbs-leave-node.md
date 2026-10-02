@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: node-leaves-the-boxes
 parent: install-drops-node
+record:
+  - step: do
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: ae8dace1953600c8a48a640d9cfcc2345a4422f6
+    hash_after: 7dbe25e13c3cd1c685af5286cbc5618082d97a3c
+reason: became
+successors: [the-verbs-port-takes-a-phase]
 ---
 
 # Ask
