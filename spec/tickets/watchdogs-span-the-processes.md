@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -185,6 +185,29 @@ record:
         exit: 0
         said: "spec/tickets/watchdogs-span-the-processes.md:301:3: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 23776eae9f68 · claude-code-remote
+    hash_before: 75321f75293eced5517ef82360b73abedb3878ed
+    hash_after: 75321f75293eced5517ef82360b73abedb3878ed
+    answered:
+      - name: tests
+        exit: 0
+        said: "green, 13 test(s) pass in 1 file(s); green, src/index passes; green, src/modules/hooks passes; green, src/modules/index "
+      - name: check
+        exit: 0
+        said: "spec/tickets/watchdogs-span-the-processes.md:345:112: Vocabulary: indexpart stands outside the words this tree writes. W"
+    inputs:
+      - name: design/tests-red
+        hash: 29fb6b88d0e8db57
+        size: 1091
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -351,26 +374,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The leases now reach across the processes under the processes shadow. The bus hands each beat to the index, and the manager's dog holds a lease for each placed process. A silent process is killed and restarted, and a run of faults raises its alarm in session/alarms and stops the restarts. Each commit of index/health beats lease.index, so a hung work loop beats nothing. The IO process writes one watchdog row for each silence of the index, and a guarded hook call writes a shadow row while the index's lease stands past its term. The design's step 5 moves from the manager to quack, since the manager reaches no bus. The hooks case reads the door's fixed clock, since the door judges the lease on its own clock.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: each file stands on the callers list
+- every door the change reaches has a fake: the dog runs over the fake clock, and the hooks door over its fixed clock
+- a comment names the approach the change implements: each new function points at this ticket
+- every fact the change adds stands in one place: the lease term lives in lease.go alone
 
 # accept
 
