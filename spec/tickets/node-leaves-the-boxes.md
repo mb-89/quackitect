@@ -95,6 +95,7 @@ record:
   - step: sync
     hand: box 3f5d7b2a1399 · claude-code-remote
     hash_before: ab21fcd8cf7f8bb302ed181b55e8b9bfe689fdc5
+    hash_after: 6f3f098f15ddc8b29895e7b801e75dd309d352a8
   - step: sync
     hand: box 3f5d7b2a1399 · claude-code-remote
     hash_before: 1b260eed3bd53ef40dcad5f8f46d634441ce32fb
@@ -209,7 +210,6 @@ record:
     def: 4da1ca5da87d5bbc
 depends_on: ["module-processes-switch-over"]
 enabled_by: migration.phase10
-cloud: true
 reason: done
 ---
 
