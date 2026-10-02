@@ -60,23 +60,30 @@ export function partsOf(words, errors = false) {
   ];
 }
 
-// The runner's flags after the node path: the spec report to the screen, and the battery's reporter to its file. [[spec/design_output/work#the-battery-answers-first]]
-export function testArgv(at, red = []) {
+// The two runs of the test part. A unit test touches memory alone, so every unit file shares one process and pays one start. A contract test drives a real door, so each keeps a process of its own. [[spec/tickets/the-tests-start-fewer-processes]]
+export const TEST_PARTS = [
+  { glob: TESTS, times: `${RUN}/tests-unit.jsonl`, shared: true },
+  { glob: CONTRACT_TESTS, times: `${RUN}/tests-contract.jsonl`, shared: false },
+];
+
+// The runner's flags after the node path for one part: the spec report to the screen, and the battery's reporter to the part's file. [[spec/design_output/work#the-battery-answers-first]]
+export function testArgv(at, red = [], part = TEST_PARTS[0]) {
   return [
     "--test",
+    ...(part.shared ? ["--experimental-test-isolation=none"] : []),
     "--test-reporter=spec",
     "--test-reporter-destination=stdout",
     // A reporter loads as a module, and a drive letter reads as a URL scheme, so the path goes as a file URL. [[spec/design_output/work#the-battery-answers-first]]
     `--test-reporter=${pathToFileURL(join(at, ...REPORTER.split("/"))).href}`,
-    `--test-reporter-destination=${join(at, ...TIMES.split("/"))}`,
-    ...(red.length ? testFiles(at, red) : [TESTS, CONTRACT_TESTS]),
+    `--test-reporter-destination=${join(at, ...part.times.split("/"))}`,
+    ...(red.length ? testFiles(at, red, [part.glob]) : [part.glob]),
   ];
 }
 
-// Every test file the two globs reach, less the red list. [[spec/design_output/pull#the-gate]]
-function testFiles(at, red) {
+// Every test file the globs reach, less the red list. [[spec/design_output/pull#the-gate]]
+function testFiles(at, red, globs) {
   const out = [];
-  for (const glob of [TESTS, CONTRACT_TESTS]) {
+  for (const glob of globs) {
     const folder = glob.slice(0, glob.lastIndexOf("/"));
     const end = glob.slice(glob.lastIndexOf("*") + 1);
     for (const one of files.list(join(at, ...folder.split("/")))) {
@@ -101,12 +108,22 @@ export function test(quiet = false) {
       `The red list stands apart until its tests-green closes: ${red.join(", ")}`,
     );
   }
-  const ran = outside.run([process.execPath, ...testArgv(root, red)], {
-    cwd: root,
-    inherit: !quiet,
-    env: { SE_SPAWNS: tally },
-  });
-  return ran.exitCode;
+  // The parts run one after the other, because a contract case reads a clock a loaded box slows. [[spec/tickets/the-tests-start-fewer-processes]]
+  let code = 0;
+  const lines = [];
+  for (const part of TEST_PARTS) {
+    const at = join(root, ...part.times.split("/"));
+    if (files.exists(at)) files.remove(at);
+    const ran = outside.run([process.execPath, ...testArgv(root, red, part)], {
+      cwd: root,
+      inherit: !quiet,
+      env: { SE_SPAWNS: tally },
+    });
+    code = code || ran.exitCode;
+    if (files.exists(at)) lines.push(files.read(at));
+  }
+  files.write(join(root, ...TIMES.split("/")), lines.join("\n"));
+  return code;
 }
 
 // The named run goes through the branch's runner, under the check's own tally. [[spec/design_output/pull#the-test-verb]]

@@ -4,13 +4,16 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { built, readsAsPast } from "../../src/engine/tense.js";
+import { readsAsPast } from "../../src/engine/tense.js";
+
+// The unit tests share one process, so the case takes a module of its own, which no other file has read through. [[spec/tickets/the-tests-start-fewer-processes]]
+const fresh = await import("../../src/engine/tense.js?a-fresh-import");
 
 test("the import builds no model, and the first read builds it", () => {
-  assert.equal(built(), false, "an import alone skips the build");
-  assert.equal(readsAsPast("the door refused the write", "refused"), true);
-  assert.equal(readsAsPast("the door reads the write", "reads"), false);
-  assert.equal(built(), true, "the first read builds the model");
+  assert.equal(fresh.built(), false, "an import alone skips the build");
+  assert.equal(fresh.readsAsPast("the door refused the write", "refused"), true);
+  assert.equal(fresh.readsAsPast("the door reads the write", "reads"), false);
+  assert.equal(fresh.built(), true, "the first read builds the model");
 });
 
 test("a match holding no letter reads as no past tense", () => {
