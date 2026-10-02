@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -171,6 +171,29 @@ record:
         exit: 0
         said: "spec/tickets/the-webview-ships-prebuilt.md:262:3: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 9bfc41191e2ebd75a7b9ecb197c53d66365f950a
+    hash_after: 9bfc41191e2ebd75a7b9ecb197c53d66365f950a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 31 test(s) pass in 3 file(s); green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-webview-ships-prebuilt.md:262:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 6621abd2f0e7c57f
+        size: 885
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -349,26 +372,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/topic-readers.test.js test/contract/tree-extension.test.js test/contract/cloud-start.test.js src/modules/lsp/tools_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Go prose checks are now the one copy. Every JavaScript prose reader hands its rows to `quack prose` and keeps what the Go vetoes keep, and the tense reader in `src/engine/tense.js` leaves. With it goes wink, the last package Node loaded at runtime, so `package.json` names no runtime dependency. The start road probes the index binary in place of `node_modules`, and the LSP tools carry no Node path.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the readers, their tests, the install and the notes naming wink, each reached by the ask
+- the readers reach quack through the process door, and `test/level0/quack-doors.js` fakes it
+- the comment at `src/bridge/prose.js` names the Go vetoes as the one answer
+- the veto stands once in `src/quack/prose.go`, and every reader calls it
 
 # accept
 
