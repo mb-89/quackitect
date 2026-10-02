@@ -91,6 +91,18 @@
       "rule": "EveryPointerResolves",
       "line": 100,
       "message": "This pointer names a chapter nobody wrote: spec/design_output/work#a-successor-stands-on-question. Point at a heading of spec/design_output/work.md, or write the chapter."
+    },
+    {
+      "file": "test/contract/drawing-shipped.test.js",
+      "rule": "EveryPointerResolves",
+      "line": 3,
+      "message": "This pointer names a chapter nobody wrote: spec/design_output/drawing#the-drawing-ships-prebuilt. Point at a heading of spec/design_output/drawing.md, or write the chapter."
+    },
+    {
+      "file": "test/contract/install.test.js",
+      "rule": "EveryPointerResolves",
+      "line": 83,
+      "message": "This pointer names a chapter nobody wrote: spec/design_output/drawing#the-drawing-ships-prebuilt. Point at a heading of spec/design_output/drawing.md, or write the chapter."
     }
   ]
 }
