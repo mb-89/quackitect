@@ -494,6 +494,11 @@
           "default": false,
           "help": "Phase 10, Node leaving the boxes. true in the tracked file on main lets a cloud box take node-leaves-the-boxes. A write on this box turns nothing on in the cloud."
         },
+        "phase11": {
+          "type": "boolean",
+          "default": false,
+          "help": "Phase 11, the verbs leaving Node. true in the tracked file on main lets a cloud box take the-verbs-run-in-go. A write on this box turns nothing on in the cloud."
+        },
         "phase1gaps": {
           "type": "boolean",
           "default": false,

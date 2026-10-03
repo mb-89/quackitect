@@ -86,6 +86,14 @@ func TestTheSliceKeyStandsShared(t *testing.T) {
 	}
 }
 
+// Phase 11 stands last among the phases, and its switch lets a cloud box take the verbs port's group. [[spec/tickets/the-verbs-port-takes-a-phase]]
+func TestPhaseElevenTakesTheVerbsPort(t *testing.T) {
+	last := phases[len(phases)-1]
+	if last.key != "phase11" || last.ticket != "the-verbs-run-in-go" {
+		t.Fatalf("the last phase reads %+v, and wants phase11 taking the-verbs-run-in-go", last)
+	}
+}
+
 // The window slice stands switched over, built in as new with no other mode, so no box keeps the window's own reads. [[spec/tickets/the-tui-data-paths-leave]]
 func TestTheWindowSliceStandsSwitchedOverToNew(t *testing.T) {
 	for _, one := range slices {
