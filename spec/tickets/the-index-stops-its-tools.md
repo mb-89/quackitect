@@ -74,3 +74,32 @@ The lsp IO module runs Vale over the whole tree each time an index starts, and t
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The measure, on a cloud box with four cores, over a copy of the full tree.
+
+The check on origin/main, its parts in seconds:
+
+| part | first run, cold caches | after this ticket |
+|---|---|---|
+| go | 52.2 | 40.4 |
+| tests | 33.7 | 31.6 |
+| rules | 32.1 | 6.2 |
+| level0 | 31.0 | 29.2 |
+| in all | 150.2 | 109.1 |
+
+The go part recompiles the packages a change touches, and the rules part reads Vale's cache, so a run beside a run differs by tens of seconds on this box.
+
+A cold start of the index over the copy, `./RUNME.sh index standing`, then `./RUNME.sh index tickets`, in milliseconds:
+
+| gap between spawns | standing | first tickets read |
+|---|---|---|
+| a quarter second | 3675 to 5085 | 16302 to 25286 |
+| a short yield | 4143 to 4774 | 15249 to 27128 |
+
+On the full tree the spawn gap moves nothing a reader sees. The first read waits on the modules' first computation over every ticket, and on the cores a whole-tree Vale run takes.
+
+The calls I took, with nobody to ask:
+
+- A stop call ended the process with a bare exit, so neither the tool runs nor the module processes took the door's stop. The call now wakes main as a signal does, and a bound ends the process where the stop hangs.
+- The whole-tree Vale run at each start stays. It draws the rows of closed files in the owner's Problems panel, and a later sweep changes what the owner sees.
+- Four Vale runs stood at once on this box during the measure, each left by a stopped index, each taking most of a core.
