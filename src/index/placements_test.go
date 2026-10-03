@@ -34,7 +34,7 @@ func placedTwo(t *testing.T) (*q.Store, *Placements, func()) {
 	return store, placements, func() { stop(); bus.Close() }
 }
 
-// The span a case watches for a process that should not start. [[spec/tickets/the-modules-start-together]]
+// The span a case watches for a process the stop keeps from starting. [[spec/tickets/the-modules-start-together]]
 const spawnWatch = time.Second
 
 // The placements wait the gap they name between two spawns, and the default gap stays short. [[spec/tickets/the-modules-start-together]]
