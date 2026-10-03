@@ -34,7 +34,7 @@ step: do
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-Phase 10 stands switched over now that [[spec/tickets/node-leaves-the-boxes]] has closed on main, and the owner chose the verbs port as phase 11. Its groups stand open on their branches since the scaffolding landed. Turning `migration.phase11` on lets boxes take [[spec/tickets/quack-holds-a-verb-registry]] first, then each verb group in parallel.
+Phase 10 stands switched over now that [[spec/tickets/node-leaves-the-boxes]] has closed on main. The owner chose the verbs port as phase 11, and its groups stand open on their branches. Turning `migration.phase11` on lets boxes take [[spec/tickets/quack-holds-a-verb-registry]] first, then each verb group in parallel.
 
 - `./RUNME.sh config` reads `migration.phase11 true`
 - `./RUNME.sh check` exits 0
@@ -62,7 +62,7 @@ Phase 10 stands switched over now that [[spec/tickets/node-leaves-the-boxes]] ha
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-Phase 10 closed on main through the pull request that merged node-leaves-the-boxes, with the check green on Linux and Windows on its merge commit. The owner then chose to port the remaining Node verbs to Go as phase 11, and the scaffolding opened its groups and their branches. So the coordinator turns the switch on, and the work routine and the coordinator's boxes take the groups, the registry first.
+Phase 10 closed on main when node-leaves-the-boxes merged. The check stood green on Linux and Windows on its merge commit. The owner then chose to port the remaining Node verbs to Go as phase 11. A box opened its groups and their branches. So the coordinator turns the switch on, and the work routine and the coordinator's boxes take the groups, the registry first.
 
 ## checked
 
