@@ -1,10 +1,19 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -24,35 +33,41 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -60,7 +75,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -74,11 +89,100 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 9d870e3fd3c577a6
+process_hash: 22b42ea1501e8967
 group: node-leaves-the-boxes
-depends_on: [go-prose-checks-stand-alone, the-webview-ships-prebuilt]
+depends_on: ["go-prose-checks-stand-alone", "the-webview-ships-prebuilt"]
+record:
+  - step: design/draft
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 60e53ce990e3048082207c957c7b7345b638c738
+    hash_after: 60e53ce990e3048082207c957c7b7345b638c738
+    inputs:
+      - name: ask
+        hash: 83575bda3f482f6c
+        size: 216
+    def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: eb9b0775880f63e66343baaa7c9b837bd60786cd
+    hash_after: eb9b0775880f63e66343baaa7c9b837bd60786cd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: f9255a679e84ad76
+        size: 3908
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 10b884eb9cae · claude-code-remote · helper-3
+    hash_before: f89534798ea7957d3d973c9899e69cad27f40405
+    hash_after: f89534798ea7957d3d973c9899e69cad27f40405
+    inputs:
+      - name: design/draft
+        hash: f9255a679e84ad76
+        size: 3908
+      - name: design/tests-red
+        hash: 8fec6f44c8b36c4d
+        size: 828
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: b9e3ef8de4cc6784eafd07af2ee583853671deb7
+    hash_after: cbcbc975bf1fdf2099e63d0723d288d0bb76049b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 3f5d7b2a1399 · claude-code-remote
+    hash_before: 5b1c4b8d9c48e7b1aaa9f04cfee36d3338a2ed56
+    hash_after: 5b1c4b8d9c48e7b1aaa9f04cfee36d3338a2ed56
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: "    2.4  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes"
+    inputs:
+      - name: design/tests-red
+        hash: 8fec6f44c8b36c4d
+        size: 828
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -92,6 +196,16 @@ A box then carries one runtime.
 
 # design
 
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -99,44 +213,67 @@ A box then carries one runtime.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The ask rests on a premise the code breaks: the verbs still run as Node programs. `programOf` in `src/quack/verbs.go` hands every verb without a Go twin to `node`, and three verbs carry a twin. So the box keeps Node after this ticket, as the verbs' runtime, and the second line of the ask stands false until the verbs port. Porting them sits outside this group.
+
+What this ticket lands: the installer neither installs Node nor runs it. Node becomes a prerequisite the verb road names, the way `sh` and `git` stand.
+
+- The `node` item leaves the loop, with `get_node` and its rows under `here`, `why` and `get`.
+- `get_vale_ls` spells the asset table in sh, with a comment naming `servers.js` as the owner. A contract case holds the two tables equal.
+- `src/scripts/go-stamp.sh` takes the source stamp over: `go list -deps` names the files each build reads, and `cksum` hashes them with the root `go.mod` and `go.sum`. `front_here`, `get_front`, `index_here` and `get_index` call it.
+- `go-source.js` keeps `BUILDS` alone, which `work-review.js` reads.
+- `rebuilt` in `lib/tools.js` reads `go-stamp.sh fresh` where it read `go-source.js fresh`.
+- The steps that run JavaScript leave the installer for a `setup` verb at `src/scripts/verbs/setup.js`: the language client, the browser, the editor link, the editor extensions, the survey, the Copilot setup and the brand.
+- `setup.js` keeps each item's here, why, get and missed lines, and honours `SE_INSTALL_SKIP` as the loop does.
+- The installer's last step runs that verb through the index binary: `"$bin/se-index" verb "$root/src/scripts" setup`. A box with no index binary skips it with one line.
+- `src/modules/verbs/tree.go` lists `setup`, so the verb table and the programs agree.
+
+Weighed: a second script beside the installer, which every caller runs. Six callers run the installer, and each would learn a second call. One hand-off inside the installer keeps every caller as it stands.
+Weighed: porting the JavaScript steps to Go. That is the verb port this group leaves, so the setup verb gathers them in one file, which leaves when its verb gets a Go twin.
+Assumed: a box running the verbs carries Node already. A cloud box carries it under Claude Code, and the owner's desk carries it from earlier installs. A fresh desk now installs Node by hand once, and the doctor names it missing.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `RUNME.sh`: runs the installer before every verb
+- `.claude/skills/level0/hooks/start.js`: `START` runs the installer under `SE_INSTALL_SKIP`
+- `src/scripts/boot.js`: `install` runs the installer
+- `src/scripts/probe-cold.js`: the cold probe runs the installer in its tree
+- `src/scripts/work-merge.js`: the merge runs the installer
+- `.github/workflows/copilot-setup-steps.yml`: the Copilot setup runs the installer
+- `.claude/skills/level0/lib/tools.js`: `rebuilt` and `installedTools` read the installer's text
+- `src/scripts/work-review.js`: reads `BUILDS` from `go-source.js`
+- `src/modules/verbs/tree.go`: `Commands` lists the verbs
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/contract/install.test.js`: the install names no node
+- `test/contract/install.test.js`: the vale-ls assets the install spells match the ones servers.js names
+- `test/contract/install.test.js`: the source stamp reads fresh after a stamp, and stale once a source the build reads changes
+- `test/level0/setup.test.js`: the setup gets each missing item, and skips the ones SE_INSTALL_SKIP names
+- `test/level0/setup.test.js`: the setup writes the survey, then runs the Copilot setup and the brand
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
+- I open `install.sh`, `verbs.go`, `go-source.js`, `servers.js`, `lib/tools.js` and `work-review.js`, and each name stands where the draft says
+- a search for `install.sh` and `go-source` over `src`, `test`, `.claude` and `.github` gives the callers list
+- the first done line rides the no-node case, and the check decides the second
 
 ## tests-red
 
@@ -145,20 +282,51 @@ A box then carries one runtime.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/install.test.js
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- test/contract/install.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The installer still names node in its loop, its helpers and its comments. No line hands the steps to the setup verb, no sh table spells the vale-ls assets, and neither `go-stamp.sh` nor `setup.sh` stands yet. One cut departs from the draft: the moved steps keep their sh form in `src/scripts/setup.sh`, and `verbs/setup.js` runs that script. Moving the steps as sh keeps each line as it ran, so the move risks no change of behaviour.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done line meets the no-node case, and the check decides the second
+- the cases read the real script and run the real stamp in a temporary module, as a contract case drives the real thing, so no door takes a fake here
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept with points
+- install-callers-cover-the-tests: test/level0/go-source.test.js imports foldersOf, fresh and stamps, and test/level0/tools.test.js drives rebuilt on go-source.js fresh. The draft strips go-source.js to BUILDS and moves rebuilt to go-stamp.sh, so both break the check. The builder updates both in place.
+- cold-probe-reads-the-setup: COLD_PATH in src/scripts/probe-cold.js names install.sh alone. go-stamp.sh, setup.sh and verbs/setup.js join the install road, so the list takes all three.
+- setup-verb-stands-red: the draft names two cases in test/level0/setup.test.js, and tests-red writes neither. A red case proves setup.js honours SE_INSTALL_SKIP and runs the survey, then the Copilot setup and the brand.
+- install-names-the-index-binary: the red case matches "$index" verb "$root/src/scripts" setup, and the draft spells "$bin/se-index". The builder names the binary $index.
+- go-stamp-takes-bare-modules: the stamp case builds a module with no go.sum and no git. go-stamp.sh hashes whichever of go.mod and go.sum stands, and reads no git.
+- bare-desk-names-missing-node: the doctor runs on Node, so a box with no Node never reaches it. RUNME.sh and the verb road meet a bare spawn error. RUNME.sh or quack names the missing Node in one line, since the no-node case bars that line from install.sh.
+- the-verbs-leave-node: the draft keeps Node as the verbs' runtime and leaves the port outside this group. The call holds: the group's done_when names install.sh alone, and the port belongs to phase 4. Phase 4 closed with three twins, so the port has no owner. This ticket gives it one, and the ask's second sentence waits on it.
+
+# implement
 
 ## change
 
@@ -167,14 +335,19 @@ A box then carries one runtime.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/install.sh src/scripts/verbs/setup.js src/doors/proc.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the installer, the setup verb, the cold probe's road and the tests the draft names; the proc door's start takes a fix because the check meets its EPIPE under load
+- every door the change reaches has a fake: the setup verb runs on the disk and proc doors, and its cases take fakeDisk and fakeProc
+- the hand-off comment in install.sh links the setup verb's ticket, and setup.js links this ticket in its header
+- servers.js owns the vale-ls pin and table, and the install.sh copy carries a comment naming it beside a contract case holding the two equal
 
 ## tests-green
 
@@ -183,26 +356,53 @@ A box then carries one runtime.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/install.test.js test/level0/setup.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The installer installs no Node and runs none. The `node` item leaves its loop. The vale-ls download spells its asset table in sh, and a contract case holds it equal to `servers.js`. The editor client, the browser, the editor link and the editor extensions leave the installer for the setup verb. So do the survey, the Copilot setup and the brand. The installer runs that verb last, through the index binary, and a stop costs one warning line. The two red cases that read `setup.sh` now read the verb, in `test/level0/setup.test.js`, because the steps stand in JavaScript on the doors. The proc door's start also takes an input its program leaves unread. Without that, the check meets an EPIPE under load.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays on the install road, past one door fix the check needs
+- the setup verb takes the disk and proc doors, and its cases run on their fakes
+- the hand-off comment in the installer links the setup verb's ticket
+- servers.js owns the vale-ls pin, and a contract case holds the shell copy equal
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
 
 # Discussion
 

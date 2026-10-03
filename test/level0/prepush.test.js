@@ -22,6 +22,7 @@ import {
   refsIn,
   staleBy,
 } from "../../src/scripts/prepush.js";
+import { keepsProse, quackUnder } from "./quack-doors.js";
 
 const SHA = "a1b2c3d4e5f6a7b8";
 const WAS = "b7a6f5e4d3c2b1a0";
@@ -422,10 +423,13 @@ test("a false past the check lets stand holds no push, and a true past does", ()
   });
   const files = fakeDisk({
     [join(root, "notes.md")]: "The reader read the note.\nThe hand walked away.\n",
+    [quackUnder(root)]: "",
   });
+  // Go reads read as its own lemma, so the veto drops it. [[spec/tickets/go-prose-checks-stand-alone]]
+  const quack = keepsProse((row) => row.said === "read");
 
   const found = lintedBy(
-    fakeProc({ vale: { stdout: vale } }),
+    fakeProc({ vale: { stdout: vale }, [`${quackUnder(root)} prose`]: quack }),
     root,
     "vale",
     files,

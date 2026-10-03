@@ -185,10 +185,10 @@ test("a here case asking find for a newer source names the binary that rebuilds"
 });
 
 // A binary keys on a hash of its source and of the folders its go.mod replaces. [[spec/tickets/every-server-stands-and-answers]]
-test("a here case asking go-source.js fresh names the binary that rebuilds", () => {
+test("a here case asking go-stamp.sh fresh names the binary that rebuilds", () => {
   const said = [
     "index_here() {",
-    '  [ -x "$bin/se-index" ] && (cd "$root" && node src/scripts/go-source.js fresh se-index)',
+    '  [ -x "$bin/se-index" ] && sh "$root/src/scripts/go-stamp.sh" fresh se-index',
     "}",
   ].join("\n");
 

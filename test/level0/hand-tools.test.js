@@ -10,6 +10,7 @@ import { MINT_TOOL, schemasFrom } from "../../.claude/skills/level0/lib/schema.j
 import { SPECS, TOOLS } from "../../src/bridge/tools.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
+import { carryQuack } from "./quack-doors.js";
 
 test("the door registers the check and the mint", () => {
   assert.deepEqual(
@@ -79,6 +80,7 @@ test("a mint over a break of form writes the note, and the answer carries the wa
     },
     projections: [],
   };
+  carryQuack(box);
   const said = await TOOLS[`mcp__level0__${MINT_TOOL}`](
     { kind: "note", path: "spec/notes/fresh.md" },
     box,

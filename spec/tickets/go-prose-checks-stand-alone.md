@@ -1,10 +1,19 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
+step: implement/tests-green
 steps:
   - name: design
-    reads: [[spec/guidance/voice]]
     steps:
+      - name: owner-read
+        does: reads the ask a handover carries, before any draft
+        by: person
+        when: handed
+        input: ask
+        evidence:
+          - name: read
+            form: verdict
+            says: pass where the ask says what the owner said, or fail with the owner's words
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -24,35 +33,41 @@ steps:
           - name: answers
             form: list
             says: every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        reads: [[spec/guidance/review/design]]
-        input: design/draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass, pass with findings naming a child a line, or fail with findings one a line
-  - name: implement
-    reads: [[spec/guidance/code/testing]]
-    needs: ["branch test"]
-    input: ["design/draft", "design/review"]
-    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every row the design review passes with stands fixed in the change"]
-    steps:
       - name: tests-red
         does: writes the tests the ask calls for
+        tags: ["code", "testing"]
+        needs: ["branch test"]
+        input: draft
+        checklist: ["every done_when line meets a test that fails, or a checkpoint the hand answers where no command decides", "every door the tests reach has a fake"]
         evidence:
           - name: tests
             form: command
             expects: assertion
             says: the tests you write fail on their own assertion
+          - name: red
+            form: list
+            says: every test file standing red until tests-green closes, one a line, which the check leaves out
           - name: seen
             form: text
             says: what you see, and what surprises you
+  - name: gate
+    gate: does the approach answer the ask, and does a red test decide every done_when line
+    does: reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points
+    not: design/draft
+    tags: ["review"]
+    input: ["design/draft", "design/tests-red"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: implement
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    input: ["design/draft", "gate"]
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    steps:
       - name: change
         does: makes the change
-        reads: [[spec/guidance/code/code]]
         evidence:
           - name: lint
             form: command
@@ -60,7 +75,7 @@ steps:
             says: the tree builds and lints
       - name: tests-green
         does: makes the tests pass
-        input: tests-red
+        input: design/tests-red
         to: retro
         evidence:
           - name: tests
@@ -74,10 +89,111 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
-step: design/draft
+  - name: accept
+    gate: does the whole work answer the ask, and does every command of the route pass
+    final: true
+    when: backlog
+    does: reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points
+    not: implement/change
+    tags: ["review", "accept"]
+    input: ["ask", "implement"]
+    evidence:
+      - name: verdict
+        form: verdict
+        says: accept, accept with points naming a fix ticket a line, or reject with findings one a line
+  - name: view
+    does: reads the change in the view the ask names
+    by: person
+    when: view
+    on_fail: implement
+    to: retro
+    input: ["ask", "implement/tests-green"]
+    evidence:
+      - name: seen
+        form: verdict
+        says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
-process_hash: 9d870e3fd3c577a6
+process_hash: 22b42ea1501e8967
 group: node-leaves-the-boxes
+record:
+  - step: design/draft
+    hand: box 77f4c295c43a · claude-code-remote
+    hash_before: f6389a4cd5ce99fdc3e5c8f533637846b1148bc5
+    hash_after: f6389a4cd5ce99fdc3e5c8f533637846b1148bc5
+    inputs:
+      - name: ask
+        hash: 8e11a8a438953a0e
+        size: 250
+    def: 71651f49796eeda4
+  - step: design/tests-red
+    hand: box 77f4c295c43a · claude-code-remote
+    hash_before: bcdfdc8117db81740d39c049a6e60e1ccc8fa31b
+    hash_after: bcdfdc8117db81740d39c049a6e60e1ccc8fa31b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: b3ef1bbfc1fd7c4e
+        size: 3711
+      - name: [[spec/tickets/install-drops-node]]
+        hash: 83575bda3f482f6c
+        size: 216
+      - name: [[spec/tickets/readers-take-the-go-topics]]
+        hash: 1e27277f7647141a
+        size: 231
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 77f4c295c43a · claude-code-remote · helper-3
+    hash_before: 333da1aa3153d02766c81e967cc294dc2823aef7
+    hash_after: 333da1aa3153d02766c81e967cc294dc2823aef7
+    inputs:
+      - name: design/draft
+        hash: b3ef1bbfc1fd7c4e
+        size: 3711
+      - name: design/tests-red
+        hash: 6621abd2f0e7c57f
+        size: 885
+      - name: [[spec/tickets/install-drops-node]]
+        hash: 83575bda3f482f6c
+        size: 216
+      - name: [[spec/tickets/readers-take-the-go-topics]]
+        hash: 1e27277f7647141a
+        size: 231
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 7b0ad8331244187326b7e156354856caf97c734d
+    hash_after: 7b0ad8331244187326b7e156354856caf97c734d
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/the-webview-ships-prebuilt.md:262:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 10b884eb9cae · claude-code-remote
+    hash_before: 9bfc41191e2ebd75a7b9ecb197c53d66365f950a
+    hash_after: 9bfc41191e2ebd75a7b9ecb197c53d66365f950a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 31 test(s) pass in 3 file(s); green, src/modules/lsp passes
+      - name: check
+        exit: 0
+        said: "spec/tickets/the-webview-ships-prebuilt.md:262:3: Sentence: A sentence holds 25 words. Cut this one in two."
+    inputs:
+      - name: design/tests-red
+        hash: 6621abd2f0e7c57f
+        size: 885
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -92,6 +208,16 @@ The prose checks were the last reason Node runs at runtime.
 
 # design
 
+## owner-read
+
+<!-- reads the ask a handover carries, before any draft -->
+
+### read
+
+<!-- pass where the ask says what the owner said, or fail with the owner's words -->
+
+<!-- the form is verdict -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -99,44 +225,70 @@ The prose checks were the last reason Node runs at runtime.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The Go vetoes in `src/prose` become the one reader of Vale's findings, and wink leaves with its two importers.
+
+- `readsProse` in `src/bridge/prose.js` answers off `keptOf` in all mode alone. `longest`, `withoutFalseLength`, `withoutFalseOutside` and the word and cap readers leave with the wink import.
+- `readsText` and `readThrough` in `src/bridge/findings.js` answer off `quack prose` in past mode alone.
+- `readThrough` sends every file in one request, through a new `keptOver` in `src/scripts/quack-topic.js`, so a check pays one process.
+- `keptOf` rides `keptOver`, and a list holding no finding answers itself with no process.
+- `src/engine/tense.js` leaves, and `withContext` moves into `src/bridge/prose.js`, its last JavaScript caller.
+- `lintedBy` in `src/scripts/prepush.js` and `readThroughTheReader` in `src/scripts/cli-read.js` hand `readThrough` the proc door `quack` needs.
+- The LSP module's past veto calls `prose.ReadsAsPast` in Go. `Tools` drops its `Node` and `Tense` fields, and `tenseScript`, `tenseAt` and the `toolInputs` row for `tense.js` go.
+- `package.json` names no dependency, and `package-lock.json` follows.
+- The `modules` item leaves `src/scripts/install.sh`, since wink is its one package.
+- The start road in `.claude/skills/level0/hooks/start.js` reads a fresh clone off the index binary in place of `node_modules`, since npm brings no folder now. Code 6 leaves `REASONS`, and code 7 says the road installs the tree.
+- The tense reader and bridgehead sections of `spec/design_output/level0.md` follow, and so do the headers of `src/prose/prose.go` and `src/quack/prose.go`.
+
+Weighed: the start road and the install's `modules` item stand outside the ask's words. Both read wink's folder, so a fresh cloud box breaks without the change. [[spec/tickets/install-drops-node]] takes the rest of `install.sh`.
+
+Assumed: the quack binary stands wherever a reader runs, as [[spec/tickets/readers-take-the-go-topics]] assumes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/bridge/write.js`: `proseFaults` calls `readsProse`
+- `src/bridge/bash.js`: `messageFaults` calls `readsProse`
+- `src/bridge/answer-read.js`: `readsAnswer` calls `readsProse`
+- `src/bridge/findings.js`: `findingsOver` calls `readsText` and `readThrough`
+- `src/bridge/findings.js`: `voiceOver` calls `readsText`
+- `src/scripts/prepush.js`: `lintedBy` calls `readThrough`
+- `src/scripts/cli-read.js`: `readThroughTheReader` calls `readThrough`
+- `src/modules/lsp/tools.go`: `vetoes` calls `pastReads`
+- `src/modules/lsp/door.go`: `reads` fills `Node` and `Tense`
+- `.claude/skills/level0/hooks/level0.js`: `startsOnce` runs `START` and reads `INSTALLED`
+- `test/contract/paragraph.test.js` and `test/contract/process.test.js` call `withoutFalsePast`
+- `test/level0/tense.test.js`, `test/level0/prose.test.js` and `test/level0/topic-readers.test.js` call the wink readers
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `test/level0/topic-readers.test.js`: readThrough runs quack prose once over every file it reads
+- `test/level0/topic-readers.test.js`: keptOf answers a list holding no finding with no process
+- `test/contract/tree-extension.test.js`: npm reaches the extension alone, and the root names no dependency
+- `test/contract/cloud-start.test.js`: a fresh clone carrying no index installs the tree, then starts the index
+- `src/modules/lsp/tools_test.go`: TestTheTenseReaderDropsAPastRow, with no node call
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-## review
-
-<!-- reads the approach against the ask -->
-
-### verdict
-
-<!-- pass, pass with findings naming a child a line, or fail with findings one a line -->
-
-<!-- the form is verdict -->
-
-# implement
+- I open every file the approach names, and each function stands where it says
+- a search for each changed name over `src`, `test` and `.claude` gives the callers list
+- the first done line rides `go test ./...`, the second rides the tree-extension case, the third rides `./RUNME.sh check`
 
 ## tests-red
 
@@ -145,20 +297,52 @@ The prose checks were the last reason Node runs at runtime.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/topic-readers.test.js test/contract/tree-extension.test.js test/contract/cloud-start.test.js src/modules/lsp/tools_test.go
+
+### red
+
+<!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
+<!-- the form is list -->
+
+- test/level0/topic-readers.test.js
+- test/contract/tree-extension.test.js
+- test/contract/cloud-start.test.js
+- src/modules/lsp/tools_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The start road answers 0 where the case wants 7, since it still reads `node_modules`. The LSP case keeps the past row, because the fake answers node nothing and the veto lets every row stand there. `keptOf` asks quack on an empty list and answers null.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the second done line rides the tree-extension case, the first rides the Go case, and the check decides the third
+- the reader cases run over the fake disk and the fake proc, the LSP case over its fake tools, and the start road over a temporary tree
+
+# gate
+
+<!-- reads the design phase against the ask, fixes what it finds within its own diff, and names the rest as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+<!-- the form is verdict -->
+
+accept with points
+- readers-tests-carry-quack: test/level0/one-reader.test.js hands readsText rows, and its fake disk holds no quack binary.
+- boot-fixture-drops-wink: test/level0/hooks.test.js plants node_modules/wink-nlp as its boot fixture, and that fixture leaves with wink.
+- lsp-fixture-drops-node: src/modules/lsp/tools_test.go fills Node and Tense in its shared Tools fixture.
+- tense-notes-follow: spec/design_output/lsp.md, spec/vocabulary/terms.yml and four Go comments still name tense.js or wink-nlp.
+- widenings-stand-needed: the start road and the modules item both read wink's folder, so both changes stay.
+
+# implement
 
 ## change
 
@@ -167,14 +351,19 @@ The prose checks were the last reason Node runs at runtime.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the prose readers, their tests, the install and the notes naming wink, each a file the ask's wink line reaches
+- the readers reach quack through the process door, and `test/level0/quack-doors.js` holds its fake
+- a comment in `src/bridge/prose.js` names the Go checks as the one copy, and points at this ticket
+- the veto stands once in `src/quack/prose.go`, and the JavaScript readers call it
 
 ## tests-green
 
@@ -183,26 +372,53 @@ The prose checks were the last reason Node runs at runtime.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/topic-readers.test.js test/contract/tree-extension.test.js test/contract/cloud-start.test.js src/modules/lsp/tools_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Go prose checks are now the one copy. Every JavaScript prose reader hands its rows to `quack prose` and keeps what the Go vetoes keep, and the tense reader in `src/engine/tense.js` leaves. With it goes wink, the last package Node loaded at runtime, so `package.json` names no runtime dependency. The start road probes the index binary in place of `node_modules`, and the LSP tools carry no Node path.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the readers, their tests, the install and the notes naming wink, each reached by the ask
+- the readers reach quack through the process door, and `test/level0/quack-doors.js` fakes it
+- the comment at `src/bridge/prose.js` names the Go vetoes as the one answer
+- the veto stands once in `src/quack/prose.go`, and every reader calls it
+
+# accept
+
+<!-- reads the diff since its last verdict against the ask and every prose criterion, and names what falls short as points -->
+
+## verdict
+
+<!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
+
+<!-- the form is verdict -->
+
+# view
+
+<!-- reads the change in the view the ask names -->
+
+## seen
+
+<!-- pass where the view shows the ask's number, or fail with what it shows -->
+
+<!-- the form is verdict -->
 
 # Discussion
 

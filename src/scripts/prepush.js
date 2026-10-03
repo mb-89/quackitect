@@ -294,7 +294,7 @@ export function lintedBy(outside, root, vale, files = disk()) {
         cwd: root,
       },
     );
-    return readThrough({ disk: files, join, root }, fromJson(ran.stdout));
+    return readThrough({ disk: files, proc: outside, join, root }, fromJson(ran.stdout));
   };
 }
 

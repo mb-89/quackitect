@@ -31,6 +31,7 @@ import { run as rename } from "../../src/scripts/verbs/rename.js";
 import { run as retro } from "../../src/scripts/verbs/retro.js";
 import { run as rules } from "../../src/scripts/verbs/rules.js";
 import { run as serve } from "../../src/scripts/verbs/serve.js";
+import { run as setup } from "../../src/scripts/verbs/setup.js";
 import { run as split } from "../../src/scripts/verbs/split.js";
 import { run as standing } from "../../src/scripts/verbs/standing.js";
 import { run as stub } from "../../src/scripts/verbs/stub.js";
@@ -67,6 +68,7 @@ const RUNS = {
   retro,
   rules,
   serve,
+  setup,
   split,
   standing,
   stub,

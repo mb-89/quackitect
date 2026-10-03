@@ -11,7 +11,6 @@ import {
   biomeFor,
   findingsOver,
   pastHistory,
-  readThrough,
   showOf,
   walkOver,
 } from "../bridge/findings.js";
@@ -66,11 +65,6 @@ export function asksIndex(argv) {
 
   const said = it.proc.run([at, ...argv], { cwd: root, inherit: true });
   return said.exitCode;
-}
-
-// [[spec/design_output/level0#the-tense-reader]]
-export function readThroughTheReader(found) {
-  return readThrough({ disk: files, join, root }, found);
 }
 
 // The command line's own reading, which `lint` prints and a case counts: the tools' rows, and the check module's sweep under the paths asked, which quack answers. [[spec/tickets/the-lsp-server-leaves]]

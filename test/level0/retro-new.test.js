@@ -11,6 +11,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
 import { SCHEMA } from "./pull-schema.js";
+import { carryQuack } from "./quack-doors.js";
 import { semicolonVale } from "./semicolon-vale.js";
 
 const ROOT = "/tree";
@@ -155,7 +156,7 @@ test("retro new takes its retro under queue", () => {
 // The --why line lands in the Ask, so the mint reads it through the lint's road, and a break of form warns while the ticket lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 test("retro new writes a --why line the lint warns on, and names Characters", () => {
   const VALE = "/tree/.se/.runtime/bin/vale";
-  const it = doors({}, { vale: VALE });
+  const it = carryQuack(doors({}, { vale: VALE }), undefined, ROOT);
   it.proc.teach([VALE], semicolonVale());
 
   const { code, said } = heard(() =>

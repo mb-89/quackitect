@@ -13,11 +13,12 @@ import { REFUSES } from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { firstLeaf } from "../../src/engine/group.js";
-import { withoutFalsePast } from "../../src/engine/tense.js";
+import { proc } from "../../src/doors/proc.js";
 import { readsFor } from "../../src/scripts/guidance-hand.js";
 import { askRows, processAt } from "../../src/scripts/process.js";
 import { leafOf, stepPathOf } from "../../src/scripts/pull.js";
 import { leavesOf, walkOf } from "../../src/scripts/pull-route.js";
+import { keptOf, PAST } from "../../src/scripts/quack-topic.js";
 import { schemasHere } from "../../src/scripts/ticket.js";
 import { at, rulesIn } from "./ruled.js";
 
@@ -173,7 +174,8 @@ ruled.ifVale(
         const made = minted.get(name);
         assert.equal(made.why, undefined, `${name} mints: ${made.why}`);
         const rows = text(name).split("\n");
-        for (const one of withoutFalsePast(text(name), found(name))) {
+        const past = keptOf({ disk: files, proc: proc(), root }, text(name), found(name), PAST);
+        for (const one of past) {
           if (!REFUSES.has(one.severity)) continue;
           faults.push(`${name}:${one.line} ${one.rule} | ${rows[one.line - 1]}`);
         }

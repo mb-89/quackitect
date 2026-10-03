@@ -11,6 +11,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { conflicted, TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
+import { carryQuack } from "./quack-doors.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -61,7 +62,7 @@ function box(files = {}) {
     [join(METHOD, "spec", "schemas", "ticket.schema.yaml")]: SCHEMA,
     ...files,
   });
-  return {
+  return carryQuack({
     method: METHOD,
     work: WORK,
     root: WORK,
@@ -69,7 +70,7 @@ function box(files = {}) {
     log: fakeLog(),
     vale: { stands: () => false },
     projections: [],
-  };
+  });
 }
 
 const write = (path, content) => ({ tool: "Write", file_path: path, content });

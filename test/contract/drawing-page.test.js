@@ -8,7 +8,7 @@ import { after, before, test } from "node:test";
 import { pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { browserFrom } from "../../src/scripts/browser.js";
-import { bundle, bundled, OUT, WEBVIEW } from "../../src/scripts/bundle.js";
+import { OUT, WEBVIEW } from "../../src/scripts/bundle.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { graphIn } from "../../src/scripts/graph.js";
 import { aheadOnly } from "../../src/scripts/ticket-route.js";
@@ -60,12 +60,11 @@ let page;
 
 before(async () => {
   if (why) return;
-  if (!bundled(files)) await bundle();
   const { chromium } = await import(pathToFileURL(DRIVER).href);
   driven = await chromium.launch({ executablePath: browser, headless: true });
   page = await driven.newPage();
   await page.setContent(PAGE);
-  await page.addStyleTag({ path: OUT.replace(/\.js$/, ".css") });
+  await page.addStyleTag({ path: OUT.replace(/\.mjs$/, ".css") });
   await page.addScriptTag({ path: OUT });
 });
 
@@ -117,6 +116,9 @@ test("a graph message draws every node and edge the graph carries", {
   assert.ok((await classes("design")).includes("phase"), "design is a phase");
   assert.match(await page.locator('[data-id="design/draft"]').innerText(), /↺2/);
   assert.equal(await page.locator(".react-flow__edge.fail").count(), 1);
+  // dagre places the nodes in route/drawing.js, which hands the layout its placer, so the bundle places the nodes apart. [[spec/design_output/drawing#the-layout-reads-the-graph]]
+  const places = await page.$$eval(".react-flow__node", (all) => all.map((one) => one.style.transform));
+  assert.equal(new Set(places).size, graph.nodes.length, "no two nodes share a place");
 });
 
 test("a theme message turns the scheme, and a stray kind changes nothing", {

@@ -7,8 +7,16 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import {
+  VALE_LS_RELEASES,
+  VALE_LS_VERSION,
+  valeLsAsset,
+} from "../../.claude/skills/level0/lib/servers.js";
 import { rebuilt } from "../../.claude/skills/level0/lib/tools.js";
 import { disk } from "../../src/doors/disk.js";
+import { WANTS } from "../../src/scripts/verbs/setup.js";
+import { FETCHING } from "./fetching.js";
+
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
@@ -22,18 +30,34 @@ test("every binary this tree builds rebuilds when its source moves ahead", () =>
   }
 });
 
-// The script runs under set -eu before every verb, so a node step it calls carries a fallback line. [[spec/design_output/copilot#setup-and-discovery]]
-test("a node step the install calls says a warning where it stops, and the install goes on", () => {
+// The verbs run on Node, and the install runs none of it, so a box brings Node with the verbs. [[spec/tickets/install-drops-node]]
+test("the install names no node", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
-  const rows = said.split("\n");
-  for (const one of ["copilot.js", "brand.js"]) {
-    const at = rows.findIndex((row) => /^node /.test(row) && row.includes(one));
-    assert.ok(at >= 0, `the script calls ${one}`);
-    assert.match(
-      `${rows[at]}\n${rows[at + 1] ?? ""}`,
-      /\|\|\s*\n?\s*say /,
-      `${one} carries a fallback line, so a refusal stops no verb`,
-    );
+  assert.deepEqual(said.match(/node/gi) ?? [], []);
+});
+
+// The steps that run JavaScript stand behind the setup verb, which the install reaches through the index. [[spec/tickets/install-drops-node]]
+test("the install hands its JavaScript steps to the setup verb, and goes on where it stops", () => {
+  const rows = disk().read(join(root, "src", "scripts", "install.sh")).split("\n");
+  const at = rows.findIndex((row) => /\$index" verb "\$root\/src\/scripts" setup/.test(row));
+  assert.ok(at >= 0, "the script runs the setup verb through the index binary");
+  assert.match(
+    `${rows[at]}\n${rows[at + 1] ?? ""}`,
+    /\|\|\s*\n?\s*say /,
+    "the setup carries a fallback line, so a refusal stops no verb",
+  );
+  assert.ok(disk().exists(join(root, "src", "scripts", "verbs", "setup.js")), "the verb stands");
+});
+
+// The shell spells the asset table servers.js owns, because a shell script imports nothing. [[spec/design_output/editor#the-asset-matrix]]
+test("the vale-ls assets the install spells match the ones servers.js names", () => {
+  const said = disk().read(join(root, "src", "scripts", "install.sh"));
+  assert.match(said, new RegExp(`^vale_ls_version=${VALE_LS_VERSION.replaceAll(".", "\\.")}$`, "m"));
+  assert.ok(said.includes(VALE_LS_RELEASES), "the script downloads from the releases servers.js names");
+  const rows = [...said.matchAll(/^\s*(\w+)-([\w-]+)\)\s+target=(\S+) ;;$/gm)];
+  assert.equal(rows.length, 6, "the script names every platform servers.js names");
+  for (const [, os, arch, target] of rows) {
+    assert.equal(`vale-ls-${target}.zip`, valeLsAsset(os, arch), `${os} ${arch}`);
   }
 });
 
@@ -80,21 +104,21 @@ test("both announcement lines wait on a missing want, so a warm tree runs silent
   );
 });
 
-// The drawing and its browser are wants, so a box with no registry and no browser still runs every verb. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-test("the install bundles the drawing and resolves a browser, both as wants", () => {
+// A vehicle case skips every want past the box, so the skip list names each one the install and the setup reach. [[spec/tickets/fetching-skip-list-stale]]
+test("the skip list names every want of the install and the setup, and nothing else", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
   const list = /^for one in (.+?)\s*\\\n\s*(.+?); do/m.exec(said);
-  const wants = `${list[1]} ${list[2]}`.split(/\s+/);
-  for (const one of ["drawing", "browser"]) {
-    assert.ok(wants.includes(one), `the loop names ${one}`);
-    assert.match(
-      said,
-      new RegExp(`\\[ "\\$1" = "${one}" \\]`),
-      `a missing ${one} stops no verb`,
-    );
-  }
-  assert.match(said, /node src\/scripts\/bundle\.js/, "the want runs the bundle step");
-  assert.match(said, /node src\/scripts\/browser\.js/, "the want asks the resolver");
+  const wants = [...`${list[1]} ${list[2]}`.split(/\s+/), ...WANTS];
+  assert.deepEqual(FETCHING.split(" ").sort(), wants.sort());
+});
+
+// A box with no Go builds no index, so the road RUNME.sh takes there runs the setup itself. [[spec/tickets/setup-runs-without-an-index]]
+test("a box with no index runs the setup before the verb, and a stop costs one line", () => {
+  const rows = disk().read(join(root, "RUNME.sh")).split("\n");
+  const at = rows.findIndex((row) => /node "\$here\/src\/scripts\/verbs\/setup\.js"/.test(row));
+  assert.ok(at >= 0, "the road runs the setup verb");
+  assert.ok(at < rows.findIndex((row) => /exec node "\$program"/.test(row)), "the setup runs before the verb");
+  assert.match(`${rows[at]}\n${rows[at + 1]}`, /\|\|\s*\n\s*printf /, "a stop stops no verb");
 });
 
 // The index builds with Go alone. [[spec/design_output/index#the-compiler-it-needs]]

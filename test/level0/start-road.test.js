@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 const HERE = "/tree";
-const NO_MODULES = 6;
+const NO_INDEX = 9;
 
 // A fresh copy of the hook a case, because the bridgehead holds what the start road answered. [[spec/design_output/level0#a-session-says-its-cage]]
 let made = 0;
@@ -118,7 +118,7 @@ test("the script reads every guard the shell read, and runs the index standing b
   assert.match(script, /CLAUDE_CODE_REMOTE/, "the cloud variables");
   assert.match(script, /SE_CLOUD/);
   assert.match(script, /existsSync\(method\)/, "the method root");
-  assert.match(script, /node_modules/, "the modules");
+  assert.match(script, /existsSync\(index\)/, "the index binary");
   assert.match(script, /\['standing'\]/, "and the index stands behind it");
 });
 
@@ -139,14 +139,14 @@ test("a desk box reads no line off the start road, because a person starts it th
 
 test("a box whose start road stands down says so in the first prompt", async () => {
   const hook = await hookHere();
-  const box = harness({ exitCode: NO_MODULES, stderr: "npm stands nowhere" });
+  const box = harness({ exitCode: NO_INDEX, stderr: "go stands nowhere" });
   const said = await opensThen(hook, box);
 
   const block = (said.blocks ?? []).find((one) => one.name === hook.CAGE_BLOCK);
   assert.ok(block, "the first prompt carries the cage block");
   assert.match(block.text, /LEVEL ZERO STANDS DOWN/);
-  assert.match(block.text, new RegExp(String(NO_MODULES)), "it names the code");
-  assert.match(block.text, /npm stands nowhere/, "and what the road says");
+  assert.match(block.text, new RegExp(String(NO_INDEX)), "it names the code");
+  assert.match(block.text, /go stands nowhere/, "and what the road says");
   assert.match(block.text, /RUNME\.sh serve/, "and what a person runs");
 });
 
@@ -173,8 +173,8 @@ test("a code saying a person starts the server carries no block", async () => {
 
 test("the block names the code, what it means, and what a person runs", async () => {
   const hook = await hookHere();
-  const said = hook.cageText(NO_MODULES, "");
-  assert.match(said, new RegExp(hook.reasonOf(NO_MODULES)[1]));
+  const said = hook.cageText(NO_INDEX, "");
+  assert.match(said, new RegExp(hook.reasonOf(NO_INDEX)[1]));
   assert.match(said, /RUNME\.sh/);
 });
 
@@ -355,7 +355,7 @@ test("a helper's stop passes while the server starts", async () => {
 // [[spec/design_output/level0#a-session-says-its-cage]]
 test("a cloud stop where the start road stood down passes, so a caged box loops nowhere", async () => {
   const hook = await hookHere();
-  const box = harness({ exitCode: NO_MODULES, stderr: "npm stands nowhere" });
+  const box = harness({ exitCode: NO_INDEX, stderr: "go stands nowhere" });
   const runs = runner(hook, box);
   await runs("session.start", { cwd: HERE });
 
