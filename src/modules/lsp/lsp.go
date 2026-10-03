@@ -488,6 +488,10 @@ func Listen(root string, server *Server) (func(), error) {
 	return func() {
 		listen.Close()
 		os.Remove(at)
+		// The stop ends the tools' runs too, so a whole-tree lint dies with the index. [[spec/tickets/the-index-stops-its-tools]]
+		if tools := server.from.Tools; tools != nil && tools.Halt != nil {
+			tools.Halt()
+		}
 	}, nil
 }
 

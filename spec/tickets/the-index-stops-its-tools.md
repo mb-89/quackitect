@@ -25,7 +25,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: the-modules-start-together
+group: the-index-stops-its-tools
 step: do
 ---
 
