@@ -53,7 +53,8 @@ export async function clearRun(it, tree, raise, seen, env) {
   return { runs, commands: [...seen.commands], prompts: [...seen.prompts] };
 }
 
-function grouped(it, tree, env) {
+// The probe mints its own group and stands on its work branch, as origin holds it. [[spec/tickets/the-clear-carries-no-local-work]]
+export function grouped(it, tree, env) {
   const minted = it.proc.run(
     [it.join(tree, "RUNME.sh"), "mint", "ticket", `spec/tickets/${GROUP}.md`, "--process=trivial"],
     { cwd: tree, env, timeoutMs: PULL_WAIT },
@@ -62,7 +63,12 @@ function grouped(it, tree, env) {
     cwd: tree,
     timeoutMs: PULL_WAIT,
   });
-  const fell = [minted, branched].find((one) => one.exitCode !== 0);
+  // A box's work branch stands on origin, so the handover finds no commit the box alone holds. [[spec/tickets/the-clear-carries-no-local-work]]
+  const pushed = it.proc.run(["git", "update-ref", `refs/remotes/origin/work/${GROUP}`, "HEAD"], {
+    cwd: tree,
+    timeoutMs: PULL_WAIT,
+  });
+  const fell = [minted, branched, pushed].find((one) => one.exitCode !== 0);
   return fell ? { words: `mint ${GROUP}`, exit: fell.exitCode, said: `${fell.stdout}${fell.stderr}` } : null;
 }
 
