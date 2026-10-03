@@ -33,11 +33,8 @@ const (
 	// The span between two sweeps on the clock. [[spec/design_output/index#a-change-moves-its-rows]]
 	sweepEvery = 10 * time.Minute
 	// Git's own index, which a watch on its folder names when the tracked list turns. [[spec/design_output/index#a-change-moves-its-rows]]
-	gitIndex       = ".git/index"
-	decimalBase    = 10
-	stopGraceDelay = 100 * time.Millisecond
-	// The longest the door's own stop runs after a stop call, before the process ends without it. [[spec/tickets/the-index-stops-its-tools]]
-	stopBound = 10 * time.Second
+	gitIndex    = ".git/index"
+	decimalBase = 10
 	// A changes call waits this long for a sweep, under the wait a caller gives a post. [[spec/design_output/index#the-index-fires-on-change]]
 	changesWait = 25 * time.Second
 )
@@ -546,26 +543,6 @@ func stampOf(bin string) string {
 		return ""
 	}
 	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), decimalBase)
-}
-
-// [[spec/design_output/index#a-door-comes-back]]
-func stopsSoon(root string) {
-	stopsAfter(root, stopGraceDelay, stopBound, exits)
-}
-
-// The stop a call asks, which main waits on beside a signal, so the door's stop ends the processes and tool runs it started. [[spec/tickets/the-index-stops-its-tools]]
-var (
-	stopAsked = make(chan struct{})
-	stopAsk   sync.Once
-)
-
-// Asks main for the stop after the grace, and ends the process itself where the stop outlasts the bound. [[spec/tickets/the-index-stops-its-tools]]
-func stopsAfter(root string, grace, bound time.Duration, exit func(int)) {
-	time.Sleep(grace)
-	stopAsk.Do(func() { close(stopAsked) })
-	time.Sleep(bound)
-	dropsOwn(root, pidOf())
-	exit(0)
 }
 
 type errorOf string
