@@ -89,3 +89,9 @@ The commands, in order:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The owner's answer, for `result`: a new phase 11, key migration.phase11, decided by the owner on the coordinator's report. The phase stands in [[spec/design_input/the-migration-runs-in-slices#the-phases]], and its group is [[spec/tickets/the-verbs-run-in-go]].
+
+The pull runs on `main` or on the group's own branch alone, and the box that opens phase 11 pushes no `main`. So the pass waits for a hand on `main`:
+
+    ./RUNME.sh ticket pull the-verbs-port-takes-a-phase --owner-says --pass --fields '{"result": "A new phase 11, key migration.phase11, decided by the owner on the coordinator report."}'
