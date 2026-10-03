@@ -41,3 +41,43 @@ A box stopped earlier this week after two and a half hours of clears with nothin
 - `./RUNME.sh test test/level0/pull-ephemeral.test.js` passes the case for unpushed work, uncommitted work and a looped handover
 - `./RUNME.sh config work.staleAfter` reads `60m`
 - `./RUNME.sh check` exits 0
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+<!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-ephemeral.test.js
+
+## check
+
+<!-- the check is green on the commit -->
+<!-- the form is command -->
+
+./RUNME.sh check
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+<!-- the form is text -->
+
+The handover's hand-back in ephemeral-pull.js now runs localWorkFault after the file check, on a cloud box alone. The fault names the commits origin lacks and the tracked files left uncommitted, and the handover stays in hand until the box pushes. A red push to a work branch lands, so the box can always comply.
+
+A pass writes the tip under .se/.runtime/handover-tip.json. The next handover on the same tip is refused, so a context that pushed nothing ends with the box saying what blocks it. work.staleAfter drops to sixty minutes, because a working box now pushes far more often than that.
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+<!-- the form is checklist -->
+
+- the change follows the ask: two refusals at the handover and one config value
+- the cleanup it reveals: none
+- every fact stands once: the tip file path lives in HANDOVER_TIP in ephemeral.js
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
