@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { DUE, HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
-import { ASKS, heldAs, READ, WRITE } from "../../src/scripts/ephemeral.js";
+import { ASKS, HANDOVER_TIP, heldAs, READ, WRITE } from "../../src/scripts/ephemeral.js";
 import { dueHandOut } from "../../src/scripts/ephemeral-pull.js";
 import { handOut, ticketsHere } from "../../src/scripts/pull-hand.js";
 import { pulling } from "../../src/scripts/work.js";
@@ -106,6 +106,43 @@ test("the handover's hand-back refuses a missing or retro-naming file, and hands
   assert.equal(passed.code, 0, passed.said);
   assert.match(passed.said, /clear stands in your hand/);
   assert.equal(held(disk).ticket, "clear");
+});
+
+// A cloud box's clear keeps nothing that lives on the box alone, and a context that pushed nothing loops nowhere. [[spec/tickets/the-clear-carries-no-local-work]]
+test("a cloud box's handover refuses unpushed work, and a second handover on the tip the first passed on", () => {
+  const TIP = "a1b2c3d4e5f6a7b8c9d0";
+  const cloudAt = (ahead, status = "", tip = TIP) =>
+    doors(
+      { [at("spec/tickets/free-one.md")]: FREE, ...due, ...holding("handover"), [at(HANDOVER)]: "# Where it stands\n\nfree-one comes next.\n" },
+      {
+        "git rev-parse --abbrev-ref HEAD": { stdout: "work/one\n" },
+        "git status --porcelain --untracked-files=no": { stdout: status },
+        "git rev-list --count origin/work/one..HEAD": { stdout: `${ahead}\n` },
+        "git rev-parse HEAD": { stdout: `${tip}\n` },
+      },
+    );
+
+  const unpushed = cloudAt(2);
+  const said = heard(() => pulling(ROOT, ["pull", "--pass"], unpushed.it));
+  assert.equal(said.code, 1, said.said);
+  assert.match(said.said, /2 commit\(s\) not pushed/);
+  assert.equal(held(unpushed.disk).ticket, "handover", "the handover stays in hand");
+
+  const dirty = cloudAt(0, " M src/x.js\n?? .se/notes.md\n M .se/HANDOVER.md\n");
+  const changed = heard(() => pulling(ROOT, ["pull", "--pass"], dirty.it));
+  assert.equal(changed.code, 1);
+  assert.match(changed.said, /1 changed file\(s\) not committed/);
+
+  const clean = cloudAt(0);
+  const passed = heard(() => pulling(ROOT, ["pull", "--pass"], clean.it));
+  assert.equal(passed.code, 0, passed.said);
+  assert.equal(JSON.parse(clean.disk.read(at(HANDOVER_TIP))).tip, TIP);
+
+  clean.disk.write(HOLD, JSON.stringify(heldAs("handover", HAND)));
+  const looped = heard(() => pulling(ROOT, ["pull", "--pass"], clean.it));
+  assert.equal(looped.code, 1);
+  assert.match(looped.said, /No commit has landed since the last handover/);
+  assert.ok(looped.said.includes(`(${TIP.slice(0, 9)})`), "the refusal names the tip by its short hash");
 });
 
 test("the clear takes no hand-back, and a bare pull shows its ask", () => {

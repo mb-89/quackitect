@@ -5,7 +5,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { RESUME } from "../../src/bridge/handover.js";
-import { clearHeld, ENDS } from "../../src/scripts/probe-clear.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
+import { clearHeld, ENDS, grouped } from "../../src/scripts/probe-clear.js";
 
 const FELL = { kind: "hook", said: "the clear the handover asks for fails", detail: "refused" };
 
@@ -57,4 +58,15 @@ test("a clear the plugin meets refused names the refusal", () => {
   const said = clearHeld([FELL], run({ commands: [] }));
   assert.equal(said.pass, false);
   assert.match(said.evidence, /the clear fails: refused/);
+});
+
+// A box's work branch stands on origin, so the probe's handover meets no work the box alone holds. [[spec/tickets/the-clear-carries-no-local-work]]
+test("the probe mints its group, stands on its work branch, and points origin's branch at its tip", () => {
+  const proc = fakeProc({ "/t/RUNME.sh": { exitCode: 0 }, git: { exitCode: 0 } });
+  const it = { proc, join: (...parts) => parts.join("/") };
+
+  assert.equal(grouped(it, "/t", {}), null);
+  const lines = proc.ran.map((one) => one.argv.join(" "));
+  assert.ok(lines.some((one) => /^git checkout -q -B work\//.test(one)), lines.join("\n"));
+  assert.ok(lines.some((one) => /^git update-ref refs\/remotes\/origin\/work\/\S+ HEAD$/.test(one)), lines.join("\n"));
 });
