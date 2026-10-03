@@ -59,6 +59,7 @@ A child names a sibling alone, where its work needs the other first. Nothing
 outside the migration waits on these groups, and none carries `urgent`. The keys `phase0`, `phase1`, `phase1gaps` and every `phaseNshadow` read `true`,
 so a shadow group starts once the groups it names land. Every `phaseNswitch`
 key and `phase10` read `false` until the owner reads the shadow before it.
+`phase11` reads `false` until the coordinator turns the verbs port on.
 
 | phase | the groups, each with its key under `migration` | done when |
 |---|---|---|
@@ -73,6 +74,7 @@ key and `phase10` read `false` until the owner reads the shadow before it.
 | 8, the extension | [[spec/tickets/sidebar-lands-in-shadow]], `phase8shadow`, then [[spec/tickets/sidebar-switches-over]], `phase8switch` | the extension spawns no verb and reads no file itself |
 | 9, the deployment | [[spec/tickets/module-processes-land-in-shadow]], `phase9shadow`, then [[spec/tickets/module-processes-switch-over]], `phase9switch` | a crash in one part leaves the others running, and raises an alarm |
 | 10, Node leaves the boxes | [[spec/tickets/node-leaves-the-boxes]], `phase10` | `install.sh` installs no Node |
+| 11, the verbs leave Node | [[spec/tickets/the-verbs-run-in-go]], `phase11` | `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the tree |
 
 The graph, each group with its switch, and the owner's hand between a shadow and
 its switch-over:
@@ -110,6 +112,7 @@ flowchart TD
   p8w --> p9s
   p9s -.-> p9w["phase 9: switch, phase9switch"]
   p9w --> p10["phase 10: Node leaves, phase10"]
+  p10 --> p11["phase 11: the verbs leave Node, phase11"]
 ```
 
 Every arrow is `depends_on`. A dotted one marks the owner's switch as well, set
@@ -132,6 +135,7 @@ What each edge carries:
 | the extension shadow | the window shadow | the sidebar draws the base files, and a badge reads the label the window draws |
 | the extension switch | the window switch | the sidebar and the window read one name off the index |
 | the deployment shadow | the cage, editor checks and extension switches | the IO process holds every listener, so each IO module stands alone first |
+| the verbs port | Node leaves the boxes | phase 10 hands the port on through [[spec/tickets/the-verbs-leave-node]], and its setup verb is one of the verbs that move |
 
 A group's ask names its work, and its children carry the done criteria. A
 group's `split` step mints the children a later phase finds it lacks. Phase 2's
