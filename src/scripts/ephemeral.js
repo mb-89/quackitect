@@ -5,12 +5,15 @@
 
 import { join } from "node:path";
 import { callOf } from "./tool-call.js";
+import { cloudHere } from "../../.claude/skills/level0/lib/cloud.js";
 import {
   DUE,
   HANDOVER,
   HOLDS,
   RETRO,
+  RUN,
 } from "../../.claude/skills/level0/lib/folders.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { stillHeld } from "../engine/named.js";
 
 export const WRITE = "handover";
@@ -100,6 +103,50 @@ export function handoverFault(disk, root) {
   if (retro)
     return `${HANDOVER} names ${retro}. Name the ticket or the class by its name, and take the path out.`;
   return "";
+}
+
+// The tip a cloud box stood on at its last handover, so the next one sees whether a commit landed between. [[spec/tickets/the-clear-carries-no-local-work]]
+export const HANDOVER_TIP = `${RUN}/handover-tip.json`;
+
+// A cloud box's handover refuses work that lives on the box alone, and a context that ends with nothing landed since the last handover, so a clear neither loses work nor loops. A desk's owner pushes by hand, so a desk meets neither rule. [[spec/tickets/the-clear-carries-no-local-work]]
+export function localWorkFault(it) {
+  if (!cloudHere(it)) return "";
+  const said = (args) => it.git.run(args, true);
+  const branch = String(said(["rev-parse", "--abbrev-ref", "HEAD"]).out ?? "").trim();
+  const dirty = String(said(["status", "--porcelain", "--untracked-files=no"]).out ?? "")
+    .split("\n")
+    .map((row) => row.slice(3).trim())
+    .filter((path) => path && !path.startsWith(".se/"));
+  const upstream = said(["rev-list", "--count", `origin/${branch}..HEAD`]);
+  const ahead = Number(
+    String((upstream.ok ? upstream : said(["rev-list", "--count", `origin/${TRUNK}..HEAD`])).out ?? "0").trim(),
+  );
+  if (dirty.length || ahead > 0) {
+    return [
+      `This box holds work origin lacks: ${ahead} commit(s) not pushed${dirty.length ? `, and ${dirty.length} changed file(s) not committed` : ""}.`,
+      `Commit and push ${branch} first. A red push to a work branch lands, and a clear keeps nothing that lives on this box alone.`,
+    ].join(" ");
+  }
+  const tip = String(said(["rev-parse", "HEAD"]).out ?? "").trim();
+  const at = join(it.root, ...HANDOVER_TIP.split("/"));
+  let last = "";
+  try {
+    last = it.disk.exists(at) ? String(JSON.parse(it.disk.read(at)).tip ?? "") : "";
+  } catch {}
+  if (tip && last === tip) {
+    return [
+      `No commit has landed since the last handover (${tip.slice(0, 9)}), so a whole context passed with nothing pushed, and a clear would loop.`,
+      "Say in the chat what blocks you, and end the turn. The coordinator reads the session.",
+    ].join(" ");
+  }
+  return "";
+}
+
+// The tip the handover passed on, read by the next handover's check. [[spec/tickets/the-clear-carries-no-local-work]]
+export function marksHandoverTip(it) {
+  if (!cloudHere(it)) return;
+  const tip = String(it.git.run(["rev-parse", "HEAD"], true).out ?? "").trim();
+  if (tip) it.disk.write(join(it.root, ...HANDOVER_TIP.split("/")), JSON.stringify({ tip }));
 }
 
 // Every hold on the box whose ticket stands, read off the folder, one a hand. [[spec/design_output/pull#the-hand-and-the-hold]]

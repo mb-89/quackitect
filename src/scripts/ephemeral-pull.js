@@ -3,7 +3,15 @@
 // [[spec/design_input/the-clear-hands-ephemeral-tickets]]
 
 import { HANDOVER } from "../../.claude/skills/level0/lib/folders.js";
-import { ASKS, CLEAR, handoverFault, heldAs, WRITE } from "./ephemeral.js";
+import {
+  ASKS,
+  CLEAR,
+  handoverFault,
+  heldAs,
+  localWorkFault,
+  marksHandoverTip,
+  WRITE,
+} from "./ephemeral.js";
 import { writeHold } from "./guidance-hand.js";
 import { handed, offer } from "./pull-hand.js";
 import { REFUSED, say, WORK } from "./pull-route.js";
@@ -28,11 +36,12 @@ export function ephemeralPull(it, who, verdict) {
     return 1;
   }
   if (held.ticket === WRITE) {
-    const fault = handoverFault(it.disk, it.root);
+    const fault = handoverFault(it.disk, it.root) || localWorkFault(it);
     if (fault) {
       say(REFUSED, [fault, "", `Fix it, and ${WRITE} stays in hand.`]);
       return 1;
     }
+    marksHandoverTip(it);
     return handsEphemeral(it, who.hand, CLEAR, [`${WRITE} closes, and ${HANDOVER} stands.`]);
   }
   // Level zero closes the clear at the clear itself, so no hand-back reaches it. [[spec/design_input/the-clear-hands-ephemeral-tickets#three-tickets-run-the-clear]]
