@@ -31,7 +31,7 @@ record:
   - step: do
     hand: box bb72b4671e2e · claude-code-remote
     hash_before: feaa1acd37fabd08c3874fc6975e98fb96f26736
-    hash_after: f3f95c1b6c5d4f6e1b59c7b70bdfbeb877fa7794
+    hash_after: 3ae1237d3289f9013dd4e54838824252069360f1
     answered:
       - name: tests
         exit: 0
