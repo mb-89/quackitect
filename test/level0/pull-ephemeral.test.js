@@ -142,6 +142,7 @@ test("a cloud box's handover refuses unpushed work, and a second handover on the
   const looped = heard(() => pulling(ROOT, ["pull", "--pass"], clean.it));
   assert.equal(looped.code, 1);
   assert.match(looped.said, /No commit has landed since the last handover/);
+  assert.ok(looped.said.includes(`(${TIP.slice(0, 9)})`), "the refusal names the tip by its short hash");
 });
 
 test("the clear takes no hand-back, and a bare pull shows its ask", () => {

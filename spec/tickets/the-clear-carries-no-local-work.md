@@ -65,9 +65,9 @@ A box stopped earlier this week after two and a half hours of clears with nothin
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The handover's hand-back in ephemeral-pull.js now runs localWorkFault after the file check, on a cloud box alone. The fault names the commits origin lacks and the tracked files left uncommitted, and the handover stays in hand until the box pushes. A red push to a work branch lands, so the box can always comply.
+The handover's hand-back in `ephemeral-pull.js` now runs `localWorkFault` after the file check, on a cloud box alone. The fault names the commits origin lacks and the tracked files left uncommitted, and the handover stays in hand until the box pushes. A red push to a work branch lands, so the box can always comply.
 
-A pass writes the tip under .se/.runtime/handover-tip.json. The next handover on the same tip is refused, so a context that pushed nothing ends with the box saying what blocks it. work.staleAfter drops to sixty minutes, because a working box now pushes far more often than that.
+A pass writes the tip under `.se/.runtime/handover-tip.json`. The pull refuses the next handover on the same tip, so a context that pushed nothing ends with the box saying what blocks it. `work.staleAfter` drops to sixty minutes, because a working box now pushes far more often than that.
 
 ## checked
 

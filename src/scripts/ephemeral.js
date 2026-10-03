@@ -107,6 +107,10 @@ export function handoverFault(disk, root) {
 
 // The tip a cloud box stood on at its last handover, so the next one sees whether a commit landed between. [[spec/tickets/the-clear-carries-no-local-work]]
 export const HANDOVER_TIP = `${RUN}/handover-tip.json`;
+// A porcelain row opens on two status letters and a space before the path. [[spec/tickets/the-clear-carries-no-local-work]]
+const STATUS_WIDTH = 3;
+// The short hash a refusal names. [[spec/tickets/the-clear-carries-no-local-work]]
+const SHORT = 9;
 
 // A cloud box's handover refuses work that lives on the box alone, and a context that ends with nothing landed since the last handover, so a clear neither loses work nor loops. A desk's owner pushes by hand, so a desk meets neither rule. [[spec/tickets/the-clear-carries-no-local-work]]
 export function localWorkFault(it) {
@@ -115,7 +119,7 @@ export function localWorkFault(it) {
   const branch = String(said(["rev-parse", "--abbrev-ref", "HEAD"]).out ?? "").trim();
   const dirty = String(said(["status", "--porcelain", "--untracked-files=no"]).out ?? "")
     .split("\n")
-    .map((row) => row.slice(3).trim())
+    .map((row) => row.slice(STATUS_WIDTH).trim())
     .filter((path) => path && !path.startsWith(".se/"));
   const upstream = said(["rev-list", "--count", `origin/${branch}..HEAD`]);
   const ahead = Number(
@@ -135,7 +139,7 @@ export function localWorkFault(it) {
   } catch {}
   if (tip && last === tip) {
     return [
-      `No commit has landed since the last handover (${tip.slice(0, 9)}), so a whole context passed with nothing pushed, and a clear would loop.`,
+      `No commit has landed since the last handover (${tip.slice(0, SHORT)}), so a whole context passed with nothing pushed, and a clear would loop.`,
       "Say in the chat what blocks you, and end the turn. The coordinator reads the session.",
     ].join(" ");
   }
