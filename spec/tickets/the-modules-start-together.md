@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-modules-start-together
 step: do
+record:
+  - step: do
+    hand: box bb72b4671e2e · claude-code-remote
+    hash_before: 423c9ef566030a75e063eb6adc980bae3e0f7275
+    hash_after: 423c9ef566030a75e063eb6adc980bae3e0f7275
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes
+      - name: check
+        exit: 0
+        said: "   94.3  in all"
+    inputs:
+      - name: ask
+        hash: 334cd9efc83b6959
+        size: 747
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -49,26 +67,34 @@ A fresh index starts its module processes one after another, a quarter second ap
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/placements_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A fresh index started its module processes a quarter second apart, and its first read waits for each process's first answer. So every fresh index paid the gap once a module before its first read answered.
+
+Now the gap stands at a short yield, and the placements take a gap a caller names. A case stopping the placements between two spawns names an hour, so its stop lands between the two on a loaded box as well.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the default gap is short, and a case holds it short and a named gap kept
+- the cleanup it reveals: the index's whole-tree Vale run outliving its stop is a ticket of its own
+- every fact stands once: the gap lives in `spawnGap` in procs.go
 
 # Discussion
 
