@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,30 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box d8921a909c1fa5 · claude-code-remote
+    hash_before: 3182759b673723d925497019b1dd0ad7894aa25a
+    hash_after: 3182759b673723d925497019b1dd0ad7894aa25a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "   61.6  in all"
+    inputs:
+      - name: ask
+        hash: 0eeadcb2fc48d726
+        size: 402
+      - name: [[spec/tickets/node-leaves-the-boxes]]
+        hash: e6099ee6a209fa79
+        size: 213
+      - name: [[spec/tickets/quack-holds-a-verb-registry]]
+        hash: 0c6937b1a801ee73
+        size: 294
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
