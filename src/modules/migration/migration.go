@@ -79,6 +79,7 @@ var phases = []struct{ key, what, ticket string }{
 	{"phase9shadow", "Phase 9 in shadow.", "module-processes-land-in-shadow"},
 	{"phase9switch", "Phase 9 switched over.", "module-processes-switch-over"},
 	{"phase10", "Phase 10, Node leaving the boxes.", "node-leaves-the-boxes"},
+	{"phase11", "Phase 11, the verbs leaving Node.", "the-verbs-run-in-go"},
 }
 
 // The module type the wiring loads as migration: each phase switch, built-in false, and each slice. It returns the first key's writer, which no caller reads. [[spec/tickets/the-config-schema-gets-generated]]

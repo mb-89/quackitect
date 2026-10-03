@@ -208,3 +208,33 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The split follows the JavaScript core each verb file imports, read off the imports under `src/scripts/verbs`. A box takes one group in a few hours, and the order below lets several boxes work at once.
+
+| order | group | verbs | the core it ports |
+|---|---|---|---|
+| first, alone | [[spec/tickets/quack-holds-a-verb-registry]] | none, the registry | `src/quack/verbs.go` |
+| second, side by side | [[spec/tickets/read-verbs-run-in-go]] | index, links, lint, notes, find, log | `cli-read.js`, `log-verb.js` |
+| second, side by side | [[spec/tickets/check-verbs-run-in-go]] | check, test | `check-verb.js` |
+| second, side by side | [[spec/tickets/config-verbs-run-in-go]] | config, fix, project, rules, standing, doors | `cli-check.js` |
+| second, side by side | [[spec/tickets/box-verbs-run-in-go]] | setup, probe, tools, doctor | `probe*.js`, the setup verb |
+| second, side by side | [[spec/tickets/window-verbs-run-in-go]] | tui, serve, voice, vehicle, stub | `tui.js`, `serve.js`, `voice.js`, `vehicle*.js` |
+| second, side by side | [[spec/tickets/landing-verbs-run-in-go]] | commit, push, rename | `commit-verb.js`, `push-verb.js`, `rename.js` |
+| second, side by side | [[spec/tickets/work-verbs-run-in-go]] | branch, cloud | `work*.js` |
+| second, side by side | [[spec/tickets/ticket-verbs-run-in-go]] | ticket, mint, graph, split | `ticket*.js`, `pull*.js`, `mint-verb.js`, `split-verb.js` |
+| second, side by side | [[spec/tickets/retro-verbs-run-in-go]] | retro | `retro*.js` |
+| third, once the work verbs land | [[spec/tickets/dispatch-verbs-run-in-go]] | dispatch | `dispatch*.js` |
+| last | [[spec/tickets/the-node-road-closes]] | none, the road | `programOf`, `verb-run.js` |
+
+Why each choice:
+
+| the choice | why |
+|---|---|
+| the registry lands first | each verb then registers in a file of its own, so parallel branches touch no shared line of `src/quack/verbs.go` |
+| the work verbs and the ticket verbs stand apart | both cores are the biggest in the tree, and one box takes neither of them whole beside the other |
+| the dispatch waits on the work verbs | it reads `waitsIn`, `freeIn` and `markOff`, and two Go copies of the waits let the Action and the boxes disagree on what is free |
+| the retro, the check and the mint name no edge | they take a constant or a helper from another core, and a group ports the helper it needs or reads the Go copy standing on `main` at its sync |
+| a closing group | the road to node stands until every verb registers, so one group takes it out once the rest land |
+| every group carries `migration.phase11` | the coordinator turns the phase on, per [[spec/design_input/the-migration-runs-in-slices#the-owner-turns-phases-on]] |
+
+A helper two groups need lands in a Go package under `src/modules`. The second group takes the first one's package at its sync, and ports none of its own.
