@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-index-stops-its-tools
 step: do
+record:
+  - step: do
+    hand: box bb72b4671e2e · claude-code-remote
+    hash_before: feaa1acd37fabd08c3874fc6975e98fb96f26736
+    hash_after: f3f95c1b6c5d4f6e1b59c7b70bdfbeb877fa7794
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/lsp passes; green, src/index passes
+      - name: check
+        exit: 0
+        said: "   65.6  in all"
+    inputs:
+      - name: ask
+        hash: 73ee4b771e7a3aec
+        size: 887
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,34 @@ The lsp IO module runs Vale over the whole tree each time an index starts, and t
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/lsp/door_test.go src/modules/lsp/lsp_test.go src/index/door_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The lsp IO module runs Vale over the whole tree at each index start, and a stop of the index left that run going. The stop call also ended the process with a bare exit, so the module processes and tool runs never took the door's stop.
+
+Now the stop call wakes main as a signal does, and main runs the door's stop. The listen's stop halts the tools, and the halt cancels every run the door started. A bound ends the process where the stop hangs.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: a halt ends a running tool, and a stopped copy of the tree holds no Vale process
+- the cleanup it reveals: the stop call skipping the door's stop is in this change
+- every fact stands once: the bound lives in `stopBound` in door.go
 
 # Discussion
 
