@@ -85,7 +85,7 @@ process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
-step: children
+step: accept
 record:
   - step: sync
     hand: box 470a600bc22e · claude-code-remote
@@ -111,6 +111,10 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 11e35ab406b45a667a3690043838107360d52318
+    hash_after: 11e35ab406b45a667a3690043838107360d52318
 ---
 
 # Ask
