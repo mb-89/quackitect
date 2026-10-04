@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 7b71d5990ac50ca7
         size: 4884
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 08f4218ba236 · claude-code-remote · helper-4
+    hash_before: 92b98c44ffcc3a6207f15940065d34da7d5adbf2
+    hash_after: 92b98c44ffcc3a6207f15940065d34da7d5adbf2
+    inputs:
+      - name: design/draft
+        hash: 7b71d5990ac50ca7
+        size: 4884
+      - name: design/tests-red
+        hash: ca2e25e5e41c8ddd
+        size: 2290
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -312,8 +324,12 @@ What surprised:
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- retro-port-size-names-pull: the draft's size list leaves out src/scripts/pull.js and test/level0/pull-leaves.test.js, which the SE_MINTED decision touches; and tests-red says test/level0/experiment.test.js leaves whole while the draft keeps its process case, so implement names the final list and removes that file with its imports of retro.js
+- se-minted-pass-binds-mint: pull.js lets any hand that sets SE_MINTED in its env pass the queue; bind the pass to a name the mint wrote for this session, or state the cost in spec/design_output/config#the-engine-controls
+- retro-registry-test-starts-green: TestEveryRetroVerbRegisters passes on the stubs and stands off the red list, so the reaches-no-node line rests on the registry plus TestRetroUsageExitsTwoOnAWordNoVerbAnswers; implement checks by a run that ./RUNME.sh retro <verb> starts no node
 
 # implement
 
