@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: config-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: bb72c84cabbb46b8
         size: 898
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 056798343132 · claude-code-remote
+    hash_before: 8ab76db67d2ebdbc0cc1a6ca59f63b8f87e2d13e
+    hash_after: c430d11c7d9b371434aed70aa142d604dc674b88
+    answered:
+      - name: lint
+        exit: 0
+        said: "    2.5  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -322,14 +331,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the six verbs Go files, the projection package, the deleted programs and modules, and the tests the draft names, and no file the ask leaves out
+- every door the verbs reach rides in as an argument, so each case hands in a temp root, a clock and a tool runner
+- each Go file opens on a header pointing at this ticket, the approach it implements
+- the verb list and the deleted modules stand once, in verb_config_group_test.go
 
 ## tests-green
 
@@ -382,3 +396,7 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The merge of main takes the program tests as main writes them, less the six verbs this group ports. Main's registry design reads programs against the Go table alone, so the branch's older `registered()` scan leaves.
+- The group's registration case moves out of the shared `src/quack/registry_test.go` into `src/quack/verb_config_group_test.go`, as `verb_read_test.go` holds the read group's. Parallel groups then meet in no shared line. It also reads the road under new and the importers of `cli-fix.js` and `shout.js`.
+- One shared line changes: the unregistered-verb case names `registry unclaimed`, because `config` now registers.
