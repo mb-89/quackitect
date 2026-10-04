@@ -16,6 +16,9 @@ import (
 // The words the probe answers, and the line an unknown word prints. [[spec/tickets/box-verbs-port-to-go]]
 const probeUsage = "Usage: ./RUNME.sh probe compact|cold|dry|reply"
 
+// The width of the float a JSON number reads as. [[spec/tickets/box-verbs-port-to-go]]
+const jsonFloatBits = 64
+
 // The span each outside run gets, the bound the compaction probe takes. [[spec/design_output/level0#what-the-probe-does]]
 const probeWait = 900 * time.Second
 
@@ -213,7 +216,7 @@ func jsText(value any) string {
 	case json.Number:
 		return one.String()
 	case float64:
-		return strconv.FormatFloat(one, 'f', -1, 64)
+		return strconv.FormatFloat(one, 'f', -1, jsonFloatBits)
 	case bool:
 		if one {
 			return "true"

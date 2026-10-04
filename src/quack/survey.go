@@ -55,7 +55,7 @@ func versionOf(said string) string {
 	return versionPattern.FindString(first)
 }
 
-// Every place a call may stand: the tree's own binaries first, then each PATH folder, under each ending PATHEXT names. [[spec/design_output/tools#reading-the-path-variable]]
+// The places a call stands in: the tree's own binaries first, then each PATH folder, under each ending PATHEXT names. [[spec/design_output/tools#reading-the-path-variable]]
 func placesFor(call string, env func(string) string, bin string) []string {
 	said := env("PATH")
 	if said == "" {
@@ -141,7 +141,7 @@ func surveyText(found map[string]*toolAt) string {
 	return said.String()
 }
 
-// Surveys the box and writes the file whole, so a caller reading it mid-write never runs the wrong binary. [[spec/design_output/tools#what-the-survey-writes]]
+// Surveys the box and writes the file whole, so a caller reading it mid-write reads the old survey or the new one whole. [[spec/design_output/tools#what-the-survey-writes]]
 func writeSurvey(d boxDoors) (map[string]*toolAt, error) {
 	found := survey(d)
 	at := filepath.Join(d.root, filepath.FromSlash(toolsFile))

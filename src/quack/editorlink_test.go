@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -202,6 +203,13 @@ func TestTheListItReplacesStandsBesideIt(t *testing.T) {
 	editorRegister(folder, mineAt(folder))
 	if kept, _ := readText(filepath.Join(folder, editorKept)); kept != was {
 		t.Errorf("the kept list reads %q", kept)
+	}
+}
+
+func TestTheEntryWritesItsInstallTimeInDecimalDigits(t *testing.T) {
+	entry := editorEntry(editorTestID, "0.1.0", "/x/"+editorTestID+"-0.1.0", 1759590000123)
+	if got := editorListText([]*ordered{entry}); !strings.Contains(got, `"installedTimestamp":1759590000123,`) {
+		t.Errorf("the entry reads\n%s", got)
 	}
 }
 

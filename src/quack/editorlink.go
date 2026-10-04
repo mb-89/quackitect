@@ -22,6 +22,9 @@ const (
 	editorKept = "extensions.json.before-quackitect"
 )
 
+// The base the editor writes its install time in. [[spec/design_output/extension#a-file-another-program-owns]]
+const timestampBase = 10
+
 // What the list reads as: the entries it names, and what the read dropped or unwrapped. [[spec/design_output/extension#a-file-another-program-owns]]
 type editorEntries struct {
 	entries            []*ordered
@@ -87,11 +90,11 @@ func editorEntry(id, version, dest string, at int64) *ordered {
 		"version", version,
 		"location", orderedFrom("$mid", json.Number("1"), "path", dest, "scheme", "file"),
 		"relativeLocation", filepath.Base(dest),
-		"metadata", orderedFrom("installedTimestamp", json.Number(strconv.FormatInt(at, 10)), "source", "vsix"),
+		"metadata", orderedFrom("installedTimestamp", json.Number(strconv.FormatInt(at, timestampBase)), "source", "vsix"),
 	)
 }
 
-// What an upsert answers: the entries to write, the ids the write would lose, and whether ours stood already. [[spec/design_output/extension#a-lost-id-stands-refused]]
+// What an upsert answers: the entries to write, the ids the write loses, and whether ours stood already. [[spec/design_output/extension#a-lost-id-stands-refused]]
 type editorUpserted struct {
 	entries  []*ordered
 	lost     []string
