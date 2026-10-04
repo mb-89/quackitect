@@ -50,7 +50,7 @@ const (
 )
 
 // The width a row's kind pads to. [[spec/design_output/level0#what-the-probe-does]]
-const kindWidth = 8
+const probeKindWidth = 8
 
 func init() { registerBox("probe", probeVerb) }
 
@@ -156,7 +156,7 @@ func compaction(d boxDoors, client string) int {
 		if one.holds("reason") {
 			why = one.text("reason")
 		}
-		fmt.Fprintf(d.out, "  %-*s %s %s\n", kindWidth, kind, why, one.text("said"))
+		fmt.Fprintf(d.out, "  %-*s %s %s\n", probeKindWidth, kind, why, one.text("said"))
 	}
 	fmt.Fprintf(d.out, "\n%s: %s\n", read.answer, read.why)
 	fmt.Fprintf(d.out, "The layer reaches the session %d time(s).\n", read.reads)
@@ -180,7 +180,7 @@ func (r probeRow) text(key string) string {
 	if !r.holds(key) {
 		return ""
 	}
-	return jsText(r[key])
+	return probeValueText(r[key])
 }
 
 // The rows of the log at the path, a torn line dropping alone, and no row where the log stands nowhere. [[spec/design_output/log#every-writer-appends]]
@@ -207,7 +207,7 @@ func rowsOfText(text string) []probeRow {
 }
 
 // A JSON value as String writes it in JavaScript. [[spec/tickets/box-verbs-port-to-go]]
-func jsText(value any) string {
+func probeValueText(value any) string {
 	switch one := value.(type) {
 	case nil:
 		return "null"
@@ -226,7 +226,7 @@ func jsText(value any) string {
 		parts := make([]string, len(one))
 		for i, each := range one {
 			if each != nil {
-				parts[i] = jsText(each)
+				parts[i] = probeValueText(each)
 			}
 		}
 		return strings.Join(parts, ",")
