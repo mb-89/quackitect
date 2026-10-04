@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "   49.4  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 3ea9c9b9f32f9c903df581d23aa0cee56b882331
+    hash_after: 3ea9c9b9f32f9c903df581d23aa0cee56b882331
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "   73.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: bee400f3585a4666
+        size: 549
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/dead-entries.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Go setup links the editor and finds the browser in process, and the Go doctor prints the browser row. So the JavaScript that did this lost every caller. editor.js now holds homeIn alone, which five scripts still import. browser.js keeps browserFrom for the drawing test, and loses its program entry and browserSays. Their tests drop the cases of removed code, and the doors rule holds over editor, brand and browser again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus one .vale.ini line
+- the browser test runs over the fake disk
+- each header links its design section
+- homeIn stays the one owner of the home folder order in JavaScript
 
 # accept
 
