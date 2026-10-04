@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 8254dc7256bcacbcfd4c12dabbbcaad3a7cef2f5
+    hash_after: 8254dc7256bcacbcfd4c12dabbbcaad3a7cef2f5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "    3.6  test/contract/runme-road.test.js ./RUNME.sh hands config to its program, which names the verbs slice at its bui"
+    inputs:
+      - name: design/tests-red
+        hash: d45bcffc41ac6b22
+        size: 617
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -331,26 +354,33 @@ Checked and holding: tuiFilesFor has one caller, tuiPlainRows. logFiles(root, ""
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/log-read-leaves.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+src/scripts/log-read.js and its level0 test leave the tree, since no program imported the module once tui.js left. tui --plain --all reads its files through logFiles in src/quack/verb_log.go, so the tree holds one read of the log files. spec/design_output/log.md names the Go owners of each flag and of the read, and drops the line saying the log verb runs in node. test/contract/log-read-leaves.test.js holds both.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch the one contract file the draft names, and no other
+- the contract test reads the real disk door, which test/contract drives
+- the test header names the ticket it decides
+- each Go owner stands once in log.md, and the test points at the note
 
 # accept
 
