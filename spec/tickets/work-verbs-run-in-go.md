@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 51947abab2e8 · claude-code-remote
@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: a4eeda78134879dd181e3c1eeab25982fa303adf
     hash_after: a4eeda78134879dd181e3c1eeab25982fa303adf
+  - step: accept
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 1def4210d927f909e8d5838f53c1e9246a87ec45
+    hash_after: 1def4210d927f909e8d5838f53c1e9246a87ec45
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/work-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 321dd01cc387f0c5
+        size: 294
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -168,8 +187,11 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The one child adds up to the goal. The branch and cloud verbs register in Go from src/quack/branch.go and src/quack/cloud.go, and TestTheBranchAndCloudVerbsRunInGo shows neither reaches node. The verbs folder names neither shim. No importer of them stands, and every module they imported keeps an importer. The check runs green on the branch head. Weighed: work.js and the work modules stay, because modules of other groups import them, which the goal allows.
 
 # retro
 
