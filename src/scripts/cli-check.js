@@ -14,8 +14,6 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
-import { vale } from "../doors/vale.js";
-import { whereIs } from "../engine/tools.js";
 import { probeApart } from "./probe-dry.js";
 
 export { deltaOf } from "./probe-dry.js";
@@ -26,7 +24,6 @@ import {
   go,
   HEALTH_WAIT,
   it,
-  known,
   outside,
   PLUGIN,
   root,
@@ -68,24 +65,6 @@ export function tuiDoors() {
 // The split verb writes files and a journal entry, and the clock names that entry. [[spec/design_output/level0#the-size-ceiling]]
 export function splitDoors() {
   return { root, join, disk: files, clock: it.clock };
-}
-
-// The commit verb reads the message through Vale, runs the cold probe on a cold-path commit, lands it, and runs the check. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#the-cold-probe]]
-export function commitDoors() {
-  return {
-    root,
-    method: root,
-    join,
-    node: it.node ?? "node",
-    git: it.git,
-    disk: files,
-    proc: outside,
-    log: it.log,
-    vale: vale(files, outside, root),
-    env: process.env,
-    pid: it.pid,
-    claude: whereIs(files, root, "claude", known),
-  };
 }
 
 export function viewerHere() {

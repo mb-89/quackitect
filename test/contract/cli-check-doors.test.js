@@ -1,5 +1,5 @@
-// The doors the commit verb runs over carry the environment, so the verb reads
-// the box it runs on and a desk pushes nothing.
+// The doors the check runs over: the Go part's quiet run, the one cloud read,
+// and the plugin's imports.
 // [[spec/guidance/working]]
 
 import assert from "node:assert/strict";
@@ -10,23 +10,6 @@ import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const source = disk().read(join(root, "src", "scripts", "cli-check.js"));
-
-// [[spec/guidance/working]]
-test("the commit verb's doors carry the environment", () => {
-  const doors = /export function commitDoors\(\)[\s\S]*?\n}\n/.exec(source)?.[0] ?? "";
-  assert.match(doors, /env: process\.env/, "the verb reads the box it runs on");
-});
-
-// A cold-path commit runs the cold probe, which takes the client off the survey and its port off the pid. [[spec/design_output/level0#the-cold-probe]]
-test("the commit verb's doors carry the client and the pid the cold probe takes", () => {
-  const doors = /export function commitDoors\(\)[\s\S]*?\n}\n/.exec(source)?.[0] ?? "";
-  assert.match(doors, /pid: it\.pid/, "the probe's port reads the pid");
-  assert.match(
-    doors,
-    /claude: whereIs\(files, root, "claude", known\)/,
-    "the survey names the client",
-  );
-});
 
 // Under `check --errors` the Go run stays quiet, and each failing Go test reaches the error stream. [[spec/tickets/the-verbs-need-no-wrapper]]
 test("the Go part runs quiet under --errors, and names each failing Go test on the error stream", () => {
