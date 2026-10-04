@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: sync
+step: split
 record:
   - step: sync
     hand: box 2e385b836f39 · claude-code-remote
@@ -95,6 +95,15 @@ record:
   - step: sync
     hand: box 1d64c60aa6ea · claude-code-remote
     hash_before: fb15021a6832623d21aefa258ccdccf88efb7b0f
+  - step: sync
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: c3b1063cbd98bba441b2e5eea7acab29decbe3d7
+    hash_after: e2096b0ab314db4ac7c01ef2eb323928b6f18523
+    answered:
+      - name: sync
+        exit: 0
+        said: work/window-verbs-run-in-go already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -110,8 +119,9 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -218,3 +228,6 @@ true
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The sync met main's box group in `roadOf`. Main sent a registered `tools` to its program under old, and `tools.js` left the tree in that same group, so node answers nothing there. The road keeps this group's rule: a verb Go registers whole takes quack under every mode, ahead of the twin block. `TestARegisteredVerbRunsAheadOfQuacksOwn` keeps its check that the twin runs ahead of quack's own `tools`, and wants quack under old. A twin of a verb's words, such as `retro notes`, keeps its shadow road. [[spec/tickets/registered-verb-skips-the-mode]]
+- The take's merge left a second `goVerbs` in `test/contract/commands.js` and in the imports of `tree.test.js`. Main's copy stays.
