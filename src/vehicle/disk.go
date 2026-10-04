@@ -6,7 +6,7 @@ package vehicle
 import (
 	"fmt"
 	"io/fs"
-	"os"
+	"os" // level0: OutsideInDoors - this file is the vehicle's disk door, and every other file takes it off the hand
 	"path/filepath"
 	"strings"
 )
