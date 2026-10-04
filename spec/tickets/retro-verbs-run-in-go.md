@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 6f8b02d3b81e · claude-code-remote
@@ -171,6 +171,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box f8b693e22e97 · claude-code-remote
+    hash_before: 0ab16d91df021f622ff15ae4f75fc8891f37f970
+    hash_after: 0ab16d91df021f622ff15ae4f75fc8891f37f970
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -246,38 +258,63 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- retro-new-undoes-its-draft: retro new removes its draft where the open refuses, with a case
+- retro-reads-the-work-root and se-minted-guard-refuses: handed back, their code stood from the last box
+- retro-go-lint-clears: the retro Go files name their numbers and split under the line cap
+- two merges of main, each keeping main's registry tests whole
+- the stale hold moved through branch take, and the accept passed
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the registry design kept the merges small: each conflict took main's side whole
+- a helper cleared the lint while the tickets moved, so the wait cost little
+- the saved tree carried the work across the take, because main stood still between them
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 17:20 the owner prompt orders a merge of main before the take
+- 17:22 git merge meets the cage, and branch sync takes its place
+- 17:24 the index dies after the sync, and serve brings it back
+- 17:30 the commit's push meets the stale hold, and the take refuses the unpushed commits
+- 17:31 the push verb refuses the warnings the retro port left
+- 18:00 the accept hand-back moves no hold, since only a take entry holds one
+- 18:06 the index dies twice after the branch switch, and a fresh serve answers
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the order: branch take first, then the merge, in the work skill and the owner prompt the dispatcher writes
+- the deadlock: take refuses unpushed commits on a stale branch, so the take keeps them through a merge (a fix ticket on take.go)
+- the hold: a hand-back on the group could move a stale hold (the prepush rule in prepush.js)
+- the index: a branch switch kills it, which the cage then reads as no cage (an index ticket)
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The engine's take resets onto origin, so any work before it dies. The owner's order ran into that. The way out was a saved branch and a checkout of its tree, which held only because main stood still.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact names its file once, and no note repeats it
+- no number lands in the change without a name
+- the new file headers say what each file is for
+- the badly list carries the owner prompt and each error with its time
+- the chapter names the role alone
 
 ## cloud
 
