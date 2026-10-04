@@ -141,12 +141,13 @@ export function pull(it, argv) {
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
   const asking = Boolean(wanted) && !named && !verdict.said && !held;
-  // A ticket a verb mints for this session passes the queue, and so does a person's hand, the owner's word, or a helper's pull of the ticket the plan works. [[spec/design_output/config#the-engine-controls]]
+  // A ticket a verb mints for this session, by its doors or by SE_MINTED in the env a Go verb hands its child, passes the queue, and so does a person's hand, the owner's word, or a helper's pull of the ticket the plan works. [[spec/design_output/config#the-engine-controls]]
   const helps = Boolean(as) && wanted === working;
   if (
     asking &&
     it.binding === QUEUE &&
     wanted !== it.minted &&
+    wanted !== it.env?.SE_MINTED &&
     !helps &&
     !byPerson(it, took)
   ) {

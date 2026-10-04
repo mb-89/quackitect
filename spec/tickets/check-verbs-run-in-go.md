@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -84,9 +84,115 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
-cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: sync
+step: retro/cloud
+record:
+  - step: sync
+    hand: box 233780cb27f2 · claude-code-remote
+    hash_before: a9b1fbb20222772c16853735f719d2ff5d30165b
+    hash_after: 2ff2341d16a9cd6dc6a04c6402270cbc8d17a8a9
+  - step: sync
+    hand: box bf0e991d1270 · claude-code-remote
+    hash_before: 2ff2341d16a9cd6dc6a04c6402270cbc8d17a8a9
+    hash_after: 56e0aa9bf2ee9c8909c3191e860aad2128c9e042
+  - step: sync
+    hand: box bf0e991d1270 · claude-code-remote
+    hash_before: 46c3fc5850995fcfca9ad8b5b0e8939932f320d0
+    hash_after: ce78a34b74be019d47c4461057aca163424d2586
+    answered:
+      - name: sync
+        exit: 0
+        said: work/check-verbs-run-in-go already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box bf0e991d1270 · claude-code-remote
+    hash_before: f419495e6c1bfc5bab68f892add3d763ca6b9313
+    hash_after: f419495e6c1bfc5bab68f892add3d763ca6b9313
+    inputs:
+      - name: ask
+        hash: 562ed8018c52a819
+        size: 292
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: d2c75cee60316be5a2d52030ade77102701518b5
+    hash_after: d2c75cee60316be5a2d52030ade77102701518b5
+  - step: accept
+    hand: box bf0e991d1270 · claude-code-remote
+    hash_before: 2b33808e945d5696576988c05742ee7944885ac4
+    hash_after: 2b33808e945d5696576988c05742ee7944885ac4
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/check-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 562ed8018c52a819
+        size: 292
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: 56e0aa9bf2ee9c8909c3191e860aad2128c9e042
+    hash_after: ec9527116b687a5c5e06cdd5002d014932fea1f6
+  - step: accept
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: 13983f5ae1958ddc05a0e3837ac5f3b2fbfb2074
+    hash_after: 13983f5ae1958ddc05a0e3837ac5f3b2fbfb2074
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/check-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 562ed8018c52a819
+        size: 292
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: dcabd85d1cf4ec005cea80711ad8382c13a9a27e
+    hash_after: dcabd85d1cf4ec005cea80711ad8382c13a9a27e
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: c732420f45ac8220af4c619214a10ca8af5e10d6
+    hash_after: c732420f45ac8220af4c619214a10ca8af5e10d6
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: 4e3cb244980ae960d95bb5b92636a777a57b080e
+    hash_after: 4e3cb244980ae960d95bb5b92636a777a57b080e
+    inputs:
+      - name: retro/write
+        hash: 8198df30b2715332
+        size: 2922
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -102,8 +208,9 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -112,14 +219,21 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/check-verbs-port-to-go]], standard
+- [[spec/tickets/check-go-cases-cover-budget]], trivial
+- [[spec/tickets/check-node-reading-owner-confirms]], trivial
+- [[spec/tickets/check-port-callers-complete]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: the port is one standard ticket, and each gate finding is a trivial one
+- the children add up to the goal: the port carries every done_when line, and the three gate findings close its gaps
+- a child that waits on another names it: each gate finding names the port as its parent
 
 # children
 
@@ -130,8 +244,13 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- check and test register in Go from check.go and testverb.go, and the contract tests pass under the check on 55c2b9e4
+- verbs/check.js, verbs/test.js, check-verb.js and red-list.js leave the tree, and an import graph over src finds no module the port orphaned; check-twins.js stays, owned by check-twins-leave-phase-seven
+- check-reads-the-road-root and check-errors-names-the-part close the points of the last verdict
+- two merges of main took the work and box ports in; check.go reads the probe port s portBase, healthWait and fileURL in place of its own copies
 
 # retro
 
@@ -142,8 +261,9 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -152,38 +272,60 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- check-reads-the-road-root: the Go check roots at the tree its verb road names, so a review checks the branch
+- check-errors-names-the-part closed on the box before, and the accept verdict passed on both points
+- two merges of main: the work and read ports first, then the box port
+- the Go check reads the probe port's port base, health wait and file URL helper, in place of its own copies
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the merge base diff told each side's cut apart, so every conflict took both cuts and lost no behavior
+- the import graph over src showed no module the port orphaned, so a command checked the done line
+- the road root fix stayed inside the check doors file, so no shared line of the registry moved
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 17:24 UTC: the index died on the first sync, and the cage refused every shell call until a serve brought it back
+- 17:33 UTC: the take refused while the branch held the merge unpushed, and the push refused while the stale hold stood, so the two guards locked each other
+- 17:36 UTC: the ticket pull MCP tool came back with no hook answering it, and the shell verb carried the hand-back
+- 17:38 UTC: the index died again during the take's merge, since the open conflict left the JavaScript unparsable
+- 17:39 UTC: main had moved past the first merge, so the take merged main a second time with eight files in conflict
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the take guard in src/branches/stands.go: let a take of the branch the box stands on keep commits on top of origin's tip, so a merge before the take meets no lock
+- the session prompt for a stale branch: run the take first, then sync, since the take merges main itself
+- the index under an open merge: serve starts from the Go binary alone, so a conflict in JavaScript leaves the cage standing
+- the level0 plugin: answer index_ticket_pull through a tool.call hook, as the error names
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The owner's order put the merge before the take. The take merges main itself, so that order only spends a merge. The merge forced a local commit, and the take refuses a branch with one. Parking the commits on a local side branch, resetting to origin's tip, then running the take cost nothing, since the side branch held every commit. The second merge was the real work: the box port and the check port both cut the check's helper module, and both declared the same Go helpers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in one place: roadRoot alone reads the road, and the Go check points at the probe port's constants in place of copies
+- every number carries a name: the change adds no number, and the copies of the port base and the health wait left the check
+- every header says what its file is for: the new test file opens on the root the doors stand over
+- the chapter carries the errors with their times: the badly list names each, and no owner prompt turned the run
+- the chapter says the role: it names the box and the owner by role, and no path of the box
 
 ## cloud
 
@@ -192,20 +334,29 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 17:24 UTC: biome stands off the PATH, and the survey under the runtime folder names where it stands
+- 17:36 UTC: the ticket pull MCP tool had no hook answering it, so the shell verb carried every hand-back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at sync: four contract tests against the work port, then eight files against the box port
+- the take and the push guards locked each other while the merge stood unpushed
+- the cage refused shell calls twice while the index stood dead, and a serve brought it back each time
+- a hook read a file name inside a heredoc as a write, and the Write tool carried the scratch file
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the retro names the take guard fix and the plugin hook under improve, for the retro hand to decide
 
 # Discussion
 

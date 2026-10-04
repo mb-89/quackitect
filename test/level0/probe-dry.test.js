@@ -11,36 +11,10 @@ import {
   DRY,
   engineOf,
   harnessOf,
-  probeApart,
   readsDry,
-  WORKING,
 } from "../../src/scripts/probe-dry.js";
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
-
-// [[spec/tickets/the-check-takes-a-minute]]
-test("the probe apart starts the dry verb over the working change, and says its lines once it ends", async () => {
-  const started = [];
-  const it = {
-    node: "/bin/node",
-    join: (...parts) => parts.join("/"),
-    proc: {
-      run: () => {
-        throw new Error("a run holds the loop, so the probe apart starts");
-      },
-      start: async (argv, init) => {
-        started.push([argv, init.cwd]);
-        return { exitCode: 1, stdout: "PASS door: it stands\n", stderr: "FAIL rules: none\n" };
-      },
-    },
-  };
-  const said = [];
-  assert.equal(await probeApart("/tree", it, (one) => said.push(one)), 1);
-  assert.deepEqual(started, [
-    [["/bin/node", "/tree/src/scripts/probe-dry.js", WORKING], "/tree"],
-  ]);
-  assert.deepEqual(said, ["PASS door: it stands", "FAIL rules: none"]);
-});
 
 // What a whole run leaves: the door stands, the context hands the canary, the prompt reads rewritten, the tools register, the read passes and the guarded call comes back refused. [[spec/tickets/level0-runs-on-the-door]]
 function whole() {

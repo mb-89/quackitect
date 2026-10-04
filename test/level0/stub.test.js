@@ -37,7 +37,7 @@ function vehicle() {
     "/tools/.claude/settings.json": SETTINGS,
     "/tools/.se/.runtime/identity.json":
       '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
-    "/tools/src/scripts/verbs/check.js": "the verbs",
+    "/tools/src/scripts/verbs/doors.js": "the verbs",
     "/tools/src/stub/RUNME.sh": "the shim",
     [`/tools/src/stub/${PLUGIN}/.claude-plugin/plugin.json`]: '{"name":"level0"}',
     [`/tools/src/stub/${PLUGIN}/hooks/hooks.json`]: '{"modules":["./bridgehead.js"]}',

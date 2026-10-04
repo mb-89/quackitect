@@ -225,3 +225,46 @@ func TestProjectWritesTheWorkRootOffTheMethodSources(t *testing.T) {
 		}
 	}
 }
+
+// Runs the verb under --check over a root, and answers its status and both streams. [[spec/design_output/projection#check-refuses-a-stale-one]]
+func checkProject(root string) (int, string, string) {
+	var out, errs strings.Builder
+	code := projectVerb(func() (string, error) { return root, nil })([]string{"project", projectCheck}, false, &out, &errs)
+	return code, out.String(), errs.String()
+}
+
+func TestProjectCheckReadsEveryTargetAndWritesNone(t *testing.T) {
+	t.Setenv(workRootVar, "")
+	t.Run("a projected tree holds", func(t *testing.T) {
+		root := projectSourcesRoot(t)
+		runProject(t, root, false)
+		if code, out, errs := checkProject(root); code != 0 || !strings.Contains(out, "every target reads as projected") {
+			t.Fatalf("check answers %d, %q, %q", code, out, errs)
+		}
+	})
+	t.Run("a missing, a changed and an extra target each name themselves, and nothing is written", func(t *testing.T) {
+		root := projectSourcesRoot(t)
+		runProject(t, root, false)
+		const extra = ".claude/commands/se-config-gone-away.md"
+		projectWrite(t, root, extra, "stale\n")
+		projectWrite(t, root, styleTarget, "by hand\n")
+		code, _, errs := checkProject(root)
+		if code != exitFailed || !strings.Contains(errs, extra+" extra") || !strings.Contains(errs, styleTarget+" differs") {
+			t.Fatalf("check answers %d, %q", code, errs)
+		}
+		if text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(styleTarget))); string(text) != "by hand\n" {
+			t.Errorf("check writes %s", styleTarget)
+		}
+		if err := os.Remove(filepath.Join(root, filepath.FromSlash(styleTarget))); err != nil {
+			t.Fatal(err)
+		}
+		if _, _, errs := checkProject(root); !strings.Contains(errs, styleTarget+" missing") {
+			t.Fatalf("check names no missing target: %q", errs)
+		}
+	})
+	t.Run("a tree naming no projection holds", func(t *testing.T) {
+		if code, out, _ := checkProject(t.TempDir()); code != 0 || !strings.Contains(out, "names no projection") {
+			t.Fatalf("check answers %d, %q", code, out)
+		}
+	})
+}

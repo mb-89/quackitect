@@ -8,6 +8,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
+import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -51,7 +52,11 @@ test("no source under src, test or level zero names cli.js", () => {
 
 test("no program stands past the list Go holds", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
-  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)].map((one) => one[1]).sort();
+  const inGo = goVerbs();
+  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)]
+    .map((one) => one[1])
+    .filter((verb) => !inGo.has(verb))
+    .sort();
   const folder = join(root, "src", "scripts", "verbs");
   const programs = files.exists(folder)
     ? files

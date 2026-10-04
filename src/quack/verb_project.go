@@ -1,7 +1,8 @@
-// The project verb: writes every projection again, from the source it names.
+// The project verb: writes every projection again, from the source it names,
+// or under --check reads every target against it and writes none.
 // Sources read off the work root laid over the method root, and the targets
 // land in the work root alone. Under dry it reads and writes nothing.
-// [[spec/tickets/config-verbs-port-to-go]]
+// [[spec/tickets/config-verbs-port-to-go]] [[spec/design_output/projection#check-refuses-a-stale-one]]
 package main
 
 import (
@@ -9,6 +10,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"quackitect/src/index"
@@ -21,11 +23,14 @@ const (
 	projectedFolder = 0o755
 )
 
+// The flag that reads every target and writes none. [[spec/design_output/projection#check-refuses-a-stale-one]]
+const projectCheck = "--check"
+
 func init() { register("project", projectVerb(index.Root)) }
 
 // project over the method root the given func answers, and the work root SE_WORK_ROOT names. [[spec/design_output/projection#who-projects-and-when]]
 func projectVerb(root func() (string, error)) twin {
-	return func(_ []string, dry bool, out, errs io.Writer) int {
+	return func(argv []string, dry bool, out, errs io.Writer) int {
 		method, err := root()
 		if err != nil {
 			fmt.Fprintln(errs, err)
@@ -45,6 +50,9 @@ func projectVerb(root func() (string, error)) twin {
 			sources = projector.Inherits(projectDisk{root: method}, targets)
 		}
 		said := projector.ReadAll(entries, sources, targets)
+		if slices.Contains(argv, projectCheck) {
+			return projectHolds(entries, said, out, errs)
+		}
 		if !dry {
 			if err := projectWrites(work, said); err != nil {
 				fmt.Fprintln(errs, err)
@@ -54,6 +62,53 @@ func projectVerb(root func() (string, error)) twin {
 		fmt.Fprintf(out, "%d file(s) projected from %d projection(s).\n", len(said.Wanted), len(entries))
 		return 0
 	}
+}
+
+// Every target reads as its source projects it, or the verb names each stale one and refuses. [[spec/design_output/projection#check-refuses-a-stale-one]]
+func projectHolds(entries []projector.Entry, said projector.Result, out, errs io.Writer) int {
+	if len(entries) == 0 {
+		fmt.Fprintf(out, "%s names no projection, so nothing is projected.\n", projector.Projections)
+		return 0
+	}
+	if len(said.Faults) > 0 {
+		for _, one := range said.Faults {
+			fmt.Fprintln(errs, one)
+		}
+		fmt.Fprintln(errs, "A source stands away from the shape beside it, so no target is written.")
+		return exitFailed
+	}
+	found := staleIn(said.Wanted, said.Standing)
+	if len(found) == 0 {
+		fmt.Fprintf(out, "%d projection(s), and every target reads as projected.\n", len(entries))
+		return 0
+	}
+	for _, one := range found {
+		fmt.Fprintln(errs, one)
+	}
+	fmt.Fprintln(errs, "A projection is read-only, so edit the source it names instead.")
+	fmt.Fprintln(errs, "Run ./RUNME.sh project, which writes every target again.")
+	return exitFailed
+}
+
+// Each target standing away from its projection, as its path and how: missing, differs or extra, by path. [[spec/design_output/projection#check-refuses-a-stale-one]]
+func staleIn(wanted, standing map[string]string) []string {
+	out := []string{}
+	for _, path := range projector.Paths(wanted) {
+		text, held := standing[path]
+		switch {
+		case !held:
+			out = append(out, path+" missing")
+		case text != wanted[path]:
+			out = append(out, path+" differs")
+		}
+	}
+	for _, path := range projector.Paths(standing) {
+		if _, held := wanted[path]; !held {
+			out = append(out, path+" extra")
+		}
+	}
+	slices.Sort(out)
+	return out
 }
 
 // Writes every wanted target that differs, and removes every standing one nothing wants. [[spec/design_output/projection#who-projects-and-when]]
