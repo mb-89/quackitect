@@ -15,18 +15,23 @@ import { files, it, root } from "./cli-doors.js";
 import { warningsStood } from "./cli-read.js";
 
 // The battery in order, each part timed under its name, stopping at the first red and naming the parts it leaves unrun. [[spec/guidance/retro/effect]]
+// A part marked beside starts where it stands, and the run goes on without it, then waits for it before it answers. So the total is the battery's own span, and no sum of its parts. [[spec/tickets/the-check-takes-a-minute]]
 export async function batteryRun(steps, clock) {
   const { parts, timed } = partsTimed(clock);
+  const from = clock.now().getTime();
   let code = 0;
   const unrun = [];
-  for (const [name, part] of steps) {
+  const beside = [];
+  for (const [name, part, how = {}] of steps) {
     if (code) {
       unrun.push(name);
       continue;
     }
-    code = (await timed(name, part)) ?? 0;
+    if (how.beside) beside.push(timed(name, part));
+    else code = (await timed(name, part)) ?? 0;
   }
-  return { code, parts, unrun };
+  for (const one of await Promise.all(beside)) code = code || (one ?? 0);
+  return { code, parts, unrun, total: clock.now().getTime() - from };
 }
 
 // [[spec/design_output/work#the-battery-answers-first]]
