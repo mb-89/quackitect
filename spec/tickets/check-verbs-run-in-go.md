@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 233780cb27f2 · claude-code-remote
@@ -171,6 +171,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: c732420f45ac8220af4c619214a10ca8af5e10d6
+    hash_after: c732420f45ac8220af4c619214a10ca8af5e10d6
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -250,38 +262,60 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- check-reads-the-road-root: the Go check roots at the tree its verb road names, so a review checks the branch
+- check-errors-names-the-part closed on the box before, and the accept verdict passed on both points
+- two merges of main: the work and read ports first, then the box port
+- the Go check reads the probe port's port base, health wait and file URL helper, in place of its own copies
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the merge base diff told each side's cut apart, so every conflict took both cuts and lost no behavior
+- the import graph over src showed no module the port orphaned, so a command checked the done line
+- the road root fix stayed inside the check doors file, so no shared line of the registry moved
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 17:24 UTC: the index died on the first sync, and the cage refused every shell call until a serve brought it back
+- 17:33 UTC: the take refused while the branch held the merge unpushed, and the push refused while the stale hold stood, so the two guards locked each other
+- 17:36 UTC: the ticket pull MCP tool came back with no hook answering it, and the shell verb carried the hand-back
+- 17:38 UTC: the index died again during the take's merge, since the open conflict left the JavaScript unparsable
+- 17:39 UTC: main had moved past the first merge, so the take merged main a second time with eight files in conflict
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the take guard in src/branches/stands.go: let a take of the branch the box stands on keep commits on top of origin's tip, so a merge before the take meets no lock
+- the session prompt for a stale branch: run the take first, then sync, since the take merges main itself
+- the index under an open merge: serve starts from the Go binary alone, so a conflict in JavaScript leaves the cage standing
+- the level0 plugin: answer index_ticket_pull through a tool.call hook, as the error names
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The owner's order put the merge before the take. The take merges main itself, so that order only spends a merge. The merge forced a local commit, and the take refuses a branch with one. Parking the commits on a local side branch, resetting to origin's tip, then running the take cost nothing, since the side branch held every commit. The second merge was the real work: the box port and the check port both cut the check's helper module, and both declared the same Go helpers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in one place: roadRoot alone reads the road, and the Go check points at the probe port's constants in place of copies
+- every number carries a name: the change adds no number, and the copies of the port base and the health wait left the check
+- every header says what its file is for: the new test file opens on the root the doors stand over
+- the chapter carries the errors with their times: the badly list names each, and no owner prompt turned the run
+- the chapter says the role: it names the box and the owner by role, and no path of the box
 
 ## cloud
 
