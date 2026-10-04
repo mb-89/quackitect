@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: d45bcffc41ac6b22
         size: 617
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 7bdaffc9969ab684e4d5b02835026ae3c023ef8a
+    hash_after: deaab9b4200548e393269fde669af6d2d3be58c3
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -301,14 +310,19 @@ Checked and holding: tuiFilesFor has one caller, tuiPlainRows. logFiles(root, ""
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the four files the size names, the new contract test, and the comment of the tui case the read drives
+- the change reaches the disk through logFiles, which TestLogVerb drives over a temp tree, and adds no door
+- the tui call and the test comment name the ticket, and log.md names the Go owners
+- log.md points at verb_log.go and tui_verb.go for the read, and states no owner twice
 
 ## tests-green
 
