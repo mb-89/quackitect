@@ -25,9 +25,9 @@ test("a token nobody asked for comes back said", () => {
   assert.match(said.result.result, /nobody asked for/);
 });
 
-// The helper's spawn takes the node path off the box, so a case names its own. [[spec/design_output/doors#a-door-reads-the-outside]]
-test("the review spawns the verb on the node the box names", async () => {
-  const proc = fakeProc({ "/node/bin/node": { stdout: "" } });
+// The helper's spawn runs the branch verb off the method root's RUNME.sh, which answers in Go. [[spec/tickets/work-verbs-port-to-go]]
+test("the review spawns the branch verb off the method root's RUNME.sh", async () => {
+  const proc = fakeProc({ sh: { stdout: "" } });
   const box = {
     method: "/tools",
     work: "/tools",
@@ -39,7 +39,14 @@ test("the review spawns the verb on the node the box names", async () => {
   await TOOLS[CALLED]({ branch: "work/one" }, box);
 
   assert.equal(proc.ran.length, 1);
-  assert.equal(proc.ran[0].argv[0], "/node/bin/node");
+  assert.deepEqual(proc.ran[0].argv, [
+    "sh",
+    "/tools/RUNME.sh",
+    "branch",
+    "review",
+    "work/one",
+    "--json",
+  ]);
 });
 
 // A restart hands the box over bare, and the reader still takes the helper's text, since a subagent reads no style. [[spec/design_output/level0#a-restart-fills-the-box]]
@@ -53,7 +60,7 @@ test("a review on a box a restart hands over bare reads the guidance into the pr
     work: "/tools",
     env: {},
     node: "/node/bin/node",
-    proc: fakeProc({ "/node/bin/node": { stdout: '{"branch":"work/one"}\n' } }),
+    proc: fakeProc({ sh: { stdout: '{"branch":"work/one"}\n' } }),
     clock: { now: () => new Date(0) },
     log: { say() {} },
   };

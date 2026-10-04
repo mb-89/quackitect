@@ -1,29 +1,22 @@
 // Every verb program loads over the real doors and hands its words to a run,
-// the vehicle bodies stand beside them, and the lens names their folder.
+// the vehicle bodies stand beside them, and the lens names their folder. A
+// verb running in Go carries no program.
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
-import { disk } from "../../src/doors/disk.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
-import { run as branch } from "../../src/scripts/verbs/branch.js";
 import { run as check } from "../../src/scripts/verbs/check.js";
-import { run as cloud } from "../../src/scripts/verbs/cloud.js";
 import { run as commit } from "../../src/scripts/verbs/commit.js";
 import { run as dispatch } from "../../src/scripts/verbs/dispatch.js";
 import { run as doctor } from "../../src/scripts/verbs/doctor.js";
-import { run as find } from "../../src/scripts/verbs/find.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
-import { run as index } from "../../src/scripts/verbs/index.js";
-import { run as links } from "../../src/scripts/verbs/links.js";
-import { run as lint } from "../../src/scripts/verbs/lint.js";
-import { run as log } from "../../src/scripts/verbs/log.js";
 import { run as mint } from "../../src/scripts/verbs/mint.js";
-import { run as notes } from "../../src/scripts/verbs/notes.js";
 import { run as probe } from "../../src/scripts/verbs/probe.js";
 import { run as push } from "../../src/scripts/verbs/push.js";
 import { run as rename } from "../../src/scripts/verbs/rename.js";
@@ -41,20 +34,12 @@ import { run as voice } from "../../src/scripts/verbs/voice.js";
 import { commands } from "./commands.js";
 
 const RUNS = {
-  branch,
   check,
-  cloud,
   commit,
   dispatch,
   doctor,
-  find,
   graph,
-  index,
-  links,
-  lint,
-  log,
   mint,
-  notes,
   probe,
   push,
   rename,
@@ -71,18 +56,19 @@ const RUNS = {
   voice,
 };
 
-// A verb that runs in Go leaves its program, so the folder names what stays in node. [[spec/tickets/quack-registers-each-verb]]
-test("every program of the folder loads as a verb of the table answering a run", () => {
-  const folder = join(dirname(fileURLToPath(import.meta.url)), "..", "..", ...VERBS);
-  const listed = disk()
-    .list(folder)
-    .map((one) => one.name)
-    .filter((one) => one.endsWith(".js"))
-    .map((one) => one.slice(0, -".js".length))
+// The folder the programs stand in. [[spec/tickets/read-verbs-port-to-go]]
+const VERB_FOLDER = join(
+  dirname(dirname(dirname(fileURLToPath(import.meta.url)))),
+  "src",
+  "scripts",
+  "verbs",
+);
+
+test("every verb of the table loads as a program answering a run", () => {
+  const listed = [...commands().keys()]
+    .filter((verb) => disk().exists(join(VERB_FOLDER, `${verb}.js`)))
     .sort();
   assert.deepEqual(Object.keys(RUNS).sort(), listed);
-  const table = commands();
-  for (const verb of listed) assert.ok(table.has(verb), `${verb} stands in the table`);
   for (const [verb, run] of Object.entries(RUNS)) {
     assert.equal(typeof run, "function", `${verb} runs`);
   }
