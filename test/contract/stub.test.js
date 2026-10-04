@@ -22,7 +22,7 @@ const PLUGIN = ".claude/skills/level0";
 const MARKER = `${PLUGIN}/.claude-plugin/plugin.json`;
 const METHOD = [
   "package.json",
-  "src/scripts/verbs/check.js",
+  "src/scripts/verbs/doors.js",
   "spec/guidance/voice.md",
   ".se",
 ];

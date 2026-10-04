@@ -4,6 +4,7 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import { join } from "node:path";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
@@ -17,6 +18,8 @@ import {
 import { REF_FORMAT } from "../../src/scripts/work-read.js";
 
 export const ROOT = "/tree";
+// The check a merge runs over the merged tree, in the quack the install built. [[spec/design_output/work#the-merge-lands-the-truth]]
+export const CHECK = `${join(ROOT, BIN)} verb ${join(ROOT, "src", "scripts")} check --errors`;
 
 export function doorsSaying(answers, files = {}) {
   const said = fakeGit(answers, ROOT);
@@ -220,7 +223,7 @@ export const merging = (extra = {}) => ({
   [`git diff --unified=0 base111..origin/main -- ${GROUP_AT}`]: { stdout: "" },
   "git merge --no-ff --no-edit origin/work/one-group": { exitCode: 0 },
   [`sh ${join(ROOT, "src/scripts/install.sh")}`]: { exitCode: 0 },
-  [`node ${join(ROOT, "src/scripts/verbs/check.js")} --errors`]: {
+  [CHECK]: {
     exitCode: 0,
     stdout: "green\n",
   },

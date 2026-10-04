@@ -29,6 +29,9 @@ const BRANCH = `work/${NAME}`;
 const REF = `origin/${BRANCH}`;
 const FIRST = "1111111111111111111111111111111111111111";
 const AT = join(ROOT, WORKTREE, "work-the-config-holds-numbers");
+const QUACK = join(AT, BIN, "se-index");
+const ROAD = ["verb", join(AT, "src", "scripts"), "check"];
+const CHECK = [QUACK, ...ROAD].join(" ");
 
 const TICKET_AT = `spec/tickets/${NAME}.md`;
 const ASK =
@@ -64,7 +67,8 @@ const standing = (more = {}) => ({
   [`git worktree add --detach ${AT} ${REF}`]: { exitCode: 0 },
   [`git worktree remove --force ${AT}`]: { exitCode: 0 },
   [`go build -o ${join(AT, BIN, "se-front")} ./src/front/cmd`]: { exitCode: 0 },
-  "/node src/scripts/verbs/check.js": { exitCode: 0, stdout: "1..3\n# pass 3\n" },
+  [`go build -o ${QUACK} ./src/quack`]: { exitCode: 0 },
+  [CHECK]: { exitCode: 0, stdout: "1..3\n# pass 3\n" },
   ...more,
 });
 
@@ -131,7 +135,7 @@ test("the verb answers the check and the retro, and no model runs", () => {
 test("the check runs on the surveyed tools, so the worktree downloads none", () => {
   const { it, disk } = doorsSaying(standing());
   const runs = [];
-  it.proc.teach(["/node", "src/scripts/verbs/check.js"], (argv, init) => {
+  it.proc.teach([QUACK, ...ROAD], (argv, init) => {
     runs.push({ argv, cwd: init.cwd, survey: disk.exists(join(AT, TOOLS)) });
     return { exitCode: 0 };
   });
@@ -146,7 +150,7 @@ test("the check runs on the surveyed tools, so the worktree downloads none", () 
 test("the worktree carries the caller's brand before the check runs", () => {
   const { it, disk } = doorsSaying(standing());
   const stamped = [];
-  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
+  it.proc.teach([QUACK, ...ROAD], () => {
     stamped.push(disk.exists(join(AT, PLUGIN)));
     return { exitCode: 0 };
   });
@@ -163,7 +167,7 @@ test("the worktree borrows the caller's modules, and gives them back before git 
     Object.fromEntries(kept.map((rel) => [join(ROOT, rel, "held"), ""])),
   );
   const seen = [];
-  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
+  it.proc.teach([QUACK, ...ROAD], () => {
     for (const rel of kept) {
       seen.push(disk.realOf(join(AT, rel)) === disk.realOf(join(ROOT, rel)));
     }
@@ -192,7 +196,7 @@ test("the worktree borrows the webview's modules, and gives them back before git
   const rel = "src/extension/webview/node_modules";
   const { it, disk } = doorsSaying(standing(), { [join(ROOT, rel, "held")]: "" });
   let seen = false;
-  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
+  it.proc.teach([QUACK, ...ROAD], () => {
     seen = disk.realOf(join(AT, rel)) === disk.realOf(join(ROOT, rel));
     return { exitCode: 0 };
   });
@@ -211,7 +215,7 @@ test("the worktree borrows the webview's modules, and gives them back before git
 test("the worktree borrows nothing out of the caller's bin but the compiler", () => {
   const { it, disk } = doorsSaying(standing(), { [join(ROOT, BIN, "logview")]: "" });
   let linked = true;
-  it.proc.teach(["/node", "src/scripts/verbs/check.js"], () => {
+  it.proc.teach([QUACK, ...ROAD], () => {
     linked = disk.isLink(join(AT, BIN)) || disk.isLink(join(AT, BIN, "logview"));
     return { exitCode: 0 };
   });
@@ -232,30 +236,45 @@ test("the worktree builds the branch's own se-front into its bin, in the worktre
     cwd: one.init?.cwd,
   }));
   const build = ran.findIndex((one) => one.line.startsWith("go build"));
-  const check = ran.findIndex((one) => one.line === "/node src/scripts/verbs/check.js");
+  const quack = ran.findIndex((one) => one.line === `go build -o ${QUACK} ./src/quack`);
+  const check = ran.findIndex((one) => one.line === CHECK);
   assert.equal(
     ran[build]?.line,
     `go build -o ${join(AT, BIN, "se-front")} ./src/front/cmd`,
     "the build writes se-front into the worktree's bin",
   );
   assert.equal(ran[build].cwd, AT, "the build reads the branch's source");
-  assert.ok(build < check, "the build runs before the check");
+  assert.equal(ran[quack]?.cwd, AT, "the branch's own quack builds in the worktree");
+  assert.equal(ran[check]?.cwd, AT, "the check runs in the worktree");
+  assert.ok(build < check && quack < check, "the builds run before the check");
 });
 
 // [[spec/tickets/review-builds-its-front]]
-test("a windows box builds se-front.exe, the name the front door tries there", () => {
+test("a windows box builds se-front.exe and se-index.exe, the names its doors try there", () => {
   const exe = `go build -o ${join(AT, BIN, "se-front.exe")} ./src/front/cmd`;
-  const { it, outside } = doorsSaying(standing({ [exe]: { exitCode: 0 } }));
+  const quack = `go build -o ${QUACK}.exe ./src/quack`;
+  const { it, outside } = doorsSaying(
+    standing({
+      [exe]: { exitCode: 0 },
+      [quack]: { exitCode: 0 },
+      [[`${QUACK}.exe`, ...ROAD].join(" ")]: { exitCode: 0 },
+    }),
+  );
 
   heard(() => work(ROOT, ["review", NAME, "--json"], { ...it, windows: true }));
 
-  assert.ok(ranGit(outside).includes(exe), "the build names the windows binary");
+  assert.ok(ranGit(outside).includes(exe), "the build names the windows front");
+  assert.ok(ranGit(outside).includes(quack), "the build names the windows quack");
+  assert.ok(
+    ranGit(outside).includes([`${QUACK}.exe`, ...ROAD].join(" ")),
+    "the check runs the windows quack",
+  );
 });
 
 test("a red check comes back with the rows the runner refused", () => {
   const { it } = doorsSaying(
     standing({
-      "/node src/scripts/verbs/check.js": {
+      [CHECK]: {
         exitCode: 1,
         stdout: "ok 1 - a\nnot ok 2 - the door holds\nnot ok 3 - the rule fires\n",
       },
@@ -488,7 +507,7 @@ test("a worktree that opens nowhere answers so, and runs no check", () => {
   assert.equal(material.check.code, null);
   assert.match(material.check.says, /no worktree opens on origin\/work/);
   assert.equal(
-    it.proc.ran.some((one) => one.argv.includes("src/scripts/verbs/check.js")),
+    it.proc.ran.some((one) => one.argv.join(" ") === CHECK),
     false,
     "no check runs where no worktree stands",
   );

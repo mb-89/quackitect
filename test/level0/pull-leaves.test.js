@@ -432,6 +432,28 @@ test("under queue a named pull refuses, and the name this session minted passes"
   );
 });
 
+// A Go verb mints in a child of its own, so the pull reads the minted name off SE_MINTED in its env. [[spec/tickets/retro-verbs-port-to-go]]
+test("under queue the name SE_MINTED names passes, and another name stays behind the queue", () => {
+  const env = { SE_MINTED: "a-child" };
+  const minted = doors(standing(), {}, { binding: "queue", env });
+  const took = heard(() => pulling(ROOT, ["pull", "a-child"], minted.it));
+  assert.doesNotMatch(took.said, /behind the queue/);
+  assert.match(
+    took.said,
+    /a-child at design\/draft/,
+    "the minted name hands that ticket out",
+  );
+
+  const other = doors(
+    standing(),
+    {},
+    { binding: "queue", env: { SE_MINTED: "another-one" } },
+  );
+  const shut = heard(() => pulling(ROOT, ["pull", "a-child"], other.it));
+  assert.equal(shut.code, 2);
+  assert.match(shut.said, /a-child stands behind the queue/);
+});
+
 // A person takes any ticket at any time, and the owner's word sends a hand the same way. [[spec/design_output/config#the-engine-controls]]
 test("under queue a person's named pull passes, and so does one under --owner-says", () => {
   const person = doors(standing(), {}, { binding: "queue", agent: false });

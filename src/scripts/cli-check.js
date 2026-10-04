@@ -1,12 +1,11 @@
-// What the check runs past the tests: the server, the grid, the viewer, the
-// projections, the plugin, the doors, the rules and the sidebar.
+// What the verbs past the check read: the grid, the viewer, the projections,
+// the doors and the rules. The check itself runs in Go.
 // [[spec/design_output/level0#the-check-reads-the-server]]
 
 import { dirname, join, resolve, sep } from "node:path";
 import { CONFIG_DIR } from "../../.claude/skills/level0/lib/code.js";
 import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
 import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
-import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   entriesIn,
@@ -14,17 +13,10 @@ import {
   readAll,
   staleIn,
 } from "../../.claude/skills/level0/lib/projection.js";
-import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
-import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
-import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { guidanceHere } from "../bridge/guidance.js";
-import { vale } from "../doors/vale.js";
-import { whereIs, writeSurvey } from "../engine/tools.js";
-import { browserSays } from "./browser.js";
-import { probeApart } from "./probe-dry.js";
 
 export { deltaOf } from "./probe-dry.js";
 import {
@@ -36,12 +28,9 @@ import {
   files,
   GUIDANCE,
   go,
-  HEALTH_WAIT,
   it,
-  known,
   OURS,
   outside,
-  PLUGIN,
   ROUNDS,
   root,
   run,
@@ -51,13 +40,8 @@ import {
   settings,
 } from "./cli-doors.js";
 import { FIX_USAGE, fixFlags } from "./cli-fix.js";
-import { goEnvOf, goGate, goTestNames } from "./cli-go.js";
-import { hookRows, hooksNamed } from "./cli-hooks.js";
 import { namesIn, show, walk } from "./cli-read.js";
-import { answerOf, configRowsOf, quackAt, readsNew, topicOf } from "./quack-topic.js";
-import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
-import { lspProbe } from "./lsp-probe.js";
-import { HOOKS } from "./precommit.js";
+import { answerOf, configRowsOf, readsNew, topicOf } from "./quack-topic.js";
 import { viewerOf } from "./tui-build.js";
 
 export function treeHere() {
@@ -95,24 +79,6 @@ export function splitDoors() {
   return { root, join, disk: files, clock: it.clock };
 }
 
-// The commit verb reads the message through Vale, runs the cold probe on a cold-path commit, lands it, and runs the check. [[spec/design_output/work#the-battery-answers-first]] [[spec/design_output/level0#the-cold-probe]]
-export function commitDoors() {
-  return {
-    root,
-    method: root,
-    join,
-    node: it.node ?? "node",
-    git: it.git,
-    disk: files,
-    proc: outside,
-    log: it.log,
-    vale: vale(files, outside, root),
-    env: process.env,
-    pid: it.pid,
-    claude: whereIs(files, root, "claude", known),
-  };
-}
-
 export function viewerHere() {
   return viewerOf({
     disk: files,
@@ -121,35 +87,6 @@ export function viewerHere() {
     go,
     windows: process.platform === "win32",
   });
-}
-
-// Every Go module's tests run in the battery, the import rules among them. The one module stands at the root. [[spec/tickets/go-code-shares-one-module]]
-// Under `check --errors` the run stays quiet, and each failing Go test reaches the error stream alone. [[spec/tickets/the-verbs-need-no-wrapper]]
-export function goHolds(quiet = false, red = []) {
-  const skip = skipOf(red, (path) => files.read(join(root, path)));
-  // The gate names each run as quiet or not, and a quiet one keeps its output for the reader. [[spec/tickets/go-checks-need-go]]
-  const run = (argv, asked) => {
-    const ran = outside.run(argv, {
-      cwd: root,
-      env: goEnvOf(),
-      inherit: !quiet && !asked.quiet,
-    });
-    if (quiet && ran.exitCode) {
-      for (const row of String(ran.stdout ?? "").split("\n")) {
-        if (/^\s*--- FAIL/.test(row)) console.error(row.trim());
-      }
-    }
-    return ran;
-  };
-  return goGate({ go, run, say: (line) => console.log(line), quiet, skip });
-}
-
-// A red Go test file stands apart until its tests-green closes, as a red JavaScript one does, so the Go run skips the tests it names. [[spec/design_output/pull#the-gate]]
-export function skipOf(red, read) {
-  // A ticket names its red files in one comma-separated line. [[spec/design_output/pull#the-gate]]
-  const paths = red.flatMap((one) => String(one).split(",")).map((one) => one.trim());
-  const names = goTestNames(paths, read);
-  return names.length ? ["-skip", `^(${names.join("|")})$`] : [];
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
@@ -315,91 +252,6 @@ export function project() {
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 // [[spec/design_output/schema#the-fields-a-caller-names]]
 
-export function pluginHolds() {
-  // One plugin stands, because the wrapper's trial ends kept. [[spec/design_output/work#an-experiment-decides]]
-  for (const plugin of [PLUGIN]) {
-    const ran = validatePlugin(outside.run, plugin, root);
-    if (ran.exitCode === 0) continue;
-    if (!ran.stdout && !ran.stderr) {
-      console.log("claude stands nowhere, so the plugin goes unvalidated here.");
-      return 0;
-    }
-    console.error(`${ran.stdout}${ran.stderr}`.trim());
-    console.error("The engine reads this module's source, and it refuses the above.");
-    return 1;
-  }
-  return 0;
-}
-
-// LEVEL ZERO RUNS, OR THE CHECK IS RED. A fresh clone of this tree, the working change on it, takes the install a cloud box takes, and the hook module the client loads runs a scripted session against the door the start road stands up, with no model and no key. The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
-export async function level0Runs(
-  dry = probeApart,
-  platform = process.platform,
-  say = console.log,
-  shout = console.error,
-) {
-  if (platform === "win32") {
-    say("The start road stands a cloud box alone, so this Windows box runs no dry session.");
-    return 0;
-  }
-  const lines = [];
-  const code = await dry(root, it, (one) => lines.push(one));
-  for (const one of lines) (code ? shout : say)(one);
-  if (code) shout("Level zero does not run whole on a fresh box, so this tree is red.");
-  return code;
-}
-
-// What the probe found, and whether the check carries on past it. A box running no server reads every rule, and a server standing and failing its health call is red. [[spec/design_output/level0#the-check-reads-the-server]]
-export function serverRead(said) {
-  if (said?.ok) return { code: 0, line: `The server stands at ${said.where}.` };
-  if (said?.answers) {
-    return {
-      code: 1,
-      red: true,
-      line: `The server at ${said.where} fails its health call: ${said.why}`,
-    };
-  }
-  return {
-    code: 0,
-    line: `No server answers at ${said?.where}, so the rules run without one. Start it with ./RUNME.sh serve, or the hook button in the sidebar.`,
-  };
-}
-
-// [[spec/design_output/level0#the-check-reads-the-server]]
-export async function serverHolds(get = fetch) {
-  const read = serverRead(await serverSays(get));
-  if (read.red) console.error(read.line);
-  else console.log(read.line);
-  return read.code;
-}
-
-// The answer of the probe: whether a server answers at all, and what it says of itself where it does. [[spec/design_output/level0#the-check-reads-the-server]]
-export async function serverSays(get = fetch) {
-  const where = `http://127.0.0.1:${portHere()}/health`;
-  try {
-    const answer = await get(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
-    const body = await answer.json();
-    return {
-      answers: true,
-      ok: Boolean(body?.ok),
-      where,
-      why: String(body?.dead ?? ""),
-    };
-  } catch (bad) {
-    return { answers: false, ok: false, where, why: bad?.message ?? String(bad) };
-  }
-}
-
-export function portHere() {
-  try {
-    return Number(JSON.parse(files.read(join(root, POINTER)))?.port) || PORT_BASE;
-  } catch {
-    return PORT_BASE;
-  }
-}
-
-// The stamp the check leaves stands in cli-stamp.js. [[spec/design_output/work#the-battery-answers-first]]
-
 // [[spec/guidance/code/testing]]
 
 export function doorsHold() {
@@ -455,107 +307,4 @@ export async function standing(argv = []) {
   console.log("");
   console.log(said.sentence);
   return 0;
-}
-
-// [[spec/design_output/tools#where-a-caller-looks]]
-export function tools() {
-  const found = writeSurvey(it, root, process.env);
-  for (const one of WANTED)
-    console.log(`${one.name.padEnd(COL.tool)} ${standsAt(found[one.name])}`);
-  console.log(`\n${TOOLS} says this, and every caller reads it.`);
-  return 0;
-}
-
-export function standsAt(one) {
-  if (!one) return "missing, run ./RUNME.sh";
-  return [one.version, one.path].filter(Boolean).join("  ");
-}
-
-// [[spec/design_output/extension#a-link-pointing-nowhere]]
-export function sidebarSays() {
-  const home = homeIn(process.env);
-  const folder = join(home, ".vscode", "extensions");
-  if (!home || !files.exists(folder)) return "no editor folder on this box, so no link";
-
-  const said = JSON.parse(files.read(manifestPath(root)));
-  const id = `${said.publisher}.${said.name}`;
-  const dest = join(folder, `${id}-${said.version}`);
-  if (linkedAt(files, dest, dirname(manifestPath(root)))) {
-    return registered(files, folder, id)
-      ? `linked, and the list names ${id}`
-      : `linked, and the list misses ${id}: run ./RUNME.sh`;
-  }
-  if (files.isLink(dest) && !files.exists(dest))
-    return "a link pointing nowhere: run ./RUNME.sh";
-  if (files.isLink(dest)) return "a link into another tree: run ./RUNME.sh";
-  if (files.exists(dest)) return "a copy in place of the link: run ./RUNME.sh";
-  return "unlinked: run ./RUNME.sh";
-}
-
-// The index binary where the install built it, and nothing where it stands unbuilt. [[spec/tickets/the-lsp-server-leaves]]
-function indexBuilt() {
-  const at = quackAt(files, join, root);
-  return files.exists(at) ? at : "";
-}
-
-export async function doctor() {
-  const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
-  const rows = [
-    ...WANTED.map((one) => [one.name, standsAt(found[one.name])]),
-    ["biome lsp-proxy", files.exists(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
-    // The editor starts quack lsp off the index binary, so the probe starts the same. [[spec/tickets/the-lsp-server-leaves]]
-    ["quack lsp", lspProbe(outside, indexBuilt(), root)],
-    [
-      "editor",
-      files.exists(join(root, EDITOR_SETTINGS))
-        ? `${EDITOR_SETTINGS}, both servers`
-        : "missing",
-    ],
-    ["sidebar", sidebarSays()],
-    ["browser", browserSays()],
-    ["commit hook", hooksSay()],
-    [
-      "vale rules",
-      files.exists(STYLES)
-        ? `${namesIn(STYLES, ".yml").length} in VoiceVale, ${
-            files.exists(SHAPE) ? namesIn(SHAPE, ".yml").length : 0
-          } in VoiceShape, ${
-            files.exists(SCRIPTED) ? namesIn(SCRIPTED, ".yml").length : 0
-          } in VoiceScript`
-        : "missing",
-    ],
-    [
-      "survey",
-      files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
-    ],
-    ["server", await serverLine()],
-    ...(await hookRows(hooksNamed(files, root, homeIn(process.env)))),
-  ];
-  for (const [what, said] of rows) {
-    console.log(`${what.padEnd(COL.tool)} ${String(said).trim() || "missing"}`);
-  }
-  return 0;
-}
-
-// [[spec/design_output/private#both-doors-one-check]]
-export function hooksSay() {
-  const at = join(HOOKS, "pre-commit");
-  const push = join(HOOKS, "pre-push");
-  if (!files.exists(join(root, at))) return `${at} stands nowhere`;
-  if (!files.exists(join(root, push))) return `${push} stands nowhere`;
-
-  const said = it.git.run(["config", "--get", "core.hooksPath"], true).out;
-  if (said === HOOKS) return `${at} and ${push}, which git reads`;
-  return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
-}
-
-// The row the doctor prints under `server`, so a person asking after a fall reads it there. [[spec/design_output/level0#the-bridge-says-it-falls]]
-export async function serverLine(get = fetch) {
-  const said = await serverSays(get);
-  return said.ok ? `stands at ${said.where}` : `none at ${said.where}`;
-}
-
-export function lspProxy() {
-  const ran = outside.run([biome, "lsp-proxy", "--help"]);
-  return ran.exitCode === 0 ? "this biome carries one" : "this biome carries none";
 }

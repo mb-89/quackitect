@@ -1,21 +1,18 @@
 // Every call that writes names the ticket it serves: a patch and a replace in
-// their ticket field, a commit at the head of its message. Edit, Write and
+// their ticket field, a commit at the head of its message, which the Go
+// commit verb's own test holds. Edit, Write and
 // NotebookEdit carry no such field, so the door refuses them.
 // [[spec/design_output/level0#a-write-names-its-ticket]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
 import { test } from "node:test";
-import { fakeFront } from "../../src/doors/fake/front.js";
 import { patchSpec, replaceSpec } from "../../.claude/skills/level0/lib/apply.js";
 import { findings } from "../../.claude/skills/level0/lib/bash.js";
 import { UNDO } from "../../.claude/skills/level0/lib/undo.js";
 import { SPECS } from "../../src/bridge/apply.js";
 import { onToolWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeGit } from "../../src/doors/fake/git.js";
 import { ticketFault, ticketOf } from "../../src/engine/named.js";
-import { commitVerb } from "../../src/scripts/commit-verb.js";
 
 const ROOT = "/tree";
 const ticket = (state) =>
@@ -74,71 +71,6 @@ test("ticketFault answers nothing for an open ticket, and the fault and the how 
     /No ticket named gone stands .* HOW$/,
   );
   assert.match(ticketFault("done-one", where, "HOW"), /done-one stands closed\. HOW$/);
-});
-
-function commitDoors() {
-  const git = fakeGit(
-    { "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-    ROOT,
-  );
-  const it = {
-    root: ROOT,
-    method: ROOT,
-    join,
-    front: fakeFront(),
-    node: "node",
-    git,
-    disk: fakeDisk(TICKETS),
-    log: { say: () => {} },
-    vale: { stands: () => true, lint: async () => ({ ran: true, found: [] }) },
-    proc: git.proc,
-    env: {},
-  };
-  for (const verb of ["test", "check"]) {
-    git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", `${verb}.js`)], {
-      exitCode: 0,
-      stdout: "ok\n",
-    });
-  }
-  return { it, git };
-}
-
-const heard = async (what) => {
-  const lines = [];
-  const was = [console.log, console.error];
-  console.log = (...said) => lines.push(said.join(" "));
-  console.error = console.log;
-  try {
-    return { code: await what(), said: lines.join("\n") };
-  } finally {
-    [console.log, console.error] = was;
-  }
-};
-
-test("a commit message opening with no ticket, an unknown one or a closed one stages nothing", async () => {
-  for (const [message, fault] of [
-    ["the change lands", /names no ticket/],
-    ["gone: the change lands", /No ticket named gone stands/],
-    ["done-one: the change lands", /done-one stands closed/],
-  ]) {
-    const { it, git } = commitDoors();
-    const { code, said } = await heard(() => commitVerb(it, [message]));
-    assert.equal(code, 2, message);
-    assert.match(said, fault, message);
-    assert.match(said, /Open the message with <ticket>:/, message);
-    assert.deepEqual(git.ran, [], message);
-  }
-});
-
-test("a commit message opening with an open ticket lands", async () => {
-  const { it, git } = commitDoors();
-  const { code } = await heard(() => commitVerb(it, ["open-one: the change lands"]));
-  assert.equal(code, 0);
-  assert.ok(
-    git.ran.some(
-      (one) => one.argv.join(" ") === "git commit -m open-one: the change lands",
-    ),
-  );
 });
 
 // A write names what stands in hand: a held ticket or the plan's working todo. [[spec/tickets/the-todo-joins-the-queue]]

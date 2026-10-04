@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fieldOf, withField } from "../../src/engine/group.js";
 import { withPayload } from "../../src/scripts/pull.js";
-import { expectedRed } from "../../src/scripts/red-list.js";
+import { redListOf } from "../../src/scripts/pull-kept.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
   at,
@@ -192,12 +192,12 @@ test("a list field handed back as an array lands on the ticket one item a line",
 });
 
 // [[spec/tickets/list-fields-split-lines]]
-test("a red list handed back as an array names each file to expectedRed", () => {
+test("a red list handed back as an array names each file to the red list", () => {
   const past = "record:\n  - step: implement/tests-red\n    hand: box one\n";
   const put = withPayload(
     RED_CHILD(past),
     "implement/tests-red",
     JSON.stringify({ red: FILES }),
   );
-  assert.deepEqual(expectedRed([{ name: "a-child", text: put.text }]), FILES);
+  assert.deepEqual(redListOf(put.text, "implement/tests-red"), FILES);
 });

@@ -16,6 +16,7 @@ import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { brandOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import { stamps } from "./brand.js";
 import { BUILDS } from "./go-source.js";
+import { roadArgv } from "./verb-run.js";
 import { DONE, standingAll, standOf } from "./work.js";
 
 const LOUD = 5;
@@ -130,18 +131,23 @@ function checkOn(it, at) {
     it.disk.write(it.join(where, TOOLS), said);
   }
   stamps(it.disk, where, brandOf(it.root));
-  // The check mints through se-front, and the install alone builds it, so the branch's own lands in the worktree's bin. [[spec/design_output/review#a-worktree-runs-the-check]]
+  // The check mints through se-front and runs in quack, and the install alone builds them, so the branch's own land in the worktree's bin. [[spec/design_output/review#a-worktree-runs-the-check]]
   const go = pathOf(surveyOf(said), "go") || "go";
-  const front = it.join(where, BIN, `se-front${it.windows ? ".exe" : ""}`);
-  it.proc.run([go, "build", "-o", front, `./${BUILDS["se-front"]}`], { cwd: where });
+  const built = (name) => {
+    const at = it.join(where, BIN, `${name}${it.windows ? ".exe" : ""}`);
+    it.proc.run([go, "build", "-o", at, `./${BUILDS[name]}`], { cwd: where });
+    return at;
+  };
+  built("se-front");
+  const quack = built("se-index");
   const borrowed = BORROWED.filter((rel) => it.disk.exists(it.join(it.root, rel)));
   for (const rel of borrowed) {
     it.disk.makeDir(dirname(it.join(where, rel)));
     it.disk.link(it.join(it.root, rel), it.join(where, rel));
   }
 
-  // The worktree reads its own check program, off the path relative to it. [[spec/tickets/cli-js-leaves]]
-  const ran = it.proc.run([it.node, "src/scripts/verbs/check.js"], { cwd: where });
+  // The worktree runs its own quack's check, so the branch's check judges the branch. [[spec/tickets/check-verbs-port-to-go]]
+  const ran = it.proc.run(roadArgv(quack, where, ["check"], it.join), { cwd: where });
   // The links go first, so the removal below keeps to the worktree. [[spec/design_output/review#a-worktree-runs-the-check]]
   for (const rel of borrowed) it.disk.remove(it.join(where, rel));
   it.git.run(["worktree", "remove", "--force", where], true);

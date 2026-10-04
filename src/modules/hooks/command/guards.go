@@ -14,9 +14,10 @@ const blessFile = ".se/.runtime/bless.json"
 
 // [[spec/design_output/pull#the-bless]]
 var (
-	handNames = []string{"CLAUDE_CODE_REMOTE", "SE_CLOUD", "CLAUDECODE"}
-	blessName = regexp.MustCompile(`bless\.json`)
-	clearsAll = regexp.MustCompile(`\benv\s+(?:-\S+\s+)*(?:-i|--ignore-environment)\b|\bdelete\s+process\.env\s*;|os\.environ\.clear\(`)
+	handNames  = []string{"CLAUDE_CODE_REMOTE", "SE_CLOUD", "CLAUDECODE"}
+	guardNames = append(handNames[:len(handNames):len(handNames)], "SE_MINTED")
+	blessName  = regexp.MustCompile(`bless\.json`)
+	clearsAll  = regexp.MustCompile(`\benv\s+(?:-\S+\s+)*(?:-i|--ignore-environment)\b|\bdelete\s+process\.env\s*;|os\.environ\.clear\(`)
 )
 
 // The refusal a command reaching the bless or the hand's variables meets, or nothing; read hands the text of each script it runs. [[spec/design_output/pull#the-bless]]
@@ -33,7 +34,7 @@ func BlessGuard(command string, read func(path string) string) string {
 		}
 	}
 	var hit []string
-	for _, name := range handNames {
+	for _, name := range guardNames {
 		for _, text := range texts {
 			if movesVariable(text, name) {
 				hit = append(hit, name)
