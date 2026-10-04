@@ -148,7 +148,7 @@ func retroCollectGitIn(root string) func(args ...string) retroRan {
 	}
 }
 
-// retro collect <retro> [--again], as collect in src/scripts/retro-collect.js answers it. [[spec/guidance/retro/collect]]
+// retro collect <retro> [--again]: copies this box into the retro's folder, and writes its manifest. [[spec/guidance/retro/collect]]
 func retroCollectVerb(doors func() retroCollectDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		name := ""

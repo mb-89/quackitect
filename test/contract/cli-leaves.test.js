@@ -48,9 +48,15 @@ test("no source under src, test or level zero names cli.js", () => {
   assert.deepEqual(naming, []);
 });
 
-test("every verb Go lists stands as a program, and no program stands past the list", () => {
+// A verb Go answers from src/quack keeps no program. [[spec/tickets/retro-verbs-port-to-go]]
+const IN_GO = new Set(["retro"]);
+
+test("every verb Go lists stands as a program or answers in Go, and no program stands past the list", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
-  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)].map((one) => one[1]).sort();
+  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)]
+    .map((one) => one[1])
+    .filter((one) => !IN_GO.has(one))
+    .sort();
   const folder = join(root, "src", "scripts", "verbs");
   const programs = files.exists(folder)
     ? files

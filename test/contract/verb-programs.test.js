@@ -28,7 +28,6 @@ import { run as probe } from "../../src/scripts/verbs/probe.js";
 import { run as project } from "../../src/scripts/verbs/project.js";
 import { run as push } from "../../src/scripts/verbs/push.js";
 import { run as rename } from "../../src/scripts/verbs/rename.js";
-import { run as retro } from "../../src/scripts/verbs/retro.js";
 import { run as rules } from "../../src/scripts/verbs/rules.js";
 import { run as serve } from "../../src/scripts/verbs/serve.js";
 import { run as setup } from "../../src/scripts/verbs/setup.js";
@@ -65,7 +64,6 @@ const RUNS = {
   project,
   push,
   rename,
-  retro,
   rules,
   serve,
   setup,
@@ -80,8 +78,11 @@ const RUNS = {
   voice,
 };
 
+// A verb Go answers from src/quack keeps no program. [[spec/tickets/retro-verbs-port-to-go]]
+const IN_GO = new Set(["retro"]);
+
 test("every verb of the table loads as a program answering a run", () => {
-  const listed = [...commands().keys()].sort();
+  const listed = [...commands().keys()].filter((verb) => !IN_GO.has(verb)).sort();
   assert.deepEqual(Object.keys(RUNS).sort(), listed);
   for (const [verb, run] of Object.entries(RUNS)) {
     assert.equal(typeof run, "function", `${verb} runs`);

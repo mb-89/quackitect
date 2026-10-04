@@ -8,7 +8,7 @@ import (
 	"io"
 )
 
-// The process a trial runs, which the audit reads off each ticket, as EXPERIMENT in src/scripts/retro.js names it. [[spec/design_output/work#an-experiment-decides]]
+// The process a trial runs, which the audit reads off each ticket. [[spec/design_output/work#an-experiment-decides]]
 const retroAuditExperiment = "spec/processes/experiment"
 
 func init() { register("retro audit", retroAuditVerb(retroRoot)) }

@@ -11,7 +11,6 @@ import { processHash } from "../../.claude/skills/level0/lib/schema.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { retro } from "../../src/scripts/retro.js";
 import { NOTES, ticket } from "../../src/scripts/ticket.js";
 import { pulling } from "../../src/scripts/work.js";
 import { NOTE_PROCESS, TICKET_SCHEMA as SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
@@ -232,16 +231,6 @@ test("ticket update reads the route off the method root, and writes the ticket u
     !disk.exists(m("spec/tickets/small.md")),
     "the method root keeps no ticket of the stub's",
   );
-});
-
-test("retro notes reads the private notes under the work root", () => {
-  const { it } = roots({
-    [w(`${NOTES}/a-doubt.md`)]:
-      "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA doubt.\n",
-  });
-  const ran = heard(() => retro(WORK, ["notes"], it));
-  assert.equal(ran.code, 1);
-  assert.match(ran.said, /1 note\(s\) stand open/);
 });
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]

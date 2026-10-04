@@ -35,7 +35,7 @@ func TestRetroUsageNamesEveryVerb(t *testing.T) {
 	}
 }
 
-// A word no verb answers prints the usage as retro.js does, and exits 2. [[spec/tickets/retro-usage-names-every-verb]]
+// A word no verb answers prints the usage, and exits 2. [[spec/tickets/retro-usage-names-every-verb]]
 func TestRetroUsageExitsTwoOnAWordNoVerbAnswers(t *testing.T) {
 	code, out, _ := retroMintHeard(retroUsageVerb(), "retro", "nothing")
 	want := "Usage: ./RUNME.sh retro <verb>\n\n" +

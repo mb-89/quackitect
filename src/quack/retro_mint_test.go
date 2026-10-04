@@ -73,7 +73,7 @@ const (
 // The record's path under the root. [[spec/guidance/retro/check]]
 var retroMintClasses = ".se/.retro/" + retroMintName + "/classes.json"
 
-// The ticket the open class carries, as CLASS in retro-mint.test.js. [[spec/guidance/retro/check]]
+// The ticket the open class carries. [[spec/guidance/retro/check]]
 func retroMintLandTicket() map[string]any {
 	return map[string]any{
 		"name":      "the-land-verb-lands",

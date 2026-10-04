@@ -5,7 +5,7 @@ package main
 
 import "io"
 
-// The usage as retro.js prints it, one line a verb. [[spec/tickets/retro-usage-names-every-verb]]
+// The usage the bare retro prints, one line a verb. [[spec/tickets/retro-usage-names-every-verb]]
 const retroUsage = `Usage: ./RUNME.sh retro <verb>
 
   notes            the private notes still open on this box, and 0 when none stands

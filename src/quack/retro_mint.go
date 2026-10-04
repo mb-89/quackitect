@@ -312,7 +312,7 @@ func retroMintWrites(at string, kept *retroMintNode, errs io.Writer) bool {
 	return true
 }
 
-// The record recordOf in src/engine/retro/classes.js keeps: its five keys in their order, each list a list and the dispositions an object. [[spec/guidance/retro/classify]]
+// The record classes writes: its five keys in their order, each list a list and the dispositions an object. [[spec/guidance/retro/classify]]
 func retroMintKept(read *retroMintNode) *retroMintNode {
 	list := func(key string) *retroMintNode {
 		if one := read.get(key); one != nil && one.kind == 'a' {

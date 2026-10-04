@@ -3,7 +3,27 @@
 // [[spec/guidance/retro/effect]]
 package main
 
-import "io"
+import (
+	"encoding/json"
+	"fmt"
+	"io"
+	"math"
+	"os"
+	"path/filepath"
+	"sort"
+)
+
+// The effect a retro writes, and the file collect stamps its time in. [[spec/guidance/retro/effect]]
+const (
+	retroEffectFile      = "effect.json"
+	retroEffectCollected = "collected.json"
+)
+
+// A case grown past this share of its last time reads as grown, and the files the effect keeps, the slowest first. [[spec/guidance/retro/effect]]
+const (
+	retroBatteryGrown   = 0.5
+	retroBatterySlowest = 10
+)
 
 // One of the slowest cases: its file, its name, its time, and its time at the last retro where it grew. [[spec/guidance/retro/effect]]
 type retroCase struct {
@@ -87,19 +107,302 @@ type retroEffectRecord struct {
 	Battery *retroBatteryRecord `json:"battery"`
 }
 
+// An ordered map of cases by key, as a JavaScript Map holds them. [[spec/guidance/retro/effect]]
+type retroCases struct {
+	keys   []string
+	values map[string]any
+}
+
 func init() { register("retro effect", retroEffectVerb(retroRoot)) }
+
+// A case keys on its file and its name, because two files share a name. [[spec/guidance/retro/effect]]
+func retroBatteryKey(one any) string {
+	if file := retroJSField(one, "file"); retroJSTruthy(file) {
+		return retroJSText(file) + " " + retroJSText(retroJSField(one, "name"))
+	}
+	return retroJSOr(retroJSField(one, "name"))
+}
+
+// The cases of a list by key, the first place of a key kept and its last case. [[spec/guidance/retro/effect]]
+func retroCasesOf(list any) retroCases {
+	out := retroCases{values: map[string]any{}}
+	for _, one := range retroJSList(list) {
+		key := retroBatteryKey(one)
+		if _, held := out.values[key]; !held {
+			out.keys = append(out.keys, key)
+		}
+		out.values[key] = one
+	}
+	return out
+}
+
+// A copy of an object, as the spread {...one} makes it. [[spec/guidance/retro/effect]]
+func retroJSCopy(one any) *retroJSDict {
+	out := retroJSObject()
+	switch value := one.(type) {
+	case *retroJSDict:
+		for _, key := range value.order() {
+			out.set(key, value.get(key))
+		}
+	case []any:
+		for at, item := range value {
+			out.set(fmt.Sprint(at), item)
+		}
+	}
+	return out
+}
+
+// A value, or 0 where it is null or undefined. [[spec/guidance/retro/effect]]
+func retroJSOrZero(value any) any {
+	if retroJSNullish(value) {
+		return 0.0
+	}
+	return value
+}
+
+// A value, or null where it is undefined. [[spec/guidance/retro/effect]]
+func retroJSOrNull(value any) any {
+	if retroJSNullish(value) {
+		return nil
+	}
+	return value
+}
+
+// This report against the last: each part's change, the cases new, grown or gone, the files against before, and the spawns side by side. [[spec/guidance/retro/effect]]
+func retroBatteryDelta(before, now any) *retroJSDict {
+	partsBefore, _ := retroJSField(before, "parts").(*retroJSDict)
+	partsNow, _ := retroJSField(now, "parts").(*retroJSDict)
+	names, seen := []string{}, map[string]bool{}
+	for _, dict := range []*retroJSDict{partsBefore, partsNow} {
+		for _, key := range dict.order() {
+			if !seen[key] {
+				seen[key] = true
+				names = append(names, key)
+			}
+		}
+	}
+	parts := []any{}
+	for _, part := range names {
+		was, is := retroJSOrZero(partsBefore.get(part)), retroJSOrZero(partsNow.get(part))
+		parts = append(parts, retroJSObject("part", part, "before", was, "now", is, "delta", retroJSToNumber(is)-retroJSToNumber(was)))
+	}
+	earlier, later := retroCasesOf(retroJSField(before, "slowest")), retroCasesOf(retroJSField(now, "slowest"))
+	fresh, grown, gone := []any{}, []any{}, []any{}
+	for _, key := range later.keys {
+		one := later.values[key]
+		was, held := earlier.values[key]
+		if !held {
+			fresh = append(fresh, retroJSCopy(one))
+			continue
+		}
+		if retroJSToNumber(retroJSField(one, "ms")) > retroJSToNumber(retroJSField(was, "ms"))*(1+retroBatteryGrown) {
+			copied := retroJSCopy(one)
+			copied.set("before", retroJSField(was, "ms"))
+			grown = append(grown, copied)
+		}
+	}
+	for _, key := range earlier.keys {
+		if _, held := later.values[key]; !held {
+			gone = append(gone, retroJSCopy(earlier.values[key]))
+		}
+	}
+	was := map[string]any{}
+	for _, one := range retroJSList(retroJSField(before, "files")) {
+		was[retroJSKeyOf(retroJSField(one, "name"))] = retroJSField(one, "ms")
+	}
+	files := []any{}
+	for at, one := range retroJSList(retroJSField(now, "files")) {
+		if at >= retroBatterySlowest {
+			break
+		}
+		name := retroJSField(one, "name")
+		files = append(files, retroJSObject("name", name, "before", retroJSOrZero(was[retroJSKeyOf(name)]), "now", retroJSField(one, "ms")))
+	}
+	return retroJSObject(
+		"total", retroJSObject("before", retroJSOrZero(retroJSField(before, "total")), "now", retroJSOrZero(retroJSField(now, "total"))),
+		"parts", parts,
+		"fresh", fresh,
+		"grown", grown,
+		"gone", gone,
+		"files", files,
+		"unrun", append([]any{}, retroJSList(retroJSField(now, "unrun"))...),
+		"red", append([]any{}, retroJSList(retroJSField(now, "red"))...),
+		"spawns", retroJSObject("before", retroJSOrNull(retroJSField(before, "spawns")), "now", retroJSOrNull(retroJSField(now, "spawns"))),
+	)
+}
+
+// A plain value as a Map key: its type and its text. [[spec/guidance/retro/effect]]
+func retroJSKeyOf(value any) string {
+	return fmt.Sprintf("%T %s", value, retroJSText(value))
+}
+
+// The two batteries side by side as the JSON the verb writes, or nil where this retro holds none. A retro with no last one reads against nothing, so its battery stands as the baseline. [[spec/guidance/retro/effect]]
+func retroBatteryValue(root, name, last string) *retroJSDict {
+	read := func(retro string) any {
+		value, ok := retroJSParse(retroFileText(filepath.Join(retroHome(root, retro), retroBattery)))
+		if !ok {
+			return nil
+		}
+		return value
+	}
+	now := read(name)
+	if !retroJSTruthy(now) {
+		return nil
+	}
+	var before any
+	if last != "" {
+		before = read(last)
+	}
+	out := retroJSObject("last", last)
+	if !retroJSTruthy(before) {
+		out.set("baseline", true)
+	}
+	delta := retroBatteryDelta(before, now)
+	for _, key := range delta.order() {
+		out.set(key, delta.get(key))
+	}
+	slowest := retroJSField(now, "slowest")
+	if retroJSNullish(slowest) {
+		slowest = []any{}
+	}
+	out.set("slowest", slowest)
+	return out
+}
 
 // The two batteries side by side, or nil where this retro holds none. [[spec/guidance/retro/effect]]
 func retroBatteryEffectOf(root, name, last string) *retroBatteryRecord {
-	return nil
+	value := retroBatteryValue(root, name, last)
+	if value == nil {
+		return nil
+	}
+	var out retroBatteryRecord
+	_ = json.Unmarshal([]byte(retroJSStringify(value)), &out)
+	return &out
+}
+
+// The retro before this one holding class fixes, by the time its collect ran. [[spec/guidance/retro/effect]]
+func retroLastRetro(root, name string) string {
+	folder := filepath.Join(root, filepath.FromSlash(retroFolder))
+	when := func(one string) float64 {
+		read, ok := retroJSParse(retroFileText(filepath.Join(folder, one, retroEffectCollected)))
+		if !ok {
+			return 0
+		}
+		if at := retroJSMillis(retroJSText(retroJSField(read, "at"))); !math.IsNaN(at) {
+			return at
+		}
+		return 0
+	}
+	now := when(name)
+	type found struct {
+		name string
+		at   float64
+	}
+	list := []found{}
+	entries, _ := os.ReadDir(folder)
+	for _, one := range entries {
+		if !one.IsDir() || one.Name() == name {
+			continue
+		}
+		if !retroIsThere(filepath.Join(folder, one.Name(), retroClassesFile)) || !retroIsThere(filepath.Join(folder, one.Name(), retroRatesFile)) {
+			continue
+		}
+		at := when(one.Name())
+		if now != 0 && !(at < now) {
+			continue
+		}
+		list = append(list, found{name: one.Name(), at: at})
+	}
+	sort.SliceStable(list, func(i, j int) bool { return list[i].at > list[j].at })
+	if len(list) == 0 {
+		return ""
+	}
+	return list[0].name
 }
 
 // A class's verdict: gone, falls, holds or grows. [[spec/guidance/retro/effect]]
 func retroVerdictOf(before, now retroRate) string {
-	return ""
+	if now.Count == 0 {
+		return "gone"
+	}
+	if now.Rate < before.Rate {
+		return "falls"
+	}
+	if now.Rate == before.Rate {
+		return "holds"
+	}
+	return "grows"
 }
 
 // The verb: counts the last retro's classes over this input, and writes each verdict. [[spec/guidance/retro/effect]]
 func retroEffectVerb(root func() string) twin {
-	return func(_ []string, _ bool, _, _ io.Writer) int { return 0 }
+	return func(argv []string, _ bool, out, errs io.Writer) int {
+		base, name := root(), retroWordAt(argv, 2)
+		if name == "" || !retroIsThere(retroHome(base, name)) {
+			fmt.Fprintln(errs, "retro effect names a retro whose collect stands: ./RUNME.sh retro effect <retro>")
+			return 2
+		}
+		home := retroHome(base, name)
+		last := retroLastRetro(base, name)
+		battery := retroBatteryValue(base, name, last)
+		var written any
+		if battery != nil {
+			written = battery
+		}
+		if last == "" {
+			if err := retroJSWrite(filepath.Join(home, retroEffectFile), retroJSObject("last", "", "classes", []any{}, "battery", written)); err != nil {
+				fmt.Fprintln(errs, err)
+				return 1
+			}
+			fmt.Fprintln(out, "No earlier retro holds class fixes, so nothing stands to measure.")
+			if battery != nil {
+				fmt.Fprintf(out, "battery  baseline %s ms, which the next retro reads against\n", retroJSText(retroJSField(battery.get("total"), "now")))
+			}
+			return 0
+		}
+		record := retroRecordOf(retroFileText(filepath.Join(retroHome(base, last), retroClassesFile)))
+		before, ok := retroJSParse(retroFileText(filepath.Join(retroHome(base, last), retroRatesFile)))
+		if record == nil || !ok {
+			fmt.Fprintf(errs, "%s of %s reads as no JSON\n", retroClassesFile+" or "+retroRatesFile, last)
+			return 1
+		}
+		now := retroRatesOf(base, name, record.classes)
+		rows, said := []any{}, []string{}
+		for _, one := range record.classes {
+			id := retroJSField(one, "id")
+			key := retroJSText(id)
+			was := retroJSField(retroJSField(before, "classes"), key)
+			is := now.Classes[key]
+			verdict := retroVerdictOf(retroRate{Rate: retroJSToNumber(retroJSField(was, "rate"))}, is)
+			tickets := retroJSField(one, "tickets")
+			if retroJSNullish(tickets) {
+				tickets = []any{}
+			}
+			rows = append(rows, retroJSObject(
+				"id", id,
+				"class", retroJSField(one, "class"),
+				"fix", retroJSField(one, "fix"),
+				"tickets", tickets,
+				"before", was,
+				"now", retroJSObject("count", is.Count, "rate", is.Rate),
+				"verdict", verdict,
+			))
+			said = append(said, fmt.Sprintf("%s  %s to %s an hour  %s  %s",
+				key, retroJSText(retroJSField(was, "rate")), retroJSNumber(is.Rate), verdict, retroJSText(retroJSField(one, "class"))))
+		}
+		if err := retroJSWrite(filepath.Join(home, retroEffectFile), retroJSObject("last", last, "classes", rows, "battery", written)); err != nil {
+			fmt.Fprintln(errs, err)
+			return 1
+		}
+		for _, line := range said {
+			fmt.Fprintln(out, line)
+		}
+		if battery != nil {
+			total := battery.get("total")
+			fmt.Fprintf(out, "battery  %s to %s ms  %d new, %d grown, %d gone\n",
+				retroJSText(retroJSField(total, "before")), retroJSText(retroJSField(total, "now")),
+				len(retroJSList(battery.get("fresh"))), len(retroJSList(battery.get("grown"))), len(retroJSList(battery.get("gone"))))
+		}
+		return 0
+	}
 }
