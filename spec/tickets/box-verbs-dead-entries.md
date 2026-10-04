@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: box-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 8abfe25c5bf1aab8
         size: 896
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 4eee5abcb7d7a7e34c78b0292c2e9f91dd224443
+    hash_after: 4eee5abcb7d7a7e34c78b0292c2e9f91dd224443
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 14 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: c6855abd1fef5fb4
+        size: 1650
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -227,26 +240,31 @@ Only homeIn leaves editor.js through a real import, so editor.js shrinks to home
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/dead-entries.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/dead-entries.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion: both modules read process.argv, and each dead export stands. The export check matches export function and export const both, since LIST and KEPT are constants.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a case: the two entry cases, one case for each export, the two module tests, and the check
+- the test reads the real tree through the disk door, so it stands under test/contract
 
 # gate
 
