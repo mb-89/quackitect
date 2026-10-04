@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 8ca46dccf16b · claude-code-remote
@@ -148,6 +148,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 50006799373850d78894b92628717a820cc2add1
+    hash_after: 50006799373850d78894b92628717a820cc2add1
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -226,38 +238,63 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- box-verbs-port-to-go: setup, probe and doctor answer in Go, and their programs leave
+- box-verbs-dead-entries: editor.js keeps homeIn alone, and browser.js loses its program entry
+- extension-link-note-names-go: the extension note names editorlink.go
+- three contract tests read a verb as a program or a Go registration
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- three helpers ported in parallel, each in its own unpacked tree, so no half file broke another
+- the take moved a stale hold and took main in one step
+- the no-node case over fakes proved every box verb without a live run
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 14:34 the owner prompt asked for a merge first, and the cage refuses a raw git merge
+- 14:37 the stop fell, since ending a cloud turn stops its helpers
+- 14:58 the doctor and the probe ports declared five names twice, and the index stayed unbuilt
+- 15:00 a regex replacement read each template slot as a capture group, and emptied it
+- 15:03 the commit gate ran the whole suite, and two contract tests read every verb as a program
+- 15:16 vale-paths failed under the check twice with exit 2, and passed alone
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the owner prompt for a take names branch take, which merges main, in place of a git merge
+- the work skill says a cloud box waits inside its turn for its helpers
+- a port helper gets the list of names the other helpers declare
+- the patch tool doc says a regex replacement reads a dollar sign as a group
+- registered() in test/contract/commands.js owns the verb table read, so a port edits no test
+- CI on the PR decides the vale flake, and a red run there gets fixed
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The work split cleanly by verb, and the shared pieces collided anyway. A helper writing in isolation cannot see a name another helper declares. So the merge step needs a compile before anything else.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact points at its owner file, registered() among them
+- no number lands in prose
+- each new header says what its file is for
+- the badly list carries each error with its time
+- the chapter names roles alone
 
 ## cloud
 
