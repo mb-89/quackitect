@@ -41,7 +41,7 @@ func renameEntries(t *testing.T, root string) []renameEntry {
 	return out
 }
 
-func TestRenameVerb(t *testing.T) {
+func TestRenameReaches(t *testing.T) {
 	t.Run("a reach is a line naming the old name, and a longer word is no reach", func(t *testing.T) {
 		text := "import a from \"./src/a.js\";\nsee [[src/a.js]]\nsrc/a.jsx stands apart\nmy-src/a.js too\n"
 		if got := reachesIn(text, "src/a.js"); len(got) != 2 || got[0].line != 1 || got[1].line != 2 {
@@ -67,6 +67,9 @@ func TestRenameVerb(t *testing.T) {
 			t.Fatalf("renamedForms answers %q", got)
 		}
 	})
+}
+
+func TestRenameMoves(t *testing.T) {
 	t.Run("the move carries a file of any ending, and a file the reader leaves out stands in the answer", func(t *testing.T) {
 		root, _ := landingRepo(t)
 		lays(t, root, "pics/a.png", "\x89PNG\x00\x01 pics/a.png")
@@ -150,6 +153,9 @@ func TestRenameVerb(t *testing.T) {
 			t.Fatal("the text rename writes a journal entry")
 		}
 	})
+}
+
+func TestRenameVerb(t *testing.T) {
 	t.Run("a name standing nowhere answers a fault, moves nothing, and writes no journal", func(t *testing.T) {
 		root, _ := landingRepo(t)
 		d, _, _ := fakeLanding(root)

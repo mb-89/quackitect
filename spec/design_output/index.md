@@ -217,7 +217,7 @@ group answers its group's standing, and a ticket in no group carries none.
 ## A rename reaches a name
 
 `./RUNME.sh rename <from> <to>` moves a name and carries every reach with it.
-`src/scripts/rename.js` holds it, and it works in the moves below:
+`src/quack/rename.go` holds it, and it works in the moves below:
 
 | the move | what it asks | what it catches |
 |---|---|---|

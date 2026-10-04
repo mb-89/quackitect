@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: landing-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: af4f299ca9d851e9
         size: 1109
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box a2b0848f196c · claude-code-remote
+    hash_before: 897dab2e29990db3c2be775f9b752cde9b3c2c92
+    hash_after: 897dab2e29990db3c2be775f9b752cde9b3c2c92
+    answered:
+      - name: lint
+        exit: 0
+        said: ""
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -321,14 +330,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+go vet ./src/quack ./src/modules/hooks/command
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus test/contract/cli-leaves.test.js and two design notes that named the deleted files, and the exported state reader in its own file
+- the verbs the road runs, Vale, the log and the clock come through landingDoors, and the tests fake each one
+- each file header names the approach and points at this ticket or the design note it ports
+- the cold path list and the stamp path stay owned by probe-cold.js and folders.js, and each Go copy names its owner in a comment
 
 ## tests-green
 

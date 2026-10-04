@@ -1057,7 +1057,7 @@ forgets to take a ticket up and to put it down.
 | the road | what it names | where the door reads it |
 |---|---|---|
 | `mcp__level0__patch`, `mcp__level0__replace` | the `ticket` field | `unnamedIn` in `src/bridge/apply.js` |
-| `./RUNME.sh commit` | `<ticket>:` at the head of the message | `commitVerb` in `src/scripts/commit-verb.js` |
+| `./RUNME.sh commit` | `<ticket>:` at the head of the message | `commitVerb` in `src/quack/commit.go` |
 | Edit, Write, MultiEdit, NotebookEdit | nothing, since the harness fixes their fields | `onToolWrite` in `src/bridge/write.js`, which refuses them and names `mcp__level0__patch` |
 | Bash, PowerShell | `<ticket>:` at the head of `description` | `ticketDoor` in `src/bridge/bash.js` |
 
