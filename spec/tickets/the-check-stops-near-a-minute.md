@@ -25,7 +25,6 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: the-check-takes-a-minute
 ---
 
 # Ask
@@ -82,4 +81,4 @@ No code changes. The stop and the roads left stand in the Discussion of [[spec/t
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-The stop note moved to [[spec/tickets/the-check-takes-a-minute]], which closed first, so the pull on this branch hands this ticket nowhere. The door deletes no file, so this draft stays for the owner to drop.
+The stop note moved to [[spec/tickets/the-check-takes-a-minute]], which closed first, so the pull on this branch hands this ticket nowhere. The door deletes no file, so this draft stands in no group, for the owner to drop.
