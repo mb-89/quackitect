@@ -26,7 +26,7 @@ const (
 
 func init() { register("project", projectVerb(index.Root)) }
 
-// project over the method root the given func answers, and the work root SE_WORK_ROOT names. [[spec/design_output/projection#who-projectWrites-and-when]]
+// project over the method root the given func answers, and the work root SE_WORK_ROOT names. [[spec/design_output/projection#who-projects-and-when]]
 func projectVerb(root func() (string, error)) twin {
 	return func(_ []string, dry bool, out, errs io.Writer) int {
 		method, err := root()
@@ -59,7 +59,7 @@ func projectVerb(root func() (string, error)) twin {
 	}
 }
 
-// Writes every wanted target that differs, and removes every standing one nothing wants. [[spec/design_output/projection#who-projectWrites-and-when]]
+// Writes every wanted target that differs, and removes every standing one nothing wants. [[spec/design_output/projection#who-projects-and-when]]
 func projectWrites(work string, said projector.Result) error {
 	for _, path := range projector.Paths(said.Wanted) {
 		at := filepath.Join(work, filepath.FromSlash(path))
