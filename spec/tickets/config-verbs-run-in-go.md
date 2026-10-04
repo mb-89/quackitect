@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: sync
+step: split
 record:
   - step: sync
     hand: box 6183eb94e809 · claude-code-remote
@@ -99,6 +99,15 @@ record:
   - step: sync
     hand: box 056798343132 · claude-code-remote
     hash_before: a99933fc7dce788158ef3db5beeb9e80415e1b90
+  - step: sync
+    hand: box 056798343132 · claude-code-remote
+    hash_before: 853bb7971ecb12ebf5c7fff1b17e5d4ccf9d5fa4
+    hash_after: 87d14fd80d17402f2590f1b2260a57f80e1fc27d
+    answered:
+      - name: sync
+        exit: 0
+        said: work/config-verbs-run-in-go already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -114,8 +123,9 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
