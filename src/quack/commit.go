@@ -30,6 +30,9 @@ const (
 	messageHow   = "Open the message with <ticket>:, where <ticket> names the open ticket this commit serves: its file name under spec/tickets or .se/tickets, without .md."
 )
 
+// The cells of a rename row git diff --name-status prints: the status, the old path and the new one. [[spec/tickets/landing-verbs-port-to-go]]
+const renameCells = 3
+
 // The cold path: a commit touching one runs the cold probe. src/scripts/probe-cold.js owns COLD_PATH, and the verb spells it again until the probe leaves Node. [[spec/design_output/level0#the-cold-probe]]
 var coldPath = []string{
 	".claude/skills/level0/hooks/",
@@ -402,7 +405,7 @@ func movedFrom(root string, paths []string) []string {
 			continue
 		}
 		touched[cells[1]] = true
-		if len(cells) == 3 && strings.HasPrefix(cells[0], "R") && slices.Contains(paths, cells[2]) && !slices.Contains(paths, cells[1]) {
+		if len(cells) == renameCells && strings.HasPrefix(cells[0], "R") && slices.Contains(paths, cells[2]) && !slices.Contains(paths, cells[1]) {
 			out = append(out, cells[1])
 		}
 	}

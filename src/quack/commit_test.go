@@ -38,8 +38,11 @@ func voiceSaying(rule string) func(string) []heard {
 	}
 }
 
+// The message the commit cases open with, naming the open ticket a-ticket. [[spec/tickets/landing-verbs-port-to-go]]
+const opens = "a-ticket: the change lands"
+
+// The commit verb over its message, its check and its tests. [[spec/tickets/landing-verbs-port-to-go]]
 func TestCommitVerb(t *testing.T) {
-	const opens = "a-ticket: the change lands"
 	t.Run("a call with no message prints the usage, and lands nothing", func(t *testing.T) {
 		root, _ := landingRepo(t)
 		d, heard, _ := fakeLanding(root)
@@ -137,6 +140,10 @@ func TestCommitVerb(t *testing.T) {
 			t.Fatalf("the verbs ran as %v, and want %v", seen, want)
 		}
 	})
+}
+
+// The commit verb on a desk, under its flags, and where git refuses. [[spec/tickets/landing-verbs-port-to-go]]
+func TestCommitVerbDesk(t *testing.T) {
 	t.Run("a desk lands and checks the commit on main, and pushes nothing", func(t *testing.T) {
 		root, origin := landingRepo(t)
 		lays(t, root, "src/a.go", "package a\n")
@@ -205,6 +212,10 @@ func TestCommitVerb(t *testing.T) {
 			t.Fatalf("src/b.go leaves the tree: %q", left)
 		}
 	})
+}
+
+// The commit verb over a moved path, which the rename journal names. [[spec/tickets/landing-verbs-port-to-go]]
+func TestCommitVerbMoves(t *testing.T) {
 	t.Run("a commit naming a renamed ticket lands the old path's deletion with it", func(t *testing.T) {
 		root, _ := landingRepo(t)
 		gitDoes(t, root, "mv", "spec/tickets/a-ticket.md", "spec/tickets/b-ticket.md")
@@ -271,6 +282,10 @@ func TestCommitVerb(t *testing.T) {
 			t.Fatalf("the commit lands %q", landed)
 		}
 	})
+}
+
+// The commit verb at its gates: the cold probe, the paths it names, and the conflict markers. [[spec/tickets/landing-verbs-port-to-go]]
+func TestCommitVerbGates(t *testing.T) {
 	t.Run("a staged file on the cold path runs the probe after the tests, and the commit stands on its pass", func(t *testing.T) {
 		root, _ := landingRepo(t)
 		lays(t, root, "src/quack/a.go", "package main\n")
