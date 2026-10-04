@@ -83,19 +83,20 @@ func vehicleRun(doors vehicleDoors, dry bool, argv ...string) (int, string, stri
 
 func TestVehicleVerbHereNamesTheRootsAndTheRegister(t *testing.T) {
 	where, doors := vehicleFixture(t)
-	// The method root comes slashed, as methodRootFrom answered it, and the work root as the caller spells it. [[spec/tickets/window-verbs-windows-green]]
+	// Both roots print slashed, the method as methodRootFrom answered it. [[spec/tickets/window-verbs-windows-green]] [[spec/tickets/window-verbs-here-one-spelling]]
 	method := filepath.ToSlash(doors.root)
 	code, out, _ := vehicleRun(doors, false)
-	want := "method  " + method + "\nwork    " + doors.root + "\nvehicle abc123  (this tree drives itself)\n"
+	want := "method  " + method + "\nwork    " + method + "\nvehicle abc123  (this tree drives itself)\n"
 	if code != 0 || out != want {
 		t.Fatalf("here answers %d:\n%s", code, out)
 	}
 	if code, _, _ := vehicleRun(doors, false, "register"); code != 0 {
 		t.Fatal("the register takes the write")
 	}
-	doors.env["SE_WORK_ROOT"] = filepath.Join(where, "work")
+	work := filepath.ToSlash(filepath.Join(where, "work"))
+	doors.env["SE_WORK_ROOT"] = strings.ReplaceAll(work, "/", `\`)
 	code, out, _ = vehicleRun(doors, false, "here")
-	want = "method  " + method + "\nwork    " + filepath.Join(where, "work") + "\nvehicle abc123\n  abc123  0.1.0  " + method + "\n"
+	want = "method  " + method + "\nwork    " + work + "\nvehicle abc123\n  abc123  0.1.0  " + method + "\n"
 	if code != 0 || out != want {
 		t.Fatalf("here answers %d:\n%s", code, out)
 	}

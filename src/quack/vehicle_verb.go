@@ -160,7 +160,8 @@ func vehicleProduce(disk vehicle.Disk, method string, words []string, into bool,
 // The method, the work, this vehicle, and every vehicle the register holds. [[spec/design_output/vehicle#what-a-vehicle-needs]]
 func vehicleHere(disk vehicle.Disk, doors vehicleDoors, pair vehicle.Pair, id string, out io.Writer) int {
 	fmt.Fprintf(out, "method  %s\n", pair.Method)
-	fmt.Fprintf(out, "work    %s\n", pair.Work)
+	// The work root prints slashed, as the method root comes, so here spells both roots one way on every box. [[spec/tickets/window-verbs-here-one-spelling]]
+	fmt.Fprintf(out, "work    %s\n", strings.ReplaceAll(pair.Work, `\`, "/"))
 	itself := ""
 	if pair.Itself {
 		itself = "  (this tree drives itself)"
