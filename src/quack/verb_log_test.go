@@ -115,6 +115,15 @@ func TestLogVerb(t *testing.T) {
 	})
 }
 
+// A span reads its count in minutes, hours or days, and words naming no span read none. [[spec/design_output/log#one-verb-reads-the-log]]
+func TestLogSpanSeconds(t *testing.T) {
+	for said, want := range map[string]int64{"5m": 300, "2h": 7200, "1d": 86400, " 3 h ": 10800, "soon": 0} {
+		if got := spanOf(said); got != want {
+			t.Fatalf("spanOf(%q) reads %d seconds, and %d stand", said, got, want)
+		}
+	}
+}
+
 func TestLogVerbSays(t *testing.T) {
 	t.Run("say appends one row and keeps the rows another writer lands", func(t *testing.T) {
 		root, log := logOver(t, map[string]string{sessionLog: logRow(1, "info", "tool", "theirs")})

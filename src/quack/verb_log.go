@@ -68,6 +68,14 @@ var logUsage = []string{
 	"  --say <row>     append one row, a JSON object of level, kind, said and extra",
 }
 
+// The seconds a span unit holds, and the base its count reads in. [[spec/design_output/log#one-verb-reads-the-log]]
+const (
+	secondsAMinute = 60
+	secondsAnHour  = 3600
+	secondsADay    = 86400
+	decimal        = 10
+)
+
 // The fields a row holds by name, which the extra line leaves out. [[spec/design_output/log#what-one-line-looks-like]]
 var logOwn = []string{"at", "level", "kind", "said"}
 
@@ -75,7 +83,7 @@ var logOwn = []string{"at", "level", "kind", "said"}
 var (
 	rotatedName = regexp.MustCompile(`^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-[0-9a-z]+\.jsonl$`)
 	spanText    = regexp.MustCompile(`^(\d+)\s*([mhd])$`)
-	spanSeconds = map[string]int64{"m": 60, "h": 3600, "d": 86400}
+	spanSeconds = map[string]int64{"m": secondsAMinute, "h": secondsAnHour, "d": secondsADay}
 	spaces      = regexp.MustCompile(`\s+`)
 )
 
@@ -159,7 +167,7 @@ func spanOf(said string) int64 {
 	if found == nil {
 		return 0
 	}
-	many, _ := strconv.ParseInt(found[1], 10, numberBits)
+	many, _ := strconv.ParseInt(found[1], decimal, numberBits)
 	return many * spanSeconds[found[2]]
 }
 
