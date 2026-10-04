@@ -59,6 +59,20 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 	})
 }
 
+// A row below the floor reaches no writer, a row at or past it does, and no floor reads as info. [[spec/design_output/log#which-kind-says-what]]
+func TestLintRowKeepsFloor(t *testing.T) {
+	for _, one := range []struct {
+		floor, level string
+		writes       bool
+	}{{"info", "debug", false}, {"info", "warn", true}, {"debug", "debug", true}, {"", "debug", false}, {"", "info", true}} {
+		wrote := 0
+		say := keepsFloor(one.floor, func(map[string]any) error { wrote++; return nil })
+		if err := say(map[string]any{"level": one.level}); err != nil || (wrote == 1) != one.writes {
+			t.Fatalf("a %s row over the floor %q writes %d time(s), and wants %v", one.level, one.floor, wrote, one.writes)
+		}
+	}
+}
+
 func TestLintVerb(t *testing.T) {
 	t.Run("the rules passing print one line, exit 0 and log at debug", func(t *testing.T) {
 		fake := &lintFake{}

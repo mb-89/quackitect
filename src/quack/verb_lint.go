@@ -19,6 +19,7 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/lsp"
 )
 
@@ -29,6 +30,7 @@ const (
 	lintShown = 3
 	lintWidth = 6
 	lintKind  = "vale"
+	logFloor  = "log.level"
 )
 
 // What the lint reads: the root, the tools over the paths named, the check module's sweep, the box's survey rule, the session log and the clock. [[spec/tickets/read-verbs-port-to-go]]
@@ -54,9 +56,20 @@ func lintHere() (lintDoors, error) {
 		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
 		sweep: func() ([]check.Finding, error) { return sweepRows(index.Ask) },
 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
-		log:   appendsRow(root, time.Now),
+		log:   keepsFloor(sliceMode(root, logFloor), appendsRow(root, time.Now)),
 		now:   time.Now,
 	}, nil
+}
+
+// The writer past the floor the box writes at, so a row below it lands nowhere, as the log door drops it. Rank reads an empty floor as info. [[spec/design_output/log#which-kind-says-what]]
+func keepsFloor(floor string, write func(row map[string]any) error) func(row map[string]any) error {
+	return func(row map[string]any) error {
+		level, _ := row["level"].(string)
+		if logmodule.Rank(level) < logmodule.Rank(floor) {
+			return nil
+		}
+		return write(row)
+	}
 }
 
 // The lint over the doors: the count a rule first and the finding lines last, a warning exiting 0 and a finding at error exiting 1. [[spec/design_output/lsp#the-lint-ends-on-findings]]
