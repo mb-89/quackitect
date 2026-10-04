@@ -29,12 +29,20 @@ const (
 	goFormatter   = "gofmt"
 )
 
-// The doors over the real box, under the root quack stands in. [[spec/design_output/work#the-battery-answers-first]]
-func checkDoorsOf(out, errs io.Writer) checkDoors {
-	root, err := index.Root()
-	if err != nil {
-		root = "."
+// The tree a verb road names: the folder over src/scripts in quack verb <scripts>, else the root the index reads. A review runs the check in a worktree under the method root's variable, and the road names the worktree. [[spec/tickets/check-reads-the-road-root]]
+func roadRoot(args []string, fallback func() (string, error)) string {
+	if len(args) > verbArgs && args[1] == "verb" {
+		return filepath.Dir(filepath.Dir(filepath.Clean(args[2])))
 	}
+	if root, err := fallback(); err == nil {
+		return root
+	}
+	return "."
+}
+
+// The doors over the real box, under the root the verb road names. [[spec/design_output/work#the-battery-answers-first]]
+func checkDoorsOf(out, errs io.Writer) checkDoors {
+	root := roadRoot(os.Args, index.Root)
 	self, _ := os.Executable()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
