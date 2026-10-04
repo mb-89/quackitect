@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: work-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 336fe34fc9021c30
         size: 698
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 51947abab2e8 · claude-code-remote
+    hash_before: a8e0de6e02c7b8a3a908be11ff1f7fd51c8ef67c
+    hash_after: e9e9d3cfbd92f68bcec60dfb45d4bfc3d23f6887
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 0e8adbb1c1bd71fd
+        size: 3473
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ A new Go package src/branches carries the port of src/scripts/work.js and every 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_b_waits_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/port_b_waits_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The port and its first cases landed in one commit, so those cases stood green from the start. The ported JS cases add 209 Go cases over a real origin and its clone, and 208 pass on the first run. The red case ports the gate case of work-gate.test.js. The JS fixture held a gate open with no ticket on trunk, so the take named the gated group at the child check. On a real repo the gate stands on trunk, and both the JS and the Go read trunk's tickets, so the gated group leaves the free list silently. The surprise is how close the port runs: no other case found a gap. One road needs a note. A merge straight after an open, with no sync between, meets the moved-on-trunk refusal, because the cloud marker lands on trunk after the cut. The JS holds the same rule, so the port keeps it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the Go cases for the roads, branch_test.go for the road reaching no node, the program tests for the verbs folder, and the check
+- every door the tests reach stands real: a bare origin and a clone, a real hook for a refused push, so no fake needs a suite
 
 # gate
 
