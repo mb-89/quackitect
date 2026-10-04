@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: check-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 233780cb27f2 · claude-code-remote
+    hash_before: 3e27391efef254348b64ec785ade27a94fda6853
+    hash_after: 3e27391efef254348b64ec785ade27a94fda6853
+    inputs:
+      - name: ask
+        hash: 75ff9ec428e07488
+        size: 668
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,103 @@ The check and the test runner answer in Go, the language the modules they run ar
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The check and the test verb register from their own files under src/quack, and the battery runs in Go. A battery part whose logic another group's verb owns runs as that verb through quack's own road, a child process of the same binary, so it lands in Go the day that group ports it, and this group edits none of their Go.
+
+The parts, in order, as check-verb.js runs them:
+
+| part | Go home |
+|---|---|
+| tests | the test runner in Go: node --test over the unit and the contract globs, the red list apart, the battery reporter, the spawn tally |
+| level0, beside | the verb probe dry --working, through the road, and a line alone on Windows |
+| go | go test -tags contract with the red Go tests skipped, then gofmt -l src, in Go |
+| doors | the verb doors, through the road |
+| projections | the verb project --check, through the road; project.js gains the flag, which answers projectionsHold |
+| plugin | claude plugin validate .claude/skills/level0, in Go, and a line where claude stands nowhere |
+| server | the health call in Go, off the vehicle pointer's port |
+| rules | the verb lint over the words, through the road; lint writes what it found to the file SE_LINT_FOUND names, so the stamp counts the warnings and check --errors prints the findings at error |
+
+The stamp, the battery's report, the parts' table and the budget warning port to Go in the same shapes, so prepush, push, retro and the trunk guard read them unchanged. The red list ports into the tickets module as RedList and RedRows, off the walk and the chapter fields it holds. The test verb with words runs branch test over them through the road, under a fresh tally.
+
+The tests part spawns node --test, since the JavaScript tests run on node's runner. I read the done_when line ./RUNME.sh test reaches no node as: quack hands neither verb to a node program. The JavaScript test files stay node's to run until they leave the tree.
+
+The JavaScript that leaves: verbs/check.js, verbs/test.js, check-verb.js, red-list.js (redListOf moves into pull-kept.js), cli-stamp.js, and the battery parts no remaining module imports: level0Runs, goHolds, skipOf, pluginHolds, serverHolds and serverRead in cli-check.js, probeApart in probe-dry.js, goGate and formatFaults in cli-go.js, batteryOf, partsSaid, partsTimed, spawnsIn and their helpers in battery.js. work-review.js and work-merge.js run the check through the quack binary in place of node.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- RUNME.sh: the quack road, which hands check and test to the registry
+- src/quack/verbs.go verbs: the road reaching the registered twins
+- src/scripts/work-review.js checkIn: the check in a review worktree
+- src/scripts/work-merge.js checkSays: check --errors over the merged tree
+- src/scripts/pull-kept.js keptRed: redListOf, which moves into the file
+- src/scripts/verbs/project.js run: gains --check for the projections part
+- src/scripts/cli-read.js lint: writes its findings where SE_LINT_FOUND points
+- src/scripts/verbs/doors.js and src/scripts/verbs/probe.js: run as parts, unchanged
+- test/level0/check-verb.test.js, red-list.test.js, cli-stamp.test.js, check-server.test.js, battery.test.js, outside-hand.test.js, work-merge-cloud.test.js, work-doors.js, review.test.js: the cases over removed code leave or move to Go
+- test/contract/cli-verbs.test.js and verb-programs.test.js: drop check and test
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/modules/tickets/red_test.go TestRedList: past tests-red and short of tests-green, an inserted tests-red-2, a closed ticket
+- src/modules/tickets/red_test.go TestRedRows: bare rows, backticks, list marks, comma-joined rows, a leaf with no list
+- src/quack/battery_test.go TestBatteryReport: rows, slowest, files, red, spawns, the report, the parts' table and the budget warning
+- src/quack/battery_test.go TestStamp: green and red stamps, ticket prose holds no push, the runs kept at one commit
+- src/quack/check_test.go TestCheckParts: order, a red part leaves the rest unrun, level0 beside after the tests, the sub-verbs each part runs
+- src/quack/check_test.go TestCheckErrors: quiet parts, the red cases and the findings at error
+- src/quack/check_test.go TestTestArgv: every test file but the red ones, the globs where none stands red
+- src/quack/check_test.go TestServerRead and TestGoGate: the server's three answers, the skip off red Go files, gofmt faults
+- src/quack/check_test.go TestCheckRegisters: check and test stand in the registry
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/modules/tickets/red.go
+- src/modules/tickets/red_test.go
+- src/quack/check.go
+- src/quack/check_test.go
+- src/quack/battery.go
+- src/quack/battery_test.go
+- src/quack/testverb.go
+- src/scripts/verbs/check.js (leaves)
+- src/scripts/verbs/test.js (leaves)
+- src/scripts/check-verb.js (leaves)
+- src/scripts/red-list.js (leaves)
+- src/scripts/cli-stamp.js (leaves)
+- src/scripts/cli-check.js
+- src/scripts/cli-go.js
+- src/scripts/battery.js
+- src/scripts/probe-dry.js
+- src/scripts/pull-kept.js
+- src/scripts/cli-read.js
+- src/scripts/verbs/project.js
+- src/scripts/work-review.js
+- src/scripts/work-merge.js
+- the JavaScript tests the callers list names
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: check-verb.js, red-list.js, cli-check.js, cli-stamp.js, battery.js, cli-go.js, work-test.js, probe.js, probe-dry.js, cli-read.js lint, registry.go, verbs.go, twins.go, drawn.go
+- the callers come off a search of src and test for each removed module and program path
+- each done_when line meets a test: go test over src/quack and src/modules/tickets; TestCheckRegisters for the road; ls and a search for the removal; the check for the last line
 
 ## tests-red
 
