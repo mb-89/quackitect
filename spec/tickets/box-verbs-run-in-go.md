@@ -84,7 +84,6 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
-cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
 step: retro/cloud
 record:
@@ -95,6 +94,7 @@ record:
   - step: sync
     hand: box 660db8e33adc · claude-code-remote
     hash_before: c14721f2d156f5bd5183a12863fe7d867f9ec618
+    hash_after: 905d5333df5cad9aa1bba7b6f04ed9717e50f667
   - step: sync
     hand: box 660db8e33adc · claude-code-remote
     hash_before: 4503579d69345f1100f6496591538ceaf9516cd9
