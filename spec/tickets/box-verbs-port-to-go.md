@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: box-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 327480c1ffa3cd47
         size: 736
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8ca46dccf16b · claude-code-remote
+    hash_before: 91b88675d883881819b84a12b9ddda9ed00d133b
+    hash_after: 91b88675d883881819b84a12b9ddda9ed00d133b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 9c1d77d5afb7ce6a
+        size: 5115
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -253,26 +266,31 @@ Each verb registers from an init in its own file under src/quack: setup_verb.go,
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/box_verbs_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/box_verbs_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: no box verb registers, and all four programs stand. The behaviour tests land beside each Go file in implement, since a case naming a function that stands nowhere fails the compile and takes the whole package red. The verb table test reads src/scripts/verbs, so it shrinks as programs leave.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when lines 2 and 3 meet TestTheBoxVerbsRegister and TestTheBoxVerbsLeaveTheScripts, line 1 meets go test, line 4 meets verb-programs.test.js and a search, line 5 meets the check
+- the behaviour tests hand each verb a doors struct of fakes: a map disk, a recording process runner, an env map
 
 # gate
 
