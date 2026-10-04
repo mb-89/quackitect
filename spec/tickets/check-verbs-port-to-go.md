@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: check-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 674e82fa573d841e
         size: 5635
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 233780cb27f2 · claude-code-remote · helper-4
+    hash_before: ca5d0b95f81ae1d2f1dd386ee9628f6788e5b8c9
+    hash_after: ca5d0b95f81ae1d2f1dd386ee9628f6788e5b8c9
+    inputs:
+      - name: design/draft
+        hash: 674e82fa573d841e
+        size: 5635
+      - name: design/tests-red
+        hash: 7ca9e2bd5154678d
+        size: 874
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -317,8 +329,12 @@ Every case fails on its assertion over stubs that compile. The first run of Test
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- check-go-cases-cover-budget: the first done_when line asks a Go case for every road the JavaScript tests cover, and no red Go case reads battery.budget off the config (check-verb.test.js budgetOf), the warn line the log takes past the budget, the CGO_ENABLED=0 environment goGate runs under (goEnvOf), the port off the vehicle pointer (portHere), the level0 red line the check shouts, or the test verb with words handing its names to branch test under a fresh tally (cli-verbs.test.js namedTests); add a case for each before tests-green closes
+- check-node-reading-owner-confirms: the draft reads the done_when line ./RUNME.sh <verb> reaches no node as quack hands neither verb to a node program, while the tests part spawns node --test and the level0, doors, projections and rules parts reach node through the road until their groups port; the owner confirms that reading, or the line changes in the ask
+- check-port-callers-complete: the callers list misses test/level0/pull-fields.test.js (expectedRed), test/level0/cli-reporter.test.js (TEST_PARTS, testArgv), test/level0/probe-dry.test.js (probeApart, which the draft removes), test/contract/stub.test.js and test/level0/stub.test.js (verbs/check.js), test/level0/work-group.test.js and test/level0/bash.test.js (the node verbs/check.js command); the implement step moves or drops each
 
 # implement
 
