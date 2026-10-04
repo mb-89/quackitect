@@ -99,6 +99,15 @@ func ReachedOf(front *yaml.Doc) map[string]bool {
 	return out
 }
 
+// Words as the list a YAML value holds. [[spec/design_input/the-agent-pulls-tickets#the-route]]
+func stringsAny(said []string) []any {
+	out := make([]any, 0, len(said))
+	for _, one := range said {
+		out = append(out, one)
+	}
+	return out
+}
+
 // Two steps read the same where their canonical forms match. [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 func SameStep(a, b any) bool { return Canonical(a) == Canonical(b) }
 

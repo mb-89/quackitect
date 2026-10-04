@@ -170,7 +170,10 @@ func unreadWhy(said []byte, err error) string {
 }
 
 // Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
-func heardOver(root, name, text string) valeHeard {
+func heardOver(root, name, text string) valeHeard { return heardIn(root, name, text, prose.All) }
+
+// What Vale answers over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
+func heardIn(root, name, text, mode string) valeHeard {
 	vale := valeAt(root)
 	if vale == "" {
 		return valeHeard{why: noValeWhy}
@@ -219,7 +222,7 @@ func heardOver(root, name, text string) valeHeard {
 	})
 	out := valeHeard{stands: true, ran: true}
 	for _, one := range all {
-		if len(prose.Kept(text, []prose.Finding{one.found}, caps, words, prose.All)) > 0 {
+		if len(prose.Kept(text, []prose.Finding{one.found}, caps, words, mode)) > 0 {
 			out.rows = append(out.rows, one)
 		}
 	}

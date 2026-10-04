@@ -44,11 +44,3 @@ func TestWalk(t *testing.T) {
 		t.Fatalf("the reached leaves read %v", reached)
 	}
 }
-
-func stringsAny(said []string) []any {
-	out := make([]any, 0, len(said))
-	for _, one := range said {
-		out = append(out, one)
-	}
-	return out
-}

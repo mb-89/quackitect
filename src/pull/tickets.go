@@ -29,6 +29,8 @@ type Held struct {
 	Name, Path, Text string
 	Front            *yaml.Doc
 	Private          bool
+	// What the ticket held before a payload rode in, and the payload, which a refusal past its cap puts back.
+	Stood, Payload string
 }
 
 // Every ticket under the public folder, then every note under the private one. [[spec/design_output/work#a-group-is-a-ticket]]

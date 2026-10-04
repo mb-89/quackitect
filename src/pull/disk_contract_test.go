@@ -29,6 +29,17 @@ func diskSuite(t *testing.T, disk Disk) {
 			t.Fatalf("the folder lists %q", got)
 		}
 	})
+	t.Run("a removed file reads as nothing, and a second removal stands clean", func(t *testing.T) {
+		if err := disk.Write("spec/gone-soon.md", "x"); err != nil {
+			t.Fatal(err)
+		}
+		if err := disk.Remove("spec/gone-soon.md"); err != nil || disk.Exists("spec/gone-soon.md") {
+			t.Fatalf("the removal answers %v", err)
+		}
+		if err := disk.Remove("spec/gone-soon.md"); err != nil {
+			t.Fatalf("a second removal answers %v", err)
+		}
+	})
 	t.Run("a path nothing holds reads as nothing", func(t *testing.T) {
 		if _, ok := disk.Read("spec/gone.md"); ok || disk.Exists("spec/gone.md") || len(disk.Files("spec/gone")) != 0 {
 			t.Fatal("a path nothing holds answers something")

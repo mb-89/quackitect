@@ -56,6 +56,20 @@ func TestVerbRegistry(t *testing.T) {
 			t.Fatalf("the node module answers %v, and wants the verb's error", err)
 		}
 	})
+	t.Run("a person's call to a registered verb runs the road in a child, under the person's environment", func(t *testing.T) {
+		ran := false
+		registersFor(t, "registry probe", func([]string, bool, io.Writer, io.Writer) int { ran = true; return 0 })
+		was := selfPath
+		selfPath = func() (string, error) { return "/no/such/quack", nil }
+		t.Cleanup(func() { selfPath = was })
+		_, err := nodeAccept(t.TempDir())(q.Request{Args: map[string]any{"words": []any{"registry", "probe"}, "person": true}})
+		if ran {
+			t.Fatal("a person's call runs the twin in the index's own process")
+		}
+		if err == nil {
+			t.Fatal("the child road answers no fault, and the test binary takes no verb")
+		}
+	})
 	t.Run("the twins register through the registry", func(t *testing.T) {
 		for _, words := range []string{"ticket yours", "retro notes", "branch list --queue"} {
 			if registry[words] == nil {
