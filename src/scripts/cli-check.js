@@ -33,7 +33,6 @@ import {
   go,
   HEALTH_WAIT,
   it,
-  known,
   OURS,
   outside,
   PLUGIN,
