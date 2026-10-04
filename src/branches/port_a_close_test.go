@@ -49,7 +49,7 @@ func TestPACloseTakesItsOwnPrefix(t *testing.T) {
 	}
 }
 
-// Close holds a trunk carrying commits origin has never seen, and deletes nothing. [[spec/tickets/work-verbs-port-to-go]]
+// Close holds a trunk carrying commits origin lacks, and deletes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPACloseHoldsAnUnpushedTrunk(t *testing.T) {
 	one := newTree(t, nil)
 	paLanded(one, "work/landed")
