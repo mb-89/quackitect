@@ -85,7 +85,7 @@ process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 470a600bc22e · claude-code-remote
@@ -115,6 +115,25 @@ record:
     hand: the engine
     hash_before: 11e35ab406b45a667a3690043838107360d52318
     hash_after: 11e35ab406b45a667a3690043838107360d52318
+  - step: accept
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: e51b255ab5525777a5491bbd1724cd877feaf6a7
+    hash_after: e51b255ab5525777a5491bbd1724cd877feaf6a7
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/quack-holds-a-verb-registry already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 0c6937b1a801ee73
+        size: 294
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -165,8 +184,9 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The registry stands in registry.go, each twin registers from an init beside its function, and twinVerbs leaves verbs.go. The road and the node module both read the registry, so node meets only a verb no file registers. TestVerbRegistry covers the registered road, the unregistered road, the node module, a double registration, and the shared files. The live test shows the twin read settling beside the action calling it. The check stands green on the commit. A port keys its verb by three words at most, as twinWordsAt sets, which every verb in the ten groups fits.
 
 # retro
 
