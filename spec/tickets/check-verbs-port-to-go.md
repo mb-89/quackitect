@@ -405,3 +405,15 @@ pass with findings
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The callers the draft missed, off [[spec/tickets/check-port-callers-complete]]. The implement step moves or drops the cases each names over removed code:
+
+- test/level0/pull-fields.test.js: `expectedRed`, which moves to the Go red list
+- test/level0/cli-reporter.test.js: `TEST_PARTS` and `testArgv`
+- test/level0/probe-dry.test.js: `probeApart`, which the draft removes
+- test/contract/stub.test.js: the program path of verbs/check.js
+- test/level0/stub.test.js: the program path of verbs/check.js
+- test/level0/work-group.test.js: the command that runs verbs/check.js on node
+- test/level0/bash.test.js: the command that runs verbs/check.js on node
+
+The box searched src and test for every module and program path the draft removes. The golden at src/quack/testdata/tree.golden.json names them in ticket text alone, and test/level0/pull-kept.test.js names red-list in a link alone, so neither imports the code that leaves.
