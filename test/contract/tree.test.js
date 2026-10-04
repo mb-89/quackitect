@@ -101,7 +101,8 @@ const edited = (where, change) => {
 };
 
 // [[spec/design_output/bash#the-description-names-verbs]]
-test("every verb the Bash description names stands as a program, or quack registers it", () => {
+// A verb stands as a program, or registered in Go. [[spec/tickets/work-verbs-port-to-go]]
+test("every verb the Bash description names stands as a program or in Go", () => {
   assert.ok(VERBS.length, "the description names at least one verb");
   const inGo = goVerbs();
   for (const verb of VERBS) {

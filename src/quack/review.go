@@ -7,8 +7,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -16,22 +16,23 @@ import (
 	"quackitect/src/modules/hooks/review"
 )
 
-// The span the verb gathers in, the verb under the method root, and the why a verb printing nothing answers. [[spec/tickets/review-spawns-off-the-door]]
+// The span the verb gathers in, and the why a verb printing nothing answers. [[spec/tickets/review-spawns-off-the-door]]
 const (
 	reviewGathering = 300 * time.Second
-	reviewVerb      = "src/scripts/verbs/branch.js"
 	saidNothing     = "the verb printed nothing"
 )
 
 var printedLines = regexp.MustCompile(`\r?\n`)
 
-// The verb under the method root, run in the work root, and its material or why it gathered none. [[spec/tickets/review-spawns-off-the-door]]
+// The branch verb off the method root, run in the work root, and its material or why it gathered none. [[spec/tickets/review-spawns-off-the-door]] [[spec/tickets/work-verbs-port-to-go]]
 func reviewOver(method string) func(root, branch string) (review.Material, string) {
 	return func(root, branch string) (review.Material, string) {
 		span, stop := context.WithTimeout(context.Background(), reviewGathering)
 		defer stop()
-		run := exec.CommandContext(span, "node", filepath.Join(method, filepath.FromSlash(reviewVerb)), "review", branch, "--json")
+		road := append(selfRoad(method), "branch", "review", branch, "--json")
+		run := exec.CommandContext(span, road[0], road[1:]...)
 		run.Dir = root
+		run.Env = append(os.Environ(), "QUACKITECT_ROOT="+method, workRootVar+"="+root)
 		var out, errs bytes.Buffer
 		run.Stdout, run.Stderr = &out, &errs
 		_ = run.Run()

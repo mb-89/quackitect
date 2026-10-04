@@ -1,9 +1,8 @@
-// What the command line reads: the version, the index, the notes a reader
-// asks for, and the walk over a folder.
+// What the command line reads: the version, the check's own lint, and the
+// walk over a folder. The index, links, notes and find verbs run in Go.
 // [[spec/design_output/tree#the-tree-handed-in]]
 
 import { join } from "node:path";
-import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { surveyFindsNode } from "../../.claude/skills/level0/lib/tree.js";
 import { WARNING } from "../../.claude/skills/level0/lib/warnings.js";
@@ -43,19 +42,6 @@ export function version() {
   } catch {
     return "0";
   }
-}
-
-// [[spec/design_output/index#the-door-owns-the-database]]
-export function asksIndex(argv) {
-  const at = join(root, `${INDEX_BIN}${process.platform === "win32" ? ".exe" : ""}`);
-  if (!files.exists(at)) {
-    console.error("The index stands unbuilt here, so nothing answers.");
-    console.error("Run ./RUNME.sh once, which builds it where a C compiler stands.");
-    return 1;
-  }
-
-  const said = it.proc.run([at, ...argv], { cwd: root, inherit: true });
-  return said.exitCode;
 }
 
 // The command line's own reading, which `lint` prints and a case counts: the tools' rows, and the check module's sweep under the paths asked, which quack answers. [[spec/tickets/the-lsp-server-leaves]]

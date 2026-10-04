@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -40,12 +39,6 @@ const (
 	lintEnv     = "SE_LINT_FOUND"
 	noCgo       = "CGO_ENABLED=0"
 	contractTag = "contract"
-)
-
-// The port the server stands at where no pointer names one, which PORT_BASE in vehicle.js owns, and how long the health call waits. [[spec/design_output/level0#the-check-reads-the-server]]
-const (
-	portBase   = 6510
-	healthWait = 2 * time.Second
 )
 
 // The keys the check reads: its budget and the runs a stamp keeps. [[spec/tickets/the-check-runs-fast-again]] [[spec/guidance/retro/effect]]
@@ -456,15 +449,6 @@ func testArgv(root string, red []string, one testPart) []string {
 	}
 	slices.Sort(files)
 	return append(argv, files...)
-}
-
-// A path as a file URL, in forward slashes, with the slash a drive letter takes. [[spec/design_output/work#the-battery-answers-first]]
-func fileURL(path string) string {
-	slashed := filepath.ToSlash(path)
-	if !strings.HasPrefix(slashed, "/") {
-		slashed = "/" + slashed
-	}
-	return (&url.URL{Scheme: "file", Path: slashed}).String()
 }
 
 // What check --errors prints: a row a red case the reporter wrote, then a row a finding at error. [[spec/tickets/the-verbs-need-no-wrapper]]

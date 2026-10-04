@@ -180,7 +180,17 @@ export function readsTexts(it, texts, docs) {
 function configOf(it) {
   const method = it.method ?? it.root;
   const work = it.work ?? it.root;
-  return assemble(it.disk, { method, work, itself: method === work }).config;
+  return assemble(it.disk, { method, work, itself: sameRoot(method, work) }).config;
+}
+
+// The method root comes back with forward slashes and the start root with the ones Windows writes, so the two compare as one spelling. [[spec/tickets/box-verbs-windows-fakes]]
+export function sameRoot(one, other) {
+  const flat = (path) =>
+    String(path ?? "")
+      .split("\\")
+      .join("/")
+      .replace(/\/+$/, "");
+  return flat(one) === flat(other);
 }
 
 // What a reading names, sorted, so a case holds one front's list against the other's. [[spec/design_output/lsp#one-checker-every-front-asks]]

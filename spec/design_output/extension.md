@@ -479,15 +479,14 @@ none of its own.
 
 ## The link stands
 
-`src/scripts/editor.js` makes the link through the disk door, and the shell asks
-it first:
+The setup makes the link in `src/quack/editorlink.go`, and asks it first:
 
-- `linked` answers `0` where the link reaches this tree and the list names the id, and prints nothing.
-- `link` removes a copy, a stale link or a link pointing nowhere, links `src/extension`, and writes the entry.
+- the link stands where it reaches this tree and the list names the id, and the setup prints nothing.
+- otherwise the setup removes a copy, a stale link or a link pointing nowhere, links `src/extension`, and writes the entry.
 
 The link is a junction on Windows, which needs no administrator, and a symbolic
-link elsewhere. A standing link answers `linked`, so a run where nothing
-installs prints nothing. `link` refuses a destination outside
+link elsewhere. A standing link needs no work, so a run where nothing
+installs prints nothing. The setup refuses a destination outside
 `~/.vscode/extensions`.
 
 ## A link pointing nowhere
@@ -496,17 +495,17 @@ A tree that moves leaves the junction pointing at the old place. The editor
 then names the folder invalid, because `package.json` stands nowhere behind
 it, and the sidebar goes.
 
-The disk door reads such a link as a link, and reaches no folder behind it. So
-`linked` reads it as no link, `link` removes it the way it removes a copy, and
-the next `./RUNME.sh` fixes it. The fake disk follows a link the same way, and
-the contract test holds both doors to it. `./RUNME.sh doctor` says where the
+The setup reads such a link as a link, and reaches no folder behind it. So it
+reads it as no link, removes it the way it removes a copy, and the next
+`./RUNME.sh` fixes it. A case in `src/quack/editorlink_test.go` holds such a
+link in a temporary tree. `./RUNME.sh doctor` says where the
 link stands, in a row named `sidebar`.
 
 ## A file another program owns
 
 A linked folder draws nothing on its own. The editor loads what
 `~/.vscode/extensions/extensions.json` names, and that file holds every
-extension a person has. So `src/scripts/editor.js` writes it, and v3 and v4
+extension a person has. So `src/quack/editorlink.go` writes it, and v3 and v4
 both paid for the rules it holds:
 
 | what the writer meets | what it does |

@@ -1,6 +1,6 @@
 // The command line's dispatch stands in Go alone: cli.js stands nowhere, no
-// source names it, and every verb Go lists stands as a program of its own,
-// past the verbs quack registers.
+// source names it, and every program stands as a verb Go lists. A verb
+// running in Go carries no program.
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
@@ -50,7 +50,7 @@ test("no source under src, test or level zero names cli.js", () => {
   assert.deepEqual(naming, []);
 });
 
-test("every verb Go lists and leaves to node stands as a program, and no program stands past the list", () => {
+test("no program stands past the list Go holds", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
   const inGo = goVerbs();
   const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)]
@@ -67,5 +67,8 @@ test("every verb Go lists and leaves to node stands as a program, and no program
         .sort()
     : [];
   assert.ok(listed.length > 0, "the table lists a verb");
-  assert.deepEqual(programs, [...new Set(listed)].sort());
+  assert.deepEqual(
+    programs.filter((one) => !listed.includes(one)),
+    [],
+  );
 });
