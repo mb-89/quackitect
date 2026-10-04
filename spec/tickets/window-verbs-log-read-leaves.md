@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: c34b8cca3b5d4090
         size: 507
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 1751eccca2635e4b6b5aa1cb8cc1c959c38ac34a
+    hash_after: 1751eccca2635e4b6b5aa1cb8cc1c959c38ac34a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 6cde03ecb0edb0c3
+        size: 1602
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,31 @@ Delete src/scripts/log-read.js and test/level0/log-read.test.js, since no progra
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/log-read-leaves.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/log-read-leaves.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their own assertion: the module stands, and the search finds it named in src/quack/tui_verb.go, test/level0/log-read.test.js and spec/design_output/log.md. The search skips src/quack/testdata, since a golden holds old ticket asks as they stood.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the search case decides the first done_when line and reads log.md for the second, and ./RUNME.sh check decides the third
+- the test reads the real disk door, which test/contract drives as its contract
 
 # gate
 
