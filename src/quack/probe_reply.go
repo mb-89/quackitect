@@ -29,7 +29,7 @@ var replyOpens = strings.Join([]string{
 	"After the call, write the first line of this prompt as you received it, in double quotes.",
 }, " ")
 
-var spaces = regexp.MustCompile(`\s+`)
+var probeSpaces = regexp.MustCompile(`\s+`)
 
 // What the reply probe reads: the call's fields in order, the fields carrying the message's text, the warning, and why. [[spec/tickets/the-reply-probe-runs]]
 type replyRead struct {
@@ -87,7 +87,7 @@ func probeReply(d boxDoors, client string) int {
 	read := readsReply(rows[before:], ran.stdout)
 	if read.fields != nil {
 		for _, key := range read.fields.keys {
-			shown := []rune(spaces.ReplaceAllString(jsText(read.fields.values[key]), " "))
+			shown := []rune(probeSpaces.ReplaceAllString(probeValueText(read.fields.values[key]), " "))
 			if len(shown) > replyShown {
 				shown = shown[:replyShown]
 			}

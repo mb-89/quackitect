@@ -84,7 +84,7 @@ func stepsOf(stream string) coldSteps {
 		if one.text("type") == "system" && one.text("subtype") == "init" {
 			tools, _ := one["tools"].([]any)
 			for _, each := range tools {
-				steps.tools = append(steps.tools, jsText(each))
+				steps.tools = append(steps.tools, probeValueText(each))
 			}
 		}
 		if one.text("type") == "result" {
