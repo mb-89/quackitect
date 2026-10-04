@@ -19,6 +19,7 @@ import (
 	"quackitect/src/index"
 	"quackitect/src/modules/hooks/brief"
 	"quackitect/src/tui/frame"
+	"quackitect/src/vehicle"
 )
 
 // What a fake box records: the builds it ran, the launches, and the tabs it told. [[spec/design_output/tui#the-verb-builds-it]]
@@ -383,10 +384,18 @@ func TestTuiSourceTextJoinsPathsAndTexts(t *testing.T) {
 	}
 }
 
-// The window's door stands one below the bridge's base, 6510 in .claude/skills/level0/lib/vehicle.js. [[spec/design_output/tui#a-second-launch-hands-over]]
+// The window's door stands one below the bridge's base, and no vehicle the register places takes it. [[spec/design_output/tui#a-second-launch-hands-over]]
 func TestTuiWindowListensOneBelowTheBridge(t *testing.T) {
-	if frame.WindowPort != 6510-1 {
+	if frame.WindowPort != vehicle.PortBase-1 {
 		t.Errorf("the window listens at %d", frame.WindowPort)
+	}
+	var list []*vehicle.Object
+	for _, id := range []string{"v0", "v1", "v2", "v3"} {
+		one := vehicle.WithPort(list, vehicle.EntryOf(id, "1", "/tree/"+id, "now"))
+		if port, _ := vehicle.Get(one, "port"); vehicle.ToNumber(port) == float64(frame.WindowPort) {
+			t.Fatalf("%s takes the window's port", id)
+		}
+		list = append(list, one)
 	}
 }
 

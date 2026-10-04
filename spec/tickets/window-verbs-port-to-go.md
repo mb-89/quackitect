@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 1b0d85c2ca187e59
         size: 3644
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e385b836f39 · claude-code-remote · helper-4
+    hash_before: 3402529f7166082d64f93e1584a20bdcc3772133
+    hash_after: 3402529f7166082d64f93e1584a20bdcc3772133
+    inputs:
+      - name: design/draft
+        hash: 1b0d85c2ca187e59
+        size: 3644
+      - name: design/tests-red
+        hash: b82d35769d0656c1
+        size: 1214
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -280,8 +292,10 @@ Under the overlay, TestTuiRegisters, TestServeRegisters, TestVoiceRegistersUnder
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- registered-verb-skips-the-mode: under migration.verbs old or shadow, roadOf in src/quack/verbs.go sends tui, serve, voice, vehicle and stub to node, whose programs this port deletes, so each verb fails there; the road sends a registered verb with no program to quack under every mode, with a case in src/quack/verbs_test.go
 
 # implement
 
