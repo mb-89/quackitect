@@ -26,7 +26,7 @@ const DOORED = new Set([
 ]);
 // The calls that pass while the door stands down: the harness reads. [[spec/tickets/a-down-index-refuses-calls]] [[spec/tickets/level0-tools-leave-the-bridge]]
 const UNGUARDED = new Set(["Read", "Grep", "Glob"]);
-// The leading change of folder a recovery command may carry, which moves nothing but the shell. [[spec/tickets/the-cage-survives-its-index]]
+// The change of folder that leads a recovery command, which moves the shell alone. [[spec/tickets/the-cage-survives-its-index]]
 const INTO = /^\s*cd\s+[\w./-]+\s*&&\s*/;
 // A character outside quotes that chains, pipes, redirects, substitutes or globs, so the words it stands in run as no recovery command. [[spec/tickets/the-cage-survives-its-index]]
 const SHELL = /[;&|<>`$()\\\n\r*?{}[\]~#!]/;
