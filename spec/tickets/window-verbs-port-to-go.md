@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: 3d3c8c3eb534276d9e78c645ad70beced24260ef
+    hash_after: 3d3c8c3eb534276d9e78c645ad70beced24260ef
+    inputs:
+      - name: ask
+        hash: bbe9c1cc20d15917
+        size: 750
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,67 @@ The window, the index's start and the vehicles answer from the Go binary that al
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each verb gets one Go file under src/quack that registers it from an init, the way twins.go registers its twins: tui_verb.go, serve_verb.go, voice_verb.go, vehicle_verb.go and stub_verb.go. Under migration.verbs new the road hands a registered verb to its Go answer, and the node module answers a vehicle or stub action through goAnswer, so neither reaches node. Each file carries a prefix of its verb on every helper name, so a parallel group porting another verb into package main meets no name collision. The vehicle and stub verbs share the register, the identity, the roots and the pointer port, so that logic stands in a new package src/vehicle, ported from lib/vehicle.js, src/scripts/vehicle.js and src/bridge/vehicle.js. The JS of those modules stays, since the hooks, serve.js and the probes still import it. tui builds the viewer off the same source hash viewerOf writes, hands a tab to a standing window over frame.TellPort, launches the viewer holding the terminal, and prints the session log's rows where no Go builds it. serve runs quack standing and reads the hooks standing file, as detachedStart does. voice ports measure and refused off lib/voice.js. The verb files src/scripts/verbs/{tui,serve,voice,vehicle,stub}.js leave, and with them every module only they import: src/scripts/tui.js, src/scripts/voice.js, src/scripts/vehicle-verb.js, src/scripts/stub.js and src/bridge/window.js, with the JS tests over them. src/scripts/serve.js, src/scripts/vehicle.js, src/bridge/vehicle.js, lib/vehicle.js and lib/voice.js keep importers, and stay. Assumed: the Go output matches the JS output line for line, since the lens and the tests read it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbRoad, through the registry
+- src/quack/twins.go nodeAccept, for the vehicle and stub actions spec/wiring.yaml loads
+- RUNME.sh, through quack verb
+- test/contract/verb-programs.test.js RUNS, which drops the five verbs
+- test/level0/tui-verb.test.js, voiceverb.test.js, stub.test.js, window-door.test.js, test/contract/stub.test.js, which leave with their modules
+- test/level0/brand.test.js, which drops its stub.js case
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/tui_verb_test.go: the tab argument, the plain rows, the handover to a standing window, the launch
+- src/quack/serve_verb_test.go: a fresh start, a door already answering, a failing start
+- src/quack/voice_verb_test.go: usage, measure missing Vale, measure over a folder, measure --transcripts, refused over days
+- src/vehicle/vehicle_test.go: identity, register read and write, roots, produce, attach port, detach
+- src/quack/vehicle_verb_test.go: here, produce, into, attach, detach, register
+- src/quack/stub_verb_test.go: usage, beside its vehicle, no upstream, empty brand, a written stub
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/tui_verb.go
+- src/quack/serve_verb.go
+- src/quack/voice_verb.go
+- src/quack/vehicle_verb.go
+- src/quack/stub_verb.go
+- src/vehicle/*.go
+- the matching _test.go files
+- src/scripts/verbs/{tui,serve,voice,vehicle,stub}.js
+- src/scripts/{tui,voice,vehicle-verb,stub}.js
+- src/bridge/window.js
+- test/contract/verb-programs.test.js
+- the JS tests over the deleted modules
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function the approach names stands opened: the five verb files, tui.js, serve.js, voice.js, vehicle-verb.js, stub.js, vehicle.js, verbs.go, twins.go, registry.go, frame/door.go, tui-build.js
+- the callers list names the road, the node module, RUNME.sh and every JS importer the resolver found
+- each done_when line maps to a test: go test for the roads, a node-free run per verb, the ls of src/scripts/verbs, the importer search, and the check
 
 ## tests-red
 
