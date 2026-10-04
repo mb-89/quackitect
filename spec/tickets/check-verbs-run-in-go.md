@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 233780cb27f2 · claude-code-remote
@@ -143,6 +143,25 @@ record:
   - step: accept
     hand: box f8b80b32320c · claude-code-remote
     hash_before: 56e0aa9bf2ee9c8909c3191e860aad2128c9e042
+  - step: accept
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: 13983f5ae1958ddc05a0e3837ac5f3b2fbfb2074
+    hash_after: 13983f5ae1958ddc05a0e3837ac5f3b2fbfb2074
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/check-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 562ed8018c52a819
+        size: 292
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -196,9 +215,11 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- check-reads-the-road-root: checkDoorsOf takes its root off QUACKITECT_ROOT, so a review the index starts checks main in place of the branch
-- check-errors-names-the-part: under --errors a quiet red part drops why it failed, and part lines reach the stdout the merge hands on
+accept
+- check and test register in Go from check.go and testverb.go, and the contract tests pass under the check on 55c2b9e4
+- verbs/check.js, verbs/test.js, check-verb.js and red-list.js leave the tree, and an import graph over src finds no module the port orphaned; check-twins.js stays, owned by check-twins-leave-phase-seven
+- check-reads-the-road-root and check-errors-names-the-part close the points of the last verdict
+- two merges of main took the work and box ports in; check.go reads the probe port s portBase, healthWait and fileURL in place of its own copies
 
 # retro
 
