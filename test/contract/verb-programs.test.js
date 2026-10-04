@@ -3,6 +3,9 @@
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
+import { readdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
@@ -11,12 +14,9 @@ import { run as branch } from "../../src/scripts/verbs/branch.js";
 import { run as check } from "../../src/scripts/verbs/check.js";
 import { run as cloud } from "../../src/scripts/verbs/cloud.js";
 import { run as commit } from "../../src/scripts/verbs/commit.js";
-import { run as config } from "../../src/scripts/verbs/config.js";
 import { run as dispatch } from "../../src/scripts/verbs/dispatch.js";
 import { run as doctor } from "../../src/scripts/verbs/doctor.js";
-import { run as doors } from "../../src/scripts/verbs/doors.js";
 import { run as find } from "../../src/scripts/verbs/find.js";
-import { run as fix } from "../../src/scripts/verbs/fix.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
 import { run as index } from "../../src/scripts/verbs/index.js";
 import { run as links } from "../../src/scripts/verbs/links.js";
@@ -29,11 +29,9 @@ import { run as project } from "../../src/scripts/verbs/project.js";
 import { run as push } from "../../src/scripts/verbs/push.js";
 import { run as rename } from "../../src/scripts/verbs/rename.js";
 import { run as retro } from "../../src/scripts/verbs/retro.js";
-import { run as rules } from "../../src/scripts/verbs/rules.js";
 import { run as serve } from "../../src/scripts/verbs/serve.js";
 import { run as setup } from "../../src/scripts/verbs/setup.js";
 import { run as split } from "../../src/scripts/verbs/split.js";
-import { run as standing } from "../../src/scripts/verbs/standing.js";
 import { run as stub } from "../../src/scripts/verbs/stub.js";
 import { run as testVerb } from "../../src/scripts/verbs/test.js";
 import { run as ticket } from "../../src/scripts/verbs/ticket.js";
@@ -48,12 +46,9 @@ const RUNS = {
   check,
   cloud,
   commit,
-  config,
   dispatch,
   doctor,
-  doors,
   find,
-  fix,
   graph,
   index,
   links,
@@ -66,11 +61,9 @@ const RUNS = {
   push,
   rename,
   retro,
-  rules,
   serve,
   setup,
   split,
-  standing,
   stub,
   test: testVerb,
   ticket,
@@ -80,9 +73,16 @@ const RUNS = {
   voice,
 };
 
-test("every verb of the table loads as a program answering a run", () => {
-  const listed = [...commands().keys()].sort();
+// A verb that runs in Go leaves its program, so the folder names what stays in node. [[spec/tickets/quack-registers-each-verb]]
+test("every program of the folder loads as a verb of the table answering a run", () => {
+  const folder = join(dirname(fileURLToPath(import.meta.url)), "..", "..", ...VERBS);
+  const listed = readdirSync(folder)
+    .filter((one) => one.endsWith(".js"))
+    .map((one) => one.slice(0, -".js".length))
+    .sort();
   assert.deepEqual(Object.keys(RUNS).sort(), listed);
+  const table = commands();
+  for (const verb of listed) assert.ok(table.has(verb), `${verb} stands in the table`);
   for (const [verb, run] of Object.entries(RUNS)) {
     assert.equal(typeof run, "function", `${verb} runs`);
   }

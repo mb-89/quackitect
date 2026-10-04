@@ -2,9 +2,7 @@
 // projections, the plugin, the doors, the rules and the sidebar.
 // [[spec/design_output/level0#the-check-reads-the-server]]
 
-import { dirname, join, resolve, sep } from "node:path";
-import { CONFIG_DIR } from "../../.claude/skills/level0/lib/code.js";
-import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
+import { dirname, join, sep } from "node:path";
 import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
@@ -15,12 +13,9 @@ import {
   staleIn,
 } from "../../.claude/skills/level0/lib/projection.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
-import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
-import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
-import { guidanceHere } from "../bridge/guidance.js";
 import { vale } from "../doors/vale.js";
 import { whereIs, writeSurvey } from "../engine/tools.js";
 import { browserSays } from "./browser.js";
@@ -28,33 +23,26 @@ import { probeApart } from "./probe-dry.js";
 
 export { deltaOf } from "./probe-dry.js";
 import {
-  bin,
   biome,
   COL,
   CONTRACT,
   DOORS,
   files,
-  GUIDANCE,
   go,
   HEALTH_WAIT,
   it,
   known,
-  OURS,
   outside,
   PLUGIN,
-  ROUNDS,
   root,
-  run,
   SCRIPTED,
   SHAPE,
   STYLES,
-  settings,
 } from "./cli-doors.js";
-import { FIX_USAGE, fixFlags } from "./cli-fix.js";
 import { goEnvOf, goGate, goTestNames } from "./cli-go.js";
 import { hookRows, hooksNamed } from "./cli-hooks.js";
-import { namesIn, show, walk } from "./cli-read.js";
-import { answerOf, configRowsOf, quackAt, readsNew, topicOf } from "./quack-topic.js";
+import { namesIn, show } from "./cli-read.js";
+import { quackAt } from "./quack-topic.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { lspProbe } from "./lsp-probe.js";
 import { HOOKS } from "./precommit.js";
@@ -150,106 +138,6 @@ export function skipOf(red, read) {
   const paths = red.flatMap((one) => String(one).split(",")).map((one) => one.trim());
   const names = goTestNames(paths, read);
   return names.length ? ["-skip", `^(${names.join("|")})$`] : [];
-}
-
-// [[spec/design_output/config#the-verb-names-the-layer]]
-export async function readConfig(argv, here = it) {
-  const [key, ...said] = argv.filter((one) => !one.startsWith("-"));
-
-  if (key && said.length) {
-    const wrote = await settings.write(key, said.join(" "));
-    // [[spec/design_output/log#a-setting-writes-a-line]]
-    await it.log.say("info", "config", `${wrote.key} is ${wrote.value}`, {
-      detail: wrote.layer,
-    });
-    console.log(`${wrote.key} is ${JSON.stringify(wrote.value)} in ${wrote.layer}.`);
-    return 0;
-  }
-
-  // The rows come off quack config where the config slice reads new. [[spec/tickets/topic-fallback-leaves-the-readers]]
-  const rows = readsNew(here, "config")
-    ? answerOf(configRowsOf(topicOf(here, ["config"])), "config")
-    : await settings.all();
-  const wanted = key ? rows.filter((one) => one.key === key) : rows;
-  if (key && !wanted.length) {
-    console.error(`No layer answers ${key}. Run ./RUNME.sh config to see every key.`);
-    return 2;
-  }
-  for (const one of wanted) {
-    console.log(
-      `${one.key.padEnd(COL.key)} ${String(one.value).padEnd(COL.value)} ${one.layer}`,
-    );
-  }
-  if (key) return 0;
-
-  for (const fault of await settings.faults()) {
-    console.error(`${fault}, and the code reading it finds nothing.`);
-  }
-  console.log("");
-  console.log(`Write one: ./RUNME.sh config <key> <value>, which lands in ${LOCAL}.`);
-  return 0;
-}
-
-// A flag the fixer knows nothing of refuses before a write. [[spec/tickets/the-small-faults-land]]
-export async function fix(argv) {
-  const { help, unknown, paths: where } = fixFlags(argv);
-  if (help || unknown.length) {
-    if (help) console.log(FIX_USAGE);
-    else console.error(`fix knows no flag ${unknown.join(", ")}. ${FIX_USAGE}`);
-    return help ? 0 : 2;
-  }
-  if (!files.exists(bin)) {
-    console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
-    return 2;
-  }
-  for (let round = 0; round < ROUNDS; round++) {
-    const was = stamp(where);
-    await calm(where);
-    outside.run([bin, "fix", "--apply", `--config=${CONFIG}`, OURS, ...where], {
-      cwd: root,
-      inherit: true,
-    });
-    if (stamp(where) === was) break;
-  }
-
-  if (files.exists(biome)) {
-    outside.run([biome, "check", "--write", `--config-path=${CONFIG_DIR}`, ...where], {
-      cwd: root,
-      inherit: true,
-    });
-  }
-  console.log("Run ./RUNME.sh lint to see what is left for a person.");
-  return 0;
-}
-
-export async function calm(where) {
-  const ran = await run([
-    bin,
-    `--config=${CONFIG}`,
-    "--output=JSON",
-    "--no-exit",
-    OURS,
-    ...where,
-  ]);
-
-  const perFile = new Map();
-  for (const one of fromJson(ran.stdout)) {
-    if (one.rule !== SHOUTED) continue;
-    perFile.set(one.file, [...(perFile.get(one.file) ?? []), one]);
-  }
-
-  for (const [file, rows] of perFile) {
-    const path = resolve(root, file);
-    const was = files.read(path);
-    const now = calmed(was, rows);
-    if (now !== was) files.write(path, now);
-  }
-}
-
-export function stamp(where) {
-  return walk(where)
-    .map((file) => `${file}\u0000${files.read(file)}`)
-    .join("\u0000");
 }
 
 export function projections() {
@@ -421,39 +309,6 @@ export function doorsHold() {
     return 1;
   }
   console.log(`${doors.length} doors, and a contract test holds each one.`);
-  return 0;
-}
-
-export function listRules() {
-  if (!files.exists(STYLES)) {
-    console.error("The style folder is missing.");
-    return 2;
-  }
-  for (const at of [STYLES, SHAPE, SCRIPTED]) {
-    if (!files.exists(at)) continue;
-    for (const name of namesIn(at, ".yml")) {
-      const text = files.read(join(at, name));
-      const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
-      console.log(`${name.replace(/\.yml$/, "").padEnd(COL.rule)} ${message}`);
-    }
-  }
-  return 0;
-}
-
-export async function standing(argv = []) {
-  if (!files.exists(GUIDANCE)) {
-    console.error("There is no spec/guidance, so nothing is handed over.");
-    return 2;
-  }
-  const stop = (await settings.ask("stop.enabled")) !== false;
-  const said = guidanceHere(files, it.method, it.work, process.env, stop, argv);
-  if (!said.helper) {
-    console.log("No guidance note carries an Actionables chapter.");
-    return 0;
-  }
-  console.log(said.helper);
-  console.log("");
-  console.log(said.sentence);
   return 0;
 }
 

@@ -45,6 +45,18 @@ test("the Go part runs quiet under --errors, and names each failing Go test on t
   );
 });
 
+// The verbs config, fix, rules and standing run in Go, so their JavaScript leaves cli-check.js. [[spec/tickets/config-verbs-port-to-go]]
+test("cli-check.js holds none of the verbs that run in Go", () => {
+  for (const name of ["readConfig", "fix", "calm", "stamp", "listRules", "standing"]) {
+    assert.doesNotMatch(
+      source,
+      new RegExp(`export (async )?function ${name}\\(`),
+      `${name} stands in cli-check.js`,
+    );
+  }
+  assert.doesNotMatch(source, /shout\.js|cli-fix\.js/, "cli-check.js imports a module that left");
+});
+
 // The cloud read and the ticket folders each stand in one module, and the readers import them. [[spec/tickets/each-fact-keeps-one-owner]]
 test("every reader of the cloud asks cloudHere, and named.js builds no folder list of its own", () => {
   for (const path of [

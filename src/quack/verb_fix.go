@@ -26,7 +26,7 @@ import (
 // The glob Vale reads past, as OURS in src/bridge/findings.js names it. [[spec/design_output/lsp]]
 const valeParked = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
 
-// The usage, the rounds Vale fixes at most, Vale's config, biome's config folder and the rule the calm reads, as cli-fix.js, cli-doors.js, vale.js, code.js and shout.js name them. [[spec/tickets/the-small-faults-land]]
+// The usage, the rounds Vale fixes at most, Vale's config, biome's config folder and the rule the calm reads. [[spec/tickets/the-small-faults-land]]
 const (
 	fixUsage    = "Usage: ./RUNME.sh fix [path ...], over the paths or the tree."
 	fixRounds   = 5
@@ -183,7 +183,7 @@ func calm(root, vale string, paths []string, run fixRunner) {
 	}
 }
 
-// The text with each shout sentence-cased where it stands at its line and column, the last first, as calmed in shout.js writes it. [[spec/design_output/level0#the-fixer-calms-a-shout]]
+// The text with each shout sentence-cased where it stands at its line and column, the last first, so an earlier span keeps its column. [[spec/design_output/level0#the-fixer-calms-a-shout]]
 func calmed(text string, shouts []valeRow) string {
 	sort.SliceStable(shouts, func(i, j int) bool {
 		if shouts[i].Line != shouts[j].Line {

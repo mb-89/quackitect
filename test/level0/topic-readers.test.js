@@ -14,7 +14,6 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { readConfig } from "../../src/scripts/cli-check.js";
 import { guidance } from "../../src/scripts/guidance-verb.js";
 import { logVerb } from "../../src/scripts/log-verb.js";
 import { handed } from "../../src/scripts/pull-hand.js";
@@ -118,10 +117,6 @@ test("every reader on a new slice faults where its topic answers nothing, naming
   await assert.rejects(
     () => printed(() => logVerb(it, [])),
     /quack log answers nothing/,
-  );
-  await assert.rejects(
-    () => printed(() => readConfig([], it)),
-    /quack config answers nothing/,
   );
   assert.throws(
     () => readsProse(it, "the door set the write\n", [set]),
@@ -319,18 +314,4 @@ test("keptOf answers what keptOver answers for its one text, and a short answer 
     "one doc answered for two reads as nothing",
   );
   assert.deepEqual(keptOver(it, [], "past"), [], "no text asks no quack");
-});
-
-test("readConfig prints the rows quack config answers where the config slice reads new", async () => {
-  const it = itOf(
-    "new",
-    {},
-    {
-      [`${QUACK} config`]: {
-        stdout: JSON.stringify({ "a.one": { value: "from go", layer: "tracked" } }),
-      },
-    },
-  );
-  const out = await printed(() => readConfig(["a.one"], it));
-  assert.match(out, /a\.one\s+from go\s+tracked/);
 });

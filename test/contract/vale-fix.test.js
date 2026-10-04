@@ -6,7 +6,8 @@
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
+// The calm of a shouted lead runs in Go, and TestTheCalmCalmsTheShoutRealValeNames holds it over real Vale. [[spec/tickets/config-verbs-port-to-go]]
+const SHOUTED = "ShoutedLead";
 import { NOTE, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -65,15 +66,11 @@ ifVale(
 );
 
 ifVale(
-  "a shouted lead is reported with no action, and the tree calms it",
+  "a shouted lead is reported with no action, so the fixer calms it",
   proves({ it: noted("NOTHING AT ALL WORKS HERE, and then calm.") }, (said) => {
     const shouts = said.found("it").filter((one) => one.rule === SHOUTED);
     assert.equal(shouts.length, 1);
     assert.equal(shouts[0].fixable, false);
-    assert.equal(
-      calmed(said.text("it"), shouts),
-      noted("Nothing at all works here, and then calm."),
-    );
   }),
 );
 
@@ -86,10 +83,7 @@ ifVale(
       calm: noted("Don't stop at all here, and then calm."),
     },
     (said) => {
-      assert.equal(
-        calmed(said.text("shouted"), said.found("shouted")),
-        said.text("calm"),
-      );
+      assert.ok(said.rules("shouted").includes(SHOUTED));
       assert.equal(
         said.fixed("calm"),
         noted("Do not stop at all here, and then calm."),
