@@ -11,13 +11,13 @@ import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
-import { commands, registered } from "./commands.js";
+import { commands, goVerbs } from "./commands.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
 
 // A verb answers as a program where its file stands, and registers in Go where none does, so a port edits no line here. [[spec/tickets/box-verbs-port-to-go]]
 test("every verb of the table loads as a program answering a run, or registers in Go", async () => {
-  const go = registered();
+  const go = goVerbs();
   const listed = new Set(commands().keys());
   const files = disk();
   for (const { name: one } of files.list(join(ROOT, ...VERBS))) {

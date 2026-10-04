@@ -22,9 +22,9 @@ async function reviewsBranch(e, box) {
   const name = String(e?.branch ?? "").trim();
   if (!name) return { result: { result: "review_branch takes one branch name." } };
 
-  // The node path comes off the box the server root builds. [[spec/design_output/doors#a-door-reads-the-outside]]
+  // The branch verb answers in Go, off the method root's RUNME.sh. [[spec/tickets/work-verbs-port-to-go]]
   const ran = box.proc.run(
-    [box.node, `${box.method}/src/scripts/verbs/branch.js`, "review", name, "--json"],
+    ["sh", `${box.method}/RUNME.sh`, "branch", "review", name, "--json"],
     {
       cwd: box.work,
       timeoutMs: GATHERING,

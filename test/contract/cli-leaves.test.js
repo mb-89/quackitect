@@ -1,5 +1,6 @@
 // The command line's dispatch stands in Go alone: cli.js stands nowhere, no
-// source names it, and every verb Go lists stands as a program of its own.
+// source names it, and every program stands as a verb Go lists. A verb
+// running in Go carries no program.
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
@@ -7,7 +8,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { registered } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -49,8 +49,7 @@ test("no source under src, test or level zero names cli.js", () => {
   assert.deepEqual(naming, []);
 });
 
-// A ported verb registers in Go in place of its program. [[spec/tickets/box-verbs-port-to-go]]
-test("every verb Go lists stands as a program or registers in Go, and no program stands past the list", () => {
+test("no program stands past the list Go holds", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
   const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)].map((one) => one[1]).sort();
   const folder = join(root, "src", "scripts", "verbs");
@@ -63,15 +62,8 @@ test("every verb Go lists stands as a program or registers in Go, and no program
         .sort()
     : [];
   assert.ok(listed.length > 0, "the table lists a verb");
-  const go = registered();
   assert.deepEqual(
     programs.filter((one) => !listed.includes(one)),
     [],
-    "a program stands past the list",
-  );
-  assert.deepEqual(
-    listed.filter((one) => !programs.includes(one) && !go.has(one)),
-    [],
-    "a verb stands as no program and registers no Go verb",
   );
 });
