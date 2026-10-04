@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+step: children-2
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -25,12 +26,15 @@ steps:
   - name: children
     by: children
     on_fail: split
+  - name: children-2
+    by: children
+    on_fail: split
   - name: accept
     gate: does the work of every child add up to the goal, and does every command of the route pass
     final: true
     does: reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points
     tags: ["review", "accept"]
-    input: ["ask", "children"]
+    input: ["ask", "children", "children-2"]
     evidence:
       - name: verdict
         form: verdict
@@ -48,7 +52,7 @@ steps:
             says: retro notes, which passes when the private folder is empty
       - name: write
         does: writes the retro over the box's own window
-        input: ["children", "notes"]
+        input: ["children", "notes", "children-2"]
         checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it", "every header the change writes says what its file is for, and counts nothing", "the chapter carries the run's owner prompts and errors off the transcript, each with its time", "the chapter says the role, and carries no name, address or path of the box"]
         evidence:
           - name: done
@@ -82,11 +86,6 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-group: the-verbs-run-in-go
-enabled_by: migration.phase11
-cloud: true
-depends_on: ["quack-holds-a-verb-registry"]
-step: accept
 record:
   - step: sync
     hand: box 2e385b836f39 · claude-code-remote
@@ -120,6 +119,20 @@ record:
     hand: the engine
     hash_before: 2934f0685698b5e1a142fc8bb34ae12b8732b878
     hash_after: 2934f0685698b5e1a142fc8bb34ae12b8732b878
+  - step: accept
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 245973525ad2962658c9221a3dc03e0ce393a6c7
+    hash_after: 595fce395717ae0b403e6b9c413903cbc7168a69
+    returns: 1
+    why: "the Windows job of the check fails go test on src/quack, src/vehicle and src/voice, the group own packages: window-verbs-windows-green carries it; src/scripts/log-read.js stands with no importer past its own test since tui.js left, and spec/design_output/log.md still names it as the read tui --plain calls"
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/window-verbs-run-in-go already carries every commit on main.
+group: the-verbs-run-in-go
+depends_on: ["quack-holds-a-verb-registry"]
+enabled_by: migration.phase11
+cloud: true
 ---
 
 # Ask
@@ -162,6 +175,8 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 
 # children
 
+# children-2
+
 # accept
 
 <!-- reads the diff since its last verdict against the goal and every prose criterion, and names what falls short as points -->
@@ -169,8 +184,11 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+reject
+- the Windows job of the check fails go test on src/quack, src/vehicle and src/voice, the group own packages: window-verbs-windows-green carries it
+- src/scripts/log-read.js stands with no importer past its own test since tui.js left, and spec/design_output/log.md still names it as the read tui --plain calls
 
 # retro
 
