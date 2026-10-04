@@ -366,9 +366,9 @@ test("a path under the hooks folder or a named cold file sits on the cold path",
   assert.ok(COLD_PATH.includes(".claude/skills/level0/lib/guidance.js"));
 });
 
-// The install hands the stamp and the setup on, so each runs on the cold road beside it. [[spec/tickets/cold-probe-reads-the-setup]]
+// The install hands the stamp and the setup on, so each runs on the cold road beside it. The setup runs in Go, under src/quack. [[spec/tickets/cold-probe-reads-the-setup]] [[spec/tickets/box-verbs-port-to-go]]
 test("the stamp and the setup verb sit on the cold path beside the install", () => {
-  const road = ["src/scripts/go-stamp.sh", "src/scripts/verbs/setup.js"];
+  const road = ["src/scripts/go-stamp.sh", "src/quack/setup_verb.go"];
   assert.deepEqual(coldIn(road), road);
 });
 

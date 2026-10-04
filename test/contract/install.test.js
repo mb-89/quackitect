@@ -14,11 +14,13 @@ import {
 } from "../../.claude/skills/level0/lib/servers.js";
 import { rebuilt } from "../../.claude/skills/level0/lib/tools.js";
 import { disk } from "../../src/doors/disk.js";
-import { WANTS } from "../../src/scripts/verbs/setup.js";
 import { FETCHING } from "./fetching.js";
 
-
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+const SETUP = join(root, "src", "quack", "setup_verb.go");
+
+// The setup's wants, read off the Go verb, which names each under want. [[spec/tickets/box-verbs-port-to-go]]
+const WANTS = [...disk().read(SETUP).matchAll(/^\s*want:\s+"([\w-]+)",$/gm)].map((one) => one[1]);
 
 test("every binary this tree builds rebuilds when its source moves ahead", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
@@ -46,7 +48,8 @@ test("the install hands its JavaScript steps to the setup verb, and goes on wher
     /\|\|\s*\n?\s*say /,
     "the setup carries a fallback line, so a refusal stops no verb",
   );
-  assert.ok(disk().exists(join(root, "src", "scripts", "verbs", "setup.js")), "the verb stands");
+  assert.match(disk().read(SETUP), /registerBox\("setup", /, "the verb registers in the index");
+  assert.ok(WANTS.length > 0, "the verb names its wants");
 });
 
 // The shell spells the asset table servers.js owns, because a shell script imports nothing. [[spec/design_output/editor#the-asset-matrix]]
