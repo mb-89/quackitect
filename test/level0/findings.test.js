@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import * as findingsModule from "../../src/bridge/findings.js";
-import { FROM, findingsOver } from "../../src/bridge/findings.js";
+import { FROM, findingsOver, sameRoot } from "../../src/bridge/findings.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -29,6 +29,13 @@ function doors(answers = {}) {
     ceilings: { function: 150, file: 600 },
   };
 }
+
+// A tree reads as itself whichever slash spells its roots, so a Windows reading assembles nothing in place. [[spec/tickets/box-verbs-windows-fakes]]
+test("one root under either slash reads as one tree, and two roots read as two", () => {
+  assert.ok(sameRoot("D:\\a\\tree", "D:/a/tree"));
+  assert.ok(sameRoot("D:/a/tree/", "D:\\a\\tree"));
+  assert.ok(!sameRoot("/a/tree", "/a/stub"));
+});
 
 test("a rule written in JavaScript reaches the list, named by the front it comes from", async () => {
   const got = await findingsOver(doors(), ["."]);

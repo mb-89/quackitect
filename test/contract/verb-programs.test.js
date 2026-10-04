@@ -1,33 +1,39 @@
-// Every verb program the folder holds loads over the real doors as a verb of
-// the table and hands its words to a run, the vehicle bodies stand beside
-// them, and the lens names their folder. A verb with no program runs in Go.
-// [[spec/tickets/cli-js-leaves]] [[spec/tickets/landing-verbs-port-to-go]]
+// Every verb program loads over the real doors and hands its words to a run,
+// the vehicle bodies stand beside them, and the lens names their folder.
+// [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
-import { VERBS } from "../../src/scripts/verb-run.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
+import { VERBS } from "../../src/scripts/verb-run.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
-import { commands } from "./commands.js";
+import { commands, goVerbs } from "./commands.js";
 
-const FOLDER = join(dirname(dirname(dirname(fileURLToPath(import.meta.url)))), ...VERBS);
+const ROOT = join(import.meta.dirname, "..", "..");
 
-// A port deletes the program and touches no line of this test. [[spec/tickets/landing-verbs-port-to-go]]
-test("every program of the verbs folder loads as a verb of the table answering a run", async () => {
+// A verb answers as a program where its file stands, and registers in Go where none does, so a port edits no line here. [[spec/tickets/box-verbs-port-to-go]]
+test("every verb of the table loads as a program answering a run, or registers in Go", async () => {
+  const go = goVerbs();
   const listed = new Set(commands().keys());
-  const programs = disk()
-    .list(FOLDER)
-    .filter((one) => one.kind === "file" && one.name.endsWith(".js"));
-  assert.ok(programs.length > 0, "the verbs folder holds a program");
-  for (const one of programs) {
-    const verb = one.name.replace(/\.js$/, "");
-    assert.ok(listed.has(verb), `${verb} names no verb of the table`);
-    const { run } = await import(pathToFileURL(join(FOLDER, one.name)).href);
-    assert.equal(typeof run, "function", `${verb} runs`);
+  const files = disk();
+  for (const { name: one } of files.list(join(ROOT, ...VERBS))) {
+    assert.ok(
+      listed.has(one.replace(/\.js$/, "")),
+      `${one} answers no verb of the table`,
+    );
+  }
+  for (const verb of listed) {
+    const program = join(ROOT, ...VERBS, `${verb}.js`);
+    if (files.exists(program)) {
+      const { run } = await import(pathToFileURL(program).href);
+      assert.equal(typeof run, "function", `${verb} runs`);
+    } else {
+      assert.ok(go.has(verb), `${verb} stands as no program and registers no Go verb`);
+    }
   }
 });
 

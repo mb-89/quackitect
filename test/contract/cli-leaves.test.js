@@ -1,6 +1,6 @@
 // The command line's dispatch stands in Go alone: cli.js stands nowhere, no
-// source names it, and every verb Go lists stands as a program of its own or
-// registers in Go.
+// source names it, and every program stands as a verb Go lists. A verb
+// running in Go carries no program.
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
@@ -49,8 +49,7 @@ test("no source under src, test or level zero names cli.js", () => {
   assert.deepEqual(naming, []);
 });
 
-// A ported verb leaves its program and registers in Go from a file of its own. [[spec/tickets/landing-verbs-port-to-go]]
-test("every verb Go lists stands as a program or registers in Go, and no program stands past the list", () => {
+test("no program stands past the list Go holds", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
   const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)].map((one) => one[1]).sort();
   const folder = join(root, "src", "scripts", "verbs");
@@ -66,16 +65,5 @@ test("every verb Go lists stands as a program or registers in Go, and no program
   assert.deepEqual(
     programs.filter((one) => !listed.includes(one)),
     [],
-    "no program stands past the list",
   );
-  const quack = join(root, "src", "quack");
-  const registered = files
-    .list(quack)
-    .filter((one) => one.name.endsWith(".go") && !one.name.endsWith("_test.go"))
-    .map((one) => String(files.read(join(quack, one.name))))
-    .join("\n");
-  const orphans = [...new Set(listed)].filter(
-    (verb) => !programs.includes(verb) && !registered.includes(`register("${verb}",`),
-  );
-  assert.deepEqual(orphans, [], "every verb with no program registers in Go");
 });

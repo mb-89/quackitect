@@ -10,7 +10,8 @@ const ROOT = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const TABLE = join(ROOT, "src", "modules", "verbs", "tree.go");
 const ROW = /\{Name: "([a-z]+)", Doc: "((?:[^"\\]|\\.)*)"\}/g;
 const QUACK = join(ROOT, "src", "quack");
-const REGISTERS = /\bregister\("([a-z]+)",/g;
+// A box verb registers through registerBox, which hands its words to register. [[spec/tickets/box-verbs-port-to-go]]
+const REGISTERS = /\bregister(?:Box)?\("([a-z]+)",/g;
 
 // Each verb of the table, keyed to its usage line. [[spec/tickets/cli-js-leaves]]
 export function commands() {
