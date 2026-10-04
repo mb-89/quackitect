@@ -17,11 +17,9 @@ type jsCase struct {
 	Name    string             `json:"name"`
 	Argv    []string           `json:"argv"`
 	Files   map[string]*string `json:"files"`
-	History *struct {
-		Path  string   `json:"path"`
-		Texts []string `json:"texts"`
-	} `json:"history"`
-	Want struct {
+	History *jsHistory         `json:"history"`
+	Bare    bool               `json:"bare"`
+	Want    struct {
 		Code  int                `json:"code"`
 		Out   string             `json:"out"`
 		Errs  string             `json:"errs"`
@@ -29,10 +27,17 @@ type jsCase struct {
 	} `json:"want"`
 }
 
-// The files every case of a verb shares, and the cases. [[spec/tickets/ticket-verbs-port-to-go]]
+// The versions of one file a case commits in order, before the tree's files land. [[spec/tickets/ticket-verbs-port-to-go]]
+type jsHistory struct {
+	Path  string   `json:"path"`
+	Texts []string `json:"texts"`
+}
+
+// The history and the files every case of a verb shares, and the cases. A case naming its own history takes that, and a bare case takes no git at all. [[spec/tickets/ticket-verbs-port-to-go]]
 type jsCases struct {
-	Shared map[string]*string `json:"shared"`
-	Cases  []jsCase           `json:"cases"`
+	History *jsHistory         `json:"history"`
+	Shared  map[string]*string `json:"shared"`
+	Cases   []jsCase           `json:"cases"`
 }
 
 // Reads a file of JS cases. [[spec/tickets/ticket-verbs-port-to-go]]
@@ -63,10 +68,14 @@ func runsJSCases(t *testing.T, at string, bases ...string) {
 	for _, one := range held.Cases {
 		t.Run(one.Name, func(t *testing.T) {
 			root := t.TempDir()
-			if one.History != nil {
+			history := one.History
+			if history == nil {
+				history = held.History
+			}
+			if history != nil && !one.Bare {
 				gitsIn(t, root, "init", "-q")
-				for _, text := range one.History.Texts {
-					seedsFile(t, root, one.History.Path, text)
+				for _, text := range history.Texts {
+					seedsFile(t, root, history.Path, text)
 					gitsIn(t, root, "add", "-A")
 					gitsIn(t, root, "commit", "-q", "-m", "a version")
 				}
