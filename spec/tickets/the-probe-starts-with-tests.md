@@ -115,3 +115,13 @@ The measure, on a cloud box with four cores, in seconds off `.se/.runtime/check.
 The overlap slows each part, since the probe's install builds Go while the tests run. The battery's span still drops, because it pays the slower road and not the sum. The probe now stands on the critical path.
 
 The call I took, with nobody to ask: the overlap stays only while CI on Linux and Windows reads green too. A red there from the overlap puts the probe back after the tests, and this table stays as the measure.
+
+The work on the check's span stops here, since a steady check now stands under a minute on this box. The battery's span reads as the dry probe beside the tests, then the go and rules parts.
+
+What stands, and why each road waits:
+
+| cost | why it waits |
+|---|---|
+| the dry probe, on the critical path | it is the one contract test of the start road: it clones, installs, starts a cold index and runs three verbs, and each is the door it proves |
+| the go part after a Go change | `go test` caches a package while its inputs stand, so it costs that span on the run after a Go change alone |
+| the first check after a binary rebuild | the live index restarts on the new binary while the tests run, and no check change shortens the box's own rebuild |
