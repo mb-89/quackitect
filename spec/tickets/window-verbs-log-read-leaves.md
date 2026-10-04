@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 596929a46c161d234f228479867efc0f08b06e13
+    hash_after: 596929a46c161d234f228479867efc0f08b06e13
+    inputs:
+      - name: ask
+        hash: c34b8cca3b5d4090
+        size: 507
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,52 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Delete src/scripts/log-read.js and test/level0/log-read.test.js, since no program imports the module once tui.js left. tuiFilesFor in src/quack/tui_verb.go repeats what logFiles in src/quack/verb_log.go answers over no span, so tuiPlainRows calls logFiles(root, "", now) and tuiFilesFor leaves, with the constants only it reads. The tree then holds one read of the log files. The paragraph of spec/design_output/log.md naming log-read.js names logFiles and logLinesOf in src/quack/verb_log.go, which tui --plain calls too. verb_log.go stands unchanged, so no line the read group owns moves.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/tui_verb.go tuiPlainRows, which calls tuiFilesFor
+- test/level0/log-read.test.js, the only importer of log-read.js
+- spec/design_output/log.md, the paragraph under the flag table
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- no new test: TestLogVerb in src/quack/verb_log_test.go holds the span and torn-line cases log-read.test.js held
+- the rotated-file case of src/quack/tui_verb_test.go holds the tui read over logFiles
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/log-read.js, deleted
+- test/level0/log-read.test.js, deleted
+- src/quack/tui_verb.go
+- spec/design_output/log.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened tui_verb.go tuiFilesFor and tuiPlainRows, verb_log.go logFiles and logLinesOf, log-read.test.js and verb_log_test.go TestLogVerb, and read each claim there
+- a search of src, test, .claude, .github and spec/design_output for log-read.js names only the three callers listed
+- the search line decides the first done_when line, a read of log.md the second, and ./RUNME.sh check the third
 
 ## tests-red
 
