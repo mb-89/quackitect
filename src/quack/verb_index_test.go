@@ -39,6 +39,13 @@ func TestIndexVerb(t *testing.T) {
 			t.Fatalf("index asks %v, and wants call value {}", asked)
 		}
 	})
+	t.Run("why prints the answer's text, as se-index prints it", func(t *testing.T) {
+		asked := [][]string{}
+		code, out, _ := runsTwin(indexVerb(askHolding(map[string]any{"text": "a\n└ b"}, nil, &asked)), "index", "why", "a")
+		if code != 0 || out != "a\n└ b\n" {
+			t.Fatalf("index why answers %d, %q, and wants the text", code, out)
+		}
+	})
 	t.Run("a fault prints on the error stream and exits 1", func(t *testing.T) {
 		code, out, errs := runsTwin(indexVerb(askHolding(nil, errors.New("no door"), &[][]string{})), "index")
 		if code != exitFailed || out != "" || !strings.Contains(errs, "no door") {
