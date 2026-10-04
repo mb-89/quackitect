@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: box-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 423535c10e4ff510
         size: 759
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 2636ea1a96893f246c0bf39c81c1721f99355b3f
+    hash_after: 8a0fc2adec83d30f3eb8076e8203bb3f0426bfca
+    answered:
+      - name: lint
+        exit: 0
+        said: "   70.0  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -329,14 +338,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the approach names, plus three contract tests (cli-leaves, tree, verb-programs) that read a verb as a program alone; each now reads a program or a Go registration through registered() in test/contract/commands.js, one owner, so a later port edits none of them
+- every door the change reaches has a fake: fakeBoxDoors hands a temp tree, a recording runner and a refusing GET, and TestEveryBoxVerbStartsNoNode runs every box verb over it
+- each Go file opens on a header naming what it is for, and each function links spec/tickets/box-verbs-port-to-go or the design section its JavaScript linked
+- every value the Go copies from the JavaScript lib names the file that owns it beside it; the names the probe and the doctor both declared stand once, in probe_cold.go. brand.js stays as the review module (box-verbs-brand-caller), and editor.js, browser.js, copilot-setup.js, probe-cold.js and probe-dry.js stay, since code outside this group imports them
 
 ## tests-green
 
