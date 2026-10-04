@@ -33,11 +33,12 @@ process_hash: 2b5ab398855a1aba
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-The work on the check's span stops here, since the check stands near a minute on a cloud box. This ticket writes down why, and what a later hand reads before it cuts further.
+The level zero dry probe starts once the tests end, so every check pays the tests' span and then the probe's. The probe starts together with the tests where five checks in a row and CI on Linux and Windows read no flake. Otherwise it stays after the tests, and the measure stands under Discussion.
 
-- gain: a later hand starts from the measure and the calls, and spends no turn on a road this one weighed
-- breaks: the next box measures again from nothing, and tries the road that loads the clock cases
-- done_when: `./RUNME.sh check` exits 0
+- gain: a check pays the slower of the tests and the probe, not their sum
+- breaks: every check pays the tests' span on top of the probe's
+- done_when: `./RUNME.sh test test/level0/battery.test.js` passes
+- done_when: `./RUNME.sh check` exits 0 five times in a row on one box
 
 # do
 
@@ -49,7 +50,7 @@ The work on the check's span stops here, since the check stands near a minute on
 
 <!-- the form is command -->
 
-./RUNME.sh check
+./RUNME.sh test test/level0/battery.test.js
 
 ## check
 
@@ -57,15 +58,11 @@ The work on the check's span stops here, since the check stands near a minute on
 
 <!-- the form is command -->
 
-./RUNME.sh check
-
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
 
 <!-- the form is text -->
-
-No code changes. The stop and the roads left stand in the Discussion of [[spec/tickets/the-check-takes-a-minute]].
 
 ## checked
 
@@ -73,12 +70,6 @@ No code changes. The stop and the roads left stand in the Discussion of [[spec/t
 
 <!-- the form is checklist -->
 
-- the change follows the ask: the stop and its reasons stand in the Discussion
-- the cleanup it reveals: none
-- every fact stands once: the measure stands in [[spec/tickets/the-check-takes-a-minute]], and this ticket points at it
-
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
-
-The stop note moved to [[spec/tickets/the-check-takes-a-minute]], which closed first, so the pull on this branch hands this ticket nowhere. The door deletes no file, so this draft stands in no group, for the owner to drop.
