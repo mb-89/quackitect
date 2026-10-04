@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: box-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: b80df296af81ba3f1621d5e3a5e757563084f7e8
+    hash_after: b80df296af81ba3f1621d5e3a5e757563084f7e8
+    inputs:
+      - name: ask
+        hash: 8abfe25c5bf1aab8
+        size: 896
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,58 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Only homeIn leaves editor.js through a real import, so editor.js shrinks to homeIn. Its program entry, main, the link and list code and their helpers leave. browser.js loses its program entry and browserSays. browserFrom stays, since the drawing-page contract drives it. The editor and browser tests drop the cases of removed code. outside-in-doors drops editor.js from its roots, since editor.js reaches no door any more.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/browser.js, trust.js, vehicle.js, probe-cold.js, cli-doors.js import homeIn, which stays
+- test/level0/editor.test.js imports the exports that leave
+- test/level0/browser.test.js imports browserSays
+- test/contract/drawing-page.test.js imports browserFrom, which stays
+- test/contract/outside-in-doors.test.js names editor.js in ROOTS
+- no Go file, shell script, RUNME.sh or workflow runs editor.js or browser.js as a program
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/dead-entries.test.js, editor.js carries no program entry
+- test/contract/dead-entries.test.js, browser.js carries no program entry
+- test/contract/dead-entries.test.js, one case for each export that leaves
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/editor.js
+- src/scripts/browser.js
+- test/level0/editor.test.js
+- test/level0/browser.test.js
+- test/contract/outside-in-doors.test.js
+- test/contract/dead-entries.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- editor.js, browser.js and every importer stand opened, and each import line checked
+- the callers come off a search of import lines in src, test, .claude, .github and the shell scripts
+- each done_when line meets a case in dead-entries.test.js, the two named test files, and the check
 
 ## tests-red
 
