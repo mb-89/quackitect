@@ -404,7 +404,7 @@ if [ -x "$index" ]; then
   "$index" verb "$root/src/scripts" setup $landed ||
     say "  the setup stopped, so the editor, the survey, the Copilot setup and the brand stand as they stood." >&2
 elif [ -n "$missing" ]; then
-  say "  no index here, so RUNME.sh runs the setup before the verb." >&2
+  say "  no index here, so the setup waits: bring go, and run this again." >&2
 fi
 
 [ -n "$missing" ] && say "Ready."

@@ -752,7 +752,7 @@ proves the block stands in front of the model past the compaction.
 1. The prompt's marker arms the bridgehead at `prompt.submit`.
 2. The next `tool.call` writes one `probe.reply` row, whose detail holds the
    event's short fields.
-3. `readsReply` in `src/scripts/probe-reply.js` names each field carrying the
+3. `readsReply` in `src/quack/probe_reply.go` names each field carrying the
    line the prompt asks for, and reads whether the answer quotes the warning
    as the prompt's first line.
 4. The verb answers green where the row stands, and red where the client
@@ -760,7 +760,7 @@ proves the block stands in front of the model past the compaction.
 
 ## What the probe reads
 
-`readsCompaction` in `src/scripts/probe.js` is a pure function over log rows:
+`readsCompaction` in `src/quack/probe_verb.go` is a pure function over log rows:
 
 | the log carries | the verb answers |
 |---|---|
