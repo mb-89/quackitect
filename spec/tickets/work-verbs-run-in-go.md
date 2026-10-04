@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -160,6 +160,22 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 8c0b0515048c6f7edc86627bffdcd0581a60b064
+    hash_after: 8c0b0515048c6f7edc86627bffdcd0581a60b064
+    inputs:
+      - name: retro/write
+        hash: d3bb2e57e1b912e5
+        size: 3260
+      - name: [[spec/tickets/work-verbs-port-to-go]]
+        hash: 336fe34fc9021c30
+        size: 698
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 245fe192a895980b
+        size: 3245
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -299,20 +315,26 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 15:41 UTC: the index refused one connection, and the shell verb stood in for the pull tool.
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the stale hold of the previous box, which the take moved after its span passed.
+- a check red on two formatter rows and two rules rows the previous box pushed.
+- the plan ask, which refused calls until the plan tool answered.
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parks, and no ticket mints outside the group.
+- the handover says: load the plan tool first after a clear, then run ticket pull, and the group stands at done once branch done runs.
 
 # Discussion
 
