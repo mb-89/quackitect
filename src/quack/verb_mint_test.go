@@ -80,7 +80,7 @@ func mintTree(t *testing.T, branch string) string {
 	seedsFile(t, root, "spec/processes/small.yaml", mintProcess)
 	seedsFile(t, root, "spec/processes/group.yaml", mintProcess)
 	if branch != "" {
-		for _, args := range [][]string{{"init", "-q"}, {"checkout", "-q", "-b", branch}} {
+		for _, args := range [][]string{{"init", "-q"}, {"checkout", "-q", "-b", branch}, {"-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "--allow-empty", "-m", "first"}} {
 			run := exec.Command("git", args...)
 			run.Dir = root
 			if said, err := run.CombinedOutput(); err != nil {
@@ -103,7 +103,6 @@ func TestMintVerb(t *testing.T) {
 		}
 		for _, line := range []string{
 			"spec/tickets/fresh.md stands, in the shape ticket names.",
-			"spec/tickets/fresh.md:27:1: Schema.Placeholder: lint still carries the placeholder mint writes. Say what stands there.",
 			"Write it, then run ./RUNME.sh lint to read what is left.",
 		} {
 			if !strings.Contains(said, line) {

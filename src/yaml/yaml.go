@@ -123,7 +123,10 @@ func listAt(rows []row, one *cursor, indent int) any {
 		one.at++
 
 		rest := strings.TrimSpace(held.said[2:])
-		pair := PairAt.FindStringSubmatch(rest)
+		var pair []string
+		if !QuotedWhole(rest) {
+			pair = PairAt.FindStringSubmatch(rest)
+		}
 		if pair == nil {
 			out = append(out, scalar(rest))
 			continue
@@ -176,7 +179,7 @@ func scalar(said string) any {
 	}
 	if strings.HasPrefix(bare, "[") && strings.HasSuffix(bare, "]") {
 		out := []any{}
-		for _, part := range strings.Split(bare[1:len(bare)-1], ",") {
+		for _, part := range flowItems(bare[1 : len(bare)-1]) {
 			each := unquote(strings.TrimSpace(part))
 			if each != "" {
 				out = append(out, each)
@@ -195,6 +198,54 @@ func scalar(said string) any {
 		return whole
 	}
 	return bare
+}
+
+// An item reads as quoted text where its closing quote stands last, so a colon inside stays text, and "a": "b" stays a pair, as quotedWhole in lib/schema-yaml.js reads it. [[spec/tickets/the-quoted-pair-stays-paired]]
+func QuotedWhole(said string) bool {
+	if said == "" || (said[0] != '"' && said[0] != '\'') {
+		return false
+	}
+	quote := said[0]
+	for at := 1; at < len(said); at++ {
+		if quote == '"' && said[at] == '\\' {
+			at++
+			continue
+		}
+		if said[at] != quote {
+			continue
+		}
+		if quote == '\'' && at+1 < len(said) && said[at+1] == '\'' {
+			at++
+			continue
+		}
+		return at == len(said)-1
+	}
+	return false
+}
+
+// The items of a flow list, split at each comma outside a quote, as flowItems in lib/schema-yaml.js splits them. [[spec/design_output/pull#the-fields-hold-their-forms]]
+func flowItems(inside string) []string {
+	out := []string{}
+	var held strings.Builder
+	var quote rune
+	for _, char := range inside {
+		switch {
+		case quote != 0:
+			held.WriteRune(char)
+			if char == quote {
+				quote = 0
+			}
+		case char == '"' || char == '\'':
+			quote = char
+			held.WriteRune(char)
+		case char == ',':
+			out = append(out, held.String())
+			held.Reset()
+		default:
+			held.WriteRune(char)
+		}
+	}
+	return append(out, held.String())
 }
 
 func unquote(said string) string {
