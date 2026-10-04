@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: dispatch-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 0eac3f0d7cae79f5
         size: 679
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: db3d707fcfe61124354bb385451cbdb41ab65e24
+    hash_after: 6b56649e0c7a97885915007a9d12a2f4974f94b6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 6966bd6d7cd4bf05
+        size: 4039
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -229,26 +242,31 @@ The dispatch ports into the Go package src/branches, beside the work verbs it re
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/dispatch_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/dispatch_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The port and the plan's cases landed in one commit, as the work group's did, so those cases stood green from the start. The red case asserts the four JavaScript files stand nowhere and nothing imports them, and it fails on that assertion while they stand. One surprise: the Go read names a group merged where main carries its ticket closed, and not by git ancestry, so the merged case lands the closed ticket on main the way a merged pull request leaves it. A second: the importer walk met d3-dispatch inside a node_modules folder, so the walk skips node_modules.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the Go cases for the roads, dispatch_test.go in src/quack for no node, the verbs folder and the importer search, and the check
+- every door the tests reach stands real or faked: a bare origin and its clone for git, and a fake send door for the network
 
 # gate
 
