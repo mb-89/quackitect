@@ -5,6 +5,7 @@ package main
 
 import (
 	"bytes"
+	"path/filepath"
 	"testing"
 )
 
@@ -37,7 +38,7 @@ func TestTheGoVerbsPrintTheirUsage(t *testing.T) {
 // The verbs run each other through this binary's verb road over the scripts folder. [[spec/tickets/the-verbs-need-no-wrapper]]
 func TestTheSelfRoadNamesTheScripts(t *testing.T) {
 	road := selfRoad("/m")
-	if len(road) != 3 || road[1] != "verb" || road[2] != "/m/src/scripts" {
+	if len(road) != 3 || road[1] != "verb" || road[2] != filepath.Join("/m", "src", "scripts") {
 		t.Fatalf("the road reads %v", road)
 	}
 }

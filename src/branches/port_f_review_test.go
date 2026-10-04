@@ -211,7 +211,7 @@ func TestPFTheWorktreeBorrowsNoBin(t *testing.T) {
 
 // The worktree builds the branch's own se-front into its own bin before the check. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBuildsItsOwnFront(t *testing.T) {
-	one := pfReviewTree(t, pfProbe(`	if !stands(".se/.runtime/bin/se-front") {
+	one := pfReviewTree(t, pfProbe(`	if !stands(".se/.runtime/bin/se-front") && !stands(".se/.runtime/bin/se-front.exe") {
 		fail("no se-front stands in the worktree's bin")
 	}
 	self, _ := os.Executable()
