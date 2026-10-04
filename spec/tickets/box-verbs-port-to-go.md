@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: box-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 9c1d77d5afb7ce6a
         size: 5115
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 8ca46dccf16b · claude-code-remote · helper-4
+    hash_before: e51372b88c22e7ce9adce33406af1dc8e8898c44
+    hash_after: e51372b88c22e7ce9adce33406af1dc8e8898c44
+    inputs:
+      - name: design/draft
+        hash: 9c1d77d5afb7ce6a
+        size: 5115
+      - name: design/tests-red
+        hash: 423535c10e4ff510
+        size: 759
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -299,8 +311,14 @@ Both cases fail on their own assertion: no box verb registers, and all four prog
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- box-verbs-brand-caller: src/scripts/work-review.js imports stamps from brand.js (and test/level0/review.test.js reaches it), so deleting brand.js breaks the review verb and done_when 4; the callers list misses it. Implement either points work-review at the Go stamps or keeps brand.js; fix in place.
+- probe-dry-leaves-node: the approach keeps ./RUNME.sh probe dry (and probeApart in the check) on node through probe-dry.js, while done_when 2 says probe reaches no node; the ask's second paragraph tolerates it, so record the exception on the ticket and carry the hook module's port as its own ticket.
+- box-verbs-no-node-test: TestTheBoxVerbsRegister checks registration alone and decides no part of 'reaches no node'; implement adds a case per verb whose fake runner refuses node, dry excepted.
+- setup-road-without-index: RUNME.sh's no-index road drops the setup call, so a box with no index runs no setup at all, against spec/tickets/setup-runs-without-an-index; implement says how that road sets up or names the index build as its first step.
+- probe-dry-entry: once verbs/probe.js leaves, probe-dry.js needs a main guard to run as its own entry, and test/level0/probe-dry.test.js reads probeApart's argv; implement updates both.
 
 # implement
 
