@@ -119,6 +119,7 @@ func serves(root string, manage Manage, starts []Start) int {
 
 	select {
 	case <-stops(swap.Watches):
+	case <-stopAsked:
 	case <-displaced(root, pid, displacedEvery):
 	}
 	stop()

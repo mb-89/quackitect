@@ -40,10 +40,14 @@ export async function check(words) {
   } finally {
     console.log = loud;
   }
-  const { code, parts, unrun } = ran;
+  const { code, parts, unrun, total } = ran;
   if (errors)
     for (const row of errorsSaid(timesHere(), errorsStood())) console.log(row);
-  const battery = batteryOf(parts, timesHere(), { unrun, spawns: spawnsHere() });
+  const battery = batteryOf(parts, timesHere(), {
+    unrun,
+    spawns: spawnsHere(),
+    span: total,
+  });
   // The parts print last, so a slow part shows on the run that grew it. [[spec/tickets/the-check-runs-fast-again]]
   if (!errors) await saysParts(battery);
   return stamped(code, battery);
@@ -71,16 +75,17 @@ async function saysParts(battery) {
     );
 }
 
-// The battery's parts in the order they run, and a red part leaves the rest unrun. Level zero runs on a fresh box before the rules, so a tree whose hook runs nothing reads red. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]]
+// The battery's parts in the order they start, and a red part leaves the rest unrun. Level zero runs on a fresh box before the rules, so a tree whose hook runs nothing reads red. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]]
+// Level zero waits on its processes, and spends less than a core, so it runs beside the parts after the tests. It starts once the tests end, because a contract case reads a clock a loaded box slows. [[spec/tickets/the-check-takes-a-minute]]
 export function partsOf(words, errors = false) {
   return [
     ["tests", () => test(errors)],
+    ["level0", () => level0Runs(), { beside: true }],
     ["go", () => goHolds(errors, redHere())],
     ["doors", () => doorsHold()],
     ["projections", () => projectionsHold()],
     ["plugin", () => pluginHolds()],
     ["server", () => serverHolds()],
-    ["level0", () => level0Runs()],
     ["rules", () => lint(whereOf(words))],
   ];
 }
