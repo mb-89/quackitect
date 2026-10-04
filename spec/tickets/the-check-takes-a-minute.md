@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,24 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
+record:
+  - step: do
+    hand: box f5bd7e8a1f6e · claude-code-remote
+    hash_before: 52ee7c48223532e8d38fba024cac1607d3796f2d
+    hash_after: 52ee7c48223532e8d38fba024cac1607d3796f2d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 83 test(s) pass in 6 file(s)
+      - name: check
+        exit: 0
+        said: "   86.5  in all"
+    inputs:
+      - name: ask
+        hash: 56e416af64659b9c
+        size: 777
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -48,7 +66,6 @@ Every push and every hand-back waits on `./RUNME.sh check`, so its length sets t
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
 
 ./RUNME.sh test test/level0/cli-stamp.test.js test/level0/battery.test.js test/level0/check-server.test.js test/level0/probe-dry.test.js test/level0/probe-cold.test.js test/contract/cli-verbs.test.js
@@ -56,7 +73,6 @@ Every push and every hand-back waits on `./RUNME.sh check`, so its length sets t
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
 ./RUNME.sh check
@@ -64,26 +80,18 @@ Every push and every hand-back waits on `./RUNME.sh check`, so its length sets t
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
-The check ran its parts one after another, and the level zero dry probe cost the most part on every run while it mostly waited on its processes. Now the probe starts once the tests end and runs beside the go, doors, projections, plugin, server and rules parts. The battery waits for it before it stamps, and its red reads red.
-
-- `batteryRun` in `src/scripts/cli-stamp.js` starts a part marked beside and goes on, and answers the battery's span as `total`.
-- `partsOf` in `src/scripts/check-verb.js` marks level zero beside, right after the tests, because a contract case reads a clock a loaded box slows.
-- `probeApart` in `src/scripts/probe-dry.js` runs `probe dry --working` in a process of its own. The probe's clone and verbs wait on synchronous spawns, and those held the check's own loop, so a probe inside the check overlapped nothing.
-- `takesDelta` in `src/scripts/probe-cold.js` commits the working change in the clone. Before, the clear's handover refused the uncommitted change, so a check over a dirty tree read level zero red.
-- The stamp's `total` in [[spec/design_output/work#the-battery-answers-first]] reads the battery's span.
+The check ran its parts one after another, and the level zero dry probe cost the most part on every run while it mostly waited on its processes. Now the probe starts once the tests end and runs beside the go, doors, projections, plugin, server and rules parts, in a process of its own. The battery waits for it before it stamps, and its red reads red. The probe's clone commits the working change, so a check over a dirty tree no longer reads level zero red.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
 - the change follows the ask: level zero runs beside the parts after the tests, and the stamp's total reads under the sum of its parts
 - the cleanup it reveals: the dirty-tree red in the dry probe is in the change, since the overlap measured red without it
-- every fact stands once: the word `--working` lives in `WORKING` in probe-dry.js, and `deltaOf` moved beside the probe, with cli-check.js passing it on
+- every fact stands once: the word --working lives in WORKING in probe-dry.js, and deltaOf moved beside the probe
 
 # Discussion
 
