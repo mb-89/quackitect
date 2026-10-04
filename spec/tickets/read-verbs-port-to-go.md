@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 2895fbdbc1763aca
         size: 4974
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box af8a15ff4571 · claude-code-remote · helper-4
+    hash_before: 822e7c64ddb1767f0cb7021e71b600986f60f538
+    hash_after: 822e7c64ddb1767f0cb7021e71b600986f60f538
+    inputs:
+      - name: design/draft
+        hash: 2895fbdbc1763aca
+        size: 4974
+      - name: design/tests-red
+        hash: 287f89a3eea24996
+        size: 1421
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -311,8 +323,13 @@ The verbs ran in Go before their tests, so every case passes except the one nami
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- read-verbs-callers-fix: the callers list names a log import in `test/level0/topic-readers.test.js` that stands nowhere. It leaves out `test/contract/one-reading.test.js` and `test/level0/cli-read.test.js`, which read `cli-read.js`.
+- read-verbs-importer-test: no test decides the importer line of the ask. `TestReadVerbsLeaveNode` checks the six programs alone, so `log-verb.js` can stand with no red test.
+- read-verbs-say-doc: the say action in `src/modules/log/log.go` says it appends through its program. After the port a Go verb answers it.
+- read-verbs-lint-drift: the lint verb runs in Go, and the check verb still runs the lint of `cli-read.js`. The two can answer apart until the check port lands.
 
 # implement
 
