@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: box-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: bee400f3585a4666
         size: 549
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 5a8882ac62672df5d065a338ca2a449091c3200d
+    hash_after: 64dc382347a9e704f1df1a94f8d11daf9be4ef97
+    answered:
+      - name: lint
+        exit: 0
+        said: "   49.4  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the .vale.ini line that switched the doors rule off for editor, brand and browser. None of the three reads process any more
+- the change reaches no door past the disk door the browser test fakes
+- the editor.js and browser.js headers link the design section they serve
+- homeIn stays the one owner of the home folder order in JavaScript
 
 ## tests-green
 
