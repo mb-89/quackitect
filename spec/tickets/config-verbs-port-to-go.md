@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: config-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 46dae2bca90f0fef
         size: 803
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 6183eb94e809 · claude-code-remote
+    hash_before: 5e685208c3582939d8cb9c0658c0a2fadd0a6c5c
+    hash_after: 5e685208c3582939d8cb9c0658c0a2fadd0a6c5c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 5348ff22bc181506
+        size: 4476
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -245,26 +258,36 @@ The JavaScript leaves: the six programs, cli-fix.js, shout.js, and readConfig, f
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_config_test.go
+- src/quack/verb_fix_test.go
+- src/quack/verb_rules_test.go
+- src/quack/verb_doors_test.go
+- src/quack/verb_standing_test.go
+- src/quack/registry_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion against stub verbs that answer exit 1 and print nothing, and the registry case finds no config. The registry case for an unregistered verb named config, so it now names words nothing registers. The project cases come from a helper porting the projection, and land red with their own commit.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the go cases per verb, the registry case for the road, and the ls, grep and check lines the implement step runs
+- the doors the verbs reach ride in as arguments: the root, the clock, the environment and the tool runner, so no case touches the box past a temp root
 
 # gate
 

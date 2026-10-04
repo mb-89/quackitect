@@ -32,7 +32,7 @@ func TestVerbRegistry(t *testing.T) {
 	})
 	t.Run("an unregistered verb reaches node", func(t *testing.T) {
 		doors, out, _ := roadOver(modeNew, "node\n", registry)
-		if code := verbs(doors, []string{"config"}); code != 0 || out.String() != "node\n" {
+		if code := verbs(doors, []string{"registry", "unclaimed"}); code != 0 || out.String() != "node\n" {
 			t.Fatalf("the road answers %d, %q, and wants the node answer", code, out.String())
 		}
 	})
@@ -76,6 +76,13 @@ func TestVerbRegistry(t *testing.T) {
 				if strings.Contains(string(text), `"`+words+`"`) {
 					t.Fatalf("%s names the verb %s, and a port edits no shared line", shared, words)
 				}
+			}
+		}
+	})
+	t.Run("the config group registers each of its verbs", func(t *testing.T) {
+		for _, words := range []string{"config", "fix", "project", "rules", "standing", "doors"} {
+			if registry[words] == nil {
+				t.Fatalf("the registry holds no %s", words)
 			}
 		}
 	})
