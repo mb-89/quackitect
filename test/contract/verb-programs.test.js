@@ -3,12 +3,12 @@
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
-import { readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
+import { disk } from "../../src/doors/disk.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { run as branch } from "../../src/scripts/verbs/branch.js";
 import { run as check } from "../../src/scripts/verbs/check.js";
@@ -76,7 +76,9 @@ const RUNS = {
 // A verb that runs in Go leaves its program, so the folder names what stays in node. [[spec/tickets/quack-registers-each-verb]]
 test("every program of the folder loads as a verb of the table answering a run", () => {
   const folder = join(dirname(fileURLToPath(import.meta.url)), "..", "..", ...VERBS);
-  const listed = readdirSync(folder)
+  const listed = disk()
+    .list(folder)
+    .map((one) => one.name)
     .filter((one) => one.endsWith(".js"))
     .map((one) => one.slice(0, -".js".length))
     .sort();
