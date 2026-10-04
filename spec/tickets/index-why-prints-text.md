@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: read-verbs-run-in-go
 parent: read-verbs-run-in-go
+record:
+  - step: do
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: 40c11b40b4622e89170144b18d9b67e727ce8f40
+    hash_after: 971c8368c6ee32c3b33ba230b143eceeea025a0e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   36.3  in all"
+    inputs:
+      - name: ask
+        hash: a5c6aaec9008bc3e
+        size: 150
+    def: b523d80c2c6f4b51
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ indexSays in src/quack/verb_index.go prints every answer as JSON, where se-index
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/verb_index_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The Go index verb printed every answer as indented JSON, so index why printed its tree as a JSON object. It now prints the text of a why answer, as se-index prints it, and links, notes and find keep the shared JSON print.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: index why prints the text
+- the cleanup the change reveals is in the change: none past the verb
+- every fact stands in one place: the why method stands named once in verb_index.go
 
 # Discussion
 
