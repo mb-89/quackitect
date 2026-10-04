@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -152,7 +152,17 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 34b754bfb977 · claude-code-remote
+    hash_before: a95fbcf9fe18ef1d602df9d568cf7219b3df7258
+    hash_after: a95fbcf9fe18ef1d602df9d568cf7219b3df7258
+    inputs:
+      - name: retro/write
+        hash: a862aad933dd756e
+        size: 2220
+    def: 4da1ca5da87d5bbc
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -293,20 +303,27 @@ The group held one child, and that child's fix stood on main before the box took
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 23:23 UTC: the level0 MCP server refused the connection on a hand-back, and the shell verb stood in for it
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the check ran past its time budget, at warning
+- the gate on a landing joined to its gate with a semicolon
+- the door refusing a shell call that names no ticket
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted
+- the handover: the group closes with its one child, and the pull request against main carries it
 
 # Discussion
 
