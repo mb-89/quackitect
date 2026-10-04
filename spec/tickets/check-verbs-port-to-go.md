@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "   65.3  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box bf0e991d1270 · claude-code-remote
+    hash_before: 7d9f7f507f53a64be40038ff52a19f4bcbedf872
+    hash_after: 7d9f7f507f53a64be40038ff52a19f4bcbedf872
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/tickets passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   69.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 7ca9e2bd5154678d
+        size: 874
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -375,26 +398,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/tickets/red_test.go src/quack/battery_test.go src/quack/check_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The check and the test verb answer in Go, and quack runs them on every road. The lint writes its findings to the file the check names, and project --check reads every target and writes none, so each part the Go check hands a node verb answers whole. The review worktree builds its own quack and runs check through the verb road. The merge and the commit verb run check and test through the same road, which roadArgv in verb-run.js owns. The node programs check.js and test.js leave, with check-verb.js, red-list.js and cli-stamp.js. The battery, gate and probe parts no module imports leave too. The red list reader moves into pull-kept.js, and Go cases take over the cases over removed code. A Go case now holds the quiet Go gate naming each failing test.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: each file stands on the size list or the callers list, or calls the check or test verb
+- every door the change reaches has a fake: the road cases drive the fake process door
+- a comment names the approach: each new function links its ticket or its design section
+- every fact the change adds stands in one place: roadArgv owns the road, and goVerbs owns the Go verb list
 
 # accept
 
