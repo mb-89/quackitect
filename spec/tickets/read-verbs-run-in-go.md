@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box af8a15ff4571 · claude-code-remote
@@ -167,6 +167,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: d71d47b895dc88634ef8c7e713601067201a5657
+    hash_after: d71d47b895dc88634ef8c7e713601067201a5657
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -243,38 +255,66 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- read-verbs-lint-drift: a contract case holds the Go lint and the check lint to one list of findings, and the log verb names its span seconds
+- read-verbs-say-doc: the say action names the Go log verb
+- read-verbs-port-to-go: implement and tests-green handed back over the port an earlier box wrote
+- index-why-prints-text: index why prints the tree as text, off the accept review
+- lint-row-keeps-floor: the lint log row keeps the log.level floor, off the accept review
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- a reviewer helper read the whole diff against the JavaScript, and found two drifts the port tests never asked about
+- each fix met a red case before its code, so each commit landed green on the first check
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 15:24 branch take with the work prefix doubled the prefix, and answered no free todo
+- 15:24 the first shell call named no ticket, and the door refused it
+- 15:24 the branch take tool answered with no handler
+- 15:27 the plan grace ran out, and ToolSearch stood refused until the plan answered
+- 15:29 a stop on a running check fell, since a cloud turn ending stops the container
+- 15:33 the commit door refused verb_log.go with no test beside it
+- 15:34 a piped gate before the commit verb met LandingFollowsItsGate
+- 15:35 the tests evidence failed twice on raw runner output, before branch test
+- 15:37 a sed write into a scratch file met ShellWritesNothing
+- 15:46 a helper started in the foreground met a refusal
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the take prefix: branch take in src/quack names the bare group in its usage, or strips a work prefix
+- the take tool: the level0 plugin answers index_branch_take, or leaves it unregistered
+- the stop and the helpers: spec/guidance/cloud/cloud names waiting on a helper inside the turn
+- the tests evidence: the do step in spec/processes/trivial names branch test as its tests command
+- the rest: the doors named the fix in their own refusal, and held
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The port stood nearly whole on arrival, so the run spent itself on proving it rather than writing it. The JavaScript lint and the Go lint now stand side by side, and the contract case is the one thing holding them together until the check port lands. The review helper paid for itself: both of its points were real drifts no test had asked about.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in one place: the lines name tickets and files, and repeat no rule
+- every number the change adds carries a name: the span seconds and the log floor key stand named once
+- every header says what its file is for: the new contract case says it holds both lints to one list
+- the chapter carries the run errors with their times, and no owner prompt reached this run
+- the chapter says the role, and names no box
 
 ## cloud
 
