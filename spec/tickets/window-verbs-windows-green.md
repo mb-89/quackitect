@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 5632e30a35cc2c00
         size: 556
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: c2faa23f9474c6e3e9a8b6077f862846ad2aa598
+    hash_after: c2faa23f9474c6e3e9a8b6077f862846ad2aa598
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/vehicle fails
+    inputs:
+      - name: design/draft
+        hash: fc6e633495ac75f4
+        size: 2057
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -227,26 +240,31 @@ The Windows runner fails on test spellings in five places and on code in one. Th
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/vehicle/vehicle_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/vehicle/vehicle_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+TestProduceRefusesTheMethodSpelledEitherWay fails on its own assertion on Linux too, since the guard compares the strings as spelled. The other Windows faults sit in the tests themselves, so the Windows runner shows them red and this box shows them green.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the new case meets the one code fault, and the Windows runner of the check decides the test-side ones, since this box runs no Windows
+- the case reaches the real disk through OS(), whose contract suite stands in src/vehicle/disk_test.go
 
 # gate
 

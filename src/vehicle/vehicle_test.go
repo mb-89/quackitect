@@ -336,6 +336,16 @@ func TestVehicleLandsInANewPlaceAndNeverOverItsMethod(t *testing.T) {
 }
 
 // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+// A vehicle lands beside its method however the destination spells it, so a Windows path naming the method refuses before any copy. [[spec/tickets/window-verbs-windows-green]]
+func TestProduceRefusesTheMethodSpelledEitherWay(t *testing.T) {
+	method := filepath.ToSlash(t.TempDir())
+	dest := strings.ReplaceAll(method, "/", `\`)
+	put, err := Produce(OS(), method, dest, true)
+	if err != nil || put.Why != "a vehicle lands beside its method, elsewhere" {
+		t.Fatalf("into %s answers %+v, %v", dest, put, err)
+	}
+}
+
 func TestVehicleAProducedVehicleStandsAlone(t *testing.T) {
 	where := t.TempDir()
 	method := filepath.Join(where, "method")
