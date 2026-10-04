@@ -28,6 +28,14 @@ const (
 	placesKey  = "places"
 )
 
+// The bases a radix prefix names, and the bits a number reads in, as Number reads a word. [[spec/tickets/view-actions-run-through-verbs]]
+const (
+	hexBase    = 16
+	octalBase  = 8
+	binaryBase = 2
+	numberBits = 64
+)
+
 // The bare ticket new writes: a kind, an empty process the completion offers, and an ask to fill. [[spec/tickets/the-sidebar-writes-through-actions]]
 const NewTicket = "---\nkind: [[ticket]]\nprocess: \"\"\n---\n\n# Ask\n"
 
@@ -141,11 +149,11 @@ func JSNumber(said string) (float64, bool) {
 	case said == "":
 		return 0, true
 	case jsRadix.MatchString(said):
-		base := map[byte]int{'x': 16, 'o': 8, 'b': 2}[strings.ToLower(said[1:2])[0]]
-		read, err := strconv.ParseUint(said[2:], base, 64)
+		base := map[byte]int{'x': hexBase, 'o': octalBase, 'b': binaryBase}[strings.ToLower(said[1:2])[0]]
+		read, err := strconv.ParseUint(said[len("0x"):], base, numberBits)
 		return float64(read), err == nil
 	case jsDecimal.MatchString(said):
-		read, err := strconv.ParseFloat(said, 64)
+		read, err := strconv.ParseFloat(said, numberBits)
 		return read, err == nil && !math.IsInf(read, 0)
 	}
 	return 0, false

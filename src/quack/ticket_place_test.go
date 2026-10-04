@@ -116,6 +116,7 @@ func TestTicketPlace(t *testing.T) {
 			{[]string{"b", "1.5"}, placeNeeds},
 			{[]string{"b", "two"}, placeNeeds},
 			{[]string{"b"}, placeNeeds},
+			{[]string{"b", ""}, placeNeeds},
 			{[]string{}, placeNeeds},
 		} {
 			root := t.TempDir()

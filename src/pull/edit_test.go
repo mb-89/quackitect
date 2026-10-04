@@ -57,7 +57,7 @@ func TestWeighs(t *testing.T) {
 }
 
 func TestJSNumber(t *testing.T) {
-	for said, want := range map[string]float64{"2": 2, " 2 ": 2, "02": 2, "2.0": 2, "2e0": 2, "0x2": 2, ".5": 0.5, "": 0, "+4": 4} {
+	for said, want := range map[string]float64{"2": 2, " 2 ": 2, "02": 2, "2.0": 2, "2e0": 2, "0x2": 2, ".5": 0.5, "": 0, "+4": 4, "0o17": 15, "0B11": 3, "0XfF": 255} {
 		if got, ok := JSNumber(said); !ok || got != want {
 			t.Errorf("%q reads %v, %v, and wants %v", said, got, ok, want)
 		}

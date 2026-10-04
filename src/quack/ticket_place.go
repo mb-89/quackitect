@@ -30,12 +30,18 @@ const (
 	lastPlace  = 9
 )
 
+// Where the ticket and the place stand in the verb's words, past ticket and place. [[spec/tickets/view-actions-run-through-verbs]]
+const (
+	placeNameAt = 2
+	placeAt     = 3
+)
+
 // [[spec/tickets/view-actions-run-through-verbs]]
 func ticketPlace(rootOf, v1 func() (string, error)) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
-		name := wordAt(argv, 2)
-		n, read := pull.JSNumber(wordAt(argv, 3))
-		if len(argv) < 4 || name == "" || !read || n != math.Trunc(n) || n < firstPlace || n > lastPlace {
+		name := wordAt(argv, placeNameAt)
+		n, read := pull.JSNumber(wordAt(argv, placeAt))
+		if len(argv) <= placeAt || name == "" || !read || n != math.Trunc(n) || n < firstPlace || n > lastPlace {
 			fmt.Fprintln(errs, placeNeeds)
 			return exitUsage
 		}
