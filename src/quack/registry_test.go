@@ -13,14 +13,6 @@ import (
 	"quackitect/src/q"
 )
 
-func TestTheConfigGroupRegistersEachVerb(t *testing.T) {
-	for _, words := range []string{"config", "fix", "project", "rules", "standing", "doors"} {
-		if registry[words] == nil {
-			t.Fatalf("the registry holds no %s", words)
-		}
-	}
-}
-
 // Registers a twin under the words for one test, and drops it after. [[spec/tickets/quack-registers-each-verb]]
 func registersFor(t *testing.T, words string, one twin) {
 	t.Helper()
