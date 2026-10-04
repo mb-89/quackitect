@@ -96,7 +96,19 @@ record:
         exit: 0
         said: work/loose-fixes-d604762 already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box 34b754bfb977 · claude-code-remote
+    hash_before: 3e3b6bf737c6c543edad11dd99bd7a5f10b8212a
+    hash_after: 3e3b6bf737c6c543edad11dd99bd7a5f10b8212a
+    inputs:
+      - name: ask
+        hash: 8dc00399b152ebf3
+        size: 385
+      - name: [[spec/design_input/the-cloud-runs-itself]]
+        hash: 591680bf2c6fc6d6
+        size: 13376
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -130,14 +142,18 @@ The source: none.
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/cli-check-drops-known]], on the trivial process
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: the one child drops an unused import
+- the children add up to the goal: the group holds the one loose agent ticket the dispatch bundled
+- no child waits on another
 
 # children
 
