@@ -50,6 +50,8 @@ type Tools struct {
 	Function int
 	File     int
 	Run      Runner
+	// Ends every run the door started, which the listen's stop calls. [[spec/tickets/the-index-stops-its-tools]]
+	Halt func()
 	// Reads the tools and the ceilings again before a whole run, which the door does and a case does not. [[spec/design_output/lsp#the-panel-follows-the-index]]
 	Again func(*Tools)
 	// [[spec/tickets/lsp-module-draws-the-tools]]
