@@ -87,6 +87,10 @@ enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
 step: sync
+record:
+  - step: sync
+    hand: box 6f8b02d3b81e · claude-code-remote
+    hash_before: 9a5042d133c3ce74cfd00d4079804dcfe59d1a21
 ---
 
 # Ask
