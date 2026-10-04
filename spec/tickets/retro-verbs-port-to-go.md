@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: ca2e25e5e41c8ddd
         size: 2290
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 08f4218ba236 · claude-code-remote
+    hash_before: ffe436947ad8d55b1673ba1750bbd40f4babd4eb
+    hash_after: ffe436947ad8d55b1673ba1750bbd40f4babd4eb
+    answered:
+      - name: lint
+        exit: 0
+        said: "   73.5  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -340,14 +349,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the retro Go files, the retro JavaScript and its tests, the shared test lines the deletion forces, and the pull queue gate with its case and its design line, which the gate points named
+- every door has a fake: collect and backlog take a fake trunk and a fake move, new and mint a fake child runner, and the rest read a temp tree
+- every retro file opens on a header naming what it is for, and each function carries the link to the guidance it implements
+- every fact stands once: retro_home.go owns the retro folder and the timed sources, RetroVerbs owns the verb list, and the config design note owns the SE_MINTED pass
 
 ## tests-green
 
