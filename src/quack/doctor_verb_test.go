@@ -61,7 +61,7 @@ func TestTheDoctorPrintsEveryRowInOrderOnABareBox(t *testing.T) {
 		"editor":          "missing",
 		"sidebar":         "no editor folder on this box, so no link",
 		"browser":         "missing, run ./RUNME.sh",
-		"commit hook":     filepath.Join(hooksFolder, "pre-commit") + " stands nowhere",
+		"commit hook":     ".githooks/pre-commit stands nowhere",
 		"vale rules":      "missing",
 		"survey":          toolsFile,
 		"server":          "none at http://127.0.0.1:6510/health",

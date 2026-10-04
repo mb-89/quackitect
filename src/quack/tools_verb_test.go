@@ -19,9 +19,9 @@ func TestTheToolsVerbWritesTheSurveyWholeAndPrintsARowATool(t *testing.T) {
 	path := d.env("PATH")
 	written, _ := readText(filepath.Join(d.root, filepath.FromSlash(toolsFile)))
 	want := "{\n  \"node\": null,\n  \"vale\": null,\n  \"biome\": null,\n  \"vale-ls\": null,\n  \"go\": null,\n" +
-		"  \"git\": {\n    \"path\": \"" + path + "/git\",\n    \"version\": \"2.43.0\"\n  },\n  \"claude\": null,\n" +
-		"  \"sh\": {\n    \"path\": \"" + path + "/sh\"\n  },\n" +
-		"  \"python\": {\n    \"path\": \"" + path + "/python3\",\n    \"version\": \"3.11.15\"\n  }\n}\n"
+		"  \"git\": {\n    \"path\": " + jsonString(path+"/git") + ",\n    \"version\": \"2.43.0\"\n  },\n  \"claude\": null,\n" +
+		"  \"sh\": {\n    \"path\": " + jsonString(path+"/sh") + "\n  },\n" +
+		"  \"python\": {\n    \"path\": " + jsonString(path+"/python3") + ",\n    \"version\": \"3.11.15\"\n  }\n}\n"
 	if written != want {
 		t.Errorf("the survey reads\n%s", written)
 	}

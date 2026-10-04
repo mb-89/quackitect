@@ -215,7 +215,7 @@ func TestACopilotSetupThatStopsSaysAWarningAndTheBrandStillRuns(t *testing.T) {
 // A folder slugging to nothing stamps no brand, and the setup still answers zero. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 func TestAFolderSluggingToNothingSaysTheBrandReachedNoName(t *testing.T) {
 	d, _, out, _ := setupBox(t, nil)
-	d.root = filepath.Join(d.root, "...")
+	d.root = filepath.Join(d.root, "___")
 	env := heldTree(t, d)
 	d.env = func(key string) string { return env[key] }
 	if code := setupVerb(d, nil); code != 0 {

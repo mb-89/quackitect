@@ -128,12 +128,12 @@ func browserSays(d boxDoors) string {
 
 // Whether both commit hooks stand, and whether git reads their folder. [[spec/design_output/private#both-doors-one-check]]
 func hooksSay(d boxDoors) string {
-	at := filepath.Join(hooksFolder, "pre-commit")
-	push := filepath.Join(hooksFolder, "pre-push")
-	if !stands(filepath.Join(d.root, at)) {
+	at := hooksFolder + "/pre-commit"
+	push := hooksFolder + "/pre-push"
+	if !stands(filepath.Join(d.root, filepath.FromSlash(at))) {
 		return at + " stands nowhere"
 	}
-	if !stands(filepath.Join(d.root, push)) {
+	if !stands(filepath.Join(d.root, filepath.FromSlash(push))) {
 		return push + " stands nowhere"
 	}
 	said := strings.TrimSpace(d.run([]string{"git", "config", "--get", "core.hooksPath"}, runOpts{cwd: d.root}).stdout)

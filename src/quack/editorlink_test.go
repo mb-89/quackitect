@@ -215,8 +215,8 @@ func TestTheEntryWritesItsInstallTimeInDecimalDigits(t *testing.T) {
 
 func TestTheEntryNamesTheFolderTheEditorReadsItThrough(t *testing.T) {
 	folder := "/home/user/.vscode/extensions"
-	want := `{"identifier":{"id":"` + editorTestID + `"},"version":"0.1.0","location":{"$mid":1,"path":"` + folder + "/" + editorTestID +
-		`-0.1.0","scheme":"file"},"relativeLocation":"` + editorTestID + `-0.1.0","metadata":{"installedTimestamp":1000,"source":"vsix"}}`
+	want := `{"identifier":{"id":"` + editorTestID + `"},"version":"0.1.0","location":{"$mid":1,"path":` + jsonString(filepath.Join(folder, editorTestID+"-0.1.0")) +
+		`,"scheme":"file"},"relativeLocation":"` + editorTestID + `-0.1.0","metadata":{"installedTimestamp":1000,"source":"vsix"}}`
 	if got := editorListText([]*ordered{mineAt(folder)}); got != "["+want+"]" {
 		t.Errorf("the entry reads\n%s", got)
 	}
