@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 6f8b02d3b81e · claude-code-remote
@@ -143,6 +143,25 @@ record:
   - step: accept
     hand: box f8b693e22e97 · claude-code-remote
     hash_before: d482e87c3e5dc1fb604795152086d2b4b6f5bad6
+  - step: accept
+    hand: box f8b693e22e97 · claude-code-remote
+    hash_before: 1031767f13b9db60de5c1dda4eb2a87dfdcbd80b
+    hash_after: 1031767f13b9db60de5c1dda4eb2a87dfdcbd80b
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/retro-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: b0f8341cbe2d0d9d
+        size: 283
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -196,11 +215,7 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- se-minted-guard-refuses: config.md says the cage refuses SE_MINTED on a command an agent types, and handNames in src/modules/hooks/command/guards.go names no such variable; add SE_MINTED to the guard with a case, so the line states what is
-- retro-reads-the-work-root: retroRoot in src/quack/retro_home.go reads index.Root and skips SE_WORK_ROOT, which the old road read as it.work; a stub run then reads and writes the vehicle tree, so retroRoot takes the work root first, with a case
-- retro-new-undoes-its-draft: retro new writes the draft before ticket open runs the ask lint, so a refused why line leaves a draft that blocks the next run by name; the verb removes its draft where the open refuses, with a case
-- collect-names-failed-writes: collect drops the error of each os.WriteFile, so a failed manifest write exits 0; the verb names the write and exits 1, with a case
+accept
 
 # retro
 
