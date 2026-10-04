@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: work-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 95cd40f5843902cf
         size: 1219
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 8b49f014b13b2842576da8e09d65951943b625da
+    hash_after: bb8ba84bf5098b2ad07dbf733c7c8052b510b97f
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/branches/port_a_close_test.go:52:52: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -302,14 +311,19 @@ The approach answers the ask: branch and cloud register from src/quack/branch.go
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the port stands in src/branches and two register files, and the follow-ons the gate names, review.go, review.js and the contract tests, move the shims' callers onto Go.
+- every door the change reaches has a fake: the cases drive a bare origin and its clone, and the review spawn meets fakeProc.
+- a comment names the approach: every file points at the ticket in its header.
+- every fact stands in one place: the waits, the claim and the queue read through the package once, and branch list --queue stays the one twin.
 
 ## tests-green
 
