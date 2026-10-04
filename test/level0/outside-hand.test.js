@@ -55,10 +55,6 @@ test("the guidance reading takes an empty map where nobody hands one", () => {
   assert.equal(typeof said, "object");
 });
 
-test("the work verbs and the check program stand after the change", async () => {
+test("the work verbs stand after the change", () => {
   assert.equal(typeof work, "function");
-  assert.equal(
-    typeof (await import("../../src/scripts/verbs/check.js")).run,
-    "function",
-  );
 });

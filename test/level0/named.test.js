@@ -16,6 +16,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { ticketFault, ticketOf } from "../../src/engine/named.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
+import { quackUnder } from "./quack-doors.js";
 
 const ROOT = "/tree";
 const ticket = (state) =>
@@ -95,7 +96,7 @@ function commitDoors() {
     env: {},
   };
   for (const verb of ["test", "check"]) {
-    git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", `${verb}.js`)], {
+    git.proc.teach([quackUnder(ROOT), "verb", join(ROOT, "src", "scripts"), verb], {
       exitCode: 0,
       stdout: "ok\n",
     });

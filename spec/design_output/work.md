@@ -670,7 +670,7 @@ the same edit where the owner says so.
 
 The stamp counts no Vale warning in a file under `spec/tickets` or
 `.se/tickets`. [[spec/guidance/working]] tells a hand to leave a ticket's prose
-warning standing. `holdsPush` in `src/scripts/cli-stamp.js`
+warning standing. `holdsPush` in `src/quack/battery.go`
 reads that, and every other warning holds the push.
 
 So `done` stops meaning "the session believes this passes". It comes to mean

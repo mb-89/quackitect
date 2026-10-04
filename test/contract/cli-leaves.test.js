@@ -1,5 +1,6 @@
 // The command line's dispatch stands in Go alone: cli.js stands nowhere, no
-// source names it, and every verb Go lists stands as a program of its own.
+// source names it, and every verb Go lists stands as a program of its own,
+// past the verbs quack registers.
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
@@ -7,6 +8,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
+import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -48,9 +50,13 @@ test("no source under src, test or level zero names cli.js", () => {
   assert.deepEqual(naming, []);
 });
 
-test("every verb Go lists stands as a program, and no program stands past the list", () => {
+test("every verb Go lists and leaves to node stands as a program, and no program stands past the list", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
-  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)].map((one) => one[1]).sort();
+  const inGo = goVerbs();
+  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)]
+    .map((one) => one[1])
+    .filter((verb) => !inGo.has(verb))
+    .sort();
   const folder = join(root, "src", "scripts", "verbs");
   const programs = files.exists(folder)
     ? files

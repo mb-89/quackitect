@@ -9,9 +9,13 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { commitVerb } from "../../src/scripts/commit-verb.js";
 import { conflicted, NAMED, named } from "./fixtures.js";
-import { carryQuack } from "./quack-doors.js";
+import { carryQuack, quackUnder } from "./quack-doors.js";
 
 const ROOT = "/tree";
+// The tests and the check the verb runs, each a verb quack registers. [[spec/tickets/check-verbs-port-to-go]]
+const ROAD = (verb) => [quackUnder(ROOT), "verb", join(ROOT, "src", "scripts"), verb];
+const TESTS = ROAD("test").join(" ");
+const CHECKS = ROAD("check").join(" ");
 const CLEAN = `${NAMED}: the message reads clean`;
 const FOUND = [
   {
@@ -56,11 +60,11 @@ const doors = (found = [], answers = {}, env = { SE_CLOUD: "1" }) => {
     env,
   };
   carryQuack(it);
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "check.js")], {
+  git.proc.teach(ROAD("check"), {
     exitCode: 0,
     stdout: "The rules pass.\n",
   });
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "test.js")], {
+  git.proc.teach(ROAD("test"), {
     exitCode: 0,
     stdout: "ok\n",
   });
@@ -132,7 +136,7 @@ test("a clean message lands, runs the check, and pushes on green", async () => {
 test("a red check holds the push back, and names what the check refuses", async () => {
   const { it, git } = doors();
   // The check writes its faults to the error stream, and its last passing line to the other. [[spec/design_output/work#one-verb-feeds-that-stamp]]
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "check.js")], {
+  git.proc.teach(ROAD("check"), {
     exitCode: 1,
     stdout: "The server stands at http://127.0.0.1:6510/health.\n",
     stderr: "src/a.js:1:1: Passive: Write in the active voice.\n",
@@ -221,7 +225,7 @@ test("the no-push flag leaves the branch where it stands", async () => {
 // The tests gate the commit, so a red run stages nothing and commits nothing. [[spec/design_output/work#the-battery-answers-first]]
 test("a red test run commits nothing, and names what the run says", async () => {
   const { it, git } = doors();
-  git.proc.teach([it.node, join(ROOT, "src", "scripts", "verbs", "test.js")], {
+  git.proc.teach(ROAD("test"), {
     exitCode: 1,
     stdout: "not ok 1 - the door refuses\n",
   });
@@ -242,11 +246,10 @@ test("the tests run before the staging, and the check after the commit", async (
   await heard(() => commitVerb(it, [CLEAN]));
 
   const ran = git.ran.map((one) => one.argv.join(" "));
-  const verbAt = (verb) => join(ROOT, "src", "scripts", "verbs", `${verb}.js`);
-  const tests = ran.indexOf(`node ${verbAt("test")}`);
+  const tests = ran.indexOf(TESTS);
   const staged = ran.indexOf("git add -A");
   const committed = ran.indexOf(`git commit -m ${CLEAN}`);
-  const checked = ran.indexOf(`node ${verbAt("check")}`);
+  const checked = ran.indexOf(CHECKS);
   assert.ok(tests >= 0 && tests < staged, "the tests run first");
   assert.ok(committed < checked, "the check stamps the commit");
 });
@@ -427,9 +430,9 @@ test("a staged file on the cold path runs the probe after the tests and before t
   assert.equal(asked.length, 1, "the probe runs once");
   assert.equal(asked[0].via, CLIENT);
   assert.match(said, /The cold probe passes/);
-  const ran = ranGit(git);
-  const verbAt = (verb) => join(ROOT, "src", "scripts", "verbs", `${verb}.js`);
-  assert.ok(ran.indexOf(`node ${verbAt("test")}`) < ran.indexOf(LISTED));
+  const ran = git.ran.map((one) => one.argv.join(" "));
+  assert.ok(ran.indexOf(TESTS) >= 0, "the tests run");
+  assert.ok(ran.indexOf(TESTS) < ran.indexOf(LISTED), "the tests run before the probe reads");
   assert.ok(
     ran.includes("git diff --cached --binary --no-renames"),
     "the delta reaches the probe",

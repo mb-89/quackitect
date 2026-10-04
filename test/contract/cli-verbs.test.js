@@ -39,45 +39,6 @@ test("the find verb reads the log through the log verb, and the tree through the
   assert.match(program, /asksIndex\(\["find", \.\.\.words\]\)/);
 });
 
-// The verb over named files hands them to the branch runner, and test/level0/test-verb.test.js proves that runner's word over a fake. [[spec/design_output/pull#the-test-verb]]
-test("the test verb hands the files you name to the branch runner", () => {
-  assert.match(
-    scriptText("verbs/test.js"),
-    /words\.length \? namedTests\(words\)/,
-    "the program hands what you name through",
-  );
-  const source = scriptText("check-verb.js");
-  const named =
-    /^export function namedTests\(names\) \{[\s\S]*?^\}/m.exec(source)?.[0] ?? "";
-  assert.match(named, /testVerb\(/, "and the named files reach the branch runner");
-  assert.match(named, /\["test", \.\.\.names\]/, "every one of them");
-});
-
-// Under --errors the parts run quiet, and the check prints the red cases and the findings at error alone. [[spec/tickets/the-verbs-need-no-wrapper]]
-test("the check verb under --errors runs its parts quiet, and prints what errorsSaid answers", () => {
-  const source = scriptText("check-verb.js");
-  const check =
-    /^export async function check\(words\) \{[\s\S]*?^\}/m.exec(source)?.[0] ?? "";
-  assert.match(check, /words\.includes\("--errors"\)/, "the check reads the flag");
-  assert.match(check, /partsOf\(words, errors\)/, "and hands it to the parts");
-  const parts =
-    /^export function partsOf\(words, errors = false\) \{[\s\S]*?^\}/m.exec(source)?.[0] ?? "";
-  assert.match(parts, /test\(errors\)/, "the tests run quiet");
-  assert.match(
-    parts,
-    /goHolds\(errors, redHere\(\)\)/,
-    "and the Go tests, the red list apart",
-  );
-  assert.match(
-    check,
-    /errorsSaid\(timesHere\(\), errorsStood\(\)\)/,
-    "then the red rows print",
-  );
-  const run =
-    /^export function test\(quiet = false\) \{[\s\S]*?^\}/m.exec(source)?.[0] ?? "";
-  assert.match(run, /inherit: !quiet/, "a quiet run keeps its output");
-});
-
 test("the command line's ticket entry names the yours, fill and route verbs", () => {
   for (const verb of ["yours", "fill", "route"]) {
     assert.match(saysOf("ticket"), new RegExp(`\\b${verb}\\b`));

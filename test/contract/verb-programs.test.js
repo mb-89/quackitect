@@ -8,7 +8,6 @@ import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { run as branch } from "../../src/scripts/verbs/branch.js";
-import { run as check } from "../../src/scripts/verbs/check.js";
 import { run as cloud } from "../../src/scripts/verbs/cloud.js";
 import { run as commit } from "../../src/scripts/verbs/commit.js";
 import { run as config } from "../../src/scripts/verbs/config.js";
@@ -35,17 +34,15 @@ import { run as setup } from "../../src/scripts/verbs/setup.js";
 import { run as split } from "../../src/scripts/verbs/split.js";
 import { run as standing } from "../../src/scripts/verbs/standing.js";
 import { run as stub } from "../../src/scripts/verbs/stub.js";
-import { run as testVerb } from "../../src/scripts/verbs/test.js";
 import { run as ticket } from "../../src/scripts/verbs/ticket.js";
 import { run as tools } from "../../src/scripts/verbs/tools.js";
 import { run as tui } from "../../src/scripts/verbs/tui.js";
 import { run as vehicle } from "../../src/scripts/verbs/vehicle.js";
 import { run as voice } from "../../src/scripts/verbs/voice.js";
-import { commands } from "./commands.js";
+import { commands, goVerbs } from "./commands.js";
 
 const RUNS = {
   branch,
-  check,
   cloud,
   commit,
   config,
@@ -72,7 +69,6 @@ const RUNS = {
   split,
   standing,
   stub,
-  test: testVerb,
   ticket,
   tools,
   tui,
@@ -80,8 +76,10 @@ const RUNS = {
   voice,
 };
 
-test("every verb of the table loads as a program answering a run", () => {
-  const listed = [...commands().keys()].sort();
+test("every verb of the table quack leaves to node loads as a program answering a run", () => {
+  const inGo = goVerbs();
+  assert.ok(inGo.has("check") && inGo.has("test"), "quack registers check and test");
+  const listed = [...commands().keys()].filter((verb) => !inGo.has(verb)).sort();
   assert.deepEqual(Object.keys(RUNS).sort(), listed);
   for (const [verb, run] of Object.entries(RUNS)) {
     assert.equal(typeof run, "function", `${verb} runs`);
@@ -95,6 +93,20 @@ test("the vehicle bodies stand beside the programs", () => {
 
 test("the lens names the folder the runner owns", () => {
   assert.equal(PROGRAMS, VERBS.join("/"));
+});
+
+// The check runs project --check, which reads every target against its source and writes none. [[spec/design_output/projection#check-refuses-a-stale-one]]
+test("the project program under --check reads the targets and writes none", async () => {
+  const said = [];
+  const was = console.log;
+  console.log = (line) => said.push(String(line));
+  try {
+    assert.equal(await project(["--check"]), 0);
+  } finally {
+    console.log = was;
+  }
+  assert.match(said.join("\n"), /reads as projected|names no projection/);
+  assert.doesNotMatch(said.join("\n"), /file\(s\) projected from/);
 });
 
 // A graph with no path refuses with its usage, before any read. [[spec/tickets/cli-js-leaves]]

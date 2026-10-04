@@ -15,12 +15,14 @@ import (
 	"strings"
 )
 
-// The cases a report names, the words a red case keeps, the cases a budget warning names, and the width a part's seconds pad to. [[spec/guidance/retro/effect]] [[spec/tickets/the-check-runs-fast-again]]
+// The cases a report names, the words a red case keeps, the cases a budget warning names, the width a part's seconds pad to, and the milliseconds in a tenth of a second and the tenths in one, which a part's time rounds by. [[spec/guidance/retro/effect]] [[spec/tickets/the-check-runs-fast-again]]
 const (
-	slowestKept = 10
-	redWords    = 200
-	budgetNamed = 5
-	secondsWide = 7
+	slowestKept    = 10
+	redWords       = 200
+	budgetNamed    = 5
+	secondsWide    = 7
+	msInTenth      = 100
+	tenthsInSecond = 10
 )
 
 // The source whose warnings a ticket's prose holds, which FROM.vale in src/bridge/findings.js names, and the folders a ticket stands in, which folders.js owns. [[spec/design_output/work#the-battery-answers-first]]
@@ -214,7 +216,7 @@ func partsSaid(report batteryReport, budget int64) []string {
 }
 
 func seconds(ms float64) string {
-	return fmt.Sprintf("%.1f", math.Round(ms/100)/10)
+	return fmt.Sprintf("%.1f", math.Round(ms/msInTenth)/tenthsInSecond)
 }
 
 // The stamp's shape, off what the check found. The battery's report rides it where one stands, and the last runs at this commit ride beside it, up to the count. [[spec/guidance/retro/effect]]

@@ -251,6 +251,21 @@ func TestGoGate(t *testing.T) {
 			t.Fatalf("no go answers %d", code)
 		}
 	})
+	t.Run("a quiet red run names each failing Go test on the error stream alone", func(t *testing.T) {
+		fake := &checkFake{codes: map[string]int{"go": 1}, said: map[string]string{"go": "=== RUN   TestA\n    --- FAIL: TestA (0.00s)\nok  \tquackitect/src/two\n--- FAIL: TestB (0.01s)\n"}}
+		doors := fake.doors()
+		var errs, out strings.Builder
+		doors.errs, doors.out = &errs, &out
+		if code := goGate(doors, true, nil); code != 1 {
+			t.Fatalf("a red quiet run answers %d", code)
+		}
+		if got := errs.String(); got != "--- FAIL: TestA (0.00s)\n--- FAIL: TestB (0.01s)\n" {
+			t.Fatalf("the error stream reads %q", got)
+		}
+		if out.Len() != 0 {
+			t.Fatalf("the out stream reads %q", out.String())
+		}
+	})
 }
 
 func TestTestArgv(t *testing.T) {

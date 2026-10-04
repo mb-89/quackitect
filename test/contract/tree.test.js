@@ -47,6 +47,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { SESSION } from "../../src/scripts/pull-hand-of.js";
+import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -100,11 +101,12 @@ const edited = (where, change) => {
 };
 
 // [[spec/design_output/bash#the-description-names-verbs]]
-test("every verb the Bash description names stands as a program", () => {
+test("every verb the Bash description names stands as a program, or quack registers it", () => {
   assert.ok(VERBS.length, "the description names at least one verb");
+  const inGo = goVerbs();
   for (const verb of VERBS) {
     assert.ok(
-      files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
+      inGo.has(verb) || files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
       `./RUNME.sh ${verb} stands`,
     );
   }

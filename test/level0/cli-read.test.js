@@ -1,5 +1,5 @@
-// The lint's reading of a tree: the warnings stand as a list the stamp
-// carries, and the list stands empty before any lint runs.
+// The lint's reading of a tree: the findings it leaves for the check, the
+// version, and the rows it prints.
 // [[spec/design_output/config#the-engine-controls]]
 
 import assert from "node:assert/strict";
@@ -7,9 +7,9 @@ import { test } from "node:test";
 import * as read from "../../src/scripts/cli-read.js";
 import {
   findingsDoors,
+  lintFoundOf,
   lintRows,
   version,
-  warningsStood,
 } from "../../src/scripts/cli-read.js";
 
 // readThrough in src/bridge/findings.js is the one road past Vale, so the command line exports no reader of its own. [[spec/tickets/go-prose-checks-stand-alone]]
@@ -30,12 +30,24 @@ test("the check's own reading keeps Vale's rows a file", async () => {
 });
 
 // A warning lands under every door, and the stamp carries the list. [[spec/design_output/config#the-engine-controls]]
-test("the warnings stand as a list, empty before any lint, and the version reads as text", () => {
-  assert.deepEqual(
-    warningsStood(),
-    [],
-    "the warnings stand as an empty list before any lint",
-  );
+test("the lint leaves each warning as its file and source, and each finding at error as its line", () => {
+  const found = [
+    { rule: "Alpha", line: 1, severity: "warning", file: "a.md", source: "vale" },
+    { rule: "Beta", line: 2, severity: "error", file: "b.md", source: "tree" },
+    { rule: "Gamma", line: 3, severity: "warning" },
+  ];
+  const lineOf = (one) => `${one.file}:${one.line} ${one.rule}`;
+  assert.deepEqual(lintFoundOf(found, lineOf), {
+    stood: [
+      { file: "a.md", source: "vale" },
+      { file: "", source: "" },
+    ],
+    erred: ["b.md:2 Beta"],
+  });
+  assert.deepEqual(lintFoundOf([], lineOf), { stood: [], erred: [] });
+});
+
+test("the version reads as text", () => {
   assert.equal(typeof version(), "string");
   assert.notEqual(version(), "", "the version names something, or the fallback");
 });

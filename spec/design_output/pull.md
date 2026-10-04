@@ -669,7 +669,7 @@ A step carrying `gate` is a gate: its value names the question it answers, and a
 - The hand-out of a gate prints its question, and `BEFORE_CLEAR` in `src/scripts/pull-chapter.js` beside it.
 - The reviewer fixes within its own diff, as its own commit. So at a gate, `handFaults` lets a commit naming the ticket stand.
 - A copy keeps no leaf a condition holds, no person step and no earlier copy.
-- Tests-red lists its red files under `red`. `expectedRed` in `src/scripts/red-list.js` reads every ticket past tests-red and short of tests-green. The check's test run leaves those files out and names them.
+- Tests-red lists its red files under `red`. `RedList` in `src/modules/tickets/red.go` reads every ticket past tests-red and short of tests-green. The check's test run leaves those files out and names them.
 
 ## The final acceptance
 
@@ -766,7 +766,7 @@ A red leaf holds a command field expecting `assertion`. Once the change lands, i
 | the red pass | the last entry of the leaf carrying `def`, with no `stale`, `skipped` or `returns` |
 | a later pass | an entry after it, of a leaf past the red leaf in route order, of the same kind |
 | the red commit | the first commit after the red pass's `hash_after` whose subject names the ticket and carries the whole change `passes <leaf>` |
-| the red tests | the leaf's `red` list, through `redListOf` in `src/scripts/red-list.js`, or the files under `test/` the red commit lands where the leaf lists none |
+| the red tests | the leaf's `red` list, through `redListOf` in `src/scripts/pull-kept.js`, or the files under `test/` the red commit lands where the leaf lists none |
 | they stand | `git diff -M --name-status` from the red commit to HEAD deletes none of them, and a rename keeps one |
 
 The entry reads `{ step, skipped: true, kept: <red commit>, why }`, and the change line reads `keeps <leaf>`.

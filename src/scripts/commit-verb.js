@@ -21,7 +21,7 @@ import { MESSAGE_HOW, ticketFault, ticketOf } from "../engine/named.js";
 import { FOLDER as UNDONE } from "../../.claude/skills/level0/lib/undo.js";
 import { coldIn, probeCold } from "./probe-cold.js";
 import { BY as RENAMED } from "./rename.js";
-import { verbArgv } from "./verb-run.js";
+import { quackArgv } from "./verb-run.js";
 
 const USAGE = ['Usage: ./RUNME.sh commit "<message>" [<path>...] [--no-push]'];
 
@@ -80,7 +80,7 @@ async function landsAndPushes(it, argv, message, paths) {
     return 1;
   }
   // The tests gate the commit, and the check after it stamps the commit that lands. [[spec/design_output/work#the-battery-answers-first]]
-  const tested = it.proc.run(verbArgv(it.node, it.root, ["test"], it.join), {
+  const tested = it.proc.run(quackArgv(it, ["test"]), {
     cwd: it.root,
   });
   if (tested.exitCode !== 0) {
@@ -121,7 +121,7 @@ async function landsAndPushes(it, argv, message, paths) {
     return 1;
   }
 
-  const ran = it.proc.run(verbArgv(it.node, it.root, ["check"], it.join), {
+  const ran = it.proc.run(quackArgv(it, ["check"]), {
     cwd: it.root,
   });
   if (ran.exitCode !== 0) {

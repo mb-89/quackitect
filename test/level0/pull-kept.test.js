@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { frontOf, recordIn, withEntry } from "../../src/engine/group.js";
 import { advanced } from "../../src/scripts/pull-hand.js";
-import { keptRed } from "../../src/scripts/pull-kept.js";
+import { keptRed, redListOf } from "../../src/scripts/pull-kept.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import { stepOn } from "../../src/scripts/pull-writes.js";
 import { CHILD, doors, ROOT, standing } from "./pull-doors.js";
@@ -194,4 +194,25 @@ test("the red commit search passes over a longer leaf name and another ticket pa
   });
   const kept = keptRed(it, text, leafOf(frontOf(text), RED_LEAF), "a-child");
   assert.equal(kept?.kept, RED_COMMIT);
+});
+
+// [[spec/tickets/kept-red-reads-red-list]]
+test("one leaf's red list reads each row as a bare path, and a leaf with no list reads empty", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# implement\n\n## tests-red\n\n### red\n\n- `test/level0/a.test.js`\n* test/level0/b.test.js\n\n## change\n";
+  assert.deepEqual(redListOf(text, "implement/tests-red"), [
+    "test/level0/a.test.js",
+    "test/level0/b.test.js",
+  ]);
+  assert.deepEqual(redListOf(text, "implement/change"), []);
+});
+
+// A hand-back landing an array as one comma-joined row still names each file. [[spec/tickets/list-fields-split-lines]] [[spec/design_output/pull#kept-red-leaves]]
+test("one leaf's red list reads a comma-joined row as each file it names", () => {
+  const text =
+    "---\nkind: [[ticket]]\n---\n\n# design\n\n## tests-red\n\n### red\n\nsrc/one/one_test.go,test/level0/a.test.js\n";
+  assert.deepEqual(redListOf(text, "design/tests-red"), [
+    "src/one/one_test.go",
+    "test/level0/a.test.js",
+  ]);
 });
