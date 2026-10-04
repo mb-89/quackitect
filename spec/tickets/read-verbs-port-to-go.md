@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 287f89a3eea24996
         size: 1421
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: bb019a90f8e3c696d0afec8406c001a372d1449d
+    hash_after: bb019a90f8e3c696d0afec8406c001a372d1449d
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/tickets/work-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -340,14 +349,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the six Go verbs and their tests, the gone programs, log-verb.js, and the JavaScript importers the callers list names
+- every door the change reaches has a fake: the ask, the tools, the sweep, the box, the log and the clock ride in through lintDoors and logDoors
+- a comment names the approach: each verb file header points at this ticket
+- every fact the change adds stands in one place: the shared print stands in verb_index.go, and links, notes and find call it
 
 ## tests-green
 
