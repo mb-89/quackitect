@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: fc6e633495ac75f4
         size: 2057
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 1d64c60aa6ea · claude-code-remote · helper-4
+    hash_before: 5c81a93cac61fbc70d28d7d3dfb956cffe184dd2
+    hash_after: 5c81a93cac61fbc70d28d7d3dfb956cffe184dd2
+    inputs:
+      - name: design/draft
+        hash: fc6e633495ac75f4
+        size: 2057
+      - name: design/tests-red
+        hash: d84ad84cd90c993f
+        size: 625
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -273,8 +285,10 @@ TestProduceRefusesTheMethodSpelledEitherWay fails on its own assertion on Linux 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- window-verbs-here-one-spelling: the approach keeps MethodRootFrom slashed and moves the test wants to filepath.ToSlash, so on Windows `vehicle here` prints the method root slashed beside a work root taken native off SE_WORK_ROOT; the ask wants each root spelled one way, so the change slashes the work root in here too, or the here case asserts both roots under one spelling
 
 # implement
 
