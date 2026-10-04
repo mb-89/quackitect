@@ -35,7 +35,7 @@ var Left = []string{".git", ".se", "node_modules", "_to_delete"}
 const PortBase = 6510
 
 // The pointer a project keeps to its vehicle and port. [[spec/design_input/the-runtime-files-stand-apart]]
-const Pointer = ".se/.runtime/vehicle.json"
+const Pointer = ".se/.runtime/vehicle.json" // the runtime folder .claude/skills/level0/lib/folders.js owns
 
 // The hooks manifest, and the two manifests a stub takes beside the modules. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
 const Hooks = "hooks/hooks.json"

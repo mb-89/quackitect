@@ -9,6 +9,7 @@ import (
 	"io"
 	"net"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -16,6 +17,7 @@ import (
 	"testing"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/hooks/brief"
 	"quackitect/src/tui/frame"
 )
 
@@ -417,5 +419,15 @@ func TestTuiTellReachesAStandingWindow(t *testing.T) {
 func TestTuiRegisters(t *testing.T) {
 	if registry["tui"] == nil {
 		t.Error("no tui verb stands in the registry")
+	}
+}
+
+// Every runtime path the window verbs spell stands under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
+func TestTuiRuntimeCopiesShareTheFolder(t *testing.T) {
+	runtime := path.Dir(brief.ToolsFile) + "/"
+	for _, one := range []string{serveIndexBin, tuiBin + "/"} {
+		if !strings.HasPrefix(one, runtime) {
+			t.Errorf("%s stands outside %s", one, runtime)
+		}
 	}
 }

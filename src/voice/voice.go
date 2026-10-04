@@ -27,7 +27,7 @@ import (
 
 // The folders and names the verbs read and write, as lib/voice.js, lib/vale.js and lib/log.js name them. [[spec/design_output/projection#the-second-target]]
 const (
-	Measured = ".se/.runtime/measure"
+	Measured = ".se/.runtime/measure" // the runtime folder .claude/skills/level0/lib/folders.js owns
 	Shortest = 25
 	Days     = 7
 	Answer   = "answer.md"

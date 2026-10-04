@@ -5,6 +5,7 @@ package vehicle
 
 import (
 	"os"
+	"path"
 	"path/filepath"
 	"reflect"
 	"slices"
@@ -12,6 +13,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/modules/hooks/brief"
 )
 
 // The stamp every case reads, as fakeClock hands it. [[spec/design_output/doors#a-fake-behaves]]
@@ -536,5 +539,12 @@ func TestVehicleWithPortTakesTheFirstFreePort(t *testing.T) {
 	}
 	if method, port, ok := PointerOf(`{"method":"/m"}`); !ok || method != "/m" || port != PortBase {
 		t.Fatal(method, port, ok)
+	}
+}
+
+// The pointer stands under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
+func TestPointerStandsInTheRuntimeFolder(t *testing.T) {
+	if !strings.HasPrefix(Pointer, path.Dir(brief.ToolsFile)+"/") {
+		t.Errorf("%s stands outside %s", Pointer, path.Dir(brief.ToolsFile))
 	}
 }

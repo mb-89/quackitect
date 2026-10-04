@@ -6,12 +6,15 @@ package voice
 import (
 	"encoding/json"
 	"errors"
+	"path"
 	"reflect"
 	"slices"
 	"sort"
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/modules/hooks/brief"
 )
 
 const (
@@ -566,5 +569,12 @@ func TestVoiceFromJSONReadsValeRows(t *testing.T) {
 	}
 	if got := FromJSON(""); len(got) != 0 {
 		t.Fatalf("FromJSON of nothing answers %v", got)
+	}
+}
+
+// The measured answers stand under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
+func TestMeasuredStandsInTheRuntimeFolder(t *testing.T) {
+	if !strings.HasPrefix(Measured, path.Dir(brief.ToolsFile)+"/") {
+		t.Errorf("%s stands outside %s", Measured, path.Dir(brief.ToolsFile))
 	}
 }

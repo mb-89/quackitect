@@ -20,7 +20,7 @@ import (
 )
 
 // The index binary under the root, as BIN in .claude/skills/level0/lib/index.js names it. [[spec/design_output/level0#a-desk-serve-returns]]
-const serveIndexBin = ".se/.runtime/bin/se-index"
+const serveIndexBin = ".se/.runtime/bin/se-index" // the runtime folder .claude/skills/level0/lib/folders.js owns
 
 // What the serve verb reaches: the root, and a run that answers the exit code and the error stream. [[spec/design_output/level0#a-desk-serve-returns]]
 type serveDoors struct {

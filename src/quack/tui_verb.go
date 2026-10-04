@@ -26,6 +26,7 @@ import (
 	"unicode/utf16"
 
 	"quackitect/src/index"
+	"quackitect/src/modules/hooks/brief"
 	"quackitect/src/tui/frame"
 )
 
@@ -44,7 +45,7 @@ const (
 // The viewer's source folder, the binaries' folder, the stamp beside the binary, the module files every stamp reads, the mark a key joins on, and the names an old binary tries. [[spec/design_output/tui#the-verb-builds-it]]
 const (
 	tuiSource = "src/tui"
-	tuiBin    = ".se/.runtime/bin"
+	tuiBin    = ".se/.runtime/bin" // the runtime folder .claude/skills/level0/lib/folders.js owns
 	tuiStamp  = tuiBin + "/.logview-source"
 	tuiJoin   = "\x1f"
 	tuiAside  = 9
@@ -614,7 +615,7 @@ func tuiGoOf(root string) string {
 	var known map[string]struct {
 		Path string `json:"path"`
 	}
-	if body, err := os.ReadFile(root + "/.se/.runtime/tools.json"); err == nil && json.Unmarshal(body, &known) == nil {
+	if body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(brief.ToolsFile))); err == nil && json.Unmarshal(body, &known) == nil {
 		if said := known["go"].Path; said != "" && tuiExists(said) {
 			return said
 		}
