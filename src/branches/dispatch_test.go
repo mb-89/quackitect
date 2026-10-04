@@ -245,6 +245,15 @@ func TestDispatchReadsAChildOffItsOwnGroupsBranch(t *testing.T) {
 	dpSame(t, one.dpPlan().Person, []personRow{})
 }
 
+// A dependency reads off its group ticket on origin/main alone, so a parent standing on no branch still holds. [[spec/tickets/groups-hold-groups]]
+func TestDispatchHoldsADependentOnAParentWithNoBranch(t *testing.T) {
+	one := dpTree(t, map[string]string{"after": dpWaiting("move"), "move": groupNote, "a-part": pcChild("move", "open")})
+	one.dpGroup("after", dpWaiting("move"))
+	plan := one.dpPlan()
+	dpSame(t, plan.Ready, []readyRow{})
+	dpSame(t, plan.Waiting, []waitRow{{Group: "after", Waits: []string{"move"}}})
+}
+
 // A group names its parent under group, and a parent hands no worker. [[spec/tickets/groups-hold-groups]]
 func TestDispatchHandsAParentNoWorker(t *testing.T) {
 	one := dpTree(t, map[string]string{"top": groupNote, "child": dpUnder("top")})

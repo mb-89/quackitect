@@ -14,7 +14,6 @@ import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { run as check } from "../../src/scripts/verbs/check.js";
 import { run as commit } from "../../src/scripts/verbs/commit.js";
 import { run as config } from "../../src/scripts/verbs/config.js";
-import { run as dispatch } from "../../src/scripts/verbs/dispatch.js";
 import { run as doctor } from "../../src/scripts/verbs/doctor.js";
 import { run as doors } from "../../src/scripts/verbs/doors.js";
 import { run as fix } from "../../src/scripts/verbs/fix.js";
@@ -43,7 +42,6 @@ const RUNS = {
   check,
   commit,
   config,
-  dispatch,
   doctor,
   doors,
   fix,

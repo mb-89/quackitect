@@ -203,7 +203,7 @@ func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
 	ask, last := dpAskSpan(text)
 	for _, rows := range found {
 		for _, row := range rows {
-			if row.Severity == "error" && row.Line >= ask && row.Line <= last {
+			if (row.Severity == "error" || row.Severity == "warning") && row.Line >= ask && row.Line <= last {
 				t.Errorf("line %d breaks %s: %s", row.Line, row.Check, row.Message)
 			}
 		}

@@ -55,7 +55,7 @@ func TestDispatchLeavesNode(t *testing.T) {
 			return err
 		}
 		for _, module := range dispatchModules {
-			if strings.Contains(string(text), "/"+module+"\"") {
+			if strings.Contains(string(text), "/"+module+"\"") || strings.Contains(string(text), "/"+module+"'") {
 				t.Errorf("%s imports %s, which the port deletes", path, module)
 			}
 		}

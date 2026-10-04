@@ -74,9 +74,9 @@ reads the chain `ancestorsOf` in `src/engine/group.js` walks off trunk:
 |---|---|
 | a parent is a group some group names | `parentsIn` in `src/engine/group.js` |
 | a child waits on every ancestor's `depends_on` | `waitsIn` in `src/scripts/work-stands.js` |
-| a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/scripts/dispatch-write.js` |
-| a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/scripts/dispatch.js`, written in the dispatch commit |
-| each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/scripts/dispatch.js` |
+| a parent reaches no worker, and opens no branch | `freeIn` in `src/scripts/work-free.js`, and `opensOf` in `src/branches/dispatch_write.go` |
+| a group on trunk no hand reaches closes once no ticket naming it stands open | `closesOf` in `src/branches/dispatch.go`, written in the dispatch commit |
+| each such group's open agent tickets bundle into a fix group under it | `bundlesOf` in `src/branches/dispatch.go` |
 | `branch done` files an open child group into its parent, and the person route loose | `filesUp` in `src/scripts/work-merge.js` |
 
 A group no hand reaches stands open on trunk, on no branch, opens none in
