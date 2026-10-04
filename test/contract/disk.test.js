@@ -56,6 +56,18 @@ function through(door) {
   return said;
 }
 
+// A folder of folders leaves whole in one removal, the one the styles assembly makes. [[spec/tickets/box-verbs-windows-fakes]]
+test("the real door removes a folder of folders whole", () => {
+  const door = disk();
+  const at = door.tempDir("se-remove-");
+  for (const one of ["a/b/c", "a/d", "e"]) {
+    door.makeDir(join(at, ...one.split("/")));
+    door.write(join(at, ...one.split("/"), "rule.yml"), "level: error\n");
+  }
+  door.remove(at);
+  assert.equal(door.exists(at), false);
+});
+
 test("the real door writes, reads back, lists and removes", () => {
   const said = through(disk());
   assert.equal(said.read, "# Notes\nmore\n");

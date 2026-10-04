@@ -29,6 +29,8 @@ import { tmpdir } from "node:os";
 import { join, relative, sep } from "node:path";
 
 const RUNNABLE = 0o755;
+// Windows answers a folder removal busy or not yet empty while a delete inside it stands pending, so the removal goes again this many times. [[spec/tickets/box-verbs-windows-fakes]]
+const REMOVE_RETRIES = 5;
 
 export function disk() {
   return {
@@ -52,7 +54,9 @@ export function disk() {
     list: (path) => readdirSync(path, { withFileTypes: true }).map(named),
     makeDir: (path) => mkdirSync(path, { recursive: true }),
     remove: (path) =>
-      isLink(path) ? unlinkSync(path) : rmSync(path, { force: true, recursive: true }),
+      isLink(path)
+        ? unlinkSync(path)
+        : rmSync(path, { force: true, recursive: true, maxRetries: REMOVE_RETRIES }),
     tempDir: (prefix) => mkdtempSync(join(tmpdir(), prefix)),
     // [[spec/design_output/extension#the-link-stands]]
     link: (target, path) => symlinkSync(target, path, "junction"),
