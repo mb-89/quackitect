@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: dispatch-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: 327d463ce2830b8897b5891525add34a379467be
+    hash_after: 327d463ce2830b8897b5891525add34a379467be
+    inputs:
+      - name: ask
+        hash: 0eac3f0d7cae79f5
+        size: 679
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,63 @@ The dispatch reads the waits, the free groups and the marker through the Go copy
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The dispatch ports into the Go package src/branches, beside the work verbs it reads, and src/quack/dispatch.go registers it from its own file. dispatch.go in the package carries the plan (planned, idleIn, looseOpen, bundlesOf, closesOf, leftForPerson, personOf, the printed rows and the JSON) and the run (carried, refused). dispatch_write.go carries opensOf, writeState, fixName, the fix ask, writesOf, fixGroup, land and opens. dispatch_fire.go carries the fire and the write branch's pull request. The plan reads the Go copy #94 landed (readWork, standingAll, trunkOf, freeIn, staleClaim, stuckIn, waitsOf, waitsIn, onPersonRoute, markOff), so the Action and the boxes agree on what is free. The fix group mints through check.Minted over check.SchemasIn, and a route copy in dispatch_write.go reads spec/processes/<name>.yaml, keeps its key order through yaml.Doc, and hashes ask and steps the way processHash in lib/schema-route.js does, over hashText in route.go. The http door rides a Send func handed to Dispatch beside the Doors, so doors.go takes no new field and no shared line changes. Weighed: askFaults ran Vale over a constant ask at each run; the Go run drops that call, a Go case runs Vale over the minted fix group once, and the check on the write branch's pull request lints every ticket it lands. The JSON and the printed plan keep their shape, since the Action reads --json. dispatch.js, dispatch-write.js, dispatch-fire.js and verbs/dispatch.js leave; an import walk over every .js file names no other module the four alone keep alive. The JS tests dispatch.test.js, dispatch-fire.test.js and dispatch-fixtures.js leave with them, their roads ported to Go, and the planOf case in work-stands.test.js moves to Go.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbs: runs a registered verb, now dispatch
+- src/quack/twins.go nodeAccept: hands an index action naming dispatch to the Go verb
+- RUNME.sh: ./RUNME.sh dispatch reaches quack verb
+- .github/workflows/dispatch.yml: runs ./RUNME.sh dispatch --json --fire
+- .claude/skills/dispatch/SKILL.md: runs ./RUNME.sh dispatch --dry
+- test/level0/work-stands.test.js: imports planOf from dispatch.js
+- test/contract/verb-programs.test.js RUNS: imports verbs/dispatch.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/dispatch_test.go: the plan roads of dispatch.test.js (ready, waiting, held, stuck, person, bundles, opens, closes, parents, the dry run, --json)
+- src/branches/dispatch_write_test.go: one fix group, one commit on claude/dispatch-<commit>, a standing and an unmerged write branch, the worktree removed, a refused push, the name cut, the route copy and its hash
+- src/branches/dispatch_fire_test.go: the roads of dispatch-fire.test.js over a fake Send
+- src/quack/dispatch_test.go: dispatch registers, reaches no node, verbs/dispatch.js stands nowhere, and no .js imports a deleted module
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/dispatch.go, new
+- src/branches/dispatch_write.go, new
+- src/branches/dispatch_fire.go, new
+- src/branches/dispatch_*_test.go, new
+- src/quack/dispatch.go, new
+- src/quack/dispatch_test.go, new
+- src/scripts/dispatch.js, dispatch-write.js, dispatch-fire.js, verbs/dispatch.js, removed
+- test/level0/dispatch.test.js, dispatch-fire.test.js, dispatch-fixtures.js, removed
+- test/level0/work-stands.test.js, test/contract/verb-programs.test.js, edited
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: dispatch.js, dispatch-write.js, dispatch-fire.js, verbs/dispatch.js, process.js withRoute and processAt, ticket.js cutTo and schemasHere, ticket-ask-lint.js, schema-route.js processHash, src/branches doors.go, stands.go, free.go, group.go, take.go, route.go hashText, src/modules/check mint.go and export.go, src/quack registry.go, branch.go, cloud.go
+- the callers list names the road, the node module, the Action, the skill and the two JS tests importing the deleted files
+- each done_when line meets a test: the Go cases, dispatch_test.go in src/quack for no node and the verbs folder and the importer search, and ./RUNME.sh check
 
 ## tests-red
 
