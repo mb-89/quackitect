@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-holds-a-verb-registry
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 1284bdec1a577adf9057b69d2746bb75ae596cf2
+    hash_after: 1284bdec1a577adf9057b69d2746bb75ae596cf2
+    inputs:
+      - name: ask
+        hash: 580ad8ec1ffd810d
+        size: 816
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -154,38 +163,61 @@ A branch porting a verb then adds one file and touches no shared line, so the ph
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new file `src/quack/registry.go` holds `registry`, a map from a verb's words to its `twin`, and `register(words, one)`, which panics at start where the same words register twice. Each Go verb calls `register` from an `init` in its own file, so a port adds one file and edits no shared line. The three twins in `src/quack/twins.go` each take an `init` beside their function. `twinVerbs` leaves `src/quack/verbs.go`, and `verbRoad` hands the road `registry`. `nodeAccept` in `src/quack/twins.go` runs a registered verb's Go answer before it reaches `programOf`, so the index's node module hands node only an unregistered verb. The road already hands a registered verb to Go: `migration.verbs` allows `new` alone (`src/modules/migration/migration.go`), and `roadOf` sends a twin to quack under `new`. Assumption: the node module runs a registered verb in Go whatever the mode, since the mode allows `new` alone and phase 11 retires node. The twins read the index over HTTP GET of values, which the server answers beside the action in flight.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbRoad, reads twinVerbs, then registry
+- src/quack/verbs_test.go TestTheTwinsStandInShadow (line 165 and 176), reads twinVerbs, then registry
+- src/quack/accepts.go accepts, calls nodeAccept
+- src/quack/person_run_test.go, calls nodeAccept with an unregistered verb
+- src/quack/verbs.go programDoor, calls programOf behind roadOf
+- src/quack/twins.go nodeAccept, calls programOf
+- src/quack/programs_test.go TestAVerbWithNoTwinRunsItsProgram, calls programOf
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/registry_test.go TestVerbRegistry/a_registered_verb_runs_in_Go
+- src/quack/registry_test.go TestVerbRegistry/an_unregistered_verb_reaches_node
+- src/quack/registry_test.go TestVerbRegistry/the_node_module_runs_a_registered_verb_in_Go
+- src/quack/registry_test.go TestVerbRegistry/a_registered_verb_failing_answers_an_error_through_the_node_module
+- src/quack/registry_test.go TestVerbRegistry/the_twins_register_through_the_registry
+- src/quack/registry_test.go TestVerbRegistry/a_second_registration_of_the_same_words_panics
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/registry.go
+- src/quack/registry_test.go
+- src/quack/twins.go
+- src/quack/verbs.go
+- src/quack/verbs_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened verbs.go, twins.go, accepts.go, cli.go, migration.go, programs_test.go and verbs_test.go, and checked each claim there
+- grep of twinVerbs, programOf and nodeAccept over src names every caller above
+- TestVerbRegistry decides the first two done_when lines, a port's diff decides the third by registering in its own file, and ./RUNME.sh check decides the fourth
 
 ## tests-red
 
