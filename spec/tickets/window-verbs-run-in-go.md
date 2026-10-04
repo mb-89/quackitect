@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: children-2
+step: accept
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -129,6 +129,10 @@ record:
       - name: sync/sync
         exit: 0
         said: work/window-verbs-run-in-go already carries every commit on main.
+  - step: children-2
+    hand: the engine
+    hash_before: 2cead64925ac69d18659c5671f56d9010b39d8cb
+    hash_after: 2cead64925ac69d18659c5671f56d9010b39d8cb
 group: the-verbs-run-in-go
 depends_on: ["quack-holds-a-verb-registry"]
 enabled_by: migration.phase11
