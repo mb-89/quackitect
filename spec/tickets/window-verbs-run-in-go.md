@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box 2e385b836f39 · claude-code-remote
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/window-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 0a508a909cf789dc0a6e3fa6ffed3560ef1073eb
+    hash_after: 0a508a909cf789dc0a6e3fa6ffed3560ef1073eb
+    inputs:
+      - name: ask
+        hash: 3484fd0a47aa84d4
+        size: 313
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -130,14 +142,19 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/window-verbs-port-to-go]], process standard: tui, serve, voice, vehicle and stub answer in Go from their own files, and their JavaScript leaves
+- [[spec/tickets/registered-verb-skips-the-mode]], process trivial: a verb Go registers whole takes quack under every mode, since its program left
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child reviews whole: the port is five verbs of one shape, each in its own file, and the road fix is one function with its case
+- the children add up to the goal: no program of the five verbs stands under src/scripts/verbs, a scan of src/scripts finds no module nothing imports, and vehicle.js stays because src/bridge/vehicle.js imports it
+- registered-verb-skips-the-mode was minted from the port gate and closed after it, so neither waits on the other and neither names depends_on
 
 # children
 
