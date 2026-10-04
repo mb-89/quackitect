@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: check-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 7ca9e2bd5154678d
         size: 874
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box bf0e991d1270 · claude-code-remote
+    hash_before: 0a67250b468653611c492341dce1686815bfd1c6
+    hash_after: 3f8215f8bb1754fb6b912d62c9c748c399a97a7b
+    answered:
+      - name: lint
+        exit: 0
+        said: "   65.3  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -345,14 +354,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: every file stands on the draft size list, on the callers list the gate completed in the Discussion, or carries a call to the check or test verb a search of src found, which are commit-verb.js and its cases
+- every door the change reaches has a fake: the review, merge and commit cases drive the quack road over the fake process door, and the lint file write rides the disk door
+- a comment names the approach: roadArgv, quackArgv, the review call and lintFoundOf each link the ticket or the battery section they implement
+- every fact the change adds stands in one place: roadArgv owns the quack road for JavaScript, CHECK in work-doors.js owns the merge key for its cases, and goVerbs owns the list of verbs quack registers for the contracts
 
 ## tests-green
 
