@@ -9,15 +9,20 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
+	"io/fs"
+	"os"      // level0: OutsideInDoors - this file is the branch verbs' door onto the disk
+	"os/exec" // level0: OutsideInDoors - this file is the branch verbs' door onto git and every process
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 )
 
 // The asks one cat-file --batch carries, as BATCH_ASKS in src/doors/git.js names it. [[spec/design_output/work#the-listing-reads-git-once]]
 const batchAsks = 400
+
+// .claude/skills/level0/lib/folders.js owns the runtime folder, and the package spells it again. [[spec/design_output/pull#the-hand-and-the-hold]]
+const runtimeFolder = ".se/.runtime"
 
 // What a run answers: whether it exits zero, its output and its errors, each trimmed. [[spec/design_output/doors#one-door-per-outside-thing]]
 type Said struct {
@@ -221,3 +226,45 @@ func readFile(at string) string {
 	}
 	return string(said)
 }
+
+// The names of the files standing in a folder under the work root, in name order. [[spec/design_output/doors#one-door-per-outside-thing]]
+func (d *Doors) names(folder string) []string {
+	entries, err := os.ReadDir(d.at(folder))
+	if err != nil {
+		return nil
+	}
+	var out []string
+	for _, one := range entries {
+		if !one.IsDir() {
+			out = append(out, one.Name())
+		}
+	}
+	sort.Strings(out)
+	return out
+}
+
+// Every file under a folder of the work root, as slash paths from the root, in the order the walk meets them. [[spec/design_output/doors#one-door-per-outside-thing]]
+func (d *Doors) filesUnder(folder string) []string {
+	var out []string
+	_ = filepath.WalkDir(d.at(folder), func(at string, entry fs.DirEntry, err error) error {
+		if err != nil || entry.IsDir() {
+			return nil
+		}
+		if rel, err := filepath.Rel(d.Root, at); err == nil {
+			out = append(out, filepath.ToSlash(rel))
+		}
+		return nil
+	})
+	return out
+}
+
+// Links a path under the work root into another folder, its parent made first, and answers whether it stands. [[spec/design_output/review#a-worktree-runs-the-check]]
+func (d *Doors) link(rel, to string) bool {
+	if err := os.MkdirAll(filepath.Dir(to), 0o755); err != nil {
+		return false
+	}
+	return os.Symlink(d.at(rel), to) == nil
+}
+
+// Removes the link at a path, leaving what it names standing. [[spec/design_output/review#a-worktree-runs-the-check]]
+func unlink(at string) { _ = os.Remove(at) }

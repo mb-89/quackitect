@@ -73,7 +73,7 @@ func (d *Doors) markOff(branch string) string {
 	return said.Out
 }
 
-// The refusal a desk meets where a verb would move it onto a work branch. [[spec/design_output/work#a-desk-works-on-trunk]]
+// The refusal a desk meets where a verb moves it onto a work branch. [[spec/design_output/work#a-desk-works-on-trunk]]
 func deskRefusal(what string) string {
 	return "A desk works on " + trunk + " alone, and a cloud box works each " + workBranch + " branch, so " + what + ".\n" +
 		"Run git switch " + trunk + ", and take a finished cloud branch in with ./RUNME.sh branch merge <name>."

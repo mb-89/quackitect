@@ -13,10 +13,12 @@ import (
 
 // The stamp the check writes, the retro step a group writes before it leaves, the reason done closes on, and the length of a short commit. [[spec/design_output/work#the-battery-answers-first]]
 const (
-	checkStamp = ".se/.runtime/check.json"
+	checkStamp = runtimeFolder + "/check.json"
 	retroRoot  = "retro"
 	doneReason = "done"
 	shortSha   = 8
+	// The width of the float a JSON number decodes to. [[spec/design_output/work#the-battery-answers-first]]
+	floatBits = 64
 )
 
 // Hands a finished group back: trunk in, the check green, every child closed, the retro written. [[spec/design_output/work#a-group-is-a-ticket]]
@@ -128,7 +130,7 @@ func saysGreen(text, sha string) (bool, string) {
 		default:
 			files = 1
 		}
-		return false, fmt.Sprintf("%s warning(s) stand in %d file(s), which ./RUNME.sh lint names", strconv.FormatFloat(warned, 'f', -1, 64), files)
+		return false, fmt.Sprintf("%s warning(s) stand in %d file(s), which ./RUNME.sh lint names", strconv.FormatFloat(warned, 'f', -1, floatBits), files)
 	}
 	return true, "the check passes on " + shortOf(sha)
 }
@@ -141,7 +143,7 @@ func jsonText(said any) string {
 	case string:
 		return one
 	case float64:
-		return strconv.FormatFloat(one, 'f', -1, 64)
+		return strconv.FormatFloat(one, 'f', -1, floatBits)
 	}
 	return fmt.Sprint(said)
 }

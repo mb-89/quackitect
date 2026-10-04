@@ -24,7 +24,7 @@ var (
 // A ticket on disk: its name, where it stands, its text and its front. [[spec/design_output/work#a-person-step-leaves]]
 type onDisk struct {
 	Name, At, Text, Why string
-	Front              *yaml.Doc
+	Front               *yaml.Doc
 }
 
 // Closes a ticket waiting on a person as became, and hands the question to its successor. [[spec/design_output/work#a-person-step-leaves]]

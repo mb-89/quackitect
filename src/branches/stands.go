@@ -7,9 +7,7 @@ package branches
 import (
 	"encoding/json"
 	"regexp"
-	"os"
 	"slices"
-	"sort"
 	"strings"
 
 	"quackitect/src/yaml"
@@ -430,7 +428,7 @@ type change struct {
 	Parked bool
 }
 
-// Whether work stands uncommitted or unpushed, so no branch may move. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+// Whether work stands uncommitted or unpushed, which holds every branch where it stands. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 func (d *Doors) dirty(branch string) bool {
 	for _, one := range d.standingIn() {
 		if !one.Parked {
@@ -453,7 +451,7 @@ func (d *Doors) dirty(branch string) bool {
 	return false
 }
 
-// Whether a branch holds commits origin lacks, which a move would drop. [[spec/design_output/work#a-branch-moves-clean]]
+// Whether a branch holds commits origin lacks, which a move drops. [[spec/design_output/work#a-branch-moves-clean]]
 func (d *Doors) unpushed(branch string) bool {
 	said := d.quiet("rev-list", "--count", "origin/"+branch+".."+branch)
 	if !said.OK || said.Out == "" || said.Out == "0" {
@@ -524,17 +522,11 @@ func (d *Doors) ticketsOnDisk() []named {
 
 // Every note under a folder of the work root, in name order. [[spec/design_output/pull#the-hand-out]]
 func (d *Doors) notesIn(folder string) []named {
-	entries, err := os.ReadDir(d.at(folder))
-	if err != nil {
-		return nil
-	}
 	var out []named
-	for _, one := range entries {
-		if one.IsDir() || !strings.HasSuffix(one.Name(), noteEnd) {
-			continue
+	for _, one := range d.names(folder) {
+		if strings.HasSuffix(one, noteEnd) {
+			out = append(out, named{Name: ticketNamed(one), Text: d.read(folder + "/" + one)})
 		}
-		out = append(out, named{Name: ticketNamed(one.Name()), Text: d.read(folder + "/" + one.Name())})
 	}
-	sort.Slice(out, func(a, b int) bool { return out[a].Name < out[b].Name })
 	return out
 }

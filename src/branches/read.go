@@ -13,6 +13,9 @@ import (
 const (
 	nameBytes = 20
 	sizeAt    = 2
+	// The base and the width a commit time reads in. [[spec/design_output/work#the-listing-reads-git-once]]
+	decimal   = 10
+	wholeBits = 64
 )
 
 // The fields every git answers, past the ahead-behind an older git lacks. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -37,7 +40,7 @@ func refsIn(said string, merged map[string]bool) []ref {
 		branch := strings.TrimPrefix(parts[0], "origin/")
 		var when int64
 		if len(parts) > 2 {
-			when, _ = strconv.ParseInt(parts[2], 10, 64)
+			when, _ = strconv.ParseInt(parts[2], decimal, wholeBits)
 		}
 		out = append(out, ref{Branch: branch, Tip: parts[1], When: when, Merged: merged[branch]})
 	}

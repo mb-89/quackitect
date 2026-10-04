@@ -5,8 +5,6 @@
 package branches
 
 import (
-	"os"
-	"path/filepath"
 	"slices"
 	"strings"
 
@@ -127,18 +125,15 @@ func (d *Doors) guidanceText(path string) string {
 // Every note under the guidance folder binding here: one naming no env, or one whose env reads true. [[spec/design_input/level-two#guidance]]
 func (d *Doors) alwaysOn() []string {
 	var out []string
-	root := d.at(guidanceFolder)
-	_ = filepath.WalkDir(root, func(at string, entry os.DirEntry, err error) error {
-		if err != nil || entry.IsDir() || !strings.HasSuffix(entry.Name(), noteEnd) || strings.HasPrefix(entry.Name(), draftMark) {
-			return nil
+	for _, rel := range d.filesUnder(guidanceFolder) {
+		name := rel[strings.LastIndex(rel, "/")+1:]
+		if !strings.HasSuffix(name, noteEnd) || strings.HasPrefix(name, draftMark) {
+			continue
 		}
-		rel, _ := filepath.Rel(d.Root, at)
-		path := strings.TrimSuffix(filepath.ToSlash(rel), noteEnd)
-		if d.bindsHere(d.guidanceText(path)) {
+		if path := strings.TrimSuffix(rel, noteEnd); d.bindsHere(d.guidanceText(path)) {
 			out = append(out, path)
 		}
-		return nil
-	})
+	}
 	return out
 }
 

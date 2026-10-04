@@ -1,5 +1,5 @@
 // A group, read off its ticket, as src/engine/group.js reads it: the front,
-// the record, the step and the ask, and the four writes through the Go front
+// the record, the step and the ask, and the writes through the Go front
 // writer. Everything here reads or writes that one note.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 package branches
@@ -18,17 +18,18 @@ import (
 // The folders, the branch prefix, the fields and the states the engine reads. [[spec/design_output/level0#a-write-names-its-ticket]]
 const (
 	ticketsFolder = "spec/tickets"
-	notesFolder   = ".se/tickets"
-	noteEnd       = ".md"
-	workBranch    = "work/"
-	groupField    = "group"
-	openState     = "open"
-	closedState   = "closed"
-	draftState    = "draft"
-	urgentField   = "urgent"
-	groupRoute    = "group"
-	trivialRoute  = "trivial"
-	frontFence    = "---"
+	// .claude/skills/level0/lib/folders.js owns the private tickets' folder, and the package spells it again. [[spec/design_output/pull#the-private-queue]]
+	notesFolder  = ".se/tickets"
+	noteEnd      = ".md"
+	workBranch   = "work/"
+	groupField   = "group"
+	openState    = "open"
+	closedState  = "closed"
+	draftState   = "draft"
+	urgentField  = "urgent"
+	groupRoute   = "group"
+	trivialRoute = "trivial"
+	frontFence   = "---"
 	// The span a claim goes stale past where work.staleAfter says nothing. [[spec/design_output/work#a-stale-group-is-yours]]
 	staleSpan = "12h"
 	// The branch every work branch leaves and lands on. [[spec/design_output/work#trunk-comes-in-first]]

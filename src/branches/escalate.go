@@ -7,7 +7,6 @@ package branches
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -22,11 +21,12 @@ import (
 const (
 	optionsFlag  = "--options"
 	ticketSchema = "spec/schemas/ticket.schema.yaml"
-	undoFolder   = ".se/.runtime/undo"
+	undoFolder   = runtimeFolder + "/undo"
 	splitsKey    = "work.stepsBeforeSplit"
 	refusedWord  = "refused"
 	workWord     = "work"
 	engineReader = "engine"
+	jsonEnd      = ".json"
 )
 
 var (
@@ -251,7 +251,7 @@ func (d *Doors) landed(one note, changes []string) string {
 		if ignored[path] {
 			continue
 		}
-		if _, err := os.Stat(d.at(path)); err == nil || d.quiet("ls-files", "--error-unmatch", "--", path).OK {
+		if d.exists(path) || d.quiet("ls-files", "--error-unmatch", "--", path).OK {
 			kept = append(kept, path)
 		}
 	}
@@ -310,14 +310,10 @@ func (d *Doors) landedAll(one note, changes, theirs []string) string {
 
 // The files the undo journals name since the hold took the ticket: the ticket's own, and every other ticket's. [[spec/design_output/pull#the-refused-commit]]
 func (d *Doors) journaled(name string) ([]string, []string) {
-	entries, err := os.ReadDir(d.at(undoFolder))
-	if err != nil {
-		return nil, nil
-	}
 	taken := d.takenOf(name)
 	var mine, theirs []string
-	for _, row := range entries {
-		if row.IsDir() || !strings.HasSuffix(row.Name(), ".json") {
+	for _, row := range d.names(undoFolder) {
+		if !strings.HasSuffix(row, jsonEnd) {
 			continue
 		}
 		var entry struct {
@@ -328,7 +324,7 @@ func (d *Doors) journaled(name string) ([]string, []string) {
 				File string `json:"file"`
 			} `json:"files"`
 		}
-		if json.Unmarshal([]byte(d.read(undoFolder+"/"+row.Name())), &entry) != nil || entry.Ticket == "" || entry.At < taken {
+		if json.Unmarshal([]byte(d.read(undoFolder+"/"+row)), &entry) != nil || entry.Ticket == "" || entry.At < taken {
 			continue
 		}
 		if entry.Landed != nil && !*entry.Landed {
@@ -353,12 +349,8 @@ func (d *Doors) journaled(name string) ([]string, []string) {
 
 // When the hold on a ticket took it, or nothing where no hold names it. [[spec/design_output/pull#the-refused-commit]]
 func (d *Doors) takenOf(name string) string {
-	entries, err := os.ReadDir(d.at(holdsFolder))
-	if err != nil {
-		return ""
-	}
-	for _, row := range entries {
-		if row.IsDir() || !strings.HasSuffix(row.Name(), ".json") {
+	for _, row := range d.names(holdsFolder) {
+		if !strings.HasSuffix(row, jsonEnd) {
 			continue
 		}
 		var held struct {
@@ -366,7 +358,7 @@ func (d *Doors) takenOf(name string) string {
 			Path   string `json:"path"`
 			Taken  string `json:"taken"`
 		}
-		if json.Unmarshal([]byte(d.read(holdsFolder+"/"+row.Name())), &held) != nil || held.Ticket != name {
+		if json.Unmarshal([]byte(d.read(holdsFolder+"/"+row)), &held) != nil || held.Ticket != name {
 			continue
 		}
 		if held.Path != "" && d.exists(held.Path) && fieldOf(d.read(held.Path), "state") == closedState {

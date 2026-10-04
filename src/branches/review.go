@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -21,9 +20,9 @@ const (
 	loud         = 5
 	diffCap      = 120000
 	nameWidth    = 10
-	reviewFolder = ".se/.runtime/review"
-	toolsFile    = ".se/.runtime/tools.json"
-	binFolder    = ".se/.runtime/bin"
+	reviewFolder = runtimeFolder + "/review"
+	toolsFile    = runtimeFolder + "/tools.json"
+	binFolder    = runtimeFolder + "/bin"
 )
 
 // What the install writes and git ignores, which the check reads alone. [[spec/design_output/review#a-worktree-runs-the-check]]
@@ -252,16 +251,14 @@ func (d *Doors) checkOn(branch, at string) checked {
 		if !d.exists(one) {
 			continue
 		}
-		to := filepath.Join(where, filepath.FromSlash(one))
-		_ = os.MkdirAll(filepath.Dir(to), 0o755)
-		if os.Symlink(d.at(one), to) == nil {
+		if to := filepath.Join(where, filepath.FromSlash(one)); d.link(one, to) {
 			linked = append(linked, to)
 		}
 	}
 	bin := filepath.Join(where, filepath.FromSlash(binFolder), "se-index"+exe())
 	ran := d.run(where, nil, "", bin, "verb", filepath.Join(where, "src", "scripts"), "check")
 	for _, one := range linked {
-		_ = os.Remove(one)
+		unlink(one)
 	}
 	d.quiet("worktree", "remove", "--force", where)
 	d.remove(rel)

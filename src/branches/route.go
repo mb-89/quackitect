@@ -245,9 +245,12 @@ var groupRow = regexp.MustCompile(`(?m)^group:[ \t]*(\S.*)$`)
 
 var fenceRow = regexp.MustCompile(`(?m)^---\s*$`)
 
+// The parts two fences cut a note into: before, the front, and the rest. [[spec/design_output/pull#the-final-acceptance]]
+const fenceCuts = 3
+
 // The group the front names off its raw rows, or nothing. [[spec/design_output/pull#the-final-acceptance]]
 func groupLine(text string) string {
-	parts := fenceRow.Split(text, 3)
+	parts := fenceRow.Split(text, fenceCuts)
 	if len(parts) < 2 {
 		return ""
 	}

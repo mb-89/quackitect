@@ -17,7 +17,7 @@ import (
 // How much of an error line a verdict carries, where the sources wait aside, and the flag and the word a red run reads. [[spec/design_output/pull#a-test-proves-red]]
 const (
 	cutError  = 160
-	asideAt   = ".se/.runtime/red"
+	asideAt   = runtimeFolder + "/red"
 	asideList = "sources.json"
 	redFlag   = "--red"
 	assertion = "assertion, "

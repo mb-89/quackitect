@@ -12,10 +12,10 @@ import (
 
 // Where the box id, the session, the identity and the holds stand, and the length of a minted box id. [[spec/design_output/pull#the-hand-and-the-hold]]
 const (
-	boxFile     = ".se/.runtime/box.json"
-	sessionFile = ".se/.runtime/session.json"
-	identity    = ".se/.runtime/identity.json"
-	holdsFolder = ".se/.runtime/hold"
+	boxFile     = runtimeFolder + "/box.json"
+	sessionFile = runtimeFolder + "/session.json"
+	identity    = runtimeFolder + "/identity.json"
+	holdsFolder = runtimeFolder + "/hold"
 	boxID       = 12
 	stampLayout = "2006-01-02T15:04:05.000Z"
 )
