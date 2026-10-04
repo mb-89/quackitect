@@ -24,7 +24,9 @@ import { guidanceHere } from "../bridge/guidance.js";
 import { vale } from "../doors/vale.js";
 import { whereIs, writeSurvey } from "../engine/tools.js";
 import { browserSays } from "./browser.js";
-import { probeDry } from "./probe-dry.js";
+import { probeApart } from "./probe-dry.js";
+
+export { deltaOf } from "./probe-dry.js";
 import {
   bin,
   biome,
@@ -331,7 +333,7 @@ export function pluginHolds() {
 
 // LEVEL ZERO RUNS, OR THE CHECK IS RED. A fresh clone of this tree, the working change on it, takes the install a cloud box takes, and the hook module the client loads runs a scripted session against the door the start road stands up, with no model and no key. The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
 export async function level0Runs(
-  dry = probeDry,
+  dry = probeApart,
   platform = process.platform,
   say = console.log,
   shout = console.error,
@@ -341,18 +343,10 @@ export async function level0Runs(
     return 0;
   }
   const lines = [];
-  const code = await dry(root, it, (one) => lines.push(one), deltaOf(it, root));
+  const code = await dry(root, it, (one) => lines.push(one));
   for (const one of lines) (code ? shout : say)(one);
   if (code) shout("Level zero does not run whole on a fresh box, so this tree is red.");
   return code;
-}
-
-// The working change as a patch, read through the process door untrimmed, since a trim cuts the blank context line a hunk ends on and git apply reads the rest as corrupt. [[spec/tickets/model-marks-io-names]]
-export function deltaOf(here, at) {
-  const ran = here.proc.run(["git", "diff", "HEAD", "--binary", "--no-renames"], {
-    cwd: at,
-  });
-  return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
 }
 
 // What the probe found, and whether the check carries on past it. A box running no server reads every rule, and a server standing and failing its health call is red. [[spec/design_output/level0#the-check-reads-the-server]]
