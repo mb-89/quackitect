@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box 8ca46dccf16b · claude-code-remote
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/box-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 02f717c53a9c5391a90751bc2911daf43e020743
+    hash_after: 02f717c53a9c5391a90751bc2911daf43e020743
+    inputs:
+      - name: ask
+        hash: 811a2cbc704967e5
+        size: 308
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -130,14 +142,24 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/box-verbs-port-to-go]], standard
+- [[spec/tickets/box-verbs-brand-caller]], standard
+- [[spec/tickets/probe-dry-leaves-node]], standard
+- [[spec/tickets/box-verbs-no-node-test]], standard
+- [[spec/tickets/setup-road-without-index]], standard
+- [[spec/tickets/probe-dry-entry]], standard
+- [[spec/tickets/box-verbs-dead-entries]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child reviews whole: the port, five gate fixes, and the dead entries the port leaves
+- the port moves the four verbs to Go and deletes their programs; the dead-entries child takes the JavaScript the port leaves with no caller, so the goal stands inside the children
+- box-verbs-dead-entries waits on nothing open, since the port it follows stands closed
 
 # children
 
