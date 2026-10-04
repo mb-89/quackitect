@@ -47,8 +47,8 @@ func TestTheRootRunsANodeVerbThroughItsProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 	accept := accepts(root, nil, nil)
-	said, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"ticket", "yours"}})
-	if err != nil || said != `["yours"]` {
+	said, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"ticket", "open"}})
+	if err != nil || said != `["open"]` {
 		t.Fatalf("the node module answers %#v, %v", said, err)
 	}
 	if _, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"ticket", "fail"}}); err == nil || !strings.Contains(err.Error(), "fail") {

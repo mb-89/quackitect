@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -117,7 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-holds-a-verb-registry
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 1284bdec1a577adf9057b69d2746bb75ae596cf2
+    hash_after: 1284bdec1a577adf9057b69d2746bb75ae596cf2
+    inputs:
+      - name: ask
+        hash: 580ad8ec1ffd810d
+        size: 816
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: c11a1b55c3f9bff81a475a242681e06636d5e78c
+    hash_after: c11a1b55c3f9bff81a475a242681e06636d5e78c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: fa73b414a51abd6a
+        size: 2644
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 470a600bc22e · claude-code-remote · helper-4
+    hash_before: 0fc9d5f180f0b54e1a283b0358822f21ed02eb19
+    hash_after: 0fc9d5f180f0b54e1a283b0358822f21ed02eb19
+    inputs:
+      - name: design/draft
+        hash: fa73b414a51abd6a
+        size: 2644
+      - name: design/tests-red
+        hash: 7f7526f6270128bf
+        size: 741
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 185e07a1156c604ab41b75a0ef904eb155c4c6a3
+    hash_after: 185e07a1156c604ab41b75a0ef904eb155c4c6a3
+    answered:
+      - name: lint
+        exit: 0
+        said: "   86.2  in all"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: f67c224a8f2a1520a2bc0cff2ba4444f0987e44c
+    hash_after: f67c224a8f2a1520a2bc0cff2ba4444f0987e44c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   85.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 7f7526f6270128bf
+        size: 741
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -150,38 +220,61 @@ A branch porting a verb then adds one file and touches no shared line, so the ph
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new file `src/quack/registry.go` holds `registry`, a map from a verb's words to its `twin`, and `register(words, one)`, which panics at start where the same words register twice. Each Go verb calls `register` from an `init` in its own file, so a port adds one file and edits no shared line. The three twins in `src/quack/twins.go` each take an `init` beside their function. `twinVerbs` leaves `src/quack/verbs.go`, and `verbRoad` hands the road `registry`. `nodeAccept` in `src/quack/twins.go` runs a registered verb's Go answer before it reaches `programOf`, so the index's node module hands node only an unregistered verb. The road already hands a registered verb to Go: `migration.verbs` allows `new` alone (`src/modules/migration/migration.go`), and `roadOf` sends a twin to quack under `new`. Assumption: the node module runs a registered verb in Go whatever the mode, since the mode allows `new` alone and phase 11 retires node. The twins read the index over HTTP GET of values, which the server answers beside the action in flight.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbRoad, reads twinVerbs, then registry
+- src/quack/verbs_test.go TestTheTwinsStandInShadow (line 165 and 176), reads twinVerbs, then registry
+- src/quack/accepts.go accepts, calls nodeAccept
+- src/quack/person_run_test.go, calls nodeAccept with an unregistered verb
+- src/quack/verbs.go programDoor, calls programOf behind roadOf
+- src/quack/twins.go nodeAccept, calls programOf
+- src/quack/programs_test.go TestAVerbWithNoTwinRunsItsProgram, calls programOf
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/registry_test.go TestVerbRegistry/a_registered_verb_runs_in_Go
+- src/quack/registry_test.go TestVerbRegistry/an_unregistered_verb_reaches_node
+- src/quack/registry_test.go TestVerbRegistry/the_node_module_runs_a_registered_verb_in_Go
+- src/quack/registry_test.go TestVerbRegistry/a_registered_verb_failing_answers_an_error_through_the_node_module
+- src/quack/registry_test.go TestVerbRegistry/the_twins_register_through_the_registry
+- src/quack/registry_test.go TestVerbRegistry/a_second_registration_of_the_same_words_panics
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/registry.go
+- src/quack/registry_test.go
+- src/quack/twins.go
+- src/quack/verbs.go
+- src/quack/verbs_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened verbs.go, twins.go, accepts.go, cli.go, migration.go, programs_test.go and verbs_test.go, and checked each claim there
+- grep of twinVerbs, programOf and nodeAccept over src names every caller above
+- TestVerbRegistry decides the first two done_when lines, a port's diff decides the third by registering in its own file, and ./RUNME.sh check decides the fourth
 
 ## tests-red
 
@@ -190,26 +283,31 @@ A branch porting a verb then adds one file and touches no shared line, so the ph
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/registry_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Five subtests of TestVerbRegistry fail on their assertions over the stub register, which holds nothing. The case of an unregistered verb passes already, since the road hands it to node today; it guards that road through the change. A surprise: the node module starts node for a verb with no program, so a missing script reads as a node stack trace.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done_when line meets TestVerbRegistry, the second meets its twins subtest, the third the diff of a port decides, and the check decides the fourth
+- the road takes fake doors through roadOver, and the node module meets a registered fake twin, so no test reaches node or the index
 
 # gate
 
@@ -218,8 +316,11 @@ A branch porting a verb then adds one file and touches no shared line, so the ph
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- twin-reads-inside-an-action: nodeAccept runs a twin that reads the index over an HTTP GET of values while the action calling the node module stands in flight. The draft asserts the server answers that read, and no test meets the real path, since every subtest hands a fake twin. Run ticket yours through the node module against a live index once, and add a test where a value read settles beside an action.
+- port-diff-stays-one-file: the third done_when line, a port adding one file and no edit of src/quack/verbs.go, meets no command. Add a check that src/quack/verbs.go and src/quack/registry.go name no verb words, or name the port diff as the checkpoint the accept step reads.
 
 # implement
 
@@ -230,14 +331,19 @@ A branch porting a verb then adds one file and touches no shared line, so the ph
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and two tests: ticket_twins_test, which named a registered verb as its node example, and twin_live_test, which the gate asked for
+- the road takes fake doors, the node module a fake twin, and the live case a served index of its own
+- the header of registry.go names the approach, and each comment links this ticket
+- the registry stands in registry.go alone, and each twin registers beside its own function
 
 ## tests-green
 
@@ -246,26 +352,33 @@ A branch porting a verb then adds one file and touches no shared line, so the ph
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+quack keeps its Go verbs in one registry in src/quack/registry.go. Each verb calls register from an init in its own file, and a second registration of the same words stops quack at start. The road reads the registry where it read the twin table, and the node module answers a registered verb in Go before it reaches programOf. So node meets only a verb no file registers. A port in phase 11 adds one file, and a test fails where a port writes its verb into verbs.go or registry.go. The three standing twins register beside their functions in twins.go.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and two tests the gate and the cleanup asked for
+- the road takes fake doors, the node module a fake twin, and the live case a served index of its own
+- the header of registry.go names the approach
+- the registry stands in registry.go alone
 
 # accept
 

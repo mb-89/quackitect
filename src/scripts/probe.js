@@ -5,7 +5,7 @@
 import { HEARD, PROBE } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { probeCold } from "./probe-cold.js";
-import { probeDry } from "./probe-dry.js";
+import { deltaOf, probeDry, WORKING } from "./probe-dry.js";
 import { probeReply } from "./probe-reply.js";
 
 export const SURVIVES = "survives";
@@ -56,7 +56,9 @@ export async function probe(root, argv, it, client) {
   // [[spec/design_output/level0#the-cold-probe]]
   if (said === "cold") return probeCold(root, it, client);
   // Level zero runs on a fresh box with no model and no key. [[spec/tickets/level0-runs-on-the-door]]
-  if (said === "dry") return probeDry(root, it);
+  // The check asks for the working change, so the clone carries what the commit lacks. [[spec/tickets/the-check-takes-a-minute]]
+  if (said === "dry")
+    return probeDry(root, it, undefined, argv.includes(WORKING) ? deltaOf(it, root) : "");
   // [[spec/tickets/the-reply-probe-runs]]
   if (said === "reply") return probeReply(root, it, client);
   if (said !== "compact") {

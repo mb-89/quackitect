@@ -30,11 +30,14 @@ export function reacted(box, id) {
   return true;
 }
 
+// The call that loads a schema and changes nothing, which passes the grace and spends none of it, so a cleared context still loads the tool the ask names. [[spec/tickets/toolsearch-rides-the-plan-ask]]
+const SCHEMA_TOOL = "ToolSearch";
+
 // Every call meets the ask: the grace lets it pass with the ask riding, and a spent grace refuses it. [[spec/design_output/stop#the-grace]]
 export function holdsGrace(e, box, passes = new Set()) {
   const grace = box.grace;
   const tool = String(e?.tool ?? "");
-  if (!grace || e?.agentId || passes.has(tool) || (grace.tool && tool === grace.tool)) return null;
+  if (!grace || e?.agentId || passes.has(tool) || tool === SCHEMA_TOOL || (grace.tool && tool === grace.tool)) return null;
   if (grace.left > 0) {
     grace.left -= 1;
     return { after: { context: [graceBlock(grace)] } };
@@ -65,7 +68,10 @@ export function graceBlock(grace) {
 
 // [[spec/design_output/stop#the-grace]]
 export function refusedByGrace(grace) {
-  return `${grace.why} The grace is spent, so this call is refused. ${capital(grace.react)}, and the calls pass again.`;
+  const load = grace.tool
+    ? ` Where ${grace.tool} stands unloaded, call ${SCHEMA_TOOL} with the query select:${grace.tool} first.`
+    : "";
+  return `${grace.why} The grace is spent, so this call is refused. ${capital(grace.react)}, and the calls pass again.${load}`;
 }
 
 function capital(said) {

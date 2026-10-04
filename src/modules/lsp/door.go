@@ -26,9 +26,18 @@ const (
 
 // The tools the box names in its survey, else the runtime binary folder, each read again before a whole run. [[spec/design_output/lsp#the-server-runs-the-tools]]
 func ToolsAt(root string, rules Check) *Tools {
-	one := &Tools{Root: root, Run: runsIn, Again: reads, Check: rules}
+	runs, halt := runsUntilHalt()
+	one := &Tools{Root: root, Run: runs, Halt: halt, Again: reads, Check: rules}
 	reads(one)
 	return one
+}
+
+// A runner whose runs the halt ends, so a stopped index leaves no tool running past it. [[spec/tickets/the-index-stops-its-tools]]
+func runsUntilHalt() (Runner, func()) {
+	life, halt := context.WithCancel(context.Background())
+	return func(dir, input, name string, argv ...string) (string, error) {
+		return runsIn(life, dir, input, name, argv...)
+	}, halt
 }
 
 // [[spec/design_output/lsp#the-server-runs-the-tools]]
@@ -80,8 +89,8 @@ func toolAt(bin string, known map[string]string, name string) string {
 }
 
 // One run of a binary in the folder, its input on standard in, and its output back, up to the wait. [[spec/design_output/lsp#the-server-runs-the-tools]]
-func runsIn(dir, input, name string, argv ...string) (string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), toolWait)
+func runsIn(life context.Context, dir, input, name string, argv ...string) (string, error) {
+	ctx, cancel := context.WithTimeout(life, toolWait)
 	defer cancel()
 	one := exec.CommandContext(ctx, name, argv...)
 	one.Dir = dir

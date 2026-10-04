@@ -5,6 +5,7 @@ package log
 import (
 	"encoding/json"
 	"reflect"
+	"strings"
 	"testing"
 
 	"quackitect/src/q"
@@ -35,7 +36,7 @@ func TestLogSayRunsTheVerb(t *testing.T) {
 	if err := json.Unmarshal([]byte(args[2]), &said); err != nil || !reflect.DeepEqual(said, row) {
 		t.Fatalf("log/%s hands the row %s, and wants %s", say, args[2], body)
 	}
-	if asked[0].Module != "node" || asked[0].Verb != "run" || asked[0].NoUndo == "" {
-		t.Fatalf("log/%s lists %+v, and wants node run", say, asked[0])
+	if asked[0].Module != "node" || asked[0].Verb != "run" || !strings.Contains(asked[0].NoUndo, "the Go log verb") {
+		t.Fatalf("log/%s lists %+v, and wants node run naming the Go log verb", say, asked[0])
 	}
 }

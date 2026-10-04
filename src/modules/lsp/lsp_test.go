@@ -66,6 +66,23 @@ func TestTheListenWritesTheDoorFile(t *testing.T) {
 	}
 }
 
+func TestTheListensStopHaltsTheTools(t *testing.T) {
+	fake := &fakeTools{says: map[string]string{"vale": "{}"}}
+	server, _ := toolsOver(t, map[string]string{}, fake)
+	halted := make(chan struct{})
+	server.from.Tools.Halt = func() { close(halted) }
+	stop, err := Listen(t.TempDir(), server)
+	if err != nil {
+		t.Fatalf("the listener stands nowhere: %v", err)
+	}
+	stop()
+	select {
+	case <-halted:
+	default:
+		t.Fatal("the listen's stop leaves the tools' runs going")
+	}
+}
+
 func opened(uri, text string) []byte {
 	body, _ := json.Marshal(map[string]any{"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": map[string]any{"textDocument": map[string]any{"uri": uri, "version": 1, "text": text}}})
 	return body
