@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry", "work-verbs-run-in-go"]
-step: split
+step: children
 record:
   - step: sync
     hand: box 89388e314a84 · claude-code-remote
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/dispatch-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 00e5f1a1f19b · claude-code-remote
+    hash_before: d32a75f6f383111a020e3bc6b578a98d30b9298a
+    hash_after: d32a75f6f383111a020e3bc6b578a98d30b9298a
+    inputs:
+      - name: ask
+        hash: 19a4399aa4f5b440
+        size: 286
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -130,14 +142,18 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/dispatch-verbs-port-to-go]] (standard, closed)
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- small enough: the one child ports one verb, dispatch, and its review read it whole
+- adds up to the goal: src/quack/dispatch.go registers dispatch in Go, src/scripts/verbs holds no dispatch.js, no file in src, test or .claude imports the dispatch modules that left, every module they imported keeps other importers, and ./RUNME.sh check exits 0, so I mint no further child
+- depends_on: the one child waits on no sibling
 
 # children
 
