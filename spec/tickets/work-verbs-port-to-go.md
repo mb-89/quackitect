@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: work-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 51947abab2e8 · claude-code-remote
+    hash_before: 3738effb9d5798139377aa809ad4eed241129d47
+    hash_after: 3738effb9d5798139377aa809ad4eed241129d47
+    inputs:
+      - name: ask
+        hash: 336fe34fc9021c30
+        size: 698
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,63 @@ The branch verbs run in Go beside `branch list --queue`, the twin that already s
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new Go package src/branches carries the port of src/scripts/work.js and every work-*.js module it reads, with the pull pieces the branch verbs lean on (the route walk, the hand rule, takeable, the hold read, the retro leaves). It reaches the outside through one Doors struct: git run in the work root, the disk, the Go front writer in src/front, the clock, the env, the config resolver in src/config, a process runner and the session log. Two files register the verbs, each from its own file as the registry asks: src/quack/branch.go registers branch, and src/quack/cloud.go registers cloud. The twin branch list --queue stays registered, and twinOf reads it first since it reads the most words first, so one copy of the queue holds. branch escalate writes the person step, lands and pushes it, then hands onward through ./RUNME.sh ticket pull, the verb owning the hand-out, which the ticket group ports. branch merge and branch review run the check through ./RUNME.sh check, so they reach whatever the check verb runs on. The JavaScript work.js and the work-*.js modules stay, because pull-route.js, pull-writes.js, dispatch-write.js, dispatch.js, check-verb.js, mint-verb.js, prepush.js, ticket-yours.js, ticket-edit.js and src/bridge/plan.js import them, and those belong to other groups. The verb shims src/scripts/verbs/branch.js and cloud.js leave, since nothing imports them. Every name in src/branches lives in its own package, so no line the parallel groups touch in src/quack changes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbs: runs a registered verb, now branch and cloud
+- src/quack/twins.go nodeAccept: hands an index action naming branch or cloud to the Go verb through goAnswer
+- RUNME.sh: ./RUNME.sh branch and ./RUNME.sh cloud reach quack verb
+- .claude/skills/work/SKILL.md and the dispatch Action: run branch take, branch done, cloud trigger
+- the pull engine needs: branch sync and branch test, named under needs, which ticket pull runs
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/group_test.go: the front reads and spans
+- src/branches/stands_test.go: waits, standing, frees, the batch framing
+- src/branches/list_test.go: the listing rows, --done, --all
+- src/branches/take_test.go: take on a desk, a dirty tree, nothing free, a claim
+- src/branches/done_test.go: done refuses behind trunk, an unclean stamp, an open child, an unwritten retro, then leaves
+- src/branches/merge_test.go: merge refuses off trunk, not done, in a pull request; close keeps unmerged
+- src/branches/cloud_test.go: cloud trigger names the routine and the free branches
+- src/branches/unblock_test.go, test_test.go, guidance_test.go, review_test.go: each verb's refusals and its happy road
+- src/quack/branch_test.go: branch and cloud stand registered, and reach no node
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/*.go, new
+- src/quack/branch.go, new
+- src/quack/cloud.go, new
+- src/quack/branch_test.go, new
+- src/scripts/verbs/branch.js, removed
+- src/scripts/verbs/cloud.js, removed
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened: work.js, work-*.js, pull-route.js, pull-hand.js, pull-hand-of.js, pull-when.js, pull-escalate.js, pull-landed.js, guidance-verb.js, engine/group.js, src/quack/registry.go, verbs.go, twins.go
+- the callers list names the road, the node module, the skills and the pull's needs
+- each done_when line meets a test: the Go tests, branch_test.go for no node, an ls in the check of the ask, a search of src, and the check
 
 ## tests-red
 
