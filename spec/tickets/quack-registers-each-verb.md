@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-holds-a-verb-registry
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 580ad8ec1ffd810d
         size: 816
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: c11a1b55c3f9bff81a475a242681e06636d5e78c
+    hash_after: c11a1b55c3f9bff81a475a242681e06636d5e78c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: fa73b414a51abd6a
+        size: 2644
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -226,26 +239,31 @@ A new file `src/quack/registry.go` holds `registry`, a map from a verb's words t
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/registry_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Five subtests of TestVerbRegistry fail on their assertions over the stub register, which holds nothing. The case of an unregistered verb passes already, since the road hands it to node today; it guards that road through the change. A surprise: the node module starts node for a verb with no program, so a missing script reads as a node stack trace.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done_when line meets TestVerbRegistry, the second meets its twins subtest, the third the diff of a port decides, and the check decides the fourth
+- the road takes fake doors through roadOver, and the node module meets a registered fake twin, so no test reaches node or the index
 
 # gate
 
