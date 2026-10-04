@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -179,6 +179,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: c481709a84306dc8df3025124d5bfd3444329d27
+    hash_after: c481709a84306dc8df3025124d5bfd3444329d27
+    inputs:
+      - name: retro/write
+        hash: b9bc4f5300c74ec4
+        size: 2710
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -323,20 +333,31 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 15:24 the level0 plugin held no handler for its branch take tool, and the shell verb served
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 15:24 the description hook refused a shell call naming no ticket
+- 15:27 the plan hook refused every call until the plan answered
+- 15:29 the stop hook refused a stop on a running check
+- 15:33 the commit door refused a code change with no test beside it
+- 15:34 LandingFollowsItsGate refused a piped gate before the commit verb
+- 15:37 ShellWritesNothing refused a sed write into the scratchpad
+- no conflict at sync, and no test failed on this box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the handover: the check verb still runs the JavaScript lint until check-verbs-run-in-go lands, and test/contract/lint-twins.test.js holds both lints to one list meanwhile
 
 # Discussion
 
