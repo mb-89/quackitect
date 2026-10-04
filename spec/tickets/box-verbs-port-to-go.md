@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "   70.0  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 32ca54b1708502333dcb791a3be32ed45e4f7a4d
+    hash_after: 32ca54b1708502333dcb791a3be32ed45e4f7a4d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   70.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 423535c10e4ff510
+        size: 759
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -359,26 +382,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/box_verbs_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+setup, probe, tools and doctor answer in Go. Each one registers from its own file under src/quack through registerBox, over a boxDoors struct a test fills with fakes. setup runs the survey, the browser order, the editor link, the copilot setup and the brand in process, and starts npm, npx and code alone. doctor prints every row the JavaScript printed, the hook probe and the language server probe among them. probe answers compact, cold and reply in Go, and hands dry alone to src/scripts/probe-dry.js, because the dry session loads the plugin hook module, which takes a JavaScript runtime (see the Discussion). Their programs, probe.js, probe-reply.js, lsp-probe.js and cli-hooks.js, and the doctor part of cli-check.js leave the tree. brand.js stays as the module the review imports, without its program entry. The contract tests reading the verb table take a verb as a program or as a Go registration, through registered() in test/contract/commands.js, so a later port edits none of them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out past the three contract tests that read every verb as a program, named under implement/change
+- every door has a fake: fakeBoxDoors and the no-node case over every box verb
+- each file header names what it is for, and each function links this ticket or its design section
+- one owner for every copied value, named beside it
 
 # accept
 
