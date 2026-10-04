@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 24e7f0ad1c081076
         size: 742
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box af8a15ff4571 · claude-code-remote
+    hash_before: 9fb35435a5e75ab6988c4a8da6c161095957fa64
+    hash_after: 084189bac8359936c626bfbd306594708c6b839b
+    answered:
+      - name: tests
+        exit: 0
+        said: assertion, TestReadVerbsLeaveNode fails on its own assertion
+    inputs:
+      - name: design/draft
+        hash: 2895fbdbc1763aca
+        size: 4974
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -265,26 +278,31 @@ Assumptions: the Go lint draws no Vale cache, so a lint over the whole tree runs
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+go test ./src/quack -run 'TestIndexVerb|TestLinksVerb|TestNotesVerb|TestFindVerb|TestLogVerb|TestLintVerb|TestReadVerbsLeaveNode' 2>&1 | grep -q 'stands, and the verb runs in Go' && echo 'assertion, TestReadVerbsLeaveNode fails on its own assertion'
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_read_test.go TestReadVerbsLeaveNode, which fails on its own assertion while src/scripts/verbs holds the six programs
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The verbs ran in Go before their tests, so every case passes except the one naming the programs, which fails on its assertion for each of the six. A comparison over the real tree printed the same lines for every verb and its program: index, links, notes and find over several words, the lint over one file, over src/quack and over the whole tree, and the log over span, level, kind, words and count. What surprised me: the JavaScript log verb reads its rows off the Go log topic, so it prints the extra fields in key order, and the Go verb sorts them the same way. The Go lint over one file answers in under a second, where the JavaScript lint took five.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the Go cases for each road, TestReadVerbsLeaveNode for no node and the gone programs, a search of src for the importer line, and the check for the last
+- every door the tests reach has a fake: the ask, the tools, the sweep, the box, the log and the clock, and the log verb reads a temporary root
 
 # gate
 
