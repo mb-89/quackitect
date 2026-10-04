@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/tickets/work-verbs-run-in-go.md:96:1: Sentence: A sentence holds 25 words. Cut this one in two."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: f261bf494b185fbf5439a7cc116e91fe5c600f83
+    hash_after: f261bf494b185fbf5439a7cc116e91fe5c600f83
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   58.1  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 287f89a3eea24996
+        size: 1421
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -370,26 +393,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/verb_index_test.go src/quack/verb_links_test.go src/quack/verb_notes_test.go src/quack/verb_find_test.go src/quack/verb_log_test.go src/quack/verb_lint_test.go src/quack/verb_read_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs index, links, lint, notes, find and log run in Go, each registered from an init in its own file under src/quack, so no verb of the six starts node. Their programs under src/scripts/verbs leave, with log-verb.js and the functions only they imported, and a test decides no file under src imports a deleted module. The check verb still runs the lint of cli-read.js until the check port lands, and a contract case holds both lints to one list of findings meanwhile.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the six verbs, their tests, the gone programs and the importers the callers list names
+- every door the change reaches has a fake: the tests read a temporary root and fake tools, sweep, box, log and clock
+- a comment names the approach: each verb file header points at this ticket
+- every fact the change adds stands in one place: the shared print stands in verb_index.go alone
 
 # accept
 
