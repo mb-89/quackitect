@@ -30,7 +30,7 @@ func pdTwoGroups(t *testing.T, config string) *tree {
 		ticketAt("a-child"):    strings.Replace(childNote, "group: g", "group: a-switched", 1),
 	})
 	one.branch("b-free", map[string]string{
-		ticketAt("b-free"): groupNote,
+		ticketAt("b-free"):  groupNote,
 		ticketAt("b-child"): strings.Replace(childNote, "group: g", "group: b-free", 1),
 	})
 	return one

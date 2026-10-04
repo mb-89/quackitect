@@ -37,9 +37,9 @@ func TestPADependencyReadsListOrLine(t *testing.T) {
 // A dependency in a flow list reads without its brackets or its quotes. [[spec/tickets/work-verbs-port-to-go]]
 func TestPADependencyFlowList(t *testing.T) {
 	cases := map[string][]string{
-		"---\ndepends_on: [one, work/two]\n---\n":   {"one", "two"},
+		"---\ndepends_on: [one, work/two]\n---\n":  {"one", "two"},
 		"---\ndepends_on: [\"one\", 'two']\n---\n": {"one", "two"},
-		"---\ndepends_on: []\n---\n":                {},
+		"---\ndepends_on: []\n---\n":               {},
 		"---\ndepends_on:\n  - \"one\"\n---\n":     {"one"},
 	}
 	for text, want := range cases {
