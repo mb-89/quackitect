@@ -15,7 +15,7 @@ import (
 
 // The runtime folder, the survey file and the binaries under it, and the span a version ask takes. [[spec/design_output/tools#what-the-survey-writes]]
 const (
-	runFolder  = ".se/.runtime"
+	runFolder  = ".se/.runtime" // the folder .claude/skills/level0/lib/folders.js owns, as RUN
 	toolsFile  = runFolder + "/tools.json"
 	binFolder  = runFolder + "/bin"
 	askingWait = 10 * time.Second

@@ -6,7 +6,7 @@
 import { REPLY_PROBE } from "../../.claude/skills/level0/lib/guidance.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { PROMPT_WHY } from "../bridge/answer.js";
-import { logRows } from "./probe.js";
+import { logRows } from "./probe-cold.js";
 
 // The span the client gets, the bound the compaction probe takes. [[spec/design_output/level0#what-the-probe-does]]
 const WAIT = 900000;

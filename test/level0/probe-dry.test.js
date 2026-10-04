@@ -37,7 +37,7 @@ test("the probe apart starts the dry verb over the working change, and says its 
   const said = [];
   assert.equal(await probeApart("/tree", it, (one) => said.push(one)), 1);
   assert.deepEqual(started, [
-    [["/bin/node", "/tree/src/scripts/verbs/probe.js", "dry", WORKING], "/tree"],
+    [["/bin/node", "/tree/src/scripts/probe-dry.js", WORKING], "/tree"],
   ]);
   assert.deepEqual(said, ["PASS door: it stands", "FAIL rules: none"]);
 });

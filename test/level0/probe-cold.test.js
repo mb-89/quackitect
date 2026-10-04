@@ -17,6 +17,7 @@ import {
   coldLines,
   coldPort,
   coldTree,
+  logRows,
   probeCold,
   readsCold,
   stepsOf,
@@ -470,4 +471,16 @@ test("the fresh box clones, installs and points the hook at a port of its own, a
   };
   assert.equal(coldTree("/repo", bare, (one) => lines.push(one), box), "");
   assert.match(lines.join("\n"), /FAIL clone: no such repo/);
+});
+
+// Two writers appending at once tear one line, and a probe reads the rest. [[spec/design_output/log#every-writer-appends]]
+test("a torn line in the log drops alone, and a log standing nowhere reads as no row", () => {
+  const one = rowOf("2026-09-12T08:00:00.000Z", "info", "context", "read");
+  const two = rowOf("2026-09-12T08:00:01.000Z", "info", "compact", "ran");
+  const disk = fakeDisk({ log: `${JSON.stringify(one)}\n{"at":"2026\n${JSON.stringify(two)}\n` });
+  assert.deepEqual(
+    logRows(disk, "log").map((row) => row.kind),
+    ["context", "compact"],
+  );
+  assert.deepEqual(logRows(disk, "gone"), []);
 });

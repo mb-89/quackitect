@@ -79,6 +79,16 @@ test("the verb prints the call's fields and exits 0 where the run writes the pro
   assert.match(said, /opening on the warning: yes/);
 });
 
+// The rows the run adds read past a line two writers tore. [[spec/design_output/log#every-writer-appends]]
+test("the verb reads the probe row past a torn line the run leaves", () => {
+  const disk = fakeDisk({ [LOG]: "" });
+  const { code } = run(disk, () => {
+    disk.write(LOG, `{"at":"2026\n${JSON.stringify(called({ tool: "Read", text: REPLY_PROBE.says }))}\n`);
+    return { exitCode: 0, stdout: "" };
+  });
+  assert.equal(code, 0);
+});
+
 test("the verb exits 1 and says why where the run writes no probe row", () => {
   const disk = fakeDisk({ [LOG]: "" });
   const { code, said } = run(disk, () => ({ exitCode: 0, stdout: "" }));

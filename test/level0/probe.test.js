@@ -8,7 +8,6 @@ import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowOf } from "../../.claude/skills/level0/lib/log.js";
 import {
   DROPS,
-  logRows,
   readsCompaction,
   SURVIVES,
   UNPROVEN,
@@ -94,19 +93,6 @@ test("an empty log leaves the road unproven, and names no read", () => {
 
   assert.equal(read.answer, UNPROVEN);
   assert.equal(read.reads, 0);
-});
-
-// Two writers appending at once tear one line, and the probe reads the rest. [[spec/design_output/log#every-writer-appends]]
-test("a torn line in the log drops alone, and the rows around it read", () => {
-  const files = {
-    read: () =>
-      `${JSON.stringify(context("first"))}\n{"at":"2026\n${JSON.stringify(compaction())}\n`,
-  };
-
-  assert.deepEqual(
-    logRows(files, "log").map((one) => one.kind),
-    ["context", "compact"],
-  );
 });
 
 // The repeat saying lands only once the line stands paid, so the first saying after a compaction still decides. [[spec/tickets/callers-name-both-readers]]
