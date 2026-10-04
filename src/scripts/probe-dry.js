@@ -33,6 +33,29 @@ export const DRY = {
   checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet", "clear"],
 };
 
+// The word that carries the working change into the clone. [[spec/tickets/the-check-takes-a-minute]]
+export const WORKING = "--working";
+
+// The working change as a patch, read through the process door untrimmed, since a trim cuts the blank context line a hunk ends on and git apply reads the rest as corrupt. [[spec/tickets/model-marks-io-names]]
+export function deltaOf(here, at) {
+  const ran = here.proc.run(["git", "diff", "HEAD", "--binary", "--no-renames"], {
+    cwd: at,
+  });
+  return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
+}
+
+// The dry probe over the working change, in a process of its own. Its clone and its verbs wait on spawns that hold a process's loop, so a check running parts beside it starts it apart, and says its lines once it ends. [[spec/tickets/the-check-takes-a-minute]]
+export async function probeApart(root, it, say = console.log) {
+  const ran = await it.proc.start(
+    [it.node, it.join(root, "src", "scripts", "verbs", "probe.js"), "dry", WORKING],
+    { cwd: root },
+  );
+  for (const one of `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`.split(/\r?\n/)) {
+    if (one.trim()) say(one);
+  }
+  return ran.exitCode;
+}
+
 // [[spec/tickets/level0-runs-on-the-door]]
 export async function probeDry(root, it, say = console.log, delta = "") {
   const temp = it.disk.tempDir("se-dry-");

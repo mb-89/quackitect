@@ -683,8 +683,8 @@ retro. For what a retro reads off it, see [[spec/guidance/retro/effect]].
 
 | field | holds |
 |---|---|
-| `parts` | a time a part, in the order the check runs them |
-| `total` | their sum |
+| `parts` | a time a part, in the order each ends |
+| `total` | the battery's span, start to end, which counts a part running beside the rest once |
 | `slowest` | the slowest cases, each with its file |
 | `files` | a time a test file, the slowest first |
 | `unrun` | the parts a red run leaves unrun |

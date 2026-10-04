@@ -162,7 +162,7 @@ func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
 
 // A verb the twin table leaves out runs the verb's program alone in shadow, and the log holds no row for it. [[spec/tickets/vehicle-verbs-become-actions]]
 func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
-	doors, out, rows := roadOver("shadow", "old\n", twinVerbs)
+	doors, out, rows := roadOver("shadow", "old\n", registry)
 	for _, argv := range [][]string{{"vehicle", "here"}, {"stub", "into", "elsewhere"}} {
 		out.Reset()
 		if code := verbs(doors, argv); code != 0 || out.String() != "old\n" || len(*rows) != 0 {
@@ -173,7 +173,7 @@ func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 
 // The road holds retro notes among its twins, so the shadow runs it beside the verb's program. [[spec/tickets/retro-notes-twin-joins-road]]
 func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
-	if twinVerbs["retro notes"] == nil || roadOf(modeShadow, []string{"retro", "notes"}, twinVerbs) != toBoth {
+	if registry["retro notes"] == nil || roadOf(modeShadow, []string{"retro", "notes"}, registry) != toBoth {
 		t.Fatal("the road holds no retro notes twin in shadow")
 	}
 }
