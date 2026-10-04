@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: landing-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a2b0848f196c · claude-code-remote
+    hash_before: 51ec96064d9ef72ce89ee2b8434fa403795faf0c
+    hash_after: 51ec96064d9ef72ce89ee2b8434fa403795faf0c
+    inputs:
+      - name: ask
+        hash: b0c7bf2381eb0d52
+        size: 721
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,75 @@ Every commit and push runs one Go road, so the check before a push and the renam
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Three files under src/quack, each registering its verb from an init, as the registry asks: commit.go, push.go and rename.go. No shared line changes in verbs.go or registry.go.
+
+- push.go reads the check stamp, judges it with command.Battery against HEAD, and pushes the branch with git. The texts stay those push-verb.js prints.
+- rename.go ports rename.js and verbs/rename.js whole: the walk past .git, node_modules, .se, .claude-plugin and bin, the text sniff, the edged rewrite of both forms of a note's name in one pass, the closed ticket left alone, the git add, and the undo journal entry carrying moved. Go regexp holds no lookbehind, so the edged rewrite scans the text by hand, longest name first. The ticket the entry names reads off command.InHand, one ticket or none.
+- commit.go ports commit-verb.js over the Go pieces that stand already: command.TicketOf and TicketFault for the ticket, heardOver for Vale with command.Refuses splitting refusal from form, command.DeskRefusal over commandSettings' cloud flag, check.MarkerLines and command.AddedIn for the markers, and the session log through appendsRow. The test and check gates run as verbs through the quack road, so the Go verb starts no node itself.
+
+The cold probe stays the box group's verb. I weigh three roads: a flag on probe.js handing it the staged delta, a port of probe-cold.js, or a commit that lands first and runs `probe cold` on the clone of HEAD. I take the third: the probe already clones HEAD, so the verb hands it no delta and touches no file of the box group. A FAIL takes the commit back with a soft reset, puts MERGE_HEAD back on a merge, and unstages, so nothing lands and nothing pushes. The cold path list stays owned by probe-cold.js, and commit.go spells it again with a pointer, as the hooks module does for its runtime folders.
+
+The JavaScript leaves: commit-verb.js, push-verb.js, rename.js, verbs/commit.js, verbs/push.js, verbs/rename.js, commitDoors in cli-check.js, and their tests. verb-programs.test.js loads each program the verbs folder holds, so every later port deletes a file and edits no line of that test.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- RUNME.sh: hands every verb to quack verb
+- src/quack/verbs.go: verbRoad and verbs, which take a registered verb to Go
+- src/quack/twins.go: nodeAccept, which answers a registered verb through goAnswer for the MCP actions
+- src/modules/verbs/tree.go: the Commands table naming commit, push and rename
+- test/contract/verb-programs.test.js: loads every program
+- test/contract/cli-check-doors.test.js: reads commitDoors
+- test/level0/named.test.js: runs commitVerb
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/commit_test.go: TestCommitVerb, a case per road commit-verb.test.js and named.test.js cover
+- src/quack/push_test.go: TestPushVerb, a green stamp pushes, no stamp or a stale stamp pushes nothing
+- src/quack/rename_test.go: TestRenameVerb, a case per road rename.test.js covers
+- src/quack/landing_test.go: TestLandingVerbsRegister, the registry holds commit, push and rename, and the road under new reaches no node for each
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/commit.go
+- src/quack/push.go
+- src/quack/rename.go
+- src/quack/commit_test.go
+- src/quack/push_test.go
+- src/quack/rename_test.go
+- src/quack/landing_test.go
+- src/scripts/cli-check.js
+- src/scripts/commit-verb.js, push-verb.js, rename.js, verbs/commit.js, verbs/push.js, verbs/rename.js, deleted
+- test/level0/commit-verb.test.js, push-verb.test.js, rename.test.js, deleted
+- test/level0/named.test.js
+- test/contract/cli-check-doors.test.js
+- test/contract/verb-programs.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened every file, function and verb the approach names, and checked each claim there: command.Battery, TicketFault, InHand, DeskRefusal, RefusesIn, AddedIn, check.MarkerLines, heardOver, appendsRow and edits.Entry
+- the callers list names the road, the node module, the table and every JS importer a search of src and test finds
+- each done_when line meets a test: go test for the roads, landing_test.go for no node and the registry, a search for the importers, and the check
 
 ## tests-red
 
