@@ -25,7 +25,6 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: retro-verbs-run-in-go
 step: do
 ---
 
@@ -68,3 +67,5 @@ cli-check.js imports a name it never uses, and the push gate reads the warning. 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The fix and its case landed on work/retro-verbs-run-in-go in commit 8cab1a0, after that group closed. The pull hands out nothing on a closed group, so this ticket left the group and stands loose. A hand on main passes do: run `./RUNME.sh test test/contract/cli-check-doors.test.js` and the check.
