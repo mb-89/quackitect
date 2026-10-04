@@ -146,3 +146,17 @@ The check after the change, on the same box, in seconds:
 | in all, the battery's span | 61.4 | 51.5 |
 | sum of the parts | 97.0 | 66.8 |
 | wall time of `./RUNME.sh check` | 62.4 | 53.0 |
+
+The work on the check's span stops here, since the check stands near a minute on this box. The battery's span now reads as the tests, then the slower of two roads: the dry probe, or the go and rules parts.
+
+The roads left, and why each waits:
+
+| road | saves | why it waits |
+|---|---|---|
+| the dry probe starts with the tests | the tests' span, on a run where Go changes nothing | the probe's install builds Go in its clone, and that load lands on the contract cases reading a clock, the flicker [[spec/tickets/the-battery-flickers-under-load]] fixed |
+| the cases in `src/quack` run in parallel | most of that package's span, after a Go change alone | the dry probe bounds that run anyway, so the battery gains a few seconds, and every case sharing a working folder or a variable needs proof first |
+| the probe's install builds both binaries at once | a few seconds a run | small beside the risk of a change to the install every fresh box walks |
+
+What stands inherent: the dry probe is the one contract test of the start road. It clones the tree, installs, starts a cold index over the whole tree, and runs three verbs. Each of those is the door it proves.
+
+The first check after a binary rebuild reads slower, because the live index restarts on the new binary while the tests run. That run is the box's own, and no check change shortens it.

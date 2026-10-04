@@ -66,7 +66,7 @@ The work on the check's span stops here, since the check stands near a minute on
 
 <!-- the form is text -->
 
-No code changes. The Discussion holds the stop and the roads left, each with what it costs.
+No code changes. The stop and the roads left stand in the Discussion of [[spec/tickets/the-check-takes-a-minute]].
 
 ## checked
 
@@ -82,16 +82,4 @@ No code changes. The Discussion holds the stop and the roads left, each with wha
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-The measure before and after stands in [[spec/tickets/the-check-takes-a-minute]]. The battery's span now reads as the tests, then the slower of two roads: the dry probe, or the go and rules parts.
-
-The roads left, and why each waits:
-
-| road | saves | why it waits |
-|---|---|---|
-| the dry probe starts with the tests | the tests' span, on a run where Go changes nothing | the probe's install builds Go in its clone, and that load lands on the contract cases reading a clock, the flicker [[spec/tickets/the-battery-flickers-under-load]] fixed |
-| the cases in `src/quack` run in parallel | most of that package's span, after a Go change alone | the dry probe bounds that run anyway, so the battery gains a few seconds, and every case sharing a working folder or a variable needs proof first |
-| the probe's install builds both binaries at once | a few seconds a run | small beside the risk of a change to the install every fresh box walks |
-
-What stands inherent: the dry probe is the one contract test of the start road. It clones the tree, installs, starts a cold index over the whole tree, and runs three verbs. Each of those is the door it proves.
-
-The first check after a binary rebuild reads slower, because the live index restarts on the new binary while the tests run. That run is the box's own, and no check change shortens it.
+The stop note moved to [[spec/tickets/the-check-takes-a-minute]], which closed first, so the pull on this branch hands this ticket nowhere. The door deletes no file, so this draft stays for the owner to drop.
