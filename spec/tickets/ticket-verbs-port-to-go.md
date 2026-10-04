@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: ticket-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box f2894f4960c9 · claude-code-remote
+    hash_before: 12678745ceec4321dec9403da2dcb56b0fcebf4f
+    hash_after: 12678745ceec4321dec9403da2dcb56b0fcebf4f
+    inputs:
+      - name: ask
+        hash: 4e6c937563b76aa6
+        size: 745
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,81 @@ The pull, the mint and the split write tickets through the Go frontmatter writer
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each verb registers its Go answer from its own file under src/quack, through register in src/quack/registry.go, and the registry sends both the road and the node module to it. The verbs slice stands at new and takes no other mode (src/modules/migration/migration.go), so a registration goes live on its first build. Every port therefore lands with its contract cases green in the same commit.
+
+The order, each step one commit through the commit verb:
+
+1. split: src/quack/verb_split.go ports split-verb.js and split-cut.js, and writes the undo journal in the shape lib/undo.js writes.
+2. graph: src/quack/verb_graph.go answers the JSON graph.js graphIn draws, off the drawing the tickets module holds (src/modules/tickets/drawn.go). It reuses the drawing, and writes no second walk.
+3. mint: src/quack/verb_mint.go reads --field=value as fieldsIn does, copies the route and its hash in as withRoute does, joins a ticket to the box's group as mintFields does, and refuses an empty group. It writes through the check module's mint (src/modules/check/mint.go) behind one exported function in a new file of that package.
+4. The ticket sub-verbs new, set, urgent, place, todo, open, note, update, route, fill and bless each register as ticket <sub> from a file of their own. The shared reads (the ticket a name finds, the schemas, the process a link names) stand in one Go package, src/tickets, which holds no disk and takes its doors as an interface with a fake.
+5. ticket pull ports pull.js and pull-*.js into the same package: the hand-out, the hand-back, the checks, the record, the commit and the push. Git, the disk, the clock, the log and the verb road reach it through those doors.
+6. ticket registers last. It prints the usage ticket.js prints, so the bare verb reaches no node, and src/scripts/verbs/{ticket,mint,graph,split}.js leave. So do mint-verb.js, split-verb.js, split-cut.js and pull-tool.js, which no remaining module imports. Their tests leave with them, and a Go case stands for each road they covered.
+
+What I weigh and assume:
+- ticket.js, pull*.js, work.js and the engine libraries stay in the tree. branch, cloud, retro and dispatch import them, and the done criterion deletes only a module nothing remaining imports.
+- The pull calls branch take, the merge check (readyToMerge) and every command a leaf needs through the verb road: the quack binary, verb, then the words. A verb another phase-11 group ports runs in Go once that group registers it, and runs in node until then. This group ports no verb another group owns, so two boxes write no twin implementation.
+- A step's commands ran through RUNME in JavaScript as well, so routing them through the verb road keeps their behaviour.
+- The prose and schema checks the hand-back runs call the Go check and prose code the index already serves, and add no second copy.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbs: the road, which takes a registered verb to Go
+- src/quack/twins.go nodeAccept: the node module, which takes a registered verb to Go
+- src/modules/verbs/actions.go: the tickets actions pull, place, flip-urgent, set-field and new, through the node module
+- src/modules/verbs/ticket.go TicketVerbs: the MCP tools index_ticket_*, through the node module
+- src/modules/holds/holds.go deskBless: ticket bless --desk, through the node module
+- src/extension/lib/lens.js: ticket pull, ticket route and ticket fill, through the road
+- .claude/skills/level0/hooks/pull-tool.js: the pull tool, which hands ticket pull --tool <json> to the road
+- src/engine/retro/mint.js runIn: ticket open, through RUNME
+- src/scripts/probe-clear.js: ticket pull and mint ticket, through RUNME
+- src/scripts/probe-dry.js: names hooks/pull-tool.js, which stays
+- src/modules/hooks/command/findings.go ticketFree: names ticket pull, mint ticket and ticket note as words, and runs none of them
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_split_test.go TestSplitVerb: one case per road in test/level0/split.test.js
+- src/quack/verb_graph_test.go TestGraphVerb: one case per road in test/level0/graph.test.js and test/contract/drawing-page.test.js
+- src/quack/verb_mint_test.go TestMintVerb: one case per road in test/contract/cli-mint-callers.test.js
+- src/tickets/*_test.go: one case per road in test/level0/ticket*.test.js, schema-route.test.js and bash-ticket.test.js
+- src/tickets/pull*_test.go: one case per road in test/level0/pull*.test.js, hand.test.js, pulled.test.js, landed.test.js and work.test.js where they reach the pull
+- src/quack/ticket_verbs_test.go TestTicketVerbsRunInGo: every verb of the group registers, and the road reaches no node for it
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_split.go, verb_graph.go, verb_mint.go, verb_ticket.go, and one ticket_<sub>.go for each sub-verb
+- src/tickets/: the new package holding the ticket reads, writes and the pull, with its tests
+- src/modules/check/minted.go: the exported mint
+- src/scripts/verbs/ticket.js, mint.js, graph.js, split.js: removed
+- src/scripts/mint-verb.js, split-verb.js, split-cut.js, pull-tool.js: removed
+- test/level0/split.test.js and the test files that cover the removed modules alone: removed
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files named above stand opened: registry.go, verbs.go, twins.go, ticket.js, pull.js, work.js pulling, mint-verb.js, split-verb.js, split-cut.js, pull-tool.js, check/mint.go and tickets/drawn.go
+- the callers list rests on a search of src and .claude for spawns of each verb, and on the two roads that reach every caller
+- each done_when line has its test: go test runs the Go cases, TestTicketVerbsRunInGo decides the no-node line and the ls line, the closure script decides the importer line, and ./RUNME.sh check decides the last
 
 ## tests-red
 
