@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 6d880bc8c9d0d71d2ead0ba13a1047c55ecc1f2a
+    hash_after: 6d880bc8c9d0d71d2ead0ba13a1047c55ecc1f2a
+    inputs:
+      - name: ask
+        hash: 5632e30a35cc2c00
+        size: 556
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,53 @@ from: none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The Windows runner fails on test spellings in five places and on code in one. The code fault: Produce in src/vehicle/vehicle.go compares dest to method as strings. MethodRootFrom answers method with slashes, as methodRootFrom in the JS did, and a Windows dest carries backslashes. So into over the method itself copies onto itself, and the guard compares both slashed. The test faults: the voice fake disk in src/voice/voice_test.go keys files by slash paths, while filesUnder joins with filepath, so the fake takes either separator, as a Windows disk does. TestVoiceVerbMeasuresARealFolder writes the raw Windows root into a JSON string, so it writes the slashed root. The vehicle and stub verb tests want the method root spelled natively, and the code answers it slashed, so the wants take filepath.ToSlash. The empty-brand cases name a folder ..., which Windows refuses, so they name ---, which slugs to nothing too. The run-bit asserts read a bit Windows lacks, so a helper reads it off Windows alone and the content still asserts on every box.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/vehicle_verb.go vehicleTwin, the produce and into roads, which call vehicle.Produce
+- src/vehicle/vehicle_test.go and src/quack/vehicle_verb_test.go, which drive Produce
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/vehicle/vehicle_test.go TestProduceRefusesTheMethodSpelledEitherWay, a dest naming the method with backslashes refuses
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/vehicle/vehicle.go
+- src/vehicle/vehicle_test.go
+- src/vehicle/stub_test.go
+- src/voice/voice_test.go
+- src/quack/voice_verb_test.go
+- src/quack/vehicle_verb_test.go
+- src/quack/stub_verb_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened every failing case the Windows log of run 37220535376 names, Produce, MethodRootFrom, methodRootFrom in src/scripts/vehicle.js, filesUnder and the voice fake, and read each cause there
+- Produce has one caller road, the vehicle twin, and its tests stand listed
+- the Windows runner of the check decides the first done_when line, GOOS=windows go vet the second, and ./RUNME.sh check the third
 
 ## tests-red
 
