@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -117,7 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: work-verbs-run-in-go
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 51947abab2e8 · claude-code-remote
+    hash_before: 3738effb9d5798139377aa809ad4eed241129d47
+    hash_after: 3738effb9d5798139377aa809ad4eed241129d47
+    inputs:
+      - name: ask
+        hash: 336fe34fc9021c30
+        size: 698
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 51947abab2e8 · claude-code-remote
+    hash_before: a8e0de6e02c7b8a3a908be11ff1f7fd51c8ef67c
+    hash_after: e9e9d3cfbd92f68bcec60dfb45d4bfc3d23f6887
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 0e8adbb1c1bd71fd
+        size: 3473
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 6ed3671b813681405818ab701475c72a112b9c03
+    hash_after: 6ed3671b813681405818ab701475c72a112b9c03
+    inputs:
+      - name: design/draft
+        hash: 0e8adbb1c1bd71fd
+        size: 3473
+      - name: design/tests-red
+        hash: 95cd40f5843902cf
+        size: 1219
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 8b49f014b13b2842576da8e09d65951943b625da
+    hash_after: bb8ba84bf5098b2ad07dbf733c7c8052b510b97f
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/branches/port_a_close_test.go:52:52: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 5575a5b16adfc992386ad7ddb00686cbfdbd1668
+    hash_after: 5575a5b16adfc992386ad7ddb00686cbfdbd1668
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    4.7  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index"
+    inputs:
+      - name: design/tests-red
+        hash: 95cd40f5843902cf
+        size: 1219
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -151,38 +221,63 @@ The branch verbs run in Go beside `branch list --queue`, the twin that already s
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A new Go package src/branches carries the port of src/scripts/work.js and every work-*.js module it reads, with the pull pieces the branch verbs lean on (the route walk, the hand rule, takeable, the hold read, the retro leaves). It reaches the outside through one Doors struct: git run in the work root, the disk, the Go front writer in src/front, the clock, the env, the config resolver in src/config, a process runner and the session log. Two files register the verbs, each from its own file as the registry asks: src/quack/branch.go registers branch, and src/quack/cloud.go registers cloud. The twin branch list --queue stays registered, and twinOf reads it first since it reads the most words first, so one copy of the queue holds. branch escalate writes the person step, lands and pushes it, then hands onward through ./RUNME.sh ticket pull, the verb owning the hand-out, which the ticket group ports. branch merge and branch review run the check through ./RUNME.sh check, so they reach whatever the check verb runs on. The JavaScript work.js and the work-*.js modules stay, because pull-route.js, pull-writes.js, dispatch-write.js, dispatch.js, check-verb.js, mint-verb.js, prepush.js, ticket-yours.js, ticket-edit.js and src/bridge/plan.js import them, and those belong to other groups. The verb shims src/scripts/verbs/branch.js and cloud.js leave, since nothing imports them. Every name in src/branches lives in its own package, so no line the parallel groups touch in src/quack changes.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbs: runs a registered verb, now branch and cloud
+- src/quack/twins.go nodeAccept: hands an index action naming branch or cloud to the Go verb through goAnswer
+- RUNME.sh: ./RUNME.sh branch and ./RUNME.sh cloud reach quack verb
+- .claude/skills/work/SKILL.md and the dispatch Action: run branch take, branch done, cloud trigger
+- the pull engine needs: branch sync and branch test, named under needs, which ticket pull runs
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/group_test.go: the front reads and spans
+- src/branches/stands_test.go: waits, standing, frees, the batch framing
+- src/branches/list_test.go: the listing rows, --done, --all
+- src/branches/take_test.go: take on a desk, a dirty tree, nothing free, a claim
+- src/branches/done_test.go: done refuses behind trunk, an unclean stamp, an open child, an unwritten retro, then leaves
+- src/branches/merge_test.go: merge refuses off trunk, not done, in a pull request; close keeps unmerged
+- src/branches/cloud_test.go: cloud trigger names the routine and the free branches
+- src/branches/unblock_test.go, test_test.go, guidance_test.go, review_test.go: each verb's refusals and its happy road
+- src/quack/branch_test.go: branch and cloud stand registered, and reach no node
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/*.go, new
+- src/quack/branch.go, new
+- src/quack/cloud.go, new
+- src/quack/branch_test.go, new
+- src/scripts/verbs/branch.js, removed
+- src/scripts/verbs/cloud.js, removed
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb named stands opened: work.js, work-*.js, pull-route.js, pull-hand.js, pull-hand-of.js, pull-when.js, pull-escalate.js, pull-landed.js, guidance-verb.js, engine/group.js, src/quack/registry.go, verbs.go, twins.go
+- the callers list names the road, the node module, the skills and the pull's needs
+- each done_when line meets a test: the Go tests, branch_test.go for no node, an ls in the check of the ask, a search of src, and the check
 
 ## tests-red
 
@@ -191,26 +286,31 @@ The branch verbs run in Go beside `branch list --queue`, the twin that already s
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_b_waits_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/branches/port_b_waits_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The port and its first cases landed in one commit, so those cases stood green from the start. The ported JS cases add 209 Go cases over a real origin and its clone, and 208 pass on the first run. The red case ports the gate case of work-gate.test.js. The JS fixture held a gate open with no ticket on trunk, so the take named the gated group at the child check. On a real repo the gate stands on trunk, and both the JS and the Go read trunk's tickets, so the gated group leaves the free list silently. The surprise is how close the port runs: no other case found a gap. One road needs a note. A merge straight after an open, with no sync between, meets the moved-on-trunk refusal, because the cloud marker lands on trunk after the cut. The JS holds the same rule, so the port keeps it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the Go cases for the roads, branch_test.go for the road reaching no node, the program tests for the verbs folder, and the check
+- every door the tests reach stands real: a bare origin and a clone, a real hook for a refused push, so no fake needs a suite
 
 # gate
 
@@ -219,8 +319,11 @@ The branch verbs run in Go beside `branch list --queue`, the twin that already s
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: branch and cloud register from src/quack/branch.go and src/quack/cloud.go over src/branches, their shims leave, and no importer of them stands (a search of src, test and .claude names none). Each done_when line meets a decider: the Go cases for the roads, src/quack/branch_test.go for no node, the program contract tests for the verbs folder, the search, and the check. Fixed in place, no child: the callers list misses src/bridge/review.js reviewsBranch and src/quack/review.go reviewOver, and the diff already moves both onto the Go verb. The size list misses src/modules/check/reroute.go, src/modules/hooks/brief/rules.go and the contract tests; each is a new file or a follow-on of the shims leaving, and none touches a line the registry design keeps for the parallel groups. Weighed: the red case TestPBTakeWalksPastAnOpenGate asserts the take names a gated group, which the JS says only through its fake, where the gate stands on no trunk disk; on a real tree both the JS and the Go drop it silently. Implement keeps the road (the gated group takes no claim, the next one does) and reads the wait off branch list, which names it on a real tree.
 
 # implement
 
@@ -231,14 +334,19 @@ The branch verbs run in Go beside `branch list --queue`, the twin that already s
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the port stands in src/branches and two register files, and the follow-ons the gate names, review.go, review.js and the contract tests, move the shims' callers onto Go.
+- every door the change reaches has a fake: the cases drive a bare origin and its clone, and the review spawn meets fakeProc.
+- a comment names the approach: every file points at the ticket in its header.
+- every fact stands in one place: the waits, the claim and the queue read through the package once, and branch list --queue stays the one twin.
 
 ## tests-green
 
@@ -247,26 +355,33 @@ The branch verbs run in Go beside `branch list --queue`, the twin that already s
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_b_waits_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The branch and cloud verbs now run in Go. The package src/branches ports work.js and the work modules it reads, and src/quack/branch.go and src/quack/cloud.go register the two verbs, each from its own file. The shims src/scripts/verbs/branch.js and cloud.js leave, and the review helper in Go and in the bridge runs the Go verb. The work modules stay, since modules other groups own still import them. The gate case reads the gated child's wait off branch list. On a real tree the take skips a gated group without a word, in the JS as in the Go, so the listing is where a reader meets the wait.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the gate names each follow-on.
+- every door the change reaches has a fake: the cases drive a real origin and clone.
+- a comment names the approach: each file header points at this ticket.
+- every fact stands in one place: branch list --queue stays the one twin.
 
 # accept
 

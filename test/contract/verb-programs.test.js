@@ -11,9 +11,7 @@ import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
-import { run as branch } from "../../src/scripts/verbs/branch.js";
 import { run as check } from "../../src/scripts/verbs/check.js";
-import { run as cloud } from "../../src/scripts/verbs/cloud.js";
 import { run as commit } from "../../src/scripts/verbs/commit.js";
 import { run as config } from "../../src/scripts/verbs/config.js";
 import { run as dispatch } from "../../src/scripts/verbs/dispatch.js";
@@ -42,9 +40,7 @@ import { run as voice } from "../../src/scripts/verbs/voice.js";
 import { commands } from "./commands.js";
 
 const RUNS = {
-  branch,
   check,
-  cloud,
   commit,
   config,
   dispatch,
