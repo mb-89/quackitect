@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: d84ad84cd90c993f
         size: 625
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: ef6ffe7372aa14ef7196b7f70db921c8167a32ec
+    hash_after: ef6ffe7372aa14ef7196b7f70db921c8167a32ec
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the seven files the size names, and no other
+- the change adds no door: the voice fake reads either separator as a Windows disk does, and permOf reads the real disk OS() drives
+- each changed spot carries a comment naming the ticket and the cause it answers
+- the slashed method root stands in MethodRootFrom alone, and the tests point at it through filepath.ToSlash
 
 ## tests-green
 
