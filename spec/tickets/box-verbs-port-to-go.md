@@ -389,3 +389,5 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+`probe dry` starts node, and it stands as the one exception to the second done_when line. The dry session loads the plugin's hook module in process, and the client takes a plugin's function hooks as JavaScript. So a probe loading that module needs a JavaScript runtime while that contract holds, whatever language the verb runs in. The Go verb hands that one road to `src/scripts/probe-dry.js`, and the check starts the same program. The other roads of the probe, and setup, tools and doctor, start no node, and `TestEveryBoxVerbStartsNoNode` decides it.
