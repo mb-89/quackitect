@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: 9d175a1f909a9d686b2288485e7d693443b40367
     hash_after: 9d175a1f909a9d686b2288485e7d693443b40367
+  - step: accept
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: 2dc04aeeac30effa98b0c8ddee0bd2587cd40225
+    hash_after: cb2e5e0d3fbc3a789e412180ae03a4108921f7e0
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/read-verbs-run-in-go took 2 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: 455feaeb9a8bedca
+        size: 317
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -172,8 +191,11 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- index-why-prints-text: indexSays in src/quack/verb_index.go prints every answer as JSON, where se-index prints the text of a why answer, so index why prints its tree as JSON
+- lint-row-keeps-floor: the lint row goes through appendsRow in src/quack/verbs.go, which writes below the log.level floor, so every passing lint appends a debug row the JavaScript dropped
 
 # retro
 
