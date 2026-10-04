@@ -209,12 +209,12 @@ test("the battery runs level zero on a fresh box before the rules", async () => 
   assert.ok(names.indexOf("level0") < names.indexOf("rules"));
 });
 
-// [[spec/tickets/the-check-takes-a-minute]]
-test("level zero starts once the tests end, and runs beside the parts past them", async () => {
+// [[spec/tickets/the-probe-starts-with-tests]]
+test("level zero starts first, and runs beside every other part", async () => {
   const { partsOf } = await import("../../src/scripts/check-verb.js");
   const parts = partsOf([]);
   const names = parts.map(([name]) => name);
-  assert.equal(names.indexOf("level0"), names.indexOf("tests") + 1, names.join(" "));
+  assert.equal(names[0], "level0", names.join(" "));
   const beside = parts.filter(([, , how]) => how?.beside).map(([name]) => name);
   assert.deepEqual(beside, ["level0"], "level zero alone runs beside");
 });

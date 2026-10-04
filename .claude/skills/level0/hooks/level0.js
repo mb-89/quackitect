@@ -51,8 +51,10 @@ let method = "";
 let saidDown = false;
 // The chat line stands apart from the row, so a session start writing the row still leaves the line to say. [[spec/design_output/level0#the-bridge-says-it-falls]]
 let toldDown = false;
-// The one run of the start road a session takes, which every event finding the door down awaits. [[spec/tickets/level0-runs-on-the-door]]
+// The one run of the start road a fall takes, which every event finding the door down awaits. A door that answers clears it, so an index dying mid-session starts once more before the cage refuses. [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-cage-survives-its-index]]
 let road = null;
+// Whether that run settled, so an answer arriving while the road runs leaves it to finish. [[spec/tickets/the-cage-survives-its-index]]
+let roadRan = false;
 // The span a post runs before a fall with no status reads as the host's cut. The host cuts at its own timeout, well past this, and a fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]
 const CUT = 1000;
 let cut = CUT;
@@ -74,6 +76,7 @@ export function register(on, options) {
   method = String(options?.method ?? "");
   cut = Number(options?.cut ?? CUT);
   road = null;
+  roadRan = false;
   reading = 0;
   launched = false;
   answered = false;
@@ -236,6 +239,7 @@ async function doorAsk($, event, e, extra, { quiet = false } = {}) {
     const answer = JSON.parse(said.text || "{}");
     saidDown = false;
     toldDown = false;
+    if (roadRan) road = null;
     return answer;
   } catch (error) {
     if (!quiet) await down($, event, error, where);
@@ -571,7 +575,12 @@ function says($, line) {
 
 // An event finding the door down while another starts it waits on that start, so the rules reach it once the door stands. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/tickets/level0-runs-on-the-door]]
 function starts($) {
-  road ??= startsOnce($);
+  if (!road) {
+    roadRan = false;
+    road = startsOnce($).finally(() => {
+      roadRan = true;
+    });
+  }
   return road;
 }
 

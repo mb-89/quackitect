@@ -96,6 +96,44 @@ test("a stopped hooks door refuses a guarded call and names session/alarms", asy
   assert.equal(starts.length, 1, "the hook starts the index once");
 });
 
+// [[spec/tickets/the-cage-survives-its-index]]
+test("a door dying mid-session starts once more, passes the recovery commands, and refuses the rest", async () => {
+  const box = caged();
+  let up = true;
+  box.$.http.fetch = async () => {
+    if (!up) throw new Error("Unable to connect");
+    return { ok: true, status: 200, text: "{}" };
+  };
+  const bash = (command) => box.hooks["*"](box.$, { tool: "Bash", command }, box.handed);
+  const starts = () =>
+    box.runs.filter((argv) => !String(argv[2]).includes("appendFileSync")).length;
+
+  assert.equal((await bash("ls"))?.handed?.command, "ls", "a live door passes the call");
+  up = false;
+  assert.match(String((await bash("ls"))?.deny ?? ""), /session\/alarms/, "the fall refuses it");
+  assert.equal(starts(), 1, "the fall starts the index once before it refuses");
+  for (const command of [
+    "./RUNME.sh serve",
+    "./RUNME.sh index standing",
+    "pkill -f .se/.runtime/bin/se-index",
+    "git add -A",
+    "git commit -m 'a-name: saves the work'",
+    "git push -u origin work/a-name",
+  ]) {
+    assert.equal((await bash(command))?.handed?.command, command, `${command} passes`);
+  }
+  for (const command of ["rm -rf .", "git push origin main", "git push --force origin work/a-name"]) {
+    assert.match(String((await bash(command))?.deny ?? ""), /refuses Bash/, `${command} stays refused`);
+  }
+  assert.equal(starts(), 1, "a door staying down takes no second start");
+
+  up = true;
+  await bash("ls");
+  up = false;
+  await bash("ls");
+  assert.equal(starts(), 2, "a door that answers and falls again starts once more");
+});
+
 // [[spec/tickets/cage-key-reads-the-layers]]
 test("an override layer alone puts the hook on the door road, and the tracked key alone leaves it off", async () => {
   const call = { tool: "Bash", command: "ls" };
