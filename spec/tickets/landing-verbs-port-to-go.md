@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: landing-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: b0c7bf2381eb0d52
         size: 721
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a2b0848f196c · claude-code-remote
+    hash_before: 999dcb43ef4c892da831cd7c10c36ed6e10cc906
+    hash_after: 999dcb43ef4c892da831cd7c10c36ed6e10cc906
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 438327f0da15dddd
+        size: 4084
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -241,26 +254,34 @@ The JavaScript leaves: commit-verb.js, push-verb.js, rename.js, verbs/commit.js,
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/landing_test.go src/quack/commit_test.go src/quack/push_test.go src/quack/rename_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/landing_test.go
+- src/quack/commit_test.go
+- src/quack/push_test.go
+- src/quack/rename_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion against stubs that answer -1. The verbs run over real git in a temporary repository with a bare origin. The verbs the road runs, Vale, the log and the clock are fakes. The undo journal module already holds the entry shape, so the rename entry embeds edits.Entry and adds the move. The surprise: the cold path list names src/quack/, so every commit of this group runs the cold probe on this box.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red test: the roads in commit_test.go, push_test.go and rename_test.go, no node and no program in landing_test.go, the importer search in landing_test.go; the check is the checkpoint the implement step answers
+- the verbs the road runs, Vale, the log and the clock have fakes in fakeLanding; git runs real against a temporary repository, the way split_test.go runs it
 
 # gate
 
