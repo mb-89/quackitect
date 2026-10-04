@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: read-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box af8a15ff4571 · claude-code-remote
+    hash_before: 8a375eca9460ec1b3909b56c3c3e72111b86ebf8
+    hash_after: 8a375eca9460ec1b3909b56c3c3e72111b86ebf8
+    inputs:
+      - name: ask
+        hash: 24e7f0ad1c081076
+        size: 742
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,99 @@ The reads already have Go modules in the index, so these verbs become thin Go ca
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Six Go files under src/quack, one a verb, each registering its verb from an init the way twins.go does, so the port edits no shared line of verbs.go or registry.go. The road takes a registered verb to Go under the verbs slice at new, and the node module's run takes it there too, so log --say off the log module's say action lands in Go.
+
+- verb_index.go registers index. Its twin asks the index through index.Ask, standing where no words come, and prints the result indented the way se-index prints it. indexSays, the shared print, stands here, and links, notes and find call it.
+- verb_links.go registers links: links <target> where words come, dangling where none do.
+- verb_notes.go registers notes: notes <words>.
+- verb_find.go registers find: find --log hands the words to the log twin as --words, and every other search asks the index's find.
+- verb_log.go registers log: the session file and every rotated file the span reaches, narrowed by --since, --level, --kind, --words and --last, printed a row the way asRow prints it, or one count a kind under --count, and --say appending one row the way rowOf shapes it. The rows read off the files in the order each holds its keys, so the extra fields print in the order the writer wrote them.
+- verb_lint.go registers lint: the Go lsp tools over a disk tree whose paths git lists, Sweep over the whole tree and Over the files under the paths named, the check module's sweep rows under the paths named past SurveyFindsNode, and check.SurveyFindsNode over the box. A closed ticket's rows leave, the count a rule prints first and the finding lines last, a warning exits 0 and a finding at error exits 1, and the session log takes a debug row where the rules pass and a warn row where a line breaks one. ValeRuns stands as the fault that stops the lint.
+
+The JavaScript of the six verbs leaves, with log-verb.js, the narrowing filters of log-read.js only log-verb.js imported, asksIndex in cli-read.js and logRowsOf in quack-topic.js where no other importer stands. cli-read.js keeps lint, which the check verb still runs until its own group ports it, and log-read.js keeps what tui.js reads.
+
+Assumptions: the Go lint draws no Vale cache, so a lint over the whole tree runs Vale whole each time; the lsp tools stand as the one Go checker the editor reads, so the lint and the panel answer one list. A value of an extra field prints as its JSON where it holds an object or a list, where the JavaScript printed [object Object].
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbs, which runs a registered twin on the road under new
+- src/quack/twins.go nodeAccept, which runs a registered verb through goAnswer
+- src/modules/log/log.go sayOf, whose request runs log --say through the node module
+- RUNME.sh, which hands every verb to quack verb
+- src/scripts/check-verb.js, which keeps the JavaScript lint of cli-read.js
+- src/scripts/tui.js, which keeps asRow, filesFor, NO_LOG, rowsIn and SESSION of log-read.js
+- test/contract/verb-programs.test.js, whose RUNS imports each program
+- test/contract/cli-verbs.test.js, whose find case reads verbs/find.js
+- test/level0/log-verb.test.js and test/level0/log-say.test.js, which import log-verb.js
+- test/level0/topic-readers.test.js, whose log cases import logVerb
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_index_test.go TestIndexVerb
+- src/quack/verb_links_test.go TestLinksVerb
+- src/quack/verb_notes_test.go TestNotesVerb
+- src/quack/verb_find_test.go TestFindVerb
+- src/quack/verb_log_test.go TestLogVerb
+- src/quack/verb_lint_test.go TestLintVerb
+- src/quack/verb_read_test.go TestReadVerbsLeaveNode
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_index.go
+- src/quack/verb_links.go
+- src/quack/verb_notes.go
+- src/quack/verb_find.go
+- src/quack/verb_log.go
+- src/quack/verb_lint.go
+- src/quack/verb_index_test.go
+- src/quack/verb_links_test.go
+- src/quack/verb_notes_test.go
+- src/quack/verb_find_test.go
+- src/quack/verb_log_test.go
+- src/quack/verb_lint_test.go
+- src/quack/verb_read_test.go
+- src/scripts/verbs/index.js
+- src/scripts/verbs/links.js
+- src/scripts/verbs/lint.js
+- src/scripts/verbs/notes.js
+- src/scripts/verbs/find.js
+- src/scripts/verbs/log.js
+- src/scripts/log-verb.js
+- src/scripts/log-read.js
+- src/scripts/cli-read.js
+- src/scripts/quack-topic.js
+- test/contract/verb-programs.test.js
+- test/contract/cli-verbs.test.js
+- test/level0/log-verb.test.js
+- test/level0/log-say.test.js
+- test/level0/topic-readers.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file the approach names stands opened: the six programs, cli-read.js, log-verb.js, log-read.js, registry.go, twins.go, verbs.go, src/index/main.go, src/modules/lsp/tools.go, src/quack/lsp.go and src/modules/log/log.go
+- the callers list names the road, the node module, the say action, RUNME.sh and every JavaScript importer a search of src and test finds
+- each done_when line meets a test: the go tests for the roads, TestReadVerbsLeaveNode for no node and the gone programs, the importer search and the check
 
 ## tests-red
 
