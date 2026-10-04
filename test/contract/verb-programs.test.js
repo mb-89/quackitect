@@ -1,9 +1,13 @@
 // Every verb program loads over the real doors and hands its words to a run,
-// the vehicle bodies stand beside them, and the lens names their folder.
+// the vehicle bodies stand beside them, and the lens names their folder. A
+// verb running in Go carries no program.
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
+import { dirname, join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
@@ -15,15 +19,9 @@ import { run as config } from "../../src/scripts/verbs/config.js";
 import { run as dispatch } from "../../src/scripts/verbs/dispatch.js";
 import { run as doctor } from "../../src/scripts/verbs/doctor.js";
 import { run as doors } from "../../src/scripts/verbs/doors.js";
-import { run as find } from "../../src/scripts/verbs/find.js";
 import { run as fix } from "../../src/scripts/verbs/fix.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
-import { run as index } from "../../src/scripts/verbs/index.js";
-import { run as links } from "../../src/scripts/verbs/links.js";
-import { run as lint } from "../../src/scripts/verbs/lint.js";
-import { run as log } from "../../src/scripts/verbs/log.js";
 import { run as mint } from "../../src/scripts/verbs/mint.js";
-import { run as notes } from "../../src/scripts/verbs/notes.js";
 import { run as probe } from "../../src/scripts/verbs/probe.js";
 import { run as project } from "../../src/scripts/verbs/project.js";
 import { run as push } from "../../src/scripts/verbs/push.js";
@@ -52,15 +50,9 @@ const RUNS = {
   dispatch,
   doctor,
   doors,
-  find,
   fix,
   graph,
-  index,
-  links,
-  lint,
-  log,
   mint,
-  notes,
   probe,
   project,
   push,
@@ -80,8 +72,18 @@ const RUNS = {
   voice,
 };
 
+// The folder the programs stand in. [[spec/tickets/read-verbs-port-to-go]]
+const VERB_FOLDER = join(
+  dirname(dirname(dirname(fileURLToPath(import.meta.url)))),
+  "src",
+  "scripts",
+  "verbs",
+);
+
 test("every verb of the table loads as a program answering a run", () => {
-  const listed = [...commands().keys()].sort();
+  const listed = [...commands().keys()]
+    .filter((verb) => disk().exists(join(VERB_FOLDER, `${verb}.js`)))
+    .sort();
   assert.deepEqual(Object.keys(RUNS).sort(), listed);
   for (const [verb, run] of Object.entries(RUNS)) {
     assert.equal(typeof run, "function", `${verb} runs`);

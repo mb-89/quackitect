@@ -106,14 +106,6 @@ export function configRowsOf(answered) {
     }));
 }
 
-// The rows the log verb filters, off the rows `quack log` answers: a broken line stays out, as the old reader drops it, and a row's extra fields ride beside its own. [[spec/tickets/the-log-topic-lands]]
-export function logRowsOf(answered) {
-  if (!Array.isArray(answered)) return null;
-  return answered
-    .filter((one) => one && typeof one === "object" && !one.broken)
-    .map(({ extra, broken, ...own }) => ({ ...(extra ?? {}), ...own }));
-}
-
 // A reader on a new slice takes its topic's answer, and a topic answering nothing is a fault. [[spec/tickets/topic-fallback-leaves-the-readers]]
 export function answerOf(said, topic) {
   if (said === null || said === undefined) {

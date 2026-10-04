@@ -300,7 +300,7 @@ func (one logLine) field(key string) string {
 	return jsText(raw, held)
 }
 
-// The rows past every filter the words name, in the order narrowed in log-verb.js composed them. [[spec/design_output/log#one-verb-reads-the-log]]
+// The rows past every filter the words name: span, level, kind and words, then the count. [[spec/design_output/log#one-verb-reads-the-log]]
 func narrowed(rows []logLine, argv []string, now time.Time) []logLine {
 	out := []logLine{}
 	span := spanOf(flagOf(argv, logSince))
