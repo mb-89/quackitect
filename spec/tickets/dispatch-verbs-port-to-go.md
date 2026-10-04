@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    3.4  test/contract/drawing-page.test.js the page posts ready once it mounts, and draws nothing before a graph"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: 0c04cc4d438f9a7fe372770752dd581cb7e530b9
+    hash_after: 0c04cc4d438f9a7fe372770752dd581cb7e530b9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   86.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: e2bd44fe2f366469
+        size: 981
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -338,26 +361,33 @@ The approach answers the ask. The dispatch ports into src/branches (dispatch.go 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/dispatch_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dispatch verb runs in Go. src/quack/dispatch.go registers it from its own file over the branch doors and a send door onto the network. src/branches/dispatch.go reads the plan off the Go copy of the work reads, so the Action and the boxes agree on what is free. dispatch_write.go lands the fix groups, the parent closes and the cloud markers on one write branch through a worktree, and dispatch_fire.go fires the routine and opens the write branch pull request with auto-merge. The fix group mints through the Go mint over the tree route, hashed as the JavaScript hashed it. The four JavaScript files and their tests leave, and their roads stand as Go cases.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the dispatch files, the two JS tests that imported them, and work.md
+- every door has a fake: a bare origin and its clone for git, a fake hub for the send door
+- each Go file opens with a header naming the approach
+- each constant stands once, and work.md points at the Go functions
 
 # accept
 
