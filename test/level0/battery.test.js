@@ -132,6 +132,13 @@ test("the tally counts a line a spawn, and the ones that are Vale", () => {
   assert.deepEqual(spawnsIn(""), { all: 0, vale: 0 });
 });
 
+// [[spec/tickets/the-check-takes-a-minute]]
+test("a report carries the span the run names, where a part ran beside the rest", () => {
+  const said = batteryOf({ tests: 1000, level0: 900, go: 400.4 }, "", { span: 1400.4 });
+  assert.equal(said.total, 1400);
+  assert.deepEqual(said.parts, { tests: 1000, level0: 900, go: 400 });
+});
+
 test("a report carries each part rounded, their sum, the slowest cases, the files, the parts unrun, the red and the spawns", () => {
   const said = batteryOf({ tests: 1200.6, go: 300.2, rules: 0 }, RED_LINES, {
     most: 1,
