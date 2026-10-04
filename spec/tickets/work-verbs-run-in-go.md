@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 51947abab2e8 · claude-code-remote
@@ -139,6 +139,15 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 3d5c801695e47c345b6010ecc086e54312850aab
+    hash_after: 3d5c801695e47c345b6010ecc086e54312850aab
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 ---
 
 # Ask
@@ -202,8 +211,9 @@ The one child adds up to the goal. The branch and cloud verbs register in Go fro
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
