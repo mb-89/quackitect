@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 6cde03ecb0edb0c3
         size: 1602
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 1d64c60aa6ea · claude-code-remote · helper-4
+    hash_before: 0f78ed0f87b7b7fbc7423021352eb223573b287f
+    hash_after: 0f78ed0f87b7b7fbc7423021352eb223573b287f
+    inputs:
+      - name: design/draft
+        hash: 6cde03ecb0edb0c3
+        size: 1602
+      - name: design/tests-red
+        hash: d45bcffc41ac6b22
+        size: 617
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -272,8 +284,13 @@ Both cases fail on their own assertion: the module stands, and the search finds 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- log-md-names-tui-rows: the draft says log.md names logFiles and logLinesOf in src/quack/verb_log.go, which tui --plain calls too, but tuiPlainRows reads its rows through tuiRowsIn in src/quack/tui_verb.go and never calls logLinesOf. The builder writes that log.md names logFiles in src/quack/verb_log.go for the files and tuiRowsIn in src/quack/tui_verb.go for the rows tui --plain prints. The note then meets the second done_when line as the ask words it.
+- log-read-leaves-asserts-the-design: test/contract/log-read-leaves.test.js only checks that log.md no longer names log-read.js. Nothing in it checks that log.md names src/quack/tui_verb.go, although the tests-red checked line says it reads log.md for the second done_when line. The builder adds an assertion that spec/design_output/log.md names src/quack/tui_verb.go, so a red test decides that line.
+- log-md-flag-owners-stale: under the same heading the builder edits, the flag table names spanOf under src/scripts/group.js, and the paragraph after it says the verb runs in node. The log verb runs in Go: register("log") stands in src/quack/verb_log.go, and spanOf, timeOf and logFiles stand there. The builder points those lines at src/quack/verb_log.go while the paragraph is open.
+Checked and holding: tuiFilesFor has one caller, tuiPlainRows. logFiles(root, "", now) answers the same list, since spanOf("") reads 0. tuiOldFolder and tuiLogEnd are read by tuiFilesFor alone, while tuiLogFolder stays for tuiOpens. test/level0/log-read.test.js is the only importer of log-read.js. TestLogVerb holds the span and torn-line cases, and TestTuiPlainAllReadsTheRotatedFilesFirst holds the tui read. The size lists every file the ask needs, and the tui_verb.go change stays inside the one read the ask asks for.
 
 # implement
 
