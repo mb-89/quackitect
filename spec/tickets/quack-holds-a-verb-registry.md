@@ -86,6 +86,10 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 step: sync
+record:
+  - step: sync
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 8b11a68b844c2317ca1d0b4284b5f3a5fd1c4846
 ---
 
 # Ask
