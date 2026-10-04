@@ -58,11 +58,15 @@ The level zero dry probe starts once the tests end, so every check pays the test
 
 <!-- the form is command -->
 
+./RUNME.sh check
+
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
 
 <!-- the form is text -->
+
+The battery started the level zero dry probe once the tests ended, so a check paid the tests' span and then the probe's. Now the probe starts first and runs beside every part, the tests among them, and the battery waits for it before it stamps. Five checks in a row on one box read green, so the overlap flakes no contract case there. This change also drops the leftover draft [[spec/tickets/the-check-takes-a-minute]] left, since no work stood behind it.
 
 ## checked
 
@@ -70,6 +74,25 @@ The level zero dry probe starts once the tests end, so every check pays the test
 
 <!-- the form is checklist -->
 
+- the change follows the ask: the probe starts with the tests, and five checks in a row read green
+- the cleanup it reveals: the leftover draft goes in the same change
+- every fact stands once: the order stands in `partsOf`, and its test pins level zero first
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The measure, on a cloud box with four cores, in seconds off `.se/.runtime/check.json`. Before is one steady run on origin/main. After is five runs in a row, and the first rebuilt the Go test cache.
+
+| run | level0 | tests | go | rules | the battery's span | exit |
+|---|---|---|---|---|---|---|
+| before | 32.0 | 22.9 | 5.1 | 6.2 | 54.9 | 0 |
+| after, 1 | 67.3 | 31.8 | 34.2 | 6.3 | 73.4 | 0 |
+| after, 2 | 43.8 | 28.6 | 11.9 | 6.6 | 49.1 | 0 |
+| after, 3 | 47.7 | 29.2 | 10.9 | 6.7 | 49.3 | 0 |
+| after, 4 | 45.7 | 25.7 | 9.8 | 7.7 | 45.7 | 0 |
+| after, 5 | 44.4 | 29.2 | 11.1 | 6.0 | 49.2 | 0 |
+
+The overlap slows each part, since the probe's install builds Go while the tests run. The battery's span still drops, because it pays the slower road and not the sum. The probe now stands on the critical path.
+
+The call I took, with nobody to ask: the overlap stays only while CI on Linux and Windows reads green too. A red there from the overlap puts the probe back after the tests, and this table stays as the measure.
