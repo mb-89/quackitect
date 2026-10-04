@@ -37,6 +37,12 @@ test("log-read.js stands nowhere", () => {
   assert.equal(files.exists(join(root, "src", "scripts", "log-read.js")), false);
 });
 
+test("the log design names the read tui --plain runs in Go", () => {
+  const note = String(files.read(join(root, "spec", "design_output", "log.md")));
+  assert.match(note, /`src\/quack\/tui_verb\.go`/);
+  assert.match(note, /`logFiles` in `src\/quack\/verb_log\.go`/);
+});
+
 test("no source, test or design note names log-read.js", () => {
   const naming = FOLDERS.flatMap(under).filter(
     (one) =>

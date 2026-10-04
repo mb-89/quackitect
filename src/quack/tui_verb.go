@@ -23,6 +23,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 	"unicode/utf16"
 
 	"quackitect/src/index"
@@ -36,8 +37,6 @@ var tuiTabs = []string{"log", "work"}
 // The log's folders, as FOLDER and OLD in .claude/skills/level0/lib/log.js name them, and the lines the plain road prints. [[spec/design_output/log#one-verb-reads-the-log]]
 const (
 	tuiLogFolder = ".se/.log"
-	tuiOldFolder = ".se/.log/old"
-	tuiLogEnd    = ".jsonl"
 	tuiNoLog     = "No log stands yet. A writer starts one the next time it says a line."
 	tuiNeedsGo   = "Go builds the viewer these rows open in. Install Go, and run this again."
 )
@@ -136,7 +135,7 @@ func tuiOpens(d tuiDoors, exe, session, tab string, out, errs io.Writer) int {
 func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, errs io.Writer) int {
 	var read []string
 	if slices.Contains(argv, "--all") {
-		read = tuiFilesFor(d.root)
+		read = logFiles(filepath.FromSlash(d.root), "", time.Time{})
 	} else if tuiExists(session) {
 		read = []string{session}
 	}
@@ -160,27 +159,6 @@ func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, er
 		fmt.Fprintln(out, tuiNeedsGo)
 	}
 	return 0
-}
-
-// Every rotated log in name order, then the session's, as filesFor in src/scripts/log-read.js answers it over no span. [[spec/design_output/log#a-session-rotates-its-file]]
-func tuiFilesFor(root string) []string {
-	old := filepath.Join(filepath.FromSlash(root), filepath.FromSlash(tuiOldFolder))
-	entries, _ := os.ReadDir(old)
-	var names []string
-	for _, one := range entries {
-		if one.Type().IsRegular() && strings.HasSuffix(one.Name(), tuiLogEnd) {
-			names = append(names, one.Name())
-		}
-	}
-	sort.Strings(names)
-	out := []string{}
-	for _, name := range names {
-		out = append(out, filepath.Join(old, name))
-	}
-	if here := filepath.Join(filepath.FromSlash(root), filepath.FromSlash(sessionLog)); tuiExists(here) {
-		out = append(out, here)
-	}
-	return out
 }
 
 // A path as the reader names it, under the root, as showOf in src/bridge/findings.js answers. [[spec/design_output/log#one-verb-reads-the-log]]

@@ -169,7 +169,7 @@ func TestTuiPlainPrintsTheSessionRows(t *testing.T) {
 	}
 }
 
-// [[spec/design_output/log#a-session-rotates-its-file]]
+// tui --plain --all reads the files logFiles answers over no span: every rotated file in name order, then the session's. [[spec/design_output/log#a-session-rotates-its-file]] [[spec/tickets/window-verbs-log-read-leaves]]
 func TestTuiPlainAllReadsTheRotatedFilesFirst(t *testing.T) {
 	box := tuiBoxAt(t)
 	row := func(said string) string {
