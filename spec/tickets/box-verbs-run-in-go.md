@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -160,6 +160,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 660db8e33adc · claude-code-remote
+    hash_before: 3f6fb8ff732e3e9c26d071d1eba14af8e85293ba
+    hash_after: 3f6fb8ff732e3e9c26d071d1eba14af8e85293ba
+    inputs:
+      - name: retro/write
+        hash: 0e6afb192a03cb0f
+        size: 2023
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -303,20 +313,29 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool stood, and no host was refused
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 14:48 the take refused while the hold stood fresh, and passed at 14:56
+- 14:56 the cage refused git push, and the commit verb pushed in its place
+- 15:03 the commit hook asked a test beside brand.js
+- 15:13 the check refused node:fs in a test, and the disk door took its place
+- 15:16 vale-paths failed under the full check on this box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step
+- no ticket outside the group
+- no handover
 
 # Discussion
 
