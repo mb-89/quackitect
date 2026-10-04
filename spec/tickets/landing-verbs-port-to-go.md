@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: landing-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 438327f0da15dddd
         size: 4084
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a2b0848f196c · claude-code-remote · helper-4
+    hash_before: d6de627241f22d1bc933d8b289b95d114d967034
+    hash_after: a0044908a94bce5d71e9517f0ee5783ed349dd9f
+    inputs:
+      - name: design/draft
+        hash: 438327f0da15dddd
+        size: 4084
+      - name: design/tests-red
+        hash: af4f299ca9d851e9
+        size: 1109
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -290,8 +302,15 @@ Every case fails on its own assertion against stubs that answer -1. The verbs ru
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- The approach answers the ask: three Go files register the verbs, and the JavaScript leaves with its importers.
+- A red test decides each done_when line but the check, which stays the checkpoint tests-green answers.
+- Fixed here: the merge fixture in `commit_test.go` runs git itself, and stands on no stub.
+- Fixed here: `commit_test.go` gains the staging git refuses, a road the JavaScript tests held.
+- Fixed here: `rename_test.go` gains the anchored link, the quoted path and the undo of a move.
+- Every case fails on its own assertion against the stubs.
 
 # implement
 
