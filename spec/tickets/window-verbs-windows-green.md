@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 0a455628c033bab854d70e7fabb6075621e78d54
+    hash_after: 0a455628c033bab854d70e7fabb6075621e78d54
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/vehicle passes
+      - name: check
+        exit: 0
+        said: "  103.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: d84ad84cd90c993f
+        size: 625
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/vehicle/vehicle_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The window verbs ported to Go failed fourteen cases on the Windows runner. One cause sat in code: Produce compared a native dest with the slashed method root, so into over the method itself reached the copy. It now compares both slashed. The rest sat in the tests: the voice fake read slash keys alone, a case wrote a raw Windows root into JSON, the wants spelled the method root natively, two cases named a folder ... that Windows refuses, and two read a run bit Windows lacks. The Windows job of check run 37223712908 passes on commit 9122c43.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tests touch the files the draft names, and the new Produce case stands in src/vehicle/vehicle_test.go
+- the voice fake reads either separator as a Windows disk does, and permOf reads the real disk
+- each changed case carries a comment naming the ticket
+- the slashed root stands in MethodRootFrom alone, and every want points at it through ToSlash
 
 # accept
 
