@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: children
+step: accept
 record:
   - step: sync
     hand: box 6183eb94e809 · claude-code-remote
@@ -120,6 +120,10 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 5e90fabe8bbab6448d31a7696f5f0a9ec7b1dfb6
+    hash_after: 5e90fabe8bbab6448d31a7696f5f0a9ec7b1dfb6
 ---
 
 # Ask
