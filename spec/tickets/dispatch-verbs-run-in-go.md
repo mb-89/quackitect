@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -160,6 +160,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 00e5f1a1f19b · claude-code-remote
+    hash_before: a6625afc03fa65c1bb245b5769d79bf2d3c4a865
+    hash_after: a6625afc03fa65c1bb245b5769d79bf2d3c4a865
+    inputs:
+      - name: retro/write
+        hash: 040d8ee98c79cd9f
+        size: 1968
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -298,20 +308,28 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: no tool, host, right or install stood missing
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at take: main and the branch both changed test/contract/verb-programs.test.js, resolved to main's side
+- the hook GitWritesThroughAVerb at 22:15 UTC, on a git add
+- the index restarting at 22:16 UTC under three patch calls
+- the check past its budget, as a warning
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted
+- the handover: the group stands accepted, its retro written, and the pull request to main carries auto-merge
 
 # Discussion
 
