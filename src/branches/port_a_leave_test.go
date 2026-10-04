@@ -84,7 +84,7 @@ func TestPAReleaseRefusesUnpushedCommits(t *testing.T) {
 	}
 }
 
-// A branch level with origin moves as before. [[spec/tickets/work-verbs-port-to-go]]
+// A branch level with origin releases. [[spec/tickets/work-verbs-port-to-go]]
 func TestPALevelBranchReleases(t *testing.T) {
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})

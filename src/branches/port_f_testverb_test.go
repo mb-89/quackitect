@@ -38,7 +38,7 @@ func pfRedProbe(fails bool) string {
 		verdict = "assert.equal(1, 2, \"the change is missing\");"
 	}
 	return `const assert = require("node:assert/strict");
-const fs = require("node:fs");
+const fs = require("fs");
 const { test } = require("node:test");
 test("it reads the sources", () => {
   const seen = {
