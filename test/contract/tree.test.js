@@ -23,6 +23,7 @@ import {
   EDITOR_VALE_INI,
 } from "../../.claude/skills/level0/lib/servers.js";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
+import { goVerbs } from "./commands.js";
 import { everyModuleTested } from "../../.claude/skills/level0/lib/tested.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import {
@@ -100,11 +101,13 @@ const edited = (where, change) => {
 };
 
 // [[spec/design_output/bash#the-description-names-verbs]]
-test("every verb the Bash description names stands as a program", () => {
+// A verb stands as a program, or registered in Go. [[spec/tickets/work-verbs-port-to-go]]
+test("every verb the Bash description names stands as a program or in Go", () => {
   assert.ok(VERBS.length, "the description names at least one verb");
+  const inGo = goVerbs();
   for (const verb of VERBS) {
     assert.ok(
-      files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
+      inGo.has(verb) || files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
       `./RUNME.sh ${verb} stands`,
     );
   }

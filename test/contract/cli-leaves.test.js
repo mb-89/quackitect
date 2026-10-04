@@ -7,6 +7,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
+import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -48,9 +49,14 @@ test("no source under src, test or level zero names cli.js", () => {
   assert.deepEqual(naming, []);
 });
 
-test("every verb Go lists stands as a program, and no program stands past the list", () => {
+// A verb Go registers whole keeps no program. [[spec/tickets/work-verbs-port-to-go]]
+test("every verb Go lists stands as a program or in Go, and no program stands past the list", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
-  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)].map((one) => one[1]).sort();
+  const inGo = goVerbs();
+  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)]
+    .map((one) => one[1])
+    .filter((one) => !inGo.has(one))
+    .sort();
   const folder = join(root, "src", "scripts", "verbs");
   const programs = files.exists(folder)
     ? files
