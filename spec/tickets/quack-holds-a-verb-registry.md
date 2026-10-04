@@ -85,11 +85,20 @@ process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
-step: sync
+step: split
 record:
   - step: sync
     hand: box 470a600bc22e · claude-code-remote
     hash_before: 8b11a68b844c2317ca1d0b4284b5f3a5fd1c4846
+  - step: sync
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 0b335bc831694a4dd2d86437675629639ce71885
+    hash_after: daebda642065f70dca1dbe3f52c40328e7ca3449
+    answered:
+      - name: sync
+        exit: 0
+        said: work/quack-holds-a-verb-registry took 8 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -105,8 +114,9 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
