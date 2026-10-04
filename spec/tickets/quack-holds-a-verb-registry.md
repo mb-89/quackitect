@@ -84,12 +84,12 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
-cloud: true
 step: retro/cloud
 record:
   - step: sync
     hand: box 470a600bc22e · claude-code-remote
     hash_before: 8b11a68b844c2317ca1d0b4284b5f3a5fd1c4846
+    hash_after: 337f2e0c12642fb8f39c4128d1f928caa17b2ef0
   - step: sync
     hand: box 470a600bc22e · claude-code-remote
     hash_before: 0b335bc831694a4dd2d86437675629639ce71885
