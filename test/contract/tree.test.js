@@ -47,6 +47,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { SESSION } from "../../src/scripts/pull-hand-of.js";
+import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -100,11 +101,12 @@ const edited = (where, change) => {
 };
 
 // [[spec/design_output/bash#the-description-names-verbs]]
-test("every verb the Bash description names stands as a program", () => {
+test("every verb the Bash description names stands as a program or a Go verb", () => {
   assert.ok(VERBS.length, "the description names at least one verb");
+  const whole = goVerbs();
   for (const verb of VERBS) {
     assert.ok(
-      files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
+      whole.has(verb) || files.exists(join(SCRIPTS, "verbs", `${verb}.js`)),
       `./RUNME.sh ${verb} stands`,
     );
   }
@@ -113,7 +115,7 @@ test("every verb the Bash description names stands as a program", () => {
 // The count chain left the tree: no verb, viewer or badge line spells the count flag, so the badge asks the index. [[spec/tickets/count-grep-misses-the-scripts]]
 test("no count chain stands in the verb, the viewer or the badge line", () => {
   for (const path of [
-    join(SCRIPTS, "tui.js"),
+    join(root, "src", "quack", "tui_verb.go"),
     join(root, "src", "tui", "main.go"),
     join(root, SCHEMA),
   ]) {

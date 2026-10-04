@@ -6,7 +6,6 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
-import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { run as branch } from "../../src/scripts/verbs/branch.js";
 import { run as check } from "../../src/scripts/verbs/check.js";
 import { run as cloud } from "../../src/scripts/verbs/cloud.js";
@@ -30,18 +29,13 @@ import { run as push } from "../../src/scripts/verbs/push.js";
 import { run as rename } from "../../src/scripts/verbs/rename.js";
 import { run as retro } from "../../src/scripts/verbs/retro.js";
 import { run as rules } from "../../src/scripts/verbs/rules.js";
-import { run as serve } from "../../src/scripts/verbs/serve.js";
 import { run as setup } from "../../src/scripts/verbs/setup.js";
 import { run as split } from "../../src/scripts/verbs/split.js";
 import { run as standing } from "../../src/scripts/verbs/standing.js";
-import { run as stub } from "../../src/scripts/verbs/stub.js";
 import { run as testVerb } from "../../src/scripts/verbs/test.js";
 import { run as ticket } from "../../src/scripts/verbs/ticket.js";
 import { run as tools } from "../../src/scripts/verbs/tools.js";
-import { run as tui } from "../../src/scripts/verbs/tui.js";
-import { run as vehicle } from "../../src/scripts/verbs/vehicle.js";
-import { run as voice } from "../../src/scripts/verbs/voice.js";
-import { commands } from "./commands.js";
+import { commands, goVerbs } from "./commands.js";
 
 const RUNS = {
   branch,
@@ -67,30 +61,21 @@ const RUNS = {
   rename,
   retro,
   rules,
-  serve,
   setup,
   split,
   standing,
-  stub,
   test: testVerb,
   ticket,
   tools,
-  tui,
-  vehicle,
-  voice,
 };
 
-test("every verb of the table loads as a program answering a run", () => {
-  const listed = [...commands().keys()].sort();
+test("every verb of the table Go answers in part loads as a program answering a run", () => {
+  const whole = goVerbs();
+  const listed = [...commands().keys()].filter((one) => !whole.has(one)).sort();
   assert.deepEqual(Object.keys(RUNS).sort(), listed);
   for (const [verb, run] of Object.entries(RUNS)) {
     assert.equal(typeof run, "function", `${verb} runs`);
   }
-});
-
-test("the vehicle bodies stand beside the programs", () => {
-  assert.equal(typeof theVehicle, "function");
-  assert.equal(typeof theStub, "function");
 });
 
 test("the lens names the folder the runner owns", () => {

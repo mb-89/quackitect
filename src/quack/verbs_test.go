@@ -160,10 +160,10 @@ func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
 	}
 }
 
-// A verb the twin table leaves out runs the verb's program alone in shadow, and the log holds no row for it. [[spec/tickets/vehicle-verbs-become-actions]]
+// A verb the registry leaves out runs the verb's program alone in shadow, and the log holds no row for it. A port registers every verb in time, so the case names words no file registers. [[spec/tickets/vehicle-verbs-become-actions]] [[spec/tickets/window-verbs-port-to-go]]
 func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 	doors, out, rows := roadOver("shadow", "old\n", registry)
-	for _, argv := range [][]string{{"vehicle", "here"}, {"stub", "into", "elsewhere"}} {
+	for _, argv := range [][]string{{"unregistered", "here"}, {"unregistered", "into", "elsewhere"}} {
 		out.Reset()
 		if code := verbs(doors, argv); code != 0 || out.String() != "old\n" || len(*rows) != 0 {
 			t.Fatalf("%v answers %d, %q, rows %v", argv, code, out.String(), *rows)

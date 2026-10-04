@@ -92,3 +92,16 @@ func TestHashesAnswersTheHashOfEachPath(t *testing.T) {
 		t.Fatalf("the head hashes the first ten units, and it reads %q", one.Head)
 	}
 }
+
+// The hashes hashText in .claude/skills/level0/lib/hash.js answers, which the viewer's stamp reads. [[spec/design_output/tui#the-verb-builds-it]]
+func TestHashTextMatchesJavaScript(t *testing.T) {
+	for text, want := range map[string]string{
+		"":                 "811c9dc59e3779b9",
+		"abc":              "1a47e90b6898d0cd",
+		"a\x1fé\U0001F600": "3aefc6a53ac2a999",
+	} {
+		if said := HashText(text); said != want {
+			t.Errorf("%q hashes %s, want %s", text, said, want)
+		}
+	}
+}

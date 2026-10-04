@@ -516,7 +516,7 @@ across, so a redraw moves nothing under a person's hands.
 # A tab the caller names
 
 `./RUNME.sh tui work` opens the window on that tab, and `--tab work` says the
-same. `TABS` in `src/scripts/tui.js` names which words stand, and the window
+same. `tuiTabs` in `src/quack/tui_verb.go` names which words stand, and the window
 answers `TabNamed` for the same words. A word no tab carries leaves the open tab
 where it is.
 
@@ -535,7 +535,7 @@ hands out none. So one window stands at a time:
 `TellPort` sends that same shape to a port. So the window reads a tab from
 another process, and reaches another port with the words it takes.
 
-The verb calls the door first. `told` in `src/scripts/tui.js` posts the tab, and
+The verb calls the door first. `tuiTellAt` in `src/quack/tui_verb.go` posts the tab, and
 a door answering `ok` means a window already stands.
 
 # The check runs its tests
