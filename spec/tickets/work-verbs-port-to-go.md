@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/branches/port_a_close_test.go:52:52: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 5575a5b16adfc992386ad7ddb00686cbfdbd1668
+    hash_after: 5575a5b16adfc992386ad7ddb00686cbfdbd1668
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    4.7  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index"
+    inputs:
+      - name: design/tests-red
+        hash: 95cd40f5843902cf
+        size: 1219
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -332,26 +355,33 @@ The approach answers the ask: branch and cloud register from src/quack/branch.go
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/port_b_waits_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The branch and cloud verbs now run in Go. The package src/branches ports work.js and the work modules it reads, and src/quack/branch.go and src/quack/cloud.go register the two verbs, each from its own file. The shims src/scripts/verbs/branch.js and cloud.js leave, and the review helper in Go and in the bridge runs the Go verb. The work modules stay, since modules other groups own still import them. The gate case reads the gated child's wait off branch list. On a real tree the take skips a gated group without a word, in the JS as in the Go, so the listing is where a reader meets the wait.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the gate names each follow-on.
+- every door the change reaches has a fake: the cases drive a real origin and clone.
+- a comment names the approach: each file header points at this ticket.
+- every fact stands in one place: branch list --queue stays the one twin.
 
 # accept
 
