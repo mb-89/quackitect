@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -183,6 +183,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box f8b693e22e97 · claude-code-remote
+    hash_before: 661c9d9f2033f8f0502dbb63399471c3245c2b20
+    hash_after: 661c9d9f2033f8f0502dbb63399471c3245c2b20
+    inputs:
+      - name: retro/write
+        hash: 3323dc4dc4b76051
+        size: 2138
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -323,20 +333,28 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- no tool, host or right was refused on this box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 17:22 the cage refused git merge, git push and git reset, each naming its verb
+- 17:30 the pre-push hook refused the stale hold until the take
+- 17:24 and 18:06 the index died, and serve brought it back
+- 18:04 a second conflict with main at sync, in the registry test
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- every ticket minted stands in this group
+- the local branch retro-save holds the pre-take tip, and nothing reads it
 
 # Discussion
 
