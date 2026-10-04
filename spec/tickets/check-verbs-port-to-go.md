@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: check-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 75ff9ec428e07488
         size: 668
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 233780cb27f2 · claude-code-remote
+    hash_before: 82cc3aa75c2fcf4c694ab197cf76a12892db6310
+    hash_after: 82cc3aa75c2fcf4c694ab197cf76a12892db6310
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/tickets fails
+    inputs:
+      - name: design/draft
+        hash: 674e82fa573d841e
+        size: 5635
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -269,26 +282,33 @@ The JavaScript that leaves: verbs/check.js, verbs/test.js, check-verb.js, red-li
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/tickets/red_test.go src/quack/battery_test.go src/quack/check_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/modules/tickets/red_test.go
+- src/quack/battery_test.go
+- src/quack/check_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its assertion over stubs that compile. The first run of TestCheckParts panicked on a part the stub never returns, so a missing part now answers -1 and the case fails on its assertion. The surprise: the red list in Go reads the same walk and chapter fields the tickets module draws with, so the port is small.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red test: the Go cases for the roads, TestCheckRegisters for the road to node, and the removal and the check as checkpoints the implement step answers
+- every door the check reaches rides in checkDoors, and the tests drive a fake of each: verb, process, health call, clock
 
 # gate
 
