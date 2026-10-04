@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box 51947abab2e8 · claude-code-remote
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/work-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: cef295a51e2969988a22a1380dcf74996a6e81e0
+    hash_after: cef295a51e2969988a22a1380dcf74996a6e81e0
+    inputs:
+      - name: ask
+        hash: 321dd01cc387f0c5
+        size: 294
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -130,14 +142,18 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/work-verbs-port-to-go]], standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: the one child ports two verbs behind one package.
+- the children add up to the goal: the shims imported work.js, cli-doors.js and verb-run.js, and each keeps an importer, so no other module goes orphan.
+- a child that waits on another names it: the one child waits on nothing.
 
 # children
 
