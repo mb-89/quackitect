@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box 6f8b02d3b81e · claude-code-remote
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/retro-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 08f4218ba236 · claude-code-remote
+    hash_before: 0a8556dd00670a4f4fb3309055a70b35aa6193b4
+    hash_after: 0a8556dd00670a4f4fb3309055a70b35aa6193b4
+    inputs:
+      - name: ask
+        hash: b0f8341cbe2d0d9d
+        size: 283
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -130,14 +142,21 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/retro-verbs-port-to-go]], standard
+- [[spec/tickets/retro-port-size-names-pull]], trivial
+- [[spec/tickets/se-minted-pass-binds-mint]], trivial
+- [[spec/tickets/retro-registry-test-starts-green]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the port is one ticket because one verb leaves Node whole, and its diff reads one file a sub-verb, each beside its own test; the three gate points stand small
+- the children add up to the goal: every retro sub-verb runs in Go, the retro JavaScript and every module only it imported leave, and a search finds no importer left
+- the three gate points wait on the port, which closed before them, so none names depends_on
 
 # children
 
