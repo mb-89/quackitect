@@ -1,0 +1,351 @@
+// The retro's minting: a class the check step leaves open gets one ticket,
+// a class the tree answers already gets none, and every promotion follows.
+// [[spec/guidance/retro/check]]
+package main
+
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"testing"
+)
+
+// One call a fake runner hears: the folder, the words and the env. [[spec/design_output/vehicle#the-work-root-inherits]]
+type retroMintCall struct {
+	dir  string
+	argv []string
+	env  map[string]string
+}
+
+// A runner answering the words a case teaches it, and hearing every call. [[spec/design_output/vehicle#the-work-root-inherits]]
+type retroMintFake struct {
+	answers map[string]func() retroMintRan
+	ran     []retroMintCall
+}
+
+// The runner a verb takes: the taught answer, or a refusal naming the words nothing taught. [[spec/design_output/vehicle#the-work-root-inherits]]
+func (f *retroMintFake) run(dir string, argv []string, env map[string]string) retroMintRan {
+	f.ran = append(f.ran, retroMintCall{dir: dir, argv: argv, env: env})
+	if answer, ok := f.answers[strings.Join(argv, " ")]; ok {
+		return answer()
+	}
+	return retroMintRan{errs: "this fake was never taught: " + strings.Join(argv, " "), code: 127}
+}
+
+// Writes a file under the root, its folders made. [[spec/guidance/retro/check]]
+func retroMintWrite(t *testing.T, root, path, text string) {
+	t.Helper()
+	at := filepath.Join(root, filepath.FromSlash(path))
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// Reads a file under the root, or the empty text where none stands. [[spec/guidance/retro/check]]
+func retroMintReadFile(t *testing.T, root, path string) string {
+	t.Helper()
+	body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
+	if err != nil {
+		return ""
+	}
+	return string(body)
+}
+
+// Runs a verb over its words, and answers the code, the output and the errors. [[spec/guidance/retro/check]]
+func retroMintHeard(verb twin, argv ...string) (int, string, string) {
+	var out, errs strings.Builder
+	code := verb(argv, false, &out, &errs)
+	return code, out.String(), errs.String()
+}
+
+const (
+	retroMintName     = "retro-a1b2c3"
+	retroMintLand     = "spec/tickets/the-land-verb-lands.md"
+	retroMintPromoted = "spec/tickets/the-rule-lands.md"
+	retroMintDraft    = "---\nkind: [[ticket]]\nstate: draft\n---\n\n# Ask\n\n<!-- gain, as text -->\n<!-- breaks, as text -->\n\n# design\n\n## approach\n"
+)
+
+// The record's path under the root. [[spec/guidance/retro/check]]
+var retroMintClasses = ".se/.retro/" + retroMintName + "/classes.json"
+
+// The ticket the open class carries, as CLASS in retro-mint.test.js. [[spec/guidance/retro/check]]
+func retroMintLandTicket() map[string]any {
+	return map[string]any{
+		"name":      "the-land-verb-lands",
+		"process":   "standard",
+		"gain":      "a commit lands in one call",
+		"breaks":    "every commit costs a round of refusals",
+		"done_when": []string{"./RUNME.sh land answers 0 over a clean tree"},
+	}
+}
+
+// The class standing open, its ticket changed by the case. [[spec/guidance/retro/check]]
+func retroMintOpenClass(id string, change func(ticket map[string]any)) map[string]any {
+	ticket := retroMintLandTicket()
+	if change != nil {
+		change(ticket)
+	}
+	return map[string]any{
+		"id":       id,
+		"category": "tools",
+		"class":    "a commit lands by hand",
+		"defect":   "the voice rules refuse the message one round at a time",
+		"fix":      "one land verb lints the message, commits, checks and pushes",
+		"measure":  map[string]any{"source": "log", "pattern": "PastTense"},
+		"tickets":  []string{},
+		"status":   "open",
+		"ticket":   ticket,
+	}
+}
+
+// The class the tree answers already, as FIXED. [[spec/guidance/retro/check]]
+func retroMintFixedClass() map[string]any {
+	one := retroMintOpenClass("k2", nil)
+	one["status"] = "fixed: src/engine/retro/mint.js holds it"
+	delete(one, "ticket")
+	return one
+}
+
+// A tree holding the routes and the record, and a runner taught the mint and the open of each ticket. [[spec/guidance/retro/check]]
+func retroMintTree(t *testing.T, classes, promotions []map[string]any) (string, *retroMintFake) {
+	t.Helper()
+	root := t.TempDir()
+	retroMintWrite(t, root, "spec/processes/standard.yaml", "steps: []\n")
+	retroMintWrite(t, root, "spec/processes/trivial.yaml", "steps: []\n")
+	if classes == nil {
+		classes = []map[string]any{}
+	}
+	if promotions == nil {
+		promotions = []map[string]any{}
+	}
+	record, err := json.Marshal(map[string]any{"classes": classes, "dispositions": map[string]any{}, "promotions": promotions})
+	if err != nil {
+		t.Fatal(err)
+	}
+	retroMintWrite(t, root, retroMintClasses, string(record))
+	drafts := func(path string) func() retroMintRan {
+		return func() retroMintRan {
+			retroMintWrite(t, root, path, retroMintDraft)
+			return retroMintRan{}
+		}
+	}
+	fake := &retroMintFake{answers: map[string]func() retroMintRan{
+		"./RUNME.sh mint ticket " + retroMintLand + " --process=standard":    drafts(retroMintLand),
+		"./RUNME.sh ticket open the-land-verb-lands":                         func() retroMintRan { return retroMintRan{} },
+		"./RUNME.sh mint ticket " + retroMintPromoted + " --process=trivial": drafts(retroMintPromoted),
+		"./RUNME.sh ticket open the-rule-lands":                              func() retroMintRan { return retroMintRan{} },
+		"./RUNME.sh mint ticket spec/tickets/a-second-ticket.md --process=standard": func() retroMintRan {
+			return retroMintRan{code: 2, errs: "the ask names a word outside the vocabulary"}
+		},
+	}}
+	return root, fake
+}
+
+// The record as the verb leaves it on disk. [[spec/guidance/retro/check]]
+func retroMintRead(t *testing.T, root string) retroMintRecord {
+	t.Helper()
+	var record retroMintRecord
+	if err := json.Unmarshal([]byte(retroMintReadFile(t, root, retroMintClasses)), &record); err != nil {
+		t.Fatal(err)
+	}
+	return record
+}
+
+// Runs retro mint over the tree with the fake runner. [[spec/guidance/retro/check]]
+func retroMintRuns(root string, fake *retroMintFake) (int, string, string) {
+	return retroMintHeard(retroMintVerb(func() string { return root }, fake.run), "retro", "mint", retroMintName)
+}
+
+// A class with no status mints nothing, and the verb names it. [[spec/guidance/retro/check]]
+func TestRetroMintRefusesAClassWithNoStatusAndNamesIt(t *testing.T) {
+	bare := retroMintOpenClass("k1", nil)
+	bare["status"] = ""
+	root, fake := retroMintTree(t, []map[string]any{bare}, nil)
+	code, _, errs := retroMintRuns(root, fake)
+	if code != 1 || !strings.Contains(errs, "k1 carries no status of open, fixed: or past: with its reason\n") {
+		t.Fatalf("retro mint answers %d and says %q", code, errs)
+	}
+}
+
+// An open class mints one ticket with its ask, a fixed class mints none, and every child works on the root. [[spec/guidance/retro/check]]
+func TestRetroMintMintsOneTicketAnOpenClassAndNoneAFixedOne(t *testing.T) {
+	root, fake := retroMintTree(t, []map[string]any{retroMintOpenClass("k1", nil), retroMintFixedClass()}, nil)
+	code, out, errs := retroMintRuns(root, fake)
+	want := "k1  spec/tickets/the-land-verb-lands.md\n1 ticket(s) mint, and 1 class(es) stand closed already.\n"
+	if code != 0 || out != want {
+		t.Fatalf("retro mint answers %d and prints %q, %q", code, out, errs)
+	}
+	ticket := retroMintReadFile(t, root, retroMintLand)
+	if !strings.Contains(ticket, "# Ask\n\na commit lands in one call") || !strings.Contains(ticket, "- ./RUNME.sh land answers 0 over a clean tree") {
+		t.Fatalf("the ticket reads %q", ticket)
+	}
+	if got := retroMintRead(t, root).Classes[0].Tickets; len(got) != 1 || got[0] != "the-land-verb-lands" {
+		t.Fatalf("the record names %v", got)
+	}
+	for _, one := range fake.ran {
+		if one.dir != root || one.env[workRoot] != root {
+			t.Fatalf("%v runs in %q with %v, off the work root", one.argv, one.dir, one.env)
+		}
+	}
+}
+
+// A ticket that mints keeps its name where a later one refuses. [[spec/guidance/retro/check]]
+func TestRetroMintKeepsTheNameOfATicketThatMintsWhereALaterOneRefuses(t *testing.T) {
+	second := retroMintOpenClass("k3", func(ticket map[string]any) { ticket["name"] = "a-second-ticket" })
+	root, fake := retroMintTree(t, []map[string]any{retroMintOpenClass("k1", nil), second}, nil)
+	code, _, errs := retroMintRuns(root, fake)
+	if code != 1 || !strings.Contains(errs, "k3 mints no ticket: the ask names a word outside the vocabulary\n") {
+		t.Fatalf("retro mint answers %d and says %q", code, errs)
+	}
+	if got := retroMintRead(t, root).Classes[0].Tickets; len(got) != 1 || got[0] != "the-land-verb-lands" {
+		t.Fatalf("the record names %v", got)
+	}
+}
+
+// A second run mints nothing twice. [[spec/guidance/retro/check]]
+func TestRetroMintMintsNothingTwiceOnASecondRun(t *testing.T) {
+	root, fake := retroMintTree(t, []map[string]any{retroMintOpenClass("k1", nil)}, nil)
+	retroMintRuns(root, fake)
+	code, out, _ := retroMintRuns(root, fake)
+	if code != 0 || out != "0 ticket(s) mint, and 0 class(es) stand closed already.\n" {
+		t.Fatalf("the second run answers %d and prints %q", code, out)
+	}
+}
+
+// The ask reads as the chapter, and lands where the mint leaves it empty. [[spec/guidance/retro/check]]
+func TestRetroMintAskReadsAsTheChapterAndLandsWhereTheMintLeavesItEmpty(t *testing.T) {
+	ask := retroMintAskOf(retroMintTicket{
+		Gain:     "a commit lands in one call",
+		Breaks:   "every commit costs a round of refusals",
+		DoneWhen: []string{"./RUNME.sh land answers 0 over a clean tree"},
+	})
+	if !strings.HasPrefix(ask, "a commit lands in one call\n\nevery commit costs a round of refusals\n\n- ./RUNME") {
+		t.Fatalf("the ask reads %q", ask)
+	}
+	said := retroMintWithAsk(retroMintDraft, ask)
+	at := strings.Index(said, "a commit lands in one call")
+	if at < 0 || at > strings.Index(said, "# design") || strings.Contains(said, "gain, as text") {
+		t.Fatalf("the ticket reads %q", said)
+	}
+}
+
+// A promotion carrying no ticket mints nothing, and the verb names it by its what or its place. [[spec/tickets/a-promotion-names-its-fault]]
+func TestRetroMintNamesAPromotionCarryingNoTicketByItsWhatOrItsPlace(t *testing.T) {
+	promotions := []map[string]any{
+		{"what": "the land rule", "from": "memory", "to": "spec/guidance/working"},
+		{"what": "", "from": "memory", "to": "spec/guidance/voice"},
+		{"what": "a rule minted already", "from": "memory", "to": "spec/guidance/retro", "tickets": []string{"the-land-verb-lands"}},
+	}
+	root, fake := retroMintTree(t, []map[string]any{retroMintFixedClass()}, promotions)
+	code, _, errs := retroMintRuns(root, fake)
+	if code != 1 ||
+		!strings.Contains(errs, "promotion \"the land rule\" waits, and its ticket carries no name\n") ||
+		!strings.Contains(errs, "promotion 2 waits, and its ticket carries no done_when\n") ||
+		strings.Contains(errs, "a rule minted already") || strings.Contains(errs, "undefined") {
+		t.Fatalf("retro mint answers %d and says %q", code, errs)
+	}
+}
+
+// A promotion's name reads its what, and its place where the what stands empty. [[spec/tickets/a-promotion-names-its-fault]]
+func TestRetroMintPromotionNameReadsItsWhatOrItsPlace(t *testing.T) {
+	if got := retroMintPromotionName(retroMintPromotion{What: " the land rule "}, 0); got != `promotion "the land rule"` {
+		t.Fatalf("the name reads %q", got)
+	}
+	if got := retroMintPromotionName(retroMintPromotion{}, 2); got != "promotion 3" {
+		t.Fatalf("the name reads %q", got)
+	}
+}
+
+// A promotion's ticket stands checked by the mint alone: five faults, one a field it lacks. The classes half belongs to retro_classes_test.go. [[spec/tickets/a-promotion-ticket-reads-once]]
+func TestRetroMintChecksAPromotionsTicketAlone(t *testing.T) {
+	record := retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule"}}}
+	if got := retroMintFaults(record, ""); len(got) != 5 {
+		t.Fatalf("the mint names %v", got)
+	}
+}
+
+// A promotion naming a process that stands nowhere is refused by its what. [[spec/tickets/the-retro-reads-the-backlog]]
+func TestRetroMintRefusesAPromotionNamingAProcessThatStandsNowhere(t *testing.T) {
+	root, _ := retroMintTree(t, nil, nil)
+	ticket := retroMintTicket{Name: "the-rule-lands", Process: "nowhere", Gain: "a commit lands in one call", Breaks: "every commit costs a round of refusals", DoneWhen: []string{"./RUNME.sh land answers 0 over a clean tree"}}
+	got := retroMintFaults(retroMintRecord{Promotions: []retroMintPromotion{{What: "the land rule", Ticket: &ticket}}}, root)
+	want := `promotion "the land rule" waits, and its ticket names process nowhere: spec/processes holds no nowhere. It holds standard, trivial.`
+	if len(got) != 1 || got[0] != want {
+		t.Fatalf("the mint names %q", got)
+	}
+}
+
+// A class naming trivial mints a trivial ticket. [[spec/tickets/the-retro-reads-the-backlog]]
+func TestRetroMintMintsATrivialTicketForAClassNamingTrivial(t *testing.T) {
+	trivial := retroMintOpenClass("k1", func(ticket map[string]any) {
+		ticket["name"] = "the-rule-lands"
+		ticket["process"] = "trivial"
+	})
+	root, fake := retroMintTree(t, []map[string]any{trivial}, nil)
+	code, out, errs := retroMintRuns(root, fake)
+	if code != 0 {
+		t.Fatalf("retro mint answers %d and prints %q, %q", code, out, errs)
+	}
+	for _, one := range fake.ran {
+		if strings.HasSuffix(strings.Join(one.argv, " "), "the-rule-lands.md --process=trivial") {
+			return
+		}
+	}
+	t.Fatalf("the mint names no trivial process: %v", fake.ran)
+}
+
+// A class naming no process is refused, and nothing mints. [[spec/tickets/the-retro-reads-the-backlog]]
+func TestRetroMintRefusesAClassNamingNoProcess(t *testing.T) {
+	bare := retroMintOpenClass("k1", func(ticket map[string]any) { ticket["process"] = "" })
+	root, fake := retroMintTree(t, []map[string]any{bare}, nil)
+	code, _, errs := retroMintRuns(root, fake)
+	if code != 1 || !strings.Contains(errs, "k1 stands open, and its ticket carries no process\n") || len(fake.ran) != 0 {
+		t.Fatalf("retro mint answers %d, says %q and runs %v", code, errs, fake.ran)
+	}
+}
+
+// A class naming a process that stands nowhere is refused, and nothing mints. [[spec/tickets/the-retro-reads-the-backlog]]
+func TestRetroMintRefusesAClassNamingAProcessThatStandsNowhere(t *testing.T) {
+	lost := retroMintOpenClass("k1", func(ticket map[string]any) { ticket["process"] = "nowhere" })
+	root, fake := retroMintTree(t, []map[string]any{lost}, nil)
+	code, _, errs := retroMintRuns(root, fake)
+	if code != 1 || !regexp.MustCompile(`k1 stands open, and its ticket names process nowhere: spec/processes holds no nowhere`).MatchString(errs) || len(fake.ran) != 0 {
+		t.Fatalf("retro mint answers %d, says %q and runs %v", code, errs, fake.ran)
+	}
+}
+
+// Every promotion mints one ticket with its ask, after the classes, and a second run mints none. [[spec/tickets/the-retro-finishes-its-asks]]
+func TestRetroMintMintsEveryPromotionAfterTheClasses(t *testing.T) {
+	promotion := map[string]any{
+		"what": "the land rule",
+		"from": "memory",
+		"to":   "spec/guidance/working",
+		"ticket": map[string]any{
+			"name":      "the-rule-lands",
+			"process":   "trivial",
+			"gain":      "the owner states the rule once",
+			"breaks":    "the owner repeats the rule the next day",
+			"done_when": []string{"spec/guidance/working holds the rule"},
+		},
+	}
+	root, fake := retroMintTree(t, []map[string]any{retroMintOpenClass("k1", nil)}, []map[string]any{promotion})
+	code, out, errs := retroMintRuns(root, fake)
+	want := "k1  spec/tickets/the-land-verb-lands.md\npromotion \"the land rule\"  spec/tickets/the-rule-lands.md\n2 ticket(s) mint, and 0 class(es) stand closed already.\n"
+	if code != 0 || out != want {
+		t.Fatalf("retro mint answers %d and prints %q, %q", code, out, errs)
+	}
+	if ticket := retroMintReadFile(t, root, retroMintPromoted); !strings.Contains(ticket, "# Ask\n\nthe owner states the rule once") {
+		t.Fatalf("the promoted ticket reads %q", ticket)
+	}
+	if got := retroMintRead(t, root).Promotions[0].Tickets; len(got) != 1 || got[0] != "the-rule-lands" {
+		t.Fatalf("the record names %v", got)
+	}
+	if _, again, _ := retroMintRuns(root, fake); !strings.HasPrefix(again, "0 ticket(s) mint") {
+		t.Fatalf("the second run prints %q", again)
+	}
+}

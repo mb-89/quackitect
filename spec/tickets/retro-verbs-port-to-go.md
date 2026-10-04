@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: f1ff445a4ded1e1b
         size: 590
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 08f4218ba236 · claude-code-remote
+    hash_before: d955e149423e150e3bbd41abd679876e55ca6f02
+    hash_after: d955e149423e150e3bbd41abd679876e55ca6f02
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 7b71d5990ac50ca7
+        size: 4884
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -243,26 +256,54 @@ Weighed: one Go file holding every sub-verb reads shorter, and the registry desi
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/retro_audit_test.go
+- src/quack/retro_backlog_test.go
+- src/quack/retro_chapters_test.go
+- src/quack/retro_classes_test.go
+- src/quack/retro_collect_test.go
+- src/quack/retro_effect_test.go
+- src/quack/retro_findings_test.go
+- src/quack/retro_matrix_test.go
+- src/quack/retro_mint_test.go
+- src/quack/retro_new_test.go
+- src/quack/retro_outside_test.go
+- src/quack/retro_read_test.go
+- src/quack/retro_report_test.go
+- src/quack/retro_score_test.go
+- src/quack/retro_timeline_test.go
+- src/quack/retro_usage_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion, over stubs that register each verb and answer nothing. The test files split one a source file, so the outside, findings and report cases stand in files of their own, against the draft's list.
+
+What surprised:
+
+- The JavaScript keeps the written order of JSON keys, and the dispositions, a chapter's lines, the battery parts and the classes print in it. The Go port decodes with order kept.
+- A child pull loses the queue pass retro new handed the pull in process. The decision: the pull lets a ticket through where SE_MINTED in its env names it, and Go retro new sets it. Weighed: leaving the pull out breaks the hand-out with no second command, and a Go write of the hold reaches into the pull's own state. The cost: a hand can set the variable itself, which a note parks for the retro.
+- retro new through the mint and ticket open now lands the open as a commit, puts a cloud box's retro into its group, and refuses a bad why line after the draft stands. A test names each change.
+- level0/experiment.test.js leaves whole: its third case reads only the constant, and the contract test reads the route's person step already.
+- Three JavaScript cases assert nothing a stub misses, so each Go case adds one assertion that starts red.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a failing test: the go test line meets every case here, reaches-no-node meets TestEveryRetroVerbRegisters with TestRetroUsageExitsTwoOnAWordNoVerbAnswers, and the ls, the importer search and the check stand as checkpoints at tests-green
+- every door has a fake: collect and backlog take a fake trunk and a fake move, new and mint take a fake child runner, and the rest read a temp tree
 
 # gate
 
