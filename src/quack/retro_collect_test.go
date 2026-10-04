@@ -400,6 +400,23 @@ func TestRetroCollectPassesTheHoldOfTheRetroItCollectsFor(t *testing.T) {
 	}
 }
 
+// A write the disk refuses fails the verb, as the old script threw. [[spec/guidance/retro/collect]]
+func TestRetroCollectFailsAndNamesTheManifestWhereItsWriteFails(t *testing.T) {
+	w := retroNewCollectWorld(t, retroFakeTrunk())
+	if err := os.MkdirAll(w.at(retroInputKey("manifest.jsonl")), 0o755); err != nil {
+		t.Fatal(err)
+	}
+
+	code, said := w.collect("--again")
+
+	if code != 1 {
+		t.Fatalf("collect answers %d, want 1: %s", code, said)
+	}
+	if !strings.Contains(said, "retro collect fails to write "+w.at(retroInputKey("manifest.jsonl"))+": ") {
+		t.Fatalf("collect says %q", said)
+	}
+}
+
 // The owner rules two folders left behind, and everything else in one place. [[spec/guidance/retro/collect]]
 func TestRetroCollectMovesEverythingPastTheDotFoldersAndLeavesTheRuntimeAndRetroFolders(t *testing.T) {
 	w := retroNewCollectWorld(t, retroFakeTrunk())

@@ -191,7 +191,9 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 			since = own
 		}
 	}
-	_ = os.MkdirAll(into, 0o777)
+	if err := os.MkdirAll(into, 0o777); err != nil {
+		return retroCollectFailed(errs, into, err)
+	}
 	refused := retroCollectMovedInto(it, into)
 	keptSince := time.Time{}
 	if again {
@@ -199,14 +201,19 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 	}
 	retroOutsideCopyTree(filepath.Join(it.root, retroCollectPrivate, retroCollectKept), filepath.Join(into, retroCollectKept), keptSince, nil, time.Time{}, &refused)
 	folders := retroOutsideInto(it, into, since, window, &refused)
-	bare := retroCollectCloudInto(it, into, since, &refused)
+	bare, at, err := retroCollectCloudInto(it, into, since, &refused)
+	if err != nil {
+		return retroCollectFailed(errs, at, err)
+	}
 
 	rows := append(retroCollectLinesOf(into, ""), refused...)
 	var manifest strings.Builder
 	for _, one := range rows {
 		manifest.WriteString(retroCollectCompact(one) + "\n")
 	}
-	_ = os.WriteFile(filepath.Join(into, retroCollectManifest), []byte(manifest.String()), 0o666)
+	if at := filepath.Join(into, retroCollectManifest); retroCollectWrite(at, manifest.String(), errs) {
+		return exitFailed
+	}
 	sinceSaid := ""
 	if !since.IsZero() {
 		sinceSaid = retroCollectISOOf(since)
@@ -216,9 +223,13 @@ func retroCollect(it retroCollectDoors, name string, again bool, out, errs io.Wr
 		Since   string   `json:"since"`
 		Folders []string `json:"folders"`
 	}{retroCollectISOOf(it.now()), sinceSaid, folders}
-	_ = os.WriteFile(filepath.Join(home, retroCollectCollected), []byte(retroCollectPretty(record)), 0o666)
+	if at := filepath.Join(home, retroCollectCollected); retroCollectWrite(at, retroCollectPretty(record), errs) {
+		return exitFailed
+	}
 	if report := retroKeptReport(retroCollectRead(filepath.Join(it.root, retroCollectStamp))); report != "" {
-		_ = os.WriteFile(filepath.Join(home, retroBattery), []byte(report), 0o666)
+		if at := filepath.Join(home, retroBattery); retroCollectWrite(at, report, errs) {
+			return exitFailed
+		}
 	}
 
 	retroCollectSaid(out, name, rows, folders, since)
@@ -422,12 +433,12 @@ func retroCollectISOOf(when time.Time) string {
 }
 
 // Every group trunk takes closed since the window: its box's retro chapter, and the time of the trunk commit landing it. [[spec/tickets/the-retro-reads-cloud-retros]]
-func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, refused *[]retroCollectRow) []string {
+func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, refused *[]retroCollectRow) ([]string, string, error) {
 	bare := []string{}
 	closed := retroClosedIn(it.git, since)
 	if !closed.ok {
 		*refused = append(*refused, retroCollectRow{Path: retroCollectGroups, Refused: closed.err})
-		return bare
+		return bare, "", nil
 	}
 	at := filepath.Join(into, retroCollectGroups)
 	closesAt := filepath.Join(at, retroCollectCloses)
@@ -455,16 +466,42 @@ func retroCollectCloudInto(it retroCollectDoors, into string, since time.Time, r
 			bare = append(bare, landing.name)
 			continue
 		}
-		_ = os.MkdirAll(at, 0o777)
-		_ = os.WriteFile(filepath.Join(at, landing.name+retroCollectNoteEnd), []byte(chapter), 0o666)
+		if err := os.MkdirAll(at, 0o777); err != nil {
+			return bare, at, err
+		}
+		to := filepath.Join(at, landing.name+retroCollectNoteEnd)
+		if err := os.WriteFile(to, []byte(chapter), 0o666); err != nil {
+			return bare, to, err
+		}
 		when, _ := retroCollectDate(landing.at)
 		closes.set(landing.name, retroCollectISOOf(when))
 		wrote = true
 	}
 	if wrote {
-		_ = os.WriteFile(closesAt, []byte(retroCollectPretty(closes)), 0o666)
+		if err := os.WriteFile(closesAt, []byte(retroCollectPretty(closes)), 0o666); err != nil {
+			return bare, closesAt, err
+		}
 	}
-	return bare
+	return bare, "", nil
+}
+
+// Writes a file collect keeps, and answers true where the write fails, after one line on errs naming the file and the error. [[spec/guidance/retro/collect]]
+func retroCollectWrite(at, text string, errs io.Writer) bool {
+	err := os.WriteFile(at, []byte(text), 0o666)
+	if err != nil {
+		retroCollectFailed(errs, at, err)
+	}
+	return err != nil
+}
+
+// One line naming the file collect fails to write and the error, and the failed exit. [[spec/guidance/retro/collect]]
+func retroCollectFailed(errs io.Writer, at string, err error) int {
+	var path *os.PathError
+	if errors.As(err, &path) {
+		err = path.Err
+	}
+	fmt.Fprintf(errs, "retro collect fails to write %s: %v\n", at, err)
+	return exitFailed
 }
 
 // Every ticket trunk takes closed since the window, and the trunk commit landing each. The first-parent line reads the merge, so a ticket a box closes before the window and trunk takes after it still counts. [[spec/tickets/the-retro-reads-the-backlog]]
