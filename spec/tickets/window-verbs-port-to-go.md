@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: b82d35769d0656c1
         size: 1214
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: e7636df28601826c6c05db8af6f25babdef56bbb
+    hash_after: e7636df28601826c6c05db8af6f25babdef56bbb
+    answered:
+      - name: lint
+        exit: 0
+        said: The check names no red case and no finding at error.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -306,14 +315,19 @@ pass with findings
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check --errors
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the ones the gate lists as following from the port: src/index/files.go for HashText, src/quack/verbs.go for wholeOf, the contract tests that list the programs, and tui.md
+- every door the change reaches takes its outside off the hand: tui, serve and voice hold function fields their tests fill, and the vehicle disk door runs its tests over a temp folder, as rule 1 leaves an IO port in quack
+- each file header names what it ports and links the design section of the approach, and each function carries its link
+- every fact stands once: the window port in frame.WindowPort, the tools file in brief.ToolsFile, the hash in index.HashText, the whole-verb mark in wholeOf and goVerbs
 
 ## tests-green
 
