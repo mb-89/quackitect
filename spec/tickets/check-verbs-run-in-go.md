@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -183,6 +183,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box f8b80b32320c · claude-code-remote
+    hash_before: 4e3cb244980ae960d95bb5b92636a777a57b080e
+    hash_after: 4e3cb244980ae960d95bb5b92636a777a57b080e
+    inputs:
+      - name: retro/write
+        hash: 8198df30b2715332
+        size: 2922
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -324,20 +334,29 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 17:24 UTC: biome stands off the PATH, and the survey under the runtime folder names where it stands
+- 17:36 UTC: the ticket pull MCP tool had no hook answering it, so the shell verb carried every hand-back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at sync: four contract tests against the work port, then eight files against the box port
+- the take and the push guards locked each other while the merge stood unpushed
+- the cage refused shell calls twice while the index stood dead, and a serve brought it back each time
+- a hook read a file name inside a heredoc as a write, and the Write tool carried the scratch file
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the retro names the take guard fix and the plugin hook under improve, for the retro hand to decide
 
 # Discussion
 
