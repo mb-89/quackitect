@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: config-verbs-run-in-go
 step: do
+record:
+  - step: do
+    hand: box 056798343132 · claude-code-remote
+    hash_before: b61939df15e5de08eed35ae6e5e86ef631cf37fe
+    hash_after: ccdc8cc77f9a6d909ad50ffecce064d34d01ef4c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   36.2  in all"
+    inputs:
+      - name: ask
+        hash: 35a4987211ca571f
+        size: 540
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ The group's accept review names four small faults in the port, and each closes h
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The accept review of the config group names four small faults, and each closes here. The rules verb reads a message line that ends in a carriage return as the line without it. The calm in fix answers the file and the cause where a write fails, and the verb exits 1, as the JavaScript threw. The project verb reads the work root through the one constant guidance.go names, and compares two roots after filepath.Clean. The exports of cli-doors.js and quack-topic.js that only the ported verbs read leave the tree, and a guard test holds them out.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and the discussion says why config faults keep one root
+- the cleanup the review reveals stands in this change
+- the work root variable stands once, in guidance.go
 
 # Discussion
 
