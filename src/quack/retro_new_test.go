@@ -129,6 +129,10 @@ func TestRetroNewTakesItsRetroUnderQueue(t *testing.T) {
 	if code != 0 || out != "Pull: retro-one at collect\n" || strings.Contains(errs, "behind the queue") {
 		t.Fatalf("retro new answers %d and prints %q, %q", code, out, errs)
 	}
+	pull := fake.ran[len(fake.ran)-1]
+	if strings.Join(pull.argv, " ") != "./RUNME.sh ticket pull retro-one" || pull.env["SE_MINTED"] != "retro-one" {
+		t.Fatalf("the pull runs %v with %v, and names no minted ticket", pull.argv, pull.env)
+	}
 }
 
 // retro new writes a --why line the lint warns on, names Characters, and the ticket lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]

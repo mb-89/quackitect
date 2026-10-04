@@ -161,6 +161,23 @@ func retroMintRuns(root string, fake *retroMintFake) (int, string, string) {
 	return retroMintHeard(retroMintVerb(func() string { return root }, fake.run), "retro", "mint", retroMintName)
 }
 
+// The record lands as recordOf and JSON.stringify with two spaces write it: its five keys, each object's keys in their order, a twice-named key at its first place, and numbers and strings as JavaScript prints them. [[spec/guidance/retro/check]]
+func TestRetroMintWritesTheRecordAsJsonStringifyDoes(t *testing.T) {
+	text := "{\"zeta\":1,\"promotions\":[{\"what\":\"a <b> & \\\"c\\\"\",\"n\":1.50,\"big\":1e21,\"small\":0.0000001,\"neg\":-0.0,\"u\":\"é\\u0001\\u2028\"}],\"classes\":[{\"id\":\"k1\",\"status\":\"fixed: x\",\"tickets\":[],\"x\":{},\"x\":[1]}],\"dispositions\":{\"b\":2,\"a\":[]},\"limits\":\"no\"}"
+	want := "{\n  \"classes\": [\n    {\n      \"id\": \"k1\",\n      \"status\": \"fixed: x\",\n      \"tickets\": [],\n      \"x\": [\n        1\n      ]\n    }\n  ],\n  \"dispositions\": {\n    \"b\": 2,\n    \"a\": []\n  },\n  \"promotions\": [\n    {\n      \"what\": \"a <b> & \\\"c\\\"\",\n      \"n\": 1.5,\n      \"big\": 1e+21,\n      \"small\": 1e-7,\n      \"neg\": 0,\n      \"u\": \"é\\u0001 \"\n    }\n  ],\n  \"limits\": [],\n  \"checklist\": []\n}\n"
+	read, err := retroMintParse(text)
+	if err != nil {
+		t.Fatal(err)
+	}
+	at := filepath.Join(t.TempDir(), "classes.json")
+	if !retroMintWrites(at, retroMintKept(read), os.Stderr) {
+		t.Fatal("the record lands nowhere")
+	}
+	if got, _ := os.ReadFile(at); string(got) != want {
+		t.Fatalf("the record reads %q, want %q", got, want)
+	}
+}
+
 // A class with no status mints nothing, and the verb names it. [[spec/guidance/retro/check]]
 func TestRetroMintRefusesAClassWithNoStatusAndNamesIt(t *testing.T) {
 	bare := retroMintOpenClass("k1", nil)

@@ -10,13 +10,13 @@ import (
 	"quackitect/src/index"
 )
 
-// The folder the retros stand under, as RETRO in .claude/skills/level0/lib/folders.js names it, and the input folder of one retro. [[spec/guidance/retro/chapter]]
-const (
-	retroFolder = ".se/.retro"
-	retroInput  = "input"
-)
+// The folder the retros stand under, as RETRO in .claude/skills/level0/lib/folders.js names it. [[spec/guidance/retro/chapter]]
+const retroFolder = ".se/.retro"
 
-// The battery's record a retro keeps, as BATTERY in src/engine/retro/effect.js named it. [[spec/guidance/retro/effect]]
+// The input folder of one retro, which collect fills. [[spec/guidance/retro/chapter]]
+const retroInput = "input"
+
+// The battery's record a retro keeps beside its input. [[spec/guidance/retro/effect]]
 const retroBattery = "battery.json"
 
 // A source of the input whose lines carry a time, and the field naming it. [[spec/guidance/retro/chapter]]
