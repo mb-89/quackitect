@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: box-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: c6855abd1fef5fb4
         size: 1650
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 660db8e33adc · claude-code-remote · helper-4
+    hash_before: 33ad960976ee2484c08996fdfc79d024e4851f8b
+    hash_after: 33ad960976ee2484c08996fdfc79d024e4851f8b
+    inputs:
+      - name: design/draft
+        hash: c6855abd1fef5fb4
+        size: 1650
+      - name: design/tests-red
+        hash: bee400f3585a4666
+        size: 549
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -273,8 +285,10 @@ Every case fails on its own assertion: both modules read process.argv, and each 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- extension-link-note-names-go: spec/design_output/extension.md says src/scripts/editor.js makes the link. After this change editorlink.go makes it. Point both sections at the Go file.
 
 # implement
 
