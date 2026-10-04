@@ -183,23 +183,6 @@ export function projectionsHold() {
   return 1;
 }
 
-// [[spec/design_output/projection#who-projects-and-when]]
-export function project() {
-  const entries = projections();
-  const { wanted, standing } = readsAll(entries);
-
-  for (const [path, text] of wanted) {
-    files.makeDir(dirname(under(path)));
-    if (standing.get(path) !== text) files.write(under(path), text);
-  }
-  for (const path of standing.keys()) {
-    if (!wanted.has(path)) files.remove(under(path));
-  }
-
-  console.log(`${wanted.size} file(s) projected from ${entries.length} projection(s).`);
-  return 0;
-}
-
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 // [[spec/design_output/schema#the-fields-a-caller-names]]
 

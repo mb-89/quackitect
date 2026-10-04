@@ -45,9 +45,9 @@ test("the Go part runs quiet under --errors, and names each failing Go test on t
   );
 });
 
-// The verbs config, fix, rules and standing run in Go, so their JavaScript leaves cli-check.js. [[spec/tickets/config-verbs-port-to-go]]
+// The verbs config, fix, project, rules and standing run in Go, so their JavaScript leaves cli-check.js. [[spec/tickets/config-verbs-port-to-go]]
 test("cli-check.js holds none of the verbs that run in Go", () => {
-  for (const name of ["readConfig", "fix", "calm", "stamp", "listRules", "standing"]) {
+  for (const name of ["readConfig", "fix", "calm", "stamp", "project", "listRules", "standing"]) {
     assert.doesNotMatch(
       source,
       new RegExp(`export (async )?function ${name}\\(`),

@@ -25,7 +25,6 @@ import { run as log } from "../../src/scripts/verbs/log.js";
 import { run as mint } from "../../src/scripts/verbs/mint.js";
 import { run as notes } from "../../src/scripts/verbs/notes.js";
 import { run as probe } from "../../src/scripts/verbs/probe.js";
-import { run as project } from "../../src/scripts/verbs/project.js";
 import { run as push } from "../../src/scripts/verbs/push.js";
 import { run as rename } from "../../src/scripts/verbs/rename.js";
 import { run as retro } from "../../src/scripts/verbs/retro.js";
@@ -57,7 +56,6 @@ const RUNS = {
   mint,
   notes,
   probe,
-  project,
   push,
   rename,
   retro,
