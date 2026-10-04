@@ -11,6 +11,7 @@ import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
+import { run as project } from "../../src/scripts/verbs/project.js";
 import { commands, goVerbs } from "./commands.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -44,6 +45,20 @@ test("the vehicle bodies stand beside the programs", () => {
 
 test("the lens names the folder the runner owns", () => {
   assert.equal(PROGRAMS, VERBS.join("/"));
+});
+
+// The check runs project --check, which reads every target against its source and writes none. [[spec/design_output/projection#check-refuses-a-stale-one]]
+test("the project program under --check reads the targets and writes none", async () => {
+  const said = [];
+  const was = console.log;
+  console.log = (line) => said.push(String(line));
+  try {
+    assert.equal(await project(["--check"]), 0);
+  } finally {
+    console.log = was;
+  }
+  assert.match(said.join("\n"), /reads as projected|names no projection/);
+  assert.doesNotMatch(said.join("\n"), /file\(s\) projected from/);
 });
 
 // A graph with no path refuses with its usage, before any read. [[spec/tickets/cli-js-leaves]]

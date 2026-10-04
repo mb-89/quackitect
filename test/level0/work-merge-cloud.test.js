@@ -7,11 +7,10 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { work } from "../../src/scripts/work.js";
 import { merge } from "../../src/scripts/work-merge.js";
-import { doorsSaying, heard, merging, ROOT, ranGit } from "./work-doors.js";
+import { CHECK, doorsSaying, heard, merging, ROOT, ranGit } from "./work-doors.js";
 
 // A cloud branch reads against trunk by its commits, and takes no group. [[spec/design_output/work#a-cloud-branch-comes-in]]
 const CLOUD = "claude/a-thing";
-const CHECK = `node ${join(ROOT, "src/scripts/verbs/check.js")} --errors`;
 function cloudMerge(cherry, more = {}) {
   const { it, outside } = doorsSaying(
     merging({ [`git cherry main origin/${CLOUD}`]: { stdout: cherry }, ...more }),

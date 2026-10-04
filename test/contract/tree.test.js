@@ -23,7 +23,6 @@ import {
   EDITOR_VALE_INI,
 } from "../../.claude/skills/level0/lib/servers.js";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
-import { goVerbs } from "./commands.js";
 import { everyModuleTested } from "../../.claude/skills/level0/lib/tested.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import {
@@ -48,6 +47,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { SESSION } from "../../src/scripts/pull-hand-of.js";
+import { goVerbs } from "./commands.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
