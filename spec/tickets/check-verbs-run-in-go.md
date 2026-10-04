@@ -120,6 +120,25 @@ record:
     hand: the engine
     hash_before: d2c75cee60316be5a2d52030ade77102701518b5
     hash_after: d2c75cee60316be5a2d52030ade77102701518b5
+  - step: accept
+    hand: box bf0e991d1270 · claude-code-remote
+    hash_before: 2b33808e945d5696576988c05742ee7944885ac4
+    hash_after: 2b33808e945d5696576988c05742ee7944885ac4
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/check-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 562ed8018c52a819
+        size: 292
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -171,8 +190,11 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- check-reads-the-road-root: checkDoorsOf takes its root off QUACKITECT_ROOT, so a review the index starts checks main in place of the branch
+- check-errors-names-the-part: under --errors a quiet red part drops why it failed, and part lines reach the stdout the merge hands on
 
 # retro
 
