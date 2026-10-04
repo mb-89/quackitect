@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: bbe9c1cc20d15917
         size: 750
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: 85345c566049aaf57703c0c8e308db0423afb085
+    hash_after: 0e97409bbe2861b26bf82a179e14cb9775b6e231
+    answered:
+      - name: tests
+        exit: 1
+        said: "assertion: 5 test(s) fail on their own assertion"
+    inputs:
+      - name: design/draft
+        hash: 1b0d85c2ca187e59
+        size: 3644
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -233,26 +246,32 @@ Each verb gets one Go file under src/quack that registers it from an init, the w
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+sh .se/scripts/red_assert.sh
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- none stands red on the tree: the overlay under .se/scripts/red puts back a registry the five verbs reach nowhere in, and only under it do the five registration tests fail
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Under the overlay, TestTuiRegisters, TestServeRegisters, TestVoiceRegistersUnderItsWord, TestStubVerbStandsInTheRegistry and TestVehicleVerbAnswersThroughTheNodeModule each fail on their own assertion. That is the state before the port, where node answers every one of the five. The helpers wrote every other test before its code too, and each of those failed to build on its missing symbols first. The surprise sat outside the new files. The shared package failed to build while three helpers wrote into it at once. TestAVerbWithNoTwinWritesNoShadowRow pinned vehicle and stub as verbs with no twin, so it now names words no file registers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every test names the JS case it replaces, out of tui-verb, window-door, serve, cli-serve, serve-port, voiceverb, verbs, answer, the vehicle and stub tests, outside-hand and brand
+- the red command fails on the tests' own assertions, quoted under seen
+- no test file stands red on the tree, so the check leaves none out
 
 # gate
 
