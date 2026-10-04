@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: work-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 0e8adbb1c1bd71fd
         size: 3473
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2a515a96a323 · claude-code-remote
+    hash_before: 6ed3671b813681405818ab701475c72a112b9c03
+    hash_after: 6ed3671b813681405818ab701475c72a112b9c03
+    inputs:
+      - name: design/draft
+        hash: 0e8adbb1c1bd71fd
+        size: 3473
+      - name: design/tests-red
+        hash: 95cd40f5843902cf
+        size: 1219
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,11 @@ The port and its first cases landed in one commit, so those cases stood green fr
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask: branch and cloud register from src/quack/branch.go and src/quack/cloud.go over src/branches, their shims leave, and no importer of them stands (a search of src, test and .claude names none). Each done_when line meets a decider: the Go cases for the roads, src/quack/branch_test.go for no node, the program contract tests for the verbs folder, the search, and the check. Fixed in place, no child: the callers list misses src/bridge/review.js reviewsBranch and src/quack/review.go reviewOver, and the diff already moves both onto the Go verb. The size list misses src/modules/check/reroute.go, src/modules/hooks/brief/rules.go and the contract tests; each is a new file or a follow-on of the shims leaving, and none touches a line the registry design keeps for the parallel groups. Weighed: the red case TestPBTakeWalksPastAnOpenGate asserts the take names a gated group, which the JS says only through its fake, where the gate stands on no trunk disk; on a real tree both the JS and the Go drop it silently. Implement keeps the road (the gated group takes no claim, the next one does) and reads the wait off branch list, which names it on a real tree.
 
 # implement
 
