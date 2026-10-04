@@ -190,3 +190,21 @@ func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
 		t.Fatal("run, which the verb's program lacks, runs in the verb's program")
 	}
 }
+
+// A verb Go registers whole takes quack under old, shadow and new, since no program stands beside it, and a twin of a verb's words keeps its shadow. [[spec/tickets/registered-verb-skips-the-mode]]
+func TestAWholeVerbTakesQuackUnderEveryMode(t *testing.T) {
+	answers := func(argv []string, _ bool, out, _ io.Writer) int {
+		fmt.Fprint(out, "go\n")
+		return 0
+	}
+	twins := map[string]twin{"whole": answers, "part words": answers}
+	for _, mode := range []string{"old", modeShadow, modeNew} {
+		doors, out, rows := roadOver(mode, "old\n", twins)
+		if code := verbs(doors, []string{"whole", "into"}); code != 0 || out.String() != "go\n" || len(*rows) != 0 {
+			t.Fatalf("under %s the whole verb answers %d, %q, rows %v", mode, code, out.String(), *rows)
+		}
+	}
+	if roadOf(modeShadow, []string{"part", "words"}, twins) != toBoth || roadOf("old", []string{"part", "words"}, twins) != toNode {
+		t.Fatal("a twin of a verb's words leaves its shadow road")
+	}
+}
