@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "   73.5  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 08f4218ba236 · claude-code-remote
+    hash_before: 044663665869bb00f7f4bb3c6ff2c5f09c13afa7
+    hash_after: 044663665869bb00f7f4bb3c6ff2c5f09c13afa7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   70.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: ca2e25e5e41c8ddd
+        size: 2290
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -370,26 +393,43 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The retro verb runs in Go. Each sub-verb registers from its own file under src/quack, so twinOf hands it to Go and node never starts: notes stood before, and timeline, chapters, read, matrix, classes, effect, collect, backlog, mint, new, score, audit and the bare usage join it. A run of each answers with no JavaScript in the tree, and the Go cases port every JavaScript case one for one. Outputs match the JavaScript byte for byte on fixture trees. Each helper diffed the printed lines, the exit and every written file against the old program before it left.
+
+The final file list:
+
+- new: src/quack/retro_*.go and their tests, retro_home.go owning the folder
+- removed: src/scripts/verbs/retro.js, src/scripts/retro.js, retro-collect.js, retro-new.js, retro-outside.js, retro-score.js, every file of src/engine/retro, test/level0/experiment.test.js and every test/level0/retro test but retro-notes-pull
+- edited: src/scripts/pull.js and test/level0/pull-leaves.test.js for the SE_MINTED pass, spec/design_output/config.md for its cost, cli-leaves, verb-programs, cli-mint-callers, experiment and roots tests for the deletion, and src/modules/verbs/retro.go comments
+
+retro new and retro mint reach the mint, ticket open and the pull through ./RUNME.sh children, so their ports in other groups need no change here. The changes past the JavaScript: retro new lands the open as a commit, a cloud box mints its retro into its group, and edge inputs where the JavaScript threw now print one line and exit 1.
+
+The done_when lines: ls src/scripts/verbs names no retro, a search of src and test names no importer of a deleted module, go test passes, and ./RUNME.sh check exits 0.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out past those the gate points named
+- every door has a fake, as implement/change lists
+- every retro file names its approach in its header and its links
+- every fact stands once, and the size ticket points at this list
 
 # accept
 
