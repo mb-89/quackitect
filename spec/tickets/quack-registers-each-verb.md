@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "   86.2  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: f67c224a8f2a1520a2bc0cff2ba4444f0987e44c
+    hash_after: f67c224a8f2a1520a2bc0cff2ba4444f0987e44c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   85.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 7f7526f6270128bf
+        size: 741
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+quack keeps its Go verbs in one registry in src/quack/registry.go. Each verb calls register from an init in its own file, and a second registration of the same words stops quack at start. The road reads the registry where it read the twin table, and the node module answers a registered verb in Go before it reaches programOf. So node meets only a verb no file registers. A port in phase 11 adds one file, and a test fails where a port writes its verb into verbs.go or registry.go. The three standing twins register beside their functions in twins.go.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and two tests the gate and the cleanup asked for
+- the road takes fake doors, the node module a fake twin, and the live case a served index of its own
+- the header of registry.go names the approach
+- the registry stands in registry.go alone
 
 # accept
 
