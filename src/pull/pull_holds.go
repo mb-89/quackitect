@@ -15,7 +15,7 @@ import (
 const (
 	// The runtime half and the retro half of the private folder, which .claude/skills/level0/lib/folders.js owns.
 	runtimeFolder = ".se/.runtime"
-	retroFolder   = ".se/.retro"
+	retroFolder   = ".se/.retro" // folders.js owns this name too
 	Holds         = runtimeFolder + "/hold"
 	boxFile       = runtimeFolder + "/box.json"
 	sessionFile   = runtimeFolder + "/session.json"

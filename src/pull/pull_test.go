@@ -219,3 +219,9 @@ func TestPull(t *testing.T) {
 		}
 	})
 }
+
+func TestHoldAt(t *testing.T) {
+	if got := holdAt("box cafe · claude-code"); got != ".se/.runtime/hold/box-cafe-claude-code.json" {
+		t.Fatalf("the hold stands at %s", got)
+	}
+}
