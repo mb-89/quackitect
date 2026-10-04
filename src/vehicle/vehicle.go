@@ -184,7 +184,8 @@ func Produce(d Disk, method, dest string, into bool) (Put, error) {
 	if !into && d.Exists(dest) {
 		return Put{Why: dest + " stands already. A vehicle lands in a new place"}, nil
 	}
-	if dest == method {
+	// A Windows dest spells its folders with backslashes, and the method root comes slashed, so the two compare slashed. [[spec/tickets/window-verbs-windows-green]]
+	if trailing.ReplaceAllString(slashed(dest), "") == trailing.ReplaceAllString(slashed(method), "") {
 		return Put{Why: "a vehicle lands beside its method, elsewhere"}, nil
 	}
 	// One copy carries the method, its bytes and its run bits, and Travels leaves the private folders behind. [[spec/tickets/disk-door-copies-a-folder]]

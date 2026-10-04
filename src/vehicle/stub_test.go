@@ -5,7 +5,6 @@ package vehicle
 
 import (
 	"io/fs"
-	"os"
 	"path/filepath"
 	"reflect"
 	"slices"
@@ -135,7 +134,7 @@ func TestStubHoldsEveryFileTheListNamesAndNothingElse(t *testing.T) {
 	if exists(filepath.Join(dest, "src/scripts")) {
 		t.Fatal("the verbs stay behind")
 	}
-	if info, _ := os.Stat(filepath.Join(dest, "RUNME.sh")); info.Mode().Perm() != 0o755 || readOf(t, filepath.Join(dest, "RUNME.sh")) != "the shim" {
+	if perm, held := permOf(t, filepath.Join(dest, "RUNME.sh")); held && perm != 0o755 || readOf(t, filepath.Join(dest, "RUNME.sh")) != "the shim" {
 		t.Fatal("the shim carries its run bit")
 	}
 	if readOf(t, filepath.Join(dest, PluginFolder, "hooks/bridgehead.js")) != "export function register() {}" {
@@ -189,7 +188,8 @@ func TestStubLandsInTheVehicleNowhere(t *testing.T) {
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 func TestStubAFolderSluggingToNothingRefuses(t *testing.T) {
 	where := t.TempDir()
-	at := filepath.Join(where, "...")
+	// Windows names no folder ..., and --- slugs to nothing the same way. [[spec/tickets/window-verbs-windows-green]]
+	at := filepath.Join(where, "---")
 	seed(t, at, map[string]string{Marker: "{}", "package.json": `{"version":"0.1.0"}`, ".se/.runtime/identity.json": `{"id":"abc"}`})
 	dest := filepath.Join(where, "stub")
 	asked := []string{}

@@ -50,7 +50,7 @@ func TestStubVerbNoUpstream(t *testing.T) {
 	if code != 1 || out != "" || errs != "the vehicle has no remote a cloud box can clone. Give it one, or say --upstream <url>.\n" {
 		t.Fatalf("%d %q %q", code, out, errs)
 	}
-	if asked != doors.root+" remote get-url origin" {
+	if asked != filepath.ToSlash(doors.root)+" remote get-url origin" {
 		t.Fatal("git runs in the method root:", asked)
 	}
 	if vehicleExists(dest) {
@@ -60,13 +60,14 @@ func TestStubVerbNoUpstream(t *testing.T) {
 
 func TestStubVerbEmptyBrand(t *testing.T) {
 	_, doors := vehicleFixture(t)
-	nameless := filepath.Join(filepath.Dir(doors.root), "...")
+	// Windows names no folder ..., and --- slugs to nothing the same way. [[spec/tickets/window-verbs-windows-green]]
+	nameless := filepath.Join(filepath.Dir(doors.root), "---")
 	if err := os.Rename(doors.root, nameless); err != nil {
 		t.Fatal(err)
 	}
 	doors.root = nameless
 	code, _, errs := stubRun(doors, "into", "stub")
-	if code != 1 || errs != "... carries no letter and no digit, so it slugs to an empty brand. Rename the folder to one a marketplace takes, or move the vehicle into one.\n" {
+	if code != 1 || errs != "--- carries no letter and no digit, so it slugs to an empty brand. Rename the folder to one a marketplace takes, or move the vehicle into one.\n" {
 		t.Fatalf("%d %q", code, errs)
 	}
 }

@@ -83,9 +83,10 @@ func vehicleRun(doors vehicleDoors, dry bool, argv ...string) (int, string, stri
 
 func TestVehicleVerbHereNamesTheRootsAndTheRegister(t *testing.T) {
 	where, doors := vehicleFixture(t)
-	method := doors.root
+	// The method root comes slashed, as methodRootFrom answered it, and the work root as the caller spells it. [[spec/tickets/window-verbs-windows-green]]
+	method := filepath.ToSlash(doors.root)
 	code, out, _ := vehicleRun(doors, false)
-	want := "method  " + method + "\nwork    " + method + "\nvehicle abc123  (this tree drives itself)\n"
+	want := "method  " + method + "\nwork    " + doors.root + "\nvehicle abc123  (this tree drives itself)\n"
 	if code != 0 || out != want {
 		t.Fatalf("here answers %d:\n%s", code, out)
 	}
@@ -164,7 +165,7 @@ func TestVehicleVerbRegister(t *testing.T) {
 	if code != 0 || out != "abc123 stands in the register.\n" {
 		t.Fatalf("%d %q", code, out)
 	}
-	want := "[\n  {\n    \"id\": \"abc123\",\n    \"version\": \"0.1.0\",\n    \"method_root\": \"" + doors.root + "\",\n    \"registered\": \"" + vehicleTestStamp + "\"\n  }\n]\n"
+	want := "[\n  {\n    \"id\": \"abc123\",\n    \"version\": \"0.1.0\",\n    \"method_root\": \"" + filepath.ToSlash(doors.root) + "\",\n    \"registered\": \"" + vehicleTestStamp + "\"\n  }\n]\n"
 	if said := vehicleRead(t, filepath.Join(where, "home", ".se", ".runtime", "registry.json")); said != want {
 		t.Fatalf("the register reads\n%s", said)
 	}

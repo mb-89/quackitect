@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"path"
+	"path/filepath"
 	"reflect"
 	"slices"
 	"sort"
@@ -26,7 +27,9 @@ const (
 // A disk held in a map of files, whose folders stand where a file stands under them. [[spec/guidance/code/testing]]
 type fakeDisk struct{ files map[string]string }
 
+// A Windows disk reads either separator, so the fake reads each path slashed. [[spec/tickets/window-verbs-windows-green]]
 func (f *fakeDisk) exists(path string) bool {
+	path = filepath.ToSlash(path)
 	if _, ok := f.files[path]; ok {
 		return true
 	}
@@ -39,6 +42,7 @@ func (f *fakeDisk) exists(path string) bool {
 }
 
 func (f *fakeDisk) list(path string) ([]Entry, error) {
+	path = filepath.ToSlash(path)
 	if _, ok := f.files[path]; ok {
 		return nil, errors.New("not a folder: " + path)
 	}
@@ -59,6 +63,7 @@ func (f *fakeDisk) list(path string) ([]Entry, error) {
 }
 
 func (f *fakeDisk) read(path string) (string, error) {
+	path = filepath.ToSlash(path)
 	text, ok := f.files[path]
 	if !ok {
 		return "", errors.New("no file: " + path)
@@ -77,7 +82,7 @@ func doorsOf(files map[string]string, vale map[string]string, now string) (Doors
 		Exists:  disk.exists,
 		List:    disk.list,
 		Read:    disk.read,
-		Write:   func(path, text string) error { disk.files[path] = text; return nil },
+		Write:   func(path, text string) error { disk.files[filepath.ToSlash(path)] = text; return nil },
 		MakeDir: func(string) error { return nil },
 		Vale: func(argv []string, cwd string) (string, error) {
 			*ran = append(*ran, cwd+" "+strings.Join(argv, " "))

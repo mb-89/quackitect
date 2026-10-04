@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"slices"
 	"strconv"
 	"strings"
@@ -302,7 +303,7 @@ func TestVehicleCopiesANestedFileByteExactAndCounts(t *testing.T) {
 	if readOf(t, filepath.Join(dest, "src/parts/deep/one.js")) != bytes {
 		t.Fatal("the bytes travel exact")
 	}
-	if info, _ := os.Stat(filepath.Join(dest, "RUNME.sh")); info.Mode().Perm()&0o100 == 0 {
+	if perm, held := permOf(t, filepath.Join(dest, "RUNME.sh")); held && perm&0o100 == 0 {
 		t.Fatal("the run bit travels")
 	}
 	count := 0
@@ -336,6 +337,16 @@ func TestVehicleLandsInANewPlaceAndNeverOverItsMethod(t *testing.T) {
 }
 
 // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+// A file's permission bits, and whether the disk keeps any: a Windows disk keeps no run bit, so a case reads the bit off Windows alone. [[spec/tickets/window-verbs-windows-green]]
+func permOf(t *testing.T, path string) (os.FileMode, bool) {
+	t.Helper()
+	info, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return info.Mode().Perm(), runtime.GOOS != "windows"
+}
+
 // A vehicle lands beside its method however the destination spells it, so a Windows path naming the method refuses before any copy. [[spec/tickets/window-verbs-windows-green]]
 func TestProduceRefusesTheMethodSpelledEitherWay(t *testing.T) {
 	method := filepath.ToSlash(t.TempDir())

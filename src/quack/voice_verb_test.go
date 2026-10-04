@@ -68,7 +68,7 @@ func TestVoiceVerbMeasuresARealFolder(t *testing.T) {
 		".se/.runtime/bin/vale": "",
 	})
 	vale := filepath.Join(root, ".se", ".runtime", "bin", "vale")
-	said := `{"docs/a.md":[{"Check":"VoiceVale.LongSentence","Line":1,"Span":[1,4]}],"` + root + `/docs/sub/b.md":[{"Check":"VoiceVale.Passive","Line":1}]}`
+	said := `{"docs/a.md":[{"Check":"VoiceVale.LongSentence","Line":1,"Span":[1,4]}],"` + filepath.ToSlash(root) + `/docs/sub/b.md":[{"Check":"VoiceVale.Passive","Line":1}]}`
 	var ran [][]string
 	code, out, errs := voiceRuns(voiceVerb(voiceFake(root, vale, said, nil, &ran)), false, "voice", "measure", "docs")
 
