@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: ticket-verbs-run-in-go
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 4e6c937563b76aa6
         size: 745
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box f2894f4960c9 · claude-code-remote
+    hash_before: 4b1ce09a623f57414e6513644a8fa852ab5068cf
+    hash_after: 4b1ce09a623f57414e6513644a8fa852ab5068cf
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 1ff3e4f063e55817
+        size: 5709
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -247,26 +260,34 @@ What I weigh and assume:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/ticket_verbs_test.go
+- src/quack/verb_split_test.go
+- src/quack/verb_graph_test.go
+- src/quack/verb_mint_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case of the four files fails on its own assertion, because the registry holds no Go answer for any verb of the group and the four programs still stand. The split, graph and mint expectations come off the JavaScript itself: graphIn and the mint libraries ran over the same inputs, and the cases hold their answers. The JavaScript links the ticket's body two lines past where I first counted it. The ticket sub-verbs and the pull get their cases beside their port, one file per sub-verb, each red before its code lands. Their roads run through a fake disk and git, so a single red file written now would cover thousands of lines no code yet answers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done_when line meets TestSplitVerb, TestGraphVerb and TestMintVerb now, and a red file beside each ticket sub-verb and the pull as each lands. The second and third meet TestTicketVerbsRunInGo, the fourth meets that test's case on the modules that leave, and the check decides the fifth
+- the split, graph and mint cases run over a temporary tree and a temporary git repository, and reach no node and no index
 
 # gate
 
