@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,19 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: read-verbs-run-in-go
 parent: read-verbs-port-to-go
+record:
+  - step: do
+    hand: box af8a15ff4571 · claude-code-remote
+    hash_before: 62fbc771b94e6a200e555806faab92959dcb9db2
+    hash_after: 62fbc771b94e6a200e555806faab92959dcb9db2
+    why: read-verbs-port-to-go answers this ask
+reason: answered
 ---
 
 # Ask
