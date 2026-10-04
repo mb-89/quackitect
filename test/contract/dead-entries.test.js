@@ -34,16 +34,24 @@ function source(where) {
 }
 
 function exported(text, name) {
-  return new RegExp(`export\\s+(async\\s+)?(function|const|let)\\s+${name}\\b`).test(text);
+  return new RegExp(`export\\s+(async\\s+)?(function|const|let)\\s+${name}\\b`).test(
+    text,
+  );
 }
 
 // [[spec/tickets/box-verbs-dead-entries]]
 test("editor.js carries no program entry", () => {
-  assert.ok(!source(EDITOR).includes("process.argv"), "editor.js still reads process.argv");
+  assert.ok(
+    !source(EDITOR).includes("process.argv"),
+    "editor.js still reads process.argv",
+  );
 });
 
 test("browser.js carries no program entry", () => {
-  assert.ok(!source(BROWSER).includes("process.argv"), "browser.js still reads process.argv");
+  assert.ok(
+    !source(BROWSER).includes("process.argv"),
+    "browser.js still reads process.argv",
+  );
 });
 
 for (const [where, names] of Object.entries(DEAD)) {

@@ -1,9 +1,8 @@
-// Which browser the drawing's test drives. Install asks this, the doctor names
-// its answer, and the test launches the path it hands back. The order stands in
+// Which browser the drawing's test drives. The test launches the path it hands
+// back. The order stands in
 // [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]].
 
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { disk } from "../doors/disk.js";
 import { homeIn } from "./editor.js";
 
@@ -70,21 +69,4 @@ export function browserFrom(env = {}, files = disk(), mac = false) {
   const cached = underFolder(cacheOf(env, mac), files);
   if (cached) return { path: cached, from: "playwright install" };
   return { path: "", from: "" };
-}
-
-// The doctor's row. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-export function browserSays(
-  env = process.env,
-  files = disk(),
-  mac = process.platform === "darwin",
-) {
-  const found = browserFrom(env, files, mac);
-  return found.path ? `${found.path}, off ${found.from}` : "missing, run ./RUNME.sh";
-}
-
-// The install asks here, and a zero answers that a browser stands. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const found = browserFrom(process.env, disk(), process.platform === "darwin");
-  if (found.path) console.log(found.path);
-  process.exit(found.path ? 0 : 1);
 }
