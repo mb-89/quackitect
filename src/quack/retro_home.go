@@ -4,8 +4,10 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"quackitect/src/index"
 )
@@ -36,8 +38,11 @@ func retroHome(root, name string) string {
 	return filepath.Join(root, filepath.FromSlash(retroFolder), name)
 }
 
-// The root a retro verb works under: the tree's root, or the folder quack stands in where none answers. [[spec/tickets/retro-verbs-port-to-go]]
+// The root a retro verb works under: the work root SE_WORK_ROOT names, then the tree's root, or the folder quack stands in where none answers. [[spec/design_output/vehicle#the-work-root-inherits]]
 func retroRoot() string {
+	if at := strings.TrimSpace(os.Getenv(workRoot)); at != "" {
+		return at
+	}
 	root, err := index.Root()
 	if err != nil {
 		return "."

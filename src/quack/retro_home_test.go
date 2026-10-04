@@ -17,6 +17,15 @@ func TestARetroHomeStandsUnderTheRetroFolder(t *testing.T) {
 	}
 }
 
+// A retro verb works under the work root SE_WORK_ROOT names. [[spec/design_output/vehicle#the-work-root-inherits]]
+func TestARetroHomeReadsTheWorkRoot(t *testing.T) {
+	work := t.TempDir()
+	t.Setenv(workRoot, work)
+	if got := retroRoot(); got != work {
+		t.Fatalf("retroRoot answers %q, want %q", got, work)
+	}
+}
+
 // The transcripts read their time off timestamp, and the log off at. [[spec/guidance/retro/chapter]]
 func TestEachTimedSourceReadsItsTime(t *testing.T) {
 	lines := map[string]string{
