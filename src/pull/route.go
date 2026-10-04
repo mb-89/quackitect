@@ -277,7 +277,7 @@ func routeValue(said any) any {
 		return out
 	case json.Number:
 		number, _ := one.Float64()
-		if number == math.Trunc(number) && math.Abs(number) <= 1<<53 {
+		if number == math.Trunc(number) && math.Abs(number) <= 1<<safeBits {
 			return int(number)
 		}
 		return number
@@ -314,12 +314,19 @@ func RouteJSON(said any) string {
 	return jsQuote(yaml.AsString(said))
 }
 
+// The bits a JavaScript number holds a whole number in, and the range it writes in full. [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
+const (
+	safeBits     = 53
+	smallestFull = 1e-6
+	largestFull  = 1e21
+)
+
 // A number as JavaScript writes it: whole digits, or an exponent past the range it writes in full. [[spec/design_input/the-editor-draws-the-ticket#the-drawing-takes-an-edit]]
 func jsNumber(said float64) string {
-	if size := math.Abs(said); size == 0 || (size >= 1e-6 && size < 1e21) {
-		return strconv.FormatFloat(said, 'f', -1, 64)
+	if size := math.Abs(said); size == 0 || (size >= smallestFull && size < largestFull) {
+		return strconv.FormatFloat(said, 'f', -1, floatBits)
 	}
-	mantissa, exponent, _ := strings.Cut(strconv.FormatFloat(said, 'e', -1, 64), "e")
+	mantissa, exponent, _ := strings.Cut(strconv.FormatFloat(said, 'e', -1, floatBits), "e")
 	sign, digits := exponent[:1], strings.TrimLeft(exponent[1:], "0")
 	return mantissa + "e" + sign + digits
 }

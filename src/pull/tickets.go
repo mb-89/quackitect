@@ -29,7 +29,7 @@ type Held struct {
 	Name, Path, Text string
 	Front            *yaml.Doc
 	Private          bool
-	// What the ticket held before a payload rode in, and the payload, which a refusal past its cap puts back.
+	// What the ticket held before a payload rode in, and the payload, which a refusal past its cap puts back. [[spec/design_output/pull#the-hand-back-refused]]
 	Stood, Payload string
 }
 

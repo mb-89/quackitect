@@ -13,7 +13,7 @@ import (
 
 // The folders and files the hand and the hold stand in. [[spec/design_output/pull#the-hand-and-the-hold]]
 const (
-	// The runtime half and the retro half of the private folder, which .claude/skills/level0/lib/folders.js owns.
+	// The runtime half and the retro half of the private folder, which .claude/skills/level0/lib/folders.js owns. [[spec/design_output/pull#the-hand-and-the-hold]]
 	runtimeFolder = ".se/.runtime"
 	retroFolder   = ".se/.retro" // folders.js owns this name too
 	Holds         = runtimeFolder + "/hold"
@@ -24,7 +24,7 @@ const (
 	Guidance      = "spec/guidance"
 	boxID         = 12
 	Person        = "person"
-	// What a hand reads where the owner sends it into a person's step.
+	// What a hand reads where the owner sends it into a person's step. [[spec/design_output/pull#the-hand-and-the-hold]]
 	Says = "the owner says so"
 )
 

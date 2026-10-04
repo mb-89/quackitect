@@ -43,31 +43,31 @@ type It struct {
 	Root, Method string
 	Env          map[string]string
 	Agent, Cloud bool
-	// The config the pull reads, as cli-doors.js hands it.
+	// The config the pull reads, as cli-doors.js hands it. [[spec/design_output/pull#the-answers]]
 	Words, Fails, Refusals, Splits int
 	PersonSigns                    bool
 	Weights                        Weights
 	Binding                        string
 	CapBytes, CapMargin            int
-	// The ticket a verb minted for this session, which passes the queue.
+	// The ticket a verb minted for this session, which passes the queue. [[spec/design_output/pull#the-answers]]
 	Minted string
-	// The owner sends this hand into a person's step.
+	// The owner sends this hand into a person's step. [[spec/design_output/pull#the-answers]]
 	OwnerSays bool
-	// The words past the verb, which a hand-back reads its flags off.
+	// The words past the verb, which a hand-back reads its flags off. [[spec/design_output/pull#the-answers]]
 	Argv []string
-	// The log row a hand-out writes per note, and the row a verb writes for its answer.
+	// The log row a hand-out writes per note, and the row a verb writes for its answer. [[spec/design_output/pull#the-answers]]
 	Log func(level, kind, said string, extra map[string]any)
-	// The notes a leaf reads, off the guidance topic, keyed process:leaf.
+	// The notes a leaf reads, off the guidance topic, keyed process:leaf. [[spec/design_output/pull#the-answers]]
 	Notes func(key string) []string
-	// A note's rules, numbered, and its Examples table under them.
+	// A note's rules, numbered, and its Examples table under them. [[spec/design_output/pull#the-answers]]
 	Rules func(text string) []string
-	// The voice over a ticket, the findings on the rows first to last alone, and none where no Vale stands.
+	// The voice over a ticket, the findings on the rows first to last alone, and none where no Vale stands. [[spec/design_output/pull#the-answers]]
 	Voice func(path, text string, first, last int) []Voiced
 	Shell Shell
-	// The branch take a cloud box runs on trunk, and the done branch a desk takes in, which the branch verbs own.
+	// The branch take a cloud box runs on trunk, and the done branch a desk takes in, which the branch verbs own. [[spec/design_output/pull#the-answers]]
 	Take  func(group string) int
 	Ready func() bool
-	// The process a ticket's ask stands in, read by the schema checks a hand-back runs.
+	// The process a ticket's ask stands in, read by the schema checks a hand-back runs. [[spec/design_output/pull#the-answers]]
 	Schemas Schemas
 }
 

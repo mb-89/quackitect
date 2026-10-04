@@ -1,5 +1,5 @@
 // A desk's empty queue reads the cloud branches first: the first one standing
-// done names the three verbs that take it in, off readyToMerge in
+// done names the verbs that take it in, off readyToMerge in
 // src/scripts/work-review.js and the standing reads in work-stands.js.
 // [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
 package pull

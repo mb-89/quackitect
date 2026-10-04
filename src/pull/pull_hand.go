@@ -17,10 +17,12 @@ import (
 
 // The trunk a desk works on, and the process a draft opens itself on. [[spec/design_output/work#a-desk-works-on-trunk]]
 const (
-	Trunk   = "main"
-	trivial = "trivial"
-	helper  = "helper"
-	spawn   = "spawn"
+	floatBits = 64
+	decimal   = 10
+	Trunk     = "main"
+	trivial   = "trivial"
+	helper    = "helper"
+	spawn     = "spawn"
 )
 
 // The schemas a pull reads the ticket's shape off. [[spec/design_output/pull#the-checks]]
@@ -141,7 +143,7 @@ func (it *It) sorted(list, all []*Held) []*Held {
 		for _, one := range from {
 			fails := 0
 			for _, entry := range entriesOf(one.Front) {
-				if number, _ := strconv.ParseFloat(yaml.AsString(entry.Get("returns")), 64); number > 0 {
+				if number, _ := strconv.ParseFloat(yaml.AsString(entry.Get("returns")), floatBits); number > 0 {
 					fails++
 				}
 			}
@@ -177,7 +179,7 @@ func (it *It) stoodHere() map[string]int64 {
 		if line == "" {
 			continue
 		}
-		if number, err := strconv.ParseInt(line, 10, 64); err == nil {
+		if number, err := strconv.ParseInt(line, decimal, floatBits); err == nil {
 			when = number
 			continue
 		}
@@ -317,99 +319,6 @@ func (it *It) openedHere(one *Held, all []*Held) (*Held, string) {
 	text, _ := it.Disk.Read(one.Path)
 	one.Text, one.Front = text, FrontOf(text)
 	return one, ""
-}
-
-// A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
-func freeIn(all []*Held) []*Held {
-	out := []*Held{}
-	for _, one := range all {
-		if !one.Private && FieldOf(one.Text, GroupField) == "" && !IsGroup(one.Text) {
-			out = append(out, one)
-		}
-	}
-	return out
-}
-
-// An open group works on a branch, so a desk cuts one where none stands and leaves the group to the cloud. [[spec/design_output/pull#the-engine-takes-the-branch]]
-func (it *It) cutForGroups(all []*Held) {
-	stands := map[string]bool{}
-	for _, row := range strings.Split(it.Git.Run("ls-remote", "--heads", "origin", "work/*").Out, "\n") {
-		if parts := strings.Split(row, "\t"); len(parts) > 1 {
-			stands[strings.TrimPrefix(parts[1], "refs/heads/")] = true
-		}
-	}
-	for _, one := range all {
-		if one.Private || !IsGroup(one.Text) || FieldOf(one.Text, "state") != Open {
-			continue
-		}
-		branch := WorkBranch + one.Name
-		if stands[branch] || !it.Git.Run("branch", branch, Trunk).OK {
-			continue
-		}
-		it.Git.Run("push", "-u", "origin", branch)
-		it.Println(branch + " is cut and pushed, because a group works on a branch and the cloud takes it.")
-	}
-}
-
-// A group a pull names on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
-func (it *It) namedGroup(name string) string {
-	for _, one := range TicketsHere(it.Disk) {
-		if !one.Private && one.Name == name && IsGroup(one.Text) {
-			return name
-		}
-	}
-	return ""
-}
-
-// The pull on trunk: a cloud box takes a branch, and a desk takes none. A negative answer hands the pull on to the queue. [[spec/design_output/pull#the-engine-takes-the-branch]]
-func (it *It) branchTaken(named string) int {
-	if it.Cloud {
-		return it.Take(named)
-	}
-	if named != "" {
-		return it.deskRefused("the pull takes no branch for "+named, named)
-	}
-	if it.Ready != nil && it.Ready() {
-		return 0
-	}
-	return -1
-}
-
-// [[spec/design_output/work#a-desk-works-on-trunk]]
-func (it *It) deskRefused(what, name string) int {
-	if name == "" {
-		name = "<name>"
-	}
-	it.Say(Refused,
-		fmt.Sprintf("A desk works on %s alone, and a cloud box works each %s branch, so %s.", Trunk, WorkBranch, what),
-		fmt.Sprintf("Run git switch %s, and take a finished cloud branch in with ./RUNME.sh branch merge %s.", Trunk, name))
-	return 2
-}
-
-// [[spec/design_output/pull#a-hand-of-its-own]]
-func (it *It) spawnAnswer(one *Held, leaf *Leaf, why string) int {
-	name := fmt.Sprintf("%s-%d", helper, len(entriesOf(one.Front))+1)
-	it.Say(spawn, fmt.Sprintf("%s at %s %s.", one.Name, leaf.Path, why),
-		"Spawn a hand of its own with the prompt below in the background, and take the next item. Pull again once it answers.")
-	it.Println("")
-	it.Println(spawnPrompt(one.Name, leaf, name))
-	return 0
-}
-
-// The prompt the pull hands a reader where it takes no step itself, for a hand of its own. [[spec/design_output/pull#a-hand-of-its-own]]
-func spawnPrompt(ticket string, leaf *Leaf, name string) string {
-	back := CallOf("ticket", "pull", ticket, "--as", name, "--pass", "--fields", "<json>") + ", or --fail \"why\" in place of --pass"
-	if leaf.holdsForm("verdict") != nil {
-		back = CallOf("ticket", "pull", ticket, "--as", name, "--fields", "<json>")
-	}
-	return strings.Join([]string{
-		fmt.Sprintf("You are a hand of your own on this box, named %s, and you work one step of one ticket.", name),
-		"",
-		fmt.Sprintf("1. Call %s. It hands you %s at %s, with its fields and its guidance.", CallOf("ticket", "pull", "--as", name), ticket, leaf.Path),
-		"2. Answer each field the pull names as a key of one JSON object, and pass it as --fields to the hand-back below. The engine writes the ticket.",
-		fmt.Sprintf("3. Call %s. It checks the hand-back and answers done, or refused with what to fix.", back),
-		"4. Answer with what the last pull said, word for word.",
-	}, "\n")
 }
 
 // Whether a hand takes a leaf of the ticket now. [[spec/design_output/pull#done-leaves-no-takeable-step]]
@@ -629,187 +538,4 @@ func (it *It) handed(who *Who, one *Held, leaf *Leaf) int {
 	it.noteRows(leaf.Path, reads)
 	hold := Hold{Ticket: one.Name, Path: one.Path, Step: leaf.Path, By: leaf.By, Group: who.Group, Hand: who.Hand, Hash: hash, Taken: it.Stamp(), Reads: reads}
 	return it.printPart(hold, it.workAnswer(one, leaf))
-}
-
-// A person step names the engine as its reader, so an older ticket lacking it takes it. [[spec/design_output/pull#the-work-answer]]
-func (it *It) repairPersonSteps(who *Who) {
-	for _, one := range it.ticketsHere() {
-		put := it.withEngineReader(one)
-		if put == "" {
-			continue
-		}
-		one.Text = put
-		it.landedAlone(one, []string{"a person step names the engine as its reader"})
-		if !one.Private {
-			it.pushed(who.Branch)
-		}
-	}
-}
-
-func (it *It) withEngineReader(one *Held) string {
-	front := FrontOf(one.Text)
-	lacking := []Entry{}
-	for _, held := range WalkOf(front) {
-		if personStep.MatchString(held.Name) && yaml.AsString(held.Said.Get("by")) == Person && held.Said.Get("to") == nil {
-			lacking = append(lacking, held)
-		}
-	}
-	bare := false
-	for _, row := range rowsOf(one.Text) {
-		bare = bare || bareAsks.MatchString(row)
-	}
-	if len(lacking) == 0 && !bare {
-		return ""
-	}
-	steps := cloneList(yaml.Flat(front.Get("steps")))
-	for _, held := range lacking {
-		if step := stepAt(steps, held.Path); step != nil {
-			step.Set("to", "engine")
-		}
-	}
-	return it.reRouted(one.Text, steps, "")
-}
-
-// The step at a path of a route. [[spec/design_output/pull#a-person-step-goes-in]]
-func stepAt(steps []any, path string) *yaml.Doc {
-	parts := strings.Split(path, "/")
-	list := steps
-	for _, part := range parts[:len(parts)-1] {
-		var next []any
-		for _, one := range list {
-			if step := yaml.AsDoc(one); step != nil && yaml.AsString(step.Get("name")) == part {
-				next = yaml.Flat(step.Get("steps"))
-				break
-			}
-		}
-		list = next
-	}
-	for _, one := range list {
-		if step := yaml.AsDoc(one); step != nil && yaml.AsString(step.Get("name")) == parts[len(parts)-1] {
-			return step
-		}
-	}
-	return nil
-}
-
-// A text rewritten over a new route, through the mint's chapters, or empty where no ticket schema stands. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-func (it *It) reRouted(text string, steps []any, hash string) string {
-	schema := it.ticketSchema()
-	if schema == nil {
-		return ""
-	}
-	return check.ReRouted(text, schema, steps, hash)
-}
-
-// The ticket schema, or nothing where the tree holds none. [[spec/design_output/pull#the-checks]]
-func (it *It) ticketSchema() *yaml.Doc {
-	if it.Schemas == nil {
-		return nil
-	}
-	if kinds := it.Schemas(); kinds != nil {
-		return kinds.Get("ticket")
-	}
-	return nil
-}
-
-// [[spec/design_output/pull#a-person-step-goes-in]]
-func (it *It) withPersonStep(one *Held, before, asks string, options []string) string {
-	standing := 0
-	for _, step := range WalkOf(FrontOf(one.Text)) {
-		if personStep.MatchString(step.Name) {
-			standing++
-		}
-	}
-	if it.Splits > 0 && standing >= it.Splits {
-		it.Errorln(fmt.Sprintf("%s carries %d person steps already, so split it: hand back --became <ticket>.", one.Name, standing))
-		return ""
-	}
-	by := Person
-	if it.Cloud {
-		by = "anyone"
-	}
-	answer := yaml.New()
-	answer.Set("name", "answer")
-	answer.Set("form", "text")
-	if options != nil {
-		answer.Set("form", "choice")
-	}
-	answer.Set("says", "the answer, which the step behind this one reads")
-	if options != nil {
-		answer.Set("options", stringsAny(options))
-	}
-	step := yaml.New()
-	step.Set("name", fmt.Sprintf("person-%d", standing+1))
-	step.Set("does", "answers the question the engine asks")
-	step.Set("by", by)
-	step.Set("to", "engine")
-	step.Set("asks", asks)
-	step.Set("evidence", []any{answer})
-	return it.inserted(one, before, step)
-}
-
-// A step written into the route before the leaf named, the pointer on it. [[spec/design_output/pull#a-person-step-goes-in]]
-func (it *It) inserted(one *Held, before string, step *yaml.Doc) string {
-	steps := cloneList(yaml.Flat(FrontOf(one.Text).Get("steps")))
-	parts := strings.Split(before, "/")
-	holder, list := (*yaml.Doc)(nil), steps
-	for _, part := range parts[:len(parts)-1] {
-		var phase *yaml.Doc
-		for _, held := range list {
-			if each := yaml.AsDoc(held); each != nil && yaml.AsString(each.Get("name")) == part {
-				phase = each
-				break
-			}
-		}
-		if phase == nil {
-			return ""
-		}
-		holder, list = phase, yaml.Flat(phase.Get("steps"))
-	}
-	at := -1
-	for i, held := range list {
-		if each := yaml.AsDoc(held); each != nil && yaml.AsString(each.Get("name")) == parts[len(parts)-1] {
-			at = i
-			break
-		}
-	}
-	if at < 0 {
-		return ""
-	}
-	list = append(list[:at], append([]any{step}, list[at:]...)...)
-	if holder == nil {
-		steps = list
-	} else {
-		holder.Set("steps", list)
-	}
-	path := strings.Join(append(append([]string{}, parts[:len(parts)-1]...), yaml.AsString(step.Get("name"))), "/")
-	text := one.Text
-	if put := it.reRouted(one.Text, steps, ""); put != "" {
-		text = put
-	}
-	one.Text = withField(withField(text, "step", path), "state", Open)
-	return path
-}
-
-// A deep copy of a route, so an edit to it leaves the ticket's own read alone. [[spec/design_output/pull#a-person-step-goes-in]]
-func cloneList(list []any) []any {
-	out := make([]any, 0, len(list))
-	for _, one := range list {
-		out = append(out, cloneValue(one))
-	}
-	return out
-}
-
-func cloneValue(value any) any {
-	switch said := value.(type) {
-	case *yaml.Doc:
-		out := yaml.New()
-		for _, key := range said.Keys() {
-			out.Set(key, cloneValue(said.Get(key)))
-		}
-		return out
-	case []any:
-		return cloneList(said)
-	}
-	return value
 }

@@ -16,6 +16,8 @@ const (
 	none      = "none"
 	cleanup   = "cleanup"
 	checkFile = runtimeFolder + "/check.json"
+	// The parts a front splits a text in: before it, the front, and after it. [[spec/design_output/pull#the-final-acceptance]]
+	frontParts = 3
 )
 
 var (
@@ -70,7 +72,7 @@ func askLine(text, name string) string {
 
 // The group the frontmatter names, or nothing. [[spec/design_output/pull#the-final-acceptance]]
 func groupOf(text string) string {
-	parts := frontFence.Split(text, 3)
+	parts := frontFence.Split(text, frontParts)
 	if len(parts) < 2 {
 		return ""
 	}
