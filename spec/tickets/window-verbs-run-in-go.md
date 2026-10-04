@@ -133,6 +133,28 @@ record:
     hand: the engine
     hash_before: 2cead64925ac69d18659c5671f56d9010b39d8cb
     hash_after: 2cead64925ac69d18659c5671f56d9010b39d8cb
+  - step: accept
+    hand: box 1d64c60aa6ea · claude-code-remote
+    hash_before: 3c9b5f26c7e2579b8b28b88dacc27e807fd0daad
+    hash_after: 1caf22247f98c0d5cd35534aa1897a28538f5ca8
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/window-verbs-run-in-go took 27 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: 3484fd0a47aa84d4
+        size: 313
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: children-2
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: bf1fe6cde364dfd7
 group: the-verbs-run-in-go
 depends_on: ["quack-holds-a-verb-registry"]
 enabled_by: migration.phase11
@@ -190,9 +212,10 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-reject
-- the Windows job of the check fails go test on src/quack, src/vehicle and src/voice, the group own packages: window-verbs-windows-green carries it
-- src/scripts/log-read.js stands with no importer past its own test since tui.js left, and spec/design_output/log.md still names it as the read tui --plain calls
+accept with points
+- tui-swap-fails-loud: tuiVerb prints the plain rows and asks for Go when the fresh viewer fails to swap in, on a box that holds Go, where tui.js failed loud
+- stub-shim-stays-tested: no test runs the real src/stub/RUNME.sh since test/contract/stub.test.js left, so its hand-over through SE_VEHICLE and the register road stand untested
+- vehicle-test-comment-current: src/modules/verbs/vehicle_test.go names theVehicle, which left with vehicle-verb.js
 
 # retro
 
