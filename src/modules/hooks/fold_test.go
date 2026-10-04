@@ -5,6 +5,7 @@
 package hooks
 
 import (
+	"strings"
 	"testing"
 
 	"quackitect/src/q"
@@ -54,6 +55,30 @@ func TestTheOwnersHoldEndsTheChainBeforeTheGrace(t *testing.T) {
 	}
 	if state.Grace == nil || state.Grace.Left != 1 {
 		t.Fatalf("the grace reads %+v, and wants its one call left, since the hold's ride ends the chain", state.Grace)
+	}
+}
+
+// Once the plan's grace runs out, ToolSearch still passes and spends nothing, Bash meets the refusal, and the refusal names the load. [[spec/tickets/toolsearch-rides-the-plan-ask]]
+func TestToolSearchRidesASpentGrace(t *testing.T) {
+	held := map[string]any{heldPlanEvery: 1, heldPlanGrace: 1}
+	step := stepper()
+	call := func(tool string) Holds {
+		return step(toolEvent, "", map[string]any{"tool": tool, heldField: held})
+	}
+	if state := call("Read"); state.Said.Word != RideWord {
+		t.Fatalf("the first call reads %+v, and wants the grace's ride", state.Said)
+	}
+	if state := call("Read"); state.Said.Word != RefuseWord {
+		t.Fatalf("the second call reads %+v, and wants the spent grace's refusal", state.Said)
+	}
+	for range 3 {
+		if state := call(schemaTool); state.Said.Word != "" || state.Grace == nil || state.Grace.Left != 0 {
+			t.Fatalf("ToolSearch reads %+v with the grace %+v, and wants a pass that leaves the grace standing", state.Said, state.Grace)
+		}
+	}
+	state := call("Bash")
+	if state.Said.Word != RefuseWord || !strings.Contains(state.Said.Text, "ToolSearch with the query select:"+planCall) {
+		t.Fatalf("Bash reads %+v, and wants the refusal naming the load", state.Said)
 	}
 }
 

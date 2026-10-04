@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,25 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 urgent: true
 step: do
+group: config-verbs-run-in-go
+record:
+  - step: do
+    hand: box 0b0033746104 · claude-code-remote
+    hash_before: 47d681ded076830d1cb4b79a1dbf45cd7a735b5f
+    hash_after: 47d681ded076830d1cb4b79a1dbf45cd7a735b5f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s); green, src/modules/hooks passes
+      - name: check
+        exit: 0
+        said: "   74.7  in all"
+    inputs:
+      - name: ask
+        hash: 23271a6327452ecb
+        size: 611
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,7 +69,6 @@ Today the spent grace refuses `ToolSearch` as well. A cleared box stays without 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
 
 ./RUNME.sh test src/modules/hooks test/level0/grace.test.js
@@ -58,7 +76,6 @@ Today the spent grace refuses `ToolSearch` as well. A cleared box stays without 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
 ./RUNME.sh check
@@ -66,7 +83,6 @@ Today the spent grace refuses `ToolSearch` as well. A cleared box stays without 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
 A spent plan grace refused every call but the plan tool and the calls ending a turn. A handover clear drops the plan tool's schema, and the grace refused `ToolSearch` too. So the box stood without the tool the grace asked for.
@@ -81,7 +97,6 @@ A spent plan grace refused every call but the plan tool and the calls ending a t
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
 - the change follows the ask: `ToolSearch` rides, the refusal names the load, and a test stands beside each side
