@@ -8,8 +8,11 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/edits"
 )
 
 // The text of a file under the root, and whether it stands. [[spec/tickets/landing-verbs-port-to-go]]
@@ -42,6 +45,13 @@ func TestRenameVerb(t *testing.T) {
 	t.Run("a reach is a line naming the old name, and a longer word is no reach", func(t *testing.T) {
 		text := "import a from \"./src/a.js\";\nsee [[src/a.js]]\nsrc/a.jsx stands apart\nmy-src/a.js too\n"
 		if got := reachesIn(text, "src/a.js"); len(got) != 2 || got[0].line != 1 || got[1].line != 2 {
+			t.Fatalf("reachesIn answers %v", got)
+		}
+	})
+	t.Run("a reach stands in an import, a note link with its anchor, a quoted path and prose", func(t *testing.T) {
+		text := "import { one } from \"../gadget/ui.js\";\n// [[spec/design_output/gadget#the-details]]\nconst at = `src/gadget/main.go`;\nthe gadget draws a row\na gadgeteer of the work\n"
+		got := reachesIn(text, "gadget")
+		if len(got) != 4 || got[3].line != 4 || !strings.Contains(got[0].said, "gadget/ui.js") {
 			t.Fatalf("reachesIn answers %v", got)
 		}
 	})
@@ -188,6 +198,20 @@ func TestRenameVerb(t *testing.T) {
 			if files[file] != said {
 				t.Fatalf("the entry holds %q for %s, and wants %q", files[file], file, said)
 			}
+		}
+		now := map[string]edits.Held{"README.md": {}, "GUIDE.md": {Exists: true, Text: "a tree\n"}, "src/b.md": {Exists: true, Text: "see GUIDE.md\n"}}
+		writes, removes, why := edits.Restores(entry.Entry, now)
+		var written []string
+		for _, one := range writes {
+			written = append(written, one.File)
+		}
+		sort.Strings(written)
+		if why != "" || strings.Join(removes, ",") != "GUIDE.md" || strings.Join(written, ",") != "README.md,src/b.md" {
+			t.Fatalf("the undo answers %v, %v, %q", written, removes, why)
+		}
+		now["README.md"] = edits.Held{Exists: true, Text: "x"}
+		if _, _, why := edits.Restores(entry.Entry, now); !strings.Contains(why, "stands again") {
+			t.Fatalf("the undo over a path standing again answers %q", why)
 		}
 	})
 	t.Run("a move under two holds names no ticket", func(t *testing.T) {

@@ -7,6 +7,7 @@ package main
 import (
 	"encoding/json"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -163,6 +164,16 @@ func TestCommitVerb(t *testing.T) {
 		d, _, _ := fakeLanding(root)
 		code, _, errs := runsTwin(commitVerb(d), "commit", opens, "--no-push")
 		if code != 0 || headSubject(t, root) != opens || originSubject(t, origin, "main") == opens {
+			t.Fatalf("commit answers %d, %q", code, errs)
+		}
+	})
+	t.Run("a staging git refuses names what git says, and commits nothing", func(t *testing.T) {
+		root, _ := landingRepo(t)
+		lays(t, root, "src/a.go", "package a\n")
+		lays(t, root, ".git/index.lock", "")
+		d, _, _ := fakeLanding(root)
+		code, _, errs := runsTwin(commitVerb(d), "commit", opens)
+		if code != exitFailed || headSubject(t, root) == opens || !strings.Contains(errs, "index.lock") {
 			t.Fatalf("commit answers %d, %q", code, errs)
 		}
 	})
@@ -357,8 +368,9 @@ func conflicted(t *testing.T) string {
 	gitDoes(t, root, "switch", "-q", "main")
 	lays(t, root, "README.md", "a tree on main\n")
 	gitDoes(t, root, "commit", "-q", "-am", "a-ticket: the main")
-	run := gitRun(root, "merge", "side")
-	if run.ok {
+	merge := exec.Command("git", "merge", "side")
+	merge.Dir = root
+	if merge.Run() == nil {
 		t.Fatal("the merge lands clean, and wants a conflict")
 	}
 	return root
