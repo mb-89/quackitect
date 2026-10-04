@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -84,8 +84,87 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
-cloud: true
-step: sync
+step: retro/cloud
+record:
+  - step: sync
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 8b11a68b844c2317ca1d0b4284b5f3a5fd1c4846
+    hash_after: 337f2e0c12642fb8f39c4128d1f928caa17b2ef0
+  - step: sync
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 0b335bc831694a4dd2d86437675629639ce71885
+    hash_after: daebda642065f70dca1dbe3f52c40328e7ca3449
+    answered:
+      - name: sync
+        exit: 0
+        said: work/quack-holds-a-verb-registry took 8 commit(s) from main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: dc5c6af186836672e0cdce31f3502e3b9f784a2e
+    hash_after: dc5c6af186836672e0cdce31f3502e3b9f784a2e
+    inputs:
+      - name: ask
+        hash: 0c6937b1a801ee73
+        size: 294
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 11e35ab406b45a667a3690043838107360d52318
+    hash_after: 11e35ab406b45a667a3690043838107360d52318
+  - step: accept
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: e51b255ab5525777a5491bbd1724cd877feaf6a7
+    hash_after: e51b255ab5525777a5491bbd1724cd877feaf6a7
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/quack-holds-a-verb-registry already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 0c6937b1a801ee73
+        size: 294
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: dde8a2e3bde07ef41647aa8a07959aa1223a965f
+    hash_after: dde8a2e3bde07ef41647aa8a07959aa1223a965f
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 09096e79bc2598a852aa3c8444db4904dcf614ac
+    hash_after: 09096e79bc2598a852aa3c8444db4904dcf614ac
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: d5c0221f23b0c412c060145f46a2fdc00ddf9943
+    hash_after: d5c0221f23b0c412c060145f46a2fdc00ddf9943
+    inputs:
+      - name: retro/write
+        hash: 2eacda3f38739688
+        size: 2687
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -101,8 +180,9 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -111,14 +191,20 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/quack-registers-each-verb]], standard
+- [[spec/tickets/twin-reads-inside-an-action]], minted by the gate
+- [[spec/tickets/port-diff-stays-one-file]], minted by the gate
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one change of a few files, reviewed whole
+- the registry, the node module road and the shared-file test add up to the goal
+- the two gate children stand on the first child alone, and each closed after it
 
 # children
 
@@ -129,8 +215,9 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The registry stands in registry.go, each twin registers from an init beside its function, and twinVerbs leaves verbs.go. The road and the node module both read the registry, so node meets only a verb no file registers. TestVerbRegistry covers the registered road, the unregistered road, the node module, a double registration, and the shared files. The live test shows the twin read settling beside the action calling it. The check stands green on the commit. A port keys its verb by three words at most, as twinWordsAt sets, which every verb in the ten groups fits.
 
 # retro
 
@@ -141,8 +228,9 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -151,38 +239,63 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- quack-registers-each-verb: the registry in src/quack/registry.go, the twins register from init, the node module answers a registered verb in Go
+- twin-reads-inside-an-action: a test over a served index, where an action runs a twin reading the same index
+- port-diff-stays-one-file: a subtest fails where verbs.go or registry.go names a registered verb
+- ticket-yours-twin-rows-differ: the note became ticket-verbs-port-to-go
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the design took one read of verbs.go, twins.go and accepts.go, because the twin table already had the shape a registry needs
+- the gate reviewer named the one real risk, the read inside an action, and a live run settled it in minutes
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 12:29 the take refused while migration.phase11 read false, and the wait ran until the switch landed at 12:31
+- 12:30 the stop hook refused your-helpers-still-run, since a cloud turn that ends stops its background helpers
+- 12:32 the plan held its working item, and the pull waited. Naming the item under done cleared it, and an empty working field did not
+- 12:35 the tests-red hand-back refused go test, since a command field expecting assertion wants branch test
+- 12:36 the MCP pull answered with no tool.call hook, and the index stood down until a bare serve call
+- 12:43 the clear probe of the check went red on uncommitted files, since the probe clones the dirty tree of a cloud box
+- 12:46 the gate hand-back of the helper committed the implementation from the working tree under the gate
+- 12:56 the accept refused --pass beside a verdict field
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- src/scripts/pull.js: the wait line on a working item names the plan done field as the way to clear it
+- src/scripts/pull.js: a refusal of a command field expecting assertion or green names branch test
+- src/scripts/probe-clear.js: a fail on local work names the uncommitted files, so the reader commits before the check
+- the work skill: commit each finished change before a helper hands back, so its commit carries its own step alone
+- spec/guidance/cloud/cloud: a box waits on a background job inside the turn, with a monitor
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The registry itself was small. Most of the run went to the road around it: the plan, the command fields, and a probe that reads the working tree. The one design doubt, whether a twin may read the index from inside an action, had a cheap answer in a live run and a test.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands in its ticket, and the retro points at the files
+- the one number, liveWait, carries its name in the test
+- the header of registry.go says what the file is for
+- the run had no owner prompt, and each error stands with its time
+- the chapter names roles and no box path
 
 ## cloud
 
@@ -191,20 +304,26 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 12:36 the MCP route of ticket pull, which answered with no tool.call hook, so the shell verb carried every hand-back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 12:30 the stop hook, which refused a turn ending on a background helper
+- 12:43 the clear probe of the check, red on uncommitted files of this box alone, and green once the commit verb landed them
+- the shell guard, which refused git push, git stash and a shell write, and sent each through a verb
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
+- the group pull request goes to main with auto-merge on
 
 # Discussion
 

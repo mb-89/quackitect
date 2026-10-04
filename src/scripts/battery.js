@@ -81,11 +81,11 @@ export function partsTimed(clock) {
   return { parts, timed };
 }
 
-// One report: the parts as timed, their sum, the slowest cases, a time a file, the parts a red run left unrun, the red cases, and the spawns. [[spec/guidance/retro/effect]]
+// One report: the parts as timed, the battery's span, the slowest cases, a time a file, the parts a red run left unrun, the red cases, and the spawns. The span is the sum of the parts where no run names its own. [[spec/guidance/retro/effect]]
 export function batteryOf(
   parts,
   lines,
-  { most = SLOWEST, unrun = [], spawns = null } = {},
+  { most = SLOWEST, unrun = [], spawns = null, span = null } = {},
 ) {
   const timed = {};
   let total = 0;
@@ -95,7 +95,7 @@ export function batteryOf(
   }
   return {
     parts: timed,
-    total,
+    total: span === null ? total : Math.round(Number(span) || 0),
     slowest: slowestIn(lines, most),
     files: filesIn(lines),
     unrun: [...unrun],

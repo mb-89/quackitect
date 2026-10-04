@@ -23,7 +23,12 @@ test("the battery runs its parts in order, times each, and stops at the first re
   ];
 
   const green = await batteryRun([step("tests", 0), step("rules", undefined)], clock);
-  assert.deepEqual(green, { code: 0, parts: { tests: 100, rules: 100 }, unrun: [] });
+  assert.deepEqual(green, {
+    code: 0,
+    parts: { tests: 100, rules: 100 },
+    unrun: [],
+    total: 200,
+  });
 
   ran.length = 0;
   const red = await batteryRun(
@@ -34,6 +39,43 @@ test("the battery runs its parts in order, times each, and stops at the first re
   assert.deepEqual(ran, ["tests", "go"], "a red part stops the run");
   assert.deepEqual(Object.keys(red.parts), ["tests", "go"]);
   assert.deepEqual(red.unrun, ["rules"], "the stamp names what the red left unrun");
+});
+
+// [[spec/tickets/the-check-takes-a-minute]]
+test("a part beside the run starts in its place, the run goes on, and its red holds the answer", async () => {
+  const clock = fakeClock(AT, 100);
+  const order = [];
+  let release;
+  const held = new Promise((done) => {
+    release = done;
+  });
+  const beside = [
+    "level0",
+    async () => {
+      order.push("level0 starts");
+      await held;
+      order.push("level0 ends");
+      return 1;
+    },
+    { beside: true },
+  ];
+  const step = (name) => [
+    name,
+    () => {
+      order.push(name);
+      if (name === "rules") release();
+      return 0;
+    },
+  ];
+
+  const ran = await batteryRun([step("tests"), beside, step("go"), step("rules")], clock);
+  assert.deepEqual(order, ["tests", "level0 starts", "go", "rules", "level0 ends"]);
+  assert.equal(ran.code, 1, "a red beside the run reads red");
+  assert.deepEqual(Object.keys(ran.parts).sort(), ["go", "level0", "rules", "tests"]);
+  assert.deepEqual(ran.unrun, []);
+
+  const early = await batteryRun([["tests", () => 1], beside, step("go")], clock);
+  assert.deepEqual(early.unrun, ["level0", "go"], "a red before it leaves it unrun");
 });
 
 test("a green run stamps ok with no warning, and a red run stamps the code", () => {
