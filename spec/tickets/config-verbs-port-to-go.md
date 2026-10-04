@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: config-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 5348ff22bc181506
         size: 4476
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 6183eb94e809 · claude-code-remote · helper-4
+    hash_before: 69165da95c1112b9ce664c5d8350c9fa32582fa7
+    hash_after: dea45d2c0647e286dce449213f4c4636e7329ba8
+    inputs:
+      - name: design/draft
+        hash: 5348ff22bc181506
+        size: 4476
+      - name: design/tests-red
+        hash: bb72c84cabbb46b8
+        size: 898
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -296,8 +308,10 @@ Every case fails on its own assertion against stub verbs that answer exit 1 and 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- project-port-reads-both-roots: verb_project.go writes under the work root, and reads its sources off the method and work layers. Land verb_project_test.go red before implement, with a case over both roots.
 
 # implement
 
