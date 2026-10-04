@@ -321,10 +321,29 @@ function takesDelta(it, temp, tree, delta, say) {
     cwd: tree,
     timeoutMs: WAIT,
   });
-  if (applied.exitCode === 0) return true;
-  say(`FAIL delta: ${tail(applied.stderr || applied.stdout)}`);
+  if (applied.exitCode !== 0) {
+    say(`FAIL delta: ${tail(applied.stderr || applied.stdout)}`);
+    return false;
+  }
+  // The clone commits the change, as a box commits its work before it hands over, so the clear meets no work standing on this box alone. [[spec/tickets/the-check-takes-a-minute]]
+  const committed = it.proc.run(["git", ...DELTA_AUTHOR, "commit", "-q", "-m", "the working change"], {
+    cwd: tree,
+    timeoutMs: WAIT,
+  });
+  if (committed.exitCode === 0) return true;
+  say(`FAIL delta: ${tail(committed.stderr || committed.stdout)}`);
   return false;
 }
+
+// The author the clone commits the working change under, since a fresh runner names none. [[spec/tickets/the-check-takes-a-minute]]
+const DELTA_AUTHOR = [
+  "-c",
+  "user.name=probe",
+  "-c",
+  "user.email=probe@example.invalid",
+  "-c",
+  "commit.gpgsign=false",
+];
 
 function clientArgv(client, plugin) {
   return [
