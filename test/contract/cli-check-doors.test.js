@@ -45,3 +45,15 @@ test("apply.js imports its siblings alone", () => {
     );
   }
 });
+
+// Every name the check imports stands used past its import, so the lint reads no unused import. [[spec/tickets/cli-check-drops-known]]
+test("every name cli-check.js imports stands used past its import", () => {
+  const unused = [];
+  for (const block of source.matchAll(/import\s*\{([^}]*)\}\s*from/g)) {
+    for (const one of block[1].split(",")) {
+      const name = one.trim().split(/\s+as\s+/).at(-1);
+      if (name && source.match(new RegExp(`\\b${name}\\b`, "g")).length < 2) unused.push(name);
+    }
+  }
+  assert.deepEqual(unused, []);
+});

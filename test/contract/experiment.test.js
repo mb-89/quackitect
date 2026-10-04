@@ -6,12 +6,13 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
-import { EXPERIMENT } from "../../src/scripts/retro.js";
 import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const read = (path) => files.read(join(root, ...path.split("/")));
+// The process a trial runs, which the Go audit in src/quack/retro_audit.go reads off each ticket. [[spec/design_output/work#an-experiment-decides]]
+const EXPERIMENT = "spec/processes/experiment";
 
 // [[spec/tickets/an-experiment-ends-decided]]
 test("the retro's audit step runs the verb, so an open trial holds the step", () => {
