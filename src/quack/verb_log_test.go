@@ -95,7 +95,7 @@ func TestLogVerb(t *testing.T) {
 			logOld + "/2026-10-03T00-00-00-a1.jsonl": logRow(36*60, "info", "tool", "gone"),
 			logOld + "/2026-10-04T10-00-00-b2.jsonl": logRow(119, "info", "tool", "before"),
 			logOld + "/2026-10-04T11-30-00-c3.jsonl": logRow(29, "info", "tool", "inside"),
-			sessionLog: logRow(1, "info", "tool", "now"),
+			sessionLog:                               logRow(1, "info", "tool", "now"),
 		})
 		if _, out, _ := runsTwin(log, "log", "--since", "2h"); strings.Join(saidIn(out), " ") != "before inside now" {
 			t.Fatalf("log --since 2h prints %q, and wants before, inside and now", out)
