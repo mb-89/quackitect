@@ -138,6 +138,19 @@ func TestMintVerb(t *testing.T) {
 			t.Fatalf("the group's own ticket joins itself:\n%s", got)
 		}
 	})
+	t.Run("a vehicle's work root takes the note, and the method root hands the schemas and the process", func(t *testing.T) {
+		method, work := mintTree(t, ""), t.TempDir()
+		t.Setenv("SE_WORK_ROOT", work)
+		if code, said := runsVerb(t, method, "mint", "ticket", "spec/tickets/fresh.md", "--process=small"); code != 0 {
+			t.Fatalf("the mint answers %d: %s", code, said)
+		}
+		if _, stands := readsBack(t, work, "spec/tickets/fresh.md"); !stands {
+			t.Fatal("the work root holds no note")
+		}
+		if _, stands := readsBack(t, method, "spec/tickets/fresh.md"); stands {
+			t.Fatal("the method root takes the note")
+		}
+	})
 	refusals := []struct {
 		name string
 		argv []string

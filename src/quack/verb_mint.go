@@ -65,13 +65,13 @@ func mintVerb(rootOf func() (string, error)) twin {
 		}
 		fields, why := fieldsIn(handed, schema)
 		if why == "" {
-			why = withRoute(pullDisk{method}, schema, fields)
+			why = withRoute(pull.OSDisk{Root: method}, schema, fields)
 		}
 		if why != "" {
 			fmt.Fprintln(errs, why)
 			return exitUsage
 		}
-		disk := pullDisk{work}
+		disk := pull.OSDisk{Root: work}
 		if disk.Exists(where) {
 			fmt.Fprintf(errs, "%s stands already. Name a path nothing holds yet.\n", where)
 			return exitUsage
