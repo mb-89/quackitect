@@ -4,7 +4,9 @@
 package main
 
 import (
+	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -49,10 +51,13 @@ func TestThePathAnswersInTheOrderTheCallsNameBeforeTheDownloadsFolder(t *testing
 	root, env := browserBox(t,
 		[]string{"b/google-chrome", "a/chromium-browser", "home/.cache/ms-playwright/chromium-7/chrome-linux/chrome"},
 		map[string]string{"HOME": "home"})
-	path := filepath.Join(root, "a") + ":" + filepath.Join(root, "b")
+	path := filepath.Join(root, "a") + string(os.PathListSeparator) + filepath.Join(root, "b")
 	withPath := func(key string) string {
-		if key == "PATH" {
+		switch {
+		case key == "PATH":
 			return path
+		case key == "PATHEXT" && runtime.GOOS == "windows":
+			return ".EXE"
 		}
 		return env(key)
 	}

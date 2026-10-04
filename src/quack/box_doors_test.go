@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -52,6 +53,10 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 		}
 	}
 	env := map[string]string{"PATH": path}
+	// A Windows box names PATHEXT, which splits its PATH on semicolons, so a drive letter stays whole. [[spec/design_output/tools#reading-the-path-variable]]
+	if runtime.GOOS == "windows" {
+		env["PATHEXT"] = ".EXE"
+	}
 	runner := &fakeRunner{answers: map[string]ranResult{}}
 	var out, errs strings.Builder
 	return boxDoors{

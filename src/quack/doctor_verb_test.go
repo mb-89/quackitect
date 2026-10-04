@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -60,7 +61,7 @@ func TestTheDoctorPrintsEveryRowInOrderOnABareBox(t *testing.T) {
 		"editor":          "missing",
 		"sidebar":         "no editor folder on this box, so no link",
 		"browser":         "missing, run ./RUNME.sh",
-		"commit hook":     ".githooks/pre-commit stands nowhere",
+		"commit hook":     filepath.Join(hooksFolder, "pre-commit") + " stands nowhere",
 		"vale rules":      "missing",
 		"survey":          toolsFile,
 		"server":          "none at http://127.0.0.1:6510/health",
@@ -96,7 +97,7 @@ func TestTheSurveyRowNamesHowToWriteOne(t *testing.T) {
 func TestTheBiomeRowAsksTheBiomeTheSurveyNames(t *testing.T) {
 	d, runner, out, _ := fakeBoxDoors(t)
 	biome := filepath.Join(d.root, "biome")
-	writeFiles(t, d.root, map[string]string{"biome": "", toolsFile: `{"biome":{"path":"` + biome + `"}}`})
+	writeFiles(t, d.root, map[string]string{"biome": "", toolsFile: `{"biome":{"path":` + jsonString(biome) + `}}`})
 	if rows := doctorRows(t, d, out); rows["biome lsp-proxy"] != "this biome carries one" {
 		t.Errorf("the row reads %q", rows["biome lsp-proxy"])
 	}
@@ -205,13 +206,17 @@ func TestTheBrowserRowNamesEachRungOfTheOrder(t *testing.T) {
 	})
 	writeFiles(t, home, map[string]string{".cache/ms-playwright/chromium-7/chrome-linux/chrome": ""})
 	at := func(path string) string { return filepath.Join(d.root, filepath.FromSlash(path)) }
+	twoFolders := map[string]string{"PATH": at("a") + string(os.PathListSeparator) + at("b")}
+	if runtime.GOOS == "windows" {
+		twoFolders["PATHEXT"] = ".EXE"
+	}
 	for _, one := range []struct {
 		env  map[string]string
 		want string
 	}{
 		{map[string]string{"PLAYWRIGHT_CHROMIUM": at("x/chrome"), "PLAYWRIGHT_BROWSERS_PATH": at("pw"), "PATH": at("a")}, at("x/chrome") + ", off PLAYWRIGHT_CHROMIUM"},
 		{map[string]string{"PLAYWRIGHT_CHROMIUM": "/gone", "PLAYWRIGHT_BROWSERS_PATH": at("pw")}, at("pw/chromium-12/chrome-linux/chrome") + ", off PLAYWRIGHT_BROWSERS_PATH"},
-		{map[string]string{"PATH": at("a") + ":" + at("b")}, at("a/chromium-browser") + ", off PATH"},
+		{twoFolders, at("a/chromium-browser") + ", off PATH"},
 		{map[string]string{"PATH": "/nowhere"}, filepath.Join(home, ".cache", "ms-playwright", "chromium-7", "chrome-linux", "chrome") + ", off playwright install"},
 		{map[string]string{"PATH": "/nowhere", "HOME": t.TempDir()}, "missing, run ./RUNME.sh"},
 	} {
