@@ -85,7 +85,7 @@ process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
-step: split
+step: children
 record:
   - step: sync
     hand: box 470a600bc22e · claude-code-remote
@@ -99,6 +99,18 @@ record:
         exit: 0
         said: work/quack-holds-a-verb-registry took 8 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: dc5c6af186836672e0cdce31f3502e3b9f784a2e
+    hash_after: dc5c6af186836672e0cdce31f3502e3b9f784a2e
+    inputs:
+      - name: ask
+        hash: 0c6937b1a801ee73
+        size: 294
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -125,14 +137,20 @@ Done when `programOf` hands only an unregistered verb to node, and adding a verb
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/quack-registers-each-verb]], standard
+- [[spec/tickets/twin-reads-inside-an-action]], minted by the gate
+- [[spec/tickets/port-diff-stays-one-file]], minted by the gate
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child is one change of a few files, reviewed whole
+- the registry, the node module road and the shared-file test add up to the goal
+- the two gate children stand on the first child alone, and each closed after it
 
 # children
 
