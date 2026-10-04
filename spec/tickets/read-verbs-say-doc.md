@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: read-verbs-run-in-go
 parent: read-verbs-port-to-go
+record:
+  - step: do
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: 2fd27fae928427cc2fe3bb5eaaf4acfcc9d50a1a
+    hash_after: 1c615815d79e05b532074055c4730cfe4fbb3ef7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/log passes
+      - name: check
+        exit: 0
+        said: "   38.5  in all"
+    inputs:
+      - name: ask
+        hash: db8cdae5bf8dae07
+        size: 116
+    def: 4d5ec233e043428a
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the say action in `src/modules/log/log.go` says it appends through its program. 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/log/say_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The say action hands log --say to the node module, which runs the registered Go log verb since the port. Its NoUndo line still named a JavaScript program, so it now names the Go log verb, and the say case asserts that wording.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the say action names the Go verb
+- the cleanup the change reveals is in the change: none past the line
+- every fact stands in one place: the line stands in log.go alone, and the case reads it there
 
 # Discussion
 
