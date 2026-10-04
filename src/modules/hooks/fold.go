@@ -38,6 +38,7 @@ const (
 	reportCall   = levelZero + "report"
 	logCall      = levelZero + "log"
 	askTool      = "AskUserQuestion"
+	schemaTool   = "ToolSearch"
 	promptWhy    = "The owner sent a prompt"
 	planReact    = "call " + planCall + " with the answers"
 	saidCap      = 80
@@ -364,6 +365,10 @@ func (state *Holds) chain(tool string, held map[string]any) (string, string) {
 	if tool == askTool && truthy(held[heldCloud]) {
 		return RefuseWord, asksNobody
 	}
+	// ToolSearch loads a schema and changes nothing, so it passes the grace and the demand and spends neither, and a context the handover clears still loads the tool the grace asks for. [[spec/tickets/toolsearch-rides-the-plan-ask]]
+	if tool == schemaTool {
+		return "", ""
+	}
 	if grace := state.Grace; grace != nil && !endsTurn[tool] && !(grace.Tool != "" && tool == grace.Tool) {
 		if grace.Left > 0 {
 			grace.Left--
@@ -415,7 +420,11 @@ func refusedByGrace(grace Grace) string {
 	if react != "" {
 		react = strings.ToUpper(react[:1]) + react[1:]
 	}
-	return grace.Why + " The grace is spent, so this call is refused. " + react + ", and the calls pass again."
+	load := ""
+	if grace.Tool != "" {
+		load = " Where " + grace.Tool + " stands unloaded, call " + schemaTool + " with the query select:" + grace.Tool + " first."
+	}
+	return grace.Why + " The grace is spent, so this call is refused. " + react + ", and the calls pass again." + load
 }
 
 // The answer door's words, off SAYS in src/bridge/answer.js. [[spec/design_output/level0#the-reply-line]]
