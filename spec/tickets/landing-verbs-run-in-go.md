@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box a2b0848f196c · claude-code-remote
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/landing-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 7e5eda79bc84 · claude-code-remote
+    hash_before: e9a11170f00ed551033f976fce0adf1af7ddb7d8
+    hash_after: e9a11170f00ed551033f976fce0adf1af7ddb7d8
+    inputs:
+      - name: ask
+        hash: 46fa0bd6fad47957
+        size: 301
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -130,14 +142,18 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/landing-verbs-port-to-go]], standard, closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child is a reviewable change of three Go files, their tests and the JavaScript they replace
+- the child's done lines are the group's ask: the Go verbs, their tests, the deleted programs and their importers; an orphan search of src names no module the three verbs left behind, only verb programs loaded by name and webview files other groups own
+- one child, so no depends_on
 
 # children
 
