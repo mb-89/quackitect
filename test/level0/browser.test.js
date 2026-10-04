@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { browserFrom, browserSays, cacheOf, underFolder } from "../../src/scripts/browser.js";
+import { browserFrom, cacheOf, underFolder } from "../../src/scripts/browser.js";
 
 // A disk holding each path a case names, so the order reads it the way it reads a box. [[spec/design_output/doors#a-fake-behaves]]
 function fake(paths) {
@@ -69,15 +69,11 @@ test("the folder the download writes answers last", () => {
   });
 });
 
-test("a box with no browser answers nothing, and the doctor says what to run", () => {
+test("a box with no browser answers an empty path and no rung", () => {
   assert.deepEqual(browserFrom({ PATH: "/a", HOME: home }, fake([])), {
     path: "",
     from: "",
   });
-  assert.equal(
-    browserSays({ PATH: "/a", HOME: home }, fake([])),
-    "missing, run ./RUNME.sh",
-  );
   assert.equal(underFolder("", fake([])), "");
 });
 

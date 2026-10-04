@@ -9,8 +9,8 @@ import { SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { PLUGIN_FOLDER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { HOOKS_FILE } from "../../.claude/skills/level0/hooks/cage.js";
 import { clearHeld, clearRun } from "./probe-clear.js";
-import { COLD, coldLines, coldPort, coldTree, stops, tail } from "./probe-cold.js";
-import { logRows } from "./probe.js";
+import { COLD, coldLines, coldPort, coldTree, logRows, stops, tail } from "./probe-cold.js";
+import { verbMain } from "./verb-run.js";
 
 // The module the plugin manifest names, which the client loads. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 const MODULE = "hooks/pull-tool.js";
@@ -36,6 +36,9 @@ export const DRY = {
 // The word that carries the working change into the clone. [[spec/tickets/the-check-takes-a-minute]]
 export const WORKING = "--working";
 
+// The dry probe's own program, which the Go probe verb and the check start, since its session loads the plugin's JavaScript hook module in process. [[spec/tickets/probe-dry-entry]]
+export const ENTRY = ["src", "scripts", "probe-dry.js"];
+
 // The working change as a patch, read through the process door untrimmed, since a trim cuts the blank context line a hunk ends on and git apply reads the rest as corrupt. [[spec/tickets/model-marks-io-names]]
 export function deltaOf(here, at) {
   const ran = here.proc.run(["git", "diff", "HEAD", "--binary", "--no-renames"], {
@@ -47,7 +50,7 @@ export function deltaOf(here, at) {
 // The dry probe over the working change, in a process of its own. Its clone and its verbs wait on spawns that hold a process's loop, so a check running parts beside it starts it apart, and says its lines once it ends. [[spec/tickets/the-check-takes-a-minute]]
 export async function probeApart(root, it, say = console.log) {
   const ran = await it.proc.start(
-    [it.node, it.join(root, "src", "scripts", "verbs", "probe.js"), "dry", WORKING],
+    [it.node, it.join(root, ...ENTRY), WORKING],
     { cwd: root },
   );
   for (const one of `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`.split(/\r?\n/)) {
@@ -332,3 +335,9 @@ function quietRun(rows, seen) {
 
 const firstOf = (text) => tail(String(text ?? "").split("\n")[0]).slice(0, SHOWN);
 const shown = (said) => firstOf(JSON.stringify(said ?? null));
+
+// Run as its own program, the probe takes the working change where the words name it. [[spec/tickets/probe-dry-entry]]
+await verbMain(import.meta.url, async (words) => {
+  const { it, root } = await import("./cli-doors.js");
+  return probeDry(root, it, console.log, words.includes(WORKING) ? deltaOf(it, root) : "");
+});
