@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a2b0848f196c · claude-code-remote
+    hash_before: 94a207f90961e39d2308f034ff78bf017bae5f17
+    hash_after: c2812dae39bf528134b31dfaf7c1ab5b1f7626d4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   88.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: af4f299ca9d851e9
+        size: 1109
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -351,26 +374,33 @@ go vet ./src/quack ./src/modules/hooks/command
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/landing_test.go src/quack/commit_test.go src/quack/push_test.go src/quack/rename_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs commit, push and rename run in Go. Each registers from its own file under src/quack, so no shared line of the registry changes. Their JavaScript programs, modules and tests leave the tree, and so does commitDoors in cli-check.js. The commit verb runs the test and check verbs through quack's own road. It reads the message through the Vale bridge that stands in Go, and reuses the ticket door, the desk guard and the marker reader the hooks module holds. A commit touching the cold path lands first and runs the probe verb on the clone of HEAD. Where the probe fails, the verb takes the commit back with a soft reset, and a merge stays open. This way the probe, which the box group ports, takes no new flag. Two contract tests now read the verbs folder as it stands: verb-programs.test.js loads each program, and cli-leaves.test.js takes a verb with no program where Go registers it. So each later port deletes a file and edits neither test. The Go commit verb landed this change itself, through the cold probe and a green check.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, the two contract tests that read the verbs folder, and two design notes naming the deleted files
+- every door the verbs reach comes through landingDoors, and the tests fake the verb runner, Vale, the log and the clock
+- each file header names what the file does and points at this ticket or the design note it ports
+- the cold path list and the stamp path stay owned by probe-cold.js, folders.js and runs.js, and each Go copy names its owner beside it
 
 # accept
 
