@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 6f8b02d3b81e · claude-code-remote
@@ -162,6 +162,15 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box f8b693e22e97 · claude-code-remote
+    hash_before: d2f8e062dac0776fdef3d29ca61a08d5cfaa724e
+    hash_after: d2f8e062dac0776fdef3d29ca61a08d5cfaa724e
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 ---
 
 # Ask
@@ -226,8 +235,9 @@ accept
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
