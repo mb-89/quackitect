@@ -76,11 +76,11 @@ async function saysParts(battery) {
 }
 
 // The battery's parts in the order they start, and a red part leaves the rest unrun. Level zero runs on a fresh box before the rules, so a tree whose hook runs nothing reads red. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]]
-// Level zero waits on its processes, and spends less than a core, so it runs beside the parts after the tests. It starts once the tests end, because a contract case reads a clock a loaded box slows. [[spec/tickets/the-check-takes-a-minute]]
+// Level zero waits on its processes, and spends less than a core, so it starts first and runs beside every other part, the tests among them. [[spec/tickets/the-probe-starts-with-tests]]
 export function partsOf(words, errors = false) {
   return [
-    ["tests", () => test(errors)],
     ["level0", () => level0Runs(), { beside: true }],
+    ["tests", () => test(errors)],
     ["go", () => goHolds(errors, redHere())],
     ["doors", () => doorsHold()],
     ["projections", () => projectionsHold()],

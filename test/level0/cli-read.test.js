@@ -17,6 +17,11 @@ test("the command line exports no prose reader beside findings.js", () => {
   assert.equal(read.readThroughTheReader, undefined);
 });
 
+// The index, links, notes and find verbs run in Go, so the command line asks the index for none of them. [[spec/tickets/read-verbs-port-to-go]]
+test("the command line exports no ask of the index", () => {
+  assert.equal(read.asksIndex, undefined);
+});
+
 // The lint's prose reader asks its slice's mode off the doors it runs on. [[spec/tickets/read-topics-switch-over]]
 test("the check's own reading carries the slices the prose reader asks", async () => {
   const doors = await findingsDoors();

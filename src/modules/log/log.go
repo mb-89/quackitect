@@ -71,7 +71,7 @@ type Said struct {
 // The log verb's say, handed the row as one JSON word. [[spec/tickets/the-sidebar-writes-through-actions]]
 func sayOf(in Said) []q.Request {
 	row, _ := json.Marshal(in)
-	return []q.Request{{Module: nodeModule, Verb: nodeRun, Args: []string{"log", "--say", string(row)}, NoUndo: "log --say appends through its program, which keeps no undo"}}
+	return []q.Request{{Module: nodeModule, Verb: nodeRun, Args: []string{"log", "--say", string(row)}, NoUndo: "log --say appends through the Go log verb, which keeps no undo"}}
 }
 
 func rowsOf(in rowsIn) []Row {
