@@ -178,13 +178,11 @@ func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
 	}
 }
 
-// A verb the verb's program answers too takes the verb's program, even where quack's verb table holds it, so ./RUNME.sh tools keeps writing tools.json. [[spec/tickets/quack-tools-spares-runme-tools]]
+// A verb the verb's program answers too takes the verb's program, even where quack's verb table holds it. [[spec/tickets/quack-tools-spares-runme-tools]]
 func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
-	table := map[string]bool{"run": true, "tools": true, "act": true}
-	for _, verb := range []string{"tools", "act"} {
-		if aloneOf([]string{verb}, table) {
-			t.Fatalf("%s runs in quack alone, and the verb's program stops answering it", verb)
-		}
+	table := map[string]bool{"run": true, "act": true}
+	if aloneOf([]string{"act"}, table) {
+		t.Fatal("act runs in quack alone, and the verb's program stops answering it")
 	}
 	if !aloneOf([]string{"run"}, table) {
 		t.Fatal("run, which the verb's program lacks, runs in the verb's program")
@@ -206,5 +204,23 @@ func TestAWholeVerbTakesQuackUnderEveryMode(t *testing.T) {
 	}
 	if roadOf(modeShadow, []string{"part", "words"}, twins) != toBoth || roadOf("old", []string{"part", "words"}, twins) != toNode {
 		t.Fatal("a twin of a verb's words leaves its shadow road")
+	}
+}
+
+// A registered verb takes its Go answer ahead of quack's own verb of the same word, so ./RUNME.sh tools keeps writing tools.json, and takes it under old too, since tools.js left the tree. [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/registered-verb-skips-the-mode]]
+func TestARegisteredVerbRunsAheadOfQuacksOwn(t *testing.T) {
+	twins := map[string]twin{"tools": twinSaying("", &[]bool{})}
+	if got := roadOf(modeNew, []string{"tools"}, twins); got != toQuack {
+		t.Fatalf("tools takes road %d under new, and wants its twin", got)
+	}
+	if got := roadOf("", []string{"tools"}, twins); got != toQuack {
+		t.Fatalf("tools takes road %d under old, and wants its twin, since no program stands", got)
+	}
+	ran := false
+	doors, _, _ := roadOver(modeNew, "", twins)
+	doors.alone = func([]string) int { ran = true; return 0 }
+	verbs(doors, []string{"tools"})
+	if ran {
+		t.Fatal("quack's own tools answers, and the registered verb waits")
 	}
 }

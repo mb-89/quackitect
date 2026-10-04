@@ -3,74 +3,36 @@
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
+import { pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
-import { run as check } from "../../src/scripts/verbs/check.js";
-import { run as commit } from "../../src/scripts/verbs/commit.js";
-import { run as config } from "../../src/scripts/verbs/config.js";
-import { run as dispatch } from "../../src/scripts/verbs/dispatch.js";
-import { run as doctor } from "../../src/scripts/verbs/doctor.js";
-import { run as doors } from "../../src/scripts/verbs/doors.js";
-import { run as fix } from "../../src/scripts/verbs/fix.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
-import { run as mint } from "../../src/scripts/verbs/mint.js";
-import { run as probe } from "../../src/scripts/verbs/probe.js";
-import { run as project } from "../../src/scripts/verbs/project.js";
-import { run as push } from "../../src/scripts/verbs/push.js";
-import { run as rename } from "../../src/scripts/verbs/rename.js";
-import { run as retro } from "../../src/scripts/verbs/retro.js";
-import { run as rules } from "../../src/scripts/verbs/rules.js";
-import { run as setup } from "../../src/scripts/verbs/setup.js";
-import { run as split } from "../../src/scripts/verbs/split.js";
-import { run as standing } from "../../src/scripts/verbs/standing.js";
-import { run as testVerb } from "../../src/scripts/verbs/test.js";
-import { run as ticket } from "../../src/scripts/verbs/ticket.js";
-import { run as tools } from "../../src/scripts/verbs/tools.js";
-import { commands } from "./commands.js";
+import { commands, goVerbs } from "./commands.js";
 
-const RUNS = {
-  check,
-  commit,
-  config,
-  dispatch,
-  doctor,
-  doors,
-  fix,
-  graph,
-  mint,
-  probe,
-  project,
-  push,
-  rename,
-  retro,
-  rules,
-  setup,
-  split,
-  standing,
-  test: testVerb,
-  ticket,
-  tools,
-};
+const ROOT = join(import.meta.dirname, "..", "..");
 
-// The folder the programs stand in. [[spec/tickets/read-verbs-port-to-go]]
-const VERB_FOLDER = join(
-  dirname(dirname(dirname(fileURLToPath(import.meta.url)))),
-  "src",
-  "scripts",
-  "verbs",
-);
-
-test("every verb of the table loads as a program answering a run", () => {
-  const listed = [...commands().keys()]
-    .filter((verb) => disk().exists(join(VERB_FOLDER, `${verb}.js`)))
-    .sort();
-  assert.deepEqual(Object.keys(RUNS).sort(), listed);
-  for (const [verb, run] of Object.entries(RUNS)) {
-    assert.equal(typeof run, "function", `${verb} runs`);
+// A verb answers as a program where its file stands, and registers in Go where none does, so a port edits no line here. [[spec/tickets/box-verbs-port-to-go]]
+test("every verb of the table loads as a program answering a run, or registers in Go", async () => {
+  const go = goVerbs();
+  const listed = new Set(commands().keys());
+  const files = disk();
+  for (const { name: one } of files.list(join(ROOT, ...VERBS))) {
+    assert.ok(
+      listed.has(one.replace(/\.js$/, "")),
+      `${one} answers no verb of the table`,
+    );
+  }
+  for (const verb of listed) {
+    const program = join(ROOT, ...VERBS, `${verb}.js`);
+    if (files.exists(program)) {
+      const { run } = await import(pathToFileURL(program).href);
+      assert.equal(typeof run, "function", `${verb} runs`);
+    } else {
+      assert.ok(go.has(verb), `${verb} stands as no program and registers no Go verb`);
+    }
   }
 });
 

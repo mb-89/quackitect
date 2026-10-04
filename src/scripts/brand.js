@@ -1,19 +1,11 @@
-#!/usr/bin/env node
-// The brand a vehicle stamps on itself. The install script runs this ahead of
-// every verb, so both manifests and the icon come out of the brand folder with
-// the marketplace name, its owner and the plugin's author answering the folder
-// the tree stands in.
-// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+// The brand a vehicle stamps on itself, which the review stamps on its
+// worktree: both manifests and the icon come out of the brand folder with the
+// marketplace name, its owner and the plugin's author answering the folder the
+// tree stands in. The setup stamps through src/quack/brand.go.
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]] [[spec/tickets/box-verbs-brand-caller]]
 
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import {
-  brandedJson,
-  brandOf,
-  emptyBrand,
-  versionedJson,
-} from "../../.claude/skills/level0/lib/vehicle.js";
-import { disk } from "../doors/disk.js";
+import { brandedJson, versionedJson } from "../../.claude/skills/level0/lib/vehicle.js";
 
 export const BRAND = "spec/config/brand";
 export const MARKETPLACE = ".claude-plugin/marketplace.json";
@@ -96,14 +88,4 @@ function readIf(files, at) {
   } catch {
     return null;
   }
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
-  const brand = brandOf(root);
-  if (!brand) {
-    console.error(emptyBrand(root));
-    process.exit(1);
-  }
-  for (const one of stamps(disk(), root, brand)) console.log(`  ${one} reads ${brand}`);
 }
