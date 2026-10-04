@@ -155,7 +155,7 @@ func retroJSCopy(one any) *retroJSDict {
 // A value, or 0 where it is null or undefined. [[spec/guidance/retro/effect]]
 func retroJSOrZero(value any) any {
 	if retroJSNullish(value) {
-		return 0.0
+		return float64(0)
 	}
 	return value
 }

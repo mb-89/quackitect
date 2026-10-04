@@ -59,6 +59,7 @@ func retroNewVerb(root func() string, run retroMintRun) twin {
 		opened := run(home, []string{retroMintRunmeAt, "ticket", "open", name}, env)
 		retroNewSays(errs, opened.errs)
 		if opened.code != 0 {
+			_ = os.Remove(at)
 			return exitFailed
 		}
 		pulled := run(home, []string{retroMintRunmeAt, "ticket", "pull", name}, map[string]string{workRoot: home, retroNewMinted: name})

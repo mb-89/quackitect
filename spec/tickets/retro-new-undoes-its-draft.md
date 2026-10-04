@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: retro-verbs-run-in-go
 parent: retro-verbs-run-in-go
+record:
+  - step: do
+    hand: box f8b693e22e97 · claude-code-remote
+    hash_before: a1ad31c8a02010f55a65e9d31a82ec8cacee4156
+    hash_after: a1ad31c8a02010f55a65e9d31a82ec8cacee4156
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   67.3  in all"
+    inputs:
+      - name: ask
+        hash: d966ad350cb8a9d2
+        size: 198
+    def: d18d07ca40f70311
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ retro new writes the draft before ticket open runs the ask lint, so a refused wh
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+retro new wrote its draft before the open ran the ask lint. A refused open left the draft behind, and the next run refused the same name as taken. The verb now removes the draft where the open refuses, and runs no pull. TestRetroNewRemovesItsDraftWhereTheOpenRefuses holds it.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask
+- the cleanup it reveals: none, the refused road ends in the one branch it touches
+- the fact stands once: the draft path is the one the mint wrote
 
 # Discussion
 

@@ -5,6 +5,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"testing"
@@ -132,6 +134,24 @@ func TestRetroNewTakesItsRetroUnderQueue(t *testing.T) {
 	pull := fake.ran[len(fake.ran)-1]
 	if strings.Join(pull.argv, " ") != "./RUNME.sh ticket pull retro-one" || pull.env["SE_MINTED"] != "retro-one" {
 		t.Fatalf("the pull runs %v with %v, and names no minted ticket", pull.argv, pull.env)
+	}
+}
+
+// retro new removes its draft where the open refuses, so the next run takes the same name. [[spec/design_output/pull#a-draft-opens]]
+func TestRetroNewRemovesItsDraftWhereTheOpenRefuses(t *testing.T) {
+	root, fake := retroNewTree(t, "retro-one")
+	fake.answers["./RUNME.sh ticket open retro-one"] = func() retroMintRan {
+		return retroMintRan{code: 1, errs: "the ask breaks a rule\n"}
+	}
+	code, _, errs := retroNewRuns(root, fake, "--why", "refused", "--name", "retro-one")
+	if code != 1 || !strings.Contains(errs, "the ask breaks a rule") {
+		t.Fatalf("retro new answers %d and says %q", code, errs)
+	}
+	if _, err := os.Stat(filepath.Join(root, "spec", "tickets", "retro-one.md")); !os.IsNotExist(err) {
+		t.Fatalf("the draft stands after a refused open: %v", err)
+	}
+	if strings.Contains(retroNewCalls(fake), "ticket pull") {
+		t.Fatalf("retro new runs %q", retroNewCalls(fake))
 	}
 }
 

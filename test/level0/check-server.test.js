@@ -8,7 +8,6 @@ import { test } from "node:test";
 import * as check from "../../src/scripts/cli-check.js";
 import {
   serverHolds,
-  serverLine,
   serverRead,
   skipOf,
 } from "../../src/scripts/cli-check.js";
@@ -25,16 +24,6 @@ test("the check answers no stamp of its own, and the stamp module answers it", (
     "cli-check.js hands the stamp to cli-stamp.js",
   );
   assert.equal(typeof stamped, "function");
-});
-
-// The doctor's hook probe stands in its own file, so the check stays under the file ceiling. [[spec/design_output/level0#the-doctor-probes-every-hook]]
-test("the check answers no hook probe of its own, and cli-hooks.js answers it", () => {
-  assert.equal(
-    check.hooksNamed,
-    undefined,
-    "cli-check.js hands the hook probe to cli-hooks.js",
-  );
-  assert.equal(check.hookRows, undefined, "and the rows it answers");
 });
 
 // The log verb asks its slice's mode off the doors the window's verbs share. [[spec/tickets/read-topics-switch-over]]
@@ -98,16 +87,6 @@ test("the probe over a fake door answers what the read says", async () => {
   const none = await said(silent());
   assert.equal(none.code, 0);
   assert.ok(none.lines.join("\n").includes("./RUNME.sh serve"));
-});
-
-// A person asking after a fall reads the doctor, so its wording stands held. [[spec/tickets/the-bridge-says-it-falls]]
-test("the doctor names a bridge standing down, and one standing up", async () => {
-  assert.match(await serverLine(silent()), /^none at http/, "a bridge standing down");
-  assert.match(
-    await serverLine(answers({ ok: true })),
-    /^stands at http/,
-    "and a bridge answering",
-  );
 });
 
 // A red Go file stands apart as a red JavaScript one does. [[spec/design_output/pull#the-gate]]

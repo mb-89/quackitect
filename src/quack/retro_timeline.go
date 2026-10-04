@@ -17,8 +17,11 @@ import (
 // A line a transcript writes as a failing tool result, and a log line at a failing level. [[spec/guidance/retro/signals]]
 var retroFault = regexp.MustCompile(`"is_error":[` + retroJSSpaces + `]*true|"level":"(?:warn|error|fatal)"`)
 
-// An hour, in the milliseconds a time counts. [[spec/guidance/retro/chapter]]
-const retroHourMillis = 3_600_000
+// An hour, in the milliseconds a time counts, and the length of an ISO time cut to its hour. [[spec/guidance/retro/chapter]]
+const (
+	retroHourMillis = 3_600_000
+	retroHourKey    = 13
+)
 
 // The printed columns, each as wide as its head. [[spec/guidance/retro/chapter]]
 var retroTimelineColumns = []string{"transcript", "log", "sessions", "faults"}
@@ -117,7 +120,7 @@ func retroHoursOf(files []retroTimedFile) []*retroHourRow {
 				continue
 			}
 			start := math.Floor(when/retroHourMillis) * retroHourMillis
-			key := retroJSISO(start)[:13]
+			key := retroJSISO(start)[:retroHourKey]
 			hour, ok := held[key]
 			if !ok {
 				hour = &retroHourRow{at: start, hour: key, sessions: map[string]bool{}}
@@ -163,7 +166,7 @@ func retroTimelineVerb(root func() string) twin {
 			return 1
 		}
 		fmt.Fprintf(out, "hour (UTC)      %s\n", strings.Join(retroTimelineColumns, "  "))
-		before := 0.0
+		var before float64
 		for _, one := range hours {
 			idle := 0
 			if before != 0 {

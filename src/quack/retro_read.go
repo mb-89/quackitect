@@ -17,8 +17,11 @@ const (
 	retroShell   = "Bash"
 )
 
-// A printed text keeps its first line, cut to this width. [[spec/tickets/the-retro-finishes-its-asks]]
-const retroReadWidth = 200
+// A printed text keeps its first line, cut to this width, and the verb's line names the id at this place. [[spec/tickets/the-retro-finishes-its-asks]]
+const (
+	retroReadWidth = 200
+	retroReadIdAt  = 3
+)
 
 // One row a line earns: its kind, and its text. [[spec/tickets/the-retro-finishes-its-asks]]
 type retroRow struct {
@@ -95,7 +98,7 @@ func retroRowsOf(path, line string) []retroRow {
 // The verb: prints each row of the chapter's lines as `path:line  kind  text`. [[spec/tickets/the-retro-finishes-its-asks]]
 func retroReadVerb(root func() string) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
-		base, name, id := root(), retroWordAt(argv, 2), retroWordAt(argv, 3)
+		base, name, id := root(), retroWordAt(argv, 2), retroWordAt(argv, retroReadIdAt)
 		home, at := "", ""
 		if name != "" {
 			home = retroHome(base, name)

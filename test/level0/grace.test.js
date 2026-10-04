@@ -42,6 +42,12 @@ test("the ask rides the calls it lets pass, and a spent grace refuses the next",
   wants(answering.box, { ...ASK, calls: 0, tool: "mcp__level0__plan" });
   assert.equal(holdsGrace({ tool: "mcp__level0__plan" }, answering.box), null);
   assert.ok(holdsGrace({ tool: "Read" }, answering.box).result.deny);
+  // ToolSearch loads the answering tool past a spent grace, Bash stays refused, and the refusal names the load. [[spec/tickets/toolsearch-rides-the-plan-ask]]
+  assert.equal(holdsGrace({ tool: "ToolSearch" }, answering.box), null);
+  assert.match(
+    holdsGrace({ tool: "Bash" }, answering.box).result.deny,
+    /call ToolSearch with the query select:mcp__level0__plan first\./,
+  );
   assert.equal(
     it.said.filter((row) => row[1] === "grace").length,
     2,

@@ -214,7 +214,7 @@ func retroRatesOf(root, name string, classes []any) *retroRates {
 		if _, seen := rates.Classes[one.id]; !seen {
 			rates.order = append(rates.order, one.id)
 		}
-		rate := 0.0
+		var rate float64
 		if hours > 0 {
 			rate = retroJSFixed(float64(counts[one.id])/float64(hours), 2)
 		}
