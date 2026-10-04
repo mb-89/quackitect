@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The check names no red case and no finding at error.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: e2e749c828a11ac62ae7c2bf9e6cfaf22721144b
+    hash_after: e2e749c828a11ac62ae7c2bf9e6cfaf22721144b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/vehicle passes; green, src/voice passes
+      - name: check
+        exit: 0
+        said: The check names no red case and no finding at error.
+    inputs:
+      - name: design/tests-red
+        hash: b82d35769d0656c1
+        size: 1214
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -336,26 +359,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/tui_verb_test.go src/vehicle/vehicle_test.go src/voice/voice_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check --errors
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs tui, serve, voice, vehicle and stub answer from Go. Each registers from its own file under src/quack, so no shared line moves. The vehicle and stub verbs share src/vehicle, ported from the vehicle JS. The voice verb stands on src/voice. A whole Go verb takes quack under every mode, so none of the five reaches node. With node off the PATH each verb answers, and only the setup step of RUNME.sh still names node. The five verb programs leave src/scripts/verbs, with tui.js, voice.js, vehicle-verb.js, stub.js and bridge/window.js, which nothing else imported. serve.js, scripts/vehicle.js, bridge/vehicle.js and the lib modules keep other importers, so they stay. The contract tests now read the Go verbs off the registry and expect no program for them. The ports match the JS output line by line on the real tree. They differ where node crashed with a stack trace, and there Go prints one line and the same exit code.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the ones the gate lists as following from the port
+- every door the change reaches takes its outside off the hand, and the tests fill it with a fake or a temp folder
+- each file header names what it ports and links the design section of the approach
+- every fact stands once: the window port in frame.WindowPort, the tools file in brief.ToolsFile, the hash in index.HashText, the whole-verb mark in wholeOf and goVerbs
 
 # accept
 
