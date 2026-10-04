@@ -125,7 +125,7 @@ func projectLine(t *testing.T, wanted int) string {
 }
 
 func TestProjectWritesTheTreeTargetsByteForByte(t *testing.T) {
-	t.Setenv(projectWorkVariable, "")
+	t.Setenv(workRootVar, "")
 	root := projectSourcesRoot(t)
 	said := runProject(t, root, false)
 
@@ -150,7 +150,7 @@ func TestProjectWritesTheTreeTargetsByteForByte(t *testing.T) {
 }
 
 func TestProjectRemovesAStaleTargetAndKeepsTheOwnersFile(t *testing.T) {
-	t.Setenv(projectWorkVariable, "")
+	t.Setenv(workRootVar, "")
 	root := projectSourcesRoot(t)
 	const stale = ".claude/commands/se-config-gone-away.md"
 	const kept = ".claude/commands/owners-note.md"
@@ -166,7 +166,7 @@ func TestProjectRemovesAStaleTargetAndKeepsTheOwnersFile(t *testing.T) {
 }
 
 func TestProjectDryWritesNothing(t *testing.T) {
-	t.Setenv(projectWorkVariable, "")
+	t.Setenv(workRootVar, "")
 	root := projectSourcesRoot(t)
 	const stale = ".claude/commands/se-config-gone-away.md"
 	projectWrite(t, root, stale, "stale\n")
@@ -199,7 +199,7 @@ func TestProjectWritesTheWorkRootOffTheMethodSources(t *testing.T) {
 	const note = "spec/guidance/arguing.md"
 	const rule = "1. The work root's rule wins over the method's."
 	projectWrite(t, work, note, "# Actionables\n\n"+rule+"\n")
-	t.Setenv(projectWorkVariable, work)
+	t.Setenv(workRootVar, work)
 	runProject(t, method, false)
 	if got := projectTargetsUnder(t, method); len(got) != 0 {
 		t.Errorf("the method root takes %d target(s), and the work root alone takes them", len(got))

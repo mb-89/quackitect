@@ -26,13 +26,14 @@ import (
 // The glob Vale reads past, as OURS in src/bridge/findings.js names it. [[spec/design_output/lsp]]
 const valeParked = "--glob=!{{.se,node_modules,.git,.claude/types,.claude/worktrees}/**,**/_*}"
 
-// The usage, the rounds Vale fixes at most, Vale's config, biome's config folder and the rule the calm reads. [[spec/tickets/the-small-faults-land]]
+// The usage, the rounds Vale fixes at most, Vale's config, biome's config folder, the rule the calm reads and the mode a calmed file keeps. [[spec/tickets/the-small-faults-land]]
 const (
 	fixUsage    = "Usage: ./RUNME.sh fix [path ...], over the paths or the tree."
 	fixRounds   = 5
 	valeIni     = ".vale.ini"
 	biomeFolder = "spec/config"
 	shoutedLead = "ShoutedLead"
+	calmedMode  = 0o644
 )
 
 // The flags that ask for the usage. [[spec/tickets/the-small-faults-land]]
@@ -90,7 +91,10 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 		}
 		for range fixRounds {
 			was := stampOf(at, paths)
-			calm(at, vale, paths, run)
+			if err := calm(at, vale, paths, run, writeCalmed); err != nil {
+				fmt.Fprintln(errs, err)
+				return exitFailed
+			}
 			run(at, out, errs, append([]string{vale, "fix", "--apply", "--config=" + valeIni, valeParked}, paths...)...)
 			if stampOf(at, paths) == was {
 				break
@@ -152,12 +156,12 @@ type valeRow struct {
 }
 
 // Sentence-cases every shouted lead Vale names over the paths, since Vale reports that fix and applies none. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-func calm(root, vale string, paths []string, run fixRunner) {
+func calm(root, vale string, paths []string, run fixRunner, write func(string, []byte) error) error {
 	var said strings.Builder
 	run(root, &said, io.Discard, append([]string{vale, "--config=" + valeIni, "--output=JSON", "--no-exit", valeParked}, paths...)...)
 	var read map[string][]valeRow
 	if json.Unmarshal([]byte(said.String()), &read) != nil {
-		return
+		return nil
 	}
 	for file, rows := range read {
 		var shouts []valeRow
@@ -178,10 +182,16 @@ func calm(root, vale string, paths []string, run fixRunner) {
 			continue
 		}
 		if now := calmed(string(was), shouts); now != string(was) {
-			_ = os.WriteFile(path, []byte(now), 0o644)
+			if err := write(path, []byte(now)); err != nil {
+				return fmt.Errorf("the calm writes no %s: %w", file, err)
+			}
 		}
 	}
+	return nil
 }
+
+// Writes a calmed file over itself. [[spec/design_output/level0#the-fixer-calms-a-shout]]
+func writeCalmed(path string, text []byte) error { return os.WriteFile(path, text, calmedMode) }
 
 // The text with each shout sentence-cased where it stands at its line and column, the last first, so an earlier span keeps its column. [[spec/design_output/level0#the-fixer-calms-a-shout]]
 func calmed(text string, shouts []valeRow) string {

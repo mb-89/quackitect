@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -59,6 +60,19 @@ func TestFixRefusesWhereNoValeStands(t *testing.T) {
 	root := t.TempDir()
 	if code, _, errs, _ := fixRan(root); code != exitUsage || errs != "Vale is missing. Run ./RUNME.sh once and it installs.\n" {
 		t.Fatalf("fix answers %d and %q, and wants the refusal", code, errs)
+	}
+}
+
+func TestTheCalmNamesAFileItCannotWrite(t *testing.T) {
+	root := fixRoot(t)
+	run := func(_ string, said, _ io.Writer, _ ...string) int {
+		fmt.Fprint(said, shoutedRow)
+		return 0
+	}
+	refuse := func(string, []byte) error { return errors.New("the disk refuses") }
+	err := calm(root, "vale", []string{"a.md"}, run, refuse)
+	if err == nil || !strings.Contains(err.Error(), "a.md") || !strings.Contains(err.Error(), "the disk refuses") {
+		t.Fatalf("the calm answers %v, and wants the file and the cause", err)
 	}
 }
 
@@ -138,7 +152,9 @@ func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
 		if err := os.WriteFile(at, []byte("# Notes\n\n"+shouted+"\n"), 0o644); err != nil {
 			t.Fatal(err)
 		}
-		calm(root, vale, []string{at}, toolRuns)
+		if err := calm(root, vale, []string{at}, toolRuns, writeCalmed); err != nil {
+			t.Fatal(err)
+		}
 		if got, _ := os.ReadFile(at); string(got) != "# Notes\n\n"+want+"\n" {
 			t.Fatalf("the calm over real Vale writes %q, and wants %q", got, want)
 		}

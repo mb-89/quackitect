@@ -18,7 +18,6 @@ import { guidance } from "../../src/scripts/guidance-verb.js";
 import { handed } from "../../src/scripts/pull-hand.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import {
-  configRowsOf,
   keptOf,
   keptOver,
   notesOf,
@@ -80,17 +79,6 @@ test("readsNew holds where the slice reads new, and nowhere else", () => {
   assert.equal(readsNew(itOf("new", {}, {}), "log"), true);
   assert.equal(readsNew(itOf("shadow", {}, {}), "log"), false);
   assert.equal(readsNew(itOf("old", {}, {}), "log"), false);
-});
-
-test("configRowsOf reads the module's map as rows in key order, values as quack config prints them", () => {
-  const rows = configRowsOf({
-    "b.two": { value: "x", layer: "local" },
-    "a.one": { value: 3, layer: "tracked" },
-  });
-  assert.deepEqual(rows, [
-    { key: "a.one", value: 3, layer: "tracked" },
-    { key: "b.two", value: "x", layer: "local" },
-  ]);
 });
 
 // A topic answering nothing is a fault on a new slice, and no reader falls back to its old path. [[spec/tickets/topic-fallback-leaves-the-readers]]

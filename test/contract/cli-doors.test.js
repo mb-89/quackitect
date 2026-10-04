@@ -7,6 +7,7 @@ import { test } from "node:test";
 import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
 import file from "../../spec/config/level0.json" with { type: "json" };
 import schema from "../../spec/config/level0.schema.json" with { type: "json" };
+import * as doors from "../../src/scripts/cli-doors.js";
 import { it } from "../../src/scripts/cli-doors.js";
 
 const said = underBuiltIns(schema, file);
@@ -18,6 +19,13 @@ test("the doors carry the cap and its margin the config names", () => {
   const margin = Number(env.SE_PULL_MARGIN || said.pull.margin);
   assert.equal(Number(it.cap.bytes), bytes);
   assert.equal(Number(it.cap.margin), margin);
+});
+
+// The names only the ported verbs read leave the doors with them. [[spec/tickets/config-verbs-accept-points]]
+test("the doors export none of the names the ported verbs alone read", () => {
+  for (const name of ["STYLES", "SHAPE", "SCRIPTED", "GUIDANCE", "ROUNDS"]) {
+    assert.equal(name in doors, false, `${name} stands in cli-doors.js`);
+  }
 });
 
 // [[spec/tickets/serve-probes-the-register-port]]

@@ -26,6 +26,15 @@ func TestRulesListsEveryStyleMessage(t *testing.T) {
 	}
 }
 
+func TestRulesReadsAMessageEndingInACarriageReturn(t *testing.T) {
+	root := t.TempDir()
+	seedFile(t, root, "spec/config/styles/VoiceVale/Antithesis.yml", "extends: existence\r\nmessage: \"Say what is.\"\r\nlevel: error\r\n")
+	code, out, _ := rulesRan(root)
+	if want := "Antithesis           Say what is.\n"; code != 0 || out != want {
+		t.Fatalf("rules answers %d and %q, and wants %q", code, out, want)
+	}
+}
+
 func TestRulesRefusesWhereNoStyleStands(t *testing.T) {
 	code, _, errs := rulesRan(t.TempDir())
 	if code != exitUsage || errs != "The style folder is missing.\n" {

@@ -15,9 +15,6 @@ import (
 	projector "quackitect/src/projection"
 )
 
-// The variable naming the work root, as the shim sets it. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
-const projectWorkVariable = "SE_WORK_ROOT"
-
 // The modes a projected file and its folder take. [[spec/tickets/config-verbs-port-to-go]]
 const (
 	projectedFile   = 0o644
@@ -34,7 +31,7 @@ func projectVerb(root func() (string, error)) twin {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
-		work := strings.TrimSpace(os.Getenv(projectWorkVariable))
+		work := strings.TrimSpace(os.Getenv(workRootVar))
 		if work == "" {
 			work = method
 		}
@@ -44,7 +41,7 @@ func projectVerb(root func() (string, error)) twin {
 		}
 		targets := projectDisk{root: work}
 		var sources projector.Tree = targets
-		if projectRootBare(method) != projectRootBare(work) {
+		if filepath.Clean(method) != filepath.Clean(work) {
 			sources = projector.Inherits(projectDisk{root: method}, targets)
 		}
 		said := projector.ReadAll(entries, sources, targets)
@@ -83,9 +80,6 @@ func projectWrites(work string, said projector.Result) error {
 	}
 	return nil
 }
-
-// A root with its trailing separators cut, as layer.js compares two roots. [[spec/design_output/vehicle#the-work-root-inherits]]
-func projectRootBare(root string) string { return strings.TrimRight(root, `/\`) }
 
 // The tree under one root on disk. [[spec/design_output/vehicle#the-work-root-inherits]]
 type projectDisk struct{ root string }

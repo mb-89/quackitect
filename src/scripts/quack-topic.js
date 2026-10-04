@@ -94,18 +94,6 @@ export function rowsUnder(rows, where) {
   });
 }
 
-// The rows the config verb prints, off the map `quack config` answers, in key order. [[spec/tickets/cfg-topic-holds-one-resolver]]
-export function configRowsOf(answered) {
-  if (!answered || typeof answered !== "object" || Array.isArray(answered)) return null;
-  return Object.keys(answered)
-    .sort()
-    .map((key) => ({
-      key,
-      value: answered[key]?.value,
-      layer: String(answered[key]?.layer ?? ""),
-    }));
-}
-
 // A reader on a new slice takes its topic's answer, and a topic answering nothing is a fault. [[spec/tickets/topic-fallback-leaves-the-readers]]
 export function answerOf(said, topic) {
   if (said === null || said === undefined) {

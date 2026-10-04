@@ -20,7 +20,7 @@ const ruleColumn = 20
 var ruleStyles = []string{"spec/config/styles/VoiceVale", "spec/config/styles/VoiceShape", "spec/config/styles/VoiceScript"}
 
 // A rule's message line, its quotes left off. [[spec/tickets/config-verbs-port-to-go]]
-var ruleMessage = regexp.MustCompile(`(?m)^message:[ \t]*"?(.*?)"?[ \t]*$`)
+var ruleMessage = regexp.MustCompile(`(?m)^message:[ \t]*"?(.*?)"?[ \t\r]*$`)
 
 func init() { register("rules", rulesVerb(index.Root)) }
 
