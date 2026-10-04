@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    2.5  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 056798343132 · claude-code-remote
+    hash_before: d3f57bf036a6d364bb903b2906cb5b318090fc50
+    hash_after: d3f57bf036a6d364bb903b2906cb5b318090fc50
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   81.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: bb72c84cabbb46b8
+        size: 898
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -352,26 +375,33 @@ pass with findings
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs config, fix, project, rules, standing and doors run in Go. Each registers itself from its own file under src/quack, so the road and the node module hand it to Go and never start node. The project verb rides on a new package, src/projection, that writes the targets projections.json names over both the method and the work roots. The six programs, cli-fix.js and shout.js leave the tree, and cli-check.js keeps only what the check program and the mint still read. verb_config_group_test.go holds the group: each verb registers, reaches no node under new, carries no program, and nothing under src imports a deleted module.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the group test the read group models
+- every door the cases reach rides in as an argument, over a temp root
+- each Go file opens on a header pointing at this ticket
+- the verb list stands once, in verb_config_group_test.go
 
 # accept
 
