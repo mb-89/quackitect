@@ -20,6 +20,18 @@ var (
 	landingImports = regexp.MustCompile(`from\s+"[^"]*/(commit-verb|push-verb|rename)\.js"`)
 )
 
+// A landing repository stands under a folder its test's name stays out of, however long the name runs. [[spec/tickets/landing-verbs-windows-green]]
+func TestLandingRepoStandsUnderAShortFolder(t *testing.T) {
+	t.Run("sentinel, a case named past the Windows path limit "+strings.Repeat("x", 120), func(t *testing.T) {
+		root, origin := landingRepo(t)
+		for _, at := range []string{root, origin} {
+			if strings.Contains(at, "sentinel") || len(filepath.Base(filepath.Dir(at))) > 32 {
+				t.Fatalf("the repository stands at %s, which carries the test's name", at)
+			}
+		}
+	})
+}
+
 func TestLandingVerbsRunInGo(t *testing.T) {
 	for _, verb := range landingVerbs {
 		t.Run(verb+" registers, and the road under new reaches no node for it", func(t *testing.T) {
@@ -101,8 +113,8 @@ func fakeLanding(root string) (landingDoors, *verbsHeard, *[]map[string]any) {
 // A repository on main holding an open ticket and a closed one, pushed to a bare origin. [[spec/tickets/landing-verbs-port-to-go]]
 func landingRepo(t *testing.T) (string, string) {
 	t.Helper()
-	root := t.TempDir()
-	origin := filepath.Join(t.TempDir(), "origin.git")
+	root := shortDir(t)
+	origin := filepath.Join(shortDir(t), "origin.git")
 	gitDoes(t, "", "init", "-q", "--bare", origin)
 	gitDoes(t, "", "init", "-q", "-b", "main", root)
 	for _, one := range [][]string{{"user.name", "a hand"}, {"user.email", "hand@example.invalid"}, {"commit.gpgsign", "false"}, {"core.autocrlf", "false"}} {
@@ -116,6 +128,17 @@ func landingRepo(t *testing.T) (string, string) {
 	gitDoes(t, root, "remote", "add", "origin", origin)
 	gitDoes(t, root, "push", "-q", "origin", "main")
 	return root, origin
+}
+
+// A fresh folder under a short name. t.TempDir names its folder after the test, and a push into a bare origin there runs past the Windows path limit. [[spec/tickets/landing-verbs-windows-green]]
+func shortDir(t *testing.T) string {
+	t.Helper()
+	at, err := os.MkdirTemp("", "land")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { os.RemoveAll(at) })
+	return at
 }
 
 // Runs git under the dir, and stops the test where it fails. [[spec/tickets/landing-verbs-port-to-go]]
@@ -140,11 +163,4 @@ func lays(t *testing.T, root, path, text string) {
 	if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
 		t.Fatal(err)
 	}
-}
-
-// Runs a twin over the words, and answers its code and both streams. [[spec/tickets/landing-verbs-port-to-go]]
-func runsTwin(one twin, words ...string) (int, string, string) {
-	var out, errs strings.Builder
-	code := one(words, false, &out, &errs)
-	return code, out.String(), errs.String()
 }

@@ -30,13 +30,9 @@ test("every verb in the table says what it does", () => {
   }
 });
 
-// The index walks no log, so the find verb hands a log search to the log verb and every other search to the index. [[spec/design_output/log#one-verb-reads-the-log]]
-test("the find verb reads the log through the log verb, and the tree through the index", () => {
-  const program = scriptText("verbs/find.js");
+// The find verb runs in Go, and src/quack/verb_find_test.go proves its two roads; its usage names the log search. [[spec/design_output/log#one-verb-reads-the-log]]
+test("the find verb's usage names the log search", () => {
   assert.match(saysOf("find"), /--log/);
-  assert.match(program, /words\.includes\("--log"\)/);
-  assert.match(program, /logVerb\(tuiDoors\(\), \[\s*"--words"/);
-  assert.match(program, /asksIndex\(\["find", \.\.\.words\]\)/);
 });
 
 // The verb over named files hands them to the branch runner, and test/level0/test-verb.test.js proves that runner's word over a fake. [[spec/design_output/pull#the-test-verb]]
