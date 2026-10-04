@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -164,6 +164,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 056798343132 · claude-code-remote
+    hash_before: 969b2585531b2d2f8e1b71e74510625f4392f3f0
+    hash_after: 969b2585531b2d2f8e1b71e74510625f4392f3f0
+    inputs:
+      - name: retro/write
+        hash: 2ab4198070b0a853
+        size: 2176
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -298,20 +308,34 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 17:43 the index connection the MCP pull reaches refuses once, and the shell verb stands in
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at each sync: three test files at the take, then cli-check.js and the programs test against the box group
+- the commit door twice: a message naming no ticket in hand, then a module change with its test in another file
+- the shell door refusing a git merge, a write past the door, and a landing after a pipe
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step, and no ticket outside this group
+- the handover: the pull request against main carries the group, with auto-merge on
+
+### checked
+
+- each fact stands once in its ticket
+- no number past the names the code already carries
+- no header changes in the retro
+- the errors carry their times
+- roles alone, and no box path
 
 # Discussion
 
