@@ -71,7 +71,10 @@ func TestDispatchVerbRunsTheDryPlanOverTheDoors(t *testing.T) {
 	root := func() (string, error) { return t.TempDir(), nil }
 	v1 := func() (string, error) { return "", nil }
 	sent := false
-	send := func(string, branches.Request) (branches.Reply, error) { sent = true; return branches.Reply{}, errors.New("no network") }
+	send := func(string, branches.Request) (branches.Reply, error) {
+		sent = true
+		return branches.Reply{}, errors.New("no network")
+	}
 	var out, errs bytes.Buffer
 	if code := dispatchVerb(root, v1, send)([]string{"dispatch", "--dry"}, false, &out, &errs); code != 0 {
 		t.Fatalf("the dry run answers %d: %s", code, errs.String())

@@ -38,7 +38,9 @@ func dpTree(t *testing.T, trunkFiles map[string]string) *tree {
 }
 
 // A send door with no network behind it. [[spec/tickets/dispatch-verbs-port-to-go]]
-func dpNoSend(string, Request) (Reply, error) { return Reply{}, errors.New("a case reaches no network") }
+func dpNoSend(string, Request) (Reply, error) {
+	return Reply{}, errors.New("a case reaches no network")
+}
 
 // A group branch whose one commit stands at a time of its own, so a case reads the hold's age. [[spec/tickets/dispatch-verbs-port-to-go]]
 func (one *tree) dpBranchAt(name string, files map[string]string, at time.Time) {
