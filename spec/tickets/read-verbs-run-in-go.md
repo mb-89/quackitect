@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box af8a15ff4571 · claude-code-remote
@@ -128,6 +128,25 @@ record:
       - name: sync/sync
         exit: 0
         said: work/read-verbs-run-in-go took 2 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: 455feaeb9a8bedca
+        size: 317
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
+  - step: accept
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: 64dddeb8cf484bb0df7f9b0f1493fe882ff192db
+    hash_after: 64dddeb8cf484bb0df7f9b0f1493fe882ff192db
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/read-verbs-run-in-go already carries every commit on main.
     inputs:
       - name: ask
         hash: 455feaeb9a8bedca
@@ -193,9 +212,7 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- index-why-prints-text: indexSays in src/quack/verb_index.go prints every answer as JSON, where se-index prints the text of a why answer, so index why prints its tree as JSON
-- lint-row-keeps-floor: the lint row goes through appendsRow in src/quack/verbs.go, which writes below the log.level floor, so every passing lint appends a debug row the JavaScript dropped
+accept
 
 # retro
 
