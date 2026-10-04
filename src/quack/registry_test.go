@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
 	"testing"
 
@@ -59,6 +60,22 @@ func TestVerbRegistry(t *testing.T) {
 		for _, words := range []string{"ticket yours", "retro notes", "branch list --queue"} {
 			if registry[words] == nil {
 				t.Fatalf("the registry holds no %s", words)
+			}
+		}
+	})
+	t.Run("the shared files name no registered verb", func(t *testing.T) {
+		for _, shared := range []string{"verbs.go", "registry.go"} {
+			text, err := os.ReadFile(shared)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if strings.Contains(string(text), "register(\"") {
+				t.Fatalf("%s registers a verb, and a verb registers from its own file", shared)
+			}
+			for words := range registry {
+				if strings.Contains(string(text), `"`+words+`"`) {
+					t.Fatalf("%s names the verb %s, and a port edits no shared line", shared, words)
+				}
 			}
 		}
 	})
