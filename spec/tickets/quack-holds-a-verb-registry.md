@@ -85,7 +85,7 @@ process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 470a600bc22e · claude-code-remote
@@ -134,6 +134,15 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: dde8a2e3bde07ef41647aa8a07959aa1223a965f
+    hash_after: dde8a2e3bde07ef41647aa8a07959aa1223a965f
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 ---
 
 # Ask
@@ -197,8 +206,9 @@ accept. The registry stands in registry.go, each twin registers from an init bes
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
