@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -155,6 +155,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: d5c0221f23b0c412c060145f46a2fdc00ddf9943
+    hash_after: d5c0221f23b0c412c060145f46a2fdc00ddf9943
+    inputs:
+      - name: retro/write
+        hash: 2eacda3f38739688
+        size: 2687
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -294,20 +304,26 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 12:36 the MCP route of ticket pull, which answered with no tool.call hook, so the shell verb carried every hand-back
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 12:30 the stop hook, which refused a turn ending on a background helper
+- 12:43 the clear probe of the check, red on uncommitted files of this box alone, and green once the commit verb landed them
+- the shell guard, which refused git push, git stash and a shell write, and sent each through a verb
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted outside the group
+- the group pull request goes to main with auto-merge on
 
 # Discussion
 
