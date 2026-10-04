@@ -19,10 +19,10 @@ import (
 	"quackitect/src/q"
 )
 
-// How long the action may take before the case names a hang. [[spec/tickets/twin-reads-inside-an-action]]
+// The wait past which the case names a hang. [[spec/tickets/twin-reads-inside-an-action]]
 const liveWait = 20 * time.Second
 
-// The index manager over the real IO accept, as manages wires it, with a clock that never ticks. [[spec/tickets/twin-reads-inside-an-action]]
+// The index manager over the real IO accept, as manages wires it, with a clock standing still. [[spec/tickets/twin-reads-inside-an-action]]
 func managesLive(as q.Writer) index.Manage {
 	return func(root string, store *q.Store, rows index.OpRows, reads index.Reads, steps func(func())) (index.Managed, error) {
 		served, err := manager.Serving(manager.Outside{
