@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box 6183eb94e809 · claude-code-remote
@@ -124,6 +124,25 @@ record:
     hand: the engine
     hash_before: 5e90fabe8bbab6448d31a7696f5f0a9ec7b1dfb6
     hash_after: 5e90fabe8bbab6448d31a7696f5f0a9ec7b1dfb6
+  - step: accept
+    hand: box 056798343132 · claude-code-remote
+    hash_before: bcf5d41e394f43ba3223025ece46aaefb17b7feb
+    hash_after: 71b8d5413867f13bf1a754531af7d4eb0acdeb00
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/config-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 84c47567d30c2e81
+        size: 325
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -174,8 +193,10 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with points
+- config-verbs-accept-points: the rules CRLF line, the calm write error, the project root variable and compare, and the dead exports
 
 # retro
 
