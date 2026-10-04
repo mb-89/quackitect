@@ -100,6 +100,12 @@ func TestACommandTakingAValueReadsAsNodeWritesIt(t *testing.T) {
 	}
 }
 
+func TestTheLocalLayerStandsInTheRuntimeFolder(t *testing.T) {
+	if !strings.HasPrefix(localConfig, ".se/.runtime/") || !strings.HasSuffix(localConfig, "/config.json") {
+		t.Errorf("the local layer reads %s, and wants config.json in the runtime folder", localConfig)
+	}
+}
+
 func TestAStaleCommandStandsAndTheOwnersFileStaysUnowned(t *testing.T) {
 	said := readOver(t, commandsEntry, Texts{
 		"c.json": `{}`, "s.json": commandsSchema,
