@@ -121,7 +121,7 @@ func fixName(words int, main, parent string) string {
 
 var nameJoins = regexp.MustCompile(`[-_.]+`)
 
-// A name past the words it may hold keeps its first ones, as cutTo in src/scripts/ticket.js does. [[spec/design_output/schema#a-name-holds-the-words]]
+// A name past the words it may hold keeps its first ones, as cutTo in src/scripts/ticket.js does. [[spec/tickets/prose-verbs-land-first-try]]
 func cutTo(name string, most int) string {
 	if most <= 0 || check.OverLong(name, most) == "" {
 		return name
@@ -135,7 +135,7 @@ func cutTo(name string, most int) string {
 	return strings.Join(kept, "-")
 }
 
-// The words a name holds at most, off the config. [[spec/design_output/schema#a-name-holds-the-words]]
+// The words a name holds at most, off the config. [[spec/tickets/prose-verbs-land-first-try]]
 func (d *Doors) nameWords() int {
 	said, _ := strconv.Atoi(d.config(namesWords))
 	return said
