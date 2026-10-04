@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-holds-a-verb-registry
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 7f7526f6270128bf
         size: 741
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 470a600bc22e · claude-code-remote
+    hash_before: 185e07a1156c604ab41b75a0ef904eb155c4c6a3
+    hash_after: 185e07a1156c604ab41b75a0ef904eb155c4c6a3
+    answered:
+      - name: lint
+        exit: 0
+        said: "   86.2  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -299,14 +308,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, and two tests: ticket_twins_test, which named a registered verb as its node example, and twin_live_test, which the gate asked for
+- the road takes fake doors, the node module a fake twin, and the live case a served index of its own
+- the header of registry.go names the approach, and each comment links this ticket
+- the registry stands in registry.go alone, and each twin registers beside its own function
 
 ## tests-green
 
