@@ -206,7 +206,8 @@ Under `queue` the hook takes a stop on a helper's wait:
 - The same holds beside a group in hand, and beside a waiting queue.
 - A named pull from an agent refuses, save the ticket a verb mints for this session.
 - A person's named pull passes, and so does one under `--owner-says`.
-- `retro new` sets `minted` to the retro it writes, and pulls it.
+- `retro new` runs in Go and pulls the retro it writes through a child `ticket pull`, with `SE_MINTED` naming that retro in the child's env. The pull lets the ticket `SE_MINTED` names pass the queue.
+- The cost: a hand that sets `SE_MINTED` itself passes the queue too. The cage holds the line where it refuses that variable on a command an agent types.
 - A refusal names the binding and who sets it: [[spec/design_output/stop#a-refusal-names-the-binding]].
 
 **`unbound` is the mode a person talks in.** A session here takes the one ticket
