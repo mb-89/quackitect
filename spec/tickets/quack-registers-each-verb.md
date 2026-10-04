@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: quack-holds-a-verb-registry
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: fa73b414a51abd6a
         size: 2644
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 470a600bc22e · claude-code-remote · helper-4
+    hash_before: 0fc9d5f180f0b54e1a283b0358822f21ed02eb19
+    hash_after: 0fc9d5f180f0b54e1a283b0358822f21ed02eb19
+    inputs:
+      - name: design/draft
+        hash: fa73b414a51abd6a
+        size: 2644
+      - name: design/tests-red
+        hash: 7f7526f6270128bf
+        size: 741
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -272,8 +284,11 @@ Five subtests of TestVerbRegistry fail on their assertions over the stub registe
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- twin-reads-inside-an-action: nodeAccept runs a twin that reads the index over an HTTP GET of values while the action calling the node module stands in flight. The draft asserts the server answers that read, and no test meets the real path, since every subtest hands a fake twin. Run ticket yours through the node module against a live index once, and add a test where a value read settles beside an action.
+- port-diff-stays-one-file: the third done_when line, a port adding one file and no edit of src/quack/verbs.go, meets no command. Add a check that src/quack/verbs.go and src/quack/registry.go name no verb words, or name the port diff as the checkpoint the accept step reads.
 
 # implement
 
