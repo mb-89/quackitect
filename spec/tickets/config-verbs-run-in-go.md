@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box 6183eb94e809 · claude-code-remote
@@ -108,6 +108,18 @@ record:
         exit: 0
         said: work/config-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 056798343132 · claude-code-remote
+    hash_before: adf00d61f4426990c93839de8ccd10d59d461e53
+    hash_after: adf00d61f4426990c93839de8ccd10d59d461e53
+    inputs:
+      - name: ask
+        hash: 84c47567d30c2e81
+        size: 325
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -134,14 +146,20 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/config-verbs-port-to-go]], standard
+- [[spec/tickets/project-port-reads-both-roots]], trivial
+- [[spec/tickets/toolsearch-rides-the-plan-ask]], trivial: a fix box lands it here by mistake, and it merges to main as #92
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the port child holds six verbs that each stand in their own file and test, so a reviewer reads it whole; the project fix reads one verb
+- the port child covers every verb and every deleted module the goal names, and the group test reads the road and the importers, so nothing of the goal stands outside it
+- the project fix follows the port gate and closes before the port does, and the toolsearch child waits on nothing of this group
 
 # children
 
