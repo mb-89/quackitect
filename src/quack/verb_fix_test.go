@@ -85,6 +85,66 @@ func TestFixCalmsAShoutedLead(t *testing.T) {
 	}
 }
 
+func TestSentenceCaseKeepsWhatStandsBeforeTheFirstLetter(t *testing.T) {
+	for said, want := range map[string]string{
+		"NOTHING AT ALL, yes": "Nothing at all, yes",
+		"  SHOUTING HERE":     "  Shouting here",
+		"1984 WAS LOUD":       "1984 Was loud",
+		"....":                "....",
+		"":                    "",
+	} {
+		if got := sentenceCase(said); got != want {
+			t.Fatalf("sentenceCase(%q) answers %q, and wants %q", said, got, want)
+		}
+	}
+}
+
+func TestTheCalmLeavesAStaleSpanAlone(t *testing.T) {
+	was := "# Notes\n\nSomething else entirely.\n"
+	if got := calmed(was, []valeRow{{Line: 3, Span: []int{1, 15}, Match: "NOTHING AT ALL,"}}); got != was {
+		t.Fatalf("the calm writes %q over a stale span", got)
+	}
+}
+
+func TestTheCalmCalmsTwoShoutsOnOneLine(t *testing.T) {
+	got := calmed("AAAA BBBB CCCC, and DDDD EEEE FFFF, done\n", []valeRow{
+		{Line: 1, Span: []int{1, 15}, Match: "AAAA BBBB CCCC,"},
+		{Line: 1, Span: []int{21, 35}, Match: "DDDD EEEE FFFF,"},
+	})
+	if got != "Aaaa bbbb cccc, and Dddd eeee ffff, done\n" {
+		t.Fatalf("the calm writes %q", got)
+	}
+}
+
+func TestACarriageReturnSurvivesTheCalm(t *testing.T) {
+	got := calmed("# Notes\r\n\r\nNOTHING AT ALL WORKS, yes\r\n", []valeRow{{Line: 3, Span: []int{1, 21}, Match: "NOTHING AT ALL WORKS,"}})
+	if got != "# Notes\r\n\r\nNothing at all works, yes\r\n" {
+		t.Fatalf("the calm writes %q", got)
+	}
+}
+
+// Real Vale names the shout, and the calm writes it in sentence case; a box with no Vale skips it. [[spec/design_output/doors#one-contract-test-per-door]]
+func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
+	root, _ := filepath.Abs(filepath.Join("..", ".."))
+	vale := toolHere(root, "vale")
+	if vale == "" {
+		t.Skip("no vale stands on this box")
+	}
+	for shouted, want := range map[string]string{
+		"NOTHING AT ALL WORKS HERE, and then calm.": "Nothing at all works here, and then calm.",
+		"DON'T STOP AT ALL HERE, and then calm.":    "Don't stop at all here, and then calm.",
+	} {
+		at := filepath.Join(t.TempDir(), "it.md")
+		if err := os.WriteFile(at, []byte("# Notes\n\n"+shouted+"\n"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		calm(root, vale, []string{at}, toolRuns)
+		if got, _ := os.ReadFile(at); string(got) != "# Notes\n\n"+want+"\n" {
+			t.Fatalf("the calm over real Vale writes %q, and wants %q", got, want)
+		}
+	}
+}
+
 func TestFixReadsTheTreeWhereNoPathStands(t *testing.T) {
 	_, _, _, ran := fixRan(fixRoot(t))
 	if len(ran) == 0 || !strings.HasSuffix(ran[0], valeParked+" .") {
