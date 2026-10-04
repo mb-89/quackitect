@@ -3,10 +3,10 @@
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
-import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { pathToFileURL } from "node:url";
+import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
@@ -19,7 +19,8 @@ const ROOT = join(import.meta.dirname, "..", "..");
 test("every verb of the table loads as a program answering a run, or registers in Go", async () => {
   const go = registered();
   const listed = new Set(commands().keys());
-  for (const one of readdirSync(join(ROOT, ...VERBS))) {
+  const files = disk();
+  for (const { name: one } of files.list(join(ROOT, ...VERBS))) {
     assert.ok(
       listed.has(one.replace(/\.js$/, "")),
       `${one} answers no verb of the table`,
@@ -27,7 +28,7 @@ test("every verb of the table loads as a program answering a run, or registers i
   }
   for (const verb of listed) {
     const program = join(ROOT, ...VERBS, `${verb}.js`);
-    if (existsSync(program)) {
+    if (files.exists(program)) {
       const { run } = await import(pathToFileURL(program).href);
       assert.equal(typeof run, "function", `${verb} runs`);
     } else {

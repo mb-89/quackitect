@@ -3,7 +3,6 @@
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 import * as vehicle from "../../.claude/skills/level0/lib/vehicle.js";
@@ -37,16 +36,6 @@ function nameless(at) {
 }
 
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-// The setup stamps through src/quack/brand.go, so brand.js stands as the review's module alone. [[spec/tickets/box-verbs-brand-caller]]
-test("brand.js carries no program entry of its own", () => {
-  const source = readFileSync(
-    new URL("../../src/scripts/brand.js", import.meta.url),
-    "utf8",
-  );
-  assert.doesNotMatch(source, /^#!/);
-  assert.doesNotMatch(source, /process\.argv/);
-});
-
 test("a folder name answers the slug a marketplace takes", () => {
   assert.equal(brandOf("/x/quackitect"), "quackitect");
   assert.equal(brandOf("/x/my.app"), "my-app");

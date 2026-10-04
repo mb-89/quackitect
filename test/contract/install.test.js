@@ -20,7 +20,18 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const SETUP = join(root, "src", "quack", "setup_verb.go");
 
 // The setup's wants, read off the Go verb, which names each under want. [[spec/tickets/box-verbs-port-to-go]]
-const WANTS = [...disk().read(SETUP).matchAll(/^\s*want:\s+"([\w-]+)",$/gm)].map((one) => one[1]);
+const WANTS = [
+  ...disk()
+    .read(SETUP)
+    .matchAll(/^\s*want:\s+"([\w-]+)",$/gm),
+].map((one) => one[1]);
+
+// The setup stamps through src/quack/brand.go, so brand.js stands as the review's module alone. [[spec/tickets/box-verbs-brand-caller]]
+test("brand.js carries no program entry of its own", () => {
+  const source = String(disk().read(join(root, "src", "scripts", "brand.js")));
+  assert.doesNotMatch(source, /^#!/);
+  assert.doesNotMatch(source, /process\.argv/);
+});
 
 test("every binary this tree builds rebuilds when its source moves ahead", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
@@ -40,23 +51,37 @@ test("the install names no node", () => {
 
 // The steps that run JavaScript stand behind the setup verb, which the install reaches through the index. [[spec/tickets/install-drops-node]]
 test("the install hands its JavaScript steps to the setup verb, and goes on where it stops", () => {
-  const rows = disk().read(join(root, "src", "scripts", "install.sh")).split("\n");
-  const at = rows.findIndex((row) => /\$index" verb "\$root\/src\/scripts" setup/.test(row));
+  const rows = disk()
+    .read(join(root, "src", "scripts", "install.sh"))
+    .split("\n");
+  const at = rows.findIndex((row) =>
+    /\$index" verb "\$root\/src\/scripts" setup/.test(row),
+  );
   assert.ok(at >= 0, "the script runs the setup verb through the index binary");
   assert.match(
     `${rows[at]}\n${rows[at + 1] ?? ""}`,
     /\|\|\s*\n?\s*say /,
     "the setup carries a fallback line, so a refusal stops no verb",
   );
-  assert.match(disk().read(SETUP), /registerBox\("setup", /, "the verb registers in the index");
+  assert.match(
+    disk().read(SETUP),
+    /registerBox\("setup", /,
+    "the verb registers in the index",
+  );
   assert.ok(WANTS.length > 0, "the verb names its wants");
 });
 
 // The shell spells the asset table servers.js owns, because a shell script imports nothing. [[spec/design_output/editor#the-asset-matrix]]
 test("the vale-ls assets the install spells match the ones servers.js names", () => {
   const said = disk().read(join(root, "src", "scripts", "install.sh"));
-  assert.match(said, new RegExp(`^vale_ls_version=${VALE_LS_VERSION.replaceAll(".", "\\.")}$`, "m"));
-  assert.ok(said.includes(VALE_LS_RELEASES), "the script downloads from the releases servers.js names");
+  assert.match(
+    said,
+    new RegExp(`^vale_ls_version=${VALE_LS_VERSION.replaceAll(".", "\\.")}$`, "m"),
+  );
+  assert.ok(
+    said.includes(VALE_LS_RELEASES),
+    "the script downloads from the releases servers.js names",
+  );
   const rows = [...said.matchAll(/^\s*(\w+)-([\w-]+)\)\s+target=(\S+) ;;$/gm)];
   assert.equal(rows.length, 6, "the script names every platform servers.js names");
   for (const [, os, arch, target] of rows) {
@@ -121,8 +146,15 @@ test("a box with no index names the index build before the verb, and starts no s
   const rows = text.split("\n");
   const at = rows.findIndex((row) => /no index here, so the setup waits/.test(row));
   assert.ok(at >= 0, "the road names the index build");
-  assert.match(rows[at], /install\.sh/, "the line names the install that builds the index");
-  assert.ok(at < rows.findIndex((row) => /exec node "\$program"/.test(row)), "the line comes before the verb");
+  assert.match(
+    rows[at],
+    /install\.sh/,
+    "the line names the install that builds the index",
+  );
+  assert.ok(
+    at < rows.findIndex((row) => /exec node "\$program"/.test(row)),
+    "the line comes before the verb",
+  );
   assert.doesNotMatch(text, /verbs\/setup\.js/, "the road starts no setup program");
 });
 
