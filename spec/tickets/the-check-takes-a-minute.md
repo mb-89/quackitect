@@ -50,11 +50,15 @@ Every push and every hand-back waits on `./RUNME.sh check`, so its length sets t
 
 <!-- the form is command -->
 
+./RUNME.sh test test/level0/cli-stamp.test.js test/level0/battery.test.js test/level0/check-server.test.js test/level0/probe-dry.test.js test/level0/probe-cold.test.js test/contract/cli-verbs.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -62,11 +66,23 @@ Every push and every hand-back waits on `./RUNME.sh check`, so its length sets t
 
 <!-- the form is text -->
 
+The check ran its parts one after another, and the level zero dry probe cost the most part on every run while it mostly waited on its processes. Now the probe starts once the tests end and runs beside the go, doors, projections, plugin, server and rules parts. The battery waits for it before it stamps, and its red reads red.
+
+- `batteryRun` in `src/scripts/cli-stamp.js` starts a part marked beside and goes on, and answers the battery's span as `total`.
+- `partsOf` in `src/scripts/check-verb.js` marks level zero beside, right after the tests, because a contract case reads a clock a loaded box slows.
+- `probeApart` in `src/scripts/probe-dry.js` runs `probe dry --working` in a process of its own. The probe's clone and verbs wait on synchronous spawns, and those held the check's own loop, so a probe inside the check overlapped nothing.
+- `takesDelta` in `src/scripts/probe-cold.js` commits the working change in the clone. Before, the clear's handover refused the uncommitted change, so a check over a dirty tree read level zero red.
+- The stamp's `total` in [[spec/design_output/work#the-battery-answers-first]] reads the battery's span.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: level zero runs beside the parts after the tests, and the stamp's total reads under the sum of its parts
+- the cleanup it reveals: the dirty-tree red in the dry probe is in the change, since the overlap measured red without it
+- every fact stands once: the word `--working` lives in `WORKING` in probe-dry.js, and `deltaOf` moved beside the probe, with cli-check.js passing it on
 
 # Discussion
 
@@ -103,3 +119,21 @@ The Go part after a change, per package, in seconds:
 The slowest test cases in `.se/.runtime/tests.jsonl` sit near two seconds each, so no single case dominates the tests part.
 
 The level0 dry probe costs the most on every run, and nothing caches it. It goes first.
+
+The calls I took, with nobody to ask:
+
+- Level zero starts after the tests, not with them. The probe's install builds Go in its clone, and that load landing on the contract cases risks the flicker [[spec/tickets/the-battery-flickers-under-load]] fixed. Starting it with the tests would save the tests' span again, and costs that risk.
+- A first try ran the probe inside the check's own process, and the total held still while the probe slowed. The probe waits on synchronous spawns, which hold the loop, so it runs apart now.
+- The same try read red: the probe over a dirty tree failed its clear, on main as well. The clone commits the change now.
+
+The check after the change, on the same box, in seconds:
+
+| part | first run, Go tests rerun | second run, nothing changed |
+|---|---|---|
+| level0 | 34.6 | 31.0 |
+| go | 32.7 | 5.0 |
+| tests | 20.4 | 20.6 |
+| rules | 6.5 | 7.1 |
+| in all, the battery's span | 61.4 | 51.5 |
+| sum of the parts | 97.0 | 66.8 |
+| wall time of `./RUNME.sh check` | 62.4 | 53.0 |
