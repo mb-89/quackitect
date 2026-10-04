@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry", "work-verbs-run-in-go"]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 89388e314a84 · claude-code-remote
@@ -148,6 +148,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 00e5f1a1f19b · claude-code-remote
+    hash_before: 1d4685cd5fe3a624099fd2a2478145ab9600e7b4
+    hash_after: 1d4685cd5fe3a624099fd2a2478145ab9600e7b4
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -226,38 +238,58 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the merge of main resolved: test/contract/verb-programs.test.js takes main's side, which reads the verb folder and the Go registry
+- sync, split, accept and retro/notes passed on dispatch-verbs-run-in-go
+- the goal read against the tree: dispatch runs in Go, its JavaScript and tests left, no orphan module stands
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the conflict resolved on one read, because main's test reads the folder and names no verb
+- the accept read fast, because the child's port carried a Go case for each JavaScript case it dropped
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 22:15 UTC: a git checkout and git add on the conflicted file met GitWritesThroughAVerb, and the write went through the patch door instead
+- 22:16 UTC: three patch calls failed with the index restarts, because a doctor run rebuilt the index while they waited
+- 22:22 UTC: the sync field took prose, then a bare verb, before the hand-back took ./RUNME.sh branch sync
+- the check took past its budget under battery.budget, with go the slowest part
+- no owner prompt turned the run, since a schedule started it
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the branch take brief: name the patch door as the road for a conflicted file
+- the doctor verb: leave the index standing while a patch waits on it
+- the command form in spec/schemas: show a full ./RUNME.sh line as the example
+- the check budget stays a warning, and the battery owner weighs the go part
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The group came to this box with its one child closed and only the merge in the way. The work was reading the goal against the tree, not writing code. I weighed whether the dropped JavaScript case left a hole, and found its Go twin before I accepted.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: the change adds no fact, it takes main's test as it stands
+- numbers: the change adds no number
+- headers: the change writes no header
+- prompts and errors: badly lists each error with its time, and no owner prompt came
+- role: the chapter names the box by role and carries no name, address or path
 
 ## cloud
 
