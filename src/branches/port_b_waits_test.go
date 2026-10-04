@@ -83,7 +83,7 @@ func pbTwoGroups(t *testing.T, gate string) (*tree, int, string, string) {
 	return one, code, a, b
 }
 
-// A take walks past a group whose gate stands open on trunk, names the wait, and claims the next free one. [[spec/tickets/work-verbs-port-to-go]]
+// A take walks past a group whose gate stands open on trunk and claims the next free one, and the listing names the wait. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeWalksPastAnOpenGate(t *testing.T) {
 	one, code, a, b := pbTwoGroups(t, openState)
 	if code != 0 {
@@ -98,11 +98,11 @@ func TestPBTakeWalksPastAnOpenGate(t *testing.T) {
 	if taken := heldIn(one.git("show", "origin/work/b-free:"+ticketAt("b-free"))); taken == nil || !strings.HasPrefix(taken.Hand, pbBox) {
 		t.Errorf("the claim on b-free reads %+v", taken)
 	}
-	for _, line := range []string{"work/a-gated stays at todo", "a-child waits for " + pbGate + " to close"} {
-		if !strings.Contains(pbSaid(one), line) {
-			t.Errorf("%q holds no %q", pbSaid(one), line)
-		}
-	}
+	one.out.Reset()
+	one.errs.Reset()
+	one.branchSays("list")
+	pdMatches(t, pbSaid(one), `work/a-gated\s+todo`)
+	pdMatches(t, pbSaid(one), `(?m)^ {2}a-child\s+ticket\s+open\s+waits for `+pbGate)
 }
 
 // A gate the owner closes on trunk frees its group for the take. [[spec/tickets/work-verbs-port-to-go]]
