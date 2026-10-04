@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box a2b0848f196c · claude-code-remote
@@ -148,6 +148,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 7e5eda79bc84 · claude-code-remote
+    hash_before: c6dcba970f5c6e8c475aaa1bd9ba500d7695faa2
+    hash_after: c6dcba970f5c6e8c475aaa1bd9ba500d7695faa2
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -224,38 +236,55 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- landing-verbs-port-to-go: closed by the earlier box, with commit, push and rename in Go and their JavaScript gone
+- this box took the branch over at sync, passed sync, split and accept, and drained the notes
+- an orphan search of src names no module the three verbs left behind
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the earlier box closed the whole child, so this box had a review alone to do
+- the done lines of the child match the group's ask, so the accept reads one list
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 15:05: a Bash call with no ticket in its description met a refusal, and the next call named the ticket
+- 15:20: the check inside branch review failed three cases, a timing budget and two Vale cases. The same cases passed alone three times, and the full check exits 0
+- 15:20: a pipe through tail hid the exit of the check, and a second run read it alone
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the hook's refusal text names the shape, so the description names its ticket from the first call, owned by the write door
+- the flaky budget case asks a ticket of its own, owned by test/level0/budget.test.js, where the check runs under load
+- the exit rides out of a pipe through pipefail, owned by the agent's own habit
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The branch reached this box with the work done and the gate open. The one judgement was whether the three red cases in the review run belonged to this branch. They touch no file of the diff and pass alone, so the box judged them load on a shared box.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the retro adds no fact the tree states elsewhere, and points at the child ticket for the work
+- the retro adds no number
+- the retro writes no file header
+- the chapter carries each error with its time, and no owner prompt reached this run
+- the chapter names roles alone, and no path of the box
 
 ## cloud
 
