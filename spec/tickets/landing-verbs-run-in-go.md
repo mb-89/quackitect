@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -160,6 +160,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 7e5eda79bc84 · claude-code-remote
+    hash_before: c1018e156f7b5fd95552e05a18dcf1bf186d4d06
+    hash_after: c1018e156f7b5fd95552e05a18dcf1bf186d4d06
+    inputs:
+      - name: retro/write
+        hash: a50c4c68cf18bbdd
+        size: 1750
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -293,20 +303,25 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool the branch asked for stood installed, and no host or right met a refusal
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a hook refused a Bash call whose description named no ticket, at the first read
+- the check inside branch review failed three cases that pass alone, a timing budget and two Vale cases
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted
+- the pull request from work/landing-verbs-run-in-go against main carries the merge, with auto-merge on
 
 # Discussion
 
