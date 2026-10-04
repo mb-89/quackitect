@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: ticket-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 1ff3e4f063e55817
         size: 5709
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box f2894f4960c9 · claude-code-remote · helper-4
+    hash_before: 72e511200c765d9e35105be6b45e590858e0506e
+    hash_after: 72e511200c765d9e35105be6b45e590858e0506e
+    inputs:
+      - name: design/draft
+        hash: 1ff3e4f063e55817
+        size: 5709
+      - name: design/tests-red
+        hash: 64f34afd472c5fe2
+        size: 1272
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -296,8 +308,12 @@ Every case of the four files fails on its own assertion, because the registry ho
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- verbs-name-frontmatter-writer: the approach names no Go frontmatter writer for the pull, the mint and the split, and the ask's second paragraph makes it their one write road. Name the writer each port calls, and keep ticket*.js, pull*.js, mint-verb.js and split-verb.js until it stands
+- ticket-verbs-importer-case: no test decides the importer done_when line. The closure script checked names stands nowhere, and TestTicketVerbsRunInGo reads absence alone. Add a Go case that searches src for an import of each module leftScripts names
+- ticket-sub-verb-red-cases: the ticket sub-verbs and the pull carry no red case yet, so the first done_when line stands half decided. Land each sub-verb's case file red before its code, and list it under tests-red/red
 
 # implement
 
