@@ -112,13 +112,15 @@ test("the skip list names every want of the install and the setup, and nothing e
   assert.deepEqual(FETCHING.split(" ").sort(), wants.sort());
 });
 
-// A box with no Go builds no index, so the road RUNME.sh takes there runs the setup itself. [[spec/tickets/setup-runs-without-an-index]]
-test("a box with no index runs the setup before the verb, and a stop costs one line", () => {
-  const rows = disk().read(join(root, "RUNME.sh")).split("\n");
-  const at = rows.findIndex((row) => /node "\$here\/src\/scripts\/verbs\/setup\.js"/.test(row));
-  assert.ok(at >= 0, "the road runs the setup verb");
-  assert.ok(at < rows.findIndex((row) => /exec node "\$program"/.test(row)), "the setup runs before the verb");
-  assert.match(`${rows[at]}\n${rows[at + 1]}`, /\|\|\s*\n\s*printf /, "a stop stops no verb");
+// The setup runs in the index, so a box with no index names the build as its step, and the verb still runs. [[spec/tickets/setup-road-without-index]]
+test("a box with no index names the index build before the verb, and starts no setup", () => {
+  const text = disk().read(join(root, "RUNME.sh"));
+  const rows = text.split("\n");
+  const at = rows.findIndex((row) => /no index here, so the setup waits/.test(row));
+  assert.ok(at >= 0, "the road names the index build");
+  assert.match(rows[at], /install\.sh/, "the line names the install that builds the index");
+  assert.ok(at < rows.findIndex((row) => /exec node "\$program"/.test(row)), "the line comes before the verb");
+  assert.doesNotMatch(text, /verbs\/setup\.js/, "the road starts no setup program");
 });
 
 // The index builds with Go alone. [[spec/design_output/index#the-compiler-it-needs]]
