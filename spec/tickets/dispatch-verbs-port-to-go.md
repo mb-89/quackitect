@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: dispatch-verbs-run-in-go
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 6966bd6d7cd4bf05
         size: 4039
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 89388e314a84 · claude-code-remote · helper-4
+    hash_before: 0da234231756437e47a54868da08750d8350d2b2
+    hash_after: 0da234231756437e47a54868da08750d8350d2b2
+    inputs:
+      - name: design/draft
+        hash: 6966bd6d7cd4bf05
+        size: 4039
+      - name: design/tests-red
+        hash: e2bd44fe2f366469
+        size: 981
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,17 @@ The port and the plan's cases landed in one commit, as the work group's did, so 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask. The dispatch ports into src/branches (dispatch.go for the plan, dispatch_write.go for the writes, dispatch_fire.go for the fire). It reads the Go copy the work verbs landed, so the Action and the boxes agree on what is free, and it registers from src/quack/dispatch.go with httpSend as its send door. In src/branches, go test -run Dispatch passes its sixteen plan cases, and they cover every plan road of dispatch.test.js. TestDispatchNamesTheSameReadyGroupsTheFreeReadNames carries the planOf road of work-stands.test.js. src/quack/dispatch_test.go TestDispatchLeavesNode fails on its own assertion: the four modules stand, and three imports reach them. It decides the no-node, verbs-folder and importer lines, and ./RUNME.sh check decides the last. Weighed: the write roads and the fire roads have code but no Go case. The draft names dispatch_write_test.go and dispatch_fire_test.go, and neither file stands. So done_when line 1 stands promised, and no test decides it yet. I accept rather than reject because the draft already names both files and every road they hold, and implement writes them where it stands. A reject sends the same list back for a round. Points for implement, fixed in place, no child:
+- write src/branches/dispatch_write_test.go over the dispatch.test.js write roads: one fix group carrying fix: true, one commit on claude/dispatch-<commit> with no push to main, a standing write branch writes nothing, an unmerged write branch stops every write and the plan still names workers, a merged one stops nothing, the person route stays loose, opens of work/<name>, the name cap and the cut keeping the commit, the worktree removed after a push and after a refused push, markOff, a parent's close landing once over two runs, and a fix group per parent
+- add to it a case pinning processHash in dispatch_write.go to the hash processHash in src/scripts/lib/schema-route.js gives for one process, so the route copy matches the JS before the JS leaves
+- add the Vale case over the minted fix group's ask that the approach names in place of askFaults; no such case stands
+- write src/branches/dispatch_fire_test.go over a fake Send, for the nine roads of dispatch-fire.test.js: once per ready group and stuck hand-over, the routine cap, a refused fire exiting 1 with its reason, a rate refusal naming the reset, no issues API, the write branch's pull request on PULL_TOKEN with auto-merge, no second pull request, missing secrets, and --json --fire
+- the size and callers lists miss spec/design_output/work.md, whose table rows for opensOf, closesOf and bundlesOf point at src/scripts/dispatch.js and dispatch-write.js; move those pointers to the Go functions
+- the importer walk in TestDispatchLeavesNode matches only a double-quoted path; biome writes double quotes, so it holds today, and a single-quoted import passes it unseen
 
 # implement
 
