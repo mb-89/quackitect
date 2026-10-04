@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 08f4218ba236 · claude-code-remote
+    hash_before: c37e3a88dbdf0990f82395bc2d7f2a863cee45cb
+    hash_after: c37e3a88dbdf0990f82395bc2d7f2a863cee45cb
+    inputs:
+      - name: ask
+        hash: f1ff445a4ded1e1b
+        size: 590
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,77 @@ The retro verbs run in Go beside `retro notes`, the twin that already stands. Un
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each retro sub-verb registers itself from its own file under src/quack, through register("retro <sub>", ...), the way twins.go registers retro notes. The verbs mode stands at new by default, so twinOf hands each one to Go and no node starts.
+
+- One file a verb: retro_audit.go, retro_backlog.go, retro_collect.go, retro_timeline.go, retro_chapters.go, retro_read.go, retro_matrix.go, retro_effect.go, retro_classes.go, retro_mint.go, retro_new.go, retro_score.go. retro_usage.go registers the bare retro and prints the usage as retro.js does, exit 0 bare and 2 on an unknown word.
+- Support files register nothing: retro_home.go holds the retro folder, its input folder and the timed sources; retro_findings.go, retro_report.go and retro_outside.go hold what several verbs read.
+- Every Go name in these files starts with retro, so no sibling group porting into package main in parallel meets a clash.
+- Each verb prints what its JavaScript prints, byte for byte, and exits as it does. The Go cases port every JavaScript case of the retro tests one for one.
+- retro new and retro mint reach the mint and the pull through ./RUNME.sh mint and ./RUNME.sh ticket pull as child processes, as runIn in mint.js does today. Those verbs belong to other groups of phase 11, and this group ports none of them.
+- The JavaScript leaves: src/scripts/verbs/retro.js, src/scripts/retro.js, retro-collect.js, retro-new.js, retro-outside.js, retro-score.js, every file of src/engine/retro, and test/level0/retro-*.test.js but retro-notes-pull.test.js, which tests the pull. battery.js, process.js, pull.js and group.js stay, since other JavaScript imports them.
+- The shared lines this forces: verb-programs.test.js drops its retro import, cli-mint-callers.test.js drops the retro caller, contract/experiment.test.js reads the experiment path as a literal, and level0/experiment.test.js keeps its process case and gives its two audit cases to Go.
+
+Weighed: one Go file holding every sub-verb reads shorter, and the registry design refuses it, since it puts one verb in one file. Assumed: this box decides the owner-read step, as rule 6 of the cloud guidance says.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/scripts/verbs/retro.js run: the node road for retro, which leaves
+- src/quack/twins.go nodeAccept: hands a registered retro verb to goAnswer, so the index actions retro/* answer in Go
+- src/quack/verbs.go roadOf and twinOf: route ./RUNME.sh retro <sub> to the registered twin
+- src/modules/verbs/retro.go RetroVerbs: the action list, unchanged
+- spec/processes/retro.yaml and group.yaml: name the retro verbs as needs, unchanged
+- test/contract/verb-programs.test.js: imports verbs/retro.js
+- test/contract/cli-mint-callers.test.js: imports newRetro
+- test/contract/experiment.test.js: imports EXPERIMENT
+- test/level0/experiment.test.js: imports openTrials and EXPERIMENT
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/retro_usage_test.go: TestRetroUsageNamesEveryVerb, off retro-usage.test.js
+- src/quack/retro_audit_test.go: one case a title of the two audit cases in level0/experiment.test.js
+- src/quack/retro_backlog_test.go: one case a title of retro-backlog.test.js
+- src/quack/retro_collect_test.go: one case a title of retro-collect.test.js, retro-collect-median.test.js and retro-outside.test.js
+- src/quack/retro_timeline_test.go, retro_chapters_test.go, retro_matrix_test.go: one case a title of retro-matrix.test.js
+- src/quack/retro_read_test.go: one case a title of retro-read.test.js
+- src/quack/retro_classes_test.go: one case a title of retro-classes.test.js
+- src/quack/retro_effect_test.go: one case a title of retro-effect.test.js
+- src/quack/retro_mint_test.go: one case a title of retro-mint.test.js
+- src/quack/retro_new_test.go: one case a title of retro-new.test.js
+- src/quack/retro_score_test.go: TestRetroScoreCountsOpenImprovements, a case the JavaScript lacks
+- src/quack/retro_registry_test.go: TestEveryRetroVerbRegisters, every name of RetroVerbs answers a registered twin, which decides the reaches-no-node line
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/retro_*.go and their _test.go files, new
+- src/scripts/verbs/retro.js, src/scripts/retro*.js, src/engine/retro/*.js, test/level0/retro-*.test.js but retro-notes-pull, removed
+- test/contract/verb-programs.test.js, cli-mint-callers.test.js, experiment.test.js and test/level0/experiment.test.js, edited
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: retro.js, each engine/retro file's imports, twins.go nodeAccept, verbs.go twinOf and roadOf, registry.go, and migration.verbs at new in the config
+- the callers list names every importer a search of src and test finds for the files that leave
+- every done_when line names its test: go test is the battery, TestEveryRetroVerbRegisters decides reaches-no-node, and the ls, the importer search and ./RUNME.sh check run at implement/tests-green
 
 ## tests-red
 
