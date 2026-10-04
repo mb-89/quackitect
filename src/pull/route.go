@@ -169,8 +169,14 @@ func DriftBase(log func() (string, bool), show func(sha string) string, hash str
 	return nil, false
 }
 
-// The new route with every leaf the ticket reached keeping what it holds, how many kept, or why the route holds no leaf where the ticket stands. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-func UpdatedRoute(held *yaml.Doc, route []any) ([]any, int, string) {
+// The new route with every leaf the ticket reached keeping what it holds, or why the route holds no leaf where the ticket stands. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+func UpdatedRoute(held *yaml.Doc, route []any) ([]any, string) {
+	steps, _, why := UpdatedRouteKept(held, route)
+	return steps, why
+}
+
+// The new route as UpdatedRoute answers it, and how many leaves kept what they hold. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+func UpdatedRouteKept(held *yaml.Doc, route []any) ([]any, int, string) {
 	step := strings.TrimSpace(yaml.AsString(held.Get("step")))
 	if step != "" && !holdsLeaf(EntriesIn(route), step) {
 		return nil, 0, fmt.Sprintf("This ticket stands at %s, and the new route holds no such leaf. Edit the route on the ticket, or close it.", step)

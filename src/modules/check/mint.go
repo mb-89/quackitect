@@ -48,6 +48,7 @@ func mintedNote(schemas *Kinds, kind, where string, fields map[string]any) (stri
 		for _, one := range found {
 			lines = append(lines, fmt.Sprintf("  %s:%d:%d  %s\n    %s", where, one.Line, one.Column, one.Rule, one.Message))
 		}
+		lines = append(lines, "", fmt.Sprintf("Run ./RUNME.sh mint %s <path> for the shape it names, or park a draft as _name.md.", kind))
 		return "", strings.Join(lines, "\n")
 	}
 	return text, ""

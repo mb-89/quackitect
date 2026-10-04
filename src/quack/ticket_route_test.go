@@ -35,8 +35,8 @@ type jsCases struct {
 	Cases  []jsCase           `json:"cases"`
 }
 
-// Runs every case of the file through the registry under ticket, and holds the Go answer to the JS answer byte for byte. [[spec/tickets/ticket-verbs-port-to-go]]
-func runsJSCases(t *testing.T, at string) {
+// Reads a file of JS cases. [[spec/tickets/ticket-verbs-port-to-go]]
+func jsCasesAt(t *testing.T, at string) jsCases {
 	t.Helper()
 	said, err := os.ReadFile(at)
 	if err != nil {
@@ -46,6 +46,20 @@ func runsJSCases(t *testing.T, at string) {
 	if err := json.Unmarshal(said, &held); err != nil {
 		t.Fatal(err)
 	}
+	return held
+}
+
+// Runs every case of the file through the registry under ticket, over the files each base file shares and then its own, and holds the Go answer to the JS answer byte for byte. [[spec/tickets/ticket-verbs-port-to-go]]
+func runsJSCases(t *testing.T, at string, bases ...string) {
+	t.Helper()
+	shared := map[string]*string{}
+	for _, base := range append(bases, at) {
+		for path, text := range jsCasesAt(t, base).Shared {
+			shared[path] = text
+		}
+	}
+	held := jsCasesAt(t, at)
+	held.Shared = shared
 	for _, one := range held.Cases {
 		t.Run(one.Name, func(t *testing.T) {
 			root := t.TempDir()

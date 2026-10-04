@@ -78,7 +78,7 @@ func TestUpdatedRoute(t *testing.T) {
 	t.Run("the new leaf lands where the ticket has yet to reach it", func(t *testing.T) {
 		front := yamlOf("step: one\nsteps:\n  - name: one\n    does: the old first\n  - name: two\n    does: the old second\n")
 		route := yaml.AsList(yamlOf("steps:\n  - name: one\n    does: the new first\n  - name: two\n    does: the new second\n").Get("steps"))
-		steps, kept, why := UpdatedRoute(front, route)
+		steps, kept, why := UpdatedRouteKept(front, route)
 		if why != "" || kept != 1 || yaml.AsString(yaml.AsDoc(steps[0]).Get("does")) != "the old first" || yaml.AsString(yaml.AsDoc(steps[1]).Get("does")) != "the new second" {
 			t.Errorf("the update answers %v, %d, %q", steps, kept, why)
 		}
@@ -86,7 +86,7 @@ func TestUpdatedRoute(t *testing.T) {
 	t.Run("a leaf the record holds keeps what it holds", func(t *testing.T) {
 		front := yamlOf("step: two\nrecord:\n  - step: one\nsteps:\n  - name: one\n    does: the old first\n  - name: two\n    does: the old second\n  - name: three\n    does: the old third\n")
 		route := yaml.AsList(yamlOf("steps:\n  - name: one\n    does: the new first\n  - name: two\n    does: the new second\n  - name: three\n    does: the new third\n").Get("steps"))
-		steps, _, _ := UpdatedRoute(front, route)
+		steps, _ := UpdatedRoute(front, route)
 		for i, want := range []string{"the old first", "the old second", "the new third"} {
 			if got := yaml.AsString(yaml.AsDoc(steps[i]).Get("does")); got != want {
 				t.Errorf("leaf %d does %q, and wants %q", i, got, want)
@@ -95,7 +95,7 @@ func TestUpdatedRoute(t *testing.T) {
 	})
 	t.Run("a pointer the new route lacks is refused", func(t *testing.T) {
 		front := yamlOf("step: decide\nsteps:\n  - name: decide\n")
-		if _, _, why := UpdatedRoute(front, yaml.AsList(yamlOf(routeTwo).Get("steps"))); why == "" {
+		if _, why := UpdatedRoute(front, yaml.AsList(yamlOf(routeTwo).Get("steps"))); why == "" {
 			t.Error("a pointer the route lacks passes")
 		}
 	})
