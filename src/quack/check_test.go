@@ -375,6 +375,16 @@ func TestCheckVerb(t *testing.T) {
 			t.Fatalf("the stamp reads %s, and wants the unrun parts", stamp)
 		}
 	})
+	t.Run("a green run under --errors prints the no-red line alone, past the parts' own lines", func(t *testing.T) {
+		fake := &checkFake{}
+		var said strings.Builder
+		doors := fake.doors()
+		doors.root, doors.out, doors.red = t.TempDir(), &said, []string{"test/level0/a.test.js"}
+		code := checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check", "--errors"}, false, &said, io.Discard)
+		if code != 0 || strings.TrimSpace(said.String()) != noErrors {
+			t.Fatalf("the run answers %d, %q", code, said.String())
+		}
+	})
 	t.Run("the stamp counts the warnings the lint leaves", func(t *testing.T) {
 		fake := &checkFake{}
 		doors := fake.doors()
@@ -389,6 +399,50 @@ func TestCheckVerb(t *testing.T) {
 		checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check"}, false, io.Discard, io.Discard)
 		if stamp := doors.text(stampFile); !strings.Contains(stamp, `"warnings": 1`) || !strings.Contains(stamp, `"src/a.go"`) {
 			t.Fatalf("the stamp reads %s", stamp)
+		}
+	})
+}
+
+func TestVerbOver(t *testing.T) {
+	type ran struct {
+		argv, env []string
+		quiet     bool
+	}
+	over := func(code int, said string) (func(words []string, quiet bool) int, *[]ran, *strings.Builder) {
+		runs := []ran{}
+		var errs strings.Builder
+		run := func(argv, env []string, quiet bool) (int, string, error) {
+			runs = append(runs, ran{argv, env, quiet})
+			return code, said, nil
+		}
+		return verbOver(run, []string{"/q", "verb", "/tree/src/scripts"}, []string{"SE_LINT_FOUND=/tree/x"}, &errs), &runs, &errs
+	}
+	t.Run("a verb runs through the road, under the lint's variable", func(t *testing.T) {
+		verb, runs, _ := over(0, "")
+		if code := verb([]string{"doors"}, false); code != 0 {
+			t.Fatalf("a green verb answers %d", code)
+		}
+		want := []ran{{[]string{"/q", "verb", "/tree/src/scripts", "doors"}, []string{"SE_LINT_FOUND=/tree/x"}, false}}
+		if !reflect.DeepEqual(*runs, want) {
+			t.Fatalf("the road ran %v", *runs)
+		}
+	})
+	t.Run("a quiet red verb names why on the error stream", func(t *testing.T) {
+		verb, _, errs := over(1, "src/doors/x.js has no test/contract/x.test.js.\n")
+		if code := verb([]string{"doors"}, true); code != 1 {
+			t.Fatalf("a red verb answers %d", code)
+		}
+		if got := errs.String(); got != "src/doors/x.js has no test/contract/x.test.js.\n" {
+			t.Fatalf("the error stream reads %q", got)
+		}
+	})
+	t.Run("a quiet green verb and a loud red one add nothing to the error stream", func(t *testing.T) {
+		green, _, quietErrs := over(0, "all well\n")
+		green([]string{"doors"}, true)
+		red, _, loudErrs := over(1, "")
+		red([]string{"doors"}, false)
+		if quietErrs.Len()+loudErrs.Len() != 0 {
+			t.Fatalf("the error streams read %q and %q", quietErrs.String(), loudErrs.String())
 		}
 	})
 }

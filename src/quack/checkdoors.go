@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -55,14 +54,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 		}
 		return 0, said.String(), err
 	}
-	d.verb = func(words []string, quiet bool) int {
-		code, _, err := d.run(append([]string{self, "verb", scripts}, words...), []string{lintEnv + "=" + d.at(lintFile)}, quiet)
-		if err != nil {
-			fmt.Fprintln(errs, err)
-			return exitFailed
-		}
-		return code
-	}
+	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {
 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
 		if err != nil {

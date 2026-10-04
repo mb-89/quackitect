@@ -102,12 +102,31 @@ type lintFound struct {
 
 func init() { register("check", checkVerb(checkDoorsOf)) }
 
+// A verb through quack's road, under the variable naming the lint's file. A quiet red run hands its output to the error stream, so --errors names why the part failed. [[spec/tickets/check-errors-names-the-part]]
+func verbOver(run func(argv, env []string, quiet bool) (int, string, error), road, env []string, errs io.Writer) func(words []string, quiet bool) int {
+	return func(words []string, quiet bool) int {
+		code, said, err := run(append(slices.Clone(road), words...), env, quiet)
+		if err != nil {
+			fmt.Fprintln(errs, err)
+			return exitFailed
+		}
+		if quiet && code != 0 {
+			fmt.Fprint(errs, said)
+		}
+		return code
+	}
+}
+
 // The check over the doors: the parts in order, each timed, then the red cases and findings at error under --errors, or the parts' table, then the stamp. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/the-verbs-need-no-wrapper]]
 func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		d := doorsOf(out, errs)
 		words := argv[1:]
 		quiet := slices.Contains(words, errorsFlag)
+		// Under --errors the stream carries the red rows alone, which the merge hands on. [[spec/tickets/check-errors-names-the-part]]
+		if quiet {
+			d.out = io.Discard
+		}
 		_ = os.Remove(d.at(lintFile))
 		code, times, unrun, total := batteryRun(partsOf(d, words, quiet), d.now)
 		lines := d.text(timesFile)
