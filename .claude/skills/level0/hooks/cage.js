@@ -26,8 +26,12 @@ const DOORED = new Set([
 ]);
 // The calls that pass while the door stands down: the harness reads. [[spec/tickets/a-down-index-refuses-calls]] [[spec/tickets/level0-tools-leave-the-bridge]]
 const UNGUARDED = new Set(["Read", "Grep", "Glob"]);
-// The commands the refusal names, which pass while the door stands down, so a box whose index stands unbuilt brings it back. [[spec/rationales/the-cage-refuses-while-down]]
-const REMEDY = /^\s*\.\/RUNME\.sh (serve|doctor)(\s+--[\w-]+)*\s*$/;
+// The change of folder that leads a recovery command, which moves the shell alone. [[spec/tickets/the-cage-survives-its-index]]
+const INTO = /^\s*cd\s+[\w./-]+\s*&&\s*/;
+// A character outside quotes that chains, pipes, redirects, substitutes or globs, so the words it stands in run as no recovery command. [[spec/tickets/the-cage-survives-its-index]]
+const SHELL = /[;&|<>`$()\\\n\r*?{}[\]~#!]/;
+// The work branch a push names, which the pre-push hook guards past this. [[spec/tickets/the-cage-survives-its-index]]
+const WORK = /^(HEAD:)?work\/[\w./-]+$/;
 // The alarm the index keeps its fault under, which AlarmsName in the index owns. [[spec/rationales/the-cage-refuses-while-down]]
 const ALARMS = "session/alarms";
 
@@ -87,7 +91,82 @@ export function guarded(event, e) {
   const tool = String(e?.tool ?? "");
   if (event !== "tool.call" || UNGUARDED.has(tool)) return false;
   return !(
-    tool === "Bash" && REMEDY.test(String(e?.command ?? e?.input?.command ?? ""))
+    tool === "Bash" && recovers(String(e?.command ?? e?.input?.command ?? ""))
+  );
+}
+
+// Whether a command brings the index back or saves the work, so a box whose door falls mid-work recovers and pushes. Every other command stays guarded. [[spec/tickets/the-cage-survives-its-index]] [[spec/rationales/the-cage-refuses-while-down]]
+export function recovers(command) {
+  const argv = wordsOf(String(command ?? "").replace(INTO, ""));
+  if (!argv?.length) return false;
+  const [head, verb, ...rest] = argv;
+  if (head === "./RUNME.sh") {
+    if (verb === "serve" || verb === "doctor")
+      return rest.every((word) => /^--[\w-]+$/.test(word));
+    return verb === "index" && rest.length === 1 && rest[0] === "standing";
+  }
+  if (head === "pkill") return killsRuntime([verb, ...rest]);
+  if (head !== "git") return false;
+  if (verb === "status" || verb === "log")
+    return rest.every((word) => !word.startsWith("--output"));
+  if (verb === "add") return true;
+  if (verb === "commit") return commits(rest);
+  return verb === "push" && pushesWork(rest);
+}
+
+// The words a shell reads off a command, or null where a character outside quotes chains, pipes, redirects or substitutes. A single-quoted word holds anything, and a double-quoted one holds no expansion, so a commit message stays one word. [[spec/tickets/the-cage-survives-its-index]]
+export function wordsOf(command) {
+  const text = String(command ?? "");
+  const words = [];
+  let word = null;
+  let at = 0;
+  while (at < text.length) {
+    const c = text[at];
+    if (c === "'" || c === '"') {
+      const end = text.indexOf(c, at + 1);
+      if (end < 0) return null;
+      const inner = text.slice(at + 1, end);
+      if (c === '"' && /[$`\\!]/.test(inner)) return null;
+      word = (word ?? "") + inner;
+      at = end + 1;
+    } else if (c === " " || c === "\t") {
+      if (word !== null) words.push(word);
+      word = null;
+      at += 1;
+    } else if (SHELL.test(c)) {
+      return null;
+    } else {
+      word = (word ?? "") + c;
+      at += 1;
+    }
+  }
+  if (word !== null) words.push(word);
+  return words;
+}
+
+// A commit taking its message and the tracked changes, and no amend and no skipped hook. [[spec/tickets/the-cage-survives-its-index]]
+function commits(words) {
+  for (let at = 0; at < words.length; at += 1) {
+    const word = words[at];
+    if (word === "-m" || word === "-am") {
+      if (at + 1 >= words.length) return false;
+      at += 1;
+    } else if (!/^(-a|--all|-q|--quiet|--message=.*)$/s.test(word)) return false;
+  }
+  return true;
+}
+
+// A push of a work branch to origin, and no force, no delete and no other ref. [[spec/tickets/the-cage-survives-its-index]]
+function pushesWork(words) {
+  const named = words.filter((word) => !/^(-u|--set-upstream|-q|--quiet)$/.test(word));
+  return named.length === 2 && named[0] === "origin" && WORK.test(named[1]);
+}
+
+// A pkill matching the full command line against a path under the runtime folder, so it stops the stale index and nothing outside it. [[spec/tickets/the-cage-survives-its-index]]
+function killsRuntime(words) {
+  const named = words.filter((word) => !/^-(9|15|KILL|TERM)$/.test(word));
+  return (
+    named.length === 2 && named[0] === "-f" && String(named[1]).includes(`${RUN}/`)
   );
 }
 
@@ -98,6 +177,9 @@ export function refusedText(e) {
     "so no cage stands behind the call.",
     `The index keeps the fault under ${ALARMS}.`,
     "Run ./RUNME.sh serve to bring it back, or ./RUNME.sh doctor where that fails.",
-    "Both pass, and so do read, grep and glob.",
+    "Both pass, and so do read, grep and glob, ./RUNME.sh index standing,",
+    `pkill -f naming a path under ${RUN}/, and the commands that save the work:`,
+    "git status, git log, git add, git commit -m, and git push origin work/<name>,",
+    "each standing alone, after cd <folder> && at most.",
   ].join(" ");
 }
