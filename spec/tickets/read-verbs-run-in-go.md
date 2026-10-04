@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box af8a15ff4571 · claude-code-remote
@@ -104,6 +104,18 @@ record:
         exit: 0
         said: work/read-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 10fabe1f5ba9 · claude-code-remote
+    hash_before: 16087f7c64209614ed51277539d475783e370f20
+    hash_after: 16087f7c64209614ed51277539d475783e370f20
+    inputs:
+      - name: ask
+        hash: 455feaeb9a8bedca
+        size: 317
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -130,14 +142,22 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/read-verbs-port-to-go]], standard
+- [[spec/tickets/read-verbs-callers-fix]], trivial
+- [[spec/tickets/read-verbs-importer-test]], trivial
+- [[spec/tickets/read-verbs-say-doc]], trivial
+- [[spec/tickets/read-verbs-lint-drift]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: the port carries the six verbs, and each gate point stands as a one-file fix
+- the children add up to the goal: the port moves the six verbs and deletes their JavaScript, and the importer test decides no module stands orphaned
+- no child waits on another: the gate points all follow the port, which their parent field names
 
 # children
 
