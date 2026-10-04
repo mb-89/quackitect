@@ -1,5 +1,5 @@
-// The doors the ticket verbs reach the outside through: the two roots a
-// vehicle holds, and git over the work root.
+// The doors the ticket verbs reach the outside through: the roots a vehicle
+// holds, and git over the work root.
 // [[spec/tickets/ticket-verbs-port-to-go]]
 package main
 

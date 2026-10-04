@@ -14,7 +14,6 @@ import (
 type Disk interface {
 	Read(path string) (string, bool)
 	Exists(path string) bool
-	// The files a folder holds, by name, and none where it stands nowhere.
 	Files(folder string) []string
 	Write(path, text string) error
 }

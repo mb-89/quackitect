@@ -12,7 +12,7 @@ import (
 )
 
 func TestProcessHash(t *testing.T) {
-	// The hashes processHash in lib/schema-route.js answered over each text.
+	// The hashes processHash in lib/schema-route.js answered over each text. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 	cases := []struct{ text, hash string }{
 		{"ask:\n  - name: why\n    form: text\n    says: why it matters\nsteps:\n  - name: build\n    does: makes the change\n    evidence:\n      - name: lint\n        form: command\n        expects: 0\n        says: the tree lints\n", "61a7767d3f2bb8d1"},
 		{"ask:\n  - name: gain\n    form: text\n    says: what \"it\" gains, and why\nsteps:\n  - name: build\n    tags: [code, testing]\n    final: true\n    expects: 0\n    steps:\n      - name: one\n        does: a step\n", "64f39a6dc090b185"},
