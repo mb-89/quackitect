@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: dispatch-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: e2bd44fe2f366469
         size: 981
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: f14c19cad2848c5b367b2f0d2d5b5b06ef15e9e6
+    hash_after: 32c53a4d8b726e5a0806c783ca06a95b599b383d
+    answered:
+      - name: lint
+        exit: 0
+        said: "    3.4  test/contract/drawing-page.test.js the page posts ready once it mounts, and draws nothing before a graph"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -308,14 +317,19 @@ The approach answers the ask. The dispatch ports into src/branches (dispatch.go 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the dispatch files the draft names, the two JS tests importing them, and work.md, whose rows point at the moved functions
+- every door the change reaches has a fake: git runs over a bare origin and its clone, and the send door over a fake hub
+- each Go file opens with a header naming the approach, and the quack files point at this ticket
+- each constant stands once: shortSha and ticketSchema stay where they stood, and jsonText answers the JSON text
 
 ## tests-green
 
