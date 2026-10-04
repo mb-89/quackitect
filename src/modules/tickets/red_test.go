@@ -69,6 +69,11 @@ func TestRedList(t *testing.T) {
 			t.Fatalf("short of tests-red reads %v, and wants none", got)
 		}
 	})
+	t.Run("a text with no front names none", func(t *testing.T) {
+		if got := RedList("# Ask\n\nNo front.\n"); len(got) != 0 {
+			t.Fatalf("a text with no front reads %v, and wants none", got)
+		}
+	})
 	t.Run("a closed ticket names none", func(t *testing.T) {
 		if got := RedList(strings.Replace(redOf(pastRed), "state: open", "state: closed", 1)); len(got) != 0 {
 			t.Fatalf("a closed ticket reads %v, and wants none", got)

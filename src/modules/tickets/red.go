@@ -13,12 +13,11 @@ import (
 	"quackitect/src/yaml"
 )
 
-// The leaves the red list reads, the field it reads under them, and the state that drops a ticket from it, as RED, GREEN, FIELD and CLOSED in the JavaScript named them. [[spec/design_output/pull#the-gate]]
+// The leaves the red list reads, and the field it reads under them. [[spec/design_output/pull#the-gate]]
 const (
-	redLeaf     = "tests-red"
-	greenLeaf   = "tests-green"
-	redField    = "red"
-	closedState = "closed"
+	redLeaf   = "tests-red"
+	greenLeaf = "tests-green"
+	redField  = "red"
 )
 
 // A reject inserts a round of its own, as tests-red-2, and its list stands red as the first round's does. [[spec/tickets/red-list-reads-inserted-leaves]]

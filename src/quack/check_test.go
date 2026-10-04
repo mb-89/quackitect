@@ -7,6 +7,7 @@ package main
 import (
 	"errors"
 	"io"
+	"os"
 	"path/filepath"
 	"reflect"
 	"slices"
@@ -32,6 +33,8 @@ func ticking(step time.Duration) func() time.Time {
 type checkFake struct {
 	verbs [][]string
 	runs  [][]string
+	envs  [][]string
+	rows  []map[string]any
 	codes map[string]int
 	said  map[string]string
 	gone  map[string]bool
@@ -44,17 +47,21 @@ func (one *checkFake) doors() checkDoors {
 			one.verbs = append(one.verbs, words)
 			return one.codes[strings.Join(words, " ")]
 		},
-		run: func(argv, _ []string, _ bool) (int, string, error) {
+		run: func(argv, env []string, _ bool) (int, string, error) {
 			one.runs = append(one.runs, argv)
+			one.envs = append(one.envs, env)
 			if one.gone[argv[0]] {
 				return 0, "", errors.New("not found")
 			}
 			return one.codes[argv[0]], one.said[argv[0]], nil
 		},
-		get:  func(string) ([]byte, error) { return []byte(`{"ok":true}`), nil },
-		now:  ticking(time.Millisecond),
-		out:  io.Discard,
-		errs: io.Discard,
+		get:    func(string) ([]byte, error) { return []byte(`{"ok":true}`), nil },
+		now:    ticking(time.Millisecond),
+		config: func(string) float64 { return 0 },
+		git:    func(...string) string { return "" },
+		log:    func(row map[string]any) error { one.rows = append(one.rows, row); return nil },
+		out:    io.Discard,
+		errs:   io.Discard,
 	}
 }
 
@@ -280,6 +287,118 @@ func TestCheckErrors(t *testing.T) {
 	if got := errorsSaid("", nil); !reflect.DeepEqual(got, []string{"The check names no red case and no finding at error."}) {
 		t.Fatalf("a clean run reads %q", got)
 	}
+}
+
+func TestCheckReads(t *testing.T) {
+	t.Run("the Go gate runs with no C compiler", func(t *testing.T) {
+		fake := &checkFake{}
+		goGate(fake.doors(), false, nil)
+		if len(fake.envs) == 0 || !slices.Contains(fake.envs[0], "CGO_ENABLED=0") {
+			t.Fatalf("the gate ran under %v", fake.envs)
+		}
+	})
+	t.Run("the port reads off the vehicle pointer, and the base where none stands", func(t *testing.T) {
+		if portOf(`{"port":6612}`) != 6612 || portOf("") != portBase || portOf(`{"port":"x"}`) != portBase {
+			t.Fatal("the port reads wrong")
+		}
+	})
+	t.Run("level zero going red says the tree is red", func(t *testing.T) {
+		fake := &checkFake{codes: map[string]int{"probe dry --working": 1}}
+		doors := fake.doors()
+		var said strings.Builder
+		doors.errs = &said
+		if code := level0Runs(doors, false); code != 1 || !strings.Contains(said.String(), "so this tree is red") {
+			t.Fatalf("a red dry session answers %d, %q", code, said.String())
+		}
+	})
+}
+
+func TestCheckVerb(t *testing.T) {
+	whole := func(t *testing.T, fake *checkFake, budget float64, words ...string) (checkDoors, string, int) {
+		t.Helper()
+		var said strings.Builder
+		doors := fake.doors()
+		doors.root, doors.out = t.TempDir(), &said
+		doors.config = func(key string) float64 {
+			if key == budgetKey {
+				return budget
+			}
+			return 1
+		}
+		doors.git = func(args ...string) string {
+			if args[0] == "rev-parse" {
+				return "abc"
+			}
+			return ""
+		}
+		code := checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })(append([]string{"check"}, words...), false, &said, io.Discard)
+		return doors, said.String(), code
+	}
+	t.Run("a green run prints its parts and stamps ok at the commit", func(t *testing.T) {
+		doors, said, code := whole(t, &checkFake{}, 0)
+		if code != 0 || !strings.Contains(said, "The check's parts, in seconds:") {
+			t.Fatalf("the run answers %d, %q", code, said)
+		}
+		if stamp := doors.text(stampFile); !strings.Contains(stamp, `"sha": "abc"`) || !strings.Contains(stamp, `"ok": true`) || !strings.Contains(stamp, `"spawns": {`) {
+			t.Fatalf("the stamp reads %s", stamp)
+		}
+	})
+	t.Run("a run past its budget warns in the log, naming its time", func(t *testing.T) {
+		fake := &checkFake{}
+		whole(t, fake, 1)
+		if len(fake.rows) != 1 || fake.rows[0]["level"] != "warn" || !strings.Contains(fake.rows[0]["said"].(string), "past its budget") {
+			t.Fatalf("the log took %v", fake.rows)
+		}
+	})
+	t.Run("under --errors the run prints the red cases and findings alone", func(t *testing.T) {
+		fake := &checkFake{codes: map[string]int{"doors": 1}}
+		doors, said, code := whole(t, fake, 0, "--errors")
+		if code != 1 || strings.TrimSpace(said) != noErrors {
+			t.Fatalf("the run answers %d, %q", code, said)
+		}
+		if stamp := doors.text(stampFile); !strings.Contains(stamp, `"ok": false`) || !strings.Contains(stamp, `"projections"`) {
+			t.Fatalf("the stamp reads %s, and wants the unrun parts", stamp)
+		}
+	})
+	t.Run("the stamp counts the warnings the lint leaves", func(t *testing.T) {
+		fake := &checkFake{}
+		doors := fake.doors()
+		doors.root = t.TempDir()
+		doors.verb = func(words []string, _ bool) int {
+			if words[0] == "lint" {
+				_ = os.MkdirAll(filepath.Dir(doors.at(lintFile)), 0o755)
+				_ = os.WriteFile(doors.at(lintFile), []byte(`{"stood":[{"file":"src/a.go","source":"tree"}],"erred":[]}`), 0o644)
+			}
+			return 0
+		}
+		checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check"}, false, io.Discard, io.Discard)
+		if stamp := doors.text(stampFile); !strings.Contains(stamp, `"warnings": 1`) || !strings.Contains(stamp, `"src/a.go"`) {
+			t.Fatalf("the stamp reads %s", stamp)
+		}
+	})
+}
+
+func TestTestVerb(t *testing.T) {
+	t.Run("named files go to branch test under a fresh tally", func(t *testing.T) {
+		fake := &checkFake{}
+		doors := fake.doors()
+		doors.root = t.TempDir()
+		self := func() (string, error) { return "/bin/quack", nil }
+		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, self)([]string{"test", "src/quack"}, false, io.Discard, io.Discard)
+		want := []string{"/bin/quack", "verb", filepath.Join(doors.root, "src", "scripts"), "branch", "test", "src/quack"}
+		if len(fake.runs) != 1 || !reflect.DeepEqual(fake.runs[0], want) || fake.envs[0][0] != "SE_SPAWNS="+doors.at(spawnsFile) {
+			t.Fatalf("the verb ran %v under %v", fake.runs, fake.envs)
+		}
+	})
+	t.Run("no word runs the test part", func(t *testing.T) {
+		fake := &checkFake{}
+		doors := fake.doors()
+		doors.root = t.TempDir()
+		testVerb(func(io.Writer, io.Writer) checkDoors { return doors }, os.Executable)([]string{"test"}, false, io.Discard, io.Discard)
+		if len(fake.runs) != len(testParts) || fake.runs[0][0] != "node" {
+			t.Fatalf("the verb ran %v", fake.runs)
+		}
+	})
 }
 
 func TestCheckRegisters(t *testing.T) {

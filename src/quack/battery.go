@@ -4,13 +4,39 @@
 // [[spec/guidance/retro/effect]] [[spec/design_output/work#the-battery-answers-first]]
 package main
 
+import (
+	"bufio"
+	"cmp"
+	"encoding/json"
+	"fmt"
+	"math"
+	"regexp"
+	"slices"
+	"strings"
+)
+
+// The cases a report names, the words a red case keeps, the cases a budget warning names, and the width a part's seconds pad to. [[spec/guidance/retro/effect]] [[spec/tickets/the-check-runs-fast-again]]
+const (
+	slowestKept = 10
+	redWords    = 200
+	budgetNamed = 5
+	secondsWide = 7
+)
+
+// The source whose warnings a ticket's prose holds, which FROM.vale in src/bridge/findings.js names, and the folders a ticket stands in, which folders.js owns. [[spec/design_output/work#the-battery-answers-first]]
+const valeSource = "vale"
+
+var ticketFolders = []string{"spec/tickets", ".se/tickets"}
+
+var valeBinary = regexp.MustCompile(`(?i)(^|[\\/])vale(\.exe)?$`)
+
 // One case the runner's reporter wrote. [[spec/guidance/retro/effect]]
 type caseRow struct {
 	File    string  `json:"file"`
 	Name    string  `json:"name"`
 	Nesting int     `json:"nesting"`
 	Ms      float64 `json:"ms"`
-	Ok      bool    `json:"ok"`
+	Ok      *bool   `json:"ok"`
 	Todo    bool    `json:"todo"`
 	Said    string  `json:"said"`
 }
@@ -66,18 +92,172 @@ type checkStamp struct {
 	Runs     []map[string]int64 `json:"runs,omitempty"`
 }
 
-func rowsIn(lines string) []caseRow                { return nil }
-func slowestIn(lines string, most int) []slowCase { return nil }
-func filesIn(lines string) []fileTime             { return nil }
-func redIn(lines string) []redCase                { return nil }
-func spawnsIn(tally string) spawnTally            { return spawnTally{} }
-
-func batteryOf(parts map[string]float64, lines string, most int, unrun []string, spawns *spawnTally, span float64) batteryReport {
-	return batteryReport{}
+// The rows the runner's reporter wrote, one a case, and none for a line that reads as no row. [[spec/guidance/retro/effect]]
+func rowsIn(lines string) []caseRow {
+	out := []caseRow{}
+	read := bufio.NewScanner(strings.NewReader(lines))
+	read.Buffer(nil, math.MaxInt32)
+	for read.Scan() {
+		line := strings.TrimSpace(read.Text())
+		var row caseRow
+		if strings.HasPrefix(line, "{") && json.Unmarshal([]byte(line), &row) == nil {
+			out = append(out, row)
+		}
+	}
+	return out
 }
 
-func partsSaid(report batteryReport, budget int64) []string { return nil }
+// The cases, each with its time and its file, the slowest first. [[spec/guidance/retro/effect]]
+func slowestIn(lines string, most int) []slowCase {
+	out := []slowCase{}
+	for _, row := range rowsIn(lines) {
+		out = append(out, slowCase{row.Name, row.Ms, row.File})
+	}
+	slices.SortStableFunc(out, func(a, b slowCase) int { return cmp.Compare(b.Ms, a.Ms) })
+	return out[:min(len(out), most)]
+}
 
+// A time a test file: the sum of its cases at the top, the slowest first. [[spec/guidance/retro/effect]]
+func filesIn(lines string) []fileTime {
+	held := map[string]float64{}
+	order := []string{}
+	for _, row := range rowsIn(lines) {
+		if row.Nesting != 0 || row.File == "" {
+			continue
+		}
+		if _, seen := held[row.File]; !seen {
+			order = append(order, row.File)
+		}
+		held[row.File] += row.Ms
+	}
+	out := []fileTime{}
+	for _, name := range order {
+		out = append(out, fileTime{name, int64(math.Round(held[name]))})
+	}
+	slices.SortStableFunc(out, func(a, b fileTime) int { return cmp.Compare(b.Ms, a.Ms) })
+	return out
+}
+
+// The red cases in their own words: the file, the name, and the error's first line. A TODO case fails by design. [[spec/guidance/retro/effect]]
+func redIn(lines string) []redCase {
+	out := []redCase{}
+	for _, row := range rowsIn(lines) {
+		if row.Ok != nil && !*row.Ok && !row.Todo {
+			said := []rune(row.Said)
+			out = append(out, redCase{row.File, row.Name, string(said[:min(len(said), redWords)])})
+		}
+	}
+	return out
+}
+
+// The tally the process door writes, one line a spawn: how many in all, and how many are Vale. [[spec/guidance/retro/effect]]
+func spawnsIn(tally string) spawnTally {
+	out := spawnTally{}
+	for _, line := range strings.Split(tally, "\n") {
+		if line = strings.TrimSpace(line); line == "" {
+			continue
+		}
+		out.All++
+		if valeBinary.MatchString(line) {
+			out.Vale++
+		}
+	}
+	return out
+}
+
+// One report: the parts rounded, the battery's span, the slowest cases, a time a file, the parts a red run left unrun, the red cases, and the spawns. The span is the sum of the parts where the run names none, as a negative span does. [[spec/guidance/retro/effect]]
+func batteryOf(parts map[string]float64, lines string, most int, unrun []string, spawns *spawnTally, span float64) batteryReport {
+	timed := map[string]int64{}
+	var total int64
+	for name, ms := range parts {
+		timed[name] = int64(math.Round(ms))
+		total += timed[name]
+	}
+	if span >= 0 {
+		total = int64(math.Round(span))
+	}
+	return batteryReport{
+		Parts:   timed,
+		Total:   total,
+		Slowest: slowestIn(lines, most),
+		Files:   filesIn(lines),
+		Unrun:   append([]string{}, unrun...),
+		Red:     redIn(lines),
+		Spawns:  spawns,
+	}
+}
+
+// The rows the check prints last: each part's seconds, the slowest first, their sum, and a warning past the budget naming the slowest part and cases. A budget of 0 names none. [[spec/tickets/the-check-runs-fast-again]]
+func partsSaid(report batteryReport, budget int64) []string {
+	row := func(ms float64, what string) string { return fmt.Sprintf("%*s  %s", secondsWide, seconds(ms), what) }
+	names := []string{}
+	for name := range report.Parts {
+		names = append(names, name)
+	}
+	slices.SortFunc(names, func(a, b string) int {
+		return cmp.Or(cmp.Compare(report.Parts[b], report.Parts[a]), strings.Compare(a, b))
+	})
+	rows := []string{"", "The check's parts, in seconds:"}
+	for _, name := range names {
+		rows = append(rows, row(float64(report.Parts[name]), name))
+	}
+	rows = append(rows, row(float64(report.Total), "in all"))
+	if budget <= 0 || report.Total <= budget || len(names) == 0 {
+		return rows
+	}
+	rows = append(rows, "", fmt.Sprintf("Warning: the check took %ss, past its budget of %ss under battery.budget. %s took the most. The slowest cases:",
+		seconds(float64(report.Total)), seconds(float64(budget)), names[0]))
+	for _, one := range report.Slowest[:min(len(report.Slowest), budgetNamed)] {
+		rows = append(rows, row(one.Ms, strings.TrimSpace(one.File+" "+one.Name)))
+	}
+	return rows
+}
+
+func seconds(ms float64) string {
+	return fmt.Sprintf("%.1f", math.Round(ms/100)/10)
+}
+
+// The stamp's shape, off what the check found. The battery's report rides it where one stands, and the last runs at this commit ride beside it, up to the count. [[spec/guidance/retro/effect]]
 func stampFor(code int, sha string, clean bool, at string, stood []finding, report *batteryReport, before []byte, keep int) checkStamp {
-	return checkStamp{}
+	files := []string{}
+	warnings := 0
+	for _, one := range stood {
+		if !holdsPush(one) {
+			continue
+		}
+		warnings++
+		if one.File != "" {
+			files = append(files, one.File)
+		}
+	}
+	slices.Sort(files)
+	out := checkStamp{Sha: sha, Ok: code == 0, Clean: clean, At: at, Warnings: warnings, Files: slices.Compact(files)}
+	if report == nil {
+		return out
+	}
+	out.Battery = report
+	var last struct {
+		Sha  string             `json:"sha"`
+		Runs []map[string]int64 `json:"runs"`
+	}
+	out.Runs = []map[string]int64{report.Parts}
+	if json.Unmarshal(before, &last) == nil && last.Sha == sha {
+		out.Runs = append(out.Runs, last.Runs...)
+	}
+	out.Runs = out.Runs[:min(len(out.Runs), max(1, keep))]
+	return out
+}
+
+// A ticket's prose stands at warning by rule, so it holds no push, and every other warning does. [[spec/design_output/work#the-battery-answers-first]]
+func holdsPush(one finding) bool {
+	if one.Source != valeSource {
+		return true
+	}
+	file := strings.ReplaceAll(one.File, `\`, "/")
+	for _, folder := range ticketFolders {
+		if strings.HasPrefix(file, folder+"/") || strings.Contains(file, "/"+folder+"/") {
+			return false
+		}
+	}
+	return true
 }
