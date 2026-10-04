@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: config-verbs-run-in-go
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 6183eb94e809 · claude-code-remote
+    hash_before: 6591e6d658a269bccdb387f6f74be4383a4115fd
+    hash_after: 6591e6d658a269bccdb387f6f74be4383a4115fd
+    inputs:
+      - name: ask
+        hash: 46dae2bca90f0fef
+        size: 803
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -155,38 +164,79 @@ The config, the projection and the standing read the index in Go, so `cli-check.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each verb registers its Go answer from its own file under src/quack, through register in src/quack/registry.go, so nodeAccept and the road hand it no node. Each file holds the verb and its doors as arguments, so a case hands in a temp root.
+
+- config (verb_config.go): the rows come off configAt, which the config module resolves; a value prints as String(value) prints it in JavaScript, a string bare and every other literal as it stands. A key with no row exits 2 with the line readConfig prints. Two or more words write the key into .se/.runtime/config.json, coerced to the type the catalog declares, nested as nest and deeply in the level0 lib write it, and append the info row the log module reads, kind config, with the layer as detail. The faults line reads the declared type against the tracked file's literal, as faultsIn does.
+- fix (verb_fix.go): the flags as fixFlags reads them; vale off the survey or the runtime bin as lsp toolAt finds it; up to five rounds of the calm then vale fix --apply over the paths, until the walk's stamp holds; then biome check --write. The calm sentence-cases each ShoutedLead span Vale names, as calmed in shout.js does.
+- project (verb_project.go over a new package src/projection): the four shapes projections.json names, written as projection.js writes them, the stale targets removed. A golden case projects the tree into a temp root and reads every target byte for byte against the tree.
+- rules (verb_rules.go): each yml of VoiceVale, VoiceShape and VoiceScript, its name padded to the rule column, then its message.
+- doors (verb_doors.go): the doors under src/doors against the contract tests under test/contract.
+- standing (verb_standing.go): brief.LayerFor over the layered roots with no kind, then the canary off brief.CountsOf and stop.enabled.
+
+The JavaScript leaves: the six programs, cli-fix.js, shout.js, and readConfig, fix, calm, stamp, project, listRules and standing in cli-check.js. doorsHold, projectionsHold, projections, under and the projection lib stay, since the check program and the mint read them until their own groups port them. The programs test reads the programs folder, so a ported verb leaves it with its program.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbRoad, which hands a registered verb to its twin
+- src/quack/twins.go nodeAccept, which answers a registered verb off goAnswer
+- .claude/commands/se-config-*.md, which run ./RUNME.sh config <key> <value>
+- src/scripts/check-verb.js, which keeps doorsHold and projectionsHold out of cli-check.js
+- test/contract/verb-programs.test.js RUNS, which imports the six programs
+- test/level0/fix.test.js, which imports fix and fixFlags
+- test/level0/topic-readers.test.js, which imports readConfig
+- test/contract/vale-fix.test.js, which imports calmed off shout.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_config_test.go TestConfigPrintsEveryRowAndItsLayer
+- src/quack/verb_config_test.go TestConfigRefusesAKeyNoLayerAnswers
+- src/quack/verb_config_test.go TestConfigWritesTheLocalLayerAndALogRow
+- src/quack/verb_fix_test.go TestFixRefusesAnUnknownFlag
+- src/quack/verb_fix_test.go TestFixCalmsAShoutedLead
+- src/quack/verb_project_test.go TestProjectWritesTheTreeTargetsByteForByte
+- src/quack/verb_rules_test.go TestRulesListsEveryStyleMessage
+- src/quack/verb_doors_test.go TestDoorsNamesADoorWithNoContract
+- src/quack/verb_standing_test.go TestStandingPrintsTheLayerAndTheCanary
+- src/quack/registry_test.go TestTheConfigGroupRegistersEachVerb
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_config.go, verb_fix.go, verb_project.go, verb_rules.go, verb_doors.go, verb_standing.go and a test beside each
+- src/projection/*.go
+- src/scripts/verbs/config.js, fix.js, project.js, rules.js, standing.js, doors.js, deleted
+- src/scripts/cli-fix.js and .claude/skills/level0/lib/shout.js, deleted
+- src/scripts/cli-check.js
+- test/level0/fix.test.js, deleted
+- test/level0/topic-readers.test.js
+- test/contract/vale-fix.test.js
+- test/contract/verb-programs.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: cli-check.js, cli-doors.js, config.js, shout.js, guidance.js, projection.js outline, registry.go, twins.go, verbs.go, brief.go, layer.go, lsp door.go
+- the callers list names the road, the node module, the config commands, and every JS importer a grep of src and test finds
+- each done_when line meets a test: the go cases, a road case per verb, ls of the programs folder, a grep, and the check
 
 ## tests-red
 
