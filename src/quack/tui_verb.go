@@ -75,7 +75,11 @@ func tuiVerb(doors func() tuiDoors) twin {
 		plain := slices.Contains(argv, "--plain")
 		exe, why := "", ""
 		if !plain && !dry {
-			exe, why = tuiViewerOf(d)
+			var fault error
+			if exe, why, fault = tuiViewerOf(d); fault != nil {
+				fmt.Fprintln(errs, fault)
+				return exitFailed
+			}
 		}
 		if why != "" {
 			fmt.Fprintln(errs, why)
@@ -176,8 +180,8 @@ func tuiExists(path string) bool {
 	return err == nil
 }
 
-// The viewer's binary, built whenever the source its stamp hashes moves, and why where none runs. [[spec/design_output/tui#the-verb-builds-it]]
-func tuiViewerOf(d tuiDoors) (string, string) {
+// The viewer's binary, built whenever the source its stamp hashes moves, and why where none runs. A build that lands and swaps not in answers a fault, since the box holds Go. [[spec/tickets/tui-swap-fails-loud]]
+func tuiViewerOf(d tuiDoors) (string, string, error) {
 	exe := d.root + "/" + tuiBin + "/logview"
 	if d.windows {
 		exe += ".exe"
@@ -185,7 +189,7 @@ func tuiViewerOf(d tuiDoors) (string, string) {
 	stamp := d.root + "/" + tuiStamp
 	hash := index.HashText(tuiSourceText(d.root))
 	if held, err := os.ReadFile(stamp); err == nil && tuiExists(exe) && strings.TrimSpace(string(held)) == hash {
-		return exe, ""
+		return exe, "", nil
 	}
 	// A running binary holds its file on Windows and renames alone, so the build lands beside it and swaps in. [[spec/design_output/tui#the-verb-builds-it]]
 	fresh := exe + ".new"
@@ -195,24 +199,24 @@ func tuiViewerOf(d tuiDoors) (string, string) {
 	}
 	if code == 0 && tuiExists(fresh) {
 		if err := tuiSwapsIn(fresh, exe); err != nil {
-			return "", err.Error()
+			return "", "", err
 		}
 		if err := os.MkdirAll(d.root+"/"+tuiBin, 0o755); err != nil {
-			return exe, err.Error()
+			return exe, err.Error(), nil
 		}
 		if err := os.WriteFile(stamp, []byte(hash+"\n"), 0o644); err != nil {
-			return exe, err.Error()
+			return exe, err.Error(), nil
 		}
-		return exe, ""
+		return exe, "", nil
 	}
 	why := strings.TrimSpace(stderr)
 	if why == "" {
 		why = "go builds no viewer here"
 	}
 	if tuiExists(exe) {
-		return exe, "the build fails, so the last one runs: " + why
+		return exe, "the build fails, so the last one runs: " + why, nil
 	}
-	return "", why
+	return "", why, nil
 }
 
 // The old binary steps aside by rename, and the fresh one takes its name. [[spec/design_output/tui#the-verb-builds-it]]

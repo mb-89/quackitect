@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -247,7 +248,7 @@ func TestTuiLaunchesTheViewerOnTheTab(t *testing.T) {
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiBuildsTheViewerAtTheRootAndStampsItsSource(t *testing.T) {
 	box := tuiBoxAt(t)
-	exe, why := tuiViewerOf(box.doors())
+	exe, why, _ := tuiViewerOf(box.doors())
 	if exe != box.exe() || why != "" {
 		t.Fatalf("exe %q, why %q", exe, why)
 	}
@@ -268,7 +269,7 @@ func TestTuiBuildsTheViewerAtTheRootAndStampsItsSource(t *testing.T) {
 func TestTuiBuildLandsBesideTheOldBinary(t *testing.T) {
 	box := tuiBoxAt(t)
 	tuiWrites(t, box.root, map[string]string{".se/.runtime/bin/logview": "old binary"})
-	if exe, why := tuiViewerOf(box.doors()); exe != box.exe() || why != "" {
+	if exe, why, _ := tuiViewerOf(box.doors()); exe != box.exe() || why != "" {
 		t.Fatalf("exe %q, why %q", exe, why)
 	}
 	if tuiReads(t, box.exe()) != "binary" || tuiReads(t, box.exe()+".old") != "old binary" {
@@ -286,11 +287,35 @@ func TestTuiBuildLandsWhileTheLastAsideStandsHeld(t *testing.T) {
 		".se/.runtime/bin/logview":          "running binary",
 		".se/.runtime/bin/logview.old/held": "older binary",
 	})
-	if exe, _ := tuiViewerOf(box.doors()); exe != box.exe() {
+	if exe, _, _ := tuiViewerOf(box.doors()); exe != box.exe() {
 		t.Fatalf("exe %q", exe)
 	}
 	if tuiReads(t, box.exe()) != "binary" || tuiReads(t, box.exe()+".old1") != "running binary" {
 		t.Error("the running binary stepped not aside to the next name")
+	}
+}
+
+// Every aside name stands held, so the old binary steps nowhere and the build that landed swaps not in. [[spec/tickets/tui-swap-fails-loud]]
+func TestTuiFailedSwapFailsTheVerbAndAsksNotForGo(t *testing.T) {
+	box := tuiBoxAt(t)
+	held := map[string]string{
+		".se/.runtime/bin/logview": "running binary",
+		".se/.log/session.jsonl":   tuiRowText,
+	}
+	for n := range tuiAside {
+		aside := ".se/.runtime/bin/logview.old"
+		if n > 0 {
+			aside += strconv.Itoa(n)
+		}
+		held[aside+"/held"] = "older binary"
+	}
+	tuiWrites(t, box.root, held)
+	code, out, errs := box.runs()
+	if code != exitFailed || out != "" || !strings.Contains(errs, "logview") {
+		t.Fatalf("code %d\nout %q\nerrs %q", code, out, errs)
+	}
+	if len(box.launched) != 0 || tuiReads(t, box.exe()) != "running binary" {
+		t.Error("the verb launched a viewer, or the running binary moved")
 	}
 }
 
@@ -328,14 +353,14 @@ func TestTuiRebuildsOnlyWhereTheSourceMoves(t *testing.T) {
 func TestTuiFailedBuildSaysWhy(t *testing.T) {
 	box := tuiBoxAt(t)
 	box.build = func([]string) (int, string, error) { return 1, "main.go:1: syntax error\n", nil }
-	if exe, why := tuiViewerOf(box.doors()); exe != "" || why != "main.go:1: syntax error" {
+	if exe, why, _ := tuiViewerOf(box.doors()); exe != "" || why != "main.go:1: syntax error" {
 		t.Errorf("exe %q, why %q", exe, why)
 	}
 	if _, err := os.Stat(box.root + "/.se/.runtime/bin/.logview-source"); err == nil {
 		t.Error("a failed build stamps its source")
 	}
 	tuiWrites(t, box.root, map[string]string{".se/.runtime/bin/logview": "old binary"})
-	exe, why := tuiViewerOf(box.doors())
+	exe, why, _ := tuiViewerOf(box.doors())
 	if exe != box.exe() || why != "the build fails, so the last one runs: main.go:1: syntax error" {
 		t.Errorf("exe %q, why %q", exe, why)
 	}
@@ -345,7 +370,7 @@ func TestTuiFailedBuildSaysWhy(t *testing.T) {
 func TestTuiNoGoAnswersNoViewerAndNamesTheFault(t *testing.T) {
 	box := tuiBoxAt(t)
 	box.build = func([]string) (int, string, error) { return 0, "", errors.New("exec: go: not found") }
-	if exe, why := tuiViewerOf(box.doors()); exe != "" || why != "exec: go: not found" {
+	if exe, why, _ := tuiViewerOf(box.doors()); exe != "" || why != "exec: go: not found" {
 		t.Errorf("exe %q, why %q", exe, why)
 	}
 }
@@ -354,7 +379,7 @@ func TestTuiNoGoAnswersNoViewerAndNamesTheFault(t *testing.T) {
 func TestTuiWindowsBuildsTheExe(t *testing.T) {
 	box := tuiBoxAt(t)
 	box.windows = true
-	if exe, _ := tuiViewerOf(box.doors()); exe != box.exe()+".exe" || box.builds[0][3] != box.exe()+".exe.new" {
+	if exe, _, _ := tuiViewerOf(box.doors()); exe != box.exe()+".exe" || box.builds[0][3] != box.exe()+".exe.new" {
 		t.Errorf("exe %q, builds %v", exe, box.builds)
 	}
 }
