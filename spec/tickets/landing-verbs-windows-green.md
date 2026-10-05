@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-verbs-run-in-go
 step: do
+record:
+  - step: do
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: 00d7a08247c588b2c70c7e5fbfbbedd668a8a66f
+    hash_after: 00d7a08247c588b2c70c7e5fbfbbedd668a8a66f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    2.0  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: ask
+        hash: 29b5cd1b3a9bf5e2
+        size: 486
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/landing_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The work landed in pull request 93, and this ticket stayed open on main after its group closed. Commit 59ed264 makes `landingRepo` build both repositories under `shortDir`, a temp folder under a short fixed prefix. A push into the test's bare origin had answered `Filename too long` on Windows, because `t.TempDir` names its folder after the whole case name. `TestLandingRepoStandsUnderAShortFolder` runs a case named past the path limit, and fails where the case name reaches the repository path. Commits 131854e and 8ee659f carry the evidence and take main in. The `check (windows-latest)` job ran green on the head of pull request 93 (job 111493747793 of run 37221897494), and auto-merge took it into main as b59d56b7e. This close changes no code.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the three done lines hold, on the check, the job and the test named in says
+- the cleanup: pull request 93 carried it, and this close adds none
+- one place: the evidence points at the commits, the job and the test, and repeats no code
 
 # Discussion
 
