@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -156,6 +156,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: ec862deb913d2d94580ca51a58f18d717074b43e
+    hash_after: ec862deb913d2d94580ca51a58f18d717074b43e
+    inputs:
+      - name: retro/write
+        hash: c95b599120b3822d
+        size: 2527
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -298,20 +308,29 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 12:22 the MCP ticket pull tool answered no hook, so the shell verb served
+- no host or right refused the box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 12:16 the trunk guard on a raw git push
+- 12:44 and 12:53 the commit hook asking a test beside each changed file
+- 12:49 gofmt turning the check red over one trailing line
+- the check ran past its time budget, and the warning named go
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the owner-read and view steps of program-of-drops-node stood skipped by the route
 
 # Discussion
 
