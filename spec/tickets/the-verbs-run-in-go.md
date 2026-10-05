@@ -372,3 +372,11 @@ Why each choice:
 | every group carries `migration.phase11` | the coordinator turns the phase on, per [[spec/design_input/the-migration-runs-in-slices#the-owner-turns-phases-on]] |
 
 A helper two groups need lands in a Go package under `src/modules`. The second group takes the first one's package at its sync, and ports none of its own.
+
+A child minted after this group closed meets a deadlock. The check went red at `branch done`, since the lint twins case read this ticket for its finding. The fix took `lint-twins-reads-a-standing-finding`.
+
+- the pull answers done on a closed group, and hands out no leaf
+- a named pull stands behind the queue under `engine.binding` at `queue`
+- `branch done` refuses while that child stands open
+
+The evidence stands under that ticket's Discussion. The pull wants a road for a late child of a closed group, through its own reopen or a named pull of a ticket the session mints.
