@@ -159,6 +159,7 @@ record:
   - step: accept
     hand: box 05659fab4226 · claude-code-remote
     hash_before: 073e467831c10526b396f2538599be8567433af9
+    hash_after: 351012b11df78ef5ac7ffc760fe3c5ccee6e32ec
   - step: accept
     hand: box 05659fab4226 · claude-code-remote
     hash_before: 17871381b63ffc23add39ba6cb6d5b4d94949740
@@ -217,7 +218,6 @@ record:
 group: the-verbs-run-in-go
 depends_on: ["quack-holds-a-verb-registry"]
 enabled_by: migration.phase11
-cloud: true
 reason: done
 ---
 
