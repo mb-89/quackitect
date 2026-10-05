@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-node-road-closes
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 3826b66824beaed9
         size: 444
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 121e1aeb12c9a0cf93b015040bd1caddb4cf067d
+    hash_after: 121e1aeb12c9a0cf93b015040bd1caddb4cf067d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: b4d544931cd8f9de
+        size: 2882
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -238,26 +251,32 @@ Every verb of the table registers whole in Go, so the program road answers only 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/no_program_test.go
+- test/contract/node-road.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The node module today starts node on a program that stands nowhere, and the error carries the node version. The verbs folder already left the tree, so the folder line holds today and the runner line fails. The branch test verb reads the contract test, and go test shows the Go case failing on its assertion too.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the grep line and the folder line meet the contract test, and the check line meets the check run at tests-green
+- the contract test drives the real disk door, and the Go case runs the node module over a temporary root with no program in it
 
 # gate
 
