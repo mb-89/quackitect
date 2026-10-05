@@ -52,7 +52,7 @@ var notesRows = []ticket.Ticket{
 	{Name: "d-public", Path: "spec/tickets/d-public.md", State: "open"},
 }
 
-// retro notes names each note under .se/tickets standing open, as notes in retro.js prints them, and exits 1. [[spec/tickets/retro-verbs-become-actions]]
+// retro notes names each note under .se/tickets standing open, and exits 1. [[spec/tickets/retro-verbs-become-actions]]
 func TestRetroNotesPrintsTheOpenNotesAsCliJsDoes(t *testing.T) {
 	var out, errs strings.Builder
 	code := retroNotes(notesTree(t, notesRows))([]string{"retro", "notes"}, true, &out, &errs)

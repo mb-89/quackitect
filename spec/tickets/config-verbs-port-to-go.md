@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -117,7 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: config-verbs-run-in-go
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 6183eb94e809 · claude-code-remote
+    hash_before: 6591e6d658a269bccdb387f6f74be4383a4115fd
+    hash_after: 6591e6d658a269bccdb387f6f74be4383a4115fd
+    inputs:
+      - name: ask
+        hash: 46dae2bca90f0fef
+        size: 803
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 6183eb94e809 · claude-code-remote
+    hash_before: 5e685208c3582939d8cb9c0658c0a2fadd0a6c5c
+    hash_after: 5e685208c3582939d8cb9c0658c0a2fadd0a6c5c
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 5348ff22bc181506
+        size: 4476
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 6183eb94e809 · claude-code-remote · helper-4
+    hash_before: 69165da95c1112b9ce664c5d8350c9fa32582fa7
+    hash_after: dea45d2c0647e286dce449213f4c4636e7329ba8
+    inputs:
+      - name: design/draft
+        hash: 5348ff22bc181506
+        size: 4476
+      - name: design/tests-red
+        hash: bb72c84cabbb46b8
+        size: 898
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 056798343132 · claude-code-remote
+    hash_before: 8ab76db67d2ebdbc0cc1a6ca59f63b8f87e2d13e
+    hash_after: c430d11c7d9b371434aed70aa142d604dc674b88
+    answered:
+      - name: lint
+        exit: 0
+        said: "    2.5  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 056798343132 · claude-code-remote
+    hash_before: d3f57bf036a6d364bb903b2906cb5b318090fc50
+    hash_after: d3f57bf036a6d364bb903b2906cb5b318090fc50
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   81.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: bb72c84cabbb46b8
+        size: 898
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -151,38 +221,79 @@ The config, the projection and the standing read the index in Go, so `cli-check.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each verb registers its Go answer from its own file under src/quack, through register in src/quack/registry.go, so nodeAccept and the road hand it no node. Each file holds the verb and its doors as arguments, so a case hands in a temp root.
+
+- config (verb_config.go): the rows come off configAt, which the config module resolves; a value prints as String(value) prints it in JavaScript, a string bare and every other literal as it stands. A key with no row exits 2 with the line readConfig prints. Two or more words write the key into .se/.runtime/config.json, coerced to the type the catalog declares, nested as nest and deeply in the level0 lib write it, and append the info row the log module reads, kind config, with the layer as detail. The faults line reads the declared type against the tracked file's literal, as faultsIn does.
+- fix (verb_fix.go): the flags as fixFlags reads them; vale off the survey or the runtime bin as lsp toolAt finds it; up to five rounds of the calm then vale fix --apply over the paths, until the walk's stamp holds; then biome check --write. The calm sentence-cases each ShoutedLead span Vale names, as calmed in shout.js does.
+- project (verb_project.go over a new package src/projection): the four shapes projections.json names, written as projection.js writes them, the stale targets removed. A golden case projects the tree into a temp root and reads every target byte for byte against the tree.
+- rules (verb_rules.go): each yml of VoiceVale, VoiceShape and VoiceScript, its name padded to the rule column, then its message.
+- doors (verb_doors.go): the doors under src/doors against the contract tests under test/contract.
+- standing (verb_standing.go): brief.LayerFor over the layered roots with no kind, then the canary off brief.CountsOf and stop.enabled.
+
+The JavaScript leaves: the six programs, cli-fix.js, shout.js, and readConfig, fix, calm, stamp, project, listRules and standing in cli-check.js. doorsHold, projectionsHold, projections, under and the projection lib stay, since the check program and the mint read them until their own groups port them. The programs test reads the programs folder, so a ported verb leaves it with its program.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbRoad, which hands a registered verb to its twin
+- src/quack/twins.go nodeAccept, which answers a registered verb off goAnswer
+- .claude/commands/se-config-*.md, which run ./RUNME.sh config <key> <value>
+- src/scripts/check-verb.js, which keeps doorsHold and projectionsHold out of cli-check.js
+- test/contract/verb-programs.test.js RUNS, which imports the six programs
+- test/level0/fix.test.js, which imports fix and fixFlags
+- test/level0/topic-readers.test.js, which imports readConfig
+- test/contract/vale-fix.test.js, which imports calmed off shout.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_config_test.go TestConfigPrintsEveryRowAndItsLayer
+- src/quack/verb_config_test.go TestConfigRefusesAKeyNoLayerAnswers
+- src/quack/verb_config_test.go TestConfigWritesTheLocalLayerAndALogRow
+- src/quack/verb_fix_test.go TestFixRefusesAnUnknownFlag
+- src/quack/verb_fix_test.go TestFixCalmsAShoutedLead
+- src/quack/verb_project_test.go TestProjectWritesTheTreeTargetsByteForByte
+- src/quack/verb_rules_test.go TestRulesListsEveryStyleMessage
+- src/quack/verb_doors_test.go TestDoorsNamesADoorWithNoContract
+- src/quack/verb_standing_test.go TestStandingPrintsTheLayerAndTheCanary
+- src/quack/registry_test.go TestTheConfigGroupRegistersEachVerb
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verb_config.go, verb_fix.go, verb_project.go, verb_rules.go, verb_doors.go, verb_standing.go and a test beside each
+- src/projection/*.go
+- src/scripts/verbs/config.js, fix.js, project.js, rules.js, standing.js, doors.js, deleted
+- src/scripts/cli-fix.js and .claude/skills/level0/lib/shout.js, deleted
+- src/scripts/cli-check.js
+- test/level0/fix.test.js, deleted
+- test/level0/topic-readers.test.js
+- test/contract/vale-fix.test.js
+- test/contract/verb-programs.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file, function and verb the approach names stands opened: cli-check.js, cli-doors.js, config.js, shout.js, guidance.js, projection.js outline, registry.go, twins.go, verbs.go, brief.go, layer.go, lsp door.go
+- the callers list names the road, the node module, the config commands, and every JS importer a grep of src and test finds
+- each done_when line meets a test: the go cases, a road case per verb, ls of the programs folder, a grep, and the check
 
 ## tests-red
 
@@ -191,26 +302,36 @@ The config, the projection and the standing read the index in Go, so `cli-check.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/verb_config_test.go
+- src/quack/verb_fix_test.go
+- src/quack/verb_rules_test.go
+- src/quack/verb_doors_test.go
+- src/quack/verb_standing_test.go
+- src/quack/registry_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every case fails on its own assertion against stub verbs that answer exit 1 and print nothing, and the registry case finds no config. The registry case for an unregistered verb named config, so it now names words nothing registers. The project cases come from a helper porting the projection, and land red with their own commit.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the go cases per verb, the registry case for the road, and the ls, grep and check lines the implement step runs
+- the doors the verbs reach ride in as arguments: the root, the clock, the environment and the tool runner, so no case touches the box past a temp root
 
 # gate
 
@@ -219,8 +340,10 @@ The config, the projection and the standing read the index in Go, so `cli-check.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- project-port-reads-both-roots: verb_project.go writes under the work root, and reads its sources off the method and work layers. Land verb_project_test.go red before implement, with a case over both roots.
 
 # implement
 
@@ -231,14 +354,19 @@ The config, the projection and the standing read the index in Go, so `cli-check.
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the six verbs Go files, the projection package, the deleted programs and modules, and the tests the draft names, and no file the ask leaves out
+- every door the verbs reach rides in as an argument, so each case hands in a temp root, a clock and a tool runner
+- each Go file opens on a header pointing at this ticket, the approach it implements
+- the verb list and the deleted modules stand once, in verb_config_group_test.go
 
 ## tests-green
 
@@ -247,26 +375,33 @@ The config, the projection and the standing read the index in Go, so `cli-check.
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs config, fix, project, rules, standing and doors run in Go. Each registers itself from its own file under src/quack, so the road and the node module hand it to Go and never start node. The project verb rides on a new package, src/projection, that writes the targets projections.json names over both the method and the work roots. The six programs, cli-fix.js and shout.js leave the tree, and cli-check.js keeps only what the check program and the mint still read. verb_config_group_test.go holds the group: each verb registers, reaches no node under new, carries no program, and nothing under src imports a deleted module.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft sizes, plus the group test the read group models
+- every door the cases reach rides in as an argument, over a temp root
+- each Go file opens on a header pointing at this ticket
+- the verb list stands once, in verb_config_group_test.go
 
 # accept
 
@@ -291,3 +426,7 @@ The config, the projection and the standing read the index in Go, so `cli-check.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The merge of main takes the program tests as main writes them, less the six verbs this group ports. Main's registry design reads programs against the Go table alone, so the branch's older `registered()` scan leaves.
+- The group's registration case moves out of the shared `src/quack/registry_test.go` into `src/quack/verb_config_group_test.go`, as `verb_read_test.go` holds the read group's. Parallel groups then meet in no shared line. It also reads the road under new and the importers of `cli-fix.js` and `shout.js`.
+- One shared line changes: the unregistered-verb case names `registry unclaimed`, because `config` now registers.

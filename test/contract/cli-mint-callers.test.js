@@ -12,7 +12,6 @@ import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
 import { TOOLS } from "../../src/bridge/tools.js";
 import { disk } from "../../src/doors/disk.js";
 import { handOut } from "../../src/scripts/pull-hand.js";
-import { newRetro } from "../../src/scripts/retro-new.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -72,14 +71,13 @@ test("each schema module stands under the file ceiling the config names", () => 
 });
 
 // The command line exits at import, so its text says which module it mints through. [[spec/design_output/editor#one-command-opens-the-editor]]
-test("the command line, the tools, the hand and the retro reach the mint through its own module", () => {
+test("the command line, the tools and the hand reach the mint through its own module", () => {
   const cli = String(files.read(join(root, "src", "scripts", "mint-verb.js")));
   assert.match(
     cli,
     /from "\.\.\/\.\.\/\.claude\/skills\/level0\/lib\/schema-mint\.js"/,
   );
   assert.equal(typeof TOOLS.mcp__level0__mint_note, "function");
-  assert.equal(typeof newRetro, "function");
   assert.equal(typeof handOut, "function");
 });
 

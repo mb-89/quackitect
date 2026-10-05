@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -117,7 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: dispatch-verbs-run-in-go
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: 327d463ce2830b8897b5891525add34a379467be
+    hash_after: 327d463ce2830b8897b5891525add34a379467be
+    inputs:
+      - name: ask
+        hash: 0eac3f0d7cae79f5
+        size: 679
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: db3d707fcfe61124354bb385451cbdb41ab65e24
+    hash_after: 6b56649e0c7a97885915007a9d12a2f4974f94b6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 6966bd6d7cd4bf05
+        size: 4039
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 89388e314a84 · claude-code-remote · helper-4
+    hash_before: 0da234231756437e47a54868da08750d8350d2b2
+    hash_after: 0da234231756437e47a54868da08750d8350d2b2
+    inputs:
+      - name: design/draft
+        hash: 6966bd6d7cd4bf05
+        size: 4039
+      - name: design/tests-red
+        hash: e2bd44fe2f366469
+        size: 981
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: f14c19cad2848c5b367b2f0d2d5b5b06ef15e9e6
+    hash_after: 32c53a4d8b726e5a0806c783ca06a95b599b383d
+    answered:
+      - name: lint
+        exit: 0
+        said: "    3.4  test/contract/drawing-page.test.js the page posts ready once it mounts, and draws nothing before a graph"
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 89388e314a84 · claude-code-remote
+    hash_before: 0c04cc4d438f9a7fe372770752dd581cb7e530b9
+    hash_after: 0c04cc4d438f9a7fe372770752dd581cb7e530b9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   86.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: e2bd44fe2f366469
+        size: 981
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -151,38 +221,63 @@ The dispatch reads the waits, the free groups and the marker through the Go copy
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The dispatch ports into the Go package src/branches, beside the work verbs it reads, and src/quack/dispatch.go registers it from its own file. dispatch.go in the package carries the plan (planned, idleIn, looseOpen, bundlesOf, closesOf, leftForPerson, personOf, the printed rows and the JSON) and the run (carried, refused). dispatch_write.go carries opensOf, writeState, fixName, the fix ask, writesOf, fixGroup, land and opens. dispatch_fire.go carries the fire and the write branch's pull request. The plan reads the Go copy #94 landed (readWork, standingAll, trunkOf, freeIn, staleClaim, stuckIn, waitsOf, waitsIn, onPersonRoute, markOff), so the Action and the boxes agree on what is free. The fix group mints through check.Minted over check.SchemasIn, and a route copy in dispatch_write.go reads spec/processes/<name>.yaml, keeps its key order through yaml.Doc, and hashes ask and steps the way processHash in lib/schema-route.js does, over hashText in route.go. The http door rides a Send func handed to Dispatch beside the Doors, so doors.go takes no new field and no shared line changes. Weighed: askFaults ran Vale over a constant ask at each run; the Go run drops that call, a Go case runs Vale over the minted fix group once, and the check on the write branch's pull request lints every ticket it lands. The JSON and the printed plan keep their shape, since the Action reads --json. dispatch.js, dispatch-write.js, dispatch-fire.js and verbs/dispatch.js leave; an import walk over every .js file names no other module the four alone keep alive. The JS tests dispatch.test.js, dispatch-fire.test.js and dispatch-fixtures.js leave with them, their roads ported to Go, and the planOf case in work-stands.test.js moves to Go.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbs: runs a registered verb, now dispatch
+- src/quack/twins.go nodeAccept: hands an index action naming dispatch to the Go verb
+- RUNME.sh: ./RUNME.sh dispatch reaches quack verb
+- .github/workflows/dispatch.yml: runs ./RUNME.sh dispatch --json --fire
+- .claude/skills/dispatch/SKILL.md: runs ./RUNME.sh dispatch --dry
+- test/level0/work-stands.test.js: imports planOf from dispatch.js
+- test/contract/verb-programs.test.js RUNS: imports verbs/dispatch.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/dispatch_test.go: the plan roads of dispatch.test.js (ready, waiting, held, stuck, person, bundles, opens, closes, parents, the dry run, --json)
+- src/branches/dispatch_write_test.go: one fix group, one commit on claude/dispatch-<commit>, a standing and an unmerged write branch, the worktree removed, a refused push, the name cut, the route copy and its hash
+- src/branches/dispatch_fire_test.go: the roads of dispatch-fire.test.js over a fake Send
+- src/quack/dispatch_test.go: dispatch registers, reaches no node, verbs/dispatch.js stands nowhere, and no .js imports a deleted module
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/dispatch.go, new
+- src/branches/dispatch_write.go, new
+- src/branches/dispatch_fire.go, new
+- src/branches/dispatch_*_test.go, new
+- src/quack/dispatch.go, new
+- src/quack/dispatch_test.go, new
+- src/scripts/dispatch.js, dispatch-write.js, dispatch-fire.js, verbs/dispatch.js, removed
+- test/level0/dispatch.test.js, dispatch-fire.test.js, dispatch-fixtures.js, removed
+- test/level0/work-stands.test.js, test/contract/verb-programs.test.js, edited
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file named stands opened: dispatch.js, dispatch-write.js, dispatch-fire.js, verbs/dispatch.js, process.js withRoute and processAt, ticket.js cutTo and schemasHere, ticket-ask-lint.js, schema-route.js processHash, src/branches doors.go, stands.go, free.go, group.go, take.go, route.go hashText, src/modules/check mint.go and export.go, src/quack registry.go, branch.go, cloud.go
+- the callers list names the road, the node module, the Action, the skill and the two JS tests importing the deleted files
+- each done_when line meets a test: the Go cases, dispatch_test.go in src/quack for no node and the verbs folder and the importer search, and ./RUNME.sh check
 
 ## tests-red
 
@@ -191,26 +286,31 @@ The dispatch reads the waits, the free groups and the marker through the Go copy
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/dispatch_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/dispatch_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The port and the plan's cases landed in one commit, as the work group's did, so those cases stood green from the start. The red case asserts the four JavaScript files stand nowhere and nothing imports them, and it fails on that assertion while they stand. One surprise: the Go read names a group merged where main carries its ticket closed, and not by git ancestry, so the merged case lands the closed ticket on main the way a merged pull request leaves it. A second: the importer walk met d3-dispatch inside a node_modules folder, so the walk skips node_modules.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every done_when line meets a test: the Go cases for the roads, dispatch_test.go in src/quack for no node, the verbs folder and the importer search, and the check
+- every door the tests reach stands real or faked: a bare origin and its clone for git, and a fake send door for the network
 
 # gate
 
@@ -219,8 +319,17 @@ The dispatch reads the waits, the free groups and the marker through the Go copy
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+
+The approach answers the ask. The dispatch ports into src/branches (dispatch.go for the plan, dispatch_write.go for the writes, dispatch_fire.go for the fire). It reads the Go copy the work verbs landed, so the Action and the boxes agree on what is free, and it registers from src/quack/dispatch.go with httpSend as its send door. In src/branches, go test -run Dispatch passes its sixteen plan cases, and they cover every plan road of dispatch.test.js. TestDispatchNamesTheSameReadyGroupsTheFreeReadNames carries the planOf road of work-stands.test.js. src/quack/dispatch_test.go TestDispatchLeavesNode fails on its own assertion: the four modules stand, and three imports reach them. It decides the no-node, verbs-folder and importer lines, and ./RUNME.sh check decides the last. Weighed: the write roads and the fire roads have code but no Go case. The draft names dispatch_write_test.go and dispatch_fire_test.go, and neither file stands. So done_when line 1 stands promised, and no test decides it yet. I accept rather than reject because the draft already names both files and every road they hold, and implement writes them where it stands. A reject sends the same list back for a round. Points for implement, fixed in place, no child:
+- write src/branches/dispatch_write_test.go over the dispatch.test.js write roads: one fix group carrying fix: true, one commit on claude/dispatch-<commit> with no push to main, a standing write branch writes nothing, an unmerged write branch stops every write and the plan still names workers, a merged one stops nothing, the person route stays loose, opens of work/<name>, the name cap and the cut keeping the commit, the worktree removed after a push and after a refused push, markOff, a parent's close landing once over two runs, and a fix group per parent
+- add to it a case pinning processHash in dispatch_write.go to the hash processHash in src/scripts/lib/schema-route.js gives for one process, so the route copy matches the JS before the JS leaves
+- add the Vale case over the minted fix group's ask that the approach names in place of askFaults; no such case stands
+- write src/branches/dispatch_fire_test.go over a fake Send, for the nine roads of dispatch-fire.test.js: once per ready group and stuck hand-over, the routine cap, a refused fire exiting 1 with its reason, a rate refusal naming the reset, no issues API, the write branch's pull request on PULL_TOKEN with auto-merge, no second pull request, missing secrets, and --json --fire
+- the size and callers lists miss spec/design_output/work.md, whose table rows for opensOf, closesOf and bundlesOf point at src/scripts/dispatch.js and dispatch-write.js; move those pointers to the Go functions
+- the importer walk in TestDispatchLeavesNode matches only a double-quoted path; biome writes double quotes, so it holds today, and a single-quoted import passes it unseen
 
 # implement
 
@@ -231,14 +340,19 @@ The dispatch reads the waits, the free groups and the marker through the Go copy
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the dispatch files the draft names, the two JS tests importing them, and work.md, whose rows point at the moved functions
+- every door the change reaches has a fake: git runs over a bare origin and its clone, and the send door over a fake hub
+- each Go file opens with a header naming the approach, and the quack files point at this ticket
+- each constant stands once: shortSha and ticketSchema stay where they stood, and jsonText answers the JSON text
 
 ## tests-green
 
@@ -247,26 +361,33 @@ The dispatch reads the waits, the free groups and the marker through the Go copy
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/dispatch_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The dispatch verb runs in Go. src/quack/dispatch.go registers it from its own file over the branch doors and a send door onto the network. src/branches/dispatch.go reads the plan off the Go copy of the work reads, so the Action and the boxes agree on what is free. dispatch_write.go lands the fix groups, the parent closes and the cloud markers on one write branch through a worktree, and dispatch_fire.go fires the routine and opens the write branch pull request with auto-merge. The fix group mints through the Go mint over the tree route, hashed as the JavaScript hashed it. The four JavaScript files and their tests leave, and their roads stand as Go cases.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the dispatch files, the two JS tests that imported them, and work.md
+- every door has a fake: a bare origin and its clone for git, a fake hub for the send door
+- each Go file opens with a header naming the approach
+- each constant stands once, and work.md points at the Go functions
 
 # accept
 

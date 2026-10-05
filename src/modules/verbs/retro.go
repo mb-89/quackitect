@@ -1,9 +1,9 @@
-// The retro verbs: every verb retro.js answers, each standing as an action of
-// the retro topic through the node module.
+// The retro verbs: every verb src/quack registers under retro, each standing
+// as an action of the retro topic through the node module.
 // [[spec/tickets/retro-verbs-become-actions]]
 package verbs
 
-// Every verb retro in src/scripts/retro.js answers, with its usage line as its doc. [[spec/tickets/retro-verbs-become-actions]]
+// Every verb src/quack registers under retro, with its usage line as its doc. [[spec/tickets/retro-verbs-become-actions]]
 var RetroVerbs = []Verb{
 	{Name: "notes", Doc: "the private notes still open on this box, and 0 when none stands"},
 	{Name: "audit", Doc: "the experiments still open, and 0 once each stands decided"},
