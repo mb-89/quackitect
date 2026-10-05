@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -152,6 +152,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: 6b2c34611f68fb27d9816ba64dfbc75770ab9ef8
+    hash_after: 6b2c34611f68fb27d9816ba64dfbc75770ab9ef8
+    inputs:
+      - name: retro/write
+        hash: 5970134d4f3d5150
+        size: 2838
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -305,20 +315,29 @@ The Windows failure was a race in the cleanup, not in the code under test. A re-
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the gh command line: GitHub reads and the pull request went through the GitHub connector, from the start
+- a blocking wait: the wait tool returned within a second, so the helper's report came in a later turn, at 19:33 UTC
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the trunk guard: the push of main from branch open came back refused, at 19:21 UTC
+- a conflict at sync: program-of-drops-node, where main carried it closed, at 19:35 UTC
+- the shell door: it refused reset, merge and pull, and branch sync passed
+- a test that fails on the box alone: TestAnIndexReachingNoWiringLoadsTheManagerAlone on the Windows runner, fixed in this group
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside this group
+- the handover: the phase 11 group closes through its pull request, and the next phase waits on the dispatcher
 
 # Discussion
 
