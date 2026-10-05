@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/tests-green
+step: accept
 record:
   - step: design/owner-read
     skipped: true
@@ -222,6 +222,22 @@ record:
         exit: 0
         said: "spec/rationales/pull.md:27:63: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box c2e39844c8bf · claude-code-remote
+    hash_before: d2308419765e694b4fb07346520e5ca0ba9d60a3
+    hash_after: d2308419765e694b4fb07346520e5ca0ba9d60a3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.8  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: design/tests-red
+        hash: b7595d42c22ced71
+        size: 715
+    def: ec253787263043a7
 ---
 
 # Ask
@@ -390,26 +406,33 @@ go build ./... && ./RUNME.sh lint src/pull src/quack/verb_mint.go src/quack/tick
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/process_test.go src/quack/verb_mint_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The mint, the open and ticket set refuse a ticket naming a closed group. The refusal names two roads out: mint with no group, or reopen the group through ticket pull --back. A ticket minted on a closed group own branch joins no group and stands free. Before this, such a child reached no hand: the closed branch handed nothing out, and trunk took groups alone. GroupClosed now holds the one closed read the pull and the three writers share.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files: the sources, their tests, pull.md, its rationale and the size golden, each named in the draft or the gate points
+- the doors: every case runs on a temp tree or FakeDisk
+- the comments: each guard links the pull note chapter a-closed-group-takes-no-child
+- one place: GroupClosed holds the closed read, and ClosedGroup the refusal text
 
 # accept
 
