@@ -10,7 +10,7 @@ import (
 	"quackitect/src/q"
 )
 
-// Every verb theVehicle answers stands as an action of the vehicle topic, writing, with its doc. [[spec/tickets/vehicle-verbs-become-actions]]
+// Every verb vehicleTwin in src/quack answers stands as an action of the vehicle topic, writing, with its doc. [[spec/tickets/vehicle-verbs-become-actions]]
 func TestEveryVehicleVerbStandsAsAnAction(t *testing.T) {
 	want := []string{"here", "produce", "into", "attach", "detach", "register"}
 	var names []string
