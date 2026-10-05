@@ -116,11 +116,20 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box c2e39844c8bf · claude-code-remote
+    hash_before: 3c05e588f08def88e3ffc388266f5845fd68c603
+    hash_after: 3c05e588f08def88e3ffc388266f5845fd68c603
+    inputs:
+      - name: ask
+        hash: ec76b8a6a166f988
+        size: 630
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -156,38 +165,56 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The mint refuses a new child under a closed group, and the pull stays as it stands. `pull.GroupClosed` reads whether a group stands closed, and the pull's closed-branch answer and the new `pull.ClosedGroup` refusal both read it. The mint verb refuses `--group=X` where X stands closed, and names the two roads out: mint the ticket standalone, or reopen X with `ticket pull X --back <leaf>`. On a closed group's own branch the auto-join skips X, so the ticket stands free and the mint says so. Otherwise no hand on that branch mints a standalone ticket at all. `OpensDraft` refuses a draft naming a closed group beside its `EmptyGroup` refusal, so a draft off any other mint road meets the same refusal at its open. Why the mint and not the pull: [[spec/design_output/pull#a-closed-group-hands-nothing]] keeps a closed branch from handing work out, since that work merges unread. A free ticket on trunk reaches a desk alone, because a cloud pull on trunk takes groups. Handing the child out as a free ticket therefore leaves a cloud box where it stood, while a refusal at the mint stops the stray child before it exists.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verb_mint.go mintVerb, which calls the new pull.ClosedGroup and pull.GroupClosed
+- src/pull/pull.go (*It).Pull, the closed-branch answer, which reads pull.GroupClosed in place of the closedGroup method
+- src/pull/pull_ticket.go (*It).OpensDraft, which calls pull.ClosedGroup
+- src/quack ticket open and the pull's trivial draft, both through OpensDraft
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/verb_mint_test.go TestMintVerb: a ticket naming a closed group comes back refused
+- src/quack/verb_mint_test.go TestMintVerb: a ticket on a closed group's branch stands free
+- src/pull/process_test.go: a ticket naming a closed group stands refused
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/pull/tickets.go
+- src/pull/pull.go
+- src/pull/pull_ticket.go
+- src/quack/verb_mint.go
+- src/quack/verb_mint_test.go
+- src/pull/process_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the files: I opened verb_mint.go, tickets.go JoinsGroup and EmptyGroup, pull.go closedGroup and pull_ticket.go OpensDraft, and each claim stands there
+- the callers: grep over src for JoinsGroup, EmptyGroup and closedGroup names every caller listed
+- the done_when lines: the first two name TestMintVerb cases, and the third names the check
 
 ## tests-red
 
