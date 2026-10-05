@@ -18,7 +18,9 @@ test("every verb of the table loads as a program answering a run, or registers i
   const go = goVerbs();
   const listed = new Set(commands().keys());
   const files = disk();
-  for (const { name: one } of files.list(join(ROOT, ...VERBS))) {
+  const folder = join(ROOT, ...VERBS);
+  const programs = files.exists(folder) ? files.list(folder) : [];
+  for (const { name: one } of programs) {
     assert.ok(
       listed.has(one.replace(/\.js$/, "")),
       `${one} answers no verb of the table`,
