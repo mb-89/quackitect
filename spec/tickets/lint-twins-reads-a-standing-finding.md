@@ -80,7 +80,7 @@ done_when:
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-The lint twins case read the phase 11 parent ticket as its file with a finding. A closed ticket passes the lint, so closing that group left the case with nothing to compare, and the check went red on the group's own branch. The case now reads `spec/design_output/tui.md`, a design note that keeps a finding at warning. The fix landed in #106; this pass carries its evidence, since the pull hands out no leaf on a closed group.
+The lint twins case read the phase 11 parent ticket as its file with a finding. A closed ticket passes the lint, so closing that group left the case with nothing to compare. The check then went red on the group's own branch. The case now reads `spec/design_output/tui.md`, a design note that keeps a finding at warning. The fix landed in pull request 106. This pass carries its evidence, since the pull hands out no leaf on a closed group.
 
 ## checked
 
@@ -88,7 +88,7 @@ The lint twins case read the phase 11 parent ticket as its file with a finding. 
 <!-- the form is checklist -->
 
 - the change follows the ask: the case reads a standing finding, as the ask names
-- the cleanup it reveals: the deadlock of a child minted after its group closed stands in the parent's Discussion
+- the cleanup it reveals: the parent's Discussion names how a child minted after its group closed waits on a hand
 - every fact stands in one place: the case names its file once, and the ticket points at the test
 
 # Discussion
