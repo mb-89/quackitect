@@ -3,7 +3,9 @@
 // [[spec/tickets/level0-runs-on-the-door]]
 
 import assert from "node:assert/strict";
+import { resolve } from "node:path";
 import { test } from "node:test";
+import { pathToFileURL } from "node:url";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { RESUME } from "../../src/bridge/handover.js";
@@ -194,7 +196,8 @@ test("the harness reads the clone's files, records each post and tool, and hands
 // [[spec/tickets/program-of-drops-node]]
 test("the probe's main runs nothing where another program is main", async () => {
   let ran = false;
-  await verbMain("file:///elsewhere/probe-dry.js", () => {
+  // A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first.
+  await verbMain(pathToFileURL(resolve("/elsewhere/probe-dry.js")).href, () => {
     ran = true;
   });
   assert.equal(ran, false);
