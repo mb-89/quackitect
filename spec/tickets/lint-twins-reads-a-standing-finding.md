@@ -70,3 +70,10 @@ done_when:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The evidence of `do` stands here. The parent group closed before this ticket was minted, so the pull hands out no leaf on its branch, and a named pull stands behind the queue. A hand with the pull, or the owner, passes `do` on it.
+
+- tests: `node --test test/contract/lint-twins.test.js`, green
+- check: `./RUNME.sh check`, green on the commit that lands the fix
+- says: The case read the parent ticket of phase 11 as its file with a finding. A closed ticket passes the lint, so closing that group left the case failing its own guard. The case now reads `spec/design_output/tui.md`, a design note keeping a finding at warning.
+- lasting road: every finding in the tree waits on the push gate, so a committed fixture carrying a finding on purpose frees the case from the tree.
