@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-verbs-run-in-go
 step: do
+record:
+  - step: do
+    hand: box d8921a909c1fa5 · claude-code-remote
+    hash_before: 2ca51e4b69f8aa28192a368cb1fa345eaa9b6d26
+    hash_after: 2ca51e4b69f8aa28192a368cb1fa345eaa9b6d26
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 1 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "  103.9  in all"
+    inputs:
+      - name: ask
+        hash: bb6664ed6d1bf7de
+        size: 499
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ done_when:
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh branch test test/contract/lint-twins.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The lint twins case read the phase 11 parent ticket as its file with a finding. A closed ticket passes the lint, so closing that group left the case with nothing to compare, and the check went red on the group's own branch. The case now reads `spec/design_output/tui.md`, a design note that keeps a finding at warning. The fix landed in #106; this pass carries its evidence, since the pull hands out no leaf on a closed group.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the case reads a standing finding, as the ask names
+- the cleanup it reveals: the deadlock of a child minted after its group closed stands in the parent's Discussion
+- every fact stands in one place: the case names its file once, and the ticket points at the test
 
 # Discussion
 
