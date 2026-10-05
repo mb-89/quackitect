@@ -32,7 +32,7 @@ func TestVerbRegistry(t *testing.T) {
 	})
 	t.Run("an unregistered verb reaches node", func(t *testing.T) {
 		doors, out, _ := roadOver(modeNew, "node\n", registry)
-		if code := verbs(doors, []string{"config"}); code != 0 || out.String() != "node\n" {
+		if code := verbs(doors, []string{"registry", "unclaimed"}); code != 0 || out.String() != "node\n" {
 			t.Fatalf("the road answers %d, %q, and wants the node answer", code, out.String())
 		}
 	})

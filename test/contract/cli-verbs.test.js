@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { commands, scriptText } from "./commands.js";
+import { commands } from "./commands.js";
 
 const saysOf = (verb) => commands().get(verb) ?? "";
 

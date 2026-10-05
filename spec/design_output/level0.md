@@ -1887,7 +1887,7 @@ Vale carries the actions below, and none of them folds case:
 | `edit` | trims, replaces, truncates, splits or runs a regex |
 | `convert` | lowercases and drops the punctuation |
 
-So `ShoutedLead` carries no action, and `.claude/skills/level0/lib/shout.js` makes the fix
+So `ShoutedLead` carries no action, and `calmed` in `src/quack/verb_fix.go` makes the fix
 from the line and the column Vale already reports. Vale skips a code fence and
 honours an exemption marker, so the finding it hands over carries both for free.
 
