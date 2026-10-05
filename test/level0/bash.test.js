@@ -59,7 +59,7 @@ test("a redirection into a file the rules reach is refused", () => {
 test("a redirection nowhere the rules reach passes", () => {
   for (const said of [
     "cat > .se/notes.md",
-    "node src/scripts/verbs/check.js > /tmp/out.md",
+    "node src/scripts/verbs/doors.js > /tmp/out.md",
     "./RUNME.sh check > .se/check.log",
     "git status --porcelain",
     "grep -rn describes spec/design_output",
@@ -304,7 +304,7 @@ test("a whole-suite run is refused, and a run naming one file passes", () => {
     'node --test --test-name-pattern="the prune"',
     "node --test --test-only test/level0/log.test.js",
     "./RUNME.sh check",
-    "node src/scripts/verbs/check.js",
+    "node src/scripts/verbs/doors.js",
     "npm run lint",
   ]) {
     assert.deepEqual(testIn(said), [], said);
@@ -373,7 +373,7 @@ test("a runner and a shell each name their script, and a tracked path names none
   assert.deepEqual(scriptsIn("sh .se/scripts/edit.sh"), [".se/scripts/edit.sh"]);
   assert.deepEqual(scriptsIn("python3 /tmp/one.py"), ["/tmp/one.py"]);
   assert.deepEqual(scriptsIn("node --test test/level0/bash.test.js"), []);
-  assert.deepEqual(scriptsIn("node src/scripts/verbs/check.js"), []);
+  assert.deepEqual(scriptsIn("node src/scripts/verbs/doors.js"), []);
 });
 
 test("a script the rules already read names no script here", () => {

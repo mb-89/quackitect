@@ -3,7 +3,6 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeFront } from "../../src/doors/fake/front.js";
@@ -26,6 +25,7 @@ import {
   work,
 } from "../../src/scripts/work.js";
 import {
+  CHECK,
   CHILD,
   doorsSaying,
   GROUP_AT,
@@ -356,7 +356,7 @@ test("a group held past staleAfter stands under yours, with its three answers", 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 test("merge runs the check on the merge commit, and undoes the merge on red", () => {
   const red = {
-    [`node ${join(ROOT, "src/scripts/verbs/check.js")} --errors`]: {
+    [CHECK]: {
       exitCode: 1,
       stdout: "two tests fail\n",
     },
@@ -378,7 +378,7 @@ test("merge runs the check on the merge commit, and undoes the merge on red", ()
 // The check under --errors prints the red cases alone, and the merge hands each one on. [[spec/tickets/the-verbs-need-no-wrapper]]
 test("merge on a red check prints each failing case the check names", () => {
   const red = {
-    [`node ${join(ROOT, "src/scripts/verbs/check.js")} --errors`]: {
+    [CHECK]: {
       exitCode: 1,
       stdout:
         "test/level0/one.test.js: a first case: it broke\ntest/level0/two.test.js: a second case: it broke\n",

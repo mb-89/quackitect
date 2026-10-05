@@ -1,0 +1,162 @@
+// The effect step: the last retro's class patterns counted again, each with
+// its verdict, and this retro's battery read against the last one's.
+// [[spec/guidance/retro/effect]]
+package main
+
+import (
+	"encoding/json"
+	"reflect"
+	"strings"
+	"testing"
+)
+
+// The earlier battery report. [[spec/guidance/retro/effect]]
+const retroEffectEarlier = `{"parts":{"tests":1000,"rules":200},"total":1200,"slowest":[{"name":"steady","ms":100},{"name":"leaves","ms":60}]}`
+
+// The later battery report. [[spec/guidance/retro/effect]]
+const retroEffectLater = `{"parts":{"tests":1400,"rules":200},"total":1600,"slowest":[{"name":"steady","ms":110},{"name":"arrives","ms":90}]}`
+
+// The next retro counts the last one's patterns again, and names each verdict. [[spec/guidance/retro/effect]]
+func TestRetroEffectCountsTheLastRetrosPatternsAgainAndNamesEachVerdict(t *testing.T) {
+	root := t.TempDir()
+	retroReadingLay(t, root, retroClassesFirst, retroClassesTree(retroClassesWhole, map[string]string{
+		"collected.json": `{"at":"2026-09-19T21:00:00.000Z"}`,
+	}))
+	retroReadingLay(t, root, retroClassesSecond, map[string]string{
+		"collected.json": `{"at":"2026-09-26T21:00:00.000Z"}`,
+		"input/log/session.jsonl": `{"at":"2026-09-26T08:10:00.000Z","said":"PastTense refused"}` + "\n" +
+			`{"at":"2026-09-26T09:10:00.000Z","said":"a quiet line"}` + "\n" +
+			`{"at":"2026-09-26T10:10:00.000Z","said":"a quiet line"}` + "\n" +
+			`{"at":"2026-09-26T11:10:00.000Z","said":"a quiet line"}`,
+	})
+	retroReadingRun(retroClassesVerb, root, "retro", "classes", retroClassesFirst)
+
+	code, out, errs := retroReadingRun(retroEffectVerb, root, "retro", "effect", retroClassesSecond)
+
+	printed := "k1  1 to 0.25 an hour  falls  commit messages meet the voice rules late\n"
+	if code != 0 || out != printed {
+		t.Fatalf("effect answers %d, %q, %q, want %q", code, out, errs, printed)
+	}
+	var effect retroEffectRecord
+	if err := json.Unmarshal([]byte(retroReadingFile(t, root, retroClassesSecond, "effect.json")), &effect); err != nil {
+		t.Fatal(err)
+	}
+	if effect.Last != retroClassesFirst || len(effect.Classes) != 1 {
+		t.Fatalf("effect.json holds %+v", effect)
+	}
+	one := effect.Classes[0]
+	if one.ID != "k1" || one.Before.Rate != 1 || one.Now.Rate != 0.25 || one.Verdict != "falls" {
+		t.Fatalf("effect.json reads k1 as %+v", one)
+	}
+}
+
+// A verdict reads gone, falls, holds or grows. [[spec/guidance/retro/effect]]
+func TestRetroEffectReadsAVerdictGoneFallsHoldsOrGrows(t *testing.T) {
+	before := retroRate{Count: 4, Rate: 1}
+	for _, one := range []struct {
+		now  retroRate
+		want string
+	}{
+		{retroRate{Count: 0, Rate: 0}, "gone"},
+		{retroRate{Count: 2, Rate: 0.5}, "falls"},
+		{retroRate{Count: 4, Rate: 1}, "holds"},
+		{retroRate{Count: 8, Rate: 2}, "grows"},
+	} {
+		if got := retroVerdictOf(before, one.now); got != one.want {
+			t.Fatalf("%+v reads %q, want %q", one.now, got, one.want)
+		}
+	}
+}
+
+// A retro with no earlier class fixes measures nothing, and says so. [[spec/guidance/retro/effect]]
+func TestRetroEffectWithNoEarlierClassFixesMeasuresNothingAndSaysSo(t *testing.T) {
+	root := t.TempDir()
+	retroReadingLay(t, root, retroClassesSecond, map[string]string{"collected.json": `{"at":"2026-09-26T21:00:00.000Z"}`})
+
+	code, out, _ := retroReadingRun(retroEffectVerb, root, "retro", "effect", retroClassesSecond)
+
+	if code != 0 || !strings.Contains(out, "No earlier retro holds class fixes") {
+		t.Fatalf("effect answers %d, %q", code, out)
+	}
+}
+
+// The effect reads this retro's battery against the last retro's. [[spec/guidance/retro/effect]]
+func TestRetroEffectReadsThisRetrosBatteryAgainstTheLastRetros(t *testing.T) {
+	root := t.TempDir()
+	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
+	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})
+
+	said := retroBatteryEffectOf(root, "retro-b", "retro-a")
+
+	if said == nil {
+		t.Fatal("the effect reads no battery")
+	}
+	if said.Last != "retro-a" || said.Total != (retroBatteryTotal{Before: 1200, Now: 1600}) {
+		t.Fatalf("the effect reads %+v", said)
+	}
+	if !reflect.DeepEqual(said.Fresh, []retroCase{{Name: "arrives", Ms: 90}}) {
+		t.Fatalf("fresh reads %+v", said.Fresh)
+	}
+	if !reflect.DeepEqual(said.Gone, []retroCase{{Name: "leaves", Ms: 60}}) {
+		t.Fatalf("gone reads %+v", said.Gone)
+	}
+	if !reflect.DeepEqual(said.Slowest, []retroCase{{Name: "steady", Ms: 110}, {Name: "arrives", Ms: 90}}) {
+		t.Fatalf("slowest reads %+v", said.Slowest)
+	}
+}
+
+// A retro with no earlier one reads every part as new, and no report reads as nothing. [[spec/guidance/retro/effect]]
+func TestRetroEffectWithNoEarlierRetroReadsEveryPartAsNewAndNoReportAsNothing(t *testing.T) {
+	root := t.TempDir()
+	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
+
+	said := retroBatteryEffectOf(root, "retro-b", "")
+
+	if said == nil || said.Last != "" {
+		t.Fatalf("the effect reads %+v", said)
+	}
+	befores := []float64{}
+	for _, one := range said.Parts {
+		befores = append(befores, one.Before)
+	}
+	if !reflect.DeepEqual(befores, []float64{0, 0}) {
+		t.Fatalf("the parts read before %v, want [0 0]", befores)
+	}
+	if got := retroBatteryEffectOf(t.TempDir(), "retro-b", "retro-a"); got != nil {
+		t.Fatalf("no report reads %+v, want nil", got)
+	}
+}
+
+// The first retro has nothing to read against, so its battery stands as the baseline the next one reads. [[spec/guidance/retro/effect]]
+func TestRetroEffectOfAFirstRetroWritesItsBatteryAsTheBaselineAndNamesIt(t *testing.T) {
+	root := t.TempDir()
+	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
+
+	code, out, errs := retroReadingRun(retroEffectVerb, root, "retro", "effect", "retro-b")
+
+	printed := "No earlier retro holds class fixes, so nothing stands to measure.\n" +
+		"battery  baseline 1600 ms, which the next retro reads against\n"
+	if code != 0 || out != printed {
+		t.Fatalf("effect answers %d, %q, %q, want %q", code, out, errs, printed)
+	}
+	var written retroEffectRecord
+	if err := json.Unmarshal([]byte(retroReadingFile(t, root, "retro-b", "effect.json")), &written); err != nil {
+		t.Fatal(err)
+	}
+	if written.Last != "" || written.Battery == nil || !written.Battery.Baseline || written.Battery.Total.Now != 1600 {
+		t.Fatalf("effect.json holds %+v", written)
+	}
+}
+
+// A retro with an earlier one reads no baseline. [[spec/guidance/retro/effect]]
+func TestRetroEffectWithAnEarlierRetroReadsNoBaseline(t *testing.T) {
+	root := t.TempDir()
+	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
+	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})
+
+	said := retroBatteryEffectOf(root, "retro-b", "retro-a")
+
+	if said == nil || said.Baseline {
+		t.Fatalf("the effect reads %+v, want no baseline", said)
+	}
+}

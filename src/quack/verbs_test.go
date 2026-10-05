@@ -171,10 +171,15 @@ func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 	}
 }
 
-// The road holds retro notes among its twins, so the shadow runs it beside the verb's program. [[spec/tickets/retro-notes-twin-joins-road]]
+// The road holds retro notes among its twins, and Go registers retro whole, so every mode runs it in quack alone. [[spec/tickets/retro-notes-twin-joins-road]] [[spec/tickets/retro-verbs-run-in-go]]
 func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
-	if registry["retro notes"] == nil || roadOf(modeShadow, []string{"retro", "notes"}, registry) != toBoth {
-		t.Fatal("the road holds no retro notes twin in shadow")
+	if registry["retro notes"] == nil {
+		t.Fatal("the registry holds no retro notes twin")
+	}
+	for _, mode := range []string{modeShadow, modeNew, "old"} {
+		if roadOf(mode, []string{"retro", "notes"}, registry) != toQuack {
+			t.Fatalf("retro notes takes another road than quack in %s", mode)
+		}
 	}
 }
 

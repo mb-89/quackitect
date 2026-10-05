@@ -14,35 +14,26 @@ import {
   walkOver,
 } from "../bridge/findings.js";
 import { readTools } from "../engine/tools.js";
-import { redIn } from "./battery.js";
 import { treeHere } from "./cli-check.js";
 import { bin, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
 import { rowsUnder, sweepRowsOf } from "./quack-topic.js";
 
-// What the last lint left standing at warning. The stamp takes it, and `branch done` reads the stamp. [[spec/design_output/work#the-battery-answers-first]]
-let stood = [];
-// What the last lint refused, each row under its shown path, so `check --errors` names it. [[spec/tickets/the-verbs-need-no-wrapper]]
-let erred = [];
+// The file the check names for what the lint found. The stamp takes the warnings, and `check --errors` prints the lines at error. [[spec/design_output/work#the-battery-answers-first]]
+const FOUND_AT = "SE_LINT_FOUND";
 
-export function warningsStood() {
-  return stood;
+// What the lint leaves for the check: each warning as its file and source, and each finding at error as its line. [[spec/design_output/work#the-battery-answers-first]]
+export function lintFoundOf(found, lineOf) {
+  return {
+    stood: found
+      .filter((one) => one.severity === WARNING)
+      .map((one) => ({ file: one.file ?? "", source: one.source ?? "" })),
+    erred: found.filter((one) => one.severity !== WARNING).map(lineOf),
+  };
 }
 
-export function errorsStood() {
-  return erred;
-}
-
-// What `check --errors` prints: a row a red case the reporter wrote, then a row a finding at error. [[spec/tickets/the-verbs-need-no-wrapper]]
-export function errorsSaid(lines, found) {
-  const rows = [
-    ...redIn(lines).map((one) =>
-      [one.file, one.name, one.said].filter(Boolean).join(": "),
-    ),
-    ...(found ?? [])
-      .filter((one) => one.severity !== WARNING)
-      .map((one) => asLine(one, one.file)),
-  ];
-  return rows.length ? rows : ["The check names no red case and no finding at error."];
+function leavesFound(said) {
+  const at = process.env[FOUND_AT];
+  if (at) files.write(at, `${JSON.stringify(said)}\n`);
 }
 
 export function version() {
@@ -103,8 +94,6 @@ export async function findingsDoors() {
 }
 
 export async function lint(where) {
-  stood = [];
-  erred = [];
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
@@ -119,6 +108,8 @@ export async function lint(where) {
   const found = got.found;
 
   const ms = it.clock.now().getTime() - began;
+  const lineOf = (one) => asLine(one, show(one.file ?? where[0]));
+  leavesFound(lintFoundOf(found, lineOf));
   if (!found.length) {
     // The rules passing is the expected road, so the row stands at debug and the floor hides it. [[spec/design_output/log#which-kind-says-what]]
     await it.log.say("debug", "vale", `the rules pass over ${where.join(" ")}`, { ms });
@@ -134,23 +125,14 @@ export async function lint(where) {
   });
 
   // [[spec/design_output/schema#warning-now-and-error-later]]
-  stood = found.filter((one) => one.severity === WARNING);
-  erred = found
-    .filter((one) => one.severity !== WARNING)
-    .map((one) => ({ ...one, file: show(one.file ?? where[0]) }));
-  const refused = found.length - stood.length;
+  const refused = found.filter((one) => one.severity !== WARNING).length;
   const note = refused
     ? []
     : [
         "",
         `${found.length} stand at warning. They stand in the Problems panel, and the push waits until the panel stands clear.`,
       ];
-  for (const row of lintRows(
-    found,
-    (one) => asLine(one, show(one.file ?? where[0])),
-    note,
-  ))
-    console.log(row);
+  for (const row of lintRows(found, lineOf, note)) console.log(row);
   if (refused) return 1;
   // A warning turns nothing red, because the doors let it land and the push waits on the panel. [[spec/design_output/config#the-engine-controls]]
   return 0;

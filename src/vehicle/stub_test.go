@@ -26,7 +26,7 @@ func stubVehicle(t *testing.T) (string, string) {
 		"package.json":               `{"version":"0.1.0"}`,
 		".claude/settings.json":      stubSettings,
 		".se/.runtime/identity.json": `{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}`,
-		"src/scripts/verbs/check.js": "the verbs",
+		"src/scripts/verbs/doors.js": "the verbs",
 		"src/stub/RUNME.sh":          "the shim",
 		"src/stub/" + p + ".claude-plugin/plugin.json": `{"name":"level0"}`,
 		"src/stub/" + p + "hooks/hooks.json":           `{"modules":["./bridgehead.js"]}`,
