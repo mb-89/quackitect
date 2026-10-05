@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["read-verbs-run-in-go", "check-verbs-run-in-go", "config-verbs-run-in-go", "box-verbs-run-in-go", "window-verbs-run-in-go", "landing-verbs-run-in-go", "work-verbs-run-in-go", "ticket-verbs-run-in-go", "retro-verbs-run-in-go", "dispatch-verbs-run-in-go"]
-step: split
+step: children
 record:
   - step: sync
     hand: box 89f685f4bb16 · claude-code-remote
@@ -100,6 +100,18 @@ record:
         exit: 0
         said: work/the-node-road-closes already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 558de8efc14b339d246324aa9a7445b946c3a63c
+    hash_after: 558de8efc14b339d246324aa9a7445b946c3a63c
+    inputs:
+      - name: ask
+        hash: 11ff794b528ab4f6
+        size: 206
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -126,14 +138,20 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/program-of-drops-node]], standard
+- [[spec/tickets/drops-node-size-list]], trivial
+- [[spec/tickets/drops-node-tests-list]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child reads whole in one review, the build being one diff
+- program-of-drops-node closes both done lines, and the two trivial children close its gate points
+- the trivial children ride the gate of program-of-drops-node, and none waits on another
 
 # children
 
