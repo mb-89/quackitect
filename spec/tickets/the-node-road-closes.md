@@ -86,11 +86,20 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["read-verbs-run-in-go", "check-verbs-run-in-go", "config-verbs-run-in-go", "box-verbs-run-in-go", "window-verbs-run-in-go", "landing-verbs-run-in-go", "work-verbs-run-in-go", "ticket-verbs-run-in-go", "retro-verbs-run-in-go", "dispatch-verbs-run-in-go"]
-step: sync
+step: split
 record:
   - step: sync
     hand: box 89f685f4bb16 · claude-code-remote
     hash_before: e313e8630d8e24fcb6d854882a1cc35720355662
+  - step: sync
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: af53a2d59c58327cf0256dcc3950dcef996d11f1
+    hash_after: af53a2d59c58327cf0256dcc3950dcef996d11f1
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-node-road-closes already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -106,8 +115,9 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
