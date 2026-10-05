@@ -138,6 +138,25 @@ func TestMintVerb(t *testing.T) {
 			t.Fatalf("the group's own ticket joins itself:\n%s", got)
 		}
 	})
+	t.Run("a ticket on main joins no group", func(t *testing.T) {
+		root := mintTree(t, "main")
+		if code, said := runsVerb(t, root, "mint", "ticket", "spec/tickets/fresh.md", "--process=small"); code != 0 {
+			t.Fatalf("the mint answers %d: %s", code, said)
+		}
+		if got, _ := readsBack(t, root, "spec/tickets/fresh.md"); strings.Contains(got, "group:") {
+			t.Fatalf("a ticket on main joins a group:\n%s", got)
+		}
+	})
+	t.Run("a note of another kind on a work branch joins no group", func(t *testing.T) {
+		root := mintTree(t, "work/grp")
+		if code, said := runsVerb(t, root, "mint", "rationale", "spec/rationales/a-why.md"); code != 0 {
+			t.Fatalf("the mint answers %d: %s", code, said)
+		}
+		got, stands := readsBack(t, root, "spec/rationales/a-why.md")
+		if !stands || strings.Contains(got, "group:") {
+			t.Fatalf("the rationale stands %v, and writes:\n%s", stands, got)
+		}
+	})
 	t.Run("a vehicle's work root takes the note, and the method root hands the schemas and the process", func(t *testing.T) {
 		method, work := mintTree(t, ""), t.TempDir()
 		t.Setenv("SE_WORK_ROOT", work)

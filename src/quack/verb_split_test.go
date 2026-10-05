@@ -119,6 +119,40 @@ func TestSplitVerb(t *testing.T) {
 			t.Fatalf("the target holds %q", got)
 		}
 	})
+	t.Run("a source past the dry flag reads as the source", func(t *testing.T) {
+		root := splitTree(t)
+		code, said := runsVerb(t, root, "split", "--dry", splitSource, "--to", "src/a.js", "--lines", "1-2")
+		if code != 0 || !strings.Contains(said, "src/a.js takes 2 line(s).") {
+			t.Fatalf("the dry split answers %d, %q", code, said)
+		}
+		if _, stands := readsBack(t, root, "src/a.js"); stands {
+			t.Fatal("the dry split writes a target")
+		}
+	})
+	t.Run("a journal the disk refuses answers a line, and no target lands", func(t *testing.T) {
+		root := splitTree(t)
+		seedsFile(t, root, ".se", "a file where the folder stands")
+		code, said := runsVerb(t, root, "split", splitSource, "--to", "src/a.js", "--lines", "1-2")
+		if code != exitFailed || !strings.Contains(said, "The journal would not write, so nothing did:") || strings.Contains(said, "goroutine") {
+			t.Fatalf("the split answers %d, %q", code, said)
+		}
+		if _, stands := readsBack(t, root, "src/a.js"); stands {
+			t.Fatal("a refused journal lets a target land")
+		}
+		if got, _ := readsBack(t, root, splitSource); got != splitText {
+			t.Fatalf("a refused journal writes the source: %q", got)
+		}
+	})
+	t.Run("a target the disk refuses answers a line, and names the way back", func(t *testing.T) {
+		root := splitTree(t)
+		code, said := runsVerb(t, root, "split", splitSource, "--to", splitSource+"/a.js", "--lines", "1-2")
+		if code != exitFailed || !strings.Contains(said, "src/long.js/a.js would not write, and ") || !strings.Contains(said, "holds the way back.") {
+			t.Fatalf("the split answers %d, %q", code, said)
+		}
+		if got, _ := readsBack(t, root, splitSource); got != splitText {
+			t.Fatalf("a refused target writes the source: %q", got)
+		}
+	})
 	t.Run("the help flag prints the usage", func(t *testing.T) {
 		code, said := runsVerb(t, splitTree(t), "split", "--help")
 		if code != 0 || !strings.Contains(said, "Usage: ./RUNME.sh split <file> --to <path> --lines <from>-<to> [...] [--dry]") {

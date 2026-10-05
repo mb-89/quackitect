@@ -220,6 +220,31 @@ func TestPull(t *testing.T) {
 	})
 }
 
+// Each tool input reads into the words a person types, off the cases test/level0/level1.test.js and pull-gate.test.js held. [[spec/design_output/pull#the-hand-out]]
+func TestPullArgvOf(t *testing.T) {
+	tool := func(said string) []string { return []string{"pull", "--tool", said} }
+	for _, one := range []struct {
+		name string
+		argv []string
+		want string
+	}{
+		{"an empty input", tool(`{}`), "pull"},
+		{"a pass", tool(`{"ticket":"a-child","verdict":"pass"}`), "pull|a-child|--pass"},
+		{"a fail", tool(`{"ticket":"a-child","verdict":"fail","reason":"thin"}`), "pull|a-child|--fail|thin"},
+		{"a became", tool(`{"ticket":"a-child","verdict":"became","reason":"a-group"}`), "pull|a-child|--became|a-group"},
+		{"an answered", tool(`{"ticket":"a-child","verdict":"answered","reason":"a-group"}`), "pull|a-child|--answered|a-group"},
+		{"a pass with fields", tool(`{"ticket":"a-child","verdict":"pass","fields":{"approach":"x"}}`), `pull|a-child|--pass|--fields|{"approach":"x"}`},
+		{"a gate's accept", tool(`{"ticket":"a-child","verdict":"accept"}`), "pull|a-child|--pass"},
+		{"a gate's reject", tool(`{"ticket":"a-child","verdict":"reject","reason":"no fail road"}`), "pull|a-child|--fail|no fail road"},
+		{"an argv as typed", []string{"pull", "a-child", "--pass"}, "pull|a-child|--pass"},
+		{"an input reading as no JSON", tool("not json"), "pull"},
+	} {
+		if got := strings.Join(PullArgvOf(one.argv), "|"); got != one.want {
+			t.Errorf("%s reads %s, and wants %s", one.name, got, one.want)
+		}
+	}
+}
+
 func TestHoldAt(t *testing.T) {
 	if got := holdAt("box cafe · claude-code"); got != ".se/.runtime/hold/box-cafe-claude-code.json" {
 		t.Fatalf("the hold stands at %s", got)

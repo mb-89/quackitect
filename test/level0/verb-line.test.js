@@ -36,9 +36,8 @@ test("the description names the index tools where the index lists them", () => {
   assert.equal(verbLine([]), verbLine(), "an empty list keeps the verb line");
 });
 
-// A verb's program reads as a verb root, so the rules over a verb read it as they read ./RUNME.sh. [[spec/tickets/cli-js-leaves]]
-test("a verb program reads as the verb it names", () => {
+// The verb root names the verb and its word, so the rules over a verb read the word past it. [[spec/tickets/cli-js-leaves]]
+test("the verb root reads as the verb it names", () => {
   assert.equal(freeOfTicket("./RUNME.sh ticket pull"), true);
-  assert.equal(freeOfTicket("node src/scripts/verbs/ticket.js pull"), true);
-  assert.equal(freeOfTicket("node src/scripts/verbs/ticket.js open"), false);
+  assert.equal(freeOfTicket("./RUNME.sh ticket open"), false);
 });

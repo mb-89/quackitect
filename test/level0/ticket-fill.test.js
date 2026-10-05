@@ -7,7 +7,6 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeFront } from "../../src/doors/fake/front.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { mintFields } from "../../src/scripts/mint-verb.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { TICKET_SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
 import { heard } from "./pull-doors.js";
@@ -101,22 +100,3 @@ test("fill over a ticket naming a process standing nowhere refuses, and names wh
   assert.equal(said.now, lost);
 });
 
-// A ticket a box mints on its branch joins the group the box works. [[spec/tickets/a-box-keeps-its-tickets]]
-test("the mint names the work branch's group on a ticket, and on no other kind", () => {
-  const fields = { state: "draft", process: "[[spec/processes/trivial]]" };
-  assert.deepEqual(
-    mintFields("ticket", "spec/tickets/a-fix.md", fields, "work/one-group"),
-    {
-      ...fields,
-      group: "one-group",
-    },
-  );
-  assert.deepEqual(
-    mintFields("rationale", "spec/rationales/a-why.md", {}, "work/one-group"),
-    {},
-  );
-  assert.deepEqual(
-    mintFields("ticket", "spec/tickets/a-fix.md", fields, "main"),
-    fields,
-  );
-});
