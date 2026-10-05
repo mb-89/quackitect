@@ -84,7 +84,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
-step: split
+step: children
 cloud: true
 record:
   - step: sync
@@ -96,6 +96,18 @@ record:
         exit: 0
         said: work/the-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: d473ee54287ca03888bbe9332b43d5fd56a75979
+    hash_after: d473ee54287ca03888bbe9332b43d5fd56a75979
+    inputs:
+      - name: ask
+        hash: f597d0eaba229fa9
+        size: 257
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -122,14 +134,32 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/quack-holds-a-verb-registry]], group
+- [[spec/tickets/read-verbs-run-in-go]], group
+- [[spec/tickets/work-verbs-run-in-go]], group
+- [[spec/tickets/box-verbs-run-in-go]], group
+- [[spec/tickets/landing-verbs-run-in-go]], group
+- [[spec/tickets/check-verbs-run-in-go]], group
+- [[spec/tickets/retro-verbs-run-in-go]], group
+- [[spec/tickets/dispatch-verbs-run-in-go]], group
+- [[spec/tickets/config-verbs-run-in-go]], group
+- [[spec/tickets/window-verbs-run-in-go]], group
+- [[spec/tickets/ticket-verbs-run-in-go]], group
+- [[spec/tickets/the-node-road-closes]], group
+- [[spec/tickets/box-verbs-windows-fakes]], trivial
+- [[spec/tickets/landing-verbs-windows-green]], trivial
+- [[spec/tickets/manager-tests-wait-for-the-binary]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- size: every child is a group of its own or a trivial ticket, and each merged through its own pull request
+- the goal: the ten verb groups port the verbs, and the-node-road-closes takes programOf and src/scripts/verbs away, so nothing of the goal stands outside them
+- depends_on: every child stands closed, so no child waits on another
 
 # children
 
