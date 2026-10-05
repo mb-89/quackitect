@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-check-fits-its-budget
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: de831620df1416e4
         size: 2049
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box ce27714b7c6d · claude-code-remote · helper-4
+    hash_before: af3af79f49d784ea7d4d7e0eec9514c4f811179e
+    hash_after: af3af79f49d784ea7d4d7e0eec9514c4f811179e
+    inputs:
+      - name: design/draft
+        hash: de831620df1416e4
+        size: 2049
+      - name: design/tests-red
+        hash: 6b15b62b0ab55396
+        size: 784
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -269,8 +281,13 @@ The guard names every src/pull test, because none calls t.Parallel. It names not
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- check-budget-measure-before: the Discussion stands empty, though the approach says it carries the numbers. done_when 2 compares battery.parts.go against the measure before, cold and warm, so take that measure at 63c619f0d and write it under Discussion before implement lands.
+- check-budget-size-names-pull: the guard in src/imports/serial_test.go names src/pull among slowPackages, and src/pull's tests are its only red, yet size names no src/pull file and no src/imports/serial.go. Add src/pull/*_test.go and src/imports/serial.go to size.
+- check-budget-tests-list: the draft's tests list names src/branches/parallel_test.go TestEveryBranchesTestRunsBesideTheOthers, which stands nowhere. The guard stands in src/imports/serial_test.go as TestATestRunningAloneWithNothingBarringItIsNamed and TestTheSlowPackagesRunEveryTestBesideTheOthers, so fix the list.
+- check-budget-race-run: the approach rests on the race detector and shuffled repeats to show the parallel tests share no state, and goGate runs neither. Name that command, and put its result under implement/tests-green.
 
 # implement
 
