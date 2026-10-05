@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -213,6 +213,15 @@ record:
         hash: 6176d05ebcbd9b2a
         size: 47283
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box c2e39844c8bf · claude-code-remote
+    hash_before: 2709ff8fc1cda6160bcac52b597c86b87de6d1e9
+    hash_after: 2709ff8fc1cda6160bcac52b597c86b87de6d1e9
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/rationales/pull.md:27:63: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -362,17 +371,17 @@ Nothing in the phase contradicts the ask.
 <!-- the tree builds and lints -->
 <!-- the form is command -->
 
-go build ./... && ./RUNME.sh lint src/pull src/quack/verb_mint.go spec/design_output/pull.md spec/rationales/pull.md
+go build ./... && ./RUNME.sh lint src/pull src/quack/verb_mint.go src/quack/ticket_set.go spec/design_output/pull.md spec/rationales/pull.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the files: the change touches the four sources and two tests the design names, plus pull.md and its rationale the gate asked for, and the size golden the pull.md count moves
-- the doors: the mint cases run on a temp tree, and ClosedGroup reads FakeDisk in TestGroups
-- the comments: ClosedGroup, GroupClosed and the freed branch in mintVerb each link spec/design_output/pull#a-closed-group-takes-no-child
-- one place: the closed read stands in GroupClosed alone, and the pull, the mint and the open call it
+- the files: the four sources, the set verb, their tests, pull.md, its rationale and the size golden
+- the doors: the mint, open and set cases run on temp trees, and ClosedGroup reads FakeDisk in TestGroups
+- the comments: ClosedGroup, the freed branch in mintVerb and the set guard link the pull note chapter a-closed-group-takes-no-child
+- one place: GroupClosed holds the closed read, and the pull, the mint, the open and the set call it
 
 ## tests-green
 
