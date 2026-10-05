@@ -84,13 +84,13 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
-cloud: true
 depends_on: ["read-verbs-run-in-go", "check-verbs-run-in-go", "config-verbs-run-in-go", "box-verbs-run-in-go", "window-verbs-run-in-go", "landing-verbs-run-in-go", "work-verbs-run-in-go", "ticket-verbs-run-in-go", "retro-verbs-run-in-go", "dispatch-verbs-run-in-go"]
 step: retro/cloud
 record:
   - step: sync
     hand: box 89f685f4bb16 · claude-code-remote
     hash_before: e313e8630d8e24fcb6d854882a1cc35720355662
+    hash_after: b8a021f8c5ff03b0e5146a5f1d702d4863bc0d97
   - step: sync
     hand: box 89f685f4bb16 · claude-code-remote
     hash_before: af53a2d59c58327cf0256dcc3950dcef996d11f1
