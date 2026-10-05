@@ -25,7 +25,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: box-verbs-run-in-go
+group: the-verbs-run-in-go
 step: do
 ---
 
@@ -69,3 +69,5 @@ The fakes join a PATH with a colon and name no PATHEXT, so a Windows drive lette
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This ticket moves from `box-verbs-run-in-go` to its parent `the-verbs-run-in-go`. Its work landed in pull request 96, and it stayed open on main after its group closed. The pull hands out the leaves of the open group alone, so the parent's branch takes it, passes `do` on that evidence, and closes it before the parent closes.

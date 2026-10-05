@@ -25,7 +25,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: landing-verbs-run-in-go
+group: the-verbs-run-in-go
 step: do
 ---
 
@@ -77,4 +77,5 @@ The evidence of `do` stands here, because the group ticket stands closed, the pu
 - tests: `cd src && go test ./quack -run 'Landing|Commit|Push|Rename' -count=1`, green
 - check: `./RUNME.sh check`, green on the commit that takes main in
 - says: The Windows job of pull request 93 failed in `TestCommitVerbMoves`. A push into the test's bare origin answered `Filename too long`, as the job log names. `t.TempDir` names its folder after the whole case name, and on Windows that folder plus the origin's incoming object path runs past the path limit. `landingRepo` now makes both folders through `shortDir`, a temp folder under a short fixed prefix. `TestLandingRepoStandsUnderAShortFolder` runs a case named past the limit, and fails where the case name reaches the repository path.
-- merge: Two contract tests conflicted, and the branch's side stands. Its program test reads the verbs folder, so a port deletes a program and touches no line of the test. Main's side lists every program by hand, and it still names the three programs this group deletes. Main brought a second `runsTwin`, and the landing test now uses that one.
+- merge: Two contract tests conflicted, and the branch's side stands.
+- group: This ticket moves from `landing-verbs-run-in-go` to its parent `the-verbs-run-in-go`, since its group closed with it open. The parent's branch passes `do` through the pull on the evidence above, and closes it before the parent closes. Its program test reads the verbs folder, so a port deletes a program and touches no line of the test. Main's side lists every program by hand, and it still names the three programs this group deletes. Main brought a second `runsTwin`, and the landing test now uses that one.
