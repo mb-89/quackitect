@@ -84,7 +84,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
-step: retro/notes
+step: retro/write
 cloud: true
 record:
   - step: sync
@@ -131,6 +131,15 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: 64c80ab688af596486fb6e0f2d97e667812142e0
+    hash_after: 64c80ab688af596486fb6e0f2d97e667812142e0
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 ---
 
 # Ask
@@ -206,8 +215,9 @@ accept
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
