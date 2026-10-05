@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -198,6 +198,21 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/pull]]
+  - step: gate
+    hand: box c2e39844c8bf · claude-code-remote · helper-11
+    hash_before: ff6b0a4076cf45acc1deca6c760931b541328355
+    hash_after: ff6b0a4076cf45acc1deca6c760931b541328355
+    inputs:
+      - name: design/draft
+        hash: 53572332c8a87c0e
+        size: 2335
+      - name: design/tests-red
+        hash: b7595d42c22ced71
+        size: 715
+      - name: [[spec/design_output/pull]]
+        hash: 6176d05ebcbd9b2a
+        size: 47283
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -327,9 +342,14 @@ Each case fails on its own assertion: the stub ClosedGroup answers nothing, the 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- set-refuses-closed-group: `ticket set <t> group <g>` writes a closed group unguarded, so a child still lands under one. Call `pull.ClosedGroup` there too.
-- open-closed-group-test: `OpensDraft` calls `ClosedGroup` with no test of its own. Add a red test on the open.
+accept
+The approach answers the ask: the mint, the open and `ticket set` refuse a child naming a closed group.
+The refusal names both roads out, and `takeBack` writes `state: open`, so the reopen road holds.
+A red test decides each `done_when` line under `TestMintVerb`: the refused mint and the free mint on `work/shut`.
+TestTicketSet and TestTicketOpen cover the other two doors, and `go test ./src/pull` covers `ClosedGroup`.
+The tests named pass, and `./RUNME.sh check` answers 0.
+The sidebar set-field runs through `ticket set`, so it meets the same refusal.
+Nothing in the phase contradicts the ask.
 
 # implement
 
