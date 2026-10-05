@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -34,11 +35,19 @@ func fixRan(root string, argv ...string) (int, string, string, []string) {
 	return code, out.String(), errs.String(), ran
 }
 
+// The file name toolHere looks for in the runtime folder on this box. [[spec/tickets/the-verbs-run-in-go]]
+func binNamed(name string) string {
+	if runtime.GOOS == "windows" {
+		return name + ".exe"
+	}
+	return name
+}
+
 // A root with both tools standing in the runtime folder, and a.md shouting. [[spec/tickets/config-verbs-port-to-go]]
 func fixRoot(t *testing.T) string {
 	root := t.TempDir()
-	seedFile(t, root, ".se/.runtime/bin/vale", "")
-	seedFile(t, root, ".se/.runtime/bin/biome", "")
+	seedFile(t, root, ".se/.runtime/bin/"+binNamed("vale"), "")
+	seedFile(t, root, ".se/.runtime/bin/"+binNamed("biome"), "")
 	seedFile(t, root, "a.md", "# Notes\n\nNOTHING AT ALL WORKS HERE, and then calm.\n")
 	return root
 }
@@ -86,7 +95,7 @@ func TestFixCalmsAShoutedLead(t *testing.T) {
 	if string(said) != "# Notes\n\nNothing at all works here, and then calm.\n" {
 		t.Fatalf("a.md reads %q, and wants the lead calmed", said)
 	}
-	vale, biome := filepath.Join(root, ".se", ".runtime", "bin", "vale"), filepath.Join(root, ".se", ".runtime", "bin", "biome")
+	vale, biome := filepath.Join(root, ".se", ".runtime", "bin", binNamed("vale")), filepath.Join(root, ".se", ".runtime", "bin", binNamed("biome"))
 	want := []string{
 		vale + " --config=.vale.ini --output=JSON --no-exit " + valeParked + " a.md",
 		vale + " fix --apply --config=.vale.ini " + valeParked + " a.md",
