@@ -394,6 +394,14 @@ The packages under `-count=1`, each one's span in seconds, alone and inside the 
 
 A package runs its tests one after another, so its span is their sum. `src/branches` builds a real origin and clone for each of its tests. `TestTwinGoldens` opens every tracked file, so an edit anywhere in the tree reruns the whole of `src/quack`.
 
+## The parallel tests share no state
+
+The race detector and shuffled repeats read the three packages whose tests now run in parallel. The check runs neither, so a hand runs this command after a change to those tests:
+
+    CGO_ENABLED=1 go test -race -tags contract -count=2 -shuffle=on ./src/quack ./src/branches ./src/imports
+
+On this box it answers ok for all three packages, and no data race. The red guard sits out under `-skip` until tests-green closes. An earlier run, five times shuffled over `src/quack` with no race detector, answered the same.
+
 ## The skip turns the cache off
 
 Go caches no test result of a run carrying `-skip`. Two runs of `go test -skip '^TestNothing$' ./src/yaml` both run, where two runs under `-run` answer the second from the cache. The check passes `-skip` for the red list, so while a ticket stands between tests-red and tests-green, every package reruns on every check. On this branch, with the guard on the red list, two checks in a row read go at 64.3 and 59.4 seconds, totals 135.6 and 125.9.
