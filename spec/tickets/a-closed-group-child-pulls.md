@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/change
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -195,6 +195,9 @@ record:
         hash: fd1fcf10ffdd07e8
         size: 47269
     def: dc4904ab364efa10
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/pull]]
 ---
 
 # Ask
