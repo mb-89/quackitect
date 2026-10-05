@@ -21,6 +21,7 @@ func paLanded(one *tree, branch string) {
 
 // Close refuses a branch outside trunk, and deletes one inside it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPACloseDeletesInsideTrunkAlone(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	paLanded(one, "work/landed")
 	one.branch("elsewhere", map[string]string{"else.md": "else\n"})
@@ -39,6 +40,7 @@ func TestPACloseDeletesInsideTrunkAlone(t *testing.T) {
 
 // Close takes a name carrying its own prefix, and reaches the branch the platform cut. [[spec/tickets/work-verbs-port-to-go]]
 func TestPACloseTakesItsOwnPrefix(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	paLanded(one, "claude/roaming-hopper-ab12cd")
 	if code := one.branchSays("close", "claude/roaming-hopper-ab12cd"); code != codeOK {
@@ -51,6 +53,7 @@ func TestPACloseTakesItsOwnPrefix(t *testing.T) {
 
 // Close holds a trunk carrying commits origin lacks, and deletes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPACloseHoldsAnUnpushedTrunk(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	paLanded(one, "work/landed")
 	one.land("one ahead", map[string]string{"x.md": "x\n"})

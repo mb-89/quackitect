@@ -28,6 +28,7 @@ func paUsageVerbs(t *testing.T) []string {
 
 // The usage names no answer verb, because the index answers the tab. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAUsageNamesNoAnswerVerb(t *testing.T) {
+	t.Parallel()
 	if slices.Contains(paUsageVerbs(t), "answer") {
 		t.Fatal("the usage names an answer verb")
 	}
@@ -35,6 +36,7 @@ func TestPAUsageNamesNoAnswerVerb(t *testing.T) {
 
 // The usage names the verbs a branch takes, one a row. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAUsageNamesTheVerbs(t *testing.T) {
+	t.Parallel()
 	verbs := paUsageVerbs(t)
 	for _, one := range []string{"open", "take", "sync", "done", "list", "merge", "close", "test"} {
 		if !slices.Contains(verbs, one) {

@@ -11,6 +11,7 @@ import (
 
 // A tagged note inside an untracked folder reads as parked, because the status names each file. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDATaggedNoteInAFreshFolderReadsParked(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"src/x.js": "export const x = 1;\n"})
 	one.write(map[string]string{
 		"spec/drafts/fresh/later.md": "---\nkind: [[ticket]]\ntodo: true\n---\n\n# Ask\n\nLater.\n",
@@ -26,6 +27,7 @@ func TestPDATaggedNoteInAFreshFolderReadsParked(t *testing.T) {
 
 // A parent group on no branch, open on trunk, holds the group depending on it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDAParentWithNoBranchHoldsItsDependents(t *testing.T) {
+	t.Parallel()
 	after := strings.Replace(pdGroupNote, "state: open\n", "state: open\ndepends_on: move\n", 1)
 	one := newTree(t, map[string]string{
 		ticketAt("after"):  after,
@@ -47,6 +49,7 @@ func TestPDAParentWithNoBranchHoldsItsDependents(t *testing.T) {
 
 // A branch answers first, and trunk answers for a dependency on no branch; a name trunk lacks holds nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDWaitingOnReadsTheBranchThenTrunk(t *testing.T) {
+	t.Parallel()
 	text := strings.Replace(pdGroupNote, "state: open\n", "state: open\ndepends_on: [busy, parent, shut, gone]\n", 1)
 	standing := map[string]string{workBranch + "busy": todo}
 	trunkTickets := map[string]string{
@@ -63,6 +66,7 @@ func TestPDWaitingOnReadsTheBranchThenTrunk(t *testing.T) {
 
 // A ref whose base stands short of the trunk tip reads behind, and one with no trunk tip reads level. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDARefShortOfTheTrunkTipReadsBehind(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): pdGroupNote})
 	pdMainMoves(one, 1)

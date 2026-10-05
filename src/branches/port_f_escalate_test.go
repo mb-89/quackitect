@@ -25,6 +25,7 @@ func pfEscalateTree(t *testing.T, group string, more map[string]string) *tree {
 
 // A desk escalation puts a person step before the held leaf, drops the hold, lands one commit and pushes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFADeskEscalationInsertsAPersonStep(t *testing.T) {
+	t.Parallel()
 	one := pfEscalateTree(t, "", nil).desk()
 	hand := one.d.handOf()
 	pfHold(one, hand, "a-child", "design/draft")
@@ -51,6 +52,7 @@ func TestPFADeskEscalationInsertsAPersonStep(t *testing.T) {
 
 // After an escalation on trunk the pull runs, and its hand-out of the next free ticket prints. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFAnEscalationOnTrunkHandsTheNextFreeTicket(t *testing.T) {
+	t.Parallel()
 	one := pfEscalateTree(t, "", map[string]string{ticketAt("b-other"): pfChild("design/draft", "")}).desk()
 	one.d.Runme = []string{"echo", "work  b-other at design/draft"}
 	pfHold(one, one.d.handOf(), "a-child", "design/draft")
@@ -64,6 +66,7 @@ func TestPFAnEscalationOnTrunkHandsTheNextFreeTicket(t *testing.T) {
 
 // An escalation with options writes a choice answer carrying the words, and a cloud box pushes the branch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFEscalationOptionsWriteAChoice(t *testing.T) {
+	t.Parallel()
 	one := pfEscalateTree(t, "one-group", nil)
 	pfOnBranch(one, "one-group")
 	pfHold(one, one.d.handOf(), "a-child", "design/draft")
@@ -79,6 +82,7 @@ func TestPFEscalationOptionsWriteAChoice(t *testing.T) {
 
 // An escalation under --as reads that hand's hold, and keeps the name out of the question. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFEscalationUnderAsReadsThatHand(t *testing.T) {
+	t.Parallel()
 	one := pfEscalateTree(t, "one-group", nil)
 	pfOnBranch(one, "one-group")
 	pfHold(one, one.d.handOf()+" · helper-2", "a-child", "design/draft")
@@ -96,6 +100,7 @@ func TestPFEscalationUnderAsReadsThatHand(t *testing.T) {
 
 // An escalation with no question refuses, and says what it takes. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFEscalationWithNoQuestionRefuses(t *testing.T) {
+	t.Parallel()
 	one := pfEscalateTree(t, "one-group", nil)
 	pfHold(one, one.d.handOf(), "a-child", "design/draft")
 	if code := one.branchSays("escalate"); code != codeRefused {
@@ -109,6 +114,7 @@ func TestPFEscalationWithNoQuestionRefuses(t *testing.T) {
 
 // An escalation with no hold standing refuses, and names the pull. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFEscalationWithNoHoldNamesThePull(t *testing.T) {
+	t.Parallel()
 	one := pfEscalateTree(t, "one-group", nil)
 	if code := one.branchSays("escalate", "which road"); code != codeRed {
 		t.Fatalf("an escalation with no hold answers %d", code)
@@ -121,6 +127,7 @@ func TestPFEscalationWithNoHoldNamesThePull(t *testing.T) {
 
 // A ticket at the split cap refuses another person step, and asks for a split. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheSplitCapRefusesAnotherPersonStep(t *testing.T) {
+	t.Parallel()
 	one := pfEscalateTree(t, "one-group", nil)
 	one.d.Config = func(key string) any {
 		if key == splitsKey {
@@ -140,6 +147,7 @@ func TestPFTheSplitCapRefusesAnotherPersonStep(t *testing.T) {
 
 // The question reads every word past the hand's flag, and a comma list reads its words. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheEscalationReadsItsWords(t *testing.T) {
+	t.Parallel()
 	if got := askedIn([]string{"--as", "helper", "which", "road?"}); got != "which road?" {
 		t.Fatalf("the question reads %q", got)
 	}

@@ -25,6 +25,7 @@ func pbChainOnMain(t *testing.T) *tree {
 
 // A take leaves a group whose parent on main alone waits on an open group, and switches nowhere. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeLeavesAGroupWhoseParentWaits(t *testing.T) {
+	t.Parallel()
 	one := pbChainOnMain(t)
 	if code := one.branchSays("take", "one-group"); code != codeRed {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
@@ -37,6 +38,7 @@ func TestPBTakeLeavesAGroupWhoseParentWaits(t *testing.T) {
 
 // The trigger names no branch free where a parent on main alone waits. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTriggerNamesNoBranchFreeUnderAWaitingParent(t *testing.T) {
+	t.Parallel()
 	one := pbChainOnMain(t)
 	one.out.Reset()
 	one.errs.Reset()
@@ -85,6 +87,7 @@ func pbTwoGroups(t *testing.T, gate string) (*tree, int, string, string) {
 
 // A take walks past a group whose gate stands open on trunk and claims the next free one, and the listing names the wait. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeWalksPastAnOpenGate(t *testing.T) {
+	t.Parallel()
 	one, code, a, b := pbTwoGroups(t, openState)
 	if code != 0 {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))
@@ -107,6 +110,7 @@ func TestPBTakeWalksPastAnOpenGate(t *testing.T) {
 
 // A gate the owner closes on trunk frees its group for the take. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBAClosedGateFreesItsGroup(t *testing.T) {
+	t.Parallel()
 	one, code, a, b := pbTwoGroups(t, closedState)
 	if code != 0 {
 		t.Fatalf("the take answers %d: %s", code, pbSaid(one))

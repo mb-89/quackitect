@@ -40,6 +40,7 @@ func pdShallow(t *testing.T) (*tree, string) {
 
 // The take passes over a branch sharing no ancestor with trunk, and names it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDTakePassesOverAnOrphan(t *testing.T) {
+	t.Parallel()
 	one := pdOrphaned(t)
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s %s", code, one.out.String(), one.errs.String())
@@ -55,6 +56,7 @@ func TestPDTakePassesOverAnOrphan(t *testing.T) {
 
 // The list marks a branch sharing no ancestor with trunk, and the other reads as it stood. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDListMarksAnOrphan(t *testing.T) {
+	t.Parallel()
 	one := pdOrphaned(t)
 	one.branchSays("list")
 	pdMatches(t, one.out.String(), `work/orphan\s+orphan`)
@@ -63,6 +65,7 @@ func TestPDListMarksAnOrphan(t *testing.T) {
 
 // The list fetches a shallow clone whole before it marks a branch an orphan. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDListUnshallowsBeforeTheOrphanMark(t *testing.T) {
+	t.Parallel()
 	one, _ := pdShallow(t)
 	one.branchSays("list")
 	if one.git("rev-parse", "--is-shallow-repository") != "false" {
@@ -74,6 +77,7 @@ func TestPDListUnshallowsBeforeTheOrphanMark(t *testing.T) {
 
 // The base fetches a shallow clone whole and asks again, answering the shared commit. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDBaseUnshallowsAndAsksAgain(t *testing.T) {
+	t.Parallel()
 	one, base := pdShallow(t)
 	shares, said := one.d.baseOnTrunk("work/old")
 	if !shares || said != base {

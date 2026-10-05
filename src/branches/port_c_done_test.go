@@ -61,6 +61,7 @@ func pcNested(more map[string]string) map[string]string {
 
 // freeChildren takes the group off each open and draft ticket, and stages it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCFreeChildrenTakesTheGroupOff(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{
 		ticketAt("a-child"):  pcChild(pcGroup, "open"),
 		ticketAt("a-draft"):  pcChild(pcGroup, "draft"),
@@ -78,6 +79,7 @@ func TestPCFreeChildrenTakesTheGroupOff(t *testing.T) {
 
 // done writes hash_after, and closes a group whose every ticket is closed. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneClosesAFinishedGroup(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, map[string]string{
 		ticketAt(pcGroup):   pcAtChildren(),
 		ticketAt("a-child"): pcChild(pcGroup, "closed"),
@@ -99,6 +101,7 @@ func TestPCDoneClosesAFinishedGroup(t *testing.T) {
 
 // done on a top group refuses while an open or draft child stands, and names the pull of each. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneRefusesAnOpenChild(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, map[string]string{
 		ticketAt(pcGroup):    pcAtChildren(),
 		ticketAt("a-child"):  pcChild(pcGroup, "open"),
@@ -123,6 +126,7 @@ func TestPCDoneRefusesAnOpenChild(t *testing.T) {
 
 // done on a top group hands a child on the person route loose, and closes. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneHandsThePersonRouteLoose(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, map[string]string{
 		ticketAt(pcGroup):    pcAtChildren(),
 		ticketAt("a-trial"):  pcPersonChild(pcGroup),
@@ -142,6 +146,7 @@ func TestPCDoneHandsThePersonRouteLoose(t *testing.T) {
 
 // done refuses a ticket waiting for a helper, and a ticket of another group counts nowhere. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneRefusesAHelperTicket(t *testing.T) {
+	t.Parallel()
 	helper := strings.Replace(pcChild(pcGroup, "open"), "    does: makes", "    by: helper\n    does: makes", 1)
 	one := pcDone(t, map[string]string{
 		ticketAt(pcGroup):     pcAtChildren(),
@@ -160,6 +165,7 @@ func TestPCDoneRefusesAHelperTicket(t *testing.T) {
 
 // done on a group refuses while the battery answers nothing green. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneWantsAGreenBattery(t *testing.T) {
+	t.Parallel()
 	one := pcOnGroup(newTree(t, nil).desk(), map[string]string{ticketAt(pcGroup): pcTake(pcGroupNote, "box 3f9a", "a1b2c3")})
 	if code := one.branchSays("done"); code != codeRed {
 		t.Fatalf("done answers %d: %s", code, one.pcSaid())
@@ -172,6 +178,7 @@ func TestPCDoneWantsAGreenBattery(t *testing.T) {
 
 // done on a group refuses where trunk stands ahead of it, and names the sync. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneWantsTrunkIn(t *testing.T) {
+	t.Parallel()
 	one := pcOnGroup(newTree(t, nil).desk(), map[string]string{ticketAt(pcGroup): pcTake(pcGroupNote, "box 3f9a", "a1b2c3")})
 	one.git("switch", "-q", trunk)
 	for _, step := range []string{"one", "two", "three"} {
@@ -192,6 +199,7 @@ func TestPCDoneWantsTrunkIn(t *testing.T) {
 
 // done refuses while the group's retro stands open, and names the retro step. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneWantsTheRetro(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, map[string]string{
 		ticketAt(pcGroup):   pcRetroGroup(),
 		ticketAt("a-child"): pcChild(pcGroup, "closed"),
@@ -210,6 +218,7 @@ func TestPCDoneWantsTheRetro(t *testing.T) {
 
 // done names the open retro before it hands a ticket on, and hands none of it on. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneNamesTheRetroBeforeTheHandOn(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, map[string]string{
 		ticketAt(pcGroup):   pcRetroGroup(),
 		ticketAt("a-child"): pcPersonChild(pcGroup),
@@ -223,6 +232,7 @@ func TestPCDoneNamesTheRetroBeforeTheHandOn(t *testing.T) {
 
 // done on a cloud box refuses while the cloud leaf of the retro stands open. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneOnACloudBoxWantsTheCloudLeaf(t *testing.T) {
+	t.Parallel()
 	one := pcOnGroup(newTree(t, nil), map[string]string{ticketAt(pcGroup): pcWritten(pcRetroGroup(), "notes", "write")})
 	one.pcGreen()
 	if code := one.branchSays("done"); code != codeRed {
@@ -234,6 +244,7 @@ func TestPCDoneOnACloudBoxWantsTheCloudLeaf(t *testing.T) {
 
 // done hands the group back once the retro leaves that apply here stand written. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneLeavesOnceTheRetroStandsWritten(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, map[string]string{
 		ticketAt(pcGroup):    pcWritten(pcRetroGroup(), "notes", "write"),
 		ticketAt("shut-one"): pcChild(pcGroup, "closed"),
@@ -252,6 +263,7 @@ func TestPCDoneLeavesOnceTheRetroStandsWritten(t *testing.T) {
 
 // done on a fix group refuses an agent ticket it leaves, and names the pull and the person route for it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneOnAFixGroupRefusesAnAgentTicket(t *testing.T) {
+	t.Parallel()
 	one := pcLeaving(t, true, map[string]string{
 		"a-follow-up": pcLoose(),
 		"b-follow-up": pcLoose(),
@@ -275,6 +287,7 @@ func TestPCDoneOnAFixGroupRefusesAnAgentTicket(t *testing.T) {
 
 // done passes where every ticket the group leaves stands on the person route. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDonePassesThePersonRoute(t *testing.T) {
+	t.Parallel()
 	one := pcLeaving(t, true, map[string]string{"a-trial": pcPersonChild("")}, nil)
 	if code := one.branchSays("done"); code != codeOK {
 		t.Fatalf("done answers %d: %s", code, one.pcSaid())
@@ -285,6 +298,7 @@ func TestPCDonePassesThePersonRoute(t *testing.T) {
 
 // done refuses a question ticket the branch adds, since the box answers it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneRefusesAQuestionTicket(t *testing.T) {
+	t.Parallel()
 	one := pcLeaving(t, false, map[string]string{"a-question": pcLoosePerson}, nil)
 	if code := one.branchSays("done"); code != codeRed {
 		t.Fatalf("done answers %d: %s", code, one.pcSaid())
@@ -295,6 +309,7 @@ func TestPCDoneRefusesAQuestionTicket(t *testing.T) {
 
 // done on a feature group refuses an open agent ticket it adds, as a fix group does. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneOnAFeatureGroupRefusesAnAgentTicket(t *testing.T) {
+	t.Parallel()
 	one := pcLeaving(t, false, map[string]string{"a-follow-up": pcLoose()}, nil)
 	if code := one.branchSays("done"); code != codeRed {
 		t.Fatalf("done answers %d: %s", code, one.pcSaid())
@@ -305,6 +320,7 @@ func TestPCDoneOnAFeatureGroupRefusesAnAgentTicket(t *testing.T) {
 
 // branch done on a child group refuses an open child, and files none under the parent. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneOnAChildGroupRefusesAnOpenChild(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, pcNested(map[string]string{
 		ticketAt("a-child"):  pcChild(pcGroup, "open"),
 		ticketAt("shut-one"): pcChild(pcGroup, "closed"),
@@ -318,6 +334,7 @@ func TestPCDoneOnAChildGroupRefusesAnOpenChild(t *testing.T) {
 
 // branch done on a child group hands the person route loose, past the parent. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneOnAChildGroupHandsThePersonRouteLoose(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, pcNested(map[string]string{
 		ticketAt("a-trial"): pcPersonChild(""),
 		ticketAt("b-trial"): pcPersonChild(pcGroup),
@@ -332,6 +349,7 @@ func TestPCDoneOnAChildGroupHandsThePersonRouteLoose(t *testing.T) {
 
 // branch done closes on the branch alone, files the children and drops the marker. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCDoneClosesOnTheBranchAlone(t *testing.T) {
+	t.Parallel()
 	one := pcDone(t, pcNested(map[string]string{
 		ticketAt("a-child"): pcPersonChild(pcGroup),
 	}))

@@ -60,6 +60,8 @@ type tree struct {
 	root, from string
 	out, errs  bytes.Buffer
 	d          *Doors
+	// The env the tree's own git calls take past the box's, so a test sets a date without touching the process the parallel tests share.
+	env []string
 }
 
 // A tree with main carrying the files, pushed to origin, on a cloud box. [[spec/tickets/work-verbs-port-to-go]]
@@ -67,10 +69,14 @@ func newTree(t *testing.T, files map[string]string) *tree {
 	t.Helper()
 	one := &tree{t: t, root: t.TempDir(), from: t.TempDir()}
 	one.sh(one.from, "git", "init", "-q", "--bare", "-b", "main")
+	one.sh(one.from, "git", "config", "receive.autogc", "false")
 	one.sh(one.root, "git", "init", "-q", "-b", "main")
 	one.git("config", "user.name", "tester")
 	one.git("config", "user.email", "tester@example.com")
 	one.git("config", "commit.gpgsign", "false")
+	// A fixture lives a second, so git's housekeeping after each fetch and commit spends processes on nothing.
+	one.git("config", "maintenance.auto", "false")
+	one.git("config", "gc.auto", "0")
 	one.git("remote", "add", "origin", one.from)
 	if files == nil {
 		files = map[string]string{}
@@ -100,7 +106,7 @@ func (one *tree) sh(dir string, argv ...string) string {
 	one.t.Helper()
 	cmd := exec.Command(argv[0], argv[1:]...)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "GIT_CONFIG_NOSYSTEM=1", "GIT_AUTHOR_NAME=tester", "GIT_AUTHOR_EMAIL=tester@example.com", "GIT_COMMITTER_NAME=tester", "GIT_COMMITTER_EMAIL=tester@example.com")
+	cmd.Env = append(append(os.Environ(), "GIT_CONFIG_NOSYSTEM=1", "GIT_AUTHOR_NAME=tester", "GIT_AUTHOR_EMAIL=tester@example.com", "GIT_COMMITTER_NAME=tester", "GIT_COMMITTER_EMAIL=tester@example.com"), one.env...)
 	said, err := cmd.CombinedOutput()
 	if err != nil {
 		one.t.Fatalf("%s answers %v: %s", strings.Join(argv, " "), err, said)

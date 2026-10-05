@@ -30,6 +30,7 @@ func pdListing(t *testing.T, flags ...string) string {
 
 // The listing shows open work alone by default. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDTheListingShowsOpenWorkByDefault(t *testing.T) {
+	t.Parallel()
 	said := pdListing(t)
 	pdMatches(t, said, `work/one-group\s+todo`)
 	pdMatches(t, said, `(?m)^ {2}a-child\s+ticket\s+open`)
@@ -41,6 +42,7 @@ func TestPDTheListingShowsOpenWorkByDefault(t *testing.T) {
 
 // The listing shows everything under --all. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDTheListingShowsEverythingUnderAll(t *testing.T) {
+	t.Parallel()
 	said := pdListing(t, "--all")
 	pdMatches(t, said, `(?m)^ {2}a-done-child\s+ticket\s+closed`)
 	pdMatches(t, said, `(?m)^a-closed-one\s+ticket\s+closed`)
@@ -49,6 +51,7 @@ func TestPDTheListingShowsEverythingUnderAll(t *testing.T) {
 
 // A group row behind main keeps its mark after the behind. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDABehindRowKeepsItsMark(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): pdGroupNote})
 	pdMainMoves(one, 1)

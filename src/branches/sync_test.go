@@ -6,6 +6,7 @@ import "testing"
 
 // A branch carrying every commit of trunk takes nothing, and one behind takes trunk by a merge. [[spec/design_output/work#trunk-comes-in-first]]
 func TestTheSyncTakesTrunkIn(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
 	one.git("switch", "-q", "-c", "work/g", "origin/work/g")
@@ -25,6 +26,7 @@ func TestTheSyncTakesTrunkIn(t *testing.T) {
 
 // The sync runs on trunk or a work branch alone. [[spec/design_output/work#trunk-comes-in-first]]
 func TestTheSyncRefusesAnyOtherBranch(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.git("switch", "-q", "-c", "side")
 	if code := one.branchSays("sync"); code != codeRefused {
@@ -34,6 +36,7 @@ func TestTheSyncRefusesAnyOtherBranch(t *testing.T) {
 
 // Two sides changing apart keys merge key by key, and the record joins what both append. [[spec/design_output/work#a-conflicted-front-resolves-itself]]
 func TestTheFrontMergesKeyByKey(t *testing.T) {
+	t.Parallel()
 	base := "---\nstate: open\nstep: a\nrecord:\n  - step: a\n    hand: x\n---\n\n# Ask\n"
 	ours := "---\nstate: open\nstep: b\nrecord:\n  - step: a\n    hand: x\n  - step: b\n    hand: y\n---\n\n# Ask\n"
 	theirs := "---\nstate: open\nstep: a\ncloud: true\nrecord:\n  - step: a\n    hand: x\n  - step: c\n    hand: z\n---\n\n# Ask\n"

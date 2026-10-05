@@ -48,6 +48,7 @@ func (one *tree) dpGreen(argv ...string) {
 }
 
 func TestDispatchWritesOneFixGroupCarryingFixHoldingTheLooseAgentTickets(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose(), "b-loose-one": pcLoose()})
 	one.dpGreen()
 	_, fix := one.dpWriteBranch()
@@ -63,6 +64,7 @@ func TestDispatchWritesOneFixGroupCarryingFixHoldingTheLooseAgentTickets(t *test
 }
 
 func TestDispatchMakesOneCommitOnTheWriteBranchAndPushesNoMain(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	main := one.peOriginTip("main")
 	one.dpGreen()
@@ -77,6 +79,7 @@ func TestDispatchMakesOneCommitOnTheWriteBranchAndPushesNoMain(t *testing.T) {
 }
 
 func TestDispatchFindsItsBranchStandingOnASecondRunAndWritesNothing(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.dpGreen()
 	branch, _ := one.dpWriteBranch()
@@ -91,6 +94,7 @@ func TestDispatchFindsItsBranchStandingOnASecondRunAndWritesNothing(t *testing.T
 }
 
 func TestDispatchStopsEveryWriteOnAnUnmergedWriteBranchAndStillNamesTheWorkers(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.dpGroup("first", groupNote)
 	one.git("switch", "-q", "-c", "old", "main")
@@ -108,6 +112,7 @@ func TestDispatchStopsEveryWriteOnAnUnmergedWriteBranchAndStillNamesTheWorkers(t
 }
 
 func TestDispatchWritesPastAMergedWriteBranch(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.git("push", "-q", "origin", "main:refs/heads/"+writesPrefix+"0ld0ld0")
 	one.dpGreen()
@@ -118,6 +123,7 @@ func TestDispatchWritesPastAMergedWriteBranch(t *testing.T) {
 
 // [[spec/tickets/the-dispatch-opens-no-issues]]
 func TestDispatchLeavesAPersonRouteTicketLooseAndNamesItUnderThePersonPart(t *testing.T) {
+	t.Parallel()
 	trial := pcPersonChild("")
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose(), "a-trial": trial})
 	one.dpGreen("--json")
@@ -129,6 +135,7 @@ func TestDispatchLeavesAPersonRouteTicketLooseAndNamesItUnderThePersonPart(t *te
 }
 
 func TestDispatchOpensABranchForAReadyGroupOnMainAndLeavesABranchedOneAlone(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"new-group": groupNote, "first": groupNote})
 	one.dpGroup("first", groupNote)
 	first := one.peOriginTip(workBranch + "first")
@@ -149,6 +156,7 @@ func TestDispatchOpensABranchForAReadyGroupOnMainAndLeavesABranchedOneAlone(t *t
 }
 
 func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.d.Config = func(key string) any {
 		if key == namesWords {
@@ -171,6 +179,7 @@ func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
 
 // The fix ask meets the voice rules Vale holds, as askFaults read them at each run in the JavaScript. [[spec/tickets/dispatch-verbs-port-to-go]]
 func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	vale, err := exec.LookPath(filepath.Join(one.d.Method, filepath.FromSlash(runtimeFolder), "bin", "vale"))
 	if err != nil {
@@ -223,6 +232,7 @@ func dpAskSpan(text string) (int, int) {
 }
 
 func TestDispatchRemovesItsWorktreeAfterThePushAndMovesNoCheckout(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	head := one.git("rev-parse", "HEAD")
 	one.dpGreen()
@@ -235,6 +245,7 @@ func TestDispatchRemovesItsWorktreeAfterThePushAndMovesNoCheckout(t *testing.T) 
 }
 
 func TestDispatchRemovesTheWorktreeAfterARefusedPushAndAnswersRefused(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.peOriginRefuses(`echo "$ref" | grep -q '^refs/heads/claude/'`)
 	if code := one.dpRun("--json"); code != codeRed {
@@ -248,6 +259,7 @@ func TestDispatchRemovesTheWorktreeAfterARefusedPushAndAnswersRefused(t *testing
 }
 
 func TestDispatchCutsTheFixNameToACapBelowItsOwnWords(t *testing.T) {
+	t.Parallel()
 	const main = "c0ffee1234abcdef"
 	dpSame(t, cutTo("loose-fixes-abc", 2), "loose-fixes")
 	dpSame(t, fixName(2, main, ""), "loose-fixes")
@@ -256,6 +268,7 @@ func TestDispatchCutsTheFixNameToACapBelowItsOwnWords(t *testing.T) {
 
 // A group names its parent under group, and a parent's name rides last. [[spec/tickets/groups-hold-groups]]
 func TestDispatchNamesAFixGroupWithItsParentLastSoTheCutKeepsTheCommit(t *testing.T) {
+	t.Parallel()
 	const main = "c0ffee1234abcdef"
 	dpSame(t, fixName(0, main, "big-move"), "loose-fixes-c0ffee1-big-move")
 	dpSame(t, fixName(4, main, "big-move"), "loose-fixes-c0ffee1-big")
@@ -263,6 +276,7 @@ func TestDispatchNamesAFixGroupWithItsParentLastSoTheCutKeepsTheCommit(t *testin
 }
 
 func TestDispatchHandsTheMarkOffCommitOffMainsTree(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	mark := one.d.markOff(workBranch + "new-group")
 	if mark == "" || one.git("rev-parse", mark+"^{tree}") != one.git("rev-parse", "origin/main^{tree}") || one.git("rev-parse", mark+"^") != one.git("rev-parse", "origin/main") {
@@ -272,6 +286,7 @@ func TestDispatchHandsTheMarkOffCommitOffMainsTree(t *testing.T) {
 
 // [[spec/tickets/groups-hold-groups]]
 func TestDispatchLandsAParentsCloseOnceOverTwoRuns(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"parent": dpCloudy(groupNote), "a-piece": pcChild("parent", closedState)})
 	one.dpGreen()
 	one.dpGreen()
@@ -285,6 +300,7 @@ func TestDispatchLandsAParentsCloseOnceOverTwoRuns(t *testing.T) {
 
 // [[spec/tickets/groups-hold-groups]]
 func TestDispatchBundlesEachParentsLooseTicketsIntoAFixGroupUnderIt(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose(), "parent": dpCloudy(groupNote), "p-piece": pcChild("parent", "open")})
 	one.dpGreen("--json")
 	dpSame(t, one.dpJSON().Bundles, []bundle{{Parent: "", Tickets: []string{"a-loose-one"}}, {Parent: "parent", Tickets: []string{"p-piece"}}})
@@ -306,6 +322,7 @@ func TestDispatchBundlesEachParentsLooseTicketsIntoAFixGroupUnderIt(t *testing.T
 
 // The route copy hashes a route as processHash in lib/schema-route.js does, over a sample and over the tree's group route. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func TestDispatchHashesARouteAsTheJavaScriptDoes(t *testing.T) {
+	t.Parallel()
 	const sample = "for: a test\nask:\n  - name: goal\n    form: text\n    says: what it adds up to\nsteps:\n  - name: sync\n    when: cloud\n    needs: [branch sync]\n    evidence:\n      - name: sync\n        form: command\n        expects: 0\n  - name: children\n    by: children\n    on_fail: split\n    final: true\n"
 	held := yaml.AsDoc(yaml.Read(sample))
 	dpSame(t, processHash(yaml.Flat(held.Get("ask")), yaml.Flat(held.Get("steps"))), "381bcb1ad042ccf6")

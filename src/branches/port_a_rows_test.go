@@ -25,6 +25,7 @@ func paListed(t *testing.T, one *tree) string {
 
 // List reads the group on a branch a root handover also stands on, with no brief column. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAListReadsGroupBesideHandover(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{"HANDOVER.md": "---\nstatus: held\n---\n", ticketAt("one-group"): paGroupNote})
 	said := paListed(t, one)
@@ -34,6 +35,7 @@ func TestPAListReadsGroupBesideHandover(t *testing.T) {
 
 // A group row carries a row per ticket naming it, off the branch tip. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAGroupRowCarriesItsTickets(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{
 		ticketAt("one-group"):  paGroupNote,
@@ -49,6 +51,7 @@ func TestPAGroupRowCarriesItsTickets(t *testing.T) {
 
 // A branch carrying no group names no ticket, and reads at no status. [[spec/tickets/work-verbs-port-to-go]]
 func TestPABranchWithNoGroupNamesNoTicket(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("no-group", map[string]string{ticketAt("a-child"): paChild("no-group", "open")})
 	said := paListed(t, one)
@@ -58,6 +61,7 @@ func TestPABranchWithNoGroupNamesNoTicket(t *testing.T) {
 
 // A child row names the tickets it waits on, and a child waiting on nothing names its step. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAChildRowNamesItsWaits(t *testing.T) {
+	t.Parallel()
 	waiting := strings.Replace(paChild("one-group", "open"), "group: one-group", "group: one-group\ndepends_on: b-child, c-shut, d-nowhere\nstep: do", 1)
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{
@@ -74,6 +78,7 @@ func TestPAChildRowNamesItsWaits(t *testing.T) {
 
 // A group row names a branch behind main, and a branch on the trunk tip stands level. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAGroupRowNamesBehindMain(t *testing.T) {
+	t.Parallel()
 	level := newTree(t, nil)
 	level.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	paNoMatch(t, paListed(t, level), `behind main`)

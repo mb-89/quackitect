@@ -11,6 +11,7 @@ import (
 
 // The merge takes a claude branch in, runs the check, pushes main and then deletes the branch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergeTakesAClaudeBranchIn(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
 	if code := one.branchSays("merge", peClaude); code != codeOK {
@@ -30,6 +31,7 @@ func TestPEMergeTakesAClaudeBranchIn(t *testing.T) {
 
 // A refused push of main keeps the claude branch standing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPERefusedTrunkPushKeepsTheClaudeBranch(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
 	one.peOriginRefuses(`[ "$ref" = refs/heads/main ]`)
@@ -44,6 +46,7 @@ func TestPERefusedTrunkPushKeepsTheClaudeBranch(t *testing.T) {
 
 // Main already carrying a claude branch's work merges nothing, runs the check and deletes the branch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPETrunkCarriesTheClaudeBranch(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
 	one.git("cherry-pick", "origin/"+peClaude)
@@ -63,6 +66,7 @@ func TestPETrunkCarriesTheClaudeBranch(t *testing.T) {
 
 // The merge runs the install over the merged tree before the check. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergeInstallsBeforeTheCheck(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, map[string]string{"src/scripts/install.sh": "mkdir -p .se && echo ok > .se/installed\n"}, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
 	one.d.Runme = []string{"sh", "-c", "test -f .se/installed"}
@@ -73,6 +77,7 @@ func TestPEMergeInstallsBeforeTheCheck(t *testing.T) {
 
 // A work branch's merge pushes main and then closes the branch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEWorkMergePushesThenCloses(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
 	if code := one.branchSays("merge", "g"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
@@ -87,6 +92,7 @@ func TestPEWorkMergePushesThenCloses(t *testing.T) {
 
 // A refused push of main keeps the work branch, and names the close to run after the push. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEWorkMergeKeepsTheBranchOnARefusedPush(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
 	one.peOriginRefuses(`[ "$ref" = refs/heads/main ]`)
 	if code := one.branchSays("merge", "g"); code != codeOK {
@@ -100,6 +106,7 @@ func TestPEWorkMergeKeepsTheBranchOnARefusedPush(t *testing.T) {
 
 // A refused delete leaves the merge green, and says the branch stands on the remote. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEWorkMergeGreenOnARefusedDelete(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
 	one.peOriginRefuses(`[ "$new" = 0000000000000000000000000000000000000000 ]`)
 	if code := one.branchSays("merge", "g"); code != codeOK {
@@ -110,6 +117,7 @@ func TestPEWorkMergeGreenOnARefusedDelete(t *testing.T) {
 
 // The merge refuses a branch a pull request carries at its tip, names it and the --closed road, and merges nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergeRefusesAPullAtTheTip(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
 	one.git("push", "-q", "origin", "main:refs/pull/7/head")
 	one.git("push", "-q", "origin", "origin/work/g:refs/pull/42/head")
@@ -126,6 +134,7 @@ func TestPEMergeRefusesAPullAtTheTip(t *testing.T) {
 
 // --closed takes the merge past a pull request standing at the tip. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergeClosedRunsPastThePull(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
 	one.git("push", "-q", "origin", "origin/work/g:refs/pull/42/head")
 	if code := one.branchSays("merge", "g", "--closed"); code != codeOK {
@@ -138,6 +147,7 @@ func TestPEMergeClosedRunsPastThePull(t *testing.T) {
 
 // A pull request standing at another commit leaves the merge to run. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEPullElsewhereLeavesTheMerge(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
 	one.git("push", "-q", "origin", "main:refs/pull/7/head")
 	if code := one.branchSays("merge", "g"); code != codeOK {

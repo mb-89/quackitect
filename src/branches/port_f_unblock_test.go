@@ -140,6 +140,7 @@ func pfClosedBecame(t *testing.T, one *tree) string {
 
 // A cloud box refuses the unblock, names the pull, and leaves the child open. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFUnblockRefusesACloudBox(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), pfSuccessor, true)
 	one.d.Env["CLAUDE_CODE_REMOTE"] = "true"
 	if code := pfUnblock(one); code != codeRefused {
@@ -152,6 +153,7 @@ func TestPFUnblockRefusesACloudBox(t *testing.T) {
 
 // The unblock closes a child waiting on a person as became, and names its successor. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFUnblockClosesTheChildAsBecame(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), pfSuccessor, true)
 	if code := pfUnblock(one); code != 0 {
 		t.Fatalf("the unblock answers %d: %s", code, one.errs.String())
@@ -162,6 +164,7 @@ func TestPFUnblockClosesTheChildAsBecame(t *testing.T) {
 
 // The unblock commits the child and its successor alone, and sweeps no other change in. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFUnblockStagesTheTwoTicketsAlone(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), pfSuccessor, true)
 	one.write(map[string]string{ticketAt("one-group"): pfUGroup + "\nAn edit in hand.\n", "src/loose.txt": "loose\n"})
 	if code := pfUnblock(one); code != 0 {
@@ -178,6 +181,7 @@ func TestPFUnblockStagesTheTwoTicketsAlone(t *testing.T) {
 
 // The successor carries the question and the ticket it comes from under Discussion, the empty line gone. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheSuccessorCarriesTheQuestion(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), pfSuccessor, true)
 	if code := pfUnblock(one); code != 0 {
 		t.Fatalf("the unblock answers %d: %s", code, one.errs.String())
@@ -193,6 +197,7 @@ func TestPFTheSuccessorCarriesTheQuestion(t *testing.T) {
 
 // A question carrying a table lands as that table, and TL;DR stays whole. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFATabledQuestionLandsAsATable(t *testing.T) {
+	t.Parallel()
 	child := strings.Replace(pfUChild("implement/person-1", ""), pfAsksLine, `        asks: TL;DR pick a road\n\n| road | cost |\n| --- | --- |\n| one | two |`+"\n", 1)
 	one := pfUnblockTree(t, child, pfSuccessor, true)
 	if code := pfUnblock(one); code != 0 {
@@ -211,6 +216,7 @@ func TestPFATabledQuestionLandsAsATable(t *testing.T) {
 
 // Two questions land one list item each. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTwoQuestionsLandAnItemEach(t *testing.T) {
+	t.Parallel()
 	child := strings.Replace(pfUChild("implement/person-1", ""), pfAsksLine, "        asks: \"the first road; the second road\"\n", 1)
 	one := pfUnblockTree(t, child, pfSuccessor, true)
 	if code := pfUnblock(one); code != 0 {
@@ -223,6 +229,7 @@ func TestPFTwoQuestionsLandAnItemEach(t *testing.T) {
 
 // A findings table a verdict fails with rides the person step the escalation writes, and lands under unblock as that table. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFAFailedVerdictTableLandsAsATable(t *testing.T) {
+	t.Parallel()
 	reason := `the rows split:; | road | cost |\n| --- | --- |\n| one | two |; no test drives the hook`
 	one := pfUnblockTree(t, pfUChild("implement/change", ""), pfSuccessor, true)
 	one.d.Method = pfMethod(t)
@@ -244,6 +251,7 @@ func TestPFAFailedVerdictTableLandsAsATable(t *testing.T) {
 
 // A successor whose first step admits an agent refuses, names what it read, and leaves the child open. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFASuccessorAdmittingAnAgentRefuses(t *testing.T) {
+	t.Parallel()
 	for _, one := range [][2]string{{"", "anyone"}, {"anyone", "anyone"}, {"agent", "agent"}} {
 		by := ""
 		if one[0] != "" {
@@ -262,6 +270,7 @@ func TestPFASuccessorAdmittingAnAgentRefuses(t *testing.T) {
 
 // The placeholder the mint writes under Discussion goes, and the question still lands. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheMintPlaceholderGoes(t *testing.T) {
+	t.Parallel()
 	minted := strings.Replace(pfSuccessor, "Nothing stands here yet.", "<!-- what anybody adds, at any time, on this ticket -->", 1)
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), minted, true)
 	if code := pfUnblock(one); code != 0 {
@@ -276,6 +285,7 @@ func TestPFTheMintPlaceholderGoes(t *testing.T) {
 
 // A successor off the person route refuses, names the mint onto it, and leaves the child open. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFASuccessorOffThePersonRouteNamesTheMint(t *testing.T) {
+	t.Parallel()
 	question := strings.Replace(pfSuccessor, "[[spec/processes/person]]", "[[spec/processes/question]]", 1)
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), question, true)
 	if code := pfUnblock(one); code != codeRefused {
@@ -287,6 +297,7 @@ func TestPFASuccessorOffThePersonRouteNamesTheMint(t *testing.T) {
 
 // A child standing at a step an agent takes refuses, names the step, and stays open. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFAChildAtAnAgentStepRefuses(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, pfUChild("implement/change", ""), pfSuccessor, true)
 	if code := pfUnblock(one); code != codeRefused {
 		t.Fatalf("the unblock answers %d", code)
@@ -298,6 +309,7 @@ func TestPFAChildAtAnAgentStepRefuses(t *testing.T) {
 
 // A successor standing inside the group it leaves refuses. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFASuccessorInsideTheGroupRefuses(t *testing.T) {
+	t.Parallel()
 	inside := strings.Replace(pfSuccessor, "urgency: soon\n", "urgency: soon\ngroup: one-group\n", 1)
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), inside, true)
 	if code := pfUnblock(one); code != codeRefused {
@@ -308,6 +320,7 @@ func TestPFASuccessorInsideTheGroupRefuses(t *testing.T) {
 
 // On main the unblock reads the group off the child's own field, and names it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFUnblockOnMainReadsTheChildsGroup(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), pfSuccessor, false)
 	if code := pfUnblock(one); code != 0 {
 		t.Fatalf("the unblock answers %d: %s", code, one.errs.String())
@@ -318,6 +331,7 @@ func TestPFUnblockOnMainReadsTheChildsGroup(t *testing.T) {
 
 // On main a child standing in no group hands its person step out, and the verb names no empty group. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFUnblockOnMainFreesAChildInNoGroup(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, strings.Replace(pfUChild("implement/person-1", ""), "group: one-group\n", "", 1), pfSuccessor, false)
 	if code := pfUnblock(one); code != 0 {
 		t.Fatalf("the unblock answers %d: %s", code, one.errs.String())
@@ -330,6 +344,7 @@ func TestPFUnblockOnMainFreesAChildInNoGroup(t *testing.T) {
 
 // A successor standing nowhere refuses, and the verb names the mint and mints none. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFUnblockNamesTheSuccessorItNeeds(t *testing.T) {
+	t.Parallel()
 	one := pfUnblockTree(t, pfUChild("implement/person-1", ""), pfSuccessor, true)
 	if code := one.branchSays("unblock", "a-child", "no-such-next"); code != codeRefused {
 		t.Fatalf("the unblock answers %d", code)
@@ -343,6 +358,7 @@ func TestPFUnblockNamesTheSuccessorItNeeds(t *testing.T) {
 
 // A successor written off the person route, as the mint copies it, opens at a person step and the verb takes it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheVerbTakesASuccessorOffThePersonRoute(t *testing.T) {
+	t.Parallel()
 	minted := `---
 kind: [[ticket]]
 state: open

@@ -14,6 +14,7 @@ import (
 
 // A group holds where the record says so, and stands free where it says nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBAGroupHoldsWhereTheRecordSaysSo(t *testing.T) {
+	t.Parallel()
 	took := pbTook()
 	if groupStanding(pbGroupNote) != todo || groupStanding(took) != held {
 		t.Fatal("the take reads apart from the record")
@@ -28,6 +29,7 @@ func TestPBAGroupHoldsWhereTheRecordSaysSo(t *testing.T) {
 
 // The list names a group and a loose ticket, each on its own row. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBListNamesAGroupAndALooseTicket(t *testing.T) {
+	t.Parallel()
 	loose := strings.Replace(pbChild("one-group", "open"), "group: one-group\n", "", 1)
 	one := newTree(t, map[string]string{ticketAt("a-loose-one"): loose, pbAt: pbGroupNote})
 	one.branch("one-group", map[string]string{pbAt: pbTook()})
@@ -49,6 +51,7 @@ func TestPBListNamesAGroupAndALooseTicket(t *testing.T) {
 
 // A group held past the stale span stands under Yours with its three answers, and a younger one asks nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBAStaleGroupStandsUnderYours(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{pbAt: pbTook()})
 	pbClockAt(one, "origin/work/one-group", 3*time.Hour)
@@ -83,6 +86,7 @@ func pbMerging(t *testing.T, check string, files map[string]string) *tree {
 
 // A merge runs the check on the merge commit, and undoes the merge on red. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBMergeUndoesTheMergeOnRed(t *testing.T) {
+	t.Parallel()
 	one := pbMerging(t, "echo 'two tests fail'; exit 1", nil)
 	was := one.git("rev-parse", "HEAD")
 	if code := one.branchSays("merge", "one-group"); code != codeRed {
@@ -97,6 +101,7 @@ func TestPBMergeUndoesTheMergeOnRed(t *testing.T) {
 
 // A merge on a red check prints each failing case the check names. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBMergePrintsEachFailingCase(t *testing.T) {
+	t.Parallel()
 	one := pbMerging(t, "printf 'test/level0/one.test.js: a first case: it broke\\ntest/level0/two.test.js: a second case: it broke\\n'; exit 1", nil)
 	if code := one.branchSays("merge", "one-group"); code != codeRed {
 		t.Fatalf("the merge answers %d: %s", code, pbSaid(one))
@@ -107,6 +112,7 @@ func TestPBMergePrintsEachFailingCase(t *testing.T) {
 
 // A merge refuses where trunk moved a ticket the branch holds, names the lines, and merges nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBMergeRefusesWhereTrunkMovedATicket(t *testing.T) {
+	t.Parallel()
 	now := strings.Replace(pbGroupNote, "Nothing yet.\n", "urgency: now\n", 1)
 	one := newTree(t, map[string]string{pbAt: now}).desk()
 	one.branch("one-group", map[string]string{pbAt: pbClosed(now)})
@@ -128,6 +134,7 @@ func TestPBMergeRefusesWhereTrunkMovedATicket(t *testing.T) {
 
 // A merge frees an open ticket of the group it takes in, leaves a closed one, and amends the merge commit. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBMergeFreesAnOpenTicket(t *testing.T) {
+	t.Parallel()
 	one := pbMerging(t, "exit 0", map[string]string{ticketAt("a-child"): pbChild("one-group", "open"), ticketAt("shut-one"): pbChild("one-group", closedState)})
 	if code := one.branchSays("merge", "one-group"); code != 0 {
 		t.Fatalf("the merge answers %d: %s", code, pbSaid(one))
@@ -146,6 +153,7 @@ func TestPBMergeFreesAnOpenTicket(t *testing.T) {
 
 // A release writes hash_after onto a held group, pushes, and frees it for anybody. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBReleaseWritesHashAfter(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{pbAt: pbTook()})
 	pbOnBranch(one, "one-group")
@@ -168,6 +176,7 @@ func TestPBReleaseWritesHashAfter(t *testing.T) {
 
 // A release closes every open take a merge left, so the group reads free. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBReleaseClosesEveryOpenTake(t *testing.T) {
+	t.Parallel()
 	first := withEntry(pbGroupNote, front.Ordered{{Key: "step", Value: "sync"}, {Key: "hand", Value: "box 3f9a"}, {Key: "hash_before", Value: "a1"}})
 	both := withEntry(first, front.Ordered{{Key: "step", Value: "sync"}, {Key: "hand", Value: "box 7c1d"}, {Key: "hash_before", Value: "d4"}})
 	one := newTree(t, nil)
@@ -192,6 +201,7 @@ func TestPBReleaseClosesEveryOpenTake(t *testing.T) {
 
 // A release on a group nobody holds writes nothing, and says so. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBReleaseOnAFreeGroupWritesNothing(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
 	pbOnBranch(one, "one-group")
@@ -207,6 +217,7 @@ func TestPBReleaseOnAFreeGroupWritesNothing(t *testing.T) {
 
 // A close drops a group's branch once trunk holds it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBCloseDropsABranchTrunkHolds(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.branch("one-group", map[string]string{pbAt: pbClosed(pbGroupNote)})
 	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/one-group")

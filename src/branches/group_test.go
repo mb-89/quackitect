@@ -11,6 +11,7 @@ import (
 
 // A field reads bare of its link, and a group reads off its route's last name. [[spec/design_output/work#a-group-is-a-ticket]]
 func TestAFieldReadsBareAndAGroupReadsOffItsRoute(t *testing.T) {
+	t.Parallel()
 	if fieldOf(groupNote, "process") != "spec/processes/group" {
 		t.Fatalf("the process reads %q", fieldOf(groupNote, "process"))
 	}
@@ -24,6 +25,7 @@ func TestAFieldReadsBareAndAGroupReadsOffItsRoute(t *testing.T) {
 
 // A take writes the open record row, a hash after closes it, and every take closes at a release. [[spec/design_output/work#held-derives-from-the-record]]
 func TestATakeHoldsUntilItsHashAfterLands(t *testing.T) {
+	t.Parallel()
 	taken := withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box one"}, {Key: "hash_before", Value: "abc"}})
 	take := heldIn(taken)
 	if take == nil || take.Hand != "box one" || take.HashBefore != "abc" {
@@ -39,6 +41,7 @@ func TestATakeHoldsUntilItsHashAfterLands(t *testing.T) {
 
 // A span names minutes, hours or days, and an age reads in its largest unit. [[spec/design_output/work#a-stale-group-is-yours]]
 func TestASpanAndAnAgeReadInTheirUnits(t *testing.T) {
+	t.Parallel()
 	if spanOf("12h") != 12*hour || spanOf("3d") != 3*day || spanOf("soon") != 0 {
 		t.Fatal("the spans read apart")
 	}
@@ -49,6 +52,7 @@ func TestASpanAndAnAgeReadInTheirUnits(t *testing.T) {
 
 // A dependency list drops its brackets, its quotes and the branch prefix. [[spec/design_output/work#the-mark-and-what-waits]]
 func TestADependencyReadsBare(t *testing.T) {
+	t.Parallel()
 	text := "---\ndepends_on: [\"work/a\", b]\n---\n"
 	if got := dependsOnText(text); !slices.Equal(got, []string{"a", "b"}) {
 		t.Fatalf("the waits read %v", got)
