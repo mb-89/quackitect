@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: ticket-verbs-run-in-go
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 64f34afd472c5fe2
         size: 1272
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: b05f43611dc0a4fc4eb4c8b7f5c1c441095aecff
+    hash_after: b05f43611dc0a4fc4eb4c8b7f5c1c441095aecff
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -324,14 +333,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the ports under src/quack, the one wrapper in src/pull, the leaving JavaScript and the tests that read it, plus the guards and the probe the port broke
+- every door the change reaches has a fake: the verbs reach the disk and git through the doors pullHere builds, and their cases run over a temporary tree and repository
+- a comment names the approach: each port file opens on the JavaScript it ports and links the design section it implements
+- every fact stands in one place: the sub-verbs call the bless, open, mint and route the pull holds, and the guards read the one verb table Go holds
 
 ## tests-green
 
