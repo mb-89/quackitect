@@ -24,7 +24,8 @@ const GROUP = "dry-probe-clears";
 export const ENDS = ["classic.Stop", "turn.complete"];
 
 // The session runs on past the key: due, the handover ticket, the clear ticket, and the turn's end. [[spec/tickets/the-clear-continues-the-session]]
-export async function clearRun(it, tree, raise, seen, env) {
+export async function clearRun(it, tree, raise, seen, outer) {
+  const env = inClone(tree, outer);
   const runs = [];
   const pull = (...words) => {
     const ran = it.proc.run([it.join(tree, "RUNME.sh"), "ticket", "pull", ...words], {
@@ -53,11 +54,16 @@ export async function clearRun(it, tree, raise, seen, env) {
   return { runs, commands: [...seen.commands], prompts: [...seen.prompts] };
 }
 
+// A verb finds its root off QUACKITECT_ROOT before its folder, and the index hands its own root to every child, so the clone names itself. [[spec/tickets/the-clear-carries-no-local-work]]
+function inClone(tree, env) {
+  return { ...env, QUACKITECT_ROOT: tree };
+}
+
 // The probe mints its own group and stands on its work branch, as origin holds it. [[spec/tickets/the-clear-carries-no-local-work]]
 export function grouped(it, tree, env) {
   const minted = it.proc.run(
     [it.join(tree, "RUNME.sh"), "mint", "ticket", `spec/tickets/${GROUP}.md`, "--process=trivial"],
-    { cwd: tree, env, timeoutMs: PULL_WAIT },
+    { cwd: tree, env: inClone(tree, env), timeoutMs: PULL_WAIT },
   );
   const branched = it.proc.run(["git", "checkout", "-q", "-B", `work/${GROUP}`], {
     cwd: tree,
