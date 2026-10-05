@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -134,6 +135,28 @@ func binaryIn(folder, name string) string {
 	return filepath.Join(folder, name)
 }
 
+// The index asked to stop, then the binary and the root removed once it lets go of them, since Windows locks a running binary and TempDir's cleanup tries once. [[spec/tickets/manager-tests-wait-for-the-binary]]
+func stopped(t *testing.T, bin, root string) {
+	t.Helper()
+	quack(t, bin, root, "call", "stop")
+	deadline := time.Now().Add(30 * time.Second)
+	for {
+		binErr := os.Remove(bin)
+		if errors.Is(binErr, os.ErrNotExist) {
+			binErr = nil
+		}
+		rootErr := os.RemoveAll(root)
+		if binErr == nil && rootErr == nil {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Errorf("the stopped index still holds %s (%v) or %s (%v)", bin, binErr, root, rootErr)
+			return
+		}
+		time.Sleep(200 * time.Millisecond)
+	}
+}
+
 // The root built into a folder, as the install builds it. [[spec/design_output/model#the-wiring-file]]
 func built(t *testing.T, folder string) string {
 	t.Helper()
@@ -151,7 +174,7 @@ func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
 	bin := built(t, t.TempDir())
 	root := t.TempDir()
 	said, err := quack(t, bin, root, "why", "session/alarms")
-	t.Cleanup(func() { quack(t, bin, root, "call", "stop") })
+	t.Cleanup(func() { stopped(t, bin, root) })
 	if err != nil {
 		t.Fatalf("quack why session/alarms answers %v: %s", err, said)
 	}
@@ -168,7 +191,7 @@ func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
 	bin := built(t, t.TempDir())
 	root := t.TempDir()
 	said, err := quack(t, bin, root, "help")
-	t.Cleanup(func() { quack(t, bin, root, "call", "stop") })
+	t.Cleanup(func() { stopped(t, bin, root) })
 	if err != nil {
 		t.Fatalf("quack help over a root with no door answers %v: %s", err, said)
 	}
@@ -191,7 +214,7 @@ func TestATreeWithNoWiringLoadsTheVehicleWiring(t *testing.T) {
 	bin := built(t, filepath.Join(vehicle, filepath.FromSlash(index.Runtime), "bin"))
 	root := t.TempDir()
 	said, err := quack(t, bin, root, "why", "tickets/all")
-	t.Cleanup(func() { quack(t, bin, root, "call", "stop") })
+	t.Cleanup(func() { stopped(t, bin, root) })
 	if err != nil {
 		t.Fatalf("quack why tickets/all answers %v: %s", err, said)
 	}
