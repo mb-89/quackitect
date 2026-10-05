@@ -80,16 +80,26 @@ func mintVerb(rootOf func() (string, error)) twin {
 			fields[askField] = pull.HandedOver(yaml.AsString(fields[askField]))
 		}
 		name := strings.TrimSuffix(path.Base(where), ".md")
+		// A ticket on a closed group's branch stands free. [[spec/design_output/pull#a-closed-group-takes-no-child]]
+		freed := ""
 		if kind == ticketKind {
 			branch, _ := gitIn(work, "rev-parse", "--abbrev-ref", "HEAD")
-			if group := pull.JoinsGroup(yaml.AsString(fields[pull.GroupField]), yaml.AsString(fields["process"]), branch, name); group != "" {
-				fields[pull.GroupField] = group
+			named := yaml.AsString(fields[pull.GroupField])
+			if group := pull.JoinsGroup(named, yaml.AsString(fields["process"]), branch, name); group != "" {
+				if named == "" && pull.GroupClosed(disk, group) {
+					freed = group
+				} else {
+					fields[pull.GroupField] = group
+				}
 			}
 		}
 		text, why := check.Minted(schemas, kind, where, fields)
 		if why == "" {
 			// [[spec/design_output/work#a-group-is-a-ticket]]
 			why = pull.EmptyGroup(disk, text, name)
+		}
+		if why == "" {
+			why = pull.ClosedGroup(disk, text)
 		}
 		if why != "" {
 			fmt.Fprintln(errs, why)
@@ -100,6 +110,9 @@ func mintVerb(rootOf func() (string, error)) twin {
 			return exitFailed
 		}
 		fmt.Fprintf(out, "%s stands, in the shape %s names.\n", where, kind)
+		if freed != "" {
+			fmt.Fprintf(out, "%s stands closed, so %s joins no group and stands free.\n", freed, where)
+		}
 		for _, one := range check.PlaceholderFaults(text, schema, where) {
 			fmt.Fprintf(out, "%s:%d:%d: %s: %s\n", one.File, one.Line, one.Column, one.Rule, one.Message)
 		}

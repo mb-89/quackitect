@@ -57,6 +57,7 @@ func TestGroups(t *testing.T) {
 		"spec/tickets/inner.md": "---\nprocess: [[spec/processes/group]]\ngroup: big\n---\n",
 		"spec/tickets/leaf.md":  "---\nprocess: [[spec/processes/trivial]]\ngroup: inner\n---\n",
 		".se/tickets/aside.md":  "---\ngroup: big\n---\n",
+		"spec/tickets/shut.md":  "---\nstate: closed\nprocess: [[spec/processes/group]]\n---\n",
 	}
 	t.Run("a group holds its groups' children, and a private note stands outside it", func(t *testing.T) {
 		names := []string{}
@@ -73,6 +74,14 @@ func TestGroups(t *testing.T) {
 		}
 		if why := EmptyGroup(disk, disk["spec/tickets/big.md"], "big"); why != "" {
 			t.Fatalf("a group with children answers %q", why)
+		}
+	})
+	t.Run("a ticket naming a closed group stands refused", func(t *testing.T) {
+		if why := ClosedGroup(disk, "---\ngroup: shut\n---\n"); !strings.HasPrefix(why, "shut stands closed, so it takes no new child.") {
+			t.Fatalf("the read answers %q", why)
+		}
+		if why := ClosedGroup(disk, disk["spec/tickets/leaf.md"]); why != "" {
+			t.Fatalf("a ticket under an open group answers %q", why)
 		}
 	})
 	t.Run("a box's ticket joins its group, and the group itself and a person's process stay out", func(t *testing.T) {

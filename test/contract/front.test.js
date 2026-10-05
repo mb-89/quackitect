@@ -27,6 +27,8 @@ const VALUES = [
   "[a, b]",
   "[[spec/one]]",
   "ends ",
+  "  leads",
+  "]closes",
   "",
   '"q"',
   "x\\y",
