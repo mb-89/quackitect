@@ -84,7 +84,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
-step: accept
+step: retro/notes
 cloud: true
 record:
   - step: sync
@@ -112,6 +112,25 @@ record:
     hand: the engine
     hash_before: 01f66aba2fd217944e501956122508ecb653ffa5
     hash_after: 01f66aba2fd217944e501956122508ecb653ffa5
+  - step: accept
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: d109bd9925c78036f0075d39f1c2dda83a388d39
+    hash_after: d109bd9925c78036f0075d39f1c2dda83a388d39
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: f597d0eaba229fa9
+        size: 257
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -174,8 +193,9 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
