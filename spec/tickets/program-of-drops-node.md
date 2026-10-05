@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -117,7 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-node-road-closes
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 3e601b1d7cc9f9f54d48b2ec10962fff9e647f47
+    hash_after: 3e601b1d7cc9f9f54d48b2ec10962fff9e647f47
+    inputs:
+      - name: ask
+        hash: 3826b66824beaed9
+        size: 444
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 121e1aeb12c9a0cf93b015040bd1caddb4cf067d
+    hash_after: 1a0bbc78ff0ce2c91853a87d5234df95d4ac3dfc
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: b4d544931cd8f9de
+        size: 2882
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 89f685f4bb16 · claude-code-remote · helper-4
+    hash_before: 281cc16ba5214d6552f9c1e7f29535807a2e94d4
+    hash_after: 281cc16ba5214d6552f9c1e7f29535807a2e94d4
+    inputs:
+      - name: design/draft
+        hash: b4d544931cd8f9de
+        size: 2882
+      - name: design/tests-red
+        hash: d64454c3cfaba25f
+        size: 691
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 71df045c68f2e6a30575dccc90244b72c37eea51
+    hash_after: 71df045c68f2e6a30575dccc90244b72c37eea51
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: a8ca0df15952762e28e24706d66b53fbc897d42c
+    hash_after: a8ca0df15952762e28e24706d66b53fbc897d42c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 73 test(s) pass in 8 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.6  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: d64454c3cfaba25f
+        size: 691
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,74 @@ The verbs then run in Go alone, and the road to node stops costing a branch a ca
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Every verb of the table registers whole in Go, so the program road answers only help, a flag-led line or a word nothing registers. 1) src/quack/verbs.go: programOf, programDoor and oldDoor leave; usageDoor(argv, errs) takes the old door's place, printing the usage for help or no verb and refusing an unknown word with exitUsage. startFault stays for check.go, and its line drops the claim that verbs run on node. 2) src/quack/twins.go nodeAccept: a word nothing registers answers an error naming it; a registered verb answers as today, in process or in a child quack road for a person. The module keeps its name, since actions call it by module. 3) src/scripts/verb-run.js leaves: roadArgv and quackArgv move into src/scripts/quack-topic.js beside quackAt; verbMain and exitsDrained move into src/scripts/probe-dry.js, their one user; verbArgv, whereOf and VERBS leave with no caller. 4) src/extension/lib/lens.js drops PROGRAMS. 5) registry.go header names no node. Assumption: the verbs slice's mode machinery stays, since a multi-word twin still reads it; its removal is a later slice.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go: verbRoad calls programDoor
+- src/quack/twins.go: nodeAccept calls programOf
+- src/quack/accepts.go: accepts calls nodeAccept
+- src/quack/check.go: runs node tests, calls startFault
+- src/scripts/work-merge.js: quackArgv
+- src/scripts/work-review.js: roadArgv
+- src/scripts/probe-dry.js: verbMain
+- test/level0/cli-exit.test.js: exitsDrained
+- test/level0/verb-run.test.js: verbArgv
+- test/contract/verb-programs.test.js: VERBS, PROGRAMS
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/programs_test.go: TestAnUnknownVerbAnswersTheUsage
+- src/quack/programs_test.go: TestHelpAnswersTheUsageAndZero
+- src/quack/registry_test.go: an unregistered verb answers no verb through the node module
+- src/quack/person_run_test.go: TestAPersonRunCarriesNoHarness, over the child road
+- test/contract/verb-programs.test.js: the road to node stands nowhere
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go
+- src/quack/twins.go
+- src/quack/registry.go
+- src/quack/programs_test.go
+- src/quack/verbs_test.go
+- src/quack/registry_test.go
+- src/quack/person_run_test.go
+- src/scripts/verb-run.js
+- src/scripts/quack-topic.js
+- src/scripts/probe-dry.js
+- src/scripts/work-merge.js
+- src/scripts/work-review.js
+- src/extension/lib/lens.js
+- test/level0/verb-run.test.js
+- test/level0/cli-exit.test.js
+- test/contract/verb-programs.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened verbs.go, twins.go, registry.go, accepts.go, check.go, verb-run.js, quack-topic.js, probe-dry.js, lens.js and every test named, and checked each claim there
+- the callers list comes off a grep for programOf, programDoor, oldDoor, nodeAccept, startFault and every verb-run.js export
+- grep on verbs.go is decided by the contract test reading it; test -d by the same test; ./RUNME.sh check by the check itself
 
 ## tests-red
 
@@ -189,26 +295,32 @@ The verbs then run in Go alone, and the road to node stops costing a branch a ca
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/no_program_test.go
+- test/contract/node-road.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The node module today starts node on a program that stands nowhere, and the error carries the node version. The verbs folder already left the tree, so the folder line holds today and the runner line fails. The branch test verb reads the contract test, and go test shows the Go case failing on its assertion too.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the grep line and the folder line meet the contract test, and the check line meets the check run at tests-green
+- the contract test drives the real disk door, and the Go case runs the node module over a temporary root with no program in it
 
 # gate
 
@@ -217,8 +329,11 @@ The verbs then run in Go alone, and the road to node stops costing a branch a ca
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- drops-node-tests-list: draft tests list names cases tests-red never wrote, so align it
+- drops-node-size-list: size omits no_program_test.go and node-road.test.js, which tests-red added
 
 # implement
 
@@ -229,14 +344,19 @@ The verbs then run in Go alone, and the road to node stops costing a branch a ca
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/cli-main.js src/scripts/probe-dry.js src/scripts/quack-topic.js src/scripts/work-merge.js src/scripts/work-review.js src/extension/lib/lens.js test/level0/cli-exit.test.js test/level0/topic-readers.test.js test/level0/probe-dry.test.js test/level0/work-merge-cloud.test.js test/level0/review.test.js test/level0/lens-v1.test.js test/contract/verb-programs.test.js test/contract/node-road.test.js src/quack/verbs.go src/quack/twins.go src/quack/main.go src/quack/registry.go src/quack/commit.go src/quack/programs_test.go src/quack/verbs_test.go src/quack/registry_test.go src/quack/person_run_test.go src/quack/ticket_twins_test.go src/quack/no_program_test.go src/modules/verbs/tree.go src/modules/verbs/ticket.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files and each reader of the gone road, and the draft names the rest
+- the node module test drives the child road through a stand-in binary, and every other case runs in memory
+- each new function carries a comment naming program-of-drops-node
+- the main runner stands once, in cli-main.js, and quack-topic.js owns the road argv
 
 ## tests-green
 
@@ -245,26 +365,33 @@ The verbs then run in Go alone, and the road to node stops costing a branch a ca
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The program road leaves quack. The usage door takes the program door's place in src/quack/verbs.go, and the node module refuses a word nothing registers. src/scripts/verb-run.js leaves. The road argv moves into quack-topic.js, and the main runner into cli-main.js, a command root the door rule exempts. The lens drops its program folder, and the tests that drove a node program now drive a registered verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files, plus the readers of the gone road the draft names
+- the node module case runs the child road through a stand-in binary, and every other case runs in memory
+- every new function names program-of-drops-node in its comment
+- the road argv stands in quack-topic.js and the main runner in cli-main.js, once each
 
 # accept
 
@@ -289,3 +416,12 @@ The verbs then run in Go alone, and the road to node stops costing a branch a ca
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's size and tests lists, as the gate asks them corrected:
+
+- size adds `src/quack/no_program_test.go`, which tests-red wrote
+- size adds `test/contract/node-road.test.js`, which tests-red wrote
+- tests reads `src/quack/no_program_test.go`: `TestTheNodeModuleRefusesAWordNothingRegisters`
+- tests reads `test/contract/node-road.test.js`: the road starts no node program
+- tests reads `test/contract/node-road.test.js`: neither the programs nor their runner stands
+- tests names no `programs_test.go` case, since tests-red wrote none there

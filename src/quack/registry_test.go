@@ -30,10 +30,10 @@ func TestVerbRegistry(t *testing.T) {
 			t.Fatalf("the road answers %d, %q, node reached %v, and wants the Go answer alone", code, out.String(), reached)
 		}
 	})
-	t.Run("an unregistered verb reaches node", func(t *testing.T) {
-		doors, out, _ := roadOver(modeNew, "node\n", registry)
-		if code := verbs(doors, []string{"registry", "unclaimed"}); code != 0 || out.String() != "node\n" {
-			t.Fatalf("the road answers %d, %q, and wants the node answer", code, out.String())
+	t.Run("an unregistered verb reaches the usage door", func(t *testing.T) {
+		doors, out, _ := roadOver(modeNew, "usage\n", registry)
+		if code := verbs(doors, []string{"registry", "unclaimed"}); code != 0 || out.String() != "usage\n" {
+			t.Fatalf("the road answers %d, %q, and wants the usage door's answer", code, out.String())
 		}
 	})
 	t.Run("the node module runs a registered verb in Go", func(t *testing.T) {

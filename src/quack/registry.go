@@ -1,6 +1,6 @@
 // The verb registry: each Go verb registers itself from an init in its own
 // file, so a port adds one file and edits no shared line. The road and the
-// node module hand node only a verb nothing registers here.
+// node module refuse a verb nothing registers here.
 // [[spec/tickets/quack-registers-each-verb]]
 package main
 

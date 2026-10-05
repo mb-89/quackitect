@@ -10,8 +10,6 @@ const CLOUD = "cloud";
 const STANDING = "holds/standing";
 const CLOUDS = "tickets/cloud";
 const TICKETS = "tickets/all";
-// The verb programs, whose folder `VERBS` in src/scripts/verb-run.js owns, spelled again here because the extension bundles alone. [[spec/tickets/cli-js-leaves]]
-const PROGRAMS = "src/scripts/verbs";
 const COMMAND = "quackitect.ticket";
 // The names the pull reads a harness off, from [[spec/design_output/pull#the-hand-rule]].
 const HARNESS = ["CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"];
@@ -267,7 +265,6 @@ function ticketLensOf(door) {
 }
 
 module.exports = {
-  PROGRAMS,
   COMMAND,
   FOLDERS,
   HARNESS,

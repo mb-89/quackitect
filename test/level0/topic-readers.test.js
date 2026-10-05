@@ -21,7 +21,9 @@ import {
   keptOf,
   keptOver,
   notesOf,
+  quackArgv,
   readsNew,
+  roadArgv,
   topicOf,
 } from "../../src/scripts/quack-topic.js";
 
@@ -280,4 +282,21 @@ test("keptOf answers what keptOver answers for its one text, and a short answer 
     "one doc answered for two reads as nothing",
   );
   assert.deepEqual(keptOver(it, [], "past"), [], "no text asks no quack");
+});
+
+// [[spec/tickets/program-of-drops-node]]
+test("a verb rides quack's road: the binary, the road, the scripts folder, then the words", () => {
+  assert.deepEqual(roadArgv("q", "/tree", ["check", "--errors"]), [
+    "q",
+    "verb",
+    join("/tree", "src", "scripts"),
+    "check",
+    "--errors",
+  ]);
+  assert.deepEqual(quackArgv({ disk: fakeDisk(), root: "/tree" }, ["check"]), [
+    join("/tree", BIN),
+    "verb",
+    join("/tree", "src", "scripts"),
+    "check",
+  ]);
 });
