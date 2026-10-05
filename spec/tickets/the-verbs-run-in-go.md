@@ -84,8 +84,18 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
-step: sync
+step: split
 cloud: true
+record:
+  - step: sync
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: 7f85c79d84ae5223cbb569b8ad1ec7a55e0c463e
+    hash_after: 7f85c79d84ae5223cbb569b8ad1ec7a55e0c463e
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-verbs-run-in-go already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -101,8 +111,9 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
