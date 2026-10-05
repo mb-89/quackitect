@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -146,6 +146,21 @@ record:
         hash: e166577ac49d2d0c
         size: 46768
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box c2e39844c8bf · claude-code-remote · helper-4
+    hash_before: 55a5ef8dfe508afc52873df39436fe4321f7fc8e
+    hash_after: 55a5ef8dfe508afc52873df39436fe4321f7fc8e
+    inputs:
+      - name: design/draft
+        hash: 53572332c8a87c0e
+        size: 2335
+      - name: design/tests-red
+        hash: b7595d42c22ced71
+        size: 715
+      - name: [[spec/design_output/pull]]
+        hash: e166577ac49d2d0c
+        size: 46768
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -273,8 +288,12 @@ Each case fails on its own assertion: the stub ClosedGroup answers nothing, the 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- closed-group-back-road: takeBack in pull.go refuses any hand but the one that wrote the leaf. So the named reopen road fails most hands; the builder words the refusal on a road that holds.
+- closed-group-mint-note: spec/design_output/pull.md says nothing of the mint refusal. The builder adds the rule there, since ClosedGroup links that section.
+- closed-group-test-name: the third tests line names no test. It is TestGroups, the closed-group case, in src/pull/process_test.go.
 
 # implement
 
