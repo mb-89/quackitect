@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-node-road-closes
 parent: program-of-drops-node
+record:
+  - step: do
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 57a378802dcfa343cdaeb3e42230c7ac06b114a9
+    hash_after: 57a378802dcfa343cdaeb3e42230c7ac06b114a9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "    2.2  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: ask
+        hash: c5d29b4238b330b6
+        size: 63
+    def: c908f075c406526d
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ draft tests list names cases tests-red never wrote, so align it
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/ticket.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The draft of program-of-drops-node named a programs_test.go case tests-red never wrote. The Discussion of that ticket now names the cases tests-red wrote, in the Go file and the contract file, and says no programs_test.go case stands.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, written under Discussion since the draft leaf stands passed
+- no cleanup comes out of this, since the build touches the same files
+- the corrected list stands once, under the ticket Discussion, beside the size list
 
 # Discussion
 
