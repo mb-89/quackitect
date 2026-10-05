@@ -35,6 +35,9 @@ func TestTicketYoursNextNamesTheFirstOpenPersonRow(t *testing.T) {
 	}
 }
 
+// A verb that registers no Go answer, so the node module runs its program. [[spec/tickets/cli-js-leaves]]
+const nodeOnly = "nodeonly"
+
 // The node module runs the verb's program under the root with the words, and fails with the output where the exit reads past 0. [[spec/tickets/cli-js-leaves]]
 func TestTheRootRunsANodeVerbThroughItsProgram(t *testing.T) {
 	root := t.TempDir()
@@ -43,15 +46,15 @@ func TestTheRootRunsANodeVerbThroughItsProgram(t *testing.T) {
 		t.Fatal(err)
 	}
 	program := "const a = process.argv.slice(2); console.log(JSON.stringify(a)); process.exit(a.includes('fail') ? 3 : 0);\n"
-	if err := os.WriteFile(filepath.Join(programs, "ticket.js"), []byte(program), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(programs, nodeOnly+".js"), []byte(program), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	accept := accepts(root, nil, nil)
-	said, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"ticket", "open"}})
+	said, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{nodeOnly, "open"}})
 	if err != nil || said != `["open"]` {
 		t.Fatalf("the node module answers %#v, %v", said, err)
 	}
-	if _, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"ticket", "fail"}}); err == nil || !strings.Contains(err.Error(), "fail") {
+	if _, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{nodeOnly, "fail"}}); err == nil || !strings.Contains(err.Error(), "fail") {
 		t.Fatalf("a failing verb answers %v", err)
 	}
 }

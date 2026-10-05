@@ -206,7 +206,7 @@ func (d *Doors) inserted(one note, before string, step *yaml.Doc) (string, strin
 	path := strings.Join(append(slices.Clone(parts[:len(parts)-1]), asText(step.Get("name"))), "/")
 	text := one.Text
 	if schema := yaml.AsDoc(yaml.Read(readFile(d.methodAt(ticketSchema)))); schema != nil {
-		text = check.ReRouted(one.Text, schema, root.Get("steps"))
+		text = check.ReRouted(one.Text, schema, yaml.AsList(root.Get("steps")), "")
 	}
 	return withField(withField(text, "step", path), "state", openState), path
 }

@@ -175,10 +175,18 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 			return nil, fmt.Errorf("the node module takes a verb, and reads no words")
 		}
 		// [[spec/tickets/quack-registers-each-verb]]
-		if _, one := twinOf(args, registry); one != nil {
-			return goAnswer(args, one)
-		}
 		argv := programOf(scripts, args)
+		if _, one := twinOf(args, registry); one != nil {
+			if !person {
+				return goAnswer(args, one)
+			}
+			// A person's call reads the person's environment, which the index's own process holds not, so the road runs in a child under it. [[spec/design_output/pull#the-hand-rule]]
+			self, err := selfPath()
+			if err != nil {
+				return nil, err
+			}
+			argv = append([]string{self, "verb", scripts}, args...)
+		}
 		run := exec.Command(argv[0], argv[1:]...)
 		run.Dir = root
 		if person {
@@ -192,6 +200,9 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 		return text, nil
 	}
 }
+
+// The binary a child road runs, which a case swaps for one standing nowhere. [[spec/design_output/pull#the-hand-rule]]
+var selfPath = os.Executable
 
 // The variables a harness sets, which HARNESS in src/extension/lib/lens.js owns, and the root a person's run names, which WORK_ROOT there owns. [[spec/design_output/pull#the-hand-rule]]
 var harness = []string{"CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"}

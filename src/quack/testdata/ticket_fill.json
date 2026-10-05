@@ -1,0 +1,142 @@
+{
+ "shared": {
+  "spec/processes/trivial.yaml": "for: a fix small enough that the ask is the design\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\n",
+  "spec/processes/note.yaml": "for: a thing to look at later\nask:\n  - name: line\n    form: text\n    says: the smallest case that shows it\nsteps:\n  - name: decide\n    does: says what the note becomes\n    from: anyone\n    by: retro\n    to: retro\n    input: ask\n    evidence:\n      - name: outcome\n        form: text\n        says: what the note becomes\n",
+  "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nprocess: [[spec/processes/trivial]]\n---\n\n# Ask\n\nThe lint drags on every save.\n"
+ },
+ "cases": [
+  {
+   "name": "--stdout prints the ticket the mint writes, and writes no file",
+   "argv": ["fill", "spec/tickets/slow-lint.md", "--stdout"],
+   "files": {},
+   "want": {
+    "code": 0,
+    "out": "---\nkind: [[ticket]]\nstate: draft\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: 02f3d2ca62a87850\n---\n\n# Ask\n\nThe lint drags on every save.\n\n# do\n\n<!-- makes the change -->\n\n## says\n\n<!-- what changes and why -->\n\n<!-- the form is text -->\n\n# Discussion\n\n<!-- what anybody adds -->\n",
+    "errs": "",
+    "files": {}
+   }
+  },
+  {
+   "name": "the fill writes the ticket over the path, and answers JSON",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {},
+   "want": {
+    "code": 0,
+    "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"process\":\"spec/processes/trivial\"}\n",
+    "errs": "",
+    "files": {
+     "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: draft\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: 02f3d2ca62a87850\n---\n\n# Ask\n\nThe lint drags on every save.\n\n# do\n\n<!-- makes the change -->\n\n## says\n\n<!-- what changes and why -->\n\n<!-- the form is text -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+    }
+   }
+  },
+  {
+   "name": "a ticket named by its name fills too",
+   "argv": ["fill", "slow-lint"],
+   "files": {},
+   "want": {
+    "code": 0,
+    "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"process\":\"spec/processes/trivial\"}\n",
+    "errs": "",
+    "files": {
+     "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: draft\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: 02f3d2ca62a87850\n---\n\n# Ask\n\nThe lint drags on every save.\n\n# do\n\n<!-- makes the change -->\n\n## says\n\n<!-- what changes and why -->\n\n<!-- the form is text -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+    }
+   }
+  },
+  {
+   "name": "a ticket whose route stands copies nothing",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: draft\nsteps:\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/trivial]]\n---\n\n# Ask\n\nThe lint drags.\n\n# do\n\n# Discussion\n"
+   },
+   "want": {"code": 0, "out": "spec/tickets/slow-lint.md carries a route already, so the fill copies nothing.\n", "errs": "", "files": {}}
+  },
+  {
+   "name": "a ticket naming no process refuses",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nprocess:\n---\n\n# Ask\n\nThe lint drags on every save.\n"
+   },
+   "want": {"code": 2, "out": "", "errs": "Name a process. spec/processes holds note, trivial.\n", "files": {}}
+  },
+  {
+   "name": "a ticket with no process line refuses",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\n---\n\n# Ask\n\nThe lint drags on every save.\n"
+   },
+   "want": {"code": 2, "out": "", "errs": "Name a process. spec/processes holds note, trivial.\n", "files": {}}
+  },
+  {
+   "name": "a path standing nowhere refuses",
+   "argv": ["fill", "spec/tickets/nowhere.md"],
+   "files": {},
+   "want": {"code": 2, "out": "", "errs": "spec/tickets/nowhere.md names no ticket: ./RUNME.sh ticket fill spec/tickets/slow-lint.md\n", "files": {}}
+  },
+  {
+   "name": "no name refuses",
+   "argv": ["fill"],
+   "files": {},
+   "want": {"code": 2, "out": "", "errs": "ticket fill names no ticket: ./RUNME.sh ticket fill spec/tickets/slow-lint.md\n", "files": {}}
+  },
+  {
+   "name": "a process standing nowhere refuses, and names what stands",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nprocess: [[spec/processes/lost]]\n---\n\n# Ask\n\nThe lint drags on every save.\n"
+   },
+   "want": {"code": 2, "out": "", "errs": "spec/processes holds no lost. It holds note, trivial.\n", "files": {}}
+  },
+  {
+   "name": "an empty ask takes the rows the process asks",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nprocess: [[spec/processes/note]]\n---\n\n# Ask\n\n<!-- a comment alone -->\n"
+   },
+   "want": {
+    "code": 0,
+    "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"process\":\"spec/processes/note\"}\n",
+    "errs": "",
+    "files": {
+     "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: draft\nsteps:\n  - name: decide\n    does: says what the note becomes\n    from: anyone\n    by: retro\n    to: retro\n    input: ask\n    evidence:\n      - name: outcome\n        form: text\n        says: what the note becomes\nprocess: [[spec/processes/note]]\nprocess_hash: 90a2d8797c85c4dc\n---\n\n# Ask\n\n<!-- line, as text: the smallest case that shows it -->\n\n# decide\n\n<!-- says what the note becomes -->\n\n## outcome\n\n<!-- what the note becomes -->\n\n<!-- the form is text -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+    }
+   }
+  },
+  {
+   "name": "the front a person wrote and the discussion ride in",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nurgent: true\ngroup: a-group\ndepends_on: [one, two]\nextra: dropped\nprocess: trivial\n---\n\n# Ask\n\n<!-- a comment the fill drops -->\nThe lint drags.\n\nMore of the ask.\n\n## A deeper chapter\n\nKept under the ask.\n\n# Discussion\n\nSomebody says a thing.\n"
+   },
+   "want": {
+    "code": 0,
+    "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"process\":\"spec/processes/trivial\"}\n",
+    "errs": "",
+    "files": {
+     "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nurgent: true\nprocess: [[spec/processes/trivial]]\nprocess_hash: 02f3d2ca62a87850\ngroup: a-group\ndepends_on: [\"one\", \"two\"]\n---\n\n# Ask\n\nThe lint drags.\n\nMore of the ask.\n\n# do\n\n<!-- makes the change -->\n\n## says\n\n<!-- what changes and why -->\n\n<!-- the form is text -->\n\n# Discussion\n\nSomebody says a thing.\n"
+    }
+   }
+  },
+  {
+   "name": "a front the schema refuses refuses the fill",
+   "argv": ["fill", "spec/tickets/slow-lint.md"],
+   "files": {
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: bogus\nprocess: [[spec/processes/trivial]]\n---\n\n# Ask\n\nThe lint drags on every save.\n"
+   },
+   "want": {"code": 2, "out": "", "errs": "The ticket schema refuses this write to spec/tickets/slow-lint.md.\n\n  spec/tickets/slow-lint.md:3:1  Schema.state\n    state reads bogus, and the schema allows draft, open, closed.\n\nRun ./RUNME.sh mint ticket <path> for the shape it names, or park a draft as _name.md.\n", "files": {}}
+  },
+  {
+   "name": "a bare name with --stdout prints",
+   "argv": ["fill", "slow-lint", "--stdout"],
+   "files": {
+    "spec/tickets/slow-lint.md": null,
+    ".se/tickets/slow-lint.md": "---\nkind: [[ticket]]\nprocess: [[spec/processes/trivial]]\n---\n\n# Ask\n\nThe lint drags on every save.\n"
+   },
+   "want": {
+    "code": 0,
+    "out": "---\nkind: [[ticket]]\nstate: draft\nsteps:\n  - name: do\n    does: makes the change\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: 02f3d2ca62a87850\n---\n\n# Ask\n\nThe lint drags on every save.\n\n# do\n\n<!-- makes the change -->\n\n## says\n\n<!-- what changes and why -->\n\n<!-- the form is text -->\n\n# Discussion\n\n<!-- what anybody adds -->\n",
+    "errs": "",
+    "files": {}
+   }
+  }
+ ]
+}

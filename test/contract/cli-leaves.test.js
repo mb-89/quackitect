@@ -53,10 +53,8 @@ test("no source under src, test or level zero names cli.js", () => {
 test("no program stands past the list Go holds", () => {
   const table = String(files.read(join(root, "src", "modules", "verbs", "tree.go")));
   const inGo = goVerbs();
-  const listed = [...table.matchAll(/\{Name: "([a-z]+)"/g)]
-    .map((one) => one[1])
-    .filter((verb) => !inGo.has(verb))
-    .sort();
+  const tableVerbs = [...table.matchAll(/\{Name: "([a-z]+)"/g)].map((one) => one[1]);
+  const listed = tableVerbs.filter((verb) => !inGo.has(verb)).sort();
   const folder = join(root, "src", "scripts", "verbs");
   const programs = files.exists(folder)
     ? files
@@ -66,7 +64,7 @@ test("no program stands past the list Go holds", () => {
         .map((one) => one.slice(0, -3))
         .sort()
     : [];
-  assert.ok(listed.length > 0, "the table lists a verb");
+  assert.ok(tableVerbs.length > 0, "the table lists a verb");
   assert.deepEqual(
     programs.filter((one) => !listed.includes(one)),
     [],

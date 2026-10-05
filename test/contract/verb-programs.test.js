@@ -9,7 +9,6 @@ import { pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
-import { run as graph } from "../../src/scripts/verbs/graph.js";
 import { commands, goVerbs } from "./commands.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -19,7 +18,9 @@ test("every verb of the table loads as a program answering a run, or registers i
   const go = goVerbs();
   const listed = new Set(commands().keys());
   const files = disk();
-  for (const { name: one } of files.list(join(ROOT, ...VERBS))) {
+  const folder = join(ROOT, ...VERBS);
+  const programs = files.exists(folder) ? files.list(folder) : [];
+  for (const { name: one } of programs) {
     assert.ok(
       listed.has(one.replace(/\.js$/, "")),
       `${one} answers no verb of the table`,
@@ -38,15 +39,4 @@ test("every verb of the table loads as a program answering a run, or registers i
 
 test("the lens names the folder the runner owns", () => {
   assert.equal(PROGRAMS, VERBS.join("/"));
-});
-
-// A graph with no path refuses with its usage, before any read. [[spec/tickets/cli-js-leaves]]
-test("the graph program refuses a call naming no path", async () => {
-  const was = console.error;
-  console.error = () => {};
-  try {
-    assert.equal(await graph([]), 2);
-  } finally {
-    console.error = was;
-  }
 });

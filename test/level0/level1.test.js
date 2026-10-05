@@ -11,7 +11,6 @@ import {
   sessionOf,
   spawnPromptIn,
 } from "../../.claude/skills/level0/lib/pull.js";
-import { pullArgvOf } from "../../src/scripts/pull-tool.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 // The hooks level one registers, keyed by their event. A registration carries a filter between the event and the handler, so the last argument is the handler. [[spec/design_output/pull#the-checks]]
@@ -73,42 +72,8 @@ test("the wrapper reads the prompt out of a spawn answer, and nothing out of any
   assert.equal(spawnPromptIn(""), "");
 });
 
-// [[spec/design_output/pull#the-hand-out]]
-test("the tool's input reads into the same words a person types", () => {
-  const tool = (said, ...more) =>
-    pullArgvOf(["pull", "--tool", JSON.stringify(said), ...more]);
-  assert.deepEqual(tool({}), ["pull"]);
-  assert.deepEqual(tool({ ticket: "a-child", verdict: "pass" }), [
-    "pull",
-    "a-child",
-    "--pass",
-  ]);
-  assert.deepEqual(tool({ ticket: "a-child", verdict: "fail", reason: "thin" }), [
-    "pull",
-    "a-child",
-    "--fail",
-    "thin",
-  ]);
-  assert.deepEqual(tool({ ticket: "a-child", verdict: "became", reason: "a-group" }), [
-    "pull",
-    "a-child",
-    "--became",
-    "a-group",
-  ]);
-  assert.deepEqual(
-    tool({ ticket: "a-child", verdict: "answered", reason: "a-group" }),
-    ["pull", "a-child", "--answered", "a-group"],
-  );
-  assert.deepEqual(
-    tool({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
-    ["pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
-  );
-  assert.deepEqual(pullArgvOf(["pull", "a-child", "--pass"]), [
-    "pull",
-    "a-child",
-    "--pass",
-  ]);
-  assert.deepEqual(pullArgvOf(["pull", "--tool", "not json"]), ["pull"]);
+// The verb reads the input into an argv, which TestPullArgvOf in src/pull/pull_test.go decides. [[spec/design_output/pull#the-hand-out]]
+test("the tool registers as pull, and its verdict takes the four words", () => {
   assert.equal(PULL_CALL, "mcp__level0__pull");
   assert.equal(pullSpec().name, "pull");
   assert.deepEqual(pullSpec().inputSchema.properties.verdict.enum, [
@@ -207,8 +172,8 @@ test("an event naming no session writes nothing, and says the hand stands at the
   assert.match(box.lines.join("\n"), /the hand stands at the box/);
 });
 
-// The hook matches the name the plugin registers, and runs the script under the method root. [[spec/design_output/pull#the-checks]]
-test("the pull hook matches the level zero call, and runs the script the method root holds", async () => {
+// The hook matches the name the plugin registers, and runs the verb through the binary under the method root. [[spec/design_output/pull#the-checks]]
+test("the pull hook matches the level zero call, and runs the verb through the binary the method root holds", async () => {
   const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
   const calls = [];
   register(
@@ -230,10 +195,13 @@ test("the pull hook matches the level zero call, and runs the script the method 
     },
   };
   assert.deepEqual(await handler($, {}, async () => null), { result: "wait" });
-  assert.deepEqual(ran[0].slice(0, 3), [
-    "node",
-    "/vehicle/src/scripts/verbs/ticket.js",
+  assert.deepEqual(ran[0].slice(0, 6), [
+    "/vehicle/.se/.runtime/bin/se-index",
+    "verb",
+    "/vehicle/src/scripts",
+    "ticket",
     "pull",
+    "--tool",
   ]);
 });
 

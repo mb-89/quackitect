@@ -27,7 +27,7 @@ body:
 func TestARerouteKeepsTheHeldChapters(t *testing.T) {
 	text := "---\nkind: \"[[ticket]]\"\nstate: open\nsteps:\n  - name: build\n    does: builds it\nstep: build\n---\n\n# Ask\n\nBuild it.\n\n# build\n\nIt builds.\n"
 	steps := yaml.AsDoc(yaml.Read("steps:\n  - name: person-1\n    does: answers\n  - name: build\n    does: builds it\n")).Get("steps")
-	said := ReRouted(text, yaml.AsDoc(yaml.Read(routeSchema)), steps)
+	said := ReRouted(text, yaml.AsDoc(yaml.Read(routeSchema)), yaml.AsList(steps), "")
 	for _, want := range []string{"  - name: person-1\n", "# Ask\n\nBuild it.\n", "# person-1\n\n<!-- answers -->\n", "# build\n\nIt builds.\n"} {
 		if !strings.Contains(said, want) {
 			t.Fatalf("the re-route holds no %q:\n%s", want, said)

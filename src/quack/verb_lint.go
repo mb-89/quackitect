@@ -25,12 +25,12 @@ import (
 
 // The path naming the whole tree, the rule the box decides in place of the sweep, the rows the warn row names, the width of a count, and the log row's kind, as cli-read.js named them. [[spec/design_output/lsp#the-lint-ends-on-findings]]
 const (
-	lintWhole = "."
-	lintBox   = "SurveyFindsNode"
-	lintShown = 3
-	lintWidth = 6
-	lintKind  = "vale"
-	logFloor  = "log.level"
+	lintWhole   = "."
+	lintBox     = "SurveyFindsNode"
+	lintShown   = 3
+	lintWidth   = 6
+	lintKind    = "vale"
+	logFloorKey = "log.level"
 )
 
 // What the lint reads: the root, the tools over the paths named, the check module's sweep, the box's survey rule, the session log and the clock. [[spec/tickets/read-verbs-port-to-go]]
@@ -56,7 +56,7 @@ func lintHere() (lintDoors, error) {
 		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
 		sweep: func() ([]check.Finding, error) { return sweepRows(index.Ask) },
 		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
-		log:   keepsFloor(sliceMode(root, logFloor), appendsRow(root, time.Now)),
+		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
 		now:   time.Now,
 	}, nil
 }

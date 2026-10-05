@@ -14,12 +14,12 @@ import { PULL_CALL, pullSpec, SESSION, sessionOf, spawnPromptIn } from "../lib/p
 // One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
 import { register as bridgehead } from "./level0.js";
 
-// The ticket program, whose folder `VERBS` in src/scripts/verb-run.js owns, spelled again here because a plugin imports its own folder alone. [[spec/tickets/cli-js-leaves]]
-const TICKET_SCRIPT = "src/scripts/verbs/ticket.js";
-// The script stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
-let cli = ["node", TICKET_SCRIPT];
-// The word and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
-const PULL = ["pull"];
+// The scripts folder the binary's verb road takes, as RUNME.sh hands it over. [[spec/tickets/cli-js-leaves]]
+const SCRIPTS = "src/scripts";
+// The binary stands under the method root, which a project root holds nowhere, so the call names it whole. [[spec/design_output/vehicle#the-work-root-inherits]]
+let cli = [binaryOf(".", false), "verb", `./${SCRIPTS}`];
+// The verb and the flag `PullArgvOf` in src/pull/pull.go reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
+const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
 const RUNNING = 600000;
 const BACKGROUND =
@@ -27,8 +27,8 @@ const BACKGROUND =
 
 export function register(on, options) {
   const method = String(options?.method ?? "").replace(/[\\/]+$/, "");
-  cli = ["node", method ? `${method}/${TICKET_SCRIPT}` : TICKET_SCRIPT];
   const bin = binaryOf(method || ".", windowsOf(method));
+  cli = [bin, "verb", `${method || "."}/${SCRIPTS}`];
   let indexTools = [];
   // The index tools answer here, before the bridgehead routes a served tool to the server. [[spec/tickets/the-hook-registers-index-tools]]
   on("tool.call", async ($, e, next) =>
@@ -86,7 +86,7 @@ function says($, line) {
   } catch {}
 }
 
-// The hook hands the raw input over, and the ticket program reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
+// The hook hands the raw input over, and the ticket pull verb reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
 function toolCall(e) {
   return [...cli, ...PULL, TOOL, JSON.stringify(e ?? {})];
 }
