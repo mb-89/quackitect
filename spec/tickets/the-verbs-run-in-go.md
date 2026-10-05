@@ -84,7 +84,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
-step: children
+step: accept
 cloud: true
 record:
   - step: sync
@@ -108,6 +108,10 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 01f66aba2fd217944e501956122508ecb653ffa5
+    hash_after: 01f66aba2fd217944e501956122508ecb653ffa5
 ---
 
 # Ask
