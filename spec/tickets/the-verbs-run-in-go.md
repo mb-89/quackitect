@@ -84,7 +84,7 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
-step: retro/write
+step: retro/cloud
 cloud: true
 record:
   - step: sync
@@ -140,6 +140,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: f3969a82c02bf172f81456c63e05e6d1a469e470
+    hash_after: f3969a82c02bf172f81456c63e05e6d1a469e470
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -226,38 +238,65 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- pull request 105 of the-node-road-closes merged, after its Windows job passed on re-run
+- box-verbs-windows-fakes closed on the evidence of pull request 96
+- landing-verbs-windows-green closed on the evidence of pull request 93
+- manager-tests-wait-for-the-binary minted and closed: the manager tests wait for the stopped index to let go of the binary
+- the-verbs-run-in-go passed sync, split, accept and notes
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the failed Windows log named the test and the locked file, so the cause took one read
+- the pull handed every child in order once the trivial tickets joined this group
+- branch sync took the diverged remote branch in where the door refused a plain merge
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 19:21 UTC: branch open pushed the work branch, then tried a push of main for its marker, and left a local main commit behind
+- 19:22 to 19:26 UTC: the door refused reset, merge and pull, while the pull itself named a pull with rebase as the fix
+- 19:25 UTC: any working value in the plan held the pull at wait, a ticket name included, until a done cleared it
+- 19:33 UTC: a helper in its own worktree could write nothing, since the door serves the main checkout and the ticket stood closed
+- 19:34 UTC: a stop of the index run inside that worktree stopped the index of this session, and the door refused every call until serve ran
+- 19:47 UTC: the index_ticket_pull tool answered that no hook serves it, so the hand-back went through the pull tool
+- 19:48 UTC: a tests field naming go test came back refused, since the field wants the green the branch test verb answers
+- the owner sent one prompt, the opening ask, and none turned the run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- branch open: a cloud box pushes its work branch alone, and skips the marker push of main
+- the pull: its refusal on a diverged branch names branch sync, the verb the door lets pass
+- the plan: a working value naming a ticket the pull hands out holds no wait
+- the helper road: a helper that writes runs in the main checkout, or the door serves its worktree
+- index_ticket_pull: the plugin answers it, or the hand-back lines name the pull tool
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The Windows failure was a race in the cleanup, not in the code under test. A re-run that passes hides a race like that, so this group kept a fix of its own rather than wait for the next red run. The two trivial tickets carried finished work, and only their closed groups kept the pull from handing them out.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: each line points at a ticket, a commit or a verb, and copies no rule
+- numbers: the times and job ids fix sources, and the change adds no constant
+- headers: the change writes no file header
+- prompts and errors: every error of the run stands under badly with its time, and the one owner prompt too
+- role: the chapter names the box and the owner by role, with no path or address
 
 ## cloud
 
