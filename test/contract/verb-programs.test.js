@@ -1,5 +1,5 @@
 // Every verb program loads over the real doors and hands its words to a run,
-// the vehicle bodies stand beside them, and the lens names their folder.
+// and the lens names their folder. A verb running in Go carries no program.
 // [[spec/tickets/cli-js-leaves]]
 
 import assert from "node:assert/strict";
@@ -8,7 +8,6 @@ import { test } from "node:test";
 import { pathToFileURL } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { PROGRAMS } from "../../src/extension/lib/lens.js";
-import { theStub, theVehicle } from "../../src/scripts/vehicle-verb.js";
 import { VERBS } from "../../src/scripts/verb-run.js";
 import { run as graph } from "../../src/scripts/verbs/graph.js";
 import { commands, goVerbs } from "./commands.js";
@@ -35,11 +34,6 @@ test("every verb of the table loads as a program answering a run, or registers i
       assert.ok(go.has(verb), `${verb} stands as no program and registers no Go verb`);
     }
   }
-});
-
-test("the vehicle bodies stand beside the programs", () => {
-  assert.equal(typeof theVehicle, "function");
-  assert.equal(typeof theStub, "function");
 });
 
 test("the lens names the folder the runner owns", () => {

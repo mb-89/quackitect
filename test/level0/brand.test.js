@@ -6,9 +6,7 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import test from "node:test";
 import * as vehicle from "../../.claude/skills/level0/lib/vehicle.js";
-import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeGit } from "../../src/doors/fake/git.js";
 import {
   BRAND,
   EXTENSION,
@@ -18,22 +16,8 @@ import {
   PLUGIN,
   stamps,
 } from "../../src/scripts/brand.js";
-import { stubInto } from "../../src/scripts/stub.js";
 
 const { brandOf, brandedJson, shimSettings } = vehicle;
-const REMOTE = "git remote get-url origin";
-
-// A vehicle in a folder whose name slugs to nothing. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-function nameless(at) {
-  return fakeDisk({
-    [`${at}/.claude/skills/level0/.claude-plugin/plugin.json`]: "{}",
-    [`${at}/RUNME.sh`]: "run me",
-    [`${at}/package.json`]: '{"version":"0.1.0"}',
-    [`${at}/.claude/settings.json`]: "{}",
-    [`${at}/.se/.runtime/identity.json`]:
-      '{"id":"abc","made":"2026-01-01T00:00:00.000Z"}',
-  });
-}
 
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 test("a folder name answers the slug a marketplace takes", () => {
@@ -116,17 +100,6 @@ test("settings the disk holds in no readable shape answer a fresh pair", () => {
   assert.equal(typeof shimSettings, "function", "vehicle.js answers shimSettings");
   const held = JSON.parse(shimSettings("{ not json", "/vehicles/acme", "acme"));
   assert.deepEqual(held.enabledPlugins, ["level0@acme"]);
-});
-
-// The brand enters the record, so the empty one stops there. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-test("a vehicle whose folder slugs to nothing refuses the stub, and writes nothing", () => {
-  const files = nameless("/...");
-  const git = fakeGit({ [REMOTE]: { stdout: "git@host:a/b.git\n" } }, "/...");
-  const said = stubInto(files, git, fakeClock(), "/...", "/stub", 7);
-  assert.equal(said.ok, false);
-  assert.match(said.why, /empty brand/);
-  assert.match(said.why, /Rename the folder/);
-  assert.equal(files.exists("/stub"), false);
 });
 
 // The sources the brand folder holds, as the tree tracks them. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]

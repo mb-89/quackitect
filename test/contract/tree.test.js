@@ -116,7 +116,7 @@ test("every verb the Bash description names stands as a program or in Go", () =>
 // The count chain left the tree: no verb, viewer or badge line spells the count flag, so the badge asks the index. [[spec/tickets/count-grep-misses-the-scripts]]
 test("no count chain stands in the verb, the viewer or the badge line", () => {
   for (const path of [
-    join(SCRIPTS, "tui.js"),
+    join(root, "src", "quack", "tui_verb.go"),
     join(root, "src", "tui", "main.go"),
     join(root, SCHEMA),
   ]) {
