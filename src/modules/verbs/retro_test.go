@@ -10,7 +10,7 @@ import (
 	"quackitect/src/q"
 )
 
-// Every verb retro.js answers stands as an action of the retro topic, with its doc. [[spec/tickets/retro-verbs-become-actions]]
+// Every retro verb stands as an action of the retro topic, with its doc. [[spec/tickets/retro-verbs-become-actions]]
 func TestEveryRetroVerbStandsAsAnAction(t *testing.T) {
 	want := []string{"notes", "audit", "backlog", "collect", "timeline", "chapters", "matrix", "read", "effect", "classes", "mint", "new", "score"}
 	var names []string

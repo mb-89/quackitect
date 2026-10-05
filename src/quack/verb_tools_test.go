@@ -7,7 +7,6 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	verbsmodule "quackitect/src/modules/verbs"
@@ -27,17 +26,11 @@ var topics = map[string][]verbsmodule.Verb{
 	"stub":    verbsmodule.StubVerbs,
 }
 
-func programTable(t *testing.T) []string {
-	t.Helper()
-	listed, err := os.ReadDir(filepath.Join("..", "..", filepath.FromSlash(programsFolder)))
-	if err != nil {
-		t.Fatal(err)
-	}
+// The verbs the command line answers, off the one table Go holds. [[spec/tickets/cli-js-leaves]]
+func verbTable() []string {
 	var out []string
-	for _, one := range listed {
-		if verb, ok := strings.CutSuffix(one.Name(), ".js"); ok {
-			out = append(out, verb)
-		}
+	for _, one := range verbsmodule.Commands {
+		out = append(out, one.Name)
 	}
 	return out
 }
@@ -73,9 +66,9 @@ func registered(t *testing.T) map[string]bool {
 
 func TestEveryVerbStandsAmongTheTools(t *testing.T) {
 	tools := registered(t)
-	table := programTable(t)
+	table := verbTable()
 	if len(table) == 0 {
-		t.Fatalf("%s lists no verb", programsFolder)
+		t.Fatal("the verb table lists no verb")
 	}
 	var missing []string
 	for _, verb := range table {

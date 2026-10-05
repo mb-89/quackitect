@@ -7,7 +7,12 @@ import { test } from "node:test";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { RESUME } from "../../src/bridge/handover.js";
-import { DRY, engineOf, harnessOf, readsDry } from "../../src/scripts/probe-dry.js";
+import {
+  DRY,
+  engineOf,
+  harnessOf,
+  readsDry,
+} from "../../src/scripts/probe-dry.js";
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
 

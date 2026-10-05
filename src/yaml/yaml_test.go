@@ -78,3 +78,14 @@ func TestReadYamlKeepsTheOrder(t *testing.T) {
 		}
 	}
 }
+
+func TestAQuotedItemStaysText(t *testing.T) {
+	said := AsDoc(Read("checklist:\n  - \"a colon: stays text\"\n  - \"a\": \"b\"\ntags: [\"one, two\", three]\n"))
+	list := AsList(said.Get("checklist"))
+	if len(list) != 2 || list[0] != "a colon: stays text" || AsDoc(list[1]) == nil {
+		t.Fatalf("the checklist reads %#v", list)
+	}
+	if tags := StringsOf(said.Get("tags")); len(tags) != 2 || tags[0] != "one, two" || tags[1] != "three" {
+		t.Fatalf("the flow list reads %#v", tags)
+	}
+}

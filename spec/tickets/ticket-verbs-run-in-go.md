@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -84,9 +84,104 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: the-verbs-run-in-go
 enabled_by: migration.phase11
-cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: sync
+step: retro/cloud
+record:
+  - step: sync
+    hand: box f2894f4960c9 · claude-code-remote
+    hash_before: 26864ccd2807eebb8798e6346153d1e3fa86a4b7
+    hash_after: 6b053f734c9fc85e5a85a0603f8d416293eb0295
+  - step: sync
+    hand: box e4806dfa3c6f · claude-code-remote
+    hash_before: 6b053f734c9fc85e5a85a0603f8d416293eb0295
+    hash_after: 150cfaee42c5d1a619a4a2e6d6e94d67878afe5a
+  - step: sync
+    hand: box d04971dbe062 · claude-code-remote
+    hash_before: 150cfaee42c5d1a619a4a2e6d6e94d67878afe5a
+    hash_after: 06e9cfd815c68953b7d09f3ece3ec0a5f17dc51f
+  - step: sync
+    hand: box 3ff4db8dd1e6 · claude-code-remote
+    hash_before: 06e9cfd815c68953b7d09f3ece3ec0a5f17dc51f
+    hash_after: 49a2b840dd9d75ceb4bc84ba131f30c94141eac9
+  - step: sync
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: 49a2b840dd9d75ceb4bc84ba131f30c94141eac9
+    hash_after: d7b1acb7d176aa1db8d9da2ec993aba91332bb43
+  - step: sync
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: 6e7bb16c463629b5f360c325d8cc31d1efe9baa7
+    hash_after: 6e7bb16c463629b5f360c325d8cc31d1efe9baa7
+    answered:
+      - name: sync
+        exit: 0
+        said: work/ticket-verbs-run-in-go already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: a001c5df19cf67751f53b941f2e4e51aa5bc9f17
+    hash_after: a001c5df19cf67751f53b941f2e4e51aa5bc9f17
+    inputs:
+      - name: ask
+        hash: 6456d34f61a5fe56
+        size: 307
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 4c123228a71c63f67940bc66df87a67cf0329b6d
+    hash_after: 4c123228a71c63f67940bc66df87a67cf0329b6d
+  - step: accept
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: 87c16d92461d12eb12a00a5327d6063e36574bd9
+    hash_after: 87c16d92461d12eb12a00a5327d6063e36574bd9
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/ticket-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 6456d34f61a5fe56
+        size: 307
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: 74a63997df96b2c3ff6bca58b8f9df54763b37de
+    hash_after: 74a63997df96b2c3ff6bca58b8f9df54763b37de
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: 64609ef519a00d36a2ea4601e7302cca9c54b6c0
+    hash_after: 64609ef519a00d36a2ea4601e7302cca9c54b6c0
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: d3cf8ca94e38097139b90dc50d711ac04365bf9f
+    hash_after: d3cf8ca94e38097139b90dc50d711ac04365bf9f
+    inputs:
+      - name: retro/write
+        hash: dc61dfbe305d932a
+        size: 3140
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -102,8 +197,9 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -112,14 +208,21 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/ticket-verbs-port-to-go]], standard
+- [[spec/tickets/ticket-sub-verb-red-cases]], trivial
+- [[spec/tickets/ticket-verbs-importer-case]], trivial
+- [[spec/tickets/verbs-name-frontmatter-writer]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: the port lands in one commit a sub-verb, and the three trivial children each answer one gate point
+- the children add up to the goal: the port carries every verb and every deletion, and the three points close the gaps its gate named
+- no child waits on another past the order the pull hands them out, and every child stands closed
 
 # children
 
@@ -130,8 +233,9 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -142,8 +246,9 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -152,38 +257,62 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the main merge: rules.go takes the RulesOf from main and keeps both tests, the hashed re-route stays over the twin port main carried, and the lint names its config key apart
+- ticket-sub-verb-red-cases: ticket note, open, bless and the bare ticket run in Go, each red before its code
+- ticket-verbs-importer-case: the importer subtest stands, and passes once the modules leave
+- verbs-name-frontmatter-writer: every port writes its front through src/front, and the clear probe names its clone as the root
+- ticket-verbs-port-to-go: the four verbs run in Go, and their programs and the modules only they imported leave
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- three helpers ported the three sub-verbs side by side, each in files of its own, so no write collided
+- the pull already held bless, open and the mint in Go, so each sub-verb stands as a thin shell
+- a fresh reviewer read the whole diff at the gate and found no defect
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 05:25 the merge commit came back refused three times: graph and mint programs stood beside their Go twins, a test ran a deleted program, and a path list made git refuse a partial merge commit
+- 05:35 the write door answered that level zero is starting for two of three helpers through their whole run, so two helpers came back with nothing written
+- 05:40 the stop hook refused the stop reason that helpers still run six times, though four helpers ran
+- 06:05 the commit check stopped the level zero server twice, and writes waited until the serve verb started it again
+- 06:30 a hand-back ran the check under the pull, the probe minted its group in this tree off an inherited root, and the next hand-back committed the stray ticket
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the commit verb in src/quack/commit.go: a partial path list during a merge commits the whole index, so a merge lands through one call
+- the stop hook under .claude/skills/level0/hooks: it reads the helpers the Agent tool runs before it refuses that reason
+- the check in src/quack/check.go: a test that stops the index starts the server again before the check ends
+- the hand-back in src/pull: a command field runs with QUACKITECT_ROOT cleared, so no child writes into the tree it judges
+- a ticket for the dead JavaScript the gate named: the dispatcher half of src/scripts/ticket.js, the four ticket helper modules it alone imports and src/scripts/graph.js, with the tests that hold them
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The port itself was the small part. Most of the run went into the doors around it: the merge gate, the write door going down, the stop hook and a probe writing where it stood. Each one cost a retry, and the gate caught every real break before it reached origin. The one break that slipped through, the stray probe ticket, came from a variable no test watched.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands once: the retro names each home and repeats no rule
+- no number in the change goes unnamed: the one constant each test adds carries a name
+- each header says what its file is for and counts nothing
+- the run had no owner prompt, since a schedule fired it, and the errors stand with their times
+- the chapter names the role, and carries no name or path of the box
 
 ## cloud
 
@@ -192,20 +321,29 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 05:25 onward the proxy refused www.google.com on every commit check, and the check passed past it
+- the GitHub CLI stands absent on this box, so the work skill opens the pull request through the GitHub tools
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 05:20 a conflict at take: two files under src/modules/hooks/brief, and two twin ports and one twin constant git did not flag
+- 05:35 the write door hook answered that level zero is starting until the serve verb ran
+- 05:40 the stop hook held the turn while helpers ran
+- the shell door refused a heredoc, a python write and git rm, so every write went through the patch tool
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked, since accept and view on the port closed by the route
+- no ticket stands minted outside the group
+- the retro names the follow-up for the dead JavaScript under improve, for the next retro to mint
 
 # Discussion
 

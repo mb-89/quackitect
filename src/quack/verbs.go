@@ -46,16 +46,6 @@ const (
 // A Go answer to a verb a program answers too, which writes nothing where dry holds. [[spec/tickets/runme-hands-verbs-to-quack]]
 type twin func(argv []string, dry bool, out, errs io.Writer) int
 
-// The twins each topic ports, keyed by the verb's words. [[spec/tickets/runme-hands-verbs-to-quack]]
-var twinVerbs = map[string]twin{
-	// [[spec/tickets/ticket-verbs-become-actions]]
-	"ticket yours": ticketYours(index.V1),
-	// [[spec/tickets/retro-verbs-become-actions]]
-	"retro notes": retroNotes(index.V1),
-	// [[spec/tickets/work-verbs-become-actions]]
-	"branch list --queue": branchQueue(index.V1),
-}
-
 // What the road reaches: the mode, the verb's program writing its standard output into out, a verb quack answers alone, the twins, the session log and the caller's streams. [[spec/tickets/runme-hands-verbs-to-quack]]
 type verbDoors struct {
 	mode      string
@@ -67,7 +57,7 @@ type verbDoors struct {
 }
 
 // The verbs a program answers under the same word, which keep its road. [[spec/tickets/quack-tools-spares-runme-tools]]
-var programKeeps = map[string]bool{"help": true, "tools": true, "act": true}
+var programKeeps = map[string]bool{"help": true, "act": true}
 
 // Whether quack answers the verb alone: a verb of the table past the ones a program keeps. [[spec/tickets/quack-alone-verbs-skip-mode]]
 func aloneOf(argv []string, table map[string]bool) bool {
@@ -85,9 +75,9 @@ func twinOf(argv []string, twins map[string]twin) (string, twin) {
 	return "", nil
 }
 
-// The road a verb takes under the mode: a verb quack answers alone takes quack under every mode, and a twin runs beside the program in shadow and alone under new. [[spec/tickets/runme-hands-verbs-to-quack]]
+// The road a verb takes under the mode: a verb Go registers whole takes quack under every mode, a twin of a verb's words runs beside the program in shadow and alone under new, ahead of quack's own verb of the same word, and a verb quack answers alone takes quack under every mode. [[spec/tickets/runme-hands-verbs-to-quack]] [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/registered-verb-skips-the-mode]]
 func roadOf(mode string, argv []string, twins map[string]twin) road {
-	if aloneOf(argv, cliVerbs) {
+	if wholeOf(argv, twins) {
 		return toQuack
 	}
 	if _, one := twinOf(argv, twins); one != nil {
@@ -97,8 +87,17 @@ func roadOf(mode string, argv []string, twins map[string]twin) road {
 		case modeNew:
 			return toQuack
 		}
+		return toNode
+	}
+	if aloneOf(argv, cliVerbs) {
+		return toQuack
 	}
 	return toNode
+}
+
+// Whether Go registers the verb whole, under its one word, so no program stands beside it and no mode sends it to one. [[spec/tickets/registered-verb-skips-the-mode]]
+func wholeOf(argv []string, twins map[string]twin) bool {
+	return len(argv) > 0 && twins[argv[0]] != nil
 }
 
 // Runs the verb on its road, and answers the exit code the caller reads. In shadow the old answer stands, and the twin runs dry beside it. [[spec/tickets/runme-hands-verbs-to-quack]]
@@ -222,7 +221,7 @@ func appendsRow(root string, now func() time.Time) func(row map[string]any) erro
 	}
 }
 
-// The road over the real doors: each verb's program under node, the tree over V1, the twins and the session log under the root. [[spec/tickets/cli-js-leaves]]
+// The road over the real doors: each verb's program under node, the tree over V1, the registered verbs and the session log under the root. [[spec/tickets/cli-js-leaves]] [[spec/tickets/quack-registers-each-verb]]
 func verbRoad(scripts string, argv []string) int {
 	root, err := index.Root()
 	if err != nil {
@@ -234,7 +233,7 @@ func verbRoad(scripts string, argv []string) int {
 		mode:  modeOf(root),
 		old:   programDoor(scripts, argv, os.Stdin, os.Stderr, signals),
 		alone: func(argv []string) int { return routes(os.Stdout, os.Stderr, index.V1, argv) },
-		twins: twinVerbs,
+		twins: registry,
 		log:   appendsRow(root, time.Now),
 		out:   os.Stdout,
 		errs:  os.Stderr,

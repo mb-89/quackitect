@@ -33,9 +33,8 @@ const (
 	// The span between two sweeps on the clock. [[spec/design_output/index#a-change-moves-its-rows]]
 	sweepEvery = 10 * time.Minute
 	// Git's own index, which a watch on its folder names when the tracked list turns. [[spec/design_output/index#a-change-moves-its-rows]]
-	gitIndex       = ".git/index"
-	decimalBase    = 10
-	stopGraceDelay = 100 * time.Millisecond
+	gitIndex    = ".git/index"
+	decimalBase = 10
 	// A changes call waits this long for a sweep, under the wait a caller gives a post. [[spec/design_output/index#the-index-fires-on-change]]
 	changesWait = 25 * time.Second
 )
@@ -544,13 +543,6 @@ func stampOf(bin string) string {
 		return ""
 	}
 	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), decimalBase)
-}
-
-// [[spec/design_output/index#a-door-comes-back]]
-func stopsSoon(root string) {
-	time.Sleep(stopGraceDelay)
-	dropsOwn(root, pidOf())
-	os.Exit(0)
 }
 
 type errorOf string

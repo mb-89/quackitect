@@ -1,5 +1,5 @@
 // Each reader takes the Go topic where its slice reads new: the config verb,
-// the log verb, the guidance verb and the prose reader. A topic answering
+// the guidance verb and the prose reader. The log verb runs in Go. A topic answering
 // nothing leaves the reader on its old path.
 // [[spec/tickets/readers-take-the-go-topics]]
 
@@ -14,13 +14,10 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { readConfig } from "../../src/scripts/cli-check.js";
 import { guidance } from "../../src/scripts/guidance-verb.js";
-import { logVerb } from "../../src/scripts/log-verb.js";
 import { handed } from "../../src/scripts/pull-hand.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import {
-  configRowsOf,
   keptOf,
   keptOver,
   notesOf,
@@ -84,45 +81,11 @@ test("readsNew holds where the slice reads new, and nowhere else", () => {
   assert.equal(readsNew(itOf("old", {}, {}), "log"), false);
 });
 
-test("configRowsOf reads the module's map as rows in key order, values as quack config prints them", () => {
-  const rows = configRowsOf({
-    "b.two": { value: "x", layer: "local" },
-    "a.one": { value: 3, layer: "tracked" },
-  });
-  assert.deepEqual(rows, [
-    { key: "a.one", value: 3, layer: "tracked" },
-    { key: "b.two", value: "x", layer: "local" },
-  ]);
-});
-
-test("the log verb prints the rows quack log answers where the log slice reads new", async () => {
-  const held = `${JSON.stringify({ at: AT, level: "info", kind: "tool", said: "the old file says" })}\n`;
-  const answered = [{ at: AT, level: "info", kind: "tool", said: "the module says" }];
-  const it = itOf(
-    "new",
-    { [join(ROOT, SESSION)]: held },
-    {
-      [`${QUACK} log`]: { stdout: JSON.stringify(answered) },
-    },
-  );
-  const out = await printed(() => logVerb(it, []));
-  assert.match(out, /the module says/);
-  assert.doesNotMatch(out, /the old file says/);
-});
-
 // A topic answering nothing is a fault on a new slice, and no reader falls back to its old path. [[spec/tickets/topic-fallback-leaves-the-readers]]
 test("every reader on a new slice faults where its topic answers nothing, naming the topic", async () => {
   const held = `${JSON.stringify({ at: AT, level: "info", kind: "tool", said: "the old file says" })}\n`;
   const it = itOf("new", { [join(ROOT, SESSION)]: held }, {});
   const set = { rule: "Voice.Other", line: 1, column: 10, said: "set", file: "n.md" };
-  await assert.rejects(
-    () => printed(() => logVerb(it, [])),
-    /quack log answers nothing/,
-  );
-  await assert.rejects(
-    () => printed(() => readConfig([], it)),
-    /quack config answers nothing/,
-  );
   assert.throws(
     () => readsProse(it, "the door set the write\n", [set]),
     /quack prose answers nothing/,
@@ -147,18 +110,16 @@ test("each reader runs quack once, and no shadow runs beside it", async () => {
       { [join(ROOT, SESSION)]: held },
       {
         [`${QUACK} prose`]: { stdout: JSON.stringify({ docs: [{ kept: [] }] }) },
-        [`${QUACK} log`]: { stdout: "[]" },
       },
     ),
     config: { ask: async () => "shadow" },
   };
   readsProse(it, "the door set the write\n", [set]);
   readsText(it, "n.md", "the door set the write\n", [set]);
-  await printed(() => logVerb(it, []));
   await new Promise((done) => setImmediate(done));
   assert.deepEqual(
     it.proc.ran.map((one) => one.argv.slice(1).join(" ")),
-    ["prose", "prose", "log"],
+    ["prose", "prose"],
   );
 });
 
@@ -319,18 +280,4 @@ test("keptOf answers what keptOver answers for its one text, and a short answer 
     "one doc answered for two reads as nothing",
   );
   assert.deepEqual(keptOver(it, [], "past"), [], "no text asks no quack");
-});
-
-test("readConfig prints the rows quack config answers where the config slice reads new", async () => {
-  const it = itOf(
-    "new",
-    {},
-    {
-      [`${QUACK} config`]: {
-        stdout: JSON.stringify({ "a.one": { value: "from go", layer: "tracked" } }),
-      },
-    },
-  );
-  const out = await printed(() => readConfig(["a.one"], it));
-  assert.match(out, /a\.one\s+from go\s+tracked/);
 });

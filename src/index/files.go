@@ -96,6 +96,9 @@ func hashUnits(units []uint16) string {
 	return fmt.Sprintf("%08x%08x", low, high)
 }
 
+// The hash hashText in .claude/skills/level0/lib/hash.js answers over a text. [[spec/design_output/tui#the-verb-builds-it]]
+func HashText(text string) string { return hashUnits(utf16.Encode([]rune(text))) }
+
 // The text of each path named, or of every path where none is named. A binary file answers the empty text. [[spec/design_output/index#a-reader-takes-the-tree]]
 func Texts(db *sql.DB, paths []string) (map[string]string, error) {
 	query, args := `SELECT path, text FROM file`, []any{}

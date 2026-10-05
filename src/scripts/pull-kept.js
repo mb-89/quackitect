@@ -4,13 +4,27 @@
 // [[spec/design_output/pull#kept-red-leaves]]
 
 import { frontOf, recordIn } from "../engine/group.js";
+import { chapterOf } from "./pull-chapter.js";
 import { walkOf } from "./pull-route.js";
-import { redListOf } from "./red-list.js";
 
 const RED = "assertion";
 const TESTS = "test/";
 const GONE = "D";
 const SHORT = 9;
+const FIELD = "red";
+
+// The files one red leaf names under its red field. [[spec/design_output/pull#kept-red-leaves]]
+export function redListOf(text, path) {
+  // A row a list payload wrote before formatted took arrays holds its paths joined by commas. [[spec/design_output/pull#kept-red-leaves]]
+  return (chapterOf(text, path).fields.get(FIELD) ?? [])
+    .flatMap((row) =>
+      String(row)
+        .replace(/^[-*]\s+/, "")
+        .split(","),
+    )
+    .map((one) => one.replaceAll("`", "").trim())
+    .filter(Boolean);
+}
 
 // [[spec/design_output/pull#kept-red-leaves]]
 export function keptRed(it, text, leaf, name = "") {

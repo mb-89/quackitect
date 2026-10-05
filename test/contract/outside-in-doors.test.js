@@ -9,8 +9,8 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { at, configSections, ruleAt, rulesIn } from "./ruled.js";
 import { it } from "../../src/scripts/cli-doors.js";
+import { at, configSections, ruleAt, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -29,7 +29,6 @@ const ROOTS = [
   "src/scripts/prepush.js",
   "src/scripts/trust.js",
   "src/scripts/copilot.js",
-  "src/scripts/editor.js",
   "src/extension/extension.js",
   "src/extension/sidebar.js",
   ".claude/skills/level0/hooks/level0.js",

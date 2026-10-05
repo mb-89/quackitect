@@ -8,7 +8,6 @@ import { fieldOf, frontOf } from "../../src/engine/group.js";
 import { isTagged, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
 import { handFaults } from "../../src/scripts/pull-chapter.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
-import { toolArgv } from "../../src/scripts/pull-tool.js";
 import { returnsOf } from "../../src/scripts/pull-writes.js";
 import { pulling } from "../../src/scripts/work.js";
 import { at, doors, filled, heard, ROOT, standing } from "./pull-doors.js";
@@ -300,15 +299,3 @@ test("a second reject inserts a person step", () => {
   );
 });
 
-// [[spec/design_output/pull#the-gate]]
-test("the pull tool reads a gate's accept and reject as the pass and fail flags", () => {
-  assert.deepEqual(toolArgv({ ticket: "a-child", verdict: "accept" }), [
-    "pull",
-    "a-child",
-    "--pass",
-  ]);
-  assert.deepEqual(
-    toolArgv({ ticket: "a-child", verdict: "reject", reason: "no fail road" }),
-    ["pull", "a-child", "--fail", "no fail road"],
-  );
-});

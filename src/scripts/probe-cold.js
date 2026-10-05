@@ -4,7 +4,7 @@
 // [[spec/design_output/level0#the-cold-probe]]
 
 import { canaryIn, HEARD } from "../../.claude/skills/level0/lib/guidance.js";
-import { SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import {
   PLUGIN_FOLDER,
   POINTER,
@@ -14,7 +14,6 @@ import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
 import { homeIn } from "./editor.js";
-import { logRows } from "./probe.js";
 
 const SERVED = "mcp__level0__";
 // The one tool the hook registers itself, beside the index's. [[spec/tickets/level0-tools-leave-the-bridge]]
@@ -54,7 +53,6 @@ export const COLD_PATH = [
   "src/scripts/go-stamp.sh",
   "src/scripts/install.sh",
   "src/scripts/probe-cold.js",
-  "src/scripts/verbs/setup.js",
 ];
 
 // A folder entry ends on a slash and takes every path under it, and a file entry takes itself alone. [[spec/design_output/level0#the-cold-probe]]
@@ -321,10 +319,29 @@ function takesDelta(it, temp, tree, delta, say) {
     cwd: tree,
     timeoutMs: WAIT,
   });
-  if (applied.exitCode === 0) return true;
-  say(`FAIL delta: ${tail(applied.stderr || applied.stdout)}`);
+  if (applied.exitCode !== 0) {
+    say(`FAIL delta: ${tail(applied.stderr || applied.stdout)}`);
+    return false;
+  }
+  // The clone commits the change, as a box commits its work before it hands over, so the clear meets no work standing on this box alone. [[spec/tickets/the-check-takes-a-minute]]
+  const committed = it.proc.run(["git", ...DELTA_AUTHOR, "commit", "-q", "-m", "the working change"], {
+    cwd: tree,
+    timeoutMs: WAIT,
+  });
+  if (committed.exitCode === 0) return true;
+  say(`FAIL delta: ${tail(committed.stderr || committed.stdout)}`);
   return false;
 }
+
+// The author the clone commits the working change under, since a fresh runner names none. [[spec/tickets/the-check-takes-a-minute]]
+const DELTA_AUTHOR = [
+  "-c",
+  "user.name=probe",
+  "-c",
+  "user.email=probe@example.invalid",
+  "-c",
+  "commit.gpgsign=false",
+];
 
 function clientArgv(client, plugin) {
   return [
@@ -349,6 +366,15 @@ export function stops(it, tree) {
       timeoutMs: WAIT,
     });
   } catch {}
+}
+
+// A torn line drops alone, so the lines a probe reads still count. [[spec/design_output/log#every-writer-appends]]
+export function logRows(files, at) {
+  try {
+    return rowsIn(files.read(at));
+  } catch {
+    return [];
+  }
 }
 
 export function tail(text) {

@@ -14,6 +14,7 @@ import (
 	"slices"
 	"strings"
 
+	"quackitect/src/index"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
 	"quackitect/src/q"
@@ -39,6 +40,8 @@ const (
 	queueNameWidth  = 34
 	noQueue         = "No ticket stands in the queue."
 )
+
+func init() { register("ticket yours", ticketYours(index.V1)) }
 
 // ticket yours off work/yours over the base v1 answers, one JSON object as ticket-yours.js prints it. [[spec/tickets/ticket-verbs-become-actions]]
 func ticketYours(v1 func() (string, error)) twin {
@@ -92,6 +95,8 @@ func printsLine(out, errs io.Writer, value any) int {
 	return 0
 }
 
+func init() { register("retro notes", retroNotes(index.V1)) }
+
 // retro notes off tickets/all over the base v1 answers: every note under .se/tickets standing open. [[spec/tickets/retro-verbs-become-actions]]
 func retroNotes(v1 func() (string, error)) twin {
 	return func(_ []string, _ bool, out, errs io.Writer) int {
@@ -125,6 +130,8 @@ func retroNotes(v1 func() (string, error)) twin {
 		return exitFailed
 	}
 }
+
+func init() { register("branch list --queue", branchQueue(index.V1)) }
 
 // branch list --queue off work/yours over the base v1 answers: each placed row off the cloud, place then name then step. [[spec/tickets/work-verbs-become-actions]]
 func branchQueue(v1 func() (string, error)) twin {
@@ -167,7 +174,19 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 		if len(args) == 0 {
 			return nil, fmt.Errorf("the node module takes a verb, and reads no words")
 		}
+		// [[spec/tickets/quack-registers-each-verb]]
 		argv := programOf(scripts, args)
+		if _, one := twinOf(args, registry); one != nil {
+			if !person {
+				return goAnswer(args, one)
+			}
+			// A person's call reads the person's environment, which the index's own process holds not, so the road runs in a child under it. [[spec/design_output/pull#the-hand-rule]]
+			self, err := selfPath()
+			if err != nil {
+				return nil, err
+			}
+			argv = append([]string{self, "verb", scripts}, args...)
+		}
 		run := exec.Command(argv[0], argv[1:]...)
 		run.Dir = root
 		if person {
@@ -181,6 +200,9 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 		return text, nil
 	}
 }
+
+// The binary a child road runs, which a case swaps for one standing nowhere. [[spec/design_output/pull#the-hand-rule]]
+var selfPath = os.Executable
 
 // The variables a harness sets, which HARNESS in src/extension/lib/lens.js owns, and the root a person's run names, which WORK_ROOT there owns. [[spec/design_output/pull#the-hand-rule]]
 var harness = []string{"CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"}

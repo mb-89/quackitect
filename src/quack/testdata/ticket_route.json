@@ -1,0 +1,206 @@
+{
+  "shared": {
+    "spec/schemas/ticket.schema.yaml": "kind: ticket\n\ngoverns:\n  - spec/tickets/**\n  - .se/tickets/**\n\nfrontmatter:\n  type: object\n  additionalProperties: false\n  required: [kind, state, steps]\n  properties:\n    kind:\n      const: ticket\n      x-link: true\n      description: the schema this note is minted from\n    state:\n      enum: [draft, open, closed]\n      x-engine: true\n      description: whether anybody pulls it\n    reason:\n      enum: [done, dropped, became, answered]\n      description: how the work stopped\n    urgent:\n      type: boolean\n      description: whether the pull hands this out first\n    step:\n      type: string\n      x-names: steps\n      x-leaf: true\n      x-engine: true\n      description: the leaf of the route this ticket stands on\n    steps:\n      type: array\n      x-engine: true\n      description: the route, as a tree of steps\n      items:\n        type: object\n        additionalProperties: false\n        required: [name]\n        properties:\n          name:\n            type: string\n            description: one word, unique among its siblings\n          steps:\n            $ref: \"#/frontmatter/properties/steps\"\n            description: the steps under this phase\n          does:\n            type: string\n            description: what the hand does at this leaf\n          by:\n            type: string\n            x-names: steps\n            x-words: [anyone, person, agent, helper, retro, children]\n            x-prefix: not\n            description: the hand this step admits\n          not:\n            type: string\n            x-names: steps\n            description: a step whose hand this step's hand may not be\n          reads:\n            type: [array, string]\n            x-link: true\n            description: the guidance notes this step's hand reads\n          on_fail:\n            type: string\n            x-earlier: steps\n            description: the earlier step a failed hand-back sends the ticket to\n          asks:\n            type: string\n            description: the question a person answers\n          options:\n            type: array\n            description: the words that answer asks\n          when:\n            enum: [cloud, desk, view, handed]\n            description: the condition the pull reads\n          checklist:\n            type: array\n            description: what a hand has to do here\n          input:\n            type: [array, string]\n            x-earlier: steps\n            x-fields: evidence\n            x-words: [ask, diff]\n            description: what this step reads\n          needs:\n            type: array\n            description: the verbs and tools this step runs\n          from:\n            type: string\n            description: who hands this step its input\n          to:\n            type: string\n            description: who takes the output\n          evidence:\n            type: array\n            description: the fields this leaf's hand fills\n            items:\n              type: object\n              additionalProperties: false\n              required: [name, form, says]\n              properties:\n                name:\n                  type: string\n                  description: one word, unique among the fields of this leaf\n                form:\n                  enum: [text, list, command, link, files, choice, checklist, verdict]\n                  description: what the hand writes\n                says:\n                  type: string\n                  description: one line on what goes in this field\n                expects:\n                  type: [integer, string]\n                  description: the exit code or the word a command answers with\n                options:\n                  type: array\n                  description: the words a choice takes\n    process:\n      x-link: true\n      description: the route the mint copies from\n    process_hash:\n      type: string\n      description: the hash of the process file\n    record:\n      type: array\n      x-engine: true\n      description: the engine's entry per leaf\n      items:\n        type: object\n        additionalProperties: false\n        required: [step]\n        properties:\n          step:\n            type: string\n            x-names: steps\n            x-leaf: true\n            description: the leaf this entry stands for\n          hand:\n            type: string\n            description: the box\n          hash_before:\n            type: string\n            description: the branch tip at the take\n          hash_after:\n            type: string\n            description: the branch tip at the hand-back\n          returns:\n            type: integer\n            description: how often this leaf fails back\n          skipped:\n            type: boolean\n            description: whether the pull passes this leaf over\n          why:\n            type: string\n            description: the reason\n          answered:\n            type: array\n            description: one entry per command field\n            items:\n              type: object\n              additionalProperties: false\n              required: [name]\n              properties:\n                name:\n                  type: string\n                  description: the field\n                exit:\n                  type: integer\n                  description: the exit code\n                said:\n                  type: string\n                  description: the last line\n    group:\n      type: string\n      description: the branch this ticket lands on\n    parent:\n      type: string\n      description: the ticket whose children step waits for this one\n    depends_on:\n      type: [array, string]\n      description: the tickets this one waits for\n    successors:\n      type: [array, string]\n      description: the tickets this one became\n    todo:\n      type: boolean\n      description: the tag a hand puts on a note\n\nbody:\n  headingLevel: 1\n  order: strict\n  extraSections: false\n  tense: present\n  sections:\n    - header: Ask\n      required: true\n      x-written: draft\n      description: what this ticket asks for\n    - x-one-per: steps\n      x-written: hand\n    - header: Discussion\n      required: true\n      position: last\n      x-written: anyone\n      description: what anybody adds\n",
+    "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nstep: design/review\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n## review\n\n# do\n\n# Discussion\n"
+  },
+  "cases": [
+    {
+      "name": "a step past the pointer lands, and the record and the hash stay",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"},{\"name\":\"sign\",\"does\":\"says yes or no\",\"by\":\"person\"}]"],
+      "files": {},
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"},{\"name\":\"sign\",\"does\":\"says yes or no\",\"by\":\"person\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\n  - name: sign\n    does: says yes or no\n    by: person\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n## review\n\n<!-- reads the approach -->\n\n# do\n\n<!-- makes the change -->\n\n# sign\n\n<!-- says yes or no -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      }
+    },
+    {
+      "name": "a write answers the ticket, the pointer and the route as JSON",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change, and its test\"}]"],
+      "files": {},
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change, and its test\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change, and its test\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n## review\n\n<!-- reads the approach -->\n\n# do\n\n<!-- makes the change, and its test -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      }
+    },
+    {
+      "name": "a changed reached leaf is refused",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes a different approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"}]"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"design/draft stands reached, so the route opens on it as it stood. Edit the steps past the pointer.\",\"at\":\"design/draft\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a dropped leaf the record names is refused",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"}]"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"design/draft stands reached, so the route opens on it as it stood. Edit the steps past the pointer.\",\"at\":\"design/draft\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a step moved ahead of a reached leaf is refused",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"sketch\",\"does\":\"draws a picture\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"}]"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"design/review stands reached, so the route opens on it as it stood. Edit the steps past the pointer.\",\"at\":\"design/review\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a changed field on a phase holding a reached leaf is refused",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/working]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"}]"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"design holds a reached leaf, so it keeps every field but steps.\",\"at\":\"design\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a new step joins a phase holding a reached leaf",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"},{\"name\":\"sign\",\"does\":\"says yes\",\"by\":\"person\"}]},{\"name\":\"do\",\"does\":\"makes the change\"}]"],
+      "files": {},
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"},{\"name\":\"sign\",\"does\":\"says yes\",\"by\":\"person\"}]},{\"name\":\"do\",\"does\":\"makes the change\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n      - name: sign\n        does: says yes\n        by: person\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n## review\n\n<!-- reads the approach -->\n\n## sign\n\n<!-- says yes -->\n\n# do\n\n<!-- makes the change -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      }
+    },
+    {
+      "name": "a route without the pointer's leaf is refused",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"}]"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"The route holds no design/review, where the pointer stands. Keep the pointer's leaf.\",\"at\":\"design/review\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a flag holding no JSON is refused",
+      "argv": ["route", "slow-lint", "--steps=not json"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"ticket route takes the whole route as a JSON list: --steps=<json>.\",\"at\":\"\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a flag holding an object is refused",
+      "argv": ["route", "slow-lint", "--steps={\"name\":\"do\"}"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"ticket route takes the whole route as a JSON list: --steps=<json>.\",\"at\":\"\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a flag with trailing words is refused",
+      "argv": ["route", "slow-lint", "--steps=[] and more"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"ticket route takes the whole route as a JSON list: --steps=<json>.\",\"at\":\"\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "an empty flag is refused",
+      "argv": ["route", "slow-lint", "--steps="],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"ticket route takes the whole route as a JSON list: --steps=<json>.\",\"at\":\"\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "no flag is refused",
+      "argv": ["route", "slow-lint"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"ticket route takes the whole route as a JSON list: --steps=<json>.\",\"at\":\"\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "a ticket standing nowhere is refused",
+      "argv": ["route", "nowhere", "--steps=[]"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\"nowhere names no ticket under .se/tickets or spec/tickets.\",\"at\":\"\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "no name is refused",
+      "argv": ["route"],
+      "files": {},
+      "want": {"code": 1, "out": "{\"refused\":\" names no ticket under .se/tickets or spec/tickets.\",\"at\":\"\"}\n", "errs": "", "files": {}}
+    },
+    {
+      "name": "the key order, numbers, nulls and marks a person hands in stand",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"does\":\"makes the change\",\"name\":\"do\",\"n\":3,\"f\":1.5,\"x\":null,\"t\":true,\"s\":\"a<b>&\u2028 \\\"q\\\" \u00e9\",\"l\":[1,\"two\",null],\"o\":{\"z\":1,\"a\":2}}]"],
+      "files": {},
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"does\":\"makes the change\",\"name\":\"do\",\"n\":3,\"f\":1.5,\"x\":null,\"t\":true,\"s\":\"a<b>&\u2028 \\\"q\\\" \u00e9\",\"l\":[1,\"two\",null],\"o\":{\"z\":1,\"a\":2}}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - does: makes the change\n    name: do\n    n: 3\n    f: 1.5\n    x:\n    t: true\n    s: a<b>&\u2028 \"q\" \u00e9\n    l: [\"1\", \"two\", \"\"]\n    o:\n      z: 1\n      a: 2\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n## review\n\n<!-- reads the approach -->\n\n# do\n\n<!-- makes the change -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      }
+    },
+    {
+      "name": "a doubled key keeps its first place and its last value",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"does\":\"first\",\"name\":\"do\",\"does\":\"makes it\"}]"],
+      "files": {},
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"does\":\"makes it\",\"name\":\"do\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - does: makes it\n    name: do\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n## review\n\n<!-- reads the approach -->\n\n# do\n\n<!-- makes it -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      }
+    },
+    {
+      "name": "what a hand wrote under a chapter stays, and a dropped step's chapter goes",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"ship\",\"does\":\"ships it\"}]"],
+      "files": {
+        "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nstep: design/review\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\nThe approach, as the hand wrote it.\n\n<!-- a comment -->\n\n## review\n\n# do\n\nThe change, half made.\n\n# Discussion\n\nA line anybody adds.\n"
+      },
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"ship\",\"does\":\"ships it\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: ship\n    does: ships it\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\nThe approach, as the hand wrote it.\n\n<!-- a comment -->\n\n## review\n\n<!-- reads the approach -->\n\n# ship\n\n<!-- ships it -->\n\n# Discussion\n\nA line anybody adds.\n"
+        }
+      }
+    },
+    {
+      "name": "a chapter of a step that moves keeps what it holds",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"test\",\"does\":\"tests it\"},{\"name\":\"do\",\"does\":\"makes the change\"}]"],
+      "files": {
+        "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nstep: design/review\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\nThe approach, as the hand wrote it.\n\n<!-- a comment -->\n\n## review\n\n# do\n\nThe change, half made.\n\n# Discussion\n\nA line anybody adds.\n"
+      },
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"test\",\"does\":\"tests it\"},{\"name\":\"do\",\"does\":\"makes the change\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: test\n    does: tests it\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\nThe approach, as the hand wrote it.\n\n<!-- a comment -->\n\n## review\n\n<!-- reads the approach -->\n\n# test\n\n<!-- tests it -->\n\n# do\n\nThe change, half made.\n\n# Discussion\n\nA line anybody adds.\n"
+        }
+      }
+    },
+    {
+      "name": "a private ticket answers by its name",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"},{\"name\":\"sign\",\"does\":\"signs\"}]"],
+      "files": {
+        "spec/tickets/slow-lint.md": null,
+        ".se/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nstep: design/review\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n## review\n\n# do\n\n# Discussion\n"
+      },
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\".se/tickets/slow-lint.md\",\"step\":\"design/review\",\"steps\":[{\"name\":\"design\",\"reads\":\"[[spec/guidance/voice]]\",\"steps\":[{\"name\":\"draft\",\"does\":\"writes the approach\"},{\"name\":\"review\",\"does\":\"reads the approach\"}]},{\"name\":\"do\",\"does\":\"makes the change\"},{\"name\":\"sign\",\"does\":\"signs\"}]}\n",
+        "errs": "",
+        "files": {
+          ".se/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nstep: design/review\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\n  - name: sign\n    does: signs\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\nrecord:\n  - step: design/draft\n    hand: box one\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n<!-- writes the approach -->\n\n## review\n\n<!-- reads the approach -->\n\n# do\n\n<!-- makes the change -->\n\n# sign\n\n<!-- signs -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      }
+    },
+    {
+      "name": "a ticket at no pointer takes any route",
+      "argv": ["route", "slow-lint", "--steps=[{\"name\":\"one\",\"does\":\"a\"}]"],
+      "files": {
+        "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: design\n    reads: [[spec/guidance/voice]]\n    steps:\n      - name: draft\n        does: writes the approach\n      - name: review\n        does: reads the approach\n  - name: do\n    does: makes the change\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\n---\n\n# Ask\n\nThe lint drags.\n\n# design\n\n## draft\n\n## review\n\n# do\n\n# Discussion\n"
+      },
+      "want": {
+        "code": 0,
+        "out": "{\"ticket\":\"spec/tickets/slow-lint.md\",\"step\":\"\",\"steps\":[{\"name\":\"one\",\"does\":\"a\"}]}\n",
+        "errs": "",
+        "files": {
+          "spec/tickets/slow-lint.md": "---\nkind: [[ticket]]\nstate: open\nsteps:\n  - name: one\n    does: a\nprocess: [[spec/processes/standard]]\nprocess_hash: 0123456789abcdef\n---\n\n# Ask\n\nThe lint drags.\n\n# one\n\n<!-- a -->\n\n# Discussion\n\n<!-- what anybody adds -->\n"
+        }
+      }
+    }
+  ]
+}

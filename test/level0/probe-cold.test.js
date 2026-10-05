@@ -17,6 +17,7 @@ import {
   coldLines,
   coldPort,
   coldTree,
+  logRows,
   probeCold,
   readsCold,
   stepsOf,
@@ -365,9 +366,9 @@ test("a path under the hooks folder or a named cold file sits on the cold path",
   assert.ok(COLD_PATH.includes(".claude/skills/level0/lib/guidance.js"));
 });
 
-// The install hands the stamp and the setup on, so each runs on the cold road beside it. [[spec/tickets/cold-probe-reads-the-setup]]
+// The install hands the stamp and the setup on, so each runs on the cold road beside it. The setup runs in Go, under src/quack. [[spec/tickets/cold-probe-reads-the-setup]] [[spec/tickets/box-verbs-port-to-go]]
 test("the stamp and the setup verb sit on the cold path beside the install", () => {
-  const road = ["src/scripts/go-stamp.sh", "src/scripts/verbs/setup.js"];
+  const road = ["src/scripts/go-stamp.sh", "src/quack/setup_verb.go"];
   assert.deepEqual(coldIn(road), road);
 });
 
@@ -394,7 +395,27 @@ test("a staged delta lands in the clone before the install runs", async () => {
   assert.ok(applied > 0 && applied < installed, ran.join("\n"));
   const apply = proc.ran[applied];
   assert.equal(apply.init.cwd, "/tmp/se-cold-1/tree");
+  // The clone commits the change, so the clear meets no work standing on the box alone. [[spec/tickets/the-check-takes-a-minute]]
+  const committed = ran.findIndex((one) => / commit -q -m /.test(one));
+  assert.equal(committed, applied + 1, ran.join("\n"));
+  assert.equal(proc.ran[committed].init.cwd, "/tmp/se-cold-1/tree");
   assert.equal(disk.exists("/tmp/se-cold-1"), false);
+});
+
+// [[spec/tickets/the-check-takes-a-minute]]
+test("a commit the clone refuses fails the probe before the install runs", async () => {
+  const { proc, it } = runner({ exitCode: 0, stdout: "" });
+  const fresh = proc.run;
+  proc.run = (argv, init) =>
+    argv.includes("commit")
+      ? { exitCode: 1, stdout: "", stderr: "nothing to commit" }
+      : fresh(argv, init);
+  const said_ = [];
+  const code = await probeCold("/repo", it, "claude", (one) => said_.push(one), "x\n");
+
+  assert.equal(code, 1);
+  assert.match(said_.join("\n"), /FAIL delta: nothing to commit/);
+  assert.ok(!proc.ran.some((one) => one.argv[0] === "sh"));
 });
 
 test("a delta the clone refuses fails the probe before the client runs", async () => {
@@ -450,4 +471,16 @@ test("the fresh box clones, installs and points the hook at a port of its own, a
   };
   assert.equal(coldTree("/repo", bare, (one) => lines.push(one), box), "");
   assert.match(lines.join("\n"), /FAIL clone: no such repo/);
+});
+
+// Two writers appending at once tear one line, and a probe reads the rest. [[spec/design_output/log#every-writer-appends]]
+test("a torn line in the log drops alone, and a log standing nowhere reads as no row", () => {
+  const one = rowOf("2026-09-12T08:00:00.000Z", "info", "context", "read");
+  const two = rowOf("2026-09-12T08:00:01.000Z", "info", "compact", "ran");
+  const disk = fakeDisk({ log: `${JSON.stringify(one)}\n{"at":"2026\n${JSON.stringify(two)}\n` });
+  assert.deepEqual(
+    logRows(disk, "log").map((row) => row.kind),
+    ["context", "compact"],
+  );
+  assert.deepEqual(logRows(disk, "gone"), []);
 });

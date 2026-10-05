@@ -1,6 +1,6 @@
 // The pull tool's pure half: the spec the tool registers, the spawn prompt
-// and the session, so a test reads them with no harness standing. The CLI
-// reads the tool's input into an argv, in pull-tool.js.
+// and the session, so a test reads them with no harness standing. The ticket
+// pull verb reads the tool's input into an argv, in src/pull/pull.go.
 // [[spec/design_output/pull#the-hand-out]]
 
 export const PULL_TOOL = "pull";

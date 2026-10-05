@@ -1,7 +1,7 @@
 // The schema library stands split by topic, and the mint stands in a module of
 // its own that imports the checker. So every caller of the mint names
 // schema-mint.js, the checker names no mint, and each module stays under the
-// file ceiling. The command line is read as text, because it exits at import.
+// file ceiling.
 // [[spec/design_output/schema#the-reader-and-the-checker]]
 
 import assert from "node:assert/strict";
@@ -12,7 +12,6 @@ import { underBuiltIns } from "../../.claude/skills/level0/lib/config.js";
 import { TOOLS } from "../../src/bridge/tools.js";
 import { disk } from "../../src/doors/disk.js";
 import { handOut } from "../../src/scripts/pull-hand.js";
-import { newRetro } from "../../src/scripts/retro-new.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -71,25 +70,8 @@ test("each schema module stands under the file ceiling the config names", () => 
   assert.deepEqual(over, []);
 });
 
-// The command line exits at import, so its text says which module it mints through. [[spec/design_output/editor#one-command-opens-the-editor]]
-test("the command line, the tools, the hand and the retro reach the mint through its own module", () => {
-  const cli = String(files.read(join(root, "src", "scripts", "mint-verb.js")));
-  assert.match(
-    cli,
-    /from "\.\.\/\.\.\/\.claude\/skills\/level0\/lib\/schema-mint\.js"/,
-  );
+// The command line's mint stands in Go, which TestMintVerb in src/quack/verb_mint_test.go decides. [[spec/design_output/editor#one-command-opens-the-editor]]
+test("the tools and the hand reach the mint through its own module", () => {
   assert.equal(typeof TOOLS.mcp__level0__mint_note, "function");
-  assert.equal(typeof newRetro, "function");
   assert.equal(typeof handOut, "function");
-});
-
-// The command line exits at import, so its text says the mint refuses an empty group. [[spec/design_output/work#a-group-is-a-ticket]]
-test("the mint on the command line reads the group through emptyGroup before it writes", () => {
-  const cli = String(files.read(join(root, "src", "scripts", "mint-verb.js")));
-  const mint = cli.slice(cli.indexOf("export function mint("));
-  assert.ok(mint.indexOf("emptyGroup(") > 0, "the mint calls emptyGroup");
-  assert.ok(
-    mint.indexOf("emptyGroup(") < mint.indexOf("files.write(at"),
-    "and calls it before the write",
-  );
 });

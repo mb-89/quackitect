@@ -101,6 +101,9 @@ func TestTheGuardsReadTheBlessAndTheVersions(t *testing.T) {
 	if said := BlessGuard("export SE_CLOUD=1", nil); !strings.HasPrefix(said, "SE_CLOUD name the hand") {
 		t.Fatalf("the bless guard says %q", said)
 	}
+	if said := BlessGuard("SE_MINTED=x ./RUNME.sh ticket pull x", nil); !strings.HasPrefix(said, "SE_MINTED name the hand") {
+		t.Fatalf("the bless guard says %q over SE_MINTED", said)
+	}
 	if said := BlessGuard("ls", nil); said != "" {
 		t.Fatalf("the bless guard says %q over a read", said)
 	}

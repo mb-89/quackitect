@@ -9,8 +9,8 @@ import { SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { PLUGIN_FOLDER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { HOOKS_FILE } from "../../.claude/skills/level0/hooks/cage.js";
 import { clearHeld, clearRun } from "./probe-clear.js";
-import { COLD, coldLines, coldPort, coldTree, stops, tail } from "./probe-cold.js";
-import { logRows } from "./probe.js";
+import { COLD, coldLines, coldPort, coldTree, logRows, stops, tail } from "./probe-cold.js";
+import { verbMain } from "./verb-run.js";
 
 // The module the plugin manifest names, which the client loads. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 const MODULE = "hooks/pull-tool.js";
@@ -32,6 +32,20 @@ const CANARY_LINE = /level0 holds this session: \d+ rules?, \d+ notes?, the stop
 export const DRY = {
   checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet", "clear"],
 };
+
+// The word that carries the working change into the clone. [[spec/tickets/the-check-takes-a-minute]]
+export const WORKING = "--working";
+
+// The dry probe's own program, which the Go probe verb and the check start, since its session loads the plugin's JavaScript hook module in process. [[spec/tickets/probe-dry-entry]]
+export const ENTRY = ["src", "scripts", "probe-dry.js"];
+
+// The working change as a patch, read through the process door untrimmed, since a trim cuts the blank context line a hunk ends on and git apply reads the rest as corrupt. [[spec/tickets/model-marks-io-names]]
+export function deltaOf(here, at) {
+  const ran = here.proc.run(["git", "diff", "HEAD", "--binary", "--no-renames"], {
+    cwd: at,
+  });
+  return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
+}
 
 // [[spec/tickets/level0-runs-on-the-door]]
 export async function probeDry(root, it, say = console.log, delta = "") {
@@ -309,3 +323,9 @@ function quietRun(rows, seen) {
 
 const firstOf = (text) => tail(String(text ?? "").split("\n")[0]).slice(0, SHOWN);
 const shown = (said) => firstOf(JSON.stringify(said ?? null));
+
+// Run as its own program, the probe takes the working change where the words name it. [[spec/tickets/probe-dry-entry]]
+await verbMain(import.meta.url, async (words) => {
+  const { it, root } = await import("./cli-doors.js");
+  return probeDry(root, it, console.log, words.includes(WORKING) ? deltaOf(it, root) : "");
+});
