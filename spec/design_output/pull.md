@@ -124,8 +124,8 @@ they merge unread. For the run behind this, see [[spec/rationales/pull]].
 
 ## A closed group takes no child
 
-A ticket naming a closed group under `group` reaches no hand. So the mint and
-the open refuse it, and name the two roads out:
+A ticket naming a closed group under `group` reaches no hand. So the mint, the
+open and `ticket set` refuse it, and name the two roads out:
 
 | the road | what the hand does |
 |---|---|

@@ -120,6 +120,14 @@ func TestTicketSet(t *testing.T) {
 			t.Fatalf("the ticket holds %q", got)
 		}
 	})
+	t.Run("set refuses a group that stands closed, and writes nothing", func(t *testing.T) {
+		root := editCaseTree(t, "a-thing")
+		seedsFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
+		code, out, errs := runsApart(t, root, false, "ticket", "set", "a-thing", "group", "shut")
+		if got, _ := readsBack(t, root, aThing); code != 2 || out != "" || !strings.HasPrefix(errs, "shut stands closed, so it takes no new child.") || got != editCaseTicket("") {
+			t.Fatalf("set group shut answers %d, %q, %q, and writes %q", code, out, errs, got)
+		}
+	})
 	t.Run("set names the call it needs where a word is missing", func(t *testing.T) {
 		root := editCaseTree(t, "a-thing")
 		for _, one := range []struct {
