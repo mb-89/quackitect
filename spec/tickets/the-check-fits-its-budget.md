@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-check-fits-its-budget
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 0a0b05c325cb5bf4
         size: 1035
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box ce27714b7c6d · claude-code-remote
+    hash_before: 16ab2a25b8d545801a0ddea0df1ca921c74e52d9
+    hash_after: 16ab2a25b8d545801a0ddea0df1ca921c74e52d9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: de831620df1416e4
+        size: 2049
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +236,31 @@ The measure decides the approach, and the Discussion carries its numbers. A warm
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/serial_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/imports/serial_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The guard names every src/pull test, because none calls t.Parallel. It names nothing in src/branches, src/quack or src/imports, where the change already stands, and its own planted case passes. The surprise is the size of the gap. Alone, src/branches runs in 50 seconds and src/quack in 34. Inside the full run, with every package competing for four cores, they ran far longer.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- done_when: the guard decides the parallel runs, the check's battery decides the budget and the go part, and the Discussion holds the measure
+- doors: the guard parses source off the disk in a tree test, as TestTheTreeHoldsTheImportRules loads it, and it reaches no other door
 
 # gate
 
