@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -205,10 +205,20 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 173248322297533c
+  - step: retro/cloud
+    hand: box 05659fab4226 · claude-code-remote
+    hash_before: 4a87e13504c7b7c5845e57c5a09c0133ba2428d9
+    hash_after: 4a87e13504c7b7c5845e57c5a09c0133ba2428d9
+    inputs:
+      - name: retro/write
+        hash: 482881c39b2f73b1
+        size: 2613
+    def: 4da1ca5da87d5bbc
 group: the-verbs-run-in-go
 depends_on: ["quack-holds-a-verb-registry"]
 enabled_by: migration.phase11
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -349,20 +359,28 @@ true
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 02:16 the permission classifier times out once on a shell call, and the retry passes
+- 02:20 the level0 server stands down after a commit, so the write door answers starting until it returns
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at take: main edits two stub tests this branch deletes, and both edit one line of cli-leaves
+- a test red on main as well: the retro notes road case, fixed on this branch
+- the write door and the git guard: every write lands through patch or ./RUNME.sh commit
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parks
+- no ticket stands minted without a group
+- the handover: the group stands at done, and its pull request carries it to main
 
 # Discussion
 
