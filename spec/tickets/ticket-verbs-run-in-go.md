@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: split
+step: children
 record:
   - step: sync
     hand: box f2894f4960c9 · claude-code-remote
@@ -116,6 +116,18 @@ record:
         exit: 0
         said: work/ticket-verbs-run-in-go already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: a001c5df19cf67751f53b941f2e4e51aa5bc9f17
+    hash_after: a001c5df19cf67751f53b941f2e4e51aa5bc9f17
+    inputs:
+      - name: ask
+        hash: 6456d34f61a5fe56
+        size: 307
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -142,14 +154,21 @@ Done when these verbs run in Go with their contract tests passing, and their Jav
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/ticket-verbs-port-to-go]], standard
+- [[spec/tickets/ticket-sub-verb-red-cases]], trivial
+- [[spec/tickets/ticket-verbs-importer-case]], trivial
+- [[spec/tickets/verbs-name-frontmatter-writer]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: the port lands in one commit a sub-verb, and the three trivial children each answer one gate point
+- the children add up to the goal: the port carries every verb and every deletion, and the three points close the gaps its gate named
+- no child waits on another past the order the pull hands them out, and every child stands closed
 
 # children
 
