@@ -159,7 +159,7 @@ func branchQueue(v1 func() (string, error)) twin {
 	}
 }
 
-// The node module: runs the verb's program under the root with the request's words, and answers its output. [[spec/tickets/cli-js-leaves]]
+// The node module: answers a registered verb's words, in process or as a person's child road under the root, and refuses a word nothing registers. [[spec/tickets/program-of-drops-node]]
 func nodeAccept(root string) func(q.Request) (any, error) {
 	scripts := filepath.Join(root, "src", "scripts")
 	return func(asked q.Request) (any, error) {
@@ -175,19 +175,19 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 			return nil, fmt.Errorf("the node module takes a verb, and reads no words")
 		}
 		// [[spec/tickets/quack-registers-each-verb]]
-		argv := programOf(scripts, args)
-		if _, one := twinOf(args, registry); one != nil {
-			if !person {
-				return goAnswer(args, one)
-			}
-			// A person's call reads the person's environment, which the index's own process holds not, so the road runs in a child under it. [[spec/design_output/pull#the-hand-rule]]
-			self, err := selfPath()
-			if err != nil {
-				return nil, err
-			}
-			argv = append([]string{self, "verb", scripts}, args...)
+		_, one := twinOf(args, registry)
+		if one == nil {
+			return nil, fmt.Errorf("there is no verb called %s", strings.Join(args, " "))
 		}
-		run := exec.Command(argv[0], argv[1:]...)
+		if !person {
+			return goAnswer(args, one)
+		}
+		// A person's call reads the person's environment, which the index's own process holds not, so the road runs in a child under it. [[spec/design_output/pull#the-hand-rule]]
+		self, err := selfPath()
+		if err != nil {
+			return nil, err
+		}
+		run := exec.Command(self, append([]string{"verb", scripts}, args...)...)
 		run.Dir = root
 		if person {
 			run.Env = personEnv(os.Environ(), root)

@@ -20,6 +20,17 @@ export function quackAt(files, join, root) {
   return [bare, `${bare}.exe`].find((one) => files.exists(one)) ?? bare;
 }
 
+// The argv of a verb through quack's road, as RUNME.sh hands it: the binary, the road, the scripts folder under the root, and the verb's words. [[spec/tickets/check-verbs-port-to-go]]
+export function roadArgv(quack, root, words, joins = join) {
+  return [quack, "verb", joins(root, "src", "scripts"), ...words];
+}
+
+// The same road through the quack binary under the root. [[spec/tickets/check-verbs-port-to-go]]
+export function quackArgv(it, words) {
+  const joins = it.join ?? join;
+  return roadArgv(quackAt(it.disk, joins, it.root), it.root, words, joins);
+}
+
 // Whether the slice reads new on the caller's doors, which hold the modes under slices. [[spec/tickets/readers-name-one-mode-source]]
 export function readsNew(it, slice) {
   return it?.slices?.[slice] === NEW;

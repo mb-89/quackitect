@@ -1,11 +1,11 @@
 // ticket yours reads work/yours off the index and prints what the verb's program prints,
-// and the node module runs a verb through the verb's program under the root.
+// and the node module answers a registered verb through the accepts.
 // [[spec/tickets/ticket-verbs-become-actions]]
 package main
 
 import (
-	"os"
-	"path/filepath"
+	"fmt"
+	"io"
 	"strings"
 	"testing"
 
@@ -35,26 +35,21 @@ func TestTicketYoursNextNamesTheFirstOpenPersonRow(t *testing.T) {
 	}
 }
 
-// A verb that registers no Go answer, so the node module runs its program. [[spec/tickets/cli-js-leaves]]
-const nodeOnly = "nodeonly"
-
-// The node module runs the verb's program under the root with the words, and fails with the output where the exit reads past 0. [[spec/tickets/cli-js-leaves]]
-func TestTheRootRunsANodeVerbThroughItsProgram(t *testing.T) {
-	root := t.TempDir()
-	programs := filepath.Join(root, "src", "scripts", "verbs")
-	if err := os.MkdirAll(programs, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	program := "const a = process.argv.slice(2); console.log(JSON.stringify(a)); process.exit(a.includes('fail') ? 3 : 0);\n"
-	if err := os.WriteFile(filepath.Join(programs, nodeOnly+".js"), []byte(program), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	accept := accepts(root, nil, nil)
-	said, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{nodeOnly, "open"}})
-	if err != nil || said != `["open"]` {
+// The node module answers a registered verb through the accepts with its output, and fails with the output where the exit reads past 0. [[spec/tickets/program-of-drops-node]]
+func TestTheAcceptsAnswerARegisteredVerb(t *testing.T) {
+	registersFor(t, "registry accepts", func(argv []string, _ bool, out, _ io.Writer) int {
+		fmt.Fprintln(out, strings.Join(argv[2:], " "))
+		if len(argv) > 2 && argv[2] == "fail" {
+			return exitFailed
+		}
+		return 0
+	})
+	accept := accepts(t.TempDir(), nil, nil)
+	said, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"registry", "accepts", "open"}})
+	if err != nil || said != "open" {
 		t.Fatalf("the node module answers %#v, %v", said, err)
 	}
-	if _, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{nodeOnly, "fail"}}); err == nil || !strings.Contains(err.Error(), "fail") {
+	if _, err := accept(q.Request{Module: verbsmodule.NodeModule, Verb: verbsmodule.NodeRun, Args: []string{"registry", "accepts", "fail"}}); err == nil || !strings.Contains(err.Error(), "fail") {
 		t.Fatalf("a failing verb answers %v", err)
 	}
 }

@@ -10,7 +10,7 @@ import { PLUGIN_FOLDER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { HOOKS_FILE } from "../../.claude/skills/level0/hooks/cage.js";
 import { clearHeld, clearRun } from "./probe-clear.js";
 import { COLD, coldLines, coldPort, coldTree, logRows, stops, tail } from "./probe-cold.js";
-import { verbMain } from "./verb-run.js";
+import { verbMain } from "./cli-main.js";
 
 // The module the plugin manifest names, which the client loads. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 const MODULE = "hooks/pull-tool.js";

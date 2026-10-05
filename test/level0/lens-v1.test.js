@@ -12,7 +12,7 @@ import schema from "../../spec/config/level0.schema.json" with { type: "json" };
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate, SHOW } from "../../src/extension/extension.js";
 import { fieldMarksOf } from "../../src/extension/lib/fields.js";
-import { ticketLensOf } from "../../src/extension/lib/lens.js";
+import lens, { ticketLensOf } from "../../src/extension/lib/lens.js";
 import { routeHostOf } from "../../src/extension/lib/route-host.js";
 import { SCHEMA } from "../../src/extension/sidebar.js";
 import { graphIn } from "../../src/scripts/graph.js";
@@ -268,4 +268,9 @@ test("src/extension/lib names no door.read, door.list, door.imports or door.watc
     "",
     "the hosts under src/extension/lib read off the index alone",
   );
+});
+
+// [[spec/tickets/program-of-drops-node]]
+test("the lens names no verb program folder", () => {
+  assert.equal("PROGRAMS" in lens, false);
 });

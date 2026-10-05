@@ -5,6 +5,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { quackArgv } from "../../src/scripts/quack-topic.js";
 import { work } from "../../src/scripts/work.js";
 import { merge } from "../../src/scripts/work-merge.js";
 import { CHECK, doorsSaying, heard, merging, ROOT, ranGit } from "./work-doors.js";
@@ -169,4 +171,9 @@ test("a pull request standing at another commit leaves the merge to run", () => 
   assert.ok(
     ranGit(outside).includes("git merge --no-ff --no-edit origin/work/one-group"),
   );
+});
+
+// [[spec/tickets/program-of-drops-node]]
+test("the merge's check rides quack's road", () => {
+  assert.equal(quackArgv({ disk: fakeDisk(), root: ROOT }, ["check", "--errors"]).join(" "), CHECK);
 });

@@ -11,7 +11,7 @@ const TreeTopic = "verb"
 // The verbs that stand as topics of their own, and so as no tree verb. [[spec/tickets/agents-call-quack-directly]]
 var topics = map[string]bool{"branch": true, "ticket": true, "retro": true, "vehicle": true, "stub": true}
 
-// Every verb in help order with its usage line, the topics among them. Each runs its program under src/scripts/verbs. [[spec/tickets/cli-js-leaves]]
+// Every verb in help order with its usage line, the topics among them. Each registers in Go. [[spec/tickets/program-of-drops-node]]
 var Commands = []Verb{
 	{Name: "check", Doc: "the tests, the doors, the server, then the rules over the tree"},
 	{Name: "lint", Doc: "the rules over the tree, or over what you name"},
