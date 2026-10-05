@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-check-fits-its-budget
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box ce27714b7c6d · claude-code-remote
+    hash_before: 1aa2468496c55855f3e504c74477a8284c96ede2
+    hash_after: 292d955659e93fbf84dd34941a094522ad234e4a
+    inputs:
+      - name: ask
+        hash: 0a0b05c325cb5bf4
+        size: 1035
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -161,38 +170,51 @@ Every push and every hand-back waits on `./RUNME.sh check`, and since the verbs 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The measure decides the approach, and the Discussion carries its numbers. A warm check spends seconds on go, because Go caches each package's result. A fresh box pays the whole go part, and so does any edit the tree takes, since TestTwinGoldens opens every tracked file and so reruns all of src/quack. The go part's span is its slowest package, because a package runs its tests one after another unless they say t.Parallel. src/branches holds that span: each test builds a real origin and clone. So the heavy packages' tests run beside each other, as rule 9 of spec/guidance/code/testing asks. A test reaching t.Setenv or t.Chdir stays serial, and the one Setenv in src/branches moves onto the fixture's own git env. A branches fixture turns off git's auto gc and maintenance, which spent processes after every fetch and commit. Each analyzer of the imports case loads its tree as a parallel subtest. No test leaves the run, and every case asserts what it asserted before. The race detector and shuffled repeats decide that the parallel tests share no state.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go goGate, which runs go test over every package
+- src/branches/tree_test.go newTree and tree.sh, which every branches test calls
+- src/branches/port_a_take_test.go paHandOver, which set the git dates through the process env
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/parallel_test.go TestEveryBranchesTestRunsBesideTheOthers
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/*_test.go
+- src/quack/*_test.go
+- src/imports/*_test.go
+- spec/tickets/the-check-fits-its-budget.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened: goGate and batteryRun in src/quack/check.go, newTree, sh and paHandOver in src/branches, the Doors run in src/branches/doors.go, TestTwinGoldens, and the imports analyzer test
+- callers: every branches test reaches tree.sh through newTree, and goGate alone runs the Go tests in the check
+- done_when: the check's battery.total and battery.parts.go in .se/.runtime/check.json decide the first two, and branch test over the moved test files decides the third
 
 ## tests-red
 
