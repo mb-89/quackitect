@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -238,6 +238,35 @@ record:
         hash: b7595d42c22ced71
         size: 715
     def: ec253787263043a7
+  - step: accept
+    hand: box c2e39844c8bf · claude-code-remote · helper-14
+    hash_before: 7e32f4a2a67f1d80511dac4604080319aca57667
+    hash_after: eb2b8e1975fabd72ca9935620a0acdf97b4e23fc
+    answered:
+      - name: design/tests-red/tests
+        exit: 0
+        said: green, src/pull passes; green, src/quack passes
+      - name: implement/change/lint
+        exit: 0
+        said: "spec/rationales/pull.md:27:63: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
+      - name: implement/tests-green/tests
+        exit: 0
+        said: green, src/pull passes; green, src/quack passes
+      - name: implement/tests-green/check
+        exit: 0
+        said: "   84.0  in all"
+    inputs:
+      - name: ask
+        hash: ec76b8a6a166f988
+        size: 630
+      - name: implement
+        hash: c371653ceb301b16
+        size: 1571
+    def: 5050b7ed72b70652
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -441,8 +470,16 @@ The mint, the open and ticket set refuse a ticket naming a closed group. The ref
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+The mint, the open and ticket set refuse a child naming a closed group.
+The refusal names both roads out: no group, or a reopen through ticket pull --back.
+TestMintVerb covers the refused mint naming shut, and the free mint on work/shut.
+TestTicketSet and TestTicketOpen cover the other two doors, and TestGroups covers ClosedGroup.
+go test ./src/pull and the named src/quack tests pass.
+GroupClosed holds the one closed read, and the pull, the mint, the open and the set share it.
+The fake front MARKS now match the Go marks, and the contract test holds a leading space and a close bracket.
 
 # view
 
