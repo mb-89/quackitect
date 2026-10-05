@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: implement/tests-green
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -170,6 +170,12 @@ record:
         exit: 0
         said: "spec/rationales/pull.md:27:63: Antithesis: Say what is. 'never' opens a half that says what the thing is not."
     def: f150b8c0dc20fe45
+  - step: design/tests-red
+    hand: the engine
+    stale: [[spec/design_output/pull]]
+  - step: gate
+    hand: the engine
+    stale: [[spec/design_output/pull]]
 ---
 
 # Ask
