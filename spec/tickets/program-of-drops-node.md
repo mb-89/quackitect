@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-node-road-closes
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 3e601b1d7cc9f9f54d48b2ec10962fff9e647f47
+    hash_after: 3e601b1d7cc9f9f54d48b2ec10962fff9e647f47
+    inputs:
+      - name: ask
+        hash: 3826b66824beaed9
+        size: 444
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,74 @@ The verbs then run in Go alone, and the road to node stops costing a branch a ca
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Every verb of the table registers whole in Go, so the program road answers only help, a flag-led line or a word nothing registers. 1) src/quack/verbs.go: programOf, programDoor and oldDoor leave; usageDoor(argv, errs) takes the old door's place, printing the usage for help or no verb and refusing an unknown word with exitUsage. startFault stays for check.go, and its line drops the claim that verbs run on node. 2) src/quack/twins.go nodeAccept: a word nothing registers answers an error naming it; a registered verb answers as today, in process or in a child quack road for a person. The module keeps its name, since actions call it by module. 3) src/scripts/verb-run.js leaves: roadArgv and quackArgv move into src/scripts/quack-topic.js beside quackAt; verbMain and exitsDrained move into src/scripts/probe-dry.js, their one user; verbArgv, whereOf and VERBS leave with no caller. 4) src/extension/lib/lens.js drops PROGRAMS. 5) registry.go header names no node. Assumption: the verbs slice's mode machinery stays, since a multi-word twin still reads it; its removal is a later slice.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go: verbRoad calls programDoor
+- src/quack/twins.go: nodeAccept calls programOf
+- src/quack/accepts.go: accepts calls nodeAccept
+- src/quack/check.go: runs node tests, calls startFault
+- src/scripts/work-merge.js: quackArgv
+- src/scripts/work-review.js: roadArgv
+- src/scripts/probe-dry.js: verbMain
+- test/level0/cli-exit.test.js: exitsDrained
+- test/level0/verb-run.test.js: verbArgv
+- test/contract/verb-programs.test.js: VERBS, PROGRAMS
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/programs_test.go: TestAnUnknownVerbAnswersTheUsage
+- src/quack/programs_test.go: TestHelpAnswersTheUsageAndZero
+- src/quack/registry_test.go: an unregistered verb answers no verb through the node module
+- src/quack/person_run_test.go: TestAPersonRunCarriesNoHarness, over the child road
+- test/contract/verb-programs.test.js: the road to node stands nowhere
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go
+- src/quack/twins.go
+- src/quack/registry.go
+- src/quack/programs_test.go
+- src/quack/verbs_test.go
+- src/quack/registry_test.go
+- src/quack/person_run_test.go
+- src/scripts/verb-run.js
+- src/scripts/quack-topic.js
+- src/scripts/probe-dry.js
+- src/scripts/work-merge.js
+- src/scripts/work-review.js
+- src/extension/lib/lens.js
+- test/level0/verb-run.test.js
+- test/level0/cli-exit.test.js
+- test/contract/verb-programs.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened verbs.go, twins.go, registry.go, accepts.go, check.go, verb-run.js, quack-topic.js, probe-dry.js, lens.js and every test named, and checked each claim there
+- the callers list comes off a grep for programOf, programDoor, oldDoor, nodeAccept, startFault and every verb-run.js export
+- grep on verbs.go is decided by the contract test reading it; test -d by the same test; ./RUNME.sh check by the check itself
 
 ## tests-red
 
