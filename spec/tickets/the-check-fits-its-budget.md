@@ -394,6 +394,14 @@ The packages under `-count=1`, each one's span in seconds, alone and inside the 
 
 A package runs its tests one after another, so its span is their sum. `src/branches` builds a real origin and clone for each of its tests. `TestTwinGoldens` opens every tracked file, so an edit anywhere in the tree reruns the whole of `src/quack`.
 
+## The draft's size, in full
+
+The draft's size list leaves out three files the approach touches, and the engine keeps that field closed. These stand beside the four it names:
+
+- `src/imports/serial.go`
+- `src/pull/*_test.go`
+- `src/quack/check.go`, where the gate runs the red packages apart
+
 ## The parallel tests share no state
 
 The race detector and shuffled repeats read the three packages whose tests now run in parallel. The check runs neither, so a hand runs this command after a change to those tests:
