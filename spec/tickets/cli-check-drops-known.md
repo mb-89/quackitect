@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 step: do
 group: loose-fixes-d604762
+record:
+  - step: do
+    hand: box 34b754bfb977 · claude-code-remote
+    hash_before: c9729f35d124da60cc1e4971e0b7aadf3f90a51f
+    hash_after: c9729f35d124da60cc1e4971e0b7aadf3f90a51f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "    2.3  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: ask
+        hash: e365aca0fbbad91e
+        size: 137
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -44,26 +62,32 @@ cli-check.js imports a name it never uses, and the push gate reads the warning. 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/contract/cli-check-doors.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+src/scripts/cli-check.js drops the import it left unused, so the lint names no warning in the file and the push gate stops reading one. The fix and its case landed in commit 8cab1a0 and reached main through the merge of work/retro-verbs-run-in-go; this step confirms it on the fix group branch.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: lint names no warning in cli-check.js
+- the cleanup the change reveals: the lint names unused imports in test/contract/cli-verbs.test.js and test/level0/work-stands.test.js, outside this ask; they stand at warning
+- every fact stands in one place: the change adds no fact
 
 # Discussion
 
