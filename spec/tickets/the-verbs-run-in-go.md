@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -84,7 +84,84 @@ process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
-step: sync
+step: retro/cloud
+cloud: true
+record:
+  - step: sync
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: 7f85c79d84ae5223cbb569b8ad1ec7a55e0c463e
+    hash_after: 7f85c79d84ae5223cbb569b8ad1ec7a55e0c463e
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-verbs-run-in-go already carries every commit on main.
+    def: 8a9850a81227554b
+  - step: split
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: d473ee54287ca03888bbe9332b43d5fd56a75979
+    hash_after: d473ee54287ca03888bbe9332b43d5fd56a75979
+    inputs:
+      - name: ask
+        hash: f597d0eaba229fa9
+        size: 257
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 01f66aba2fd217944e501956122508ecb653ffa5
+    hash_after: 01f66aba2fd217944e501956122508ecb653ffa5
+  - step: accept
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: d109bd9925c78036f0075d39f1c2dda83a388d39
+    hash_after: d109bd9925c78036f0075d39f1c2dda83a388d39
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-verbs-run-in-go already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: f597d0eaba229fa9
+        size: 257
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/design_input/the-migration-runs-in-slices]]
+        hash: 3eaee7b8cc71d34a
+        size: 11400
+    def: 07c43ae7253713ec
+  - step: retro/notes
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: 64c80ab688af596486fb6e0f2d97e667812142e0
+    hash_after: 64c80ab688af596486fb6e0f2d97e667812142e0
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: f3969a82c02bf172f81456c63e05e6d1a469e470
+    hash_after: f3969a82c02bf172f81456c63e05e6d1a469e470
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box b87e97900f8f · claude-code-remote
+    hash_before: 6b2c34611f68fb27d9816ba64dfbc75770ab9ef8
+    hash_after: 6b2c34611f68fb27d9816ba64dfbc75770ab9ef8
+    inputs:
+      - name: retro/write
+        hash: 5970134d4f3d5150
+        size: 2838
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -100,8 +177,9 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
@@ -110,14 +188,32 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/quack-holds-a-verb-registry]], group
+- [[spec/tickets/read-verbs-run-in-go]], group
+- [[spec/tickets/work-verbs-run-in-go]], group
+- [[spec/tickets/box-verbs-run-in-go]], group
+- [[spec/tickets/landing-verbs-run-in-go]], group
+- [[spec/tickets/check-verbs-run-in-go]], group
+- [[spec/tickets/retro-verbs-run-in-go]], group
+- [[spec/tickets/dispatch-verbs-run-in-go]], group
+- [[spec/tickets/config-verbs-run-in-go]], group
+- [[spec/tickets/window-verbs-run-in-go]], group
+- [[spec/tickets/ticket-verbs-run-in-go]], group
+- [[spec/tickets/the-node-road-closes]], group
+- [[spec/tickets/box-verbs-windows-fakes]], trivial
+- [[spec/tickets/landing-verbs-windows-green]], trivial
+- [[spec/tickets/manager-tests-wait-for-the-binary]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- size: every child is a group of its own or a trivial ticket, and each merged through its own pull request
+- the goal: the ten verb groups port the verbs, and the-node-road-closes takes programOf and src/scripts/verbs away, so nothing of the goal stands outside them
+- depends_on: every child stands closed, so no child waits on another
 
 # children
 
@@ -128,8 +224,9 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
@@ -140,8 +237,9 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -150,38 +248,65 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- pull request 105 of the-node-road-closes merged, after its Windows job passed on re-run
+- box-verbs-windows-fakes closed on the evidence of pull request 96
+- landing-verbs-windows-green closed on the evidence of pull request 93
+- manager-tests-wait-for-the-binary minted and closed: the manager tests wait for the stopped index to let go of the binary
+- the-verbs-run-in-go passed sync, split, accept and notes
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the failed Windows log named the test and the locked file, so the cause took one read
+- the pull handed every child in order once the trivial tickets joined this group
+- branch sync took the diverged remote branch in where the door refused a plain merge
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 19:21 UTC: branch open pushed the work branch, then tried a push of main for its marker, and left a local main commit behind
+- 19:22 to 19:26 UTC: the door refused reset, merge and pull, while the pull itself named a pull with rebase as the fix
+- 19:25 UTC: any working value in the plan held the pull at wait, a ticket name included, until a done cleared it
+- 19:33 UTC: a helper in its own worktree could write nothing, since the door serves the main checkout and the ticket stood closed
+- 19:34 UTC: a stop of the index run inside that worktree stopped the index of this session, and the door refused every call until serve ran
+- 19:47 UTC: the index_ticket_pull tool answered that no hook serves it, so the hand-back went through the pull tool
+- 19:48 UTC: a tests field naming go test came back refused, since the field wants the green the branch test verb answers
+- the owner sent one prompt, the opening ask, and none turned the run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- branch open: a cloud box pushes its work branch alone, and skips the marker push of main
+- the pull: its refusal on a diverged branch names branch sync, the verb the door lets pass
+- the plan: a working value naming a ticket the pull hands out holds no wait
+- the helper road: a helper that writes runs in the main checkout, or the door serves its worktree
+- index_ticket_pull: the plugin answers it, or the hand-back lines name the pull tool
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The Windows failure was a race in the cleanup, not in the code under test. A re-run that passes hides a race like that, so this group kept a fix of its own rather than wait for the next red run. The two trivial tickets carried finished work, and only their closed groups kept the pull from handing them out.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- one place: each line points at a ticket, a commit or a verb, and copies no rule
+- numbers: the times and job ids fix sources, and the change adds no constant
+- headers: the change writes no file header
+- prompts and errors: every error of the run stands under badly with its time, and the one owner prompt too
+- role: the chapter names the box and the owner by role, with no path or address
 
 ## cloud
 
@@ -190,20 +315,29 @@ Done when `programOf` hands no verb to node, and `src/scripts/verbs/` leaves the
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the gh command line: GitHub reads and the pull request went through the GitHub connector, from the start
+- a blocking wait: the wait tool returned within a second, so the helper's report came in a later turn, at 19:33 UTC
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the trunk guard: the push of main from branch open came back refused, at 19:21 UTC
+- a conflict at sync: program-of-drops-node, where main carried it closed, at 19:35 UTC
+- the shell door: it refused reset, merge and pull, and branch sync passed
+- a test that fails on the box alone: TestAnIndexReachingNoWiringLoadsTheManagerAlone on the Windows runner, fixed in this group
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside this group
+- the handover: the phase 11 group closes through its pull request, and the next phase waits on the dispatcher
 
 # Discussion
 
@@ -238,3 +372,11 @@ Why each choice:
 | every group carries `migration.phase11` | the coordinator turns the phase on, per [[spec/design_input/the-migration-runs-in-slices#the-owner-turns-phases-on]] |
 
 A helper two groups need lands in a Go package under `src/modules`. The second group takes the first one's package at its sync, and ports none of its own.
+
+A child minted after this group closed meets a deadlock. The check went red at `branch done`, since the lint twins case read this ticket for its finding. The fix took `lint-twins-reads-a-standing-finding`.
+
+- the pull answers done on a closed group, and hands out no leaf
+- a named pull stands behind the queue under `engine.binding` at `queue`
+- `branch done` refuses while that child stands open
+
+The evidence stands under that ticket's Discussion. The pull wants a road for a late child of a closed group, through its own reopen or a named pull of a ticket the session mints.
