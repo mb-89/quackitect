@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["quack-holds-a-verb-registry"]
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box f2894f4960c9 · claude-code-remote
@@ -160,6 +160,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: 64609ef519a00d36a2ea4601e7302cca9c54b6c0
+    hash_after: 64609ef519a00d36a2ea4601e7302cca9c54b6c0
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -235,38 +247,62 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the main merge: rules.go takes the RulesOf from main and keeps both tests, the hashed re-route stays over the twin port main carried, and the lint names its config key apart
+- ticket-sub-verb-red-cases: ticket note, open, bless and the bare ticket run in Go, each red before its code
+- ticket-verbs-importer-case: the importer subtest stands, and passes once the modules leave
+- verbs-name-frontmatter-writer: every port writes its front through src/front, and the clear probe names its clone as the root
+- ticket-verbs-port-to-go: the four verbs run in Go, and their programs and the modules only they imported leave
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- three helpers ported the three sub-verbs side by side, each in files of its own, so no write collided
+- the pull already held bless, open and the mint in Go, so each sub-verb stands as a thin shell
+- a fresh reviewer read the whole diff at the gate and found no defect
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 05:25 the merge commit came back refused three times: graph and mint programs stood beside their Go twins, a test ran a deleted program, and a path list made git refuse a partial merge commit
+- 05:35 the write door answered that level zero is starting for two of three helpers through their whole run, so two helpers came back with nothing written
+- 05:40 the stop hook refused the stop reason that helpers still run six times, though four helpers ran
+- 06:05 the commit check stopped the level zero server twice, and writes waited until the serve verb started it again
+- 06:30 a hand-back ran the check under the pull, the probe minted its group in this tree off an inherited root, and the next hand-back committed the stray ticket
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the commit verb in src/quack/commit.go: a partial path list during a merge commits the whole index, so a merge lands through one call
+- the stop hook under .claude/skills/level0/hooks: it reads the helpers the Agent tool runs before it refuses that reason
+- the check in src/quack/check.go: a test that stops the index starts the server again before the check ends
+- the hand-back in src/pull: a command field runs with QUACKITECT_ROOT cleared, so no child writes into the tree it judges
+- a ticket for the dead JavaScript the gate named: the dispatcher half of src/scripts/ticket.js, the four ticket helper modules it alone imports and src/scripts/graph.js, with the tests that hold them
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The port itself was the small part. Most of the run went into the doors around it: the merge gate, the write door going down, the stop hook and a probe writing where it stood. Each one cost a retry, and the gate caught every real break before it reached origin. The one break that slipped through, the stray probe ticket, came from a variable no test watched.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands once: the retro names each home and repeats no rule
+- no number in the change goes unnamed: the one constant each test adds carries a name
+- each header says what its file is for and counts nothing
+- the run had no owner prompt, since a schedule fired it, and the errors stand with their times
+- the chapter names the role, and carries no name or path of the box
 
 ## cloud
 
