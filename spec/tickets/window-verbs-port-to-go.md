@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -117,7 +117,77 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: window-verbs-run-in-go
-step: design/owner-read
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: 3d3c8c3eb534276d9e78c645ad70beced24260ef
+    hash_after: 3d3c8c3eb534276d9e78c645ad70beced24260ef
+    inputs:
+      - name: ask
+        hash: bbe9c1cc20d15917
+        size: 750
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: 85345c566049aaf57703c0c8e308db0423afb085
+    hash_after: 0e97409bbe2861b26bf82a179e14cb9775b6e231
+    answered:
+      - name: tests
+        exit: 1
+        said: "assertion: 5 test(s) fail on their own assertion"
+    inputs:
+      - name: design/draft
+        hash: 1b0d85c2ca187e59
+        size: 3644
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e385b836f39 · claude-code-remote · helper-4
+    hash_before: 3402529f7166082d64f93e1584a20bdcc3772133
+    hash_after: 3402529f7166082d64f93e1584a20bdcc3772133
+    inputs:
+      - name: design/draft
+        hash: 1b0d85c2ca187e59
+        size: 3644
+      - name: design/tests-red
+        hash: b82d35769d0656c1
+        size: 1214
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: e7636df28601826c6c05db8af6f25babdef56bbb
+    hash_after: e7636df28601826c6c05db8af6f25babdef56bbb
+    answered:
+      - name: lint
+        exit: 0
+        said: The check names no red case and no finding at error.
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e385b836f39 · claude-code-remote
+    hash_before: e2e749c828a11ac62ae7c2bf9e6cfaf22721144b
+    hash_after: e2e749c828a11ac62ae7c2bf9e6cfaf22721144b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes; green, src/vehicle passes; green, src/voice passes
+      - name: check
+        exit: 0
+        said: The check names no red case and no finding at error.
+    inputs:
+      - name: design/tests-red
+        hash: b82d35769d0656c1
+        size: 1214
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -151,38 +221,67 @@ The window, the index's start and the vehicles answer from the Go binary that al
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Each verb gets one Go file under src/quack that registers it from an init, the way twins.go registers its twins: tui_verb.go, serve_verb.go, voice_verb.go, vehicle_verb.go and stub_verb.go. Under migration.verbs new the road hands a registered verb to its Go answer, and the node module answers a vehicle or stub action through goAnswer, so neither reaches node. Each file carries a prefix of its verb on every helper name, so a parallel group porting another verb into package main meets no name collision. The vehicle and stub verbs share the register, the identity, the roots and the pointer port, so that logic stands in a new package src/vehicle, ported from lib/vehicle.js, src/scripts/vehicle.js and src/bridge/vehicle.js. The JS of those modules stays, since the hooks, serve.js and the probes still import it. tui builds the viewer off the same source hash viewerOf writes, hands a tab to a standing window over frame.TellPort, launches the viewer holding the terminal, and prints the session log's rows where no Go builds it. serve runs quack standing and reads the hooks standing file, as detachedStart does. voice ports measure and refused off lib/voice.js. The verb files src/scripts/verbs/{tui,serve,voice,vehicle,stub}.js leave, and with them every module only they import: src/scripts/tui.js, src/scripts/voice.js, src/scripts/vehicle-verb.js, src/scripts/stub.js and src/bridge/window.js, with the JS tests over them. src/scripts/serve.js, src/scripts/vehicle.js, src/bridge/vehicle.js, lib/vehicle.js and lib/voice.js keep importers, and stay. Assumed: the Go output matches the JS output line for line, since the lens and the tests read it.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/verbs.go verbRoad, through the registry
+- src/quack/twins.go nodeAccept, for the vehicle and stub actions spec/wiring.yaml loads
+- RUNME.sh, through quack verb
+- test/contract/verb-programs.test.js RUNS, which drops the five verbs
+- test/level0/tui-verb.test.js, voiceverb.test.js, stub.test.js, window-door.test.js, test/contract/stub.test.js, which leave with their modules
+- test/level0/brand.test.js, which drops its stub.js case
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/tui_verb_test.go: the tab argument, the plain rows, the handover to a standing window, the launch
+- src/quack/serve_verb_test.go: a fresh start, a door already answering, a failing start
+- src/quack/voice_verb_test.go: usage, measure missing Vale, measure over a folder, measure --transcripts, refused over days
+- src/vehicle/vehicle_test.go: identity, register read and write, roots, produce, attach port, detach
+- src/quack/vehicle_verb_test.go: here, produce, into, attach, detach, register
+- src/quack/stub_verb_test.go: usage, beside its vehicle, no upstream, empty brand, a written stub
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/quack/tui_verb.go
+- src/quack/serve_verb.go
+- src/quack/voice_verb.go
+- src/quack/vehicle_verb.go
+- src/quack/stub_verb.go
+- src/vehicle/*.go
+- the matching _test.go files
+- src/scripts/verbs/{tui,serve,voice,vehicle,stub}.js
+- src/scripts/{tui,voice,vehicle-verb,stub}.js
+- src/bridge/window.js
+- test/contract/verb-programs.test.js
+- the JS tests over the deleted modules
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every file and function the approach names stands opened: the five verb files, tui.js, serve.js, voice.js, vehicle-verb.js, stub.js, vehicle.js, verbs.go, twins.go, registry.go, frame/door.go, tui-build.js
+- the callers list names the road, the node module, RUNME.sh and every JS importer the resolver found
+- each done_when line maps to a test: go test for the roads, a node-free run per verb, the ls of src/scripts/verbs, the importer search, and the check
 
 ## tests-red
 
@@ -191,26 +290,32 @@ The window, the index's start and the vehicles answer from the Go binary that al
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+sh .se/scripts/red_assert.sh
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- none stands red on the tree: the overlay under .se/scripts/red puts back a registry the five verbs reach nowhere in, and only under it do the five registration tests fail
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Under the overlay, TestTuiRegisters, TestServeRegisters, TestVoiceRegistersUnderItsWord, TestStubVerbStandsInTheRegistry and TestVehicleVerbAnswersThroughTheNodeModule each fail on their own assertion. That is the state before the port, where node answers every one of the five. The helpers wrote every other test before its code too, and each of those failed to build on its missing symbols first. The surprise sat outside the new files. The shared package failed to build while three helpers wrote into it at once. TestAVerbWithNoTwinWritesNoShadowRow pinned vehicle and stub as verbs with no twin, so it now names words no file registers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every test names the JS case it replaces, out of tui-verb, window-door, serve, cli-serve, serve-port, voiceverb, verbs, answer, the vehicle and stub tests, outside-hand and brand
+- the red command fails on the tests' own assertions, quoted under seen
+- no test file stands red on the tree, so the check leaves none out
 
 # gate
 
@@ -219,8 +324,10 @@ The window, the index's start and the vehicles answer from the Go binary that al
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass with findings
+- registered-verb-skips-the-mode: under migration.verbs old or shadow, roadOf in src/quack/verbs.go sends tui, serve, voice, vehicle and stub to node, whose programs this port deletes, so each verb fails there; the road sends a registered verb with no program to quack under every mode, with a case in src/quack/verbs_test.go
 
 # implement
 
@@ -231,14 +338,19 @@ The window, the index's start and the vehicles answer from the Go binary that al
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check --errors
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the ones the gate lists as following from the port: src/index/files.go for HashText, src/quack/verbs.go for wholeOf, the contract tests that list the programs, and tui.md
+- every door the change reaches takes its outside off the hand: tui, serve and voice hold function fields their tests fill, and the vehicle disk door runs its tests over a temp folder, as rule 1 leaves an IO port in quack
+- each file header names what it ports and links the design section of the approach, and each function carries its link
+- every fact stands once: the window port in frame.WindowPort, the tools file in brief.ToolsFile, the hash in index.HashText, the whole-verb mark in wholeOf and goVerbs
 
 ## tests-green
 
@@ -247,26 +359,33 @@ The window, the index's start and the vehicles answer from the Go binary that al
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/tui_verb_test.go src/vehicle/vehicle_test.go src/voice/voice_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check --errors
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs tui, serve, voice, vehicle and stub answer from Go. Each registers from its own file under src/quack, so no shared line moves. The vehicle and stub verbs share src/vehicle, ported from the vehicle JS. The voice verb stands on src/voice. A whole Go verb takes quack under every mode, so none of the five reaches node. With node off the PATH each verb answers, and only the setup step of RUNME.sh still names node. The five verb programs leave src/scripts/verbs, with tui.js, voice.js, vehicle-verb.js, stub.js and bridge/window.js, which nothing else imported. serve.js, scripts/vehicle.js, bridge/vehicle.js and the lib modules keep other importers, so they stay. The contract tests now read the Go verbs off the registry and expect no program for them. The ports match the JS output line by line on the real tree. They differ where node crashed with a stack trace, and there Go prints one line and the same exit code.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the ones the gate lists as following from the port
+- every door the change reaches takes its outside off the hand, and the tests fill it with a fake or a temp folder
+- each file header names what it ports and links the design section of the approach
+- every fact stands once: the window port in frame.WindowPort, the tools file in brief.ToolsFile, the hash in index.HashText, the whole-verb mark in wholeOf and goVerbs
 
 # accept
 

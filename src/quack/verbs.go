@@ -75,8 +75,11 @@ func twinOf(argv []string, twins map[string]twin) (string, twin) {
 	return "", nil
 }
 
-// The road a verb takes under the mode: a twin runs beside the program in shadow and alone under new, ahead of quack's own verb of the same word, and a verb quack answers alone takes quack under every mode. [[spec/tickets/runme-hands-verbs-to-quack]] [[spec/tickets/box-verbs-port-to-go]]
+// The road a verb takes under the mode: a verb Go registers whole takes quack under every mode, a twin of a verb's words runs beside the program in shadow and alone under new, ahead of quack's own verb of the same word, and a verb quack answers alone takes quack under every mode. [[spec/tickets/runme-hands-verbs-to-quack]] [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/registered-verb-skips-the-mode]]
 func roadOf(mode string, argv []string, twins map[string]twin) road {
+	if wholeOf(argv, twins) {
+		return toQuack
+	}
 	if _, one := twinOf(argv, twins); one != nil {
 		switch mode {
 		case modeShadow:
@@ -90,6 +93,11 @@ func roadOf(mode string, argv []string, twins map[string]twin) road {
 		return toQuack
 	}
 	return toNode
+}
+
+// Whether Go registers the verb whole, under its one word, so no program stands beside it and no mode sends it to one. [[spec/tickets/registered-verb-skips-the-mode]]
+func wholeOf(argv []string, twins map[string]twin) bool {
+	return len(argv) > 0 && twins[argv[0]] != nil
 }
 
 // Runs the verb on its road, and answers the exit code the caller reads. In shadow the old answer stands, and the twin runs dry beside it. [[spec/tickets/runme-hands-verbs-to-quack]]
