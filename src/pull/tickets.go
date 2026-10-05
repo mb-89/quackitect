@@ -103,6 +103,11 @@ func EmptyGroup(disk Disk, text, name string) string {
 	return name + " is a group, and no ticket names it under group. Mint a child naming " + name + " under group first, then the group."
 }
 
+// Why a ticket naming a closed group stands refused, or nothing. [[spec/design_output/pull#a-closed-group-hands-nothing]]
+func ClosedGroup(disk Disk, text string) string {
+	return ""
+}
+
 // A ticket a box mints on its branch joins the group the box works, unless it is that group, names one already, or runs a person's process. [[spec/tickets/a-box-keeps-its-tickets]]
 func JoinsGroup(group, process, branch, name string) string {
 	if group != "" || !strings.HasPrefix(branch, WorkBranch) {

@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -130,6 +130,22 @@ record:
         hash: ec76b8a6a166f988
         size: 630
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box c2e39844c8bf · claude-code-remote
+    hash_before: cced801e38062d9087fdc7f4290e7326945cfa81
+    hash_after: cced801e38062d9087fdc7f4290e7326945cfa81
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 53572332c8a87c0e
+        size: 2335
+      - name: [[spec/design_output/pull]]
+        hash: e166577ac49d2d0c
+        size: 46768
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -223,26 +239,32 @@ The mint refuses a new child under a closed group, and the pull stays as it stan
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/process_test.go src/quack/verb_mint_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/pull/process_test.go
+- src/quack/verb_mint_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion: the stub ClosedGroup answers nothing, the mint writes a child under the closed group named, and on the closed branch the auto-join files the ticket under it. No case fails on a compile error, because the stub stands in tickets.go.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the done_when lines: the first two meet the two TestMintVerb cases, both red, and the check line stands for implement to answer
+- the doors: the mint cases run on a temp tree with git, the same fake mintTree the other cases use, and the pull case reads FakeDisk
 
 # gate
 
