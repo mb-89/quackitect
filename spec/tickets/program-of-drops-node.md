@@ -372,3 +372,12 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft's size and tests lists, as the gate asks them corrected:
+
+- size adds `src/quack/no_program_test.go`, which tests-red wrote
+- size adds `test/contract/node-road.test.js`, which tests-red wrote
+- tests reads `src/quack/no_program_test.go`: `TestTheNodeModuleRefusesAWordNothingRegisters`
+- tests reads `test/contract/node-road.test.js`: the road starts no node program
+- tests reads `test/contract/node-road.test.js`: neither the programs nor their runner stands
+- tests names no `programs_test.go` case, since tests-red wrote none there
