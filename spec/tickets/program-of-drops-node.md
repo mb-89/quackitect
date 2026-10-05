@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-node-road-closes
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: b4d544931cd8f9de
         size: 2882
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 89f685f4bb16 · claude-code-remote · helper-4
+    hash_before: 281cc16ba5214d6552f9c1e7f29535807a2e94d4
+    hash_after: 281cc16ba5214d6552f9c1e7f29535807a2e94d4
+    inputs:
+      - name: design/draft
+        hash: b4d544931cd8f9de
+        size: 2882
+      - name: design/tests-red
+        hash: d64454c3cfaba25f
+        size: 691
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -285,8 +297,11 @@ The node module today starts node on a program that stands nowhere, and the erro
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- drops-node-tests-list: draft tests list names cases tests-red never wrote, so align it
+- drops-node-size-list: size omits no_program_test.go and node-road.test.js, which tests-red added
 
 # implement
 
