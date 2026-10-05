@@ -54,6 +54,7 @@ var notesRows = []ticket.Ticket{
 
 // retro notes names each note under .se/tickets standing open, and exits 1. [[spec/tickets/retro-verbs-become-actions]]
 func TestRetroNotesPrintsTheOpenNotesAsCliJsDoes(t *testing.T) {
+	t.Parallel()
 	var out, errs strings.Builder
 	code := retroNotes(notesTree(t, notesRows))([]string{"retro", "notes"}, true, &out, &errs)
 	want := "2 note(s) stand open under .se/tickets. Decide each one, then run this again:\n  a-doubt\n  b-bug\n"
@@ -64,6 +65,7 @@ func TestRetroNotesPrintsTheOpenNotesAsCliJsDoes(t *testing.T) {
 
 // retro notes passes where every note under .se/tickets stands closed. [[spec/tickets/retro-verbs-become-actions]]
 func TestRetroNotesPassesWhereNoNoteStandsOpen(t *testing.T) {
+	t.Parallel()
 	var out, errs strings.Builder
 	code := retroNotes(notesTree(t, notesRows[2:]))([]string{"retro", "notes"}, true, &out, &errs)
 	want := ".se/tickets holds no open note, so the box leaves nothing behind.\n"
@@ -74,6 +76,7 @@ func TestRetroNotesPassesWhereNoNoteStandsOpen(t *testing.T) {
 
 // The wiring loads the retro topic, so an agent calls retro/collect through the index. [[spec/tickets/retro-verbs-become-actions]]
 func TestTheWiringLoadsTheRetroTopic(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)

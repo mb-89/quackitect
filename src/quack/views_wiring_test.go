@@ -10,6 +10,7 @@ import (
 )
 
 func TestTheProjectedModulesAnswerTheBasesAndTheBless(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file"))
 	for _, registers := range projected {

@@ -10,6 +10,7 @@ import (
 
 // A retro's home stands at .se/.retro/<name> under the root. [[spec/guidance/retro/chapter]]
 func TestARetroHomeStandsUnderTheRetroFolder(t *testing.T) {
+	t.Parallel()
 	got := retroHome("/tree", "retro-abc")
 	want := filepath.Join("/tree", ".se", ".retro", "retro-abc")
 	if got != want {
@@ -28,6 +29,7 @@ func TestARetroHomeReadsTheWorkRoot(t *testing.T) {
 
 // The transcripts read their time off timestamp, and the log off at. [[spec/guidance/retro/chapter]]
 func TestEachTimedSourceReadsItsTime(t *testing.T) {
+	t.Parallel()
 	lines := map[string]string{
 		"transcripts": `{"type":"user","timestamp":"2026-01-02T03:04:05Z"}`,
 		"log":         `{"level":"info","at":"2026-01-02T03:04:05Z"}`,

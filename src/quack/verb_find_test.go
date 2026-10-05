@@ -10,6 +10,7 @@ import (
 )
 
 func TestFindVerb(t *testing.T) {
+	t.Parallel()
 	t.Run("a search of the tree asks the index", func(t *testing.T) {
 		asked, logged := [][]string{}, [][]string{}
 		find := findVerb(askHolding([]any{}, nil, &asked), logRecording(&logged))

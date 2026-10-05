@@ -10,6 +10,7 @@ import (
 )
 
 func TestTheWorkAndTicketsModulesTakeTheViewActions(t *testing.T) {
+	t.Parallel()
 	for module, names := range map[string][]string{"work": {"pull", "place"}, "tickets": {"flip-urgent", "set-field"}} {
 		c := q.New()
 		modules[module].registers(c)

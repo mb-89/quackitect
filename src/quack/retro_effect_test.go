@@ -18,6 +18,7 @@ const retroEffectLater = `{"parts":{"tests":1400,"rules":200},"total":1600,"slow
 
 // The next retro counts the last one's patterns again, and names each verdict. [[spec/guidance/retro/effect]]
 func TestRetroEffectCountsTheLastRetrosPatternsAgainAndNamesEachVerdict(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroClassesFirst, retroClassesTree(retroClassesWhole, map[string]string{
 		"collected.json": `{"at":"2026-09-19T21:00:00.000Z"}`,
@@ -52,6 +53,7 @@ func TestRetroEffectCountsTheLastRetrosPatternsAgainAndNamesEachVerdict(t *testi
 
 // A verdict reads gone, falls, holds or grows. [[spec/guidance/retro/effect]]
 func TestRetroEffectReadsAVerdictGoneFallsHoldsOrGrows(t *testing.T) {
+	t.Parallel()
 	before := retroRate{Count: 4, Rate: 1}
 	for _, one := range []struct {
 		now  retroRate
@@ -70,6 +72,7 @@ func TestRetroEffectReadsAVerdictGoneFallsHoldsOrGrows(t *testing.T) {
 
 // A retro with no earlier class fixes measures nothing, and says so. [[spec/guidance/retro/effect]]
 func TestRetroEffectWithNoEarlierClassFixesMeasuresNothingAndSaysSo(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroClassesSecond, map[string]string{"collected.json": `{"at":"2026-09-26T21:00:00.000Z"}`})
 
@@ -82,6 +85,7 @@ func TestRetroEffectWithNoEarlierClassFixesMeasuresNothingAndSaysSo(t *testing.T
 
 // The effect reads this retro's battery against the last retro's. [[spec/guidance/retro/effect]]
 func TestRetroEffectReadsThisRetrosBatteryAgainstTheLastRetros(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
 	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})
@@ -107,6 +111,7 @@ func TestRetroEffectReadsThisRetrosBatteryAgainstTheLastRetros(t *testing.T) {
 
 // A retro with no earlier one reads every part as new, and no report reads as nothing. [[spec/guidance/retro/effect]]
 func TestRetroEffectWithNoEarlierRetroReadsEveryPartAsNewAndNoReportAsNothing(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
 
@@ -129,6 +134,7 @@ func TestRetroEffectWithNoEarlierRetroReadsEveryPartAsNewAndNoReportAsNothing(t 
 
 // The first retro has nothing to read against, so its battery stands as the baseline the next one reads. [[spec/guidance/retro/effect]]
 func TestRetroEffectOfAFirstRetroWritesItsBatteryAsTheBaselineAndNamesIt(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
 
@@ -150,6 +156,7 @@ func TestRetroEffectOfAFirstRetroWritesItsBatteryAsTheBaselineAndNamesIt(t *test
 
 // A retro with an earlier one reads no baseline. [[spec/guidance/retro/effect]]
 func TestRetroEffectWithAnEarlierRetroReadsNoBaseline(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
 	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})

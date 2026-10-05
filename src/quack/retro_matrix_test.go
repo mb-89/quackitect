@@ -11,6 +11,7 @@ import (
 
 // The matrix refuses a chapter without findings, and draws references with the details under them. [[spec/guidance/retro/read]]
 func TestRetroMatrixRefusesAChapterWithoutFindingsAndDrawsReferencesWithTheDetails(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroReadingName, retroReadingWith(retroReadingInput, map[string]string{
 		"chapters.json": retroReadingCuts,
@@ -46,6 +47,7 @@ func TestRetroMatrixRefusesAChapterWithoutFindingsAndDrawsReferencesWithTheDetai
 
 // A hand-back records the verb's last line, so the line carries no path of the box. [[spec/design_output/private#the-box-names-the-owner]]
 func TestRetroMatrixAnswersWithTheRetrosNameAndNoPathOfTheBox(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroReadingName, retroReadingWith(retroReadingInput, map[string]string{
 		"chapters.json":  retroReadingCuts,

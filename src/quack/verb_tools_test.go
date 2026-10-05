@@ -65,6 +65,7 @@ func registered(t *testing.T) map[string]bool {
 }
 
 func TestEveryVerbStandsAmongTheTools(t *testing.T) {
+	t.Parallel()
 	tools := registered(t)
 	table := verbTable()
 	if len(table) == 0 {
@@ -91,6 +92,7 @@ func TestEveryVerbStandsAmongTheTools(t *testing.T) {
 
 // The module types hold the verb topic under the name the wiring loads. [[spec/tickets/agents-call-quack-directly]]
 func TestTheModuleTypesHoldTheVerbTopic(t *testing.T) {
+	t.Parallel()
 	if _, ok := modules[verbsmodule.TreeTopic]; !ok {
 		t.Fatalf("the module types hold no %s", verbsmodule.TreeTopic)
 	}

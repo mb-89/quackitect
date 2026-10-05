@@ -120,6 +120,7 @@ var tuiRowsSaid = []string{
 
 // [[spec/design_output/tui#a-tab-the-caller-names]]
 func TestTuiTabWanted(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct {
 		argv []string
 		want string
@@ -139,6 +140,7 @@ func TestTuiTabWanted(t *testing.T) {
 
 // [[spec/tickets/the-count-chain-leaves]]
 func TestTuiWorkCountPrintsNoCountAndLaunchesNothing(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	box.build = func([]string) (int, string, error) { return 1, "", nil }
 	code, out, errs := box.runs("work", "--count")
@@ -158,6 +160,7 @@ func TestTuiWorkCountPrintsNoCountAndLaunchesNothing(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiPlainPrintsTheSessionRows(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	tuiWrites(t, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
 	code, out, errs := box.runs("--plain")
@@ -172,6 +175,7 @@ func TestTuiPlainPrintsTheSessionRows(t *testing.T) {
 
 // tui --plain --all reads the files logFiles answers over no span: every rotated file in name order, then the session's. [[spec/design_output/log#a-session-rotates-its-file]] [[spec/tickets/window-verbs-log-read-leaves]]
 func TestTuiPlainAllReadsTheRotatedFilesFirst(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	row := func(said string) string {
 		return `{"at":"2026-01-02T03:04:05.678Z","level":"info","kind":"k","said":"` + said + `"}`
@@ -195,6 +199,7 @@ func TestTuiPlainAllReadsTheRotatedFilesFirst(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiNoGoPrintsTheRowsAndAsksForGo(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	box.build = func([]string) (int, string, error) { return 0, "", errors.New("no go here") }
 	tuiWrites(t, box.root, map[string]string{".se/.log/session.jsonl": tuiRowText})
@@ -208,6 +213,7 @@ func TestTuiNoGoPrintsTheRowsAndAsksForGo(t *testing.T) {
 
 // [[spec/design_output/tui#a-second-launch-hands-over]]
 func TestTuiHandsTheTabToAStandingWindow(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct {
 		argv []string
 		tab  string
@@ -230,6 +236,7 @@ func TestTuiHandsTheTabToAStandingWindow(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiLaunchesTheViewerOnTheTab(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	box.code = 3
 	session := filepath.Join(box.root, ".se", ".log", "session.jsonl")
@@ -247,6 +254,7 @@ func TestTuiLaunchesTheViewerOnTheTab(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiBuildsTheViewerAtTheRootAndStampsItsSource(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	exe, why, _ := tuiViewerOf(box.doors())
 	if exe != box.exe() || why != "" {
@@ -267,6 +275,7 @@ func TestTuiBuildsTheViewerAtTheRootAndStampsItsSource(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiBuildLandsBesideTheOldBinary(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	tuiWrites(t, box.root, map[string]string{".se/.runtime/bin/logview": "old binary"})
 	if exe, why, _ := tuiViewerOf(box.doors()); exe != box.exe() || why != "" {
@@ -282,6 +291,7 @@ func TestTuiBuildLandsBesideTheOldBinary(t *testing.T) {
 
 // A folder full of files refuses its removal, the way a binary a window holds refuses on Windows. [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiBuildLandsWhileTheLastAsideStandsHeld(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	tuiWrites(t, box.root, map[string]string{
 		".se/.runtime/bin/logview":          "running binary",
@@ -297,6 +307,7 @@ func TestTuiBuildLandsWhileTheLastAsideStandsHeld(t *testing.T) {
 
 // Every aside name stands held, so the old binary steps nowhere and the build that landed swaps not in. [[spec/tickets/tui-swap-fails-loud]]
 func TestTuiFailedSwapFailsTheVerbAndAsksNotForGo(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	held := map[string]string{
 		".se/.runtime/bin/logview": "running binary",
@@ -321,6 +332,7 @@ func TestTuiFailedSwapFailsTheVerbAndAsksNotForGo(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiRebuildsOnlyWhereTheSourceMoves(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	builds := func() int {
 		tuiViewerOf(box.doors())
@@ -351,6 +363,7 @@ func TestTuiRebuildsOnlyWhereTheSourceMoves(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiFailedBuildSaysWhy(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	box.build = func([]string) (int, string, error) { return 1, "main.go:1: syntax error\n", nil }
 	if exe, why, _ := tuiViewerOf(box.doors()); exe != "" || why != "main.go:1: syntax error" {
@@ -368,6 +381,7 @@ func TestTuiFailedBuildSaysWhy(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiNoGoAnswersNoViewerAndNamesTheFault(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	box.build = func([]string) (int, string, error) { return 0, "", errors.New("exec: go: not found") }
 	if exe, why, _ := tuiViewerOf(box.doors()); exe != "" || why != "exec: go: not found" {
@@ -377,6 +391,7 @@ func TestTuiNoGoAnswersNoViewerAndNamesTheFault(t *testing.T) {
 
 // [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiWindowsBuildsTheExe(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	box.windows = true
 	if exe, _, _ := tuiViewerOf(box.doors()); exe != box.exe()+".exe" || box.builds[0][3] != box.exe()+".exe.new" {
@@ -386,6 +401,7 @@ func TestTuiWindowsBuildsTheExe(t *testing.T) {
 
 // The order localeCompare in Node answers, which the stamp walks its folders in. [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiCollatesAsLocaleCompare(t *testing.T) {
+	t.Parallel()
 	names := []string{"model_view.go", "model.go", "Model2.go", "a-b.go", "a.go", "a_b.go", "B.go", "b.go", "frame", "frame.go", "x1.go", "x10.go", "x2.go"}
 	want := []string{"a_b.go", "a-b.go", "a.go", "b.go", "B.go", "frame", "frame.go", "model_view.go", "model.go", "Model2.go", "x1.go", "x10.go", "x2.go"}
 	slices.SortFunc(names, tuiCollate)
@@ -396,6 +412,7 @@ func TestTuiCollatesAsLocaleCompare(t *testing.T) {
 
 // The text the stamp hashes: each source's path and text, joined on the unit separator. [[spec/design_output/tui#the-verb-builds-it]]
 func TestTuiSourceTextJoinsPathsAndTexts(t *testing.T) {
+	t.Parallel()
 	box := tuiBoxAt(t)
 	tuiWrites(t, box.root, map[string]string{"src/yaml/yaml.go": "package yaml", "src/yaml/notes.txt": "skip"})
 	r := box.root
@@ -411,6 +428,7 @@ func TestTuiSourceTextJoinsPathsAndTexts(t *testing.T) {
 
 // The window's door stands one below the bridge's base, and no vehicle the register places takes it. [[spec/design_output/tui#a-second-launch-hands-over]]
 func TestTuiWindowListensOneBelowTheBridge(t *testing.T) {
+	t.Parallel()
 	if frame.WindowPort != vehicle.PortBase-1 {
 		t.Errorf("the window listens at %d", frame.WindowPort)
 	}
@@ -426,6 +444,7 @@ func TestTuiWindowListensOneBelowTheBridge(t *testing.T) {
 
 // The real tell reaches a window standing on the port, and answers false where none stands. [[spec/design_output/tui#a-second-launch-hands-over]]
 func TestTuiTellReachesAStandingWindow(t *testing.T) {
+	t.Parallel()
 	free, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
@@ -451,6 +470,7 @@ func TestTuiTellReachesAStandingWindow(t *testing.T) {
 
 // The registered verb answers the tui words. [[spec/tickets/quack-registers-each-verb]]
 func TestTuiRegisters(t *testing.T) {
+	t.Parallel()
 	if registry["tui"] == nil {
 		t.Error("no tui verb stands in the registry")
 	}
@@ -458,6 +478,7 @@ func TestTuiRegisters(t *testing.T) {
 
 // Every runtime path the window verbs spell stands under the runtime folder brief.ToolsFile names, which .claude/skills/level0/lib/folders.js owns. [[spec/design_input/the-runtime-files-stand-apart]]
 func TestTuiRuntimeCopiesShareTheFolder(t *testing.T) {
+	t.Parallel()
 	runtime := path.Dir(brief.ToolsFile) + "/"
 	for _, one := range []string{serveIndexBin, tuiBin + "/"} {
 		if !strings.HasPrefix(one, runtime) {

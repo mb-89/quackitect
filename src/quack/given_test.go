@@ -15,6 +15,7 @@ import (
 var givenForms = []string{"Given" + "In(", "q.Given" + "(", "func Given" + "["}
 
 func TestNoRegistrationTakesTheGivenForm(t *testing.T) {
+	t.Parallel()
 	err := filepath.WalkDir(filepath.Join(treeRoot, "src"), func(path string, entry fs.DirEntry, err error) error {
 		if err != nil || entry.IsDir() || !strings.HasSuffix(path, ".go") {
 			return err

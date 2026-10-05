@@ -30,6 +30,7 @@ func browserBox(t *testing.T, paths []string, env map[string]string) (string, fu
 }
 
 func TestTheVariableNamingAFileWinsOverEveryOtherRung(t *testing.T) {
+	t.Parallel()
 	root, env := browserBox(t,
 		[]string{"x/chrome", "pw/chromium-1/chrome-linux/chrome", "bin/chromium", "home/.cache/ms-playwright/chromium-7/chrome-linux/chrome"},
 		map[string]string{"PLAYWRIGHT_CHROMIUM": "x/chrome", "PLAYWRIGHT_BROWSERS_PATH": "pw", "PATH": "bin", "HOME": "home"})
@@ -39,6 +40,7 @@ func TestTheVariableNamingAFileWinsOverEveryOtherRung(t *testing.T) {
 }
 
 func TestAVariableNamingNoFileFallsToTheBrowsersFolderNewestBuildFirst(t *testing.T) {
+	t.Parallel()
 	root, env := browserBox(t,
 		[]string{"pw/chromium-9/chrome-linux/chrome", "pw/chromium-12/chrome-linux/chrome", "pw/chromium_headless_shell-12/chrome-linux/headless_shell"},
 		map[string]string{"PLAYWRIGHT_CHROMIUM": "gone", "PLAYWRIGHT_BROWSERS_PATH": "pw"})
@@ -48,6 +50,7 @@ func TestAVariableNamingNoFileFallsToTheBrowsersFolderNewestBuildFirst(t *testin
 }
 
 func TestThePathAnswersInTheOrderTheCallsNameBeforeTheDownloadsFolder(t *testing.T) {
+	t.Parallel()
 	root, env := browserBox(t,
 		[]string{"b/google-chrome", "a/chromium-browser", "home/.cache/ms-playwright/chromium-7/chrome-linux/chrome"},
 		map[string]string{"HOME": "home"})
@@ -67,6 +70,7 @@ func TestThePathAnswersInTheOrderTheCallsNameBeforeTheDownloadsFolder(t *testing
 }
 
 func TestAWindowsPathSplitsOnSemicolonsAndTriesTheExeEnding(t *testing.T) {
+	t.Parallel()
 	root, env := browserBox(t, []string{"w/chrome.exe"}, map[string]string{"Path": "w", "PATHEXT": ".EXE"})
 	if at, from := browserFrom(env, false); at != filepath.Join(root, "w", "chrome.exe") || from != "PATH" {
 		t.Errorf("the order answers %s off %s", at, from)
@@ -74,6 +78,7 @@ func TestAWindowsPathSplitsOnSemicolonsAndTriesTheExeEnding(t *testing.T) {
 }
 
 func TestTheFolderTheDownloadWritesAnswersLast(t *testing.T) {
+	t.Parallel()
 	root, env := browserBox(t, []string{"home/.cache/ms-playwright/chromium-7/chrome-linux/chrome"}, map[string]string{"PATH": "a", "HOME": "home"})
 	if at, from := browserFrom(env, false); at != filepath.Join(root, "home", ".cache", "ms-playwright", "chromium-7", "chrome-linux", "chrome") || from != "playwright install" {
 		t.Errorf("the order answers %s off %s", at, from)
@@ -85,6 +90,7 @@ func TestTheFolderTheDownloadWritesAnswersLast(t *testing.T) {
 }
 
 func TestABoxWithNoBrowserAnswersNothing(t *testing.T) {
+	t.Parallel()
 	_, env := browserBox(t, nil, map[string]string{"PATH": "a", "HOME": "home"})
 	if at, from := browserFrom(env, false); at != "" || from != "" {
 		t.Errorf("the order answers %s off %s", at, from)
@@ -95,6 +101,7 @@ func TestABoxWithNoBrowserAnswersNothing(t *testing.T) {
 }
 
 func TestTheCacheFolderReadsTheHomeFolderTheOneReaderNames(t *testing.T) {
+	t.Parallel()
 	envOf := func(pairs map[string]string) func(string) string {
 		return func(key string) string { return pairs[key] }
 	}

@@ -21,6 +21,7 @@ func retroReportHolds(t *testing.T, report string, patterns ...string) {
 
 // The report puts the field feedback beside the chapters. [[spec/guidance/retro/read]]
 func TestRetroReportPutsTheFieldFeedbackBesideTheChapters(t *testing.T) {
+	t.Parallel()
 	columns := []retroColumn{
 		{id: "c1", title: "the morning", findings: map[string][]string{"start": {"a"}}},
 		{id: "feedback", title: "field feedback", findings: map[string][]string{"code": {"b"}}},
@@ -36,6 +37,7 @@ func TestRetroReportPutsTheFieldFeedbackBesideTheChapters(t *testing.T) {
 
 // The report draws the battery beside the effect, part by part, with the cases that moved. [[spec/guidance/retro/effect]]
 func TestRetroReportDrawsTheBatteryBesideTheEffectPartByPartWithTheCasesThatMoved(t *testing.T) {
+	t.Parallel()
 	var effect retroEffectRecord
 	if err := json.Unmarshal([]byte(`{"last":"retro-0000000","classes":[],"battery":{`+
 		`"total":{"before":1300,"now":1820},`+
@@ -72,6 +74,7 @@ func TestRetroReportDrawsTheBatteryBesideTheEffectPartByPartWithTheCasesThatMove
 
 // A class with no status stands open at the retro's check step, and the report names that step. [[spec/guidance/retro/check]]
 func TestRetroReportReadsAClassTheCheckStepLeavesOpenSo(t *testing.T) {
+	t.Parallel()
 	record := retroRecordOf(`{"classes":[{"id":"k1","class":"one class","category":"` + retroCategories[0] +
 		`","defect":"a defect","fix":"a fix"}],"dispositions":{}}`)
 	if record == nil {

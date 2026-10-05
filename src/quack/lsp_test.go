@@ -21,6 +21,7 @@ import (
 
 // The lsp module reads the check module's rules through the ports quack wires, so a text fault reaches it as check draws it. [[spec/tickets/lsp-module-draws-the-tools]]
 func TestThePortsAnswerTheCheckModulesRows(t *testing.T) {
+	t.Parallel()
 	const path, function, file = "src/over.go", 2, 3
 	texts := map[string]string{path: "package over\n\nfunc a() {\n\tb()\n\tb()\n\tb()\n}\n"}
 	ports := lspChecks("")
@@ -41,6 +42,7 @@ func TestThePortsAnswerTheCheckModulesRows(t *testing.T) {
 
 // The lsp module reads the check module's features through the ports quack wires, so a hover, a completion, a link and a fold reach it as check reads them. [[spec/tickets/lsp-module-serves-the-features]]
 func TestTheFeaturePortsAnswerTheCheckModulesReads(t *testing.T) {
+	t.Parallel()
 	texts := map[string]string{
 		"spec/schemas/paragraph.schema.yaml": "kind: paragraph\nlayers:\n  vocabulary:\n    terms: spec/vocabulary/terms.yml\n    endings: spec/config/stems.yaml\n",
 		"spec/vocabulary/terms.yml":          "terms:\n  - {word: door, means: \"the one place the tree guards an outside thing\"}\n",
@@ -84,6 +86,7 @@ func TestTheFeaturePortsAnswerTheCheckModulesReads(t *testing.T) {
 
 // The tools and the features read the tracked texts, so the wiring binds the lsp module's inputs to the files the index mirrors and the paths git tracks. [[spec/tickets/lsp-module-draws-the-tools]]
 func TestTheWiringHandsTheLspModuleTheTrackedFiles(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -100,6 +103,7 @@ func TestTheWiringHandsTheLspModuleTheTrackedFiles(t *testing.T) {
 }
 
 func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
+	t.Parallel()
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)
@@ -141,6 +145,7 @@ func TestQuackLspRelaysTheStreamWhole(t *testing.T) {
 }
 
 func TestQuackLspDialsThePortTheStandingFileNames(t *testing.T) {
+	t.Parallel()
 	listen, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)

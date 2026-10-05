@@ -11,6 +11,7 @@ import (
 )
 
 func TestTheWiringLoadsTheMCPModule(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)

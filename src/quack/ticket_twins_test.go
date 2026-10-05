@@ -14,6 +14,7 @@ import (
 )
 
 func TestTicketYoursPrintsTheRowsAsCliJsDoes(t *testing.T) {
+	t.Parallel()
 	var out, errs strings.Builder
 	code := ticketYours(yoursTree(t, yoursRows))([]string{"ticket", "yours"}, true, &out, &errs)
 	want := `{"tickets":[{"ticket":"a-draft","path":"spec/tickets/a-draft.md","step":"design/owner-read","queue":"-2","state":"draft","person":true},{"ticket":"a-trial","path":"spec/tickets/a-trial.md","step":"do","queue":"-1","state":"open","person":true}]}` + "\n"
@@ -23,6 +24,7 @@ func TestTicketYoursPrintsTheRowsAsCliJsDoes(t *testing.T) {
 }
 
 func TestTicketYoursNextNamesTheFirstOpenPersonRow(t *testing.T) {
+	t.Parallel()
 	var out, errs strings.Builder
 	code := ticketYours(yoursTree(t, yoursRows))([]string{"ticket", "yours", "--next"}, true, &out, &errs)
 	if want := `{"ticket":"a-trial","path":"spec/tickets/a-trial.md","step":"do"}` + "\n"; code != 0 || out.String() != want {
@@ -37,6 +39,7 @@ func TestTicketYoursNextNamesTheFirstOpenPersonRow(t *testing.T) {
 
 // The node module answers a registered verb through the accepts with its output, and fails with the output where the exit reads past 0. [[spec/tickets/program-of-drops-node]]
 func TestTheAcceptsAnswerARegisteredVerb(t *testing.T) {
+	t.Parallel()
 	registersFor(t, "registry accepts", func(argv []string, _ bool, out, _ io.Writer) int {
 		fmt.Fprintln(out, strings.Join(argv[2:], " "))
 		if len(argv) > 2 && argv[2] == "fail" {

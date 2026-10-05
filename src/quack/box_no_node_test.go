@@ -26,6 +26,7 @@ func startsNode(argv []string) bool {
 }
 
 func TestEveryBoxVerbStartsNoNode(t *testing.T) {
+	t.Parallel()
 	if len(boxAnswers) == 0 {
 		t.Fatal("no box verb registers")
 	}
@@ -47,6 +48,7 @@ func TestEveryBoxVerbStartsNoNode(t *testing.T) {
 }
 
 func TestTheNoNodeCaseCatchesANodeRun(t *testing.T) {
+	t.Parallel()
 	if !startsNode([]string{"/opt/bin/node", "x.js"}) || !startsNode([]string{"cmd", "/c", "node.exe", "y.js"}) {
 		t.Error("a node run reads as none")
 	}

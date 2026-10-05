@@ -75,6 +75,7 @@ func partNamed(parts []part, name string) part {
 }
 
 func TestCheckParts(t *testing.T) {
+	t.Parallel()
 	t.Run("the parts run in order, and level zero runs beside the parts after the tests", func(t *testing.T) {
 		fake := &checkFake{}
 		parts := partsOf(fake.doors(), nil, false)
@@ -146,6 +147,7 @@ func TestCheckParts(t *testing.T) {
 }
 
 func TestBatteryRun(t *testing.T) {
+	t.Parallel()
 	step := func(name string, code int, ran *[]string) part {
 		return part{name: name, run: func() int { *ran = append(*ran, name); return code }}
 	}
@@ -202,6 +204,7 @@ func TestBatteryRun(t *testing.T) {
 }
 
 func TestServerRead(t *testing.T) {
+	t.Parallel()
 	if code, line, red := serverRead(true, true, "http://127.0.0.1:6510/health", ""); code != 0 || red || !strings.Contains(line, "stands at") {
 		t.Fatalf("a server answering well reads %d, %q, %v", code, line, red)
 	}
@@ -214,6 +217,7 @@ func TestServerRead(t *testing.T) {
 }
 
 func TestGoGate(t *testing.T) {
+	t.Parallel()
 	read := func(path string) string {
 		if path == "src/one/one_test.go" {
 			return "package one\n\nfunc TestB(t *testing.T) {}\nfunc helper() {}\nfunc TestA(t *testing.T) {}\nfunc TestB(t *testing.T) {}\n"
@@ -269,6 +273,7 @@ func TestGoGate(t *testing.T) {
 }
 
 func TestTestArgv(t *testing.T) {
+	t.Parallel()
 	root, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
@@ -295,6 +300,7 @@ func TestTestArgv(t *testing.T) {
 }
 
 func TestCheckErrors(t *testing.T) {
+	t.Parallel()
 	lines := caseLine(map[string]any{"file": "test/a.test.js", "name": "a case", "ok": false, "said": "it broke"})
 	if got := errorsSaid(lines, []string{"src/a.js:1:1: Rule: a message"}); !reflect.DeepEqual(got, []string{"test/a.test.js: a case: it broke", "src/a.js:1:1: Rule: a message"}) {
 		t.Fatalf("the rows read %q", got)
@@ -305,6 +311,7 @@ func TestCheckErrors(t *testing.T) {
 }
 
 func TestCheckReads(t *testing.T) {
+	t.Parallel()
 	t.Run("the Go gate runs with no C compiler", func(t *testing.T) {
 		fake := &checkFake{}
 		goGate(fake.doors(), false, nil)
@@ -329,6 +336,7 @@ func TestCheckReads(t *testing.T) {
 }
 
 func TestCheckVerb(t *testing.T) {
+	t.Parallel()
 	whole := func(t *testing.T, fake *checkFake, budget float64, words ...string) (checkDoors, string, int) {
 		t.Helper()
 		var said strings.Builder
@@ -404,6 +412,7 @@ func TestCheckVerb(t *testing.T) {
 }
 
 func TestVerbOver(t *testing.T) {
+	t.Parallel()
 	type ran struct {
 		argv, env []string
 		quiet     bool
@@ -448,6 +457,7 @@ func TestVerbOver(t *testing.T) {
 }
 
 func TestTestVerb(t *testing.T) {
+	t.Parallel()
 	t.Run("named files go to branch test under a fresh tally", func(t *testing.T) {
 		fake := &checkFake{}
 		doors := fake.doors()
@@ -471,6 +481,7 @@ func TestTestVerb(t *testing.T) {
 }
 
 func TestCheckRegisters(t *testing.T) {
+	t.Parallel()
 	for _, words := range []string{"check", "test"} {
 		if registry[words] == nil {
 			t.Fatalf("the registry holds no %s, so quack hands it to node", words)

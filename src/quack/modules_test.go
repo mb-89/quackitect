@@ -13,6 +13,7 @@ import (
 )
 
 func TestEachModuleTypeNamesAFolderThatStands(t *testing.T) {
+	t.Parallel()
 	for name, module := range modules {
 		if module.folder == "" {
 			if !slices.Contains(settings.Sections(), name) {

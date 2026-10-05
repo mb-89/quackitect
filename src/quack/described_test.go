@@ -11,6 +11,7 @@ import (
 )
 
 func TestEveryModuleDescribesWhatItExposes(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	c.Take(q.Main)
 	for _, one := range modules {

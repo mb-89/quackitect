@@ -26,6 +26,7 @@ func replyFields(pairs ...string) string {
 }
 
 func TestTheReplyReadsWhichFieldCarriesTheLine(t *testing.T) {
+	t.Parallel()
 	read := readsReply([]probeRow{replyCalled(`{"tool":"Read","text":"` + replySays + `."}`)}, "")
 	if !slices.Equal(read.carries, []string{"text"}) || read.fields.values["tool"] != "Read" || !strings.Contains(read.why, "carries the message's text on text") {
 		t.Errorf("the read reads %+v", read)
@@ -37,6 +38,7 @@ func TestTheReplyReadsWhichFieldCarriesTheLine(t *testing.T) {
 }
 
 func TestTheReplyReadsWhetherTheAnswerQuotesTheWarning(t *testing.T) {
+	t.Parallel()
 	if !readsReply(nil, `"`+promptWhy+`, and nothing has answered it yet."`).warned {
 		t.Error("the warning reads as no warning")
 	}
@@ -46,6 +48,7 @@ func TestTheReplyReadsWhetherTheAnswerQuotesTheWarning(t *testing.T) {
 }
 
 func TestTheReplyProbePrintsTheFieldsTheRunAdds(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	writeLog(t, d.root, logText(replyCalled(replyFields("tool", "Read", "old", "x"))))
 	clientAnswers(&d, func([]string, runOpts) ranResult {
@@ -66,6 +69,7 @@ func TestTheReplyProbePrintsTheFieldsTheRunAdds(t *testing.T) {
 
 // The rows the run adds read past a line two writers tore. [[spec/design_output/log#every-writer-appends]]
 func TestTheReplyProbeReadsPastATornLine(t *testing.T) {
+	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
 	writeLog(t, d.root, "")
 	clientAnswers(&d, func([]string, runOpts) ranResult {
@@ -78,6 +82,7 @@ func TestTheReplyProbeReadsPastATornLine(t *testing.T) {
 }
 
 func TestTheReplyProbeAnswersOneWhereTheRunWritesNoRow(t *testing.T) {
+	t.Parallel()
 	d, _, out, errs := fakeBoxDoors(t)
 	clientAnswers(&d, func([]string, runOpts) ranResult { return ranResult{code: 2} })
 	if code := probeVerb(d, []string{"reply"}); code != 1 || !strings.Contains(out.String(), "loads no function hooks") || errs.String() != "The client answers 2.\n" {

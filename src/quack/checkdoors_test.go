@@ -11,6 +11,7 @@ import (
 
 // A road naming a worktree's scripts roots the check there, past the method root's variable. [[spec/tickets/check-reads-the-road-root]]
 func TestRoadRootTakesTheTreeTheRoadNames(t *testing.T) {
+	t.Parallel()
 	method := func() (string, error) { return filepath.FromSlash("/main"), nil }
 	scripts := filepath.Join("/work", "tree", "src", "scripts")
 	if got, want := roadRoot([]string{"quack", "verb", scripts, "check"}, method), filepath.Join("/work", "tree"); got != want {
@@ -20,6 +21,7 @@ func TestRoadRootTakesTheTreeTheRoadNames(t *testing.T) {
 
 // No road leaves the root to the index, and a failed read leaves the folder quack stands in. [[spec/tickets/check-reads-the-road-root]]
 func TestRoadRootFallsBackToTheIndexRoot(t *testing.T) {
+	t.Parallel()
 	method := func() (string, error) { return filepath.FromSlash("/main"), nil }
 	if got := roadRoot([]string{"quack", "check"}, method); got != filepath.FromSlash("/main") {
 		t.Fatalf("without a road the root reads %q", got)

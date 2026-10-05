@@ -13,6 +13,7 @@ const retroMedianLast = `{"parts":{"tests":300,"rules":30},"total":330,"slowest"
 
 // [[spec/guidance/retro/effect]]
 func TestRetroCollectKeepsEachPartsMedianOverTheRunsAndTheLastRunsCasesAndFiles(t *testing.T) {
+	t.Parallel()
 	said, _ := retroJSON(retroKeptReport(`{"battery":` + retroMedianLast + `,"runs":[{"tests":300,"rules":30},{"tests":100},{"tests":200,"rules":10}]}`)).(map[string]any)
 	last, _ := retroJSON(retroMedianLast).(map[string]any)
 
@@ -29,6 +30,7 @@ func TestRetroCollectKeepsEachPartsMedianOverTheRunsAndTheLastRunsCasesAndFiles(
 
 // [[spec/guidance/retro/effect]]
 func TestRetroCollectReadsAStampFromBeforeTheRunsAsItsOneReportAndNoReportAsNothing(t *testing.T) {
+	t.Parallel()
 	said, _ := retroJSON(retroKeptReport(`{"battery":` + retroMedianLast + `}`)).(map[string]any)
 	last, _ := retroJSON(retroMedianLast).(map[string]any)
 

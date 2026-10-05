@@ -30,6 +30,7 @@ var leftScripts = []string{
 var registers = regexp.MustCompile(`register\("([^"]+)"`)
 
 func TestTicketVerbsRunInGo(t *testing.T) {
+	t.Parallel()
 	t.Run("each verb of the group registers a Go answer", func(t *testing.T) {
 		for _, words := range groupVerbs {
 			if registry[words] == nil {

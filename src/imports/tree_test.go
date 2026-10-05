@@ -11,6 +11,7 @@ import (
 )
 
 func TestTheTreeHoldsTheImportRules(t *testing.T) {
+	t.Parallel()
 	loaded, err := packages.Load(&packages.Config{Mode: packages.NeedName | packages.NeedImports | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedSyntax, Dir: "../..", Tests: true}, "./...")
 	if err != nil {
 		t.Fatal(err)
@@ -39,6 +40,7 @@ func TestTheTreeHoldsTheImportRules(t *testing.T) {
 }
 
 func TestAFolderSharingAPrefixStandsOutsideTheRules(t *testing.T) {
+	t.Parallel()
 	if said := Faults("quackitect/src/modulesx/work", []string{"quackitect/src/doors/disk"}); len(said) != 0 {
 		t.Fatalf("src/modulesx reads as a module: %v", said)
 	}

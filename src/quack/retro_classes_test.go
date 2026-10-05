@@ -53,6 +53,7 @@ func retroClassesTree(record string, more map[string]string) map[string]string {
 
 // Classes refuse a finding with no disposition, and a disposition naming nothing. [[spec/guidance/retro/classify]]
 func TestRetroClassesRefuseAFindingWithNoDispositionAndADispositionNamingNothing(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	record := `{"classes":[` + retroClassesClass + `],"dispositions":{"c1.stop.1":"k9"},"promotions":[]}`
 	retroReadingLay(t, root, retroClassesFirst, retroClassesTree(record, nil))
@@ -68,6 +69,7 @@ func TestRetroClassesRefuseAFindingWithNoDispositionAndADispositionNamingNothing
 
 // Every collected note and memory answers where it goes, and the report lists them with the checklist and the limits. [[spec/guidance/retro/classify]]
 func TestRetroClassesHoldEveryNoteAndMemoryAndTheReportListsThemWithTheChecklistAndTheLimits(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroClassesFirst, retroClassesTree(retroClassesWhole, map[string]string{
 		"input/tickets/a-parked-thought.md":  "---\nkind: [[ticket]]\n---\n",
@@ -102,6 +104,7 @@ func TestRetroClassesHoldEveryNoteAndMemoryAndTheReportListsThemWithTheChecklist
 
 // An auditor's column joins the matrix beside the chapters. [[spec/guidance/retro/audit]]
 func TestRetroClassesTakeAnAuditorsColumnBesideTheChapters(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroClassesFirst, retroClassesTree(retroClassesWhole, map[string]string{
 		"findings/audit-code.md": retroReadingFindings(map[string][]string{"stop": {"a header retells its pointer"}}),
@@ -116,6 +119,7 @@ func TestRetroClassesTakeAnAuditorsColumnBesideTheChapters(t *testing.T) {
 
 // Classes count each pattern per active hour, and the report opens on them. [[spec/guidance/retro/classify]]
 func TestRetroClassesCountEachPatternPerActiveHourAndTheReportOpensOnThem(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroClassesFirst, retroClassesTree(retroClassesWhole, nil))
 

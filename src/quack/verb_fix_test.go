@@ -53,6 +53,7 @@ func fixRoot(t *testing.T) string {
 }
 
 func TestFixRefusesAnUnknownFlag(t *testing.T) {
+	t.Parallel()
 	code, _, errs, ran := fixRan(fixRoot(t), "--apply-everything", "src")
 	if code != exitUsage || errs != "fix knows no flag --apply-everything. Usage: ./RUNME.sh fix [path ...], over the paths or the tree.\n" || len(ran) != 0 {
 		t.Fatalf("fix answers %d and %q and ran %v, and wants the refusal with nothing run", code, errs, ran)
@@ -60,12 +61,14 @@ func TestFixRefusesAnUnknownFlag(t *testing.T) {
 }
 
 func TestFixPrintsItsUsage(t *testing.T) {
+	t.Parallel()
 	if code, out, _, ran := fixRan(fixRoot(t), "--help"); code != 0 || out != "Usage: ./RUNME.sh fix [path ...], over the paths or the tree.\n" || len(ran) != 0 {
 		t.Fatalf("fix --help answers %d and %q and ran %v", code, out, ran)
 	}
 }
 
 func TestFixRefusesWhereNoValeStands(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	if code, _, errs, _ := fixRan(root); code != exitUsage || errs != "Vale is missing. Run ./RUNME.sh once and it installs.\n" {
 		t.Fatalf("fix answers %d and %q, and wants the refusal", code, errs)
@@ -73,6 +76,7 @@ func TestFixRefusesWhereNoValeStands(t *testing.T) {
 }
 
 func TestTheCalmNamesAFileItCannotWrite(t *testing.T) {
+	t.Parallel()
 	root := fixRoot(t)
 	run := func(_ string, said, _ io.Writer, _ ...string) int {
 		fmt.Fprint(said, shoutedRow)
@@ -86,6 +90,7 @@ func TestTheCalmNamesAFileItCannotWrite(t *testing.T) {
 }
 
 func TestFixCalmsAShoutedLead(t *testing.T) {
+	t.Parallel()
 	root := fixRoot(t)
 	code, out, _, ran := fixRan(root, "a.md")
 	if code != 0 || out != "Run ./RUNME.sh lint to see what is left for a person.\n" {
@@ -109,6 +114,7 @@ func TestFixCalmsAShoutedLead(t *testing.T) {
 }
 
 func TestSentenceCaseKeepsWhatStandsBeforeTheFirstLetter(t *testing.T) {
+	t.Parallel()
 	for said, want := range map[string]string{
 		"NOTHING AT ALL, yes": "Nothing at all, yes",
 		"  SHOUTING HERE":     "  Shouting here",
@@ -123,6 +129,7 @@ func TestSentenceCaseKeepsWhatStandsBeforeTheFirstLetter(t *testing.T) {
 }
 
 func TestTheCalmLeavesAStaleSpanAlone(t *testing.T) {
+	t.Parallel()
 	was := "# Notes\n\nSomething else entirely.\n"
 	if got := calmed(was, []valeRow{{Line: 3, Span: []int{1, 15}, Match: "NOTHING AT ALL,"}}); got != was {
 		t.Fatalf("the calm writes %q over a stale span", got)
@@ -130,6 +137,7 @@ func TestTheCalmLeavesAStaleSpanAlone(t *testing.T) {
 }
 
 func TestTheCalmCalmsTwoShoutsOnOneLine(t *testing.T) {
+	t.Parallel()
 	got := calmed("AAAA BBBB CCCC, and DDDD EEEE FFFF, done\n", []valeRow{
 		{Line: 1, Span: []int{1, 15}, Match: "AAAA BBBB CCCC,"},
 		{Line: 1, Span: []int{21, 35}, Match: "DDDD EEEE FFFF,"},
@@ -140,6 +148,7 @@ func TestTheCalmCalmsTwoShoutsOnOneLine(t *testing.T) {
 }
 
 func TestACarriageReturnSurvivesTheCalm(t *testing.T) {
+	t.Parallel()
 	got := calmed("# Notes\r\n\r\nNOTHING AT ALL WORKS, yes\r\n", []valeRow{{Line: 3, Span: []int{1, 21}, Match: "NOTHING AT ALL WORKS,"}})
 	if got != "# Notes\r\n\r\nNothing at all works, yes\r\n" {
 		t.Fatalf("the calm writes %q", got)
@@ -148,6 +157,7 @@ func TestACarriageReturnSurvivesTheCalm(t *testing.T) {
 
 // Real Vale names the shout, and the calm writes it in sentence case; a box with no Vale skips it. [[spec/design_output/doors#one-contract-test-per-door]]
 func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
+	t.Parallel()
 	root, _ := filepath.Abs(filepath.Join("..", ".."))
 	vale := toolHere(root, "vale")
 	if vale == "" {
@@ -171,6 +181,7 @@ func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
 }
 
 func TestFixReadsTheTreeWhereNoPathStands(t *testing.T) {
+	t.Parallel()
 	_, _, _, ran := fixRan(fixRoot(t))
 	if len(ran) == 0 || !strings.HasSuffix(ran[0], valeParked+" .") {
 		t.Fatalf("fix ran %v, and wants the tree", ran)

@@ -15,6 +15,7 @@ import (
 )
 
 func TestSchemaStandsAsGenerated(t *testing.T) {
+	t.Parallel()
 	want, err := schemaText(treeRoot)
 	if err != nil {
 		t.Fatal(err)
@@ -29,6 +30,7 @@ func TestSchemaStandsAsGenerated(t *testing.T) {
 }
 
 func TestDefaultFileHoldsNoBuiltIn(t *testing.T) {
+	t.Parallel()
 	keys := declared(t)
 	for dotted, literal := range trackedLeaves(t) {
 		key, ok := keys[dotted]
@@ -46,6 +48,7 @@ func TestDefaultFileHoldsNoBuiltIn(t *testing.T) {
 }
 
 func TestEveryTrackedKeyIsDeclared(t *testing.T) {
+	t.Parallel()
 	keys := declared(t)
 	for dotted := range trackedLeaves(t) {
 		if _, ok := keys[dotted]; !ok {
@@ -56,6 +59,7 @@ func TestEveryTrackedKeyIsDeclared(t *testing.T) {
 
 // The sections the drawing names stand first, in its order, so the sidebar meets its groups as it drew them. [[spec/tickets/the-config-schema-gets-generated]]
 func TestDrawnSectionsStandFirst(t *testing.T) {
+	t.Parallel()
 	text, err := schemaText(treeRoot)
 	if err != nil {
 		t.Fatal(err)
@@ -140,6 +144,7 @@ func normalised(t *testing.T, literal string) string {
 
 // The schema verb's write form holds the program, the verb and the flag, the count main weighs it by. [[spec/design_output/config#the-magic-numbers-take-names]]
 func TestTheSchemaWriteFormHoldsItsArgs(t *testing.T) {
+	t.Parallel()
 	if said := len([]string{"quack", "schema", "--write"}); said != schemaArgs {
 		t.Fatalf("the write form holds %d arguments, and main weighs %d", said, schemaArgs)
 	}

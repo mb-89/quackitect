@@ -15,6 +15,7 @@ import (
 )
 
 func TestTheWiringBindsTheHooksEventsAndTheSessionFolds(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -79,6 +80,7 @@ func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
 
 // The holds read the hold, the ask, the binding, the graces, the plan's numbers and the helper tiers off the root's config. [[spec/tickets/cage-call-holds-port]]
 func TestCommandSettingsReadTheHoldKeys(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	at := filepath.Join(root, "spec", "config")
 	if err := os.MkdirAll(at, 0o755); err != nil {

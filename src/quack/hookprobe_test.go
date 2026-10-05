@@ -53,6 +53,7 @@ func wheres(found []hookNamed) []string {
 }
 
 func TestTheHookReaderTakesAnAddressOutOfEachOfTheThreeSettingsFiles(t *testing.T) {
+	t.Parallel()
 	root, home := t.TempDir(), t.TempDir()
 	writeFiles(t, root, map[string]string{
 		settingsFile:      hookSettings("http://127.0.0.1:1/a"),
@@ -73,6 +74,7 @@ func TestTheHookReaderTakesAnAddressOutOfEachOfTheThreeSettingsFiles(t *testing.
 }
 
 func TestASettingsFileHoldingNoHooksStandingNowhereOrTornNamesNoAddress(t *testing.T) {
+	t.Parallel()
 	for name, files := range map[string]map[string]string{
 		"no hooks": {settingsFile: `{"permissions":{"allow":[]}}`},
 		"nowhere":  {},
@@ -87,6 +89,7 @@ func TestASettingsFileHoldingNoHooksStandingNowhereOrTornNamesNoAddress(t *testi
 }
 
 func TestACommandHookStandsOutsideTheAddresses(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	writeFiles(t, root, map[string]string{settingsFile: `{"hooks":{"PreToolUse":[
 		{"hooks":[{"type":"command","command":"C:\\hook.exe"}]},
@@ -98,6 +101,7 @@ func TestACommandHookStandsOutsideTheAddresses(t *testing.T) {
 }
 
 func TestTwoFilesNamingOneAddressNameItOnceOffTheFileReadingFirst(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	writeFiles(t, root, map[string]string{
 		settingsFile:      hookSettings("http://127.0.0.1:1/a"),
@@ -110,6 +114,7 @@ func TestTwoFilesNamingOneAddressNameItOnceOffTheFileReadingFirst(t *testing.T) 
 }
 
 func TestTheAddressReadsAsABrowserWritesIt(t *testing.T) {
+	t.Parallel()
 	for said, want := range map[string]string{
 		"http://127.0.0.1:1/a":  "http://127.0.0.1:1/a",
 		"HTTP://Host:80":        "http://host/",
@@ -126,6 +131,7 @@ func TestTheAddressReadsAsABrowserWritesIt(t *testing.T) {
 }
 
 func TestAHookAnsweringStandsAndOneAnsweringNothingWarns(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	where := "http://127.0.0.1:36368/hook"
 	d.get = answeringGet(map[string]string{where: ""})
@@ -141,6 +147,7 @@ func TestAHookAnsweringStandsAndOneAnsweringNothingWarns(t *testing.T) {
 }
 
 func TestAHookAnsweringAFailingStatusStands(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	where := "http://127.0.0.1:36368/hook"
 	// The real GET answers a 500 with its body and no error, so the fake does the same. [[spec/design_output/level0#the-doctor-probes-every-hook]]
@@ -151,6 +158,7 @@ func TestAHookAnsweringAFailingStatusStands(t *testing.T) {
 }
 
 func TestTheProbeAsksEveryAddressTogether(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	var mu sync.Mutex
 	var asked []string
@@ -183,6 +191,7 @@ func TestTheProbeAsksEveryAddressTogether(t *testing.T) {
 }
 
 func TestTheHookRowsComeBackInTheOrderTheReaderNamesThem(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	d.get = answeringGet(map[string]string{"http://127.0.0.1:2/b": ""})
 	rows := hookRows(d, []hookNamed{{"http://127.0.0.1:1/a", "a"}, {"http://127.0.0.1:2/b", "b"}})

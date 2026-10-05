@@ -183,6 +183,7 @@ func retroJSON(text string) any {
 
 // A retro opens on a battery green at this commit, with no warning standing. [[spec/guidance/retro/collect]]
 func TestRetroCollectRefusesABatteryHoldingAWarningAndOneRanAgainstAnotherCommit(t *testing.T) {
+	t.Parallel()
 	for _, stamp := range []string{
 		`{"sha":"abc123","ok":true,"clean":true,"warnings":3}`,
 		`{"sha":"old999","ok":true,"clean":true,"warnings":0}`,
@@ -207,6 +208,7 @@ func TestRetroCollectRefusesABatteryHoldingAWarningAndOneRanAgainstAnotherCommit
 
 // A move while a hand works takes the file it reads. [[spec/guidance/retro/collect]]
 func TestRetroCollectRefusesWhileAnotherHandHoldsATicketAndMovesNothing(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.write("tree:.se/.runtime/hold/box-one.json", `{"ticket":"a-child"}`+"\n")
 
@@ -225,6 +227,7 @@ func TestRetroCollectRefusesWhileAnotherHandHoldsATicketAndMovesNothing(t *testi
 
 // [[spec/guidance/retro/collect]]
 func TestRetroCollectPassesTheHoldOfTheRetroItCollectsFor(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.write("tree:.se/.runtime/hold/box-one.json", `{"ticket":"`+retroCollectName+`"}`+"\n")
 
@@ -240,6 +243,7 @@ func TestRetroCollectPassesTheHoldOfTheRetroItCollectsFor(t *testing.T) {
 
 // A write the disk refuses fails the verb, as the old script threw. [[spec/guidance/retro/collect]]
 func TestRetroCollectFailsAndNamesTheManifestWhereItsWriteFails(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	if err := os.MkdirAll(w.at(retroInputKey("manifest.jsonl")), 0o755); err != nil {
 		t.Fatal(err)
@@ -257,6 +261,7 @@ func TestRetroCollectFailsAndNamesTheManifestWhereItsWriteFails(t *testing.T) {
 
 // The owner rules two folders left behind, and everything else in one place. [[spec/guidance/retro/collect]]
 func TestRetroCollectMovesEverythingPastTheDotFoldersAndLeavesTheRuntimeAndRetroFolders(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 
 	code, said := w.collect()
@@ -288,6 +293,7 @@ func TestRetroCollectMovesEverythingPastTheDotFoldersAndLeavesTheRuntimeAndRetro
 
 // A session run from a folder inside the tree names a folder of its own. [[spec/guidance/retro/collect]]
 func TestRetroCollectCopiesTheTranscriptsMemoryAndScratchpadsOfThisTreeAndNoOther(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 
 	w.collect()
@@ -313,6 +319,7 @@ func TestRetroCollectCopiesTheTranscriptsMemoryAndScratchpadsOfThisTreeAndNoOthe
 
 // The count by source, because a short answer reads like a whole one. [[spec/guidance/retro/collect]]
 func TestRetroCollectManifestNamesEveryFileWithItsSizeAndSourceAndTheVerbPrintsTheCount(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 
 	_, said := w.collect()
@@ -347,6 +354,7 @@ func TestRetroCollectManifestNamesEveryFileWithItsSizeAndSourceAndTheVerbPrintsT
 
 // [[spec/guidance/retro/effect]]
 func TestRetroCollectKeepsTheBatteryReportBesideTheRecordOneARetro(t *testing.T) {
+	t.Parallel()
 	battery := `{"parts":{"tests":12},"total":12,"slowest":[{"name":"a case","ms":9}]}`
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.write("tree:.se/.runtime/check.json", `{"sha":"abc123","ok":true,"clean":true,"warnings":0,"battery":`+battery+`}`)
@@ -367,6 +375,7 @@ func TestRetroCollectKeepsTheBatteryReportBesideTheRecordOneARetro(t *testing.T)
 
 // The last retro's collect opens the window, and the memory is standing state. [[spec/guidance/retro/collect]]
 func TestRetroCollectLeavesATranscriptOlderThanTheLastCollectOutAndTakesTheMemoryWhole(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.write(retroCollectLast, `{"at":"2026-09-12T00:00:00.000Z"}`+"\n")
 	w.write("home:.claude/projects/"+w.slug+"/old.jsonl", `{"type":"user"}`+"\n")
@@ -395,6 +404,7 @@ func TestRetroCollectLeavesATranscriptOlderThanTheLastCollectOutAndTakesTheMemor
 
 // A gate runs the evidence again, and a torn run deletes nothing it moved. [[spec/guidance/retro/collect]]
 func TestRetroCollectSecondRunAnswersTheFirstAndATornRunCarriesOn(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.collect()
 
@@ -421,6 +431,7 @@ func TestRetroCollectSecondRunAnswersTheFirstAndATornRunCarriesOn(t *testing.T) 
 
 // A second pass merges what arrives since, and overwrites nothing. [[spec/guidance/retro/collect]]
 func TestRetroCollectSecondPassMergesWhatArrivesSinceAndKeepsBothLogs(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.collect()
 
@@ -460,6 +471,7 @@ func retroRefusingMove(refuses func(from string) bool, code syscall.Errno) func(
 
 // A file the disk holds takes a line of its own, and the verb names what stays. [[spec/guidance/retro/collect]]
 func TestRetroCollectMoveTheDiskRefusesTakesAManifestLineAndTheVerbNamesWhatStays(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.move = retroRefusingMove(func(from string) bool { return strings.Contains(from, "check.out") }, syscall.EBUSY)
 
@@ -481,6 +493,7 @@ func TestRetroCollectMoveTheDiskRefusesTakesAManifestLineAndTheVerbNamesWhatStay
 
 // An editor watching a folder refuses its rename, and its files still move. [[spec/guidance/retro/collect]]
 func TestRetroCollectFolderTheDiskRefusesToMoveWholeMovesFileByFile(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	w.write("tree:.se/tmp/ste/words.txt", "one\n")
 	w.move = retroRefusingMove(func(from string) bool { return strings.HasSuffix(from, ".se/tmp") }, syscall.EPERM)
@@ -508,6 +521,7 @@ func retroStamped(when, more string) string {
 
 // [[spec/tickets/the-retro-finishes-its-asks]]
 func TestRetroCollectLeavesATranscriptLineStampedBeforeTheLastCollectOut(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	session := "home:.claude/projects/" + w.slug + "/session.jsonl"
 	w.write(retroCollectLast, `{"at":"2026-09-12T00:00:00.000Z"}`+"\n")
@@ -532,6 +546,7 @@ func TestRetroCollectLeavesATranscriptLineStampedBeforeTheLastCollectOut(t *test
 
 // [[spec/tickets/the-second-collect-keeps-lines]]
 func TestRetroCollectSecondPassKeepsTheLinesTheFirstTakesAndAddsTheLinesPastIt(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	session := "home:.claude/projects/" + w.slug + "/session.jsonl"
 	first := retroStamped("2026-09-19T11:00:00.000Z", `,"said":"first"`)
@@ -550,6 +565,7 @@ func TestRetroCollectSecondPassKeepsTheLinesTheFirstTakesAndAddsTheLinesPastIt(t
 
 // [[spec/tickets/the-retro-finishes-its-asks]]
 func TestRetroCollectCopiesTheScriptsAndLeavesThemAndASecondPassCopiesWhatChanges(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk())
 	code, said := w.collect()
 	if code != 0 {

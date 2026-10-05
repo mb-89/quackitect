@@ -78,6 +78,7 @@ func TestTheWiringFileStartsEachIOModuleUnderItsBoundNames(t *testing.T) {
 
 // The wiring loads the migration module, and its slice key reads the value the config resolves. [[spec/tickets/open-tasks-run-in-shadow]]
 func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -129,6 +130,7 @@ func TestTheWiredTreeAnswersItsSlice(t *testing.T) {
 
 // The wiring loads the check module, and every check/ name reads its empty list off the wired tree. [[spec/tickets/check-module-joins-the-wiring]]
 func TestTheWiredTreeAnswersEveryCheckName(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -157,6 +159,7 @@ func TestTheWiredTreeAnswersEveryCheckName(t *testing.T) {
 
 // The index holds no module's logic, so it imports nothing under src/modules and no src/tickets. [[spec/tickets/tickets-becomes-a-module]]
 func TestTheIndexImportsNoModule(t *testing.T) {
+	t.Parallel()
 	cmd := exec.Command("go", "list", "-deps", "./src/index")
 	cmd.Dir = filepath.Join("..", "..")
 	listed, err := cmd.Output()
@@ -243,6 +246,7 @@ func awaits(t *testing.T, want map[string]string) {
 
 // The wiring loads the tickets module, which reads files/ in and answers tickets/all out. [[spec/tickets/tickets-becomes-a-module]]
 func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
+	t.Parallel()
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}},
 		Wires:     map[string]string{"tickets.files/<path...>": "files/<path...>", "tickets.all": "tickets/all", "tickets.tips": tipsName, "tickets.trunk": trunkName, "tickets.branched": "tickets/branched"},
@@ -269,6 +273,7 @@ func TestTheWiredTreeAnswersItsTickets(t *testing.T) {
 
 // The wiring loads the queue beside the tickets, and the queue answers a place for the open ticket they read. [[spec/tickets/the-queue-becomes-a-module]]
 func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
+	t.Parallel()
 	w := q.Wiring{
 		Instances: []q.Instance{{Name: "tickets", Module: "tickets"}, {Name: "queue", Module: "queue"}},
 		Wires: map[string]string{
@@ -302,6 +307,7 @@ func TestTheWiredTreeAnswersItsPlaces(t *testing.T) {
 
 // The wiring loads tickets, the queue and the work module, and work/open-tasks counts a fake tree of tickets: a marked group and its child stand on the cloud, a closed ticket takes no place, and the free one counts. [[spec/tickets/open-tasks-come-from-work]]
 func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -349,6 +355,7 @@ func TestTheWiredTreeAnswersItsOpenTasks(t *testing.T) {
 
 // The root hands a request to disk through the files module, and refuses one to any other module by its name. [[spec/tickets/actions-answer-over-http]]
 func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	accept := accepts(root, nil, nil)
 	if _, err := accept(q.Request{Module: files.DiskModule, Verb: "write", Args: files.Write{Path: "a.md", Text: "one"}}); err != nil {
@@ -364,6 +371,7 @@ func TestTheRootAcceptsDiskAndRefusesEveryOtherModule(t *testing.T) {
 
 // The router folds a store land into the guard it names, so an action reaches config/held. [[spec/tickets/config-answers-keys-and-overrides]]
 func TestTheRootLandsAStoreRequest(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	q.OutIn(c, "files/<path...>", q.Content{}, q.Doc("a file, as the case seeds it"))
 	config.Registers(c)
@@ -379,6 +387,7 @@ func TestTheRootLandsAStoreRequest(t *testing.T) {
 
 // The wiring's http instance declares its wait under the name the door reads, so a layer setting the key reaches every post with no Prefer. [[spec/tickets/wait-key-meets-its-wiring]]
 func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -398,6 +407,7 @@ func TestTheWiringDeclaresTheWaitTheDoorReads(t *testing.T) {
 
 // Main hands help, --help, run and get to the tree over the base V1 answers, and every other verb to the index, hook among them since Copilot's hook answers off the hooks door. [[spec/tickets/quack-main-routes-the-tree]] [[spec/tickets/copilot-answers-off-the-door]]
 func TestMainHandsTheTreeVerbsToCliOverV1(t *testing.T) {
+	t.Parallel()
 	base := standingTree(t)
 	v1 := func() (string, error) { return base, nil }
 	for _, argv := range [][]string{{"help"}, {"--help"}, {"run", "t/add", "--a", "1"}, {"get", "t/n"}} {

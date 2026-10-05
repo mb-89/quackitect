@@ -61,6 +61,7 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 
 // A row below the floor reaches no writer, a row at or past it does, and no floor reads as info. [[spec/design_output/log#which-kind-says-what]]
 func TestLintRowKeepsFloor(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct {
 		floor, level string
 		writes       bool
@@ -74,6 +75,7 @@ func TestLintRowKeepsFloor(t *testing.T) {
 }
 
 func TestLintVerb(t *testing.T) {
+	t.Parallel()
 	t.Run("the rules passing print one line, exit 0 and log at debug", func(t *testing.T) {
 		fake := &lintFake{}
 		code, out, _ := runsTwin(fake.verb(t, nil), "lint")

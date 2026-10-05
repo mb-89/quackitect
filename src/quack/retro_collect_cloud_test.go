@@ -177,6 +177,7 @@ func retroTicketPath(name string) string { return "spec/tickets/" + name + ".md"
 
 // [[spec/tickets/the-retro-reads-cloud-retros]]
 func TestRetroCollectGathersTheRetroChapterOfEveryGroupClosingInTheWindowWithTheTrunkClose(t *testing.T) {
+	t.Parallel()
 	closed := retroGroupAt("cloud-one", "closed", retroChapterText)
 	w := retroNewCollectWorld(t, retroFakeTrunk(
 		retroCommit{sha: "open1", at: "2026-09-08T09:00:00+00:00", trunk: true, changes: map[string]string{retroTicketPath("cloud-one"): retroGroupAt("cloud-one", "open", "")}},
@@ -219,6 +220,7 @@ func TestRetroCollectGathersTheRetroChapterOfEveryGroupClosingInTheWindowWithThe
 
 // [[spec/tickets/the-retro-reads-cloud-retros]]
 func TestRetroCollectLeavesAGroupClosingBeforeTheWindowAndATicketThatIsNoGroupOut(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk(
 		retroCommit{sha: "merge0", at: "2026-09-10T10:00:00+00:00", trunk: true, changes: map[string]string{retroTicketPath("cloud-old"): retroGroupAt("cloud-old", "closed", retroChapterText)}},
 		retroCommit{sha: "fix1", at: "2026-09-14T10:00:00+00:00", trunk: true, changes: map[string]string{retroTicketPath("a-fix"): retroTicketText("a-fix", "closed", "standard", retroChapterText)}},
@@ -242,6 +244,7 @@ func TestRetroCollectLeavesAGroupClosingBeforeTheWindowAndATicketThatIsNoGroupOu
 
 // [[spec/tickets/the-retro-reads-cloud-retros]]
 func TestRetroCollectGroupClosingWithNoRetroTextWritesNothingAndThePrintNamesIt(t *testing.T) {
+	t.Parallel()
 	bare := "# retro\n\n## write\n\n### badly\n\n<!-- the form is list -->\n\n"
 	w := retroNewCollectWorld(t, retroFakeTrunk(
 		retroCommit{sha: "merge2", at: "2026-09-15T10:00:00+00:00", trunk: true, changes: map[string]string{retroTicketPath("cloud-bare"): retroGroupAt("cloud-bare", "closed", bare)}},
@@ -262,6 +265,7 @@ func TestRetroCollectGroupClosingWithNoRetroTextWritesNothingAndThePrintNamesIt(
 
 // [[spec/tickets/the-retro-reads-cloud-retros]]
 func TestRetroCollectSecondPassTakesEachGroupOnceAndTheCountPrintsTheGroups(t *testing.T) {
+	t.Parallel()
 	w := retroNewCollectWorld(t, retroFakeTrunk(
 		retroCommit{sha: "merge3", at: "2026-09-19T12:00:00+00:00", trunk: true, changes: map[string]string{retroTicketPath("cloud-a"): retroGroupAt("cloud-a", "closed", retroChapterText)}},
 	))

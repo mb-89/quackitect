@@ -47,6 +47,7 @@ func saidLine(out *strings.Builder, start string) bool {
 }
 
 func TestTheSetupGetsEachMissingItemAndSkipsTheOnesTheSkipListNames(t *testing.T) {
+	t.Parallel()
 	home := t.TempDir()
 	seedTree(t, home, map[string]string{".vscode/extensions/extensions.json": "[]"})
 	d, runner, out, lines := setupBox(t, map[string]string{"HOME": home, "SE_INSTALL_SKIP": "browser editor-link"})
@@ -89,6 +90,7 @@ func TestTheSetupGetsEachMissingItemAndSkipsTheOnesTheSkipListNames(t *testing.T
 }
 
 func TestTheSetupWritesTheSurveyThenTheCopilotSetupAndTheBrand(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := setupBox(t, nil)
 	env := heldTree(t, d)
 	env["TERM_PROGRAM"] = "vscode"
@@ -138,6 +140,7 @@ func TestTheSetupWritesTheSurveyThenTheCopilotSetupAndTheBrand(t *testing.T) {
 
 // A box with no code on the PATH skips the extensions, and a code that answers an error still installs them. [[spec/tickets/code-failure-reads-missing]]
 func TestACodeListExitingPastZeroReadsAsMissingAndTheSetupInstallsTheExtensions(t *testing.T) {
+	t.Parallel()
 	d, runner, _, lines := setupBox(t, nil)
 	env := heldTree(t, d)
 	d.env = func(key string) string { return env[key] }
@@ -161,6 +164,7 @@ func TestACodeListExitingPastZeroReadsAsMissingAndTheSetupInstallsTheExtensions(
 
 // Windows ships the three as cmd shims, so the setup reaches each through cmd. [[spec/tickets/setup-reaches-windows-shims]]
 func TestOnWindowsTheSetupReachesNpmNpxAndCodeThroughCmd(t *testing.T) {
+	t.Parallel()
 	d, _, _, lines := setupBox(t, nil)
 	d.goos = "windows"
 	setupVerb(d, nil)
@@ -179,6 +183,7 @@ func TestOnWindowsTheSetupReachesNpmNpxAndCodeThroughCmd(t *testing.T) {
 
 // cmd answers its own exit where no code stands, and that reads as no code. [[spec/tickets/windows-missing-code-reads-absent]]
 func TestOnWindowsACmdAnsweringNoSuchCommandReadsAsNoCode(t *testing.T) {
+	t.Parallel()
 	d, runner, out, lines := setupBox(t, nil)
 	env := heldTree(t, d)
 	d.env = func(key string) string { return env[key] }
@@ -195,6 +200,7 @@ func TestOnWindowsACmdAnsweringNoSuchCommandReadsAsNoCode(t *testing.T) {
 
 // The setup runs before every verb, so a step that stops says a warning and the next one runs. [[spec/design_output/copilot#setup-and-discovery]]
 func TestACopilotSetupThatStopsSaysAWarningAndTheBrandStillRuns(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := setupBox(t, nil)
 	env := heldTree(t, d)
 	env["TERM_PROGRAM"] = "vscode"
@@ -214,6 +220,7 @@ func TestACopilotSetupThatStopsSaysAWarningAndTheBrandStillRuns(t *testing.T) {
 
 // A folder slugging to nothing stamps no brand, and the setup still answers zero. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 func TestAFolderSluggingToNothingSaysTheBrandReachedNoName(t *testing.T) {
+	t.Parallel()
 	d, _, out, _ := setupBox(t, nil)
 	d.root = filepath.Join(d.root, "___")
 	env := heldTree(t, d)
@@ -228,6 +235,7 @@ func TestAFolderSluggingToNothingSaysTheBrandReachedNoName(t *testing.T) {
 
 // The browser is a want, so a box with no browser still runs every verb, and the drawing ships in git. [[spec/design_output/drawing#the-drawing-ships-prebuilt]]
 func TestTheSetupResolvesABrowserAsAWant(t *testing.T) {
+	t.Parallel()
 	d, runner, out, lines := setupBox(t, nil)
 	seedTree(t, d.root, map[string]string{setupClient: "{}", toolsFile: "{}"})
 	runner.answers["npx"] = ranResult{code: 1}
@@ -251,6 +259,7 @@ func TestTheSetupResolvesABrowserAsAWant(t *testing.T) {
 
 // The editor link links the sidebar where the editor's folder stands, and a second run finds it standing. [[spec/design_output/extension#the-link-stands]]
 func TestTheSetupLinksTheSidebarWhereTheEditorStands(t *testing.T) {
+	t.Parallel()
 	home := t.TempDir()
 	seedTree(t, home, map[string]string{".vscode/extensions/.keep": ""})
 	d, runner, out, _ := setupBox(t, map[string]string{"HOME": home})
@@ -272,6 +281,7 @@ func TestTheSetupLinksTheSidebarWhereTheEditorStands(t *testing.T) {
 
 // The extension list is the one the tracked settings recommend. [[spec/design_output/lsp#the-panel-reads-the-battery]]
 func TestTheExtensionsAreTheOnesTheTrackedSettingsRecommend(t *testing.T) {
+	t.Parallel()
 	text, _ := readText(filepath.Join("..", "..", ".vscode", "extensions.json"))
 	var said struct{ Recommendations []string }
 	if err := json.Unmarshal([]byte(text), &said); err != nil {

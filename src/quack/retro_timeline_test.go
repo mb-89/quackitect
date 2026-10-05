@@ -87,6 +87,7 @@ func retroReadingFindings(rows map[string][]string) string {
 
 // The timeline counts every timed line by hour, and a line with no time takes the time before it. [[spec/guidance/retro/chapter]]
 func TestRetroTimelineCountsEveryTimedLineByHourAndAnUntimedLineTakesTheTimeBefore(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroReadingName, retroReadingInput)
 

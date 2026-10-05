@@ -22,6 +22,7 @@ import (
 
 // An override on watchdog/beat re-arms the manager's tick at its span, and one on watchdog/lease holds the index's lease at its term, through the config module's layers. [[spec/design_output/model#a-lease]]
 func TestAnOverrideSetsTheSpanTheManagerTicksAt(t *testing.T) {
+	t.Parallel()
 	var as q.Writer
 	ix := qtest.New(t, func(c *q.Catalog) {
 		q.OutIn(c, "env/<name>", "", q.Doc("an SE_ variable, as the case seeds it"))
@@ -70,6 +71,7 @@ func (one heldTable) All() ([]index.OpRow, error) {
 }
 
 func TestTheManagerReadsTheIndexOpTable(t *testing.T) {
+	t.Parallel()
 	table := heldTable{}
 	rows := opRows{table}
 	if err := rows.Save("1", []byte(`{"state":"running"}`)); err != nil {
@@ -101,6 +103,7 @@ func listed(t *testing.T, args ...string) []string {
 }
 
 func TestTheManagerFoldsOpsAndTheWatchdog(t *testing.T) {
+	t.Parallel()
 	found := false
 	for _, one := range listed(t, "./src/modules/index/...") {
 		found = found || one == managerPackage
@@ -171,6 +174,7 @@ func built(t *testing.T, folder string) string {
 
 // A binary standing outside any vehicle, over a tree with no wiring file, reaches no wiring at all. [[spec/design_output/model#the-index-manager]]
 func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
+	t.Parallel()
 	bin := built(t, t.TempDir())
 	root := t.TempDir()
 	said, err := quack(t, bin, root, "why", "session/alarms")
@@ -188,6 +192,7 @@ func TestAnIndexReachingNoWiringLoadsTheManagerAlone(t *testing.T) {
 
 // A tree verb reaches /v1 before the index's own command line runs, and starts this binary where no door stands. [[spec/design_output/index#a-door-comes-back]]
 func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
+	t.Parallel()
 	bin := built(t, t.TempDir())
 	root := t.TempDir()
 	said, err := quack(t, bin, root, "help")
@@ -199,6 +204,7 @@ func TestATreeVerbStartsThisIndexWhereNoneStands(t *testing.T) {
 
 // A driven tree carries no wiring file, so the index loads the wiring of the vehicle whose runtime folder holds the binary. [[spec/design_output/model#the-wiring-file]]
 func TestATreeWithNoWiringLoadsTheVehicleWiring(t *testing.T) {
+	t.Parallel()
 	vehicle := t.TempDir()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {

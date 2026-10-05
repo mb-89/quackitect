@@ -7,6 +7,7 @@ import "testing"
 
 // [[spec/guidance/retro/collect]]
 func TestRetroOutsideFolderBelongsToTheTreeByItsNameWhateverTheCaseOfTheDriveLetter(t *testing.T) {
+	t.Parallel()
 	if got := retroSlugOf(`c:\work\tree\quackitect-v5`); got != "c--work-tree-quackitect-v5" {
 		t.Fatalf("the slug reads %q", got)
 	}

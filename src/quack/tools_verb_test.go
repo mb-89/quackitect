@@ -10,6 +10,7 @@ import (
 )
 
 func TestTheToolsVerbWritesTheSurveyWholeAndPrintsARowATool(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t, "git", "sh", "python3")
 	runner.answers["git"] = ranResult{stdout: "git version 2.43.0\n"}
 	runner.answers["python3"] = ranResult{stderr: "Python 3.11.15\n"}

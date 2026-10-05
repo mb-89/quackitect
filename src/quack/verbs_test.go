@@ -23,6 +23,7 @@ func twinSaying(said string, dry *[]bool) twin {
 }
 
 func TestTheRoadHandsEachVerbByItsMode(t *testing.T) {
+	t.Parallel()
 	twins := map[string]twin{"ticket yours": twinSaying("", &[]bool{})}
 	cases := []struct {
 		mode string
@@ -70,6 +71,7 @@ func roadOver(mode, old string, twins map[string]twin) (verbDoors, *strings.Buil
 }
 
 func TestATwinAnsweringApartWritesAShadowRow(t *testing.T) {
+	t.Parallel()
 	dry := []bool{}
 	doors, out, rows := roadOver("shadow", "old\n", map[string]twin{"ticket yours": twinSaying("new\n", &dry)})
 	if code := verbs(doors, []string{"ticket", "yours"}); code != 0 || out.String() != "old\n" {
@@ -88,6 +90,7 @@ func TestATwinAnsweringApartWritesAShadowRow(t *testing.T) {
 }
 
 func TestATwinAgreeingWritesNoRow(t *testing.T) {
+	t.Parallel()
 	dry := []bool{}
 	doors, out, rows := roadOver("shadow", "same\n", map[string]twin{"ticket yours": twinSaying("same\n", &dry)})
 	if code := verbs(doors, []string{"ticket", "yours"}); code != 0 || out.String() != "same\n" || len(*rows) != 0 || len(dry) != 1 {
@@ -96,6 +99,7 @@ func TestATwinAgreeingWritesNoRow(t *testing.T) {
 }
 
 func TestTheNewRoadRunsTheTwinForReal(t *testing.T) {
+	t.Parallel()
 	dry := []bool{}
 	doors, out, rows := roadOver("new", "old\n", map[string]twin{"ticket yours": twinSaying("new\n", &dry)})
 	if code := verbs(doors, []string{"ticket", "yours"}); code != 0 || out.String() != "new\n" || len(*rows) != 0 || len(dry) != 1 || dry[0] {
@@ -105,6 +109,7 @@ func TestTheNewRoadRunsTheTwinForReal(t *testing.T) {
 
 // A box with no runtime hears which one to install, in one line. [[spec/tickets/bare-desk-names-missing-node]]
 func TestAStartFaultNamesAMissingRuntime(t *testing.T) {
+	t.Parallel()
 	_, err := exec.LookPath("no-such-runtime")
 	said := startFault("no-such-runtime", err)
 	if strings.Contains(said, "\n") || said != "No no-such-runtime stands on the PATH. Install no-such-runtime, and run this again." {
@@ -114,6 +119,7 @@ func TestAStartFaultNamesAMissingRuntime(t *testing.T) {
 
 // The mode reads the verbs key off the tracked file under the root, and none where the file sets none. [[spec/tickets/runme-hands-verbs-to-quack]]
 func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	if said := modeOf(root); said != "" {
 		t.Fatalf("a bare root reads %q", said)
@@ -132,6 +138,7 @@ func TestTheModeReadsTheVerbsKeyOffTheTrackedFile(t *testing.T) {
 
 // A verb the registry leaves out runs the verb's program alone in shadow, and the log holds no row for it. A port registers every verb in time, so the case names words no file registers. [[spec/tickets/vehicle-verbs-become-actions]] [[spec/tickets/window-verbs-port-to-go]]
 func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
+	t.Parallel()
 	doors, out, rows := roadOver("shadow", "old\n", registry)
 	for _, argv := range [][]string{{"unregistered", "here"}, {"unregistered", "into", "elsewhere"}} {
 		out.Reset()
@@ -143,6 +150,7 @@ func TestAVerbWithNoTwinWritesNoShadowRow(t *testing.T) {
 
 // The road holds retro notes among its twins, and Go registers retro whole, so every mode runs it in quack alone. [[spec/tickets/retro-notes-twin-joins-road]] [[spec/tickets/retro-verbs-run-in-go]]
 func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
+	t.Parallel()
 	if registry["retro notes"] == nil {
 		t.Fatal("the registry holds no retro notes twin")
 	}
@@ -155,6 +163,7 @@ func TestTheRoadHoldsRetroNotesAmongItsTwins(t *testing.T) {
 
 // A verb the verb's program answers too takes the verb's program, even where quack's verb table holds it. [[spec/tickets/quack-tools-spares-runme-tools]]
 func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
+	t.Parallel()
 	table := map[string]bool{"run": true, "act": true}
 	if aloneOf([]string{"act"}, table) {
 		t.Fatal("act runs in quack alone, and the verb's program stops answering it")
@@ -166,6 +175,7 @@ func TestAVerbCliJsAnswersRunsNeverAlone(t *testing.T) {
 
 // A verb Go registers whole takes quack under old, shadow and new, since no program stands beside it, and a twin of a verb's words keeps its shadow. [[spec/tickets/registered-verb-skips-the-mode]]
 func TestAWholeVerbTakesQuackUnderEveryMode(t *testing.T) {
+	t.Parallel()
 	answers := func(argv []string, _ bool, out, _ io.Writer) int {
 		fmt.Fprint(out, "go\n")
 		return 0
@@ -184,6 +194,7 @@ func TestAWholeVerbTakesQuackUnderEveryMode(t *testing.T) {
 
 // A registered verb takes its Go answer ahead of quack's own verb of the same word, so ./RUNME.sh tools keeps writing tools.json, and takes it under old too, since tools.js left the tree. [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/registered-verb-skips-the-mode]]
 func TestARegisteredVerbRunsAheadOfQuacksOwn(t *testing.T) {
+	t.Parallel()
 	twins := map[string]twin{"tools": twinSaying("", &[]bool{})}
 	if got := roadOf(modeNew, []string{"tools"}, twins); got != toQuack {
 		t.Fatalf("tools takes road %d under new, and wants its twin", got)

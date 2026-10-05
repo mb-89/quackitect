@@ -7,6 +7,7 @@ import (
 
 // A root with no Vale under it reads no voice, as the bridge reads none. [[spec/tickets/cage-commit-guards-port]]
 func TestCommitVoiceReadsNothingWhereNoValeStands(t *testing.T) {
+	t.Parallel()
 	if rows := commitVoice(t.TempDir(), "a commit message"); rows != nil {
 		t.Errorf("commitVoice answers %v under a root with no Vale", rows)
 	}
@@ -14,6 +15,7 @@ func TestCommitVoiceReadsNothingWhereNoValeStands(t *testing.T) {
 
 // Vale over the message answers the kept findings, and a private shape refuses. [[spec/tickets/cage-commit-guards-port]]
 func TestCommitVoiceRefusesAPrivateShape(t *testing.T) {
+	t.Parallel()
 	root := filepath.Join("..", "..")
 	if valeAt(root) == "" {
 		t.Skip("no Vale stands under the tree")

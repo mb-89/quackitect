@@ -16,6 +16,7 @@ func stampsGreen(t *testing.T, root, sha string) {
 }
 
 func TestPushVerb(t *testing.T) {
+	t.Parallel()
 	t.Run("a green stamp on the commit pushes the branch", func(t *testing.T) {
 		root, origin := landingRepo(t)
 		gitDoes(t, root, "commit", "-q", "--allow-empty", "-m", "a-ticket: one more")

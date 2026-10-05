@@ -71,6 +71,7 @@ func (box *serveBox) runs(t *testing.T, argv ...string) (int, string, string) {
 
 // [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeStartsTheIndexWhereNoDoorStands(t *testing.T) {
+	t.Parallel()
 	box := serveBoxAt(t)
 	code, out, _ := box.runs(t)
 	if code != 0 || out != "The index starts at port 7001, because no door stood.\n" {
@@ -84,6 +85,7 @@ func TestServeStartsTheIndexWhereNoDoorStands(t *testing.T) {
 
 // [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeOverAStandingDoorSaysItAnswers(t *testing.T) {
+	t.Parallel()
 	box := serveBoxAt(t)
 	box.stands(t, serveDoorText)
 	if code, out, _ := box.runs(t); code != 0 || out != "The index answers at port 7001.\n" {
@@ -93,6 +95,7 @@ func TestServeOverAStandingDoorSaysItAnswers(t *testing.T) {
 
 // A door the start rewrites stands fresh, so the verb names the start. [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeOverAMovedDoorSaysItStarts(t *testing.T) {
+	t.Parallel()
 	box := serveBoxAt(t)
 	box.stands(t, `{"port":7000,"token":"old"}`)
 	if code, out, _ := box.runs(t); code != 0 || out != "The index starts at port 7001, because no door stood.\n" {
@@ -102,6 +105,7 @@ func TestServeOverAMovedDoorSaysItStarts(t *testing.T) {
 
 // A door naming no number reads as port 0, as Number answers NaN and the JavaScript falls back. [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeReadsAPortOfNoNumberAsZero(t *testing.T) {
+	t.Parallel()
 	for door, want := range map[string]string{
 		`{"token":"t"}`:     "0",
 		`not json`:          "0",
@@ -121,6 +125,7 @@ func TestServeReadsAPortOfNoNumberAsZero(t *testing.T) {
 
 // [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeWhoseIndexFallsNamesWhatItSaid(t *testing.T) {
+	t.Parallel()
 	box := serveBoxAt(t)
 	box.code, box.said = 1, "the index door does not answer\n"
 	if code, out, _ := box.runs(t); code != 1 || out != "The index falls: the index door does not answer\n" {
@@ -135,6 +140,7 @@ func TestServeWhoseIndexFallsNamesWhatItSaid(t *testing.T) {
 
 // [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeWhoseIndexFallsSilentNamesItsExit(t *testing.T) {
+	t.Parallel()
 	box := serveBoxAt(t)
 	box.code = 3
 	if code, out, _ := box.runs(t); code != 1 || out != "The index falls: it exits 3\n" {
@@ -144,6 +150,7 @@ func TestServeWhoseIndexFallsSilentNamesItsExit(t *testing.T) {
 
 // The JavaScript throws where no index runs, and node exits 1; the Go names the fault. [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeWithNoIndexFalls(t *testing.T) {
+	t.Parallel()
 	box := serveBoxAt(t)
 	box.fault = errors.New("no such file")
 	if code, out, _ := box.runs(t); code != 1 || out != "The index falls: no such file\n" {
@@ -153,6 +160,7 @@ func TestServeWithNoIndexFalls(t *testing.T) {
 
 // [[spec/design_output/level0#a-desk-serve-returns]]
 func TestServeTakesNoDebuggerAndRunsTheIndexStandingAlone(t *testing.T) {
+	t.Parallel()
 	box := serveBoxAt(t)
 	if code, _, _ := box.runs(t, "--inspect"); code != 0 {
 		t.Fatalf("code %d", code)
@@ -165,6 +173,7 @@ func TestServeTakesNoDebuggerAndRunsTheIndexStandingAlone(t *testing.T) {
 
 // The registered verb answers the serve words. [[spec/tickets/quack-registers-each-verb]]
 func TestServeRegisters(t *testing.T) {
+	t.Parallel()
 	if registry["serve"] == nil {
 		t.Error("no serve verb stands in the registry")
 	}

@@ -8,6 +8,7 @@ import (
 
 // The stop hook stands off where the local layer turns its switch off, and on where nothing does. [[spec/tickets/cage-stop-rules-port]]
 func TestStopOffReadsTheSwitch(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	if stopOff(root) {
 		t.Error("stopOff answers off where no layer names the switch")

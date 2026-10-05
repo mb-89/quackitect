@@ -33,6 +33,7 @@ func configRan(root string, argv ...string) (int, string, string) {
 }
 
 func TestConfigPrintsEveryRowAndItsLayer(t *testing.T) {
+	t.Parallel()
 	root := configRoot(t, `{"log": {"level": "warn"}}`)
 	code, out, errs := configRan(root)
 	if code != 0 || errs != "" {
@@ -53,6 +54,7 @@ func TestConfigPrintsEveryRowAndItsLayer(t *testing.T) {
 }
 
 func TestConfigPrintsOneKeyAlone(t *testing.T) {
+	t.Parallel()
 	root := configRoot(t, `{}`)
 	seedFile(t, root, ".se/.runtime/config.json", `{"log": {"level": "debug"}}`)
 	code, out, _ := configRan(root, "log.level")
@@ -62,6 +64,7 @@ func TestConfigPrintsOneKeyAlone(t *testing.T) {
 }
 
 func TestConfigRefusesAKeyNoLayerAnswers(t *testing.T) {
+	t.Parallel()
 	code, out, errs := configRan(configRoot(t, `{}`), "no.such")
 	if code != exitUsage || out != "" || errs != "No layer answers no.such. Run ./RUNME.sh config to see every key.\n" {
 		t.Fatalf("config no.such answers %d, %q and %q, and wants the refusal", code, out, errs)
@@ -69,6 +72,7 @@ func TestConfigRefusesAKeyNoLayerAnswers(t *testing.T) {
 }
 
 func TestConfigNamesAKeyCarryingTheWrongType(t *testing.T) {
+	t.Parallel()
 	_, _, errs := configRan(configRoot(t, `{"answer": {"words": "many"}}`))
 	if errs != "answer.words carries a string, and the schema says number, and the code reading it finds nothing.\n" {
 		t.Fatalf("config names %q, and wants the type fault", errs)
@@ -76,6 +80,7 @@ func TestConfigNamesAKeyCarryingTheWrongType(t *testing.T) {
 }
 
 func TestConfigWritesTheLocalLayerAndALogRow(t *testing.T) {
+	t.Parallel()
 	root := configRoot(t, `{}`)
 	seedFile(t, root, ".se/.runtime/config.json", "{\n  \"log\": {\n    \"level\": \"debug\"\n  }\n}\n")
 	code, out, _ := configRan(root, "answer.words", "200")

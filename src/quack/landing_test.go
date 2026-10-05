@@ -22,6 +22,7 @@ var (
 
 // A landing repository stands under a folder its test's name stays out of, however long the name runs. [[spec/tickets/landing-verbs-windows-green]]
 func TestLandingRepoStandsUnderAShortFolder(t *testing.T) {
+	t.Parallel()
 	t.Run("sentinel, a case named past the Windows path limit "+strings.Repeat("x", 120), func(t *testing.T) {
 		root, origin := landingRepo(t)
 		for _, at := range []string{root, origin} {
@@ -33,6 +34,7 @@ func TestLandingRepoStandsUnderAShortFolder(t *testing.T) {
 }
 
 func TestLandingVerbsRunInGo(t *testing.T) {
+	t.Parallel()
 	for _, verb := range landingVerbs {
 		t.Run(verb+" registers, and the road under new reaches no node for it", func(t *testing.T) {
 			if registry[verb] == nil {

@@ -11,6 +11,7 @@ import (
 )
 
 func TestAFolderNameAnswersTheSlugAMarketplaceTakes(t *testing.T) {
+	t.Parallel()
 	for path, want := range map[string]string{
 		"/x/quackitect": "quackitect", "/x/my.app": "my-app", "/x/Acme Tools": "acme-tools",
 		"/x/.hidden": "hidden", `C:\x\Desk\`: "desk", "/x/...": "",
@@ -22,6 +23,7 @@ func TestAFolderNameAnswersTheSlugAMarketplaceTakes(t *testing.T) {
 }
 
 func TestTheBrandReachesTheMarketplaceNameItsOwnerAndThePluginsAuthor(t *testing.T) {
+	t.Parallel()
 	got := brandedJSON(`{"name":"old","owner":{"name":"old","email":"e"},"plugins":[]}`, "acme")
 	want := "{\n  \"name\": \"acme\",\n  \"owner\": {\n    \"name\": \"acme\",\n    \"email\": \"e\"\n  },\n  \"plugins\": []\n}\n"
 	if got != want {
@@ -35,6 +37,7 @@ func TestTheBrandReachesTheMarketplaceNameItsOwnerAndThePluginsAuthor(t *testing
 }
 
 func TestTextThatReadsAsNoObjectStandsAsItIs(t *testing.T) {
+	t.Parallel()
 	for _, text := range []string{"not json", "[1]", `"x"`, "{} {}"} {
 		if got := brandedJSON(text, "acme"); got != text {
 			t.Errorf("brandedJSON(%q) = %q", text, got)
@@ -46,6 +49,7 @@ func TestTextThatReadsAsNoObjectStandsAsItIs(t *testing.T) {
 }
 
 func TestTheVersionLandsInPlaceOrLastAndAnEmptyOneLeavesTheText(t *testing.T) {
+	t.Parallel()
 	if got := versionedJSON(`{"version":"0","name":"n"}`, "2.0.0"); got != "{\n  \"version\": \"2.0.0\",\n  \"name\": \"n\"\n}\n" {
 		t.Errorf("in place: %q", got)
 	}
@@ -71,6 +75,7 @@ func seedTree(t *testing.T, root string, files map[string]string) {
 }
 
 func TestAStampWritesEveryTargetOffTheBrandFolderAndASecondWritesNothing(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedTree(t, root, map[string]string{
 		"package.json":                    `{"version":"1.2.3"}`,
@@ -96,6 +101,7 @@ func TestAStampWritesEveryTargetOffTheBrandFolderAndASecondWritesNothing(t *test
 }
 
 func TestACloneHoldingNoSourceAndNoTargetTakesTheShapes(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	done, err := stamps(root, "acme")
 	if err != nil {
@@ -111,6 +117,7 @@ func TestACloneHoldingNoSourceAndNoTargetTakesTheShapes(t *testing.T) {
 }
 
 func TestATargetStandingWithNoSourceReadsAsItsOwnSource(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedTree(t, root, map[string]string{marketplaceTarget: "{\n  \"name\": \"acme\",\n  \"owner\": {\n    \"name\": \"acme\"\n  }\n}\n"})
 	done, _ := stamps(root, "acme")

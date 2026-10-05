@@ -90,6 +90,7 @@ func ran(base string, argv ...string) (int, string, string) {
 }
 
 func TestTheHelpReadsEachActionsDoc(t *testing.T) {
+	t.Parallel()
 	base := standingTree(t)
 	code, out, errs := ran(base, "--help")
 	if code != 0 || !strings.Contains(out, "t/add") || !strings.Contains(out, "adds two terms") || !strings.Contains(out, "sleeps past the wait") {
@@ -103,6 +104,7 @@ func TestTheHelpReadsEachActionsDoc(t *testing.T) {
 }
 
 func TestRunPostsItsFlagsAsTheInput(t *testing.T) {
+	t.Parallel()
 	code, out, errs := ran(standingTree(t), "run", "t/add", "--a", "2", "--b", "3")
 	if code != 0 || !strings.Contains(out, `"sum": 5`) {
 		t.Fatalf("quack run t/add answers %d: %s%s", code, out, errs)
@@ -110,6 +112,7 @@ func TestRunPostsItsFlagsAsTheInput(t *testing.T) {
 }
 
 func TestRunFollowsASlowActionToItsResult(t *testing.T) {
+	t.Parallel()
 	code, out, errs := ran(standingTree(t), "run", "t/slow")
 	if code != 0 || !strings.Contains(out, `"slept"`) {
 		t.Fatalf("quack run t/slow answers %d: %s%s", code, out, errs)
@@ -117,6 +120,7 @@ func TestRunFollowsASlowActionToItsResult(t *testing.T) {
 }
 
 func TestRunDetachedAnswersTheHandleAtOnce(t *testing.T) {
+	t.Parallel()
 	base := standingTree(t)
 	started := time.Now()
 	code, out, errs := ran(base, "run", "t/slow", "--detach")
@@ -129,6 +133,7 @@ func TestRunDetachedAnswersTheHandleAtOnce(t *testing.T) {
 }
 
 func TestGetPrintsTheValueOfAName(t *testing.T) {
+	t.Parallel()
 	code, out, errs := ran(standingTree(t), "get", "t/n")
 	if code != 0 || strings.TrimSpace(out) != "4" {
 		t.Fatalf("quack get t/n answers %d: %s%s", code, out, errs)
@@ -136,6 +141,7 @@ func TestGetPrintsTheValueOfAName(t *testing.T) {
 }
 
 func TestToolsPrintsTheListTheIndexGenerates(t *testing.T) {
+	t.Parallel()
 	code, out, errs := ran(standingTree(t), "tools")
 	if code != 0 || !strings.Contains(out, `"index_t_add"`) || !strings.Contains(out, "adds two terms") {
 		t.Fatalf("quack tools answers %d: %s%s", code, out, errs)
@@ -143,6 +149,7 @@ func TestToolsPrintsTheListTheIndexGenerates(t *testing.T) {
 }
 
 func TestActPostsItsJSONAndPrintsTheResult(t *testing.T) {
+	t.Parallel()
 	code, out, errs := ran(standingTree(t), "act", "t/add", `{"a":2,"b":3}`)
 	if code != 0 || !strings.Contains(out, `"sum": 5`) {
 		t.Fatalf("quack act t/add answers %d: %s%s", code, out, errs)

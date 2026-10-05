@@ -92,6 +92,7 @@ func findCall(t *testing.T, root string, reads index.Reads, input any) string {
 
 // [[spec/tickets/find-and-wait-in-go]]
 func TestAFindAnswersTheLinesTheIndexRanks(t *testing.T) {
+	t.Parallel()
 	var asked []string
 	reads := fakeReads{asked: &asked, hits: []index.Hit{
 		{Path: "src/a.go", Line: 3, Text: "\tfunc one() {  ", Score: 2},
@@ -108,6 +109,7 @@ func TestAFindAnswersTheLinesTheIndexRanks(t *testing.T) {
 
 // [[spec/tickets/find-and-wait-in-go]]
 func TestAFindByFunctionAnswersItsBody(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedFile(t, root, "src/x.go", "package x\n\nfunc Mark(a int) int {\n\tif a > 0 {\n\t\treturn a\n\t}\n\treturn 0\n}\n\nfunc after() {}\n")
 	reads := fakeReads{hits: []index.Hit{
@@ -122,6 +124,7 @@ func TestAFindByFunctionAnswersItsBody(t *testing.T) {
 
 // [[spec/tickets/find-and-wait-in-go]]
 func TestAFindNoRowCarriesSaysNothingCarriesThem(t *testing.T) {
+	t.Parallel()
 	said := findCall(t, t.TempDir(), fakeReads{hits: []index.Hit{}}, map[string]any{"words": "marzipan"})
 	if want := "Nothing carries those words."; said != want {
 		t.Errorf("the find answers %q, and wants %q", said, want)
@@ -130,6 +133,7 @@ func TestAFindNoRowCarriesSaysNothingCarriesThem(t *testing.T) {
 
 // [[spec/tickets/find-and-wait-in-go]]
 func TestAFindOverAFailingReadSaysTheIndexIsDead(t *testing.T) {
+	t.Parallel()
 	reads := fakeReads{fault: errors.New("the db is locked")}
 	said := findCall(t, t.TempDir(), reads, map[string]any{"words": "one"})
 	if want := "The index is dead: the db is locked. Run ./RUNME.sh, which builds it, and Grep reads the disk until then."; said != want {
@@ -139,6 +143,7 @@ func TestAFindOverAFailingReadSaysTheIndexIsDead(t *testing.T) {
 
 // [[spec/tickets/find-and-wait-in-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
 func TestTheFindAndWaitModulesStandOnTheWiring(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)

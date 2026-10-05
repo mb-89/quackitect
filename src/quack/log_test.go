@@ -20,6 +20,7 @@ const (
 )
 
 func TestLogGoldenHoldsTheModule(t *testing.T) {
+	t.Parallel()
 	fixture, err := os.ReadFile(logFixtureAt)
 	if err != nil {
 		t.Fatal(err)
@@ -66,6 +67,7 @@ func TestLogGoldenHoldsTheModule(t *testing.T) {
 
 // The log verb takes an array alone, so a log holding no row answers an empty one. [[spec/tickets/log-shadow-reads-unfiltered-rows]]
 func TestLogAnswersAnEmptyArrayForNoRow(t *testing.T) {
+	t.Parallel()
 	said, err := json.Marshal(logRows(""))
 	if err != nil || string(said) != "[]" {
 		t.Fatalf("no row reads %s, %v, and wants []", said, err)

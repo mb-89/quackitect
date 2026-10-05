@@ -52,6 +52,7 @@ var yoursRows = []work.YoursRow{
 
 // branch list --queue prints each placed row as queueOnly in work-list.js prints it. [[spec/tickets/work-verbs-become-actions]]
 func TestBranchQueuePrintsThePlacesAsCliJsDoes(t *testing.T) {
+	t.Parallel()
 	var out, errs strings.Builder
 	code := branchQueue(yoursTree(t, yoursRows))([]string{"branch", "list", "--queue"}, true, &out, &errs)
 	want := fmt.Sprintf("%6s  %-34s %s\n%6s  %-34s %s\n", "-2", "a-draft", "design/owner-read", "-1", "a-trial", "do")
@@ -62,6 +63,7 @@ func TestBranchQueuePrintsThePlacesAsCliJsDoes(t *testing.T) {
 
 // branch list --queue says so where no row stands placed. [[spec/tickets/work-verbs-become-actions]]
 func TestBranchQueueSaysSoWhereNoRowStands(t *testing.T) {
+	t.Parallel()
 	var out, errs strings.Builder
 	code := branchQueue(yoursTree(t, nil))([]string{"branch", "list", "--queue"}, true, &out, &errs)
 	if want := "No ticket stands in the queue.\n"; code != 0 || out.String() != want {
@@ -71,6 +73,7 @@ func TestBranchQueueSaysSoWhereNoRowStands(t *testing.T) {
 
 // The wiring loads the branch topic, so an agent calls branch/take through the index. [[spec/tickets/work-verbs-become-actions]]
 func TestTheWiringLoadsTheBranchTopic(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -93,6 +96,7 @@ func TestTheWiringLoadsTheBranchTopic(t *testing.T) {
 
 // A twin keyed on three words runs beside the verb's program for that spelling, and the two-word verb runs the verb's program alone. [[spec/tickets/work-verbs-become-actions]]
 func TestATwinKeysOnThreeWords(t *testing.T) {
+	t.Parallel()
 	dry := []bool{}
 	doors, _, rows := roadOver("shadow", "old\n", map[string]twin{"branch list --queue": twinSaying("new\n", &dry)})
 	verbs(doors, []string{"branch", "list", "--queue"})

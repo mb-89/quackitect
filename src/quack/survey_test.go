@@ -11,6 +11,7 @@ import (
 )
 
 func TestThePlacesStartAtTheTreesBinariesAndTakeEachEnding(t *testing.T) {
+	t.Parallel()
 	unix := map[string]string{"PATH": "/a::/b"}
 	if got := placesFor("go", func(k string) string { return unix[k] }, "/bin"); !slices.Equal(got, []string{"/bin/go", "/a/go", "/b/go"}) {
 		t.Errorf("unix places %v", got)
@@ -24,6 +25,7 @@ func TestThePlacesStartAtTheTreesBinariesAndTakeEachEnding(t *testing.T) {
 }
 
 func TestTheVersionComesOffTheFirstLine(t *testing.T) {
+	t.Parallel()
 	for said, want := range map[string]string{"go version go1.24.7 linux/amd64": "1.24.7", "v22.22.0\n": "22.22.0", "Python 3.11": "3.11", "none\n1.2.3": ""} {
 		if got := versionOf(said); got != want {
 			t.Errorf("versionOf(%q) = %q, want %q", said, got, want)
@@ -32,6 +34,7 @@ func TestTheVersionComesOffTheFirstLine(t *testing.T) {
 }
 
 func TestACallerLooksAtTheSurveyThenTheTreesBinaryThenTheBareName(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t, "vale")
 	at := d.env("PATH") + "/vale"
 	if got := whereIs(d.root, "vale", map[string]*toolAt{"vale": {Path: at}}); got != at {

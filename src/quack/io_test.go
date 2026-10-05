@@ -19,6 +19,7 @@ import (
 
 // The fake silent IO process: it commits a value, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
 func TestFakeSilentIO(t *testing.T) {
+	t.Parallel()
 	if os.Getenv(index.BusEnv) == "" {
 		return
 	}
@@ -36,6 +37,7 @@ func TestFakeSilentIO(t *testing.T) {
 }
 
 func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	as := manager.Registers(c)
 	fake := q.OutIn(c, "fake/out", 0, q.IO(), q.Doc("the fake's value"))
@@ -66,6 +68,7 @@ func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
 
 // The fake silent module process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/module-silence-reads-alarms]]
 func TestFakeSilentModule(t *testing.T) {
+	t.Parallel()
 	if os.Getenv(index.BusEnv) == "" {
 		return
 	}
@@ -83,6 +86,7 @@ func TestFakeSilentModule(t *testing.T) {
 }
 
 func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	as := manager.Registers(c)
 	fake := q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid"))
@@ -139,6 +143,7 @@ func ioOnAWire(t *testing.T) *q.Store {
 
 // quack io answers no run, so an IO instance reading a wire reads as wired, and one reading nothing does not. [[spec/tickets/quack-io-answers-no-run]]
 func TestAnIOInstanceReadingAWireReadsAsWired(t *testing.T) {
+	t.Parallel()
 	if got := wiredIO(ioOnAWire(t), []string{"source", "reader"}); len(got) != 1 || got[0] != "reader" {
 		t.Fatalf("the wired IO instances read %v, and want reader alone", got)
 	}
@@ -146,6 +151,7 @@ func TestAnIOInstanceReadingAWireReadsAsWired(t *testing.T) {
 
 // The split refuses to start an IO instance on a wire, and names it. [[spec/tickets/start-refuses-wired-io]]
 func TestTheSplitRefusesAnIOInstanceOnAWire(t *testing.T) {
+	t.Parallel()
 	split, err := ioProcesses(t.TempDir(), ioOnAWire(t), doors{io: []string{"source", "reader"}}, nil)
 	if err == nil {
 		split.Stop()
@@ -158,6 +164,7 @@ func TestTheSplitRefusesAnIOInstanceOnAWire(t *testing.T) {
 
 // The tracked wiring places no IO instance on a wire, so quack io holds no reader. [[spec/tickets/quack-io-answers-no-run]]
 func TestTheTrackedWiringWiresNoIOInstance(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -177,6 +184,7 @@ func TestTheTrackedWiringWiresNoIOInstance(t *testing.T) {
 }
 
 func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
+	t.Parallel()
 	bus, err := index.StartBus()
 	if err != nil {
 		t.Fatal(err)
@@ -212,6 +220,7 @@ func TestTheIOProcessWritesARowWhenTheIndexFallsSilent(t *testing.T) {
 }
 
 func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	as := manager.Registers(c)
 	if faults := c.Check(); len(faults) > 0 {
@@ -254,6 +263,7 @@ func TestACommitOfIndexHealthBeatsTheIndexLease(t *testing.T) {
 
 // The hooks door reads the index's lease off index/health. [[spec/tickets/the-split-deployment-takes-over]]
 func TestTheHooksDoorReadsTheIndexLease(t *testing.T) {
+	t.Parallel()
 	c := q.New()
 	as := manager.Registers(c)
 	if faults := c.Check(); len(faults) > 0 {
@@ -271,6 +281,7 @@ func TestTheHooksDoorReadsTheIndexLease(t *testing.T) {
 }
 
 func TestQuackIOCommitsItsInstancesOverTheBus(t *testing.T) {
+	t.Parallel()
 	bus, err := index.StartBus()
 	if err != nil {
 		t.Fatal(err)

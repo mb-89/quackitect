@@ -20,6 +20,7 @@ const (
 
 // Two open tickets tie on every term but their age. The name puts a-new first, and the day it stood puts b-old first, as the verb's program orders them. [[spec/design_output/pull#the-queue-is-a-score]]
 func TestTheWiredQueueWeighsTheDaysATicketStood(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)

@@ -67,6 +67,7 @@ func retroRunBacklog(t *testing.T, verdicts string) (int, string) {
 
 // [[spec/tickets/the-retro-reads-the-backlog]]
 func TestRetroBacklogPrintsEachProseCriterionOfABacklogTicketTheWindowCloses(t *testing.T) {
+	t.Parallel()
 	_, said := retroRunBacklog(t, "")
 
 	if !regexp.MustCompile(`a-backlog-one {2}` + regexp.QuoteMeta(retroBacklogProse)).MatchString(said) {
@@ -82,6 +83,7 @@ func TestRetroBacklogPrintsEachProseCriterionOfABacklogTicketTheWindowCloses(t *
 
 // [[spec/tickets/the-retro-reads-the-backlog]]
 func TestRetroBacklogAnswersOneWhileACriterionHoldsNoVerdictAndZeroOnceEachDoes(t *testing.T) {
+	t.Parallel()
 	if code, said := retroRunBacklog(t, ""); code != 1 {
 		t.Fatalf("backlog with no verdict answers %d: %s", code, said)
 	}
@@ -97,6 +99,7 @@ func TestRetroBacklogAnswersOneWhileACriterionHoldsNoVerdictAndZeroOnceEachDoes(
 
 // [[spec/tickets/the-retro-reads-the-backlog]]
 func TestRetroBacklogLeavesAGroupsTicketAndACriterionNamingACommandOut(t *testing.T) {
+	t.Parallel()
 	_, said := retroRunBacklog(t, "")
 
 	if !strings.Contains(said, retroBacklogProse) {
@@ -111,6 +114,7 @@ func TestRetroBacklogLeavesAGroupsTicketAndACriterionNamingACommandOut(t *testin
 
 // [[spec/tickets/the-retro-reads-the-backlog]]
 func TestRetroBacklogProseCriterionIsAnAskBulletNamingNoCommandUnderEitherMark(t *testing.T) {
+	t.Parallel()
 	text := strings.Replace(retroBacklogTicket("closed", nil, []string{retroBacklogProse, retroBacklogCommand}), "- "+retroBacklogProse, "* "+retroBacklogProse, 1)
 
 	if got := retroCriteriaOf(text); !reflect.DeepEqual(got, []string{retroBacklogProse}) {
@@ -123,6 +127,7 @@ func TestRetroBacklogProseCriterionIsAnAskBulletNamingNoCommandUnderEitherMark(t
 
 // [[spec/tickets/the-retro-reads-the-backlog]]
 func TestRetroBacklogClosedInAnswersEveryTicketTrunkClosesInsideTheWindowWithItsCommit(t *testing.T) {
+	t.Parallel()
 	closed := retroClosedIn(retroBacklogTrunk().run, retroWhen("2026-09-10T00:00:00Z"))
 
 	if !closed.ok {
