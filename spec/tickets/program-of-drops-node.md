@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: a8ca0df15952762e28e24706d66b53fbc897d42c
+    hash_after: a8ca0df15952762e28e24706d66b53fbc897d42c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 73 test(s) pass in 8 file(s); green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.6  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: d64454c3cfaba25f
+        size: 691
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -342,26 +365,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The program road leaves quack. The usage door takes the program door's place in src/quack/verbs.go, and the node module refuses a word nothing registers. src/scripts/verb-run.js leaves. The road argv moves into quack-topic.js, and the main runner into cli-main.js, a command root the door rule exempts. The lens drops its program folder, and the tests that drove a node program now drive a registered verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files, plus the readers of the gone road the draft names
+- the node module case runs the child road through a stand-in binary, and every other case runs in memory
+- every new function names program-of-drops-node in its comment
+- the road argv stands in quack-topic.js and the main runner in cli-main.js, once each
 
 # accept
 

@@ -4,11 +4,21 @@
 package main
 
 import (
+	"io"
 	"strings"
 	"testing"
 
 	"quackitect/src/q"
 )
+
+func TestTheRoadRefusesAWordNothingRegistersThroughTheUsageDoor(t *testing.T) {
+	var out, errs strings.Builder
+	argv := []string{"unclaimed"}
+	doors := verbDoors{old: usageDoor(argv, &errs), twins: map[string]twin{}, log: func(map[string]any) error { return nil }, out: &out, errs: io.Discard}
+	if code := verbs(doors, argv); code != exitUsage || !strings.Contains(errs.String(), "there is no verb called unclaimed") {
+		t.Fatalf("the road answers %d, %q", code, errs.String())
+	}
+}
 
 func TestTheNodeModuleRefusesAWordNothingRegisters(t *testing.T) {
 	_, err := nodeAccept(t.TempDir())(q.Request{Args: []any{"registry", "unclaimed"}})
