@@ -20,7 +20,7 @@ import (
 	"quackitect/src/modules/edits"
 )
 
-func init() { register(splitBy, splitVerb(index.Root, time.Now)) }
+func init() { register("split", splitVerb(index.Root, time.Now)) }
 
 // The verb's word, which the journal names as the hand of the entry. [[spec/design_output/apply#the-journal-holds-both-halves]]
 const splitBy = "split"

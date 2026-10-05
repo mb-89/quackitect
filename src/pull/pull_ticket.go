@@ -72,6 +72,11 @@ func (it *It) RoutedTicket(where string, held Process, steps []any, line string,
 	return text, why
 }
 
+// The ticket a route mints and the lines its Ask warns on, or why it mints none. [[spec/design_output/pull#a-draft-opens]]
+func (it *It) RoutedWarned(where string, held Process, steps []any, line string, fields map[string]any) (string, []string, string) {
+	return it.routed(where, held, steps, line, fields)
+}
+
 // The whole ticket goes to the voice, and the findings on the Ask's lines stay, so a line number names the file's line. The lines that refuse and the lines that warn come back apart. [[spec/design_output/pull#a-draft-opens]]
 func (it *It) askFaults(where, text string) (refused, warned []string) {
 	if it.Voice == nil {
