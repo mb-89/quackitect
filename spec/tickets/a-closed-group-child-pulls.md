@@ -116,7 +116,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -176,6 +176,10 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/pull]]
+  - step: design/tests-red
+    skipped: true
+    kept: 55a5ef8dfe508afc52873df39436fe4321f7fc8e
+    why: its red tests stand as 55a5ef8df landed them, and a later leaf passed since
 ---
 
 # Ask
