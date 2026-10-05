@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -190,6 +190,21 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 05659fab4226 · claude-code-remote
+    hash_before: fa840c8e34edd05d48b50c23618a57cabc5931af
+    hash_after: fa840c8e34edd05d48b50c23618a57cabc5931af
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+      - name: children-2
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 173248322297533c
 group: the-verbs-run-in-go
 depends_on: ["quack-holds-a-verb-registry"]
 enabled_by: migration.phase11
@@ -269,38 +284,63 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the merge of main: the stub cases stay in Go, the Go fixture reads doors.js where check.js leaves, and cli-leaves takes main side
+- the retro notes road case reads retro registered whole, a case main also carries red
+- stub-shim-stays-tested: src/vehicle/shim_contract_test.go runs the real shim on SE_VEHICLE, the register, the clone folder and the miss
+- tui-swap-fails-loud: a build that lands and swaps not in fails the tui verb with the fault
+- vehicle-test-comment-current: the vehicle action case names vehicleTwin
+- accept: no module this group frees of importers stands, and the tests and the check run green
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the accept points of the last round each name one file, so each closes in one commit
+- a red case first for the swap, held by aside folders that refuse removal, so the fault replays on any box
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 02:16 a Bash call meets the classifier timeout, and a retry passes
+- 02:17 git rm and git add meet GitWritesThroughAVerb, and a shell redirection meets ShellWritesNothing while resolving the merge
+- 02:19 the patch door holds no delete op, so the two stub tests leave through rm
+- 02:20 and 02:36 the level0 server restarts after a commit, so patch answers starting, and one ticket pull meets connection refused
+- 02:31 the tests field refuses a raw go test command that answers ok, and takes ./RUNME.sh branch test
+- 02:45 accept refuses --pass beside a verdict field, then refuses the last round points standing in the field, and takes --fields with the verdict alone
+- 02:42 a first edit reads the node module as Node, where it names NodeModule in the index, and a second edit takes it back
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the patch door: a delete op, so a merge resolution removes a file through the door
+- the brief of a merge: name ./RUNME.sh commit as the road for a deleted file, beside the write door
+- the accept step brief: say the verdict goes in --fields alone, and replaces the last round
+- the tests evidence: name ./RUNME.sh branch test in the step says line
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The merge brought a red case in from main: the road case for retro notes expects the shadow road, and main now registers retro whole. The fix rides this branch, since the check needs it green to land.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands once: the shim cases read the real shim, and the tui note holds the new row the code links to
+- no number added: the aside count reads tuiAside
+- the new test file header says what it is for and counts nothing
+- the errors carry their times off the transcript, and no owner prompt arrives in this run
+- the chapter names roles alone, and no box path
 
 ## cloud
 
