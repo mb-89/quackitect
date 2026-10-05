@@ -156,6 +156,14 @@ func TestTicketOpen(t *testing.T) {
 			t.Fatalf("open answers %d, %q", code, errs)
 		}
 	})
+	t.Run("a draft naming a closed group refuses the open, and the draft stands", func(t *testing.T) {
+		root := openTree(t, strings.Replace(openDraft, "state: draft\n", "state: draft\ngroup: shut\n", 1))
+		seedsFile(t, root, "spec/tickets/shut.md", closedGroupTicket)
+		code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing")
+		if code != exitFailed || !strings.Contains(errs, "shut stands closed, so it takes no new child.") || openState(t, root, aThing) != "draft" {
+			t.Fatalf("open answers %d, %q", code, errs)
+		}
+	})
 	t.Run("a group with a child standing opens", func(t *testing.T) {
 		root := openTree(t, strings.Replace(openDraft, "state: draft\n", "state: draft\nprocess: [[spec/processes/group]]\n", 1))
 		seedsFile(t, root, "spec/tickets/a-part.md", openChild)
