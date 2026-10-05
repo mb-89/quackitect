@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 4c04792eb7ca · claude-code-remote
+    hash_before: 5b8984f31bcac1275921dfb11a8dc154215f8892
+    hash_after: 5b8984f31bcac1275921dfb11a8dc154215f8892
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    2.1  test/contract/paragraph.test.js a character outside the set is refused, and a code span passes"
+    inputs:
+      - name: design/tests-red
+        hash: 64f34afd472c5fe2
+        size: 1272
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -354,26 +377,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/ticket_verbs_test.go src/quack/verb_graph_test.go src/quack/verb_mint_test.go src/quack/verb_split_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The verbs ticket, mint, graph and split answer in Go, each registered from its own file under src/quack, and the road reaches no node for any of them. Each ticket sub-verb is a thin shell over the pull: bless, open and the mint call what src/pull and the check module already hold, and note adds the twin search and the name cut the JavaScript carried. The programs under src/scripts/verbs left, and so did mint-verb.js, split-verb.js, split-cut.js and pull-tool.js. The pull hook now reaches ticket pull through the binary. Each JavaScript test that read a leaving module moved its roads into a Go case first. Three guards that read the program folder now read the verb table Go holds. The clear probe names its clone as the root, since the Go mint finds its root off the variable the index hands its children.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the ports, the leaving JavaScript and its tests, and the guards and probe the port broke
+- every door has a fake: the cases run over a temporary tree and repository through the doors pullHere builds
+- a comment names the approach: each port file opens on the JavaScript it ports and links its design section
+- every fact stands once: the sub-verbs call the pull, and the guards read the one verb table
 
 # accept
 
