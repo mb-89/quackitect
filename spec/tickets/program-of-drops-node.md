@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-node-road-closes
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: d64454c3cfaba25f
         size: 691
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 89f685f4bb16 · claude-code-remote
+    hash_before: 71df045c68f2e6a30575dccc90244b72c37eea51
+    hash_after: 71df045c68f2e6a30575dccc90244b72c37eea51
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -312,14 +321,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/scripts/cli-main.js src/scripts/probe-dry.js src/scripts/quack-topic.js src/scripts/work-merge.js src/scripts/work-review.js src/extension/lib/lens.js test/level0/cli-exit.test.js test/level0/topic-readers.test.js test/level0/probe-dry.test.js test/level0/work-merge-cloud.test.js test/level0/review.test.js test/level0/lens-v1.test.js test/contract/verb-programs.test.js test/contract/node-road.test.js src/quack/verbs.go src/quack/twins.go src/quack/main.go src/quack/registry.go src/quack/commit.go src/quack/programs_test.go src/quack/verbs_test.go src/quack/registry_test.go src/quack/person_run_test.go src/quack/ticket_twins_test.go src/quack/no_program_test.go src/modules/verbs/tree.go src/modules/verbs/ticket.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the drafted files and each reader of the gone road, and the draft names the rest
+- the node module test drives the child road through a stand-in binary, and every other case runs in memory
+- each new function carries a comment naming program-of-drops-node
+- the main runner stands once, in cli-main.js, and quack-topic.js owns the road argv
 
 ## tests-green
 

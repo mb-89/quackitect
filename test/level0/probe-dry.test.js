@@ -7,6 +7,7 @@ import { test } from "node:test";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { RESUME } from "../../src/bridge/handover.js";
+import { verbMain } from "../../src/scripts/cli-main.js";
 import {
   DRY,
   engineOf,
@@ -188,4 +189,13 @@ test("the harness reads the clone's files, records each post and tool, and hands
   assert.deepEqual(seen.posts, [{ url: "http://127.0.0.1:1/hook", event: "tool.call" }]);
   assert.deepEqual(seen.registered, ["find"]);
   assert.deepEqual(await $.session.messages(), [{ role: "assistant", id: "a1", text: "said" }]);
+});
+
+// [[spec/tickets/program-of-drops-node]]
+test("the probe's main runs nothing where another program is main", async () => {
+  let ran = false;
+  await verbMain("file:///elsewhere/probe-dry.js", () => {
+    ran = true;
+  });
+  assert.equal(ran, false);
 });

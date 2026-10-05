@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { exitsDrained } from "../../src/scripts/verb-run.js";
+import { exitsDrained } from "../../src/scripts/cli-main.js";
 
 const BIG = 4 * 65536;
 const SIP = 1024;

@@ -3,7 +3,7 @@
 // [[spec/tickets/ticket-verbs-each-pinned]]
 package verbs
 
-// Every verb ticket in src/scripts/verbs/ticket.js and src/scripts/ticket.js answers, with its usage line as its doc. [[spec/tickets/ticket-verbs-each-pinned]]
+// Every verb ticket answers, with its usage line as its doc. [[spec/tickets/ticket-verbs-each-pinned]]
 var TicketVerbs = []Verb{
 	{Name: "pull", Doc: "take the next leaf of this group, or hand one back with --pass, --fail, --became, --answered"},
 	{Name: "note", Doc: "write a private ticket off the note process, and carry on"},

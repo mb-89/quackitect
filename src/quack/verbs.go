@@ -10,10 +10,8 @@ import (
 	"io"
 	"os"
 	"os/exec"
-	"os/signal"
 	"path/filepath"
 	"strings"
-	"syscall"
 	"time"
 
 	"quackitect/src/index"
@@ -131,11 +129,6 @@ func verbs(d verbDoors, argv []string) int {
 // The width the usage pads a verb's name to. [[spec/tickets/cli-js-leaves]]
 const usageColumn = 8
 
-// The argv of a verb's program under the scripts folder: node, the program, and the words past the verb. [[spec/tickets/cli-js-leaves]]
-func programOf(scripts string, argv []string) []string {
-	return append([]string{"node", filepath.Join(scripts, "verbs", argv[0]+".js")}, argv[1:]...)
-}
-
 // The usage quack prints for help and for a verb it knows nowhere, off the one table. [[spec/tickets/cli-js-leaves]]
 func usageText() string {
 	var said strings.Builder
@@ -146,18 +139,8 @@ func usageText() string {
 	return said.String()
 }
 
-// Whether the table holds the verb. [[spec/tickets/cli-js-leaves]]
-func isCommand(verb string) bool {
-	for _, one := range verbsmodule.Commands {
-		if one.Name == verb {
-			return true
-		}
-	}
-	return false
-}
-
-// The program door: the verb's program past any flag before it, or the usage where the words name help or no verb the table holds. [[spec/tickets/cli-js-leaves]]
-func programDoor(scripts string, argv []string, stdin io.Reader, errs io.Writer, signals <-chan os.Signal) func(out io.Writer) int {
+// The usage door, which stands where the program door stood: the usage where the words past any flag name help or nothing, and a refusal naming a word Go registers nowhere. [[spec/tickets/program-of-drops-node]]
+func usageDoor(argv []string, errs io.Writer) func(out io.Writer) int {
 	return func(out io.Writer) int {
 		at := 0
 		for at < len(argv) && strings.HasPrefix(argv[at], "-") {
@@ -167,12 +150,9 @@ func programDoor(scripts string, argv []string, stdin io.Reader, errs io.Writer,
 			fmt.Fprint(out, usageText())
 			return 0
 		}
-		if !isCommand(argv[at]) {
-			fmt.Fprintf(errs, "se: there is no verb called %s\n\n", argv[at])
-			fmt.Fprint(out, usageText())
-			return exitUsage
-		}
-		return oldDoor(programOf(scripts, argv[at:]), stdin, errs, signals)(out)
+		fmt.Fprintf(errs, "se: there is no verb called %s\n\n", argv[at])
+		fmt.Fprint(out, usageText())
+		return exitUsage
 	}
 }
 
@@ -221,17 +201,15 @@ func appendsRow(root string, now func() time.Time) func(row map[string]any) erro
 	}
 }
 
-// The road over the real doors: each verb's program under node, the tree over V1, the registered verbs and the session log under the root. [[spec/tickets/cli-js-leaves]] [[spec/tickets/quack-registers-each-verb]]
-func verbRoad(scripts string, argv []string) int {
+// The road over the real doors: the usage door, the tree over V1, the registered verbs and the session log under the root. [[spec/tickets/quack-registers-each-verb]] [[spec/tickets/program-of-drops-node]]
+func verbRoad(argv []string) int {
 	root, err := index.Root()
 	if err != nil {
 		root = "."
 	}
-	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 	return verbs(verbDoors{
 		mode:  modeOf(root),
-		old:   programDoor(scripts, argv, os.Stdin, os.Stderr, signals),
+		old:   usageDoor(argv, os.Stderr),
 		alone: func(argv []string) int { return routes(os.Stdout, os.Stderr, index.V1, argv) },
 		twins: registry,
 		log:   appendsRow(root, time.Now),
@@ -243,41 +221,8 @@ func verbRoad(scripts string, argv []string) int {
 // The line a failed start says: a runtime missing from the PATH names itself, since the install brings none. [[spec/tickets/bare-desk-names-missing-node]]
 func startFault(runtime string, err error) string {
 	if errors.Is(err, exec.ErrNotFound) {
-		return fmt.Sprintf("No %s stands on the PATH, and every verb without a Go twin runs on it. Install %s, and run this again.", runtime, runtime)
+		return fmt.Sprintf("No %s stands on the PATH. Install %s, and run this again.", runtime, runtime)
 	}
 	return err.Error()
 }
 
-// The old road: the verb's program as a child holding the caller's stdin and error stream, its standard output written to out, each signal forwarded, and its exit code answered. An out that is the caller's own file hands the child the terminal itself. [[spec/tickets/verb-road-keeps-the-terminal]]
-func oldDoor(command []string, stdin io.Reader, errs io.Writer, signals <-chan os.Signal) func(out io.Writer) int {
-	return func(out io.Writer) int {
-		child := exec.Command(command[0], command[1:]...)
-		child.Stdin, child.Stdout, child.Stderr = stdin, out, errs
-		if err := child.Start(); err != nil {
-			fmt.Fprintln(errs, startFault(command[0], err))
-			return exitFailed
-		}
-		ended := make(chan struct{})
-		go func() {
-			for {
-				select {
-				case one := <-signals:
-					child.Process.Signal(one)
-				case <-ended:
-					return
-				}
-			}
-		}()
-		err := child.Wait()
-		close(ended)
-		var exit *exec.ExitError
-		if errors.As(err, &exit) && exit.ExitCode() >= 0 {
-			return exit.ExitCode()
-		}
-		if err != nil {
-			fmt.Fprintln(errs, err)
-			return exitFailed
-		}
-		return 0
-	}
-}

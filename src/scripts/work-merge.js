@@ -3,7 +3,7 @@
 // [[spec/design_output/work#a-merged-branch-closes]]
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { quackArgv } from "./verb-run.js";
+import { quackArgv } from "./quack-topic.js";
 import {
   CLOSED,
   fieldOf,

@@ -43,7 +43,6 @@ var coldPath = []string{
 	"src/scripts/go-stamp.sh",
 	"src/scripts/install.sh",
 	"src/scripts/probe-cold.js",
-	"src/scripts/verbs/setup.js",
 }
 
 func init() {

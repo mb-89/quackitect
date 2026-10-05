@@ -21,6 +21,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { PLUGIN } from "../../src/scripts/brand.js";
 import { work } from "../../src/scripts/work.js";
+import { roadArgv } from "../../src/scripts/quack-topic.js";
 import { whatFailed } from "../../src/scripts/work-review.js";
 
 const ROOT = "/tree";
@@ -511,4 +512,9 @@ test("a worktree that opens nowhere answers so, and runs no check", () => {
     false,
     "no check runs where no worktree stands",
   );
+});
+
+// [[spec/tickets/program-of-drops-node]]
+test("the review's check rides quack's road", () => {
+  assert.deepEqual(roadArgv(QUACK, AT, ["check"]), [QUACK, ...ROAD]);
 });
