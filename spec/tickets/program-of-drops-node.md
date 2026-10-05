@@ -134,7 +134,7 @@ record:
   - step: design/tests-red
     hand: box 89f685f4bb16 · claude-code-remote
     hash_before: 121e1aeb12c9a0cf93b015040bd1caddb4cf067d
-    hash_after: 121e1aeb12c9a0cf93b015040bd1caddb4cf067d
+    hash_after: 1a0bbc78ff0ce2c91853a87d5234df95d4ac3dfc
     answered:
       - name: tests
         exit: 1
