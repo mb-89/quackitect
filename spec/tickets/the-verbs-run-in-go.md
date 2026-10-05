@@ -85,6 +85,7 @@ process_hash: 5d4a884bfb2491ff
 enabled_by: migration.phase11
 depends_on: ["node-leaves-the-boxes"]
 step: sync
+cloud: true
 ---
 
 # Ask
