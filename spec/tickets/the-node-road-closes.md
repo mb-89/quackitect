@@ -86,7 +86,7 @@ group: the-verbs-run-in-go
 enabled_by: migration.phase11
 cloud: true
 depends_on: ["read-verbs-run-in-go", "check-verbs-run-in-go", "config-verbs-run-in-go", "box-verbs-run-in-go", "window-verbs-run-in-go", "landing-verbs-run-in-go", "work-verbs-run-in-go", "ticket-verbs-run-in-go", "retro-verbs-run-in-go", "dispatch-verbs-run-in-go"]
-step: children
+step: accept
 record:
   - step: sync
     hand: box 89f685f4bb16 · claude-code-remote
@@ -112,6 +112,10 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: cb8f90bc86fc7d39
+  - step: children
+    hand: the engine
+    hash_before: 92ccf16a53e82204d63b15045a36e91e4fd1067b
+    hash_after: 92ccf16a53e82204d63b15045a36e91e4fd1067b
 ---
 
 # Ask
