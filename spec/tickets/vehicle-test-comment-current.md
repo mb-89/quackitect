@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: window-verbs-run-in-go
 parent: window-verbs-run-in-go
+record:
+  - step: do
+    hand: box 05659fab4226 · claude-code-remote
+    hash_before: d6b1d021051a61186ebfa05df6a1261904f18efa
+    hash_after: ac16a8111c510eb04f55360bba3706e55687b317
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/verbs passes
+      - name: check
+        exit: 0
+        said: "   66.7  in all"
+    inputs:
+      - name: ask
+        hash: db71aefcadd69181
+        size: 83
+    def: 66bb314c32a9b6ac
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ src/modules/verbs/vehicle_test.go names theVehicle, which left with vehicle-verb
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The comment over the vehicle action case in src/modules/verbs/vehicle_test.go named theVehicle, the JavaScript function that left with vehicle-verb.js. It now names vehicleTwin in src/quack, the Go verb that answers the vehicle words. The stub case comment names the node module, the index module each action hands its words to, so it stays.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the comment names the function that answers now
+- the cleanup: the stub comment beside it reads true and stays
+- each fact stands once: the comment points at the verb, and src/modules/verbs/vehicle.go names its file
 
 # Discussion
 
