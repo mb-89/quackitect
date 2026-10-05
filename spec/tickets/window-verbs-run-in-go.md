@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/notes
+step: retro/write
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -181,6 +181,15 @@ record:
         hash: 3eaee7b8cc71d34a
         size: 11400
     def: bf1fe6cde364dfd7
+  - step: retro/notes
+    hand: box 05659fab4226 · claude-code-remote
+    hash_before: e3fb578e4d5135e04fa0bd3c4017b036520a8594
+    hash_after: e3fb578e4d5135e04fa0bd3c4017b036520a8594
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+    def: cb5a549f0e587fc2
 group: the-verbs-run-in-go
 depends_on: ["quack-holds-a-verb-registry"]
 enabled_by: migration.phase11
@@ -249,8 +258,9 @@ accept
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
