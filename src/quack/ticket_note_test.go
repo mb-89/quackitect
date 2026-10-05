@@ -33,16 +33,6 @@ steps:
         says: what the note becomes
 `
 
-// A Vale that behaves over stdin: a semicolon breaks Characters as a warning, and the marker breaks Private at error. [[spec/design_output/doors#a-fake-behaves]]
-const noteCaseVale = `#!/bin/sh
-for a in "$@"; do case "$a" in --path=*) p="${a#--path=}";; esac; done
-awk -v p="$p" '
-function row(rule, line, said, message, severity) { r = r (n ? "," : "") sprintf("{\"Check\":\"VoiceVale.%s\",\"Line\":%d,\"Span\":[1,1],\"Match\":\"%s\",\"Message\":\"%s\",\"Severity\":\"%s\"}", rule, line, said, message, severity); n++ }
-index($0, ";") { row("Characters", NR, ";", "A semicolon joins two sentences.", "warning") }
-index($0, "SECRET") { row("Private", NR, "SECRET", "A private name leaves the box.", "error") }
-END { if (n) printf "{\"%s\":[%s]}\n", p, r; else print "{}" }'
-`
-
 // A tree holding the ticket schema this tree holds and the note route, its work root the same. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 func noteCaseTree(t *testing.T) string {
 	t.Helper()
@@ -76,10 +66,7 @@ func noteCaseWiring(t *testing.T, root string) {
 // Seeds the fake Vale where the voice finds it. [[spec/design_output/doors#a-fake-behaves]]
 func noteCaseVoice(t *testing.T, root string) {
 	t.Helper()
-	seedsFile(t, root, ".se/.runtime/bin/vale", noteCaseVale)
-	if err := os.Chmod(filepath.Join(root, ".se", ".runtime", "bin", "vale"), 0o755); err != nil {
-		t.Fatal(err)
-	}
+	fakeVale(t, root, fakeValeLines, "")
 }
 
 // Whether the text holds a row the pattern matches whole. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]

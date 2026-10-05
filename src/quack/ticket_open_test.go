@@ -43,11 +43,8 @@ Nothing yet.
 // A child naming a-thing under group, as ask-lint.test.js seeds it. [[spec/design_output/work#a-group-is-a-ticket]]
 const openChild = "---\nkind: [[ticket]]\nstate: draft\ngroup: a-thing\n---\n\n# Ask\n\nA part.\n"
 
-// The Vale the fake answers with, and the file it keeps what it read in. [[spec/design_output/pull#a-draft-opens]]
-const (
-	openVale  = ".se/.runtime/bin/vale"
-	openHeard = openVale + ".stdin"
-)
+// The file the fake Vale keeps what it read in. [[spec/design_output/pull#a-draft-opens]]
+const openHeard = ".se/vale.stdin"
 
 // A tree in git holding the draft, git reading no config of this box's own. [[spec/design_output/pull#a-draft-opens]]
 func openTree(t *testing.T, draft string) string {
@@ -83,10 +80,7 @@ func openGit(t *testing.T, root string, args ...string) string {
 func openValeSaying(t *testing.T, root, rule string, line int, severity string) {
 	t.Helper()
 	said := `{"stdin.md":[{"Check":"` + rule + `","Line":` + strconv.Itoa(line) + `,"Span":[17,17],"Message":"It breaks.","Severity":"` + severity + `"}]}`
-	seedsFile(t, root, openVale, "#!/bin/sh\ncat > \"$0.stdin\"\nprintf '%s' '"+said+"'\n")
-	if err := os.Chmod(filepath.Join(root, filepath.FromSlash(openVale)), 0o755); err != nil {
-		t.Fatal(err)
-	}
+	fakeVale(t, root, said, filepath.Join(root, filepath.FromSlash(openHeard)))
 }
 
 func openState(t *testing.T, root, path string) string {
