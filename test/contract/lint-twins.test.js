@@ -13,8 +13,8 @@ import * as reading from "../../src/scripts/cli-read.js";
 const ROOT = join(import.meta.dirname, "..", "..");
 // How long one run of the entry waits, the install and the tools' start among it, in milliseconds. [[spec/tickets/read-verbs-lint-drift]]
 const RUN_TIMEOUT_MS = 300000;
-// The file both read: it carries a finding, so the case compares findings, and one file costs the battery seconds where a folder costs a minute. [[spec/tickets/one-reading-proves-one-file]]
-const WHERE = "spec/tickets/the-verbs-run-in-go.md";
+// The file both read: a design note keeping a finding at warning, so the case compares findings when a ticket closes, and one file costs the battery seconds where a folder costs a minute. [[spec/tickets/one-reading-proves-one-file]] [[spec/tickets/lint-twins-reads-a-standing-finding]]
+const WHERE = "spec/design_output/tui.md";
 const FINDING = /^\S+:\d+:\d+: /;
 
 test("the Go lint and the check's lint name the same finding lines", async () => {
