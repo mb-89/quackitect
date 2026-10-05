@@ -358,3 +358,42 @@ accept with points
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+## The measure before
+
+The box is a fresh cloud container with four cores. The tree stands at bcafef356, the commit that opens this ticket, and it carries the code of 63c619f0d unchanged. The parts come off `battery.parts` in `.se/.runtime/check.json`, in milliseconds. The first run found a Go cache the box image left half full, and the second run follows it with nothing changed.
+
+| part | first run | second run |
+|---|---|---|
+| go | 95210 | 15274 |
+| level0 | 52702 | 47373 |
+| tests | 34357 | 36264 |
+| rules | 29947 | 47856 |
+| plugin | 1300 | 1873 |
+| projections | 241 | 443 |
+| total | 161073 | 101731 |
+
+A third run with every Go package cached read a total of 67621, the go part 7378.
+
+The Go tests alone, `CGO_ENABLED=0 go test -tags contract ./...`, in seconds:
+
+| run | seconds |
+|---|---|
+| a fresh `GOCACHE`, compile and run | 237 |
+| builds cached, `-count=1` | 188 |
+
+The packages under `-count=1`, each one's span in seconds, alone and inside the full run:
+
+| package | alone | in the full run |
+|---|---|---|
+| `src/branches` | 50.5 | 185.3 |
+| `src/quack` | 34.5 | 81.2 |
+| `src/imports` | 14.0 | 24.3 |
+| `src/index` | 13.6 | 18.4 |
+| `src/pull` | 5.3 | 7.9 |
+
+A package runs its tests one after another, so its span is their sum. `src/branches` builds a real origin and clone for each of its tests. `TestTwinGoldens` opens every tracked file, so an edit anywhere in the tree reruns the whole of `src/quack`.
+
+## The skip turns the cache off
+
+Go caches no test result of a run carrying `-skip`. Two runs of `go test -skip '^TestNothing$' ./src/yaml` both run, where two runs under `-run` answer the second from the cache. The check passes `-skip` for the red list, so while a ticket stands between tests-red and tests-green, every package reruns on every check. On this branch, with the guard on the red list, two checks in a row read go at 64.3 and 59.4 seconds, totals 135.6 and 125.9.

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: the-check-fits-its-budget
 parent: the-check-fits-its-budget
+record:
+  - step: do
+    hand: box ce27714b7c6d · claude-code-remote
+    hash_before: a1de090b797013827bfbc21307b5d316fc80b86e
+    hash_after: a1de090b797013827bfbc21307b5d316fc80b86e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: "   99.7  in all"
+    inputs:
+      - name: ask
+        hash: a5b89fbe47483a74
+        size: 246
+    def: 30024539343bec95
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the Discussion stands empty, though the approach says it carries the numbers. do
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/schema.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The parent's Discussion holds the measure before the change, taken on this box at the commit that opens the ticket. It gives the battery's parts on two runs, the Go tests alone cold and with builds cached, and the slow packages alone and inside the full run. A second chapter records that go test caches no result of a run carrying -skip, which the check passes for the red list.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask: the measure stands under the parent's Discussion, taken at bcafef356, whose code matches 63c619f0d
+- cleanup: the skip finding goes into the parent's implement step, where goGate changes
+- one place: the numbers stand in the parent's Discussion alone, and this ticket points there
 
 # Discussion
 
