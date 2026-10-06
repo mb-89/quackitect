@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,12 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: e2501fa68ca48baa074a3b2ca6188bb26ea83eab
+    hash_after: 74e6486d3349c740100cc64f62095ed9414ffd28
+reason: became
+successors: [level0-smoke-runs-in-seconds]
 ---
 
 # Ask
@@ -315,26 +321,33 @@ the desk trial name stands once, in deskTrial, and the line reads it there
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+cd src && CGO_ENABLED=0 go test -count=1 ./quack/ -run "TestCheckReads/(a_green_level_zero|a_Windows_box)" -v
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+level0Runs now names the platform in every line it prints. A green run says level zero runs whole on the platform. A red run says the tree is red on the platform. A Windows box names spec/tickets/desk-probe-reply-trial, the trial on the owner desk that covers it, since every box proof runs on Linux. The red case keys on probe smoke, so it goes green when level0-smoke-runs-in-seconds switches the verb.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack/check.go alone, which the size list names
+the platform and the streams ride through checkDoors, and the fake names linux
+the comment over level0Runs links this ticket
+the trial name stands once, in the deskTrial constant
 
 # accept
 
