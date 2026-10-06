@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/yaml"
 )
 
 // The files a retro's home and input hold, the private folder, and the folders collect drains, keeps, and fills with the groups. [[spec/guidance/retro/collect]]
@@ -220,7 +221,7 @@ func retroCollectAgain(home, into, name string, out, errs io.Writer) int {
 	record, _ := retroCollectParsed(retroCollectRead(filepath.Join(home, retroCollectCollected)))
 	refusals := 0
 	for _, row := range strings.Split(retroCollectRead(filepath.Join(into, retroCollectManifest)), "\n") {
-		if said, _ := retroCollectParsed(row); retroCollectTruthy(retroCollectGet(said, "refused")) {
+		if said, _ := retroCollectParsed(row); yaml.Truthy(retroCollectGet(said, "refused")) {
 			refusals++
 		}
 	}
@@ -228,7 +229,7 @@ func retroCollectAgain(home, into, name string, out, errs io.Writer) int {
 	if refusals > 0 {
 		fmt.Fprintf(errs, "  that run records %d refused file(s).\n", refusals)
 	}
-	if retroCollectTruthy(record) && refusals == 0 {
+	if yaml.Truthy(record) && refusals == 0 {
 		return 0
 	}
 	return exitFailed
