@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 4f5c268fe7e0d58aef6ba11b80ec9c0505523b26
+    hash_after: 4f5c268fe7e0d58aef6ba11b80ec9c0505523b26
+    inputs:
+      - name: ask
+        hash: 991e2455b4efe785
+        size: 656
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,84 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The process door takes the two things the lsp runner holds and the door lacks: a halt that ends every run in flight, and a wait that ends one run. The lsp module then drops its own `Runner` and runs Vale and Biome through `proc.Runner`.
+
+The door gains these parts in `src/proc/proc.go`:
+- `Command` gains `Wait`, a span past which the run ends with a fault. A zero `Wait` lets the run take as long as it takes.
+- `Halting()` answers a real `Runner` and a halt. The runner runs each command under one shared life, through `exec.CommandContext`, so the halt ends every run in flight. A run the halt reaches, or one past its `Wait`, answers a nonzero code and an error. A run after the halt answers `NotStarted`.
+- `Real` stays, as a runner whose life never ends.
+- `FakeRunner` gains `Halted`, which the fake's own `Halt` sets, and `After`, the timer a wait arms through. A run after the halt answers `NotStarted`. A program the fake runs takes the command, and a taught program that waits reads a channel the fake closes at the halt or the wait.
+
+The lsp module moves:
+- `Runner` leaves `src/modules/lsp/tools.go`, and `Tools.Run` takes `proc.Runner`.
+- `valeRun` and `biome` build a `proc.Command` with the folder, the input and `Wait: toolWait`. A run answering no output and a nonzero code reads as the fault it reads today.
+- `ToolsAt` takes its runner and its halt from `proc.Halting`. `runsUntilHalt` and `runsIn` leave `src/modules/lsp/door.go`, and so does `os/exec` there.
+- `fakeTools` in `src/modules/lsp/tools_test.go` becomes a `proc.FakeRunner` taught `vale` and `biome`, with a table of answers and a record of calls.
+- `src/modules/lsp/door_test.go` leaves. Its claim, that a halt ends a running tool, moves into the process contract, which runs it on both runners.
+
+The moves table row for this ticket already names the halt and the wait. The family table's row for a tool's process, now on `src/modules/lsp` and `door_test.go`, moves onto the process door and its suite.
+
+I weighed keeping the halt in the lsp module, wrapping `proc.Real` in a goroutine. I refuse it: a wrapper cannot kill the process it waits on, so the halt would leave the tool running, which the index's stop forbids. The cost: the process door grows a life and a wait that only the lsp module needs today.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/modules/lsp/door.go` `ToolsAt`
+- `src/modules/lsp/door.go` `runsUntilHalt`
+- `src/modules/lsp/door.go` `runsIn`
+- `src/modules/lsp/tools.go` `Runner`
+- `src/modules/lsp/tools.go` `Tools`
+- `src/modules/lsp/tools.go` `valeRun`
+- `src/modules/lsp/tools.go` `biome`
+- `src/modules/lsp/lsp.go` the stop calling `tools.Halt`
+- `src/quack/verb_lint.go` the lint calling `tools.Halt`
+- `src/modules/lsp/tools_test.go` `fakeTools`
+- `src/modules/lsp/door_test.go` `TestAHaltEndsARunningTool`
+- `src/proc/proc.go` `Command`
+- `src/proc/proc.go` `FakeRunner.Run`
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/proc/proc_contract_test.go` `TestAHaltEndsARunInFlight`
+- `src/proc/proc_contract_test.go` `TestARunAfterTheHaltNeverStarts`
+- `src/proc/proc_contract_test.go` `TestARunPastItsWaitEndsWithAFault`
+- `src/modules/lsp/tools_test.go` `TestTheToolsRunThroughTheProcessDoorWithTheirWait`
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/proc/proc.go
+- src/proc/proc_contract_test.go
+- src/modules/lsp/door.go
+- src/modules/lsp/door_test.go
+- src/modules/lsp/tools.go
+- src/modules/lsp/tools_test.go
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- I opened `src/modules/lsp/door.go`, `tools.go`, `tools_test.go`, `door_test.go`, `src/proc/proc.go` and its suite, and the process door section of `spec/design_output/doors.md`. `Halt` callers stand in `lsp.go` and `verb_lint.go`, and keep their call.
+- The callers come off a search for `Runner`, `Run(`, `runsUntilHalt` and `Halt()` under `src`.
+- Done_when one meets `TestTheToolsRunThroughTheProcessDoorWithTheirWait`, two meets the three process contract cases, three meets `./RUNME.sh branch test src/modules/lsp/tools_test.go`, and four is the check.
 
 ## tests-red
 
