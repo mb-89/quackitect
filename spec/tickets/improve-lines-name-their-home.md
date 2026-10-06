@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 40c833ee214a778b
         size: 341
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: b4a64b1a54af1aff947b322bc6665a24cb1d3285
+    hash_after: b4a64b1a54af1aff947b322bc6665a24cb1d3285
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 2362b656d120e1b4
+        size: 1779
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -217,26 +230,31 @@ the one done_when line meets TestImproveLinesNameTheirHome
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/pull_home_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/pull/pull_home_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+A list field takes any line today, so the line naming no home and the four naming a home that stands nowhere all pass. The two subcases on homes that stand, and on an unmarked field, already hold, and guard the change against refusing too much.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the one done_when line meets TestImproveLinesNameTheirHome, red on its assertion
+the test reaches the disk through FakeDisk alone
 
 # gate
 
