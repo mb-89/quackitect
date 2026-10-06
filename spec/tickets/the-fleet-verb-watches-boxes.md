@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: 064514c799d1f358cc61de98b5946a7f6fe0e74a
+    hash_after: 064514c799d1f358cc61de98b5946a7f6fe0e74a
+    inputs:
+      - name: ask
+        hash: d3b64a5b3f02c0c4
+        size: 607
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -154,38 +163,68 @@ The coordinator builds the fleet table by hand each cycle, and finds an idle, lo
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`./RUNME.sh cloud fleet` prints one row a work branch, and a wake line for each box that stalls. It exits 1 where a wake stands, so the watch that runs it wakes the coordinator.
+
+- `fleetRows` in `src/branches/fleet.go` gains the tip, the tip's age and the pull request. It stays pure over the stands, the clock's now and the pull request map.
+- The pull requests come off one `git ls-remote origin refs/pull/*/head`. A branch whose tip a pull head names carries that number. That needs no token and no new door.
+- `wakesOf(rows, idle)` stands pure and answers one wake a stalled box.
+  - idle: held, and its tip stands older than the span.
+  - stopped: done, with no pull request.
+  - failed: free again, with a final line on its last entry, which a release short of done writes.
+- The span is the config key `fleet.idleAfter`, `30m` by default, read through `spanOf` as the stale span is.
+- `Cloud` in `src/branches/branch.go` runs `fleet` beside `trigger`.
+- The sentinel ticket stands open. So the wake stands as the verb's lines and exit code, and a line under that ticket's Discussion names the watch it takes over.
+
+Weighed: the pull refs over the GitHub API, since a desk and a box both hold git and neither holds a token. Assumed: a box that holds a branch pushes as it works, so the tip's age reads its idle time.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/branches/branch.go: Cloud, which gains the fleet word
+- src/branches/routine.go: pullRouteOf, which reads fleetRows
+- src/quack/cloud.go: cloudVerb, which hands every word to Cloud and changes nothing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/branches/fleet_test.go: TestFleetListsEachBranchWithTipAgeHolderAndPullRequest
+- src/branches/fleet_test.go: TestAnIdleBoxRaisesAWake
+- src/branches/fleet_test.go: TestAStoppedBoxRaisesAWake
+- src/branches/fleet_test.go: TestAFailedBoxRaisesAWake
+- src/branches/fleet_test.go: TestABusyBoxRaisesNoWake
+- src/branches/fleet_test.go: TestFleetExitsRedOnAWake
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/branches/fleet.go
+- src/branches/fleet_test.go
+- src/branches/branch.go
+- spec/tickets/failures-and-the-sentinel.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Opened `free.go` (tipAge, staleSpan, spanOf), `list.go` (rowOf), `read.go` (ref), `stands.go` (standings) and `branch.go` (Cloud), and checked each claim there.
+- Callers: Cloud and pullRouteOf stand in the list, and `src/quack/cloud.go` reaches Cloud unchanged.
+- The second done_when line meets TestFleetListsEachBranchWithTipAgeHolderAndPullRequest. The third meets the idle, stopped and failed cases, and the check line meets the command at tests-green. The sentinel line rides the Discussion of that ticket.
 
 ## tests-red
 
