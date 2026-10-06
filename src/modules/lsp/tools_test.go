@@ -19,18 +19,23 @@ import (
 // The fake process door taught vale and biome, and the commands it takes. [[spec/design_output/doors#the-process-door]]
 type fakeTools struct {
 	proc.FakeRunner
-	mu   sync.Mutex
-	took []proc.Command
+	mu    sync.Mutex
+	took  []proc.Command
+	first map[string][]string
 }
 
-// The fake whose vale and biome answer their stdout off says, or a fault off fails with no output. [[spec/design_output/doors#the-process-door]]
+// The fake whose vale and biome answer their stdout off says, or a fault off fails with no output, each first fault spent once ahead of both. [[spec/design_output/doors#the-process-door]]
 func taughtTools(says, fails map[string]string) *fakeTools {
-	fake := &fakeTools{}
+	fake := &fakeTools{first: map[string][]string{}}
 	answers := func(name string) proc.Program {
 		return func(one proc.Command) proc.Said {
 			fake.mu.Lock()
 			defer fake.mu.Unlock()
 			fake.took = append(fake.took, one)
+			if ahead := fake.first[name]; len(ahead) > 0 {
+				fake.first[name] = ahead[1:]
+				return proc.Said{Err: ahead[0], Code: 2}
+			}
 			if why := fails[name]; why != "" {
 				return proc.Said{Err: why, Code: 1}
 			}
@@ -320,30 +325,9 @@ func TestAValeFaultDrawsValeRuns(t *testing.T) {
 	}
 }
 
-// Vale's own timeout, as it answers it: its JSON fault on the output, and exit 2. [[spec/tickets/vale-retries-its-timeout]]
-const valeTimeout = `{"Code": "E201", "Text": "VoiceParagraph.Vocabulary: did not finish within 2s"}`
-
-// The fake taught vale's answer, whose vale times out on the first runs it names, or on every run where it names none. [[spec/tickets/vale-retries-its-timeout]]
-func timingOut(says string, first int) *fakeTools {
-	fake := taughtTools(map[string]string{"vale": says}, nil)
-	answers := fake.Programs["vale"]
-	var held sync.Mutex
-	runs := 0
-	fake.Programs["vale"] = func(one proc.Command) proc.Said {
-		said := answers(one)
-		held.Lock()
-		defer held.Unlock()
-		runs++
-		if first == 0 || runs <= first {
-			return proc.Said{Out: valeTimeout, Code: 2}
-		}
-		return said
-	}
-	return fake
-}
-
 func TestValeGoesAgainOnItsOwnTimeout(t *testing.T) {
-	fake := timingOut(valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some"), 1)
+	fake := taughtTools(map[string]string{"vale": valeSays("/tree/spec/b.md", "VoiceVale.Sentence", "Some")}, nil)
+	fake.first["vale"] = []string{`{"Code": "E201", "Text": "VoiceParagraph.Vocabulary: did not finish within 2s"}`}
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n\nSome text\n"}, fake)
 	bodies := server.SweepTools()
 	if drawn := drawnOn(bodies, "file:///tree/spec/b.md"); !holds(drawn, "vale", "Sentence") {
@@ -355,7 +339,7 @@ func TestValeGoesAgainOnItsOwnTimeout(t *testing.T) {
 }
 
 func TestValeTimingOutEveryRunDrawsValeRuns(t *testing.T) {
-	fake := timingOut("", 0)
+	fake := taughtTools(nil, map[string]string{"vale": `{"Code": "E201", "Text": "did not finish within 2s"}`})
 	server, _ := toolsOver(t, map[string]string{"spec/b.md": "# B\n"}, fake)
 	if drawn := drawnOn(server.SweepTools(), "file:///tree/.vale.ini"); !holds(drawn, "vale", "ValeRuns") {
 		t.Fatalf("the config draws %+v, and wants ValeRuns once every run times out", drawn)
