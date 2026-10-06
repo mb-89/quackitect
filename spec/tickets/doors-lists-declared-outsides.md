@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -29,6 +29,24 @@ process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: doors-declare-what-they-own
 parent: javascript-reaches-through-doors
+record:
+  - step: do
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: a746b9f3a5a93e8274e294e1c69be43c4a4a8e07
+    hash_after: a746b9f3a5a93e8274e294e1c69be43c4a4a8e07
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "  119.1  in all"
+    inputs:
+      - name: ask
+        hash: 7b0b0b1b7c273313
+        size: 403
+    def: 42cfda0a032b94c3
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ parent: javascript-reaches-through-doors
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/verb_doors_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A declaration takes an outside key. With it set, its names stand owned inside its own files and nowhere else, so no other file reads it among the doors it walks around. The doors verb prints each of its files as standing inside that outside. The page bundle and the prototype take the key, and the prototype lists each file under files.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change departs from the ask in one place: an explicit outside key, since a declaration with no contract also covers Go modules missing theirs
+the cleanup stands in the change: the declarations drop report, since an outside claims nothing past its files
+the outside key stands once in spec/design_output/doors.md, and the code points there
 
 # Discussion
 
