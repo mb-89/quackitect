@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: the-fleet-watches-itself
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: cbd2dd886d303b08
         size: 3072
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 238560a34a48 · claude-code-remote · helper-4
+    hash_before: 44f3d63c066fc94a222621c068fbcd055322c765
+    hash_after: 44f3d63c066fc94a222621c068fbcd055322c765
+    inputs:
+      - name: design/draft
+        hash: cbd2dd886d303b08
+        size: 3072
+      - name: design/tests-red
+        hash: f9d34cc63f54d15f
+        size: 973
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -285,8 +297,11 @@ Each case fails on its own assertion. The take writes no session, done writes no
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- size-misses-held-and-branch: the release path closes its take in held.go letGo, and release reads --final as the branch name through word(argv, 1) in branch.go, so both files change and the size list names neither; the builder adds them in place.
+- prompt-flags-follow-prompt-verb: src/branches/prompt.go belongs to the sibling a-verb-writes-box-prompts, so the three flags land on the rules that ticket writes, after it, not as a second write of the same file.
 
 # implement
 
