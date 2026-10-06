@@ -32,7 +32,7 @@ const ROOTS = [
   "src/extension/extension.js",
   "src/extension/sidebar.js",
   ".claude/skills/level0/hooks/level0.ts",
-  "src/stub/.claude/skills/level0/hooks/bridgehead.js",
+  "src/stub/.claude/skills/level0/hooks/bridgehead.ts",
 ];
 
 const READS = "const here = process.env.HOME;\n";
