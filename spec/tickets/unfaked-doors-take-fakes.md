@@ -83,7 +83,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: tests-meet-the-doors-once
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box e97c7a20bbd2 · claude-code-remote
@@ -107,6 +107,22 @@ record:
     hand: the engine
     hash_before: 4b3376d5271c8019316b8f2e39eaea1e664df9ed
     hash_after: 4b3376d5271c8019316b8f2e39eaea1e664df9ed
+  - step: accept
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: a65e74b8f3d280b1afd96003b710bce080611c1f
+    hash_after: 1b64f585f08ece59e7bd5754bea8b177e5fc879e
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/tests-meet-the-doors-once took 51 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: 5495474fd0152fe7
+        size: 964
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -160,8 +176,13 @@ Done when a design output names the git door and the process door with their fak
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the doors chapter names the git door with FakeRepo and the process door with FakeRunner, each beside its contract suite run on both
+- the quack verbs row names its cases as moved onto the process door fake. The rows for the branch verbs, the quack verbs over a repository and the pull leave the table, and a guard in each package fails once one returns or a case spawns
+- under src/quack, exec stands in the box and check doors alone, which checkdoors.go and boxdoors.go are
+- the real-wait guard stands green with the rows narrowed, and the check stands green at 100.6 seconds against 122.7 before, which the Discussion carries
 
 # retro
 
