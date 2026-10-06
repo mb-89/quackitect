@@ -104,8 +104,9 @@ func TestTheSweepReadsTheWordsOffTheLocalLayer(t *testing.T) {
 	if found := sweepOver(t, files, nil); !holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
 		t.Fatalf("the sweep answers %+v, and wants the local cap of two words to draw NameHoldsTheWords", found)
 	}
-	if found := sweepOver(t, files, map[string]string{"SE_NAMES_WORDS": "4"}); !holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
-		t.Fatalf("the sweep answers %+v, and wants the local file over the variable, as src/config reads it", found)
+	files[".se/.runtime/config.json"] = `{"names": {"words": 5}}`
+	if found := sweepOver(t, files, map[string]string{"SE_NAMES_WORDS": "2"}); !holdsRule(found, "NameHoldsTheWords", "spec/one-two-three.md") {
+		t.Fatalf("the sweep answers %+v, and wants the variable over the local file, as q.AtRest reads it", found)
 	}
 }
 
