@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: b9bab6ddb10cb2bd
         size: 1203
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a694567529c5 · claude-code-remote · helper-4
+    hash_before: 02727c9fef6f94b54aad7ebd6157206707778365
+    hash_after: 02727c9fef6f94b54aad7ebd6157206707778365
+    inputs:
+      - name: design/draft
+        hash: b9bab6ddb10cb2bd
+        size: 1203
+      - name: design/tests-red
+        hash: b9c2ed36934e28a6
+        size: 581
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -258,8 +270,11 @@ Both cases fail on their assertion: the green run prints nothing, and the Window
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- platform-draft-names-checkdoors: the draft's size and callers lists leave out src/quack/checkdoors.go checkDoorsOf, which tests-red already changes from the windows flag to platform: runtime.GOOS, and src/quack/check_test.go TestCheckParts, whose Windows case the rename reaches; the builder names both in place
+- platform-red-line-tested: the approach has the red line name the platform beside the tree going red, and no test decides it; the builder adds the platform to the existing case 'level zero going red says the tree is red', or drops that claim from the approach
 
 # implement
 
