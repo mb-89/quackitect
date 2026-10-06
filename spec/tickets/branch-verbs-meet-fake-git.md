@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: pull-meets-fake-git
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -154,6 +154,21 @@ record:
         hash: 8f2f939387c0fe86
         size: 17697
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-5
+    hash_before: 41fc7b0e818feb44683f1939cb36008b4fb98742
+    hash_after: 41fc7b0e818feb44683f1939cb36008b4fb98742
+    inputs:
+      - name: design/draft
+        hash: 633272e4648e13cc
+        size: 8721
+      - name: design/tests-red
+        hash: 8a0ced81fe1fc8ae
+        size: 922
+      - name: [[spec/design_output/doors]]
+        hash: 8f2f939387c0fe86
+        size: 17697
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -384,8 +399,10 @@ the doors the tests reach are git, the disk and the process door, and FakeRepo, 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- fixture-spawn-guard-runs-live: TestTheBranchVerbCasesSpawnNothingAndTheDoorsChapterListsThemNowhere reads test files for exec.Command and time.Sleep alone, so a tree fixture filling Doors with git.NewRepo or proc.Real passes it and still spawns git through repo.go; done_when one wants the runtime case the draft named, TestATakeAndADispatchRunOnTheFakesAndSpawnNoGit, a take and a dispatch over a FakeRunner taught no git, which tests-red left out
 
 # implement
 
