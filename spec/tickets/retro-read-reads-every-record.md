@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: f9b1b51bd0f4784c27a0eccf0d2147ca103f2729
+    hash_after: f9b1b51bd0f4784c27a0eccf0d2147ca103f2729
+    inputs:
+      - name: ask
+        hash: bac3852e47980fa2
+        size: 485
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,62 @@ Each retro misses owner prompts and refusals, and every fresh box measures its e
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Read: `retroRowsOf` in `src/quack/retro_read.go` gains two rows. A `queued_command` attachment from a human origin, or one naming no origin and not marked meta, earns a prompt row, and a helper's transcript earns none, as for a typed prompt. The queue's own enqueue line earns none, since the attachment or a user line carries the same prompt. A tool result carrying no error mark whose text opens on the word refused earns a refusal row, with its reason line. The retro read note and the verb's usage name the refusal row.
+
+Effect: `retroLastRetro` and `retroEffectVerb` in `src/quack/retro_effect.go` look for a retro in its private home first, then in the tracked folder `spec/retros/<retro>`. `retroMintVerb` copies the classes, the rates and the collect time into that folder once its writes land, so the commit carries them and a fresh box measures against the last retro.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/retro_read.go retroReadVerb, which calls retroRowsOf
+src/quack/retro_read_test.go, the fault case, which calls retroRowsOf
+src/quack/retro_effect.go retroEffectVerb, the one caller of retroLastRetro
+src/quack/retro_mint.go retroMintVerb
+src/quack/retro_usage.go, the usage line naming what read lists
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/retro_read_test.go TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal
+src/quack/retro_effect_test.go TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder
+src/quack/retro_mint_test.go TestRetroMintKeepsTheClassesInTheTrackedFolder
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/quack/retro_read.go
+src/quack/retro_read_test.go
+src/quack/retro_effect.go
+src/quack/retro_effect_test.go
+src/quack/retro_mint.go
+src/quack/retro_mint_test.go
+src/quack/retro_usage.go
+src/quack/retro_usage_test.go
+spec/guidance/retro/read.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+retro_read.go, retro_effect.go and retro_mint.go stand opened, and a live transcript shows the queued attachment and the quiet refusal's shape
+the callers come from a grep of retroRowsOf, retroLastRetro and retroMintVerb
+the first done_when line meets TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal, the second TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder
 
 ## tests-red
 
