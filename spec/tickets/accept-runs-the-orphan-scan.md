@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: f75794b80ce4ceff
         size: 330
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: e2d31375c89471556e03a1fb5a02c377ae2b0f52
+    hash_after: e2d31375c89471556e03a1fb5a02c377ae2b0f52
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/branches fails
+    inputs:
+      - name: design/draft
+        hash: 39c7a5f96138c952
+        size: 1706
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -217,26 +230,31 @@ the one done_when line meets TestTheReviewNamesAPackageNothingImports
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/unreached_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/branches/unreached_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The review answers with the check and retro rows alone, and no unreached row, so the case fails on its holds line. The review exits 0 even with things to fix, as it does over a red check, so the refusal reads as a counted fix in the report.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the one done_when line meets TestTheReviewNamesAPackageNothingImports, red on its assertion
+the test reaches git through a real bare origin and clone, as every src/branches test does, and no other door
 
 # gate
 
