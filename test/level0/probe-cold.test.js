@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.ts";
+import { INSTALL_SKIP } from "../../src/scripts/boot.js";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowOf } from "../../.claude/skills/level0/lib/log.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";

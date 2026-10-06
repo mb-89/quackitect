@@ -874,7 +874,6 @@ client 2.1.42, reads the box around it:
 
 | what a cloud box carries | what the probe reads |
 |---|---|
-| `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` | `1`, so the switch stands ready |
 | `hasTrustDialogAccepted`, per project | `false`, and the top level holds no key |
 | permission mode | auto, and no call there raises a prompt |
 
@@ -994,6 +993,20 @@ The probes on a fresh clone with no setup decide what retires:
 
 - whether the first session holds level zero once the hook runs, which retires the install line
 - whether a clone carrying no trust runs a project session start hook at all
+
+## What stays off the standard road
+
+Level zero is a mod of function hooks, loaded as `level0@skills-dir`. Client
+2.1.287 and later loads a mod by default, so the settings carry no switch for
+mods. Two pieces stay off the standard road, each for its reason:
+
+| piece | why it stays |
+|---|---|
+| the boot hook in `.claude/settings.json` | it installs the plugin manifest, which git ignores because each box stamps its brand into it, and the client scans plugins before any hook of a mod runs |
+| function hooks over settings command hooks alone | the handover clears its own session: `$.command.run` runs `/clear`, then `$.prompt.submit` hands the resume prompt, and a settings command hook answers the client and runs neither |
+
+The cold probe of [[spec/design_output/level0#the-cold-probe]] runs a fresh
+clone with no switch, and decides whether a mod loads there.
 
 ## Where the mode stands
 

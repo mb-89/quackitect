@@ -3,7 +3,6 @@
 // starts it and says so.
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 
-import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.ts";
 import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { POINTER, pointerOf } from "../../.claude/skills/level0/lib/vehicle.js";
@@ -51,9 +50,9 @@ export function portIn(it) {
   }
 }
 
-// One line starts the server on both roads, and the bridgehead holds it, because that hook reaches no module past its own folder and every other caller imports it there. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export function startOf(root, node = "node") {
-  return [node, "-e", START, root, root];
+// The index answers its standing by starting its door where none answers, so a cloud take runs it alone. [[spec/design_output/level0#the-cloud-starts-the-server]]
+export function startOf(root) {
+  return [`${root}/${BIN}`, "standing"];
 }
 
 // A desk start stands detached, so the shell that asks returns and the server stays. [[spec/design_output/level0#a-desk-serve-returns]]
@@ -79,10 +78,10 @@ export async function detachedStart(it) {
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 export function servesHere(it) {
   const was = doorOf(it);
-  const started = it.proc.run(startOf(it.root, it.node ?? "node"), { cwd: it.root });
+  const started = it.proc.run(startOf(it.root), { cwd: it.root });
   if (started.exitCode !== 0) {
-    const [, why] = reasonOf(started.exitCode);
-    return `No index answers, and the start fails: ${String(started.stderr ?? "").trim() || why}`;
+    const why = String(started.stderr ?? "").trim() || `it exits ${started.exitCode}`;
+    return `No index answers, and the start fails: ${why}`;
   }
   const door = doorOf(it);
   const port = portOf(door);

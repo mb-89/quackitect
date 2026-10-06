@@ -22,10 +22,6 @@ export function failureOf(error: unknown): Failure | undefined {
   return error !== null && typeof error === "object" ? error : undefined;
 }
 
-// The append a row takes through a process, so a row another writer appends between a read and a write stays. [[spec/design_output/log#every-writer-appends]]
-export const APPEND =
-  "const fs = require('node:fs'); const path = require('node:path'); const [file, row] = process.argv.slice(1); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.appendFileSync(file, row);";
-
 // An answer with an after merged in: a list grows, a text takes the new one below it, and anything else stands replaced. [[spec/design_output/schema#the-verbs-own-their-fields]]
 export function merged(said: unknown, after: Readonly<Fields> | null | undefined): Fields {
   const out: Fields = said && typeof said === "object" ? { ...said } : {};

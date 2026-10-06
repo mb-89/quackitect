@@ -15,6 +15,7 @@ import type {
   StarNext,
   StreamNext,
 } from "claude-code";
+import { BIN } from "../lib/index.js";
 import { SESSION } from "../lib/log.js";
 import {
   type Answer,
@@ -27,17 +28,16 @@ import {
 } from "./cage.ts";
 import { CLEAR_FALLBACK_MS, holdsClear, takesClear } from "./clear.ts";
 import {
-  APPEND,
   type Fields,
   failureOf,
   type Given,
   merged,
   type Spawned,
 } from "./shape.ts";
-import { cageText, INSTALL_SKIP, NO_NODE, reasonOf, STARTING, START } from "./start.ts";
 import { beforeIn, rawRows, textOf, textsOf } from "./transcript.ts";
 
-export { cageText, INSTALL_SKIP, reasonOf, STARTING, START };
+// The span the start road takes. An index standing up runs past a spawn, and the road runs only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const STARTING = 180_000;
 
 let root = "";
 let method = "";
@@ -344,43 +344,51 @@ function starts($: EngineInterface): Promise<void> {
   return road;
 }
 
+// A verb of the index binary the method root carries, run in the work root, so Go answers what the hook hands it. [[spec/tickets/level0-hooks-hold-no-rule]]
+function verb(...words: string[]): string[] {
+  const at = method || root || ".";
+  return [`${at}/${BIN}`, "verb", `${at}/src/scripts`, ...words];
+}
+
+// Go owns the road: the cloud guard, the standing and the row it prints. A desk prints nothing, and a binary standing nowhere or an answer carrying no row writes the one fall row. [[spec/tickets/level0-hooks-hold-no-rule]]
 async function startsOnce($: EngineInterface): Promise<void> {
-  let ran: ProcessRunResult;
+  let ran: ProcessRunResult | undefined;
+  let why = "";
   try {
-    ran = await $.process.run(
-      ["node", "-e", START, root, method || root, INSTALL_SKIP],
-      { timeoutMs: STARTING },
-    );
-  } catch (error) {
-    // Node itself refuses to start, so this box carries none. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-    await wrote($, {
-      level: "warn",
-      said: reasonOf(NO_NODE)[1],
-      event: "session.start",
-      detail: String(failureOf(error)?.message ?? error),
+    ran = await $.process.run(verb("serve", "--bridge"), {
+      ...(root ? { cwd: root } : {}),
+      timeoutMs: STARTING,
     });
-    return;
+  } catch (error) {
+    why = String(failureOf(error)?.message ?? error);
   }
-  const code = Number(ran?.exitCode ?? 1);
-  const [level, said] = reasonOf(code);
-  if (!level) return;
-  const detail = String(ran?.stderr ?? "").trim() || `exit ${code}`;
-  await wrote($, { level, said, event: "session.start", detail });
+  const out = String(ran?.stdout ?? "").trim();
+  if (ran && !out && Number(ran.exitCode) === 0) return;
+  try {
+    const row: unknown = JSON.parse(out);
+    if (row && typeof row === "object") {
+      await wrote($, row as Fields);
+      return;
+    }
+  } catch {}
+  await wrote($, {
+    level: "warn",
+    said: "the start road answers no row, so no index starts",
+    event: "session.start",
+    detail: why || String(ran?.stderr ?? "").trim() || out || `exit ${ran?.exitCode}`,
+  });
 }
 
 // One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 async function wrote($: EngineInterface, said: Readonly<Fields>): Promise<boolean> {
   const row = { at: new Date().toISOString(), kind: "bridge", ...said };
-  // The loader takes $ spelled as $.noun.event alone, so a host running no process throws here, and the row falls back to the read and the write back. [[spec/design_output/log#every-writer-appends]]
+  // The log verb appends the row. A box whose binary stands nowhere throws here, and the row falls back to the read and the write back. [[spec/design_output/log#every-writer-appends]]
   try {
-    const file = root ? `${root}/${SESSION}` : SESSION;
-    const ran = await $.process.run([
-      "node",
-      "-e",
-      APPEND,
-      file,
-      `${JSON.stringify(row)}\n`,
-    ]);
+    const { level, said: words, ...extra } = said;
+    const ran = await $.process.run(
+      verb("log", "--say", JSON.stringify({ level, kind: "bridge", said: words, extra })),
+      root ? { cwd: root } : {},
+    );
     return Number(ran?.exitCode ?? 1) === 0;
   } catch {}
   try {

@@ -3,7 +3,7 @@
 // and reads the log and the stream that run leaves for the start road whole.
 // [[spec/design_output/level0#the-cold-probe]]
 
-import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.ts";
+import { INSTALL_SKIP } from "./boot.js";
 import { canaryIn, HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";

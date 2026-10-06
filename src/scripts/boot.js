@@ -6,9 +6,11 @@
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.ts";
 import { disk } from "../doors/disk.js";
 import { proc } from "../doors/proc.js";
+
+// The install steps a cloud box skips. It stands here, because this hook runs before any index binary stands, and installSkip in src/quack/probe_cold.go spells it again. [[spec/design_output/level0#the-boot-hook]]
+export const INSTALL_SKIP = "editor-link editor-extensions editor-client go";
 
 // The manifest git ignores. Where it stands the plugin loads, and its bridgehead brings the modules. [[spec/design_output/level0#the-boot-hook]]
 const MANIFEST = [".claude", "skills", "level0", ".claude-plugin", "plugin.json"];

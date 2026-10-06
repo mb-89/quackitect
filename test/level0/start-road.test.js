@@ -1,12 +1,12 @@
-// The start road the bridgehead runs: node carries every guard, a desk box
-// stays quiet, and a door that falls says so once.
+// The start road the bridgehead runs: the index binary's serve verb answers
+// the row the log takes, a desk box stays quiet, and a door that falls says so
+// once.
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
 const HERE = "/tree";
-const NO_INDEX = 9;
 
 // A fresh copy of the hook a case, because the bridgehead holds what the start road answered. [[spec/design_output/level0#a-session-says-its-cage]]
 let made = 0;
@@ -19,9 +19,11 @@ async function hookHere() {
 function harness({
   answers = false,
   exitCode = 0,
+  stdout = "",
   stderr = "",
   ui = true,
   logs = true,
+  missing = false,
 } = {}) {
   const wrote = new Map();
   const ran = [];
@@ -51,16 +53,20 @@ function harness({
       },
     },
     process: {
-      run: async (argv) => {
-        // The bridgehead appends its row through node, and the append lands in the log the case reads. [[spec/tickets/a-down-index-refuses-calls]]
-        if (argv[0] === "node" && String(argv[2]).includes("appendFileSync")) {
-          tries.push(String(argv[4]));
-          if (!logs) return { exitCode: 1, stderr: "the log stands read only" };
-          wrote.set(argv[3], `${wrote.get(argv[3]) ?? ""}${argv[4]}`);
-          return { exitCode: 0, stderr: "" };
+      run: async (argv, init) => {
+        // A box whose binary stands nowhere refuses every spawn of it. [[spec/tickets/level0-hooks-hold-no-rule]]
+        if (missing) throw new Error(`spawn ${argv[0]} ENOENT`);
+        // The bridgehead appends its row through the log verb, and the append lands in the log the case reads. [[spec/tickets/level0-hooks-hold-no-rule]]
+        if (argv.includes("log") && argv.includes("--say")) {
+          const said = String(argv.at(-1));
+          tries.push(said);
+          if (!logs) return { exitCode: 1, stdout: "", stderr: "the log stands read only" };
+          const file = `${init?.cwd ?? "."}/.se/.log/session.jsonl`;
+          wrote.set(file, `${wrote.get(file) ?? ""}${said}\n`);
+          return { exitCode: 0, stdout: "", stderr: "" };
         }
         ran.push(argv);
-        return { exitCode, stderr };
+        return { exitCode, stdout, stderr };
       },
     },
   };
@@ -92,55 +98,48 @@ async function opensThen(hook, box, e) {
   return runs("prompt.context", e ?? {});
 }
 
-// A Windows box carries no shell on the host's path, so every guard runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-test("the start road runs node, and reaches no shell to read its guards", async () => {
+// Go owns the road, so the hook runs the index binary's serve verb once, and no node and no shell. [[spec/tickets/level0-hooks-hold-no-rule]]
+test("the start road runs the serve verb of the index binary under the bridge flag", async () => {
   const hook = await hookHere();
-  const box = harness({ exitCode: 3 });
+  const box = harness();
   await opensThen(hook, box);
 
   assert.equal(box.ran.length, 1, "the road runs once");
-  assert.equal(box.ran[0][0], "node", "and node carries it");
-  assert.equal(box.ran[0][1], "-e", "off the script the hook holds");
-  assert.equal(
-    /^(sh|bash|cmd|powershell)$/.test(box.ran[0][0]),
-    false,
-    "no shell stands between the hook and the guards",
-  );
+  assert.match(box.ran[0][0], /\/se-index$/, "and the index binary carries it");
+  assert.deepEqual(box.ran[0].slice(-2), ["serve", "--bridge"]);
 });
 
-test("the script reads every guard the shell read, and runs the index standing behind it", async () => {
-  const hook = await hookHere();
-  const box = harness({ exitCode: 3 });
-  await opensThen(hook, box);
-  const script = box.ran[0][2];
-
-  assert.match(script, /CLAUDE_CODE_REMOTE/, "the cloud variables");
-  assert.match(script, /SE_CLOUD/);
-  assert.match(script, /existsSync\(method\)/, "the method root");
-  assert.match(script, /existsSync\(index\)/, "the index binary");
-  assert.match(script, /\['standing'\]/, "and the index stands behind it");
-});
-
+// A desk prints nothing, so the log names the down server alone. [[spec/tickets/level0-hooks-hold-no-rule]]
 test("a desk box reads no line off the start road, because a person starts it there", async () => {
   const hook = await hookHere();
-  const box = harness({ exitCode: 3 });
+  const box = harness();
   await opensThen(hook, box);
 
   const rows = [...box.wrote.values()].join("\n");
-  assert.doesNotMatch(rows, /the start of the server fails/, "the road fails nowhere");
-  assert.doesNotMatch(rows, /a person starts the server here/, "and says nothing");
-  assert.match(
-    rows,
-    /the server answers nothing/,
-    "the log names the down server alone",
-  );
+  assert.doesNotMatch(rows, /start road answers no row/, "the road fails nowhere");
+  assert.match(rows, /the server answers nothing/, "the log names the down server alone");
 });
 
-test("the block names the code, what it means, and what a person runs", async () => {
+// The row Go prints lands in the log as it came. [[spec/tickets/level0-hooks-hold-no-rule]]
+test("the row the start road prints lands in the log as it came", async () => {
   const hook = await hookHere();
-  const said = hook.cageText(NO_INDEX, "");
-  assert.match(said, new RegExp(hook.reasonOf(NO_INDEX)[1]));
-  assert.match(said, /RUNME\.sh/);
+  const row = { level: "info", said: "the go row", event: "session.start", detail: "port 7001" };
+  const box = harness({ stdout: `${JSON.stringify(row)}\n` });
+  await opensThen(hook, box);
+
+  const said = box.tries.map((one) => JSON.parse(one)).find((one) => one.said === "the go row");
+  assert.deepEqual(said, { level: "info", kind: "bridge", said: "the go row", extra: { event: "session.start", detail: "port 7001" } });
+});
+
+// A box whose binary stands nowhere writes one fall row, through the file door. [[spec/tickets/level0-hooks-hold-no-rule]]
+test("a binary standing nowhere writes the fall row through the file door", async () => {
+  const hook = await hookHere();
+  const box = harness({ missing: true });
+  await opensThen(hook, box);
+
+  const rows = [...box.wrote.values()].join("\n");
+  assert.match(rows, /start road answers no row/);
+  assert.match(rows, /ENOENT/, "and the row names the spawn's fault");
 });
 
 // A fall reaches the person at the moment it falls, beside the row the log takes. [[spec/tickets/the-bridge-says-it-falls]]
@@ -246,7 +245,7 @@ test("a prompt meeting no server starts the road once, and passes on", async () 
 // [[spec/design_output/level0#a-session-says-its-cage]]
 test("a cloud stop where the start road stood down passes, so a caged box loops nowhere", async () => {
   const hook = await hookHere();
-  const box = harness({ exitCode: NO_INDEX, stderr: "go stands nowhere" });
+  const box = harness({ exitCode: 1, stderr: "go stands nowhere" });
   const runs = runner(hook, box);
   await runs("session.start", { cwd: HERE });
 
@@ -258,7 +257,7 @@ test("a cloud stop where the start road stood down passes, so a caged box loops 
 // [[spec/design_output/level0#rules-ride-the-first-answer]]
 test("a desk stop meeting no server passes, because a person starts it there", async () => {
   const hook = await hookHere();
-  const box = harness({ exitCode: 3 });
+  const box = harness();
   const runs = runner(hook, box);
   await runs("session.start", { cwd: HERE });
 

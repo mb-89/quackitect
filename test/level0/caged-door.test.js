@@ -40,8 +40,8 @@ function caged(layers = DOOR) {
     process: {
       run: async (argv) => {
         runs.push(argv);
-        if (argv[0] === "node" && String(argv[2]).includes("appendFileSync"))
-          files.append(at(argv[3]), String(argv[4]));
+        // The log verb appends the row the hook hands it. [[spec/tickets/level0-hooks-hold-no-rule]]
+        if (argv.includes("--say")) files.append(LOG, `${argv.at(-1)}\n`);
         return { exitCode: 0, stdout: "", stderr: "" };
       },
     },
@@ -74,7 +74,7 @@ test("a stopped hooks door refuses a guarded call and names session/alarms", asy
     "the refusal names the alarm",
   );
   assert.match(String(said.deny), /\.\/RUNME\.sh /, "and the command that clears it");
-  const starts = box.runs.filter((argv) => !String(argv[2]).includes("appendFileSync"));
+  const starts = box.runs.filter((argv) => argv.includes("--bridge"));
   assert.equal(starts.length, 1, "the hook starts the index once");
 });
 
@@ -89,7 +89,7 @@ test("a door dying mid-session starts once more, passes the recovery commands, a
   const bash = (command) =>
     box.hooks["*"](box.$, { tool: "Bash", command }, box.handed);
   const starts = () =>
-    box.runs.filter((argv) => !String(argv[2]).includes("appendFileSync")).length;
+    box.runs.filter((argv) => argv.includes("--bridge")).length;
 
   assert.equal(
     (await bash("ls"))?.handed?.command,
@@ -410,7 +410,7 @@ test("under new a prompt context finding the door down while the session start r
     road = done;
   });
   box.$.process.run = async (argv, init) => {
-    if (argv[1] === "-e" && !String(argv[2]).includes("appendFileSync")) {
+    if (argv.includes("--bridge")) {
       road();
       await new Promise((done) => setTimeout(done, 20));
       standing = true;
@@ -482,8 +482,7 @@ test("under new a door the start road stands up says no fall to the session, and
   };
   const run = box.$.process.run;
   box.$.process.run = async (argv, init) => {
-    if (argv[1] === "-e" && !String(argv[2]).includes("appendFileSync"))
-      standing = true;
+    if (argv.includes("--bridge")) standing = true;
     return run(argv, init);
   };
   const submit = Object.assign(async (e) => e, { event: "prompt.submit" });

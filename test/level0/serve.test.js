@@ -5,7 +5,6 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { START } from "../../.claude/skills/level0/hooks/level0.ts";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
@@ -49,7 +48,8 @@ function heard(what) {
   }
 }
 
-const started = (proc) => proc.ran.filter((one) => one.argv.includes(START)).length;
+const started = (proc) =>
+  proc.ran.filter((one) => one.argv.join(" ") === startOf(ROOT).join(" ")).length;
 
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 test("a cloud take runs the start road once, and names the port of the hooks door", () => {
@@ -77,9 +77,9 @@ test("a failed start names the last thing the start said", () => {
   );
 });
 
-// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-test("the take runs the line the bridgehead runs, and no copy of it", () => {
-  assert.deepEqual(startOf(ROOT), ["node", "-e", START, ROOT, ROOT]);
+// [[spec/design_output/level0#the-cloud-starts-the-server]]
+test("the take runs the index standing, and no node", () => {
+  assert.deepEqual(startOf(ROOT), [INDEX_AT, "standing"]);
 });
 
 test("the port reads off the pointer, and stands at the base without one", () => {
