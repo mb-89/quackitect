@@ -833,7 +833,8 @@ runs `run`, then `decide`, which a person takes:
 | drop | the code leaves, and the ticket closes on the reason |
 | grow | a ticket of its own carries it, and the experiment closes `became` |
 
-`retro audit` answers the trials standing open, and the retro's `audit` step
+`retro audit` answers the trials standing open, and each trial standing closed
+with no decision and no successor. The retro's `audit` step
 runs it as a command its evidence names. A need names a verb a box holds, and
 reads the tree nowhere. So the hold stands in the evidence, and the need stands
 beside it.

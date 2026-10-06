@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 8cbd15eac786f9db
         size: 533
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: da7e404be24523ead9534d11a6679c397447cf73
+    hash_after: da7e404be24523ead9534d11a6679c397447cf73
+    answered:
+      - name: lint
+        exit: 0
+        said: "spec/design_output/work.md:836:73: PastTense: Write the present tense: 'closed'. The past belongs in spec/rationales."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -287,14 +296,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/retro_audit.go spec/design_output/work.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the size golden that reads work.md at its new length
+- the audit reads a temp folder the cases seed, and no other door
+- retro_audit.go points at the audit section of spec/design_output/work
+- the rule that a trial keeps its decision or a successor stands once, in spec/design_output/work.md
 
 ## tests-green
 
