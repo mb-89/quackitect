@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: eea6d816b58614e1
         size: 323
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 1de9acb28a9827394606b88f4acdeae741f7bf9e
+    hash_after: 1de9acb28a9827394606b88f4acdeae741f7bf9e
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 109d1abe6f2ad25a
+        size: 1605
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -215,26 +228,31 @@ The done_when line on `./RUNME.sh test` meets TestABareRunmeOnACloudBoxPrintsThe
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/runme_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/quack/runme_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The cloud case answers 1 and the editor note under both cloud variables, which is the fault the ask names. The desk case passes already, so it guards the desk road through the change. The script calls `sh` by name for the install, so the PATH folder links `sh` beside `dirname` and `mkdir`.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The done_when line on `./RUNME.sh test` meets TestABareRunmeOnACloudBoxPrintsTheVerbs, red on its assertion; the check line waits for tests-green.
+The test drives the real script once, and its install and binary are fakes in a temporary root, so no real install or index runs.
 
 # gate
 
