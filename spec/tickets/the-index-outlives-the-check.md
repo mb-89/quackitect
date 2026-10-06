@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 4aa4f2a7920686bfee3287ed8c3875425b554edd
+    hash_after: 4aa4f2a7920686bfee3287ed8c3875425b554edd
+    inputs:
+      - name: ask
+        hash: 972de3a0dd10e09f
+        size: 482
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,53 @@ Boxes in most groups meet a plan tool with no server after a check or a merge, a
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The cause: spawns in src/index/door.go starts se-index serve with no session of its own, so the door joins the process group of whatever starts it. A door the start road raises stands in the client's group and lives. A door a ./RUNME.sh call raises inside a check, a branch switch or a merge stands in that command's group, and whatever ends that group ends the door too: the tool running the command, a test runner, and the group kill the-check-ends-what-it-drops adds. The plan and review tools then meet no server, and the next event pays for a start. The fix: Detached in src/index/detach.go readies the door's command, with detach_unix.go giving it a session of its own and detach_windows.go a new process group with no console. spawns runs every door through it. A rebuild still stops a door on the old build, and the next call stands the new one, as the build stamp asks. That road stands as it is.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/index/door.go spawns, called by starts, called by reaches, called by every client of the door (V1, quack's verbs, the start road's standing)
+- src/quack/ending.go endsWhole, whose group kill the door now stands apart from
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/detach_test.go TestADoorStandsInASessionOfItsOwn
+- src/quack/ending_test.go TestAServerStandingBeforeTheCheckAnswersAfterIt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/index/detach.go
+- src/index/detach_unix.go
+- src/index/detach_windows.go
+- src/index/detach_test.go
+- src/index/door.go
+- src/quack/ending_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- door.go spawns and starts, main.go reaches, liveDoor and stands stand opened, and ps shows the live door in the client's process group, never a session of its own
+- grep finds spawns called by starts alone, and starts by reaches, and the reach tests swap spawns for a fake
+- the quack line meets the ending_test case, where a group kill like the check's leaves the detached process standing, and the index line meets detach_test, since a merge ends the command group that would hold the door. The check line is its own command
 
 ## tests-red
 
