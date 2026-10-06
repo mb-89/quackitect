@@ -22,9 +22,6 @@ export function failureOf(error: unknown): Failure | undefined {
   return error !== null && typeof error === "object" ? error : undefined;
 }
 
-// The cap on a string an event carries once the body runs past the post's limit. [[spec/design_output/level0#the-bridgehead-and-the-server]]
-const SHORT = 4000;
-
 // The append a row takes through a process, so a row another writer appends between a read and a write stays. [[spec/design_output/log#every-writer-appends]]
 export const APPEND =
   "const fs = require('node:fs'); const path = require('node:path'); const [file, row] = process.argv.slice(1); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.appendFileSync(file, row);";
@@ -39,17 +36,6 @@ export function merged(said: unknown, after: Readonly<Fields> | null | undefined
     else if (typeof value === "string" && typeof was === "string" && was)
       out[key] = `${was}\n\n${value}`;
     else out[key] = value;
-  }
-  return out;
-}
-
-// An event cut to its short strings, numbers and flags. [[spec/design_output/level0#the-bridgehead-and-the-server]]
-export function slim(e: unknown): unknown {
-  if (!e || typeof e !== "object") return e ?? null;
-  const out: Fields = {};
-  for (const [key, value] of Object.entries(e)) {
-    if (typeof value === "string") out[key] = value.slice(0, SHORT);
-    else if (typeof value === "number" || typeof value === "boolean") out[key] = value;
   }
   return out;
 }

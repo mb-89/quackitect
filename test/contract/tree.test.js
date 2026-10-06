@@ -403,12 +403,10 @@ test("a spelling of a name the runtime half took is refused where the old place 
 
 // A plugin imports nothing past its own folder, so the plugin spells the session file the hand writes once in its library, and the pull hook imports it from there. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
-  for (const path of [
-    ".claude/skills/level0/hooks/level0.ts",
-    ".claude/skills/level0/lib/pull.js",
-  ]) {
-    assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
-  }
+  assert.match(
+    here.read(".claude/skills/level0/lib/pull.js"),
+    new RegExp(`"${SESSION}"`),
+  );
   assert.doesNotMatch(
     here.read(".claude/skills/level0/hooks/pull-tool.ts"),
     new RegExp(`"${SESSION}"`),

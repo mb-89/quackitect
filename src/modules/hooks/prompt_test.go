@@ -92,3 +92,58 @@ func TestAHelpersHandBackLandsAsAnAgentRowAndPasses(t *testing.T) {
 	}
 	t.Fatalf("the session log holds %v, and wants an agent row carrying the hand-back", rowsUnder(root))
 }
+
+// A marked prompt arms the main agent's next call, which lands in the log as a probe row carrying the call's own fields; a helper's call leaves it armed, and a call after an unmarked prompt lands none. [[spec/tickets/the-reply-probe-runs]] [[spec/tickets/level0-hooks-hold-no-rule]]
+func TestAMarkedPromptWritesTheNextCallsProbeRow(t *testing.T) {
+	const says = "se-probe-reply writes this line"
+	for _, one := range []struct {
+		name   string
+		prompt string
+		agent  string
+		want   string
+	}{
+		{"a marked prompt", replyMarker + ". In one message, write the line.", "", "Read"},
+		{"an unmarked prompt", "Say hello.", "", ""},
+		{"a marked prompt and a helper's call", replyMarker + ".", "a1", "Bash"},
+	} {
+		t.Run(one.name, func(t *testing.T) {
+			root := treeOf(t, map[string]string{}, "")
+			door := holdDoor(t, Settings{Binding: queueBinding, BindingLayer: builtInLayer})
+			call := map[string]any{"session_id": "s1", "tool": "Read", "text": says, "input": map[string]any{"file_path": "README.md"}}
+			if one.agent != "" {
+				call["agentId"] = one.agent
+			}
+			for _, post := range []Post{
+				{Event: submitEvent, Root: root, E: map[string]any{"session_id": "s1", "text": one.prompt, "origin": map[string]any{"kind": "task"}}},
+				{Event: toolEvent, Root: root, Fill: float64(9), E: call},
+				{Event: toolEvent, Root: root, E: map[string]any{"session_id": "s1", "tool": "Bash"}},
+			} {
+				if _, err := door.Hook(post); err != nil {
+					t.Fatal(err)
+				}
+			}
+			var probed []map[string]any
+			for _, row := range rowsUnder(root) {
+				if row["said"] == replyEvent {
+					probed = append(probed, row)
+				}
+			}
+			if wants := len(one.want) > 0; (len(probed) == 1) != wants || len(probed) > 1 {
+				t.Fatalf("the log holds %d probe rows, and wants one: %v", len(probed), wants)
+			}
+			if one.want == "" {
+				return
+			}
+			var detail map[string]any
+			if err := json.Unmarshal([]byte(textOf(probed[0], "detail")), &detail); err != nil {
+				t.Fatal(err)
+			}
+			if one.want == "Read" && (len(detail) != 3 || detail["text"] != says) {
+				t.Fatalf("the probe row's detail reads %v, and wants the call's own short fields: session_id, tool and text", detail)
+			}
+			if detail["tool"] != one.want || probed[0]["event"] != toolEvent || probed[0]["kind"] != probeKind {
+				t.Fatalf("the probe row reads %v with detail %v, and wants the %s call's", probed[0], detail, one.want)
+			}
+		})
+	}
+}

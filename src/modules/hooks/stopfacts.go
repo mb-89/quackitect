@@ -42,7 +42,7 @@ type heldFile struct {
 func (d *Door) stoppedOf(post Post, settings Settings, root string) Stopped {
 	facts := Stopped{Off: settings.StopOff, Most: settings.MostInARow, HandoverAt: settings.HandoverAt, Layer: settings.BindingLayer}
 	whole := post.Event == stopEvent || (post.Event == toolEvent && textOf(post.E, "tool") == stopCall)
-	measured := post.Event == measureEvent || post.Event == turnEvent || post.Fill != nil
+	measured := post.Event == measureEvent || post.Event == turnEvent || filledOf(post) != nil
 	if root == "" || !(whole || measured) {
 		return facts
 	}

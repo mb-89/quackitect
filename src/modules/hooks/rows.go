@@ -30,8 +30,41 @@ type LogRow struct {
 	Level  string `json:"level"`
 	Kind   string `json:"kind"`
 	Said   string `json:"said"`
+	Event  string `json:"event,omitempty"`
 	Detail string `json:"detail,omitempty"`
 	Text   string `json:"text,omitempty"`
+}
+
+// The reply probe's words, as REPLY_PROBE in .claude/skills/level0/lib/guidance.js names them, which the package spells again, the kind its row carries, and the cap on a string the row keeps. [[spec/tickets/the-reply-probe-runs]]
+const (
+	replyMarker = "se-probe-reply"
+	replyEvent  = "probe.reply"
+	probeKind   = "probe"
+	probeShort  = 4000
+)
+
+// The fields the door stamps beside the event's own, which the probe's row leaves out. [[spec/tickets/the-reply-probe-runs]]
+var stamped = map[string]bool{"root": true, "fill": true, heldField: true, stoppedField: true, briefField: true}
+
+// The row the reply probe reads: the call's own short strings, numbers and flags, as JSON under detail. src/quack/probe_reply.go reads it. [[spec/tickets/the-reply-probe-runs]] [[spec/tickets/level0-hooks-hold-no-rule]]
+func probeRowOf(at time.Time, fields map[string]any) LogRow {
+	slim := map[string]any{}
+	for key, value := range fields {
+		if stamped[key] {
+			continue
+		}
+		switch one := value.(type) {
+		case string:
+			if runes := []rune(one); len(runes) > probeShort {
+				one = string(runes[:probeShort])
+			}
+			slim[key] = one
+		case float64, int, int64, bool:
+			slim[key] = one
+		}
+	}
+	detail, _ := json.Marshal(slim)
+	return LogRow{At: at.UTC().Format(stampFormat), Level: infoLevel, Kind: probeKind, Said: replyEvent, Event: toolEvent, Detail: string(detail)}
 }
 
 // [[spec/tickets/prompt-answers-off-the-door]]

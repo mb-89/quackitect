@@ -242,6 +242,40 @@ test("under new a held call asks back on agent.spoke with the effect's call id, 
   assert.equal(posts[1].body.e.text, "the reply");
 });
 
+// A door whose standing file names raw takes the transcript raw on the ask-back and on a prompt, and the fill rides every post. [[spec/tickets/level0-hooks-hold-no-rule]]
+test("under a raw door a held call and a prompt carry the raw rows, and every post carries the fill", async () => {
+  const box = caged({
+    [`${STUB}/.se/.runtime/hooks.json`]: JSON.stringify({ port: 7001, token: "t0k", raw: true }),
+  });
+  const posts = [];
+  box.$.session = {
+    messages: async () => [{ role: "assistant", id: "a1", text: "the reply", toolUses: [{}] }],
+    usage: async () => ({ context: { tokens: 1234 } }),
+  };
+  box.$.http = {
+    fetch: async (_url, init) => {
+      const body = JSON.parse(init.body);
+      posts.push(body);
+      const effects = body.event === "tool.call" ? [{ kind: "rows", call: "s1.2" }] : [];
+      return { ok: true, status: 200, text: JSON.stringify({ effects }) };
+    },
+  };
+  const submit = Object.assign(async (e) => e, { event: "prompt.submit" });
+
+  await box.hooks["*"](box.$, { tool: "Bash", command: "ls" }, box.handed);
+  await box.hooks["*"](box.$, { text: "the owner's prompt" }, submit);
+
+  const raw = [{ role: "assistant", id: "a1", text: "the reply", toolUses: 1 }];
+  const [call, spoke, prompt] = posts;
+  assert.equal(call.fill, 1234, "the call carries the fill");
+  assert.equal(prompt.fill, 1234, "and so does the prompt");
+  assert.equal(spoke.event, "agent.spoke");
+  assert.deepEqual(spoke.messages, raw, "the ask-back carries the raw rows");
+  assert.equal("rows" in spoke.e || "texts" in spoke.e, false, "and no trim");
+  assert.deepEqual(prompt.messages, raw, "the prompt carries the raw rows");
+  assert.equal("before" in prompt.e, false, "and no row id");
+});
+
 // A door answering every post, which records each address the hook reaches and hands the prompt context its named blocks. [[spec/tickets/level0-runs-on-the-door]]
 function answering(box, posts) {
   box.$.http = {

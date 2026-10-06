@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { APPEND, merged, slim } from "../../.claude/skills/level0/hooks/shape.ts";
+import { APPEND, merged } from "../../.claude/skills/level0/hooks/shape.ts";
 
 test("a merge grows a list, puts a text below the one standing, and replaces anything else", () => {
   assert.deepEqual(
@@ -13,15 +13,6 @@ test("a merge grows a list, puts a text below the one standing, and replaces any
     { context: ["a", "b"], note: "one\n\ntwo", n: 2 },
   );
   assert.deepEqual(merged(null, { context: ["b"] }), { context: ["b"] });
-});
-
-test("a slim event keeps its short strings, numbers and flags alone", () => {
-  const out = slim({ text: "x".repeat(5000), n: 3, on: true, deep: { a: 1 } });
-  assert.equal(out.text.length, 4000);
-  assert.equal(out.n, 3);
-  assert.equal(out.on, true);
-  assert.equal("deep" in out, false);
-  assert.equal(slim(undefined), null);
 });
 
 // The append script runs against a fake require: a disk that appends, and a path that names the folder. [[spec/design_output/log#every-writer-appends]]

@@ -15,7 +15,6 @@ import type {
   StarNext,
   StreamNext,
 } from "claude-code";
-import { REPLY_PROBE } from "../lib/guidance.js";
 import { SESSION } from "../lib/log.js";
 import {
   type Answer,
@@ -34,23 +33,12 @@ import {
   type Given,
   merged,
   type Spawned,
-  slim,
 } from "./shape.ts";
-import {
-  cageText,
-  INSTALL_SKIP,
-  NO_NODE,
-  reasonOf,
-  STARTING,
-  spawnTagOf,
-  START,
-} from "./start.ts";
-import { beforeIn, textOf, textsOf } from "./transcript.ts";
+import { cageText, INSTALL_SKIP, NO_NODE, reasonOf, STARTING, START } from "./start.ts";
+import { beforeIn, rawRows, textOf, textsOf } from "./transcript.ts";
 
-export { cageText, INSTALL_SKIP, reasonOf, STARTING, spawnTagOf, START };
+export { cageText, INSTALL_SKIP, reasonOf, STARTING, START };
 
-// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], under the runtime folder folders.js owns.
-const HAND_FILE = ".se/.runtime/session.json";
 let root = "";
 let method = "";
 let saidDown = false;
@@ -67,7 +55,6 @@ export function register(on: On, options: PluginOptions): void {
   method = String(options?.method ?? "");
   road = null;
   roadRan = false;
-  probing = false;
   saidDown = false;
   toldDown = false;
   takesClear();
@@ -76,28 +63,12 @@ export function register(on: On, options: PluginOptions): void {
   // Every event the engine raises is an object or nothing, read loosely as the door reads it. [[spec/design_output/level0#the-bridgehead-and-the-server]]
   on("*", ($, e, next) => seen($, e as Given, next));
   on("turn.step", streams);
-  // [[spec/design_output/pull#a-hand-of-its-own]]
-  on("agent.spawn", async ($, e: Frozen<Args<"agent.spawn">> & { readonly own?: unknown }, next) => {
-    if (e?.own) return next(e);
-    const line = spawnTagOf(await sessionHeld($));
-    if (!line) return next(e);
-    return next({ ...e, prompt: `${line}\n\n${String(e?.prompt ?? "")}` });
-  });
-}
-
-async function sessionHeld($: EngineInterface): Promise<Fields | null> {
-  try {
-    return JSON.parse(String(await $.fs.read(HAND_FILE)));
-  } catch {
-    return null;
-  }
 }
 
 // The door decides every event it names, and every other event passes untouched. [[spec/tickets/level0-runs-on-the-door]]
 async function seen($: EngineInterface, e: Given, next: StarNext): Promise<unknown> {
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
-  await probes($, event, e);
   // The session start names the root the door posts and the log writes under. [[spec/tickets/level0-runs-on-the-door]]
   if (event === "session.start" && e?.cwd) root = String(e.cwd);
   return doors(event) ? door($, event, e, next) : next(e);
@@ -110,8 +81,12 @@ async function door(
   e: Given,
   next: StarNext,
 ): Promise<unknown> {
-  const extra = await fillOf($, event, e);
-  const sent = await promptOf($, event, e, next);
+  const raw = event === "prompt.submit" && (await readsRaw($));
+  const extra = {
+    ...(await fillOf($)),
+    ...(raw ? { messages: rawRows(await messages($)) } : {}),
+  };
+  const sent = await promptOf($, event, e, next, raw);
   // A door the start road has yet to stand answers nothing, and only a post still falling once the road ran says so. [[spec/tickets/level0-runs-on-the-door]]
   let answer = await doorAsk($, event, sent, extra, { quiet: true });
   if (!answer) {
@@ -122,17 +97,12 @@ async function door(
   let step = stepOf(answer, event, { asks: true });
   // A held call asks back for the newest rows on agent.spoke, with the effect's call id. [[spec/tickets/spoke-answer-reaches-the-door]]
   if (step.rows !== undefined) {
-    const { texts, rows } = await lastTexts($);
-    const text = stepText || texts.at(-1) || "";
-    const spoken = {
-      tool: e?.tool,
-      agentId: e?.agentId,
-      text,
-      texts,
-      rows,
-      call: step.rows,
-    };
-    const back = await doorAsk($, "agent.spoke", spoken, {});
+    const said = { tool: e?.tool, agentId: e?.agentId, call: step.rows };
+    const back = (await readsRaw($))
+      ? await doorAsk($, "agent.spoke", { ...said, text: stepText }, {
+          messages: rawRows(await messages($)),
+        })
+      : await doorAsk($, "agent.spoke", await trimmed($, said), {});
     step = back ? stepOf(back, event, { asks: false }) : {};
   }
   if (step.answer?.spawn) return doorSpawns($, step.answer, event);
@@ -155,10 +125,29 @@ async function promptOf(
   event: string,
   e: Given,
   next: StarNext,
+  raw: boolean,
 ): Promise<Given> {
   if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
-  const said = await before($, event, e);
+  const said = raw ? e : await before($, event, e);
   return next?.origin ? { ...said, origin: next.origin } : said;
+}
+
+// Whether the door standing trims the raw transcript itself, which Raw in src/modules/hooks/listen.go says. A door started before it reads the trimmed fields alone, so the bridgehead trims for it until it restarts. [[spec/tickets/level0-hooks-hold-no-rule]]
+async function readsRaw($: EngineInterface): Promise<boolean> {
+  try {
+    return JSON.parse(String(await $.fs.read(HOOKS_FILE)))?.raw === true;
+  } catch {
+    return false;
+  }
+}
+
+// [[spec/tickets/a-reply-follows-its-prompt]]
+async function messages($: EngineInterface): Promise<unknown> {
+  try {
+    return await $.session.messages();
+  } catch {
+    return [];
+  }
 }
 
 async function doorAsk(
@@ -192,23 +181,17 @@ async function doorAsk(
   }
 }
 
-// [[spec/tickets/a-reply-follows-its-prompt]]
-async function lastTexts($: EngineInterface): Promise<ReturnType<typeof textsOf>> {
-  try {
-    return textsOf(await $.session.messages());
-  } catch {
-    return textsOf([]);
-  }
+// The spoke post an old door reads, trimmed here: the newest rows and the agent's last texts. Delete it with the trim in transcript.ts. [[spec/tickets/level0-hooks-hold-no-rule]]
+async function trimmed($: EngineInterface, said: Readonly<Fields>): Promise<Fields> {
+  const { texts, rows } = textsOf(await messages($));
+  return { ...said, text: stepText || texts.at(-1) || "", texts, rows };
 }
 
-// [[spec/tickets/a-reply-follows-its-prompt]]
+// The newest row's id, which an old door keys a prompt on. Delete it with the trim in transcript.ts. [[spec/tickets/level0-hooks-hold-no-rule]]
 async function before($: EngineInterface, event: string, e: Given): Promise<Given> {
   if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
-  try {
-    return beforeIn(e, await $.session.messages());
-  } catch {
-    return e;
-  }
+  const rows = await messages($);
+  return beforeIn(e, Array.isArray(rows) ? rows : []);
 }
 
 // A door's answer carrying a spawn: the helper runs, its answer goes back to the door, and the door's step answers the call. [[spec/tickets/review-spawns-off-the-door]]
@@ -241,12 +224,8 @@ async function helped($: EngineInterface, answer: Answer): Promise<Fields> {
   };
 }
 
-// The events the fill rides: every call of the agent's own, and the turn's end, which the harness measures only after the vote. [[spec/design_output/stop#the-context-hands-over]]
-const FILLED = new Set(["tool.call", "classic.Stop"]);
-
-// The fill of the context rides every call of the agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. The plain call costs nothing. [[spec/design_output/stop#the-context-hands-over]]
-async function fillOf($: EngineInterface, event: string, e: Given): Promise<Fields> {
-  if (!FILLED.has(event) || e?.agentId) return {};
+// The fill of the context rides every post, and the door reads it where filledOf in src/modules/hooks/stops.go says. The plain call costs nothing. [[spec/design_output/stop#the-context-hands-over]] [[spec/tickets/level0-hooks-hold-no-rule]]
+async function fillOf($: EngineInterface): Promise<Fields> {
   try {
     const tokens = (await $.session.usage())?.context?.tokens;
     return Number.isFinite(tokens) ? { fill: tokens } : {};
@@ -387,24 +366,6 @@ async function startsOnce($: EngineInterface): Promise<void> {
   if (!level) return;
   const detail = String(ran?.stderr ?? "").trim() || `exit ${code}`;
   await wrote($, { level, said, event: "session.start", detail });
-}
-
-// The reply probe's marker arms the next call of the session, which lands in the log as the event carries it. [[spec/tickets/the-reply-probe-runs]]
-let probing = false;
-
-async function probes($: EngineInterface, event: string, e: Given): Promise<void> {
-  if (event === "prompt.submit") {
-    probing = String(e?.text ?? "").includes(REPLY_PROBE.marker);
-    return;
-  }
-  if (event !== "tool.call" || !probing || e?.agentId) return;
-  probing = false;
-  await wrote($, {
-    level: "info",
-    said: REPLY_PROBE.event,
-    event,
-    detail: JSON.stringify(slim(e)),
-  });
 }
 
 // One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]

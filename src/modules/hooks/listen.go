@@ -18,6 +18,8 @@ import (
 type Standing struct {
 	Port  int    `json:"port"`
 	Token string `json:"token"`
+	// Says the door takes the transcript's raw rows and trims them itself, so a bridgehead sends them raw. A standing file lacking it stands from a door that reads the trimmed fields. [[spec/tickets/level0-hooks-hold-no-rule]]
+	Raw bool `json:"raw"`
 }
 
 // Serves POST /hook on a loopback port behind a token, and writes both under the root. The listener stands in the index process until the IO process holds every listener. [[spec/tickets/hooks-listener-joins-io-process]]
@@ -36,7 +38,7 @@ func Listen(root string, door *Door) (func(), error) {
 	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
 	go server.Serve(listen)
 	at := filepath.Join(root, filepath.FromSlash(StandingFile))
-	body, err := json.Marshal(Standing{Port: listen.Addr().(*net.TCPAddr).Port, Token: token})
+	body, err := json.Marshal(Standing{Port: listen.Addr().(*net.TCPAddr).Port, Token: token, Raw: true})
 	if err == nil {
 		err = os.MkdirAll(filepath.Dir(at), 0o755)
 	}

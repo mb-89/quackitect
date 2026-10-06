@@ -2,7 +2,6 @@
 
 import { BIN } from "../lib/index.js";
 import { SERVE } from "../lib/log.js";
-import type { Fields } from "./shape.ts";
 
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const STARTING = 180_000;
@@ -70,11 +69,4 @@ export function cageText(code: unknown, detail: unknown): string {
   ]
     .filter(Boolean)
     .join(" ");
-}
-
-// [[spec/design_output/pull#a-hand-of-its-own]]
-export function spawnTagOf(held: Readonly<Fields> | null | undefined): string {
-  const id = String(held?.id ?? "").trim();
-  if (!id) return "";
-  return `You are the hand of session ${id} on this box, so you pull under no --as.`;
 }
