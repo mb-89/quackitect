@@ -261,4 +261,16 @@ The check before, on the cloud box, warm, at commit bf2759cd9:
 
 It answers red on one finding: `src/index/procs.go` reads otherwise than the formatter writes it.
 
+The check after, on the cloud box, warm, at commit 1d4f13ef4, every child closed:
+
+| part | seconds |
+|---|---|
+| rules | 60.2 |
+| level0 | 57.7 |
+| go | 20.4 |
+| tests | 19.3 |
+| in all, by the check | 101.2 |
+
+It answers green, with one biome warning on unused imports in `test/level0/work-stands.test.js`.
+
 The cold-runner fixes land on this branch, in `cold-runner-waits-meet-readiness`, and in no pull request of their own. The owner asks for one where the group's plan allows, and the tree's notes hold that a session opens no branch of its own. A pull request red on the same three takes commits b3f1df35f and 157e9a2c9, which touch the two cases and the index client alone.
