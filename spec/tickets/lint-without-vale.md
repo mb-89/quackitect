@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box 09cf21ad3c5d · claude-code-remote
@@ -96,6 +96,15 @@ record:
         exit: 0
         said: work/lint-without-vale already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 8297fc59a8d194ff130c1d8a3b4d33b86320c2d3
+    hash_after: 4ed7285940f3845b9391dcd752dc111269cfb6b3
+    inputs:
+      - name: ask
+        hash: b1429804df0c41dd
+        size: 958
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -127,14 +136,33 @@ The tree lints its prose and its code with its own Go rules, at commit and mint 
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/go-rules-replace-vale]], standard
+[[spec/tickets/go-rules-design-note]], trivial
+[[spec/tickets/go-rules-exemption-marker]], trivial
+[[spec/tickets/go-rules-rename-voicevale]], trivial
+[[spec/tickets/go-rules-span-parity]], trivial
+[[spec/tickets/comment-rules-meet-the-lint]], trivial
+[[spec/tickets/rules-lint-changed-files-first]], standard
+[[spec/tickets/changed-lint-without-merge-base]], trivial
+[[spec/tickets/working-rule-strict-commit]], trivial
+[[spec/tickets/the-check-lint-runs-in-go]], standard
+[[spec/tickets/lint-contract-test-leaves]], trivial
+[[spec/tickets/lint-strict-leaves-erred]], trivial
+[[spec/tickets/vale-leaves-the-tree]], standard
+[[spec/tickets/done-when-grep-meets-testdata]], trivial
+[[spec/tickets/vale-size-misses-files]], trivial
+[[spec/tickets/design-notes-name-no-vale]], trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every child is small enough to review whole: each standard child landed in moves of its own commit, and each trivial child touches a file or a few
+the children add up to the goal: the Go engine, the compare, the check's lint in Go, the changed-file lint, the comment rules and the leaving of Vale each hold a child, and the design notes child closes what Vale left in prose
+no open child waits on another: the design notes child reads the tree the closed children left, so it names no depends_on
 
 # children
 
