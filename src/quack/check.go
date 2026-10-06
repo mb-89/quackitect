@@ -49,16 +49,18 @@ const (
 
 const noErrors = "The check names no red case and no finding at error."
 
+// The line a red part prints, while the parts beside it run on. [[spec/tickets/the-parts-start-at-once]]
+const redPart = "%s answers red, and the parts beside it ran on.\n"
+
 var (
 	goTestFunc = regexp.MustCompile(`(?m)^func (Test\w+)\(`)
 	goFailRow  = regexp.MustCompile(`^\s*--- FAIL`)
 )
 
-// One part of the battery: its name, its run, and whether it runs beside the parts after it. [[spec/design_output/work#the-battery-answers-first]]
+// One part of the battery: its name and its run. [[spec/design_output/work#the-battery-answers-first]]
 type part struct {
-	name   string
-	run    func() int
-	beside bool
+	name string
+	run  func() int
 }
 
 // What the check reaches: the root, a verb through quack's own road, a process, the health call, the clock, the platform, the red list, the config, git, the session log and the streams. [[spec/design_output/work#the-battery-answers-first]]
@@ -121,7 +123,10 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 			d.out = io.Discard
 		}
 		_ = os.Remove(d.at(lintFile))
-		code, times, unrun, total := batteryRun(partsOf(d, words, quiet), d.now)
+		code, times, red, total := batteryRun(partsOf(d, words, quiet), d.now)
+		for _, name := range red {
+			fmt.Fprintf(d.errs, redPart, name)
+		}
 		lines := d.text(timesFile)
 		var found lintFound
 		_ = json.Unmarshal([]byte(d.text(lintFile)), &found)
@@ -130,7 +135,7 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 			one := spawnsIn(string(tally))
 			spawns = &one
 		}
-		report := batteryOf(times, lines, slowestKept, unrun, spawns, total)
+		report := batteryOf(times, lines, slowestKept, nil, spawns, total)
 		if quiet {
 			for _, row := range errorsSaid(lines, found.Erred) {
 				fmt.Fprintln(out, row)
@@ -188,45 +193,42 @@ func (d checkDoors) text(rel string) string {
 	return string(said)
 }
 
-// The battery in order, each part timed under its name, stopping at the first red and naming the parts it leaves unrun. A part marked beside starts where it stands, the run goes on, and the run waits for it before it answers, so the total is the battery's own span. [[spec/guidance/retro/effect]] [[spec/tickets/the-check-takes-a-minute]]
+// The battery all at once: the run reads every part's start, then starts every part and waits for all of them, each timed under its name. It answers the first red code in part order and the red parts by name, so a red part names itself while every part beside it still reports. No part reads another's output, so none waits on another, and the total is the slowest part's span. [[spec/tickets/the-parts-start-at-once]] [[spec/guidance/retro/effect]]
 func batteryRun(parts []part, now func() time.Time) (int, map[string]float64, []string, float64) {
 	from := now()
-	times := map[string]float64{}
-	var held sync.Mutex
-	timed := func(one part) int {
-		start := now()
-		code := one.run()
-		took := float64(now().Sub(start).Milliseconds())
-		held.Lock()
-		times[one.name] = took
-		held.Unlock()
-		return code
+	starts := make([]time.Time, len(parts))
+	for at := range parts {
+		starts[at] = now()
 	}
+	codes := make([]int, len(parts))
+	took := make([]float64, len(parts))
+	var all sync.WaitGroup
+	for at, one := range parts {
+		all.Add(1)
+		go func() {
+			defer all.Done()
+			codes[at] = one.run()
+			took[at] = float64(now().Sub(starts[at]).Milliseconds())
+		}()
+	}
+	all.Wait()
 	code := 0
-	unrun := []string{}
-	beside := []chan int{}
-	for _, one := range parts {
-		if code != 0 {
-			unrun = append(unrun, one.name)
+	times := map[string]float64{}
+	red := []string{}
+	for at, one := range parts {
+		times[one.name] = took[at]
+		if codes[at] == 0 {
 			continue
 		}
-		if !one.beside {
-			code = timed(one)
-			continue
-		}
-		done := make(chan int, 1)
-		go func(one part) { done <- timed(one) }(one)
-		beside = append(beside, done)
-	}
-	for _, done := range beside {
-		if said := <-done; code == 0 {
-			code = said
+		red = append(red, one.name)
+		if code == 0 {
+			code = codes[at]
 		}
 	}
-	return code, times, unrun, float64(now().Sub(from).Milliseconds())
+	return code, times, red, float64(now().Sub(from).Milliseconds())
 }
 
-// The battery's parts in the order they start, and a red part leaves the rest unrun. Level zero waits on its processes, so it runs beside the parts after the tests. A part another verb owns runs that verb through quack's own road. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-check-takes-a-minute]]
+// The battery's parts, which all start at once. A part another verb owns runs that verb through quack's own road. [[spec/design_output/work#the-battery-answers-first]] [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-check-takes-a-minute]]
 func partsOf(d checkDoors, words []string, quiet bool) []part {
 	where := []string{}
 	for _, one := range words {
@@ -239,7 +241,7 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 	}
 	return []part{
 		{name: "tests", run: func() int { return testsRun(d, quiet) }},
-		{name: "level0", run: func() int { return level0Runs(d, quiet) }, beside: true},
+		{name: "level0", run: func() int { return level0Runs(d, quiet) }},
 		{name: "go", run: func() int { return goGate(d, quiet, goSkipOf(d.red, d.text)) }},
 		{name: "doors", run: func() int { return d.verb([]string{"doors"}, quiet) }},
 		{name: "projections", run: func() int { return d.verb([]string{"project", "--check"}, quiet) }},

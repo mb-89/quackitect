@@ -117,7 +117,7 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -147,6 +147,18 @@ record:
         hash: e752f098fe7ee9d0
         size: 2092
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box c46fdbdc0cdf · claude-code-remote · helper-4
+    hash_before: 5c874136829b811bc9c58789dd203b0f9a339ec0
+    hash_after: 5c874136829b811bc9c58789dd203b0f9a339ec0
+    inputs:
+      - name: design/draft
+        hash: e752f098fe7ee9d0
+        size: 2092
+      - name: design/tests-red
+        hash: 698e90a09495faee
+        size: 1027
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,13 @@ Each of the three cases fails on its own assertion against the serial battery. T
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: batteryRun starts every part at once, the first red code in part order answers, the red parts come back by name, and checkVerb prints a line a red part to the error stream; no part reads another's output (goSkipOf reads the red list's source files, not a part's output), so the draft names no wait, and says why
+- every done_when line meets a test failing on its own assertion, seen with go test: the overlap case and the red-part case in TestBatteryRun, the error-stream case in TestCheckVerb; the check line waits for tests-green
+- the implement step fixes in place: the overlap case's guard asks the battery to read every part's start before it runs any part, stricter than the ask's every part starts before any part ends; a goroutine reading its own start and then running fails that case now and then, so batteryRun reads the starts first and then starts the goroutines, as the tests-red seen says
+- the implement step fixes in place: the error-stream line reads 'doors answers red', a wording the test pins and the draft leaves unnamed, and checkVerb passes no red names into batteryOf, so the report's unrun stays empty as the draft says
 
 # implement
 
