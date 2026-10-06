@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: fae2abb9b10e4632
         size: 2309
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: cb2f5f096445c92cf8d08b7a5e0233e8c7695bcd
+    hash_after: cb2f5f096445c92cf8d08b7a5e0233e8c7695bcd
+    inputs:
+      - name: design/draft
+        hash: fae2abb9b10e4632
+        size: 2309
+      - name: design/tests-red
+        hash: 903a5e28ce3cdf10
+        size: 700
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -279,8 +291,14 @@ the check test runs over checkFake's doors, and the dispatch test over the fake 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the reporter writes the line field, and a case in test/level0/battery-reporter.test.js proves it, since the Go test builds the reporter row itself
+- the loud run door in src/quack/checkdoors.go keeps standard output, and a case proves the Go red reaches the report through it
+- the fire skips a red pull whose branch stands anywhere but done, so a worker that takes it moves it off done and no second worker follows
+- dispatch.yml wakes on workflow_run of the check workflow, completed with a failure, since a check_run raised by an Actions run starts no workflow
+- the read of check runs uses the token dispatch already sends with, and the says field names the right it needs
 
 # implement
 
