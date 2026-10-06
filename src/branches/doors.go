@@ -164,6 +164,12 @@ func (d *Doors) env(key string) string {
 	return os.Getenv(key)
 }
 
+// The text of a file a box variable names, which stands outside the work root, or nothing. [[spec/tickets/one-routine-checks-the-fleet]]
+func (d *Doors) readOutside(path string) string {
+	body, _ := os.ReadFile(path)
+	return string(body)
+}
+
 // The clock's now, or the zero time where the doors carry none. [[spec/design_output/work#a-stale-group-is-yours]]
 func (d *Doors) now() time.Time {
 	if d.Now == nil {

@@ -5,6 +5,7 @@ package branches
 import (
 	"slices"
 	"testing"
+	"time"
 
 	"quackitect/src/front"
 )
@@ -53,10 +54,12 @@ func TestABusyBoxRaisesNoWake(t *testing.T) {
 func fleetTree(t *testing.T, date string) *tree {
 	t.Helper()
 	one := newTree(t, nil)
-	one.env = []string{"GIT_COMMITTER_DATE=" + date, "GIT_AUTHOR_DATE=" + date}
-	one.branch("g", map[string]string{ticketAt("g"): withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box 9e1f"}, {Key: "hash_before", Value: "a1b2c3"}, {Key: "session", Value: "cse_holder"}})})
-	one.env = nil
-	one.git("push", "-q", "origin", "origin/work/g:refs/pull/7/head")
+	at, err := time.Parse(time.RFC3339, date)
+	if err != nil {
+		t.Fatal(err)
+	}
+	one.branchAt("g", map[string]string{ticketAt("g"): withEntry(groupNote, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box 9e1f"}, {Key: "hash_before", Value: "a1b2c3"}, {Key: "session", Value: "cse_holder"}})}, at)
+	one.pushAt("origin/work/g", "refs/pull/7/head")
 	return one
 }
 
@@ -66,7 +69,7 @@ func TestFleetListsEachBranchWithTipAgeHolderAndPullRequest(t *testing.T) {
 	if code := one.cloudSays("fleet"); code != codeOK {
 		t.Fatalf("cloud fleet answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
-	tip := shortOf(one.git("rev-parse", "origin/work/g"))
+	tip := shortOf(one.rev("origin/work/g"))
 	for _, said := range []string{"work/g", held, tip, "10m", "box 9e1f", "cse_holder", "#7"} {
 		holds(t, one.out.String(), said)
 	}

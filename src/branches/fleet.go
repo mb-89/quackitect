@@ -91,7 +91,7 @@ func (d *Doors) idleSpan() int64 {
 func (d *Doors) fleet() int {
 	d.fetch()
 	stood, _ := d.readWork(false)
-	pulls := pullsOf(d.quiet("ls-remote", "origin", "refs/pull/*/head").Out)
+	pulls := pullsOf(d.pullRows())
 	rows := withTips(fleetRows(stood, standingAll(stood)), stood, d.nowSeconds(), pulls)
 	for _, one := range rows {
 		d.say("%s", strings.Join(dashed(one.Branch, one.Standing, one.Tip, one.Age, one.Hand, one.Session, one.Pull, one.Model, one.Cost, one.Final), "  "))
@@ -104,6 +104,18 @@ func (d *Doors) fleet() int {
 		return codeRed
 	}
 	return codeOK
+}
+
+// Origin's pull request heads, as ls-remote's rows. [[spec/tickets/the-fleet-verb-watches-boxes]]
+func (d *Doors) pullRows() string {
+	refs, _ := d.Repo.RemoteRefs(pullRefs)
+	rows := []string{}
+	for _, one := range refs {
+		if strings.HasSuffix(one.Name, "/head") {
+			rows = append(rows, one.Hash+"\t"+one.Name)
+		}
+	}
+	return strings.Join(rows, "\n")
 }
 
 // The fields, with a dash for each that stands empty. [[spec/tickets/the-fleet-verb-watches-boxes]]
