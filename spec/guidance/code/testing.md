@@ -12,8 +12,8 @@ rationale: [[spec/rationales/testing]]
 3. In that JavaScript, put a test that drives the real thing in `test/contract`, one per door. A door nobody drives fails on the first box its fake misses. *
 4. Write a fake that behaves. A double scripting the answer tests the script. *
 5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. The commit door refuses a change standing with no test, and `EveryModuleTested` reads the tree. *
-6. Name a test as the claim it makes, and assert every word of that claim.
-7. Share a fixture nobody writes to, and make what a test changes inside the test. Fixtures count toward the test-to-code ratio, which is about 1:1 at most per package. The `ratio` guard names a package past it. [[spec/design_output/model#the-guards-hold-a-baseline]]
+6. Name a test as the claim it makes, and assert every word of that claim. Test behavior through an interface, and leave the implementation detail untested. A test of a detail turns red on a refactor that breaks nothing.
+7. Build a shared fixture once, in the package's one home `main_test.go`, and make what a test changes inside the test. The `fixture` guard names a build outside the home. Fixtures count toward the test-to-code ratio, which is about 1:1 at most per package. The `ratio` guard names a package past it. [[spec/design_output/model#the-guards-hold-a-baseline]]
 8. Take the clock and the random source as arguments, so a failing case replays. Start no timer in a test, and the `purity` guard names a function reaching the clock in place. [[spec/design_output/model#the-guards-hold-a-baseline]]
 9. Let every test run beside every other. A test needing an order is a red test.
 10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change.
@@ -21,7 +21,7 @@ rationale: [[spec/rationales/testing]]
 12. Where the command line misses an edge, test an IO module against `q/qtest` and the fake of its outside world. A fake disk, git, process or clock stands local. [[spec/design_output/model#its-file-carries-its-fake]]
 13. Every fake stands for a contract. Each contract has one suite of cases, written once, that runs against both the fake and the real thing. The check refuses a fake with no suite beside it. [[spec/design_output/model#the-fake-keeps-a-contract]] *
 14. Where the command line misses an edge of the index, test it against a fake module. It registers reads and writes, and drives every transaction a module makes. [[spec/design_output/model#the-index-meets-fake-modules]]
-15. Cross no module boundary in a test, past a contract suite, the fake module and the cage's replays.
+15. Cross no module boundary in a test, past a contract suite, the fake module and the cage's replays. Write a Go test in the outside package `<name>_test`, or mark its clause `// level0: InPackageTest - <why>`. The `blackbox` guard reads it. [[spec/design_output/model#the-guards-hold-a-baseline]]
 
 # Examples
 

@@ -12,3 +12,4 @@ rationale: [[spec/rationales/auditing]]
 3. Answer each item: held, broken with its evidence, or untested with the reason. An item with no answer reads as held. *
 4. Write `findings/audit-<group>.md` in the ten rows: a broken item under stop, a held one under keep.
 5. Name a rule nobody follows as a check to build or a rule to cut. A rule that stands unfollowed teaches every reader that the rules are optional. *
+6. Answer a code or test rule a guard holds off `./RUNME.sh guards`, and read the rest off the window's diff. A guard counts what a reader reads past.

@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
 depends_on: [black-box-tests-guard-reports, fixture-home-guard-reports, test-ratio-measure-reports, hand-script-guard-reports, purity-guard-covers-every-outside]
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: 96c683892ae46d57
         size: 744
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 3a30f08270a122b437e503e225eb3ffde416a62d
+    hash_after: 3a30f08270a122b437e503e225eb3ffde416a62d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -310,14 +319,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint spec/guidance/code/code.md spec/guidance/code/testing.md spec/processes/retro.yaml spec/guidance/retro/audit.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the four files the ask names, and the rationale the door-once point added
+no door: the change is guidance and a process checklist
+the approach stands in the design/draft chapter, and the guidance files carry no code comment
+one place: every guard rule links the model section owning the guards and their markers
 
 ## tests-green
 
