@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 3041511ebe33f68f
         size: 5066
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 4190dceabe52773229c37fffa62293ed4db4aeab
+    hash_after: 4190dceabe52773229c37fffa62293ed4db4aeab
+    inputs:
+      - name: design/draft
+        hash: 3041511ebe33f68f
+        size: 5066
+      - name: design/tests-red
+        hash: 1ce3808a628ac46a
+        size: 755
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -320,8 +332,11 @@ The check cases run over the fake index in q/qtest, and the yaml case reads pure
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- vehicle-truthy-joins-yaml: src/vehicle/json.go holds a ninth copy, exported as Truthy, with the body voice.go holds in another case order. The approach and its callers list leave it and its callers in src/vehicle/pure.go out. Fold it into yaml.Truthy with the rest, since the ask wants each helper in one package, and the grep for a lower-case name misses it.
+- copy-rule-drops-twin-word: package check already says twin for a JavaScript check and its Go port, in Twins, check.go and check_twins_test.go. A new twins.go holding helperTwins gives one word two meanings. Name the file, the function and the test file for a copied body, as copies.go, helperCopies and copies_test.go, and carry the red list with the rename.
 
 # implement
 
