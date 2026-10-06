@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: e4908af626725415
         size: 613
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box add8d8d0dd3d · claude-code-remote · helper-5
+    hash_before: f4ca758df8f19055363a022bca1899cd86df58ab
+    hash_after: 99e76dd9791f01658afea857f61c88fb3e5b02df
+    answered:
+      - name: lint
+        exit: 0
+        said: The check names no red case and no finding at error.
+    def: f150b8c0dc20fe45
 depends_on: [go-waits-on-events]
 ---
 
@@ -305,14 +314,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check --errors
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack files the doors verb lists for the clock, and io_test.go for the one signature that takes the clock
+the clock door has its fake in src/q/qtest/clock.go, and the watchdog case in src/quack/io_test.go runs on it
+io.go names spec/tickets/quack-waits-on-the-clock beside watchesIndex, the one function that now takes the clock
+the clock stands once as wall in src/quack/main.go, and every door points at it
 
 ## tests-green
 
