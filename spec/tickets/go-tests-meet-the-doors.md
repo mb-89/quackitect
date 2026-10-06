@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: doors-declare-what-they-own
 depends_on: [tests-meet-the-doors-once]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 9b7ce7f57fcdf21c
         size: 2406
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box add8d8d0dd3d · claude-code-remote · helper-4
+    hash_before: 548aab348bc2467f3c6072904a6e1099e84f64bf
+    hash_after: 548aab348bc2467f3c6072904a6e1099e84f64bf
+    inputs:
+      - name: design/draft
+        hash: 9b7ce7f57fcdf21c
+        size: 2406
+      - name: design/tests-red
+        hash: 55348f9e242faeab
+        size: 815
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -284,8 +296,12 @@ each case goes red for the reason the change answers, and the run shows it
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- doors-lists-contract-tests: the ask's second done_when line says `./RUNME.sh doors` lists a door's contract test under the door, but TestDoorsPassesAContractTestItsDoorNames in src/quack/verb_doors_test.go asserts the output names no contract test, and doorsVerb in src/quack/verb_doors.go prints walks and a count alone; add a red case asserting the listing, and have doorsVerb print each door's contract tests
+- contract-names-its-door: the draft names TestEveryContractTestNamesItsDoor in src/owns/tree_test.go, which tests-red never wrote, and the red list leaves tree_test.go out; write it red so every file under test/contract and every _contract_test.go stands in one door's contract key
+- contract-beside-files-key: the draft says a contract test in its door's folder needs no key, but Door.Holds in src/owns/owns.go checks Files alone where a door names files; Holds answers true for a contract path whatever files says, and a case pins it
 
 # implement
 
