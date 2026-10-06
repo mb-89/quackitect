@@ -101,6 +101,21 @@ func TestCollapseOnAChildGoesToItsParentAndShutsIt(t *testing.T) {
 	}
 }
 
+// [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+func TestTheSiblingsOfARowStandAtItsOwnLevel(t *testing.T) {
+	t.Parallel()
+	view := tickets()
+	if said := view.Siblings("the frame"); len(said) != 2 || said[0].Name != "the frame" || said[1].Name != "the help" {
+		t.Fatalf("a child stands beside its parent's other children, and reads %v", said)
+	}
+	if said := view.Siblings("the tree"); len(said) != 2 {
+		t.Fatalf("a root stands beside the other roots, and reads %v", said)
+	}
+	if view.Siblings("nobody") != nil {
+		t.Fatal("a name the tree holds nowhere has no siblings")
+	}
+}
+
 // [[spec/design_output/tree-view#the-name-column-nests]]
 func TestTheFirstColumnCarriesTheNestingAndTheName(t *testing.T) {
 	t.Parallel()
@@ -201,6 +216,10 @@ func TestTheFilterReadsAnItemInTheLanguageTheLogReads(t *testing.T) {
 	}
 	if !narrow("bands").Narrowed() || tickets().Narrowed() {
 		t.Fatal("a held filter says so, and an empty one says not")
+	}
+	view := narrow("bands")
+	if view.Narrow(draw.Filter{}); view.Len() != 4 || view.Narrowed() {
+		t.Fatalf("an empty filter keeps every row, and %d stand", view.Len())
 	}
 }
 

@@ -1,7 +1,8 @@
 // The keys and the arrivals, driven through Update the way the terminal drives
-// them. Every model here reads memory and no file.
+// them, and the order a press on a column name puts the rows in. Every model
+// here reads memory and no file.
 
-package main
+package log
 
 import (
 	"encoding/json"
@@ -14,17 +15,13 @@ import (
 
 	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
-	"quackitect/src/tui/log"
 	"quackitect/src/tui/registry"
 )
 
-// A row the way the log writes one, read through the parser the tab reads with. [[spec/design_output/log#what-one-line-looks-like]]
-func row(at int, door, said string) log.Record {
-	return log.ParseRecord(fmt.Sprintf(`{"at":"2026-09-11T15:00:%02dZ","level":"info","kind":%q,"said":%q}`, at, door, said))
-}
+func logTab(m frame.Model) *Tab { return m.Tabs[0].(*Tab) }
 
 func window(n int) frame.Model {
-	m := newModel("no/such/log.jsonl", time.UTC)
+	m := frame.New("no/such/log.jsonl", time.UTC, []frame.Tab{New("no/such/log.jsonl", time.UTC)})
 	m.W, m.H = 120, 10+frame.NamesWide+frame.HeadWide+frame.FootWide
 	for at := 1; at <= n; at++ {
 		logTab(m).All = append(logTab(m).All, row(at, "tool", fmt.Sprintf("line %d", at)))
@@ -60,18 +57,23 @@ func press(m frame.Model, keys ...string) frame.Model {
 	return m
 }
 
-// The rows the log tab holds and the new ones, as the watch sends the whole session. [[spec/tickets/the-log-tab-reads-v1]]
-func arrive(m frame.Model, recs ...log.Record) frame.Model {
-	return watched(m, append(append([]log.Record(nil), logTab(m).All...), recs...)...)
+func click(m frame.Model, x, y int) frame.Model {
+	next, _ := m.Update(tea.MouseMsg{X: x, Y: y, Button: tea.MouseButtonLeft, Action: tea.MouseActionPress})
+	return next.(frame.Model)
 }
 
-func watched(m frame.Model, recs ...log.Record) frame.Model {
-	rows := make([]log.IndexRow, 0, len(recs))
+// The rows the log tab holds and the new ones, as the watch sends the whole session. [[spec/tickets/the-log-tab-reads-v1]]
+func arrive(m frame.Model, recs ...Record) frame.Model {
+	return watched(m, append(append([]Record(nil), logTab(m).All...), recs...)...)
+}
+
+func watched(m frame.Model, recs ...Record) frame.Model {
+	rows := make([]IndexRow, 0, len(recs))
 	for _, one := range recs {
-		rows = append(rows, log.IndexRow{At: one.At.Format(time.RFC3339Nano), Level: one.Level, Kind: one.Kind, Said: one.Said, Text: one.Text, Extra: one.Extra, Broken: one.Broken})
+		rows = append(rows, IndexRow{At: one.At.Format(time.RFC3339Nano), Level: one.Level, Kind: one.Kind, Said: one.Said, Text: one.Text, Extra: one.Extra, Broken: one.Broken})
 	}
 	value, _ := json.Marshal(rows)
-	out, _ := m.Update(registry.Change{Name: "log/rows", Value: value})
+	out, _ := m.Update(registry.Change{Name: rowsName, Value: value})
 	return out.(frame.Model)
 }
 
@@ -225,8 +227,7 @@ func erase(m frame.Model, n int) frame.Model {
 // [[spec/design_output/tui#alt-l-raises-the-floor]]
 func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 	t.Parallel()
-	m := newModel("no/such/log.jsonl", time.UTC)
-	m.W, m.H = 120, 10+frame.NamesWide+frame.HeadWide+frame.FootWide
+	m := window(0)
 	for at, level := range []string{"debug", "info", "warn", "error", "fatal", ""} {
 		r := row(at+1, "hook", "a "+level+" line")
 		r.Level = level
@@ -393,7 +394,7 @@ func TestAltQKeepsThePromptsAndTheRepliesAndTheSameChordClearsIt(t *testing.T) {
 	m := arrive(mixed(), row(6, "reply", "hello"))
 	m = press(m, "end")
 	m = chord(m, altQ)
-	if m.Input.Value() != log.PromptsFilter || len(logTab(m).View) != 3 || m.Pane != frame.PaneShut {
+	if m.Input.Value() != PromptsFilter || len(logTab(m).View) != 3 || m.Pane != frame.PaneShut {
 		t.Fatalf("alt+q keeps the two prompts and the reply and opens no pane, and got %q %v %d", m.Input.Value(), logTab(m).View, m.Pane)
 	}
 	if !strings.Contains(m.RenderMarks(), draw.LevelStyle("error").Render(frame.FilterMark)) {
@@ -413,7 +414,7 @@ func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 	t.Parallel()
 	m := chord(press(mixed(), "home"), altShiftF)
 	m = chord(m, altQ)
-	if m.Input.Value() != log.PromptsFilter {
+	if m.Input.Value() != PromptsFilter {
 		t.Fatalf("a second chord writes its own filter, and got %q", m.Input.Value())
 	}
 	strip := m.RenderStrip()
@@ -464,5 +465,142 @@ func TestARestartedLogReplacesWhatWasRead(t *testing.T) {
 	m = watched(m, row(1, "level0", "session start"))
 	if len(logTab(m).All) != 1 || logTab(m).Sel != 0 || !logTab(m).Follow {
 		t.Fatalf("a restart keeps the one new row, selected and following, and got %d rows at %d follow %v", len(logTab(m).All), logTab(m).Sel, logTab(m).Follow)
+	}
+}
+
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
+func TestTheSelectionBandGoesWhileNothingStandsSelected(t *testing.T) {
+	t.Parallel()
+	m := window(0)
+	// The row's preset stands in the filter pane, and an empty log offers none. [[spec/design_output/tui#one-key-filters-the-line]]
+	drawn := frame.RenderParts(m.PresetParts(), 60)
+	if strings.Contains(drawn, "this row's kind") {
+		t.Fatalf("an empty log selects nothing and offers no row preset, and the pane reads:\n%s", drawn)
+	}
+	m = arrive(m, row(1, "tool", "line 1"))
+	drawn = frame.RenderParts(m.PresetParts(), 60)
+	if !strings.Contains(drawn, "this row's kind") {
+		t.Fatalf("a selected row offers its kind as a preset, and the pane reads:\n%s", drawn)
+	}
+}
+
+// [[spec/design_output/tui#the-help-reads-the-cursor]]
+func TestAKeyNobodyRegistersDoesNothing(t *testing.T) {
+	t.Parallel()
+	m := window(5)
+	if press(m, "?").Pane != frame.PaneShut {
+		t.Fatal("the question mark alone registers nowhere, and opens nothing")
+	}
+	if logTab(press(m, "x")).Sel != logTab(m).Sel {
+		t.Fatal("a key nobody registers moves nothing")
+	}
+}
+
+func threeLevels() frame.Model {
+	m := window(0)
+	logTab(m).Floor = "debug"
+	for at, one := range []struct{ level, kind, said string }{
+		{"warn", "vale", "c"},
+		{"debug", "bash", "a"},
+		{"error", "work", "b"},
+	} {
+		r := row(at+1, one.kind, one.said)
+		r.Level = one.level
+		logTab(m).All = append(logTab(m).All, r)
+	}
+	logTab(m).Rebuild(m.Rows())
+	return m
+}
+
+func saidIn(m frame.Model) string {
+	out := make([]string, 0, len(logTab(m).View))
+	for _, index := range logTab(m).View {
+		out = append(out, logTab(m).All[index].Said)
+	}
+	return strings.Join(out, "")
+}
+
+func TestTheColumnAPressLandsOnAndTheOneItMisses(t *testing.T) {
+	t.Parallel()
+	w := 120
+	for at, one := range []struct {
+		x    int
+		want int
+	}{
+		{draw.GutterWide, 0},
+		{draw.GutterWide + StampWide - 1, 0},
+		{draw.GutterWide + StampWide, SortNone},
+		{draw.GutterWide + StampWide + 1, 1},
+		{draw.GutterWide + StampWide + 1 + LevelWide + 1, 2},
+		{draw.GutterWide + StampWide + 1 + LevelWide + 1 + KindWide + 1, 3},
+		{0, SortNone},
+	} {
+		if got := ColumnAt(one.x, w); got != one.want {
+			t.Fatalf("case %d: column %d stands under x %d, and ColumnAt answers %d", at, one.want, one.x, got)
+		}
+	}
+}
+
+func TestAPressSortsThenFlipsThenPutsTheArrivalOrderBack(t *testing.T) {
+	t.Parallel()
+	m := threeLevels()
+	if saidIn(m) != "cab" {
+		t.Fatalf("the log arrives in its own order, and reads %q", saidIn(m))
+	}
+
+	said := draw.GutterWide + StampWide + 1 + LevelWide + 1 + KindWide + 1
+	m = click(m, said, frame.NamesRow)
+	if saidIn(m) != "abc" {
+		t.Fatalf("a press on said sorts up, and reads %q", saidIn(m))
+	}
+	m = click(m, said, frame.NamesRow)
+	if !logTab(m).SortDown || saidIn(m) != "cba" {
+		t.Fatalf("a second press flips it down, and reads %q", saidIn(m))
+	}
+	m = click(m, said, frame.NamesRow)
+	if logTab(m).SortAt != SortNone || saidIn(m) != "cab" {
+		t.Fatalf("a third press puts the arrival order back, and reads %q", saidIn(m))
+	}
+}
+
+func TestSortingByLevelReadsTheLadderAndNotTheLetters(t *testing.T) {
+	t.Parallel()
+	level := draw.GutterWide + StampWide + 1
+	m := click(threeLevels(), level, frame.NamesRow)
+	if saidIn(m) != "acb" {
+		t.Fatalf("debug, warn then error is the ladder's order, and the rows read %q", saidIn(m))
+	}
+	if saidIn(click(m, level, frame.NamesRow)) != "bca" {
+		t.Fatalf("a flipped sort runs the ladder down, and the rows read %q", saidIn(click(m, level, frame.NamesRow)))
+	}
+}
+
+func TestTheNamesRowLightsTheSortedColumnAndTheFooterNamesIt(t *testing.T) {
+	t.Parallel()
+	m := threeLevels()
+	if logTab(m).SortSays() != "" {
+		t.Fatalf("no column sorts at the start, and the footer says %q", logTab(m).SortSays())
+	}
+	m = click(m, draw.GutterWide+StampWide+1, frame.NamesRow)
+	if logTab(m).SortSays() != "▲ level" {
+		t.Fatalf("the footer names the column and the direction, and says %q", logTab(m).SortSays())
+	}
+	if !strings.Contains(logTab(m).RenderNames(m.W), draw.Bar.Render(draw.Pad("level", LevelWide))) {
+		t.Fatalf("the sorted column lights up, and the names read %q", logTab(m).RenderNames(m.W))
+	}
+	m = click(m, draw.GutterWide+StampWide+1, frame.NamesRow)
+	if logTab(m).SortSays() != "▼ level" {
+		t.Fatalf("a flipped sort turns the arrow over, and the footer says %q", logTab(m).SortSays())
+	}
+}
+
+func TestAPressOnTheNamesRowHoldsTheSelectedRowThroughTheReorder(t *testing.T) {
+	t.Parallel()
+	m := threeLevels()
+	m = click(m, 10, frame.FirstRow())
+	held := logTab(m).All[logTab(m).Sel].Said
+	m = click(m, draw.GutterWide+StampWide+1+LevelWide+1+KindWide+1, frame.NamesRow)
+	if logTab(m).All[logTab(m).Sel].Said != held {
+		t.Fatalf("the cursor holds the row it stood on, and now stands on %q", logTab(m).All[logTab(m).Sel].Said)
 	}
 }

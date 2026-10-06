@@ -13,24 +13,11 @@ import (
 	"testing"
 	"time"
 
-	"quackitect/src/tui/draw"
 	"quackitect/src/tui/frame"
 	"quackitect/src/tui/registry"
 	"quackitect/src/tui/tree"
 	"quackitect/src/tui/work"
 )
-
-const indexRowsSaid = `[
-  {"name": "one-group", "path": "spec/tickets/one-group.md", "state": "open", "step": "children",
-   "route": "group", "group": "", "urgent": false, "todo": false, "standing": "held",
-   "says": "Two tickets that land as one."},
-  {"name": "a-child", "path": "spec/tickets/a-child.md", "state": "open", "step": "do",
-   "route": "trivial", "group": "one-group", "urgent": true, "todo": false, "standing": "held",
-   "says": "One piece of it."},
-  {"name": "a-loose-one", "path": "spec/tickets/a-loose-one.md", "state": "open", "step": "do",
-   "route": "trivial", "group": "", "urgent": false, "todo": true, "standing": "",
-   "says": "A ticket in no group."}
-]`
 
 // The rows work/rows answers for a case: a held group carrying one ticket, and a loose one, each at its place. [[spec/tickets/the-work-tab-reads-v1]]
 const workRowsSaid = `[
@@ -92,105 +79,6 @@ func writeAt(t *testing.T, root, rel, text string) {
 
 func logOf(root string) string {
 	return filepath.Join(root, ".se", ".log", "session.jsonl")
-}
-
-// [[spec/design_output/tui#the-work-tab]]
-func TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft(t *testing.T) {
-	t.Parallel()
-	items, err := work.ReadWorkItems(indexRowsSaid)
-	if err != nil {
-		t.Fatalf("the rows read, and answered %v", err)
-	}
-	if len(items) != 2 {
-		t.Fatalf("the rows name a group and a loose ticket, and read %d", len(items))
-	}
-	if items[0].Name != "one-group" || len(items[0].Kids) != 1 {
-		t.Fatalf("the group carries its one ticket, and read %d", len(items[0].Kids))
-	}
-	if items[0].Keys["held"] != "true" || items[0].Keys["standing"] != "held" {
-		t.Fatal("a held group carries the mark, and its standing")
-	}
-	if items[0].Kids[0].Keys["urgent"] != "true" {
-		t.Fatal("a marked ticket carries the mark")
-	}
-	if items[1].Name != "a-loose-one" || items[1].Keys["group"] != "" {
-		t.Fatal("a ticket naming no group stands at the left, with no mark")
-	}
-	if items[1].Keys["urgent"] != "false" || items[1].Keys["held"] != "false" {
-		t.Fatal("an unmarked ticket carries no mark")
-	}
-	orphan, _ := work.ReadWorkItems(strings.ReplaceAll(indexRowsSaid, `"group": "one-group"`, `"group": "nobody"`))
-	if len(orphan) != 3 {
-		t.Fatalf("a ticket naming a group the rows hold nowhere stands at the left, and %d rows do", len(orphan))
-	}
-}
-
-// [[spec/design_output/tui#the-work-tab]]
-func TestTheTabReadsTheBaseFileAndTheRowsOffTheCatalog(t *testing.T) {
-	t.Parallel()
-	tree := loadWork(t, workRowsSaid)
-	if tree.Len() != 3 {
-		t.Fatalf("the group, its ticket and the loose one stand, and %d rows do", tree.Len())
-	}
-	head := tree.Header(120)
-	for _, one := range []string{"name", "flags", "queue"} {
-		if !strings.Contains(head, one) {
-			t.Fatalf("the column %s stands in the names, and they read %q", one, head)
-		}
-	}
-	// The table draws the name, the flags and the queue alone: the nesting says the group, and the details draw the rest. [[spec/design_output/tui#the-work-tab]]
-	for _, gone := range []string{"says", "state", "kind", "standing", "step", "group"} {
-		if strings.Contains(head, gone) {
-			t.Fatalf("the column %s stands off the table, and the names read %q", gone, head)
-		}
-	}
-}
-
-// A ticket naming another row nests under it, at any depth, and one naming a row nobody holds stands at the left. [[spec/design_output/tree-view#the-name-column-nests]]
-func TestATicketNestsUnderTheRowItNamesAtAnyDepth(t *testing.T) {
-	t.Parallel()
-	items, err := work.ReadWorkItems(`[
-		{"name": "its-child", "route": "trivial", "state": "open", "group": "a-group", "says": "One piece."},
-		{"name": "a-group", "route": "group", "state": "open", "group": "", "says": "Two as one."},
-		{"name": "grandchild", "route": "trivial", "state": "open", "group": "its-child", "says": ""},
-		{"name": "alone", "route": "trivial", "state": "open", "group": "nobody", "says": ""}
-	]`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(items) != 2 || items[0].Name != "a-group" || items[1].Name != "alone" {
-		t.Fatalf("the group and the ticket naming no standing row stand at the left, and the roots read %v", items)
-	}
-	if items[0].Keys["kind"] != work.KindGroup || items[1].Keys["kind"] != work.KindTicket {
-		t.Fatalf("the kind reads off the route, and it reads %v", items)
-	}
-	if len(items[0].Kids) != 1 || items[0].Kids[0].Name != "its-child" {
-		t.Fatalf("the child nests under its group, and the kids read %v", items[0].Kids)
-	}
-	if len(items[0].Kids[0].Kids) != 1 || items[0].Kids[0].Kids[0].Name != "grandchild" {
-		t.Fatalf("a child's own child nests under it, and the kids read %v", items[0].Kids[0].Kids)
-	}
-}
-
-// [[spec/design_output/tree-view#the-filter-reads-an-item]]
-func TestTheFilterReadsATicketsKeysInTheLogsOwnLanguage(t *testing.T) {
-	t.Parallel()
-	tree := loadWork(t, workRowsSaid)
-	f, err := draw.ParseFilter("group:one-group")
-	if err != nil {
-		t.Fatalf("the filter reads, and answered %v", err)
-	}
-	tree.Narrow(f)
-	if !tree.Narrowed() {
-		t.Fatal("a filter standing says so")
-	}
-	if tree.Len() != 2 {
-		t.Fatalf("the group stands for its child, and %d rows do", tree.Len())
-	}
-	tree.Narrow(draw.Filter{})
-	if tree.Len() != 3 {
-		t.Fatalf("an empty filter keeps every row, and %d stand", tree.Len())
-	}
 }
 
 // [[spec/design_output/tui#the-work-tab]]
