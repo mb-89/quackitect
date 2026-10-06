@@ -1,0 +1,7 @@
+# The root: the command line reaches the box through these files alone, and
+# every verb takes its reach off the hands they build.
+# [[spec/tickets/quack-reaches-the-box-through-doors]]
+quack:
+  go: [os, os/exec, net, net/http, syscall]
+  files: [main.go, io.go, boxdoors.go, boxfiles.go, checkdoors.go, ticket_doors.go, writedoor.go]
+  report: true
