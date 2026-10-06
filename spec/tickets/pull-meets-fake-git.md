@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -206,6 +206,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 2a9cbd9af8126d503dfa4524606474778be2b6a5
+    hash_after: 2a9cbd9af8126d503dfa4524606474778be2b6a5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes
+      - name: check
+        exit: 0
+        said: "  115.3  in all"
+    inputs:
+      - name: design/tests-red
+        hash: e9b3cce58a3a8d57
+        size: 1098
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -510,26 +533,33 @@ the git operations stand once, in src/modules/git/repo.go, and the doors chapter
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/shell_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The pull reaches git through the typed Repo door in src/modules/git and the shell through ShellOver on the process door. Its cases run on FakeRepo and a FakeRunner, so src/pull spawns no git and its tests finish in a fraction of a second. FakeRepo behaves: commits by content hash, refs, an index, an origin, rebase and push, and one contract suite holds it to real git. The doors chapter drops the pull row and names the new door and its operations.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the draft size names, plus the local tree in src/modules/git/tree_test.go and the person-run case folded into TestVerbRegistry
+every door the change reaches has a fake: FakeRepo, FakeRunner, FakeDisk and TreeDisk
+each new file opens with a header naming the git door section of spec/design_output/doors.md
+the git operations stand once, in src/modules/git/repo.go
 
 # accept
 
