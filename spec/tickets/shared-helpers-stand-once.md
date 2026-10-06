@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,12 @@ record:
         hash: 1ce3808a628ac46a
         size: 755
     def: dc4904ab364efa10
+  - step: design/tests-red
+    hand: the engine
+    stale: design/draft
+  - step: gate
+    hand: the engine
+    stale: design/draft, design/tests-red
 ---
 
 # Ask
