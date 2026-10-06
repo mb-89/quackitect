@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 3a96bb98609b7a6438067a336655ba3d4bb45fdc
+    hash_after: 3a96bb98609b7a6438067a336655ba3d4bb45fdc
+    inputs:
+      - name: ask
+        hash: 4db3bc82c38588d5
+        size: 401
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,53 @@ A timer in a test passes or fails on the box's speed, and a slow runner turns th
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The index door gains ready(): it runs se-index standing with no timeout, which returns once the door over the root stands, and answers whether it stands and why not. The fake index answers ready the way it answers warm. test/contract/runme-road.test.js waits on index(...).ready() in a before hook, and runs both RUNME.sh calls with no timeout, so RUN_TIMEOUT_MS leaves the file. A hung road then hangs the case, which the test runner names, in place of a timer guessing how slow the box is.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- test/contract/runme-road.test.js both cases
+- src/doors/index.js index, read by src/scripts/cli-doors.js and every caller of it.index
+- src/doors/fake/index.js fakeIndex, read by every case faking the index
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- test/contract/runme-road.test.js the file names no timer, and waits on the index's ready event
+- test/contract/index.test.js ready answers once the door stands, and a box with no binary says why
+- test/level0/fakes.test.js or the behaves check holds the fake index to the door's calls
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/doors/index.js
+- src/doors/fake/index.js
+- test/contract/runme-road.test.js
+- test/contract/index.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- runme-road.test.js, src/doors/index.js warm and at, src/doors/fake/index.js, src/index/main.go V1 and the standing call stand opened
+- grep finds the index door built in cli-doors.js and its fake in the cases faking it, and ready is new, so nothing calls it yet
+- the done_when line on runme-road meets the case reading the file and the ready wait, and the check line its own command
 
 ## tests-red
 
