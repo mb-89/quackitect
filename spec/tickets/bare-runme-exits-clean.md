@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 92ffdec01fbd47ecfc40678b9be9b257514e22e6
+    hash_after: 92ffdec01fbd47ecfc40678b9be9b257514e22e6
+    inputs:
+      - name: ask
+        hash: eea6d816b58614e1
+        size: 323
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -152,38 +161,52 @@ Every box that runs it bare meets an exit of 1 and a note to install an editor n
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`RUNME.sh` runs the install, then reads a bare call. On a cloud box, where `CLAUDE_CODE_REMOTE` or `SE_CLOUD` stands set, the bare call becomes `help`. The script runs `set -- help` and falls through to the verb road, so the binary prints the usage and exits 0. A desk keeps its road: the panel flag, then `code`, or the note and exit 1.
+
+A new Go test runs the real script once by `sh`, in a temporary root. That root holds a copy of `RUNME.sh`, a no-op `src/scripts/install.sh`, and a fake `.se/.runtime/bin/se-index` printing its words. The PATH holds `dirname` and `mkdir` alone, so `code` stands nowhere. The cloud case reads exit 0 and the words `verb <root>/src/scripts help`. The desk case reads exit 1 and the note.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+RUNME.sh the bare branch, which a person runs
+src/quack/doctor_verb.go toolRow and its siblings, whose hint names a bare ./RUNME.sh
+src/quack/lspprobe.go lspProbe, whose hint names a bare ./RUNME.sh
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/runme_test.go TestABareRunmeOnACloudBoxPrintsTheVerbs
+src/quack/runme_test.go TestABareRunmeOnADeskWithNoEditorNamesIt
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+RUNME.sh
+src/quack/runme_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+RUNME.sh, usageDoor in src/quack/verbs.go, cloudVariables in src/quack/command.go and runShim in src/vehicle/shim_contract_test.go stand opened, and `./RUNME.sh help` exits 0 here.
+A grep for a bare RUNME.sh over src, the workflows and the hooks finds a person and the doctor's hints alone.
+The done_when line on `./RUNME.sh test` meets TestABareRunmeOnACloudBoxPrintsTheVerbs, and the check line meets the check at tests-green.
 
 ## tests-red
 
