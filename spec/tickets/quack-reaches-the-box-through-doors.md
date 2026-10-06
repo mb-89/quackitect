@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "  110.8  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 46978ab3d20a35b8e365ffed44ba4d505b036475
+    hash_after: 46978ab3d20a35b8e365ffed44ba4d505b036475
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/owns passes
+      - name: check
+        exit: 0
+        said: "  105.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 59f0b483526f19bf
+        size: 698
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -340,26 +363,33 @@ the door files stand once in src/quack/owns.yaml, and each shared real reach sta
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/owns/quack_tree_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every file of src/quack past the root door files now reaches the box through the hands. src/quack/owns.yaml names the door files: main.go, io.go, boxdoors.go, boxfiles.go, checkdoors.go, ticket_doors.go and writedoor.go. The box hand gained a disk member, an environ member and run options, each with a fake, and the disk and the box keep contract suites over fake and real. The move landed in three green commits: the retro verbs, the verb files, then the rest. No marker was added.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/quack alone
+every member the hands gain has a fake
+each door file points at the ticket
+the door files stand once in src/quack/owns.yaml
 
 # accept
 
