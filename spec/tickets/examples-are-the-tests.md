@@ -104,7 +104,11 @@ record:
         hash: ec95a41be42e2146
         size: 430
     def: cb8f90bc86fc7d39
-step: children
+  - step: children
+    hand: the engine
+    hash_before: 250bffc26cdadd320113a296a41b23b147d374ec
+    hash_after: 250bffc26cdadd320113a296a41b23b147d374ec
+step: accept
 ---
 
 # Ask
