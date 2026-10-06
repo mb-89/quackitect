@@ -46,7 +46,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	self, _ := os.Executable()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
-	d := checkDoors{root: root, now: time.Now, windows: runtime.GOOS == "windows", red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
+	d := checkDoors{root: root, now: time.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
 	d.run = func(argv, env []string, quiet bool) (int, string, error) {
 		child := exec.Command(toolOf(survey, argv[0]), argv[1:]...)
 		child.Dir, child.Env = root, append(os.Environ(), env...)

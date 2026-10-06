@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: f2b473ba57ff3686
         size: 326
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: c7e91ca468d252f900122b16ec7f3a945126b549
+    hash_after: c7e91ca468d252f900122b16ec7f3a945126b549
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: b9bab6ddb10cb2bd
+        size: 1203
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -212,26 +225,31 @@ level0Runs names the platform in every line it prints, as runtime.GOOS reads thr
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both cases fail on their assertion: the green run prints nothing, and the Windows box names neither its platform nor the trial. checkDoors carried a windows flag, so the platform name rides in as a string now, and the fake reads linux on every runner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when go test line meets a case failing on its assertion, and the check line stays with tests-green
+- the platform rides through the check's doors, and the fake names linux, so a Windows runner reads the fake and no box
 
 # gate
 

@@ -68,7 +68,7 @@ type checkDoors struct {
 	run       func(argv, env []string, quiet bool) (int, string, error)
 	get       func(url string) ([]byte, error)
 	now       func() time.Time
-	windows   bool
+	platform  string
 	red       []string
 	config    func(key string) float64
 	git       func(args ...string) string
@@ -249,9 +249,12 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 	}
 }
 
+// The trial that runs the live client on the owner's Windows desk, which no box reaches. [[spec/tickets/level0-claims-name-the-platform]]
+const deskTrial = "spec/tickets/desk-probe-reply-trial"
+
 // Level zero runs on a fresh box, or the check is red. The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
 func level0Runs(d checkDoors, quiet bool) int {
-	if d.windows {
+	if d.platform == "windows" {
 		fmt.Fprintln(d.out, "The start road stands a cloud box alone, so this Windows box runs no dry session.")
 		return 0
 	}
