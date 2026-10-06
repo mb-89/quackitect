@@ -21,6 +21,8 @@ const ANSWER = "The handover stands, and the clear ends this turn.";
 const GROUP = "dry-probe-clears";
 // The leaf the probe's group carries across the clear, and the words each pull past the clear answers. [[spec/tickets/the-clear-hands-back-the-leaf]]
 const LEAF = "dry-probe-leaf";
+// The line a tagged ticket's front matter carries. [[spec/tickets/probe-clone-drops-free-tags]]
+const TAGGED = /^todo: true$/m;
 const LEAF_TEXT = `---
 kind: [[ticket]]
 state: open
@@ -118,10 +120,16 @@ export function grouped(it, tree, env) {
     { cwd: tree, env: inClone(tree, env), timeoutMs: PULL_WAIT },
   );
   it.disk.write(it.join(tree, "spec", "tickets", `${LEAF}.md`), LEAF_TEXT);
+  untagged(it, it.join(tree, "spec", "tickets"));
   const branched = it.proc.run(["git", "checkout", "-q", "-B", `work/${GROUP}`], {
     cwd: tree,
     timeoutMs: PULL_WAIT,
   });
+  // The untag lands as a commit on the probe's branch, so the handover meets no tracked change the box alone holds. [[spec/tickets/probe-clone-drops-free-tags]]
+  it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-a", "--allow-empty", "-m", "dry probe: no ticket of the tree stands tagged"],
+    { cwd: tree, timeoutMs: PULL_WAIT },
+  );
   // A box's work branch stands on origin, so the handover finds no commit the box alone holds. [[spec/tickets/the-clear-carries-no-local-work]]
   const pushed = it.proc.run(["git", "update-ref", `refs/remotes/origin/work/${GROUP}`, "HEAD"], {
     cwd: tree,
@@ -129,6 +137,16 @@ export function grouped(it, tree, env) {
   });
   const fell = [minted, branched, pushed].find((one) => one.exitCode !== 0);
   return fell ? { words: `mint ${GROUP}`, exit: fell.exitCode, said: `${fell.stdout}${fell.stderr}` } : null;
+}
+
+// A tagged ticket stands first in every pull, so the clone stands for a fresh box only once no ticket of the tree carries the tag. [[spec/tickets/probe-clone-drops-free-tags]]
+function untagged(it, folder) {
+  for (const one of it.disk.list(folder)) {
+    if (one.kind !== "file" || one.name === `${LEAF}.md`) continue;
+    const at = it.join(folder, one.name);
+    const text = String(it.disk.read(at));
+    if (TAGGED.test(text)) it.disk.write(at, text.replace(TAGGED, "todo: false"));
+  }
 }
 
 function keyed(it, tree) {

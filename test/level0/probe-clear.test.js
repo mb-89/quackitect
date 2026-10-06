@@ -94,6 +94,20 @@ test("the probe mints its group, stands on its work branch, and points origin's 
   assert.ok(lines.some((one) => /^git update-ref refs\/remotes\/origin\/work\/\S+ HEAD$/.test(one)), lines.join("\n"));
 });
 
+// A tagged ticket stands first in every pull, so a point the tree holds open would reach the probe ahead of its leaf. [[spec/tickets/probe-clone-drops-free-tags]]
+test("the probe's clone leaves no ticket tagged but its own leaf", () => {
+  const proc = fakeProc({ "/t/RUNME.sh": { exitCode: 0 }, git: { exitCode: 0 } });
+  const disk = fakeDisk();
+  disk.makeDir("/t/spec/tickets");
+  disk.write("/t/spec/tickets/a-point.md", "---\nstate: open\ntodo: true\n---\n\n# Ask\n");
+  disk.write("/t/spec/tickets/a-plain-one.md", "---\nstate: open\n---\n\n# Ask\n");
+  const it = { proc, disk, join: (...parts) => parts.join("/") };
+
+  grouped(it, "/t", {});
+  assert.match(String(disk.read("/t/spec/tickets/a-point.md")), /^todo: false$/m);
+  assert.equal(String(disk.read("/t/spec/tickets/a-plain-one.md")), "---\nstate: open\n---\n\n# Ask\n");
+});
+
 // A verb reads QUACKITECT_ROOT before its folder, so a probe under the index still writes in its clone. [[spec/tickets/the-clear-carries-no-local-work]]
 test("the probe's mint names the clone as its root, whatever root the parent carries", () => {
   const proc = fakeProc({ "/t/RUNME.sh": { exitCode: 0 }, git: { exitCode: 0 } });
