@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -96,6 +95,12 @@ func copilotDetected(d boxDoors) bool {
 	return false
 }
 
+// The modes a made folder and a written registration take. [[spec/design_output/copilot#setup-and-discovery]]
+const (
+	copilotFolderMode = 0o755
+	copilotFileMode   = 0o644
+)
+
 // Writes the registrations a target asks, auto where Copilot runs here, and answers the files it writes. A file lacking the mark refuses the whole write. [[spec/design_output/copilot#setup-and-discovery]]
 func copilotSetup(d boxDoors, target string) ([]string, error) {
 	if !slices.Contains([]string{"auto", "vscode", "cloud"}, target) {
@@ -106,7 +111,8 @@ func copilotSetup(d boxDoors, target string) ([]string, error) {
 	}
 	var pending []copilotFile
 	for _, one := range copilotRegistrations() {
-		if previous, ok := readText(filepath.Join(d.root, filepath.FromSlash(one.name))); ok {
+		if body, err := d.disk.read(filepath.Join(d.root, filepath.FromSlash(one.name))); err == nil {
+			previous := string(body)
 			if previous == one.content {
 				continue
 			}
@@ -119,20 +125,20 @@ func copilotSetup(d boxDoors, target string) ([]string, error) {
 	var written []string
 	for _, one := range pending {
 		at := filepath.Join(d.root, filepath.FromSlash(one.name))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := d.disk.makeAll(filepath.Dir(at), copilotFolderMode); err != nil {
 			return written, err
 		}
-		if err := os.WriteFile(at, []byte(one.content), 0o644); err != nil {
+		if err := d.disk.write(at, []byte(one.content), copilotFileMode); err != nil {
 			return written, err
 		}
 		written = append(written, one.name)
 	}
 	if target == "cloud" {
 		at := filepath.Join(d.root, filepath.FromSlash(copilotCloudMark))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		if err := d.disk.makeAll(filepath.Dir(at), copilotFolderMode); err != nil {
 			return written, err
 		}
-		if err := os.WriteFile(at, []byte("cloud\n"), 0o644); err != nil {
+		if err := d.disk.write(at, []byte("cloud\n"), copilotFileMode); err != nil {
 			return written, err
 		}
 	}

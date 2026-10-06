@@ -100,7 +100,7 @@ func doublerRuns(t *testing.T) (*index.Peer, chan map[string]json.RawMessage) {
 		t.Fatal(err)
 	}
 	t.Cleanup(done)
-	stop, err := runsModule(bus.URL(), bus.Token(), moduleSide, []string{"doubler"})
+	stop, err := runsModule(bus.URL(), bus.Token(), moduleSide, []string{"doubler"}, os.Stderr)
 	if err != nil {
 		t.Fatal(err)
 	}

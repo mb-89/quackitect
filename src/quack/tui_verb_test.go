@@ -81,6 +81,7 @@ func (box *tuiBox) doors() tuiDoors {
 		root:    box.root,
 		windows: box.windows,
 		goTool:  "go",
+		disk:    realDisk(),
 		run: func(argv []string, cwd string) (int, string, error) {
 			box.builds = append(box.builds, argv)
 			box.cwds = append(box.cwds, cwd)
@@ -268,7 +269,7 @@ func TestTuiBuildsTheViewerAtTheRootAndStampsItsSource(t *testing.T) {
 	if !regexp.MustCompile(`^[0-9a-f]{16}\n$`).MatchString(stamp) {
 		t.Errorf("stamp %q", stamp)
 	}
-	if stamp != index.HashText(tuiSourceText(box.root))+"\n" {
+	if stamp != index.HashText(tuiSourceText(realDisk(), box.root))+"\n" {
 		t.Errorf("stamp %q answers no hash of the source", stamp)
 	}
 }
@@ -421,7 +422,7 @@ func TestTuiSourceTextJoinsPathsAndTexts(t *testing.T) {
 		r + "/src/yaml/yaml.go", "package yaml",
 		r + "/go.mod", "module quackitect",
 	}, "\x1f")
-	if said := tuiSourceText(r); said != want {
+	if said := tuiSourceText(realDisk(), r); said != want {
 		t.Errorf("text %q\nwant %q", said, want)
 	}
 }

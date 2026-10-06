@@ -5,7 +5,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -41,7 +40,7 @@ func doctorVerb(d boxDoors, _ []string) int {
 		[2]string{"sidebar", sidebarSays(d)},
 		[2]string{"browser", browserSays(d)},
 		[2]string{"commit hook", hooksSay(d)},
-		[2]string{"vale rules", valeRules(d.root)},
+		[2]string{"vale rules", valeRules(d.disk, d.root)},
 		[2]string{"survey", surveyRow(d.root)},
 		[2]string{"server", serverLine(d)},
 	)
@@ -102,14 +101,14 @@ func sidebarSays(d boxDoors) string {
 	id := said.Publisher + "." + said.Name
 	dest := filepath.Join(folder, id+"-"+said.Version)
 	switch {
-	case editorLinkedAt(dest, filepath.Dir(manifest)):
-		if editorRegistered(folder, id) {
+	case editorLinkedAt(d.disk, dest, filepath.Dir(manifest)):
+		if editorRegistered(d.disk, folder, id) {
 			return "linked, and the list names " + id
 		}
 		return "linked, and the list misses " + id + ": run ./RUNME.sh"
-	case isLink(dest) && !stands(dest):
+	case isLink(d.disk, dest) && !stands(dest):
 		return "a link pointing nowhere: run ./RUNME.sh"
-	case isLink(dest):
+	case isLink(d.disk, dest):
 		return "a link into another tree: run ./RUNME.sh"
 	case stands(dest):
 		return "a copy in place of the link: run ./RUNME.sh"
@@ -119,7 +118,7 @@ func sidebarSays(d boxDoors) string {
 
 // The browser the drawing's test drives, with the rung that found it. [[spec/design_input/the-editor-draws-the-ticket#install-resolves-a-browser]]
 func browserSays(d boxDoors) string {
-	path, from := browserFrom(d.env, d.goos == "darwin")
+	path, from := browserFrom(d.disk, d.env, d.goos == "darwin")
 	if path == "" {
 		return "missing, run ./RUNME.sh"
 	}
@@ -147,18 +146,17 @@ func hooksSay(d boxDoors) string {
 }
 
 // How many rules each rule folder holds, or missing where the first stands nowhere. [[spec/tickets/box-verbs-port-to-go]]
-func valeRules(root string) string {
+func valeRules(disk diskDoors, root string) string {
 	counts := make([]int, len(ruleFolders))
 	for at, one := range ruleFolders {
 		folder := filepath.Join(root, "spec", "config", "styles", one)
-		if !stands(folder) {
+		if !disk.stands(folder) {
 			if at == 0 {
 				return "missing"
 			}
 			continue
 		}
-		listed, _ := os.ReadDir(folder)
-		for _, file := range listed {
+		for _, file := range disk.listed(folder) {
 			if file.Type().IsRegular() && strings.HasSuffix(file.Name(), ".yml") {
 				counts[at]++
 			}

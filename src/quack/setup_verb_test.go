@@ -17,7 +17,7 @@ const setupClient = "src/extension/node_modules/vscode-languageclient/package.js
 // The fake doors with the env a case names past the PATH, and every run read as one line. [[spec/tickets/install-drops-node]]
 func setupBox(t *testing.T, env map[string]string) (boxDoors, *fakeRunner, *strings.Builder, func() []string) {
 	t.Helper()
-	d, runner, out, _ := fakeBoxDoors(t)
+	d, runner, out, _ := boxDoorsOnDisk(t)
 	path := d.env("PATH")
 	d.env = func(key string) string {
 		if key == "PATH" {

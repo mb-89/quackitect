@@ -177,14 +177,14 @@ func sliceMode(root, key string) string {
 }
 
 // Appends one row to the session log under the root, stamped as the log writes its rows. [[spec/design_output/log#what-one-line-looks-like]]
-func appendsRow(root string, now func() time.Time) func(row map[string]any) error {
+func appendsRow(disk diskDoors, root string, now func() time.Time) func(row map[string]any) error {
 	return func(row map[string]any) error {
 		row["at"] = now().UTC().Format(logStamp)
 		line, err := json.Marshal(row)
 		if err != nil {
 			return err
 		}
-		return appendsLine(realDisk(), filepath.Join(root, filepath.FromSlash(sessionLog)), string(line))
+		return appendsLine(disk, filepath.Join(root, filepath.FromSlash(sessionLog)), string(line))
 	}
 }
 
@@ -199,7 +199,7 @@ func verbRoad(argv []string, out, errs io.Writer) int {
 		old:   usageDoor(argv, errs),
 		alone: func(argv []string) int { return routes(out, errs, reachV1, argv) },
 		twins: registry,
-		log:   appendsRow(root, time.Now),
+		log:   appendsRow(realDisk(), root, time.Now),
 		out:   out,
 		errs:  errs,
 	}, argv)

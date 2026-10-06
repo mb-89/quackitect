@@ -169,7 +169,7 @@ func TestQuackLspDialsThePortTheStandingFileNames(t *testing.T) {
 	}()
 	started := false
 	var out bytes.Buffer
-	if err := lsps(root, func() error { started = true; return nil }, strings.NewReader("{}"), &out); err != nil {
+	if err := lsps(realDisk(), dialLocal, root, func() error { started = true; return nil }, strings.NewReader("{}"), &out); err != nil {
 		t.Fatal(err)
 	}
 	if !started {

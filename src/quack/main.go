@@ -20,6 +20,7 @@ import (
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/holds"
 	"quackitect/src/modules/hooks"
+	"quackitect/src/modules/hooks/command"
 	manager "quackitect/src/modules/index"
 	"quackitect/src/modules/mcp"
 	"quackitect/src/modules/queue"
@@ -102,7 +103,7 @@ func main() {
 	// This binary is the index, so a verb that finds no door starts this one. [[spec/design_output/index#a-door-comes-back]]
 	index.Serving()
 	if len(os.Args) == 2 && os.Args[1] == "lsp" {
-		if err := lspVerb(); err != nil {
+		if err := lspVerb(os.Stdin, os.Stdout); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
@@ -118,7 +119,7 @@ func main() {
 	}
 	// [[spec/tickets/the-system-places-modules]]
 	if len(os.Args) > 2 && os.Args[1] == moduleVerb {
-		if err := moduleMain(os.Args[2:]); err != nil {
+		if err := moduleMain(realBoxDoors(os.Stdout, os.Stderr), os.Args[2:]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
@@ -135,21 +136,21 @@ func main() {
 		return
 	}
 	if len(os.Args) >= 2 && os.Args[1] == "schema" {
-		if err := schemas(".", len(os.Args) == schemaArgs && os.Args[2] == "--write"); err != nil {
+		if err := schemas(realBoxDoors(os.Stdout, os.Stderr), ".", len(os.Args) == schemaArgs && os.Args[2] == "--write"); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		return
 	}
 	if len(os.Args) == 2 && os.Args[1] == "guidance" {
-		if err := guidances("."); err != nil {
+		if err := guidances(realBoxDoors(os.Stdout, os.Stderr), "."); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		return
 	}
 	if len(os.Args) == 2 && os.Args[1] == "log" {
-		if err := logs("."); err != nil {
+		if err := logs(realBoxDoors(os.Stdout, os.Stderr), "."); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
@@ -327,6 +328,7 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 	if reads != nil {
 		asks = indexAsk(reads)
 	}
+	box := quietBox()
 	door := hooks.New(hooks.Outside{
 		Index:  asks,
 		Health: healthOf(store),
@@ -338,8 +340,11 @@ func listensHooks(root string, store *q.Store, hook hooked, served manager.Serve
 		Ops: func(caller string) []hooks.Op { return opsOf(served.Of(caller), time.Now()) },
 		// [[spec/tickets/copilot-meets-the-hooks-door]]
 		Shadow: hooks.ShadowTo(filepath.Join(root, filepath.FromSlash(sessionLog))),
-		Root:   root, Config: commandSettings, Git: gitRead, Voice: commitVoice, Drop: oldconfig.Drop, Prose: writeProse, Schema: writeSchema,
-		Review: reviewOver(root),
+		Root:   root, Drop: oldconfig.Drop, Prose: writeProse, Schema: writeSchema,
+		Config: func(root string) hooks.Settings { return commandSettings(box, root) },
+		Git:    func(root string, args ...string) string { return gitRead(box, root, args...) },
+		Voice:  func(root, message string) []command.Row { return commitVoice(box, root, message) },
+		Review: reviewOver(box, root),
 	})
 	return hooks.Listen(root, door)
 }

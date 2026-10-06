@@ -6,25 +6,30 @@ package main
 import (
 	"errors"
 	"io"
-	"os"
-	"os/exec"
-	"strings"
 	"time"
 
 	"quackitect/src/index"
 	"quackitect/src/voice"
 )
 
-// What the voice verb reaches past the disk: the root, Vale's path under it, a Vale run, and the clock. [[spec/design_output/doors#one-door-per-outside-thing]]
+// What the voice verb reaches: the root, Vale's path under it, a Vale run, the clock and the disk. [[spec/design_output/doors#one-door-per-outside-thing]]
 type voiceOutside struct {
 	root func() (string, error)
 	vale func(root string) string
 	run  func(argv []string, cwd string) (string, error)
 	now  func() time.Time
+	disk diskDoors
 }
 
 func init() {
-	register("voice", voiceVerb(voiceOutside{root: index.Root, vale: valeAt, run: voiceRunsVale, now: time.Now}))
+	disk := realDisk()
+	register("voice", voiceVerb(voiceOutside{
+		root: index.Root,
+		vale: func(root string) string { return valeAt(disk, root) },
+		run:  voiceRunsVale(realRun(io.Discard, io.Discard)),
+		now:  time.Now,
+		disk: disk,
+	}))
 }
 
 // The voice twin over the outside it binds, the root falling back to here as the road's does. [[spec/design_output/projection#the-second-target]]
@@ -40,15 +45,13 @@ func voiceVerb(outside voiceOutside) twin {
 
 // The voice doors over the real disk under the root. [[spec/design_output/doors#one-door-per-outside-thing]]
 func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
+	disk := outside.disk
 	return voice.Doors{
-		Root: root,
-		Bin:  outside.vale(root),
-		Exists: func(path string) bool {
-			_, err := os.Stat(path)
-			return err == nil
-		},
+		Root:   root,
+		Bin:    outside.vale(root),
+		Exists: disk.stands,
 		List: func(path string) ([]voice.Entry, error) {
-			found, err := os.ReadDir(path)
+			found, err := disk.list(path)
 			out := make([]voice.Entry, 0, len(found))
 			for _, one := range found {
 				out = append(out, voice.Entry{Name: one.Name(), Dir: one.IsDir()})
@@ -56,24 +59,29 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 			return out, err
 		},
 		Read: func(path string) (string, error) {
-			text, err := os.ReadFile(path)
+			text, err := disk.read(path)
 			return string(text), err
 		},
-		Write:   func(path, text string) error { return os.WriteFile(path, []byte(text), 0o644) },
-		MakeDir: func(path string) error { return os.MkdirAll(path, 0o755) },
+		Write:   func(path, text string) error { return disk.write(path, []byte(text), voiceFileMode) },
+		MakeDir: func(path string) error { return disk.makeAll(path, voiceFolderMode) },
 		Vale:    outside.run,
 		Now:     outside.now,
 	}
 }
 
+// The modes a written file and a made folder take. [[spec/design_output/projection#the-second-target]]
+const (
+	voiceFileMode   = 0o644
+	voiceFolderMode = 0o755
+)
+
 // Runs Vale in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start answers its fault. [[spec/design_output/projection#the-second-target]]
-func voiceRunsVale(argv []string, cwd string) (string, error) {
-	run := exec.Command(argv[0], argv[1:]...)
-	run.Dir, run.Stdin = cwd, strings.NewReader("")
-	said, err := run.Output()
-	var exit *exec.ExitError
-	if err != nil && !errors.As(err, &exit) {
-		return "", err
+func voiceRunsVale(run func(argv []string, o runOpts) ranResult) func(argv []string, cwd string) (string, error) {
+	return func(argv []string, cwd string) (string, error) {
+		ran := run(argv, runOpts{cwd: cwd})
+		if ran.fault != "" {
+			return "", errors.New(ran.fault)
+		}
+		return ran.stdout, nil
 	}
-	return string(said), nil
 }

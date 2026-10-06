@@ -43,13 +43,13 @@ func TestACopyStandingWhereTheLinkBelongsGoesAndTheLinkTakesItsPlace(t *testing.
 	t.Parallel()
 	source, _, dest := editorBox(t)
 	seedTree(t, dest, map[string]string{"stale.js": "old"})
-	if editorLinkedAt(dest, source) {
+	if editorLinkedAt(realDisk(), dest, source) {
 		t.Fatal("a copy reads as the link")
 	}
-	if linked, why := editorLinkAt(dest, source, symlinkHere); !linked || why != "the link went in" {
+	if linked, why := editorLinkAt(realDisk(), dest, source, symlinkHere); !linked || why != "the link went in" {
 		t.Errorf("the link answers %v, %s", linked, why)
 	}
-	if !editorLinkedAt(dest, source) || stands(filepath.Join(source, "stale.js")) {
+	if !editorLinkedAt(realDisk(), dest, source) || stands(filepath.Join(source, "stale.js")) {
 		t.Error("the link stands not, or the copy reached the source")
 	}
 }
@@ -60,7 +60,7 @@ func TestALinkStandingAlreadyStays(t *testing.T) {
 	if err := os.Symlink(source, dest); err != nil {
 		t.Fatal(err)
 	}
-	if linked, why := editorLinkAt(dest, source, func(string, string) error { t.Error("a second link goes in"); return nil }); !linked || why != "the link stands already" {
+	if linked, why := editorLinkAt(realDisk(), dest, source, func(string, string) error { t.Error("a second link goes in"); return nil }); !linked || why != "the link stands already" {
 		t.Errorf("the link answers %v, %s", linked, why)
 	}
 }
@@ -73,13 +73,13 @@ func TestALinkPointingAtAnotherTreeGoesAndThisTreesLinkGoesIn(t *testing.T) {
 	if err := os.Symlink(other, dest); err != nil {
 		t.Fatal(err)
 	}
-	if editorLinkedAt(dest, source) {
+	if editorLinkedAt(realDisk(), dest, source) {
 		t.Fatal("another tree's link reads as ours")
 	}
-	if linked, why := editorLinkAt(dest, source, symlinkHere); !linked || why != "the link went in" {
+	if linked, why := editorLinkAt(realDisk(), dest, source, symlinkHere); !linked || why != "the link went in" {
 		t.Errorf("the link answers %v, %s", linked, why)
 	}
-	if !editorLinkedAt(dest, source) || !stands(filepath.Join(other, "package.json")) {
+	if !editorLinkedAt(realDisk(), dest, source) || !stands(filepath.Join(other, "package.json")) {
 		t.Error("the link stands not, or the other tree lost a file")
 	}
 }
@@ -90,13 +90,13 @@ func TestALinkPointingNowhereReadsAsNoLinkAndThisTreesLinkTakesItsPlace(t *testi
 	if err := os.Symlink(filepath.Join(t.TempDir(), "gone"), dest); err != nil {
 		t.Fatal(err)
 	}
-	if !isLink(dest) || stands(dest) || editorLinkedAt(dest, source) {
+	if !isLink(realDisk(), dest) || stands(dest) || editorLinkedAt(realDisk(), dest, source) {
 		t.Fatal("a link pointing nowhere reads as standing")
 	}
-	if linked, why := editorLinkAt(dest, source, symlinkHere); !linked || why != "a link pointing nowhere went, and the link went in" {
+	if linked, why := editorLinkAt(realDisk(), dest, source, symlinkHere); !linked || why != "a link pointing nowhere went, and the link went in" {
 		t.Errorf("the link answers %v, %s", linked, why)
 	}
-	if !editorLinkedAt(dest, source) {
+	if !editorLinkedAt(realDisk(), dest, source) {
 		t.Error("the link stands not")
 	}
 }
@@ -105,7 +105,7 @@ func TestADestinationOutsideTheEditorsFolderIsRefusedAndNothingIsRemoved(t *test
 	t.Parallel()
 	notes := t.TempDir()
 	seedTree(t, notes, map[string]string{"keep.md": "mine"})
-	if linked, _ := editorLinkAt(notes, "/tree/src/extension", symlinkHere); linked {
+	if linked, _ := editorLinkAt(realDisk(), notes, "/tree/src/extension", symlinkHere); linked {
 		t.Error("a destination outside the editor's folder links")
 	}
 	if text, _ := readText(filepath.Join(notes, "keep.md")); text != "mine" {
@@ -117,13 +117,13 @@ func TestTheListNamesTheIdOrTheExtensionStandsUnregistered(t *testing.T) {
 	t.Parallel()
 	_, folder, _ := editorBox(t)
 	seedTree(t, folder, map[string]string{editorList: `[{"identifier":{"id":"a.b"},"version":"1.0.0"}]`})
-	if editorRegistered(folder, editorTestID) {
+	if editorRegistered(realDisk(), folder, editorTestID) {
 		t.Fatal("a list lacking the id registers it")
 	}
-	if wrote, why := editorRegister(folder, mineAt(folder)); !wrote || why != "the entry went in" {
+	if wrote, why := editorRegister(realDisk(), folder, mineAt(folder)); !wrote || why != "the entry went in" {
 		t.Errorf("the register answers %v, %s", wrote, why)
 	}
-	if !editorRegistered(folder, editorTestID) {
+	if !editorRegistered(realDisk(), folder, editorTestID) {
 		t.Error("the id stands unregistered")
 	}
 }
@@ -148,7 +148,7 @@ func TestAListThatReadsAsNoJSONLeavesTheFileAlone(t *testing.T) {
 	t.Parallel()
 	_, folder, _ := editorBox(t)
 	seedTree(t, folder, map[string]string{editorList: "not json at all"})
-	if wrote, why := editorRegister(folder, mineAt(folder)); wrote || why != "the list reads as no JSON at all, so it stands as it is" {
+	if wrote, why := editorRegister(realDisk(), folder, mineAt(folder)); wrote || why != "the list reads as no JSON at all, so it stands as it is" {
 		t.Errorf("the register answers %v, %s", wrote, why)
 	}
 	if text, _ := readText(filepath.Join(folder, editorList)); text != "not json at all" {
@@ -161,7 +161,7 @@ func TestEveryKeyTheEditorOwnsIsCarriedVerbatim(t *testing.T) {
 	_, folder, _ := editorBox(t)
 	was := `{"identifier":{"id":"a.b","uuid":"u"},"version":"1","odd":{"deep":true}}`
 	seedTree(t, folder, map[string]string{editorList: "[" + was + "]"})
-	editorRegister(folder, mineAt(folder))
+	editorRegister(realDisk(), folder, mineAt(folder))
 	text, _ := readText(filepath.Join(folder, editorList))
 	if len(text) < len(was)+1 || text[1:len(was)+1] != was {
 		t.Errorf("the list reads\n%s", text)
@@ -171,7 +171,7 @@ func TestEveryKeyTheEditorOwnsIsCarriedVerbatim(t *testing.T) {
 func TestTheFileItWritesIsAlwaysAnArrayEvenHoldingOneEntry(t *testing.T) {
 	t.Parallel()
 	_, folder, _ := editorBox(t)
-	editorRegister(folder, mineAt(folder))
+	editorRegister(realDisk(), folder, mineAt(folder))
 	if said := listOf(t, folder); len(said) != 1 {
 		t.Errorf("the list holds %d entries", len(said))
 	}
@@ -181,7 +181,7 @@ func TestOursStandsOnceWhereTheListAlreadyNamesIt(t *testing.T) {
 	t.Parallel()
 	_, folder, _ := editorBox(t)
 	seedTree(t, folder, map[string]string{editorList: `[{"identifier":{"id":"a.b"}},{"identifier":{"id":"` + editorTestID + `"},"version":"0.0.1"}]`})
-	if wrote, why := editorRegister(folder, mineAt(folder)); !wrote || why != "the entry stood already, and it stands again" {
+	if wrote, why := editorRegister(realDisk(), folder, mineAt(folder)); !wrote || why != "the entry stood already, and it stands again" {
 		t.Errorf("the register answers %v, %s", wrote, why)
 	}
 	count := 0
@@ -214,7 +214,7 @@ func TestTheListItReplacesStandsBesideIt(t *testing.T) {
 	_, folder, _ := editorBox(t)
 	was := `[{"identifier":{"id":"a.b"}}]`
 	seedTree(t, folder, map[string]string{editorList: was})
-	editorRegister(folder, mineAt(folder))
+	editorRegister(realDisk(), folder, mineAt(folder))
 	if kept, _ := readText(filepath.Join(folder, editorKept)); kept != was {
 		t.Errorf("the kept list reads %q", kept)
 	}
@@ -241,6 +241,8 @@ func TestTheEntryNamesTheFolderTheEditorReadsItThrough(t *testing.T) {
 func TestTheLinkVerbLinksAndListsTheTreesSidebar(t *testing.T) {
 	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
+	// The link stands on the box, where the editor resolves it. [[spec/design_output/extension#the-link-stands]]
+	d.disk = realDisk()
 	home := t.TempDir()
 	seedTree(t, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})
 	seedTree(t, home, map[string]string{".vscode/extensions/.keep": ""})

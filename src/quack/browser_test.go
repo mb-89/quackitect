@@ -34,7 +34,7 @@ func TestTheVariableNamingAFileWinsOverEveryOtherRung(t *testing.T) {
 	root, env := browserBox(t,
 		[]string{"x/chrome", "pw/chromium-1/chrome-linux/chrome", "bin/chromium", "home/.cache/ms-playwright/chromium-7/chrome-linux/chrome"},
 		map[string]string{"PLAYWRIGHT_CHROMIUM": "x/chrome", "PLAYWRIGHT_BROWSERS_PATH": "pw", "PATH": "bin", "HOME": "home"})
-	if path, from := browserFrom(env, false); path != filepath.Join(root, "x", "chrome") || from != "PLAYWRIGHT_CHROMIUM" {
+	if path, from := browserFrom(realDisk(), env, false); path != filepath.Join(root, "x", "chrome") || from != "PLAYWRIGHT_CHROMIUM" {
 		t.Errorf("the order answers %s off %s", path, from)
 	}
 }
@@ -44,7 +44,7 @@ func TestAVariableNamingNoFileFallsToTheBrowsersFolderNewestBuildFirst(t *testin
 	root, env := browserBox(t,
 		[]string{"pw/chromium-9/chrome-linux/chrome", "pw/chromium-12/chrome-linux/chrome", "pw/chromium_headless_shell-12/chrome-linux/headless_shell"},
 		map[string]string{"PLAYWRIGHT_CHROMIUM": "gone", "PLAYWRIGHT_BROWSERS_PATH": "pw"})
-	if path, from := browserFrom(env, false); path != filepath.Join(root, "pw", "chromium-12", "chrome-linux", "chrome") || from != "PLAYWRIGHT_BROWSERS_PATH" {
+	if path, from := browserFrom(realDisk(), env, false); path != filepath.Join(root, "pw", "chromium-12", "chrome-linux", "chrome") || from != "PLAYWRIGHT_BROWSERS_PATH" {
 		t.Errorf("the order answers %s off %s", path, from)
 	}
 }
@@ -64,7 +64,7 @@ func TestThePathAnswersInTheOrderTheCallsNameBeforeTheDownloadsFolder(t *testing
 		}
 		return env(key)
 	}
-	if at, from := browserFrom(withPath, false); at != filepath.Join(root, "a", "chromium-browser") || from != "PATH" {
+	if at, from := browserFrom(realDisk(), withPath, false); at != filepath.Join(root, "a", "chromium-browser") || from != "PATH" {
 		t.Errorf("the order answers %s off %s", at, from)
 	}
 }
@@ -72,7 +72,7 @@ func TestThePathAnswersInTheOrderTheCallsNameBeforeTheDownloadsFolder(t *testing
 func TestAWindowsPathSplitsOnSemicolonsAndTriesTheExeEnding(t *testing.T) {
 	t.Parallel()
 	root, env := browserBox(t, []string{"w/chrome.exe"}, map[string]string{"Path": "w", "PATHEXT": ".EXE"})
-	if at, from := browserFrom(env, false); at != filepath.Join(root, "w", "chrome.exe") || from != "PATH" {
+	if at, from := browserFrom(realDisk(), env, false); at != filepath.Join(root, "w", "chrome.exe") || from != "PATH" {
 		t.Errorf("the order answers %s off %s", at, from)
 	}
 }
@@ -80,11 +80,11 @@ func TestAWindowsPathSplitsOnSemicolonsAndTriesTheExeEnding(t *testing.T) {
 func TestTheFolderTheDownloadWritesAnswersLast(t *testing.T) {
 	t.Parallel()
 	root, env := browserBox(t, []string{"home/.cache/ms-playwright/chromium-7/chrome-linux/chrome"}, map[string]string{"PATH": "a", "HOME": "home"})
-	if at, from := browserFrom(env, false); at != filepath.Join(root, "home", ".cache", "ms-playwright", "chromium-7", "chrome-linux", "chrome") || from != "playwright install" {
+	if at, from := browserFrom(realDisk(), env, false); at != filepath.Join(root, "home", ".cache", "ms-playwright", "chromium-7", "chrome-linux", "chrome") || from != "playwright install" {
 		t.Errorf("the order answers %s off %s", at, from)
 	}
 	root, env = browserBox(t, []string{"home/Library/Caches/ms-playwright/chromium-3/chrome-mac/Chromium.app/Contents/MacOS/Chromium"}, map[string]string{"HOME": "home"})
-	if at, _ := browserFrom(env, true); at != filepath.Join(root, "home", "Library", "Caches", "ms-playwright", "chromium-3", "chrome-mac", "Chromium.app", "Contents", "MacOS", "Chromium") {
+	if at, _ := browserFrom(realDisk(), env, true); at != filepath.Join(root, "home", "Library", "Caches", "ms-playwright", "chromium-3", "chrome-mac", "Chromium.app", "Contents", "MacOS", "Chromium") {
 		t.Errorf("a mac answers %s", at)
 	}
 }
@@ -92,10 +92,10 @@ func TestTheFolderTheDownloadWritesAnswersLast(t *testing.T) {
 func TestABoxWithNoBrowserAnswersNothing(t *testing.T) {
 	t.Parallel()
 	_, env := browserBox(t, nil, map[string]string{"PATH": "a", "HOME": "home"})
-	if at, from := browserFrom(env, false); at != "" || from != "" {
+	if at, from := browserFrom(realDisk(), env, false); at != "" || from != "" {
 		t.Errorf("the order answers %s off %s", at, from)
 	}
-	if browserUnder("") != "" {
+	if browserUnder(realDisk(), "") != "" {
 		t.Error("an empty folder answers a browser")
 	}
 }

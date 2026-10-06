@@ -10,6 +10,7 @@ import (
 	"errors"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 	"syscall"
 )
@@ -25,6 +26,9 @@ type diskDoors struct {
 	removeAll func(path string) error
 	rename    func(from, to string) error
 	appendTo  func(path string, data []byte) error
+	readlink  func(path string) (string, error)
+	symlink   func(target, path string) error
+	makeTemp  func(dir, pattern string) (string, error)
 }
 
 // The disk of the box itself. [[spec/tickets/quack-reaches-the-box-through-doors]]
@@ -39,6 +43,9 @@ func realDisk() diskDoors {
 		removeAll: os.RemoveAll,
 		rename:    os.Rename,
 		appendTo:  realAppend,
+		readlink:  os.Readlink,
+		symlink:   os.Symlink,
+		makeTemp:  os.MkdirTemp,
 	}
 }
 
@@ -84,6 +91,28 @@ func (d diskDoors) listed(path string) []fs.DirEntry {
 		return nil
 	}
 	return entries
+}
+
+// Every file under a folder, each folder read in name order, and the fault of the first read that falls. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func (d diskDoors) walkFiles(base string) ([]string, error) {
+	entries, err := d.list(base)
+	if err != nil {
+		return nil, err
+	}
+	var out []string
+	for _, one := range entries {
+		at := filepath.Join(base, one.Name())
+		if !one.IsDir() {
+			out = append(out, at)
+			continue
+		}
+		under, err := d.walkFiles(at)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, under...)
+	}
+	return out, nil
 }
 
 // The codes a disk error carries, named the way node names them. [[spec/guidance/retro/collect]]

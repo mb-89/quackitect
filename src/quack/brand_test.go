@@ -84,7 +84,7 @@ func TestAStampWritesEveryTargetOffTheBrandFolderAndASecondWritesNothing(t *test
 		brandFolder + "/icon.svg":         "<svg/>",
 		extensionTarget:                   `{"name":"ext","version":"0.0.0"}`,
 	})
-	done, err := stamps(root, "acme")
+	done, err := stamps(realDisk(), root, "acme")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestAStampWritesEveryTargetOffTheBrandFolderAndASecondWritesNothing(t *test
 	if plugin != "{\n  \"name\": \"level0\",\n  \"author\": {\n    \"name\": \"acme\"\n  },\n  \"version\": \"1.2.3\"\n}\n" {
 		t.Errorf("the plugin reads\n%s", plugin)
 	}
-	if again, _ := stamps(root, "acme"); len(again) != 0 {
+	if again, _ := stamps(realDisk(), root, "acme"); len(again) != 0 {
 		t.Errorf("a second stamp writes %v", again)
 	}
 }
@@ -103,7 +103,7 @@ func TestAStampWritesEveryTargetOffTheBrandFolderAndASecondWritesNothing(t *test
 func TestACloneHoldingNoSourceAndNoTargetTakesTheShapes(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	done, err := stamps(root, "acme")
+	done, err := stamps(realDisk(), root, "acme")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func TestATargetStandingWithNoSourceReadsAsItsOwnSource(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	seedTree(t, root, map[string]string{marketplaceTarget: "{\n  \"name\": \"acme\",\n  \"owner\": {\n    \"name\": \"acme\"\n  }\n}\n"})
-	done, _ := stamps(root, "acme")
+	done, _ := stamps(realDisk(), root, "acme")
 	if slices.Contains(done, marketplaceTarget) {
 		t.Errorf("a stamped target with no source takes a write: %v", done)
 	}

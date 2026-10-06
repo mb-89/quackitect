@@ -188,7 +188,7 @@ func ioOver(peer *index.Peer, root string, starts map[string]index.Start) (func(
 			return nil, fmt.Errorf("%s answers not: %w", instance, err)
 		}
 	}
-	watching, err := watchesIndex(peer, manager.LeaseTerm(root), appendsRow(root, time.Now))
+	watching, err := watchesIndex(peer, manager.LeaseTerm(root), appendsRow(realDisk(), root, time.Now))
 	if err != nil {
 		halt()
 		return nil, err

@@ -109,6 +109,7 @@ func fakeLanding(root string) (landingDoors, *verbsHeard, *[]map[string]any) {
 		voice: func(string) []heard { return nil },
 		log:   func(row map[string]any) error { *rows = append(*rows, row); return nil },
 		now:   func() time.Time { return time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC) },
+		box:   quietBox(),
 	}, record, rows
 }
 

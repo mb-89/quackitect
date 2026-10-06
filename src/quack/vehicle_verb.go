@@ -6,14 +6,10 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"time"
 
-	"quackitect/src/index"
 	"quackitect/src/vehicle"
 )
 
@@ -31,13 +27,14 @@ type vehicleDoors struct {
 
 // The real doors, read at each run. [[spec/design_output/doors#a-door-reads-the-outside]]
 func vehicleOutside() vehicleDoors {
+	box := quietBox()
 	return vehicleDoors{
-		env:     vehicleEnv(os.Environ()),
-		root:    vehicleRootHere(),
+		env:     vehicleEnv(box.environ()),
+		root:    vehicleRootHere(box),
 		now:     time.Now,
-		pid:     os.Getpid(),
-		windows: runtime.GOOS == "windows",
-		git:     vehicleGit,
+		pid:     box.pid,
+		windows: box.windows(),
+		git:     vehicleGit(box),
 	}
 }
 
@@ -53,13 +50,13 @@ func vehicleEnv(pairs []string) map[string]string {
 }
 
 // The tree the verb runs from, as root in src/scripts/cli-doors.js names the tree holding the program: the root the index door hands, else the tree the binary stands in, else the index's root. [[spec/design_output/vehicle#the-work-root-inherits]]
-func vehicleRootHere() string {
-	if said := os.Getenv("QUACKITECT_ROOT"); said != "" {
+func vehicleRootHere(box boxDoors) string {
+	if said := box.env("QUACKITECT_ROOT"); said != "" {
 		if abs, err := filepath.Abs(said); err == nil {
 			return abs
 		}
 	}
-	if bin, err := os.Executable(); err == nil {
+	if bin, err := selfPath(); err == nil {
 		if real, err := filepath.EvalSymlinks(bin); err == nil {
 			bin = real
 		}
@@ -68,18 +65,15 @@ func vehicleRootHere() string {
 			return root
 		}
 	}
-	if root, err := index.Root(); err == nil {
-		return root
-	}
-	return "."
+	return box.root
 }
 
 // Git in a folder: its trimmed output, and whether it exited zero, its errors kept quiet. [[spec/design_output/doors#a-door-standing-on-another]]
-func vehicleGit(dir string, args ...string) (string, bool) {
-	run := exec.Command("git", args...)
-	run.Dir = dir
-	said, err := run.Output()
-	return strings.TrimSpace(string(said)), err == nil
+func vehicleGit(box boxDoors) func(dir string, args ...string) (string, bool) {
+	return func(dir string, args ...string) (string, bool) {
+		ran := box.run(append([]string{"git"}, args...), runOpts{cwd: dir})
+		return strings.TrimSpace(ran.stdout), ran.code == 0 && ran.fault == ""
+	}
 }
 
 // The disk the verb writes through, which writes nothing where the run is dry. [[spec/tickets/runme-hands-verbs-to-quack]]

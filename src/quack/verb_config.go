@@ -230,7 +230,7 @@ func configWrites(disk diskDoors, root, key, said string, dry bool, now func() t
 			err = disk.write(local, body, 0o644)
 		}
 		if err == nil && slices.Contains(logsInfo, configLevel(root)) {
-			err = appendsRow(root, now)(map[string]any{"level": "info", "kind": "config", "said": key + " is " + shownValue(json.RawMessage(literal)), "detail": config.Local})
+			err = appendsRow(disk, root, now)(map[string]any{"level": "info", "kind": "config", "said": key + " is " + shownValue(json.RawMessage(literal)), "detail": config.Local})
 		}
 		if err != nil {
 			fmt.Fprintln(errs, err)

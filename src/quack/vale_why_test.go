@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-	"os/exec"
 	"testing"
 )
 
@@ -20,17 +18,17 @@ func TestTheValeReasonNamesWhyValeReadNothing(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
 		claim string
-		said  []byte
-		err   error
+		ran   ranResult
 		why   string
 	}{
-		{"stderr names the fault", nil, &exec.ExitError{Stderr: []byte(" E100 config broken \n")}, "E100 config broken"},
-		{"the run's error names it", nil, errors.New("signal: killed"), "signal: killed"},
-		{"an empty answer", nil, nil, "vale answered nothing"},
-		{"an answer past JSON", []byte("not json"), nil, "vale answered no JSON: not json"},
+		{"stderr names the fault", ranResult{code: 2, stderr: " E100 config broken \n"}, "E100 config broken"},
+		{"the run's fault names it", ranResult{code: exitFailed, fault: "fork/exec vale: permission denied"}, "fork/exec vale: permission denied"},
+		{"an exit with nothing said names its status", ranResult{code: 3}, "exit status 3"},
+		{"an empty answer", ranResult{}, "vale answered nothing"},
+		{"an answer past JSON", ranResult{stdout: "not json"}, "vale answered no JSON: not json"},
 	}
 	for _, one := range cases {
-		if got := unreadWhy(one.said, one.err); got != one.why {
+		if got := unreadWhy(one.ran); got != one.why {
 			t.Errorf("%s: unreadWhy answers %q, want %q", one.claim, got, one.why)
 		}
 	}

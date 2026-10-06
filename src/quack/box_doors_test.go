@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"slices"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -22,12 +23,13 @@ import (
 type fakeDisk struct {
 	mu    sync.Mutex
 	files fstest.MapFS
+	made  int
 }
 
 // The fake disk as the hand a verb takes. [[spec/tickets/quack-reaches-the-box-through-doors]]
 func newFakeDisk() diskDoors {
 	f := &fakeDisk{files: fstest.MapFS{}}
-	return diskDoors{read: f.read, write: f.write, stat: f.stat, list: f.list, makeAll: f.makeAll, remove: f.remove, removeAll: f.removeAll, rename: f.rename, appendTo: f.appendTo}
+	return diskDoors{read: f.read, write: f.write, stat: f.stat, list: f.list, makeAll: f.makeAll, remove: f.remove, removeAll: f.removeAll, rename: f.rename, appendTo: f.appendTo, readlink: f.readlink, symlink: f.symlink, makeTemp: f.makeTemp}
 }
 
 func fakeKey(at string) string {
@@ -73,6 +75,44 @@ func (f *fakeDisk) appendTo(at string, data []byte) error {
 	}
 	f.files[key] = &fstest.MapFile{Data: append(slices.Clone(was), data...), Mode: appendedMode, ModTime: time.Unix(0, 0)}
 	return nil
+}
+
+func (f *fakeDisk) symlink(target, at string) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	key := fakeKey(at)
+	if !f.folder(path.Dir(key)) {
+		return &os.LinkError{Op: "symlink", Old: target, New: at, Err: fs.ErrNotExist}
+	}
+	if _, err := fs.Stat(f.files, key); err == nil {
+		return &os.LinkError{Op: "symlink", Old: target, New: at, Err: fs.ErrExist}
+	}
+	f.files[key] = &fstest.MapFile{Data: []byte(target), Mode: fs.ModeSymlink | 0o777, ModTime: time.Unix(0, 0)}
+	return nil
+}
+
+func (f *fakeDisk) readlink(at string) (string, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	held, ok := f.files[fakeKey(at)]
+	if !ok {
+		return "", &fs.PathError{Op: "readlink", Path: at, Err: fs.ErrNotExist}
+	}
+	if held.Mode&fs.ModeSymlink == 0 {
+		return "", &fs.PathError{Op: "readlink", Path: at, Err: fs.ErrInvalid}
+	}
+	return string(held.Data), nil
+}
+
+func (f *fakeDisk) makeTemp(dir, pattern string) (string, error) {
+	if dir == "" {
+		dir = "/tmp"
+	}
+	f.mu.Lock()
+	f.made++
+	at := path.Join(filepath.ToSlash(dir), pattern+strconv.Itoa(f.made))
+	f.mu.Unlock()
+	return at, f.makeAll(at, 0o700)
 }
 
 func (f *fakeDisk) stat(at string) (fs.FileInfo, error) {
@@ -282,6 +322,41 @@ var diskContract = map[string]func(t *testing.T, disk diskDoors, root string){
 			t.Fatal("an append into no folder passes")
 		}
 	},
+	"symlink makes a link readlink answers, and readlink refuses a plain file": func(t *testing.T, disk diskDoors, root string) {
+		at := filepath.Join(root, "link")
+		if err := disk.symlink(filepath.Join(root, "target"), at); err != nil {
+			t.Fatal(err)
+		}
+		if got, err := disk.readlink(at); err != nil || got != filepath.Join(root, "target") {
+			t.Fatalf("readlink answers %q, %v", got, err)
+		}
+		if err := disk.symlink("elsewhere", at); err == nil {
+			t.Fatal("a link over a standing link passes")
+		}
+		_ = disk.write(filepath.Join(root, "plain"), []byte("a"), 0o644)
+		if _, err := disk.readlink(filepath.Join(root, "plain")); err == nil {
+			t.Fatal("readlink of a plain file passes")
+		}
+		if _, err := disk.readlink(filepath.Join(root, "none")); !errors.Is(err, fs.ErrNotExist) {
+			t.Fatalf("readlink of nothing answers %v", err)
+		}
+	},
+	"makeTemp makes a fresh empty folder under the folder each call": func(t *testing.T, disk diskDoors, root string) {
+		one, err := disk.makeTemp(root, "cold-")
+		if err != nil {
+			t.Fatal(err)
+		}
+		other, err := disk.makeTemp(root, "cold-")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if one == other || !strings.HasPrefix(filepath.Base(one), "cold-") || filepath.Dir(filepath.Clean(one)) != filepath.Clean(root) {
+			t.Fatalf("makeTemp answers %q and %q under %q", one, other, root)
+		}
+		if said, err := disk.stat(one); err != nil || !said.IsDir() || len(disk.listed(one)) != 0 {
+			t.Fatalf("the folder %q stands not empty: %v", one, err)
+		}
+	},
 	"rename moves a file and a folder with what it holds": func(t *testing.T, disk diskDoors, root string) {
 		_ = disk.makeAll(filepath.Join(root, "f"), 0o777)
 		_ = disk.write(filepath.Join(root, "f", "a.txt"), []byte("a"), 0o644)
@@ -298,6 +373,32 @@ var diskContract = map[string]func(t *testing.T, disk diskDoors, root string){
 			t.Fatal("rename of nothing passes")
 		}
 	},
+}
+
+// The box contract, one case a member past the disk, held by the fake box and by the box itself. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func TestTheFakeBoxKeepsTheContractTheRealBoxKeeps(t *testing.T) {
+	t.Parallel()
+	boxes := map[string]func(t *testing.T) boxDoors{
+		"fake": func(t *testing.T) boxDoors { d, _, _, _ := fakeBoxDoors(t); return d },
+		"real": func(*testing.T) boxDoors { return quietBox() },
+	}
+	for name, open := range boxes {
+		t.Run(name, func(t *testing.T) {
+			t.Parallel()
+			d := open(t)
+			t.Run("environ names each variable as env reads it", func(t *testing.T) {
+				pairs := d.environ()
+				if len(pairs) == 0 {
+					t.Fatal("environ names no variable")
+				}
+				for key, value := range vehicleEnv(pairs) {
+					if got := d.env(key); got != value {
+						t.Errorf("environ names %s=%q, and env reads %q", key, value, got)
+					}
+				}
+			})
+		})
+	}
 }
 
 // A move into a folder standing already names the code node gives it. [[spec/guidance/retro/collect]]
@@ -336,6 +437,14 @@ func (f *fakeRunner) run(argv []string, o runOpts) ranResult {
 	return ranResult{stdout: key + " 1.2.3\n"}
 }
 
+// The fake doors over the box's own disk under a temporary tree, for the verbs that read the tree through stands and readText as well as through the hand. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func boxDoorsOnDisk(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *strings.Builder, *strings.Builder) {
+	t.Helper()
+	d, runner, out, errs := fakeBoxDoors(t, programs...)
+	d.disk = realDisk()
+	return d, runner, out, errs
+}
+
 // The fake doors over a temporary tree, with the named programs standing on its PATH. [[spec/tickets/box-verbs-no-node-test]]
 func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *strings.Builder, *strings.Builder) {
 	t.Helper()
@@ -359,6 +468,13 @@ func fakeBoxDoors(t *testing.T, programs ...string) (boxDoors, *fakeRunner, *str
 	return boxDoors{
 		root: root,
 		env:  func(key string) string { return env[key] },
+		environ: func() []string {
+			out := []string{}
+			for key, value := range env {
+				out = append(out, key+"="+value)
+			}
+			return out
+		},
 		goos: "linux",
 		pid:  7,
 		run:  runner.run,

@@ -4,11 +4,8 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
-	"errors"
-	"os"
-	"os/exec"
+	"fmt"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -72,10 +69,10 @@ const (
 var proseStyle = regexp.MustCompile(`^Voice(Vale|Paragraph)\.`)
 
 // The words a name holds under the root, and whether a cloud variable reads true. [[spec/tickets/cage-command-rules-port]]
-func commandSettings(root string) hooks.Settings {
+func commandSettings(box boxDoors, root string) hooks.Settings {
 	cloud := false
 	for _, name := range cloudVariables {
-		said := strings.ToLower(strings.TrimSpace(os.Getenv(name)))
+		said := strings.ToLower(strings.TrimSpace(box.env(name)))
 		cloud = cloud || (said != "" && said != "0" && said != "false")
 	}
 	helpers := map[string]string{}
@@ -90,7 +87,7 @@ func commandSettings(root string) hooks.Settings {
 		FinishGrace: settingsreader.Count(root, finishGraceKey), UpdateGrace: settingsreader.Count(root, updateGraceKey),
 		PlanEvery: settingsreader.Count(root, planEveryKey), PlanGrace: settingsreader.Count(root, planGraceKey),
 		PlanMostOpen: settingsreader.Count(root, planMostOpenKey), Helpers: helpers,
-		User: firstSet(userVariables), Home: firstSet(homeVariables),
+		User: firstSet(box, userVariables), Home: firstSet(box, homeVariables),
 		StopOff: stopOff(root), MostInARow: settingsreader.Count(root, mostInARowKey),
 		HandoverAt: settingsreader.Count(root, handoverAtKey), BindingLayer: layerOf(root, bindingKey),
 	}
@@ -112,9 +109,9 @@ func layerOf(root, key string) string {
 }
 
 // The first variable set, or nothing. [[spec/tickets/cage-commit-guards-port]]
-func firstSet(names []string) string {
+func firstSet(box boxDoors, names []string) string {
 	for _, name := range names {
-		if said := os.Getenv(name); said != "" {
+		if said := box.env(name); said != "" {
 			return said
 		}
 	}
@@ -122,9 +119,9 @@ func firstSet(names []string) string {
 }
 
 // The findings the voice keeps over a commit message: Vale over it as level0-commit.md, each past the Go prose vetoes. A box with no Vale, or a Vale answering no rows, reads none, as messageFaults does. [[spec/tickets/cage-commit-guards-port]]
-func commitVoice(root, message string) []command.Row {
+func commitVoice(box boxDoors, root, message string) []command.Row {
 	var out []command.Row
-	for _, one := range heardOver(root, commitName, message).rows {
+	for _, one := range heardOver(box, root, commitName, message).rows {
 		out = append(out, command.Row{Rule: one.found.Rule, Said: one.found.Said, Message: one.message})
 	}
 	return out
@@ -152,41 +149,40 @@ const (
 	valeNoJSON   = "vale answered no JSON: "
 )
 
-// Why a Vale answer reads as no JSON: its stderr where it exits on one, else the run's error, else what it answered. [[spec/tickets/drafts-lint-seam-carries-why]]
-func unreadWhy(said []byte, err error) string {
-	var exit *exec.ExitError
-	if errors.As(err, &exit) {
-		if stderr := strings.TrimSpace(string(exit.Stderr)); stderr != "" {
-			return stderr
-		}
+// Why a Vale answer reads as no JSON: its stderr where it exits on one, else the run's fault or its exit, else what it answered. [[spec/tickets/drafts-lint-seam-carries-why]]
+func unreadWhy(ran ranResult) string {
+	if stderr := strings.TrimSpace(ran.stderr); ran.code != 0 && stderr != "" {
+		return stderr
 	}
-	if err != nil {
-		return err.Error()
+	if ran.fault != "" {
+		return ran.fault
 	}
-	if answer := strings.TrimSpace(string(said)); answer != "" {
+	if ran.code != 0 {
+		return fmt.Sprintf("exit status %d", ran.code)
+	}
+	if answer := strings.TrimSpace(ran.stdout); answer != "" {
 		return valeNoJSON + answer
 	}
 	return valeQuietWhy
 }
 
 // Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
-func heardOver(root, name, text string) valeHeard { return heardIn(root, name, text, prose.All) }
+func heardOver(box boxDoors, root, name, text string) valeHeard {
+	return heardIn(box, root, name, text, prose.All)
+}
 
 // What Vale answers over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
-func heardIn(root, name, text, mode string) valeHeard {
-	vale := valeAt(root)
+func heardIn(box boxDoors, root, name, text, mode string) valeHeard {
+	vale := valeAt(box.disk, root)
 	if vale == "" {
 		return valeHeard{why: noValeWhy}
 	}
 	config := valeOwn
-	if !standsUnder(root, valeOwn) && standsUnder(root, valeBuilt) {
+	if !standsUnder(box.disk, root, valeOwn) && standsUnder(box.disk, root, valeBuilt) {
 		config = valeBuilt
 	}
-	span, stop := context.WithTimeout(context.Background(), valeSpan)
-	defer stop()
-	run := exec.CommandContext(span, vale, "--config="+config, "--path="+name, "--output=JSON", "--no-exit")
-	run.Dir, run.Stdin = root, strings.NewReader(text)
-	said, err := run.Output()
+	ran := box.run([]string{vale, "--config=" + config, "--path=" + name, "--output=JSON", "--no-exit"}, runOpts{cwd: root, stdin: text, timeout: valeSpan})
+	said := []byte(ran.stdout)
 	var read map[string][]struct {
 		Check    string `json:"Check"`
 		Line     int    `json:"Line"`
@@ -196,12 +192,9 @@ func heardIn(root, name, text, mode string) valeHeard {
 		Severity string `json:"Severity"`
 	}
 	if json.Unmarshal(said, &read) != nil {
-		return valeHeard{stands: true, why: unreadWhy(said, err)}
+		return valeHeard{stands: true, why: unreadWhy(ran)}
 	}
-	body := func(path string) string {
-		text, _ := os.ReadFile(filepath.Join(root, filepath.FromSlash(path)))
-		return string(text)
-	}
+	body := func(path string) string { return box.disk.text(filepath.Join(root, filepath.FromSlash(path))) }
 	caps, paths := proseSchema([]byte(body(paragraphSchema)))
 	words := prose.Words(body(paths[0]), body(paths[1]), body(paths[2]))
 	var all []heard
@@ -230,17 +223,17 @@ func heardIn(root, name, text, mode string) valeHeard {
 }
 
 // The Vale the survey names where it stands, else the one in the runtime binary folder, else nothing. [[spec/tickets/cage-commit-guards-port]]
-func valeAt(root string) string {
+func valeAt(disk diskDoors, root string) string {
 	var survey map[string]struct {
 		Path string `json:"path"`
 	}
-	if text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
-		if said := survey["vale"].Path; said != "" && standsUnder("", said) {
+	if text, err := disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(text, &survey) == nil {
+		if said := survey["vale"].Path; said != "" && standsUnder(disk, "", said) {
 			return said
 		}
 	}
 	for _, name := range []string{"vale", "vale.exe"} {
-		if guess := filepath.Join(root, filepath.FromSlash(check.Bin), name); standsUnder("", guess) {
+		if guess := filepath.Join(root, filepath.FromSlash(check.Bin), name); standsUnder(disk, "", guess) {
 			return guess
 		}
 	}
@@ -248,9 +241,8 @@ func valeAt(root string) string {
 }
 
 // Whether a file stands at the path, under the root where one names it. [[spec/tickets/cage-commit-guards-port]]
-func standsUnder(root, path string) bool {
-	_, err := os.Stat(filepath.Join(root, filepath.FromSlash(path)))
-	return err == nil
+func standsUnder(disk diskDoors, root, path string) bool {
+	return disk.stands(filepath.Join(root, filepath.FromSlash(path)))
 }
 
 // A text key's value under the root, or nothing where it stands nowhere. [[spec/tickets/cage-call-holds-port]]
@@ -267,14 +259,10 @@ func textSetting(root, key string) string {
 }
 
 // What a git read prints under the root, or nothing where it fails. [[spec/tickets/cage-command-rules-port]]
-func gitRead(root string, args ...string) string {
-	span, stop := context.WithTimeout(context.Background(), gitReadSpan)
-	defer stop()
-	run := exec.CommandContext(span, "git", args...)
-	run.Dir = root
-	said, err := run.Output()
-	if err != nil {
+func gitRead(box boxDoors, root string, args ...string) string {
+	ran := box.run(append([]string{"git"}, args...), runOpts{cwd: root, timeout: gitReadSpan})
+	if ran.code != 0 || ran.fault != "" {
 		return ""
 	}
-	return strings.TrimSpace(string(said))
+	return strings.TrimSpace(ran.stdout)
 }

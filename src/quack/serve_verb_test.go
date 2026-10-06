@@ -51,6 +51,7 @@ func (box *serveBox) runs(t *testing.T, argv ...string) (int, string, string) {
 	doors := func() serveDoors {
 		return serveDoors{
 			root: box.root,
+			disk: realDisk(),
 			run: func(argv []string, cwd string) (int, string, error) {
 				box.ran = append(box.ran, argv)
 				box.cwds = append(box.cwds, cwd)

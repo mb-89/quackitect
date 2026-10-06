@@ -70,13 +70,13 @@ func pullHere(rootOf func() (string, error), out, errs io.Writer) (*pull.It, int
 		Schemas: func() *check.Kinds { return check.SchemasIn(check.TreeOver(method, rootDisk{method})) },
 	}
 	it.Notes = func(key string) []string {
-		said, err := guidanceRows(method, env)
+		said, err := guidanceRows(realDisk(), method, env)
 		if err != nil {
 			return []string{}
 		}
 		return said[key]
 	}
-	if valeAt(method) != "" {
+	if valeAt(realDisk(), method) != "" {
 		it.Voice = pullVoice(method)
 	}
 	scripts := filepath.Join(method, "src", "scripts")
@@ -121,7 +121,7 @@ const (
 
 // The session log the verbs write under the work root: a row at or past the floor the config names, its sentence on one line and cut, as rowOf in lib/log.js shapes it. [[spec/design_output/log#what-one-line-looks-like]]
 func pullLog(work, floor string) func(level, kind, said string, extra map[string]any) {
-	write := appendsRow(work, time.Now)
+	write := appendsRow(realDisk(), work, time.Now)
 	rank := func(level string) int {
 		for i, one := range logLevels {
 			if one == level {
@@ -156,7 +156,7 @@ func pullVoice(root string) func(path, text string, first, last int) []pull.Voic
 		if strings.TrimSpace(text) == "" {
 			return nil
 		}
-		said := heardIn(root, path, text, prose.Past)
+		said := heardIn(quietBox(), root, path, text, prose.Past)
 		if !said.ran {
 			return nil
 		}

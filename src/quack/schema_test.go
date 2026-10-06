@@ -16,7 +16,7 @@ import (
 
 func TestSchemaStandsAsGenerated(t *testing.T) {
 	t.Parallel()
-	want, err := schemaText(treeRoot)
+	want, err := schemaText(realDisk(), treeRoot)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func TestEveryTrackedKeyIsDeclared(t *testing.T) {
 // The sections the drawing names stand first, in its order, so the sidebar meets its groups as it drew them. [[spec/tickets/the-config-schema-gets-generated]]
 func TestDrawnSectionsStandFirst(t *testing.T) {
 	t.Parallel()
-	text, err := schemaText(treeRoot)
+	text, err := schemaText(realDisk(), treeRoot)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +80,7 @@ func TestDrawnSectionsStandFirst(t *testing.T) {
 // Every key the tree declares, by its dotted name. [[spec/tickets/the-config-schema-gets-generated]]
 func declared(t *testing.T) map[string]q.Key {
 	t.Helper()
-	c, err := catalogOf(treeRoot)
+	c, err := catalogOf(realDisk(), treeRoot)
 	if err != nil {
 		t.Fatal(err)
 	}

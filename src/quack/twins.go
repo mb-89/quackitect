@@ -8,8 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -186,22 +184,18 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 		if err != nil {
 			return nil, err
 		}
-		run := exec.Command(self, append([]string{"verb", scripts}, args...)...)
-		run.Dir = root
-		if person {
-			run.Env = personEnv(os.Environ(), root)
+		box := quietBox()
+		ran := box.run(append([]string{self, "verb", scripts}, args...), runOpts{cwd: root, environ: personEnv(box.environ(), root), combined: true})
+		text := strings.TrimRight(ran.stdout, "\n")
+		if ran.fault != "" {
+			return nil, fmt.Errorf("%s answers %s: %s", strings.Join(args, " "), ran.fault, text)
 		}
-		said, err := run.CombinedOutput()
-		text := strings.TrimRight(string(said), "\n")
-		if err != nil {
-			return nil, fmt.Errorf("%s answers %v: %s", strings.Join(args, " "), err, text)
+		if ran.code != 0 {
+			return nil, fmt.Errorf("%s answers exit status %d: %s", strings.Join(args, " "), ran.code, text)
 		}
 		return text, nil
 	}
 }
-
-// The binary a child road runs, which a case swaps for one standing nowhere. [[spec/design_output/pull#the-hand-rule]]
-var selfPath = os.Executable
 
 // The variables a harness sets, which HARNESS in src/extension/lib/lens.js owns, and the root a person's run names, which WORK_ROOT there owns. [[spec/design_output/pull#the-hand-rule]]
 var harness = []string{"CLAUDECODE", "CLAUDE_CODE_REMOTE", "SE_CLOUD"}

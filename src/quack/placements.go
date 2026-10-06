@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
+	"io"
 	"slices"
 	"strings"
 	"time"
@@ -76,8 +76,8 @@ func placedOf(instances []string, folders map[string]string, hands map[string]q.
 }
 
 // quack module <instance>...: the process a placement spawns, which runs its instances until the bus goes. [[spec/design_output/model#one-binary-many-processes]]
-func moduleMain(instances []string) error {
-	url, token := os.Getenv(index.BusEnv), os.Getenv(index.TokenEnv)
+func moduleMain(box boxDoors, instances []string) error {
+	url, token := box.env(index.BusEnv), box.env(index.TokenEnv)
 	if url == "" {
 		return errors.New("quack module runs where the index spawns it, with the bus in its environment")
 	}
@@ -100,7 +100,7 @@ func moduleMain(instances []string) error {
 		return err
 	}
 	defer peer.Close()
-	stop, err := moduleOver(peer, q.NewStore(catalog), instances)
+	stop, err := moduleOver(peer, q.NewStore(catalog), instances, box.errs)
 	if err != nil {
 		return err
 	}
@@ -110,12 +110,12 @@ func moduleMain(instances []string) error {
 }
 
 // Runs the instances a module process holds over the bus, and answers its stop. [[spec/design_output/model#one-binary-many-processes]]
-func runsModule(url, token string, store *q.Store, instances []string) (func(), error) {
+func runsModule(url, token string, store *q.Store, instances []string, errs io.Writer) (func(), error) {
 	peer, err := index.Dial(url, token)
 	if err != nil {
 		return nil, err
 	}
-	stop, err := moduleOver(peer, store, instances)
+	stop, err := moduleOver(peer, store, instances, errs)
 	if err != nil {
 		peer.Close()
 		return nil, err
@@ -127,9 +127,9 @@ func runsModule(url, token string, store *q.Store, instances []string) (func(), 
 }
 
 // On each run.<instance> the process restores the inputs the index answers, settles its scheduler, and commits the instance's names, and it beats its lease while it runs. The runs heard while one runs fold into one, so a burst of commits costs one read of the inputs. [[spec/design_output/model#the-placements]]
-func moduleOver(peer *index.Peer, store *q.Store, instances []string) (func(), error) {
+func moduleOver(peer *index.Peer, store *q.Store, instances []string, errs io.Writer) (func(), error) {
 	scheduler := q.NewScheduler(store, func(run func()) { go run() }, func(name string, err error) {
-		fmt.Fprintln(os.Stderr, name, "runs not:", err)
+		fmt.Fprintln(errs, name, "runs not:", err)
 	})
 	// The catalog holds the whole wiring, and the index answers every name another instance provides. [[spec/tickets/process-shadow-reads-clean]]
 	scheduler.Only(instances...)
@@ -142,7 +142,7 @@ func moduleOver(peer *index.Peer, store *q.Store, instances []string) (func(), e
 		scheduler.Stop()
 	}
 	for _, instance := range instances {
-		waiting, run := make(chan struct{}, 1), &moduleRun{instance: instance, sent: map[string]string{}}
+		waiting, run := make(chan struct{}, 1), &moduleRun{instance: instance, sent: map[string]string{}, errs: errs}
 		go func() {
 			for {
 				select {
@@ -187,18 +187,19 @@ func moduleOver(peer *index.Peer, store *q.Store, instances []string) (func(), e
 	}, nil
 }
 
-// One instance's runs: whether it read its inputs whole yet, and the JSON of each name it last committed. [[spec/design_output/model#the-placements]]
+// One instance's runs: whether it read its inputs whole yet, the JSON of each name it last committed, and the stream its faults go to. [[spec/design_output/model#the-placements]]
 type moduleRun struct {
 	instance string
 	read     bool
 	sent     map[string]string
+	errs     io.Writer
 }
 
 // The first run reads the inputs whole, and each later one the moved ones alone, and a run commits the names that moved since the last. Every run commits, an empty commit where nothing moved, so the index hears each run answered. [[spec/design_output/model#the-placements]] [[spec/tickets/the-split-deployment-takes-over]]
 func (r *moduleRun) once(peer *index.Peer, store *q.Store, scheduler *q.Scheduler) {
 	instance := r.instance
 	if err := peer.Commit(instance, r.computes(peer, store, scheduler)); err != nil {
-		fmt.Fprintln(os.Stderr, instance, "commits nothing:", err)
+		fmt.Fprintln(r.errs, instance, "commits nothing:", err)
 	}
 }
 
@@ -212,15 +213,15 @@ func (r *moduleRun) computes(peer *index.Peer, store *q.Store, scheduler *q.Sche
 	}
 	saved, err := asks(instance)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, instance, "reads no inputs:", err)
+		fmt.Fprintln(r.errs, instance, "reads no inputs:", err)
 		return moved
 	}
 	refused, err := store.Restore(saved)
 	for _, line := range refused {
-		fmt.Fprintln(os.Stderr, instance, "restores", line)
+		fmt.Fprintln(r.errs, instance, "restores", line)
 	}
 	if err != nil {
-		fmt.Fprintln(os.Stderr, instance, "restores nothing:", err)
+		fmt.Fprintln(r.errs, instance, "restores nothing:", err)
 		return moved
 	}
 	r.read = true

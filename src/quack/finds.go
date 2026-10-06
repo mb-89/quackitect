@@ -5,11 +5,8 @@
 package main
 
 import (
-	"os"
-	"runtime"
 	"strings"
 	"sync"
-	"syscall"
 	"time"
 
 	settingsreader "quackitect/src/config"
@@ -83,19 +80,6 @@ func reportsHeard(store *q.Store) func(agent string) bool {
 		defer mu.Unlock()
 		return heard[agent]
 	}
-}
-
-// A process stands alive where it takes signal zero. Windows takes no signal, so there a process stands alive while it opens. [[spec/tickets/find-and-wait-in-go]]
-func alive(pid int) bool {
-	one, err := os.FindProcess(pid)
-	if err != nil {
-		return false
-	}
-	if runtime.GOOS == "windows" {
-		one.Release()
-		return true
-	}
-	return one.Signal(syscall.Signal(0)) == nil
 }
 
 // Reads with no index behind them find nothing. [[spec/tickets/find-and-wait-in-go]]

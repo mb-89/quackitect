@@ -51,7 +51,7 @@ var setupItems = []setupItem{
 		want: "browser",
 		why:  "browser: the chromium the drawing's test drives",
 		here: func(d boxDoors) bool {
-			path, _ := browserFrom(d.env, d.goos == "darwin")
+			path, _ := browserFrom(d.disk, d.env, d.goos == "darwin")
 			return path != ""
 		},
 		get: func(d boxDoors) bool {
@@ -198,7 +198,7 @@ func setupBrand(d boxDoors) bool {
 		fmt.Fprintln(d.errs, emptyBrand(d.root))
 		return false
 	}
-	done, err := stamps(d.root, brand)
+	done, err := stamps(d.disk, d.root, brand)
 	for _, one := range done {
 		say(d, "  "+one+" reads "+brand)
 	}

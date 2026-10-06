@@ -40,7 +40,8 @@ func voiceFake(root, vale, said string, fault error, ran *[][]string) voiceOutsi
 			*ran = append(*ran, append([]string{cwd}, argv...))
 			return said, fault
 		},
-		now: func() time.Time { return time.Date(2026, 9, 12, 0, 0, 0, 0, time.UTC) },
+		now:  func() time.Time { return time.Date(2026, 9, 12, 0, 0, 0, 0, time.UTC) },
+		disk: realDisk(),
 	}
 }
 
@@ -149,11 +150,12 @@ func TestVoiceVerbHelpAndRefused(t *testing.T) {
 
 func TestVoiceRunsValeKeepsTheOutputOfAFailedExit(t *testing.T) {
 	t.Parallel()
-	said, err := voiceRunsVale([]string{"sh", "-c", "echo '{}'; exit 3"}, t.TempDir())
+	vale := voiceRunsVale(quietBox().run)
+	said, err := vale([]string{"sh", "-c", "echo '{}'; exit 3"}, t.TempDir())
 	if err != nil || said != "{}\n" {
 		t.Fatalf("a nonzero exit answers %q %v", said, err)
 	}
-	if _, err := voiceRunsVale([]string{filepath.Join(t.TempDir(), "none")}, t.TempDir()); err == nil {
+	if _, err := vale([]string{filepath.Join(t.TempDir(), "none")}, t.TempDir()); err == nil {
 		t.Fatal("a Vale that cannot start answers its fault")
 	}
 }

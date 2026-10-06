@@ -9,8 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -26,6 +24,7 @@ const serveIndexBin = ".se/.runtime/bin/se-index" // the runtime folder .claude/
 type serveDoors struct {
 	root string
 	run  func(argv []string, cwd string) (int, string, error)
+	disk diskDoors
 }
 
 func init() { register("serve", serveVerb(serveReal)) }
@@ -45,7 +44,7 @@ func serveVerb(doors func() serveDoors) twin {
 
 // The index answers its standing by starting its door where none answers, so one run starts it and probes it. [[spec/design_output/level0#a-desk-serve-returns]]
 func serveDetachedStart(d serveDoors) (int, string) {
-	was := serveDoorOf(d.root)
+	was := serveDoorOf(d.disk, d.root)
 	code, stderr, err := d.run([]string{d.root + "/" + serveIndexBin, "standing"}, d.root)
 	if err != nil {
 		return 1, "The index falls: " + err.Error()
@@ -57,7 +56,7 @@ func serveDetachedStart(d serveDoors) (int, string) {
 		}
 		return 1, "The index falls: " + why
 	}
-	door := serveDoorOf(d.root)
+	door := serveDoorOf(d.disk, d.root)
 	port := servePortOf(door)
 	if was != "" && was == door {
 		return 0, fmt.Sprintf("The index answers at port %s.", port)
@@ -66,12 +65,8 @@ func serveDetachedStart(d serveDoors) (int, string) {
 }
 
 // What the hooks door's standing file says, or nothing where none stands. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-func serveDoorOf(root string) string {
-	body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(hooks.StandingFile)))
-	if err != nil {
-		return ""
-	}
-	return string(body)
+func serveDoorOf(disk diskDoors, root string) string {
+	return disk.text(filepath.Join(root, filepath.FromSlash(hooks.StandingFile)))
 }
 
 // The port the door names, as Number(JSON.parse(door).port) || 0 prints it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -107,23 +102,20 @@ func serveReal() serveDoors {
 	if err != nil {
 		root = "."
 	}
-	return serveDoors{root: filepath.ToSlash(root), run: serveRuns}
+	box := quietBox()
+	return serveDoors{root: filepath.ToSlash(root), run: serveRuns(box.run), disk: box.disk}
 }
 
 // Runs a program in a folder, and answers its exit code and what it wrote to its error stream. A signal's end reads as 1, as the JavaScript door answers it. [[spec/design_output/level0#a-desk-serve-returns]]
-func serveRuns(argv []string, cwd string) (int, string, error) {
-	cmd := exec.Command(argv[0], argv[1:]...)
-	cmd.Dir = cwd
-	var stderr strings.Builder
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	var exit *exec.ExitError
-	if errors.As(err, &exit) {
-		code := exit.ExitCode()
-		if code < 0 {
-			code = 1
+func serveRuns(run func(argv []string, o runOpts) ranResult) func(argv []string, cwd string) (int, string, error) {
+	return func(argv []string, cwd string) (int, string, error) {
+		ran := run(argv, runOpts{cwd: cwd})
+		if ran.fault != "" {
+			return 0, ran.stderr, errors.New(ran.fault)
 		}
-		return code, stderr.String(), nil
+		if ran.code < 0 {
+			return 1, ran.stderr, nil
+		}
+		return ran.code, ran.stderr, nil
 	}
-	return 0, stderr.String(), err
 }

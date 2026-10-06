@@ -37,7 +37,7 @@ func readGuidanceGolden(t *testing.T) map[string]map[string][]string {
 
 func TestGuidanceGoldenHoldsTheModule(t *testing.T) {
 	t.Parallel()
-	rows, err := guidanceRows(filepath.Join("..", ".."), map[string]string{})
+	rows, err := guidanceRows(realDisk(), filepath.Join("..", ".."), map[string]string{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +97,7 @@ func TestGuidanceFilesKeyEachFileByItsPathUnderTheRoot(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(at, "code.md"), []byte("# Actionables\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	said, err := guidanceFiles(root)
+	said, err := guidanceFiles(realDisk(), root)
 	if err != nil {
 		t.Fatal(err)
 	}

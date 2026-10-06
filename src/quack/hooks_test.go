@@ -66,14 +66,14 @@ func TestTheCommandSettingsReadTheRootAndTheBox(t *testing.T) {
 	for _, name := range cloudVariables {
 		t.Setenv(name, "")
 	}
-	if said := commandSettings(root); said.Words != 3 || said.Cloud {
+	if said := commandSettings(quietBox(), root); said.Words != 3 || said.Cloud {
 		t.Fatalf("the settings read %+v, and want three words off the box's desk", said)
 	}
 	t.Setenv(cloudVariables[0], "1")
-	if said := commandSettings(root); !said.Cloud {
+	if said := commandSettings(quietBox(), root); !said.Cloud {
 		t.Fatalf("the settings read %+v, and want the cloud flag", said)
 	}
-	if said := gitRead(root, "no-such-verb"); said != "" {
+	if said := gitRead(quietBox(), root, "no-such-verb"); said != "" {
 		t.Fatalf("a failing git read prints %q, and wants nothing", said)
 	}
 }
@@ -90,7 +90,7 @@ func TestCommandSettingsReadTheHoldKeys(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(at, "level0.json"), []byte(config), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	body, _ := json.Marshal(commandSettings(root))
+	body, _ := json.Marshal(commandSettings(quietBox(), root))
 	var said map[string]any
 	if err := json.Unmarshal(body, &said); err != nil {
 		t.Fatal(err)

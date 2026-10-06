@@ -6,27 +6,34 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
+	"quackitect/src/branches"
 	"quackitect/src/index"
 )
 
-// How one outside run goes: its folder, the variables past the box's own, what it reads, its bound, and whether it writes to the caller's streams. [[spec/tickets/box-verbs-port-to-go]]
+// How one outside run goes: its folder, the variables past the box's own or the whole environment in place of it, what it reads, its bound, whether it writes to the caller's streams, whether it reads the caller's terminal, and whether its error stream joins its output. [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/quack-reaches-the-box-through-doors]]
 type runOpts struct {
-	cwd     string
-	env     map[string]string
-	stdin   string
-	timeout time.Duration
-	inherit bool
+	cwd      string
+	env      map[string]string
+	environ  []string
+	stdin    string
+	timeout  time.Duration
+	inherit  bool
+	console  bool
+	combined bool
 }
 
 // What one outside run answers. missing holds where the program stands nowhere. [[spec/tickets/box-verbs-port-to-go]]
@@ -41,6 +48,7 @@ type ranResult struct {
 type boxDoors struct {
 	root      string
 	env       func(key string) string
+	environ   func() []string
 	goos      string
 	pid       int
 	run       func(argv []string, o runOpts) ranResult
@@ -71,16 +79,17 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		root = "."
 	}
 	return boxDoors{
-		root: root,
-		env:  os.Getenv,
-		goos: runtime.GOOS,
-		pid:  os.Getpid(),
-		run:  realRun(out, errs),
-		get:  realGet,
-		now:  time.Now,
-		disk: realDisk(),
-		out:  out,
-		errs: errs,
+		root:    root,
+		env:     os.Getenv,
+		environ: os.Environ,
+		goos:    runtime.GOOS,
+		pid:     os.Getpid(),
+		run:     realRun(out, errs),
+		get:     realGet,
+		now:     time.Now,
+		disk:    realDisk(),
+		out:     out,
+		errs:    errs,
 	}
 }
 
@@ -108,8 +117,11 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 		}
 		child := exec.CommandContext(ctx, argv[0], argv[1:]...)
 		child.Dir = o.cwd
-		if len(o.env) > 0 {
-			child.Env = os.Environ()
+		if len(o.env) > 0 || o.environ != nil {
+			child.Env = o.environ
+			if child.Env == nil {
+				child.Env = os.Environ()
+			}
 			for key, value := range o.env {
 				child.Env = append(child.Env, key+"="+value)
 			}
@@ -117,8 +129,14 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 		if o.stdin != "" {
 			child.Stdin = strings.NewReader(o.stdin)
 		}
+		if o.console {
+			child.Stdin = os.Stdin
+		}
 		var said, fell bytes.Buffer
 		child.Stdout, child.Stderr = &said, &fell
+		if o.combined {
+			child.Stderr = &said
+		}
 		if o.inherit {
 			child.Stdout, child.Stderr = out, errs
 		}
@@ -136,6 +154,100 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 		}
 		return ran
 	}
+}
+
+// The binary this process runs, which a case swaps for one standing nowhere. [[spec/design_output/pull#the-hand-rule]]
+var selfPath = os.Executable
+
+// A process stands alive where it takes signal zero. Windows takes no signal, so there a process stands alive while it opens. [[spec/tickets/find-and-wait-in-go]]
+func alive(pid int) bool {
+	one, err := os.FindProcess(pid)
+	if err != nil {
+		return false
+	}
+	if runtime.GOOS == "windows" {
+		one.Release()
+		return true
+	}
+	return one.Signal(syscall.Signal(0)) == nil
+}
+
+// A connection to a port on this box. [[spec/design_output/model#the-editor-starts-quack-lsp]]
+func dialLocal(port int) (io.ReadWriteCloser, error) {
+	return net.Dial("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+}
+
+// How long one request of the fire waits for its reply. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
+const sendTimeout = time.Minute
+
+// One request onto the network, its reply's headers keyed in lower case. [[spec/design_output/doors#a-door-reads-the-outside]]
+func httpSend(url string, request branches.Request) (branches.Reply, error) {
+	asked, err := http.NewRequest(request.Method, url, strings.NewReader(request.Body))
+	if err != nil {
+		return branches.Reply{}, err
+	}
+	for key, value := range request.Headers {
+		asked.Header.Set(key, value)
+	}
+	said, err := (&http.Client{Timeout: sendTimeout}).Do(asked)
+	if err != nil {
+		return branches.Reply{}, err
+	}
+	defer said.Body.Close()
+	body, err := io.ReadAll(said.Body)
+	if err != nil {
+		return branches.Reply{}, err
+	}
+	headers := map[string]string{}
+	for key := range said.Header {
+		headers[strings.ToLower(key)] = said.Header.Get(key)
+	}
+	return branches.Reply{Status: said.StatusCode, Text: string(body), Headers: headers}, nil
+}
+
+// Posts the body to /v1, under the wait the prefer header names. [[spec/tickets/the-quack-cli-gets-generated]]
+func posts(url, prefer string, body []byte) (called, error) {
+	var said called
+	asked, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return said, err
+	}
+	asked.Header.Set("Content-Type", "application/json")
+	asked.Header.Set("Prefer", prefer)
+	err = answers(asked, &said)
+	return said, err
+}
+
+// Reads one value off /v1 into into. [[spec/tickets/the-quack-cli-gets-generated]]
+func reads(url string, into any) error {
+	asked, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return err
+	}
+	return answers(asked, into)
+}
+
+// Sends the request, and decodes a success into into, or answers the problem's detail. [[spec/design_output/model#surfaces]]
+func answers(asked *http.Request, into any) error {
+	said, err := http.DefaultClient.Do(asked)
+	if err != nil {
+		return err
+	}
+	defer said.Body.Close()
+	body, err := io.ReadAll(said.Body)
+	if err != nil {
+		return err
+	}
+	if said.StatusCode >= http.StatusBadRequest {
+		var problem struct {
+			Detail string `json:"detail"`
+		}
+		if json.Unmarshal(body, &problem) == nil && problem.Detail != "" {
+			return fmt.Errorf("%s", problem.Detail)
+		}
+		return fmt.Errorf("%s answers %d: %s", asked.URL.Path, said.StatusCode, body)
+	}
+	return json.Unmarshal(body, into)
 }
 
 func realGet(url string, wait time.Duration) (string, error) {

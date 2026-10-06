@@ -6,7 +6,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -141,17 +140,23 @@ func surveyText(found map[string]*toolAt) string {
 	return said.String()
 }
 
+// The modes the survey's folder and file take. [[spec/design_output/tools#what-the-survey-writes]]
+const (
+	surveyFolderMode = 0o755
+	surveyFileMode   = 0o644
+)
+
 // Surveys the box and writes the file whole, so a caller reading it mid-write reads the old survey or the new one whole. [[spec/design_output/tools#what-the-survey-writes]]
 func writeSurvey(d boxDoors) (map[string]*toolAt, error) {
 	found := survey(d)
 	at := filepath.Join(d.root, filepath.FromSlash(toolsFile))
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+	if err := d.disk.makeAll(filepath.Dir(at), surveyFolderMode); err != nil {
 		return found, err
 	}
-	if err := os.WriteFile(at+".part", []byte(surveyText(found)), 0o644); err != nil {
+	if err := d.disk.write(at+".part", []byte(surveyText(found)), surveyFileMode); err != nil {
 		return found, err
 	}
-	return found, os.Rename(at+".part", at)
+	return found, d.disk.rename(at+".part", at)
 }
 
 // The survey the file holds, empty where it stands nowhere or reads as no object. [[spec/design_output/tools#where-a-caller-looks]]

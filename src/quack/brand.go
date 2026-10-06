@@ -6,7 +6,6 @@ package main
 
 import (
 	"encoding/json"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -81,8 +80,8 @@ func versionedJSON(text, version string) string {
 }
 
 // The tree's version, which package.json alone holds. [[spec/design_output/vehicle#one-file-holds-the-version]]
-func versionIn(root string) string {
-	text, _ := readText(filepath.Join(root, "package.json"))
+func versionIn(disk diskDoors, root string) string {
+	text := disk.text(filepath.Join(root, "package.json"))
 	held := objectOf(text)
 	if held == nil {
 		return ""
@@ -96,9 +95,15 @@ func versionIn(root string) string {
 	return ""
 }
 
+// The modes a made folder and a stamped target take. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+const (
+	brandFolderMode = 0o755
+	brandFileMode   = 0o644
+)
+
 // Stamps each target off its source in the brand folder, and answers the targets it writes. A target standing already reads as its own source. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-func stamps(root, brand string) ([]string, error) {
-	version := versionIn(root)
+func stamps(disk diskDoors, root, brand string) ([]string, error) {
+	version := versionIn(disk, root)
 	targets := []struct {
 		rel, source string
 		branded     func(string) string
@@ -111,8 +116,10 @@ func stamps(root, brand string) ([]string, error) {
 	var done []string
 	for _, one := range targets {
 		to := filepath.Join(root, filepath.FromSlash(one.rel))
-		was, standing := readText(to)
-		held, ok := readText(filepath.Join(root, filepath.FromSlash(one.source)))
+		wasBody, wasErr := disk.read(to)
+		was, standing := string(wasBody), wasErr == nil
+		heldBody, heldErr := disk.read(filepath.Join(root, filepath.FromSlash(one.source)))
+		held, ok := string(heldBody), heldErr == nil
 		if !ok && !standing {
 			held, ok = brandShapes[one.rel]
 		}
@@ -123,10 +130,10 @@ func stamps(root, brand string) ([]string, error) {
 		if standing && made == was {
 			continue
 		}
-		if err := os.MkdirAll(filepath.Dir(to), 0o755); err != nil {
+		if err := disk.makeAll(filepath.Dir(to), brandFolderMode); err != nil {
 			return done, err
 		}
-		if err := os.WriteFile(to, []byte(made), 0o644); err != nil {
+		if err := disk.write(to, []byte(made), brandFileMode); err != nil {
 			return done, err
 		}
 		done = append(done, one.rel)

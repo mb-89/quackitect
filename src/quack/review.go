@@ -4,11 +4,7 @@
 package main
 
 import (
-	"bytes"
-	"context"
 	"encoding/json"
-	"os"
-	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -25,18 +21,11 @@ const (
 var printedLines = regexp.MustCompile(`\r?\n`)
 
 // The branch verb off the method root, run in the work root, and its material or why it gathered none. [[spec/tickets/review-spawns-off-the-door]] [[spec/tickets/work-verbs-port-to-go]]
-func reviewOver(method string) func(root, branch string) (review.Material, string) {
+func reviewOver(box boxDoors, method string) func(root, branch string) (review.Material, string) {
 	return func(root, branch string) (review.Material, string) {
-		span, stop := context.WithTimeout(context.Background(), reviewGathering)
-		defer stop()
 		road := append(selfRoad(method), "branch", "review", branch, "--json")
-		run := exec.CommandContext(span, road[0], road[1:]...)
-		run.Dir = root
-		run.Env = append(os.Environ(), "QUACKITECT_ROOT="+method, workRootVar+"="+root)
-		var out, errs bytes.Buffer
-		run.Stdout, run.Stderr = &out, &errs
-		_ = run.Run()
-		return gatheredOf(out.String(), errs.String())
+		ran := box.run(road, runOpts{cwd: root, env: map[string]string{"QUACKITECT_ROOT": method, workRootVar: root}, timeout: reviewGathering})
+		return gatheredOf(ran.stdout, ran.stderr)
 	}
 }
 

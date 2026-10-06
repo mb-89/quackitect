@@ -62,7 +62,7 @@ func writeProse(root, where, text string) []write.Finding {
 	if codeFile.MatchString(where) {
 		return nil
 	}
-	said := heardOver(root, where, text)
+	said := heardOver(quietBox(), root, where, text)
 	if !said.ran {
 		if said.stands && proseFile.MatchString(where) {
 			return []write.Finding{{Rule: unranRule, Line: 1, Column: 1, Message: unranSays, Severity: errorLevel}}
@@ -150,7 +150,7 @@ func unmerged(root, where string) bool {
 	if !strings.HasPrefix(where, write.TicketsOnGit) || !strings.HasSuffix(where, ".md") {
 		return false
 	}
-	return gitRead(root, "ls-files", "-u", "--", where) != ""
+	return gitRead(quietBox(), root, "ls-files", "-u", "--", where) != ""
 }
 
 // The front keys the ticket schema gives the engine. [[spec/design_output/schema#the-verbs-own-their-fields]]

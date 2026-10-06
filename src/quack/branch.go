@@ -6,7 +6,6 @@ package main
 import (
 	"encoding/json"
 	"io"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -31,8 +30,9 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 	if err != nil {
 		method = "."
 	}
+	box := realBoxDoors(out, errs)
 	work := method
-	if at := strings.TrimSpace(os.Getenv(workRootVar)); at != "" {
+	if at := strings.TrimSpace(box.env(workRootVar)); at != "" {
 		work = at
 	}
 	return &branches.Doors{
@@ -46,7 +46,7 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 			for key, value := range more {
 				row[key] = value
 			}
-			_ = appendsRow(work, time.Now)(row)
+			_ = appendsRow(box.disk, work, time.Now)(row)
 		},
 		Config: func(key string) any {
 			said, _ := config.Value(work, key)
@@ -68,20 +68,14 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 			return json.Unmarshal(said.Value, into)
 		},
 		Guidance: func() (map[string][]string, error) {
-			env := map[string]string{}
-			for _, one := range os.Environ() {
-				if name, value, ok := strings.Cut(one, "="); ok {
-					env[name] = value
-				}
-			}
-			return guidanceRows(method, env)
+			return guidanceRows(box.disk, method, vehicleEnv(box.environ()))
 		},
 	}
 }
 
 // The road a verb runs another verb by: this binary's verb road over the scripts folder, as RUNME.sh hands it past the install, or RUNME.sh where the binary names no path. [[spec/tickets/the-verbs-need-no-wrapper]]
 func selfRoad(method string) []string {
-	if self, err := os.Executable(); err == nil {
+	if self, err := selfPath(); err == nil {
 		return []string{self, "verb", filepath.Join(method, "src", "scripts")}
 	}
 	return []string{"sh", filepath.Join(method, "RUNME.sh")}
