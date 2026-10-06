@@ -82,7 +82,11 @@ func deskRefusal(what string) string {
 }
 
 // Takes the next free branch, or the one named, and writes the claim. [[spec/design_output/work#why-a-routine-needs-this]]
-func take(d *Doors, name string, _ []string) int {
+func take(d *Doors, name string, argv []string) int {
+	over := word(argv, 1) == overFlag
+	if over {
+		name = word(argv, 2)
+	}
 	if !d.cloud() {
 		d.raises(failure.Raise(d.Failures, "desk-works-on-trunk", deskRefusal("branch take moves this box onto no branch")))
 		return codeRefused
@@ -111,6 +115,15 @@ func take(d *Doors, name string, _ []string) int {
 			return codeRed
 		}
 		d.say("%s stands %s, so its hold drops and the take goes on to %s.", holding.Branch, past, named)
+	}
+	if name != "" {
+		if live := d.liveHold(read.Stand, read.Standing, workBranch+name); live != "" {
+			d.warn("%s", live)
+			return codeRed
+		}
+	}
+	if over && name == "" {
+		return d.takeOver(read)
 	}
 	if name == "" {
 		if stuck := d.stuckFirst(read.Stand, read.Standing, d.nowSeconds()); stuck != nil {
@@ -280,7 +293,7 @@ func (d *Doors) claimGroup(one stand) int {
 	before := d.head()
 	role := roleOf(hand)
 	from, base := handedOver(was, role, before)
-	_ = d.write(at, withEntry(base, front.Ordered{{Key: "step", Value: stepOf(was)}, {Key: "hand", Value: role}, {Key: "hash_before", Value: before}}))
+	_ = d.write(at, withEntry(base, front.Ordered{{Key: "step", Value: stepOf(was)}, {Key: "hand", Value: role}, {Key: "hash_before", Value: before}, {Key: "session", Value: d.env(sessionVar)}}))
 	d.quiet("add", at)
 	says := role + " takes it"
 	if from != "" {
@@ -301,6 +314,10 @@ func (d *Doors) claimGroup(one stand) int {
 		d.quiet("reset", "--keep", "origin/"+one.Branch)
 		d.raises(failure.Raise(d.Failures, "take-push-refused", refusedPush(one.Branch)))
 		return codeRed
+	}
+	d.writeBeat(one.Name, role, false)
+	if from != "" {
+		d.takesRescue(one)
 	}
 	if d.sync() == codeRed {
 		d.raises(failure.Raise(d.Failures, "take-sync-conflict", "Resolve the conflict on "+one.Branch+" and commit it, then work the ask below."))

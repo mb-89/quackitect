@@ -144,6 +144,13 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the hold reads %+v", held)
 		}
 	})
+	t.Run("a tagged ticket of another group stays out of the pull on work/g", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write("spec/tickets/aside.md", strings.Replace(strings.Replace(childTicket, "group: g\n", "group: other\n", 1), "process:", "todo: true\nprocess:", 1))
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
 	t.Run("a second pull refuses while one ticket stands in hand", func(t *testing.T) {
 		it, _, errs := cloudPull(t)
 		it.Pulling([]string{"pull"})

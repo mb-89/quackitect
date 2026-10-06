@@ -18,7 +18,7 @@ rationale: [[spec/rationales/cloud]]
 7. Mint a free ticket on `main` only for work a person alone can do. That means a secret, a setting on claude.ai or GitHub, or a trial on the owner's machine. Write every command they need into its ask, push it, and finish the branch. An ask in the chat meets nobody. *
 8. Open no GitHub issue. The ticket holds the question. Where a ticket already carries an issue, close that issue. *
 9. Say beside each answer what you weigh and what you assume. The hand at the merge judges the call on that. *
-10. Carry the branch to done, and finish every step an agent takes before you leave. A step you leave meets the next box and waits again. *
+10. Carry the branch to done, and wait for every helper and retry inside your turn. A turn ending on a wait stops this box, and the step meets the next box and waits again. *
 11. Green the check before you hand the branch back, whatever hand puts the fault there. A fault with no owner outlives every hand that meets it. *
 12. Write your result, your retro and every script under `.se/scripts` into the group's retro. Git carries what this box learns, and nothing else does.
 13. Run `./RUNME.sh branch done` last, and push. It refuses while the retro stands unwritten. Close every child first, since only a person's ticket leaves the group, as a free ticket on `main`. The work skill then opens the branch's pull request against `main`, with auto-merge on, and the session stops there.
@@ -34,6 +34,7 @@ rationale: [[spec/rationales/cloud]]
 | 7 | a ticket carrying the trial's commands, then the branch at done | a closing question asking the owner to grant a permission |
 | 8 | a ticket naming the question | a GitHub issue asking the owner |
 | 10 | the branch at done, then the push | a branch standing mid-step |
+| 10 | a wait on the helper inside the turn | a turn ending while a helper runs |
 | 11 | the check green, whoever breaks it | a hand-back on a red check |
 | 14 | one branch, then the session ends | a second branch after the first |
 | 15 | the commit and whether origin matches | current, naming no commit |
