@@ -3,7 +3,56 @@
 // [[spec/tickets/check-patterns-compile-once]]
 package check
 
-import "testing"
+import (
+	"encoding/json"
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
+
+// The size ceilings the cases read: the function ceiling and the file ceiling. [[spec/tickets/size-golden-drops-line-counts]]
+const (
+	caseFunction = 50
+	caseFile     = 600
+)
+
+// A prose file past the ceiling grows a line and draws no size row, and the size golden names no file the size rule leaves out. [[spec/tickets/size-golden-drops-line-counts]]
+func TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds(t *testing.T) {
+	t.Parallel()
+	text := strings.Repeat("a line\n", caseFile+1)
+	for _, path := range []string{"spec/a.md", "spec/config/a.json", "spec/a.yml"} {
+		if rows := sizeFaults(path, text+"one more\n", caseFunction, caseFile); len(rows) != 0 {
+			t.Errorf("%s draws %+v", path, rows)
+		}
+	}
+	said, err := os.ReadFile(filepath.Join("testdata", "size.golden.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var golden map[string][]struct {
+		File string `json:"file"`
+	}
+	if err := json.Unmarshal(said, &golden); err != nil {
+		t.Fatal(err)
+	}
+	for side, rows := range golden {
+		for _, row := range rows {
+			if !sizedFile.MatchString(row.File) {
+				t.Errorf("the %s side of the size golden names %s, which the size rule leaves out", side, row.File)
+			}
+		}
+	}
+}
+
+// A code file past the ceiling still names its ceiling. [[spec/tickets/size-golden-drops-line-counts]]
+func TestACodeFilePastTheCeilingStillNamesItsCeiling(t *testing.T) {
+	t.Parallel()
+	rows := sizeFaults("src/a.go", strings.Repeat("x := 1\n", caseFile+1), caseFunction, caseFile)
+	if len(rows) != 1 || rows[0].Rule != FileCeiling {
+		t.Errorf("src/a.go draws %+v", rows)
+	}
+}
 
 // Lines a brace language writes, with the shapes each pattern reads and the ones it refuses. [[spec/tickets/check-patterns-compile-once]]
 var codeLines = []string{

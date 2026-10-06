@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 1c3f36d653132a35
         size: 398
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: dc528d7fb0c4dddf08ba533b367960d567156f74
+    hash_after: dc528d7fb0c4dddf08ba533b367960d567156f74
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/modules/check fails
+    inputs:
+      - name: design/draft
+        hash: f8d26b0dc8cbb876
+        size: 3221
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -227,26 +240,32 @@ The first done_when line meets TestAProseFilePastTheCeilingGrowsALineAndTheSizeG
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/check/textfaults_test.go src/branches/test_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/modules/check/textfaults_test.go
+src/branches/test_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+A note, a JSON file and a YAML file past the ceiling each draw a size row, and the golden names prose and data files the lint leaves out. The readers stub names no package for a changed golden. The code file case passes already, and it guards the ceiling on code through the change.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The check line meets TestAProseFilePastTheCeilingGrowsALineAndTheSizeGoldenHolds, the test verb line meets TestGoldenReadersNameEveryPackageReadingAChangedGolden, and the check line waits for tests-green.
+The size cases read pure text and the tracked golden, and the readers case reads a map the verb builds, so no case reaches a door.
 
 # gate
 

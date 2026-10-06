@@ -38,6 +38,11 @@ var (
 )
 
 // Runs the tests the branch changes, or the files named, and answers one word on them. [[spec/design_output/pull#the-test-verb]]
+// The packages that read a changed golden: the golden folder's own, and every package whose test text names that folder. [[spec/tickets/size-golden-drops-line-counts]]
+func goldenReaders(changed []string, tests map[string]string) []string {
+	return nil
+}
+
 func testVerb(d *Doors, _ string, argv []string) int {
 	if slices.Contains(argv, redFlag) {
 		return d.redTest(argv[1:])
