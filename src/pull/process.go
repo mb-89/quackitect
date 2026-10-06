@@ -66,12 +66,33 @@ func ProcessAt(disk Disk, said string) (Process, string) {
 	}, ""
 }
 
-// The rows an ask writes for each field it names, as comments the hand writes under. [[spec/design_input/the-agent-pulls-tickets#evidence-has-a-form]]
 // The Ask a mint writes off the ask fields a hand names: a text field as a paragraph and a list field as lines, in the order the process names them. [[spec/tickets/verbs-mint-tickets-and-keys]]
 func AskFrom(ask []any, said map[string][]string) string {
-	return ""
+	parts := []string{}
+	for _, item := range ask {
+		one := yaml.AsDoc(item)
+		if one == nil {
+			continue
+		}
+		lines := []string{}
+		for _, value := range said[yaml.AsString(one.Get("name"))] {
+			if value = strings.TrimSpace(value); value != "" {
+				lines = append(lines, value)
+			}
+		}
+		if len(lines) == 0 {
+			continue
+		}
+		if yaml.AsString(one.Get("form")) == "list" {
+			parts = append(parts, "- "+strings.Join(lines, "\n- "))
+			continue
+		}
+		parts = append(parts, strings.Join(lines, "\n\n"))
+	}
+	return strings.Join(parts, "\n\n")
 }
 
+// The rows an ask writes for each field it names, as comments the hand writes under. [[spec/design_input/the-agent-pulls-tickets#evidence-has-a-form]]
 func AskRows(ask []any) string {
 	rows := []string{}
 	for _, item := range ask {

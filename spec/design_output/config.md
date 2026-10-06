@@ -182,6 +182,10 @@ number `5`, which keeps `"5" > 3` a bug nobody files.
 Where the schema knows no such key, the text lands as given. A key only the
 local file names resolves, and nothing knows its type.
 
+`./RUNME.sh config <key> <value> --tracked` writes `spec/config/level0.json`
+instead. The write keeps the comment member and the key order. The printed
+line and the log row name the layer the write lands in.
+
 # The engine controls
 
 `engine.binding` says how tightly the queue holds a session. This chapter is the

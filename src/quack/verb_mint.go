@@ -63,7 +63,16 @@ func mintVerb(rootOf func() (string, error)) twin {
 			}
 			handed = append(handed, one)
 		}
+		// [[spec/tickets/verbs-mint-tickets-and-keys]]
+		handed, said, ask := askFlags(pull.OSDisk{Root: method}, handed)
 		fields, why := fieldsIn(handed, schema)
+		if why == "" && len(said) > 0 {
+			if strings.TrimSpace(yaml.AsString(fields[askField])) != "" {
+				why = fmt.Sprintf("Name the ask by --%s or by its fields, and not by both.", askField)
+			} else {
+				fields[askField] = pull.AskFrom(ask, said)
+			}
+		}
 		if why == "" {
 			why = withRoute(pull.OSDisk{Root: method}, schema, fields)
 		}
@@ -157,6 +166,44 @@ func fieldsIn(words []string, schema *yaml.Doc) (map[string]any, string) {
 		fields[key] = pair[2]
 	}
 	return fields, ""
+}
+
+// The words left once every --<name>=value naming a field of the named process's ask stands taken out, with the values each name takes and the process's ask. [[spec/tickets/verbs-mint-tickets-and-keys]]
+func askFlags(disk pull.Disk, words []string) ([]string, map[string][]string, []any) {
+	process := ""
+	for _, word := range words {
+		if pair := fieldFlag.FindStringSubmatch(word); pair != nil && check.SlugOf(pair[1]) == "process" {
+			process = pair[2]
+		}
+	}
+	if process == "" {
+		return words, nil, nil
+	}
+	held, why := pull.ProcessAt(disk, process)
+	if why != "" {
+		return words, nil, nil
+	}
+	names := map[string]string{}
+	for _, item := range held.Ask {
+		if name := yaml.AsString(yaml.AsDoc(item).Get("name")); name != "" {
+			names[check.SlugOf(name)] = name
+		}
+	}
+	rest, said := []string{}, map[string][]string{}
+	for _, word := range words {
+		pair := fieldFlag.FindStringSubmatch(word)
+		if pair == nil {
+			rest = append(rest, word)
+			continue
+		}
+		name, ok := names[check.SlugOf(pair[1])]
+		if !ok {
+			rest = append(rest, word)
+			continue
+		}
+		said[name] = append(said[name], pair[2])
+	}
+	return rest, said, held.Ask
 }
 
 // Copies the route, its hash and the process's ask in where the fields name a process and the schema takes steps, off withRoute in src/scripts/process.js. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]

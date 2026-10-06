@@ -36,7 +36,7 @@ func TestAskFromWritesEachFieldInRouteOrder(t *testing.T) {
 		field.Set("form", one[1])
 		ask = append(ask, field)
 	}
-	said := map[string][]string{"done_when": {"one passes", "two passes"}, "gain": {"It gains."}, "breaks": {"It breaks."}}
+	said := map[string][]string{"done_when": {"one passes", "two passes"}, "gain": {"It gains."}, "breaks": {"It breaks."}, "view": {"  "}}
 	if got, want := AskFrom(ask, said), "It gains.\n\nIt breaks.\n\n- one passes\n- two passes"; got != want {
 		t.Errorf("AskFrom reads %q, want %q", got, want)
 	}

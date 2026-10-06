@@ -49,7 +49,7 @@ func TestConfigPrintsEveryRowAndItsLayer(t *testing.T) {
 			t.Fatalf("config prints no row %q in:\n%s", row, out)
 		}
 	}
-	if !strings.HasSuffix(out, "\n\nWrite one: ./RUNME.sh config <key> <value>, which lands in .se/.runtime/config.json.\n") {
+	if !strings.HasSuffix(out, "\n\nWrite one: ./RUNME.sh config <key> <value>, which lands in .se/.runtime/config.json, or add --tracked to land it in spec/config/level0.json.\n") {
 		t.Fatalf("config ends on no write line:\n%s", out)
 	}
 }

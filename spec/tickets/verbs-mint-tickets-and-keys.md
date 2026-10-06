@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -177,6 +177,15 @@ record:
         hash: 34b83b8d5ff9d575
         size: 959
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: d12d1969bf45a1ae1144c7339c9fc431edb33850
+    hash_after: d12d1969bf45a1ae1144c7339c9fc431edb33850
+    answered:
+      - name: lint
+        exit: 0
+        said: "   89.4  in all"
+    def: f150b8c0dc20fe45
 group: engine-verbs-hold
 ---
 
@@ -331,14 +340,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft size list plus the config design output, which the gate row names, and the config verb test, whose usage line names the new flag.
+The mint reads the process through pull.ProcessAt and the verbs own disk door, and the config write keeps settingAt and orderedAt, so no new door opens.
+Each new function carries a link to spec/tickets/verbs-mint-tickets-and-keys.
+The ask layout stands once, in AskFrom in src/pull/process.go, and the retro mint and the mint verb both call it; the tracked flag word stands once as configTrackedFlag.
 
 ## tests-green
 
