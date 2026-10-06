@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: b9d2935fa7d8472b
         size: 1701
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box a694567529c5 · claude-code-remote · helper-4
+    hash_before: 93df06a489659ca7429058d85497f88a6510d2ec
+    hash_after: 93df06a489659ca7429058d85497f88a6510d2ec
+    inputs:
+      - name: design/draft
+        hash: b9d2935fa7d8472b
+        size: 1701
+      - name: design/tests-red
+        hash: d7c071c1f34ecffe
+        size: 596
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -264,8 +276,11 @@ The case fails on its assertion: the stub leaves the child in the test's own gro
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- ending-windows-tree-tested: ending_test.go builds under !windows, so the taskkill /T /F road in ending_windows.go meets no test while check.yml runs windows-latest; add a Windows case where a child and the process it starts both stand ended once the span ends, waiting on the pipe as the unix case does
+- vale-call-takes-endswhole: the case drives endsWhole over sh and never the Vale road, so no test decides that heardIn, gitRead, reviewOver and realRun wrap their child in endsWhole; the implementer wraps all four in place and names in the says field that a missed caller leaves that call's children orphaned
 
 # implement
 
