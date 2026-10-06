@@ -196,6 +196,10 @@ func asks(root string, argv []string) int {
 		fmt.Fprintln(stderr, said.Error)
 		return 1
 	}
+	// The stop returns once the door has exited. [[spec/tickets/smoke-waits-for-the-door]]
+	if argv[0] == "stop" {
+		awaitsStopped(said.Result)
+	}
 	// why prints the tree the design input draws. [[spec/design_output/model#quack-why]]
 	if found, ok := said.Result.(map[string]any); ok && argv[0] == "why" {
 		fmt.Println(found["text"])

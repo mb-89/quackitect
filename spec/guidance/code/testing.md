@@ -12,7 +12,7 @@ rationale: [[spec/rationales/testing]]
 3. Give each door one door test against the real thing, list it in the door audit, and run every other test on the door's fake. A door driven from many tests waits on the box in each of them, and one nobody drives fails on the first box its fake misses. In the JavaScript the door test stands in `test/contract`. [[spec/design_output/doors#one-contract-test-per-door]] *
 4. Write a fake that behaves. A double scripting the answer tests the script. *
 5. Open a hard piece with a design doc, and a simple one with the test. Then write the code, and watch a test fail for the reason you expect before you make it pass. The commit door refuses a change standing with no test, and `EveryModuleTested` reads the tree. *
-6. Name a test as the claim it makes, and assert every word of that claim.
+6. Name a test as the claim it makes, and assert every word of that claim. Read the rules on behavior tests in [[spec/guidance/code/examples]].
 7. Build a fixture once a package run and share it where no case writes to it, and copy it into the case where one does. A fixture each case builds pays its build once a case. *
 8. Take the clock and the random source as arguments, and wait on readiness or a fake clock outside a door test, where no process spawns either. A wait on the wall clock passes on a quiet box and fails on a loaded one, and the check names a test doing it outside the audit. *
 9. Let every test run beside every other. A test needing an order is a red test.

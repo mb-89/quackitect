@@ -86,10 +86,7 @@ func runUnder(life context.Context, one Command) Said {
 		run, cancel = context.WithTimeout(life, one.Wait)
 	}
 	defer cancel()
-	cmd := exec.CommandContext(run, one.Argv[0], one.Argv[1:]...)
-	cmd.WaitDelay = pipesClose
-	cmd.Dir = one.Dir
-	cmd.Env = append(without(cmd.Environ(), one.Drop), one.Env...)
+	cmd := command(run, one)
 	var out, errs bytes.Buffer
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = strings.NewReader(one.Stdin), &out, &errs
 	if through := one.Streams; through != nil {
@@ -111,6 +108,18 @@ func runUnder(life context.Context, one Command) Said {
 		return Said{Err: err.Error(), Code: NotStarted}
 	}
 	return Said{Out: out.String(), Err: errs.String()}
+}
+
+// The run's process in its folder and env, which the end of the life ends whole with every process it started, where it reads none of the caller's streams. A run on the caller's terminal stays in the caller's group, so its reads reach the terminal. [[spec/tickets/the-check-ends-what-it-drops]]
+func command(life context.Context, one Command) *exec.Cmd {
+	cmd := exec.CommandContext(life, one.Argv[0], one.Argv[1:]...)
+	cmd.WaitDelay = pipesClose
+	cmd.Dir = one.Dir
+	cmd.Env = append(without(cmd.Environ(), one.Drop), one.Env...)
+	if one.Streams == nil {
+		whole(cmd)
+	}
+	return cmd
 }
 
 // Whether an exit code reads as a signal's end. Go answers below zero where a signal ends a run on a POSIX box. Windows carries no signals, and the MSYS sh Git for Windows ships ends on one with the signal's number in the high byte and none in the low. [[spec/tickets/the-doors-pr-goes-green]]

@@ -65,7 +65,10 @@
       "Bash(./RUNME.sh ticket pull:*)"
     ],
     "deny": [
-      "Artifact"
+      "Artifact",
+      "mcp__github__merge_pull_request",
+      "mcp__b6be2f0a-1533-41f3-8991-00692028c4db__merge_pull_request",
+      "Bash(gh pr merge:*)"
     ]
   },
   "skipAutoPermissionPrompt": true,
