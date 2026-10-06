@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: retro/cloud
 steps:
   - name: sync
@@ -151,7 +151,20 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 34eba3f85616 · claude-code-remote
+    hash_before: 51498837537f751eea5375686b7a067577cbea6a
+    hash_after: 51498837537f751eea5375686b7a067577cbea6a
+    inputs:
+      - name: retro/write
+        hash: ee39ce77262b47c4
+        size: 4214
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 7c1b55b24304355c
+        size: 3362
+    def: 4da1ca5da87d5bbc
 cloud: true
+reason: done
 ---
 
 # Ask
@@ -314,20 +327,29 @@ The line count script reads each tracked Go or JS file at a commit through git s
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool the run needed stood on the box, and no host or right came back refused
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a merge of main left open by an earlier box, at the start
+- a conflict at the second sync, twelve files, at the accept gate
+- the gate's git-write rule, refusing git rm, git add and git push
+- the stop hook, refusing a stop while helpers ran
+- the dead index, refusing writes while a conflict marker stood
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked
+- no ticket minted outside the group
+- the handover: every child closed, the check green, the branch pushed, and the pull request opens next
 
 # Discussion
 
