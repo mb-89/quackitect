@@ -95,7 +95,16 @@ record:
         exit: 0
         said: work/failures-stand-registered already carries every commit on main.
     def: 8a9850a81227554b
-step: split
+  - step: split
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: c8bbe0f6b6fe7d6432ee73da35a00d6b5b2b9c54
+    hash_after: c8bbe0f6b6fe7d6432ee73da35a00d6b5b2b9c54
+    inputs:
+      - name: ask
+        hash: 8602fdf90b84396a
+        size: 1198
+    def: cb8f90bc86fc7d39
+step: children
 ---
 
 # Ask
@@ -129,14 +138,41 @@ Every failure the tree raises takes its registered name, the way a log call take
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/check-skips-named-red-tests]] trivial
+- [[spec/tickets/failure-check-refuses]] standard
+- [[spec/tickets/failure-count-skips-no-id]] trivial
+- [[spec/tickets/failure-door-raises]] standard
+- [[spec/tickets/failure-new-refusals-tested]] trivial
+- [[spec/tickets/failure-new-shape-once]] trivial
+- [[spec/tickets/failure-nodes-stand]] standard
+- [[spec/tickets/failure-raise-joins-said]] trivial
+- [[spec/tickets/failure-raise-row-off-door]] trivial
+- [[spec/tickets/failure-raise-unregistered-case]] trivial
+- [[spec/tickets/failure-verb-in-help]] trivial
+- [[spec/tickets/failure-verbs-raise-and-register]] standard
+- [[spec/tickets/failure-watch-shape]] trivial
+- [[spec/tickets/failures-and-the-sentinel]] standard
+- [[spec/tickets/js-refusals-move]] trivial
+- [[spec/tickets/mint-refusals-keep-ids]] trivial
+- [[spec/tickets/moved-owns-the-files]] trivial
+- [[spec/tickets/pull-callers-name-stillheld]] trivial
+- [[spec/tickets/pull-ids-test-written]] trivial
+- [[spec/tickets/raise-scan-keys-failure-door]] trivial
+- [[spec/tickets/sentinel-callers-list-whole]] trivial
+- [[spec/tickets/sentinel-fires-watches]] standard
+- [[spec/tickets/sentinel-note-names-the-runner]] trivial
+- [[spec/tickets/take-moves-stands-refusals]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: each standard child is one slice of the split's order, and each trivial child one fix a review named
+- the children add up to the goal: the node shape, the door and its twin, the check, the sentinel, the verbs and the move of the pull, take and mint refusals each close under a child
+- a child that waits names it under depends_on: the check, the verbs and the sentinel name the nodes and the door, and failures-and-the-sentinel names the five slices
 
 # children
 
