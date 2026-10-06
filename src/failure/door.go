@@ -13,6 +13,7 @@ import (
 // The reads the registry takes: the names a folder holds, and one file's text. [[spec/design_output/failures#the-registry-reads-the-nodes]]
 type Reader interface {
 	Files(folder string) []string
+	Walk(folder string) []string
 	Read(path string) (string, bool)
 }
 
@@ -36,6 +37,11 @@ func (one Dir) Files(folder string) []string {
 	return out
 }
 
+// Every file under a folder, at any depth, by slashed path from the root. [[spec/design_output/failures#the-check-holds-the-registry]]
+func (one Dir) Walk(folder string) []string {
+	return []string{}
+}
+
 func (one Dir) Read(path string) (string, bool) {
 	said, err := os.ReadFile(one.at(path))
 	return string(said), err == nil
@@ -53,6 +59,10 @@ func (one FakeDir) Files(folder string) []string {
 	}
 	sort.Strings(out)
 	return out
+}
+
+func (one FakeDir) Walk(folder string) []string {
+	return []string{}
 }
 
 func (one FakeDir) Read(path string) (string, bool) {

@@ -35,5 +35,11 @@ func TestDirAndFakeDirAnswerAlike(t *testing.T) {
 		if got := reader.Files("spec/none"); len(got) != 0 {
 			t.Errorf("%s lists %v under a folder nobody made", name, got)
 		}
+		if got := reader.Walk("spec"); !reflect.DeepEqual(got, []string{Folder + "/a.md", Folder + "/b.md", "spec/other.md"}) {
+			t.Errorf("%s walks %v", name, got)
+		}
+		if got := reader.Walk("spec/none"); len(got) != 0 {
+			t.Errorf("%s walks %v under a folder nobody made", name, got)
+		}
 	}
 }

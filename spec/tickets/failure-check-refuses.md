@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
 depends_on: ["failure-nodes-stand, failure-door-raises"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -135,6 +135,22 @@ record:
         hash: 8955ba9cf023e089
         size: 4419
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 4f138fba4b111099bbae7a563f5d7c334b905020
+    hash_after: 4f138fba4b111099bbae7a563f5d7c334b905020
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/failure fails
+    inputs:
+      - name: design/draft
+        hash: d49d70f3831b853c
+        size: 2429
+      - name: [[spec/design_output/failures]]
+        hash: 8955ba9cf023e089
+        size: 4419
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -233,26 +249,37 @@ The door gains Walk(folder), which lists every file under a folder by slashed pa
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/check_test.go src/failure/tree_test.go src/failure/door_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/failure/check_test.go TestNodeFaultsNameANodeWithNoRemedy
+- src/failure/check_test.go TestRaiseFaultsNameAnIdWithNoNode
+- src/failure/check_test.go TestDoorFaultsNameAMovedFileHoldingItsRefusal
+- src/failure/tree_test.go TestEveryNodeNamesARemedy
+- src/failure/tree_test.go TestEveryRaisedIdStandsAsANode
+- src/failure/tree_test.go TestTheMovedFilesWriteNoRefusalPastTheDoor
+- src/failure/door_contract_test.go TestDirAndFakeDirAnswerAlike
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion. The fault stubs answer no fault, so each fixture case misses the fault it names. The Walk stubs answer no file, so the contract case misses the walk, and each tree case stops on a walk that reads nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the three tree cases decide the three go test lines, the fixture cases pin each fault's wording, and ./RUNME.sh check decides the last
+- the fixture cases read through FakeDir and the Fake registry, and the contract case holds Dir and FakeDir to the same Walk
 
 # gate
 
