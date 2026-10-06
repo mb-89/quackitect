@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: retro-and-coordinator
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 903a5e28ce3cdf10
         size: 700
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: b17a09908afa9cf9d6a69505d483f35aa37abdfb
+    hash_after: b17a09908afa9cf9d6a69505d483f35aa37abdfb
+    answered:
+      - name: lint
+        exit: 0
+        said: ".claude/skills/work/SKILL.md:14:1: ListItem: A sentence in a list item holds 20 words, and this one holds 26. Cut it."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -309,14 +318,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/battery.go src/quack/battery_test.go src/quack/check.go src/quack/check_test.go src/quack/checkdoors.go src/quack/checkdoors_test.go src/scripts/battery-reporter.js test/level0/battery-reporter.test.js src/branches/dispatch.go src/branches/dispatch_fire.go src/branches/dispatch_fire_test.go .github/workflows/dispatch.yml .claude/skills/work/SKILL.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus one line in src/branches/dispatch.go recording the branches at done, which the fire guard reads
+- the check runs over checkFake doors, the dispatch over the fake hub behind the send door, and the loud run door over a helper process
+- the workflow and the skill point at this ticket
+- the red row format stands once, in saysParts
 
 ## tests-green
 

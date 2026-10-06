@@ -127,7 +127,7 @@ func dfBody(t *testing.T, one dfSent) map[string]any {
 	return out
 }
 
-// A work pull request whose check reads red gets a worker, told where and what to fix; a green one, another branch's, and one the plan fires already get none. [[spec/tickets/ci-reds-name-their-cases]]
+// A work pull request whose check reads red gets a worker, told where and what to fix; a green one, another branch's, one the plan fires already, and one a worker took off done get none. [[spec/tickets/ci-reds-name-their-cases]]
 func TestDispatchFiresAWorkerAtARedWorkPullRequest(t *testing.T) {
 	t.Parallel()
 	hub := newHub()
@@ -135,8 +135,9 @@ func TestDispatchFiresAWorkerAtARedWorkPullRequest(t *testing.T) {
 	pull := func(ref, sha string, number int) map[string]any {
 		return map[string]any{"number": number, "html_url": fmt.Sprintf("https://github.example/%s/pull/%d", dfRepo, number), "head": map[string]any{"ref": ref, "sha": sha}}
 	}
-	hub.pulls = append(hub.pulls, pull("work/red", "sha-red", 8), pull("work/green", "sha-green", 9), pull("claude/dispatch-abc1234", "sha-red", 10), pull("work/first", "sha-red", 11))
+	hub.pulls = append(hub.pulls, pull("work/red", "sha-red", 8), pull("work/green", "sha-green", 9), pull("claude/dispatch-abc1234", "sha-red", 10), pull("work/first", "sha-red", 11), pull("work/taken", "sha-red", 12))
 	plan := dfPlan([]string{"first"}, nil, nil, nil)
+	plan.atDone = map[string]bool{"work/red": true, "work/green": true}
 	if code := dfFired(hub, plan, nil); code != codeOK {
 		t.Fatalf("the fire answers %d", code)
 	}

@@ -247,7 +247,9 @@ func TestGoGate(t *testing.T) {
 			t.Fatalf("the gate ran %v, and wants %v", fake.runs, want)
 		}
 		red := &checkFake{codes: map[string]int{"go": 1}}
-		if code := goGate(red.doors(), false, nil); code != 1 || len(red.runs) != 1 {
+		redDoors := red.doors()
+		redDoors.root = t.TempDir()
+		if code := goGate(redDoors, false, nil); code != 1 || len(red.runs) != 1 {
 			t.Fatalf("a red test answers %d after %v", code, red.runs)
 		}
 		gone := &checkFake{gone: map[string]bool{"go": true}}
@@ -259,7 +261,7 @@ func TestGoGate(t *testing.T) {
 		fake := &checkFake{codes: map[string]int{"go": 1}, said: map[string]string{"go": "=== RUN   TestA\n    --- FAIL: TestA (0.00s)\nok  \tquackitect/src/two\n--- FAIL: TestB (0.01s)\n"}}
 		doors := fake.doors()
 		var errs, out strings.Builder
-		doors.errs, doors.out = &errs, &out
+		doors.errs, doors.out, doors.root = &errs, &out, t.TempDir()
 		if code := goGate(doors, true, nil); code != 1 {
 			t.Fatalf("a red quiet run answers %d", code)
 		}

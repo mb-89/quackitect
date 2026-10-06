@@ -64,6 +64,16 @@ test("a fail carries the error's first line, and the cause's where one stands", 
   assert.equal(bare.said, "one is two");
 });
 
+// A red case names its line, so the check's log points at it. [[spec/tickets/ci-reds-name-their-cases]]
+test("a fail carries the line its case stands at, and a pass carries none", () => {
+  const event = (type) => ({
+    type,
+    data: { name: "a case", file: FILE, line: 12, details: { error: new Error("no") } },
+  });
+  assert.equal(rowOf(event("test:fail"), FROM).line, 12);
+  assert.equal("line" in rowOf(event("test:pass"), FROM), false);
+});
+
 test("an event that is no case answers nothing", () => {
   assert.equal(rowOf({ type: "test:diagnostic", data: {} }, FROM), null);
   assert.equal(rowOf({ type: "test:start", data: { name: "a" } }, FROM), null);
