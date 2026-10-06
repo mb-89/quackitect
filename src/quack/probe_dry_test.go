@@ -1,6 +1,6 @@
 // The dry probe over fake doors: the door the clone stands, every event posted
 // to it, the rows ask answered with the transcript, the clear road, the working
-// delta, and the eight checks read off the door's answers and the log.
+// delta, and the checks read off the door's answers and the log.
 // [[spec/tickets/probes-leave-node]]
 package main
 
