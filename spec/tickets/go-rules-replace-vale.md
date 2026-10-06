@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: e7c1548ba27dee4fc7fba3a2b2ce7fc75619f737
+    hash_after: e7c1548ba27dee4fc7fba3a2b2ce7fc75619f737
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/rules passes; green, src/modules/lsp passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   77.7  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 25b5ae1b04509dbe
+        size: 930
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -357,26 +380,33 @@ every fact the change adds stands in one place: the text model, the kinds and th
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/rules/rules_test.go src/modules/lsp/tools_test.go src/quack/rules_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The prose rules run in Go. src/rules loads every rule under spec/config/styles, ports Vale's text model over goldmark and the prose tagger, runs the token kinds and a Go function for each former Tengo script, honours the vale markers, and places each finding where Vale placed it. One run over the whole tree answers 9903 rows against Vale's 9912. The difference is Vale placing a sequence match on the first copy of a word in a block holding code, Vale matching masked code under Passive, and files moving under the run. The write door, the commit voice, the pull, the lsp panel and the lint all read the Go rules, through heardIn, the lsp Tools.Rules field and the rules-over verb that lib/vale.js calls. A project's own style folder adds no rule any more, per the Discussion. Vale itself, its install, its survey entry, its configs and the voice verb's run leave once the-check-lint-runs-in-go lands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: the tests turn green with no edit past src/rules, the quack seams, the lsp tools and the JavaScript door
+every door the change reaches has a fake: the lsp case fakes Tools.Rules, the verb case fakes the lint, and the quack cases meet the real rules over a seeded root
+a comment names the approach the change implements: each file of src/rules points at spec/design_output/rules or the ticket
+every fact the change adds stands in one place: the engine's design stands in spec/design_output/rules.md, and the compare's result in the group's retro
 
 # accept
 
