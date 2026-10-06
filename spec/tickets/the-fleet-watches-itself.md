@@ -149,7 +149,19 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
-step: retro/write
+  - step: retro/write
+    hand: box 238560a34a48 · claude-code-remote
+    hash_before: b4e4bb5f3e1f1342c1ee3164fea1ec53ed04531e
+    hash_after: b4e4bb5f3e1f1342c1ee3164fea1ec53ed04531e
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
+step: retro/cloud
 ---
 
 # Ask
@@ -230,38 +242,67 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- boxes-write-their-final-record: branch done writes the model, the cost and the final line into the record
+- a-verb-writes-box-prompts: one verb writes a box prompt off the route and the ticket
+- the-fleet-verb-watches-boxes: the fleet verb lists every box, the dispatch's among them, with tip, hold age, pull request and final record, and exits red on a stall
+- one-routine-checks-the-fleet: the fleet routine stands in the route, and a pull request event reaches the box holding its branch
+- size-misses-held-and-branch, prompt-flags-follow-prompt-verb, fleet-prompt-awaits-fleet-verb, pr-events-reach-their-box, fleet-rows-print-final-record: the findings the gates and accept minted, closed inside the group
+- the-fleet-routine-stands: left loose on main for the owner, since a box stores no routine
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- every child passed gate on the first round, because each design drafted its red tests before the change
+- the accept step caught the missing final record in the fleet rows and the group closed it before done
+- the handover carried the work across two context clears with no step lost
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 16:27 the dispatch prompt 'run the work skill' opened the run; the first calls named no ticket or a ticket that stood on main alone, and the door refused them
+- 16:28 a git merge and 16:33 a git push to main met the trunk guard; branch open needs main, so the group commit went up through switch and push and the box took the branch by name
+- 16:33 to 16:58 the plan grace ran out on several calls, since a call carried no plan answer
+- 16:46 the stop hook fed back twice, since the turn tried to end while helpers ran
+- 16:59 a probe clone under the scratchpad met ShellWritesNothing
+- 17:13 the handover write broke its schema at the first try
+- 17:17 the MCP pull tool answered once, then lost its tool.call hook, and the CLI ran the same verb
+- 17:32 a chained test and pull command met LandingFollowsItsGate
+- 17:36, 18:15, 18:22 a pass that closed a ticket left it as the plan's working item, so the next write named it and the door refused
+- 18:00 the person ticket the-fleet-routine-stands failed its do back, because a box stores no routine
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- src/pull: a pass that closes the working ticket clears the plan's working item in the same call
+- the level0 plugin's tool registry: index_ticket_pull keeps its tool.call hook across a reload, with a test that calls it twice
+- src/branches: branch open on a cloud box pushes to the work branch alone and reads the group off its own tip, so it needs no write to main
+- the work skill: its first step names the plan call and the ticket a description carries, so the first calls meet the door clean
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The thoughts kept weighing whether a refusal was a fault of the tree or of the hand. Most refusals named a ticket out of hand after a close, which reads as one defect in the pull rather than many slips. The thoughts also took the dispatch's fire as the ask's acceptance, a call the merge hand judges.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- single place: each improve line names the home that owns the fix, and no fact repeats a note
+- numbers: the chapter adds no number but the times the badly list owes
+- headers: the change writes no file header
+- prompts and errors: the badly list carries the dispatch prompt, the stop hook feedback and each refusal, each with its time off the transcript
+- role: the chapter names the box and the owner by role, with no name, address or path
 
 ## cloud
 
