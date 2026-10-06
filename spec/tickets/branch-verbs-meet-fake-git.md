@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: pull-meets-fake-git
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -221,6 +221,15 @@ record:
         hash: cc0e07111bce8fc0
         size: 18378
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 848c44104b03e63572afcc03c6578eaf27d88e10
+    hash_after: 848c44104b03e63572afcc03c6578eaf27d88e10
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -474,10 +483,10 @@ The change in 93e1f290a answers the point the last gate raised and leaves the ap
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the change touches the files the draft size names; it departs by adding fourteen Repo operations the verbs needed, each with its contract case, and the runtime spawn case the gate point asked for
-every door the change reaches has a fake: FakeRepo for git, FakeRunner for the processes, FakeDisk for the disk
-each changed door file points at the git door section of spec/design_output/doors.md, which names the approach
-the git operations stand once, in src/modules/git/repo.go, and the doors chapter names them in its operations table
+- the change touches the files the draft size names, and departs by adding the Repo operations the verbs needed, each with its contract case, and the runtime spawn case the first gate point asked for. The child branch-vale-case-runs-fake adds the vale door test file and its row
+- every door the change reaches has a fake: FakeRepo for git, FakeRunner for the processes, FakeDisk for the disk, and the one vale case stands as a listed door test
+- each changed door file points at the git door section of spec/design_output/doors.md, which names the approach
+- the git operations stand once, in src/modules/git/repo.go, and the doors chapter names them in its operations table
 
 ## tests-green
 
