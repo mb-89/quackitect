@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: green
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: af9b881e589e27b51193d1f2c58a8126e8ed5a36
+    hash_after: af9b881e589e27b51193d1f2c58a8126e8ed5a36
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/hooks passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: green
+    inputs:
+      - name: design/tests-red
+        hash: 2826846c8851c458
+        size: 789
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -328,26 +351,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/hooks/hooks_test.go src/quack/sentinel_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A watch in the failure registry now fires in the running index. Hook in src/modules/hooks/hooks.go hands each post to Hear, as its event name and its payload in compact JSON. listensHooks in src/quack/main.go builds the sentinel through sentinelHere, over the tree's nodes, the clock door, the process door and the session log. A fired failure writes its row there, and a row the log refuses prints on stderr. The design note's watch example names tool.call, an event a post carries. A case under src/modules/hooks posts a watched tool call over the fakes and reads the row.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches hooks.go and the design note, and the fix children landed sentinel.go, main.go and the cases
+- every door the change reaches has a fake: FakeDir, FakeRunner, the fake clock and a still timer
+- a comment over hears, sentinelOver and sentinelHere names the approach
+- the row stamp reads logStamp, and the log path reads sessionLog
 
 # accept
 
