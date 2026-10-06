@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: failures-stand-registered
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: abce73f782ebab81
         size: 2173
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-6
+    hash_before: 5a2875c06e0b7a33305bcf15836eab613988cec7
+    hash_after: 5a2875c06e0b7a33305bcf15836eab613988cec7
+    inputs:
+      - name: design/draft
+        hash: abce73f782ebab81
+        size: 2173
+      - name: design/tests-red
+        hash: ed08e844123f91a5
+        size: 861
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -265,8 +277,13 @@ the fake proc stands for the process door in the unit case, and the contract cas
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach answers the ask by its cause: spawns in src/index/door.go hands every child of the index QUACKITECT_ROOT, rootHere in src/index/main.go reads it before the working folder, and run in src/doors/index.js sets cwd alone, so the fix there (env QUACKITECT_ROOT = work, which proc.js merges over process.env) names the door's own root; the departure from a test under src/modules/index stands argued in the draft
+- the first done_when line meets the contract case in test/contract/index.test.js and the unit case in test/level0/search-door.test.js, both red on their own assertion; the second is a checkpoint the tests-green hand-back answers through the pull tool call
+- the draft's tests list names the contract case 'leaves the index an inherited QUACKITECT_ROOT names standing', and the file carries it as 'a door over one work folder starts its own index, whatever root the environment names'; the builder aligns the name at tests-green
+- the callers list names every importer of src/doors/index.js: src/scripts/cli-doors.js and the two test files
 
 # implement
 
