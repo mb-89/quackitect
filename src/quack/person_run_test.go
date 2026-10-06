@@ -8,13 +8,46 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"testing"
 
+	"quackitect/src/proc"
 	"quackitect/src/q"
 )
 
 // The child road a person's run starts, standing in for quack: it prints the harness variable it reads. [[spec/tickets/program-of-drops-node]]
 const childSays = "#!/bin/sh\necho \"${CLAUDECODE:-none}\"\n"
+
+// The quack a person's child road names, a path standing on no box. [[spec/tickets/quack-spawns-meet-fake-process]]
+const fakeQuack = "/fake/quack"
+
+// The binary the child road runs, as os.Executable answers it. [[spec/tickets/quack-spawns-meet-fake-process]]
+func fakeSelf() (string, error) { return fakeQuack, nil }
+
+func TestAPersonRunDropsTheHarnessAndNamesItsRoot(t *testing.T) {
+	registersFor(t, "person probe", func([]string, bool, io.Writer, io.Writer) int { return 0 })
+	var ran []proc.Command
+	fake := &proc.FakeRunner{Programs: map[string]proc.Program{fakeQuack: func(one proc.Command) proc.Said {
+		ran = append(ran, one)
+		return proc.Said{Out: "the road ran\n"}
+	}}}
+	root := t.TempDir()
+	said, err := nodeAcceptOver(fake.Run, fakeSelf, root)(q.Request{Module: "node", Verb: "run", Args: map[string]any{"words": []any{"person", "probe"}, "person": true}})
+	if err != nil || said != "the road ran" {
+		t.Fatalf("a person's run answers %v, %v, and wants the child's output", said, err)
+	}
+	if len(ran) != 1 {
+		t.Fatalf("a person's run starts %d child roads, and wants one", len(ran))
+	}
+	one := ran[0]
+	want := []string{fakeQuack, "verb", filepath.Join(root, "src", "scripts"), "person", "probe"}
+	if !slices.Equal(one.Argv, want) || one.Dir != root {
+		t.Fatalf("the child road runs %q in %s, and wants %q in %s", one.Argv, one.Dir, want, root)
+	}
+	if !slices.Equal(one.Drop, harness) || !slices.Equal(one.Env, []string{workRoot + "=" + root}) {
+		t.Fatalf("the child road drops %q and adds %q, and wants %q dropped and %s named", one.Drop, one.Env, harness, workRoot)
+	}
+}
 
 func TestAPersonRunCarriesNoHarness(t *testing.T) {
 	if runtime.GOOS == "windows" {

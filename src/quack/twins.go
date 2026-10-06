@@ -17,6 +17,7 @@ import (
 	"quackitect/src/index"
 	verbsmodule "quackitect/src/modules/verbs"
 	"quackitect/src/modules/work"
+	"quackitect/src/proc"
 	"quackitect/src/q"
 	"quackitect/src/ticket"
 )
@@ -198,6 +199,17 @@ func nodeAccept(root string) func(q.Request) (any, error) {
 			return nil, fmt.Errorf("%s answers %v: %s", strings.Join(args, " "), err, text)
 		}
 		return text, nil
+	}
+}
+
+// The node module over the process door and the binary a child road runs. A stub until the implement step: a person's call answers a fault and spawns nothing. [[spec/tickets/quack-spawns-meet-fake-process]]
+func nodeAcceptOver(_ proc.Runner, _ func() (string, error), root string) func(q.Request) (any, error) {
+	inProcess := nodeAccept(root)
+	return func(asked q.Request) (any, error) {
+		if marked, ok := asked.Args.(map[string]any); ok && marked[verbsmodule.PersonField] == true {
+			return nil, fmt.Errorf("nodeAcceptOver runs no child road yet")
+		}
+		return inProcess(asked)
 	}
 }
 

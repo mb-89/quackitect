@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"quackitect/src/index"
+	"quackitect/src/proc"
 	"quackitect/src/voice"
 )
 
@@ -64,6 +65,11 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 		Vale:    outside.run,
 		Now:     outside.now,
 	}
+}
+
+// Runs Vale through the process door. A stub until the implement step: it spawns in place as voiceRunsVale does. [[spec/tickets/quack-spawns-meet-fake-process]]
+func voiceRunsValeOver(_ proc.Runner) func(argv []string, cwd string) (string, error) {
+	return voiceRunsVale
 }
 
 // Runs Vale in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start answers its fault. [[spec/design_output/projection#the-second-target]]

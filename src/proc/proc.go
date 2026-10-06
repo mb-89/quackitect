@@ -17,10 +17,11 @@ const NotStarted = -1
 // What either runner answers a command naming no program. [[spec/design_output/doors#the-process-door]]
 var namesNoProgram = Said{Err: "proc: a command names no program", Code: NotStarted}
 
-// What a run takes. Env carries the pairs past the box's own. [[spec/design_output/doors#the-process-door]]
+// What a run takes. Drop names the box's variables a run leaves behind, and Env carries the pairs past the box's own. [[spec/design_output/doors#the-process-door]]
 type Command struct {
 	Argv  []string
 	Dir   string
+	Drop  []string
 	Env   []string
 	Stdin string
 	Wait  time.Duration

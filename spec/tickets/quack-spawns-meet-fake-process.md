@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: cb034706036a0d50
         size: 568
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 10de6c7dd169691a67635a18070435d81e1682c4
+    hash_after: 10de6c7dd169691a67635a18070435d81e1682c4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 7f13a4b6bdd9ca88
+        size: 6809
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -280,26 +293,34 @@ The doors.md line asking every `exec.Command` in the quack verbs to take the `Ru
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/registry_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/proc/proc_contract_test.go
+- src/quack/person_run_test.go
+- src/quack/registry_test.go
+- src/quack/voice_verb_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Six new cases fail on their own assertions. The process contract case for Drop fails on the real runner, which still reads the box variable. The quack cases run the person call and the Vale run on a FakeRunner taught paths no box holds, so the stubs spawn nothing real. The draft gave Drop two meanings, so the contract case pins the real one: a pair in Env stands after the drop, and the fake must not strip it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+done_when one meets the person-run, registry and voice cases now, and the moved index import case at implement; done_when two meets TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit; done_when three is the check
+the one door the tests reach is the process door, and FakeRunner stands beside the real runner
 
 # gate
 

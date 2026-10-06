@@ -152,6 +152,20 @@ func TestARunReadsTheEnvPastTheBoxs(t *testing.T) {
 	}
 }
 
+// The box holds the variable, so a run reads it unless the command drops it, and a pair in Env stands past the drop. [[spec/tickets/quack-spawns-meet-fake-process]]
+func TestARunDropsTheVariablesItNames(t *testing.T) {
+	t.Setenv("PROC_CONTRACT", "box")
+	for name, run := range runners() {
+		line := []string{"sh", "-c", "printf %s \"$PROC_CONTRACT\""}
+		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}}); said.Out != "" || said.Code != 0 {
+			t.Errorf("the %s runner answers %+v, and wants the box's variable dropped", name, said)
+		}
+		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}, Env: []string{"PROC_CONTRACT=held"}}); said.Out != "held" || said.Code != 0 {
+			t.Errorf("the %s runner answers %+v, and wants the pair in Env past the drop", name, said)
+		}
+	}
+}
+
 func TestACommandNamingNoProgramAnswersNotStarted(t *testing.T) {
 	t.Parallel()
 	for name, run := range runners() {
