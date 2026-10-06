@@ -111,6 +111,7 @@ type Doors struct {
 	MakeDir func(path string) error
 	Lint    func(path, text string) []Finding
 	Now     func() time.Time
+	Ceiling int
 }
 
 // Runs the voice verb over the words past it, and answers its exit code; a dry run writes no answer file. [[spec/design_output/projection#the-second-target]]
@@ -192,7 +193,25 @@ func measure(d Doors, words []string, dry bool, out, errs io.Writer) int {
 		fmt.Fprintln(out)
 		fmt.Fprintln(out, Tabled([]string{"rule", "fires"}, shownCounts, []int{1}))
 	}
+	if pulling {
+		return pastCeiling(rows, d.Ceiling, errs)
+	}
 	return 0
+}
+
+// Names each answer whose score passes the ceiling, and exits 1 where one does; a ceiling of 0 holds the check off. [[spec/tickets/the-coordinator-runs-under-level0]]
+func pastCeiling(rows []ScoreRow, ceiling int, errs io.Writer) int {
+	if ceiling <= 0 {
+		return 0
+	}
+	code := 0
+	for _, one := range rows {
+		if one.Score > float64(ceiling) {
+			fmt.Fprintf(errs, "%s scores %.1f, past the ceiling of %d.\n", one.File, one.Score, ceiling)
+			code = 1
+		}
+	}
+	return code
 }
 
 // Ranks the warn rows of the log inside the days asked, seven by default. [[spec/design_output/projection#the-second-target]]

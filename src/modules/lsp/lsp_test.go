@@ -67,7 +67,7 @@ func TestTheListenWritesTheDoorFile(t *testing.T) {
 }
 
 func TestTheListensStopHaltsTheTools(t *testing.T) {
-	fake := &fakeTools{}
+	fake := taughtTools(nil, nil)
 	server, _ := toolsOver(t, map[string]string{}, fake)
 	halted := make(chan struct{})
 	server.from.Tools.Halt = func() { close(halted) }

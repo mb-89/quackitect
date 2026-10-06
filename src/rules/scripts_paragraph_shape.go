@@ -131,19 +131,23 @@ func paraTableWords(one string) []string {
 	return strings.Fields(clean)
 }
 
-// The longest run of words two places share. [[spec/design_output/lsp#a-second-copy-draws]]
-func paraSharedRun(a, b []string) int {
-	most := 0
-	for i := range a {
-		for j := range b {
-			n := 0
-			for i+n < len(a) && j+n < len(b) && a[i+n] == b[j+n] {
-				n++
-			}
-			most = max(most, n)
+// Each run of words that long a place holds, so a long table takes one lookup a run. [[spec/design_output/lsp#a-second-copy-draws]]
+func paraRunsOf(words []string, most int) map[string]bool {
+	seen := map[string]bool{}
+	for j := 0; j+most <= len(words); j++ {
+		seen[strings.Join(words[j:j+most], " ")] = true
+	}
+	return seen
+}
+
+// Whether a place shares a run of words that long with the runs a cell holds. [[spec/design_output/lsp#a-second-copy-draws]]
+func paraShares(words []string, seen map[string]bool, most int) bool {
+	for i := 0; i+most <= len(words); i++ {
+		if seen[strings.Join(words[i:i+most], " ")] {
+			return true
 		}
 	}
-	return most
+	return false
 }
 
 // A heading, a row, an item, a quote and a blank stand outside the paragraph beside a table. [[spec/design_output/lsp#a-second-copy-draws]]
@@ -178,11 +182,11 @@ func paraRestatedTable(read Read) (script, error) {
 				continue
 			}
 			from := at
-			cells := [][]string{}
+			cells := []map[string]bool{}
 			for at < len(lines) && rowOf(lines[at]) {
 				for _, cell := range strings.Split(strings.TrimSpace(lines[at].said), "|") {
 					if one := strings.TrimSpace(cell); one != "" && !paraDivider.MatchString(one) {
-						cells = append(cells, paraTableWords(one))
+						cells = append(cells, paraRunsOf(paraTableWords(one), most))
 					}
 				}
 				at++
@@ -207,7 +211,7 @@ func paraRestatedTable(read Read) (script, error) {
 			for _, row := range near {
 				mine := paraTableWords(row.said)
 				for _, cell := range cells {
-					if paraSharedRun(mine, cell) >= most {
+					if paraShares(mine, cell, most) {
 						out = append(out, paraOver(row, "This line says again what a cell of the table beside it holds. Cut it, and let the table carry it."))
 						break
 					}

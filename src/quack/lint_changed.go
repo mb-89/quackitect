@@ -5,15 +5,20 @@
 package main
 
 import (
-	"os/exec"
+	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/proc"
 )
 
 // The folders the engine writes, where a hand fixes no warning. [[spec/tickets/rules-lint-changed-files-first]]
 var engineWrites = []string{"spec/tickets/", "spec/retros/", ".se/"}
+
+// The ref a merge in progress names the commit it brings in by. [[spec/tickets/rules-lint-changed-files-first]]
+const mergeHeadRef = "MERGE_HEAD"
 
 // The paths a hand writes, past every folder the engine writes. [[spec/tickets/rules-lint-changed-files-first]]
 func handWritten(paths []string) []string {
@@ -26,17 +31,18 @@ func handWritten(paths []string) []string {
 	return out
 }
 
-// The files the staging adds and the ones staged already, read through a dry run so nothing stages, past every deletion. [[spec/tickets/rules-lint-changed-files-first]]
-func stagesTo(root string, addArgs, only []string) []string {
+// The files the staging adds, under the paths named or all where none is, and the ones staged already, past every deletion, read off the git door so nothing stages. [[spec/tickets/rules-lint-changed-files-first]]
+func (d landingDoors) stagesTo(adds, only []string) []string {
 	var paths []string
-	for _, line := range strings.Split(gitRun(root, append([]string{addArgs[0], "--dry-run"}, addArgs[1:]...)...).out, "\n") {
-		if at, ok := strings.CutPrefix(line, "add '"); ok {
-			paths = append(paths, strings.TrimSuffix(at, "'"))
-		}
-	}
-	for _, line := range strings.Split(gitRun(root, append([]string{"diff", "--cached", "--name-only", "--diff-filter=d"}, only...)...).out, "\n") {
-		if line != "" {
-			paths = append(paths, line)
+	changed, _ := d.git.Status(true)
+	staged, _ := d.git.Staged(only)
+	merged, merging := d.git.Resolve(mergeHeadRef)
+	for _, one := range append(changed, staged...) {
+		named := len(adds) == 0 || slices.ContainsFunc(adds, func(at string) bool {
+			return one.Path == at || strings.HasPrefix(one.Path, strings.TrimSuffix(at, "/")+"/")
+		})
+		if (named || slices.Contains(staged, one)) && standsUnder(d.root, one.Path) && !(merging && d.asMerged(merged, one.Path)) {
+			paths = append(paths, one.Path)
 		}
 	}
 	slices.Sort(paths)
@@ -49,8 +55,8 @@ type gitAnswers func(args ...string) (string, bool)
 // Git under the root. [[spec/tickets/changed-lint-without-merge-base]]
 func gitAt(root string) gitAnswers {
 	return func(args ...string) (string, bool) {
-		said, err := exec.Command("git", append([]string{"-C", root}, args...)...).Output()
-		return string(said), err == nil
+		said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root, Wait: gitReadSpan})
+		return said.Out, said.Code == 0
 	}
 }
 
@@ -72,8 +78,20 @@ func changedOver(git gitAnswers, say func(line string)) []string {
 		say("No merge base with origin/" + command.Trunk + " stands here, so the changed files are HEAD's own commit's and the working tree's.")
 		read("diff-tree", "--no-commit-id", "--name-only", "-r", "--root", "--diff-filter=d", "HEAD")
 	}
-	read("diff", "--name-only", "--diff-filter=d", "HEAD")
+	// A merge in progress stages trunk's own files, so the working tree reads against MERGE_HEAD, leaving the hand's files and the resolutions. [[spec/tickets/rules-lint-changed-files-first]]
+	if _, merging := git("rev-parse", "-q", "--verify", mergeHeadRef); merging {
+		read("diff", "--name-only", "--diff-filter=d", mergeHeadRef)
+	} else {
+		read("diff", "--name-only", "--diff-filter=d", "HEAD")
+	}
 	read("ls-files", "--others", "--exclude-standard")
 	slices.Sort(paths)
 	return slices.Compact(paths)
+}
+
+// Whether the file on disk reads as the merged commit holds it, so a merge's strict lint passes trunk's own files. [[spec/tickets/rules-lint-changed-files-first]]
+func (d landingDoors) asMerged(merged, path string) bool {
+	there, held := d.git.Show(merged, path)
+	text, err := os.ReadFile(filepath.Join(d.root, filepath.FromSlash(path)))
+	return held && err == nil && there == string(text)
 }

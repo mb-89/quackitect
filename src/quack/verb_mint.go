@@ -13,11 +13,12 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
-func init() { register("mint", mintVerb(index.Root)) }
+func init() { register("mint", mintVerb(index.Root, registeredRepo)) }
 
 // The kind whose mint joins the box's group. [[spec/tickets/a-box-keeps-its-tickets]]
 const ticketKind = "ticket"
@@ -25,7 +26,7 @@ const ticketKind = "ticket"
 var fieldFlag = regexp.MustCompile(`(?s)^--([^=]+)=(.*)$`)
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-func mintVerb(rootOf func() (string, error)) twin {
+func mintVerb(rootOf func() (string, error), repoAt func(root string) git.Repo) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		words := argv[1:]
 		places := []string{}
@@ -83,7 +84,7 @@ func mintVerb(rootOf func() (string, error)) twin {
 		// A ticket on a closed group's branch stands free. [[spec/design_output/pull#a-closed-group-stays-shut]]
 		freed := ""
 		if kind == ticketKind {
-			branch, _ := gitIn(work, "rev-parse", "--abbrev-ref", "HEAD")
+			branch, _ := repoAt(work).Head()
 			named := yaml.AsString(fields[pull.GroupField])
 			if group := pull.JoinsGroup(named, yaml.AsString(fields["process"]), branch, name); group != "" {
 				if named == "" && pull.GroupClosed(disk, group) {

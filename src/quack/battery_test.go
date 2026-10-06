@@ -51,12 +51,37 @@ func TestBatteryReport(t *testing.T) {
 		}
 	})
 	t.Run("a red case comes off the lines in its own words, and a todo case reads none", func(t *testing.T) {
-		want := []redCase{{"test/contract/stub.test.js", "a stub holds its files", "ENOENT: no such file"}}
+		want := []redCase{{File: "test/contract/stub.test.js", Name: "a stub holds its files", Said: "ENOENT: no such file"}}
 		if got := redIn(redLines); !reflect.DeepEqual(got, want) {
 			t.Fatalf("the red read %v, and want %v", got, want)
 		}
 		if got := redIn(caseLines); len(got) != 0 {
 			t.Fatalf("green lines read red %v", got)
+		}
+	})
+	t.Run("a red runner case keeps the line its reporter wrote", func(t *testing.T) {
+		row := caseLine(map[string]any{"file": "test/a.test.js", "name": "a case", "ok": false, "said": "it broke", "line": 4})
+		if got := redIn(row); !reflect.DeepEqual(got, []redCase{{File: "test/a.test.js", Name: "a case", Said: "it broke", Line: 4}}) {
+			t.Fatalf("the red read %v", got)
+		}
+	})
+	t.Run("a red Go test reads its file under its package, and a parent with no message of its own stays out", func(t *testing.T) {
+		said := "--- FAIL: TestA (0.00s)\n    --- FAIL: TestA/inner (0.00s)\n        a_test.go:7: one is two\n        and more\n--- FAIL: TestB (0.00s)\n    b_test.go:3: three\nFAIL\nFAIL\tquackitect/src/one\t0.01s\nok  \tquackitect/src/two\t0.02s\nFAIL\n"
+		want := []redCase{{File: "src/one/a_test.go", Name: "TestA/inner", Said: "one is two", Line: 7}, {File: "src/one/b_test.go", Name: "TestB", Said: "three", Line: 3}}
+		if got := goRedIn(said); !reflect.DeepEqual(got, want) {
+			t.Fatalf("the Go red read %v, and want %v", got, want)
+		}
+		if got := goRedIn("ok  \tquackitect/src/two\t0.02s\n"); len(got) != 0 {
+			t.Fatalf("a green run reads red %v", got)
+		}
+	})
+	t.Run("the red rows open on their header, a row a case, and a green run prints none", func(t *testing.T) {
+		got := redSaid([]redCase{{File: "a.js", Name: "one", Said: "broke", Line: 2}, {Name: "two"}})
+		if want := []string{"", "The red cases:", "  a.js:2: one: broke", "  two"}; !reflect.DeepEqual(got, want) {
+			t.Fatalf("the rows read %q, and want %q", got, want)
+		}
+		if got := redSaid(nil); len(got) != 0 {
+			t.Fatalf("a green run reads %q", got)
 		}
 	})
 	t.Run("the tally counts a line a spawn", func(t *testing.T) {

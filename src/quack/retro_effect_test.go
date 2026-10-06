@@ -17,19 +17,40 @@ const retroEffectEarlier = `{"parts":{"tests":1000,"rules":200},"total":1200,"sl
 const retroEffectLater = `{"parts":{"tests":1400,"rules":200},"total":1600,"slowest":[{"name":"steady","ms":110},{"name":"arrives","ms":90}]}`
 
 // The next retro counts the last one's patterns again, and names each verdict. [[spec/guidance/retro/effect]]
+// The second retro's collect time and its log: four active hours, the pattern matching once. [[spec/guidance/retro/effect]]
+var retroEffectSecond = map[string]string{
+	"collected.json": `{"at":"2026-09-26T21:00:00.000Z"}`,
+	"input/log/session.jsonl": `{"at":"2026-09-26T08:10:00.000Z","said":"PastTense refused"}` + "\n" +
+		`{"at":"2026-09-26T09:10:00.000Z","said":"a quiet line"}` + "\n" +
+		`{"at":"2026-09-26T10:10:00.000Z","said":"a quiet line"}` + "\n" +
+		`{"at":"2026-09-26T11:10:00.000Z","said":"a quiet line"}`,
+}
+
+// A fresh box finds the last retro's classes in the tracked folder, where no private folder holds them. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	kept := "spec/retros/" + retroClassesFirst + "/"
+	retroMintWrite(t, root, kept+"classes.json", retroClassesWhole)
+	retroMintWrite(t, root, kept+"rates.json", `{"hours":2,"classes":{"k1":{"count":2,"rate":1}}}`)
+	retroMintWrite(t, root, kept+"collected.json", `{"at":"2026-09-19T21:00:00.000Z"}`)
+	retroReadingLay(t, root, retroClassesSecond, retroEffectSecond)
+
+	code, out, errs := retroReadingRun(retroEffectVerb, root, "retro", "effect", retroClassesSecond)
+
+	printed := "k1  1 to 0.25 an hour  falls  commit messages meet the voice rules late\n"
+	if code != 0 || out != printed {
+		t.Fatalf("effect answers %d, %q, %q, want %q", code, out, errs, printed)
+	}
+}
+
 func TestRetroEffectCountsTheLastRetrosPatternsAgainAndNamesEachVerdict(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroClassesFirst, retroClassesTree(retroClassesWhole, map[string]string{
 		"collected.json": `{"at":"2026-09-19T21:00:00.000Z"}`,
 	}))
-	retroReadingLay(t, root, retroClassesSecond, map[string]string{
-		"collected.json": `{"at":"2026-09-26T21:00:00.000Z"}`,
-		"input/log/session.jsonl": `{"at":"2026-09-26T08:10:00.000Z","said":"PastTense refused"}` + "\n" +
-			`{"at":"2026-09-26T09:10:00.000Z","said":"a quiet line"}` + "\n" +
-			`{"at":"2026-09-26T10:10:00.000Z","said":"a quiet line"}` + "\n" +
-			`{"at":"2026-09-26T11:10:00.000Z","said":"a quiet line"}`,
-	})
+	retroReadingLay(t, root, retroClassesSecond, retroEffectSecond)
 	retroReadingRun(retroClassesVerb, root, "retro", "classes", retroClassesFirst)
 
 	code, out, errs := retroReadingRun(retroEffectVerb, root, "retro", "effect", retroClassesSecond)

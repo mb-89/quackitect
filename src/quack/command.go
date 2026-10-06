@@ -4,9 +4,7 @@
 package main
 
 import (
-	"context"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -16,6 +14,7 @@ import (
 	settingsreader "quackitect/src/config"
 	"quackitect/src/modules/hooks"
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/proc"
 	"quackitect/src/prose"
 	"quackitect/src/rules"
 )
@@ -141,7 +140,7 @@ type valeHeard struct {
 // Vale over a text as the named file, each row past the Go prose vetoes. A box with no Vale reads nothing, as messageFaults and proseFaults do. [[spec/tickets/cage-commit-guards-port]] [[spec/tickets/cage-write-door-port]]
 func heardOver(root, name, text string) valeHeard { return heardIn(root, name, text, prose.All) }
 
-// What Vale answers over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
+// What the Go rules answer over a text, kept through the Go prose vetoes the mode names. [[spec/tickets/prose-checks-run-in-go]]
 func heardIn(root, name, text, mode string) valeHeard {
 	set, err := rulesAt(root)
 	if err != nil {
@@ -200,13 +199,9 @@ func textSetting(root, key string) string {
 
 // What a git read prints under the root, or nothing where it fails. [[spec/tickets/cage-command-rules-port]]
 func gitRead(root string, args ...string) string {
-	span, stop := context.WithTimeout(context.Background(), gitReadSpan)
-	defer stop()
-	run := exec.CommandContext(span, "git", args...)
-	run.Dir = root
-	said, err := run.Output()
-	if err != nil {
+	said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root, Wait: gitReadSpan})
+	if said.Code != 0 {
 		return ""
 	}
-	return strings.TrimSpace(string(said))
+	return strings.TrimSpace(said.Out)
 }

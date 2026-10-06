@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -116,8 +116,78 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: the-fleet-week-retro
-step: design/owner-read
+group: retro-and-coordinator
+step: implement/tests-green
+record:
+  - step: design/owner-read
+    skipped: true
+    why: the ask comes off no handover
+  - step: design/draft
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: f9b1b51bd0f4784c27a0eccf0d2147ca103f2729
+    hash_after: f9b1b51bd0f4784c27a0eccf0d2147ca103f2729
+    inputs:
+      - name: ask
+        hash: bac3852e47980fa2
+        size: 485
+    def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 8c9d6ebe7819 · claude-code-remote
+    hash_before: 5598aa566d687ac369010442f37d21dfbd55fcd9
+    hash_after: 5598aa566d687ac369010442f37d21dfbd55fcd9
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 70a72d6b73857176
+        size: 2158
+    def: 08e16d07b0de477c
+  - step: gate
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 0b2ba603a0e45e58666d5fe16a3187c5c5bf23c9
+    hash_after: 0b2ba603a0e45e58666d5fe16a3187c5c5bf23c9
+    inputs:
+      - name: design/draft
+        hash: 70a72d6b73857176
+        size: 2158
+      - name: design/tests-red
+        hash: d4411837207b96b8
+        size: 888
+    def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: c86fc4aeece65f963215bb02375307f6c7b0a6c1
+    hash_after: c86fc4aeece65f963215bb02375307f6c7b0a6c1
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/quack/retro_read.go:65:108: Antithesis: Say what is. 'and not' opens a half that says what the thing is not."
+    def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 45fc15f089570ee9e6f61ba25c8f8e6bc6dc256c
+    hash_after: 45fc15f089570ee9e6f61ba25c8f8e6bc6dc256c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: design/tests-red
+        hash: d4411837207b96b8
+        size: 888
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -149,38 +219,62 @@ Each retro misses owner prompts and refusals, and every fresh box measures its e
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Read: `retroRowsOf` in `src/quack/retro_read.go` gains two rows. A `queued_command` attachment from a human origin, or one naming no origin and not marked meta, earns a prompt row, and a helper's transcript earns none, as for a typed prompt. The queue's own enqueue line earns none, since the attachment or a user line carries the same prompt. A tool result carrying no error mark whose text opens on the word refused earns a refusal row, with its reason line. The retro read note and the verb's usage name the refusal row.
+
+Effect: `retroLastRetro` and `retroEffectVerb` in `src/quack/retro_effect.go` look for a retro in its private home first, then in the tracked folder `spec/retros/<retro>`. `retroMintVerb` copies the classes, the rates and the collect time into that folder once its writes land, so the commit carries them and a fresh box measures against the last retro.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/quack/retro_read.go retroReadVerb, which calls retroRowsOf
+src/quack/retro_read_test.go, the fault case, which calls retroRowsOf
+src/quack/retro_effect.go retroEffectVerb, the one caller of retroLastRetro
+src/quack/retro_mint.go retroMintVerb
+src/quack/retro_usage.go, the usage line naming what read lists
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+src/quack/retro_read_test.go TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal
+src/quack/retro_effect_test.go TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder
+src/quack/retro_mint_test.go TestRetroMintKeepsTheClassesInTheTrackedFolder
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+src/quack/retro_read.go
+src/quack/retro_read_test.go
+src/quack/retro_effect.go
+src/quack/retro_effect_test.go
+src/quack/retro_mint.go
+src/quack/retro_mint_test.go
+src/quack/retro_usage.go
+src/quack/retro_usage_test.go
+spec/guidance/retro/read.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+retro_read.go, retro_effect.go and retro_mint.go stand opened, and a live transcript shows the queued attachment and the quiet refusal's shape
+the callers come from a grep of retroRowsOf, retroLastRetro and retroMintVerb
+the first done_when line meets TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal, the second TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder
 
 ## tests-red
 
@@ -189,26 +283,33 @@ Each retro misses owner prompts and refusals, and every fresh box measures its e
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_read_test.go src/quack/retro_effect_test.go src/quack/retro_mint_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/quack/retro_read_test.go
+src/quack/retro_effect_test.go
+src/quack/retro_mint_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Read prints nothing for a queued prompt and a quiet refusal, since it reads typed prompts and error-marked results alone. Effect finds no earlier retro where only the tracked folder holds one. Mint leaves the tracked folder empty. The second retro's input moves into one shared variable, so the standing effect case and the new one read the same lines.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the first done_when line meets TestRetroReadCountsAQueuedOwnerPromptAndListsAQuietRefusal, the second TestRetroEffectFindsTheLastRetrosClassesInATrackedFolder, both red on their assertion
+the tests reach temp folders the cases seed, and the mint test reaches git through retroMintFake
 
 # gate
 
@@ -217,8 +318,12 @@ Each retro misses owner prompts and refusals, and every fresh box measures its e
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- src/modules/verbs/retro.go repeats the read doc line of retro_usage.go, so both change
+- the read test also covers a helper transcript earning no row, and a queued prompt naming no origin and not marked meta, and the mint test covers the copy of collected.json
+- the copy into spec/retros carries no disk path, name or date in prose, and a missing rates or collected file is skipped
 
 # implement
 
@@ -229,14 +334,19 @@ Each retro misses owner prompts and refusals, and every fresh box measures its e
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/quack/retro_read.go src/quack/retro_read_test.go src/quack/retro_effect.go src/quack/retro_mint.go src/quack/retro_mint_test.go src/quack/retro_usage.go src/quack/retro_usage_test.go src/modules/verbs/retro.go src/modules/verbs/retro_test.go spec/guidance/retro/read.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the doc line in src/modules/verbs/retro.go the gate named
+- the cases read temp folders they seed, and the mint case reaches git through retroMintFake
+- the code points at the retro read and effect sections it implements
+- the refusal row stands once in the usage line, and the verb doc and the read note point at the same words
 
 ## tests-green
 
@@ -245,26 +355,33 @@ Each retro misses owner prompts and refusals, and every fresh box measures its e
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_read_test.go src/quack/retro_effect_test.go src/quack/retro_mint_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+retro read now lists every record a run leaves. A queued owner prompt earns a prompt row where its origin is human, or names none and carries no meta mark, and a helper transcript and the queue line earn none. A tool result with no error mark whose text opens on refused earns a refusal row with its reason line. retro effect looks for the last retro in its private home, then in the tracked folder spec/retros, and retro mint copies the classes, the rates and the collect time there, so a fresh box measures against the last retro. The usage line, the verb doc and the read note name the refusal row.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the doc line in src/modules/verbs/retro.go the gate named
+- the cases read temp folders they seed, and the mint case reaches git through retroMintFake
+- the code points at the retro read and effect sections it implements
+- the refusal row stands once in the usage line, and the verb doc and the read note point at the same words
 
 # accept
 

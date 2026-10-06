@@ -4,10 +4,6 @@
 // [[spec/design_output/work#a-stale-group-is-yours]]
 package branches
 
-import (
-	"strconv"
-)
-
 // The key naming the span a claim goes stale past. [[spec/design_output/work#a-stale-group-is-yours]]
 const staleKey = "work.staleAfter"
 
@@ -27,19 +23,12 @@ func (d *Doors) staleSpan() int64 {
 	return int64(spanOf(staleSpan))
 }
 
-// A claim's age and whether it stands older than the span. [[spec/design_output/work#a-stale-group-is-yours]]
+// A claim's age, whether it stands dead, and whether its box still beats, with the beat's age. [[spec/design_output/work#a-hold-beats-with-its-session]]
 type claim struct {
 	Age   string
 	Stale bool
-}
-
-// The age of the claim on a branch, and whether it stands stale. [[spec/design_output/work#a-stale-group-is-yours]]
-func (d *Doors) staleClaim(one stand, now int64) claim {
-	held := tipAge(one, now)
-	if held < 0 {
-		return claim{}
-	}
-	return claim{Age: aged(held), Stale: held > d.staleSpan()}
+	Live  bool
+	Beat  string
 }
 
 // The clock's now in seconds, or zero where the doors carry none. [[spec/design_output/work#a-stale-group-is-yours]]
@@ -92,8 +81,7 @@ func (d *Doors) readFree(now int64) freeRead {
 
 // Why a group at done stands stuck: behind trunk, stale past the span, or nothing. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
 func (d *Doors) stuckIn(one stand, now int64) string {
-	said := d.quiet("rev-list", "--count", "origin/"+one.Branch+"..origin/"+trunk)
-	if count, _ := strconv.Atoi(said.Out); count > 0 {
+	if d.ahead("origin/"+one.Branch, "origin/"+trunk) > 0 {
 		return "behind"
 	}
 	if d.staleClaim(one, now).Stale {

@@ -10,7 +10,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 )
 
@@ -29,6 +31,18 @@ const valeSource = "vale"
 
 var ticketFolders = []string{"spec/tickets", ".se/tickets"}
 
+// The module every Go package's path opens on, the header over the red cases, and the rows go test prints: a failing case, its message under it, and the package line closing them. [[spec/rationales/go-stands-as-one-module]] [[spec/tickets/ci-reds-name-their-cases]]
+const (
+	goModule  = "quackitect/"
+	redHeader = "The red cases:"
+)
+
+var (
+	goFailCase    = regexp.MustCompile(`^\s*--- FAIL: (\S+)`)
+	goSaidLine    = regexp.MustCompile(`^\s+([\w.-]+\.go):(\d+): (.*)$`)
+	goFailPackage = regexp.MustCompile(`^FAIL\s+(\S+)\s`)
+)
+
 // One case the runner's reporter wrote. [[spec/guidance/retro/effect]]
 type caseRow struct {
 	File    string  `json:"file"`
@@ -38,6 +52,7 @@ type caseRow struct {
 	Ok      *bool   `json:"ok"`
 	Todo    bool    `json:"todo"`
 	Said    string  `json:"said"`
+	Line    int     `json:"line,omitempty"`
 }
 
 type slowCase struct {
@@ -55,6 +70,7 @@ type redCase struct {
 	File string `json:"file"`
 	Name string `json:"name"`
 	Said string `json:"said"`
+	Line int    `json:"line,omitempty"`
 }
 
 type spawnTally struct {
@@ -141,11 +157,71 @@ func redIn(lines string) []redCase {
 	out := []redCase{}
 	for _, row := range rowsIn(lines) {
 		if row.Ok != nil && !*row.Ok && !row.Todo {
-			said := []rune(row.Said)
-			out = append(out, redCase{row.File, row.Name, string(said[:min(len(said), redWords)])})
+			out = append(out, redCase{File: row.File, Name: row.Name, Said: redWordsOf(row.Said), Line: row.Line})
 		}
 	}
 	return out
+}
+
+func redWordsOf(said string) string {
+	runes := []rune(said)
+	return string(runes[:min(len(runes), redWords)])
+}
+
+// The red Go tests off go test's output: each failing case with its first message, its file under its package's folder, and a parent case with no message of its own left out. [[spec/tickets/ci-reds-name-their-cases]]
+func goRedIn(said string) []redCase {
+	out := []redCase{}
+	var held []redCase
+	for _, line := range strings.Split(said, "\n") {
+		if found := goFailCase.FindStringSubmatch(line); found != nil {
+			held = append(held, redCase{Name: found[1]})
+			continue
+		}
+		if found := goSaidLine.FindStringSubmatch(line); found != nil && len(held) > 0 && held[len(held)-1].File == "" {
+			at, _ := strconv.Atoi(found[2])
+			last := &held[len(held)-1]
+			last.File, last.Line, last.Said = found[1], at, redWordsOf(found[3])
+			continue
+		}
+		if found := goFailPackage.FindStringSubmatch(line); found != nil {
+			folder := strings.TrimPrefix(found[1], goModule)
+			for _, one := range held {
+				if one.File != "" {
+					one.File = folder + "/" + one.File
+					out = append(out, one)
+				}
+			}
+			held = nil
+		}
+	}
+	return out
+}
+
+// One red case as a row: its file and line, its name, and what it said. [[spec/tickets/ci-reds-name-their-cases]]
+func redLine(one redCase) string {
+	where := one.File
+	if where != "" && one.Line > 0 {
+		where += ":" + strconv.Itoa(one.Line)
+	}
+	kept := []string{}
+	for _, word := range []string{where, one.Name, one.Said} {
+		if word != "" {
+			kept = append(kept, word)
+		}
+	}
+	return strings.Join(kept, ": ")
+}
+
+// The rows a red run's log ends on, a red case each, and none on a green run. [[spec/tickets/ci-reds-name-their-cases]]
+func redSaid(red []redCase) []string {
+	if len(red) == 0 {
+		return nil
+	}
+	rows := []string{"", redHeader}
+	for _, one := range red {
+		rows = append(rows, "  "+redLine(one))
+	}
+	return rows
 }
 
 // The tally the process door writes, one line a spawn: how many in all. [[spec/guidance/retro/effect]]

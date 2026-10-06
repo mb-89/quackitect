@@ -39,6 +39,20 @@ func TestChangedOver(t *testing.T) {
 			t.Fatalf("the door reads %v and says %v, and wants %v and no line", got, lines, want)
 		}
 	})
+	t.Run("a merge in progress reads the working tree against MERGE_HEAD in place of HEAD", func(t *testing.T) {
+		answers := map[string]string{
+			"merge-base origin/main HEAD":                  "abc123\n",
+			"diff --name-only --diff-filter=d abc123 HEAD": "src/c.go\n",
+			"rev-parse -q --verify MERGE_HEAD":             "def456\n",
+			"diff --name-only --diff-filter=d MERGE_HEAD":  "src/c.go\nsrc/resolved.go\n",
+			"diff --name-only --diff-filter=d HEAD":        "src/trunk.go\nsrc/resolved.go\n",
+			"ls-files --others --exclude-standard":         "",
+		}
+		got := changedOver(gitHolding(answers), func(string) {})
+		if want := []string{"src/c.go", "src/resolved.go"}; !reflect.DeepEqual(got, want) {
+			t.Fatalf("the door reads %v, and wants %v with trunk's own file left out", got, want)
+		}
+	})
 	t.Run("a clone with no trunk ref reads HEAD's own commit and the working tree, and says so", func(t *testing.T) {
 		answers := map[string]string{
 			"diff-tree --no-commit-id --name-only -r --root --diff-filter=d HEAD": "src/c.go\n",

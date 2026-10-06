@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"slices"
@@ -21,6 +20,7 @@ import (
 	"quackitect/src/modules/check"
 	logmodule "quackitect/src/modules/log"
 	"quackitect/src/modules/lsp"
+	"quackitect/src/proc"
 )
 
 // The path naming the whole tree, the rule the box decides in place of the sweep, the rows the warn row names, the width of a count, and the log row's kind, as cli-read.js named them. [[spec/design_output/lsp#the-lint-ends-on-findings]]
@@ -331,12 +331,12 @@ func lintTree(root string) *check.Tree {
 type listedDisk struct{ rootDisk }
 
 func (one listedDisk) Paths() []string {
-	said, err := exec.Command("git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").Output()
-	if err != nil {
+	said := proc.Real(proc.Command{Argv: []string{"git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"}})
+	if said.Code != 0 {
 		return nil
 	}
 	out, seen := []string{}, map[string]bool{}
-	for _, file := range strings.Split(string(said), "\x00") {
+	for _, file := range strings.Split(said.Out, "\x00") {
 		if file != "" && !seen[file] && one.Exists(file) {
 			seen[file] = true
 			out = append(out, file)

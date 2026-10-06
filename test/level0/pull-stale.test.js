@@ -8,7 +8,7 @@ import { hashText } from "../../.claude/skills/level0/lib/hash.js";
 import { fakeIndex } from "../../src/doors/fake/index.js";
 import { fieldOf, frontOf, recordIn, withEntry } from "../../src/engine/group.js";
 import { processHash } from "../../.claude/skills/level0/lib/schema-route.js";
-import { defOf, inputsOf } from "../../src/scripts/pull-stale.js";
+import { defOf, inputsOf, LINK } from "../../src/scripts/pull-stale.js";
 import { leafOf } from "../../src/scripts/pull-route.js";
 import { pulling } from "../../src/scripts/work.js";
 import { offer } from "../../src/scripts/pull-hand.js";
@@ -383,4 +383,9 @@ test("a process edit dropping a leaf the record names leaves the ticket as it st
   );
   assert.equal(frontOf(text).steps.length, frontOf(before).steps.length);
   assert.match(text, /- name: review\n/, "the recorded leaf stands in the route");
+});
+
+test("the link pattern reads the note a link names, past its anchor and its label", () => {
+  const said = [..."[[spec/one#part|the part]] and [[spec/two]]".matchAll(LINK)].map((one) => one[1]);
+  assert.deepEqual(said, ["spec/one", "spec/two"]);
 });

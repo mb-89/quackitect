@@ -354,6 +354,19 @@ ifRules(
   ),
 );
 
+// A long table beside a long paragraph finishes in a lookup a run, and restates nothing. [[spec/tickets/restated-table-runs-in-time]]
+const wordy = (tag, n) => Array.from({ length: n }, (_, i) => `${tag}w${i}`).join(" ");
+const longTable = () => {
+  const lines = Array.from({ length: 40 }, (_, i) => wordy(`p${i}`, 12));
+  const rows = Array.from({ length: 200 }, (_, r) => `| ${wordy(`a${r}`, 30)} | ${wordy(`b${r}`, 30)} |`);
+  return `${lines.join("\n")}\n\n| one | two |\n|---|---|\n${rows.join("\n")}\n`;
+};
+
+ifRules(
+  "a long table beside a long paragraph finishes, and restates nothing",
+  proves({ long: longTable() }, (said) => passes(said, "RestatedTable", "long")),
+);
+
 // The tense reader stands over the rule, so a word this tree means in the present reads past it. [[spec/design_output/projection#the-grammar-rules]]
 ifRules(
   "the past tense is refused, and the words this tree means pass",

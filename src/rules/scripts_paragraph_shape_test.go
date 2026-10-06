@@ -21,3 +21,20 @@ func TestTheParagraphShapeBranchesMeetVale(t *testing.T) {
 		}},
 	})
 }
+
+// The table rule refuses a line sharing a run as long as its layer names, and passes a shorter one. [[spec/design_output/lsp#a-second-copy-draws]]
+func TestRestatedTableLooksUpRunsOfTheLengthItsLayerNames(t *testing.T) {
+	t.Parallel()
+	schema := "layers:\n  restated:\n    table: 4\n"
+	rule, err := paraRestatedTable(func(string) string { return schema })
+	if err != nil {
+		t.Fatal(err)
+	}
+	table := "\n\n| step | what it does |\n|---|---|\n| pull | red green blue gold pink |\n"
+	if got := rule(scriptIn{Path: "notes.md", Text: "Say red green blue gold now." + table}); len(got) != 1 {
+		t.Errorf("a line sharing four words answers %d matches, want 1", len(got))
+	}
+	if got := rule(scriptIn{Path: "notes.md", Text: "Say red green blue now." + table}); len(got) != 0 {
+		t.Errorf("a line sharing three words answers %d matches, want 0", len(got))
+	}
+}

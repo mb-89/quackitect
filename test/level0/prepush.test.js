@@ -174,6 +174,39 @@ test("a cloud box pushes its own work branch", () => {
 const HOLDER = "box 0ther1d · session s1 · claude-code-remote";
 const heldBy = (hand) => () => hand;
 
+// A beat carries no work, so an agent pushes it on any stamp. [[spec/tickets/beats-pass-the-push-gate]]
+test("an agent's beat lands where no stamp reaches it", () => {
+  const beat = refsIn("abc123 abc123 refs/heads/beats/x 0000000000000000000000000000000000000000");
+  assert.deepEqual(holds(beat, ""), { code: 0, said: "" });
+});
+
+// A rescue carries red work on purpose, so an agent pushes it on any stamp. [[spec/tickets/rescue-passes-the-stamp-gate]]
+test("an agent's rescue lands where no stamp reaches it", () => {
+  const rescue = refsIn("abc123 abc123 refs/heads/rescue/x 0000000000000000000000000000000000000000");
+  assert.deepEqual(holds(rescue, ""), { code: 0, said: "" });
+});
+
+// An end at or past the tip reads dead at once, and a beat inside its span reads live past the stale span. [[spec/tickets/beats-pass-the-push-gate]]
+test("the stale reader reads the beat before the tip's age", () => {
+  const now = Date.parse("2026-01-01T12:00:00.000Z");
+  const seconds = Math.floor(now / 1000);
+  const at = (tipAgo, beat) => ({
+    run: (args) => {
+      const said = args.join(" ");
+      if (said === "log -1 --format=%ct origin/work/x") return { ok: true, out: String(seconds - tipAgo) };
+      if (said === "log -1 --format=%ct %s origin/beats/x" && beat) return { ok: true, out: beat };
+      return { ok: false, out: "" };
+    },
+  });
+  const ref = refsIn(toWork)[0];
+  assert.equal(staleBy(at(60, `${seconds - 60} box a ends`), "30m", now, "10m")(ref), true);
+  assert.equal(staleBy(at(60, `${seconds - 120} box a ends`), "30m", now, "10m")(ref), false);
+  assert.equal(staleBy(at(3600, `${seconds - 60} box a beats`), "30m", now, "10m")(ref), false);
+  assert.equal(staleBy(at(3600, `${seconds - 1200} box a beats`), "30m", now, "10m")(ref), true);
+  assert.equal(staleBy(at(3600, `${seconds - 600} box a beats`), "30m", now, "10m")(ref), true, "a beat one span old reads dead");
+  assert.equal(staleBy(at(3600, `${seconds - 599} box a beats`), "30m", now, "10m")(ref), false);
+});
+
 // [[spec/tickets/one-writer-holds-a-branch]]
 test("a push to a work branch another box holds refuses, and names the holder and main", () => {
   const said = holds(refsIn(toWork), stamp(), () => [], false, heldBy(HOLDER), "myb0x");

@@ -5,8 +5,6 @@ package branches
 
 import (
 	"bytes"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -31,21 +29,17 @@ func promptChild(state string) string {
 	return "---\nkind: [[ticket]]\nstate: " + state + "\nprocess: [[spec/processes/standard]]\ngroup: g\n---\n\n# Ask\n\nBuild it.\n"
 }
 
-// Doors over a folder holding the files, and the prompt verb's code, output and errors. [[spec/tickets/a-verb-writes-box-prompts]]
+// Doors over a fake disk holding the files, and the prompt verb's code, output and errors. [[spec/tickets/a-verb-writes-box-prompts]]
 func promptSays(t *testing.T, files map[string]string, argv ...string) (int, string, string) {
 	t.Helper()
-	root := t.TempDir()
+	disk := newFakeDisk()
 	for rel, text := range files {
-		at := filepath.Join(root, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+		if err := disk.Write(rel, text); err != nil {
 			t.Fatal(err)
 		}
 	}
 	var out, errs bytes.Buffer
-	d := &Doors{Root: root, Env: map[string]string{}, Out: &out, Errs: &errs}
+	d := &Doors{Root: testRoot, Disk: disk, Env: map[string]string{}, Out: &out, Errs: &errs}
 	code := Cloud(d, append([]string{"prompt"}, argv...))
 	return code, out.String(), errs.String()
 }

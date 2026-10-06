@@ -125,14 +125,14 @@ func pcWritten(text string, leaves ...string) string {
 func pcOnGroup(one *tree, files map[string]string) *tree {
 	one.t.Helper()
 	one.branch(pcGroup, files)
-	one.git("switch", "-q", "-c", workBranch+pcGroup, "origin/"+workBranch+pcGroup)
+	one.cut(workBranch+pcGroup, "origin/"+workBranch+pcGroup)
 	return one
 }
 
 // Writes the check stamp green on HEAD. [[spec/tickets/work-verbs-port-to-go]]
 func (one *tree) pcGreen() {
 	one.t.Helper()
-	one.write(map[string]string{checkStamp: fmt.Sprintf(`{"sha":"%s","ok":true,"clean":true,"warnings":0}`, one.git("rev-parse", "HEAD"))})
+	one.write(map[string]string{checkStamp: fmt.Sprintf(`{"sha":"%s","ok":true,"clean":true,"warnings":0}`, one.rev("HEAD"))})
 }
 
 // What a verb printed on both streams. [[spec/tickets/work-verbs-port-to-go]]
@@ -142,7 +142,7 @@ func (one *tree) pcSaid() string { return one.out.String() + one.errs.String() }
 func (one *tree) pcTicket(name string) string { return one.read(ticketAt(name)) }
 
 // A ref's commit, or nothing where none stands. [[spec/tickets/work-verbs-port-to-go]]
-func (one *tree) pcTip(ref string) string { return one.d.quiet("rev-parse", "--verify", "-q", ref).Out }
+func (one *tree) pcTip(ref string) string { return one.rev(ref) }
 
 // Writes the box id this clone carries, and answers the role its hand holds. [[spec/tickets/work-verbs-port-to-go]]
 func (one *tree) pcHand() string {

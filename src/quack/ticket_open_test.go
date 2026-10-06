@@ -5,12 +5,11 @@
 package main
 
 import (
-	"os"
-	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
+
+	"quackitect/src/modules/git"
 )
 
 // The Ask's own line in openDraft, as the lint names it. [[spec/design_output/pull#a-draft-opens]]
@@ -43,34 +42,31 @@ const openChild = "---\nkind: [[ticket]]\nstate: draft\ngroup: a-thing\n---\n\n#
 // The Ask's line in openDraft, which a case rewrites. [[spec/tickets/go-rules-replace-vale]]
 const openAsk = "The verb clones the upstream into the folder.\n"
 
-// A tree in git holding the draft, git reading no config of this box's own. [[spec/design_output/pull#a-draft-opens]]
+// A FakeRepo over a folder holding the draft, committed once. [[spec/tickets/quack-repos-meet-fake-git]]
 func openTree(t *testing.T, draft string) string {
 	t.Helper()
-	root := editCaseTree(t)
-	for _, name := range []string{"GIT_AUTHOR_NAME", "GIT_COMMITTER_NAME"} {
-		t.Setenv(name, "t")
-	}
-	for _, name := range []string{"GIT_AUTHOR_EMAIL", "GIT_COMMITTER_EMAIL"} {
-		t.Setenv(name, "t@t")
-	}
-	t.Setenv("GIT_CONFIG_GLOBAL", os.DevNull)
-	t.Setenv("GIT_CONFIG_NOSYSTEM", "1")
-	seedsFile(t, root, aThing, draft)
-	for _, args := range [][]string{{"init", "-q", "-b", "main"}, {"add", "-A"}, {"commit", "-q", "-m", "first"}} {
-		openGit(t, root, args...)
-	}
+	root, _ := openRepo(t, draft)
 	return root
 }
 
-func openGit(t *testing.T, root string, args ...string) string {
+// The same tree, and the FakeRepo the verbs reach over it. [[spec/tickets/quack-repos-meet-fake-git]]
+func openRepo(t *testing.T, draft string) (string, *git.FakeRepo) {
 	t.Helper()
-	run := exec.Command("git", args...)
-	run.Dir = root
-	said, err := run.CombinedOutput()
-	if err != nil {
-		t.Fatalf("git %v: %v %s", args, err, said)
+	root := editCaseTree(t)
+	repo := standsInRepo(t, root)
+	seedsFile(t, root, aThing, draft)
+	commitsAll(t, repo, "first")
+	return root, repo
+}
+
+// Every commit's subject on HEAD, newest first, a line each. [[spec/tickets/quack-repos-meet-fake-git]]
+func openLog(root string) string {
+	log, _ := standingRepo(root).Log("", "HEAD", false)
+	said := ""
+	for _, one := range log {
+		said += one.Subject + "\n"
 	}
-	return string(said)
+	return said
 }
 
 // A tree holding the draft with its Ask line in place of the plain one, and the rule files the voice loads. [[spec/tickets/go-rules-replace-vale]]
@@ -128,7 +124,7 @@ func TestTicketOpen(t *testing.T) {
 		if !strings.Contains(got, "\nstate: open\n") || !strings.Contains(got, "\nstep: do\n") {
 			t.Fatalf("the ticket holds %q", got)
 		}
-		if log := openGit(t, root, "log", "--format=%s"); log != "a-thing: opens\nfirst\n" {
+		if log := openLog(root); log != "a-thing: opens\nfirst\n" {
 			t.Fatalf("git logs %q, and wants one commit naming the ticket", log)
 		}
 	})
@@ -194,12 +190,10 @@ func TestTicketOpen(t *testing.T) {
 			t.Fatalf("open answers %d, %q", code, errs)
 		}
 	})
-	t.Run("a hook refusing the commit leaves the draft standing", func(t *testing.T) {
-		root := openTree(t, openDraft)
-		seedsFile(t, root, ".git/hooks/pre-commit", "#!/bin/sh\necho the hook refuses >&2\nexit 1\n")
-		if err := os.Chmod(filepath.Join(root, ".git", "hooks", "pre-commit"), 0o755); err != nil {
-			t.Fatal(err)
-		}
+	t.Run("a commit git refuses leaves the draft standing", func(t *testing.T) {
+		root, repo := openRepo(t, openDraft)
+		repo.Set("user.useConfigOnly", "true")
+		repo.Set("user.email", "")
 		code, _, errs := runsApart(t, root, false, "ticket", "open", "a-thing")
 		if code != exitFailed || !strings.HasPrefix(errs, "the hook refuses the commit, so "+aThing+" stands a draft:\n") || openState(t, root, aThing) != "draft" {
 			t.Fatalf("open answers %d, %q", code, errs)
@@ -211,7 +205,7 @@ func TestTicketOpen(t *testing.T) {
 		if code, out, _ := runsApart(t, root, false, "ticket", "open", "slow-lint"); code != 0 || out != slowLint+" stands open at do, and the pull hands it out.\n" || openState(t, root, slowLint) != "open" {
 			t.Fatalf("open answers %d, %q", code, out)
 		}
-		if log := openGit(t, root, "log", "--format=%s"); log != "first\n" {
+		if log := openLog(root); log != "first\n" {
 			t.Fatalf("git logs %q, and wants no commit for a private note", log)
 		}
 	})

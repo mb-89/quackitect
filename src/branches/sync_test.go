@@ -9,15 +9,15 @@ func TestTheSyncTakesTrunkIn(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
-	one.git("switch", "-q", "-c", "work/g", "origin/work/g")
+	one.cut("work/g", "origin/work/g")
 	if code := one.branchSays("sync"); code != 0 {
 		t.Fatalf("the sync answers %d", code)
 	}
 	holds(t, one.out.String(), "work/g already carries every commit on main.")
-	one.git("switch", "-q", "main")
+	one.switchTo("main")
 	one.land("main moves", map[string]string{"other.txt": "x\n"})
-	one.git("push", "-q", "origin", "main")
-	one.git("switch", "-q", "work/g")
+	one.push("main")
+	one.switchTo("work/g")
 	if code := one.branchSays("sync"); code != 0 {
 		t.Fatalf("the sync answers %d: %s", code, one.errs.String())
 	}
@@ -28,7 +28,7 @@ func TestTheSyncTakesTrunkIn(t *testing.T) {
 func TestTheSyncRefusesAnyOtherBranch(t *testing.T) {
 	t.Parallel()
 	one := newTree(t, nil)
-	one.git("switch", "-q", "-c", "side")
+	one.cut("side", "")
 	if code := one.branchSays("sync"); code != codeRefused {
 		t.Fatalf("the sync answers %d", code)
 	}

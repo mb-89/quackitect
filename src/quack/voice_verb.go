@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	settingsreader "quackitect/src/config"
 	"quackitect/src/index"
 	"quackitect/src/modules/lsp"
 	"quackitect/src/voice"
@@ -59,6 +60,7 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 		MakeDir: func(path string) error { return os.MkdirAll(path, 0o755) },
 		Lint:    voiceLint(outside.rules(root)),
 		Now:     outside.now,
+		Ceiling: settingsreader.Count(root, answerCeilingKey),
 	}
 }
 

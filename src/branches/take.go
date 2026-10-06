@@ -48,7 +48,7 @@ func openGroup(d *Doors, name string, _ []string) int {
 		d.warn("The commit that opens %s came back refused, so nothing is pushed.", branch)
 		return codeRed
 	}
-	if !d.loud("push", "origin", mark+":refs/heads/"+branch).OK {
+	if !d.pushTo(mark, branch) {
 		d.warn("%s", refusedPush(branch))
 		return codeRed
 	}
@@ -62,15 +62,20 @@ func openGroup(d *Doors, name string, _ []string) int {
 
 // The commit a branch opens on, off trunk's tree, so trunk moving on leaves it unmerged. [[spec/design_output/work#a-merged-branch-closes]]
 func (d *Doors) markOff(branch string) string {
-	tree := d.quiet("rev-parse", "origin/"+trunk+"^{tree}")
-	if !tree.OK || tree.Out == "" {
+	said, err := d.Repo.CommitTree("origin/"+trunk, "origin/"+trunk, branch+" opens")
+	if err != nil {
 		return ""
 	}
-	said := d.quiet("commit-tree", tree.Out, "-p", "origin/"+trunk, "-m", branch+" opens")
-	if !said.OK {
-		return ""
+	return said
+}
+
+// Pushes a commit to origin as a branch, printing git's refusal. [[spec/design_output/work#a-merged-branch-closes]]
+func (d *Doors) pushTo(commit, branch string) bool {
+	pushed := d.Repo.PushTo(commit, branch)
+	if !pushed.OK && pushed.Err != "" {
+		d.warn("%s", strings.TrimSpace(pushed.Err))
 	}
-	return said.Out
+	return pushed.OK
 }
 
 // The refusal a desk meets where a verb moves it onto a work branch. [[spec/design_output/work#a-desk-works-on-trunk]]
@@ -80,7 +85,11 @@ func deskRefusal(what string) string {
 }
 
 // Takes the next free branch, or the one named, and writes the claim. [[spec/design_output/work#why-a-routine-needs-this]]
-func take(d *Doors, name string, _ []string) int {
+func take(d *Doors, name string, argv []string) int {
+	over := word(argv, 1) == overFlag
+	if over {
+		name = word(argv, 2)
+	}
 	if !d.cloud() {
 		d.warn("%s", deskRefusal("branch take moves this box onto no branch"))
 		return codeRefused
@@ -108,6 +117,15 @@ func take(d *Doors, name string, _ []string) int {
 			return codeRed
 		}
 		d.say("%s stands %s, so its hold drops and the take goes on to %s.", holding.Branch, past, named)
+	}
+	if name != "" {
+		if live := d.liveHold(read.Stand, read.Standing, workBranch+name); live != "" {
+			d.warn("%s", live)
+			return codeRed
+		}
+	}
+	if over && name == "" {
+		return d.takeOver(read)
 	}
 	if name == "" {
 		if stuck := d.stuckFirst(read.Stand, read.Standing, d.nowSeconds()); stuck != nil {
@@ -237,12 +255,12 @@ func (d *Doors) standsOpen(name string) groupStands {
 func (d *Doors) onBranch(branch string) bool {
 	parked := d.parkedFiles()
 	for _, one := range parked {
-		d.quiet("checkout", "--", one.Name)
+		_ = d.Repo.Restore(one.Name)
 	}
-	if !d.quiet("switch", branch).OK && !d.loud("switch", "-c", branch, "origin/"+branch).OK {
+	if !d.loudly(d.Repo.Switch(branch, false)) {
 		return false
 	}
-	d.quiet("reset", "--hard", "origin/"+branch)
+	_ = d.Repo.ResetTo("origin/"+branch, true)
 	for _, one := range parked {
 		_ = d.write(one.Name, one.Text)
 	}
@@ -278,27 +296,26 @@ func (d *Doors) claimGroup(one stand) int {
 	role := roleOf(hand)
 	from, base := handedOver(was, role, before)
 	_ = d.write(at, withEntry(base, front.Ordered{{Key: "step", Value: stepOf(was)}, {Key: "hand", Value: role}, {Key: "hash_before", Value: before}, {Key: "session", Value: d.env(sessionVar)}}))
-	d.quiet("add", at)
+	_ = d.Repo.Add([]string{at})
 	says := role + " takes it"
 	if from != "" {
 		says = role + " takes it over from " + from
 	}
-	committed := d.quiet("commit", "-m", one.Branch+": "+says)
-	if !committed.OK {
-		d.quiet("reset", "--", at)
+	if _, err := d.Repo.Commit(one.Branch+": "+says, nil); err != nil {
+		_ = d.Repo.Reset([]string{at})
 		_ = d.write(at, was)
 		d.warn("The claim on %s would not commit, so the take stands undone.", one.Branch)
-		if committed.Err != "" {
-			d.warn("%s", committed.Err)
-		} else {
-			d.warn("%s", committed.Out)
-		}
+		d.warn("%s", strings.TrimSpace(err.Error()))
 		return codeRed
 	}
-	if !d.loud("push", "origin", one.Branch).OK {
-		d.quiet("reset", "--keep", "origin/"+one.Branch)
+	if !d.push(one.Branch) {
+		_ = d.Repo.ResetTo("origin/"+one.Branch, false)
 		d.warn("%s", refusedPush(one.Branch))
 		return codeRed
+	}
+	d.writeBeat(one.Name, role, false)
+	if from != "" {
+		d.takesRescue(one)
 	}
 	if d.sync() == codeRed {
 		d.warn("Resolve the conflict on %s and commit it, then work the ask below.", one.Branch)

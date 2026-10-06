@@ -7,6 +7,10 @@ on:
   schedule:
     - cron: "17 * * * *"
   workflow_dispatch:
+  # A check run an Actions run raises starts no workflow, so the dispatch wakes on the check workflow's end. [[spec/tickets/ci-reds-name-their-cases]]
+  workflow_run:
+    workflows: [check]
+    types: [completed]
 
 permissions:
   contents: read
@@ -18,6 +22,8 @@ concurrency:
 
 jobs:
   dispatch:
+    # A finished check wakes the dispatch where it failed on a work branch alone.
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'failure' && startsWith(github.event.workflow_run.head_branch, 'work/'))
     runs-on: ubuntu-latest
     steps:
       # The write branch's push and its pull request ride the owner's token, so the check runs on them. [[spec/tickets/the-owner-stores-the-token]]
