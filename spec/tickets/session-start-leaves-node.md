@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 4bec0446bc785bc0f4f888dd2a9f307c5ae7fa89
+    hash_after: 4bec0446bc785bc0f4f888dd2a9f307c5ae7fa89
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.8  test/contract/vale-paths.test.js a rationale reads the same by its absolute path as by its relative one"
+    inputs:
+      - name: design/tests-red
+        hash: 345c545bd2b0dce5
+        size: 996
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -363,26 +386,33 @@ the skip list stands in install.sh because a shell script imports nothing, and T
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/session_start_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A session now starts through the boot word of install.sh, which the SessionStart hook runs through sh. Off a cloud box, or where the plugin manifest stands, the word exits at once. Otherwise it runs the install under the session skip list, and it answers 0 whatever the install answers. boot.js leaves, so no start road imports a door or the hook module from src/scripts. The boot cases move from hooks.test.js into session_start_test.go, which runs the real install.sh in a temporary tree over a fake index.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size field names, and no other
+the boot word reaches the disk and a process through sh alone, and the Go cases fake the index
+the boot block in install.sh points at spec/design_output/level0#the-boot-hook
+the skip list in install.sh is pinned to installSkip by a Go case, and the span stands once as startSpan
 
 # accept
 
