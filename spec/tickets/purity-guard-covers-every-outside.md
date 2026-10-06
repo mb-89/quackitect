@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -198,8 +198,31 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 1ed5111ae6e176904a259d74c34b35fd68b01d4f
+    hash_after: 1ed5111ae6e176904a259d74c34b35fd68b01d4f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 88 test(s) pass in 5 file(s); green, src/branches passes; green, src/front passes; green, src/imports passes; gre
+      - name: check
+        exit: 0
+        said: "    2.5  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: design/tests-red
+        hash: eba58ab396d31b46
+        size: 663
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: code-is-pure-tests-behave
 depends_on: doors-declare-what-they-own
+reason: done
 ---
 
 # Ask
@@ -416,26 +439,33 @@ go vet ./src/imports ./src/quack
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A fifth guard, purity, names each Go function outside an IO module and its tests that calls a name of OutsideKinds: files, processes, network, clock, random numbers, git and the index. A function carrying the Impure marker with its reason in its doc or body passes, as the owner says: code is pure by default, and an impure function carries a one-line reason. It runs in report mode against its baseline, so the check stays green while the verbs gain their reasons. It builds on the guards of this group, since src/owns stands on no main.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the redraft names
+- the guard reads planted text and a reader, so no door needs a fake
+- every new function names the guards section of the model
+- OutsideKinds stands once, in purity.go, and the model row points at it
 
 # accept
 
