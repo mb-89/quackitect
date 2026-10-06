@@ -41,7 +41,6 @@ var (
 	assertFail = regexp.MustCompile(`ERR_ASSERTION|AssertionError`)
 )
 
-// Runs the tests the branch changes, or the files named, and answers one word on them. [[spec/design_output/pull#the-test-verb]]
 // The packages that read a changed golden: the golden folder's own, and every package whose test text names that folder. [[spec/tickets/size-golden-drops-line-counts]]
 func goldenReaders(changed []string, tests map[string]string) []string {
 	var out []string
@@ -62,6 +61,7 @@ func goldenReaders(changed []string, tests map[string]string) []string {
 	return slices.Compact(out)
 }
 
+// Runs the tests the branch changes, or the files named, and answers one word on them. [[spec/design_output/pull#the-test-verb]]
 func testVerb(d *Doors, _ string, argv []string) int {
 	if slices.Contains(argv, redFlag) {
 		return d.redTest(argv[1:])
@@ -147,7 +147,6 @@ func goPackagesOf(paths []string) []string {
 	return out
 }
 
-// The test functions the named Go test files hold. [[spec/design_output/pull#the-test-verb]]
 // Every Go test file under src by its text, read only where a change touches a golden. [[spec/tickets/size-golden-drops-line-counts]]
 func (d *Doors) goTestTexts(changed []string) map[string]string {
 	out := map[string]string{}
@@ -162,6 +161,7 @@ func (d *Doors) goTestTexts(changed []string) map[string]string {
 	return out
 }
 
+// The test functions the named Go test files hold. [[spec/design_output/pull#the-test-verb]]
 func (d *Doors) goTestNames(paths []string) []string {
 	var out []string
 	for _, one := range paths {
