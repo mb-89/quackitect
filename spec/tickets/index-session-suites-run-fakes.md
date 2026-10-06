@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: 2c579a37ad74ef60
         size: 1851
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 1fc5e6091d6f391f37ee9778081cc7391adab461
+    hash_after: 90770c50e08005f967e3480abeb23f58aa7f3212
+    inputs:
+      - name: design/draft
+        hash: 2c579a37ad74ef60
+        size: 1851
+      - name: design/tests-red
+        hash: 7aa476c87847d0d7
+        size: 750
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -276,8 +288,12 @@ The shared cases pass both ways at once: the fakes already behave on what the ol
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the index suite runs both doors on the hashes case alone, since fakeIndex answers hashes and null to glob, tickets and changes, and the one other user of the fake, test/level0/pull-stale.test.js, asks hashes alone; implement words the family row and the suite's head comment as the fake running beside the real door on every answer the fake gives
+- the red session case fails on fakeSession's path, which answers the root for an empty name where src/doors/session.js refuses with Missing file path; implement makes the fake refuse an empty or non-string name, and the other session cases pass both ways
+- both suites failed biome format under spec/config/biome.json, so this gate formats them in its own commit, and the check answers green on it
 
 # implement
 
