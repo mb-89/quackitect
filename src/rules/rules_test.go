@@ -109,3 +109,17 @@ func TestTheMarkupHidesCodeAndFront(t *testing.T) {
 		}
 	}
 }
+
+// A marker quiets its rule over the stretch it opens, and the rule speaks again past its YES. [[spec/design_output/rules#a-marker-quiets-a-rule]]
+func TestLintHonoursTheMarker(t *testing.T) {
+	t.Parallel()
+	set := loaded(t)
+	const shouted = "VoiceVale.ShoutedLead"
+	const path = "spec/design_output/a.md"
+	const line = "THIS IS THE SHOUTED PART, and it follows.\n"
+	text := line + "\n<!-- vale VoiceVale.ShoutedLead = NO -->\n\n" + line + "\n<!-- vale VoiceVale.ShoutedLead = YES -->\n\n" + line
+	found := ofRule(set.Lint(path, text), shouted)
+	if len(found) != 2 || found[0].Line != 1 || found[1].Line != 9 {
+		t.Errorf("the marked text answers %+v, and wants rows at lines 1 and 9 alone", found)
+	}
+}
