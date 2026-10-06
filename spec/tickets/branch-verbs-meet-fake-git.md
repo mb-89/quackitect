@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-depends_on: git-and-process-doors-designed
+depends_on: pull-meets-fake-git
 step: design/tests-red
 record:
   - step: design/owner-read
