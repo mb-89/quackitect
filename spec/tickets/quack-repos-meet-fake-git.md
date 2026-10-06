@@ -660,3 +660,5 @@ accept with points
 The draft's approach says Five cases lean on a refusal the fake holds no road to, and reads Four: the index lock, the commit hook, the open hook and the remote URL. The tests list names the same four, so no case goes missing.
 
 The red list of design/tests-red names `src/modules/git/repo_contract_test.go`, and `./RUNME.sh branch test src/modules/git/repo_contract_test.go` answers green, since move 1 filled every operation. The red list stands at `src/quack/repos_moved_test.go` alone from the next pass of tests-red, and tests-green drops the git suite either way.
+
+Implement adds one more seam: `runsJSCases` in `src/quack/ticket_route_test.go` reaches the ticket verbs through the registry, whose `repoAt` each `init` fixes to `realRepo`. So the registry verbs read `repoAt` through a package value a case can set for its run, and the case hands the `FakeRepo` over its own folder, so `copiedBase` reads the seeded history. `TestTheQuackRepositoryVerbsReachGitThroughRepoAndBuildTheRealOneInTheirSeamsAlone` in `src/quack/repos_moved_test.go` guards the verb side of the move.
