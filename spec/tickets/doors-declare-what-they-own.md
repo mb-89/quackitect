@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box 86086f797ef7 · claude-code-remote
@@ -100,6 +100,15 @@ record:
         exit: 0
         said: work/doors-declare-what-they-own already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 9695c0507c8a9d005401cce19c692e343d5243d7
+    hash_after: 010fcc7e9cb34c85805ec76bf5acf4a777ff816d
+    inputs:
+      - name: ask
+        hash: 94aff2f3cc1fa455
+        size: 623
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -126,14 +135,28 @@ Done when the guard refuses, not reports, every walk-around, the walk-around lis
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/a-guard-reads-door-declarations]] standard, closed
+[[spec/tickets/door-lists-take-whole-packages]] trivial, closed
+[[spec/tickets/doors-only-reads-the-declarations]] trivial, closed
+[[spec/tickets/draft-lists-match-red-tests]] trivial, closed
+[[spec/tickets/owns-joins-the-pure-tree]] trivial, closed
+[[spec/tickets/go-waits-on-events]] standard
+[[spec/tickets/quack-waits-on-the-clock]] standard
+[[spec/tickets/quack-reaches-the-box-through-doors]] standard
+[[spec/tickets/javascript-reaches-through-doors]] standard
+[[spec/tickets/go-tests-meet-the-doors]] standard
+[[spec/tickets/the-guard-refuses]] standard
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+each open child takes one slice of the walk-around list `./RUNME.sh doors` prints, by language, by production or test, and by root or not, so a review reads one slice whole
+the five slices cover every walk-around the list holds, and `the-guard-refuses` takes the refusal, the retirement of `DoorsOnly` and the guidance, which closes the goal
+`go-tests-meet-the-doors` names `tests-meet-the-doors-once` under depends_on, since that group moves the tests onto fakes, and `the-guard-refuses` names the five slices
 
 # children
 
