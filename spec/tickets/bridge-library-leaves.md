@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 steps:
   - name: design
     steps:
@@ -118,6 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
 depends_on: ["git-hooks-run-in-go", "probes-leave-node", "extension-imports-stay-inside"]
+step: design/owner-read
 ---
 
 # Ask
