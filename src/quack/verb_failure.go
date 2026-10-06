@@ -47,7 +47,7 @@ var failureUsage = []string{
 type failureDoors struct {
 	root string
 	now  func() time.Time
-	// Stages a written node in git, so the next commit carries it. Nil stages nothing. [[spec/tickets/failure-new-lands-untracked]]
+	// Stages a written node in git, so the next commit carries it. Nil stages nothing. [[spec/design_output/failures#an-agent-raises-by-verb]]
 	stage func(path string) bool
 }
 

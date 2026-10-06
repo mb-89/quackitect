@@ -118,7 +118,7 @@ func take(d *Doors, name string, argv []string) int {
 	}
 	if name != "" {
 		if live := d.liveHold(read.Stand, read.Standing, workBranch+name); live != "" {
-			d.warn("%s", live)
+			d.raises(failure.Raise(d.Failures, "take-branch-held-live", live))
 			return codeRed
 		}
 	}
