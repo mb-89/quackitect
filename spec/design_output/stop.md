@@ -319,6 +319,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `step-waits-on-person` | a held ticket, or the group it names, stands at a leaf carrying `by: person`, and the box is no cloud box |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
 | `helpers-running` | the turn's end names a helper the harness still runs, or a helper spawned in the background sends no stop yet |
+| `ends-on-a-question` | the box is a cloud box, and the last prose paragraph of the answer, past the tables, the headings and the stop line, closes on a question mark |
 | `a-report-stands` | the message ending the turn carries the heading What the agent needs with a numbered row under it |
 | `the-plan-is-empty` | the plan holds no todo and nothing in hand, so a claim of done stands on an empty plan |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
@@ -359,6 +360,22 @@ The claim stands under every binding, `queue` too, and the box decides it:
 The refusal on a cloud box says so. The box then waits for the helper inside
 the turn, or does the work itself. For what
 each binding means, see [[spec/design_output/config#the-engine-controls]].
+
+## A cloud box decides
+
+A cloud box asks a person nobody is. A turn ending on a question there stands
+idle until a takeover, so the rule `a-cloud-box-decides` holds it at priority
+`83` and says decide. The owner's holds stand above it, so a hold still ends
+the turn.
+
+| box | `ends-on-a-question` | the turn |
+|---|---|---|
+| a desk | answers false | stops as the rest of the vote says |
+| a cloud box | reads the last prose paragraph | holds, and the agent decides and carries on |
+
+The check reads the text alone at the turn's end, and stays out of
+`ReadsText`, so the stop call runs it with the rest of the vote. For why a box
+decides, see [[spec/guidance/cloud/cloud]].
 
 ## A refusal names its check
 

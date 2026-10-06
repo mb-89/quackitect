@@ -48,6 +48,8 @@ type Doors struct {
 	Runme []string
 	// The queue as branch list --queue prints it, off the index. [[spec/design_output/pull#the-queue-is-a-score]]
 	Queue func() int
+	// The last beat on each group, read once a run, and dropped at each fetch. [[spec/design_output/work#a-hold-beats-with-its-session]]
+	beats map[string]beat
 	// An index value by its name, decoded into the target. [[spec/design_output/work#one-reading-answers-git]]
 	Value func(name string, into any) error
 	// Every leaf's notes, keyed process:path, off the Go guidance module. [[spec/tickets/the-guidance-topic-lands]]
@@ -70,7 +72,10 @@ func (d *Doors) quiet(args ...string) Said { return d.git(true, args...) }
 func (d *Doors) loud(args ...string) Said { return d.git(false, args...) }
 
 // Refreshes the refs off origin, pruning the gone ones. [[spec/design_output/work#the-listing-reads-git-once]]
-func (d *Doors) fetch() { d.quiet("fetch", "--prune", "origin") }
+func (d *Doors) fetch() {
+	d.quiet("fetch", "--prune", "origin")
+	d.beats = nil
+}
 
 // The branch HEAD stands on. [[spec/design_output/work#a-group-is-a-ticket]]
 func (d *Doors) here() string { return d.quiet("rev-parse", "--abbrev-ref", "HEAD").Out }

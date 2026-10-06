@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,8 +25,26 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
-group: the-fleet-week-retro
+group: retro-and-coordinator
 step: do
+record:
+  - step: do
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: da88010b6f3817b78d3a00785814987acdc43f83
+    hash_after: da88010b6f3817b78d3a00785814987acdc43f83
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/guidance passes
+      - name: check
+        exit: 0
+        said: "  111.8  in all"
+    inputs:
+      - name: ask
+        hash: 6f7a3c4332aa4e7e
+        size: 542
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -46,26 +64,32 @@ The coordinator reports what no read backs, asks rulings the owner gave, runs on
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/guidance/guidance_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+spec/guidance/coordinator/coordinator.md now names the coordinator role and its rules: a read, a measured number or a design section behind every claim, a ruling asked once as a ticket after a read of the standing ones, a shift ending on a handover, every follow-up as a ticket, and the same doors as a box. The note binds through SE_COORDINATOR, which the owner sets when starting a coordinator session, so no box reads it. spec/rationales/coordinator.md argues each rule off the fleet week retro.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, one note naming the role and each rule the ask lists
+- the change reveals no cleanup
+- the handover rule points at rule 9 of the guidance note, which owns it
 
 # Discussion
 

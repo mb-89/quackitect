@@ -80,7 +80,11 @@ func deskRefusal(what string) string {
 }
 
 // Takes the next free branch, or the one named, and writes the claim. [[spec/design_output/work#why-a-routine-needs-this]]
-func take(d *Doors, name string, _ []string) int {
+func take(d *Doors, name string, argv []string) int {
+	over := word(argv, 1) == overFlag
+	if over {
+		name = word(argv, 2)
+	}
 	if !d.cloud() {
 		d.warn("%s", deskRefusal("branch take moves this box onto no branch"))
 		return codeRefused
@@ -108,6 +112,15 @@ func take(d *Doors, name string, _ []string) int {
 			return codeRed
 		}
 		d.say("%s stands %s, so its hold drops and the take goes on to %s.", holding.Branch, past, named)
+	}
+	if name != "" {
+		if live := d.liveHold(read.Stand, read.Standing, workBranch+name); live != "" {
+			d.warn("%s", live)
+			return codeRed
+		}
+	}
+	if over && name == "" {
+		return d.takeOver(read)
 	}
 	if name == "" {
 		if stuck := d.stuckFirst(read.Stand, read.Standing, d.nowSeconds()); stuck != nil {
@@ -299,6 +312,10 @@ func (d *Doors) claimGroup(one stand) int {
 		d.quiet("reset", "--keep", "origin/"+one.Branch)
 		d.warn("%s", refusedPush(one.Branch))
 		return codeRed
+	}
+	d.writeBeat(one.Name, role, false)
+	if from != "" {
+		d.takesRescue(one)
 	}
 	if d.sync() == codeRed {
 		d.warn("Resolve the conflict on %s and commit it, then work the ask below.", one.Branch)

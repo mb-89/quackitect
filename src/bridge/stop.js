@@ -19,6 +19,7 @@ import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
   decide,
   detail,
+  endsOnQuestion,
   namesNext,
   pool,
   RULES,
@@ -255,6 +256,8 @@ const CHECKS = {
   "no-stop-line": (held) => !claimStands(held),
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud/cloud]]
   "a-person-sits-here": (held) => !cloudHere(held.box),
+  // A cloud box asks nobody, so a turn ending on a question decides instead. [[spec/design_output/stop#a-cloud-box-decides]]
+  "ends-on-a-question": (held) => cloudHere(held.box) && endsOnQuestion(held.text),
   // [[spec/design_output/stop#a-talk-follows-a-report]]
   // A report an earlier message of this turn carries stands too, so a stop line sent alone repeats nothing. [[spec/design_output/stop#a-talk-follows-a-report]]
   "a-report-stands": (held) => reportStands(held.text) || Boolean(held.box?.reported),

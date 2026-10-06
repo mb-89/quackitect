@@ -65,6 +65,13 @@
   runs: owner-finishes
   says: The owner holds this session at finish, so this turn ends with the piece in hand.
 
+- id: a-cloud-box-decides
+  side: continue
+  priority: 83
+  decides: mechanical
+  runs: ends-on-a-question
+  says: A cloud box asks nobody, so decide the question yourself, say what you weigh and what you assume, and carry on.
+
 - id: your-helpers-still-run
   side: stop
   priority: 83

@@ -42,38 +42,15 @@ func roadRoot(args []string, fallback func() (string, error)) string {
 	return "."
 }
 
-// A process under the root, its streams to the caller's or held where the run is quiet. A calm one runs under nice where the box holds it, so the parts beside it keep the cores they time themselves on. [[spec/tickets/the-parts-start-at-once]]
-func processOver(root string, survey map[string]string, out, errs io.Writer, calm bool) func(argv, env []string, quiet bool) (int, string, error) {
-	return func(argv, env []string, quiet bool) (int, string, error) {
-		name, args := toolOf(survey, argv[0]), argv[1:]
-		if nice, err := exec.LookPath(niceProgram); calm && err == nil {
-			name, args = nice, append([]string{"-n", calmBy, name}, args...)
-		}
-		child := exec.Command(name, args...)
-		child.Dir, child.Env = root, append(os.Environ(), env...)
-		var said bytes.Buffer
-		child.Stdout, child.Stderr = out, errs
-		if quiet {
-			child.Stdout, child.Stderr = &said, &said
-		}
-		err := child.Run()
-		var exited *exec.ExitError
-		if errors.As(err, &exited) {
-			return exited.ExitCode(), said.String(), nil
-		}
-		return 0, said.String(), err
-	}
-}
-
 // The doors over the real box, under the root the verb road names. [[spec/design_output/work#the-battery-answers-first]]
 func checkDoorsOf(out, errs io.Writer) checkDoors {
 	root := roadRoot(os.Args, index.Root)
 	self, _ := os.Executable()
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
-	d := checkDoors{root: root, self: self, now: time.Now, windows: runtime.GOOS == "windows", red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
-	d.run = processOver(root, survey, out, errs, false)
-	d.calm = processOver(root, survey, out, errs, !d.windows)
+	d := checkDoors{root: root, self: self, now: time.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
+	d.run = runsUnder(root, survey, out, errs, false)
+	d.calm = runsUnder(root, survey, out, errs, d.platform != "windows")
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.calmVerb = verbOver(d.calm, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {
@@ -97,6 +74,29 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 		return strings.TrimSpace(string(said))
 	}
 	return d
+}
+
+// A process under the root. A quiet run keeps both streams, and a loud one prints them and keeps the standard output too, so a red Go run names its cases. [[spec/tickets/ci-reds-name-their-cases]]
+func runsUnder(root string, survey map[string]string, out, errs io.Writer, calm bool) func(argv, env []string, quiet bool) (int, string, error) {
+	return func(argv, env []string, quiet bool) (int, string, error) {
+		name, args := toolOf(survey, argv[0]), argv[1:]
+		if nice, err := exec.LookPath(niceProgram); calm && err == nil {
+			name, args = nice, append([]string{"-n", calmBy, name}, args...)
+		}
+		child := exec.Command(name, args...)
+		child.Dir, child.Env = root, append(os.Environ(), env...)
+		var said bytes.Buffer
+		child.Stdout, child.Stderr = io.MultiWriter(out, &said), errs
+		if quiet {
+			child.Stdout, child.Stderr = &said, &said
+		}
+		err := child.Run()
+		var exited *exec.ExitError
+		if errors.As(err, &exited) {
+			return exited.ExitCode(), said.String(), nil
+		}
+		return 0, said.String(), err
+	}
 }
 
 // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]

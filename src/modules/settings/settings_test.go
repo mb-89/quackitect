@@ -4,7 +4,9 @@
 package settings
 
 import (
+	"strings"
 	"testing"
+	"time"
 
 	"quackitect/src/q"
 )
@@ -73,5 +75,26 @@ func TestANamedBuiltInReadsItsNumber(t *testing.T) {
 		if key.Local == "most-in-a-row" && key.Default != "3" {
 			t.Fatalf("most-in-a-row reads the built-in %s, and wants 3", key.Default)
 		}
+	}
+}
+
+// A hold whose box stops beating reads dead before its tip goes stale, so beat-after stands shorter than stale-after. [[spec/tickets/beat-after-joins-schema]]
+func TestBeatAfterStandsShorterThanStaleAfter(t *testing.T) {
+	c := q.New()
+	Of("work")(c)
+	spans := map[string]time.Duration{}
+	for _, key := range c.Keys() {
+		if key.Local == "beat-after" || key.Local == "stale-after" {
+			span, err := time.ParseDuration(strings.Trim(key.Default, `"`))
+			if err != nil {
+				t.Fatalf("%s reads the built-in %s, which no span parses: %v", key.Local, key.Default, err)
+			}
+			spans[key.Local] = span
+		}
+	}
+	beat, beats := spans["beat-after"]
+	stale, stales := spans["stale-after"]
+	if !beats || !stales || beat >= stale {
+		t.Fatalf("work reads beat-after %v and stale-after %v, and wants both, the beat shorter", beat, stale)
 	}
 }

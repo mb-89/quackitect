@@ -26,6 +26,7 @@ const (
 	spawnsFile  = runtimeDir + "/spawns.txt"
 	stampFile   = runtimeDir + "/check.json"
 	lintFile    = runtimeDir + "/lint-found.json"
+	goRedFile   = runtimeDir + "/go-red.json"
 	pointerFile = runtimeDir + "/vehicle.json"
 	reporter    = "src/scripts/battery-reporter.js"
 	pluginDir   = ".claude/skills/level0"
@@ -74,7 +75,7 @@ type checkDoors struct {
 	calm      func(argv, env []string, quiet bool) (int, string, error)
 	get       func(url string) ([]byte, error)
 	now       func() time.Time
-	windows   bool
+	platform  string
 	red       []string
 	config    func(key string) float64
 	git       func(args ...string) string
@@ -127,6 +128,7 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 			d.out = io.Discard
 		}
 		_ = os.Remove(d.at(lintFile))
+		_ = os.Remove(d.at(goRedFile))
 		code, times, red, total := batteryRun(readyOf(d, quiet), partsOf(d, words, quiet), d.now)
 		for _, name := range red {
 			fmt.Fprintf(d.errs, redPart, name)
@@ -140,6 +142,10 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 			spawns = &one
 		}
 		report := batteryOf(times, lines, slowestKept, nil, spawns, total)
+		var goRed []redCase
+		if json.Unmarshal([]byte(d.text(goRedFile)), &goRed) == nil {
+			report.Red = append(report.Red, goRed...)
+		}
 		if quiet {
 			for _, row := range errorsSaid(lines, found.Erred) {
 				fmt.Fprintln(out, row)
@@ -155,10 +161,10 @@ func checkVerb(doorsOf func(out, errs io.Writer) checkDoors) twin {
 	}
 }
 
-// The parts print last, so a slow part shows on the run that grew it, and a run past its budget leaves a warning in the log. [[spec/tickets/the-check-runs-fast-again]]
+// The parts print last, so a slow part shows on the run that grew it, and a run past its budget leaves a warning in the log. A red run's log ends on its red cases. [[spec/tickets/the-check-runs-fast-again]] [[spec/tickets/ci-reds-name-their-cases]]
 func saysParts(d checkDoors, report batteryReport) {
 	budget := int64(d.config(budgetKey))
-	for _, row := range partsSaid(report, budget) {
+	for _, row := range append(partsSaid(report, budget), redSaid(report.Red)...) {
 		fmt.Fprintln(d.out, row)
 	}
 	if budget <= 0 || report.Total <= budget {
@@ -278,15 +284,19 @@ func partsOf(d checkDoors, words []string, quiet bool) []part {
 	}
 }
 
-// Level zero runs on a fresh box, or the check is red. The dry session times nothing against the wall, so it runs at low priority and yields the cores to the parts that do. [[spec/tickets/the-parts-start-at-once]] The start road stands a cloud box alone, and a cloud box runs Linux, so a Windows desk says so and carries on. [[spec/tickets/level0-runs-on-the-door]]
+// The trial that runs the live client on the owner's Windows desk, which no box reaches. [[spec/tickets/level0-claims-name-the-platform]]
+const deskTrial = "spec/tickets/desk-probe-reply-trial"
+
+// Level zero runs over the tree as it stands with the model faked, on every platform, or the check is red, and every line names the platform it ran on. The smoke fakes the live client, so a Windows box also names the trial covering that client on the owner's desk. [[spec/tickets/level0-smoke-runs-in-seconds]] [[spec/tickets/level0-claims-name-the-platform]] The smoke times nothing against the wall, so it runs at low priority and yields the cores to the parts that do. [[spec/tickets/the-parts-start-at-once]]
 func level0Runs(d checkDoors, quiet bool) int {
-	if d.windows {
-		fmt.Fprintln(d.out, "The start road stands a cloud box alone, so this Windows box runs no dry session.")
-		return 0
-	}
-	code := d.calmVerb([]string{"probe", "dry", workingFlag}, quiet)
+	code := d.calmVerb([]string{"probe", "smoke", workingFlag}, quiet)
 	if code != 0 {
-		fmt.Fprintln(d.errs, "Level zero does not run whole on a fresh box, so this tree is red.")
+		fmt.Fprintf(d.errs, "Level zero does not run whole on %s, so this tree is red.\n", d.platform)
+		return code
+	}
+	fmt.Fprintf(d.out, "Level zero runs whole on %s.\n", d.platform)
+	if d.platform == "windows" {
+		fmt.Fprintf(d.out, "The live client on %s stands with %s.\n", d.platform, deskTrial)
 	}
 	return code
 }
@@ -391,6 +401,9 @@ func goGate(d checkDoors, quiet bool, skip []string) int {
 		return 1
 	}
 	if code != 0 {
+		if err := writesGoRed(d, goRedIn(said)); err != nil {
+			fmt.Fprintln(d.errs, err)
+		}
 		if quiet {
 			for _, row := range strings.Split(said, "\n") {
 				if goFailRow.MatchString(row) {
@@ -409,6 +422,18 @@ func goGate(d checkDoors, quiet bool, skip []string) int {
 		}
 	}
 	return min(faults, 1)
+}
+
+// The red Go tests the gate found, which the check's report reads. [[spec/tickets/ci-reds-name-their-cases]]
+func writesGoRed(d checkDoors, red []redCase) error {
+	text, err := json.Marshal(red)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(d.at(goRedFile)), 0o755); err != nil {
+		return err
+	}
+	return os.WriteFile(d.at(goRedFile), text, 0o644)
 }
 
 // The test part: the unit run, then the contract run, the red list apart, each run's cases written for the battery's report. The runs go one after the other, because a contract case reads a clock a loaded box slows. [[spec/tickets/the-tests-start-fewer-processes]] [[spec/design_output/pull#the-gate]]
@@ -484,13 +509,7 @@ func testArgv(root string, red []string, one testPart) []string {
 func errorsSaid(lines string, erred []string) []string {
 	rows := []string{}
 	for _, one := range redIn(lines) {
-		kept := []string{}
-		for _, word := range []string{one.File, one.Name, one.Said} {
-			if word != "" {
-				kept = append(kept, word)
-			}
-		}
-		rows = append(rows, strings.Join(kept, ": "))
+		rows = append(rows, redLine(one))
 	}
 	rows = append(rows, erred...)
 	if len(rows) == 0 {

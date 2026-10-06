@@ -97,10 +97,16 @@ script: |
     return text.fields(clean)
   }
 
-  runs := func(words, many) {
-    out := {}
-    for i := 0; i + many <= len(words); i++ { out[text.join(words[i:i+many], " ")] = true }
-    return out
+  runsOf := func(words, most) {
+    seen := {}
+    for j := 0; j+most <= len(words); j++ { seen[text.join(words[j:j+most], " ")] = true }
+    return seen
+  }
+  shares := func(words, seen, most) {
+    for i := 0; i+most <= len(words); i++ {
+      if seen[text.join(words[i:i+most], " ")] { return true }
+    }
+    return false
   }
 
   aside := func(line) {
@@ -121,13 +127,11 @@ script: |
       continue
     }
     from := at
-    shared := {}
+    cells := []
     for at < len(lines) && text.has_prefix(text.trim_space(lines[at].said), "|") {
       for cell in text.split(text.trim_space(lines[at].said), "|") {
         one := text.trim_space(cell)
-        if len(one) > 0 && !text.re_match(`^[-: ]+$`, one) {
-          for key, _ in runs(wordsOf(one), 6) { shared[key] = true }
-        }
+        if len(one) > 0 && !text.re_match(`^[-: ]+$`, one) { cells = append(cells, runsOf(wordsOf(one), 6)) }
       }
       at = at + 1
     }
@@ -147,8 +151,9 @@ script: |
     }
 
     for row in near {
-      for key, _ in runs(wordsOf(row.said), 6) {
-        if shared[key] {
+      mine := wordsOf(row.said)
+      for cell in cells {
+        if shares(mine, cell, 6) {
           matches = append(matches, {
             begin: row.begin,
             end: row.end,

@@ -5,7 +5,7 @@
       "file": "spec/config/level0.schema.json",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 843. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 849. Split it by topic."
     },
     {
       "file": "spec/config/styles/VoiceParagraph/Vocabulary.yml",
@@ -41,13 +41,13 @@
       "file": "spec/design_output/pull.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 930. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 931. Split it by topic."
     },
     {
       "file": "spec/design_output/work.md",
       "rule": "FileCeiling",
       "line": 1,
-      "message": "A file holds 600 lines, and the file holds 901. Split it by topic."
+      "message": "A file holds 600 lines, and the file holds 965. Split it by topic."
     },
     {
       "file": "spec/pages/the-agent-pulls-tickets.html",

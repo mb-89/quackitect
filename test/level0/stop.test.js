@@ -7,6 +7,7 @@ import {
   askForStop,
   decide,
   detail,
+  endsOnQuestion,
   namesNext,
   pool,
   reprompt,
@@ -377,6 +378,15 @@ test("an answer names a next step where a sentence opens on the agent's own next
     false,
   );
   assert.equal(namesNext(""), false);
+});
+
+test("an answer ends on a question where its last prose paragraph closes on a question mark", () => {
+  const asking = "I weigh the cheap road.\n\nShould I take it?\n\nstop: the-work-stands-complete";
+  assert.equal(endsOnQuestion(asking), true);
+  assert.equal(endsOnQuestion("Shall I merge it?\n\n| 1 | the merge |"), true);
+  assert.equal(endsOnQuestion("**Which road do you want?**"), true);
+  assert.equal(endsOnQuestion("Which road? I take the cheap one."), false);
+  assert.equal(endsOnQuestion(""), false);
 });
 
 test("a prompt from outside the plugin puts the count back", () => {

@@ -254,6 +254,52 @@ Under yours it carries the answers below, and each is a verb:
 `work.staleAfter` stands in `spec/config/level0.json`, and the rule derives from
 the tip, so nothing writes to a branch nobody holds.
 
+## A hold beats with its session
+
+The tip's age reads a box dead late, and reads a live box that commits
+nothing dead. So a box holding a group beats: `branch beat` pushes a
+parentless commit on the empty tree to the branch `beats/<group>`, by force, with
+the clock door's time and the subject `<hand> beats`. `branch beat --end`
+writes `<hand> ends`. The take writes the first beat, a Stop command hook
+beats at each turn's end, and a SessionEnd command hook ends the hold. Its
+matcher leaves out `clear`, since a clear goes on inside a living box.
+
+| the last beat | the hold reads |
+|---|---|
+| ends, at or past the tip's second | dead at once |
+| beats, younger than `work.beatAfter` | live, whatever the tip's age |
+| none, or older | by the tip's age against `work.staleAfter` |
+
+A beat younger than half of `work.beatAfter` writes nothing, so a beat at
+every turn costs one push a span. The verb answers 0 and prints nothing off a
+branch this box holds, and on a refused push, since a Stop hook answering 2
+holds the turn. The beat stands on a branch, since the cloud's git proxy
+refuses a push outside `refs/heads`. The fetch brings it with every branch,
+and the list reads the refs it brings.
+
+| verb | on a live hold | on a dead hold |
+|---|---|---|
+| `branch take <name>` | refuses, naming the beat's age | takes it over |
+| `branch take --over [name]` | refuses, naming the beat's age | takes it, ahead of a branch at `todo` |
+| `branch list` | writes `live` beside the age, and leaves it out of yours | puts it under yours |
+
+## A red commit reaches a rescue branch
+
+A cloud box dies with its tree, and a commit the check answers red stays on
+the box. So on a cloud box standing on `work/<group>`, the commit verb pushes
+a red commit by force to the branch `rescue/<group>`, and still answers red.
+The work branch stays green, so CI and the pull request read no red commit.
+
+| who | what it does with `rescue/<group>` |
+|---|---|
+| the commit verb, red on a cloud box | pushes HEAD there by force, and names it |
+| the commit verb, green and pushed | deletes it on origin where HEAD carries it |
+| the take, over another box's hold | merges it in, pushes, and deletes it |
+| the take, on a conflict | aborts the merge, leaves it on origin, and names `git merge origin/rescue/<group>` |
+
+A desk, and a branch off `work/`, write no rescue. The push door lets the red
+push through, since CI guards a work branch.
+
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
@@ -405,6 +451,23 @@ a rejected push and takes the next. For details, see
 
 The pull's hand-out says what a branch does next, so no branch carries a copy
 of it. For details, see [[spec/design_output/pull#the-hand-out]].
+
+## The check runs once a head
+
+`.github/workflows/check.yml` runs on a push to `main` and on a pull request
+against `main`, and nowhere else.
+
+| event | concurrency group | a newer run |
+|---|---|---|
+| a pull request | one per pull request | cancels the run it supersedes |
+| a push to `main` | one per run | waits beside it, and cancels nothing |
+
+The fleet pushes often. A push run on every branch beside its pull request
+run doubled each head's jobs, and superseded runs kept their runners, so the
+queue held `main`'s own run back. A group per ref on `main` still drops a
+queued run when a newer one joins, so `main` takes a group per run. The job
+and its matrix keep their names, so the required checks still report under
+the names branch protection reads.
 
 # A branch moves clean
 
@@ -845,7 +908,8 @@ runs `run`, then `decide`, which a person takes:
 | drop | the code leaves, and the ticket closes on the reason |
 | grow | a ticket of its own carries it, and the experiment closes `became` |
 
-`retro audit` answers the trials standing open, and the retro's `audit` step
+`retro audit` answers the trials standing open, and each trial standing closed
+with no decision and no successor. The retro's `audit` step
 runs it as a command its evidence names. A need names a verb a box holds, and
 reads the tree nowhere. So the hold stands in the evidence, and the need stands
 beside it.
