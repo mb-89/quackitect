@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -41,6 +42,8 @@ type dfHub struct {
 	sent  []dfSent
 	pulls []map[string]any
 	fire  func() Reply
+	// The number of the pull request whose update meets a conflict. [[spec/tickets/running-work-takes-main-fixes]]
+	conflicts string
 }
 
 func dfJSON(status int, body any, headers map[string]string) Reply {
@@ -73,10 +76,62 @@ func (hub *dfHub) send(url string, request Request) (Reply, error) {
 		made := map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": body["head"]}, "html_url": "https://github.example/" + dfRepo + "/pull/7"}
 		hub.pulls = append(hub.pulls, made)
 		return dfJSON(201, made, nil), nil
+	case strings.HasSuffix(url, "/update-branch") && request.Method == "PUT":
+		if hub.conflicts != "" && strings.HasSuffix(url, "/pulls/"+hub.conflicts+"/update-branch") {
+			return dfJSON(422, map[string]any{"message": "merge conflict between base and head"}, nil), nil
+		}
+		return dfJSON(202, map[string]any{"message": "Updating pull request branch."}, nil), nil
 	case url == dfAPI+"/graphql" && request.Method == "POST":
 		return dfJSON(200, map[string]any{"data": map[string]any{"enablePullRequestAutoMerge": map[string]any{"clientMutationId": nil}}}, nil), nil
 	}
 	return Reply{Status: 404, Text: "no route"}, nil
+}
+
+// A hub holding two open work pull requests and one of another kind, and the doors an update runs behind, outside any git tree. [[spec/tickets/running-work-takes-main-fixes]]
+func dfUpdating(t *testing.T) (*dfHub, *Doors, *strings.Builder) {
+	t.Helper()
+	hub := newHub()
+	for number, head := range map[int]string{3: "work/a", 4: "work/b", 5: "feature/x"} {
+		hub.pulls = append(hub.pulls, map[string]any{"number": number, "head": map[string]any{"ref": head}, "base": map[string]any{"ref": "main"}})
+	}
+	out := &strings.Builder{}
+	return hub, &Doors{Root: t.TempDir(), Method: t.TempDir(), Env: dfEnv(), Out: out, Errs: out}, out
+}
+
+// The update-branch calls the hub heard, by their path past the repository. [[spec/tickets/running-work-takes-main-fixes]]
+func (hub *dfHub) updates() []string {
+	var out []string
+	for _, one := range hub.sent {
+		if one.Method == "PUT" && strings.HasSuffix(one.URL, "/update-branch") {
+			out = append(out, strings.TrimPrefix(one.URL, dfAPI+"/repos/"+dfRepo))
+		}
+	}
+	slices.Sort(out)
+	return out
+}
+
+// A push to main updates every open work pull request, and leaves one of another kind. [[spec/tickets/running-work-takes-main-fixes]]
+func TestDispatchUpdatesEveryOpenWorkPullRequest(t *testing.T) {
+	t.Parallel()
+	hub, d, out := dfUpdating(t)
+	code := Dispatch(d, hub.send, []string{"--update"})
+	if got := hub.updates(); code != codeOK || !slices.Equal(got, []string{"/pulls/3/update-branch", "/pulls/4/update-branch"}) {
+		t.Fatalf("the update answers %d and sends %v:\n%s", code, got, out)
+	}
+	if said := out.String(); !strings.Contains(said, "work/a") || !strings.Contains(said, "work/b") || strings.Contains(said, "feature/x") {
+		t.Fatalf("the update says:\n%s", said)
+	}
+}
+
+// An update meeting a conflict names its branch and the reason, and answers red. [[spec/tickets/running-work-takes-main-fixes]]
+func TestDispatchUpdateNamesARefusedBranchAndAnswersRed(t *testing.T) {
+	t.Parallel()
+	hub, d, out := dfUpdating(t)
+	hub.conflicts = "4"
+	code := Dispatch(d, hub.send, []string{"--update"})
+	if said := out.String(); code != codeRed || !strings.Contains(said, "work/b") || !strings.Contains(said, "merge conflict") || len(hub.updates()) != 2 {
+		t.Fatalf("the update answers %d, sends %v:\n%s", code, hub.updates(), said)
+	}
 }
 
 // The fires the hub heard. [[spec/tickets/dispatch-verbs-port-to-go]]

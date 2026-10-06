@@ -132,8 +132,39 @@ func cloudPull(t *testing.T) (*It, *bytes.Buffer, *bytes.Buffer) {
 	return it, out, errs
 }
 
+// A git door answering the paths main moves past HEAD, and the clone's own door for every other call. [[spec/tickets/running-work-takes-main-fixes]]
+type mainMoves struct {
+	Git
+	paths string
+}
+
+func (one mainMoves) Run(args ...string) Ran {
+	if len(args) > 0 && args[0] == "diff" && args[len(args)-1] == "HEAD...origin/main" {
+		return Ran{OK: true, Out: one.paths}
+	}
+	return one.Git.Run(args...)
+}
+
 func TestPull(t *testing.T) {
 	t.Parallel()
+	t.Run("main moving the cold path asks a sync before any hand-out", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		it.Git = mainMoves{it.Git, "spec/a.md\nsrc/modules/hooks/a.go"}
+		if code := it.Pulling([]string{"pull"}); code != 1 || strings.Contains(out.String(), "work  alpha") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+		said := out.String()
+		if !strings.Contains(said, "src/modules/hooks/a.go") || !strings.Contains(said, "./RUNME.sh branch sync") {
+			t.Fatalf("the pull says:\n%s", said)
+		}
+	})
+	t.Run("main moving off the cold path hands the leaf out", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		it.Git = mainMoves{it.Git, "spec/a.md"}
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
 	t.Run("a bare pull hands the child's leaf, and the hold names it", func(t *testing.T) {
 		it, out, _ := cloudPull(t)
 		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {

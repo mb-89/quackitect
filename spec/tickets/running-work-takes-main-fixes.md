@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 8b94909371973615
         size: 460
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: fda9959e88c98ea038ddecd13693c97d8c9adc94
+    hash_after: fda9959e88c98ea038ddecd13693c97d8c9adc94
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: 1a0ca8874b7da9b9
+        size: 3433
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -232,26 +245,33 @@ The pull done_when line meets TestPull's cold-path subtest under go test ./src/p
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/cold_test.go src/pull/pull_test.go src/branches/dispatch_fire_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/pull/cold_test.go
+src/pull/pull_test.go
+src/branches/dispatch_fire_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The pull hands alpha out while main moves a hook file, and the dispatch reads --update as no word and sends no update. The cold path read answers nothing through its stub. The case where main moves a note alone passes already, and it guards the pull against a sync it needs nowhere. The dispatch cases run in a temporary folder outside any git tree, so the fetch meets no repository.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The pull line meets TestPull/main_moving_the_cold_path_asks_a_sync_before_any_hand-out, the pull request line meets TestDispatchUpdatesEveryOpenWorkPullRequest, and the check line waits for tests-green.
+The pull case wraps the clone git door in mainMoves for the one diff call, and the dispatch cases run on dfHub, so no case reaches the network.
 
 # gate
 
