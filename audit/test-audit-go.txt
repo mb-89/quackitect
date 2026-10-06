@@ -1,0 +1,279 @@
+# Go test audit: over-coverage, duplication, dead targets
+
+Tree: /home/user/quackitect on `main` at 376fa3024. Read-only audit: no repository files or git state were changed.
+
+## How the evidence was gathered
+
+- **Line counts:** test and code lines were counted per directory. Each test's span, including its doc comment, was measured with a small script.
+- **Unreachable code:** `deadcode` from golang.org/x/tools v0.42.0, the version go.mod already pins, was run over the three `main` packages (src/quack, src/tui, src/front/cmd). It reported 105 unreachable functions. The test files calling each one were then traced.
+- **Full test run:** `go test -count=1 -json ./src/...` ran 1880 top-level tests. All passed and one was skipped (a Windows drive-letter case). The run took 54 s wall time. The slowest packages were branches (45 s), quack (31 s) and index (13 s). Afterwards `git status` was clean.
+- **Migration switches:** `spec/config/level0.json` switches on every phase from phase0 through phase11, and sets `sidebar` and `lsp` to `new`. The schema's built-in modes for config, log, guidance, check, prose, verbs, cage, window, processes and opentasks are `new`, and each of these has `enum: ["new"]`. So every shadow or parity test below guards a phase that is already switched on.
+- **Ticket states:** every ticket the scaffolding cites is `state: closed`. These are the-guidance-topic-lands, the-log-topic-lands, cfg-topic-holds-one-resolver, check-names-meet-their-goldens, twin-goldens-walk-every-twin, the-queue-becomes-a-module, tickets-becomes-a-module, the-lens-reads-v1, the-tui-data-paths-leave, the-verbs-run-in-go and agents-call-quack-directly.
+
+## Totals
+
+| Verdict | Findings | Go test lines saved | Golden/fixture lines saved |
+|---|---|---|---|
+| DELETE | 12 | ~1,550 | ~15,410 |
+| MERGE | 7 | ~1,340 | 0 |
+| REWRITE | 3 | ~275 | 0 |
+| KEEP | 4 (listed so they are not cut by mistake; #23 trims ~6 rows) | ~6 | 0 |
+| **Total** | **26** | **~3,170 of 51k (6%)** | **~15,400 of 16,181 testdata lines (95%)** |
+
+JS twins of Go behavior are listed under finding 24. They are not counted in the Go totals, and they add about 5,900 more lines that can go.
+
+Ratios after the cuts:
+
+| Package | Test lines now | Test lines after | Code lines |
+|---|---|---|---|
+| src/quack | 17.0k | ~15.7k | 17.4k |
+| src/branches | 7.0k | ~6.4k | 6.5k |
+| src/tui root | 2.3k | ~1.8k | 0.2k |
+
+The src/tui root stays far over its code because the main package holds the tests for its subpackages. Moving model_test.go (log-tab keys) into tui/log and frame_test.go into tui/frame leaves about 300 lines at the root.
+
+## Top 10 findings (by lines saved)
+
+| # | Finding | Files | Lines | Verdict |
+|---|---|---|---|---|
+| 3 | Queue golden: a frozen run of the JS queue | src/modules/queue/golden_test.go + testdata/queue.golden.json | 143 + 6,208 | DELETE |
+| 2 | Ticket-tree golden: the Ask text of every real ticket | src/quack/golden_test.go + testdata/tree.golden.json | 113 + 5,208 | DELETE |
+| 4 | Config readers golden: six readers over a frozen default file | src/quack/config_test.go (TestReadersGolden + helpers, TestTheSliceKeysStandShared) + testdata/readers.* | 143 + 2,826 | DELETE |
+| 1 | Check twin goldens (JS against Go, phase 3), including line-count pins | src/quack/check_twins_test.go, src/modules/check/check_test.go, src/modules/check/testdata/* | 292 + 417 | DELETE |
+| 13 | branches: native tests restated by the port_a…port_f suites | src/branches/{take,done,unblock,escalate,review,test,sync,list,merge,free,held,guidance,branch}_test.go | ~440 | MERGE into port_* |
+| 15 | tui root restates work/tree/frame package tests | src/tui/{workedit,workplace,work,sort,workdetail,shipped,door}_test.go | ~384 | MERGE into tui/work, tui/tree, tui/frame |
+| 19 | Tests of production-dead functions | retro_effect, modules/index call/ops, index placements, quack rename, queue outline, hooks/command voice, q scheduler | ~210 | DELETE (or wire the code) |
+| 11 | One "registers" test per verb | 11 tests across src/quack | 223 → ~35 | MERGE into one table |
+| 8 | Cage shadow replay (phase 5) | src/modules/hooks/cage_test.go (8 tests) + test/replay/cage/*.jsonl | 187 + 142 | DELETE |
+| 10 | Tests that restate migration switch values | src/modules/migration/migration_test.go, src/tui/switched_test.go, src/quack/main_test.go, src/config/config_test.go | 176 | DELETE |
+
+## All findings
+
+### 1. Check twin goldens: DELETE
+- **Files:** src/quack/check_twins_test.go (268), src/modules/check/check_test.go (24), src/modules/check/testdata/{tree,schema,size,magic,names,paths,private,slug,vale,biome}.golden.json + vale.out + biome.out (417).
+- **Evidence:**
+  - TestTwinGoldens shells out to `node test/level0/check-twins.js`. It diffs the JS rows against the Go rows and compares the leftovers with a golden file. This is parity scaffolding for "check twins, switched over in phase 4". The migration module's check slice has `enum: ["new"]`.
+  - Six goldens read `{"javascript": [], "go": []}`.
+  - size.golden.json (203 lines) pins line counts of real repository files, for example `"the file holds 821. Split it by topic."` for spec/config/level0.schema.json. Any edit to those files breaks the golden.
+  - check_test.go's TestEveryTwinNameStands asserts the same thing as quack TestTheWiredTreeAnswersEveryCheckName: each `check/` name reads an empty list.
+  - The JS half is test/level0/check-twins.js (38), check-twins.test.js (127) and src/scripts/check-twins.js (91).
+
+### 2. Ticket-tree golden: DELETE
+- **Files:** src/quack/golden_test.go (113), testdata/tree.golden.json (5,208).
+- **Evidence:**
+  - The test snapshots the Ask and Standing of every ticket in spec/tickets.
+  - Rows whose ticket hash or group hash changed are silently skipped (`continue`). It fails only when zero rows still compare, so it degrades into "unchanged tickets still read the same".
+  - It pins wording, not behavior. Its phase (tickets-becomes-a-module, phase1gaps) is closed.
+  - The behavior is already covered in src/modules/tickets: TestAllAnswersEveryTicketWithItsFields, TestAStandingReadsOffTheGroupsRecordThroughTheTicket, TestAskDropsComments and TestAskReadsFencesAsText.
+
+### 3. Queue golden: DELETE
+- **Files:** src/modules/queue/golden_test.go (143), testdata/queue.golden.json (6,208).
+- **Evidence:**
+  - This is "one real run of the queue over this tree" written by test/level0/queue-golden.js from src/scripts/work-answer.js. It is parity for open-tasks-shadow-lands, and phase2switch is on.
+  - The ordering rules are already tested once each in about 265 lines: score_test (marks, blockers, ties, days and fails), places_test, outline_test and overrides_test.
+
+### 4. Config readers golden: DELETE
+- **Files:** src/quack/config_test.go, specifically TestReadersGolden, goReaders, readGolden, readersRoot and constants (~125), plus TestTheSliceKeysStandShared (18). Fixtures: testdata/readers.golden.json (1,936), readers.tracked.json (143), readers.local.json (11), readers.env.json (6), and readers.schema.json (730, read only by src/scripts/config-golden.js).
+- **Evidence:**
+  - It snapshots six readers over a frozen copy of the default file: four in JS and two in Go (src/config Where and src/modules/config Layered). The Go sections are compared only with their own `-update` output.
+  - The golden pins a disagreement between the two live Go readers instead of failing on it. On `answer.words`, src/config answers 40 from the local file while modules/config answers 60 from SE_ANSWER_WORDS. On `migration.opentasks`, they answer "new" (local) and "shadow" (tracked). The doc comments differ in the same way: src/config says "the local file beats the environment", while modules/config says "environment, local file, default file".
+  - Layer precedence is already tested in src/config/config_test.go (13 tests), src/modules/config/config_test.go (17 tests) and quack TestConfigRowsReadEveryLayer.
+  - TestTheSliceKeysStandShared asserts that two migration keys are shared.
+  - **Side issue:** the precedence disagreement is a real inconsistency and should be fixed on its own.
+
+### 5. Guidance golden: DELETE
+- **Files:** src/quack/guidance_test.go, specifically TestGuidanceGoldenHoldsTheModule (33), TestGuidanceGoldenOldMeetsNew (19), readGuidanceGolden and constants (~21), plus testdata/guidance.golden.json (152).
+- **Evidence:**
+  - It snapshots the notes for every leaf of the real tree, and it compares the "old" JS readsFor with the module. The guidance slice is new-only, and phase3switch is on.
+  - Keep TestGuidanceFilesKeyEachFileByItsPathUnderTheRoot. src/modules/guidance has its own tests (149 lines).
+
+### 6. Log golden: DELETE
+- **Files:** src/quack/log_test.go TestLogGoldenHoldsTheModule (~52), src/tui/log/golden_test.go (85), src/quack/testdata/log.golden.json (103).
+- **Evidence:**
+  - These are reader sections for the-log-topic-lands (phase 3). The JS twin is test/level0/log-golden.test.js.
+  - ParseRecord is already tested by tui/log TestAParsedRowKeepsItsOwnFieldsAndHandsTheRestToExtra, TestALineThatDoesNotParseStandsAsAnUnparsedRow and TestAnOlderLineNamingItsDoorStillReadsItsKind.
+  - Keep TestLogAnswersAnEmptyArrayForNoRow.
+
+### 7. Drawn twin: DELETE
+- **Files:** src/modules/tickets/drawn_test.go TestDrawnMeetsTheEmitter (~20), testdata/drawn.golden.json (308), drawn-two.md (47, used only through the golden).
+- **Evidence:**
+  - The test checks that the Go drawing equals what the JS emitter prints, via test/level0/drawn-twin.js. Phase8switch is on and the sidebar is `new`.
+  - TestDrawnMarksTheOpenFields already asserts the drawing's behavior: the fields, lines and filled flags.
+
+### 8. Cage shadow replay: DELETE
+- **Files:** src/modules/hooks/cage_test.go: TestPostsOf ×2, TestDecisionOf ×2, TestReplayLog ×2, TestALivePostDecided ×2 (187). Data: test/replay/cage/*.jsonl (142 lines, read only by this test). Every *.shadow.jsonl golden is empty (1 byte).
+- **Evidence:**
+  - deadcode reports `PostsOf` and `Door.ReplayLog` as unreachable.
+  - The live shadow needs `post.Old`, and no hook sender under .claude/skills/level0 or src sets it.
+  - The cage slice is new-only and phase5switch is on. The comment calls this porting scaffolding: "a ported rule shrinks the golden file".
+  - Rule behavior is tested once per rule by the case tables in hooks: command_test, commits_test, holds_test, stops_test and writes_test.
+  - Keep TestShadowToAppendsOneLineARow, because ShadowTo still writes health rows, and keep TestAGuardedCall….
+
+### 9. Verbs road modes: REWRITE
+- **Files:** src/quack/verbs_test.go: TestTheRoadHandsEachVerbByItsMode (29), TestATwinAnsweringApartWritesAShadowRow (19), TestATwinAgreeingWritesNoRow (9), TestAVerbWithNoTwinWritesNoShadowRow (12), TestTheRoadHoldsRetroNotesAmongItsTwins (13) and TestAWholeVerbTakesQuackUnderEveryMode (19). Also src/quack/twins_test.go TestATwinKeysOnThreeWords (12). About 85 lines saved.
+- **Evidence:**
+  - The verbs key's enum is `["new"]`, phase4switch and phase11 are on, and "branch", "ticket", "tui", "check" and "config" are all registered whole.
+  - The `old` and `shadow` rows, and the `toBoth` road, test a mode that config cannot select.
+  - The road should be cut down to "registered → Go, else program". Keep TestTheNewRoadRunsTheTwinForReal and TestARegisteredVerbRunsAheadOfQuacksOwn as the two behavior cases. The `toBoth` branch in src/quack/verbs.go can go with them.
+
+### 10. Tests that restate migration switch values: DELETE
+- **Files:**
+  - src/modules/migration/migration_test.go (79 of 126): TestTheLspSliceStandsOld, …ProcessesSlice…, …VerbsSliceStandsNew, …CageSlice…, TestPhaseElevenTakesTheVerbsPort, …WindowSlice…, …SidebarSliceStandsBuiltInOld and …SidebarKeyReadsOldWithNothingSet.
+  - src/tui/switched_test.go (30).
+  - src/quack/main_test.go TestTheWiredTreeAnswersItsSlice (52).
+  - src/config/config_test.go TestSharedReadsTheDefaultFileThenTheBuiltIn (15).
+- **Evidence:**
+  - These tests assert that a Go table literal holds the value it holds, or that the slice keys read "shadow".
+  - config.Shared is unreachable (deadcode).
+  - TestTheWindowModeReadsNew passes only through the schema default, because level0.json sets no `migration.window`.
+  - Keep TestTheSliceKeyReadsTheDefaultFile and TestTheSliceKeyStandsShared.
+
+### 11. One "registers" test per verb: MERGE
+- **Files:** TestTuiRegisters, TestCheckRegisters, TestServeRegisters, TestVehicleVerbRegister, TestVoiceRegistersUnderItsWord, TestTheBoxVerbsRegister, TestTheBoxVerbsLeaveTheScripts, TestTheBranchAndCloudVerbsRunInGo, TestLandingVerbsRunInGo, TestTicketVerbsRunInGo (88) and TestEveryRetroVerbRegisters. 223 lines in total.
+- **Evidence:**
+  - All eleven assert that a word is in `registry`.
+  - The `…LeaveTheScripts` tests and the `leftScripts` checks assert that old JS files are gone, which is port scaffolding.
+  - Replace them with one ~35-line table test: every entry in verbsmodule.Commands and RetroVerbs resolves through `twinOf` to a registered Go answer.
+
+### 12. One "the wiring declares X" test per topic: MERGE
+- **Files:** TestTheWiringLoadsTheVehicleAndStubTopics, …BranchTopic, …RetroTopic, …MCPModule, TestTheFindAndWaitModulesStandOnTheWiring, TestThePlansModuleStandsOnTheWiring, TestTheWiringDeclaresTheWaitTheDoorReads and TestTheWiredTreeAnswersEveryCheckName. 177 lines; ~140 saved.
+- **Evidence:** each one re-reads spec/wiring.yaml, loads it and checks one or two `Declared` names. One table of the names callers read covers all of them. Keep the binding tests that check more than declaration: hooks, lsp and io.
+
+### 13. branches: native tests restated by the port suites: MERGE into port_*
+- **Files:** native take, done, unblock, escalate, review, test, sync, list, merge, free, held, guidance and branch-usage tests, about 440 of ~750 lines.
+- **Evidence:** pairs that assert the same behavior through the same `Branch()` entry point and a real git tree:
+
+  | Native test | Port test that covers it |
+  |---|---|
+  | TestACloudBoxHandsNoQuestionOut | TestPFUnblockRefusesACloudBox |
+  | TestTheUnblockHandsTheQuestionOn | TestPFTheSuccessorCarriesTheQuestion |
+  | TestASuccessorOffThePersonRouteRefuses | TestPFASuccessorOffThePersonRouteNamesTheMint |
+  | TestTheSyncTakesTrunkIn | TestPDSyncOnAWorkBranchTakesMain |
+  | TestAnEscalationWantsAQuestionAndAHold | TestPFEscalationWithNoQuestionRefuses + …NoHoldNamesThePull |
+  | TestTheQuestionIsTheWordsPastTheFlags | TestPFTheEscalationReadsItsWords |
+  | TestThePersonStepGoesInBeforeTheLeaf | TestPFADeskEscalationInsertsAPersonStep |
+  | TestABranchChangingNoTestAnswersMissing | TestPFABranchChangingNoTestAnswersMissingSinceTheBase |
+  | TestAGoRunAnswersOneWord | TestPFGoSaysItsWord |
+  | TestANodeRunAnswersItsVerdict | TestPFTestSaysItsVerdict |
+  | TestAReviewWantsABranchThatStands | TestPFAReviewNamingNoBranchRefuses |
+  | TestARedRunNamesItsCases | TestPFARedSpecRunNamesEachCaseOnce |
+  | TestReadPrintsTheGroup | TestPAReadPrintsTheGroup |
+  | TestDoneRunsOnAWorkBranchAlone | TestPADoneOffAWorkBranchRefuses |
+  | TestADeskTakesNoBranch | TestPDADeskTakeRefusesAndNamesMain |
+  | TestAClaimGoesStalePastTheSpan | TestPATakeHandsStaleByTheClock |
+  | TestTheBranchVerbPrintsItsUsage | TestPAUsageNamesTheVerbs |
+  | guidance_test (2 tests) | port_f_guidance (3 tests) |
+  | TestCloseKeepsAnUnmergedBranch / TestCloseDeletesAMergedBranch | TestPACloseDeletesInsideTrunkAlone / TestPBCloseDropsABranchTrunkHolds |
+
+- **Keep these unique tests:** the units in read_test, doors_test and group_test, TestTheFrontMergesKeyByKey (unit), TestANeedReadsTheVerbTable and TestALoudVerbLogsItsCode.
+- The port files are organized by porting batch (PA…PF), not by verb. Rename them by verb once they are merged.
+
+### 14. branches: the same fixtures built seven times: REWRITE
+- **Files:** tree_test.go (175), port_a_fixtures (101), port_b_fixtures (114), port_c_fixtures (167), port_d_common (115), port_e_helpers (88) and port_f_helpers (125). About 150 lines saved.
+- **Evidence:**
+  - Five group-ticket notes (groupNote, paGroupNote, pbGroupNote, pcGroupNote, pdGroupNote).
+  - Four copies of the same "switch onto work/<name>" helper (paOn, pbOnBranch, pdOn, pcOnGroup), plus pfOnBranch, which pushes as well.
+  - Three copies of "out + errs" (paSaid, pbSaid, pcSaid).
+  - 237 tests call newTree. Each call spawns about 12 git processes (init bare, init, configs, commit, push), at roughly 0.1 s per test and about 24 s of the package's 79 s summed time.
+  - **Fix:** build the origin and clone template once in TestMain and copy it per test (`cp -a`). Usage and argument-refusal tests need no repository at all, for example TestTheBranchVerbPrintsItsUsage and TestPAUsageNamesTheVerbs.
+
+### 15. tui root restates package tests: MERGE into tui/work, tui/tree, tui/frame
+About 384 lines (372 in the tests below, plus the indexRowsSaid fixture).
+
+| Root test | Package test that covers it |
+|---|---|
+| workedit TestAnEditInTheWorkTabPostsTheFieldToItsAction | work TestAnEditPostsSetFieldForEveryRowItWrites |
+| workedit TestTheUrgentKeyPostsAFlipAndWritesNothing | work TestTheUrgentKeyPostsFlipUrgentForEveryMarkedRow |
+| workedit TestAValueTheSchemaRefusesNamesTheReasonAndWritesNothing | work TestAValueTheSchemaRefusesPostsNothing |
+| workedit TestEscapePutsTheOldValueBackAndWritesNothing | tree TestEscapePutsTheOldValueBack |
+| workedit TestTheCellOffersWhatTheSchemaNamesAndTabTakesIt | tree TestTabTakesTheFirstValueTheCompletionOffers |
+| workplace TestPThenADigitPostsThePlace | work TestThePlaceChordPostsWorkPlace |
+| work_test TestTheTabReadsTheBaseFileAndTheRowsOffTheCatalog | work TestTheWorkTabDrawsOffWorkRowsAlone |
+| work_test TestTheFilterReadsATicketsKeysInTheLogsOwnLanguage | tree TestTheFilterReadsAnItemInTheLanguageTheLogReads |
+| sort_test TestAPressSortsThenFlipsThenPutsTheArrivalOrderBack | tree TestAPressTurnsAKeyAroundAndAThirdDropsIt |
+| sort_test TestTheColumnAPressLandsOnAndTheOneItMisses | tree TestAPressOnAColumnHeadNamesTheKeyUnderIt |
+| workdetail TestANameInTheTableLinksToItsNote | work TestAPrivateNoteLinksWhereItStands |
+| workdetail TestAPressOnTheMarkClosesTheGroupAndOpensItAgain | tree TestAParentCollapsesAndExpands |
+
+- **shipped_test.go (69):** pins positions in the shipped spec/views/work.base, for example `said[3]` is urgent, `said[4]` is todos and `said[6]` is notes. That is incidental ordering. tree TestTheWorkBaseFileDeclaresItsRowsBadgeAndActions already reads the shipped file.
+- **work_test TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft and TestATicketNestsUnderTheRowItNamesAtAnyDepth:** these use an outdated `indexRowsSaid` row shape through the test-only ReadWorkItems.
+- **Moves:** TestTheSiblingsOfARowStandAtItsOwnLevel is the only test of tree.Siblings, so move it to tui/tree. frame_test.go (207) tests frame.Model through a stub tab, so move it to tui/frame (no lines saved).
+
+### 16. tui/work test-only entry points: REWRITE
+- **Files:** src/tui/work/workitems_test.go (81), work_test.go uses of `work.ReadWorkItems` and `work.Read`, and work/v1_test TestTheWorkTabDrawsOffWorkRowsAlone. About 40 lines saved.
+- **Evidence:**
+  - deadcode reports `ReadWorkItems` and `work.Read` as unreachable. They are wrappers that exist for tests around the live `itemsOfTickets` and `drawn`.
+  - Drive the same assertions (person lighting, progress, private links) through the tab's `registry.Change` message, as TestTheWorkTabRedrawsOnAWatchedChange already does. Then drop the two exports.
+
+### 17. One window port, tested from three places: MERGE into tui/frame/door_test.go
+- **Files:** src/tui/door_test.go (3 tests, 39), src/tui/frame/door_test.go (44), and src/quack/tui_verb_test.go TestTuiTellReachesAStandingWindow (24). About 59 lines saved.
+- **Evidence:** all three open `frame.OpenDoor` on a real port and send a tab with `frame.TellPort` or `tuiTellAt`. The real door should be tested once. quack only needs to check that `tuiTellAt` calls frame.TellPort, and a fake can do that.
+
+### 18. Import-layering checks outside the imports analyzer: MERGE into src/imports
+- **Files:** src/tui/layout_test.go (90) and src/quack/main_test.go TestTheIndexImportsNoModule (16, runs `go list -deps`).
+- **Evidence:** src/imports already holds the import-rule analyzers and TestTheTreeHoldsTheImportRules, including tui renderers. Add the tui package table and the "index imports no module" rule there.
+
+### 19. Tests of production-dead functions: DELETE, or wire the code
+About 210 lines.
+
+| Function (deadcode) | Tests calling it | Lines |
+|---|---|---|
+| quack `retroBatteryEffectOf` (retro_effect.go:273, never called; the Battery field is never set) | retro_effect_test TestRetroEffectReadsThisRetrosBatteryAgainstTheLastRetros, …NoEarlierRetro…, …FirstRetroWritesItsBattery…, …EarlierRetroReadsNoBaseline | 85 |
+| modules/index `Book.WaitCaller`, `Book.Open` (ops/wait with no handle) | call_test TestWaitWithNoHandleWaitsOnTheSessionsOpenOperations | 29 |
+| modules/index `Book.Cancel` (ops/cancel) | ops_test TestACancelEndsAQueuedOrRunningOp | 14 |
+| index `Placements.Restart` | placements_test TestAPlacementRestartsTheProcessesOfOneTopic | 16 |
+| index `Placements.Gap` setter (a test seam; the test reads the private `.gap` field) | TestThePlacementsWaitTheGapTheyName | 13 |
+| q `Scheduler.Lists`, `Scheduler.Unwatch`, `Scheduler.Read` | scheduler_test TestASecondChangeReusesTheKeptList, TestAnUnwatchedPendingNameRunsWhenRead | 24 |
+| quack `reachesIn` | rename_test TestRenameReaches, first two subtests | 12 |
+| modules/hooks/command `FormIn` | voice_test TestTheVoiceSplitsRefusalsFromForm | 10 |
+| modules/queue `Compare` (wraps ticket.ComparePlaces) | outline_test TestCompareStandsTheCloudLast (move to src/ticket) | 7 |
+
+- ops/cancel and ops/wait-all are designed behaviors with no action wired to them. Either wire them or delete the code together with the tests.
+- **Related, rewrite only:** `q.Start` is unreachable, because production loads through quack `load` plus `Catalog.Check`. TestTheStartRefuses…NoDoc… and start_test still reach Load and Check through it. Call Load and Check directly instead. Doc enforcement is really guarded by quack TestEveryModuleDescribesWhatItExposes.
+
+### 20. Tests of the library and of config constants: DELETE
+- **Files:** src/index/index_test.go TestTheIndexOpensWithoutCgo (21) and TestTheIndexOpensWithItsPragmas (23).
+- **Evidence:**
+  - The first runs raw `INSERT` and `MATCH … bm25` SQL against modernc sqlite, so it tests the library. Product ranking is already covered by TestANoteNamingTheWordOutranksOneSayingItInItsBody.
+  - The second pins `journal_mode=wal`, `busy_timeout=5000` and `synchronous=1`, which are implementation constants.
+
+### 21. Call and wait semantics at four layers: MERGE
+- **Files:**
+  - modules/index call_test: TestAQuickCallAnswersItsResultWithinTheWait and TestASlowCallAnswersStillRunning….
+  - index actions_test: TestAnActionAnswersItsResultWithinTheWait and TestAWaitOfNoneAnswersAcceptedWithTheHandle.
+  - quack waits_test: TestAWaitPastTheCallWaitAnswersARunningHandle and TestTheDoorAnswersAWaitPastItsCallWaitAsRunning.
+- **Evidence:** "a result within the wait, a running handle past it" is asserted at the Book, at HTTP /v1/actions, through `served.Call` and through `door.Hook`. Keep the Book test as the semantics test. Narrow the HTTP tests to the 200/202 status and Preference-Applied mapping. Keep one quack end-to-end test. About 40 lines saved.
+
+### 22. Private helpers already covered by a verb test: DELETE
+- **Files:** src/quack/retro_mint_test.go TestRetroMintPromotionNameReadsItsWhatOrItsPlace (11).
+- **Evidence:** TestRetroMintNamesAPromotionCarryingNoTicketByItsWhatOrItsPlace already covers both branches (`promotion "the land rule"` and `promotion 2`) through the verb. Similar candidates to check case by case: TestConfigTextHoldsOneKeyALine, and tickets `Ask` / `Held`, which are test-only exports over askIn and heldIn.
+
+### 23. Table rows that differ only in data: KEEP, trim about 6 rows
+- **Files:** src/pull/edit_test.go TestWeighs and src/modules/hooks/command/findings_test.go TestFindingsAnswerTheSharedCases.
+- **Evidence:**
+  - TestWeighs has two passing "group" rows, and "urgent true" and "shape round" pass the same way.
+  - The findings table has `echo >` and `echo >>` (both ShellWrites redirects) and `git add .` and `git stash` (both GitWrite).
+  - The big tables otherwise each hit a distinct branch: verb_split refusals, probe_cold, stop_test.
+  - This is a small category in Go. The real "data-only" over-coverage is the goldens above.
+
+### 24. Go and JS both assert the same behavior; Go is live: KEEP the Go side, DELETE the JS side (outside Go totals)
+- **branches port_* against test/level0/work-*.test.js + work-doors.js (~4,474 lines).** "branch" is registered whole in Go (`register("branch"`), so RUNME no longer reaches src/scripts/work-stands.js and its siblings. The port_* files say "as test/level0/work-doors.js holds them for the JS cases".
+- **hooks case tables against the bridge.** test/replay/cage/{command,commit-guards,brief,layer,verb-line}-cases.json and src/modules/hooks/review/testdata/review-cases.json are run by Go hooks tests and by test/level0/{command-cases,commit-guards-cases,brief-cases,cage,verb-line,review-cases}.test.js (~551 lines) against src/bridge. The cage slice is new-only.
+- **Golden writers and their JS tests:** check-twins.js and .test.js, config-golden.js, log-golden.js and .test.js, guidance-golden.js and .test.js, queue-golden.js, drawn-twin.js, plus src/scripts/{config,log,guidance}-golden.js and check-twins.js (~860). These go with findings 1 through 7.
+
+### 25. KEEP: shared Go/JS contracts and real-door checks
+- **src/index/testdata/tools.golden.json:** TestTheToolListReadsAsItsGoldenFile writes it, and test/level0/index-tools.test.js reads it as the list `se-index tools` prints. This is one contract between the Go producer and the JS consumer.
+- **src/quack/writedoor_test.go TestTheSchemaPortAnswersWhatEveryWriteTableTeaches:** it checks that the real schema door answers what the fakes in hooks/writes_test are taught. This is the "real door once, fakes elsewhere" pattern the rules ask for.
+- **index TestHashTextMatchesJavaScript:** a cross-language hash contract.
+
+### 26. KEEP: index Serve and Sweep wrappers, both APIs
+- `index.Serve`, `Sweep`, `Touches` and `Retracks` are unreachable in production. They are thin wrappers that exist for tests around the live `ServeManaged` and `sweep`, so the tests still exercise real code. Move the wrappers into a `_test.go` helper.
+- The old API and /v1 are both live: index.Ask posts to the old API, and the tui reads /v1. door_test and v1_test are not duplicates.
+
+## Other unreachable functions (deadcode) with no test, for reference
+
+These need no test change:
+
+- **Fakes:** FakeGit, FakeDisk, FakeWatch, FakeClock, registry.Fake, pull.FakeDisk, FakeEnv.
+- **Other functions:** branches `number`, `padStart` and `Doors.ticketsOn`; check `Checker.Over`, `Checker.Tree`, `restatedOver`, `engineFaults`, `blockOf` and `hint`; hooks/stop `KnowsCheck`; lsp `Settle`, `ValeRows` and `BiomeRows`; index `Peer.AnswersInputs`; pull `containsSlash` and `withoutField`; tui `LoadColoursForCases` and `Tree.nameOf`.
+- The full list is the deadcode output: 105 lines over src/quack, src/tui and src/front/cmd.

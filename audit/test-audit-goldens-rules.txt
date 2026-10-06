@@ -1,0 +1,243 @@
+# Test audit: goldens, fixtures, and the rules that prevent them
+
+Read-only audit of `/home/user/quackitect` at `376fa3024` (main). Nothing in the tree was written.
+
+Context that frames every verdict below: `spec/config/level0.json` sets every migration key on
+(`phase0` … `phase11` all `true`, `sidebar: new`, `lsp: new`), and every switch-over ticket
+(`read-topics-switch-over`, `quack-verbs-switch-over`, `go-cage-switches-over`,
+`lsp-door-switches-over`, `sidebar-switches-over`, `tui-shell-switches-over`, `the-js-twins-leave`)
+is `state: closed, reason: done`. Phase 3's done-when in
+`spec/design_input/the-migration-runs-in-slices.md` reads "no JavaScript twin of a Go check stands".
+So every old-vs-new comparison still in the tree is past its phase.
+
+## Numbers
+
+| measure | value | command |
+|---|---|---|
+| commits whose message says `golden` | 64 | `git log --oneline -i --grep=golden \| wc -l` |
+| of those, since <date> (when the twin goldens landed) | 40 | `... --since=<date>` |
+| commits touching `size.golden.json` | 57 (from <date> to <date>) | `git log --oneline -- src/modules/check/testdata/size.golden.json` |
+| of those, with "size golden"/"size twin golden" in the subject | 32 | |
+| of those, changing the golden and at most one other file (hand re-counts) | 29 | |
+| every other golden file | 1 to 3 commits each | |
+| files under `src/**/testdata` | 38 (16,181 lines; 12 `*.golden.json`) | |
+| Go tests total | 51,112 test lines vs 74,301 code lines | |
+| JS tests total (`test/`) | 52,211 test lines vs 34,625 code lines (`src` + `.claude/skills/level0`) | |
+
+Why the size golden churns: `sizeFaults` in Go (`src/modules/check/textfaults.go:105`) counts every
+file, while `lib/size.js` counts only `.js/.ts/.go` (`SIZED`). So each `.md`, `.json` and `.yml` past
+600 lines is a "Go side alone" row, and its message carries the live line count
+("A file holds 600 lines, and the file holds 2024"). Any edit to `spec/design_output/level0.md`,
+the schema, a long ticket, or the golden files themselves (`tree.golden.json` appears in the size
+golden at 5209 lines) moves the number. The golden pins a behavior gap nobody decided, plus a count.
+Ticket `size-golden-drops-line-counts` is open at `design/owner-read`.
+
+---
+
+# Part A: every golden and golden-like fixture
+
+Verdicts: **DELETE** (the behavior is pinned elsewhere, or the test only compares old to new past the
+switch), **REPLACE** (the behavior matters and nothing else pins it: write a named assertion, then
+delete the golden), **KEEP**.
+
+## A1. Golden files and their tests
+
+| # | golden file(s) | test(s) and writer | what it pins | incidental output? | churn | tested elsewhere? | verdict |
+|---|---|---|---|---|---|---|---|
+| 1 | `src/modules/check/testdata/size.golden.json` (203 lines, 33 Go-alone rows) | `TestTwinGoldens` in `src/quack/check_twins_test.go` (`-twins` rewrites); JS side from `test/level0/check-twins.js` + `src/scripts/check-twins.js` | the rows where Go `sizeFaults` and JS `sizeFaults` disagree over the real tracked tree | yes: live line counts in messages, the real tree's content | 57 commits, 29 pure re-counts | Go `sizeFaults`: **no Go test** besides this. JS: `test/level0/size.test.js` (5 cases) | **REPLACE**: Go cases for "one line past the file ceiling meets `FileCeiling`", "at the ceiling meets nothing", "a function past its ceiling meets `FunctionCeiling` at its line", and decide the scope (code files only, as `lib/size.js` and `spec/design_output/level0.md#the-size-ceiling` say "over a brace language"). Then delete. |
+| 2 | `check/testdata/tree.golden.json` (96 lines: JS-alone 4 rules, Go-alone 11 rows) | same harness | rule-level gaps: JS has `everyModuleTested`, `installerHoldsTheNames`, `privateFolderOwned`, `stopFolderIsData`, Go lacks them; Go's `EveryPointerResolves` reports 8 dead pointers in real notes | yes: the real tree's dead pointers | 2 | Go tree rules: `src/modules/check/sweep_test.go` (dead pointer etc.) | **DELETE** with the harness, after a ticket decides the four JS-only rules (port or drop). The gap is the finding, not the golden. |
+| 3 | `check/testdata/{magic,names,paths,private,schema,slug}.golden.json` (4 lines each, both sides empty) | same harness | Go and JS agree over the real tree | no (empty) | 1 each | Go: only `private` (`TestANameReadsAsAWordAlone`); magic, names (`overLong`), paths (`isDraft`), slug, schema-kinds have **no Go test** besides the twin run. JS: `test/level0/{magic,names,paths}.test.js` | **REPLACE**: port the JS behavior cases to Go at the check sweep, then delete. |
+| 4 | `check/testdata/{vale,biome}.golden.json` + captured `vale.out`, `biome.out` | same harness | that JS keeps Windows backslashes and an empty severity (`Cap. []`) where Go normalizes (`[error]`) | the captured paths and severities | 1 | Go `ValeRows`: `src/voice/voice_test.go:562`; `BiomeRows`: none outside the twin | **DELETE** the goldens; keep `biome.out` as a fixture for one Go `BiomeRows` case (REPLACE for Biome). |
+| 5 | (harness) `TestTwinGoldens`, `src/scripts/check-twins.js` (91), `test/level0/check-twins.js` (38), `test/level0/check-twins.test.js` (127), `check.Twins`, `TestEveryTwinNameStands` | | the twin list and empty `check/` names "until phase 7 moves in" | | | | **DELETE** all after rows 1-4 are replaced. `src/scripts/check-twins.js` is test-only code under `src/scripts` (no non-test importer). `TestEveryTwinNameStands` pins phase-7 placeholders that should leave with the names. |
+| 6 | `src/quack/testdata/tree.golden.json` (5,208 lines, 768 rows) | `TestTreeGolden` in `src/quack/golden_test.go` (`-update`) | the Ask text and standing of every real ticket under `spec/tickets` | yes: it is the tree's own content; rows whose hash moved are silently skipped (748 of 768 still compare; 1,000 tickets now, ~232 have no row) | 2, plus two tickets it caused (`the-golden-keys-group-hash`, `golden-carries-the-given-ask`) and grep pollution | Ask parsing and standing: `src/modules/tickets/{tickets,module,branches}_test.go` | **DELETE**. If a gap shows, add fixture-based cases to `src/modules/tickets`. |
+| 7 | `src/quack/testdata/guidance.golden.json` (152 lines; sections `src/modules/guidance` and `src/scripts/guidance-hand.js readsFor`) | Go: `TestGuidanceGoldenHoldsTheModule`, `TestGuidanceGoldenOldMeetsNew` (`src/quack/guidance_test.go`); JS: `test/level0/guidance-golden.test.js`; writers `src/scripts/guidance-golden.js`, `test/level0/guidance-golden.js` | notes per process leaf over the real tree, and old == new | yes: the real tree's processes and notes | 1 | `src/modules/guidance/guidance_test.go` (6 behavior cases: tags, env, top note, own reads, root precedence, drafts) | **DELETE** both sections, both tests, both writers. `guidance` key is `new` alone. |
+| 8 | `src/quack/testdata/log.golden.json` (103 lines; 4 sections: `lib/log.js asRow`, `extension/lib/rows.js rowOf`, `src/modules/log`, `src/tui/log ParseRecord`) over fixture `session.jsonl` | `TestLogGoldenHoldsTheModule` (`src/quack/log_test.go`), `TestLogGoldenHoldsParseRecord` (`src/tui/log/golden_test.go`), `test/level0/log-golden.test.js`; writer `src/scripts/log-golden.js` | four readers of one log line format, each against its own frozen section (no cross-section compare) | low (fixture-based) | 1 | `src/modules/log/log_test.go` (rank, fields, broken line, nested field); `src/tui/log/{detail,read}_test.go`; the JS torn-line case | **DELETE** the golden and the three section tests. Finding for the code: two Go readers (`modules/log` and `tui/log.ParseRecord`) parse one format; one place should own it. |
+| 9 | `src/quack/testdata/readers.golden.json` (1,936 lines; 6 sections x 80 keys) + `readers.{schema,tracked,local,env}.json` (`readers.schema.json` is a 730-line frozen copy of the config schema) | `TestReadersGolden` (`src/quack/config_test.go`); JS writer `src/scripts/config-golden.js`, `test/level0/config-golden.js` | what each config reader answers per key | yes: a frozen schema copy | 3 | Go: `TestConfigRowsReadEveryLayer`, `TestConfigTextHoldsOneKeyALine`, `src/modules/config` tests, `src/config` tests. The four **JS sections are never asserted** by any test (writer only): dead data | **DELETE** golden, JS writers, and the frozen schema copy. Keep one layered-precedence case at `src/modules/config` if not already there. |
+| 10 | `src/modules/queue/testdata/queue.golden.json` (6,208 lines) | `TestQueueGolden` (`src/modules/queue/golden_test.go`, embed); writer `test/level0/queue-golden.js` runs the JS queue (`work-answer.js`, `pull-queue.js`, `engine/group.js`) | the place of every row in one real run of the JS queue on <date> | yes: a frozen real-tree run | 4 (frozen; a change to Go ordering can only be re-blessed by running the old JS) | `places_test.go` (5), `outline_test.go` (4), `overrides_test.go`, `places_plan_test.go`, `score_test.go` (5) | **DELETE**. If one ordering claim is missing (cloud last, person first, older first, todo before its row, child takes group number), it is already a named case; add any missing one by name. |
+| 11 | `src/modules/tickets/testdata/drawn.golden.json` (308 lines) over `drawn-one.md`, `drawn-two.md` | `TestDrawnMeetsTheEmitter` (`drawn_test.go`); writer `test/level0/drawn-twin.js` (JS emitter) | Go projection == JS emitter's drawing | low (fixture-based) | 1 | `TestDrawnMarksTheOpenFields` (fields, mark lines, filled), `TestDrawnRefusesAWrite` | **REPLACE**: keep the two fixture tickets; add named asserts for graph and route if `TestDrawnMarksTheOpenFields` lacks them; delete the golden and the emitter comparison (phase 8 switched). `drawn-twin.js` also feeds the JS fake index `test/level0/v1-index.js`; it stays only as long as that fake does. |
+| 12 | `src/index/testdata/tools.golden.json` (131 lines) | `TestTheToolListReadsAsItsGoldenFile` (`src/index/tools_test.go`, `-update`); consumed by `test/level0/index-tools.test.js` | the `/v1/tools` wire shape the JS hook registers from | partly: the `plan` field's description prose (commit `de9562fa1` re-blessed it for a prose change) | 3 | no other cross-language shape test | **KEEP** as the one producer/consumer contract. Narrow it: assert the `plan` property by key and type, not by its wording. |
+
+## A2. Golden-like comparisons outside `testdata`
+
+| what | where | pins | verdict |
+|---|---|---|---|
+| cage shadow replays: 17 `*.shadow.jsonl` beside recorded logs | `test/replay/cage/`, `TestReplayLogAnswersEveryRecordedLog` (`src/modules/hooks/cage_test.go:145`) | the rows where the Go decision parts from the JS decision recorded in the log. 16 files are empty (1 byte); `one-refusal.shadow.jsonl` holds one row (`classic.Stop`, old `hold`, new `pass`) | **REPLACE** lightly: keep the recorded logs as end-to-end cage cases (they are the outermost interface); assert "no row apart" directly and delete the 16 empty files; decide the one `Stop` row (fix the code, or edit the recorded decision) so no "known difference" file stays. |
+| `lint-twins.test.js` | `test/contract/` | Go lint == `cli-read.js` lint "until its own port lands", over one design note, through `RUNME.sh lint` with a 300 s timeout | **DELETE** (past phase 4/7; slow). |
+| removal guards: `twins-left`, `log-read-leaves`, `no-old-server`, `bridge-server-leaves`, `cli-leaves`, `dead-entries`, `extension-spawns-no-verb`, `sidebar-reads-no-file`, `no-road-names-server` | `test/contract/` (~390 lines) | that a file the migration removed stays removed, and the schema enum takes `new` alone | **DELETE** once the phase is closed (all are). The two that guard live behavior (`extension-spawns-no-verb`, `sidebar-reads-no-file`) could stay as architecture checks; move them to the check (guidance rule 7) instead of contract tests. |
+| Go regex oracle | `TestAFunctionNameReadsAsThePatternsReadIt`, `TestPlainCodeCutsAsThePatternsCut` (`src/modules/check/textfaults_test.go`) | the hand-written Go scanner == the ported JS regexes kept in the test | **REPLACE** with expected values per line (the regexes are a second implementation living in the test). |
+
+## A3. Other fixtures under `testdata` (not goldens)
+
+| fixture | used by | note | verdict |
+|---|---|---|---|
+| `src/quack/testdata/ticket_{fill,route,update}.json` (50 cases, captured from `src/scripts/ticket.js`) | `runsJSCases` in `src/quack/ticket_*_test.go` | end-to-end verb cases (argv to stdout, stderr, files). Exact bytes are the verb's output contract. Each embeds its own copy of the ticket schema, which drifts from `spec/schemas/ticket.schema.yaml` silently | **KEEP**; rename away from "JS cases" and drop the "off ticket.js" lineage comments. |
+| `src/modules/drafts/testdata/draft-cases.json` | `src/modules/drafts/drafts_test.go` (whole table) **and** `TestTheDraftCasesAnswerOffTheWiredModule` in `src/quack/drafts_test.go` (whole table again) | one behavior in two layers | **KEEP** the table at the module; cut the quack test to one wiring case. |
+| `src/modules/hooks/review/testdata/review-cases.json` | Go `review_test.go` and JS `test/level0/review-cases.test.js` (`lib/review.js`, `src/bridge/review.js`) | one behavior in two languages | **KEEP** Go; delete the JS half when the bridge review code leaves (cage key is `new`; `src/bridge/review.js` is still imported by `src/scripts/work-review.js`, so check liveness first). |
+| `src/tui/work/testdata/badges.json`, `places.json` | Go `src/tui/work`, `src/pull/edit_test.go`; JS `test/level0/sidebar-views.test.js`, `ticket-edit.test.js` | a shared table across two languages because two implementations exist (extension `views.js` badge vs TUI badge; `ticket-edit.js` vs Go `place`) | **KEEP** while both implementations stand; the duplicate implementation is the finding (phase 8 done-when wants one name off the index). |
+| `src/quack/testdata/{config,hold,plan}.json`, `ticket.txt` | `src/quack/codec_test.go` | codec round-trip seeds | **KEEP**. |
+| `src/quack/testdata/session.jsonl`, `src/tui/testdata/session.jsonl` | log golden; `TestAFrameDrawsTheWindowWithNoTerminal` | small log fixtures; the frame test asserts named substrings (a behavior assertion) | **KEEP**. |
+
+## A4. Test-only code living in `src/scripts`
+
+`src/scripts/check-twins.js`, `config-golden.js`, `log-golden.js`, `guidance-golden.js` have no
+importer outside `test/` and the Go golden tests. They leave with rows 5, 7, 8, 9.
+
+## A5. Test-to-code ratio, worst Go packages (lines, `_test.go` vs other `.go`)
+
+| package | code | test | ratio |
+|---|---|---|---|
+| `src/tui` (package dir only) | 225 | 2,294 | 10.2 |
+| `src/modules` (root file) | 4 | 23 | 5.8 |
+| `src/pointer` | 6 | 17 | 2.8 |
+| `src/modules/work` | 207 | 309 | 1.5 |
+| `src/modules/verbs` | 276 | 364 | 1.3 |
+| `src/modules/migration` | 99 | 126 | 1.3 |
+| `src/modules/index` | 981 | 1,196 | 1.2 |
+| `src/branches` | 6,504 | 6,995 | 1.1 |
+
+Fixtures are not counted here; counted, `src/quack` (17,409 code / 17,012 test) gains ~9,700
+testdata lines and `src/modules/queue` gains 6,208. JS overall sits at 1.5.
+
+## A6. Suggested order
+
+1. Port the JS behavior cases of size, magic, names, paths, slug and the Biome parser to Go at the
+   check sweep; decide the size scope and the four JS-only tree rules in a ticket.
+2. Delete the twin harness (A1 rows 1-5), `lint-twins.test.js`, and close
+   `size-golden-drops-line-counts` as answered by the deletion.
+3. Delete the tree, guidance, log, readers and queue goldens with their writers (rows 6-10).
+4. Replace the drawn comparison (row 11) and the cage shadow files (A2).
+5. Narrow the tools golden (row 12).
+6. Cut the drafts double run; retire removal guards.
+
+---
+
+# Part B: the rules
+
+## B0. A constraint found first
+
+`spec/config/styles/VoiceShape/GuidanceCap.yml` refuses a guidance note past fifteen rules (level
+`error`). `spec/guidance/code/testing.md` holds fifteen already, so the new rules cannot be appended.
+Two ways out:
+
+- **Recommended:** a new note `spec/guidance/code/tests.md` (draft below), tagged `testing` so it
+  reaches the same leaves. Its scope is the writer of a test, where `testing.md` covers doors,
+  fakes and contracts.
+- Or cut `testing.md` rules 1-3 ("In the JavaScript the migration has yet to remove…"). With phase 11
+  on, those rules are themselves migration scaffolding. That frees three slots, not six, so a split
+  is still needed.
+
+The draft text was linted with the tree's own Vale styles (`.se/.runtime/bin/vale` against
+`spec/config/styles`, from a scratch copy): **0 errors, 0 warnings**. That includes `Vocabulary`,
+`ListItem` (twenty words a sentence in a list item), `MarkedRuleNamesFailure` and `PastTense`. The
+word "scaffolding" is outside the vocabulary, so the rules spell it out instead.
+
+## B1. Draft note for a writer of tests
+
+File: `spec/guidance/code/tests.md` (mint it with `mint_note`, per `spec/guidance/guidance.md` rule 11).
+
+```markdown
+---
+kind: [[guidance]]
+tags: [testing]
+scope: ["every test a change adds, moves or deletes"]
+rationale: [[spec/rationales/testing]]
+---
+
+# Actionables
+
+1. Test a behavior once, at the outermost interface that reaches it within rule 15 of [[spec/guidance/code/testing]]. A second test of one behavior fails on the same edit, and every fix pays twice. *
+2. Hold a behavior in one layer and one language. The module runs its table, and the wiring runs one case of it. The contract suite of rule 13 in [[spec/guidance/code/testing]] alone runs twice. Where two languages hold one behavior, write the second copy as a finding. [[spec/guidance/working]] *
+3. Delete a test in the change that deletes the code it tests. A test over a removed path fails for nothing or passes over nothing. *
+4. Delete what compares old and new code in the change that switches its migration phase. That is each twin, parity case, shadow row, old golden section, and guard keeping a removed file gone. A comparison past its switch holds the live code to code nobody runs. *
+5. Pin a behavior in a golden file, and keep incidental output out of it. That output is a line count, a size, an unread order, a wording, a hash or the tree's own content. A golden file holding it fails on an unrelated edit, and a hand counts it again. *
+6. Keep the test lines of a module at or under its code lines, its fixtures counted. A module past that holds copies of one behavior, and every change pays for each copy. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | the draft table run by the module test, and one case of it through the wired quack | the whole draft table run by the module test and again by the quack test |
+| 3 | the test deleted in the commit deleting its function | a test of a removed script, standing for its fixture |
+| 4 | the twin golden files deleted in the switch-over | a parity golden file standing after its switch |
+| 5 | a case asserting a file one line past the ceiling meets `FileCeiling` | a golden file listing each long file with its line count |
+| 6 | a module of two hundred lines with two hundred lines of tests | a window module of two hundred lines with two thousand lines of tests |
+```
+
+Each rule is starred, so each gets argued in the rationale (`guidance.md` rule 6). Rules 1, 3, 4, 5
+and 6 fail in the tree today, so each gets an Examples row (`guidance.md` rule 12). Rule 2 shares its
+row with rule 1.
+
+Add a section to `spec/rationales/testing.md` (rationales may count and tell history; linted clean):
+
+```markdown
+## 6. A behavior tested once
+
+Three golden files of the migration show the cost of a test pinning more than a
+behavior.
+
+| the golden file | what it held | what it cost |
+|---|---|---|
+| `size.golden.json` | each file past the line ceiling with its count, a row the Go side reported alone | 57 commits in its first seven days, 29 of them changing it and at most one other file |
+| `tree.golden.json` | the Ask and the standing of every ticket on disk | two tickets of its own, and every search for a word in an Ask |
+| the other twin golden files | each Go check beside its JavaScript twin, past the switch-over | the only test six Go rules had |
+
+A test written in two layers, or in two languages, fails twice on one edit. A
+comparison past its switch holds the live code to old code nobody runs. So a
+test names one behavior, sits at the outermost interface that reaches it, and
+leaves with its code or its phase.
+
+One line of test per line of code is the ceiling. A module past it holds copies.
+```
+
+(Before landing, check the "six Go rules" count against the tree: by grep, size, magic, names
+(`overLong`), paths (`isDraft`), slug and the schema-kind listing have no Go test outside
+`TestTwinGoldens`.)
+
+## B2. Draft retro audit item
+
+Add as rule 6 to `spec/guidance/retro/audit.md`, which holds five (linted clean):
+
+```markdown
+6. Read the test lines against the code lines of each module the window touches. Write each module past one test line per code line as a finding. Write each test over deleted code as a finding. Write each twin, parity case or shadow row past its switch as one too. A test nobody counts grows with every change, and the battery pays for it. *
+```
+
+Add as a checklist line under the `audit` step of `spec/processes/retro.yaml`, after the line
+"every change lands with a test that fails before it and passes after…" (linted clean):
+
+```yaml
+      - no module holds more test lines than code lines, and no test outlives its code or its phase, as [[spec/guidance/code/tests]] asks
+```
+
+Rule 6 needs a command that answers the ratio, since `audit.md` rule 2 says to walk the record and not
+memory, and `guidance.md` rule 7 says to move a checkable rule to a program. Nothing in the tree counts
+it today. The smallest step is to have `./RUNME.sh retro audit` (or `retro effect`, which already
+writes the battery report `effect.md` rule 5 reads) print a per-module table: code lines, test lines
+with fixtures, ratio, tests naming a removed file, and files under `testdata` or `test/replay` named
+`*.golden.*`, `*.shadow.*`, `*-twin*`, or `*-golden*`. Then `tests.md` rule 6 can become a check with
+a link in its place, like `FileCeiling`.
+
+A process edit changes `process_hash` for new tickets minted from `retro.yaml`; that is expected.
+
+## B3. What the tree already says (to avoid duplicates)
+
+| new rule | already said in part by | what is new |
+|---|---|---|
+| B1.1 test once, outermost interface | `working.md` 14 and `code.md` 1 ("one place owns a thing"); `code.md` 10 (search before you write a function) | the application to tests. **Tension:** `testing.md` 15 ("cross no module boundary in a test, past a contract suite, the fake module and the cage's replays") and 11 (module tests against `q/qtest` only) bound "outermost" to the module's own ports. The draft says "within rule 15" to resolve it. If the caller means the outermost *system* interface (`quack` verbs), rule 15 has to change first. |
+| B1.2 one layer, one language | `testing.md` 13 (one contract suite runs twice, against the fake and the real thing) is the sanctioned exception; `retro.yaml` checklist "a change reaches every place holding the same thing, each writer, each copy" | an explicit ban on running one table in two layers or languages, and turning a second copy into a finding |
+| B1.3 delete a test with its code | nothing in guidance. `test/contract/dead-entries.test.js` and `twins-left.test.js` enforce removals ticket by ticket | the general rule |
+| B1.4 scaffolding leaves at its switch | the per-phase done-when lines in `spec/design_input/the-migration-runs-in-slices.md` (phase 3: "no JavaScript twin of a Go check stands"); `spec/design_output/migration.md#what-goes-with-no-successor` (the twins row); ticket `the-js-twins-leave` | a rule that holds for any phase, naming goldens, shadow rows and removal guards. The phase-3 done-when is closed but unmet in fact (the check twins stand), which is the evidence for a rule over a done-when. |
+| B1.5 goldens pin behavior | `testing.md` 6 ("name a test as the claim it makes, and assert every word of that claim"); `testing.md` 7 (share a fixture nobody writes to) | the list of incidental output, and the ban on the tree's own content in a golden |
+| B1.6 one test line per code line | `effect.md` 6 and 7 (cut a case that no longer earns its time; read the slowest cases and say what a smaller fixture proves) | a ceiling by lines, not by time. `effect.md` judges cost; this judges duplication |
+| B2 audit item | `audit.md` 3 (held, broken or untested) and 5 (a rule nobody follows becomes a check or a cut); `retro.yaml` checklist line 2 (test before and after); `effect.md` 5-7 (battery report) | the ratio per module, dead tests, and scaffolding past its phase as findings. Point at `effect.md` for time and do not repeat it |
+| (both) | `reviewing.md` 5 (every rule carries a test proving it fires) | already says the Go check rules need tests; it is why A1 rows 1 and 3 are REPLACE, not DELETE |
+
+## B4. Open points for the owner
+
+1. Where does "outermost" stop: the module's ports (as drafted, consistent with `testing.md` 11 and 15),
+   or the `quack` verb?
+2. Do fixtures count toward the ratio (as drafted)? Counting them puts `src/quack` and
+   `src/modules/queue` over the line until the goldens leave.
+3. Should `testing.md` rules 1-3 (JS doors) be cut now that phase 11 is on? The extension stays JS, so
+   they may still apply there; if so, rescope them to `src/extension`.
+4. The size scope: does `FileCeiling` apply to prose and data files (Go today) or only code (JS
+   today, and the design note)? A1 row 1 needs that answer before its replacement case is written.
