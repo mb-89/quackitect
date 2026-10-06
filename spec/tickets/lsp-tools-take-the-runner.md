@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 991e2455b4efe785
         size: 656
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 14db272a679bab786236d52def86bc8a04e0adf0
+    hash_after: 14db272a679bab786236d52def86bc8a04e0adf0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/proc fails
+    inputs:
+      - name: design/draft
+        hash: aa8ef2545de3a91d
+        size: 3995
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -259,26 +272,32 @@ I weighed keeping the halt in the lsp module, wrapping `proc.Real` in a goroutin
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/proc/proc_contract_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/proc/proc_contract_test.go
+- src/modules/lsp/tools_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The three process cases fail on both runners: a run outlasts its halt and its wait, and a run after the halt still answers. The lsp case fails on Wait alone, since an adapter in the test carries the folder and the input onto the door but no wait. A killed sh leaves its sleep holding the output pipe, so the real case runs exec sleep. A killed process reads code -1, the same as NotStarted, so implement writes the error itself.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+done_when one and three meet TestTheToolsRunThroughTheProcessDoorWithTheirWait in src/modules/lsp/tools_test.go, done_when two meets the three process contract cases, and done_when four is the check
+the one door the tests reach is the process door, and FakeRunner stands beside the real runner in every case
 
 # gate
 

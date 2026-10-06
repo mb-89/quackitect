@@ -8,6 +8,7 @@ import (
 	"errors"
 	"os/exec" // level0: OutsideInDoors - this file is the process door
 	"strings"
+	"time"
 )
 
 // The exit code a run answers where its program never starts. [[spec/design_output/doors#the-process-door]]
@@ -22,6 +23,7 @@ type Command struct {
 	Dir   string
 	Env   []string
 	Stdin string
+	Wait  time.Duration
 }
 
 // What a run answers. [[spec/design_output/doors#the-process-door]]
@@ -56,12 +58,27 @@ func Real(one Command) Said {
 	return Said{Out: out.String(), Err: errs.String()}
 }
 
+// A real runner and the halt that ends every run in flight through it. [[spec/tickets/lsp-tools-take-the-runner]]
+func Halting() (Runner, func()) {
+	return Real, func() {}
+}
+
 // A program the fake runs: the command in, the answer out. [[spec/design_output/doors#the-process-door]]
 type Program func(Command) Said
 
 // The fake runner: a table from a program's name to what it does. [[spec/design_output/doors#the-process-door]]
 type FakeRunner struct {
 	Programs map[string]Program
+	Halted   bool
+	After    func(time.Duration) <-chan time.Time
+}
+
+// Ends every run in flight, and every run after answers NotStarted. [[spec/tickets/lsp-tools-take-the-runner]]
+func (fake *FakeRunner) Halt() {}
+
+// The channel a taught program that waits reads, closed at the halt. [[spec/tickets/lsp-tools-take-the-runner]]
+func (fake *FakeRunner) Ends() <-chan struct{} {
+	return nil
 }
 
 // [[spec/design_output/doors#the-process-door]]

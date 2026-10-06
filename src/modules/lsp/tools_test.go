@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"quackitect/src/proc"
 )
 
 // What a fake binary answers: its stdout by the binary's name, and the calls it takes. [[spec/tickets/lsp-module-draws-the-tools]]
@@ -158,8 +160,13 @@ func fakeFolds(tree Tree, path string, line, character int) any {
 // A server over the files named, whose sweep answers nothing, running the fake tools with no quiet span. [[spec/tickets/lsp-module-draws-the-tools]]
 func toolsOver(t *testing.T, files map[string]string, fake *fakeTools) (*Server, *[][]byte) {
 	t.Helper()
+	return toolsServer(t, files, &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: fake.run, Check: fakeCheck})
+}
+
+// A server over the files named, whose sweep answers nothing, running the tools handed in. [[spec/tickets/lsp-tools-take-the-runner]]
+func toolsServer(t *testing.T, files map[string]string, tools *Tools) (*Server, *[][]byte) {
+	t.Helper()
 	store, as := catalogOf(t)
-	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: fake.run, Check: fakeCheck}
 	server := New(Outside{
 		Root: "/tree", Store: store, As: as, Bound: func(local string) string { return local },
 		Sweep: func() any { return []Finding{} },
@@ -255,6 +262,63 @@ func TestTheTenseReaderDropsAPastRow(t *testing.T) {
 		if strings.HasPrefix(call, "node ") {
 			t.Fatalf("the runs %q ask node, and the tense reader runs in Go", fake.calls)
 		}
+	}
+}
+
+// The fake process door taught vale and biome, each answering an empty report, and the commands it takes. [[spec/tickets/lsp-tools-take-the-runner]]
+func taughtTools() (*proc.FakeRunner, func() []proc.Command) {
+	var (
+		mu  sync.Mutex
+		ran []proc.Command
+	)
+	answers := func(out string) proc.Program {
+		return func(one proc.Command) proc.Said {
+			mu.Lock()
+			defer mu.Unlock()
+			ran = append(ran, one)
+			return proc.Said{Out: out}
+		}
+	}
+	fake := &proc.FakeRunner{Programs: map[string]proc.Program{"vale": answers("{}"), "biome": answers(`{"diagnostics": []}`)}}
+	return fake, func() []proc.Command {
+		mu.Lock()
+		defer mu.Unlock()
+		return slices.Clone(ran)
+	}
+}
+
+// Today's tool runner over the process door, which carries the folder and the input and knows no wait. [[spec/tickets/lsp-tools-take-the-runner]]
+func throughTheDoor(run proc.Runner) Runner {
+	return func(dir, input, name string, argv ...string) (string, error) {
+		said := run(proc.Command{Argv: append([]string{name}, argv...), Dir: dir, Stdin: input})
+		if said.Code != 0 && said.Out == "" {
+			return "", errors.New(said.Err)
+		}
+		return said.Out, nil
+	}
+}
+
+func TestTheToolsRunThroughTheProcessDoorWithTheirWait(t *testing.T) {
+	fake, ran := taughtTools()
+	buffer := "# A\nSome text\n"
+	tools := &Tools{Root: "/tree", Vale: "vale", Biome: "biome", Config: ".vale.ini", Run: throughTheDoor(fake.Run), Check: fakeCheck}
+	server, _ := toolsServer(t, map[string]string{"spec/a.md": "# A\n", "src/a.js": "let a = 0;\n"}, tools)
+	server.Handle(opened("file:///tree/spec/a.md", buffer))
+	server.Settle()
+	server.SweepTools()
+	seen := map[string]bool{}
+	for _, one := range ran() {
+		seen[one.Argv[0]] = true
+		input := ""
+		if slices.Contains(one.Argv, "--path=/tree/spec/a.md") {
+			input = buffer
+		}
+		if one.Dir != "/tree" || one.Stdin != input || one.Wait != toolWait {
+			t.Errorf("the run %q carries Dir %q, Stdin %q and Wait %v, and wants /tree, %q and %v", one.Argv, one.Dir, one.Stdin, one.Wait, input, toolWait)
+		}
+	}
+	if !seen["vale"] || !seen["biome"] {
+		t.Fatalf("the door runs %q, and wants vale and biome", ran())
 	}
 }
 

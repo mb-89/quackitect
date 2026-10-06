@@ -4,10 +4,85 @@
 package proc
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
+
+// The line a run that waits hands sh, the file it leaves once it stands, the span a case gives a run to end, and the wait a case arms. [[spec/tickets/lsp-tools-take-the-runner]]
+const (
+	waitsLine  = ": > ready; exec sleep 30"
+	readyFile  = "ready"
+	endsWithin = 5 * time.Second
+	shortWait  = 100 * time.Millisecond
+)
+
+// A runner and the halt that ends its runs. [[spec/tickets/lsp-tools-take-the-runner]]
+type halting struct {
+	run  Runner
+	halt func()
+}
+
+// The real runner under its own life, and the fake whose sh waits on its ends, whose timer fires at once. [[spec/tickets/lsp-tools-take-the-runner]]
+func haltingRunners(t *testing.T) map[string]halting {
+	fake := &FakeRunner{After: firesAtOnce}
+	fake.Programs = map[string]Program{"sh": func(one Command) Said {
+		if one.Argv[2] != waitsLine {
+			return fakeSh(one)
+		}
+		if err := os.WriteFile(filepath.Join(one.Dir, readyFile), nil, 0o644); err != nil {
+			return Said{Err: err.Error(), Code: 1}
+		}
+		<-fake.Ends()
+		return Said{}
+	}}
+	run, halt := Halting()
+	t.Cleanup(halt)
+	t.Cleanup(fake.Halt)
+	return map[string]halting{"real": {run, halt}, "fake": {fake.Run, fake.Halt}}
+}
+
+func firesAtOnce(time.Duration) <-chan time.Time {
+	fired := make(chan time.Time, 1)
+	fired <- time.Time{}
+	return fired
+}
+
+// The run started beside the case, its answer on the channel once it ends. [[spec/tickets/lsp-tools-take-the-runner]]
+func started(run Runner, one Command) <-chan Said {
+	said := make(chan Said, 1)
+	go func() { said <- run(one) }()
+	return said
+}
+
+// The answer, or false where the run outlasts the span. [[spec/tickets/lsp-tools-take-the-runner]]
+func endsIn(said <-chan Said) (Said, bool) {
+	select {
+	case one := <-said:
+		return one, true
+	case <-time.After(endsWithin):
+		return Said{}, false
+	}
+}
+
+// Whether the run leaves its ready file within the span. [[spec/tickets/lsp-tools-take-the-runner]]
+func standsUp(folder string) bool {
+	tick := time.NewTicker(10 * time.Millisecond)
+	defer tick.Stop()
+	giveUp := time.After(endsWithin)
+	for {
+		if _, err := os.Stat(filepath.Join(folder, readyFile)); err == nil {
+			return true
+		}
+		select {
+		case <-tick.C:
+		case <-giveUp:
+			return false
+		}
+	}
+}
 
 // The sh the real runner reaches, and the same program taught to the fake, which reads the line it is handed. [[spec/design_output/doors#the-process-door]]
 func runners() map[string]Runner {
@@ -82,6 +157,53 @@ func TestACommandNamingNoProgramAnswersNotStarted(t *testing.T) {
 	for name, run := range runners() {
 		if said := run(Command{}); said.Code != NotStarted || said.Err == "" {
 			t.Errorf("the %s runner answers %+v", name, said)
+		}
+	}
+}
+
+func TestAHaltEndsARunInFlight(t *testing.T) {
+	t.Parallel()
+	for name, one := range haltingRunners(t) {
+		folder := t.TempDir()
+		said := started(one.run, Command{Argv: []string{"sh", "-c", waitsLine}, Dir: folder})
+		if !standsUp(folder) {
+			t.Errorf("the %s runner starts no run within %v", name, endsWithin)
+			continue
+		}
+		one.halt()
+		answer, ended := endsIn(said)
+		if !ended {
+			t.Errorf("the %s runner's run outlasts the halt by %v", name, endsWithin)
+			continue
+		}
+		if answer.Code == 0 || answer.Err == "" {
+			t.Errorf("the %s runner's halted run answers %+v", name, answer)
+		}
+	}
+}
+
+func TestARunAfterTheHaltNeverStarts(t *testing.T) {
+	t.Parallel()
+	for name, one := range haltingRunners(t) {
+		one.halt()
+		answer, ended := endsIn(started(one.run, Command{Argv: []string{"sh", "-c", "cat"}, Stdin: "in"}))
+		if !ended || answer.Code != NotStarted || answer.Err == "" {
+			t.Errorf("the %s runner answers %+v after the halt, ended %v", name, answer, ended)
+		}
+	}
+}
+
+func TestARunPastItsWaitEndsWithAFault(t *testing.T) {
+	t.Parallel()
+	for name, one := range haltingRunners(t) {
+		said := started(one.run, Command{Argv: []string{"sh", "-c", waitsLine}, Dir: t.TempDir(), Wait: shortWait})
+		answer, ended := endsIn(said)
+		if !ended {
+			t.Errorf("the %s runner's run outlasts its wait by %v", name, endsWithin)
+			continue
+		}
+		if answer.Code == 0 || answer.Err == "" {
+			t.Errorf("the %s runner's run past its wait answers %+v", name, answer)
 		}
 	}
 }
