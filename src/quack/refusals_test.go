@@ -14,7 +14,7 @@ import (
 var refusalsPast = map[string]string{
 	"src/pull":               "Say(" + "Refused",
 	"src/branches/take.go":   "d." + "warn(",
-	"src/quack/verb_mint.go": "(" + "errs,",
+	"src/quack/verb_mint.go": "(errs, " + "why)",
 }
 
 func TestMovedRefusalsPassTheFailureDoor(t *testing.T) {

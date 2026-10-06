@@ -93,24 +93,7 @@ func failureRaises(d failureDoors, said []string, out, errs io.Writer) int {
 		message = append(message, words)
 	}
 	raised := failure.Raise(failure.Load(failure.Dir{Root: d.root}), said[0], message...)
-	for _, line := range raised.Lines() {
-		fmt.Fprintln(out, line)
-	}
-	row := raised.Row("")
-	extra, err := json.Marshal(map[string]any{failure.IDField: row[failure.IDField]})
-	if err != nil {
-		fmt.Fprintln(errs, err)
-		return exitFailed
-	}
-	fields := map[string]json.RawMessage{"extra": extra}
-	for _, key := range []string{"level", "kind", "said"} {
-		fields[key], _ = json.Marshal(row[key])
-	}
-	line, err := sayLine(d.now(), fields)
-	if err == nil {
-		err = appendsLine(filepath.Join(d.root, filepath.FromSlash(sessionLog)), line)
-	}
-	if err != nil {
+	if err := raisedOnto(d, raised, out); err != nil {
 		fmt.Fprintln(errs, err)
 		return exitFailed
 	}
@@ -118,6 +101,27 @@ func failureRaises(d failureDoors, said []string, out, errs io.Writer) int {
 		return exitFailed
 	}
 	return 0
+}
+
+// Prints a raised failure's lines, and appends the row the door answers onto the session log, the id under extra. A verb raising a refusal shares it. [[spec/design_output/failures#one-door-raises-a-failure]] [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func raisedOnto(d failureDoors, raised failure.Raised, out io.Writer) error {
+	for _, line := range raised.Lines() {
+		fmt.Fprintln(out, line)
+	}
+	row := raised.Row("")
+	extra, err := json.Marshal(map[string]any{failure.IDField: row[failure.IDField]})
+	if err != nil {
+		return err
+	}
+	fields := map[string]json.RawMessage{"extra": extra}
+	for _, key := range []string{"level", "kind", "said"} {
+		fields[key], _ = json.Marshal(row[key])
+	}
+	line, err := sayLine(d.now(), fields)
+	if err != nil {
+		return err
+	}
+	return appendsLine(filepath.Join(d.root, filepath.FromSlash(sessionLog)), line)
 }
 
 // Writes the node in the shape the failure schema names, through the mint's writer, and reads it back through NodeOf first. It refuses an id off the shape, an id a node carries, a level off the log ladder, no remedy and no when. [[spec/design_output/failures#an-agent-raises-by-verb]] [[spec/tickets/failure-new-shape-once]] [[spec/tickets/failure-new-refusals-tested]]
