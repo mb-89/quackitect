@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
 depends_on: [black-box-tests-guard-reports, fixture-home-guard-reports, test-ratio-measure-reports, hand-script-guard-reports, purity-guard-covers-every-outside]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: 9ac6e3a0b7d7194b
         size: 904
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: 578f984c79394bc71607077b6696f5fc38b6fa83
+    hash_after: 578f984c79394bc71607077b6696f5fc38b6fa83
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: 6dcace64ad189441
+        size: 2449
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -236,26 +249,31 @@ every done_when line names its decider: lint for the two guidance notes, check f
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/guidance_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/imports/guidance_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both tests fail on their own assertions: the code guidance names no guard, the audit checklist names none, and audit.md names no guards verb. The behavior and door-once rules stay with the audit, since no check reads them. The test reads the guard list off imports.Guards, so a sixth guard turns it red until the guidance names it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test: the two guidance lines and the audit line meet the two red tests, and the classify line stands answered by rule 11 of spec/guidance/retro/classify.md
+the tests reach the tree files alone, as the tree test beside them does, so no door needs a fake
 
 # gate
 
