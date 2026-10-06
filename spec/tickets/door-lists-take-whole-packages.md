@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -43,6 +43,23 @@ record:
       - name: check
         exit: 1
         said: "    2.4  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes"
+  - step: do
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 09ecaebbe6b7db1a1a324a5f7b95c273bb2ba769
+    hash_after: b7d3d23bc22616dad2ff82bcb26445f45d0a1d0e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes; green, src/owns passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/desk-start.test.js a server the proc door starts detached writes its marker after its starter exi"
+    inputs:
+      - name: ask
+        hash: d807f67a4d8a5703
+        size: 369
+    def: ce98b9e976552e83
+reason: done
 ---
 
 # Ask
@@ -62,7 +79,7 @@ ioonly's outside and onlyq's impure must derive from owns.Whole, never owns.Pack
 <!-- the tests that cover the change, or the check where it touches no code -->
 <!-- the form is command -->
 
-go test ./src/imports -run 'TestTheCoresListComesOffTheDeclarations|TestAModulesListComesOffTheDeclarations|TestAModuleImportingOsIsNamed|TestFaultsNameAModuleImportingOs|TestAnIOModuleImportingOsPassesOnlyQ|TestTheCoreImportingOsIsNamed|TestARendererReachingOutBesideItsDoorIsNamed|TestEveryPureReaderImportsThePureLibraryAlone|TestTheTreeHoldsTheImportRules'
+./RUNME.sh test src/imports src/owns
 
 ## check
 
@@ -76,16 +93,16 @@ go test ./src/imports -run 'TestTheCoresListComesOffTheDeclarations|TestAModules
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-ioonly and onlyq read the packages a door owns whole off the owns.yaml declarations under the module root, through owns.Whole, read once a root. ioonly refuses an owned package, matched exactly. onlyq refuses an owned package, or a floor package no door owns (io/fs, io/ioutil, database/sql, syscall, unsafe, plugin, log/syslog, runtime/cgo), matched by prefix. A door owning a member, as the clock owns time.Sleep, leaves the package open, so time.Duration imports pass. Faults and FaultsIn take the owned list, and the fixtures declare os. Commit 8de84c5c4 lands against the owns stub, so the mailed cases go green once the parent's implement leaf lands src/owns. The check stands red on the group's planned red tests and the level0 clear probe, and the push waits on that green.
+The module rule and the core rule in `src/imports` read the packages a door owns whole, through `Owned` and `owns.Whole`, since 8de84c5c4. A door owning `time` by member, as the clock does, leaves `time.Duration` free to the core and the modules. The floor list in `src/imports/imports.go` keeps the impure standard library refused where no declaration names it. b7d3d23bc adds three analyzer tests: the core and a module importing a package owned by member pass, and a module importing `syscall` with no declaration is named. The two member tests go red with `Owned` pointed at `owns.Packages`, and green on `owns.Whole`.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-the change follows the ask: both lists derive from owns.Whole, and the floor stays refused under onlyq. ioonly keeps no floor, since src/tui/log/read.go imports io/fs as a renderer
-the cleanup the change reveals: size.golden.json takes the new line count of model.md. The owns draft waits for the parent's implement leaf
-every fact stands in one place: the rows of model.md point at the declarations and the doors note, and the floor stands once, in imports.go
+the change follows the ask: both rules derive from `owns.Whole`, and the floor holds every package the ask lists
+the cleanup: none revealed; the warnings the check prints stand in files this leaf leaves alone
+one place: the floor stands once in `src/imports/imports.go`, and the tests point at the analyzers, not a copy of the list
 
 # Discussion
 
