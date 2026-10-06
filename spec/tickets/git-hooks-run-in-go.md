@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: af12ed6a879723291bba68d79666c8aaaf615eed
+    hash_after: af12ed6a879723291bba68d79666c8aaaf615eed
+    inputs:
+      - name: ask
+        hash: e2dfc6797d0ea176
+        size: 507
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -158,38 +167,102 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+One verb, `se-index hook <event>`, answers both git hooks, and `copilot-hooks-run-in-go` adds its Copilot events to the same verb later. This ticket lands the git events alone.
+
+1. `.githooks/pre-commit` and `.githooks/pre-push` run `"$here/.se/.runtime/bin/se-index" verb "$here/src/scripts" hook <event>`, passing stdin on. They exit 0 where no binary stands, as they exit 0 today where no node stands. No line names node.
+2. `src/quack/hook_verb.go` registers `hook`, reads the event word, builds the hooks `Door` over the real git and disk, and prints the refusal to stderr with exit 1, or exits 0.
+3. `src/modules/hooks/githooks.go` holds `PreCommit(root, settings)` and `PrePush(root, refs, settings)`. Each runs the rules `precommit.js` and `prepush.js` hold, in their order.
+4. pre-commit: the marker opener on an added line (new `command.MarkedIn` and `command.RefusedMarker` in `src/modules/hooks/command/markers.go`), then the private delta, then the tested delta. `privateDelta` and `testedDelta` in `commits.go` lose their `CommitIn` gate to `commitGuards`, so the Bash door and the hook run one body.
+5. pre-push, over the refs on stdin: a deleted version branch (`command.VersionRefusal`, the text `VersionGuard` builds, now fed by ref), a cloud push to trunk (`command.CloudLeavesTrunk`), a red battery on trunk (`command.Battery` and `command.RedBattery`), an unchecked tip (the stamp's sha, or its descendant where only `spec/tickets` changed since, and skipped where `.github/workflows/check.yml` stands), a work branch another box holds, a stale hold a plain push leaves in place, and a todo tag in the pushed range (the `todoOnPush` body, fed by a range in place of `HEAD --not --remotes`).
+6. The battery, unchecked, hold and stale rules run for an agent's push alone: `SE_ENGINE=1`, a cloud box, or `CLAUDECODE`. The owner's own terminal pushes ungated, as `agentPushes` holds it today.
+7. The hold and its age come off `src/branches`: `heldIn` gains an exported `branches.HandIn(text) string`, and the stale span gains `branches.StaleSpan(config)` beside `staleSpan`. The hooks module imports branches, and branches imports no hooks package but `brief`, so no cycle forms.
+8. `src/scripts/precommit.js`, `src/scripts/prepush.js`, `test/level0/precommit.test.js`, `test/level0/prepush.test.js` and `test/level0/warnings.test.js` leave. `lintedBy` leaves with them, since only a test calls it.
+
+Weighed: one Go body for each rule over two doors, against a second copy in the hook. Assumed: the binary on the box stands built from this tree, as `RUNME.sh` assumes it already.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- .githooks/pre-commit: the hook body, calls precommit.js
+- .githooks/pre-push: the hook body, calls prepush.js
+- test/level0/precommit.test.js: imports holds, merging, boxOf, notesOf
+- test/level0/prepush.test.js: imports holds, refsIn and the readers
+- test/level0/warnings.test.js: imports holds, refsIn
+- test/contract/outside-in-doors.test.js: lists both scripts
+- src/modules/hooks/commits.go: commitGuards, calls privateDelta, testedDelta, todoOnPush
+- src/modules/hooks/command/guards.go: VersionGuard, whose refusal text the ref road shares
+- src/branches/group.go: heldIn, which HandIn wraps
+- src/branches/free.go: staleSpan, which StaleSpan serves
+- src/quack/doctor_verb.go: hooksFolder, whose comment names precommit.js as the owner
+- spec/design_output/private.md: the table row and test line naming precommit.js
+- spec/design_output/migration.md: the row naming precommit.js and prepush.js
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/hook_verb_test.go: TestHookPreCommitRefusesAMarker
+- src/quack/hook_verb_test.go: TestHookPreCommitRefusesAPrivateDelta
+- src/quack/hook_verb_test.go: TestHookPreCommitRefusesAnUntestedChange
+- src/quack/hook_verb_test.go: TestHookPreCommitPassesACleanDelta
+- src/quack/hook_verb_test.go: TestHookPrePushRefusesAVersionDelete
+- src/quack/hook_verb_test.go: TestHookPrePushRefusesACloudPushToTrunk
+- src/quack/hook_verb_test.go: TestHookPrePushRefusesARedBatteryOnTrunk
+- src/quack/hook_verb_test.go: TestHookPrePushRefusesAnUncheckedTip
+- src/quack/hook_verb_test.go: TestHookPrePushRefusesABranchAnotherBoxHolds
+- src/quack/hook_verb_test.go: TestHookPrePushRefusesAPlainPushOntoAStaleHold
+- src/quack/hook_verb_test.go: TestHookPrePushRefusesATodoTag
+- src/quack/hook_verb_test.go: TestHookPrePushLetsTheOwnersTerminalThrough
+- src/quack/hook_verb_test.go: TestHookPrePushLetsARedWorkBranchThroughUnderCI
+- src/quack/hook_verb_test.go: TestGitHooksNameNoNode, for the git grep line
+- src/quack/hook_verb_test.go: TestHookScriptsLeave, for the git ls-files line
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- .githooks/pre-commit
+- .githooks/pre-push
+- src/quack/hook_verb.go
+- src/quack/hook_verb_test.go
+- src/modules/hooks/githooks.go
+- src/modules/hooks/commits.go
+- src/modules/hooks/command/markers.go
+- src/modules/hooks/command/guards.go
+- src/modules/hooks/command/trunk.go
+- src/branches/group.go
+- src/branches/free.go
+- src/quack/doctor_verb.go
+- src/scripts/precommit.js
+- src/scripts/prepush.js
+- test/level0/precommit.test.js
+- test/level0/prepush.test.js
+- test/level0/warnings.test.js
+- test/contract/outside-in-doors.test.js
+- spec/design_output/private.md
+- spec/design_output/migration.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- opened .githooks/*, precommit.js, prepush.js, commits.go, command/{private,tested,todo,trunk,guards}.go, branches/{group,free,held}.go, push.go, RUNME.sh and runs.js, and checked each name there
+- the callers come off a git grep over both script names and the Go functions the approach changes
+- each done_when line maps to a test: ls-files to TestHookScriptsLeave, the node grep to TestGitHooksNameNoNode, each refusal to its TestHook case, and the check to ./RUNME.sh check at tests-green
 
 ## tests-red
 
