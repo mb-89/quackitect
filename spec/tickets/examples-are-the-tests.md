@@ -108,7 +108,23 @@ record:
     hand: the engine
     hash_before: 250bffc26cdadd320113a296a41b23b147d374ec
     hash_after: 250bffc26cdadd320113a296a41b23b147d374ec
-step: accept
+  - step: accept
+    hand: box 2dca9acd8cb4 · claude-code-remote
+    hash_before: 9d73104ecf6b3c03458fa0b1215979026495a4f2
+    hash_after: 9d73104ecf6b3c03458fa0b1215979026495a4f2
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/examples-are-the-tests already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: ec95a41be42e2146
+        size: 430
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
+step: retro/notes
 ---
 
 # Ask
@@ -159,8 +175,9 @@ The design of examples stands written: one Markdown file a behavior is tutorial,
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept: the design input holds the seven points with pylib and the pyqtgraph explorer; the design note holds the format, the places, the suite, one runner with two drivers, the Tutorial tab, its two-mode search, the editor road, the checks, and the doors, fixtures and ratio; the rules stand in spec/guidance/code/examples.md behind a pointer from testing.md, since testing.md stands at its cap, and in the audit guidance and the retro checklist; the implementation group stands as eight drafts; the check stands green
 
 # retro
 
