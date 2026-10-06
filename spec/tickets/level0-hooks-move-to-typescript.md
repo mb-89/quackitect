@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: gate
+step: implement/change
 steps:
   - name: design
     steps:
@@ -144,6 +144,18 @@ record:
         hash: 15f1e97e971aae3f
         size: 1820
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 5090e9523847 · claude-code-remote
+    hash_before: 86af6b65e745fd8a408e658dee628b9f91b7a00c
+    hash_after: 86af6b65e745fd8a408e658dee628b9f91b7a00c
+    inputs:
+      - name: design/draft
+        hash: 15f1e97e971aae3f
+        size: 1820
+      - name: design/tests-red
+        hash: e67ae0eb78415dd4
+        size: 657
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -283,8 +295,9 @@ the cases read the tree files alone, and reach no door
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept. The approach answers the ask, TestCheckParts decides the validate and tsc parts, and the stub cases decide the glue. The points the implement step takes stand under Discussion.
 
 # implement
 
@@ -355,3 +368,11 @@ the cases read the tree files alone, and reach no door
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate's points, which the implement step takes:
+
+- the stub port reaches these callers: `test/level0/bridgehead.test.js`, `src/vehicle/stub_test.go`, `test/contract/outside-in-doors.test.js` and `.vale.ini`
+- the `.vale.ini` section over the stub hooks moves from `*.js` to `*.ts`
+- the case in `test/level0/tested.test.js` keeps a `.js` path under `src/stub`, because `lib/tested.js` reads JavaScript alone as source
+- the CI Linux job decides that `tsc` exits 0, because `TestCheckParts` fakes `tsc`
+- the rules the stub bridgehead holds go to [[spec/tickets/level0-hooks-hold-no-rule]]

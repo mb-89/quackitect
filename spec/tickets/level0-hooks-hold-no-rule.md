@@ -303,3 +303,5 @@ The javascript-leaves group ports `lib/` itself; this ticket moves only the deci
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The gate of [[spec/tickets/level0-hooks-move-to-typescript]] hands this ticket the rules the stub bridgehead holds: the vehicle roads, the home order and the clone, in `src/stub/.claude/skills/level0/hooks/bridgehead.ts`.
