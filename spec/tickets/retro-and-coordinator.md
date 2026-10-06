@@ -138,7 +138,19 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
-step: retro/write
+  - step: retro/write
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 703a63ca95e81c8b32f7a990559c15c99fd5de90
+    hash_after: 703a63ca95e81c8b32f7a990559c15c99fd5de90
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
+step: retro/cloud
 ---
 
 # Ask
@@ -224,38 +236,75 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- `accept-runs-the-orphan-scan`: branch review names each Go file the group adds that nothing reaches, on both review roads
+- `ci-reds-name-their-cases`: a red check ends on its red cases with file and line, and the dispatch fires a worker at a red work pull request at done
+- `improve-lines-name-their-home`: the hand-back refuses an improve line naming no path, link or ticket, in Go and in the JavaScript road
+- `retro-audit-reads-the-decision`: retro audit names a closed trial with no decision and no successor
+- `retro-read-reads-every-record`: retro read lists queued owner prompts and quiet refusals, and retro effect finds the last retro in spec/retros
+- `splits-name-what-siblings-read`: the split and draft checklists ask for sibling reads, an early split and the default files of a new key
+- `the-coordinator-guidance-stands`: the coordinator note and its rationale stand
+- `the-coordinator-runs-under-level0`: a desk session with no plugin meets a start refusal, and voice measure fails an answer past the ceiling
+- `start-refusal-stops-trial`: a person trial, loose on main, for the one claim no box can check
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the box took over a stale hold by the take verb once the stale bar passed, and lost no commit of the box before it
+- read-only gate reviews ran in parallel while the hold went stale, so every gate verdict stood ready at the take
+- the new red-case line of the check named its own first fault, a test missing t.Parallel, at the first red run
+- each helper carried the pitfalls the leaf before it met, so the same door refused nothing twice
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 17:53 UTC: the Bash door refused every command until a ticket stood in hand, and the group ticket stood on the remote branch alone
+- 17:53 UTC: the branch take MCP tool answered no handler, and the Bash road served instead
+- 17:55 UTC: the stop hook refused a turn end while helpers ran, since a cloud box that ends its turn stops its container
+- 18:21 UTC: the index MCP road refused a connection mid-run, and the Bash pull served instead
+- 18:22 UTC: the commit door refused a log-line change with no test beside it, and the change left the diff
+- 18:25 UTC: the check failed once on the index contract case and once on the dry probe, each passing alone, cause unknown
+- 18:30 UTC: a bare self-pointer in a design note failed the pointer rule and the twins golden
+- 19:20 UTC: the mint wrote a guidance env as an inline list, which the shape rule refuses
+- 19:37 UTC: the privacy door refused a made-up home path in a test
+- 20:05 UTC: deciding a private note while the group stood in hand took four refused pulls before the helper road showed
+- no owner prompt reached the run past the opening one
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the Bash door admits a branch read on a cloud box before the take, in `src/modules/hooks/command/ticket.go`
+- the branch take tool gets its handler, in `src/modules/verbs`
+- the index contract case and the dry probe count only the se-index processes they start, in `test/contract/index.test.js`
+- the red fire takes a done branch into work before the worker fixes it, so the hourly dispatch fires once, in `src/branches/dispatch_fire.go`
+- the mint writes a guidance env as a block list, in `src/quack`
+- the notes leaf names the helper road for a note, the plan entry and a fresh hand, in `spec/design_output/pull.md`
+- a self-pointer in a design note takes the full path, which the write door can name at the write, in `src/modules/hooks/write`
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The run spent its first half hour waiting on a stale hold, and the waiting paid off only because the reviews ran inside it. The doors refused often, and each refusal named its own fix, so the cost sat in round trips and not in wrong work. The one claim the run could not settle, whether the client stops a session at its start, rests on a client key no box holds, and the trial ticket hands it to the owner.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in its ticket or design note, and the retro points at the tickets
+- the retro adds no number past the times of its errors
+- the retro writes no file header
+- the badly list carries each error of the run with its time, and the run met no owner prompt past the opening one
+- the retro names the role and the box by its role, and no name, address or path of the box
 
 ## cloud
 
