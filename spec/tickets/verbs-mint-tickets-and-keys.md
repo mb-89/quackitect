@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: 9f3104d696453518
         size: 518
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: db8a31f5d46c8036c6b17d402bb87ff1bd5fefaf
+    hash_after: db8a31f5d46c8036c6b17d402bb87ff1bd5fefaf
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/pull fails
+    inputs:
+      - name: design/draft
+        hash: bdf59bab9d2faa1c
+        size: 3478
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -232,26 +245,33 @@ The mint done_when line meets TestMintVerb's new gain/breaks/done_when case unde
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/process_test.go src/quack/verb_config_test.go src/quack/verb_mint_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+src/pull/process_test.go
+src/quack/verb_config_test.go
+src/quack/verb_mint_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The mint refuses gain as no field of a ticket, the config verb writes the local layer under --tracked, and the layout stub answers nothing. A pull function already holds the name AskOf for reading a ticket, so the new layout takes the name AskFrom. The refusal case now meets the stray field refusal, and tests-green turns it to a refusal naming the two roads.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The mint line meets TestMintVerb/a_ticket_takes_the_gain_the_breaks_and_the_done_when_as_fields, the config line meets TestConfigWritesTheTrackedLayerWithTracked, and the check line waits for tests-green.
+The mint and config cases write a temporary root through the verbs own disk door, which the package already proves, and the layout case reads pure values.
 
 # gate
 

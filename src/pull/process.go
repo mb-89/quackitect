@@ -67,6 +67,11 @@ func ProcessAt(disk Disk, said string) (Process, string) {
 }
 
 // The rows an ask writes for each field it names, as comments the hand writes under. [[spec/design_input/the-agent-pulls-tickets#evidence-has-a-form]]
+// The Ask a mint writes off the ask fields a hand names: a text field as a paragraph and a list field as lines, in the order the process names them. [[spec/tickets/verbs-mint-tickets-and-keys]]
+func AskFrom(ask []any, said map[string][]string) string {
+	return ""
+}
+
 func AskRows(ask []any) string {
 	rows := []string{}
 	for _, item := range ask {
