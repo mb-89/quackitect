@@ -82,11 +82,20 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box a694567529c5 · claude-code-remote
     hash_before: 2ee966bb48952e1a68afe7ba643b5965d1666195
+  - step: sync
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 33fcf457f97ca50658c5ca2d6761c8740eeaa706
+    hash_after: 33fcf457f97ca50658c5ca2d6761c8740eeaa706
+    answered:
+      - name: sync
+        exit: 0
+        said: work/level-zero-smoke already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -100,8 +109,9 @@ A pull request that breaks level zero cannot go green. A fast smoke test with th
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
