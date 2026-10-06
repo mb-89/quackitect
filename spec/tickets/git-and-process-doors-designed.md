@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: e2842fc2057e82dbf60f9860bf6ce47b3fca1d9b
+    hash_after: 25bbd1f0a7b557d324039e1b609e6efbcc6d06aa
+    inputs:
+      - name: ask
+        hash: 9d952661f907f30c
+        size: 729
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -163,38 +172,49 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/doors#the-git-door-carries-writes]] names the git door Repo in src/modules/git with FakeRepo and its contract suite, and the process door Runner in a new src/modules/proc, grown from the lsp runner, with FakeRunner and its contract suite. The same chapter orders the four moves, the pull first and the branch verbs last. The ticket writes the design alone, so its tests are the check over the note.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- spec/tickets/pull-meets-fake-git, which reads the design
+- spec/tickets/quack-repos-meet-fake-git, which reads the design
+- spec/tickets/quack-spawns-meet-fake-process, which reads the design
+- spec/tickets/branch-verbs-meet-fake-git, which reads the design
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- none: the design adds no code, and the check reads the note
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- spec/design_output/doors.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- src/modules/git/git.go, src/branches/doors.go, src/pull/door.go and src/modules/lsp/tools.go stand opened, and the subcommands come off a grep of each package
+- the callers are the four moves, which each read the chapter
+- each done_when line meets the chapter: the git door, the process door, the order of the moves, and the check green on the commit
 
 ## tests-red
 
