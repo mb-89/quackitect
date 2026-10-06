@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "spec/design_output/work.md:836:73: PastTense: Write the present tense: 'closed'. The past belongs in spec/rationales."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: 472ac3a8f56fd1a65973f72863b741875dee3591
+    hash_after: 472ac3a8f56fd1a65973f72863b741875dee3591
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    2.0  test/contract/index.test.js the door stands where the binary is built, and a glob comes out of the rows"
+    inputs:
+      - name: design/tests-red
+        hash: 8cbd15eac786f9db
+        size: 533
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -317,26 +340,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/retro_audit_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+retro audit now names every closed trial that keeps nothing it found. A trial keeps it where the decision field under its decide step holds a row, or its front names a successor. The verb prints the open trials first as before, then the closed trials with no decision and no successor, and fails while either stands. The one closed trial in the tree names a successor, so the audit on the tree stays at 0.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft size list, plus the size golden that reads work.md at its new length
+- the audit reads a temp folder the cases seed, and no other door
+- retro_audit.go points at the audit section of spec/design_output/work
+- the rule that a trial keeps its decision or a successor stands once, in spec/design_output/work.md
 
 # accept
 
