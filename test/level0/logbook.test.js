@@ -5,15 +5,13 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { logbookOf } from "../../src/extension/lib/logbook.js";
-import { v1Over } from "./v1-index.js";
+import { LOG as SESSION, memoryFiles, v1Over } from "./v1-index.js";
 
 const OTHER = `${JSON.stringify({ at: "x", level: "info", kind: "cli", said: "the other writer" })}\n`;
 
 function doorOf(seed = {}) {
-  const files = fakeDisk(seed);
+  const files = memoryFiles(seed);
   let landed = false;
   const lands = (path) => {
     if (landed || path !== SESSION) return;

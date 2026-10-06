@@ -11,7 +11,7 @@ import { drawnOf } from "./drawn-twin.js";
 
 const SCHEMA = "spec/config/level0.schema.json";
 const BLESS = ".se/.runtime/bless.json";
-const LOG = ".se/.log/session.jsonl";
+export const LOG = ".se/.log/session.jsonl";
 const BASE = /^spec\/views\/([^/]+)\.base$/;
 const OWN = ["at", "level", "kind", "said"];
 const HOLDS = ".se/.runtime/hold/";
@@ -114,6 +114,18 @@ export function orderedOf(value) {
 }
 
 // [[spec/tickets/the-sidebar-reads-v1]]
+// The files the fake index reads, held in memory, so a test reaches no door. [[spec/tickets/logbook-test-leaves-level0-lib]]
+export function memoryFiles(seed = {}) {
+  const files = new Map(Object.entries(seed));
+  return {
+    files,
+    exists: (path) => files.has(path),
+    read: (path) => files.get(path),
+    write: (path, text) => files.set(path, String(text)),
+    append: (path, text) => files.set(path, `${files.get(path) ?? ""}${text}`),
+  };
+}
+
 export function v1Over(files, given = {}) {
   const text = (path) => (files.exists(path) ? String(files.read(path)) : "");
   const file = (path) => (files.exists(path) ? parsed(text(path)) : undefined);
