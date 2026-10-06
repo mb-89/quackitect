@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 09cf21ad3c5d · claude-code-remote
+    hash_before: 4b0fc06460793e670fcbf126f30a2789d1bc6c30
+    hash_after: 4b0fc06460793e670fcbf126f30a2789d1bc6c30
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 10 test(s) pass in 1 file(s); green, src/rules passes; green, src/voice passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   84.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 2ca6d5ec6b7e972b
+        size: 1255
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -398,26 +421,33 @@ every fact stands in one place: the replace action has one name, rules.ActionRep
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/rules/apply_test.go src/voice/voice_test.go src/quack/verb_fix_test.go src/quack/rules_test.go test/contract/install.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Vale leaves the tree. The voice and fix verbs, the lsp and the JavaScript readers read the Go rules, and Apply rewrites a text by each replace action. The install fetches neither Vale nor its language server, the editor offers no Vale extension, and both ini files leave. The projection writes each script rule as its head alone, since the Go scripts dispatch by name. Each red case now passes on its own assertion.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the files the size list and the Discussion name, and departs on these: the JavaScript projection twins and lib/helpers.js, since the JavaScript projection rewrites the same rule files and would put the Tengo back; the size golden and the projected VoiceParagraph rules, which the projection writes; the voice split, which the file ceiling asked; and the tests the commit door asks beside each changed file
+every door the change reaches has a fake: the voice verb's Lint door takes a fake in the voice tests, the rules-over door meets the fake process through a taught answer, and the fix verb runs over a seeded rules root
+a comment names the approach: each new file's header and each new case's pointer names vale-leaves-the-tree or the design section it serves
+every fact stands in one place: the replace action has one name in src/rules, the voice door reuses the lsp's rules reader, and the size additions stand once under the Discussion
 
 # accept
 
