@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: engine-verbs-hold
 parent: branch-done-opens-the-pr
+record:
+  - step: do
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 54662ba2cee7091de9fe6f30d0cc5f408faa231a
+    hash_after: 54662ba2cee7091de9fe6f30d0cc5f408faa231a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/branches passes
+      - name: check
+        exit: 0
+        said: "    1.8  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: ask
+        hash: 6c28392e73a05852
+        size: 166
+    def: aeb558b18945ff5c
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the draft adds Doors.Send while Dispatch still takes send as a parameter, so two
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/branches/dispatch_level_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Dispatch keeps its send argument for its callers, and puts it on d.Send at its first line, so the fire, the write branch pull request and every done branch pull request read one send door. Done reads the same door, which branchDoors sets to httpSend.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change follows the ask: fire takes no send argument, and pulled and pullOpens read d.Send.
+The cleanup the change reveals is in the change: the fire test hands its hub on the Send field.
+The send door stands once, on Doors.Send in src/branches/doors.go, and Dispatch points its argument there.
 
 # Discussion
 
