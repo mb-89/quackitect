@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -166,6 +166,18 @@ record:
     skipped: true
     kept: 78dbdd03594d87fcb75c4cac77e28cd5a38b3fb1
     why: its red tests stand as 78dbdd035 landed them, and a later leaf passed since
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-8
+    hash_before: 7a151ce392c358eddf0ee6e622f26811a5f0c320
+    hash_after: 7a151ce392c358eddf0ee6e622f26811a5f0c320
+    inputs:
+      - name: design/draft
+        hash: 68e76c4838dcc033
+        size: 5070
+      - name: design/tests-red
+        hash: d62ea66838360d58
+        size: 757
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -345,8 +357,7 @@ The check cases run over the fake index in q/qtest, and the yaml case reads pure
 <!-- the form is verdict -->
 
 accept with points
-- vehicle-truthy-joins-yaml: src/vehicle/json.go holds a ninth copy, exported as Truthy, with the body voice.go holds in another case order. The approach and its callers list leave it and its callers in src/vehicle/pure.go out. Fold it into yaml.Truthy with the rest, since the ask wants each helper in one package, and the grep for a lower-case name misses it.
-- copy-rule-drops-twin-word: package check already says twin for a JavaScript check and its Go port, in Twins, check.go and check_twins_test.go. A new twins.go holding helperTwins gives one word two meanings. Name the file, the function and the test file for a copied body, as copies.go, helperCopies and copies_test.go, and carry the red list with the rename.
+- collect-truthy-joins-yaml: src/quack/retro_collect_values.go holds retroCollectTruthy, the voice.go body under another name with its cases in another order, so neither the grep for func truthy nor a rule printing bodies exactly finds it. Fold it into yaml.Truthy and point its callers in retro_collect.go and retro_collect_values.go there, since the ask wants each helper in one package.
 
 # implement
 
