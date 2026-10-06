@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -151,6 +151,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: a6bb278b79201a2d6dcaae8e4ad36fd999abe7c7
+    hash_after: a6bb278b79201a2d6dcaae8e4ad36fd999abe7c7
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 ---
 
 # Ask
@@ -252,38 +264,64 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- quack-ending-files-go: the two ending files holding a package clause alone leave the tree
+- standing-pull-takes-auto-merge: a standing pull request without auto-merge takes it, through one autoMerged the new path shares
+- test-verb-comments-sit-home: the test verb and goTestNames comments sit on their own functions again
+- accept passes over the three fixes, with the check at exit 0
+- the retro drains four private notes: two done, one dropped, and inhand-reads-working-as-todo becomes inhand-skips-ticket-names in this group
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- each fix took a red case first, and the standing pull case failed for the reason named before the code changed
+- the fake hub records auto-merge on the pull it enables, so a second fire reads the first and the case proves one mutation
+- the commit verb ran the check and pushed on every landing, so origin carried each closed step
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- 23:16 the door refused git rm, the commit verb stages named paths alone, and the patch tool has no delete op; a plain rm and then the commit verb landed the deletion
+- 23:21 the hand-back through the index tool met connection refused, since the commit rebuilt the index and restarted the server
+- 23:22 to 23:27 the write tool answered level zero is starting three times after a commit or a test build, and each retry waited on a shell loop
+- 23:24 the door refused a wait loop joined to a hand-back with a semicolon
+- 23:32 the accept hand-back with the pass flag came back refused, since the verdict field decides
+- 23:33 the door refused the ask of the minted ticket, since the note in hand bound the write, and the write named the note instead
+- 23:36 the retro hand-back with fields alone reprinted the prompt and landed nothing, since a leaf holding no verdict field takes the pass flag
+- no owner prompt in this window past the level zero clear that opened it
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the patch op list in `src/modules/edits/apply.go` takes a delete op, so a deletion needs no plain rm
+- the commit verb in `src/quack/commit.go` waits for the server it restarts before it answers, so the next tool call meets a standing server
+- the hand-back in `src/pull/pull_back.go` refuses fields with no flag on a leaf holding no verdict field, and names the pass flag, in place of a silent reprint
+- `inhand-skips-ticket-names` stops a ticket named on the plan from standing in hand as a todo
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The three fixes were small, and most of the window went to waiting on the server after each commit. The door and the pull disagree on what a plan names, and this run met that twice: once as a refusal naming a ticket as the working todo, once as a write bound to the note in hand. The pass flag and the verdict field split the hand-backs in two, and both halves refused me once.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+one place: each improve line names the file owning its fix, and no rule repeats
+numbers: the chapter adds no number past the times
+headers: the chapter writes no file header
+prompts and errors: each refusal of the run stands with its time, and the one owner-side event is the clear
+role: the chapter names the box and the owner by role, with no address and no box path
 
 ## cloud
 
