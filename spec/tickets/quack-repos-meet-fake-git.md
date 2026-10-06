@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -301,6 +301,15 @@ record:
         hash: 0ecf0b21dbd1a30f
         size: 430
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 5bbde4dee5ea86ec4a704757b4b0a08c51b919f9
+    hash_after: e06afde26bd7c13435668a7f84db02695d6e7e2f
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -596,14 +605,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the draft's size list, departing in one file: src/quack/spawndoors.go holds roadVerb, claudeAt and takesBranch unchanged, since the verb guard refuses os/exec in commit.go and ticket_doors.go and quack-spawns-meet-fake-process owns their shape
+- every door the change reaches has a fake: FakeRepo over the case's folder for git, and the real disk under it spawns nothing
+- each changed function points at the git door section of spec/design_output/doors.md, which names the approach
+- the git operations stand once, in src/modules/git/repo.go, and the verbs reach the real Repo through realRepo and landingHere alone
 
 ## tests-green
 
