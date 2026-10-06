@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: boxes-hold-and-hand-back
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 1f088f57a6ca77e2
         size: 699
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: d1a2fcc508a7980703793e420d96abe3b86bc408
+    hash_after: 5dd11cdea4d4fc86e02860348c467f6ef01b33c2
+    answered:
+      - name: lint
+        exit: 0
+        said: "    2.6  test/contract/index.test.js a stopped index leaves no se-index process past the case"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the stop module, the rule file, the stop design note, the JS stop door with its lib and test, and one quack test; the JS door joined because the contract test holds every mechanical check in both doors
+- the check reads the facts alone, and the quack test reads the real rule file, so no new door stands
+- each new function and check carries a comment pointing at spec/design_output/stop#a-cloud-box-decides
+- the rule text stands in spec/config/stop/level0.yml, the check meaning in the design table, and the code points at the section
 
 ## tests-green
 
