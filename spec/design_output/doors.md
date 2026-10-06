@@ -197,14 +197,14 @@ family carries its fate:
 | the standing file over a real bus | `src/index/standing_test.go` | door test of the bus |
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
 | the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
-| the branch verbs over a bare origin and a clone a case | `src/branches/tree_test.go`, `src/branches/dispatch_test.go`, `src/branches/dispatch_write_test.go` | moves onto `FakeGit` and a fake process, under a child ticket |
-| the quack verbs spawning git or the binary | `src/quack/*_test.go` reaching `exec.Command` or `os.Args[0]` | moves onto the process door's fake, under a child ticket |
-| the index and session suites driving the real door alone | `test/contract/index.test.js`, `test/contract/session.test.js` | run the fake beside the real door, under a child ticket |
+| the branch verbs over a bare origin and a clone a case | `src/branches/tree_test.go`, `src/branches/dispatch_test.go`, `src/branches/dispatch_write_test.go` | moves onto `FakeGit` and a fake process, under [[spec/tickets/branch-verbs-meet-fake-git]] |
+| the quack verbs spawning git or the binary | `src/quack/*_test.go` reaching `exec.Command` or `os.Args[0]` | moves onto the process door's fake, under [[spec/tickets/quack-spawns-meet-fake-process]] |
+| the index and session suites driving the real door alone | `test/contract/index.test.js`, `test/contract/session.test.js` | run the fake beside the real door, under [[spec/tickets/index-session-suites-run-fakes]] |
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
 | the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go` | door tests of the index door |
-| the quack verbs over a repository a case | `src/quack/commit_test.go` and the ticket verbs' cases | move onto `FakeGit`, under a child ticket |
+| the quack verbs over a repository a case | `src/quack/commit_test.go` and the ticket verbs' cases | move onto `FakeGit`, under [[spec/tickets/quack-repos-meet-fake-git]] |
 | the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
-| the pull over a real repository | `src/pull/pull_test.go` | moves onto `FakeGit`, under a child ticket |
+| the pull over a real repository | `src/pull/pull_test.go` | moves onto `FakeGit`, under [[spec/tickets/pull-meets-fake-git]] |
 
 The one state a module holds is `namePatterns` in
 `src/modules/check/private.go`, a memo of a pure compile, and it stands as the
