@@ -118,11 +118,20 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
 depends_on: [black-box-tests-guard-reports, fixture-home-guard-reports, test-ratio-measure-reports, hand-script-guard-reports, purity-guard-covers-every-outside]
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: cb053ef7ecc5a35f230c36046282d4a290fc7062
+    hash_after: cb053ef7ecc5a35f230c36046282d4a290fc7062
+    inputs:
+      - name: ask
+        hash: 9ac6e3a0b7d7194b
+        size: 904
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,61 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Add rules to two guidance notes, and point the audit at them. No code changes.
+
+In spec/guidance/code/code.md, rule 11 writes a function pure, with the Impure marker and its reason on each function reaching the outside. Rule 12 promotes a step that repeats into a verb or an engine function, with the HandScript marker on a script that stays. Each links to spec/design_output/model#the-guards-hold-a-baseline, which owns the guards and their markers.
+
+In spec/guidance/code/testing.md, six rules join. Test behavior through the interface. Test at the outermost door, the command line, and a module port only where the command line cannot reach. Write the test outside its package. Build a fixture in the package home alone. Reach no clock in a test. Keep the test lines of a package near its code lines. Black-box, fixture home, no-timer and ratio link to the same model section, since the blackbox, fixture, purity clock kind and ratio guards hold them. Behavior and door-once have no check, so the audit holds them, and each carries a star with its argument in the rationale.
+
+In spec/processes/retro.yaml, the audit checklist takes one item a rule, each linking the guidance rule. spec/guidance/retro/audit.md gains one rule: walk the code and test rules item by item, and answer a guarded rule off the guards verb.
+
+The classify step already promotes every hand script, by rule 11 of spec/guidance/retro/classify.md.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+src/modules/guidance/guidance.go hands code.md and testing.md to every leaf tagged code or testing
+src/pull/pull_chapter.go workAnswer prints the audit checklist of retro.yaml to the audit leaf
+the lint reads both guidance notes and retro.yaml against their schemas
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+none: the change touches no code, and ./RUNME.sh check with ./RUNME.sh lint decide each done_when line
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+spec/guidance/code/code.md
+spec/guidance/code/testing.md
+spec/rationales/code.md
+spec/rationales/testing.md
+spec/processes/retro.yaml
+spec/guidance/retro/audit.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every file the approach names stands opened: the guards in src/imports/guards.go and purity.go, the model section, code.md, testing.md, retro.yaml and classify.md
+the callers list names the guidance module, the pull chapter and the lint, the readers of these files
+every done_when line names its decider: lint for the two guidance notes, check for the audit checklist, and classify rule 11 for the scripts
 
 ## tests-red
 
