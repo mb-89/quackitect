@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: failures-stand-registered
 parent: sentinel-fires-watches
+record:
+  - step: do
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 0558800df12968672354fb309f4a9313ef1c282c
+    hash_after: 0558800df12968672354fb309f4a9313ef1c282c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/failure passes
+      - name: check
+        exit: 0
+        said: "    1.6  test/contract/front.test.js set, drop, entry and after write what se-front writes over tickets of this tree"
+    inputs:
+      - name: ask
+        hash: 1ff62c8d0bdce062
+        size: 335
+    def: 3be54dfd84be35f8
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ spec/design_output/failures.md says Sentinel takes the registry, the clock door 
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/failure/sentinel_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The sentinel chapter of the failures design note now matches the code. NewSentinel takes a Runner beside the registry, the clock door and the hand, and the sentinel runs a fired failure reaction through it, raising failure-reaction-fails where the reaction fails. The note said the engine ran the reaction, which no code does.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask, and names the Runner and the sentinel as the hand running the reaction
+- the change reveals no cleanup
+- the note names NewSentinel and the Runner, and src/failure/sentinel.go owns their shape
 
 # Discussion
 

@@ -60,9 +60,9 @@ A `watch` names an event kind, a pattern the event's text matches, and a quiet s
 - With no quiet span, the sentinel fires the failure on each event that matches.
 - With a quiet span, it fires the failure once the span passes with no matching event.
 
-`failure.Sentinel` takes the registry, the clock door and a hand it fires through. `Hear` takes one event. A quiet watch arms `After` on the clock door, and each matching event arms it again. So the sentinel reads the time through the clock door, and polls nothing.
+`failure.NewSentinel` takes the registry, the clock door, a hand it fires through and a `Runner`, the process door. `Hear` takes one event. A quiet watch arms `After` on the clock door, and each matching event arms it again. So the sentinel reads the time through the clock door, and polls nothing.
 
-The hooks door hears every post the bridge sends, and hands each to the sentinel. A fired failure writes its row. The engine then runs its `reaction` through the process door.
+The hooks door hears every post the bridge sends, and hands each to the sentinel. A fired failure writes its row. The sentinel then runs its `reaction` through the `Runner`, and raises `failure-reaction-fails` where the reaction exits nonzero or runs nowhere.
 
 # An agent raises by verb
 
