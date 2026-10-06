@@ -114,3 +114,11 @@ func TestOpenedDropsTheOverridesOfOtherWindows(t *testing.T) {
 		t.Fatalf("%s holds %+v after a third window opens", HeldName, held)
 	}
 }
+
+// A dotted key names the key the catalog declares, and reads back the same. [[spec/design_output/model#config-comes-off-the-registrations]]
+func TestADottedKeyNamesTheCatalogKey(t *testing.T) {
+	key := KeyOfDotted("stop.mostInARow")
+	if key.Name != "stop/config/most-in-a-row" || key.Dotted() != "stop.mostInARow" {
+		t.Fatalf("stop.mostInARow names %q and reads back %q", key.Name, key.Dotted())
+	}
+}

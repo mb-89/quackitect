@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	oldconfig "quackitect/src/config"
@@ -147,5 +148,17 @@ func TestTheSchemaWriteFormHoldsItsArgs(t *testing.T) {
 	t.Parallel()
 	if said := len([]string{"quack", "schema", "--write"}); said != schemaArgs {
 		t.Fatalf("the write form holds %d arguments, and main weighs %d", said, schemaArgs)
+	}
+}
+
+// A shared key carries the mark a reader past the catalog reads, and a key of one box carries none. [[spec/design_output/config#the-go-reader]]
+func TestASharedKeyCarriesItsMark(t *testing.T) {
+	shared, _ := q.JSON.Serialize(keyEntry(q.Key{Type: "string", Default: `"new"`, Shared: true}))
+	if !strings.Contains(string(shared), `"shared": true`) {
+		t.Fatalf("a shared key's entry reads %s, with no shared mark", shared)
+	}
+	local, _ := q.JSON.Serialize(keyEntry(q.Key{Type: "number", Default: "3"}))
+	if strings.Contains(string(local), "shared") {
+		t.Fatalf("a key of one box reads %s, with a shared mark", local)
 	}
 }
