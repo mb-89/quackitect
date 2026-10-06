@@ -249,7 +249,9 @@ func TestGoGate(t *testing.T) {
 			t.Fatalf("the gate ran %v, and wants %v", fake.runs, want)
 		}
 		red := &checkFake{codes: map[string]int{"go": 1}}
-		if code := goGate(red.doors(), false, nil); code != 1 || len(red.runs) != 1 {
+		redDoors := red.doors()
+		redDoors.root = t.TempDir()
+		if code := goGate(redDoors, false, nil); code != 1 || len(red.runs) != 1 {
 			t.Fatalf("a red test answers %d after %v", code, red.runs)
 		}
 		gone := &checkFake{gone: map[string]bool{"go": true}}
@@ -261,7 +263,7 @@ func TestGoGate(t *testing.T) {
 		fake := &checkFake{codes: map[string]int{"go": 1}, said: map[string]string{"go": "=== RUN   TestA\n    --- FAIL: TestA (0.00s)\nok  \tquackitect/src/two\n--- FAIL: TestB (0.01s)\n"}}
 		doors := fake.doors()
 		var errs, out strings.Builder
-		doors.errs, doors.out = &errs, &out
+		doors.errs, doors.out, doors.root = &errs, &out, t.TempDir()
 		if code := goGate(doors, true, nil); code != 1 {
 			t.Fatalf("a red quiet run answers %d", code)
 		}
@@ -299,6 +301,51 @@ func TestTestArgv(t *testing.T) {
 	if !slices.Contains(testArgv(root, nil, testParts[1]), "test/contract/*.test.js") {
 		t.Fatal("no red list runs the glob")
 	}
+}
+
+// A red check ends by naming each red case with its file, and its line where the run names one. [[spec/tickets/ci-reds-name-their-cases]]
+func TestCheckEndsOnTheRedCases(t *testing.T) {
+	t.Parallel()
+	ends := func(t *testing.T, run func(doors *checkDoors, argv []string) (int, string)) []string {
+		t.Helper()
+		var said strings.Builder
+		doors := (&checkFake{}).doors()
+		doors.root, doors.out = t.TempDir(), &said
+		doors.run = func(argv, _ []string, _ bool) (int, string, error) {
+			code, out := run(&doors, argv)
+			return code, out, nil
+		}
+		if code := checkVerb(func(io.Writer, io.Writer) checkDoors { return doors })([]string{"check"}, false, &said, io.Discard); code != 1 {
+			t.Fatalf("a red run answers %d: %q", code, said.String())
+		}
+		rows := strings.Split(strings.TrimRight(said.String(), "\n"), "\n")
+		return rows[max(0, len(rows)-2):]
+	}
+	t.Run("a red runner case ends the log with its file and line", func(t *testing.T) {
+		rows := ends(t, func(doors *checkDoors, argv []string) (int, string) {
+			if argv[0] != "node" || !slices.Contains(argv, testParts[0].glob) {
+				return 0, ""
+			}
+			row := caseLine(map[string]any{"file": "test/level0/a.test.js", "name": "a case", "nesting": 0, "ms": 3, "ok": false, "said": "it broke", "line": 12})
+			_ = os.MkdirAll(filepath.Dir(doors.at(testParts[0].times)), 0o755)
+			_ = os.WriteFile(doors.at(testParts[0].times), []byte(row+"\n"), 0o644)
+			return 1, ""
+		})
+		if want := []string{"The red cases:", "  test/level0/a.test.js:12: a case: it broke"}; !reflect.DeepEqual(rows, want) {
+			t.Fatalf("the log ends %q, and wants %q", rows, want)
+		}
+	})
+	t.Run("a red Go test ends the log with its file under its package and its line", func(t *testing.T) {
+		rows := ends(t, func(_ *checkDoors, argv []string) (int, string) {
+			if argv[0] != "go" {
+				return 0, ""
+			}
+			return 1, "--- FAIL: TestA (0.00s)\n    --- FAIL: TestA/inner (0.00s)\n        a_test.go:7: one is two\nFAIL\nFAIL\tquackitect/src/one\t0.01s\nFAIL\n"
+		})
+		if want := []string{"The red cases:", "  src/one/a_test.go:7: TestA/inner: one is two"}; !reflect.DeepEqual(rows, want) {
+			t.Fatalf("the log ends %q, and wants %q", rows, want)
+		}
+	})
 }
 
 func TestCheckErrors(t *testing.T) {
