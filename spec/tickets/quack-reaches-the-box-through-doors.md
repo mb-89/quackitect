@@ -414,3 +414,5 @@ the door files stand once in src/quack/owns.yaml
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The size closes on "every verb file the callers list names". The files the implement step touched stand in git: `git log --name-only --format= --grep='^quack-reaches-the-box-through-doors' main` lists each one. `./RUNME.sh doors` lists every root file still walking around os, os/exec, net, net/http or syscall.
