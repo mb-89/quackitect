@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,12 @@ record:
         exit: 0
         said: ""
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 7da8e25908c9de7bf15e57bec150b88fddc9a96b
+    hash_after: 66d158e08200207a75771fea3ad52e9e37c57d2d
+reason: became
+successors: [the-index-outlives-the-check]
 ---
 
 # Ask
