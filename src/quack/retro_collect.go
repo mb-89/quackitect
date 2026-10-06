@@ -78,7 +78,7 @@ func retroCollectLive() retroCollectDoors {
 		root: root,
 		home: homeOf(d.env),
 		temp: retroCollectFirst(d.env("TEMP"), d.env("TMP"), d.env("TMPDIR")),
-		now:  d.now,
+		now:  d.clock.Now,
 		git:  retroCollectGitIn(d.run, root),
 		disk: d.disk,
 		move: d.disk.rename,

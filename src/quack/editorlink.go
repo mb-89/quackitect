@@ -300,7 +300,7 @@ func editorLink(d boxDoors, loud bool) bool {
 	if !linked {
 		return false
 	}
-	wrote, why := editorRegister(d.disk, folder, editorEntry(id, said.Version, dest, d.now().UnixMilli()))
+	wrote, why := editorRegister(d.disk, folder, editorEntry(id, said.Version, dest, d.clock.Now().UnixMilli()))
 	fmt.Fprintf(d.out, "%s: %s.\n", id, why)
 	return wrote
 }

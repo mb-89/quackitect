@@ -22,6 +22,7 @@ import (
 
 	"quackitect/src/branches"
 	"quackitect/src/index"
+	"quackitect/src/q"
 )
 
 // How one outside run goes: its folder, the variables past the box's own or the whole environment in place of it, what it reads, its bound, whether it writes to the caller's streams, whether it reads the caller's terminal, and whether its error stream joins its output. [[spec/tickets/box-verbs-port-to-go]] [[spec/tickets/quack-reaches-the-box-through-doors]]
@@ -53,7 +54,7 @@ type boxDoors struct {
 	pid       int
 	run       func(argv []string, o runOpts) ranResult
 	get       func(url string, wait time.Duration) (string, error)
-	now       func() time.Time
+	clock     q.Clock
 	disk      diskDoors
 	out, errs io.Writer
 }
@@ -86,7 +87,7 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		pid:     os.Getpid(),
 		run:     realRun(out, errs),
 		get:     realGet,
-		now:     wall.Now,
+		clock:   wall,
 		disk:    realDisk(),
 		out:     out,
 		errs:    errs,
