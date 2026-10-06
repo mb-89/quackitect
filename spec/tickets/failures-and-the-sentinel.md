@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -189,7 +189,30 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 8e2e929d6bec8e08da1a34777ce44a527ec91740
+    hash_after: 8e2e929d6bec8e08da1a34777ce44a527ec91740
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    1.7  test/contract/lint-twins.test.js the Go lint and the check's lint name the same finding lines"
+    inputs:
+      - name: design/tests-red
+        hash: 08bd99e184844752
+        size: 586
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 depends_on: failure-nodes-stand, failure-door-raises, failure-check-refuses, sentinel-fires-watches, failure-verbs-raise-and-register
+reason: done
 ---
 
 # Ask
@@ -381,26 +404,33 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/quack/refusals_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The red case TestMovedRefusalsPassTheFailureDoor passes: the pull, the take and the mint raise every refusal through failure.Raise with a literal id, and failure.Moved names the three places. go test ./src/pull/ and ./src/branches/ read the ids off failure.Fake, and the bless and mint cases read the line the door prints. Each id stands as a node under spec/failures with a remedy.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the size list names, plus src/branches/stands.go and merge.go, which the take reaches through its guards, and src/quack/branch.go, which wires the take's registry
+- every door the change reaches has a fake: the pull and the take read failure.Fake in their cases, and failure.Dir has FakeDir
+- each file the change touches carries a header line and a link to spec/design_output/failures#the-refusals-move-onto-nodes
+- every fact stands in one place: remedies stand on their nodes under spec/failures, the moved places stand in failure.Moved alone
 
 # accept
 
