@@ -100,6 +100,12 @@ A door fake in a module test made the module reach past the index. The fake
 index held it to the one peer the design gave it. For the harness, see
 [[spec/design_output/model#the-fake-index]].
 
+The owner ruled that a test met the code at its outermost door: the command
+line, `quack ...`. A module port took a test only for an edge the command line
+could not reach. A test at the command line held the behavior a person saw, so a
+refactor behind it kept it green. A test at an inner seam held the seam, and the
+next refactor turned it red with no behavior broken.
+
 ## 13. A fake keeps a contract
 
 The owner ruled that every fake stood for a contract. Each contract had one

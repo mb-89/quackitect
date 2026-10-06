@@ -17,10 +17,10 @@ rationale: [[spec/rationales/testing]]
 8. Take the clock and the random source as arguments, so a failing case replays.
 9. Let every test run beside every other. A test needing an order is a red test.
 10. Read the rule on the check in [[spec/guidance/code/code]], which holds it over every change.
-11. Test a Go module without the `io` flag against the fake index in `q/qtest`, and against nothing else. Import nothing past `q`, `q/qtest` and the pure standard library. A fixture rides in through `embed`, or the case seeds it. [[spec/design_output/model#the-fake-index]] *
-12. Test an IO module against `q/qtest` and the fake of its outside world. A fake disk, git, process or clock stands local. [[spec/design_output/model#its-file-carries-its-fake]]
+11. Test a behavior at the outermost door, the command line `quack ...`. Where it cannot reach an edge, test a Go module without the `io` flag against the fake index in `q/qtest`. Import nothing past `q`, `q/qtest` and the pure standard library. A fixture rides in through `embed`, or the case seeds it. [[spec/design_output/model#the-fake-index]] *
+12. Where the command line misses an edge, test an IO module against `q/qtest` and the fake of its outside world. A fake disk, git, process or clock stands local. [[spec/design_output/model#its-file-carries-its-fake]]
 13. Every fake stands for a contract. Each contract has one suite of cases, written once, that runs against both the fake and the real thing. The check refuses a fake with no suite beside it. [[spec/design_output/model#the-fake-keeps-a-contract]] *
-14. Test the index against a fake module. It registers reads and writes, and drives every transaction a module makes. [[spec/design_output/model#the-index-meets-fake-modules]]
+14. Where the command line misses an edge of the index, test it against a fake module. It registers reads and writes, and drives every transaction a module makes. [[spec/design_output/model#the-index-meets-fake-modules]]
 15. Cross no module boundary in a test, past a contract suite, the fake module and the cage's replays.
 
 # Examples
