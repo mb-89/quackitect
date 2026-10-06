@@ -9,6 +9,9 @@ import (
 	"syscall"
 )
 
+// The process a spawn starts is the door itself. [[spec/tickets/door-outlives-taskkill-tree]]
+const starterIsDoor = true
+
 // [[spec/tickets/the-index-outlives-the-check]]
 func detached(run *exec.Cmd) *exec.Cmd {
 	if run.SysProcAttr == nil {
