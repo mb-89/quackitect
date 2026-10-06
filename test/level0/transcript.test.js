@@ -6,7 +6,7 @@ import {
   beforeIn,
   textOf,
   textsOf,
-} from "../../.claude/skills/level0/hooks/transcript.js";
+} from "../../.claude/skills/level0/hooks/transcript.ts";
 
 const ROWS = [
   { role: "user", id: "u1", text: "go" },

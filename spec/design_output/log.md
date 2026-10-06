@@ -144,7 +144,7 @@ The viewer holds a floor of its own over what the disk carries. For details, see
 `.claude/skills/level0/lib/log.js` shapes a line and reaches nothing. The
 writers below read it, one for each runtime:
 
-- `logHere` in `hooks/level0.js`, through `$.fs`
+- `logHere` in `hooks/level0.ts`, through `$.fs`
 - `src/doors/log.js`, through the disk door, for the command line
 - `src/extension/lib/logbook.js`, through the editor door, for the sidebar
 

@@ -7,15 +7,10 @@ import { resolve } from "node:path";
 import { test } from "node:test";
 import { pathToFileURL } from "node:url";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { RESUME } from "../../src/bridge/handover.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
-import {
-  DRY,
-  engineOf,
-  harnessOf,
-  readsDry,
-} from "../../src/scripts/probe-dry.js";
+import { DRY, engineOf, harnessOf, readsDry } from "../../src/scripts/probe-dry.js";
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
 
@@ -30,7 +25,10 @@ function whole() {
       door: true,
       blocks: [
         { name: "level0-tools", text: "the tools" },
-        { name: "level0-canary", text: `Open your FIRST answer with:\n\n    ${SENTENCE}` },
+        {
+          name: "level0-canary",
+          text: `Open your FIRST answer with:\n\n    ${SENTENCE}`,
+        },
       ],
       sentence: SENTENCE,
       prompt: { text: "probe" },
@@ -41,7 +39,13 @@ function whole() {
       posts: [{ url: "http://127.0.0.1:7001/hook", event: "session.start" }],
       said: [],
       cleared: {
-        runs: [{ words: "handover --pass", exit: 0, said: "Level zero clears the conversation." }],
+        runs: [
+          {
+            words: "handover --pass",
+            exit: 0,
+            said: "Level zero clears the conversation.",
+          },
+        ],
         commands: ["clear"],
         prompts: [RESUME],
         after: {
@@ -77,7 +81,9 @@ test("a context read handing no canary block fails the rules", () => {
 
 test("a prompt the client reads as given fails the prompt check", () => {
   const { rows, seen } = whole();
-  assert.deepEqual(failing(rows, { ...seen, submitted: { text: "probe" } }), ["prompt"]);
+  assert.deepEqual(failing(rows, { ...seen, submitted: { text: "probe" } }), [
+    "prompt",
+  ]);
 });
 
 test("the pull alone fails the tools check", () => {
@@ -121,7 +127,10 @@ test("a door that never stood, and a canary nobody heard, fail their checks", ()
 test("a read the door holds for an answer the chat never showed fails the guard", () => {
   const { rows, seen } = whole();
   assert.deepEqual(
-    failing(rows, { ...seen, read: { deny: "The owner sent a prompt, and nothing has answered it." } }),
+    failing(rows, {
+      ...seen,
+      read: { deny: "The owner sent a prompt, and nothing has answered it." },
+    }),
     ["guard"],
   );
 });
@@ -142,7 +151,12 @@ test("the engine wraps each registration around the ones after it, reads a filte
   const read = await engine.raise({}, "tool.call", { tool: "Read" }, async (e) => ({
     passed: e,
   }));
-  const pulled = await engine.raise({}, "tool.call", { tool: "pull" }, async () => ({}));
+  const pulled = await engine.raise(
+    {},
+    "tool.call",
+    { tool: "pull" },
+    async () => ({}),
+  );
   const origin = { kind: "composer" };
   let heard;
   await engine.raise({}, "prompt.submit", {}, async () => ({}), origin);
@@ -187,22 +201,32 @@ test("the harness reads the clone's files, records each post and tool, and hands
   seen.held.push({ role: "assistant", id: "a1", text: "said" });
 
   seen.depth = 1;
-  await assert.rejects($.command.run({ command: "clear" }), /inside a hook the turn is waiting on/);
+  await assert.rejects(
+    $.command.run({ command: "clear" }),
+    /inside a hook the turn is waiting on/,
+  );
   seen.depth = 0;
   await $.command.run({ command: "clear" });
   await $.prompt.submit({ text: "resume" });
-  assert.deepEqual(seen.commands, ["clear"], "a command runs outside a hook the turn holds");
+  assert.deepEqual(
+    seen.commands,
+    ["clear"],
+    "a command runs outside a hook the turn holds",
+  );
   assert.deepEqual(seen.prompts, ["resume"]);
 
-  assert.deepEqual(seen.posts, [{ url: "http://127.0.0.1:1/hook", event: "tool.call" }]);
+  assert.deepEqual(seen.posts, [
+    { url: "http://127.0.0.1:1/hook", event: "tool.call" },
+  ]);
   assert.deepEqual(seen.registered, ["find"]);
-  assert.deepEqual(await $.session.messages(), [{ role: "assistant", id: "a1", text: "said" }]);
+  assert.deepEqual(await $.session.messages(), [
+    { role: "assistant", id: "a1", text: "said" },
+  ]);
 });
 
-// [[spec/tickets/program-of-drops-node]]
+// A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first. [[spec/tickets/program-of-drops-node]]
 test("the probe's main runs nothing where another program is main", async () => {
   let ran = false;
-  // A URL with no drive letter refuses fileURLToPath on Windows, so the path resolves first.
   await verbMain(pathToFileURL(resolve("/elsewhere/probe-dry.js")).href, () => {
     ran = true;
   });

@@ -15,7 +15,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 // The hooks level one registers, keyed by their event. A registration carries a filter between the event and the handler, so the last argument is the handler. [[spec/design_output/pull#the-checks]]
 async function hooksHere() {
-  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.ts");
   const held = {};
   register((event, ...rest) => {
     held[event] = rest.at(-1);
@@ -40,7 +40,7 @@ function harness() {
 
 // The engine takes one session start a module and counts them in the source. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 test("the module registers one session start, and it registers the pull tool first", async () => {
-  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.ts");
   const counts = {};
   const starts = [];
   register((event, ...rest) => {
@@ -86,7 +86,7 @@ test("the tool registers as pull, and its verdict takes the four words", () => {
 
 // A hand-back through the tool, over a box whose files a fake disk holds. It answers what the shell ran, what the model was asked, and what the tool answered. [[spec/tickets/the-judge-leaves-the-code]]
 async function handedBack(seed, method = "") {
-  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.ts");
   const calls = [];
   register(
     (event, ...rest) => {
@@ -174,7 +174,7 @@ test("an event naming no session writes nothing, and says the hand stands at the
 
 // The hook matches the name the plugin registers, and runs the verb through the binary under the method root. [[spec/design_output/pull#the-checks]]
 test("the pull hook matches the level zero call, and runs the verb through the binary the method root holds", async () => {
-  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.ts");
   const calls = [];
   register(
     (event, ...rest) => {
@@ -207,7 +207,7 @@ test("the pull hook matches the level zero call, and runs the verb through the b
 
 // The tool's pull reads the hand the shell verb reads, so the verb runs under the harness keys the session carries. [[spec/tickets/doors-read-what-commands-do]]
 test("the pull tool runs the verb under the harness env the shell verb reads", async () => {
-  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.js");
+  const { register } = await import("../../.claude/skills/level0/hooks/pull-tool.ts");
   const { agentOf } = await import("../../src/scripts/pull-hand-of.js");
   const calls = [];
   register((event, ...rest) => {
@@ -248,7 +248,7 @@ test("the pull tool runs the verb under the harness env the shell verb reads", a
   assert.equal(agentOf(opts[0]?.env), "claude-code-remote");
   const { HARNESS } = await import("../../src/scripts/pull-hand-of.js");
   const { HARNESS_KEYS } = await import(
-    "../../.claude/skills/level0/hooks/pull-tool.js"
+    "../../.claude/skills/level0/hooks/pull-tool.ts"
   );
   assert.deepEqual(
     HARNESS_KEYS,

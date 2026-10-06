@@ -46,6 +46,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
+import { MODULE } from "../../src/scripts/probe-dry.js";
 import { SESSION } from "../../src/scripts/pull-hand-of.js";
 import { goVerbs } from "./commands.js";
 
@@ -403,15 +404,24 @@ test("a spelling of a name the runtime half took is refused where the old place 
 // A plugin imports nothing past its own folder, so the plugin spells the session file the hand writes once in its library, and the pull hook imports it from there. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
   for (const path of [
-    ".claude/skills/level0/hooks/level0.js",
+    ".claude/skills/level0/hooks/level0.ts",
     ".claude/skills/level0/lib/pull.js",
   ]) {
     assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
   }
   assert.doesNotMatch(
-    here.read(".claude/skills/level0/hooks/pull-tool.js"),
+    here.read(".claude/skills/level0/hooks/pull-tool.ts"),
     new RegExp(`"${SESSION}"`),
     "the hook imports the path from the library beside it",
+  );
+});
+
+// The dry probe loads the module the manifest names, so a rename moves both, and the probe reads the module the client loads. [[spec/tickets/level0-hooks-move-to-typescript]]
+test("the dry probe loads the module the plugin manifest names", () => {
+  const manifest = JSON.parse(here.read(".claude/skills/level0/hooks/hooks.json"));
+  assert.deepEqual(
+    manifest.modules.map((one) => `hooks/${one.replace(/^\.\//, "")}`),
+    [MODULE],
   );
 });
 

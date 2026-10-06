@@ -3,7 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { refusedText } from "../../.claude/skills/level0/hooks/cage.js";
+import { refusedText } from "../../.claude/skills/level0/hooks/cage.ts";
 import {
   callsOf,
   eventOf,

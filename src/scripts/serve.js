@@ -3,9 +3,9 @@
 // starts it and says so.
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 
-import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.js";
-import { BIN } from "../../.claude/skills/level0/lib/index.js";
+import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.ts";
 import { inRun } from "../../.claude/skills/level0/lib/folders.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { POINTER, pointerOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import { registeredPort } from "../bridge/vehicle.js";
 

@@ -1,6 +1,39 @@
 // THE CAGE UNDER NEW. The hooks door decides the events it ports, and the bridge keeps the rest until the bridge server leaves. A guarded call meets a refusal while the door stands down, so a fault shows on the first call. The loader follows $ into no import, so the bridgehead makes every call on $, and this file holds the words and the choices. [[spec/tickets/a-down-index-refuses-calls]] [[spec/rationales/the-cage-refuses-while-down]]
 
+import type { AgentSpawnArgs, HttpInit } from "claude-code";
 import { RUN } from "../lib/folders.js";
+import type { Fields, Given } from "./shape.ts";
+
+// What a door or the server answers an event with, read off its JSON; the engine names no such shape. [[spec/design_output/model#the-effects]]
+export type Answer = {
+  readonly register?: unknown;
+  readonly clear?: { readonly prompt?: unknown };
+  readonly needs?: unknown;
+  readonly spawn?: AgentSpawnArgs;
+  readonly back?: Readonly<Fields> & { readonly event?: unknown };
+  readonly result?: unknown;
+  readonly pass?: unknown;
+  readonly event?: unknown;
+  readonly after?: Readonly<Fields>;
+  readonly deny?: string;
+  readonly block?: string;
+  readonly effects?: readonly Effect[];
+};
+// One effect of a door's answer. [[spec/design_output/model#the-effects]]
+type Effect = {
+  readonly kind?: unknown;
+  readonly text?: unknown;
+  readonly result?: Answer;
+  readonly name?: unknown;
+  readonly call?: unknown;
+};
+// The step the effects answer. [[spec/design_output/model#the-effects]]
+export type Step = {
+  answer?: Answer;
+  rows?: string;
+  blocks?: { name: string; text: string }[];
+  after?: string[];
+};
 
 // The slice key the cage reads, and the value that hands the events to the door. [[spec/design_input/the-migration-runs-in-slices#how-a-slice-moves]]
 export const CAGE_KEY = "migration.cage";
@@ -36,12 +69,18 @@ const WORK = /^(HEAD:)?work\/[\w./-]+$/;
 const ALARMS = "session/alarms";
 
 // Whether the door decides the event, where the key reads new. [[spec/tickets/a-down-index-refuses-calls]]
-export function doors(event) {
+export function doors(event: string): boolean {
   return DOORED.has(event);
 }
 
 // The post the door reads: its address, and the body with the standing token as a bearer. [[spec/design_output/model#a-post-and-its-answer]]
-export function postOf(standing, event, e, root, extra) {
+export function postOf(
+  standing: { readonly port?: unknown; readonly token?: unknown } | null | undefined,
+  event: string,
+  e: unknown,
+  root: string,
+  extra: Readonly<Fields> | undefined,
+): { where: string; init: HttpInit } {
   return {
     where: `http://127.0.0.1:${standing?.port}/hook`,
     init: {
@@ -56,9 +95,13 @@ export function postOf(standing, event, e, root, extra) {
 }
 
 // The step the effects answer, in order: a result answers the call with its text as a deny, a block holds the Stop, rows ask back, and an after rides the answer as context. A call the door passes goes on to the harness, and none to the bridge. [[spec/design_output/model#the-effects]] [[spec/tickets/level0-tools-leave-the-bridge]]
-export function stepOf(answer, event, { asks }) {
-  const after = [];
-  const blocks = [];
+export function stepOf(
+  answer: Answer | null | undefined,
+  event: string,
+  { asks }: { asks: boolean },
+): Step {
+  const after: string[] = [];
+  const blocks: { name: string; text: string }[] = [];
   for (const one of answer?.effects ?? []) {
     const kind = String(one?.kind ?? "");
     if (kind === "result")
@@ -87,7 +130,7 @@ export function stepOf(answer, event, { asks }) {
 }
 
 // A guarded call meets the refusal while the door stands down. [[spec/tickets/a-down-index-refuses-calls]]
-export function guarded(event, e) {
+export function guarded(event: string, e: Given): boolean {
   const tool = String(e?.tool ?? "");
   if (event !== "tool.call" || UNGUARDED.has(tool)) return false;
   return !(
@@ -96,7 +139,7 @@ export function guarded(event, e) {
 }
 
 // Whether a command brings the index back or saves the work, so a box whose door falls mid-work recovers and pushes. Every other command stays guarded. [[spec/tickets/the-cage-survives-its-index]] [[spec/rationales/the-cage-refuses-while-down]]
-export function recovers(command) {
+export function recovers(command: unknown): boolean {
   const argv = wordsOf(String(command ?? "").replace(INTO, ""));
   if (!argv?.length) return false;
   const [head, verb, ...rest] = argv;
@@ -115,13 +158,13 @@ export function recovers(command) {
 }
 
 // The words a shell reads off a command, or null where a character outside quotes chains, pipes, redirects or substitutes. A single-quoted word holds anything, and a double-quoted one holds no expansion, so a commit message stays one word. [[spec/tickets/the-cage-survives-its-index]]
-export function wordsOf(command) {
+export function wordsOf(command: unknown): string[] | null {
   const text = String(command ?? "");
-  const words = [];
-  let word = null;
+  const words: string[] = [];
+  let word: string | null = null;
   let at = 0;
   while (at < text.length) {
-    const c = text[at];
+    const c = text[at] ?? "";
     if (c === "'" || c === '"') {
       const end = text.indexOf(c, at + 1);
       if (end < 0) return null;
@@ -145,9 +188,9 @@ export function wordsOf(command) {
 }
 
 // A commit taking its message and the tracked changes, and no amend and no skipped hook. [[spec/tickets/the-cage-survives-its-index]]
-function commits(words) {
+function commits(words: readonly string[]): boolean {
   for (let at = 0; at < words.length; at += 1) {
-    const word = words[at];
+    const word = words[at] ?? "";
     if (word === "-m" || word === "-am") {
       if (at + 1 >= words.length) return false;
       at += 1;
@@ -157,21 +200,21 @@ function commits(words) {
 }
 
 // A push of a work branch to origin, and no force, no delete and no other ref. [[spec/tickets/the-cage-survives-its-index]]
-function pushesWork(words) {
+function pushesWork(words: readonly string[]): boolean {
   const named = words.filter((word) => !/^(-u|--set-upstream|-q|--quiet)$/.test(word));
-  return named.length === 2 && named[0] === "origin" && WORK.test(named[1]);
+  return named.length === 2 && named[0] === "origin" && WORK.test(named[1] ?? "");
 }
 
 // A pkill matching the full command line against a path under the runtime folder, so it stops the stale index and nothing outside it. [[spec/tickets/the-cage-survives-its-index]]
-function killsRuntime(words) {
-  const named = words.filter((word) => !/^-(9|15|KILL|TERM)$/.test(word));
+function killsRuntime(words: readonly (string | undefined)[]): boolean {
+  const named = words.filter((word) => !/^-(9|15|KILL|TERM)$/.test(String(word)));
   return (
     named.length === 2 && named[0] === "-f" && String(named[1]).includes(`${RUN}/`)
   );
 }
 
 // The one line a guarded call meets while the hooks door stands down. [[spec/tickets/a-down-index-refuses-calls]]
-export function refusedText(e) {
+export function refusedText(e: Given): string {
   return [
     `Level zero refuses ${String(e?.tool ?? "this call")}: the index answers nothing,`,
     "so no cage stands behind the call.",

@@ -4,11 +4,24 @@
 // nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
+import type {
+  Args,
+  EngineInterface,
+  Frozen,
+  Next,
+  On,
+  PluginOptions,
+  ProcessRunResult,
+  StarNext,
+  StreamNext,
+  ToolSpec,
+} from "claude-code";
 import { configOf } from "../lib/config.js";
 import { REPLY_PROBE } from "../lib/guidance.js";
 import { SERVE, SESSION } from "../lib/log.js";
 import { POINTER, PORT_BASE as PORT } from "../lib/vehicle.js";
 import {
+  type Answer,
   CAGE_KEY,
   doors,
   guarded,
@@ -17,9 +30,17 @@ import {
   postOf,
   refusedText,
   stepOf,
-} from "./cage.js";
-import { CLEAR_FALLBACK_MS, holdsClear, takesClear } from "./clear.js";
-import { APPEND, merged, slim } from "./shape.js";
+} from "./cage.ts";
+import { CLEAR_FALLBACK_MS, holdsClear, takesClear } from "./clear.ts";
+import {
+  APPEND,
+  type Fields,
+  failureOf,
+  type Given,
+  merged,
+  type Spawned,
+  slim,
+} from "./shape.ts";
 import {
   cageText,
   INSTALL_SKIP,
@@ -29,8 +50,8 @@ import {
   STARTING,
   spawnTagOf,
   START,
-} from "./start.js";
-import { beforeIn, textOf, textsOf } from "./transcript.js";
+} from "./start.ts";
+import { beforeIn, textOf, textsOf } from "./transcript.ts";
 
 export { cageText, INSTALL_SKIP, reasonOf, STARTING, spawnTagOf, START };
 
@@ -52,7 +73,7 @@ let saidDown = false;
 // The chat line stands apart from the row, so a session start writing the row still leaves the line to say. [[spec/design_output/level0#the-bridge-says-it-falls]]
 let toldDown = false;
 // The one run of the start road a fall takes, which every event finding the door down awaits. A door that answers clears it, so an index dying mid-session starts once more before the cage refuses. [[spec/tickets/level0-runs-on-the-door]] [[spec/tickets/the-cage-survives-its-index]]
-let road = null;
+let road: Promise<void> | null = null;
 // Whether that run settled, so an answer arriving while the road runs leaves it to finish. [[spec/tickets/the-cage-survives-its-index]]
 let roadRan = false;
 // The span a post runs before a fall with no status reads as the host's cut. The host cuts at its own timeout, well past this, and a fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]
@@ -64,7 +85,7 @@ const WAIT_CALL = "mcp__level0__wait";
 let armed = false;
 let stepText = "";
 // What the start road answered where it stood down, so the first prompt says the cage is missing. [[spec/design_output/level0#a-session-says-its-cage]]
-let cage = null;
+let cage: { code: number; detail: string } | null = null;
 export const CAGE_BLOCK = "level0-cage";
 
 const url = () => `http://127.0.0.1:${port}/event`;
@@ -72,7 +93,7 @@ const url = () => `http://127.0.0.1:${port}/event`;
 const SERVED = "mcp__level0__";
 
 // The engine takes one session start a module and counts them in the source, so this registers none: the module wrapping this one holds the start and calls startsSession from it. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export function register(on, options) {
+export function register(on: On, options: PluginOptions): void {
   method = String(options?.method ?? "");
   cut = Number(options?.cut ?? CUT);
   road = null;
@@ -90,10 +111,11 @@ export function register(on, options) {
   takesClear();
   // It wraps the door road, so a clear the turn's own hooks leave waiting runs once they answer. [[spec/tickets/the-clear-runs-live-remote]]
   on("turn.complete", clearsAtTurnEnd);
-  on("*", ($, e, next) => seen($, e, next));
+  // Every event the engine raises is an object or nothing, read loosely as the door reads it. [[spec/design_output/level0#the-bridgehead-and-the-server]]
+  on("*", ($, e, next) => seen($, e as Given, next));
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
-  on("agent.spawn", async ($, e, next) => {
+  on("agent.spawn", async ($, e: Frozen<Args<"agent.spawn">> & { readonly own?: unknown }, next) => {
     if (e?.own) return next(e);
     const line = spawnTagOf(await sessionHeld($));
     if (!line) return next(e);
@@ -101,7 +123,7 @@ export function register(on, options) {
   });
 }
 
-async function sessionHeld($) {
+async function sessionHeld($: EngineInterface): Promise<Fields | null> {
   try {
     return JSON.parse(String(await $.fs.read(HAND_FILE)));
   } catch {
@@ -109,7 +131,7 @@ async function sessionHeld($) {
   }
 }
 
-async function seen($, e, next) {
+async function seen($: EngineInterface, e: Given, next: StarNext): Promise<unknown> {
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
   await probes($, event, e);
@@ -158,11 +180,11 @@ async function seen($, e, next) {
 }
 
 // The key reads through the layers the bridge reads, so a local override moves the hook as it moves the bridge. [[spec/tickets/a-down-index-refuses-calls]]
-async function caged($) {
+async function caged($: EngineInterface): Promise<boolean> {
   reading += 1;
   try {
     return (
-      String(await configOf({ read: (at) => $.fs.read(at) }).ask(CAGE_KEY)) === NEW
+      String(await configOf({ read: (at: string) => $.fs.read(at) }).ask(CAGE_KEY)) === NEW
     );
   } catch {
     return false;
@@ -175,7 +197,12 @@ async function caged($) {
 let reading = 0;
 
 // The door answers, or the start road runs once and the door takes the post again. Still down, a guarded call meets the refusal, and every other event passes. [[spec/tickets/a-down-index-refuses-calls]]
-async function door($, event, e, next) {
+async function door(
+  $: EngineInterface,
+  event: string,
+  e: Given,
+  next: StarNext,
+): Promise<unknown> {
   const extra = await fillOf($, event, e);
   const sent = await promptOf($, event, e, next);
   // A door the start road has yet to stand answers nothing, and only a post still falling once the road ran says so. [[spec/tickets/level0-runs-on-the-door]]
@@ -216,13 +243,24 @@ async function door($, event, e, next) {
 }
 
 // A prompt reaches the door with who sent it and the newest row before it, which the door reads an owner's turn off, as the bridge's body carried them. [[spec/tickets/level0-runs-on-the-door]]
-async function promptOf($, event, e, next) {
+async function promptOf(
+  $: EngineInterface,
+  event: string,
+  e: Given,
+  next: StarNext,
+): Promise<Given> {
   if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
   const said = await before($, event, e);
   return next?.origin ? { ...said, origin: next.origin } : said;
 }
 
-async function doorAsk($, event, e, extra, { quiet = false } = {}) {
+async function doorAsk(
+  $: EngineInterface,
+  event: string,
+  e: unknown,
+  extra: Readonly<Fields>,
+  { quiet = false }: { quiet?: boolean } = {},
+): Promise<Answer | null> {
   let where = HOOKS_FILE;
   try {
     const post = postOf(
@@ -248,7 +286,7 @@ async function doorAsk($, event, e, extra, { quiet = false } = {}) {
 }
 
 // [[spec/tickets/a-reply-follows-its-prompt]]
-async function lastTexts($) {
+async function lastTexts($: EngineInterface): Promise<ReturnType<typeof textsOf>> {
   try {
     return textsOf(await $.session.messages());
   } catch {
@@ -257,7 +295,7 @@ async function lastTexts($) {
 }
 
 // [[spec/tickets/a-reply-follows-its-prompt]]
-async function before($, event, e) {
+async function before($: EngineInterface, event: string, e: Given): Promise<Given> {
   if (event !== "prompt.submit" || !e || typeof e !== "object") return e;
   try {
     return beforeIn(e, await $.session.messages());
@@ -267,20 +305,29 @@ async function before($, event, e) {
 }
 
 // A door answering a vote and a hand in one: the hand runs, and the vote stands as the answer. [[spec/tickets/the-spawn-reaches-its-guidance]]
-export async function besides($, answer, e, next) {
+export async function besides(
+  $: EngineInterface,
+  answer: Answer,
+  e: Given,
+  next: StarNext,
+): Promise<unknown> {
   await spawns($, answer, next);
   if (answer.result !== undefined) return answer.result;
   return next(e);
 }
 
-async function spawns($, answer, next) {
+async function spawns(
+  $: EngineInterface,
+  answer: Answer,
+  next: Pick<StarNext, "origin">,
+): Promise<unknown> {
   const back = await helped($, answer);
   const done = await ask($, String(answer.back?.event ?? "agent.answered"), back, next);
   return done?.result ?? { result: "the helper answered, and the server said nothing" };
 }
 
 // A door's answer carrying a spawn: the helper runs, its answer goes back to the door, and the door's step answers the call. [[spec/tickets/review-spawns-off-the-door]]
-async function doorSpawns($, answer, event) {
+async function doorSpawns($: EngineInterface, answer: Answer, event: string): Promise<unknown> {
   const back = await helped($, answer);
   const said = await doorAsk(
     $,
@@ -293,12 +340,13 @@ async function doorSpawns($, answer, event) {
 }
 
 // The helper the answer spawns, and what it says as the back post carries it. [[spec/tickets/the-spawn-reaches-its-guidance]]
-async function helped($, answer) {
-  let said;
+async function helped($: EngineInterface, answer: Answer): Promise<Fields> {
+  let said: Spawned;
   try {
-    said = await $.agent.spawn(answer.spawn);
+    // Only an answer carrying a spawn reaches here; one without lets the engine refuse, and the refusal answers. [[spec/tickets/the-spawn-reaches-its-guidance]]
+    said = await $.agent.spawn(answer.spawn!);
   } catch (error) {
-    said = { deny: String(error?.message ?? error) };
+    said = { deny: String(failureOf(error)?.message ?? error) };
   }
   return {
     ...(answer.back ?? {}),
@@ -308,7 +356,7 @@ async function helped($, answer) {
   };
 }
 
-async function opens($, e) {
+async function opens($: EngineInterface, e: Given): Promise<void> {
   if (e?.cwd) root = String(e.cwd);
   answered = false;
   held = 0;
@@ -320,7 +368,13 @@ async function opens($, e) {
   }
 }
 
-async function ask($, event, given, next, extra = {}) {
+async function ask(
+  $: EngineInterface,
+  event: string,
+  given: Given,
+  next: Pick<StarNext, "origin"> | undefined,
+  extra: Readonly<Fields> = {},
+): Promise<Answer | null> {
   const e = stamped(event, given);
   let body = "";
   try {
@@ -354,9 +408,14 @@ async function ask($, event, given, next, extra = {}) {
   }
 }
 
-async function fell($, event, body, error) {
+async function fell(
+  $: EngineInterface,
+  event: string,
+  body: string,
+  error: unknown,
+): Promise<Answer | null> {
   // A server restarting on another port writes the pointer again, so a post nobody took reads it before the server reads as down. [[spec/design_output/level0#the-bridge-says-it-falls]]
-  if (!error?.status && (await repoints($))) {
+  if (!failureOf(error)?.status && (await repoints($))) {
     try {
       return await posted($, body);
     } catch (again) {
@@ -369,22 +428,22 @@ async function fell($, event, body, error) {
 }
 
 // A wait carries the stamp of its first post, so a post again carries on the watch and its cap. [[spec/design_output/level0#the-wait-returns-on-signals]]
-function stamped(event, e) {
+function stamped(event: string, e: Given): Given {
   if (!waited(event, e) || e?.since) return e;
   return { ...e, since: Date.now() };
 }
 
-function waited(event, e) {
+function waited(event: string, e: Given): boolean {
   return event === "tool.call" && String(e?.tool ?? "") === WAIT_CALL;
 }
 
 // A fall with no status, after the post ran the span, reads as the host's cut. A fault falls at once. [[spec/design_output/level0#the-bridge-says-it-falls]]
-function cutAfter(error, from) {
-  return !error?.status && Date.now() - from >= cut;
+function cutAfter(error: unknown, from: number): boolean {
+  return !failureOf(error)?.status && Date.now() - from >= cut;
 }
 
 // One ask of the health, so a cut on a live server reads apart from a fall. [[spec/design_output/level0#the-bridge-says-it-falls]]
-async function alive($) {
+async function alive($: EngineInterface): Promise<boolean> {
   try {
     const said = await $.http.fetch(`http://127.0.0.1:${port}/health`, {
       method: "GET",
@@ -399,7 +458,7 @@ async function alive($) {
 const FILLED = new Set(["tool.call", "classic.Stop"]);
 
 // The fill of the context rides every call of the agent's own and the turn's end, because the harness measures it once a turn and a turn runs long. The plain call costs nothing. [[spec/design_output/stop#the-context-hands-over]]
-async function fillOf($, event, e) {
+async function fillOf($: EngineInterface, event: string, e: Given): Promise<Fields> {
   if (!FILLED.has(event) || e?.agentId) return {};
   try {
     const tokens = (await $.session.usage())?.context?.tokens;
@@ -411,7 +470,12 @@ async function fillOf($, event, e) {
 
 
 // The turn the handover ends: the event goes on, and the conversation clears at the turn's completion, or on a timer where it came first. [[spec/tickets/the-clear-runs-live-remote]]
-async function clears($, answer, e, next) {
+async function clears(
+  $: EngineInterface,
+  answer: Answer,
+  e: Given,
+  next: StarNext,
+): Promise<unknown> {
   const out = await next(e);
   holdsClear(String(answer.clear?.prompt ?? ""));
   if (next.event === "turn.complete" && !e?.agentId) await cleared($, "turn.complete");
@@ -420,13 +484,17 @@ async function clears($, answer, e, next) {
 }
 
 // The main agent's turn completes, the hooks inside it answer, and a clear left waiting runs. [[spec/tickets/the-clear-runs-live-remote]]
-async function clearsAtTurnEnd($, e, next) {
+async function clearsAtTurnEnd(
+  $: EngineInterface,
+  e: Frozen<Args<"turn.complete">> & { readonly agentId?: unknown },
+  next: Next<"turn.complete">,
+) {
   const out = await next(e);
   if (!e?.agentId) await cleared($, "turn.complete");
   return out;
 }
 
-async function cleared($, from) {
+async function cleared($: EngineInterface, from: string): Promise<void> {
   const prompt = takesClear();
   if (prompt === null) return;
   try {
@@ -437,12 +505,12 @@ async function cleared($, from) {
       level: "warn",
       said: "the clear the handover asks for fails",
       event: from,
-      detail: String(error?.message ?? error),
+      detail: String(failureOf(error)?.message ?? error),
     });
   }
 }
 
-async function posted($, body) {
+async function posted($: EngineInterface, body: string): Promise<Answer> {
   const said = await $.http.fetch(url(), {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -459,7 +527,7 @@ async function posted($, body) {
 }
 
 // Whether the pointer names a port other than the one the hook posts to, and the hook takes it. [[spec/design_output/level0#the-bridge-says-it-falls]]
-async function repoints($) {
+async function repoints($: EngineInterface): Promise<boolean> {
   try {
     const named = Number(JSON.parse(String(await $.fs.read(POINTER)))?.port);
     if (!named || named === port) return false;
@@ -470,8 +538,12 @@ async function repoints($) {
   }
 }
 
-async function* streams($, e, next) {
-  const kinds = {};
+async function* streams(
+  $: EngineInterface,
+  e: Frozen<Args<"turn.step">>,
+  next: StreamNext<"turn.step">,
+) {
+  const kinds: Record<string, number> = {};
   stepText = "";
   for await (const chunk of next(e)) {
     const kind = String(chunk?.kind ?? typeof chunk);
@@ -485,7 +557,7 @@ async function* streams($, e, next) {
   else await ask($, "turn.said", said, next);
 }
 
-async function spoke($, e, next) {
+async function spoke($: EngineInterface, e: Given, next: StarNext): Promise<unknown> {
   const { texts, rows } = await lastTexts($);
   const text = stepText || texts.at(-1) || "";
   const answer = await ask(
@@ -500,7 +572,7 @@ async function spoke($, e, next) {
   return next(e);
 }
 
-async function registers($, specs) {
+async function registers($: EngineInterface, specs: readonly ToolSpec[]): Promise<void> {
   for (const spec of specs) {
     try {
       await $.tool.register(spec);
@@ -509,16 +581,16 @@ async function registers($, specs) {
 }
 
 // A launch no answer has met yet reads as starting, and anything else as a dead server. [[spec/design_output/level0#the-first-call-pays]]
-function missingLine(e) {
+function missingLine(e: Given): string {
   return starting() ? startingLine(e) : deadLine(e);
 }
 
-function starting() {
+function starting(): boolean {
   return launched && !answered;
 }
 
 // The one line a level zero tool answers while the launched server stands up. [[spec/design_output/level0#the-first-call-pays]]
-function startingLine(e) {
+function startingLine(e: Given): string {
   return `Level zero is starting on this box, so ${String(e?.tool ?? "")} answers once the server stands. Call it again.`;
 }
 
@@ -527,20 +599,25 @@ export const STARTING_STOP =
   "Level zero is starting on this box, and the next event carries its rules. Make your next call, and read them.";
 
 // A launch means a cloud box, since the road exits before it off one. A stood-down road launched nothing, so a caged box and a desk pass. [[spec/design_output/level0#rules-ride-the-first-answer]]
-function holdsStop(e) {
+function holdsStop(e: Given): boolean {
   if (e?.agentId || !starting() || held >= HOLDS) return false;
   held += 1;
   return true;
 }
 
 // The one line a level zero tool answers where no server answers. [[spec/design_output/level0#the-bridge-says-it-falls]]
-function deadLine(e) {
+function deadLine(e: Given): string {
   return `no server answers at ${url()}, so ${String(e?.tool ?? "")} answers nothing. Run ./RUNME.sh serve, and read ${SERVE} for what it says.`;
 }
 
 // A fall reaches the person at the moment it falls, beside the row the log takes. The session start says nothing to them, because the start road runs under it. [[spec/design_output/level0#the-bridge-says-it-falls]]
-async function down($, event, error, where = url()) {
-  const why = String(error?.message ?? error);
+async function down(
+  $: EngineInterface,
+  event: string,
+  error: unknown,
+  where: string = url(),
+): Promise<void> {
+  const why = String(failureOf(error)?.message ?? error);
   if (!saidDown) {
     saidDown = true;
     await wrote($, {
@@ -556,7 +633,7 @@ async function down($, event, error, where = url()) {
 }
 
 // The one line a person reads where the bridge falls. [[spec/design_output/level0#the-bridge-says-it-falls]]
-export function fellText(why, where = url()) {
+export function fellText(why: unknown, where: string = url()): string {
   return [
     `LEVEL ZERO ANSWERS NOTHING. The server answers nothing at ${where}, so no`,
     "rule, no write door and no stop hook reaches this session. It says:",
@@ -567,14 +644,14 @@ export function fellText(why, where = url()) {
 }
 
 // The line reaches the person through the harness, and a harness carrying no such door leaves the row alone. [[spec/design_output/level0#the-bridge-says-it-falls]]
-function says($, line) {
+function says($: EngineInterface, line: string): void {
   try {
     $.ui.log(line);
   } catch {}
 }
 
 // An event finding the door down while another starts it waits on that start, so the rules reach it once the door stands. [[spec/design_output/level0#the-bridgehead-starts-it-too]] [[spec/tickets/level0-runs-on-the-door]]
-function starts($) {
+function starts($: EngineInterface): Promise<void> {
   if (!road) {
     roadRan = false;
     road = startsOnce($).finally(() => {
@@ -584,8 +661,8 @@ function starts($) {
   return road;
 }
 
-async function startsOnce($) {
-  let ran;
+async function startsOnce($: EngineInterface): Promise<void> {
+  let ran: ProcessRunResult;
   try {
     ran = await $.process.run(
       ["node", "-e", START, root, method || root, INSTALL_SKIP],
@@ -593,7 +670,7 @@ async function startsOnce($) {
     );
   } catch (error) {
     // Node itself refuses to start, so this box carries none. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-    const detail = String(error?.message ?? error);
+    const detail = String(failureOf(error)?.message ?? error);
     cage = { code: NO_NODE, detail };
     await wrote($, {
       level: "warn",
@@ -616,7 +693,7 @@ async function startsOnce($) {
 // The reply probe's marker arms the next call of the session, which lands in the log as the event carries it. [[spec/tickets/the-reply-probe-runs]]
 let probing = false;
 
-async function probes($, event, e) {
+async function probes($: EngineInterface, event: string, e: Given): Promise<void> {
   if (event === "prompt.submit") {
     probing = String(e?.text ?? "").includes(REPLY_PROBE.marker);
     return;
@@ -632,7 +709,7 @@ async function probes($, event, e) {
 }
 
 // One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-async function wrote($, said) {
+async function wrote($: EngineInterface, said: Readonly<Fields>): Promise<boolean> {
   const row = { at: new Date().toISOString(), kind: "bridge", ...said };
   // The loader takes $ spelled as $.noun.event alone, so a host running no process throws here, and the row falls back to the read and the write back. [[spec/design_output/log#every-writer-appends]]
   try {
@@ -654,7 +731,7 @@ async function wrote($, said) {
       // A read that fails on a file standing keeps the file, so the session's rows stay whole. [[spec/design_output/log#every-writer-appends]]
       if (
         !/ENOENT|no such|not found|no file/i.test(
-          String(err?.code ?? err?.message ?? err),
+          String(failureOf(err)?.code ?? failureOf(err)?.message ?? err),
         )
       )
         return false;

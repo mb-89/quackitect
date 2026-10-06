@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { besides } from "../../.claude/skills/level0/hooks/level0.js";
+import { besides } from "../../.claude/skills/level0/hooks/level0.ts";
 
 function session(said = { text: "the hand is done" }) {
   const spawned = [];

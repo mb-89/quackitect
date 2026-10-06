@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
+import { register as level0 } from "../../.claude/skills/level0/hooks/level0.ts";
 import { LOCAL, TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
@@ -104,13 +104,22 @@ test("a door dying mid-session starts once more, passes the recovery commands, a
     if (!up) throw new Error("Unable to connect");
     return { ok: true, status: 200, text: "{}" };
   };
-  const bash = (command) => box.hooks["*"](box.$, { tool: "Bash", command }, box.handed);
+  const bash = (command) =>
+    box.hooks["*"](box.$, { tool: "Bash", command }, box.handed);
   const starts = () =>
     box.runs.filter((argv) => !String(argv[2]).includes("appendFileSync")).length;
 
-  assert.equal((await bash("ls"))?.handed?.command, "ls", "a live door passes the call");
+  assert.equal(
+    (await bash("ls"))?.handed?.command,
+    "ls",
+    "a live door passes the call",
+  );
   up = false;
-  assert.match(String((await bash("ls"))?.deny ?? ""), /session\/alarms/, "the fall refuses it");
+  assert.match(
+    String((await bash("ls"))?.deny ?? ""),
+    /session\/alarms/,
+    "the fall refuses it",
+  );
   assert.equal(starts(), 1, "the fall starts the index once before it refuses");
   for (const command of [
     "./RUNME.sh serve",
@@ -122,8 +131,16 @@ test("a door dying mid-session starts once more, passes the recovery commands, a
   ]) {
     assert.equal((await bash(command))?.handed?.command, command, `${command} passes`);
   }
-  for (const command of ["rm -rf .", "git push origin main", "git push --force origin work/a-name"]) {
-    assert.match(String((await bash(command))?.deny ?? ""), /refuses Bash/, `${command} stays refused`);
+  for (const command of [
+    "rm -rf .",
+    "git push origin main",
+    "git push --force origin work/a-name",
+  ]) {
+    assert.match(
+      String((await bash(command))?.deny ?? ""),
+      /refuses Bash/,
+      `${command} stays refused`,
+    );
   }
   assert.equal(starts(), 1, "a door staying down takes no second start");
 
@@ -285,9 +302,12 @@ test("under new the prompt context hands the session the door's named blocks", a
   const box = caged();
   const posts = [];
   answering(box, posts);
-  const context = Object.assign(async () => ({ blocks: [{ name: "own", text: "x" }] }), {
-    event: "prompt.context",
-  });
+  const context = Object.assign(
+    async () => ({ blocks: [{ name: "own", text: "x" }] }),
+    {
+      event: "prompt.context",
+    },
+  );
 
   const said = await box.hooks["*"](box.$, {}, context);
 
@@ -325,7 +345,11 @@ test("under new no event of a session reaches anything but the hooks door", asyn
     },
     { event: "turn.step" },
   );
-  for await (const _ of box.hooks["turn.step"](box.$, { turnId: "t1", index: 0 }, step)) {
+  for await (const _ of box.hooks["turn.step"](
+    box.$,
+    { turnId: "t1", index: 0 },
+    step,
+  )) {
   }
 
   const elsewhere = posts.filter((one) => !one.url.endsWith("/hook"));
@@ -472,9 +496,17 @@ test("under new a prompt reaches the door with its origin and the newest row bef
   await box.hooks["*"](box.$, { text: "the owner's prompt" }, submit);
 
   const posted = bodies.find((one) => one.event === "prompt.submit");
-  assert.deepEqual(posted?.e?.origin, { kind: "composer" }, "the door reads who sent it");
+  assert.deepEqual(
+    posted?.e?.origin,
+    { kind: "composer" },
+    "the door reads who sent it",
+  );
   assert.equal(posted?.e?.before, "row-9", "and the newest row before it");
-  assert.deepEqual(handed, [{ text: "the owner's prompt" }], "the harness reads the prompt bare");
+  assert.deepEqual(
+    handed,
+    [{ text: "the owner's prompt" }],
+    "the harness reads the prompt bare",
+  );
 });
 
 // [[spec/tickets/level0-runs-on-the-door]]
@@ -489,7 +521,8 @@ test("under new a door the start road stands up says no fall to the session, and
   };
   const run = box.$.process.run;
   box.$.process.run = async (argv, init) => {
-    if (argv[1] === "-e" && !String(argv[2]).includes("appendFileSync")) standing = true;
+    if (argv[1] === "-e" && !String(argv[2]).includes("appendFileSync"))
+      standing = true;
     return run(argv, init);
   };
   const submit = Object.assign(async (e) => e, { event: "prompt.submit" });

@@ -10,7 +10,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 // The unit tests share one process, and the hook module holds the session in module state, so these cases take a module of their own. [[spec/tickets/the-tests-start-fewer-processes]]
 const { register } = await import(
-  "../../.claude/skills/level0/hooks/level0.js?reply-hook"
+  "../../.claude/skills/level0/hooks/level0.ts?reply-hook"
 );
 
 const ROOT = "/tree";

@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
+import { register as level0 } from "../../.claude/skills/level0/hooks/level0.ts";
 import { TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 

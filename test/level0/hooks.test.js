@@ -5,12 +5,12 @@
 
 import assert from "node:assert/strict";
 import { posix } from "node:path";
-import settings from "../../.claude/settings.json" with { type: "json" };
 import { test } from "node:test";
+import settings from "../../.claude/settings.json" with { type: "json" };
+import { INSTALL_SKIP, STARTING } from "../../.claude/skills/level0/hooks/level0.ts";
 import { wholeAfter } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { INSTALL_SKIP, STARTING } from "../../.claude/skills/level0/hooks/level0.js";
 import { boots } from "../../src/scripts/boot.js";
 
 const PATH = "/tree/spec/vocabulary/terms.yml";

@@ -17,7 +17,7 @@ its first session with nothing typed.
 
 # The bridgehead and the server
 
-Level zero holds the bridgehead and the server. The bridgehead, `hooks/level0.js`, is the module the
+Level zero holds the bridgehead and the server. The bridgehead, `hooks/level0.ts`, is the module the
 client loads, and the one hook a project carries: one door for every event,
 `*`, and one function behind it. It posts each event to the server at the
 port, with the root the session works in, and does what the answer says. It
@@ -358,7 +358,7 @@ bridgehead posts there once more before the server reads as down.
 
 The host's fetch cuts a post at its own timeout, and a wait runs past it. So a
 `mcp__level0__wait` post falling with no status after `CUT` or more in
-`.claude/skills/level0/hooks/level0.js` asks `/health` once.
+`.claude/skills/level0/hooks/level0.ts` asks `/health` once.
 
 | the health | the wait |
 |---|---|
@@ -388,7 +388,7 @@ asks after it later.
 
 Under `migration.cage` at `new`, the hooks door decides the events it ports,
 and the bridge answers the rest until [[spec/tickets/the-bridge-server-leaves]]
-moves them. `.claude/skills/level0/hooks/cage.js` holds the road.
+moves them. `.claude/skills/level0/hooks/cage.ts` holds the road.
 
 | the event | who answers |
 |---|---|
@@ -424,7 +424,7 @@ carries one block, `level0-cage`:
 | what the road itself says | the error under the code |
 | `./RUNME.sh`, then `./RUNME.sh serve` | what a person runs to fix it |
 
-`cageText` in `hooks/level0.js` builds the block. The hook holds that code until
+`cageText` in `hooks/level0.ts` builds the block. The hook holds that code until
 a server answers. The block asks the agent to open its first answer with one
 line saying level zero stands down. A person then tells a caged session from
 an uncaged one at a glance.

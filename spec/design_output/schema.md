@@ -14,7 +14,7 @@ reads one, how it weighs a note against one, and what it answers.
 | the sweep, beside the tree rules | `src/scripts/cli-read.js` |
 | the underscore skip | `lib/paths.js`, and every caller of it |
 | the `mint` verb | `src/scripts/mint-verb.js` |
-| the `mint_note` tool | `.claude/skills/level0/hooks/level0.js` |
+| the `mint_note` tool | `.claude/skills/level0/hooks/level0.ts` |
 
 # The reader and the checker
 

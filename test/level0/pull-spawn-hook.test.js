@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { register } from "../../.claude/skills/level0/hooks/pull-tool.js";
+import { register } from "../../.claude/skills/level0/hooks/pull-tool.ts";
 import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
 
 const SPAWN =

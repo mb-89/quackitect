@@ -65,7 +65,10 @@ test("the box file alone off a harness names the git author, and the record take
 
 // The session file outlives the session that wrote it, so a person at a terminal reads as a person. [[spec/design_output/pull#the-hand-and-the-hold]]
 test("a session file standing off a harness leaves the hand a person", () => {
-  const it = box(session({ id: "s7", harness: "claude-code" }), { agent: false, env: {} });
+  const it = box(session({ id: "s7", harness: "claude-code" }), {
+    agent: false,
+    env: {},
+  });
   assert.equal(handOf(it), "person Ada");
 });
 
@@ -96,7 +99,7 @@ test("the wrapper's lib builds the session file its hook writes at session.start
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the spawn hook's line names a helper as the session's own hand", async () => {
-  const lib = await import("../../.claude/skills/level0/hooks/level0.js");
+  const lib = await import("../../.claude/skills/level0/hooks/level0.ts");
   assert.equal(typeof lib.spawnTagOf, "function", "the hook names the spawn tag");
   const line = lib.spawnTagOf({ id: "s7", harness: "claude-code" });
   assert.equal(line.split("\n").length, 1, "one line");
@@ -137,7 +140,7 @@ test("a box carrying no session file leaves every prompt as written", async () =
 });
 
 async function spawnsWith(e, held) {
-  const { register } = await import("../../.claude/skills/level0/hooks/level0.js");
+  const { register } = await import("../../.claude/skills/level0/hooks/level0.ts");
   const hooks = {};
   register((event, fn) => {
     hooks[event] = fn;

@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { START } from "../../.claude/skills/level0/hooks/level0.js";
+import { START } from "../../.claude/skills/level0/hooks/level0.ts";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";

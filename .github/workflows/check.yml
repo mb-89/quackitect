@@ -37,4 +37,11 @@ jobs:
           path: .se/bin
           key: se-bin-${{ runner.os }}-vale3.20.0-biome2.5.12
 
+      # The plugin parts read the hooks with the engine's own tools: claude lays
+      # the types and validates the module, and tsc reads the hooks against
+      # them. The Linux job carries both, and the Windows job says it lacks them.
+      # [[spec/tickets/level0-hooks-move-to-typescript]]
+      - if: runner.os == 'Linux'
+        run: npm install -g typescript@6.0.2 @anthropic-ai/claude-code@2.1.291
+
       - run: ./RUNME.sh check

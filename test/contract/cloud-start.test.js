@@ -5,12 +5,12 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import test from "node:test";
-import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import {
   INSTALL_SKIP,
   reasonOf,
   START,
-} from "../../.claude/skills/level0/hooks/level0.js";
+} from "../../.claude/skills/level0/hooks/level0.ts";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 

@@ -135,7 +135,7 @@ test("the walk parks what Vale's glob parks, at any depth", () => {
   assert.equal(parked(".se/tickets/one.md"), true);
   assert.equal(parked("spec/_draft.md"), true);
   assert.equal(parked(".claude/types/api.d.ts"), true);
-  assert.equal(parked(".claude/skills/level0/hooks/cage.js"), false);
+  assert.equal(parked(".claude/skills/level0/hooks/cage.ts"), false);
   assert.equal(parked("spec/tickets/one.md"), false);
 });
 

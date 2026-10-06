@@ -6,7 +6,7 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
+import { register as level0 } from "../../.claude/skills/level0/hooks/level0.ts";
 import { TRACKED } from "../../.claude/skills/level0/lib/config.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
@@ -26,7 +26,8 @@ function caged() {
   const timers = [];
   const hook = { open: false };
   const idle = (call) => {
-    if (hook.open) throw new Error(`${call} rejects inside a hook the turn is waiting on`);
+    if (hook.open)
+      throw new Error(`${call} rejects inside a hook the turn is waiting on`);
   };
   const $ = {
     ui: { log: () => {} },
@@ -88,7 +89,9 @@ test("under new a door answer carrying a clear runs the clear, and the resume pr
 test("a clear the Stop answers waits for the turn's completion, runs inside it, and the timer runs nothing more", async () => {
   const box = caged();
   const stop = Object.assign(async () => ({}), { event: "classic.Stop" });
-  const ends = Object.assign(async () => ({ text: "done" }), { event: "turn.complete" });
+  const ends = Object.assign(async () => ({ text: "done" }), {
+    event: "turn.complete",
+  });
 
   box.hook.open = true;
   await box.hooks["*"](box.$, {}, stop);
@@ -97,7 +100,15 @@ test("a clear the Stop answers waits for the turn's completion, runs inside it, 
   const said = await box.hooks["turn.complete"](box.$, { reason: "answer" }, ends);
   for (const fn of box.timers) await fn();
 
-  assert.deepEqual(box.commands, [{ command: "clear" }], "the conversation clears once");
-  assert.deepEqual(box.prompts, [{ text: RESUME }], "and the resume prompt opens the next turn");
+  assert.deepEqual(
+    box.commands,
+    [{ command: "clear" }],
+    "the conversation clears once",
+  );
+  assert.deepEqual(
+    box.prompts,
+    [{ text: RESUME }],
+    "and the resume prompt opens the next turn",
+  );
   assert.deepEqual(said, { text: "done" }, "the turn's completion answers as before");
 });

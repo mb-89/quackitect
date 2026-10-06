@@ -9,7 +9,7 @@ import {
   recovers,
   refusedText,
   stepOf,
-} from "../../.claude/skills/level0/hooks/cage.js";
+} from "../../.claude/skills/level0/hooks/cage.ts";
 import { guidanceHere, onAgentSpawn } from "../../src/bridge/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import LAYERS from "../replay/cage/layer-cases.json" with { type: "json" };

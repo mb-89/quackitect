@@ -9,7 +9,7 @@ import {
   NO_NODE,
   reasonOf,
   spawnTagOf,
-} from "../../.claude/skills/level0/hooks/start.js";
+} from "../../.claude/skills/level0/hooks/start.ts";
 
 test("each code the road exits with reads as a level and a reason, and an unnamed one warns", () => {
   assert.equal(reasonOf(NO_NODE)[0], "warn");

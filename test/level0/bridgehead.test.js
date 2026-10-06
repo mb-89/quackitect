@@ -4,6 +4,7 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
+import { register as level0 } from "../../.claude/skills/level0/hooks/level0.ts";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import {
@@ -14,13 +15,12 @@ import {
   roadsOf,
   serveOf,
 } from "../../src/stub/.claude/skills/level0/hooks/bridgehead.js";
-import { register as level0 } from "../../.claude/skills/level0/hooks/level0.js";
 
 const STUB = "/stub";
 const HOME = "/home/agent";
 const CLONED = `${HOME}/.se/vehicles/acme`;
 const UPSTREAM = "https://host/acme/acme.git";
-const HOOK = ".claude/skills/level0/hooks/level0.js";
+const HOOK = ".claude/skills/level0/hooks/level0.ts";
 const LINK = JSON.stringify({
   vehicle: "abc123",
   name: "acme",

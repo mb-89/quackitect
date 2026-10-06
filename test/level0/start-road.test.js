@@ -13,7 +13,7 @@ const NO_INDEX = 9;
 let made = 0;
 async function hookHere() {
   made += 1;
-  return import(`../../.claude/skills/level0/hooks/level0.js?case=${made}`);
+  return import(`../../.claude/skills/level0/hooks/level0.ts?case=${made}`);
 }
 
 // The harness the bridgehead reaches: a wire, a file system, a process and the lines a person reads. [[spec/design_output/doors#a-fake-behaves]]

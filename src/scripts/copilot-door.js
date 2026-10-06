@@ -8,7 +8,7 @@ import {
   postOf,
   refusedText,
   stepOf,
-} from "../../.claude/skills/level0/hooks/cage.js";
+} from "../../.claude/skills/level0/hooks/cage.ts";
 import { callsOf, postedAs } from "../../.claude/skills/level0/lib/copilot.js";
 
 // Copilot calls none of the reads the plugin serves, so every tool call is guarded while the door stands down. [[spec/tickets/a-down-index-refuses-calls]]

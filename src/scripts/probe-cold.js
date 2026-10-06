@@ -3,16 +3,16 @@
 // and reads the log and the stream that run leaves for the start road whole.
 // [[spec/design_output/level0#the-cold-probe]]
 
+import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.ts";
 import { canaryIn, HEARD } from "../../.claude/skills/level0/lib/guidance.js";
+import { BIN } from "../../.claude/skills/level0/lib/index.js";
 import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
 import {
   PLUGIN_FOLDER,
   POINTER,
   PORT_BASE,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
-import { BIN } from "../../.claude/skills/level0/lib/index.js";
-import { PULL_CALL } from "../../.claude/skills/level0/lib/pull.js";
 import { homeIn } from "./editor.js";
 
 const SERVED = "mcp__level0__";
@@ -121,7 +121,10 @@ function quietOnce(rows) {
       evidence: `${fell.length} row(s) say the server answers nothing after the rules reached the session, first on ${fell[0].event ?? fell[0].kind}`,
     };
   }
-  return { pass: true, evidence: "no row says the server answers nothing past the rules" };
+  return {
+    pass: true,
+    evidence: "no row says the server answers nothing past the rules",
+  };
 }
 
 const ours = (row) => row?.kind === "bridge" && row?.event !== undefined;
@@ -324,10 +327,13 @@ function takesDelta(it, temp, tree, delta, say) {
     return false;
   }
   // The clone commits the change, as a box commits its work before it hands over, so the clear meets no work standing on this box alone. [[spec/tickets/the-check-takes-a-minute]]
-  const committed = it.proc.run(["git", ...DELTA_AUTHOR, "commit", "-q", "-m", "the working change"], {
-    cwd: tree,
-    timeoutMs: WAIT,
-  });
+  const committed = it.proc.run(
+    ["git", ...DELTA_AUTHOR, "commit", "-q", "-m", "the working change"],
+    {
+      cwd: tree,
+      timeoutMs: WAIT,
+    },
+  );
   if (committed.exitCode === 0) return true;
   say(`FAIL delta: ${tail(committed.stderr || committed.stdout)}`);
   return false;

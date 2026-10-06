@@ -6,7 +6,7 @@
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.js";
+import { INSTALL_SKIP } from "../../.claude/skills/level0/hooks/level0.ts";
 import { disk } from "../doors/disk.js";
 import { proc } from "../doors/proc.js";
 

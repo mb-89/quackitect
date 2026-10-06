@@ -5,9 +5,9 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { POINTER } from "../../.claude/skills/level0/lib/vehicle.js";
 // The plugin loads the pull module, which holds the one session start and calls the bridgehead's register. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-import { register } from "../../.claude/skills/level0/hooks/pull-tool.js";
+import { register } from "../../.claude/skills/level0/hooks/pull-tool.ts";
+import { POINTER } from "../../.claude/skills/level0/lib/vehicle.js";
 
 // The engine hands a hook one `on`, and the hook names the events it takes. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 function engine(answers = {}) {

@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { APPEND, merged, slim } from "../../.claude/skills/level0/hooks/shape.js";
+import { APPEND, merged, slim } from "../../.claude/skills/level0/hooks/shape.ts";
 
 test("a merge grows a list, puts a text below the one standing, and replaces anything else", () => {
   assert.deepEqual(

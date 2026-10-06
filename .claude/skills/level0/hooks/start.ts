@@ -2,6 +2,7 @@
 
 import { BIN } from "../lib/index.js";
 import { SERVE } from "../lib/log.js";
+import type { Fields } from "./shape.ts";
 
 // The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const STARTING = 180_000;
@@ -38,7 +39,7 @@ export const START = [
   "process.exit(brought ? 7 : 0);",
 ].join("\n");
 
-const REASONS = {
+const REASONS: Readonly<Record<number, readonly [string, string]>> = {
   0: ["info", "no index answered, so the bridgehead starts one"],
   1: ["warn", "the start of the index fails"],
   3: ["", "a person starts the index here"],
@@ -50,14 +51,14 @@ const REASONS = {
 };
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export function reasonOf(code) {
+export function reasonOf(code: unknown): readonly [string, string] {
   return (
     REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`]
   );
 }
 
 // The one block a session outside the cage reads, because the agent inside it is the one reader who cannot see the fault. [[spec/design_output/level0#a-session-says-its-cage]]
-export function cageText(code, detail) {
+export function cageText(code: unknown, detail: unknown): string {
   return [
     "LEVEL ZERO STANDS DOWN ON THIS BOX. No rule, no brief, no write door and no",
     `stop hook reaches this session. The start road answers ${code}, and that`,
@@ -72,7 +73,7 @@ export function cageText(code, detail) {
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
-export function spawnTagOf(held) {
+export function spawnTagOf(held: Readonly<Fields> | null | undefined): string {
   const id = String(held?.id ?? "").trim();
   if (!id) return "";
   return `You are the hand of session ${id} on this box, so you pull under no --as.`;

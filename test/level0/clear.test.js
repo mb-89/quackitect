@@ -3,7 +3,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { holdsClear, takesClear } from "../../.claude/skills/level0/hooks/clear.js";
+import { holdsClear, takesClear } from "../../.claude/skills/level0/hooks/clear.ts";
 
 test("a held clear is taken once, and then none waits", () => {
   takesClear();

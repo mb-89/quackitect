@@ -5,7 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { START, STANDING_WAIT } from "../../.claude/skills/level0/hooks/start.js";
+import { STANDING_WAIT, START } from "../../.claude/skills/level0/hooks/start.ts";
 import * as vehicle from "../../.claude/skills/level0/lib/vehicle.js";
 
 // [[spec/tickets/start-road-starts-the-index]]
