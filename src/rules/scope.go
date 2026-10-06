@@ -1,4 +1,4 @@
-// Which rule reads which path: the sections .vale.ini held, in its order,
+// Which rule reads which path: the scope sections, in their order,
 // each matching path turning its styles and rules on or off, the last word
 // winning. [[spec/design_output/rules#a-rule-reads-its-paths]]
 package rules

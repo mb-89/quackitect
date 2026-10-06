@@ -434,3 +434,12 @@ The first done_when line reads with a pathspec that skips the goldens, and the c
 - `git grep -il -e '\.runtime/bin/vale' -e 'vale-ls' -e 'errata-ai' -e '\.vale\.ini' -- src test RUNME.sh .github ':!*testdata*'` answers nothing.
 
 The queue and tree goldens snapshot ticket names such as `vale-ls-on-windows`, and run nothing. The door holds the ask, so the line stands here. For details, see [[spec/tickets/done-when-grep-meets-testdata]].
+
+The size list also takes these files, which the grep names and the change moves with the Vale run:
+
+- `src/branches/dispatch_write_test.go`: its case runs the real Vale over `.vale.ini`
+- `src/modules/lsp/tools_test.go`: its `ValeIni`, `Vale` and `Config` fields, and its sweep case over `.vale.ini`
+- `test/contract/fetching.js`: its `vale-ls` entry
+- `test/contract/ruled.js`: its `.vale.ini` config
+
+The RulesLoad case stands in `src/quack/rules_test.go`, and `tools_test.go` keeps no RulesLoad case. For details, see [[spec/tickets/vale-size-misses-files]].
