@@ -111,6 +111,25 @@ record:
     hand: the engine
     hash_before: 20746d6d63235e07eeee15f013a4b0736aa5120a
     hash_after: 20746d6d63235e07eeee15f013a4b0736aa5120a
+  - step: accept
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: d79c45d87bd1dfaf1155a1e66a3c7114ba8b83cb
+    hash_after: d79c45d87bd1dfaf1155a1e66a3c7114ba8b83cb
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-check-runs-beside already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 40924ce6fcecee9a
+        size: 619
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: 07c43ae7253713ec
 step: accept
 ---
 
@@ -163,8 +182,10 @@ The check's parts block each other no more: every part starts at once, so the ch
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- index-cases-wait-for-it: the check in the review's fresh worktree goes red in the cases reaching the index through RUNME.sh, lint-twins and runme-road. Lint-twins also ran red once on this box after a Go change. With every part starting at once, the tests part can meet an index still restarting on a new binary. Find the cause, make those cases wait for a live index or the check wait out the restart, and prove it on branch review.
 
 # retro
 
