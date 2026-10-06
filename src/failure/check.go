@@ -5,13 +5,18 @@ package failure
 
 import (
 	"fmt"
+	pathpkg "path"
 	"regexp"
 	"sort"
 	"strings"
 )
 
-// Each moved file, and the refusal call it held before the move. [[spec/design_output/failures#the-check-holds-the-registry]]
-var Moved = map[string]string{}
+// Each moved place, a file or a folder of files, and the refusal call it held before the move, spelled in halves so this file names none. [[spec/design_output/failures#the-check-holds-the-registry]]
+var Moved = map[string]string{
+	"src/pull":               "Say(" + "Refused",
+	"src/branches/take.go":   "d." + "warn(",
+	"src/quack/verb_mint.go": "(errs, " + "why)",
+}
 
 // A raise the scan reads: a Go call through the package, and a JavaScript call on a receiver whose name holds failure, the handle the door answers, so an engine's raise of an event stays out. [[spec/design_output/failures#the-check-holds-the-registry]] [[spec/tickets/raise-scan-keys-failure-door]]
 var raiseCalls = []*regexp.Regexp{
@@ -50,12 +55,14 @@ func RaiseFaults(registry Registry, files map[string]string) []string {
 	return out
 }
 
-// Each moved file whose text still holds the refusal call it held before the move. [[spec/design_output/failures#the-check-holds-the-registry]]
+// Each file a moved place names, itself or directly in its folder, whose text still holds the refusal call the place held before the move. [[spec/design_output/failures#the-check-holds-the-registry]]
 func DoorFaults(moved, files map[string]string) []string {
 	out := []string{}
-	for _, path := range sortedKeys(moved) {
-		if text, ok := files[path]; ok && strings.Contains(text, moved[path]) {
-			out = append(out, fmt.Sprintf("%s still writes %s past the failure door", path, moved[path]))
+	for _, place := range sortedKeys(moved) {
+		for _, path := range sortedKeys(files) {
+			if (path == place || pathpkg.Dir(path) == place) && strings.Contains(files[path], moved[place]) {
+				out = append(out, fmt.Sprintf("%s still writes %s past the failure door", path, moved[place]))
+			}
 		}
 	}
 	return out

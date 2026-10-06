@@ -35,6 +35,21 @@ func TestRaiseFaultsNameAnIdWithNoNode(t *testing.T) {
 	}
 }
 
+func TestDoorFaultsNameEachFileInAMovedFolderHoldingItsRefusal(t *testing.T) {
+	t.Parallel()
+	moved := map[string]string{"src/pull": "refuse("}
+	files := map[string]string{
+		"src/pull/held.go":      "return refuse(\"a leaf stands\")\n",
+		"src/pull/moved.go":     "return failure.Raise(registry, \"leaf-held\")\n",
+		"src/pull/deep/held.go": "return refuse(\"below the folder\")\n",
+		"src/pullout/held.go":   "return refuse(\"beside the folder\")\n",
+	}
+	want := []string{"src/pull/held.go still writes refuse( past the failure door"}
+	if got := DoorFaults(moved, files); !reflect.DeepEqual(got, want) {
+		t.Fatalf("DoorFaults names %q, want %q", got, want)
+	}
+}
+
 func TestDoorFaultsNameAMovedFileHoldingItsRefusal(t *testing.T) {
 	t.Parallel()
 	moved := map[string]string{"src/pull/held.go": "refuse(", "src/pull/moved.go": "refuse("}

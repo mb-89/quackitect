@@ -1,5 +1,5 @@
-// The tree holds the registry: every node names a remedy, every raised id
-// stands as a node, and every moved file raises through the door.
+// The tree holds the registry: every node names a remedy, and every raised
+// id stands as a node. src/quack/refusals_test.go holds the moved files.
 // [[spec/design_output/failures#the-check-holds-the-registry]]
 package failure
 
@@ -51,13 +51,6 @@ func TestEveryNodeNamesARemedy(t *testing.T) {
 func TestEveryRaisedIdStandsAsANode(t *testing.T) {
 	t.Parallel()
 	for _, fault := range RaiseFaults(Load(Dir{Root: treeRoot}), sources(t)) {
-		t.Error(fault)
-	}
-}
-
-func TestTheMovedFilesWriteNoRefusalPastTheDoor(t *testing.T) {
-	t.Parallel()
-	for _, fault := range DoorFaults(Moved, sources(t)) {
 		t.Error(fault)
 	}
 }

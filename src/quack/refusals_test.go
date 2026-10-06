@@ -8,27 +8,28 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-)
 
-// The refusal calls each moved place wrote before the move, spelled in halves so this file names none. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
-var refusalsPast = map[string]string{
-	"src/pull":               "Say(" + "Refused",
-	"src/branches/take.go":   "d." + "warn(",
-	"src/quack/verb_mint.go": "(errs, " + "why)",
-}
+	"quackitect/src/failure"
+)
 
 func TestMovedRefusalsPassTheFailureDoor(t *testing.T) {
 	t.Parallel()
-	for place, form := range refusalsPast {
+	files := map[string]string{}
+	for place := range failure.Moved {
 		for _, path := range goFilesAt(t, filepath.Join(treeRoot, filepath.FromSlash(place))) {
 			text, err := os.ReadFile(path)
 			if err != nil {
 				t.Fatal(err)
 			}
-			if strings.Contains(string(text), form) {
-				t.Errorf("%s writes a refusal past the failure door: %s", path, form)
+			rel, err := filepath.Rel(treeRoot, path)
+			if err != nil {
+				t.Fatal(err)
 			}
+			files[filepath.ToSlash(rel)] = string(text)
 		}
+	}
+	for _, fault := range failure.DoorFaults(failure.Moved, files) {
+		t.Error(fault)
 	}
 }
 
