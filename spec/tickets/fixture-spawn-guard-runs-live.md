@@ -1,0 +1,80 @@
+---
+kind: [[ticket]]
+state: closed
+steps:
+  - name: do
+    does: makes the change, with the test that covers it
+    from: branch-verbs-meet-fake-git/gate
+    by: anyone
+    to: retro
+    input: ask
+    tags: ["code", "testing"]
+    needs: ["branch test"]
+    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    evidence:
+      - name: tests
+        form: command
+        expects: green
+        says: the tests that cover the change, or the check where it touches no code
+      - name: check
+        form: command
+        expects: 0
+        says: the check is green on the commit
+      - name: says
+        form: text
+        says: what changes and why, for a reader who was not there
+point: gate
+todo: false
+step: do
+process: [[spec/processes/trivial]]
+process_hash: 2b5ab398855a1aba
+group: unfaked-doors-take-fakes
+parent: branch-verbs-meet-fake-git
+record:
+  - step: do
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 8fb9395524833cc90d1db2a47f9067a95fa49247
+    hash_after: 8fb9395524833cc90d1db2a47f9067a95fa49247
+reason: became
+successors: [branch-verbs-meet-fake-git]
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+<!-- breaks, as text: what breaks if it is never done -->
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+
+TestTheBranchVerbCasesSpawnNothingAndTheDoorsChapterListsThemNowhere reads test files for exec.Command and time.Sleep alone, so a tree fixture filling Doors with git.NewRepo or proc.Real passes it and still spawns git through repo.go; done_when one wants the runtime case the draft named, TestATakeAndADispatchRunOnTheFakesAndSpawnNoGit, a take and a dispatch over a FakeRunner taught no git, which tests-red left out
+
+# do
+
+<!-- makes the change, with the test that covers it -->
+
+## tests
+
+<!-- the tests that cover the change, or the check where it touches no code -->
+
+<!-- the form is command -->
+
+## check
+
+<!-- the check is green on the commit -->
+
+<!-- the form is command -->
+
+## says
+
+<!-- what changes and why, for a reader who was not there -->
+
+<!-- the form is text -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

@@ -13,7 +13,7 @@ import (
 func dfDoneTree(t *testing.T) *tree {
 	t.Helper()
 	one := dpTree(t, nil)
-	one.dpBranchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-time.Hour))
+	one.branchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-time.Hour))
 	for key, value := range dfEnv() {
 		one.d.Env[key] = value
 	}

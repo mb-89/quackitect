@@ -4,9 +4,7 @@
 package branches
 
 import (
-	"fmt"
 	"slices"
-	"strconv"
 	"strings"
 )
 
@@ -52,27 +50,22 @@ func (d *Doors) writeBeat(group, hand string, ended bool) bool {
 	if ended {
 		word = endsWord
 	}
-	empty := d.run(d.Root, nil, "", "git", "hash-object", "-w", "-t", "tree", "--stdin")
-	if !empty.OK {
-		return d.beatFails(group, empty)
+	commit, err := d.Repo.EmptyCommit(hand + " " + word)
+	if err != nil {
+		return d.beatFails(group, err.Error())
 	}
-	dated := []string{fmt.Sprintf("GIT_COMMITTER_DATE=@%d +0000", d.nowSeconds()), fmt.Sprintf("GIT_AUTHOR_DATE=@%d +0000", d.nowSeconds())}
-	commit := d.run(d.Root, dated, "", "git", "commit-tree", empty.Out, "-m", hand+" "+word)
-	if !commit.OK {
-		return d.beatFails(group, commit)
+	if pushed := d.Repo.ForcePushTo(commit, beatsOn+group); !pushed.OK {
+		return d.beatFails(group, pushed.Err)
 	}
-	if pushed := d.quiet("push", "-q", "-f", "origin", commit.Out+":"+beatPush+group); !pushed.OK {
-		return d.beatFails(group, pushed)
-	}
-	d.quiet("update-ref", beatRefs+group, commit.Out)
+	_ = d.Repo.UpdateRef(beatRefs+group, commit)
 	d.beats = nil
 	return true
 }
 
 // The log row a beat that writes nothing leaves. [[spec/design_output/work#a-hold-beats-with-its-session]]
-func (d *Doors) beatFails(group string, said Said) bool {
+func (d *Doors) beatFails(group, why string) bool {
 	if d.Log != nil {
-		d.Log("warn", "work", "the beat on "+group+" writes nothing", map[string]any{"err": said.Err})
+		d.Log("warn", "work", "the beat on "+group+" writes nothing", map[string]any{"err": why})
 	}
 	return false
 }
@@ -91,19 +84,17 @@ func (d *Doors) beatsSeen() map[string]beat {
 		return d.beats
 	}
 	d.beats = map[string]beat{}
-	said := d.quiet("for-each-ref", "--format=%(refname)%09%(committerdate:unix)%09%(subject)", beatRefs)
-	for _, line := range strings.Split(said.Out, "\n") {
-		parts := strings.SplitN(line, "\t", 3)
-		if len(parts) < 3 {
+	refs, _ := d.Repo.Refs(beatRefs)
+	for _, one := range refs {
+		when, ok := d.Repo.When(one.Hash)
+		commits, err := d.Repo.Log("", one.Hash, false)
+		if !ok || err != nil || len(commits) == 0 {
 			continue
 		}
-		when, err := strconv.ParseInt(parts[1], 10, 64)
-		if err != nil {
-			continue
-		}
-		ended := strings.HasSuffix(parts[2], " "+endsWord)
-		hand := strings.TrimSuffix(strings.TrimSuffix(parts[2], " "+endsWord), " "+beatsWord)
-		d.beats[strings.TrimPrefix(parts[0], beatRefs)] = beat{When: when, Hand: hand, Ended: ended}
+		subject := commits[0].Subject
+		ended := strings.HasSuffix(subject, " "+endsWord)
+		hand := strings.TrimSuffix(strings.TrimSuffix(subject, " "+endsWord), " "+beatsWord)
+		d.beats[strings.TrimPrefix(one.Name, beatRefs)] = beat{When: when, Hand: hand, Ended: ended}
 	}
 	return d.beats
 }

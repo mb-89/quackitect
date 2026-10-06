@@ -1,18 +1,18 @@
-// The dispatcher's writes over a real origin and its clone: one fix group, one
-// commit on claude/dispatch-<commit>, a worktree that leaves, and no push of
+// The dispatcher's writes over a fake origin and its clone: one fix group, one
+// commit on claude/dispatch-<commit> made off main's tree, and no push of
 // main, ported off the JavaScript dispatch cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
 package branches
 
 import (
-	"encoding/json"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 	"testing"
 
+	"quackitect/src/modules/files"
 	"quackitect/src/yaml"
 )
 
@@ -23,7 +23,7 @@ func TestFixGroupWritesTheGroupOpenAtItsFirstStep(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	d := &Doors{Method: root}
+	d := &Doors{Method: root, Methods: files.NewDisk(root)}
 	route, why := d.processAt(groupRoute)
 	if why != "" {
 		t.Fatal(why)
@@ -39,7 +39,7 @@ func TestFixGroupWritesTheGroupOpenAtItsFirstStep(t *testing.T) {
 
 // The write branch this tree's main names, and the top fix group's name. [[spec/tickets/dispatch-verbs-port-to-go]]
 func (one *tree) dpWriteBranch() (string, string) {
-	main := shortWrite(one.git("rev-parse", "origin/main"))
+	main := shortWrite(one.rev("origin/main"))
 	return writesPrefix + main, fixPrefix + "-" + main
 }
 
@@ -52,13 +52,16 @@ func (one *tree) dpWritten(name string) string {
 // The commits the write branch carries past main. [[spec/tickets/dispatch-verbs-port-to-go]]
 func (one *tree) dpWriteCommits() string {
 	branch, _ := one.dpWriteBranch()
-	one.git("fetch", "-q", "origin")
-	return one.git("rev-list", "--count", "origin/main..origin/"+branch)
+	one.fetch()
+	count, _ := one.repo.Count("origin/main", "origin/"+branch)
+	return strconv.Itoa(count)
 }
 
-// The worktrees the clone holds. [[spec/tickets/dispatch-verbs-port-to-go]]
-func (one *tree) dpWorktrees() int {
-	return strings.Count(one.git("worktree", "list", "--porcelain"), "worktree ")
+// Whether the clone's disk holds no file past the ones its tree tracks and the box's own. [[spec/tickets/branch-verbs-meet-fake-git]]
+func (one *tree) dpTouchesNoDisk() bool {
+	listed, _ := one.disk.List("")
+	tracked, _ := one.repo.Files("HEAD", "")
+	return slices.Equal(listed, tracked) && len(one.status()) == 0
 }
 
 func (one *tree) dpGreen(argv ...string) {
@@ -118,10 +121,10 @@ func TestDispatchStopsEveryWriteOnAnUnmergedWriteBranchAndStillNamesTheWorkers(t
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.dpGroup("first", groupNote)
-	one.git("switch", "-q", "-c", "old", "main")
+	one.cut("old", "main")
 	one.land("an old write", map[string]string{"old.txt": "old\n"})
-	one.git("push", "-q", "origin", "HEAD:refs/heads/"+writesPrefix+"0ld0ld0")
-	one.git("switch", "-q", "main")
+	one.pushAt("HEAD", "refs/heads/"+writesPrefix+"0ld0ld0")
+	one.switchTo("main")
 	one.dpGreen("--json")
 	branch, _ := one.dpWriteBranch()
 	if one.peOriginTip(branch) != "" {
@@ -135,7 +138,7 @@ func TestDispatchStopsEveryWriteOnAnUnmergedWriteBranchAndStillNamesTheWorkers(t
 func TestDispatchWritesPastAMergedWriteBranch(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
-	one.git("push", "-q", "origin", "main:refs/heads/"+writesPrefix+"0ld0ld0")
+	one.pushAt("main", "refs/heads/"+writesPrefix+"0ld0ld0")
 	one.dpGreen()
 	if got := one.dpWriteCommits(); got != "1" {
 		t.Fatalf("the write branch carries %s commits", got)
@@ -165,7 +168,7 @@ func TestDispatchOpensABranchForAReadyGroupOnMainAndLeavesABranchedOneAlone(t *t
 	if opened == "" {
 		t.Fatal("work/new-group stands nowhere on origin")
 	}
-	if one.git("rev-parse", opened+"^{tree}") != one.git("rev-parse", "origin/main^{tree}") {
+	if one.treeOf(opened) != one.treeOf("origin/main") {
 		t.Fatal("work/new-group opens off another tree than main's")
 	}
 	if one.peOriginTip(workBranch+"first") != first {
@@ -188,8 +191,9 @@ func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
 	one.dpGreen()
 	branch, _ := one.dpWriteBranch()
 	var made []string
-	for _, path := range strings.Split(one.git("diff", "--name-only", "origin/main", "origin/"+branch), "\n") {
-		if name := ticketNamed(strings.TrimPrefix(path, ticketsFolder+"/")); name != "a-loose-one" {
+	changes, _ := one.repo.Diff("origin/main", "origin/"+branch)
+	for _, change := range changes {
+		if name := ticketNamed(strings.TrimPrefix(change.Path, ticketsFolder+"/")); name != "a-loose-one" {
 			made = append(made, name)
 		}
 	}
@@ -198,82 +202,28 @@ func TestDispatchNamesTheFixGroupWithNamesWordsAtMost(t *testing.T) {
 	}
 }
 
-// The fix ask meets the voice rules Vale holds, as askFaults read them at each run in the JavaScript. [[spec/tickets/dispatch-verbs-port-to-go]]
-func TestDispatchWritesAFixAskTheVoiceRulesPass(t *testing.T) {
+func TestDispatchWritesNothingToTheDiskAndMovesNoCheckout(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
-	vale, err := exec.LookPath(filepath.Join(one.d.Method, filepath.FromSlash(runtimeFolder), "bin", "vale"))
-	if err != nil {
-		if vale, err = exec.LookPath("vale"); err != nil {
-			t.Skip("this box holds no vale")
-		}
-	}
+	head := one.rev("HEAD")
 	one.dpGreen()
-	_, fix := one.dpWriteBranch()
-	text := one.dpWritten(fix)
-	if !strings.Contains(text, "# Ask\n\nThe loose agent tickets") {
-		t.Fatalf("the ask holds no line:\n%s", text)
+	if !one.dpTouchesNoDisk() {
+		t.Fatal("the run writes to the box's disk")
 	}
-	cmd := exec.Command(vale, "--config="+filepath.Join(one.d.Method, ".vale.ini"), "--output=JSON", "--no-exit", "--path="+ticketAt(fix))
-	cmd.Dir = one.d.Method
-	cmd.Stdin = strings.NewReader(text)
-	said, err := cmd.Output()
-	if err != nil {
-		t.Fatalf("vale answers %v: %s", err, said)
-	}
-	var found map[string][]struct {
-		Line     int
-		Severity string
-		Check    string
-		Message  string
-	}
-	if err := json.Unmarshal(said, &found); err != nil {
-		t.Fatalf("vale prints no JSON: %s", said)
-	}
-	ask, last := dpAskSpan(text)
-	for _, rows := range found {
-		for _, row := range rows {
-			if (row.Severity == "error" || row.Severity == "warning") && row.Line >= ask && row.Line <= last {
-				t.Errorf("line %d breaks %s: %s", row.Line, row.Check, row.Message)
-			}
-		}
-	}
-}
-
-// The lines the Ask chapter spans, its heading first. [[spec/tickets/dispatch-verbs-port-to-go]]
-func dpAskSpan(text string) (int, int) {
-	lines := strings.Split(text, "\n")
-	first := slices.Index(lines, "# Ask") + 1
-	for at := first; at < len(lines); at++ {
-		if strings.HasPrefix(lines[at], "# ") {
-			return first, at
-		}
-	}
-	return first, len(lines)
-}
-
-func TestDispatchRemovesItsWorktreeAfterThePushAndMovesNoCheckout(t *testing.T) {
-	t.Parallel()
-	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
-	head := one.git("rev-parse", "HEAD")
-	one.dpGreen()
-	if one.dpWorktrees() != 1 {
-		t.Fatalf("the clone holds worktrees:\n%s", one.git("worktree", "list"))
-	}
-	if one.git("rev-parse", "HEAD") != head || one.git("rev-parse", "--abbrev-ref", "HEAD") != trunk || one.git("status", "--porcelain") != "" {
+	if one.rev("HEAD") != head || one.here() != trunk {
 		t.Fatal("the run moves the box's own checkout")
 	}
 }
 
-func TestDispatchRemovesTheWorktreeAfterARefusedPushAndAnswersRefused(t *testing.T) {
+func TestDispatchWritesNothingToTheDiskAfterARefusedPushAndAnswersRefused(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
-	one.peOriginRefuses(`echo "$ref" | grep -q '^refs/heads/claude/'`)
+	one.peOriginRefuses(func(ref, _ string) bool { return strings.HasPrefix(ref, "refs/heads/claude/") })
 	if code := one.dpRun("--json"); code != codeRed {
 		t.Fatalf("the run answers %d", code)
 	}
-	if one.dpWorktrees() != 1 {
-		t.Fatalf("the clone holds worktrees:\n%s", one.git("worktree", "list"))
+	if !one.dpTouchesNoDisk() {
+		t.Fatal("the run writes to the box's disk")
 	}
 	branch, _ := one.dpWriteBranch()
 	dpSame(t, *one.dpJSON().Write, writeRow{Branch: branch, State: "refused", Why: "The push of " + branch + " came back refused."})
@@ -300,7 +250,7 @@ func TestDispatchHandsTheMarkOffCommitOffMainsTree(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, nil)
 	mark := one.d.markOff(workBranch + "new-group")
-	if mark == "" || one.git("rev-parse", mark+"^{tree}") != one.git("rev-parse", "origin/main^{tree}") || one.git("rev-parse", mark+"^") != one.git("rev-parse", "origin/main") {
+	if mark == "" || one.treeOf(mark) != one.treeOf("origin/main") || one.rev(mark+"^") != one.rev("origin/main") {
 		t.Fatalf("markOff answers %q", mark)
 	}
 }

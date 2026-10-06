@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"slices"
 	"sort"
-	"strconv"
 	"strings"
 )
 
@@ -221,8 +220,7 @@ func personOf(loose []ticketFile) []personRow {
 
 // A branch on origin carrying a commit main lacks. The hub refuses a pull request over a branch level with main. [[spec/tickets/dispatch-skips-merged-done-branches]]
 func (d *Doors) aheadOfTrunk(branch string) bool {
-	count, _ := strconv.Atoi(d.quiet("rev-list", "--count", "origin/"+trunk+"..origin/"+branch).Out)
-	return count > 0
+	return d.ahead("origin/"+trunk, "origin/"+branch) > 0
 }
 
 // Runs the dispatch: the plan, the writes past a dry run, the fire where asked, then the plan printed or as JSON. The send it takes becomes the doors' one send door. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]] [[spec/tickets/one-send-door]]

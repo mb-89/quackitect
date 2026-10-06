@@ -249,7 +249,8 @@ type hub struct {
 func (d *Doors) hubOf(token, name string) (hub, string) {
 	repo := d.env("GITHUB_REPOSITORY")
 	if repo == "" {
-		repo = originRepo(d.quiet("remote", "get-url", "origin").Out)
+		url, _ := d.Repo.Config("remote.origin.url")
+		repo = originRepo(url)
 	}
 	var missing []string
 	if token == "" {

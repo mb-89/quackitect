@@ -14,6 +14,9 @@ import (
 	"quackitect/src/branches"
 	"quackitect/src/config"
 	"quackitect/src/index"
+	"quackitect/src/modules/files"
+	"quackitect/src/modules/git"
+	"quackitect/src/proc"
 )
 
 func init() { register("branch", branchVerb(index.Root, index.V1)) }
@@ -36,11 +39,15 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 		work = at
 	}
 	return &branches.Doors{
-		Root:   work,
-		Method: method,
-		Now:    time.Now,
-		Out:    out,
-		Errs:   errs,
+		Root:    work,
+		Method:  method,
+		Repo:    git.NewRepo(work, proc.Real),
+		Run:     proc.Real,
+		Disk:    files.NewDisk(work),
+		Methods: files.NewDisk(method),
+		Now:     time.Now,
+		Out:     out,
+		Errs:    errs,
 		Log: func(level, kind, said string, more map[string]any) {
 			row := map[string]any{"level": level, "kind": kind, "said": said}
 			for key, value := range more {
@@ -81,8 +88,11 @@ func branchDoors(root func() (string, error), v1 func() (string, error), out, er
 }
 
 // The road a verb runs another verb by: this binary's verb road over the scripts folder, as RUNME.sh hands it past the install, or RUNME.sh where the binary names no path. [[spec/tickets/the-verbs-need-no-wrapper]]
-func selfRoad(method string) []string {
-	if self, err := os.Executable(); err == nil {
+func selfRoad(method string) []string { return selfRoadOver(os.Executable, method) }
+
+// The verb road off the binary the self answers, or RUNME.sh where it names none. [[spec/tickets/quack-spawns-all-take-the-runner]]
+func selfRoadOver(binary func() (string, error), method string) []string {
+	if self, err := binary(); err == nil {
 		return []string{self, "verb", filepath.Join(method, "src", "scripts")}
 	}
 	return []string{"sh", filepath.Join(method, "RUNME.sh")}

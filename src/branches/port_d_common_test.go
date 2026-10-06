@@ -54,48 +54,48 @@ func pdUnderKind(text, row string) string {
 // Moves the box onto a local work branch at origin's tip. [[spec/tickets/work-verbs-port-to-go]]
 func pdOn(one *tree, name string) {
 	one.t.Helper()
-	one.git("switch", "-q", "-c", workBranch+name, "origin/"+workBranch+name)
+	one.cut(workBranch+name, "origin/"+workBranch+name)
 }
 
 // A file name no other commit of the case writes. [[spec/tickets/work-verbs-port-to-go]]
 func pdFresh(one *tree, at int) string {
-	return fmt.Sprintf("moved/%s-%d.txt", one.git("rev-parse", "--short", "HEAD"), at)
+	return fmt.Sprintf("moved/%s-%d.txt", one.rev("HEAD")[:7], at)
 }
 
 // Lands commits on main, pushes them, and comes back to the branch the box stood on. [[spec/tickets/work-verbs-port-to-go]]
 func pdMainMoves(one *tree, count int) {
 	one.t.Helper()
-	was := one.git("rev-parse", "--abbrev-ref", "HEAD")
+	was := one.here()
 	if was != trunk {
-		one.git("switch", "-q", trunk)
+		one.switchTo(trunk)
 	}
 	for at := 0; at < count; at++ {
 		one.land("main moves", map[string]string{pdFresh(one, at): "x\n"})
 	}
-	one.git("push", "-q", "origin", trunk)
+	one.push(trunk)
 	if was != trunk {
-		one.git("switch", "-q", was)
+		one.switchTo(was)
 	}
-	one.git("fetch", "-q", "origin")
+	one.fetch()
 }
 
 // Pushes commits on the branch the box stands on, then drops them here, so origin stands ahead. [[spec/tickets/work-verbs-port-to-go]]
 func pdRemoteAhead(one *tree, files ...map[string]string) {
 	one.t.Helper()
-	branch := one.git("rev-parse", "--abbrev-ref", "HEAD")
+	branch := one.here()
 	for at, each := range files {
 		if each == nil {
 			each = map[string]string{pdFresh(one, at): "x\n"}
 		}
 		one.land("another hand lands", each)
 	}
-	one.git("push", "-q", "origin", branch)
-	one.git("reset", "-q", "--hard", fmt.Sprintf("HEAD~%d", len(files)))
+	one.push(branch)
+	one.must(one.repo.ResetTo(fmt.Sprintf("HEAD~%d", len(files)), true))
 }
 
 // Whether the first commit stands inside the second. [[spec/tickets/work-verbs-port-to-go]]
 func pdInside(one *tree, commit, in string) bool {
-	return one.d.quiet("merge-base", "--is-ancestor", commit, in).OK
+	return one.repo.IsAncestor(commit, in)
 }
 
 // Fails where the text matches no pattern. [[spec/tickets/work-verbs-port-to-go]]

@@ -1,16 +1,15 @@
 // The fixtures the port_b cases share, ported from test/level0/work-doors.js:
-// the group note, its child, the box identity and the reads over a real tree.
+// the group note, its child, the box identity and the reads over a fake tree.
 // [[spec/tickets/work-verbs-port-to-go]]
 package branches
 
 import (
-	"os"
-	"path/filepath"
-	"strconv"
+	"errors"
 	"strings"
 	"time"
 
 	"quackitect/src/front"
+	"quackitect/src/modules/git"
 )
 
 // The group ticket every work case reads, as GROUP_NOTE writes it. [[spec/tickets/work-verbs-port-to-go]]
@@ -92,23 +91,17 @@ func pbSaid(one *tree) string { return one.out.String() + one.errs.String() }
 
 // Moves the clone onto a local copy of a pushed work branch. [[spec/tickets/work-verbs-port-to-go]]
 func pbOnBranch(one *tree, name string) {
-	one.git("switch", "-q", "-c", workBranch+name, "origin/"+workBranch+name)
+	one.cut(workBranch+name, "origin/"+workBranch+name)
 }
 
 // Sets the clock a span past a ref's commit time. [[spec/tickets/work-verbs-port-to-go]]
 func pbClockAt(one *tree, ref string, past time.Duration) {
-	seconds, _ := strconv.ParseInt(one.git("log", "-1", "--format=%ct", ref), 10, 64)
+	seconds, _ := one.repo.When(ref)
 	at := time.Unix(seconds, 0).Add(past)
 	one.d.Now = func() time.Time { return at }
 }
 
-// Writes an executable hook script at a path. [[spec/tickets/work-verbs-port-to-go]]
-func pbHook(one *tree, at, script string) {
-	one.t.Helper()
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		one.t.Fatal(err)
-	}
-	if err := os.WriteFile(at, []byte("#!/bin/sh\n"+script+"\n"), 0o755); err != nil {
-		one.t.Fatal(err)
-	}
+// Sets a hook on a repository that refuses every move with the line named. [[spec/tickets/work-verbs-port-to-go]]
+func pbHook(on *git.FakeRepo, name, refuse string) {
+	on.Hook(name, func(string, string) error { return errors.New(refuse) })
 }

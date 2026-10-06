@@ -1,4 +1,4 @@
-// The dispatcher's plan over a real origin and its clone: what stands ready,
+// The dispatcher's plan over a fake origin and its clone: what stands ready,
 // held, waiting, stuck, loose and left for a person, ported off the
 // JavaScript dispatch cases.
 // [[spec/tickets/dispatch-verbs-port-to-go]]
@@ -7,15 +7,14 @@ package branches
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"os"
-	"os/exec"
 	"path/filepath"
 	"reflect"
 	"slices"
 	"strings"
 	"testing"
 	"time"
+
+	"quackitect/src/modules/files"
 )
 
 // The span a hold goes stale past in these cases, past the default. [[spec/tickets/dispatch-verbs-port-to-go]]
@@ -24,41 +23,23 @@ const dpPastStale = 13 * time.Hour
 // A tree whose method root is this repository, so the mint reads the tree's own schema and group route. [[spec/tickets/dispatch-verbs-port-to-go]]
 func dpTree(t *testing.T, trunkFiles map[string]string) *tree {
 	t.Helper()
-	files := map[string]string{}
+	seeded := map[string]string{}
 	for name, text := range trunkFiles {
-		files[ticketAt(name)] = text
+		seeded[ticketAt(name)] = text
 	}
-	one := newTree(t, files)
+	one := newTree(t, seeded)
 	method, err := filepath.Abs(filepath.Join("..", ".."))
 	if err != nil {
 		t.Fatal(err)
 	}
 	one.d.Method = method
+	one.d.Methods = files.NewDisk(method)
 	return one
 }
 
 // A send door with no network behind it. [[spec/tickets/dispatch-verbs-port-to-go]]
 func dpNoSend(string, Request) (Reply, error) {
 	return Reply{}, errors.New("a case reaches no network")
-}
-
-// A group branch whose one commit stands at a time of its own, so a case reads the hold's age. [[spec/tickets/dispatch-verbs-port-to-go]]
-func (one *tree) dpBranchAt(name string, files map[string]string, at time.Time) {
-	one.t.Helper()
-	one.git("switch", "-q", "-c", workBranch+name, "main")
-	one.write(files)
-	one.git("add", "-A")
-	date := fmt.Sprintf("@%d +0000", at.Unix())
-	cmd := exec.Command("git", "commit", "-q", "--allow-empty", "-m", name+" lands")
-	cmd.Dir = one.root
-	cmd.Env = append(os.Environ(), "GIT_CONFIG_NOSYSTEM=1", "GIT_AUTHOR_DATE="+date, "GIT_COMMITTER_DATE="+date)
-	if said, err := cmd.CombinedOutput(); err != nil {
-		one.t.Fatalf("the dated commit answers %v: %s", err, said)
-	}
-	one.git("push", "-q", "origin", workBranch+name)
-	one.git("switch", "-q", "main")
-	one.git("branch", "-q", "-D", workBranch+name)
-	one.git("fetch", "-q", "origin")
 }
 
 // A group branch carrying its group ticket alone. [[spec/tickets/dispatch-verbs-port-to-go]]
@@ -153,8 +134,8 @@ func TestDispatchReadsAGroupWaitingOnAnOpenGroupAsWaitingAndNotReady(t *testing.
 func TestDispatchReadsAStaleHoldReadyAndAFreshHoldHeld(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, nil)
-	one.dpBranchAt("left", map[string]string{ticketAt("left"): dpHeld()}, testNow.Add(-dpPastStale))
-	one.dpBranchAt("worked", map[string]string{ticketAt("worked"): dpHeld()}, testNow.Add(-time.Hour))
+	one.branchAt("left", map[string]string{ticketAt("left"): dpHeld()}, testNow.Add(-dpPastStale))
+	one.branchAt("worked", map[string]string{ticketAt("worked"): dpHeld()}, testNow.Add(-time.Hour))
 	plan := one.dpPlan()
 	dpSame(t, dpReady(plan), []string{"left"})
 	if len(plan.Held) != 1 || plan.Held[0].Group != "worked" || plan.Held[0].Age == "" {
@@ -189,14 +170,14 @@ func TestDispatchReadsADoneGroupBehindMainAsAStuckHandOver(t *testing.T) {
 func TestDispatchReadsADoneGroupPastTheStaleSpanAsAStuckHandOver(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, nil)
-	one.dpBranchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-dpPastStale))
+	one.branchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-dpPastStale))
 	dpSame(t, one.dpPlan().Stuck, []stuckRow{{Group: "landing", Why: "stale"}})
 }
 
 func TestDispatchLeavesADoneGroupLevelAndFreshOutOfTheStuckPart(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, nil)
-	one.dpBranchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-time.Hour))
+	one.branchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-time.Hour))
 	dpSame(t, one.dpPlan().Stuck, []stuckRow{})
 }
 
@@ -204,20 +185,17 @@ func TestDispatchDryRunWritesNoFileMakesNoCommitAndPushesNothing(t *testing.T) {
 	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.dpGroup("first", groupNote)
-	head := one.git("rev-parse", "HEAD")
+	head := one.rev("HEAD")
 	if code := one.dpRun("--dry"); code != codeOK {
 		t.Fatalf("the dry run answers %d: %s", code, one.errs.String())
 	}
 	holds(t, one.out.String(), "work/first")
 	holds(t, one.out.String(), "the top: a-loose-one")
-	if one.git("rev-parse", "HEAD") != head || one.git("status", "--porcelain") != "" {
+	if one.rev("HEAD") != head || len(one.status()) != 0 {
 		t.Fatal("the dry run moves the checkout")
 	}
-	if said := one.git("ls-remote", "origin", "refs/heads/"+writesPrefix+"*"); said != "" {
-		t.Fatalf("the dry run pushes %s", said)
-	}
-	if _, err := os.Stat(one.d.at(writeTree)); err == nil {
-		t.Fatal("the dry run opens a worktree")
+	if said, _ := one.origin.Refs("refs/heads/" + writesPrefix); len(said) != 0 {
+		t.Fatalf("the dry run pushes %v", said)
 	}
 }
 

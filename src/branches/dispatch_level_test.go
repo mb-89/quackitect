@@ -8,9 +8,9 @@ import "testing"
 func TestDispatchPostsNoPullRequestOverADoneBranchLevelWithMain(t *testing.T) {
 	t.Parallel()
 	one := dfDoneTree(t)
-	one.git("merge", "-q", "--ff-only", "origin/"+workBranch+"landing")
-	one.git("push", "-q", "origin", trunk)
-	one.git("fetch", "-q", "origin")
+	one.must(one.repo.FastForward("origin/" + workBranch + "landing"))
+	one.push(trunk)
+	one.fetch()
 	if plan := one.dpPlan(); len(plan.Done) != 0 {
 		t.Fatalf("the plan keeps %v at done", plan.Done)
 	}

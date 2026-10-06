@@ -86,6 +86,6 @@ func TestPAGroupRowNamesBehindMain(t *testing.T) {
 	behind := newTree(t, nil)
 	behind.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	behind.land("trunk moves", map[string]string{"t.md": "t\n"})
-	behind.git("push", "-q", "origin", "main")
+	behind.push("main")
 	paMatch(t, paListed(t, behind), `work/one-group\s+todo\s+behind main`)
 }

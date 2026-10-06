@@ -6,12 +6,10 @@
 package main
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -20,6 +18,7 @@ import (
 	"time"
 
 	"quackitect/src/modules/hooks/command"
+	"quackitect/src/proc"
 	"quackitect/src/yaml"
 )
 
@@ -110,12 +109,8 @@ func retroCollectFirst(said ...string) string {
 // Git run in the root, its output and its error trimmed, as src/doors/git.js runs it. [[spec/tickets/the-retro-reads-cloud-retros]]
 func retroCollectGitIn(root string) func(args ...string) retroRan {
 	return func(args ...string) retroRan {
-		var out, errs bytes.Buffer
-		run := exec.Command("git", args...)
-		run.Dir = root
-		run.Stdout, run.Stderr = &out, &errs
-		err := run.Run()
-		return retroRan{ok: err == nil, out: strings.TrimSpace(out.String()), err: strings.TrimSpace(errs.String())}
+		said := proc.Real(proc.Command{Argv: append([]string{"git"}, args...), Dir: root})
+		return retroRan{ok: said.Code == 0, out: strings.TrimSpace(said.Out), err: strings.TrimSpace(said.Err)}
 	}
 }
 

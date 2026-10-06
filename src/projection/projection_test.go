@@ -11,6 +11,14 @@ import (
 	"testing"
 )
 
+// The paths of a map come back in sorted order, the same each call. [[spec/tickets/config-verbs-port-to-go]]
+func TestPathsAnswerTheKeysSorted(t *testing.T) {
+	t.Parallel()
+	if got := Paths(map[string]string{"b": "", "a": "", "c": ""}); !slices.Equal(got, []string{"a", "b", "c"}) {
+		t.Fatalf("Paths answers %v", got)
+	}
+}
+
 // The entries one or more entry texts name. [[spec/tickets/config-verbs-port-to-go]]
 func entries(t *testing.T, text string) []Entry {
 	t.Helper()

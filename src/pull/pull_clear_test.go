@@ -21,10 +21,13 @@ const (
 func twoChildren(t *testing.T) *It {
 	t.Helper()
 	it, _, _ := cloudPull(t)
-	_ = it.Disk.Write("spec/tickets/beta.md", childTicket)
-	gitIn(t, it.Root, "add", "-A")
-	gitIn(t, it.Root, "commit", "-q", "-m", "beta")
-	gitIn(t, it.Root, "push", "-q", "origin", "HEAD:work/g")
+	must(t, it.Disk.Write("spec/tickets/beta.md", childTicket))
+	must(t, it.Git.AddAll())
+	_, err := it.Git.Commit("beta", nil)
+	must(t, err)
+	if pushed := it.Git.Push("work/g", false); !pushed.OK {
+		t.Fatal(pushed.Err)
+	}
 	return it
 }
 

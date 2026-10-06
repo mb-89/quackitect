@@ -34,11 +34,22 @@ func (one *tree) pcClock(ahead time.Duration) {
 		}
 		return nil
 	}
-	one.d.Now = func() time.Time { return time.Now().Add(ahead) }
+	one.d.Now = func() time.Time { return testNow.Add(ahead) }
 }
 
 // The commit subjects a ref carries. [[spec/tickets/work-verbs-port-to-go]]
-func (one *tree) pcSubjects(ref string) string { return one.git("log", "--format=%s", ref) }
+func (one *tree) pcSubjects(ref string) string { return one.subjects(ref) }
+
+// The newest commit a ref holds whose subject carries the words, or nothing. [[spec/tickets/work-verbs-port-to-go]]
+func (one *tree) pcCommitSaying(ref, words string) string {
+	log, _ := one.repo.Log("", ref, false)
+	for _, each := range log {
+		if strings.Contains(each.Subject, words) {
+			return each.Hash
+		}
+	}
+	return ""
+}
 
 // A take on a box holding its branch hands the ask again, and claims nothing new. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCATakeOnAHeldBranchHandsTheAskAgain(t *testing.T) {
@@ -47,13 +58,13 @@ func TestPCATakeOnAHeldBranchHandsTheAskAgain(t *testing.T) {
 		one := newTree(t, nil)
 		hand := one.pcHand()
 		pcOnGroup(one, map[string]string{ticketAt(pcGroup): pcTake(pcGroupNote, hand, "b818c390")})
-		head := one.git("rev-parse", "HEAD")
+		head := one.rev("HEAD")
 		if code := one.branchSays(argv...); code != codeOK {
 			t.Fatalf("%v answers %d: %s", argv, code, one.pcSaid())
 		}
 		holds(t, one.pcSaid(), "You already hold work/one-group")
 		holds(t, one.pcSaid(), "Two tickets that land as one")
-		if one.git("rev-parse", "--abbrev-ref", "HEAD") != workBranch+pcGroup || one.git("rev-parse", "HEAD") != head {
+		if one.here() != workBranch+pcGroup || one.rev("HEAD") != head {
 			t.Fatalf("%v moves the box or writes a second claim", argv)
 		}
 	}
@@ -71,11 +82,11 @@ func pcTakingPast(t *testing.T, past pcPast) *tree {
 	one.branch("old-group", map[string]string{ticketAt("old-group"): old})
 	one.branch(pcGroup, map[string]string{ticketAt(pcGroup): pcGroupNote})
 	if past == pcMerged {
-		one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/old-group")
+		one.mergeIn("origin/work/old-group", "")
 		one.land("old-group lands", map[string]string{ticketAt("old-group"): withField(old, "state", closedState)})
-		one.git("push", "-q", "origin", trunk)
+		one.push(trunk)
 	}
-	one.git("switch", "-q", "-c", "work/old-group", "origin/work/old-group")
+	one.cut("work/old-group", "origin/work/old-group")
 	ahead := time.Duration(0)
 	if past == pcStale {
 		ahead = 48 * time.Hour
@@ -93,7 +104,7 @@ func TestPCANamedTakeDropsAHoldPastItsWork(t *testing.T) {
 		if code := one.branchSays("take", pcGroup); code != codeOK {
 			t.Fatalf("the take past hold %d answers %d: %s", past, code, one.pcSaid())
 		}
-		if on := one.git("rev-parse", "--abbrev-ref", "HEAD"); on != workBranch+pcGroup {
+		if on := one.here(); on != workBranch+pcGroup {
 			t.Fatalf("the take past hold %d lands on %s: %s", past, on, one.pcSaid())
 		}
 		pcLacks(one, one.pcSaid(), pcOldAsk)
@@ -112,7 +123,7 @@ func TestPCANamedTakeRefusesAHoldInWork(t *testing.T) {
 		holds(t, one.pcSaid(), line)
 	}
 	pcLacks(one, one.pcSaid(), pcOldAsk)
-	if on := one.git("rev-parse", "--abbrev-ref", "HEAD"); on != "work/old-group" {
+	if on := one.here(); on != "work/old-group" {
 		t.Fatalf("the refusal moves the box to %s", on)
 	}
 }
@@ -127,7 +138,7 @@ func pcTakingHeld(t *testing.T, ahead time.Duration, behind int) *tree {
 		one.land("main moves", map[string]string{"moves/" + string(rune('a'+at)): "moved"})
 	}
 	if behind > 0 {
-		one.git("push", "-q", "origin", trunk)
+		one.push(trunk)
 	}
 	one.pcClock(ahead)
 	return one
@@ -140,7 +151,7 @@ func TestPCATakeOverAStaleHoldClosesIt(t *testing.T) {
 	if code := one.branchSays("take", pcGroup); code != codeOK {
 		t.Fatalf("the take answers %d: %s", code, one.pcSaid())
 	}
-	if on := one.git("rev-parse", "--abbrev-ref", "HEAD"); on != workBranch+pcGroup {
+	if on := one.here(); on != workBranch+pcGroup {
 		t.Fatalf("the take lands on %s", on)
 	}
 	text := one.pcTicket(pcGroup)
@@ -161,17 +172,17 @@ func TestPCATakeOverAStaleHoldPushesBeforeTrunk(t *testing.T) {
 	if code := one.branchSays("take", pcGroup); code != codeOK {
 		t.Fatalf("the take answers %d: %s", code, one.pcSaid())
 	}
-	claim := one.git("log", "--format=%H", "-1", "--grep=over from "+pcOther, "HEAD")
+	claim := one.pcCommitSaying("HEAD", "over from "+pcOther)
 	if claim == "" {
 		t.Fatalf("no claim commit stands: %s", one.pcSubjects("HEAD"))
 	}
-	if !one.d.quiet("merge-base", "--is-ancestor", claim, "origin/"+workBranch+pcGroup).OK {
+	if !one.repo.IsAncestor(claim, "origin/"+workBranch+pcGroup) {
 		t.Fatal("the claim stays off origin")
 	}
-	if one.d.quiet("merge-base", "--is-ancestor", "origin/"+trunk, claim).OK {
+	if one.repo.IsAncestor("origin/"+trunk, claim) {
 		t.Fatal("main comes in before the claim")
 	}
-	if !one.d.quiet("merge-base", "--is-ancestor", "origin/"+trunk, "HEAD").OK {
+	if !one.repo.IsAncestor("origin/"+trunk, "HEAD") {
 		t.Fatal("main stays out after the claim")
 	}
 }
@@ -184,11 +195,11 @@ func TestPCATakeUnderTheStaleSpanRefuses(t *testing.T) {
 	if code := one.branchSays("take", pcGroup); code != codeRed {
 		t.Fatalf("the take answers %d: %s", code, one.pcSaid())
 	}
-	one.git("fetch", "-q", "origin")
+	one.fetch()
 	if one.pcTip("origin/"+workBranch+pcGroup) != tip {
 		t.Fatal("the refusal writes a claim")
 	}
-	if held := heldIn(one.git("show", "origin/"+workBranch+pcGroup+":"+ticketAt(pcGroup))); held == nil || held.Hand != pcOther {
+	if held := heldIn(one.show("origin/"+workBranch+pcGroup, ticketAt(pcGroup))); held == nil || held.Hand != pcOther {
 		t.Fatalf("the hold moves: %+v", held)
 	}
 }

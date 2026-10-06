@@ -6,7 +6,6 @@ package branches
 
 import (
 	"fmt"
-	"strconv"
 
 	"quackitect/src/config"
 )
@@ -91,8 +90,7 @@ func (d *Doors) readFree(now int64) freeRead {
 
 // Why a group at done stands stuck: behind trunk, stale past the span, or nothing. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
 func (d *Doors) stuckIn(one stand, now int64) string {
-	said := d.quiet("rev-list", "--count", "origin/"+one.Branch+"..origin/"+trunk)
-	if count, _ := strconv.Atoi(said.Out); count > 0 {
+	if d.ahead("origin/"+one.Branch, "origin/"+trunk) > 0 {
 		return "behind"
 	}
 	if d.staleClaim(one, now).Stale {

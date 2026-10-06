@@ -39,7 +39,6 @@ var (
 	skipped    = regexp.MustCompile(`# (TODO|SKIP)\b`)
 	loadFaults = regexp.MustCompile(`ERR_MODULE_NOT_FOUND|SyntaxError|Cannot find module|ReferenceError`)
 	assertFail = regexp.MustCompile(`ERR_ASSERTION|AssertionError`)
-	statusMark = regexp.MustCompile(`^\s*(\S{1,2})\s`)
 )
 
 // Runs the tests the branch changes, or the files named, and answers one word on them. [[spec/design_output/pull#the-test-verb]]
@@ -221,7 +220,8 @@ func (d *Doors) sinceOf(held *holdFile) string {
 			return held.Hash
 		}
 	}
-	return d.quiet("merge-base", "origin/"+trunk, "HEAD").Out
+	base, _ := d.Repo.MergeBase("origin/"+trunk, "HEAD")
+	return base
 }
 
 // The files changed since a commit and in the tree, a deleted one past. [[spec/design_output/pull#the-test-verb]]
@@ -233,18 +233,18 @@ func (d *Doors) changedFiles(since string) []string {
 		}
 	}
 	if since != "" {
-		for _, one := range strings.Split(d.quiet("diff", "--name-only", "--diff-filter=d", since+"..HEAD").Out, "\n") {
-			add(one)
+		changes, _ := d.Repo.Diff(since, "HEAD")
+		for _, one := range changes {
+			if one.Status != "D" {
+				add(one.Path)
+			}
 		}
 	}
-	for _, row := range strings.Split(d.quiet("status", "--porcelain", "-uall").Out, "\n") {
-		if strings.TrimSpace(row) == "" {
-			continue
+	standing, _ := d.Repo.Status(true)
+	for _, one := range standing {
+		if !strings.Contains(one.Status, "D") {
+			add(one.Path)
 		}
-		if found := statusMark.FindStringSubmatch(row); found != nil && strings.Contains(found[1], "D") {
-			continue
-		}
-		add(changedIn(row))
 	}
 	sort.Strings(out)
 	return out
@@ -340,8 +340,8 @@ func (d *Doors) setAside(sources []string) {
 		list = append(list, aside{one, kept})
 		text, _ := json.MarshalIndent(list, "", "  ")
 		_ = d.write(asideAt+"/"+asideList, string(text)+"\n")
-		if head := d.raw(d.Root, "", "git", "show", "HEAD:"+one); head.OK {
-			_ = d.write(one, head.Out)
+		if head, ok := d.Repo.Show("HEAD", one); ok {
+			_ = d.write(one, head)
 		} else if kept {
 			d.remove(one)
 		}

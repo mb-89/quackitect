@@ -112,7 +112,7 @@ func pfUnblockTree(t *testing.T, child, successor string, onBranch bool) *tree {
 		ticketAt("a-successor"): successor,
 	}).desk()
 	if onBranch {
-		one.git("switch", "-q", "-c", workBranch+"one-group")
+		one.cut(workBranch+"one-group", "")
 	}
 	return one
 }
@@ -170,13 +170,20 @@ func TestPFUnblockStagesTheTwoTicketsAlone(t *testing.T) {
 	if code := pfUnblock(one); code != 0 {
 		t.Fatalf("the unblock answers %d: %s", code, one.errs.String())
 	}
-	landed := one.git("show", "--name-only", "--format=", "HEAD")
-	if landed != ticketAt("a-child")+"\n"+ticketAt("a-successor") {
+	changed, _ := one.repo.Changed("HEAD")
+	var landed []string
+	for _, each := range changed {
+		landed = append(landed, each.Path)
+	}
+	if strings.Join(landed, "\n") != ticketAt("a-child")+"\n"+ticketAt("a-successor") {
 		t.Fatalf("the commit carries %q", landed)
 	}
-	still := one.git("status", "--porcelain", "-uall")
-	holds(t, still, ticketAt("one-group"))
-	holds(t, still, "src/loose.txt")
+	var still []string
+	for _, each := range one.status() {
+		still = append(still, each.Path)
+	}
+	holds(t, strings.Join(still, "\n"), ticketAt("one-group"))
+	holds(t, strings.Join(still, "\n"), "src/loose.txt")
 }
 
 // The successor carries the question and the ticket it comes from under Discussion, the empty line gone. [[spec/tickets/work-verbs-port-to-go]]
@@ -232,7 +239,7 @@ func TestPFAFailedVerdictTableLandsAsATable(t *testing.T) {
 	t.Parallel()
 	reason := `the rows split:; | road | cost |\n| --- | --- |\n| one | two |; no test drives the hook`
 	one := pfUnblockTree(t, pfUChild("implement/change", ""), pfSuccessor, true)
-	one.d.Method = pfMethod(t)
+	one.pfMethodRoot()
 	text, path := one.d.withPersonStep(note{Name: "a-child", Text: pfUChild("implement/change", "")}, "implement/change", "implement/change fails back 2 times: "+reason, nil)
 	if path != "implement/person-2" {
 		t.Fatalf("the person step goes in at %q", path)
