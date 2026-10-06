@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -187,6 +187,29 @@ record:
         exit: 0
         said: "   92.3  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: b3a6ca308e30281e4a4c81700102ec913f409a69
+    hash_after: b3a6ca308e30281e4a4c81700102ec913f409a69
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: "   96.2  in all"
+    inputs:
+      - name: design/tests-red
+        hash: d62ea66838360d58
+        size: 757
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -398,26 +421,33 @@ Each folded helper stands once: truthy, JSONText, FrontOf, FieldText, QuotedWhol
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+CGO_ENABLED=0 go test -count=1 ./src/modules/check/ -run "Copy|Copies|Body|Short|Methods" && CGO_ENABLED=0 go test -count=1 ./src/yaml/ && echo green
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Each helper the tree copied now stands in one package, so a fix reaches every caller. The truthy copies fold into yaml.Truthy, and git grep for func truthy under src answers one file. The new HelperStandsOnce rule in src/modules/check/copies.go prints each top-level function body with its own names renamed, and draws an error where the same print stands in a second folder. It found nine more copies, which fold into src/yaml and src/pull, and it finds none now. Every caller reads a value as JavaScript does: an int zero and NaN read false where some copies read them true. The rule skips methods, whose shared bodies over different types stand honest. The tests line runs the copy cases alone, because package check also holds the textfaults case another ticket keeps red.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list and the files its last size line covers: every Go file the new rule names, folded so the check stays green, plus retroJSTruthy, which now leans on yaml.Truthy for the kinds yaml knows.
+The rule reads the tree through the checker's Go texts, which the tests seed in memory, and every folded caller keeps its package's own doors.
+Each new function and the rule carry a link to spec/tickets/shared-helpers-stand-once.
+Each folded helper stands once: truthy, JSONText, FrontOf, FieldText, QuotedWhole and FlowItems in src/yaml, HashText and JSQuote in src/pull, and the rule over the tree finds no copy left.
 
 # accept
 
