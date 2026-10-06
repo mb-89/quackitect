@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -190,6 +190,21 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-10
+    hash_before: d4ffa836e9d4bbad777f3b3a525aef291d19bb88
+    hash_after: d4ffa836e9d4bbad777f3b3a525aef291d19bb88
+    inputs:
+      - name: design/draft
+        hash: 2e87095745369753
+        size: 1218
+      - name: design/tests-red
+        hash: 2a9158664f043493
+        size: 860
+      - name: [[spec/design_output/doors]]
+        hash: ffaadf7c3fe494dd
+        size: 17605
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -317,8 +332,7 @@ A design adds no code, so the red test is the process door contract suite, the h
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- lsp-takes-the-process-door: the chapter says the lsp module moves onto the Runner in src/proc, yet the lsp Runner in src/modules/lsp/tools.go keeps its own signature with no env and no exit code, and neither the moves table nor any ticket carries that move
+accept
 
 # implement
 
