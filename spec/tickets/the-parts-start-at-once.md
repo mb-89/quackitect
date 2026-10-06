@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-check-runs-beside
 steps:
   - name: design
@@ -168,6 +168,29 @@ record:
         exit: 0
         said: The rules pass.
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: df530f5093a0ae81e71033a5ca31c71caca9ab59
+    hash_after: e2712174641baa6ab47ea186a2b678a1621989fb
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/quack passes
+      - name: check
+        exit: 0
+        said: "    7.5  test/contract/vale.test.js a shouted lead is refused and an acronym inside a sentence passes"
+    inputs:
+      - name: design/tests-red
+        hash: 698e90a09495faee
+        size: 1027
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -334,26 +357,37 @@ accept
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/check_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Every part of the check now starts at once. The battery reads each part start, launches every part, waits for all of them, and answers the first red code in part order. Each red part prints its own line on the error stream, and every part beside it still reports its time in the table. No part reads another part output, so none waits on another.
+
+The overlap loaded a four-core box past three wall-clock limits: two Vale script caps and a pull time budget. Two changes answer it. The dry probe of level zero runs at low priority through a calm process door, since it times nothing tight, so the parts that time themselves keep the cores. RestatedTable keys each run of words once, in place of a search over every pair, so its cost grows with the words a file holds. The Go part tried low priority and lost: a module lease case times against the wall, so it runs at full priority.
+
+The measure on this box: five steady checks in a row read green at a span near two minutes, against the serial order near the same span, since the parts are bound by the four cores here. A box with more cores pays its slowest part alone.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the check, its doors, its test, the work design note and the RestatedTable twins with their tests; the last answer the red check the overlap brought
+- every door has a fake: the held clock, the check fake with calm and calmVerb, and the projection tests run on memory alone
+- comments over batteryRun, processOver, level0Runs and tableRun name the approach and link this ticket
+- the red line stands once as redPart, the priority once as calmBy, and the report fields once in the work design note
 
 # accept
 
