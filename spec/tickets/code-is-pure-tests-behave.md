@@ -218,3 +218,15 @@ Each analyzer or measure lands in report mode first, listing offenders, then the
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The box releasing this branch leaves it here:
+
+| ticket | where it waits |
+|---|---|
+| `black-box-tests-guard-reports` | its gate, which a hand other than the drafting one takes |
+| `fixture-home-guard-reports` | its gate, past tests-red |
+| `test-ratio-measure-reports` | its gate, past tests-red |
+| `hand-script-guard-reports` | its gate, past tests-red |
+| `purity-guard-covers-every-outside` | tests-red, until `src/owns` lands on `main` with the doors-declare-what-they-own group |
+
+The purity tests name `src/owns`, which stands on `work/doors-declare-what-they-own` alone. Sync `main` in first, and write them once `src/owns` stands there. A merge of that branch into this one carries its open work into this group's pull request, so this branch waits for it instead.
