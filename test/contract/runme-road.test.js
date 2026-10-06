@@ -3,10 +3,10 @@
 // [[spec/tickets/runme-hands-verbs-to-quack]]
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 
 const ROOT = join(import.meta.dirname, "..", "..");
@@ -21,7 +21,7 @@ const runs = (...argv) =>
 
 // The road waits on the index's ready event, and a timer guesses at nothing. [[spec/tickets/runme-road-waits-on-ready]]
 test("the road waits on the index's ready event, and names no timer", () => {
-  const text = readFileSync(fileURLToPath(import.meta.url), "utf8");
+  const text = String(disk().read(fileURLToPath(import.meta.url)));
   assert.match(text, /\.ready\(\)/, "the file waits on the ready event");
   assert.doesNotMatch(text, new RegExp(["time", "outMs|set", "Timeout|_MS\\b"].join("")), "the file names no timer");
 });

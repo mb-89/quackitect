@@ -1,6 +1,6 @@
 //go:build !windows
 
-// [[spec/tickets/the-index-outlives-the-check]]
+// [[spec/tickets/the-index-outlives-the-check]] [[spec/tickets/platform-draft-names-checkdoors]]
 package index
 
 import (

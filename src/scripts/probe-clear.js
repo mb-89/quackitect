@@ -113,6 +113,8 @@ function inClone(tree, env) {
 
 // The probe mints its own group and stands on its work branch, as origin holds it. [[spec/tickets/the-clear-carries-no-local-work]]
 export function grouped(it, tree, env) {
+  const dropped = untodo(it, tree);
+  if (dropped) return dropped;
   const minted = it.proc.run(
     [it.join(tree, "RUNME.sh"), "mint", "ticket", `spec/tickets/${GROUP}.md`, "--process=trivial"],
     { cwd: tree, env: inClone(tree, env), timeoutMs: PULL_WAIT },
@@ -129,6 +131,28 @@ export function grouped(it, tree, env) {
   });
   const fell = [minted, branched, pushed].find((one) => one.exitCode !== 0);
   return fell ? { words: `mint ${GROUP}`, exit: fell.exitCode, said: `${fell.stdout}${fell.stderr}` } : null;
+}
+
+// A todo ranks first in the pull, so a tree carrying one hands it past the clear in place of the probe's leaf. The clone drops every mark and commits that, since the queue is the tree's and the clear is the probe's. [[spec/tickets/platform-draft-names-checkdoors]]
+function untodo(it, tree) {
+  const folder = it.join(tree, "spec", "tickets");
+  if (!it.disk.exists(folder)) return null;
+  let changed = false;
+  for (const name of it.disk.list(folder)) {
+    const at = it.join(folder, typeof name === "string" ? name : name.name);
+    if (!at.endsWith(".md")) continue;
+    const text = String(it.disk.read(at));
+    const left = text.replace(/^todo: true\r?\n/m, "");
+    if (left === text) continue;
+    it.disk.write(at, left);
+    changed = true;
+  }
+  if (!changed) return null;
+  const ran = it.proc.run(
+    ["git", "-c", "user.name=probe", "-c", "user.email=probe@probe", "commit", "-q", "-a", "-m", "the probe's clone drops the todo marks"],
+    { cwd: tree, timeoutMs: PULL_WAIT },
+  );
+  return ran.exitCode === 0 ? null : { words: "drop the todo marks", exit: ran.exitCode, said: `${ran.stdout}${ran.stderr}` };
 }
 
 function keyed(it, tree) {
