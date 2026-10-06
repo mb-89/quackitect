@@ -128,7 +128,7 @@ steps:
 process: [[spec/processes/retro]]
 process_hash: 437ae3e9f952ac3c
 group: the-fleet-week-retro
-step: backlog
+step: chapter
 record:
   - step: feedback
     hand: box 8f95d4cd1cfb · claude-code-remote · the owner says so
@@ -174,6 +174,19 @@ record:
         hash: 0d0ba34c12e954be
         size: 49
     def: f993cc8b0a8c580c
+  - step: backlog
+    hand: box 8f95d4cd1cfb · claude-code-remote
+    hash_before: d8610df2df72313ea7deebda4e62a25af454728f
+    hash_after: d8610df2df72313ea7deebda4e62a25af454728f
+    answered:
+      - name: backlog
+        exit: 0
+        said: the-pull-takes-the-branch  a group at urgency now reaches a desk through the plain pull, and a test drives it  falls sho
+    inputs:
+      - name: audit
+        hash: abbc1492b1d54237
+        size: 1547
+    def: 9cf43185b299fada
 ---
 
 # Ask
@@ -281,8 +294,9 @@ The owner asks for a retro over the fleet's week of cloud-box work, from Sep 29 
 ## backlog
 
 <!-- retro backlog, which answers 0 once each prose criterion holds a verdict with its reason -->
-
 <!-- the form is command -->
+
+    ./RUNME.sh retro backlog retro-0d14eda
 
 # chapter
 
