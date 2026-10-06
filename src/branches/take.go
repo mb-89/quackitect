@@ -314,6 +314,9 @@ func (d *Doors) claimGroup(one stand) int {
 		return codeRed
 	}
 	d.writeBeat(one.Name, role, false)
+	if from != "" {
+		d.takesRescue(one)
+	}
 	if d.sync() == codeRed {
 		d.warn("Resolve the conflict on %s and commit it, then work the ask below.", one.Branch)
 		d.brief(one.Branch, one.Name, hand, was)

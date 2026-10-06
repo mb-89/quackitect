@@ -282,6 +282,23 @@ and the list reads the refs it brings.
 | `branch take --over [name]` | refuses, naming the beat's age | takes it, ahead of a branch at `todo` |
 | `branch list` | writes `live` beside the age, and leaves it out of yours | puts it under yours |
 
+## A red commit reaches a rescue branch
+
+A cloud box dies with its tree, and a commit the check answers red stays on
+the box. So on a cloud box standing on `work/<group>`, the commit verb pushes
+a red commit by force to the branch `rescue/<group>`, and still answers red.
+The work branch stays green, so CI and the pull request read no red commit.
+
+| who | what it does with `rescue/<group>` |
+|---|---|
+| the commit verb, red on a cloud box | pushes HEAD there by force, and names it |
+| the commit verb, green and pushed | deletes it on origin where HEAD carries it |
+| the take, over another box's hold | merges it in, pushes, and deletes it |
+| the take, on a conflict | aborts the merge, leaves it on origin, and names `git merge origin/rescue/<group>` |
+
+A desk, and a branch off `work/`, write no rescue. The push door lets the red
+push through, since CI guards a work branch.
+
 # A box leaves
 
 `branch done` on a group branch writes `hash_after` into the newest record entry, which
