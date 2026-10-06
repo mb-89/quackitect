@@ -1341,6 +1341,39 @@ func TestRepoFetchAllTakesEveryBranchAndPrunesTheGoneOnes(t *testing.T) {
 	}
 }
 
+// A beat: a parentless commit on the empty tree, pushed by force over the branch's last beat, whose commit shares no history with it. [[spec/tickets/the-doors-pr-goes-green]]
+func TestRepoForcePushesAnEmptyCommitOverTheLastOne(t *testing.T) {
+	t.Parallel()
+	for _, w := range worlds(t) {
+		first, err := w.here.EmptyCommit("box beats")
+		if err != nil {
+			t.Fatalf("the %s repo's empty commit answers %v", w.name, err)
+		}
+		if log, err := w.here.Log("", first, false); err != nil || len(log) != 1 || log[0].Subject != "box beats" {
+			t.Errorf("the %s repo's empty commit logs %+v, %v, and wants one commit under its message", w.name, log, err)
+		}
+		if files, err := w.here.Files(first, ""); err != nil || len(files) != 0 {
+			t.Errorf("the %s repo's empty commit holds %v, %v", w.name, files, err)
+		}
+		if pushed := w.here.ForcePushTo(first, "beats/g"); !pushed.OK {
+			t.Errorf("the %s repo's first beat answers %+v", w.name, pushed)
+		}
+		second, err := w.here.EmptyCommit("box ends")
+		if err != nil {
+			t.Fatalf("the %s repo's second empty commit answers %v", w.name, err)
+		}
+		if pushed := w.here.PushTo(second, "beats/g"); pushed.OK {
+			t.Errorf("the %s repo's plain push over an unrelated beat passes", w.name)
+		}
+		if pushed := w.here.ForcePushTo(second, "beats/g"); !pushed.OK {
+			t.Errorf("the %s repo's forced beat answers %+v", w.name, pushed)
+		}
+		if said, ok := w.origin.Resolve("refs/heads/beats/g"); !ok || said != second {
+			t.Errorf("the %s origin holds beats/g at %q, %v, and the forced push names %q", w.name, said, ok, second)
+		}
+	}
+}
+
 // A commit pushed under a branch name of its own, then the branch deleted on origin, as the open and the close move them. [[spec/design_output/work#a-merged-branch-closes]]
 func TestRepoPushesACommitToABranchAndDeletesTheBranchOnOrigin(t *testing.T) {
 	t.Parallel()

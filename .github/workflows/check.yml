@@ -2,8 +2,10 @@
 # A session says the check passes; this says whether it does.
 name: check
 # A pull request against main runs the check GitHub's auto-merge waits on. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
+# A rescue push carries red work and a beat push carries no code, so neither runs it. [[spec/tickets/ci-skips-rescue-and-beats]]
 on:
   push:
+    branches-ignore: ["rescue/**", "beats/**"]
   pull_request:
     branches: [main]
 

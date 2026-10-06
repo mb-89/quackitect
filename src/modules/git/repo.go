@@ -92,6 +92,9 @@ type Repo interface {
 	ShowMany(asks []string) (map[string]string, error)
 	FetchAll() error
 	PushTo(commit, branch string) Pushed
+	// A parentless commit on the empty tree, and a push of a commit onto the branch whatever origin holds there, which a beat writes. [[spec/design_output/work#a-hold-beats-with-its-session]]
+	EmptyCommit(message string) (string, error)
+	ForcePushTo(commit, branch string) Pushed
 	DeleteRemote(branch string) error
 	DeleteRef(name string) error
 	Amend() error
@@ -234,6 +237,20 @@ func (one *door) Push(branch string, upstream bool) Pushed {
 
 func (one *door) PushTo(commit, branch string) Pushed {
 	return one.pushed("push", "--quiet", originName, commit+":"+headsPrefix+branch)
+}
+
+func (one *door) ForcePushTo(commit, branch string) Pushed {
+	return one.pushed("push", "--quiet", "--force", originName, commit+":"+headsPrefix+branch)
+}
+
+// The empty tree comes off git itself, so a repository of either hash names it. [[spec/design_output/work#a-hold-beats-with-its-session]]
+func (one *door) EmptyCommit(message string) (string, error) {
+	empty := one.run(proc.Command{Argv: []string{"git", "hash-object", "-w", "-t", "tree", "--stdin"}, Dir: one.root, Env: []string{"LC_ALL=C"}})
+	if empty.Code != 0 {
+		return "", fmt.Errorf("git names no empty tree: %s", strings.TrimSpace(empty.Err))
+	}
+	said, err := one.must("commit-tree", strings.TrimSpace(empty.Out), "-m", message)
+	return strings.TrimSpace(said), err
 }
 
 func (one *door) pushed(args ...string) Pushed {
@@ -1605,6 +1622,39 @@ func (one *FakeRepo) PushTo(commit, branch string) Pushed {
 		return Pushed{Err: fmt.Sprintf("error: src refspec %s does not match any", commit)}
 	}
 	return one.pushHash(local, branch, false)
+}
+
+func (one *FakeRepo) ForcePushTo(commit, branch string) Pushed {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	local, ok := one.resolve(commit)
+	if !ok && one.origin != nil {
+		return Pushed{Err: fmt.Sprintf("error: src refspec %s does not match any", commit)}
+	}
+	if one.origin == nil {
+		return one.pushHash(local, branch, false)
+	}
+	one.origin.mu.Lock()
+	was, held := one.origin.refs[headsPrefix+branch]
+	delete(one.origin.refs, headsPrefix+branch)
+	one.origin.mu.Unlock()
+	pushed := one.pushHash(local, branch, false)
+	if !pushed.OK && held {
+		one.origin.mu.Lock()
+		one.origin.refs[headsPrefix+branch] = was
+		one.origin.mu.Unlock()
+	}
+	return pushed
+}
+
+func (one *FakeRepo) EmptyCommit(message string) (string, error) {
+	one.mu.Lock()
+	defer one.mu.Unlock()
+	if err := one.identity(); err != nil {
+		return "", err
+	}
+	subject, _, _ := strings.Cut(message, "\n")
+	return one.store(&fakeCommit{tree: map[string]string{}, subject: subject, when: one.now().Unix()}), nil
 }
 
 func (one *FakeRepo) pushHash(local, branch string, upstream bool) Pushed {

@@ -33,7 +33,8 @@ var table []verbRow
 func init() {
 	table = []verbRow{
 		{"open", "  open <group>  push work/<group> off main for a group ticket, so the cloud finds it", openGroup, true},
-		{"take", "  take          take the next branch marked todo, and print its ask", take, true},
+		{"take", "  take [--over] [name] take the next branch marked todo, or with --over a hold whose box stopped beating, and print its ask", take, true},
+		{"beat", "  beat [--end]  push this box's beat on the group it holds, or end the hold at once", beatVerb, false},
 		{"sync", "  sync          take main into this branch before you start", func(d *Doors, _ string, _ []string) int { return d.sync() }, false},
 		{"done", "  done          mark this branch done, commit and push", finish, true},
 		{"release", "  release       put this branch, or the one you name, back to todo", release, true},
