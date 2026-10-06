@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -168,6 +168,10 @@ record:
   - step: gate
     hand: the engine
     stale: [[spec/design_output/doors]]
+  - step: design/tests-red
+    skipped: true
+    kept: 18f9e64f61fc6c30d0b025f7a38c2b4f006ec933
+    why: its red tests stand as 18f9e64f6 landed them, and a later leaf passed since
 ---
 
 # Ask
