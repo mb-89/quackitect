@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: df5766ae1b46f46d
         size: 455
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: ca9021a78c6cdba6a7a665f1ff307d9b4002fd52
+    hash_after: ca9021a78c6cdba6a7a665f1ff307d9b4002fd52
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 9d1f32ff4065dbb1
+        size: 2867
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -230,26 +243,31 @@ The extension stops loading files of the tree at runtime, and reaches Go through
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/vehicle_settle_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/vehicle_settle_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Both settle cases fail on their assertion: the verb takes the word for here and prints the roots. The logbook case passes already, as a guard the change must keep, and the grep in the ask decides the import itself.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the grep and the check are checkpoints the hand runs at tests-green, the settle cases fail red, and the logbook case guards the filter
+- the Go cases reach the disk through the vehicle package's own temp method, the pattern this package holds, and the logbook case runs on the fake disk and the fake index
 
 # gate
 

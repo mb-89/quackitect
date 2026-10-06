@@ -60,3 +60,10 @@ test("a logbook line lands after every line the session holds", async () => {
     "two presses",
   ]);
 });
+
+test("a line below the level now posts nothing", async () => {
+  const door = doorOf();
+  const row = await logbookOf(door, async () => "warn").say("info", "sidebar", "a quiet press");
+  assert.equal(row, undefined);
+  assert.equal(door.files.exists(SESSION), false);
+});
