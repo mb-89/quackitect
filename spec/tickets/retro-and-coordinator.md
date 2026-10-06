@@ -91,7 +91,16 @@ record:
   - step: sync
     hand: box 2e87e70adc83 · claude-code-remote
     hash_before: 9a9c79d348105d143f6c860291a407269d8a44f9
-step: sync
+  - step: sync
+    hand: box 2e87e70adc83 · claude-code-remote
+    hash_before: f0745c4a5de04f8a02d0f6d1c8fec9172c82389a
+    hash_after: aac471454570dcc57cd0f3a7ecb46938c2ecf80b
+    answered:
+      - name: sync
+        exit: 0
+        said: work/retro-and-coordinator already carries every commit on main.
+    def: 8a9850a81227554b
+step: split
 ---
 
 # Ask
@@ -109,8 +118,9 @@ Done when every child closes and `./RUNME.sh check` exits 0.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
