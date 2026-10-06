@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: 47799efb83a652b4
         size: 831
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: b4cec71ef55c4662ad1a4c52ae47df627b7ab3a8
+    hash_after: b4cec71ef55c4662ad1a4c52ae47df627b7ab3a8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: c0a79dd2622f6ee7
+        size: 1537
+      - name: [[spec/design_output/model]]
+        hash: 61ac69020f637f41
+        size: 76243
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -232,26 +248,33 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- `src/imports/blackbox_test.go`
+- `src/imports/guards_test.go`
+- `src/quack/verb_guards_test.go`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over the stubs: the guard names nothing, the compare answers empty, and the verb core prints nothing. The new `src/imports` tests stand black-box in `package imports_test`, the first such files there. The `src/quack` test cannot, since a main package admits no outside test package, so its clause carries the marker with that reason. That bounds the guard: every test file of `src/quack` stays an offender until its logic leaves the main package.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the guard and its marker in the two blackbox cases, the baseline in the compare and verb cases, and the design section stands written
+- the tests reach no door: they parse planted text and read a map
 
 # gate
 
