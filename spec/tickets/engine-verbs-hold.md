@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -126,6 +126,22 @@ record:
         hash: 811c9dc59e3779b9
         size: 0
     def: 07c43ae7253713ec
+  - step: accept
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 86232817d1c39b3f676d641b6a06d58b5cebd165
+    hash_after: bb54f2fe39da8270397575fa4220901bfba9f73e
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/engine-verbs-hold took 2 commit(s) from main.
+    inputs:
+      - name: ask
+        hash: c8bde0276841d2e6
+        size: 661
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -205,10 +221,7 @@ The diff stays one review: the folds the copy rule named landed under shared-hel
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept with points
-- test-verb-comments-sit-home: In src/branches/test.go the testVerb doc comment now sits above goldenReaders, and the goTestNames comment above goTestTexts. Move each comment back onto its own function.
-- quack-ending-files-go: src/quack/ending_unix.go and ending_windows.go hold a package clause and a comment naming a mechanism they lack. Delete both files, since proc.Whole holds the code.
-- standing-pull-takes-auto-merge: pullOpens returns a standing pull request untouched, yet done prints it with auto-merge on. Read auto_merge off the list, and enable it where it stands unset.
+accept
 
 # retro
 
