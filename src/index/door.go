@@ -189,7 +189,11 @@ var spawns = func(bin, root string) (<-chan error, error) {
 		return nil, err
 	}
 	exited := make(chan error, 1)
-	go func() { exited <- one.Wait() }()
+	go func() {
+		if said := one.Wait(); exitEnds(said) {
+			exited <- said
+		}
+	}()
 	return exited, nil
 }
 

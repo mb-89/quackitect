@@ -33,6 +33,17 @@ func holdsForever() {
 	os.Exit(0)
 }
 
+// The starter exits clean once it launches the door, so a start waits on the door past that exit, and a failed starter ends the start. [[spec/tickets/the-doors-pr-goes-green]]
+func TestAStartersCleanExitLeavesTheDoorStanding(t *testing.T) {
+	t.Parallel()
+	if exitEnds(nil) {
+		t.Error("the starter's clean exit reads as the door's end")
+	}
+	if !exitEnds(exec.ErrNotFound) {
+		t.Error("a failed starter reads as no end")
+	}
+}
+
 // [[spec/tickets/door-outlives-taskkill-tree]]
 func TestADoorOutlivesATreeKillOverWhatStartedIt(t *testing.T) {
 	self := "-test.run=^TestADoorOutlivesATreeKillOverWhatStartedIt$"
