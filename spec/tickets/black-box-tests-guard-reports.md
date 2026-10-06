@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -200,6 +200,21 @@ record:
     skipped: true
     kept: 77cdcc06f46792b90c4b27f619c16b411effc12b
     why: its red tests stand as 77cdcc06f landed them, and a later leaf passed since
+  - step: gate
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: b73bb752c750f7dc10aadcb1aa57ed887eab23f3
+    hash_after: b73bb752c750f7dc10aadcb1aa57ed887eab23f3
+    inputs:
+      - name: design/draft
+        hash: c0a79dd2622f6ee7
+        size: 1537
+      - name: design/tests-red
+        hash: 251f6039a646caf2
+        size: 661
+      - name: [[spec/design_output/model]]
+        hash: ede6066f3673d0de
+        size: 77789
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -338,7 +353,7 @@ Each case fails on its own assertion over the stubs. The new `src/imports` tests
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
 <!-- the form is verdict -->
 
-accept: the approach answers each done_when line; InPackageTests and Compare stand as stubs and their cases in src/imports fail on their own assertion, verb_guards_test carries the marker with the main-package reason, and model.md#the-guards-hold-a-baseline names the guard, its marker and its baseline. I weigh the src/quack offenders standing in the baseline as the ask intends, since report mode keeps the check green.
+accept: model.md gained one sentence, that a report-mode guard naming files prints its offenders per package, which done_when line two asks; the approach and its red tests stand as accepted before.
 
 # implement
 
