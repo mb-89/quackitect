@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -24,12 +24,30 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 point: gate
-todo: true
+todo: false
 step: do
 process: [[spec/processes/trivial]]
 process_hash: 2b5ab398855a1aba
 group: failures-stand-registered
 parent: the-twins-leave-whole
+record:
+  - step: do
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: 163fe0aeb52b3dbf9f179ea6d85b7d8a1aaeec75
+    hash_after: 69e546a23cc44038f742cec48c7efe272de66297
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: green
+    inputs:
+      - name: ask
+        hash: 720715339a4265ef
+        size: 581
+    def: b3995cb871db2080
+reason: done
 ---
 
 # Ask
@@ -47,26 +65,32 @@ the draft departs from done_when lines one and two and says why, and the tree be
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/copilot-dispatch.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check > /dev/null 2>&1 && echo green
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Copilot dispatch now claims its group through the Go branch take, run through the proc door, and reads groupStanding from work-stands.js. Before, it ran the JS take in src/scripts/work.js, which drifts from src/branches/take.go, and it was the one runtime road into the twins past the dry probe. The two done_when lines this child carries stay open on purpose. A trace of the imports from every runtime entry (the plugin hooks, copilot.js, the probe scripts, the battery reporter, the editor extension) shows the twins head a JS pull stack that only one import keeps alive: probe-clear.js reads RESUME from src/bridge/handover.js, a copy of the prompt src/modules/hooks/stops.go owns. Deleting the three files alone would move their live helpers into some other file of that same dead stack. The retirement of the whole stack, with the tests covering it alone, stands as the note the-js-pull-stack-retires for the retro to mint as a group of its own.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change departs from the ask's two lines, and says why: the twins head a stack a group of its own retires
+- the cleanup the change reveals is the dead JS pull stack, parked as the note the-js-pull-stack-retires
+- the change adds no fact: spec/design_output/copilot.md already says the dispatcher calls branch take, and the code now matches it
 
 # Discussion
 
