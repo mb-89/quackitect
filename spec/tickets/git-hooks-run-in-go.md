@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: 7e42663b12491bc4
         size: 962
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 2e445c6698302c0bf448e0cfb2635d4405511421
+    hash_after: ca84890110ecca734fc91dbfad29940d94ba3635
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/voice/voice.go:653:43: MagicNumber: 64 carries a meaning here. Name it in the constants block at the top of this fil"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -346,14 +355,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src .githooks
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches the size field files, plus the four gate findings: land.go exports its marker scan, branches gains HandIn and StaleSpan, .vale.ini drops both names; warnings.test.js keeps its six cases over lib/warnings.js, which stays, and drops the prepush cases alone
+the hooks module reaches git through the taughtGit fake in githooks_test.go, and the hook verb cases run real git in a temporary repository
+githooks.go and hook_verb.go point at spec/tickets/git-hooks-run-in-go
+the marker scan stands once in land.go, and the hold, stale and todo rules reuse boxIDIn, todoIn, HandIn and StaleSpan instead of a second copy
 
 ## tests-green
 
