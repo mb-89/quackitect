@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
 depends_on: ["each-door-meets-one-test"]
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -132,6 +132,19 @@ record:
         hash: d7ed6f3f3b972aaa
         size: 523
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 85e31731a5c2e341cac460c3f8048014c29ab888
+    hash_after: 85e31731a5c2e341cac460c3f8048014c29ab888
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+    inputs:
+      - name: design/draft
+        hash: 2c579a37ad74ef60
+        size: 1851
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -230,26 +243,31 @@ Each suite runs its shared cases over a table of doors, the real one and the fak
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/contract/session.test.js
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- test/contract/session.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The shared cases pass both ways at once: the fakes already behave on what the old cases asked. So a third session case holds both doors to refusing a missing path and a missing session ID, and the fake fails it on its own assertion: its path answers the root for an empty name, where the real door refuses. That drift is what running both ways exists to catch. The hashes case passes over both indexes.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the first done_when line meets the session cases over both doors and the hashes case, the second the row, the third the check
+- the cases reach the real door as the one door test of each, and the fake beside it
 
 # gate
 
