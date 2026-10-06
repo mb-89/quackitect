@@ -6,6 +6,7 @@ package branches
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -111,5 +112,19 @@ func TestABeatStaysQuietWhereItWritesNothing(t *testing.T) {
 	refused.git("remote", "set-url", "--push", "origin", t.TempDir())
 	if code := refused.branchSays("beat", "--end"); code != codeOK || refused.pcSaid() != "" || refused.beatTip(pcGroup) != "" {
 		t.Fatalf("a refused beat answers %d and prints %q", code, refused.pcSaid())
+	}
+}
+
+// Git dates carry seconds alone, so an end stamped in the tip's own second reads the hold dead. [[spec/tickets/ended-beat-ties-the-tip]]
+func TestAnEndInTheTipsSecondReadsDead(t *testing.T) {
+	t.Parallel()
+	one := pcTakingHeld(t, 0, 0)
+	tip, err := strconv.ParseInt(one.git("log", "-1", "--format=%ct", "origin/"+workBranch+pcGroup), 10, 64)
+	if err != nil {
+		t.Fatal(err)
+	}
+	one.beatOn(pcGroup, pcOther, "ends", time.Unix(tip, 0))
+	if code := one.branchSays("take", "--over", pcGroup); code != codeOK {
+		t.Fatalf("the take --over over an end in the tip's second answers %d: %s", code, one.pcSaid())
 	}
 }
