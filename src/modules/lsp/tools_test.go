@@ -307,7 +307,7 @@ func TestTheToolsRunThroughTheProcessDoorWithTheirWait(t *testing.T) {
 		}
 	}
 	if !seen["vale"] || !seen["biome"] {
-		t.Fatalf("the door runs %q, and wants vale and biome", fake.ran())
+		t.Fatalf("the door runs %+v, and wants vale and biome", fake.ran())
 	}
 }
 
