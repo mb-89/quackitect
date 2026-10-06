@@ -83,7 +83,17 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: tests-meet-the-doors-once
-step: sync
+step: split
+record:
+  - step: sync
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 64d2c1612bdafeef3c33ce29641b5eff5c448248
+    hash_after: 7c10da94588f99740e350ccea4c6bf2394a364bd
+    answered:
+      - name: sync
+        exit: 0
+        said: work/tests-meet-the-doors-once took 20 commit(s) from main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -100,8 +110,9 @@ Done when a design output names the git door and the process door with their fak
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
