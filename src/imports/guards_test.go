@@ -31,7 +31,7 @@ func TestTheGuardsListEveryGuardTheModelNames(t *testing.T) {
 	for _, one := range imports.Guards {
 		names = append(names, one.Name)
 	}
-	if want := []string{"blackbox", "fixture", "ratio", "script"}; !slices.Equal(names, want) {
+	if want := []string{"blackbox", "fixture", "ratio", "script", "purity"}; !slices.Equal(names, want) {
 		t.Fatalf("the guards read %v, not %v", names, want)
 	}
 	for _, one := range imports.Guards {

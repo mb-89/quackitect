@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/tests-red
+step: gate
 steps:
   - name: design
     steps:
@@ -164,6 +164,19 @@ record:
     hash_before: 9bee25cd0939c581d3770b70e2f9adbd184c17a7
     hash_after: 9bee25cd0939c581d3770b70e2f9adbd184c17a7
     def: cd6d0838fccd52f3
+  - step: design/tests-red
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: d0f6ebbc585a7cfa97317025d0421a32a0584950
+    hash_after: d0f6ebbc585a7cfa97317025d0421a32a0584950
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: 2f56b2e1a3a40ec9
+        size: 5161
+    def: 08e16d07b0de477c
 group: code-is-pure-tests-behave
 depends_on: doors-declare-what-they-own
 ---
@@ -316,29 +329,30 @@ Redraft, as the owner says: code is pure by default, and every impure function c
 <!-- the tests you write fail on their own assertion -->
 <!-- the form is command -->
 
-go test ./src/imports
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
 <!-- the form is list -->
 
-- none: no test file lands before src/owns stands on main
+- `src/imports/purity_test.go`
+- `src/imports/guards_test.go`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
 <!-- the form is text -->
 
-src/owns, owns.yaml and the walkaround analyzer stand on origin/work/doors-declare-what-they-own alone. A test naming owns.Unheld or a run key builds on no commit of this branch, so it fails on the build and never on its own assertion. The ticket now carries depends_on: doors-declare-what-they-own, and tests-red opens on branch sync once that group merges.
+The reach case and the kinds case fail on their assertions over the stub, and the guard list case fails until purity joins it. The two sparing cases pass over the stub already, and they turn into the guard against a guard naming too much once the code lands. The redraft stands under Discussion, since the draft above names src/owns, which stands on no main.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-every done_when line meets a test the draft names, and none can fail on its assertion before src/owns lands
-the tests reach no door: they run the walkaround analyzer over planted packages through analysistest, as the doors branch's own cases do
+- done_when one is the Discussion table, two and three meet purity_test.go, and four meets the check at tests-green
+- the cases parse planted text, so they reach no door
 
 # gate
 
@@ -419,6 +433,23 @@ the tests reach no door: they run the walkaround analyzer over planted packages 
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The redraft, which tests-red and the gate read in place of the draft above. `src/owns` stands on no `main`, so the guard builds on the guards in `src/imports` that this group landed.
+
+- `ImpureFunctions` in `src/imports/purity.go` names each top-level function and method of a non-test Go file that calls a Go name of `OutsideKinds`, unless its package calls `q.IO()`, or its doc or body carries `level0: Impure - <why>`.
+- It reads direct reaches alone, so a caller of a marked function stays pure.
+- It joins `imports.Guards` as `purity`, in report mode against `src/imports/baseline/purity.txt`, and counts per package.
+- The verb functions in `src/quack` carry the marker as they gain reasons, and the baseline shrinks with each one.
+
+| the outside kind | its IO module on `main` | its guard case |
+|---|---|---|
+| files | `src/modules/files` | `os.ReadFile` in `TestAFunctionReachingTheOutsideIsNamed` |
+| processes | none: the gap | `exec.Command` in the same case |
+| network | `src/modules/hooks`, `src/modules/lsp`, `src/modules/mcp` | `http.Get` in the same case |
+| clock | `src/modules/clock` | `time.Now` in the same case |
+| random numbers | none: the gap | `rand.Read` in the same case |
+| git | `src/modules/git` | `exec.Command` naming `git` in the same case |
+| the index | `src/modules/index` | `index.Ask` and `sql.Open` in the same case |
 
 The seven outside kinds, read off the Go declarations of `origin/work/doors-declare-what-they-own`. The `owns.yaml` declarations and `src/owns` stand on that branch alone, and none of them stands on `origin/main` yet.
 
