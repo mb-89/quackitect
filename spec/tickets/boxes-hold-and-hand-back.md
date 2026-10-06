@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: split
+step: children
 record:
   - step: sync
     hand: box 3341fdcd540f · claude-code-remote
@@ -96,6 +96,15 @@ record:
         exit: 0
         said: work/boxes-hold-and-hand-back already carries every commit on main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box 3341fdcd540f · claude-code-remote
+    hash_before: 9dcab0e04a61c0a6980b4af5f535b6e51abfee67
+    hash_after: 9dcab0e04a61c0a6980b4af5f535b6e51abfee67
+    inputs:
+      - name: ask
+        hash: 1d203dacf8882c98
+        size: 453
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -120,14 +129,28 @@ A cloud box holds its branch while it lives, and hands its work on whole when it
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+[[spec/tickets/holds-beat-with-the-session]] standard
+[[spec/tickets/takeover-rescues-unpushed-commits]] standard
+[[spec/tickets/cloud-turns-end-without-questions]] standard
+[[spec/tickets/cloud-boxes-wait-in-turn]] trivial
+[[spec/tickets/beat-after-joins-schema]] trivial
+[[spec/tickets/beat-hook-stays-quiet]] trivial
+[[spec/tickets/beats-pass-the-push-gate]] trivial
+[[spec/tickets/ended-beat-ties-the-tip]] trivial
+[[spec/tickets/cloud-question-check-leaves-readstext]] trivial
+[[spec/tickets/rescue-passes-the-stamp-gate]] trivial
+[[spec/tickets/ci-skips-rescue-and-beats]] trivial
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every child is small enough to review whole: the three standard children each touch one mechanism, and the trivial ones one line or one case
+the children add up to the goal: the beat holds a live branch, the rescue hands a dead box work on, the turn ends on a decision, and the box waits inside its turn; nothing of the ask stands outside them
+no child waits on another now: every child stands closed, and the rescue children followed their parent through its gate
 
 # children
 
