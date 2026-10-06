@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -155,7 +155,23 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: e7ed0badf886b5b5
+  - step: retro/cloud
+    hand: box 31f16efb1b52 · claude-code-remote
+    hash_before: 064b15e06c8ba97df2e2bd2cbeb125744a122b8f
+    hash_after: 064b15e06c8ba97df2e2bd2cbeb125744a122b8f
+    inputs:
+      - name: retro/write
+        hash: 8a7c5071411b37c6
+        size: 1893
+      - name: [[spec/design_output/level0]]
+        hash: 54ec69d2728d6aaf
+        size: 92174
+      - name: [[spec/guidance/cloud/cloud]]
+        hash: 7c1b55b24304355c
+        size: 3362
+    def: 4da1ca5da87d5bbc
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -298,20 +314,26 @@ The dispatch named work/examples-run-as-tests, and the take handed this fix grou
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 23:24 UTC: the MCP ticket pull door, whose local server refused its connection
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 23:28 UTC: a conflict at sync in the group ticket, which the front writer merged on its own
+- the git write guard, which sent the push through the commit verb
+- the gate guard, which split ticket open from the pull
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted
+- the dispatched group work/examples-run-as-tests still waits on the owner read at example-schema-reads-steps
 
 # Discussion
 
