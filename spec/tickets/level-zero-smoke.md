@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -146,6 +146,55 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 7536c7e41ef0bdcb62ca8c4c2d7673ee64468bcb
+    hash_after: 7536c7e41ef0bdcb62ca8c4c2d7673ee64468bcb
+    inputs:
+      - name: retro/write
+        hash: e4dd36d1460d661f
+        size: 3799
+      - name: [[spec/tickets/level0-smoke-runs-in-seconds]]
+        hash: 1ba74feccc7fa8db
+        size: 625
+      - name: [[spec/tickets/probe-at-revision-guards-merges]]
+        hash: 015d35ecc32e1941
+        size: 508
+      - name: [[spec/tickets/probe-at-stays-dry]]
+        hash: 27c821b6ad5f4b81
+        size: 602
+      - name: [[spec/tickets/merge-deny-every-connector]]
+        hash: d945b21bdfca39f5
+        size: 430
+      - name: [[spec/tickets/runme-road-waits-on-ready]]
+        hash: 4db3bc82c38588d5
+        size: 401
+      - name: [[spec/tickets/the-check-ends-what-it-drops]]
+        hash: 21bf3069c0e18f63
+        size: 421
+      - name: [[spec/tickets/ending-windows-tree-tested]]
+        hash: c0611586865b9087
+        size: 274
+      - name: [[spec/tickets/vale-call-takes-endswhole]]
+        hash: 78d2853b43624499
+        size: 280
+      - name: [[spec/tickets/the-index-outlives-the-check]]
+        hash: 972de3a0dd10e09f
+        size: 482
+      - name: [[spec/tickets/door-outlives-taskkill-tree]]
+        hash: cbdf1802dd8c454b
+        size: 457
+      - name: [[spec/tickets/level0-claims-name-the-platform]]
+        hash: f2b473ba57ff3686
+        size: 326
+      - name: [[spec/tickets/platform-draft-names-checkdoors]]
+        hash: 6797cbe800abc30c
+        size: 278
+      - name: [[spec/tickets/platform-red-line-tested]]
+        hash: 933f016133cd9e76
+        size: 232
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -301,20 +350,28 @@ The box weighed minting the sleep-loop fix into this group and kept it out, beca
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the gh command line, all through the run, so GitHub work rides the GitHub connector tools
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the index restart after a check, early in the run and at 19:06, which this group fixes
+- the GitWritesThroughAVerb hook at 19:11, which routes the push through the push verb
+- the ShellWritesNothing hook at 19:15, which routes a scratch file through the write door
+- no conflict at sync, since the branch carried every commit on main
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/desk-probe-reply-trial]] stands open on main for the owner, since the live client on a Windows desk lies past every box
+- the Windows cases first run on the windows-latest runner, so the pull request CI reads their result
+- the handover names the pull request, its CI and the backlog findings the retro names
 
 # Discussion
 
