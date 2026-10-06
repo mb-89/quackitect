@@ -311,7 +311,7 @@ export function carriesLogin(it, config) {
 }
 
 // [[spec/design_output/level0#the-cold-probe]]
-function takesDelta(it, temp, tree, delta, say) {
+export function takesDelta(it, temp, tree, delta, say) {
   if (!delta) return true;
   const patch = it.join(temp, "staged.patch");
   it.disk.write(patch, delta.endsWith("\n") ? delta : `${delta}\n`);

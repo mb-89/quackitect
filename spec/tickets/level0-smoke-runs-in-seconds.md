@@ -379,3 +379,8 @@ This ticket carries the tests-green step of [[spec/tickets/level0-claims-name-th
 - `go test ./src/quack/` passes a case where `level0Runs` on Windows names the desk trial that covers it.
 - the red line names the platform beside the tree going red.
 - `./RUNME.sh check` exits 0.
+
+The cases covering the smoke road landed at tests-red, and these commands run them:
+
+    node --test test/level0/probe-dry.test.js test/level0/start-constants.test.js
+    grep -n smoke src/quack/check_test.go src/quack/probe_verb_test.go

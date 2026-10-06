@@ -14,7 +14,7 @@ import (
 )
 
 // The words the probe answers, and the line an unknown word prints. [[spec/tickets/box-verbs-port-to-go]]
-const probeUsage = "Usage: ./RUNME.sh probe compact|cold|dry|reply"
+const probeUsage = "Usage: ./RUNME.sh probe compact|cold|dry|smoke|reply"
 
 // The width of the float a JSON number reads as. [[spec/tickets/box-verbs-port-to-go]]
 const jsonFloatBits = 64
@@ -69,6 +69,9 @@ func probeVerb(d boxDoors, argv []string) int {
 		return probeCold(d, client, func(line string) { fmt.Fprintln(d.out, line) }, "")
 	// Level zero runs on a fresh box with no model and no key. [[spec/tickets/level0-runs-on-the-door]]
 	case "dry":
+		return probeDry(d, argv)
+	// Level zero runs over the tree as it stands, in seconds. [[spec/tickets/level0-smoke-runs-in-seconds]]
+	case "smoke":
 		return probeDry(d, argv)
 	// [[spec/tickets/the-reply-probe-runs]]
 	case "reply":
