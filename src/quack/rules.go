@@ -83,7 +83,7 @@ func lspRules(root string) func(path, text string) []lsp.Finding {
 	return func(path, text string) []lsp.Finding {
 		set, err := rulesAt(root)
 		if err != nil {
-			return []lsp.Finding{{Rule: lsp.ValeRuns, Line: 1, Column: 1, Message: "The rules load nothing, so every rule stands unchecked: " + err.Error(), Severity: "error"}}
+			return []lsp.Finding{{Rule: lsp.RulesLoad, Line: 1, Column: 1, Message: "The rules load nothing, so every rule stands unchecked: " + err.Error(), Severity: "error"}}
 		}
 		lines := strings.Split(text, "\n")
 		out := []lsp.Finding{}

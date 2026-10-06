@@ -95,7 +95,7 @@ func lspChecks(root string) lsp.Check {
 			return out
 		},
 		Draft: check.IsDraft, Relative: check.RelativeTo,
-		ValeIni: check.ValeIni, Survey: check.ToolsAt, Bin: check.Bin,
+		Survey: check.ToolsAt, Bin: check.Bin,
 		// [[spec/tickets/lsp-module-serves-the-features]]
 		Hover: overTree(func(tree *check.Tree, path string, line, character int) any {
 			return check.HoverAt(tree, path, line, character)

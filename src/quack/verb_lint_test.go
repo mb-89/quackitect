@@ -196,11 +196,11 @@ func TestLintVerb(t *testing.T) {
 			t.Fatalf("lint prints %q, and wants the open ticket's row alone", out)
 		}
 	})
-	t.Run("Vale failing stops the lint with its fault", func(t *testing.T) {
-		fake := &lintFake{tools: []check.Finding{{Rule: lsp.ValeRuns, Message: "Vale stands nowhere here."}}}
+	t.Run("a rules load that fails stops the lint with its fault", func(t *testing.T) {
+		fake := &lintFake{tools: []check.Finding{{Rule: lsp.RulesLoad, Message: "The rules load nothing, so every rule stands unchecked."}}}
 		code, out, errs := runsTwin(fake.verb(t, nil), "lint")
-		if code != exitFailed || out != "" || !strings.Contains(errs, "Vale stands nowhere here.\nVale read no file") {
-			t.Fatalf("lint answers %d, %q, %q, and wants the Vale fault", code, out, errs)
+		if code != exitFailed || out != "" || !strings.Contains(errs, "The rules load nothing") {
+			t.Fatalf("lint answers %d, %q, %q, and wants the rules load's fault", code, out, errs)
 		}
 	})
 	t.Run("no sweep stops the lint with its fault", func(t *testing.T) {

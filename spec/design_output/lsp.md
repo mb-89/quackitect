@@ -164,14 +164,14 @@ Biome extension:
 
 | the rows | the source |
 |---|---|
-| Vale's | `vale` |
+| the Go rules' | `rules` |
 | Biome's | `biome` |
 | the code faults and the exemption markers | `tree` |
 
 | the box | what the server draws |
 |---|---|
 | a row names a file the index holds nowhere, or a draft | nothing |
-| Vale answers a fault, or stands nowhere | `ValeRuns` on the config, in Vale's own words, so a broken rule stands in the panel |
+| the rules load nothing | `RulesLoad` on each file, naming the load's fault, so a broken rule stands in the panel |
 | no Biome | no Biome row |
 
 `StopFolderIsData` and `GridHolds` read JavaScript modules, so this server

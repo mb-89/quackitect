@@ -161,8 +161,8 @@ func lintReading(d lintDoors, asked []string) ([]check.Finding, string) {
 	}
 	found := []check.Finding{}
 	for _, one := range d.tools(where) {
-		if one.Rule == lsp.ValeRuns {
-			return nil, one.Message + "\nVale read no file, so every rule it holds stands unchecked."
+		if one.Rule == lsp.RulesLoad {
+			return nil, one.Message
 		}
 		found = append(found, one)
 	}
