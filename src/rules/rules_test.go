@@ -14,6 +14,14 @@ import (
 //go:embed testdata/cases.json
 var casesFile []byte
 
+//go:embed testdata/vale.json
+var valeFile []byte
+
+// What Vale answered over one rule's fixture and its twin. [[spec/tickets/go-rules-span-parity]]
+type valeAnswer struct {
+	Refuses []Finding `json:"refuses"`
+}
+
 // One rule's fixture: the path it reads as, the text it refuses, and the plain twin it passes. [[spec/tickets/go-rules-replace-vale]]
 type ruleCase struct {
 	Check   string `json:"check"`
@@ -121,5 +129,33 @@ func TestLintHonoursTheMarker(t *testing.T) {
 	found := ofRule(set.Lint(path, text), shouted)
 	if len(found) != 2 || found[0].Line != 1 || found[1].Line != 9 {
 		t.Errorf("the marked text answers %+v, and wants rows at lines 1 and 9 alone", found)
+	}
+}
+
+// Each rule's finding stands at Vale's line and span over the same match, since the editor and the fix verb place their edits there. [[spec/tickets/go-rules-span-parity]]
+func TestEachRulePlacesItsFindingWhereValeDid(t *testing.T) {
+	t.Parallel()
+	var cases []ruleCase
+	if err := json.Unmarshal(casesFile, &cases); err != nil {
+		t.Fatal(err)
+	}
+	var answers map[string]valeAnswer
+	if err := json.Unmarshal(valeFile, &answers); err != nil {
+		t.Fatal(err)
+	}
+	set := loaded(t)
+	for _, one := range cases {
+		t.Run(one.Check, func(t *testing.T) {
+			want := ofRule(answers[one.Check].Refuses, one.Check)
+			got := ofRule(set.Lint(one.Path, one.Refuses), one.Check)
+			if len(got) != len(want) {
+				t.Fatalf("%s answers %d row(s), and Vale answered %d: %+v", one.Check, len(got), len(want), want)
+			}
+			for index, row := range want {
+				if got[index].Line != row.Line || got[index].Span != row.Span || got[index].Match != row.Match {
+					t.Errorf("%s stands at %d:%v on %q, and Vale stood at %d:%v on %q", one.Check, got[index].Line, got[index].Span, got[index].Match, row.Line, row.Span, row.Match)
+				}
+			}
+		})
 	}
 }
