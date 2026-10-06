@@ -9,6 +9,7 @@ import (
 	"os" // level0: OutsideInDoors - the case reads the declarations the tree holds, as a build check reads source
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -160,6 +161,21 @@ func TestEveryIOModuleAndDoorDeclares(t *testing.T) {
 			t.Errorf("%s is a door, and no %s holds it", at, File)
 		}
 	}
+}
+
+// The process door declares itself, so its contract test has an owner and its runs walk around nothing. [[spec/design_output/doors#the-process-door]]
+func TestTheProcessDoorOwnsTheRunsAndNamesItsContract(t *testing.T) {
+	t.Parallel()
+	doors, _ := doorsOf(t)
+	for _, one := range doors {
+		if one.At == "src/proc" {
+			if !slices.Contains(one.Go, "os/exec") || !slices.Contains(one.Contract, "src/proc/proc_contract_test.go") || !one.Holds("src/proc/proc.go") {
+				t.Fatalf("the process door reads %+v, and wants os/exec owned, its contract named and src/proc/proc.go held", one)
+			}
+			return
+		}
+	}
+	t.Fatal("no door named proc stands in the tree")
 }
 
 func TestEveryContractTestNamesItsDoor(t *testing.T) {

@@ -117,6 +117,17 @@ func fakeSh(one Command) Said {
 			}
 		}
 		return Said{}
+	case "printf %s \"$PROC_CONTRACT$PROC_CONTRACT_KEPT\"":
+		var said strings.Builder
+		seen := append(without(os.Environ(), one.Drop), one.Env...)
+		for _, name := range []string{"PROC_CONTRACT=", "PROC_CONTRACT_KEPT="} {
+			for _, pair := range seen {
+				if value, ok := strings.CutPrefix(pair, name); ok {
+					said.WriteString(value)
+				}
+			}
+		}
+		return Said{Out: said.String()}
 	}
 	return Said{Err: "sh: the fake holds no answer to " + one.Argv[2], Code: 2}
 }
@@ -195,6 +206,18 @@ func TestARunDropsTheVariablesItNames(t *testing.T) {
 		}
 		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}, Env: []string{"PROC_CONTRACT=held"}}); said.Out != "held" || said.Code != 0 {
 			t.Errorf("the %s runner answers %+v, and wants the pair in Env past the drop", name, said)
+		}
+	}
+}
+
+// A drop names a variable whole, so a variable whose name runs longer stays. [[spec/design_output/doors#the-process-door]]
+func TestADropKeepsAVariableWhoseNameRunsLonger(t *testing.T) {
+	t.Setenv("PROC_CONTRACT", "box")
+	t.Setenv("PROC_CONTRACT_KEPT", "kept")
+	for name, run := range runners() {
+		line := []string{"sh", "-c", "printf %s \"$PROC_CONTRACT$PROC_CONTRACT_KEPT\""}
+		if said := run(Command{Argv: line, Drop: []string{"PROC_CONTRACT"}}); said.Out != "kept" || said.Code != 0 {
+			t.Errorf("the %s runner answers %+v, and wants PROC_CONTRACT dropped and PROC_CONTRACT_KEPT read", name, said)
 		}
 	}
 }
