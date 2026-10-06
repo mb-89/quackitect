@@ -82,12 +82,26 @@ type fireRow struct {
 	Hands []pullRow `json:"hands,omitempty"`
 }
 
-// [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
+// One fire: the branch it sends a worker to, and the text the worker reads. [[spec/tickets/ci-reds-name-their-cases]]
+type fireOne struct {
+	Branch, Text string
+}
+
+// The red conclusions a check run ends on. [[spec/tickets/ci-reds-name-their-cases]]
+var redConclusions = []string{"failure", "timed_out"}
+
+// [[spec/design_input/the-cloud-runs-itself#firing-the-workers]] [[spec/tickets/ci-reds-name-their-cases]]
 func (d *Doors) fire(plan *dispatchPlan) int {
 	out := &fireRow{Fired: []firedRow{}, Refused: []refusedRow{}, Left: []string{}, Pull: pullRow{State: "none"}}
 	plan.Fire = out
 	code := codeOK
-	if d.fires(d.Send, branchesOf(plan), out) != codeOK || d.pulled(plan.Write, &out.Pull) != codeOK {
+	ones := firesOf(plan)
+	red, why := d.redPulls(d.Send, plan, ones)
+	fired := d.fires(d.Send, append(ones, red...), out)
+	if why != "" {
+		out.Why = strings.TrimSpace(out.Why + " " + why)
+	}
+	if fired != codeOK || d.pulled(plan.Write, &out.Pull) != codeOK || why != "" {
 		code = codeRed
 	}
 	// A done branch holding no pull request gets one, so no pushed branch stands without. [[spec/tickets/branch-done-opens-the-pr]]
@@ -102,19 +116,76 @@ func (d *Doors) fire(plan *dispatchPlan) int {
 }
 
 // The ready groups first, then the stuck hand-overs, one branch each. [[spec/design_input/the-cloud-runs-itself#the-hand-over]]
-func branchesOf(plan *dispatchPlan) []string {
-	var out []string
+func firesOf(plan *dispatchPlan) []fireOne {
+	var branches []string
 	for _, one := range plan.Ready {
-		out = append(out, one.Branch)
+		branches = append(branches, one.Branch)
 	}
 	for _, one := range plan.Stuck {
-		out = append(out, workBranch+one.Group)
+		branches = append(branches, workBranch+one.Group)
+	}
+	out := []fireOne{}
+	for _, branch := range branches {
+		out = append(out, fireOne{Branch: branch, Text: "The dispatch fires this run for " + branch + ". Take that branch."})
 	}
 	return out
 }
 
+// The open work pull requests whose check reads red, one fire each, on a branch at done the plan fires nowhere else. A worker on the branch moves it off done, so no second fire follows. A run with no PULL_TOKEN reads none, and a refused read says why. [[spec/tickets/ci-reds-name-their-cases]]
+func (d *Doors) redPulls(send Send, plan *dispatchPlan, taken []fireOne) ([]fireOne, string) {
+	gh, missing := d.hubOf(d.env("PULL_TOKEN"), "PULL_TOKEN")
+	if missing != "" {
+		return nil, ""
+	}
+	fired := map[string]bool{}
+	for _, one := range taken {
+		fired[one.Branch] = true
+	}
+	listed := sent(send, gh.API+"/repos/"+gh.Repo+"/pulls?state=open&per_page=100", Request{Method: "GET", Headers: gh.Headers})
+	if !okOf(listed) {
+		return nil, "The open pull request list came back " + strconv.Itoa(listed.Status) + ": " + reasonOf(listed) + "."
+	}
+	var pulls []struct {
+		URL  string `json:"html_url"`
+		Head struct {
+			Ref string `json:"ref"`
+			Sha string `json:"sha"`
+		} `json:"head"`
+	}
+	if json.Unmarshal([]byte(listed.Text), &pulls) != nil {
+		pulls = nil
+	}
+	out := []fireOne{}
+	var why []string
+	for _, one := range pulls {
+		ref := one.Head.Ref
+		if !strings.HasPrefix(ref, workBranch) || fired[ref] || !plan.atDone[ref] || one.Head.Sha == "" {
+			continue
+		}
+		runs := sent(send, gh.API+"/repos/"+gh.Repo+"/commits/"+one.Head.Sha+"/check-runs", Request{Method: "GET", Headers: gh.Headers})
+		if !okOf(runs) {
+			why = append(why, "The check runs of "+ref+" came back "+strconv.Itoa(runs.Status)+": "+reasonOf(runs)+".")
+			continue
+		}
+		var read struct {
+			Runs []struct {
+				Conclusion string `json:"conclusion"`
+			} `json:"check_runs"`
+		}
+		_ = json.Unmarshal([]byte(runs.Text), &read)
+		for _, run := range read.Runs {
+			if slices.Contains(redConclusions, run.Conclusion) {
+				fired[ref] = true
+				out = append(out, fireOne{Branch: ref, Text: "The check on " + one.URL + " reads red. Take " + ref + ", fix the red cases its check log ends on, run ./RUNME.sh check, and push."})
+				break
+			}
+		}
+	}
+	return out, strings.Join(why, " ")
+}
+
 // One fire a branch up to the cap, and a rate refusal stops the rest. [[spec/design_input/the-cloud-runs-itself#firing-the-workers]]
-func (d *Doors) fires(send Send, branches []string, out *fireRow) int {
+func (d *Doors) fires(send Send, ones []fireOne, out *fireRow) int {
 	url, token := d.env("ROUTINE_FIRE_URL"), d.env("ROUTINE_FIRE_TOKEN")
 	var missing []string
 	for name, value := range map[string]string{"ROUTINE_FIRE_URL": url, "ROUTINE_FIRE_TOKEN": token} {
@@ -123,17 +194,20 @@ func (d *Doors) fires(send Send, branches []string, out *fireRow) int {
 		}
 	}
 	if len(missing) > 0 {
-		if len(branches) == 0 {
+		if len(ones) == 0 {
 			return codeOK
 		}
 		if len(missing) > 1 {
 			missing = []string{"ROUTINE_FIRE_URL", "ROUTINE_FIRE_TOKEN"}
 		}
 		out.Why = "The run holds no " + strings.Join(missing, " and no ") + ", so it fires nothing."
-		out.Left = append(out.Left, branches...)
+		for _, one := range ones {
+			out.Left = append(out.Left, one.Branch)
+		}
 		return codeRed
 	}
-	for at, branch := range branches {
+	for at, one := range ones {
+		branch := one.Branch
 		if at >= fireCap || out.Wait != "" {
 			out.Left = append(out.Left, branch)
 			continue
@@ -145,7 +219,7 @@ func (d *Doors) fires(send Send, branches []string, out *fireRow) int {
 				"anthropic-version": fireVersion,
 				"Content-Type":      "application/json",
 			},
-			Body: jsonLine(map[string]string{"text": "The dispatch fires this run for " + branch + ". Take that branch."}),
+			Body: jsonLine(map[string]string{"text": one.Text}),
 		})
 		if okOf(said) {
 			out.Fired = append(out.Fired, firedRow{Branch: branch, Session: jsonText(readOf(said)["claude_code_session_url"])})

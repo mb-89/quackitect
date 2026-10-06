@@ -68,7 +68,13 @@ func TestDispatchOpensNoSecondPullRequestForADoneBranch(t *testing.T) {
 	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "work/landing"}, "html_url": "https://github.example/" + dfRepo + "/pull/7"})
 	one.out.Reset()
 	Dispatch(one.d, hub.send, []string{"--fire"})
-	listed := hub.pullsSent("GET")
+	// The red fire lists every open pull request first, so the test reads the head lists alone. [[spec/tickets/ci-reds-name-their-cases]]
+	var listed []dfSent
+	for _, said := range hub.pullsSent("GET") {
+		if strings.Contains(said.URL, "head=") {
+			listed = append(listed, said)
+		}
+	}
 	if len(listed) != 1 || !strings.HasSuffix(listed[0].URL, "head=owner:work/landing") {
 		t.Fatalf("the dispatch lists %v", listed)
 	}

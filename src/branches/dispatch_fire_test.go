@@ -39,9 +39,10 @@ type dfSent struct {
 
 // A GitHub and a routine that keep what they hear, and a GitHub that keeps the pull requests it opens, so a second run reads the first one's. [[spec/design_output/doors#a-fake-behaves]]
 type dfHub struct {
-	sent  []dfSent
-	pulls []map[string]any
-	fire  func() Reply
+	sent   []dfSent
+	pulls  []map[string]any
+	checks map[string][]string
+	fire   func() Reply
 	// The number of the pull request whose update meets a conflict. [[spec/tickets/running-work-takes-main-fixes]]
 	conflicts string
 }
@@ -83,6 +84,13 @@ func (hub *dfHub) send(url string, request Request) (Reply, error) {
 		return dfJSON(202, map[string]any{"message": "Updating pull request branch."}, nil), nil
 	case url == dfAPI+"/graphql" && request.Method == "POST":
 		return dfJSON(200, map[string]any{"data": map[string]any{"enablePullRequestAutoMerge": map[string]any{"clientMutationId": nil}}}, nil), nil
+	case strings.HasPrefix(url, dfAPI+"/repos/"+dfRepo+"/commits/") && request.Method == "GET":
+		sha, _, _ := strings.Cut(strings.TrimPrefix(url, dfAPI+"/repos/"+dfRepo+"/commits/"), "/")
+		runs := []map[string]any{}
+		for _, one := range hub.checks[sha] {
+			runs = append(runs, map[string]any{"name": "check", "status": "completed", "conclusion": one})
+		}
+		return dfJSON(200, map[string]any{"total_count": len(runs), "check_runs": runs}, nil), nil
 	}
 	return Reply{Status: 404, Text: "no route"}, nil
 }
@@ -173,6 +181,31 @@ func dfBody(t *testing.T, one dfSent) map[string]any {
 		t.Fatal(err)
 	}
 	return out
+}
+
+// A work pull request whose check reads red gets a worker, told where and what to fix; a green one, another branch's, one the plan fires already, and one a worker took off done get none. [[spec/tickets/ci-reds-name-their-cases]]
+func TestDispatchFiresAWorkerAtARedWorkPullRequest(t *testing.T) {
+	t.Parallel()
+	hub := newHub()
+	hub.checks = map[string][]string{"sha-red": {"success", "failure"}, "sha-green": {"success"}}
+	pull := func(ref, sha string, number int) map[string]any {
+		return map[string]any{"number": number, "html_url": fmt.Sprintf("https://github.example/%s/pull/%d", dfRepo, number), "head": map[string]any{"ref": ref, "sha": sha}}
+	}
+	hub.pulls = append(hub.pulls, pull("work/red", "sha-red", 8), pull("work/green", "sha-green", 9), pull("claude/dispatch-abc1234", "sha-red", 10), pull("work/first", "sha-red", 11), pull("work/taken", "sha-red", 12))
+	plan := dfPlan([]string{"first"}, nil, nil, nil)
+	plan.atDone = map[string]bool{"work/red": true, "work/green": true}
+	if code := dfFired(hub, plan, nil); code != codeOK {
+		t.Fatalf("the fire answers %d", code)
+	}
+	sent := hub.fires()
+	if len(sent) != 2 {
+		t.Fatalf("the fire sends %d, and wants the ready group and the red pull request", len(sent))
+	}
+	holds(t, dfBody(t, sent[0])["text"].(string), "work/first")
+	red := dfBody(t, sent[1])["text"].(string)
+	holds(t, red, "work/red")
+	holds(t, red, "https://github.example/owner/repo/pull/8")
+	holds(t, red, "./RUNME.sh check")
 }
 
 func TestDispatchFiresOnceAReadyGroupAndOnceAStuckHandOver(t *testing.T) {

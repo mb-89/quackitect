@@ -70,6 +70,8 @@ type dispatchPlan struct {
 	Fire    *fireRow    `json:"fire,omitempty"`
 	// The work branches at done that carry a commit main lacks, whose pull request the fire opens. [[spec/tickets/dispatch-skips-merged-done-branches]]
 	Done []string `json:"done,omitempty"`
+	// The work branches standing at done, which a red fire reads. [[spec/tickets/ci-reds-name-their-cases]]
+	atDone map[string]bool
 }
 
 // The parts of the plan, in the order the dry run prints them. [[spec/design_input/the-cloud-runs-itself#the-dispatcher]]
@@ -105,7 +107,7 @@ func (d *Doors) planned() (*dispatchPlan, workRead) {
 	trunkTickets := trunkOf(loose)
 	free := d.freeIn(stood, standing, now, trunkTickets)
 	freed := map[string]bool{}
-	plan := &dispatchPlan{Ready: []readyRow{}, Held: []heldRow{}, Waiting: []waitRow{}, Stuck: []stuckRow{}}
+	plan := &dispatchPlan{Ready: []readyRow{}, Held: []heldRow{}, Waiting: []waitRow{}, Stuck: []stuckRow{}, atDone: map[string]bool{}}
 	for _, one := range free {
 		freed[one.Branch] = true
 		plan.Ready = append(plan.Ready, readyRow{Group: one.Name, Branch: one.Branch})
@@ -121,6 +123,7 @@ func (d *Doors) planned() (*dispatchPlan, workRead) {
 				plan.Waiting = append(plan.Waiting, waitRow{Group: one.Name, Waits: waits})
 			}
 		case done:
+			plan.atDone[one.Branch] = true
 			if why := d.stuckIn(one, now); why != "" {
 				plan.Stuck = append(plan.Stuck, stuckRow{Group: one.Name, Why: why})
 			}
