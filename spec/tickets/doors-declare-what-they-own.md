@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: sync
+step: split
 record:
   - step: sync
     hand: box 86086f797ef7 · claude-code-remote
@@ -91,6 +91,15 @@ record:
   - step: sync
     hand: box add8d8d0dd3d · claude-code-remote
     hash_before: 8f1ec24d9f276cee46ea41a3acbb797c9c5dc6f1
+  - step: sync
+    hand: box add8d8d0dd3d · claude-code-remote
+    hash_before: 24c4d3ad77b895af516ac6ed334fb47a340afcc1
+    hash_after: 24c4d3ad77b895af516ac6ed334fb47a340afcc1
+    answered:
+      - name: sync
+        exit: 0
+        said: work/doors-declare-what-they-own already carries every commit on main.
+    def: 8a9850a81227554b
 ---
 
 # Ask
@@ -106,8 +115,9 @@ Done when the guard refuses, not reports, every walk-around, the walk-around lis
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
