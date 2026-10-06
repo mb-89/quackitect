@@ -13,19 +13,32 @@ import (
 
 var standsAt = time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
 
-func TestTheRealClockAndTheFakeAreAQClock(t *testing.T) {
-	t.Parallel()
-	for name, one := range map[string]q.Clock{"real": New(), "fake": NewFake(standsAt)} {
-		if one == nil {
-			t.Errorf("the %s clock reads as no q.Clock", name)
-		}
+// The waits a clock offers beside the time now. [[spec/tickets/go-waits-on-events]]
+type waiter interface {
+	After(span time.Duration) <-chan time.Time
+	AfterFunc(span time.Duration, hand func()) (stop func() bool)
+	WithTimeout(parent context.Context, span time.Duration) (context.Context, context.CancelFunc)
+}
+
+func waiterOf(t *testing.T, one any) waiter {
+	t.Helper()
+	found, ok := one.(waiter)
+	if !ok {
+		t.Fatalf("%T offers no After, AfterFunc and WithTimeout", one)
 	}
+	return found
+}
+
+func TestTheRealClockAndTheFakeWait(t *testing.T) {
+	t.Parallel()
+	waiterOf(t, New())
+	waiterOf(t, NewFake(standsAt))
 }
 
 func TestTheFakeFiresAfterOnTick(t *testing.T) {
 	t.Parallel()
 	fake := NewFake(standsAt)
-	fired := fake.After(time.Second)
+	fired := waiterOf(t, fake).After(time.Second)
 	fake.Tick(time.Second - time.Millisecond)
 	select {
 	case <-fired:
@@ -43,7 +56,7 @@ func TestTheFakeFiresAfterOnTick(t *testing.T) {
 func TestTheFakeEndsAContextOnTick(t *testing.T) {
 	t.Parallel()
 	fake := NewFake(standsAt)
-	bounded, cancel := fake.WithTimeout(context.Background(), time.Second)
+	bounded, cancel := waiterOf(t, fake).WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	fake.Tick(time.Second)
 	select {
@@ -60,7 +73,7 @@ func TestAStoppedAfterFuncNeverRuns(t *testing.T) {
 	t.Parallel()
 	fake := NewFake(standsAt)
 	ran := false
-	stop := fake.AfterFunc(time.Second, func() { ran = true })
+	stop := waiterOf(t, fake).AfterFunc(time.Second, func() { ran = true })
 	if !stop() {
 		t.Fatal("stop reports the hand gone before its span")
 	}

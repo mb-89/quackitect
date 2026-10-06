@@ -23,9 +23,10 @@ func clockSuite(t *testing.T, one Clock, pass func()) {
 }
 
 func afterSuite(t *testing.T, one Clock, pass func()) {
-	fired := one.After(time.Millisecond)
+	waits := waiterOf(t, one)
+	fired := waits.After(time.Millisecond)
 	ran := make(chan struct{})
-	one.AfterFunc(time.Millisecond, func() { close(ran) })
+	waits.AfterFunc(time.Millisecond, func() { close(ran) })
 	pass()
 	for name, each := range map[string]<-chan struct{}{"After": drained(fired), "AfterFunc": ran} {
 		select {
