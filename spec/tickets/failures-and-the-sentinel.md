@@ -147,6 +147,7 @@ record:
         hash: 88bf6a4f020f44dd
         size: 263
     def: 08e16d07b0de477c
+depends_on: failure-nodes-stand, failure-door-raises, failure-check-refuses, sentinel-fires-watches, failure-verbs-raise-and-register
 ---
 
 # Ask
