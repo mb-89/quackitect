@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: 3eb72c6a81da690e2f7fd0d1e41b57224835cbb4
+    hash_after: 3eb72c6a81da690e2f7fd0d1e41b57224835cbb4
+    inputs:
+      - name: ask
+        hash: 0fce39be9f102ff2
+        size: 839
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -162,38 +171,57 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+[[spec/design_output/model#the-guards-hold-a-baseline]]. A pure function, `HandScripts`, in `src/imports/script.go` names each tracked script outside the engine that carries no marker. A guard entry `script` in `src/imports/guards.go` runs it. In `src/quack/retro_classes.go`, `retroDrainedFolders` gains the collected scripts, so `retro classes` refuses a script with no disposition, as it refuses a note. The classify step in `spec/processes/retro.yaml` and `spec/guidance/retro/classify.md` say a script takes a promotion: a ticket for a verb or an engine function, or done where one stands.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- `src/imports/guards.go` `Guards`, which gains the entry
+- `src/quack/retro_classes.go` `retroDrainedOf`, which walks the new folder
+- every open ticket whose route carries the retro, which `./RUNME.sh ticket update` moves onto the new classify text
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- `src/imports/script_test.go` `TestATrackedScriptOutsideTheEngineIsNamed`
+- `src/imports/script_test.go` `TestTheEngineAndAMarkedScriptAreSpared`
+- `src/quack/retro_classes_test.go` `TestRetroClassesHoldEveryNoteAndMemoryAndTheReportListsThemWithTheChecklistAndTheLimits`, which gains a collected script
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first draft
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- `src/imports/script.go`
+- `src/imports/script_test.go`
+- `src/imports/guards.go`
+- `src/imports/baseline/script.txt`
+- `src/quack/retro_classes.go`
+- `src/quack/retro_classes_test.go`
+- `spec/processes/retro.yaml`
+- `spec/guidance/retro/classify.md`
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- `retroDrainedFolders`, `retroDrainedOf`, the collect step and the classify step stand opened
+- the callers line names the registry, the drained walk and the routes the process change moves
+- each done_when line meets a case: the guard in the script cases, the classify refusal in the retro classes case
 
 ## tests-red
 
