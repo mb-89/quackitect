@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 2f0e49e2fdcd8f7d
         size: 1711
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 09cf21ad3c5d · claude-code-remote · helper-4
+    hash_before: 191355695e8684b66b714ebafbce1205ff14b41b
+    hash_after: 191355695e8684b66b714ebafbce1205ff14b41b
+    inputs:
+      - name: design/draft
+        hash: 2f0e49e2fdcd8f7d
+        size: 1711
+      - name: design/tests-red
+        hash: 3775347d2e198c47
+        size: 483
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -275,8 +287,11 @@ The case fails on its own assertion: the Go lint leaves nothing for the check. T
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- lint-strict-leaves-erred: since rules-lint-changed-files-first the check's first part runs `lint --changed --strict`, where a warning refuses, yet the approach leaves a warning under stood alone as lintFoundOf did, so a red changed part answers `check --errors` with no line naming it; leave a finding the lint refuses under erred, so --strict puts its warnings there
+- lint-contract-test-leaves: test/contract/cli-read.test.js reads the lint's log rows off the source of src/scripts/cli-read.js, and the approach names it among the callers and leaves it out of size, so it breaks once lint leaves that file; drop its lint cases or the file with the rest
 
 # implement
 
