@@ -72,6 +72,9 @@ function builtIn(it, from) {
 // The word that carries the working change into the clone. [[spec/tickets/the-check-takes-a-minute]]
 export const WORKING = "--working";
 
+// The word naming the commit the dry road runs at, which the Go probe verb resolves first. [[spec/tickets/probe-at-revision-guards-merges]]
+const AT = "--at";
+
 // The word the Go probe verb hands the entry for the smoke road. [[spec/tickets/level0-smoke-runs-in-seconds]]
 const SMOKE_WORD = "smoke";
 
@@ -87,8 +90,9 @@ export function deltaOf(here, at) {
 }
 
 // [[spec/tickets/level0-runs-on-the-door]]
-export function probeDry(root, it, say = console.log, delta = "") {
-  return probed(root, it, say, delta, { stands: coldTree, clears: true, checks: DRY.checks });
+export function probeDry(root, it, say = console.log, delta = "", at = "") {
+  const stands = (from, doors, said, where) => coldTree(from, doors, said, { ...where, at });
+  return probed(root, it, say, delta, { stands, clears: true, checks: DRY.checks });
 }
 
 // [[spec/tickets/level0-smoke-runs-in-seconds]]
@@ -376,6 +380,8 @@ const shown = (said) => firstOf(JSON.stringify(said ?? null));
 // Run as its own program, the probe takes the working change where the words name it. [[spec/tickets/probe-dry-entry]]
 await verbMain(import.meta.url, async (words) => {
   const { it, root } = await import("./cli-doors.js");
-  const probe = words.includes(SMOKE_WORD) ? probeSmoke : probeDry;
-  return probe(root, it, console.log, words.includes(WORKING) ? deltaOf(it, root) : "");
+  const delta = words.includes(WORKING) ? deltaOf(it, root) : "";
+  if (words.includes(SMOKE_WORD)) return probeSmoke(root, it, console.log, delta);
+  const at = words.includes(AT) ? (words[words.indexOf(AT) + 1] ?? "") : "";
+  return probeDry(root, it, console.log, at ? "" : delta, at);
 });

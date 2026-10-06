@@ -205,6 +205,24 @@ func TestTheDryProbeRefusesARevisionGitCannotResolve(t *testing.T) {
 	}
 }
 
+// The smoke stands on the tree as it is, so it takes no revision, and neither does the working change. [[spec/tickets/probe-at-stays-dry]]
+func TestTheSmokeRefusesARevision(t *testing.T) {
+	t.Parallel()
+	d, runner, _, errs := fakeBoxDoors(t)
+	if code := probeVerb(d, []string{"smoke", "--at", "HEAD~1"}); code != exitUsage || len(runner.ran) != 0 || !strings.Contains(errs.String(), "dry road alone") {
+		t.Errorf("the smoke at a revision answers %d, runs %v, says %q", code, runner.ran, errs)
+	}
+}
+
+// [[spec/tickets/probe-at-stays-dry]]
+func TestTheDryProbeRefusesARevisionBesideTheWorkingChange(t *testing.T) {
+	t.Parallel()
+	d, runner, _, errs := fakeBoxDoors(t)
+	if code := probeVerb(d, []string{"dry", "--working", "--at", "HEAD~1"}); code != exitUsage || len(runner.ran) != 0 || !strings.Contains(errs.String(), "--working") {
+		t.Errorf("a revision beside the working change answers %d, runs %v, says %q", code, runner.ran, errs)
+	}
+}
+
 // The smoke road starts the same entry with its words, as the dry road does. [[spec/tickets/level0-smoke-runs-in-seconds]]
 func TestTheSmokeProbeHandsItsRoadToTheEntry(t *testing.T) {
 	t.Parallel()

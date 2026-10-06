@@ -71,3 +71,7 @@ the approach assumes the check runs `probe dry`, and level0Runs in src/quack/che
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+This change also lands the revision road of [[spec/tickets/probe-at-revision-guards-merges]], since the refusals stand in the same function. The cold tree case covers the JavaScript half:
+
+    node --test test/level0/probe-dry.test.js
