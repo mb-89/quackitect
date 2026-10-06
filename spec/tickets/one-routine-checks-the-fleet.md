@@ -156,6 +156,7 @@ record:
         hash: 733bb02b6ec002b3
         size: 854
     def: dc4904ab364efa10
+depends_on: the-fleet-verb-watches-boxes
 ---
 
 # Ask
