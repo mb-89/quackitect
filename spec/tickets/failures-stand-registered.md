@@ -145,7 +145,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 83c32b2b4d58 · claude-code-remote
+    hash_before: e8e603de9038f4ef26a77fd20e58c68a2b979fc5
+    hash_after: e8e603de9038f4ef26a77fd20e58c68a2b979fc5
+    inputs:
+      - name: retro/write
+        hash: 25435732da6546b5
+        size: 4613
+    def: 4da1ca5da87d5bbc
+step: children
 ---
 
 # Ask
@@ -322,20 +331,30 @@ the chapter names roles alone, and no person, address or box path
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- 16:26 to 17:15: the auto mode classifier denied one command as irreversible local destruction
+- 16:26 to 17:15: a push of a stale branch met remote rejected, cannot lock ref
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- 16:26 to 17:15: the trunk guard refused a checkout of main, and refused a push of main from a cloud box
+- 16:26 to 21:17: the context cap cleared the conversation five times, and each window began on the handover
+- 16:26 to 18:21: the index dropped during a tests-green hand-back through the pull tool, a fault of this box alone, and the shell hand-back stood in
+- 19:44: the commit hook refused code with no test beside it
+- 21:26 and 21:30: LandingFollowsItsGate refused a piped landing, and the stop hook refused a stop that waited on helpers
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step stands parked
+- no ticket stands minted with no group
+- the handover says the group carries three open children the retro minted: index-survives-a-long-call, the-twins-leave-whole and the-hooks-feed-the-sentinel
 
 # Discussion
 
