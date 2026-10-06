@@ -94,11 +94,13 @@ func TestABareRunmeOnACloudBoxPrintsTheVerbs(t *testing.T) {
 	}
 }
 
-// A bare RUNME.sh on a desk with no editor names the editor to install and exits 1. [[spec/tickets/bare-runme-exits-clean]]
+// A bare RUNME.sh on a desk with no editor names the editor to install and exits 1, a cloud variable saying false or 0 among desks. [[spec/tickets/bare-runme-exits-clean]]
 func TestABareRunmeOnADeskWithNoEditorNamesIt(t *testing.T) {
 	t.Parallel()
-	code, out, errs := runBare(t)
-	if code != 1 || out != "" || errs != "No code stands on the PATH. Install VS Code, then open this folder in it.\n" {
-		t.Errorf("the bare call answers %d, %q, %q", code, out, errs)
+	for _, env := range [][]string{nil, {"SE_CLOUD=false"}, {"CLAUDE_CODE_REMOTE= 0 "}, {"SE_CLOUD="}} {
+		code, out, errs := runBare(t, env...)
+		if code != 1 || out != "" || errs != "No code stands on the PATH. Install VS Code, then open this folder in it.\n" {
+			t.Errorf("under %q the bare call answers %d, %q, %q", env, code, out, errs)
+		}
 	}
 }

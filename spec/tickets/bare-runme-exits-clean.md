@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: da25498fea11bdac
         size: 688
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 0e28860425a70a72c869219566a2edd14e78d987
+    hash_after: 0e28860425a70a72c869219566a2edd14e78d987
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -289,14 +298,19 @@ pass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches RUNME.sh and src/quack/runme_test.go, the two files the draft names, and nothing past them.
+The test runs the real script with a fake install and a fake binary in a temporary root, so no real install, index or editor runs.
+A comment above cloud_box names the approach and links the ticket, and the bare branch carries its own line.
+The cloud rule points at cloudVariables in src/quack/command.go, and the script follows that rule: a trimmed value, with empty, 0 or false reading as a desk. The desk test now covers SE_CLOUD=false, a padded 0 and an empty value.
 
 ## tests-green
 
