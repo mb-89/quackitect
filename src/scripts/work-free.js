@@ -4,7 +4,7 @@
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { aged, parentsIn, STALE, spanOf } from "../engine/group.js";
+import { aged, parentsIn, spanOf } from "../engine/group.js";
 import { DONE, MS, ROUTINE, standingAll, TODO, waitsOf } from "./work.js";
 import { readWork, trunkOf } from "./work-stands.js";
 
@@ -14,9 +14,9 @@ export function tipAge(one, now) {
   return Math.max(0, Math.floor(now / MS) - Number(one.when));
 }
 
-// The span a claim goes stale past. `work.staleAfter` names it, and STALE stands where it says nothing. [[spec/design_output/work#a-stale-group-is-yours]]
+// The span a claim goes stale past, off `work.staleAfter`, whose one default the config schema holds. No span reads no claim as stale. [[spec/design_output/work#a-stale-group-is-yours]] [[spec/tickets/js-stale-reads-settings-default]]
 export function staleSpan(it) {
-  return spanOf(it?.stale || STALE) || spanOf(STALE);
+  return spanOf(it?.stale);
 }
 
 // Whether the claim on this branch stands older than the span. The list draws this, and the take reads it. [[spec/design_output/work#a-stale-group-is-yours]]
@@ -25,7 +25,7 @@ export function staleClaim(one, now, it) {
   return {
     held,
     age: held < 0 ? "" : aged(held),
-    stale: held >= 0 && held > staleSpan(it),
+    stale: held >= 0 && staleSpan(it) > 0 && held > staleSpan(it),
   };
 }
 

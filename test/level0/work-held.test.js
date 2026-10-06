@@ -87,6 +87,7 @@ const takingPast = (old, ref) => {
       agent: true,
       cloud: true,
       clock: fakeClock(NOW),
+      stale: "30m",
     }),
   );
   return { ...said, ran: ranGit(outside) };

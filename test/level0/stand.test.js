@@ -4,7 +4,6 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { STALE } from "../../src/engine/group.js";
 import { freeIn, freeNow, staleClaim, staleSpan } from "../../src/scripts/work-free.js";
 import { DONE, HELD, standingOf, TODO } from "../../src/scripts/work.js";
 
@@ -69,10 +68,11 @@ test("a dependency done and unmerged holds its dependent, and merged frees it", 
 });
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
-test("the span reads work.staleAfter, and STALE where the config says nothing", () => {
+test("the span reads work.staleAfter alone, and no span reads no claim as stale", () => {
   assert.equal(staleSpan({ stale: "1h" }), HOUR);
-  assert.equal(staleSpan({}), staleSpan({ stale: STALE }));
-  assert.equal(staleSpan({ stale: "nonsense" }), staleSpan({}));
+  assert.equal(staleSpan({}), 0);
+  assert.equal(staleSpan({ stale: "nonsense" }), 0);
+  assert.equal(staleClaim(tip(100 * HOUR), NOW, {}).stale, false);
 });
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
