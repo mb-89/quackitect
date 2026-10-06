@@ -40,24 +40,33 @@ func plantFlagged(t *testing.T) string {
 }
 
 func TestAnIOModuleImportingOsIsNamedByNone(t *testing.T) {
+	t.Parallel()
+	// Each analyzer loads the planted tree on its own, so the loads run side by side.
 	for _, one := range []*analysis.Analyzer{OnlyQ, IOOnly, FakeSuite, NoModule} {
-		analysistest.Run(t, plantFlagged(t), one, "quackitect/src/modules/disk")
+		t.Run(one.Name, func(t *testing.T) {
+			t.Parallel()
+			analysistest.Run(t, plantFlagged(t), one, "quackitect/src/modules/disk")
+		})
 	}
 }
 
 func TestAFakeWithNoSuiteIsNamed(t *testing.T) {
+	t.Parallel()
 	analysistest.Run(t, plantFlagged(t), FakeSuite, "quackitect/src/modules/lonely")
 }
 
 func TestTheCoreImportingOsIsNamed(t *testing.T) {
+	t.Parallel()
 	analysistest.Run(t, plantFlagged(t), IOOnly, "quackitect/src/q/clock")
 }
 
 // A renderer reaches the outside through its door.go alone, and its tests stand apart. [[spec/design_output/model#the-build-checks-imports]]
 func TestARendererReachingOutBesideItsDoorIsNamed(t *testing.T) {
+	t.Parallel()
 	analysistest.Run(t, plantFlagged(t), IOOnly, "quackitect/src/tui/paint")
 }
 
 func TestQtestWithNoSuiteIsNamed(t *testing.T) {
+	t.Parallel()
 	analysistest.Run(t, plantFlagged(t), FakeSuite, "quackitect/src/q/qtest")
 }

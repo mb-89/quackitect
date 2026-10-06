@@ -7,6 +7,7 @@ import "testing"
 
 // The take on a desk refuses, names main, and leaves the box where it stood. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDADeskTakeRefusesAndNamesMain(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("one-group"): pdGroupNote}).desk()
 	one.branch("one-group", nil)
 	was := one.git("rev-parse", "HEAD")
@@ -25,6 +26,7 @@ func TestPDADeskTakeRefusesAndNamesMain(t *testing.T) {
 
 // A desk's merge takes a done cloud branch into main, the check passes on it, and the branch closes. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDADeskMergesADoneCloudBranch(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.d.Runme = []string{"true"}
 	done := withField(withEntry(pdGroupNote, entryRow("sync", "a1b2c3", "d4e5f6")), "state", closedState)

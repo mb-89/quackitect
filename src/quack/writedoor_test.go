@@ -20,6 +20,7 @@ var taughtSchemas = []string{
 }
 
 func TestTheSchemaPortAnswersWhatEveryWriteTableTeaches(t *testing.T) {
+	t.Parallel()
 	for _, at := range taughtSchemas {
 		body, err := os.ReadFile(at)
 		if err != nil {
@@ -43,12 +44,14 @@ func TestTheSchemaPortAnswersWhatEveryWriteTableTeaches(t *testing.T) {
 }
 
 func TestWriteProseReadsNothingWhereNoValeStands(t *testing.T) {
+	t.Parallel()
 	if found := writeProse(t.TempDir(), write.Handover, "# Where it stands\n"); found != nil {
 		t.Errorf("writeProse answers %v under a root with no Vale", found)
 	}
 }
 
 func TestWriteProseReadsNoCode(t *testing.T) {
+	t.Parallel()
 	if found := writeProse(treeRoot, "src/engine/thing.js", "const a = 1;\n"); found != nil {
 		t.Errorf("writeProse answers %v over a code file", found)
 	}

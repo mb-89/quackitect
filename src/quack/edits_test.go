@@ -119,6 +119,7 @@ func landingOps() []map[string]any {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAPatchLandsAtomicallyThroughTheWriteDoor(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	said := editCall(t, root, patchAction, patchOf(editTicket, landingOps()...))
 	if got, _ := readIn(root, "docs/one.txt"); got != "uno\n" {
@@ -134,6 +135,7 @@ func TestAPatchLandsAtomicallyThroughTheWriteDoor(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAFailingOpInAPatchWritesNothing(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	ops := append(landingOps(), map[string]any{"op": "exact", "file": "docs/one.txt", "old": "nowhere", "new": "x"})
 	said := editCall(t, root, patchAction, patchOf(editTicket, ops...))
@@ -150,6 +152,7 @@ func TestAFailingOpInAPatchWritesNothing(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAPatchTheSchemaRefusesWritesNoFile(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	path, text := "spec/design_input/stranger.md", "---\nkind: [[rationale]]\n---\n\n# Why\n\nA reason.\n"
 	if judged := writeSchema(root, path, text); !judged.Stranger {
@@ -166,6 +169,7 @@ func TestAPatchTheSchemaRefusesWritesNoFile(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAPatchNamingNoOpenTicketWritesNothing(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	said := editCall(t, root, patchAction, patchOf("a-closed-thing", landingOps()...))
 	if !strings.Contains(said, "a-closed-thing stands closed") {
@@ -178,6 +182,7 @@ func TestAPatchNamingNoOpenTicketWritesNothing(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAnUndoPutsEveryFileBack(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	editCall(t, root, patchAction, patchOf(editTicket, landingOps()...))
 	if got, _ := readIn(root, "docs/one.txt"); got != "uno\n" {
@@ -200,6 +205,7 @@ func TestAnUndoPutsEveryFileBack(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAnUndoRefusesAFileThatMovesSinceThePatch(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	editCall(t, root, patchAction, patchOf(editTicket, landingOps()...))
 	seedFile(t, root, "docs/one.txt", "moved by hand\n")
@@ -214,6 +220,7 @@ func TestAnUndoRefusesAFileThatMovesSinceThePatch(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestTheJournalReadsAsTheBridgeWritesIt(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	editCall(t, root, patchAction, patchOf(editTicket, landingOps()...))
 	found := journalsIn(root)
@@ -255,6 +262,7 @@ func TestTheJournalReadsAsTheBridgeWritesIt(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAMintWritesANoteInItsSchemasShape(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	path := "spec/design_input/a-want.md"
 	said := editCall(t, root, mintAction, map[string]any{
@@ -275,6 +283,7 @@ func TestAMintWritesANoteInItsSchemasShape(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]]
 func TestAMintRefusesAPathAnotherKindGoverns(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	path := "spec/design_input/a-reason.md"
 	said := editCall(t, root, mintAction, map[string]any{"kind": "rationale", "path": path, "ticket": editTicket})
@@ -288,6 +297,7 @@ func TestAMintRefusesAPathAnotherKindGoverns(t *testing.T) {
 
 // [[spec/tickets/edit-tools-answer-in-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
 func TestTheEditModuleStandsOnTheWiring(t *testing.T) {
+	t.Parallel()
 	if _, ok := modules[editModuleType]; !ok {
 		t.Errorf("the root loads no module type %s", editModuleType)
 	}

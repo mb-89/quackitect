@@ -108,6 +108,7 @@ func (one waitWorld) ended(action string) manager.Op {
 
 // [[spec/tickets/find-and-wait-in-go]]
 func TestAWaitReturnsOnAHelpersReport(t *testing.T) {
+	t.Parallel()
 	world := waitWorldOf(t)
 	world.reports(t, "a1")
 	said, err := world.served.Call(waitAction, map[string]any{"agent": "a1"}, waitSession, endsWithin)
@@ -121,6 +122,7 @@ func TestAWaitReturnsOnAHelpersReport(t *testing.T) {
 
 // [[spec/tickets/find-and-wait-in-go]]
 func TestAWaitPastTheCallWaitAnswersARunningHandle(t *testing.T) {
+	t.Parallel()
 	world := waitWorldOf(t)
 	said, err := world.served.Call(waitAction, map[string]any{"agent": "a2"}, waitSession, shortWait)
 	if err != nil {
@@ -137,6 +139,7 @@ func TestAWaitPastTheCallWaitAnswersARunningHandle(t *testing.T) {
 
 // [[spec/tickets/find-and-wait-in-go]]
 func TestTheDoorAnswersAWaitPastItsCallWaitAsRunning(t *testing.T) {
+	t.Parallel()
 	world := waitWorldOf(t)
 	answer, err := world.door.Hook(hooks.Post{Event: "tool.call", E: map[string]any{
 		"tool": waitTool, "session_id": waitSession,

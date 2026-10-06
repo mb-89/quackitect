@@ -132,6 +132,7 @@ func dpSame(t *testing.T, got, want any) {
 
 // A group reads merged where main carries its ticket closed. [[spec/design_output/work#a-dependency-waits-for-trunk]]
 func TestDispatchReadsAGroupReadyWhoseDependencyIsMerged(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpGroup("first", groupNote)
 	one.peTrunkMoves(map[string]string{ticketAt("first"): dpShut(groupNote)})
@@ -140,6 +141,7 @@ func TestDispatchReadsAGroupReadyWhoseDependencyIsMerged(t *testing.T) {
 }
 
 func TestDispatchReadsAGroupWaitingOnAnOpenGroupAsWaitingAndNotReady(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpGroup("first", groupNote)
 	one.dpGroup("second", dpWaiting("first"))
@@ -149,6 +151,7 @@ func TestDispatchReadsAGroupWaitingOnAnOpenGroupAsWaitingAndNotReady(t *testing.
 }
 
 func TestDispatchReadsAStaleHoldReadyAndAFreshHoldHeld(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpBranchAt("left", map[string]string{ticketAt("left"): dpHeld()}, testNow.Add(-dpPastStale))
 	one.dpBranchAt("worked", map[string]string{ticketAt("worked"): dpHeld()}, testNow.Add(-time.Hour))
@@ -161,6 +164,7 @@ func TestDispatchReadsAStaleHoldReadyAndAFreshHoldHeld(t *testing.T) {
 
 // A box answers a question like any open work, and the person route alone waits for the owner. [[spec/tickets/the-dispatch-opens-no-issues]]
 func TestDispatchBundlesALooseQuestionAndLeavesThePersonRouteToThePersonPart(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{
 		"a-loose-one":  pcLoose(),
 		"a-closed-one": strings.Replace(pcChild("", closedState), "group: \n", "", 1),
@@ -173,6 +177,7 @@ func TestDispatchBundlesALooseQuestionAndLeavesThePersonRouteToThePersonPart(t *
 }
 
 func TestDispatchReadsADoneGroupBehindMainAsAStuckHandOver(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpGroup("landing", dpShut(groupNote))
 	one.peTrunkMoves(map[string]string{"notes.txt": "main moves on\n"})
@@ -182,18 +187,21 @@ func TestDispatchReadsADoneGroupBehindMainAsAStuckHandOver(t *testing.T) {
 }
 
 func TestDispatchReadsADoneGroupPastTheStaleSpanAsAStuckHandOver(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpBranchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-dpPastStale))
 	dpSame(t, one.dpPlan().Stuck, []stuckRow{{Group: "landing", Why: "stale"}})
 }
 
 func TestDispatchLeavesADoneGroupLevelAndFreshOutOfTheStuckPart(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpBranchAt("landing", map[string]string{ticketAt("landing"): dpShut(groupNote)}, testNow.Add(-time.Hour))
 	dpSame(t, one.dpPlan().Stuck, []stuckRow{})
 }
 
 func TestDispatchDryRunWritesNoFileMakesNoCommitAndPushesNothing(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	one.dpGroup("first", groupNote)
 	head := one.git("rev-parse", "HEAD")
@@ -214,6 +222,7 @@ func TestDispatchDryRunWritesNoFileMakesNoCommitAndPushesNothing(t *testing.T) {
 }
 
 func TestDispatchPrintsThePlanAsOneJSONObject(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpGroup("first", groupNote)
 	if code := one.dpRun("--dry", "--json"); code != codeOK {
@@ -227,6 +236,7 @@ func TestDispatchPrintsThePlanAsOneJSONObject(t *testing.T) {
 }
 
 func TestDispatchNamesTheSameReadyGroupsTheFreeReadNames(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, nil)
 	one.dpGroup("first", groupNote)
 	one.dpGroup("second", dpWaiting("first"))
@@ -240,6 +250,7 @@ func TestDispatchNamesTheSameReadyGroupsTheFreeReadNames(t *testing.T) {
 }
 
 func TestDispatchReadsAChildOffItsOwnGroupsBranch(t *testing.T) {
+	t.Parallel()
 	asked := strings.Replace(pcLoosePerson, "state: open\n", "state: open\ngroup: first\n", 1)
 	one := dpTree(t, map[string]string{"a-child": asked})
 	one.branch("first", map[string]string{ticketAt("first"): groupNote, ticketAt("a-child"): pcChild("first", "open")})
@@ -249,6 +260,7 @@ func TestDispatchReadsAChildOffItsOwnGroupsBranch(t *testing.T) {
 
 // A dependency reads off its group ticket on origin/main alone, so a parent standing on no branch still holds. [[spec/tickets/groups-hold-groups]]
 func TestDispatchHoldsADependentOnAParentWithNoBranch(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"after": dpWaiting("move"), "move": groupNote, "a-part": pcChild("move", "open")})
 	one.dpGroup("after", dpWaiting("move"))
 	plan := one.dpPlan()
@@ -258,6 +270,7 @@ func TestDispatchHoldsADependentOnAParentWithNoBranch(t *testing.T) {
 
 // A group names its parent under group, and a parent hands no worker. [[spec/tickets/groups-hold-groups]]
 func TestDispatchHandsAParentNoWorker(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"top": groupNote, "child": dpUnder("top")})
 	one.dpGroup("top", groupNote)
 	one.dpGroup("child", dpUnder("top"))
@@ -265,6 +278,7 @@ func TestDispatchHandsAParentNoWorker(t *testing.T) {
 }
 
 func TestDispatchClosesAParentOnceEveryChildStandsClosedOnMain(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{
 		"parent":      groupNote,
 		"a-part":      dpShut(dpUnder("parent")),
@@ -290,6 +304,7 @@ func dpChained(t *testing.T, blocker string) *dispatchPlan {
 }
 
 func TestDispatchHoldsAGroupBackOnAGrandparentsOpenDependency(t *testing.T) {
+	t.Parallel()
 	plan := dpChained(t, groupNote)
 	if slices.Contains(dpReady(plan), "leaf") {
 		t.Fatalf("ready reads %v", dpReady(plan))
@@ -302,6 +317,7 @@ func TestDispatchHoldsAGroupBackOnAGrandparentsOpenDependency(t *testing.T) {
 }
 
 func TestDispatchFreesThatGroupOnceTheDependencyCloses(t *testing.T) {
+	t.Parallel()
 	plan := dpChained(t, dpShut(groupNote))
 	dpSame(t, dpReady(plan), []string{"leaf"})
 	if slices.ContainsFunc(plan.Waiting, func(one waitRow) bool { return one.Group == "leaf" }) {
@@ -310,6 +326,7 @@ func TestDispatchFreesThatGroupOnceTheDependencyCloses(t *testing.T) {
 }
 
 func TestDispatchPrintsEveryPartUnderItsHead(t *testing.T) {
+	t.Parallel()
 	plan := &dispatchPlan{
 		Ready:   []readyRow{{Group: "a", Branch: "work/a"}},
 		Held:    []heldRow{{Group: "b", Branch: "work/b", Age: "2h"}},

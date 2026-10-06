@@ -65,6 +65,7 @@ func TestQuackDumpWritesWhatTheIndexAnswers(t *testing.T) {
 }
 
 func TestADumpIsReadByNothing(t *testing.T) {
+	t.Parallel()
 	at := dumpPath("tickets/")
 	if !strings.HasPrefix(at, ".se/.dump/") {
 		t.Fatalf("the dump of tickets/ lands at %q", at)
@@ -77,6 +78,7 @@ func TestADumpIsReadByNothing(t *testing.T) {
 }
 
 func TestADumpNamesItsFileAfterItsPrefix(t *testing.T) {
+	t.Parallel()
 	for prefix, want := range map[string]string{"ops/": ".se/.dump/ops.json", "files/src/": ".se/.dump/files-src.json", "": ".se/.dump/all.json"} {
 		if got := dumpPath(prefix); got != want {
 			t.Fatalf("the dump of %q lands at %s", prefix, got)

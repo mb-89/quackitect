@@ -9,6 +9,7 @@ import (
 )
 
 func TestLinksVerb(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct{ argv, want string }{
 		{"links spec/guidance/working", "links spec/guidance/working"},
 		{"links", "dangling"},

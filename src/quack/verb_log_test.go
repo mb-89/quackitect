@@ -49,6 +49,7 @@ func saidIn(out string) []string {
 }
 
 func TestLogVerb(t *testing.T) {
+	t.Parallel()
 	session := logRow(120, "info", "tool", "early") + logRow(30, "warn", "vale", "middle") + logRow(5, "error", "tool", "late")
 	cases := []struct {
 		name, argv, want string
@@ -117,6 +118,7 @@ func TestLogVerb(t *testing.T) {
 
 // A span reads its count in minutes, hours or days, and words naming no span read none. [[spec/design_output/log#one-verb-reads-the-log]]
 func TestLogSpanSeconds(t *testing.T) {
+	t.Parallel()
 	for said, want := range map[string]int64{"5m": 300, "2h": 7200, "1d": 86400, " 3 h ": 10800, "soon": 0} {
 		if got := spanOf(said); got != want {
 			t.Fatalf("spanOf(%q) reads %d seconds, and %d stand", said, got, want)
@@ -125,6 +127,7 @@ func TestLogSpanSeconds(t *testing.T) {
 }
 
 func TestLogVerbSays(t *testing.T) {
+	t.Parallel()
 	t.Run("say appends one row and keeps the rows another writer lands", func(t *testing.T) {
 		root, log := logOver(t, map[string]string{sessionLog: logRow(1, "info", "tool", "theirs")})
 		code, _, _ := runsTwin(log, "log", "--say", `{"level":"warn","kind":"side","said":"  two\n  lines ","extra":{"level":"x","ms":3,"detail":"`+strings.Repeat("d", 130)+`"}}`)

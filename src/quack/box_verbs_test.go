@@ -13,6 +13,7 @@ import (
 var boxVerbs = []string{"setup", "probe", "tools", "doctor"}
 
 func TestTheBoxVerbsRegister(t *testing.T) {
+	t.Parallel()
 	for _, verb := range boxVerbs {
 		if registry[verb] == nil {
 			t.Errorf("%s registers no Go answer", verb)
@@ -21,6 +22,7 @@ func TestTheBoxVerbsRegister(t *testing.T) {
 }
 
 func TestTheBoxVerbsLeaveTheScripts(t *testing.T) {
+	t.Parallel()
 	for _, verb := range boxVerbs {
 		at := filepath.Join("..", "..", filepath.FromSlash(programsFolder), verb+".js")
 		if _, err := os.Stat(at); err == nil {

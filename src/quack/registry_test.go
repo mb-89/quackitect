@@ -21,6 +21,7 @@ func registersFor(t *testing.T, words string, one twin) {
 }
 
 func TestVerbRegistry(t *testing.T) {
+	t.Parallel()
 	t.Run("a registered verb runs in Go", func(t *testing.T) {
 		registersFor(t, "registry probe", twinSaying("go\n", &[]bool{}))
 		reached := false

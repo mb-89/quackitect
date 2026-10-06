@@ -39,6 +39,7 @@ func doctorRows(t *testing.T, d boxDoors, out *strings.Builder) map[string]strin
 }
 
 func TestTheDoctorPrintsEveryRowInOrderOnABareBox(t *testing.T) {
+	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t, "git")
 	doctorVerb(d, nil)
 	var labels []string
@@ -73,6 +74,7 @@ func TestTheDoctorPrintsEveryRowInOrderOnABareBox(t *testing.T) {
 }
 
 func TestTheDoctorReadsTheSurveyThatStandsAndWritesOneWhereNoneDoes(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t, "git")
 	writeFiles(t, d.root, map[string]string{toolsFile: `{"node":{"path":"/opt/node","version":"22.0.0"}}`})
 	rows := doctorRows(t, d, out)
@@ -89,12 +91,14 @@ func TestTheDoctorReadsTheSurveyThatStandsAndWritesOneWhereNoneDoes(t *testing.T
 }
 
 func TestTheSurveyRowNamesHowToWriteOne(t *testing.T) {
+	t.Parallel()
 	if got := surveyRow(t.TempDir()); got != "absent, run ./RUNME.sh tools" {
 		t.Errorf("the row reads %q", got)
 	}
 }
 
 func TestTheBiomeRowAsksTheBiomeTheSurveyNames(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	biome := filepath.Join(d.root, "biome")
 	writeFiles(t, d.root, map[string]string{"biome": "", toolsFile: `{"biome":{"path":` + jsonString(biome) + `}}`})
@@ -111,6 +115,7 @@ func TestTheBiomeRowAsksTheBiomeTheSurveyNames(t *testing.T) {
 }
 
 func TestTheQuackLspRowProbesTheIndexBinary(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	writeFiles(t, d.root, map[string]string{indexBinary: ""})
 	runner.answers["se-index lsp"] = ranResult{code: 3, stderr: "no tree\n"}
@@ -128,6 +133,7 @@ func TestTheQuackLspRowProbesTheIndexBinary(t *testing.T) {
 }
 
 func TestTheEditorRowNamesTheSettingsThatStartBothServers(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	writeFiles(t, root, map[string]string{editorSettings: "{}"})
 	if got := editorRow(root); got != ".vscode/settings.json, both servers" {
@@ -149,6 +155,7 @@ func sidebarBox(t *testing.T) (boxDoors, string, string) {
 }
 
 func TestTheSidebarRowReadsEveryShapeTheLinkStandsIn(t *testing.T) {
+	t.Parallel()
 	d, folder, dest := sidebarBox(t)
 	source := filepath.Join(d.root, "src", "extension")
 	if got := sidebarSays(d); got != "unlinked: run ./RUNME.sh" {
@@ -183,6 +190,7 @@ func TestTheSidebarRowReadsEveryShapeTheLinkStandsIn(t *testing.T) {
 }
 
 func TestTheEditorListReadsAnUnreadableFileAsNamingNothing(t *testing.T) {
+	t.Parallel()
 	folder := t.TempDir()
 	writeFiles(t, folder, map[string]string{editorList: "[{"})
 	if editorRegistered(folder, "quackitect.quackitect") {
@@ -194,6 +202,7 @@ func TestTheEditorListReadsAnUnreadableFileAsNamingNothing(t *testing.T) {
 }
 
 func TestTheBrowserRowNamesEachRungOfTheOrder(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	home := t.TempDir()
 	writeFiles(t, d.root, map[string]string{
@@ -231,6 +240,7 @@ func TestTheBrowserRowNamesEachRungOfTheOrder(t *testing.T) {
 }
 
 func TestThePlaywrightCacheReadsTheHomeEachBoxNames(t *testing.T) {
+	t.Parallel()
 	env := func(said map[string]string) func(string) string { return func(key string) string { return said[key] } }
 	for _, one := range []struct {
 		env  map[string]string
@@ -252,6 +262,7 @@ func TestThePlaywrightCacheReadsTheHomeEachBoxNames(t *testing.T) {
 }
 
 func TestTheCommitHookRowReadsBothHooksAndTheFolderGitReads(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	writeFiles(t, d.root, map[string]string{".githooks/pre-commit": ""})
 	if got := hooksSay(d); got != ".githooks/pre-push stands nowhere" {
@@ -274,6 +285,7 @@ func TestTheCommitHookRowReadsBothHooksAndTheFolderGitReads(t *testing.T) {
 }
 
 func TestTheValeRowCountsTheRulesOfEachFolder(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	writeFiles(t, root, map[string]string{
 		"spec/config/styles/VoiceVale/A.yml":   "",
@@ -287,6 +299,7 @@ func TestTheValeRowCountsTheRulesOfEachFolder(t *testing.T) {
 }
 
 func TestTheServerRowNamesABridgeStandingDownAndOneStandingUp(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	if got := serverLine(d); got != "none at http://127.0.0.1:6510/health" {
 		t.Errorf("a bridge standing down reads %q", got)
@@ -322,6 +335,7 @@ func TestTheServerRowNamesABridgeStandingDownAndOneStandingUp(t *testing.T) {
 }
 
 func TestTheDoctorPrintsARowAHookAfterTheServer(t *testing.T) {
+	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
 	home := t.TempDir()
 	writeFiles(t, home, map[string]string{settingsFile: hookSettings("http://127.0.0.1:36368/hook")})

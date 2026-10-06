@@ -72,6 +72,7 @@ func compactHeard(said string) probeRow {
 }
 
 func TestTheCompactionReadsEveryRoad(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name   string
 		rows   []probeRow
@@ -98,6 +99,7 @@ func TestTheCompactionReadsEveryRoad(t *testing.T) {
 }
 
 func TestTheCompactProbeRunsTheClientAndPrintsTheRowsItReads(t *testing.T) {
+	t.Parallel()
 	d, runner, out, errs := fakeBoxDoors(t)
 	clientAnswers(&d, func([]string, runOpts) ranResult {
 		writeLog(t, d.root, logText(compactContext("first"), compactHeard(heardSame), compactRun(), compactContext("re-read"), compactHeard(heardSame)))
@@ -123,6 +125,7 @@ func TestTheCompactProbeRunsTheClientAndPrintsTheRowsItReads(t *testing.T) {
 }
 
 func TestTheCompactProbeAnswersOneWhereTheLayerDropsOrNoClientStands(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	clientAnswers(&d, func([]string, runOpts) ranResult {
 		writeLog(t, d.root, logText(compactContext("first"), compactRun()))
@@ -140,6 +143,7 @@ func TestTheCompactProbeAnswersOneWhereTheLayerDropsOrNoClientStands(t *testing.
 
 // The client stands where the survey finds it. [[spec/design_output/tools#where-a-caller-looks]]
 func TestTheProbeRunsTheClientTheSurveyNames(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t, "claude")
 	at := filepath.Join(d.env("PATH"), "claude")
 	survey := filepath.Join(d.root, filepath.FromSlash(toolsFile))
@@ -153,6 +157,7 @@ func TestTheProbeRunsTheClientTheSurveyNames(t *testing.T) {
 
 // The dry road starts its JavaScript entry with the words as they stand. [[spec/tickets/probe-dry-leaves-node]]
 func TestTheDryProbeHandsItsRoadToTheEntry(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	runner.answers["node"] = ranResult{code: 4}
 	if code := probeVerb(d, []string{"dry", "--working"}); code != 4 {
@@ -173,6 +178,7 @@ func TestTheDryProbeHandsItsRoadToTheEntry(t *testing.T) {
 }
 
 func TestAnUnknownWordPrintsTheUsage(t *testing.T) {
+	t.Parallel()
 	for _, argv := range [][]string{nil, {"nothing"}} {
 		d, runner, out, errs := fakeBoxDoors(t)
 		if code := probeVerb(d, argv); code != exitUsage {
@@ -186,6 +192,7 @@ func TestAnUnknownWordPrintsTheUsage(t *testing.T) {
 
 // Two writers appending at once tear one line, and a probe reads the rest. [[spec/design_output/log#every-writer-appends]]
 func TestATornLineDropsAloneAndAMissingLogReadsAsNoRow(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	writeLog(t, root, logText(probeRowOf("info", "context", "read", nil))+"{\"at\":\"2026\n"+logText(probeRowOf("info", "compact", "ran", nil)))
 	rows := probeRows(filepath.Join(root, filepath.FromSlash(sessionLog)))

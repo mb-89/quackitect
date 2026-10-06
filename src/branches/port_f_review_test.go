@@ -109,6 +109,7 @@ func pfGreenCheck(t *testing.T, said material) {
 
 // A retro chapter reads present where a hand writes a line, and absent where it holds placeholders or stands nowhere. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheRetroReadsOffTheTicket(t *testing.T) {
+	t.Parallel()
 	empty := "# Ask\n\nA thing.\n\n# retro\n\n## write\n\n### done\n\n<!-- what was done -->\n\n<!-- the form is list -->\n\n# Discussion\n\nNothing.\n"
 	if retroOnTicket(empty) {
 		t.Fatal("placeholders and headings read present")
@@ -123,6 +124,7 @@ func TestPFTheRetroReadsOffTheTicket(t *testing.T) {
 
 // The review gathers the ask off the first commit, the handback off the tip, and both diffs. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheReviewGathersTheAskTheHandbackAndTheDiffs(t *testing.T) {
+	t.Parallel()
 	said := pfMaterial(t, pfReviewTree(t, pfGreen, pfHandback))
 	if said.Branch != workBranch+pfName || said.Ref != "origin/"+workBranch+pfName {
 		t.Fatalf("the review reads %s at %s", said.Branch, said.Ref)
@@ -136,6 +138,7 @@ func TestPFTheReviewGathersTheAskTheHandbackAndTheDiffs(t *testing.T) {
 
 // The review answers a green check run in a worktree, and a present retro. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheReviewAnswersTheCheckAndTheRetro(t *testing.T) {
+	t.Parallel()
 	said := pfMaterial(t, pfReviewTree(t, pfGreen, pfHandback))
 	pfGreenCheck(t, said)
 	if said.Check.Code == nil || *said.Check.Code != 0 || !said.Retro {
@@ -145,6 +148,7 @@ func TestPFTheReviewAnswersTheCheckAndTheRetro(t *testing.T) {
 
 // The check runs inside the worktree, with the caller's survey landed there first. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheCheckRunsInTheWorktreeOnTheSurvey(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfProbe(`	if !strings.HasSuffix(filepath.ToSlash(here), "/`+pfWorktree+`") {
 		fail("the check runs at " + here)
 	}
@@ -162,6 +166,7 @@ func TestPFTheCheckRunsInTheWorktreeOnTheSurvey(t *testing.T) {
 
 // The worktree carries the caller's brand before the check runs. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeCarriesTheBrand(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfProbe(`	if !stands(".claude-plugin/marketplace.json") {
 		fail("no brand stands")
 	}`), pfHandback)
@@ -171,6 +176,7 @@ func TestPFTheWorktreeCarriesTheBrand(t *testing.T) {
 
 // The worktree borrows the caller's two module folders, and gives them back before git removes it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBorrowsTheModules(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfProbe(`	for _, at := range []string{"node_modules", "src/extension/webview/node_modules"} {
 		if !linked(at) || !stands(at+"/held") {
 			fail(at + " stands borrowed not")
@@ -190,6 +196,7 @@ func TestPFTheWorktreeBorrowsTheModules(t *testing.T) {
 
 // The worktree borrows the webview's modules alone where the caller carries those, and gives them back. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBorrowsTheWebviewModules(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfProbe(`	if !linked("src/extension/webview/node_modules") || !stands("src/extension/webview/node_modules/held") {
 		fail("the webview modules stand borrowed not")
 	}`), pfHandback)
@@ -202,6 +209,7 @@ func TestPFTheWorktreeBorrowsTheWebviewModules(t *testing.T) {
 
 // The worktree borrows nothing out of the caller's bin, so a branch's build lands in its own. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBorrowsNoBin(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfProbe(`	if linked(".se/.runtime/bin") || stands(".se/.runtime/bin/logview") {
 		fail("the caller's bin stands borrowed")
 	}`), pfHandback)
@@ -211,6 +219,7 @@ func TestPFTheWorktreeBorrowsNoBin(t *testing.T) {
 
 // The worktree builds the branch's own se-front into its own bin before the check. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheWorktreeBuildsItsOwnFront(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfProbe(`	if !stands(".se/.runtime/bin/se-front") && !stands(".se/.runtime/bin/se-front.exe") {
 		fail("no se-front stands in the worktree's bin")
 	}
@@ -223,6 +232,7 @@ func TestPFTheWorktreeBuildsItsOwnFront(t *testing.T) {
 
 // A red check comes back with its code and the rows the runner refused. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFARedCheckNamesTheRowsRefused(t *testing.T) {
+	t.Parallel()
 	red := `package main
 
 import (
@@ -245,6 +255,7 @@ func main() {
 
 // A review of a branch standing nowhere refuses, and says which. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFAReviewOfNothingRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := one.branchSays("review", "gone"); code != codeRed {
 		t.Fatalf("the review answers %d", code)
@@ -254,6 +265,7 @@ func TestPFAReviewOfNothingRefuses(t *testing.T) {
 
 // A review of a branch carrying no commit beyond trunk refuses. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFABranchCarryingNoCommitRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.git("push", "-q", "origin", "main:"+workBranch+pfName)
 	if code := one.branchSays("review", pfName); code != codeRed {
@@ -264,6 +276,7 @@ func TestPFABranchCarryingNoCommitRefuses(t *testing.T) {
 
 // A review naming no branch refuses, and says it needs a name. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFAReviewNamingNoBranchRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := one.branchSays("review"); code != codeRefused {
 		t.Fatalf("the review answers %d", code)
@@ -273,6 +286,7 @@ func TestPFAReviewNamingNoBranchRefuses(t *testing.T) {
 
 // A report with nothing to fix fits on one line. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFACleanReportFitsOneLine(t *testing.T) {
+	t.Parallel()
 	code := 0
 	said := report(material{Branch: workBranch + pfName, Check: checked{OK: true, Code: &code}, Retro: true})
 	if strings.Contains(said, "\n") {
@@ -283,6 +297,7 @@ func TestPFACleanReportFitsOneLine(t *testing.T) {
 
 // A red check and an absent retro each count one thing to fix, and the report holds no merge back. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFARedCheckAndAnAbsentRetroCountTwo(t *testing.T) {
+	t.Parallel()
 	code := 1
 	said := report(material{Branch: workBranch + pfName, Check: checked{Code: &code}})
 	for _, row := range []string{`(?m)^work/the-config-holds-numbers$`, `(?m)^check {6}answers 1$`, `(?m)^retro {6}absent from the handback$`, `(?m)^2 things to fix\. Run branch merge once every fix lands\.$`} {
@@ -297,6 +312,7 @@ func TestPFARedCheckAndAnAbsentRetroCountTwo(t *testing.T) {
 
 // The report says what a red check broke on, under the check row. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheReportSaysWhatTheCheckBrokeOn(t *testing.T) {
+	t.Parallel()
 	code := 1
 	said := report(material{Branch: workBranch + pfName, Retro: true, Check: checked{Code: &code, Says: "not ok 3 - the door holds"}})
 	for _, row := range []string{`(?m)^check {6}answers 1:$`, `(?m)^ {11}not ok 3 - the door holds$`, `(?m)^1 thing to fix`} {
@@ -308,11 +324,13 @@ func TestPFTheReportSaysWhatTheCheckBrokeOn(t *testing.T) {
 
 // A run naming no failing row falls back to its last lines, the errors among them. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFARunNamingNoRowFallsBackToItsLastLines(t *testing.T) {
+	t.Parallel()
 	holds(t, whatFailed("one\ntwo\n", "the rules refuse three\n"), "the rules refuse three")
 }
 
 // A red spec run answers each failing case once, and leaves the list header out. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFARedSpecRunNamesEachCaseOnce(t *testing.T) {
+	t.Parallel()
 	got := whatFailed("✔ one holds\n✖ two breaks (1ms)\n✖ failing tests:\n✖ two breaks (1ms)\nℹ fail 1\n", "")
 	if got != "✖ two breaks (1ms)" {
 		t.Fatalf("the cases read %q", got)
@@ -321,6 +339,7 @@ func TestPFARedSpecRunNamesEachCaseOnce(t *testing.T) {
 
 // A red lint answers with the lines naming the rule. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFARedLintNamesTheRule(t *testing.T) {
+	t.Parallel()
 	got := whatFailed("The rules pass.\nspec/a.md:8:11: PastTense: Write the present tense.\n", "")
 	if got != "spec/a.md:8:11: PastTense: Write the present tense." {
 		t.Fatalf("the lint reads %q", got)
@@ -329,6 +348,7 @@ func TestPFARedLintNamesTheRule(t *testing.T) {
 
 // The verb alone prints the two rows it owns, and no ask. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheVerbAlonePrintsItsTwoRows(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfGreen, pfAsk)
 	if code := one.branchSays("review", pfName); code != 0 {
 		t.Fatalf("the review answers %d: %s", code, one.errs.String())
@@ -346,6 +366,7 @@ func TestPFTheVerbAlonePrintsItsTwoRows(t *testing.T) {
 
 // The diff runs from the merge base, so trunk's own later work stays out. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheDiffRunsFromTheMergeBase(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfGreen, pfHandback)
 	one.land("trunk moves", map[string]string{"trunk-only.txt": "trunk\n"})
 	one.git("push", "-q", "origin", "main")
@@ -358,6 +379,7 @@ func TestPFTheDiffRunsFromTheMergeBase(t *testing.T) {
 
 // A worktree opening nowhere answers so, with no code, and runs no check. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFAWorktreeOpeningNowhereRunsNoCheck(t *testing.T) {
+	t.Parallel()
 	one := pfReviewTree(t, pfGreen, pfHandback)
 	one.write(map[string]string{reviewFolder: "a file where the folder stands\n"})
 	said := pfMaterial(t, one)

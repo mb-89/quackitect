@@ -120,6 +120,7 @@ func dfBody(t *testing.T, one dfSent) map[string]any {
 }
 
 func TestDispatchFiresOnceAReadyGroupAndOnceAStuckHandOver(t *testing.T) {
+	t.Parallel()
 	dpSame(t, fireVersion, "2023-06-01")
 	hub := newHub()
 	plan := dfPlan([]string{"first"}, []string{"stuck"}, nil, nil)
@@ -139,6 +140,7 @@ func TestDispatchFiresOnceAReadyGroupAndOnceAStuckHandOver(t *testing.T) {
 }
 
 func TestDispatchStopsTheFireAtTheRoutineCapAndLeavesTheRest(t *testing.T) {
+	t.Parallel()
 	dpSame(t, fireCap, 30)
 	var many []string
 	for at := 0; at < fireCap+5; at++ {
@@ -153,6 +155,7 @@ func TestDispatchStopsTheFireAtTheRoutineCapAndLeavesTheRest(t *testing.T) {
 }
 
 func TestDispatchPrintsTheReasonARefusedFireGivesAndAnswersRed(t *testing.T) {
+	t.Parallel()
 	hub := newHub()
 	hub.fire = func() Reply { return dfEnvelope(400, "invalid_request_error", "The routine is paused.", nil) }
 	plan := dfPlan([]string{"first"}, nil, nil, nil)
@@ -166,6 +169,7 @@ func TestDispatchPrintsTheReasonARefusedFireGivesAndAnswersRed(t *testing.T) {
 }
 
 func TestDispatchStopsTheRunOnARateRefusalAndNamesWhenTheWindowResets(t *testing.T) {
+	t.Parallel()
 	hub := newHub()
 	hub.fire = func() Reply {
 		return dfEnvelope(429, "rate_limit_error", "Hourly fire limit reached.", map[string]string{"retry-after": "1200"})
@@ -181,6 +185,7 @@ func TestDispatchStopsTheRunOnARateRefusalAndNamesWhenTheWindowResets(t *testing
 
 // The ticket holds the work, so the fire opens no issue for it. [[spec/tickets/the-dispatch-opens-no-issues]]
 func TestDispatchFireSendsNothingToTheIssuesAPI(t *testing.T) {
+	t.Parallel()
 	hub := newHub()
 	plan := dfPlan(nil, nil, []personRow{{Ticket: "who-holds-the-key"}, {Ticket: "which-door-opens"}}, nil)
 	if code := dfFired(hub, plan, nil); code != codeOK {
@@ -197,6 +202,7 @@ func TestDispatchFireSendsNothingToTheIssuesAPI(t *testing.T) {
 }
 
 func TestDispatchOpensTheWriteBranchsPullRequestOnPullTokenWithAutoMerge(t *testing.T) {
+	t.Parallel()
 	hub := newHub()
 	plan := dfPlan(nil, nil, nil, &writeRow{Branch: "claude/dispatch-abc1234", State: "pushed"})
 	if code := dfFired(hub, plan, nil); code != codeOK {
@@ -227,6 +233,7 @@ func TestDispatchOpensTheWriteBranchsPullRequestOnPullTokenWithAutoMerge(t *test
 }
 
 func TestDispatchOpensNoSecondPullRequestOverAStandingOne(t *testing.T) {
+	t.Parallel()
 	hub := newHub()
 	hub.pulls = append(hub.pulls, map[string]any{"number": 7, "node_id": "PR_7", "head": map[string]any{"ref": "claude/dispatch-abc1234"}})
 	plan := dfPlan(nil, nil, nil, &writeRow{Branch: "claude/dispatch-abc1234", State: "standing"})
@@ -240,6 +247,7 @@ func TestDispatchOpensNoSecondPullRequestOverAStandingOne(t *testing.T) {
 }
 
 func TestDispatchFiresNothingWithoutTheSecretsAndSaysWhich(t *testing.T) {
+	t.Parallel()
 	hub := newHub()
 	plan := dfPlan([]string{"first"}, nil, nil, nil)
 	if code := dfFired(hub, plan, map[string]string{"ROUTINE_FIRE_URL": "", "ROUTINE_FIRE_TOKEN": ""}); code != codeRed {
@@ -252,6 +260,7 @@ func TestDispatchFiresNothingWithoutTheSecretsAndSaysWhich(t *testing.T) {
 }
 
 func TestDispatchLandsTheWritesThenPrintsAPlanCarryingTheFire(t *testing.T) {
+	t.Parallel()
 	one := dpTree(t, map[string]string{"a-loose-one": pcLoose()})
 	for key, value := range dfEnv() {
 		one.d.Env[key] = value

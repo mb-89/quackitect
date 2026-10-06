@@ -30,6 +30,7 @@ const (
 )
 
 func TestConfigRowsReadEveryLayer(t *testing.T) {
+	t.Parallel()
 	tracked := []byte(`{"comment": "c", "a": {"comment": "c", "x": 1, "y": {"z": true}}, "m": {"s": "old"}}`)
 	local := []byte(`{"a": {"x": 2}, "m": {"s": "new"}}`)
 	env := map[string]string{"SE_A_X": "3"}
@@ -51,6 +52,7 @@ func TestConfigRowsReadEveryLayer(t *testing.T) {
 }
 
 func TestConfigTextHoldsOneKeyALine(t *testing.T) {
+	t.Parallel()
 	text, err := configText(map[string]configRow{
 		"b.y": {Value: json.RawMessage(`"t"`), Layer: "L"},
 		"a.x": {Value: json.RawMessage(`1`), Layer: "T"},
@@ -70,6 +72,7 @@ func TestConfigTextHoldsOneKeyALine(t *testing.T) {
 
 // The wiring this tree loads declares the slice keys shared, so the default file alone answers them. [[spec/tickets/cfg-topic-holds-one-resolver]]
 func TestTheSliceKeysStandShared(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", "spec", "wiring.yaml"))
 	if err != nil {
 		t.Skip("no wiring file stands here")

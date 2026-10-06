@@ -50,6 +50,7 @@ func pdFrontConflict(t *testing.T, base, ours, theirs string) *tree {
 
 // Sync on main takes the remote's main in. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncOnMainTakesOriginMain(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	pdRemoteAhead(one, nil, nil)
 	if code := one.branchSays("sync"); code != codeOK {
@@ -63,6 +64,7 @@ func TestPDSyncOnMainTakesOriginMain(t *testing.T) {
 
 // Sync on main stops on a conflict and leaves the merge open for the hand. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncOnMainStopsOnAConflict(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"x.txt": "base\n"})
 	pdRemoteAhead(one, map[string]string{"x.txt": "remote\n"})
 	one.land("main here", map[string]string{"x.txt": "local\n"})
@@ -78,6 +80,7 @@ func TestPDSyncOnMainStopsOnAConflict(t *testing.T) {
 
 // Sync on main stops where git refuses the merge outright, and points at git status. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncOnMainNamesGitStatus(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	pdRemoteAhead(one, map[string]string{"y.txt": "remote\n"})
 	one.write(map[string]string{"y.txt": "untracked here\n"})
@@ -90,6 +93,7 @@ func TestPDSyncOnMainNamesGitStatus(t *testing.T) {
 
 // Sync on a work branch takes main in with the branch's merge message. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncOnAWorkBranchTakesMain(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", nil)
 	pdOn(one, "g")
@@ -105,6 +109,7 @@ func TestPDSyncOnAWorkBranchTakesMain(t *testing.T) {
 
 // Sync on a work branch merges a diverged remote branch before trunk, and keeps both sides. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncMergesTheDivergedRemoteBranchFirst(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", nil)
 	pdOn(one, "g")
@@ -131,6 +136,7 @@ func TestPDSyncMergesTheDivergedRemoteBranchFirst(t *testing.T) {
 
 // Sync leaves the branch alone where the remote branch carries nothing new. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncLeavesALevelRemoteBranch(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", nil)
 	pdOn(one, "g")
@@ -145,6 +151,7 @@ func TestPDSyncLeavesALevelRemoteBranch(t *testing.T) {
 
 // A conflict with the remote branch stops, names the files, and trunk waits. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncStopsOnTheRemoteBranchConflict(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"x.txt": "base\n"})
 	one.branch("g", nil)
 	pdOn(one, "g")
@@ -163,6 +170,7 @@ func TestPDSyncStopsOnTheRemoteBranchConflict(t *testing.T) {
 
 // Sync on any other branch refuses, and names where it runs. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncNamesWhereItRuns(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.git("switch", "-q", "-c", "claude/a-thing")
 	if code := one.branchSays("sync"); code != codeRefused {
@@ -173,6 +181,7 @@ func TestPDSyncNamesWhereItRuns(t *testing.T) {
 
 // A record the branch appends merges with a key main adds, and the merge commits. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncMergesAFrontConflict(t *testing.T) {
+	t.Parallel()
 	base, ours, theirs := pdStages()
 	one := pdFrontConflict(t, base, ours, theirs)
 	if code := one.branchSays("sync"); code != codeOK {
@@ -191,6 +200,7 @@ func TestPDSyncMergesAFrontConflict(t *testing.T) {
 
 // A key both sides change apart waits for a hand, and nothing commits. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncLeavesAClashingKeyForAHand(t *testing.T) {
+	t.Parallel()
 	base, ours, theirs := pdStages()
 	one := pdFrontConflict(t, base, strings.Replace(ours, "state: open", "state: closed", 1), strings.Replace(theirs, "state: open", "state: draft", 1))
 	if code := one.branchSays("sync"); code != codeRed {
@@ -205,6 +215,7 @@ func TestPDSyncLeavesAClashingKeyForAHand(t *testing.T) {
 
 // A ticket main retires while the branch changes it waits for a hand, named. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDSyncNamesATicketMainRetires(t *testing.T) {
+	t.Parallel()
 	base, ours, _ := pdStages()
 	one := pdFrontConflict(t, base, ours, "")
 	if code := one.branchSays("sync"); code != codeRed {

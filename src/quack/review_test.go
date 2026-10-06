@@ -6,6 +6,7 @@ import "testing"
 
 // [[spec/tickets/review-spawns-off-the-door]]
 func TestTheSeamReadsTheNewestMaterialLine(t *testing.T) {
+	t.Parallel()
 	printed := "gathering\n{\"branch\":\"work/old\"}\r\n{\"branch\":\"work/a-group\",\"retro\":true}\n{not json\n"
 	material, why := gatheredOf(printed, "")
 	if why != "" || material.Branch != "work/a-group" || !material.Retro {
@@ -15,6 +16,7 @@ func TestTheSeamReadsTheNewestMaterialLine(t *testing.T) {
 
 // [[spec/tickets/review-spawns-off-the-door]]
 func TestTheSeamSaysWhyItGatheredNothing(t *testing.T) {
+	t.Parallel()
 	for _, one := range []struct{ stdout, stderr, want string }{
 		{"usage\n", " no such branch \n", "no such branch"},
 		{" usage \n", "", "usage"},

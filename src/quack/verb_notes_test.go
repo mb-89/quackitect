@@ -8,6 +8,7 @@ import (
 )
 
 func TestNotesVerb(t *testing.T) {
+	t.Parallel()
 	asked := [][]string{}
 	if code, _, _ := runsTwin(notesVerb(askHolding([]any{}, nil, &asked)), "notes", "verb", "5"); code != 0 || strings.Join(asked[0], " ") != "notes verb 5" {
 		t.Fatalf("notes answers %d and asks %v, and wants notes verb 5", code, asked)

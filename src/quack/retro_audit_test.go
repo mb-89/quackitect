@@ -12,6 +12,7 @@ func retroAuditTrial(name, state string) string {
 
 // The audit holds while a trial stands open, and names each one: a closed trial and a plain ticket stand nowhere. [[spec/tickets/an-experiment-ends-decided]]
 func TestRetroAuditHoldsWhileATrialStandsOpenAndNamesEachOne(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroMintWrite(t, root, "spec/tickets/a-trial.md", retroAuditTrial("a trial", "open"))
 	retroMintWrite(t, root, "spec/tickets/a-closed-trial.md", retroAuditTrial("a closed trial", "closed"))
@@ -23,6 +24,7 @@ func TestRetroAuditHoldsWhileATrialStandsOpenAndNamesEachOne(t *testing.T) {
 
 // The audit step answers a wait over an open trial, naming it, and passes over none. [[spec/tickets/an-experiment-ends-decided]]
 func TestRetroAuditAnswersAWaitOverAnOpenTrialAndPassesOverNone(t *testing.T) {
+	t.Parallel()
 	held := t.TempDir()
 	retroMintWrite(t, held, "spec/tickets/a-trial.md", retroAuditTrial("a trial", "open"))
 	code, out, _ := retroMintHeard(retroAuditVerb(func() string { return held }), "retro", "audit")

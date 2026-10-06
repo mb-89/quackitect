@@ -34,6 +34,7 @@ var redLines = strings.Join([]string{
 }, "\n")
 
 func TestBatteryReport(t *testing.T) {
+	t.Parallel()
 	t.Run("the slowest cases come off the lines, slowest first, each with its file", func(t *testing.T) {
 		want := []slowCase{{"a slow case", 900.25, "test/level0/one.test.js"}, {"a group", 47.25, "test/level0/one.test.js"}, {"a case", 40, "test/level0/two.test.js"}}
 		if got := slowestIn(caseLines, 3); !reflect.DeepEqual(got, want) {
@@ -121,6 +122,7 @@ func TestBatteryReport(t *testing.T) {
 }
 
 func TestStamp(t *testing.T) {
+	t.Parallel()
 	t.Run("a green run stamps ok with no warning, and a red run stamps the code", func(t *testing.T) {
 		green := stampFor(0, "abc", true, batteryAt, nil, nil, nil, 1)
 		want := checkStamp{Sha: "abc", Ok: true, Clean: true, At: batteryAt, Warnings: 0, Files: []string{}}

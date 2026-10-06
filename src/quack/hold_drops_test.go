@@ -9,6 +9,7 @@ import (
 
 // The config writer listensHooks wires fits the door's Drop, and the reader reads the drop back off the local layer. [[spec/tickets/cage-hold-drops-port]]
 func TestTheHooksDoorDropsThroughTheLocalLayer(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	out := hooks.Outside{Drop: oldconfig.Drop}
 	if err := out.Drop(root, "stop.hold", "off"); err != nil {

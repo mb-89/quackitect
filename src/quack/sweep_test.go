@@ -9,6 +9,7 @@ import (
 )
 
 func TestTheSweepVerbPrintsTheSettledSweep(t *testing.T) {
+	t.Parallel()
 	var asked []string
 	var out strings.Builder
 	rows := []any{map[string]any{"file": "spec/a.md", "rule": "DeadAnchor", "line": 1}}
@@ -28,6 +29,7 @@ func TestTheSweepVerbPrintsTheSettledSweep(t *testing.T) {
 }
 
 func TestAnEmptySweepPrintsAnEmptyList(t *testing.T) {
+	t.Parallel()
 	var out strings.Builder
 	if err := sweeps(&out, func(...string) (any, error) { return nil, nil }); err != nil || out.String() != "[]\n" {
 		t.Fatalf("an empty sweep prints %q and %v", out.String(), err)
@@ -35,6 +37,7 @@ func TestAnEmptySweepPrintsAnEmptyList(t *testing.T) {
 }
 
 func TestAnIndexFaultReachesTheCaller(t *testing.T) {
+	t.Parallel()
 	var out strings.Builder
 	if err := sweeps(&out, func(...string) (any, error) { return nil, errors.New("down") }); err == nil || out.Len() != 0 {
 		t.Fatalf("a fault prints %q and answers %v", out.String(), err)

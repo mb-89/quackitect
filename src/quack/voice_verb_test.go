@@ -51,6 +51,7 @@ func voiceRuns(one twin, dry bool, argv ...string) (int, string, string) {
 }
 
 func TestVoiceRegistersUnderItsWord(t *testing.T) {
+	t.Parallel()
 	if registry["voice"] == nil {
 		t.Fatal("voice registers no Go twin")
 	}
@@ -60,6 +61,7 @@ func TestVoiceRegistersUnderItsWord(t *testing.T) {
 }
 
 func TestVoiceVerbMeasuresARealFolder(t *testing.T) {
+	t.Parallel()
 	root := voiceTree(t, map[string]string{
 		"docs/a.md":             voiceTen + "\n",
 		"docs/sub/b.md":         voiceTen + " " + voiceTen,
@@ -90,6 +92,7 @@ func TestVoiceVerbMeasuresARealFolder(t *testing.T) {
 }
 
 func TestVoiceVerbDryWritesNoAnswer(t *testing.T) {
+	t.Parallel()
 	row := `{"type":"assistant","message":{"content":[{"type":"text","text":"` + voiceTen + " " + voiceTen + " " + voiceTen + `"}]}}`
 	root := voiceTree(t, map[string]string{"logs/sess.jsonl": row, ".se/.runtime/bin/vale": ""})
 	vale := filepath.Join(root, ".se", ".runtime", "bin", "vale")
@@ -113,6 +116,7 @@ func TestVoiceVerbDryWritesNoAnswer(t *testing.T) {
 }
 
 func TestVoiceVerbSaysSoWhereValeIsAbsentOrFalls(t *testing.T) {
+	t.Parallel()
 	root := voiceTree(t, map[string]string{"docs/a.md": voiceTen})
 	var ran [][]string
 	code, out, errs := voiceRuns(voiceVerb(voiceFake(root, "", "", nil, &ran)), false, "voice", "measure", "docs")
@@ -128,6 +132,7 @@ func TestVoiceVerbSaysSoWhereValeIsAbsentOrFalls(t *testing.T) {
 }
 
 func TestVoiceVerbHelpAndRefused(t *testing.T) {
+	t.Parallel()
 	root := voiceTree(t, map[string]string{".se/.log/session.jsonl": `{"at":"2026-09-11T00:00:00.000Z","level":"warn","rule":"VoiceVale.PastTense","phrase":"bold"}`})
 	var ran [][]string
 	one := voiceVerb(voiceFake(root, "", "", nil, &ran))
@@ -143,6 +148,7 @@ func TestVoiceVerbHelpAndRefused(t *testing.T) {
 }
 
 func TestVoiceRunsValeKeepsTheOutputOfAFailedExit(t *testing.T) {
+	t.Parallel()
 	said, err := voiceRunsVale([]string{"sh", "-c", "echo '{}'; exit 3"}, t.TempDir())
 	if err != nil || said != "{}\n" {
 		t.Fatalf("a nonzero exit answers %q %v", said, err)

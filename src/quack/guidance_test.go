@@ -36,6 +36,7 @@ func readGuidanceGolden(t *testing.T) map[string]map[string][]string {
 }
 
 func TestGuidanceGoldenHoldsTheModule(t *testing.T) {
+	t.Parallel()
 	rows, err := guidanceRows(filepath.Join("..", ".."), map[string]string{})
 	if err != nil {
 		t.Fatal(err)
@@ -68,6 +69,7 @@ func TestGuidanceGoldenHoldsTheModule(t *testing.T) {
 }
 
 func TestGuidanceGoldenOldMeetsNew(t *testing.T) {
+	t.Parallel()
 	golden := readGuidanceGolden(t)
 	new, old := golden[guidanceModule], golden[guidanceOld]
 	if len(new) == 0 || len(old) == 0 {
@@ -86,6 +88,7 @@ func TestGuidanceGoldenOldMeetsNew(t *testing.T) {
 }
 
 func TestGuidanceFilesKeyEachFileByItsPathUnderTheRoot(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	at := filepath.Join(root, filepath.FromSlash(guidance.Guidance), "code")
 	if err := os.MkdirAll(at, 0o755); err != nil {

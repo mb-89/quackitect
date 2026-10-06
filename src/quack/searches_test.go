@@ -12,6 +12,7 @@ import (
 
 // [[spec/tickets/grep-glob-answer-off-index]]
 func TestTheIndexAskCarriesTheAskAndTheAnswer(t *testing.T) {
+	t.Parallel()
 	var grepAsks []index.GrepAsk
 	var globAsks []index.GlobAsk
 	reads := fakeReads{

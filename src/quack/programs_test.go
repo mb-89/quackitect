@@ -11,6 +11,7 @@ import (
 )
 
 func TestHelpAndNoWordAnswerTheUsageAndZero(t *testing.T) {
+	t.Parallel()
 	for _, argv := range [][]string{{"help"}, {}, {"--quiet"}, {"--quiet", "help"}} {
 		var out, errs strings.Builder
 		if code := usageDoor(argv, &errs)(&out); code != 0 || out.String() != usageText() || errs.Len() != 0 {
@@ -20,6 +21,7 @@ func TestHelpAndNoWordAnswerTheUsageAndZero(t *testing.T) {
 }
 
 func TestAWordNothingRegistersAnswersTheUsageAndRefuses(t *testing.T) {
+	t.Parallel()
 	var out, errs strings.Builder
 	code := usageDoor([]string{"--quiet", "unclaimed", "spec"}, &errs)(&out)
 	if code != exitUsage || out.String() != usageText() || errs.String() != "se: there is no verb called unclaimed\n\n" {
@@ -28,6 +30,7 @@ func TestAWordNothingRegistersAnswersTheUsageAndRefuses(t *testing.T) {
 }
 
 func TestHelpPrintsTheUsageOffCommands(t *testing.T) {
+	t.Parallel()
 	said := usageText()
 	if len(verbsmodule.Commands) == 0 || !strings.HasPrefix(said, "Usage: ./RUNME.sh <verb>") {
 		t.Fatalf("the usage reads %q", said)

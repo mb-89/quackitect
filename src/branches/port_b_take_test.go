@@ -12,6 +12,7 @@ import (
 
 // A take claims a group: the record names the hand and the tip it took, the claim lands on origin, and the brief prints the ask. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeClaimsAGroupAndPushes(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
 	before := one.git("rev-parse", "origin/work/one-group")
@@ -33,6 +34,7 @@ func TestPBTakeClaimsAGroupAndPushes(t *testing.T) {
 
 // A group whose open children no hand here takes stays at todo, names the need, and writes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeLeavesAGroupNoHandTakes(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: withField(pbGroupNote, "step", "children"), ticketAt("a-child"): pbNeeds()})
 	before := one.git("rev-parse", "origin/work/one-group")
@@ -51,6 +53,7 @@ func TestPBTakeLeavesAGroupNoHandTakes(t *testing.T) {
 
 // A take names the dependency a child waits on, and the need of the one it waits on. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeNamesTheDependencyAChildWaitsOn(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	waiting := strings.Replace(pbChild("one-group", "open"), "group: one-group\n", "group: one-group\ndepends_on: [b-child]\n", 1)
 	one.branch("one-group", map[string]string{pbAt: withField(pbGroupNote, "step", "children"), ticketAt("a-child"): waiting, ticketAt("b-child"): pbNeeds()})
@@ -63,6 +66,7 @@ func TestPBTakeNamesTheDependencyAChildWaitsOn(t *testing.T) {
 
 // A take names a person for a by: person step alone, and a step no person holds names none. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeNamesAPersonForAPersonStepAlone(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: withField(pbGroupNote, "step", "children"), ticketAt("a-child"): pbNeeds()})
 	if code := one.branchSays("take"); code != 0 {
@@ -83,6 +87,7 @@ func TestPBTakeNamesAPersonForAPersonStepAlone(t *testing.T) {
 
 // A take with a name takes that branch alone, and refuses a name nobody frees with no switch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeWithANameTakesThatBranchAlone(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
 	if code := one.branchSays("take", "one-group"); code != 0 {
@@ -104,6 +109,7 @@ func TestPBTakeWithANameTakesThatBranchAlone(t *testing.T) {
 
 // A take meeting a rejected push names both roads, and the branch steps back to origin's tip. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeMeetingARejectedPushNamesBothRoads(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
 	pbHook(one, filepath.Join(one.from, "hooks", "pre-receive"), "exit 1")
@@ -121,6 +127,7 @@ func TestPBTakeMeetingARejectedPushNamesBothRoads(t *testing.T) {
 
 // A take whose claim does not commit stops, puts the ticket back, and pushes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeWhoseClaimRefusesToCommitStops(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, nil))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote})
 	before := one.git("rev-parse", "origin/work/one-group")
@@ -139,6 +146,7 @@ func TestPBTakeWhoseClaimRefusesToCommitStops(t *testing.T) {
 
 // A take whose sync conflicts after the claim still hands the box its ask. [[spec/tickets/work-verbs-port-to-go]]
 func TestPBTakeWhoseSyncConflictsStillHandsTheAsk(t *testing.T) {
+	t.Parallel()
 	one := pbIdentify(newTree(t, map[string]string{"x.txt": "base\n"}))
 	one.branch("one-group", map[string]string{pbAt: pbGroupNote, "x.txt": "branch\n"})
 	one.land("main moves", map[string]string{"x.txt": "main\n"})

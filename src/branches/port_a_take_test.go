@@ -6,7 +6,6 @@ package branches
 
 import (
 	"fmt"
-	"os"
 	"strings"
 	"testing"
 	"time"
@@ -29,6 +28,7 @@ func paParkedTree(t *testing.T) *tree {
 
 // Take stops on a tree carrying uncommitted work, and moves nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeStopsOnUncommittedWork(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"a.md": "a\n"})
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	one.write(map[string]string{"a.md": "changed\n"})
@@ -43,6 +43,7 @@ func TestPATakeStopsOnUncommittedWork(t *testing.T) {
 
 // The uncommitted check looks past a tagged ticket, and take carries on onto the branch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeLooksPastATaggedTicket(t *testing.T) {
+	t.Parallel()
 	one := paParkedTree(t)
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s", code, paSaid(one))
@@ -57,6 +58,7 @@ func TestPATakeLooksPastATaggedTicket(t *testing.T) {
 
 // Take puts every tagged file back, so the reset leaves the tag standing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeKeepsTheTag(t *testing.T) {
+	t.Parallel()
 	one := paParkedTree(t)
 	one.branchSays("take")
 	if said := one.read(paParkedAt); said != paParked {
@@ -66,6 +68,7 @@ func TestPATakeKeepsTheTag(t *testing.T) {
 
 // An untagged change still stops a take, and the tagged one beside it changes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAUntaggedChangeStopsTake(t *testing.T) {
+	t.Parallel()
 	one := paParkedTree(t)
 	one.write(map[string]string{"src/scripts/work.js": "two\n"})
 	if code := one.branchSays("take"); code != codeRefused {
@@ -79,6 +82,7 @@ func TestPAUntaggedChangeStopsTake(t *testing.T) {
 
 // Take refuses where this box stands ahead of origin, and leaves the commit standing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeRefusesBoxAhead(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("fix-lsp", map[string]string{"a.md": "a\n"})
 	paOn(one, "fix-lsp")
@@ -95,6 +99,7 @@ func TestPATakeRefusesBoxAhead(t *testing.T) {
 
 // Take refuses where the branch it picks holds a commit origin lacks, and leaves that branch standing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeRefusesPickedBranchAhead(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	paOn(one, "one-group")
@@ -117,12 +122,10 @@ func paHandOver(t *testing.T, landingDate string) *tree {
 	t.Helper()
 	one := newTree(t, nil)
 	if landingDate != "" {
-		t.Setenv("GIT_COMMITTER_DATE", landingDate)
-		t.Setenv("GIT_AUTHOR_DATE", landingDate)
+		one.env = []string{"GIT_COMMITTER_DATE=" + landingDate, "GIT_AUTHOR_DATE=" + landingDate}
 	}
 	one.branch("landing", map[string]string{ticketAt("landing"): withField(paGroupNote, "state", closedState)})
-	os.Unsetenv("GIT_COMMITTER_DATE")
-	os.Unsetenv("GIT_AUTHOR_DATE")
+	one.env = nil
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	return one
 }
@@ -137,6 +140,7 @@ func paTrunkMoves(one *tree) {
 
 // Branch take hands out a stuck hand-over first, prints sync, check and push, and writes no record. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeHandsStuckFirst(t *testing.T) {
+	t.Parallel()
 	one := paHandOver(t, "")
 	paTrunkMoves(one)
 	if code := one.branchSays("take"); code != codeOK {
@@ -158,6 +162,7 @@ func TestPATakeHandsStuckFirst(t *testing.T) {
 
 // Branch take naming a free group passes a stuck hand-over by. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeNamedPassesStuckBy(t *testing.T) {
+	t.Parallel()
 	one := paHandOver(t, "")
 	paTrunkMoves(one)
 	one.branchSays("take", "one-group")
@@ -171,6 +176,7 @@ func TestPATakeNamedPassesStuckBy(t *testing.T) {
 
 // Branch take hands out a hand-over past work.staleAfter, by the clock. [[spec/tickets/work-verbs-port-to-go]]
 func TestPATakeHandsStaleByTheClock(t *testing.T) {
+	t.Parallel()
 	from := time.Date(2026, 1, 2, 0, 0, 0, 0, time.UTC)
 	twoDaysBack := from.Add(-48 * time.Hour).Unix()
 	one := paHandOver(t, fmt.Sprintf("@%d +0000", twoDaysBack))

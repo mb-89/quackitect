@@ -11,6 +11,7 @@ import (
 
 // Every name RetroVerbs lists answers a registered twin, and none falls to the bare retro's usage. [[spec/tickets/retro-verbs-port-to-go]]
 func TestEveryRetroVerbRegisters(t *testing.T) {
+	t.Parallel()
 	for _, one := range verbsmodule.RetroVerbs {
 		key, found := twinOf([]string{"retro", one.Name}, registry)
 		if found == nil || key != "retro "+one.Name {

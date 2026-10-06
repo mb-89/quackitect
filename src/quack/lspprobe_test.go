@@ -58,6 +58,7 @@ func answeringServer(t *testing.T, codes ...any) (func([]string, runOpts) ranRes
 }
 
 func TestALanguageServerThatAnswersDrawsARowNamingEachDiagnostic(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	run, asked := answeringServer(t, "Schema.Kind", "Voice.Tense", "Schema.Kind", 7)
 	var stdin string
@@ -92,6 +93,7 @@ func TestALanguageServerThatAnswersDrawsARowNamingEachDiagnostic(t *testing.T) {
 }
 
 func TestALanguageServerDrawingNothingSaysSo(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	d.run, _ = answeringServer(t)
 	if row := lspProbe(d, "/bin/se-index", d.root); row != "answers, and draws no diagnostic on the probe note" {
@@ -100,6 +102,7 @@ func TestALanguageServerDrawingNothingSaysSo(t *testing.T) {
 }
 
 func TestALanguageServerThatExitsDrawsAWarnRowNamingTheExit(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	runner.answers["se-index lsp"] = ranResult{code: 2, stderr: "panic: the checker reads no tree\ngoroutine 1\n"}
 	if row := lspProbe(d, "/bin/se-index", d.root); row != "warn: quack lsp exits with 2 before it answers: panic: the checker reads no tree" {
@@ -116,6 +119,7 @@ func TestALanguageServerThatExitsDrawsAWarnRowNamingTheExit(t *testing.T) {
 }
 
 func TestALanguageServerStandingNowhereDrawsTheInstallsLine(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	if row := lspProbe(d, "", d.root); row != "missing, run ./RUNME.sh" || len(runner.ran) != 0 {
 		t.Errorf("the row reads %q after %v", row, runner.ran)

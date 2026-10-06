@@ -11,6 +11,7 @@ import (
 )
 
 func TestProseKeepsWhatTheVetoesLeave(t *testing.T) {
+	t.Parallel()
 	set := prose.Finding{Rule: "VoiceParagraph.PastTense", Line: 1, Column: 10, Said: "set"}
 	wrote := prose.Finding{Rule: "VoiceParagraph.PastTense", Line: 2, Column: 10, Said: "wrote"}
 	ask, err := json.Marshal(proseAsk{Mode: prose.Past, Docs: []proseDoc{{
@@ -35,6 +36,7 @@ func TestProseKeepsWhatTheVetoesLeave(t *testing.T) {
 }
 
 func TestTheProseSchemaNamesTheCapsAndTheLists(t *testing.T) {
+	t.Parallel()
 	schema := "layers:\n  sentence:\n    words:\n      max: 25\n      listItem: 20\n  vocabulary:\n    core: spec/words/core.yml\n"
 	caps, paths := proseSchema([]byte(schema))
 	if caps.Sentence != 25 || caps.ListItem != 20 {

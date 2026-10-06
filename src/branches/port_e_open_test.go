@@ -13,6 +13,7 @@ import (
 
 // A ref reads merged where the merged set names it, and open where it does not. [[spec/tickets/work-verbs-port-to-go]]
 func TestPERefsReadMergedOffTheSet(t *testing.T) {
+	t.Parallel()
 	said := refsIn("origin/work/fresh-cut aaa 0\norigin/work/landed bbb 0", map[string]bool{"work/landed": true})
 	var got [][2]any
 	for _, one := range said {
@@ -26,6 +27,7 @@ func TestPERefsReadMergedOffTheSet(t *testing.T) {
 
 // The merged set drops a branch standing at trunk's tip. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergedDropsACutAtTheTip(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.branch("landed", map[string]string{"src/landed.txt": "x\n"})
 	one.git("merge", "-q", "--no-ff", "--no-edit", "origin/work/landed")
@@ -39,6 +41,7 @@ func TestPEMergedDropsACutAtTheTip(t *testing.T) {
 
 // The merged set drops a cut on trunk's first-parent line after trunk moves on. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergedDropsACutOnTrunksLine(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.git("push", "-q", "origin", "main:refs/heads/work/fresh-cut")
 	one.peTrunkMoves(map[string]string{"src/moved.txt": "m\n"})
@@ -53,6 +56,7 @@ func TestPEMergedDropsACutOnTrunksLine(t *testing.T) {
 
 // A group landed once trunk carries its ticket closed, and a cut or a done-only branch has not. [[spec/tickets/work-verbs-port-to-go]]
 func TestPELandedReadsTrunksTicket(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{
 		ticketAt("landed"):    "---\nstate: closed\n---\n",
 		ticketAt("fresh-cut"): "---\nstate: open\n---\n",
@@ -65,6 +69,7 @@ func TestPELandedReadsTrunksTicket(t *testing.T) {
 
 // Open pushes a group off trunk, and says it stands at todo. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEOpenPushesAGroupOffTrunk(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): groupNote}).desk()
 	if code := one.branchSays("open", "g"); code != codeOK {
 		t.Fatalf("the open answers %d: %s", code, one.errs.String())
@@ -77,6 +82,7 @@ func TestPEOpenPushesAGroupOffTrunk(t *testing.T) {
 
 // Open refuses a name trunk carries no group for, and pushes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEOpenRefusesAMissingGroup(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	tip := one.peOriginTip("main")
 	if code := one.branchSays("open", "g"); code != codeRefused {
@@ -90,6 +96,7 @@ func TestPEOpenRefusesAMissingGroup(t *testing.T) {
 
 // Open leaves a branch already in the cloud alone where trunk carries the marker, and pushes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEOpenLeavesAStandingBranchAlone(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): peMarked}).desk()
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
 	trunkTip, branchTip := one.peOriginTip("main"), one.peOriginTip("work/g")
@@ -104,6 +111,7 @@ func TestPEOpenLeavesAStandingBranchAlone(t *testing.T) {
 
 // On trunk a cloud box takes the group, and the record lands in the ticket under the work root, the method root holding none. [[spec/tickets/work-verbs-port-to-go]]
 func TestPETakeWritesTheRecordUnderTheWorkRoot(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.d.Method = t.TempDir()
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})

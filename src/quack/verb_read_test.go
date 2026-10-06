@@ -20,6 +20,7 @@ var readVerbs = []string{"index", "links", "lint", "notes", "find", "log"}
 var readModules = []string{"log-verb.js"}
 
 func TestReadVerbsLeaveNode(t *testing.T) {
+	t.Parallel()
 	for _, verb := range readVerbs {
 		t.Run(verb, func(t *testing.T) {
 			if registry[verb] == nil {

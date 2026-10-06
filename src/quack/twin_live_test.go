@@ -41,6 +41,7 @@ func managesLive(as q.Writer) index.Manage {
 }
 
 func TestATwinReadsTheIndexBesideTheActionCallingIt(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(root, index.Runtime), 0o755); err != nil {
 		t.Fatal(err)

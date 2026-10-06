@@ -40,6 +40,7 @@ func shortHash(text string) string {
 }
 
 func TestTreeGolden(t *testing.T) {
+	t.Parallel()
 	found, err := filepath.Glob(filepath.Join(treeRoot, "spec", "tickets", "*.md"))
 	if err != nil {
 		t.Fatal(err)

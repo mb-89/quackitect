@@ -17,6 +17,7 @@ func standingRan(root string, env map[string]string) (int, string, string) {
 }
 
 func TestStandingPrintsTheLayerAndTheCanary(t *testing.T) {
+	t.Parallel()
 	root := configRoot(t, `{}`)
 	seedFile(t, root, "spec/guidance/voice.md", standingNote)
 	seedFile(t, root, "spec/guidance/cloud.md", "---\nkind: [[guidance]]\nenv: [SE_CLOUD]\n---\n\n# Actionables\n\n1. Push.\n")
@@ -32,6 +33,7 @@ func TestStandingPrintsTheLayerAndTheCanary(t *testing.T) {
 }
 
 func TestStandingSaysTheStopHookOff(t *testing.T) {
+	t.Parallel()
 	root := configRoot(t, `{"stop": {"enabled": false}}`)
 	seedFile(t, root, "spec/guidance/voice.md", standingNote)
 	if _, out, _ := standingRan(root, map[string]string{}); !strings.HasSuffix(out, "the stop hook off.\n") {
@@ -40,6 +42,7 @@ func TestStandingSaysTheStopHookOff(t *testing.T) {
 }
 
 func TestStandingRefusesWhereNoGuidanceStands(t *testing.T) {
+	t.Parallel()
 	code, _, errs := standingRan(t.TempDir(), map[string]string{})
 	if code != exitUsage || errs != "There is no spec/guidance, so nothing is handed over.\n" {
 		t.Fatalf("standing answers %d and %q, and wants the refusal", code, errs)
@@ -47,6 +50,7 @@ func TestStandingRefusesWhereNoGuidanceStands(t *testing.T) {
 }
 
 func TestStandingSaysWhereNoNoteCarriesRules(t *testing.T) {
+	t.Parallel()
 	root := configRoot(t, `{}`)
 	seedFile(t, root, "spec/guidance/empty.md", "---\nkind: [[guidance]]\n---\n\n# Notes\n")
 	if code, out, _ := standingRan(root, map[string]string{}); code != 0 || out != "No guidance note carries an Actionables chapter.\n" {

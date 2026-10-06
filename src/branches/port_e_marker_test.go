@@ -13,6 +13,7 @@ import (
 
 // Open marks trunk once the branch push lands: the branch carries the bare group, and trunk the mark. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEOpenMarksTrunkAfterTheBranchPush(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): groupNote}).desk()
 	if code := one.branchSays("open", "g"); code != codeOK {
 		t.Fatalf("the open answers %d: %s", code, one.errs.String())
@@ -33,6 +34,7 @@ func TestPEOpenMarksTrunkAfterTheBranchPush(t *testing.T) {
 
 // Open off trunk refuses, and pushes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEOpenOffTrunkRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): groupNote}).desk()
 	tip := one.peOriginTip("main")
 	one.git("switch", "-q", "-c", "work/other")
@@ -47,6 +49,7 @@ func TestPEOpenOffTrunkRefuses(t *testing.T) {
 
 // A refused branch push leaves trunk without the marker. [[spec/tickets/work-verbs-port-to-go]]
 func TestPERefusedBranchPushLeavesTrunkBare(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): groupNote}).desk()
 	one.peOriginRefuses(`case "$ref" in refs/heads/work/*) true;; *) false;; esac`)
 	tip := one.peOriginTip("main")
@@ -63,6 +66,7 @@ func TestPERefusedBranchPushLeavesTrunkBare(t *testing.T) {
 
 // Open marks a branch already standing in the cloud, and pushes trunk alone. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEOpenMarksABranchAlreadyStanding(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): groupNote}).desk()
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
 	branchTip := one.peOriginTip("work/g")
@@ -80,6 +84,7 @@ func TestPEOpenMarksABranchAlreadyStanding(t *testing.T) {
 
 // The merge drops the marker inside the merge commit. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergeDropsTheMarkerOnTheMergeCommit(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, map[string]string{ticketAt("g"): peMarked}, map[string]string{ticketAt("g"): peMarkedDone})
 	if code := one.branchSays("merge", "g"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
@@ -97,6 +102,7 @@ func TestPEMergeDropsTheMarkerOnTheMergeCommit(t *testing.T) {
 
 // A merge conflicting elsewhere drops the marker and stages the drop, with no amend. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEConflictedMergeStagesTheMarkerDrop(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t,
 		map[string]string{ticketAt("g"): peMarked, "src/a.txt": "one\n"},
 		map[string]string{ticketAt("g"): peMarkedDone, "src/a.txt": "two\n"})
@@ -119,6 +125,7 @@ func TestPEConflictedMergeStagesTheMarkerDrop(t *testing.T) {
 
 // A merge conflicting on the group ticket leaves the marker and the conflict for the person, and names the drop. An empty ticket trunk deletes makes the conflict past the moved-on-trunk read. [[spec/tickets/work-verbs-port-to-go]]
 func TestPETicketConflictLeavesTheMarkerUnstaged(t *testing.T) {
+	t.Parallel()
 	one := peMergeTree(t, map[string]string{ticketAt("g"): ""}, map[string]string{ticketAt("g"): peMarkedDone})
 	one.git("rm", "-q", ticketAt("g"))
 	one.peTrunkMoves(nil)
@@ -134,6 +141,7 @@ func TestPETicketConflictLeavesTheMarkerUnstaged(t *testing.T) {
 
 // Close drops the marker on trunk, pushes trunk, and then deletes the branch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPECloseDropsTheMarkerBeforeTheBranchGoes(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): peMarked}).desk()
 	one.branch("g", map[string]string{"src/one.txt": "one\n"})
 	if code := one.branchSays("close", "g", "--force"); code != codeOK {
@@ -155,6 +163,7 @@ func TestPECloseDropsTheMarkerBeforeTheBranchGoes(t *testing.T) {
 
 // Close off trunk refuses, and deletes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPECloseOffTrunkRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): peMarked}).desk()
 	one.branch("g", map[string]string{"src/one.txt": "one\n"})
 	one.git("switch", "-q", "-c", "work/other")
@@ -169,6 +178,7 @@ func TestPECloseOffTrunkRefuses(t *testing.T) {
 
 // Close on a dirty tree refuses, and deletes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPECloseOnADirtyTreeRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("g"): peMarked, "src/one.js": "one\n"}).desk()
 	one.branch("g", map[string]string{"src/two.txt": "two\n"})
 	one.write(map[string]string{"src/one.js": "changed\n"})
@@ -183,6 +193,7 @@ func TestPECloseOnADirtyTreeRefuses(t *testing.T) {
 
 // Release leaves the marker on the branch's group, pushes no trunk, and the branch stands at todo. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEReleaseLeavesTheMarker(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	held := withEntry(peMarked, front.Ordered{{Key: "step", Value: "children"}, {Key: "hand", Value: "box 3f9a"}, {Key: "hash_before", Value: "a1b2c3"}})
 	one.branch("g", map[string]string{ticketAt("g"): held})

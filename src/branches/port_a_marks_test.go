@@ -13,6 +13,7 @@ import (
 
 // The mark reads from the frontmatter, and a note carrying none reads unmarked. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAMarkReadsFromTheFront(t *testing.T) {
+	t.Parallel()
 	if !urgent("---\nstatus: todo\nurgent: true\n---\n") {
 		t.Fatal("a marked note reads unmarked")
 	}
@@ -23,6 +24,7 @@ func TestPAMarkReadsFromTheFront(t *testing.T) {
 
 // A dependency reads as a list or on one line, with the prefix dropped. [[spec/tickets/work-verbs-port-to-go]]
 func TestPADependencyReadsListOrLine(t *testing.T) {
+	t.Parallel()
 	if said := dependsOnText("---\ndepends_on:\n  - one\n  - work/two\n---\n"); !slices.Equal(said, []string{"one", "two"}) {
 		t.Fatalf("the list reads %q", said)
 	}
@@ -36,6 +38,7 @@ func TestPADependencyReadsListOrLine(t *testing.T) {
 
 // A dependency in a flow list reads without its brackets or its quotes. [[spec/tickets/work-verbs-port-to-go]]
 func TestPADependencyFlowList(t *testing.T) {
+	t.Parallel()
 	cases := map[string][]string{
 		"---\ndepends_on: [one, work/two]\n---\n":  {"one", "two"},
 		"---\ndepends_on: [\"one\", 'two']\n---\n": {"one", "two"},
@@ -51,6 +54,7 @@ func TestPADependencyFlowList(t *testing.T) {
 
 // A branch waits for a dependency until trunk holds it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAWaitsUntilTrunkHoldsIt(t *testing.T) {
+	t.Parallel()
 	ticket := "---\ndepends_on:\n  - open\n  - busy\n  - ready\n  - merged\n  - gone\n---\n"
 	standing := map[string]string{"work/open": todo, "work/busy": held, "work/ready": done, "work/merged": merged}
 	if said := waitingOn(ticket, standing, nil); !slices.Equal(said, []string{"open", "busy", "ready"}) {
@@ -60,6 +64,7 @@ func TestPAWaitsUntilTrunkHoldsIt(t *testing.T) {
 
 // The mark orders a marked note over an unmarked one. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAMarkOrdersFirst(t *testing.T) {
+	t.Parallel()
 	marked := "---\nstatus: todo\nurgent: true\n---\n"
 	bareNote := "---\nstatus: todo\n---\n"
 	order := []string{bareNote, marked}
@@ -71,6 +76,7 @@ func TestPAMarkOrdersFirst(t *testing.T) {
 
 // Close reaches a work branch and a branch the platform cut, and no other. [[spec/tickets/work-verbs-port-to-go]]
 func TestPACloseReachesOwnBranches(t *testing.T) {
+	t.Parallel()
 	for _, one := range []string{"work/fix-lsp", "claude/gracious-hawking-zepc6h"} {
 		if !ownBranch.MatchString(one) {
 			t.Fatalf("%s reads as no branch of ours", one)
@@ -85,6 +91,7 @@ func TestPACloseReachesOwnBranches(t *testing.T) {
 
 // A porcelain row names its file, with the status gone and a rename at its end. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAPorcelainRowNamesItsFile(t *testing.T) {
+	t.Parallel()
 	cases := map[string]string{
 		" M spec/tickets/slow-lint.md": "spec/tickets/slow-lint.md",
 		"M spec/tickets/slow-lint.md":  "spec/tickets/slow-lint.md",
@@ -101,6 +108,7 @@ func TestPAPorcelainRowNamesItsFile(t *testing.T) {
 
 // A ticket says the step it stands at, and one naming no step and carrying no mark says nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAWhyReadsTheStep(t *testing.T) {
+	t.Parallel()
 	if said := whyOf(paChild("one-group", "open")); said != "do" {
 		t.Fatalf("the child says %q", said)
 	}

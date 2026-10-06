@@ -86,6 +86,7 @@ func roundTrips(bodies map[string][]byte) error {
 }
 
 func TestEveryCodecRoundTripsItsCommittedFiles(t *testing.T) {
+	t.Parallel()
 	if err := roundTrips(mirrored(t)); err != nil {
 		t.Fatal(err)
 	}
@@ -93,6 +94,7 @@ func TestEveryCodecRoundTripsItsCommittedFiles(t *testing.T) {
 
 // A file broken under one projection fails the round trip on that file, where its codec writes the break back another way. The markdown codec writes any bytes back, so a break passes there. [[spec/design_output/model#everything-on-disk-mirrors]]
 func TestABrokenFileFailsItsRoundTrip(t *testing.T) {
+	t.Parallel()
 	bodies := mirrored(t)
 	failed := 0
 	for _, one := range projections() {
@@ -129,6 +131,7 @@ func TestABrokenFileFailsItsRoundTrip(t *testing.T) {
 
 // A read-only projection writes nothing back, so the round trip leaves it out: the ticket drawing refuses a write. [[spec/tickets/the-lens-reads-v1]]
 func TestARoundTripLeavesAReadOnlyProjectionOut(t *testing.T) {
+	t.Parallel()
 	for _, one := range projections() {
 		if _, err := one.roundTrip([]byte("---\nkind: [[ticket]]\n---\n")); err != nil && strings.Contains(err.Error(), "writes none") {
 			t.Fatalf("the projection over %s refuses a write, and the round trip takes it", one.glob)

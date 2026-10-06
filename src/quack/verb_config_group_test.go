@@ -20,6 +20,7 @@ var configVerbs = []string{"config", "fix", "project", "rules", "standing", "doo
 var configModules = []string{"src/scripts/cli-fix.js", ".claude/skills/level0/lib/shout.js"}
 
 func TestConfigVerbsLeaveNode(t *testing.T) {
+	t.Parallel()
 	for _, verb := range configVerbs {
 		t.Run(verb, func(t *testing.T) {
 			if registry[verb] == nil {

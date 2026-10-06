@@ -7,6 +7,7 @@ import "testing"
 
 // Done runs on a work branch alone. [[spec/design_output/work#a-group-is-a-ticket]]
 func TestDoneRunsOnAWorkBranchAlone(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := one.branchSays("done"); code != codeRefused {
 		t.Fatalf("done on main answers %d", code)
@@ -16,6 +17,7 @@ func TestDoneRunsOnAWorkBranchAlone(t *testing.T) {
 
 // A branch with no check stamp claims nothing. [[spec/design_output/work#the-battery-answers-first]]
 func TestDoneWantsTheCheckOnHead(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
 	one.git("switch", "-q", "-c", "work/g", "origin/work/g")
@@ -27,6 +29,7 @@ func TestDoneWantsTheCheckOnHead(t *testing.T) {
 
 // The stamp reads green on its own commit alone, clean and with no warning. [[spec/design_output/work#the-battery-answers-first]]
 func TestTheStampReadsGreenOnItsCommit(t *testing.T) {
+	t.Parallel()
 	if ok, _ := saysGreen(`{"sha":"abc","ok":true,"clean":true,"warnings":0}`, "abc"); !ok {
 		t.Fatal("a green stamp reads red")
 	}
@@ -40,6 +43,7 @@ func TestTheStampReadsGreenOnItsCommit(t *testing.T) {
 
 // The retro's first unwritten leaf stops the leave, and a cloud leaf waits on a desk. [[spec/design_output/work#a-box-leaves]]
 func TestTheRetroComesBeforeTheBoxLeaves(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if open := one.d.retroOpen(groupNote); open != "retro/write" {
 		t.Fatalf("the open retro reads %q", open)
@@ -52,6 +56,7 @@ func TestTheRetroComesBeforeTheBoxLeaves(t *testing.T) {
 
 // Read prints the group a branch carries, and refuses a branch carrying none. [[spec/design_output/work#a-group-is-a-ticket]]
 func TestReadPrintsTheGroup(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): groupNote})
 	if code := one.branchSays("read", "g"); code != 0 {

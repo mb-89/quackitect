@@ -6,6 +6,7 @@ package pull
 import "testing"
 
 func TestTicketAt(t *testing.T) {
+	t.Parallel()
 	disk := FakeDisk{
 		".se/tickets/both.md":   "---\nstate: closed\n---\n",
 		"spec/tickets/both.md":  "---\nstate: open\n---\n",

@@ -19,6 +19,7 @@ import (
 
 // [[spec/tickets/prose-tools-answer-in-go]]
 func TestTheDraftsModuleLoads(t *testing.T) {
+	t.Parallel()
 	if _, ok := modules[drafts.Module]; !ok {
 		t.Errorf("quack loads no module type %q", drafts.Module)
 	}
@@ -26,6 +27,7 @@ func TestTheDraftsModuleLoads(t *testing.T) {
 
 // A tree with no Vale reads the draft nowhere, as the bridge says. [[spec/tickets/prose-tools-answer-in-go]]
 func TestQuackAnswersAnAnswerCheckWithNoValeAsTheBridgeDoes(t *testing.T) {
+	t.Parallel()
 	ask := accepts(t.TempDir(), nil, nil)
 	said, err := ask(q.Request{Module: drafts.Module, Verb: drafts.AnswerVerb, Args: drafts.Answer{Text: "The door reads the note."}})
 	if err != nil {
@@ -63,6 +65,7 @@ type wiredDrafts struct {
 
 // Each case of the table reaches the wired module as a call, through the outside quack builds over a Vale the case fakes. [[spec/tickets/prose-tools-answer-in-go]]
 func TestTheDraftCasesAnswerOffTheWiredModule(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(draftCasesFile)))
 	if err != nil {
 		t.Fatal(err)

@@ -9,6 +9,7 @@ import (
 
 // A bare branch prints the usage, and a verb the table lacks refuses with it. [[spec/design_output/work#the-round-trip]]
 func TestTheBranchVerbPrintsItsUsage(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := one.branchSays(); code != 0 {
 		t.Fatalf("a bare branch answers %d", code)
@@ -21,6 +22,7 @@ func TestTheBranchVerbPrintsItsUsage(t *testing.T) {
 
 // A need names a branch verb this box holds, and one it lacks. [[spec/design_output/pull#a-need-is-a-verb]]
 func TestANeedReadsTheVerbTable(t *testing.T) {
+	t.Parallel()
 	if !holdsVerb("branch sync") || !holdsVerb("ticket pull") || holdsVerb("branch fly") || holdsVerb("deploy") {
 		t.Fatal("the needs read apart from the table")
 	}
@@ -28,6 +30,7 @@ func TestANeedReadsTheVerbTable(t *testing.T) {
 
 // A loud verb leaves a log row at warn on red. [[spec/design_output/log#which-kind-says-what]]
 func TestALoudVerbLogsItsCode(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	var rows []string
 	one.d.Log = func(level, kind, said string, _ map[string]any) { rows = append(rows, level+" "+kind+" "+said) }

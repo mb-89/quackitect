@@ -27,6 +27,7 @@ func commandsOf(placed []index.Placed) []string {
 }
 
 func TestEachInstanceInNoListTakesAProcessOfItsOwn(t *testing.T) {
+	t.Parallel()
 	got := commandsOf(placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"ticket"}}, "quack"))
 	if strings.Join(got, " | ") != "quack module ticket | quack module tickets | quack module queue" {
 		t.Fatalf("the placements run %q, and want tickets and queue apart, with the clock left to the IO process and the hooks and http listeners to the index", got)
@@ -34,6 +35,7 @@ func TestEachInstanceInNoListTakesAProcessOfItsOwn(t *testing.T) {
 }
 
 func TestThePlacementsKeyReadsItsListsOffTheTree(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	at := filepath.Join(root, "spec", "config", "level0.json")
 	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
@@ -48,6 +50,7 @@ func TestThePlacementsKeyReadsItsListsOffTheTree(t *testing.T) {
 }
 
 func TestAListOfInstancesSharesOneProcess(t *testing.T) {
+	t.Parallel()
 	placed := placementsOf(placedWiring, map[string]q.Writer{}, [][]string{{"tickets", "queue", "ticket"}}, "quack")
 	if got := commandsOf(placed); strings.Join(got, " | ") != "quack module tickets queue ticket" {
 		t.Fatalf("the placements run %q, and want tickets, queue and ticket in one process", got)
@@ -107,6 +110,7 @@ func doublerRuns(t *testing.T) (*index.Peer, chan map[string]json.RawMessage) {
 
 // The process runs once at its start with no run sent, and a run over the same inputs answers an empty commit. [[spec/tickets/the-split-deployment-takes-over]]
 func TestAModuleProcessAnswersAnEmptyCommitWhereNothingMoved(t *testing.T) {
+	t.Parallel()
 	peer, heard := doublerRuns(t)
 	select {
 	case values := <-heard:
@@ -130,6 +134,7 @@ func TestAModuleProcessAnswersAnEmptyCommitWhereNothingMoved(t *testing.T) {
 }
 
 func TestAModuleProcessCommitsItsInstanceOffTheInputs(t *testing.T) {
+	t.Parallel()
 	peer, heard := doublerRuns(t)
 	if err := peer.Run("doubler"); err != nil {
 		t.Fatal(err)

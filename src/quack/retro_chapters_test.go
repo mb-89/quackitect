@@ -13,6 +13,7 @@ import (
 
 // Chapters hand every line to one chapter, as line ranges per file. [[spec/guidance/retro/chapter]]
 func TestRetroChaptersHandEveryLineToOneChapterAsLineRangesPerFile(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	retroReadingLay(t, root, retroReadingName, retroReadingWith(retroReadingInput, map[string]string{"chapters.json": retroReadingCuts}))
 
@@ -47,6 +48,7 @@ func TestRetroChaptersHandEveryLineToOneChapterAsLineRangesPerFile(t *testing.T)
 
 // Chapters refuse a gap between two cuts, and a line past every chapter. [[spec/guidance/retro/chapter]]
 func TestRetroChaptersRefuseAGapBetweenTwoCutsAndALinePastEveryChapter(t *testing.T) {
+	t.Parallel()
 	morning := `{"id":"c1","title":"the morning","from":"2026-09-19T08:00:00.000Z","to":"2026-09-19T12:00:00.000Z"}`
 	afternoon := `{"id":"c2","title":"the afternoon","from":"2026-09-19T14:00:00.000Z","to":"2026-09-19T15:00:00.000Z"}`
 	root := t.TempDir()

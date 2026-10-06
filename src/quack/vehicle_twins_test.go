@@ -13,6 +13,7 @@ import (
 
 // The wiring loads the vehicle and stub topics, so an agent calls each through the index. [[spec/tickets/vehicle-verbs-become-actions]]
 func TestTheWiringLoadsTheVehicleAndStubTopics(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join("..", "..", filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)

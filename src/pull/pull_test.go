@@ -133,6 +133,7 @@ func cloudPull(t *testing.T) (*It, *bytes.Buffer, *bytes.Buffer) {
 }
 
 func TestPull(t *testing.T) {
+	t.Parallel()
 	t.Run("a bare pull hands the child's leaf, and the hold names it", func(t *testing.T) {
 		it, out, _ := cloudPull(t)
 		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
@@ -222,6 +223,7 @@ func TestPull(t *testing.T) {
 
 // Each tool input reads into the words a person types, off the cases test/level0/level1.test.js and pull-gate.test.js held. [[spec/design_output/pull#the-hand-out]]
 func TestPullArgvOf(t *testing.T) {
+	t.Parallel()
 	tool := func(said string) []string { return []string{"pull", "--tool", said} }
 	for _, one := range []struct {
 		name string
@@ -246,6 +248,7 @@ func TestPullArgvOf(t *testing.T) {
 }
 
 func TestHoldAt(t *testing.T) {
+	t.Parallel()
 	if got := holdAt("box cafe · claude-code"); got != ".se/.runtime/hold/box-cafe-claude-code.json" {
 		t.Fatalf("the hold stands at %s", got)
 	}

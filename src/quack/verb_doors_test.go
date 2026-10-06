@@ -15,6 +15,7 @@ func doorsRan(root string) (int, string, string) {
 }
 
 func TestDoorsCountsWhereEveryDoorHoldsATest(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedFile(t, root, "src/doors/disk.js", "")
 	seedFile(t, root, "src/doors/fake/disk.js", "")
@@ -25,6 +26,7 @@ func TestDoorsCountsWhereEveryDoorHoldsATest(t *testing.T) {
 }
 
 func TestDoorsNamesADoorWithNoContract(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedFile(t, root, "src/doors/disk.js", "")
 	seedFile(t, root, "src/doors/git.js", "")

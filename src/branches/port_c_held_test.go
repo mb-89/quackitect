@@ -42,6 +42,7 @@ func (one *tree) pcSubjects(ref string) string { return one.git("log", "--format
 
 // A take on a box holding its branch hands the ask again, and claims nothing new. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCATakeOnAHeldBranchHandsTheAskAgain(t *testing.T) {
+	t.Parallel()
 	for _, argv := range [][]string{{"take"}, {"take", pcGroup}} {
 		one := newTree(t, nil)
 		hand := one.pcHand()
@@ -86,6 +87,7 @@ func pcTakingPast(t *testing.T, past pcPast) *tree {
 
 // A named take drops a hold standing done, merged or stale, and lands on the name. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCANamedTakeDropsAHoldPastItsWork(t *testing.T) {
+	t.Parallel()
 	for _, past := range []pcPast{pcClosed, pcMerged, pcStale} {
 		one := pcTakingPast(t, past)
 		if code := one.branchSays("take", pcGroup); code != codeOK {
@@ -101,6 +103,7 @@ func TestPCANamedTakeDropsAHoldPastItsWork(t *testing.T) {
 
 // A named take refuses while the held branch stands in work, and names both. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCANamedTakeRefusesAHoldInWork(t *testing.T) {
+	t.Parallel()
 	one := pcTakingPast(t, pcInWork)
 	if code := one.branchSays("take", pcGroup); code != codeRed {
 		t.Fatalf("the take answers %d: %s", code, one.pcSaid())
@@ -132,6 +135,7 @@ func pcTakingHeld(t *testing.T, ahead time.Duration, behind int) *tree {
 
 // A take over a hold past work.staleAfter closes that hold and writes its own. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCATakeOverAStaleHoldClosesIt(t *testing.T) {
+	t.Parallel()
 	one := pcTakingHeld(t, time.Hour, 0)
 	if code := one.branchSays("take", pcGroup); code != codeOK {
 		t.Fatalf("the take answers %d: %s", code, one.pcSaid())
@@ -152,6 +156,7 @@ func TestPCATakeOverAStaleHoldClosesIt(t *testing.T) {
 
 // A take over a stale hold behind main pushes the claim, then takes main in. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCATakeOverAStaleHoldPushesBeforeTrunk(t *testing.T) {
+	t.Parallel()
 	one := pcTakingHeld(t, time.Hour, 3)
 	if code := one.branchSays("take", pcGroup); code != codeOK {
 		t.Fatalf("the take answers %d: %s", code, one.pcSaid())
@@ -173,6 +178,7 @@ func TestPCATakeOverAStaleHoldPushesBeforeTrunk(t *testing.T) {
 
 // A take over a hold under work.staleAfter refuses, and writes nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCATakeUnderTheStaleSpanRefuses(t *testing.T) {
+	t.Parallel()
 	one := pcTakingHeld(t, 0, 0)
 	tip := one.pcTip("origin/" + workBranch + pcGroup)
 	if code := one.branchSays("take", pcGroup); code != codeRed {
@@ -189,6 +195,7 @@ func TestPCATakeUnderTheStaleSpanRefuses(t *testing.T) {
 
 // A release of another box's hold closes it, and the commit names the hand-over. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCAReleaseOfAnotherHoldNamesTheHandOver(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.pcHand()
 	pcOnGroup(one, map[string]string{ticketAt(pcGroup): pcTake(pcGroupNote, pcOther, "a1b2c3")})

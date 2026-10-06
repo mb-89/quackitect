@@ -6,6 +6,7 @@ import "testing"
 
 // A release closes the take, pushes, and the branch reads todo again. [[spec/design_output/work#a-stale-group-is-yours]]
 func TestAReleaseFreesTheBranch(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): groupNote, ticketAt("kid"): childNote})
 	if code := one.branchSays("take"); code != 0 {

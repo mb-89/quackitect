@@ -28,6 +28,7 @@ func answeredBy(t *testing.T, door *hooks.Door, tool string, input map[string]an
 
 // [[spec/tickets/log-report-stop-in-go]]
 func TestTheLogReportAndStopToolsAnswerOffTheDoor(t *testing.T) {
+	t.Parallel()
 	door := waitWorldOf(t).door
 	if said, want := answeredBy(t, door, "mcp__level0__report", map[string]any{"text": "Half way."}), "The reply stands in the log. Nothing asked for one, so carry on, and write it in the chat too where the owner reads it."; said != want {
 		t.Errorf("the report answers %q, and wants %q", said, want)

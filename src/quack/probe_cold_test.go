@@ -85,6 +85,7 @@ func verdictOf(t *testing.T, checks []coldCheck, name string) coldCheck {
 }
 
 func TestAStreamReadsIntoTheSessionsOwnSteps(t *testing.T) {
+	t.Parallel()
 	steps := stepsOf(stream(
 		streamInit("Read", "mcp__level0__find"),
 		streamSaid("one", nil),
@@ -101,6 +102,7 @@ func TestAStreamReadsIntoTheSessionsOwnSteps(t *testing.T) {
 }
 
 func TestAWholeColdRoadPassesEveryCheck(t *testing.T) {
+	t.Parallel()
 	checks := readsCold(coldWhole(), coldClean())
 	for i, one := range checks {
 		if one.check != coldChecks[i] || !one.pass {
@@ -110,6 +112,7 @@ func TestAWholeColdRoadPassesEveryCheck(t *testing.T) {
 }
 
 func TestEveryColdCheckFailsOnItsOwnRoad(t *testing.T) {
+	t.Parallel()
 	refused := coldStarted()
 	refused["event"], refused["level"] = "classic.SessionStart", "warn"
 	fall := probeRow{"level": "warn", "kind": "bridge", "event": "env.get", "said": "the server answers nothing at http://127.0.0.1:6510/event"}
@@ -143,6 +146,7 @@ func TestEveryColdCheckFailsOnItsOwnRoad(t *testing.T) {
 }
 
 func TestEveryColdCheckPassesOnItsOwnRoad(t *testing.T) {
+	t.Parallel()
 	down := coldStarted()
 	down["level"], down["said"] = "warn", "the bridge code fails its self-test"
 	early := probeRow{"level": "warn", "kind": "bridge", "event": "classic.SessionStart", "said": "the server answers nothing at http://127.0.0.1:6510/event"}
@@ -166,6 +170,7 @@ func TestEveryColdCheckPassesOnItsOwnRoad(t *testing.T) {
 }
 
 func TestEachColdCheckReadsAsOneLine(t *testing.T) {
+	t.Parallel()
 	got := coldLines([]coldCheck{{check: "hook", pass: true, evidence: "a row"}, {check: "server", evidence: "no row"}})
 	if !slices.Equal(got, []string{"PASS hook: a row", "FAIL server: no row"}) {
 		t.Errorf("the lines read %v", got)
@@ -173,6 +178,7 @@ func TestEachColdCheckReadsAsOneLine(t *testing.T) {
 }
 
 func TestTheColdPortStandsPastTheBase(t *testing.T) {
+	t.Parallel()
 	if coldPort(12345) <= portBase || coldPort(12345) != coldPort(12345) {
 		t.Errorf("the cold port reads %d", coldPort(12345))
 	}
@@ -200,6 +206,7 @@ func cloneOf(t *testing.T, runner *fakeRunner) string {
 }
 
 func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	d.pid = 12345
 	clientAnswers(&d, func(_ []string, o runOpts) ranResult {
@@ -241,6 +248,7 @@ func TestTheColdRunnerClonesInstallsRunsTheClientAndRemovesTheClone(t *testing.T
 }
 
 func TestAClientStandingNowhereFailsTheColdProbeAndTheCloneStillGoes(t *testing.T) {
+	t.Parallel()
 	d, runner, out, _ := fakeBoxDoors(t)
 	clientAnswers(&d, func([]string, runOpts) ranResult { return ranResult{code: 1, missing: true} })
 	if code := probeVerb(d, []string{"cold"}); code != 1 || !strings.Contains(out.String(), "claude stands nowhere") {
@@ -253,6 +261,7 @@ func TestAClientStandingNowhereFailsTheColdProbeAndTheCloneStillGoes(t *testing.
 
 // The client under a fresh config folder signs in off the desk's login alone. [[spec/tickets/the-probe-carries-the-login]]
 func TestTheDesksLoginRidesIntoTheFreshConfigFolder(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	home := t.TempDir()
 	env := map[string]string{"HOME": home}
@@ -277,6 +286,7 @@ func TestTheDesksLoginRidesIntoTheFreshConfigFolder(t *testing.T) {
 
 // The probe clones the commit standing, so a staged change reaches the clone as a patch, and the clone commits it. [[spec/tickets/the-check-takes-a-minute]]
 func TestAStagedDeltaLandsInTheCloneBeforeTheInstall(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	runner.answers["claude"] = ranResult{code: 1}
 	probeCold(d, "claude", func(string) {}, "diff --git a/x b/x")
@@ -294,6 +304,7 @@ func TestAStagedDeltaLandsInTheCloneBeforeTheInstall(t *testing.T) {
 }
 
 func TestADeltaTheCloneRefusesFailsTheProbe(t *testing.T) {
+	t.Parallel()
 	cases := []struct{ key, said string }{{"git apply", "patch does not apply"}, {"git -c", "nothing to commit"}}
 	for _, one := range cases {
 		d, runner, _, _ := fakeBoxDoors(t)
@@ -313,6 +324,7 @@ func TestADeltaTheCloneRefusesFailsTheProbe(t *testing.T) {
 
 // The box both probes stand on. [[spec/tickets/level0-runs-on-the-door]]
 func TestTheFreshBoxPointsTheHookAtAPortOfItsOwn(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	temp := t.TempDir()
 	box := coldBox{temp: temp, tree: filepath.Join(temp, "tree"), port: 6900}
@@ -336,6 +348,7 @@ func TestTheFreshBoxPointsTheHookAtAPortOfItsOwn(t *testing.T) {
 }
 
 func TestATailKeepsTheLastLinesOnOne(t *testing.T) {
+	t.Parallel()
 	if got := tail("\n1\n2\n3\n4\n5\n6\n7\n"); got != "2 | 3 | 4 | 5 | 6 | 7" {
 		t.Errorf("the tail reads %q", got)
 	}

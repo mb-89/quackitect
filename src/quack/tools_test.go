@@ -41,6 +41,7 @@ func calledNames(t *testing.T) map[string]bool {
 }
 
 func TestEveryToolTheBridgeServedStandsInTheWiredToolList(t *testing.T) {
+	t.Parallel()
 	called := calledNames(t)
 	var missing []string
 	for _, name := range bridgeServed {

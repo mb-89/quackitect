@@ -39,6 +39,7 @@ func retroReaderTree(t *testing.T) string {
 
 // retro read prints every owner prompt, fault and command of the chapter with its file and line, in the chapter's order. [[spec/tickets/the-retro-finishes-its-asks]]
 func TestRetroReadPrintsEveryOwnerPromptFaultAndCommandOfTheChapterWithItsFileAndLine(t *testing.T) {
+	t.Parallel()
 	root := retroReaderTree(t)
 
 	code, out, errs := retroReadingRun(retroReadVerb, root, "retro", "read", retroReadingName, "c1")
@@ -54,6 +55,7 @@ func TestRetroReadPrintsEveryOwnerPromptFaultAndCommandOfTheChapterWithItsFileAn
 
 // retro read refuses a chapter the retro holds nowhere. [[spec/tickets/the-retro-finishes-its-asks]]
 func TestRetroReadRefusesAChapterTheRetroHoldsNowhere(t *testing.T) {
+	t.Parallel()
 	root := retroReaderTree(t)
 
 	code, _, errs := retroReadingRun(retroReadVerb, root, "retro", "read", retroReadingName, "c9")
@@ -67,6 +69,7 @@ func TestRetroReadRefusesAChapterTheRetroHoldsNowhere(t *testing.T) {
 
 // The reader marks a fault the way the timeline counts it, and a line reading as no JSON earns no row. [[spec/tickets/the-retro-finishes-its-asks]]
 func TestRetroReadMarksAFaultAsTheTimelineCountsItAndALineOfNoJSONEarnsNone(t *testing.T) {
+	t.Parallel()
 	warn := fmt.Sprintf(`{"at":%q,"level":"warn","msg":"a slow door"}`, retroReaderWhen)
 	if !retroFault.MatchString(warn) {
 		t.Fatal("a warn line reads as no fault")

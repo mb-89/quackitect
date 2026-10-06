@@ -40,6 +40,7 @@ func planOn(t *testing.T, root string) map[string]any {
 
 // [[spec/tickets/plan-writes-off-go]]
 func TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedFile(t, root, planFile, `{"working":"","todos":[],"places":{},"kept":true}`)
 	c := q.New()
@@ -77,6 +78,7 @@ func TestAPlanCallWritesThePlanFileAsTheBridgeWritesIt(t *testing.T) {
 
 // [[spec/tickets/plan-writes-off-go]]
 func TestAPlanFieldRidingAGoCallWritesThePlanFile(t *testing.T) {
+	t.Parallel()
 	world := waitWorldOf(t)
 	_, err := world.door.Hook(hooks.Post{Event: "tool.call", E: map[string]any{
 		"tool": waitTool, "session_id": waitSession,
@@ -92,6 +94,7 @@ func TestAPlanFieldRidingAGoCallWritesThePlanFile(t *testing.T) {
 
 // [[spec/tickets/plan-writes-off-go]] [[spec/tickets/level0-tools-leave-the-bridge]]
 func TestThePlansModuleStandsOnTheWiring(t *testing.T) {
+	t.Parallel()
 	text, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
 	if err != nil {
 		t.Fatal(err)
@@ -110,6 +113,7 @@ func TestThePlansModuleStandsOnTheWiring(t *testing.T) {
 
 // The answer names the place the queue gives a new todo, off the ports the real wiring binds. [[spec/tickets/plan-writes-off-go]]
 func TestAPlanAnswerReadsThePlaceOffTheQueuesPorts(t *testing.T) {
+	t.Parallel()
 	world := waitWorldOf(t)
 	wiring, err := os.ReadFile(filepath.Join(treeRoot, filepath.FromSlash(q.WiringFile)))
 	if err != nil {

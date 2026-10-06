@@ -21,6 +21,7 @@ import (
 var dispatchModules = []string{"verbs/dispatch.js", "dispatch.js", "dispatch-write.js", "dispatch-fire.js"}
 
 func TestDispatchLeavesNode(t *testing.T) {
+	t.Parallel()
 	if registry["dispatch"] == nil {
 		t.Fatal("the registry holds no dispatch")
 	}
@@ -68,6 +69,7 @@ func TestDispatchLeavesNode(t *testing.T) {
 
 // The verb hands every word past its name to the package, over the send door it holds. [[spec/tickets/dispatch-verbs-port-to-go]]
 func TestDispatchVerbRunsTheDryPlanOverTheDoors(t *testing.T) {
+	t.Parallel()
 	root := func() (string, error) { return t.TempDir(), nil }
 	v1 := func() (string, error) { return "", nil }
 	sent := false

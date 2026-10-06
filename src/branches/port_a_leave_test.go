@@ -17,6 +17,7 @@ type paRow struct {
 
 // Done says one line to the log, naming the branch and the code, and closes the take at HEAD. [[spec/tickets/work-verbs-port-to-go]]
 func TestPADoneLogsOneLine(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): withField(paTaken(), "state", closedState)})
 	paOn(one, "one-group")
@@ -40,6 +41,7 @@ func TestPADoneLogsOneLine(t *testing.T) {
 
 // Done off a work branch refuses, and moves nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPADoneOffAWorkBranchRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{ticketAt("one-group"): paGroupNote})
 	before := one.git("rev-parse", "HEAD")
 	if code := one.branchSays("done"); code != codeRefused {
@@ -53,6 +55,7 @@ func TestPADoneOffAWorkBranchRefuses(t *testing.T) {
 
 // Done with no group on the tree refuses, because the group is what comes back. [[spec/tickets/work-verbs-port-to-go]]
 func TestPADoneWithNoGroupRefuses(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("fix-lsp", map[string]string{"a.md": "a\n"})
 	paOn(one, "fix-lsp")
@@ -64,6 +67,7 @@ func TestPADoneWithNoGroupRefuses(t *testing.T) {
 
 // Release refuses where the branch holds a commit origin lacks, and leaves those commits standing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAReleaseRefusesUnpushedCommits(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	paOn(one, "one-group")
@@ -86,6 +90,7 @@ func TestPAReleaseRefusesUnpushedCommits(t *testing.T) {
 
 // A branch level with origin releases. [[spec/tickets/work-verbs-port-to-go]]
 func TestPALevelBranchReleases(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	paOn(one, "one-group")
@@ -96,6 +101,7 @@ func TestPALevelBranchReleases(t *testing.T) {
 
 // Release refuses a branch already standing at done, and leaves the group untouched. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAReleaseRefusesDone(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	shut := withField(paGroupNote, "state", closedState)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): shut})
@@ -112,6 +118,7 @@ func TestPAReleaseRefusesDone(t *testing.T) {
 
 // Read prints the group a branch carries, and refuses a branch carrying none. [[spec/tickets/work-verbs-port-to-go]]
 func TestPAReadPrintsTheGroup(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("one-group", map[string]string{ticketAt("one-group"): paGroupNote})
 	if code := one.branchSays("read", "one-group"); code != codeOK {

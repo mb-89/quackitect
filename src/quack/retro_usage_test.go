@@ -14,6 +14,7 @@ import (
 
 // The usage prints one line a verb, audit among them, each name as RetroVerbs lists it. [[spec/tickets/retro-usage-names-every-verb]]
 func TestRetroUsageNamesEveryVerb(t *testing.T) {
+	t.Parallel()
 	code, out, _ := retroMintHeard(retroUsageVerb(), "retro")
 	if code != 0 {
 		t.Fatalf("the bare retro answers %d", code)
@@ -37,6 +38,7 @@ func TestRetroUsageNamesEveryVerb(t *testing.T) {
 
 // A word no verb answers prints the usage, and exits 2. [[spec/tickets/retro-usage-names-every-verb]]
 func TestRetroUsageExitsTwoOnAWordNoVerbAnswers(t *testing.T) {
+	t.Parallel()
 	code, out, _ := retroMintHeard(retroUsageVerb(), "retro", "nothing")
 	want := "Usage: ./RUNME.sh retro <verb>\n\n" +
 		"  notes            the private notes still open on this box, and 0 when none stands\n" +

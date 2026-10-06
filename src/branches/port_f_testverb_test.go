@@ -74,6 +74,7 @@ func pfPutBack(t *testing.T, one *tree) {
 
 // A named test file runs with the box's env, and a named Go folder runs its packages under the Go env. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFNamedFilesAndFoldersRunTogether(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{
 		"go.mod":                  pfMod,
 		"test/level0/x.test.js":   pfNodeTests(2, "  assert.equal(process.env.SE_SPAWNS, \""+pfTally+"\");"),
@@ -90,6 +91,7 @@ func TestPFNamedFilesAndFoldersRunTogether(t *testing.T) {
 
 // A named Go folder alone runs its packages. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFANamedGoFolderRunsAlone(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"go.mod": pfMod, "src/engine/swap/swap_test.go": "package swap\n\nimport \"testing\"\n\nfunc TestSwap(t *testing.T) {}\n"})
 	if code := one.branchSays("test", "src/engine/swap"); code != 0 {
 		t.Fatalf("the test verb answers %d: %s", code, one.out.String())
@@ -101,6 +103,7 @@ func TestPFANamedGoFolderRunsAlone(t *testing.T) {
 
 // A named Go test file runs the cases it declares alone, so a red case beside it stays out. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFANamedGoTestFileRunsItsOwnCases(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{
 		"go.mod":          pfMod,
 		"src/q/a_test.go": "package q\n\nimport \"testing\"\n\nfunc TestB(t *testing.T) {}\n\nfunc TestA(t *testing.T) {}\n",
@@ -116,6 +119,7 @@ func TestPFANamedGoTestFileRunsItsOwnCases(t *testing.T) {
 
 // A folder names itself, a Go test names the folder holding it, and anything else names nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFGoPackagesOfNamesFolders(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		in   []string
 		want []string
@@ -139,6 +143,7 @@ func TestPFGoPackagesOfNamesFolders(t *testing.T) {
 
 // A Go run answers green, assertion on a failing case, or build naming the broken line. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFGoSaysItsWord(t *testing.T) {
+	t.Parallel()
 	if got := goSays(Said{OK: true}, "src/tui"); got != "green, src/tui passes" {
 		t.Fatalf("a green run reads %q", got)
 	}
@@ -152,6 +157,7 @@ func TestPFGoSaysItsWord(t *testing.T) {
 
 // A node run answers green, assertion, build on a load fault, or build on a throw outside an assertion. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTestSaysItsVerdict(t *testing.T) {
+	t.Parallel()
 	cases := [][2]string{
 		{"^green, 3 test\\(s\\) pass in 1 file\\(s\\)", ""},
 		{"assertion, 1 test\\(s\\) fail on their own assertion", ""},
@@ -174,6 +180,7 @@ func TestPFTestSaysItsVerdict(t *testing.T) {
 
 // A red run names each failing case above its verdict, a todo case left out, and the verdict stays last. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFARedRunNamesItsCasesAboveTheVerdict(t *testing.T) {
+	t.Parallel()
 	out := strings.Join([]string{
 		"ok 1 - a green case",
 		"not ok 2 - a first red case",
@@ -197,6 +204,7 @@ func TestPFARedRunNamesItsCasesAboveTheVerdict(t *testing.T) {
 
 // A branch changing no test answers missing, naming the branch point. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFABranchChangingNoTestAnswersMissingSinceTheBase(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	base := one.git("rev-parse", "HEAD")
 	one.git("switch", "-q", "-c", workBranch+"x")
@@ -211,6 +219,7 @@ func TestPFABranchChangingNoTestAnswersMissingSinceTheBase(t *testing.T) {
 
 // A branch changing a test runs it, and answers green. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFABranchChangingATestRunsIt(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	one.git("switch", "-q", "-c", workBranch+"x")
 	one.land("a test", map[string]string{"test/level0/x.test.js": pfNodeTests(3, ""), "src/x.js": "x\n"})
@@ -224,6 +233,7 @@ func TestPFABranchChangingATestRunsIt(t *testing.T) {
 
 // A deleted test runs nowhere, and an untracked folder names each test under it. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFADeletedTestStaysOutAndAnUntrackedFolderRuns(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"test/level0/gone.test.js": "require(\"node:test\").test(\"gone\", () => { throw new Error(\"it ran\"); });\n"}).desk()
 	one.sh(one.root, "rm", "test/level0/gone.test.js")
 	one.write(map[string]string{"test/level0/fresh/new.test.js": pfNodeTests(1, "")})
@@ -237,6 +247,7 @@ func TestPFADeletedTestStaysOutAndAnUntrackedFolderRuns(t *testing.T) {
 
 // The red run sets the sources aside, answers red on an assertion, and puts them back. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheRedRunSetsTheSourcesAside(t *testing.T) {
+	t.Parallel()
 	one := pfRedTree(t, true)
 	if code := one.branchSays("test", "--red", pfRedTest, pfSource, pfFresh); code != 0 {
 		t.Fatalf("the red run answers %d: %s", code, one.out.String())
@@ -261,6 +272,7 @@ func TestPFTheRedRunSetsTheSourcesAside(t *testing.T) {
 
 // A red run after a killed one puts the working texts back first, a new source among them. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheRedRunAfterAKilledRunPutsTheTextsBack(t *testing.T) {
+	t.Parallel()
 	one := pfRedTree(t, true)
 	one.d.remove(pfFresh)
 	list, _ := json.Marshal([]aside{{pfSource, true}, {pfFresh, true}})
@@ -278,6 +290,7 @@ func TestPFTheRedRunAfterAKilledRunPutsTheTextsBack(t *testing.T) {
 
 // A red run refuses where the test passes with the sources set aside, and puts them back. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheRedRunRefusesAPassingTest(t *testing.T) {
+	t.Parallel()
 	one := pfRedTree(t, false)
 	if code := one.branchSays("test", "--red", pfRedTest, pfSource, pfFresh); code != codeRed {
 		t.Fatalf("the red run answers %d: %s", code, one.out.String())

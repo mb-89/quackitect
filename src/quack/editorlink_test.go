@@ -40,6 +40,7 @@ func listOf(t *testing.T, folder string) []map[string]any {
 }
 
 func TestACopyStandingWhereTheLinkBelongsGoesAndTheLinkTakesItsPlace(t *testing.T) {
+	t.Parallel()
 	source, _, dest := editorBox(t)
 	seedTree(t, dest, map[string]string{"stale.js": "old"})
 	if editorLinkedAt(dest, source) {
@@ -54,6 +55,7 @@ func TestACopyStandingWhereTheLinkBelongsGoesAndTheLinkTakesItsPlace(t *testing.
 }
 
 func TestALinkStandingAlreadyStays(t *testing.T) {
+	t.Parallel()
 	source, _, dest := editorBox(t)
 	if err := os.Symlink(source, dest); err != nil {
 		t.Fatal(err)
@@ -64,6 +66,7 @@ func TestALinkStandingAlreadyStays(t *testing.T) {
 }
 
 func TestALinkPointingAtAnotherTreeGoesAndThisTreesLinkGoesIn(t *testing.T) {
+	t.Parallel()
 	source, _, dest := editorBox(t)
 	other := filepath.Join(t.TempDir(), "other")
 	seedTree(t, other, map[string]string{"package.json": "{}"})
@@ -82,6 +85,7 @@ func TestALinkPointingAtAnotherTreeGoesAndThisTreesLinkGoesIn(t *testing.T) {
 }
 
 func TestALinkPointingNowhereReadsAsNoLinkAndThisTreesLinkTakesItsPlace(t *testing.T) {
+	t.Parallel()
 	source, _, dest := editorBox(t)
 	if err := os.Symlink(filepath.Join(t.TempDir(), "gone"), dest); err != nil {
 		t.Fatal(err)
@@ -98,6 +102,7 @@ func TestALinkPointingNowhereReadsAsNoLinkAndThisTreesLinkTakesItsPlace(t *testi
 }
 
 func TestADestinationOutsideTheEditorsFolderIsRefusedAndNothingIsRemoved(t *testing.T) {
+	t.Parallel()
 	notes := t.TempDir()
 	seedTree(t, notes, map[string]string{"keep.md": "mine"})
 	if linked, _ := editorLinkAt(notes, "/tree/src/extension", symlinkHere); linked {
@@ -109,6 +114,7 @@ func TestADestinationOutsideTheEditorsFolderIsRefusedAndNothingIsRemoved(t *test
 }
 
 func TestTheListNamesTheIdOrTheExtensionStandsUnregistered(t *testing.T) {
+	t.Parallel()
 	_, folder, _ := editorBox(t)
 	seedTree(t, folder, map[string]string{editorList: `[{"identifier":{"id":"a.b"},"version":"1.0.0"}]`})
 	if editorRegistered(folder, editorTestID) {
@@ -123,6 +129,7 @@ func TestTheListNamesTheIdOrTheExtensionStandsUnregistered(t *testing.T) {
 }
 
 func TestAnElementNothingCanIdentifyIsDroppedNeverCarried(t *testing.T) {
+	t.Parallel()
 	said := editorEntriesOf(`[{"identifier":{"id":"a.b"}},{"version":"2"},null]`)
 	if len(said.entries) != 1 || said.dropped != 2 || entryID(said.entries[0]) != "a.b" {
 		t.Errorf("the read answers %d entries, %d dropped", len(said.entries), said.dropped)
@@ -130,6 +137,7 @@ func TestAnElementNothingCanIdentifyIsDroppedNeverCarried(t *testing.T) {
 }
 
 func TestEntriesNestedUnderAWrapperComeBackOutOfIt(t *testing.T) {
+	t.Parallel()
 	said := editorEntriesOf(`{"value":[{"identifier":{"id":"a.b"}},{"identifier":{"id":"c.d"}}]}`)
 	if said.unwrapped != 1 || len(said.entries) != 2 || entryID(said.entries[1]) != "c.d" {
 		t.Errorf("the read answers %d entries, %d unwrapped", len(said.entries), said.unwrapped)
@@ -137,6 +145,7 @@ func TestEntriesNestedUnderAWrapperComeBackOutOfIt(t *testing.T) {
 }
 
 func TestAListThatReadsAsNoJSONLeavesTheFileAlone(t *testing.T) {
+	t.Parallel()
 	_, folder, _ := editorBox(t)
 	seedTree(t, folder, map[string]string{editorList: "not json at all"})
 	if wrote, why := editorRegister(folder, mineAt(folder)); wrote || why != "the list reads as no JSON at all, so it stands as it is" {
@@ -148,6 +157,7 @@ func TestAListThatReadsAsNoJSONLeavesTheFileAlone(t *testing.T) {
 }
 
 func TestEveryKeyTheEditorOwnsIsCarriedVerbatim(t *testing.T) {
+	t.Parallel()
 	_, folder, _ := editorBox(t)
 	was := `{"identifier":{"id":"a.b","uuid":"u"},"version":"1","odd":{"deep":true}}`
 	seedTree(t, folder, map[string]string{editorList: "[" + was + "]"})
@@ -159,6 +169,7 @@ func TestEveryKeyTheEditorOwnsIsCarriedVerbatim(t *testing.T) {
 }
 
 func TestTheFileItWritesIsAlwaysAnArrayEvenHoldingOneEntry(t *testing.T) {
+	t.Parallel()
 	_, folder, _ := editorBox(t)
 	editorRegister(folder, mineAt(folder))
 	if said := listOf(t, folder); len(said) != 1 {
@@ -167,6 +178,7 @@ func TestTheFileItWritesIsAlwaysAnArrayEvenHoldingOneEntry(t *testing.T) {
 }
 
 func TestOursStandsOnceWhereTheListAlreadyNamesIt(t *testing.T) {
+	t.Parallel()
 	_, folder, _ := editorBox(t)
 	seedTree(t, folder, map[string]string{editorList: `[{"identifier":{"id":"a.b"}},{"identifier":{"id":"` + editorTestID + `"},"version":"0.0.1"}]`})
 	if wrote, why := editorRegister(folder, mineAt(folder)); !wrote || why != "the entry stood already, and it stands again" {
@@ -187,6 +199,7 @@ func TestOursStandsOnceWhereTheListAlreadyNamesIt(t *testing.T) {
 }
 
 func TestAWriteThatWouldLoseAnIdIsRefused(t *testing.T) {
+	t.Parallel()
 	said := editorEntriesOf(`[{"identifier":{"id":"a.b"}}]`)
 	if found := editorUpsert(said, mineAt("/f/.vscode/extensions")); len(found.lost) != 0 || len(found.entries) != 2 {
 		t.Errorf("the upsert loses %v", found.lost)
@@ -197,6 +210,7 @@ func TestAWriteThatWouldLoseAnIdIsRefused(t *testing.T) {
 }
 
 func TestTheListItReplacesStandsBesideIt(t *testing.T) {
+	t.Parallel()
 	_, folder, _ := editorBox(t)
 	was := `[{"identifier":{"id":"a.b"}}]`
 	seedTree(t, folder, map[string]string{editorList: was})
@@ -207,6 +221,7 @@ func TestTheListItReplacesStandsBesideIt(t *testing.T) {
 }
 
 func TestTheEntryWritesItsInstallTimeInDecimalDigits(t *testing.T) {
+	t.Parallel()
 	entry := editorEntry(editorTestID, "0.1.0", "/x/"+editorTestID+"-0.1.0", 1759590000123)
 	if got := editorListText([]*ordered{entry}); !strings.Contains(got, `"installedTimestamp":1759590000123,`) {
 		t.Errorf("the entry reads\n%s", got)
@@ -214,6 +229,7 @@ func TestTheEntryWritesItsInstallTimeInDecimalDigits(t *testing.T) {
 }
 
 func TestTheEntryNamesTheFolderTheEditorReadsItThrough(t *testing.T) {
+	t.Parallel()
 	folder := "/home/user/.vscode/extensions"
 	want := `{"identifier":{"id":"` + editorTestID + `"},"version":"0.1.0","location":{"$mid":1,"path":` + jsonString(filepath.Join(folder, editorTestID+"-0.1.0")) +
 		`,"scheme":"file"},"relativeLocation":"` + editorTestID + `-0.1.0","metadata":{"installedTimestamp":1000,"source":"vsix"}}`
@@ -223,6 +239,7 @@ func TestTheEntryNamesTheFolderTheEditorReadsItThrough(t *testing.T) {
 }
 
 func TestTheLinkVerbLinksAndListsTheTreesSidebar(t *testing.T) {
+	t.Parallel()
 	d, _, out, _ := fakeBoxDoors(t)
 	home := t.TempDir()
 	seedTree(t, d.root, map[string]string{"src/extension/package.json": `{"publisher":"quackitect","name":"quackitect","version":"0.1.0"}`})

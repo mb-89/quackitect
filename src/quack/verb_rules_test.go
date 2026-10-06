@@ -15,6 +15,7 @@ func rulesRan(root string) (int, string, string) {
 }
 
 func TestRulesListsEveryStyleMessage(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedFile(t, root, "spec/config/styles/VoiceVale/Antithesis.yml", "extends: existence\nmessage: \"Say what is.\"\n")
 	seedFile(t, root, "spec/config/styles/VoiceVale/notes.txt", "no rule\n")
@@ -27,6 +28,7 @@ func TestRulesListsEveryStyleMessage(t *testing.T) {
 }
 
 func TestRulesReadsAMessageEndingInACarriageReturn(t *testing.T) {
+	t.Parallel()
 	root := t.TempDir()
 	seedFile(t, root, "spec/config/styles/VoiceVale/Antithesis.yml", "extends: existence\r\nmessage: \"Say what is.\"\r\nlevel: error\r\n")
 	code, out, _ := rulesRan(root)
@@ -36,6 +38,7 @@ func TestRulesReadsAMessageEndingInACarriageReturn(t *testing.T) {
 }
 
 func TestRulesRefusesWhereNoStyleStands(t *testing.T) {
+	t.Parallel()
 	code, _, errs := rulesRan(t.TempDir())
 	if code != exitUsage || errs != "The style folder is missing.\n" {
 		t.Fatalf("rules answers %d and %q, and wants the refusal", code, errs)

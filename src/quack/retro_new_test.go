@@ -61,6 +61,7 @@ func retroNewCalls(fake *retroMintFake) string {
 
 // retro new writes the ticket off the retro route through the mint, and names it for the tip. [[spec/design_input/the-agent-pulls-tickets]]
 func TestRetroNewWritesTheTicketOffTheRetroRouteNamedForTheTip(t *testing.T) {
+	t.Parallel()
 	root, fake := retroNewTree(t, "retro-a1b2c3d")
 	code, out, errs := retroNewRuns(root, fake)
 	if code != 0 {
@@ -77,6 +78,7 @@ func TestRetroNewWritesTheTicketOffTheRetroRouteNamedForTheTip(t *testing.T) {
 
 // retro new opens the ticket at the route's first leaf, so a hand pulls it without a second command. [[spec/design_input/the-agent-pulls-tickets]]
 func TestRetroNewOpensTheTicketSoAHandPullsItWithoutASecondCommand(t *testing.T) {
+	t.Parallel()
 	root, fake := retroNewTree(t, "retro-a1b2c3d")
 	retroNewRuns(root, fake)
 	want := "git rev-parse HEAD\n./RUNME.sh mint ticket spec/tickets/retro-a1b2c3d.md --process=retro\n./RUNME.sh ticket open retro-a1b2c3d\n./RUNME.sh ticket pull retro-a1b2c3d"
@@ -96,6 +98,7 @@ func TestRetroNewOpensTheTicketSoAHandPullsItWithoutASecondCommand(t *testing.T)
 
 // retro new writes the reason into the ask, before the next chapter, and takes a name a hand gives. [[spec/design_input/the-agent-pulls-tickets]]
 func TestRetroNewWritesTheReasonIntoTheAskAndTakesANameAHandGives(t *testing.T) {
+	t.Parallel()
 	root, fake := retroNewTree(t, "retro-one")
 	code, out, errs := retroNewRuns(root, fake, "--why", "the window ends", "--name", "retro-one")
 	if code != 0 {
@@ -110,6 +113,7 @@ func TestRetroNewWritesTheReasonIntoTheAskAndTakesANameAHandGives(t *testing.T) 
 
 // retro new refuses a name a ticket holds already, writes nothing over it and runs no mint. [[spec/design_input/the-agent-pulls-tickets]]
 func TestRetroNewRefusesANameATicketHoldsAlready(t *testing.T) {
+	t.Parallel()
 	root, fake := retroNewTree(t, "retro-one")
 	retroMintWrite(t, root, "spec/tickets/retro-one.md", "---\nkind: [[ticket]]\n---\n")
 	code, _, errs := retroNewRuns(root, fake, "--name", "retro-one")
@@ -126,6 +130,7 @@ func TestRetroNewRefusesANameATicketHoldsAlready(t *testing.T) {
 
 // retro new hands its retro to the pull by name, and the pull's words and exit stand as its own. [[spec/design_output/config#the-engine-controls]]
 func TestRetroNewTakesItsRetroUnderQueue(t *testing.T) {
+	t.Parallel()
 	root, fake := retroNewTree(t, "retro-one")
 	code, out, errs := retroNewRuns(root, fake, "--name", "retro-one")
 	if code != 0 || out != "Pull: retro-one at collect\n" || strings.Contains(errs, "behind the queue") {
@@ -139,6 +144,7 @@ func TestRetroNewTakesItsRetroUnderQueue(t *testing.T) {
 
 // retro new removes its draft where the open refuses, so the next run takes the same name. [[spec/design_output/pull#a-draft-opens]]
 func TestRetroNewRemovesItsDraftWhereTheOpenRefuses(t *testing.T) {
+	t.Parallel()
 	root, fake := retroNewTree(t, "retro-one")
 	fake.answers["./RUNME.sh ticket open retro-one"] = func() retroMintRan {
 		return retroMintRan{code: 1, errs: "the ask breaks a rule\n"}
@@ -157,6 +163,7 @@ func TestRetroNewRemovesItsDraftWhereTheOpenRefuses(t *testing.T) {
 
 // retro new writes a --why line the lint warns on, names Characters, and the ticket lands. [[spec/design_output/pull#the-voice-reads-the-evidence]]
 func TestRetroNewWritesAWhyLineTheLintWarnsOnAndNamesCharacters(t *testing.T) {
+	t.Parallel()
 	root, fake := retroNewTree(t, "retro-one")
 	code, out, errs := retroNewRuns(root, fake, "--why", "one; two", "--name", "retro-one")
 	if code != 0 || !strings.Contains(errs, "breaks a rule of form, and it lands") || !strings.Contains(errs, "breaks Characters") {

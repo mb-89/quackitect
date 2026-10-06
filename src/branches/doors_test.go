@@ -10,6 +10,7 @@ import (
 
 // A folder names its files in name order and leaves its folders out, and a walk names every file under it. [[spec/design_output/doors#one-door-per-outside-thing]]
 func TestTheDiskDoorsNameTheFiles(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"notes/b.md": "b", "notes/a.md": "a", "notes/deep/c.md": "c"})
 	if got := one.d.names("notes"); !slices.Equal(got, []string{"a.md", "b.md"}) {
 		t.Fatalf("the folder names %v", got)
@@ -24,6 +25,7 @@ func TestTheDiskDoorsNameTheFiles(t *testing.T) {
 
 // A link reads what it names, and its removal leaves that standing. [[spec/design_output/review#a-worktree-runs-the-check]]
 func TestALinkLeavesWhatItNames(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"lib/x.txt": "held"})
 	to := filepath.Join(t.TempDir(), "deep", "lib")
 	if !one.d.link("lib", to) || readFile(filepath.Join(to, "x.txt")) != "held" {

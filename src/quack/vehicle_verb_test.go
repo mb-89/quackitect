@@ -82,6 +82,7 @@ func vehicleRun(doors vehicleDoors, dry bool, argv ...string) (int, string, stri
 }
 
 func TestVehicleVerbHereNamesTheRootsAndTheRegister(t *testing.T) {
+	t.Parallel()
 	where, doors := vehicleFixture(t)
 	// Both roots print slashed, the method as methodRootFrom answered it. [[spec/tickets/window-verbs-windows-green]] [[spec/tickets/window-verbs-here-one-spelling]]
 	method := filepath.ToSlash(doors.root)
@@ -103,6 +104,7 @@ func TestVehicleVerbHereNamesTheRootsAndTheRegister(t *testing.T) {
 }
 
 func TestVehicleVerbProduceSaysWhereTheVehicleLands(t *testing.T) {
+	t.Parallel()
 	_, doors := vehicleFixture(t)
 	code, out, errs := vehicleRun(doors, false, "produce")
 	if code != 2 || out != "" || errs != "se vehicle produce <folder>: say where the vehicle lands.\n" {
@@ -114,6 +116,7 @@ func TestVehicleVerbProduceSaysWhereTheVehicleLands(t *testing.T) {
 }
 
 func TestVehicleVerbProduceCopiesTheMethod(t *testing.T) {
+	t.Parallel()
 	where, doors := vehicleFixture(t)
 	dest := filepath.Join(where, "vehicle")
 	code, out, errs := vehicleRun(doors, false, "produce", dest)
@@ -140,6 +143,7 @@ func TestVehicleVerbProduceCopiesTheMethod(t *testing.T) {
 }
 
 func TestVehicleVerbAttachAndDetach(t *testing.T) {
+	t.Parallel()
 	where, doors := vehicleFixture(t)
 	work := filepath.Join(where, "work")
 	doors.env["SE_WORK_ROOT"] = work
@@ -161,6 +165,7 @@ func TestVehicleVerbAttachAndDetach(t *testing.T) {
 }
 
 func TestVehicleVerbRegister(t *testing.T) {
+	t.Parallel()
 	where, doors := vehicleFixture(t)
 	code, out, _ := vehicleRun(doors, false, "register")
 	if code != 0 || out != "abc123 stands in the register.\n" {
@@ -179,6 +184,7 @@ func TestVehicleVerbRegister(t *testing.T) {
 
 // The version off the root's package, as cli-read.js version reads it. [[spec/design_output/vehicle#one-file-holds-the-version]]
 func TestVehicleVerbMakesAnIdentityOnEveryRoad(t *testing.T) {
+	t.Parallel()
 	_, doors := vehicleFixture(t)
 	os.Remove(filepath.Join(doors.root, filepath.FromSlash(vehicle.Identity)))
 	code, _, _ := vehicleRun(doors, false, "detach")
@@ -189,6 +195,7 @@ func TestVehicleVerbMakesAnIdentityOnEveryRoad(t *testing.T) {
 
 // A dry run answers its lines and writes nothing. [[spec/tickets/runme-hands-verbs-to-quack]]
 func TestVehicleVerbDryWritesNothing(t *testing.T) {
+	t.Parallel()
 	where, doors := vehicleFixture(t)
 	dest := filepath.Join(where, "vehicle")
 	code, out, _ := vehicleRun(doors, true, "produce", dest)
@@ -202,6 +209,7 @@ func TestVehicleVerbDryWritesNothing(t *testing.T) {
 
 // The node module answers the verb through goAnswer, into one builder. [[spec/tickets/quack-registers-each-verb]]
 func TestVehicleVerbAnswersThroughTheNodeModule(t *testing.T) {
+	t.Parallel()
 	if _, one := twinOf([]string{"vehicle", "here"}, registry); one == nil {
 		t.Fatal("the registry holds vehicle")
 	}

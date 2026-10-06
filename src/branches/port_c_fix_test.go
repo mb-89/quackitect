@@ -11,6 +11,7 @@ import (
 
 // leftOpen names each open child and each open loose ticket the branch adds, and passes the person route, a closed one and another group's. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCLeftOpenNamesOpenChildrenAndLooseAdds(t *testing.T) {
+	t.Parallel()
 	one := pcOnGroup(newTree(t, map[string]string{
 		ticketAt("a-child"):   pcChild(pcGroup, "open"),
 		ticketAt("a-draft"):   pcChild(pcGroup, "draft"),
@@ -28,6 +29,7 @@ func TestPCLeftOpenNamesOpenChildrenAndLooseAdds(t *testing.T) {
 
 // leftOpen leaves out a draft the branch adds with no group. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCLeftOpenPassesALooseDraft(t *testing.T) {
+	t.Parallel()
 	sketch := strings.Replace(pcChild("", "draft"), "group: \n", "", 1)
 	one := pcOnGroup(newTree(t, map[string]string{ticketAt("one-group"): pcGroupNote}), map[string]string{
 		ticketAt("sketch"): sketch,
@@ -40,6 +42,7 @@ func TestPCLeftOpenPassesALooseDraft(t *testing.T) {
 
 // onPersonRoute reads the process in either spelling, and nothing else. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCOnPersonRouteReadsEitherSpelling(t *testing.T) {
+	t.Parallel()
 	loose := pcLoose()
 	with := func(process string) string {
 		return withField(loose, "process", process)
@@ -60,6 +63,7 @@ func TestPCOnPersonRouteReadsEitherSpelling(t *testing.T) {
 
 // addedHere reads each ticket the branch adds off the disk, and passes one the disk lacks. [[spec/tickets/work-verbs-port-to-go]]
 func TestPCAddedHereReadsTheDisk(t *testing.T) {
+	t.Parallel()
 	one := pcOnGroup(newTree(t, nil), map[string]string{
 		ticketAt("left"): pcLoose(),
 		ticketAt("gone"): pcLoose(),

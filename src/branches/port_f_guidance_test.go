@@ -47,6 +47,7 @@ func pfGuidanceTree(t *testing.T, files map[string]string) *tree {
 
 // The guidance verb prints the notes a named step resolves, and refuses a step standing nowhere. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheGuidanceVerbPrintsAStepsNotes(t *testing.T) {
+	t.Parallel()
 	one := pfGuidanceTree(t, pfNotes())
 	if code := one.branchSays("guidance", "--step", "fixture:implement/tests-red"); code != 0 {
 		t.Fatalf("the guidance answers %d: %s", code, one.errs.String())
@@ -65,6 +66,7 @@ func TestPFTheGuidanceVerbPrintsAStepsNotes(t *testing.T) {
 
 // The guidance verb refuses a step naming a process that stands nowhere. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheGuidanceVerbRefusesAProcessStandingNowhere(t *testing.T) {
+	t.Parallel()
 	one := pfGuidanceTree(t, pfNotes())
 	if code := one.branchSays("guidance", "--step", "nowhere:do"); code != codeRed {
 		t.Fatalf("a process standing nowhere answers %d", code)
@@ -74,6 +76,7 @@ func TestPFTheGuidanceVerbRefusesAProcessStandingNowhere(t *testing.T) {
 
 // The guidance verb prints the notes the guidance topic answers for a step, and no other. [[spec/tickets/work-verbs-port-to-go]]
 func TestPFTheGuidanceVerbPrintsWhatTheTopicAnswers(t *testing.T) {
+	t.Parallel()
 	note := func(word string) string {
 		return "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Read " + word + ".\n"
 	}

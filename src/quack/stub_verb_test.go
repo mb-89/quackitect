@@ -22,6 +22,7 @@ func stubRun(doors vehicleDoors, argv ...string) (int, string, string) {
 const stubUsage = "se stub into <folder> [--upstream <url>]: say where the stub lands.\n"
 
 func TestStubVerbUsage(t *testing.T) {
+	t.Parallel()
 	_, doors := vehicleFixture(t)
 	for _, argv := range [][]string{{}, {"into"}, {"onto", "x"}, {"into", "--upstream", "u"}} {
 		if code, out, errs := stubRun(doors, argv...); code != 2 || out != "" || errs != stubUsage {
@@ -31,6 +32,7 @@ func TestStubVerbUsage(t *testing.T) {
 }
 
 func TestStubVerbBesideItsVehicle(t *testing.T) {
+	t.Parallel()
 	_, doors := vehicleFixture(t)
 	code, _, errs := stubRun(doors, "into", doors.root)
 	if code != 1 || errs != "a stub lands beside its vehicle, elsewhere\n" {
@@ -39,6 +41,7 @@ func TestStubVerbBesideItsVehicle(t *testing.T) {
 }
 
 func TestStubVerbNoUpstream(t *testing.T) {
+	t.Parallel()
 	where, doors := vehicleFixture(t)
 	asked := ""
 	doors.git = func(dir string, args ...string) (string, bool) {
@@ -59,6 +62,7 @@ func TestStubVerbNoUpstream(t *testing.T) {
 }
 
 func TestStubVerbEmptyBrand(t *testing.T) {
+	t.Parallel()
 	_, doors := vehicleFixture(t)
 	// Windows names no folder ..., and --- slugs to nothing the same way. [[spec/tickets/window-verbs-windows-green]]
 	nameless := filepath.Join(filepath.Dir(doors.root), "---")
@@ -73,6 +77,7 @@ func TestStubVerbEmptyBrand(t *testing.T) {
 }
 
 func TestStubVerbWritesAStubUnderTheUpstreamItNames(t *testing.T) {
+	t.Parallel()
 	where, doors := vehicleFixture(t)
 	dest := filepath.Join(where, "stub")
 	code, out, errs := stubRun(doors, "into", dest, "--upstream", "https://host/c/d.git")
@@ -95,6 +100,7 @@ func TestStubVerbWritesAStubUnderTheUpstreamItNames(t *testing.T) {
 
 // A relative folder lands under the root, as atRoot places it. [[spec/design_output/vehicle#the-work-root-inherits]]
 func TestStubVerbPlacesARelativeFolderUnderTheRoot(t *testing.T) {
+	t.Parallel()
 	_, doors := vehicleFixture(t)
 	code, out, _ := stubRun(doors, "into", "inner")
 	if code != 0 || !strings.HasPrefix(out, "7 file(s) written into inner.\n") {
@@ -106,6 +112,7 @@ func TestStubVerbPlacesARelativeFolderUnderTheRoot(t *testing.T) {
 }
 
 func TestStubVerbStandsInTheRegistry(t *testing.T) {
+	t.Parallel()
 	if _, one := twinOf([]string{"stub", "into"}, registry); one == nil {
 		t.Fatal("the registry holds stub")
 	}

@@ -9,6 +9,7 @@ import (
 
 // A branch changing no test answers missing. [[spec/design_output/pull#the-test-verb]]
 func TestABranchChangingNoTestAnswersMissing(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := one.branchSays("test"); code != codeRed {
 		t.Fatalf("the test verb answers %d", code)
@@ -18,6 +19,7 @@ func TestABranchChangingNoTestAnswersMissing(t *testing.T) {
 
 // A Go run answers green, assertion or build. [[spec/design_output/pull#the-test-verb]]
 func TestAGoRunAnswersOneWord(t *testing.T) {
+	t.Parallel()
 	if goSays(Said{OK: true}, "src/x") != "green, src/x passes" {
 		t.Fatal("a green run reads apart")
 	}
@@ -31,6 +33,7 @@ func TestAGoRunAnswersOneWord(t *testing.T) {
 
 // A changed Go test names its package folder, and a named folder names itself. [[spec/tickets/go-code-shares-one-module]]
 func TestAChangedGoTestNamesItsPackage(t *testing.T) {
+	t.Parallel()
 	got := goPackagesOf([]string{"src/a/b_test.go", "src/c/", "src/d.go", "test/e_test.go"})
 	if !slices.Equal(got, []string{"src/a", "src/c"}) {
 		t.Fatalf("the packages read %v", got)
@@ -39,6 +42,7 @@ func TestAChangedGoTestNamesItsPackage(t *testing.T) {
 
 // A node run answers green with its count, or assertion with its failing cases above. [[spec/design_output/pull#the-test-verb]]
 func TestANodeRunAnswersItsVerdict(t *testing.T) {
+	t.Parallel()
 	if testSays(Said{OK: true, Out: "# tests 3\n# pass 3\n"}, 1) != "green, 3 test(s) pass in 1 file(s)" {
 		t.Fatal("a green run reads apart")
 	}

@@ -25,6 +25,7 @@ func runsTwin(one twin, argv ...string) (int, string, string) {
 }
 
 func TestIndexVerb(t *testing.T) {
+	t.Parallel()
 	t.Run("no words ask standing, and the answer prints indented", func(t *testing.T) {
 		asked := [][]string{}
 		code, out, _ := runsTwin(indexVerb(askHolding(map[string]any{"port": 1}, nil, &asked)), "index")

@@ -12,6 +12,7 @@ import (
 )
 
 func TestProcessHash(t *testing.T) {
+	t.Parallel()
 	// The hashes processHash in lib/schema-route.js answered over each text. [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 	cases := []struct{ text, hash string }{
 		{"ask:\n  - name: why\n    form: text\n    says: why it matters\nsteps:\n  - name: build\n    does: makes the change\n    evidence:\n      - name: lint\n        form: command\n        expects: 0\n        says: the tree lints\n", "61a7767d3f2bb8d1"},
@@ -26,6 +27,7 @@ func TestProcessHash(t *testing.T) {
 }
 
 func TestProcessAt(t *testing.T) {
+	t.Parallel()
 	disk := FakeDisk{"spec/processes/small.yaml": "ask:\n  - name: why\n    says: why it matters\nsteps:\n  - name: build\n", "spec/processes/group.yaml": "steps: []\n"}
 	t.Run("a link, a path and a bare name read one process", func(t *testing.T) {
 		for _, said := range []string{"small", "[[spec/processes/small]]", "spec/processes/small.yaml"} {
@@ -52,6 +54,7 @@ func TestProcessAt(t *testing.T) {
 }
 
 func TestGroups(t *testing.T) {
+	t.Parallel()
 	disk := FakeDisk{
 		"spec/tickets/big.md":   "---\nprocess: [[spec/processes/group]]\n---\n",
 		"spec/tickets/inner.md": "---\nprocess: [[spec/processes/group]]\ngroup: big\n---\n",

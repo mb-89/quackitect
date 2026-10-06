@@ -24,6 +24,7 @@ func doorCall(t *testing.T, root string, op map[string]any) string {
 
 // [[spec/tickets/edit-door-rules-port]]
 func TestAnEditReachesNoBlessFile(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	said := doorCall(t, root, map[string]any{"op": "create", "file": ".se/.runtime/bless.json", "new": "{}\n"})
 	if !strings.Contains(said, "is the owner's word on who blesses") {
@@ -36,6 +37,7 @@ func TestAnEditReachesNoBlessFile(t *testing.T) {
 
 // [[spec/tickets/edit-door-rules-port]]
 func TestADraftPassesEveryRule(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	path := "spec/design_input/_draft.md"
 	said := doorCall(t, root, map[string]any{"op": "create", "file": path, "new": "---\nkind: [[rationale]]\n---\n\nA draft.\n"})
@@ -46,6 +48,7 @@ func TestADraftPassesEveryRule(t *testing.T) {
 
 // [[spec/tickets/edit-door-rules-port]]
 func TestAnOpenTicketTakesAnEditUnderDiscussionAlone(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	path := "spec/tickets/" + editTicket + ".md"
 	said := doorCall(t, root, map[string]any{"op": "exact", "file": path, "old": "A thing.", "new": "Another thing."})
@@ -60,6 +63,7 @@ func TestAnOpenTicketTakesAnEditUnderDiscussionAlone(t *testing.T) {
 
 // [[spec/tickets/edit-door-rules-port]]
 func TestTheEngineFieldsComeBackAndTheEditLands(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	seedFile(t, root, "spec/schemas/ticket.schema.yaml", engineSchema)
 	said := doorCall(t, root, map[string]any{"op": "exact", "file": closedPath, "old": "state: closed\n---\n\n# Ask\n\nA thing done.", "new": "state: open\n---\n\n# Ask\n\nA thing done well."})
@@ -78,6 +82,7 @@ func TestTheEngineFieldsComeBackAndTheEditLands(t *testing.T) {
 
 // [[spec/tickets/edit-door-rules-port]]
 func TestAProjectedFileTakesNoEdit(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	seedFile(t, root, projectionsFile, owningFile)
 	said := doorCall(t, root, map[string]any{"op": "create", "file": "made/one.txt", "new": "one\n"})
@@ -88,6 +93,7 @@ func TestAProjectedFileTakesNoEdit(t *testing.T) {
 
 // [[spec/tickets/edit-door-rules-port]]
 func TestAnEditCarriesNoTokenOutOfANote(t *testing.T) {
+	t.Parallel()
 	root := editTree(t)
 	seedFile(t, root, ".se/notes/a-note.md", "The key is "+noteToken+".\n")
 	said := doorCall(t, root, map[string]any{"op": "create", "file": "docs/two.txt", "new": "use " + noteToken + "\n"})

@@ -10,6 +10,7 @@ import (
 )
 
 func TestTheRegistrationsEqualTheTrackedFiles(t *testing.T) {
+	t.Parallel()
 	for _, one := range copilotRegistrations() {
 		tracked, ok := readText(filepath.Join("..", "..", filepath.FromSlash(one.name)))
 		if !ok {
@@ -23,6 +24,7 @@ func TestTheRegistrationsEqualTheTrackedFiles(t *testing.T) {
 }
 
 func TestTheSetupWritesOnceAndLeavesTheClaudeSettings(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	seedTree(t, d.root, map[string]string{".claude/settings.json": "original"})
 	written, err := copilotSetup(d, "vscode")
@@ -38,6 +40,7 @@ func TestTheSetupWritesOnceAndLeavesTheClaudeSettings(t *testing.T) {
 }
 
 func TestTheSetupRefusesAFileAPersonOwns(t *testing.T) {
+	t.Parallel()
 	d, _, _, _ := fakeBoxDoors(t)
 	seedTree(t, d.root, map[string]string{".github/workflows/copilot-setup-steps.yml": "user workflow"})
 	if _, err := copilotSetup(d, "vscode"); err == nil || err.Error() != "Keep .github/workflows/copilot-setup-steps.yml: it belongs to you. Merge the generated registration manually." {
@@ -55,6 +58,7 @@ func TestTheSetupRefusesAFileAPersonOwns(t *testing.T) {
 }
 
 func TestAutoWaitsOnCopilotAndCloudWritesItsMark(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	if written, err := copilotSetup(d, "auto"); err != nil || len(written) != 0 {
 		t.Errorf("auto with no Copilot writes %v, %v", written, err)
@@ -71,6 +75,7 @@ func TestAutoWaitsOnCopilotAndCloudWritesItsMark(t *testing.T) {
 }
 
 func TestAnEditorListingCopilotOrTheEditorsTerminalTurnsAutoOn(t *testing.T) {
+	t.Parallel()
 	d, runner, _, _ := fakeBoxDoors(t)
 	runner.answers["code --list-extensions"] = ranResult{stdout: "GitHub.copilot-chat\n"}
 	if !copilotDetected(d) {

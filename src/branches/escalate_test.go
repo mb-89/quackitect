@@ -9,6 +9,7 @@ import (
 
 // An escalation with no words refuses, and one with no hold refuses. [[spec/design_output/pull#a-person-step-goes-in]]
 func TestAnEscalationWantsAQuestionAndAHold(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := one.branchSays("escalate"); code != codeRefused {
 		t.Fatalf("a bare escalation answers %d", code)
@@ -21,6 +22,7 @@ func TestAnEscalationWantsAQuestionAndAHold(t *testing.T) {
 
 // The question is every word past the flags, and the options split on commas. [[spec/design_output/pull#a-person-step-goes-in]]
 func TestTheQuestionIsTheWordsPastTheFlags(t *testing.T) {
+	t.Parallel()
 	rest := []string{"which", "--options", "a, b", "one", "--as", "helper-1"}
 	if askedIn(rest) != "which one" || !slices.Equal(wordsIn(flagIn(rest, optionsFlag)), []string{"a", "b"}) {
 		t.Fatalf("the question reads %q", askedIn(rest))
@@ -29,6 +31,7 @@ func TestTheQuestionIsTheWordsPastTheFlags(t *testing.T) {
 
 // The person step goes in before the leaf, takes the next number, and the ticket stands at it. [[spec/design_output/pull#a-person-step-goes-in]]
 func TestThePersonStepGoesInBeforeTheLeaf(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil).desk()
 	text, path := one.d.withPersonStep(note{Name: "kid", Text: childNote}, "build", "which one", nil)
 	if path != "person-1" || fieldOf(text, "step") != "person-1" {

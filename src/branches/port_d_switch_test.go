@@ -43,6 +43,7 @@ func pdClaimed(one *tree, name string) bool {
 
 // A take passes over a group whose switch reads false on trunk, and claims the next. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDTakePassesOverASwitchedGroup(t *testing.T) {
+	t.Parallel()
 	one := pdTwoGroups(t, pdShared("false"))
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s %s", code, one.out.String(), one.errs.String())
@@ -57,6 +58,7 @@ func TestPDTakePassesOverASwitchedGroup(t *testing.T) {
 
 // A switch reading true on trunk frees its group for the take. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDATrueSwitchFreesItsGroup(t *testing.T) {
+	t.Parallel()
 	one := pdTwoGroups(t, pdShared("true"))
 	if code := one.branchSays("take"); code != codeOK {
 		t.Fatalf("the take answers %d: %s %s", code, one.out.String(), one.errs.String())
@@ -68,6 +70,7 @@ func TestPDATrueSwitchFreesItsGroup(t *testing.T) {
 
 // A switch this box alone turns on, in its local file or its environment, frees nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDALocalSwitchFreesNothing(t *testing.T) {
+	t.Parallel()
 	one := pdTwoGroups(t, pdShared("false"))
 	one.write(map[string]string{runtimeFolder + "/config.json": pdShared("true")})
 	one.d.Env["SE_MIGRATION_PHASE2SWITCH"] = "true"
@@ -81,6 +84,7 @@ func TestPDALocalSwitchFreesNothing(t *testing.T) {
 
 // A switch the tracked config on trunk lacks reads as off. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDAMissingSwitchReadsOff(t *testing.T) {
+	t.Parallel()
 	one := pdTwoGroups(t, "")
 	one.branchSays("take")
 	if pdClaimed(one, "a-switched") {
@@ -90,6 +94,7 @@ func TestPDAMissingSwitchReadsOff(t *testing.T) {
 
 // The list says a switched group waits for its key to read true, and the other waits for nothing. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDTheListNamesTheSwitch(t *testing.T) {
+	t.Parallel()
 	one := pdTwoGroups(t, pdShared("false"))
 	if code := one.branchSays("list"); code != codeOK {
 		t.Fatalf("list answers %d: %s", code, one.errs.String())
@@ -111,6 +116,7 @@ func TestPDTheListNamesTheSwitch(t *testing.T) {
 
 // The trigger counts a switched group nowhere among the free ones. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDTheTriggerSkipsTheSwitchedGroup(t *testing.T) {
+	t.Parallel()
 	one := pdTwoGroups(t, pdShared("false"))
 	one.out.Reset()
 	Cloud(one.d, []string{"trigger"})
@@ -123,6 +129,7 @@ func TestPDTheTriggerSkipsTheSwitchedGroup(t *testing.T) {
 
 // A switch reads true alone, and a key the shared config lacks reads off. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDShutByReadsTrueAlone(t *testing.T) {
+	t.Parallel()
 	text := pdUnderKind(pdGroupNote, switchField+": "+pdSwitchKey)
 	cases := []struct {
 		shared map[string]any
@@ -145,6 +152,7 @@ func TestPDShutByReadsTrueAlone(t *testing.T) {
 
 // A branch waits for the groups it names first, then for its switch. [[spec/tickets/work-verbs-port-to-go]]
 func TestPDWaitsOfNamesGroupsThenTheSwitch(t *testing.T) {
+	t.Parallel()
 	ticket := pdUnderKind(pdGroupNote, "depends_on: [before]")
 	standing := map[string]string{workBranch + "before": todo}
 	said := waitsOf(stand{Ticket: ticket, Shut: pdSwitchKey}, standing, nil)

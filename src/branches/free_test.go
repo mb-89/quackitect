@@ -6,6 +6,7 @@ import "testing"
 
 // The trigger names the routine, and each free branch, past one waiting on another. [[spec/design_output/work#the-routine-a-verb-names]]
 func TestTheTriggerNamesTheFreeBranches(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("a", map[string]string{ticketAt("a"): groupNote})
 	one.branch("b", map[string]string{ticketAt("b"): withField(groupNote, "depends_on", "[a]")})
@@ -23,6 +24,7 @@ func TestTheTriggerNamesTheFreeBranches(t *testing.T) {
 
 // The cloud verb with no word prints its usage, and an unknown word refuses. [[spec/design_output/work#the-routine-a-verb-names]]
 func TestTheCloudVerbPrintsItsUsage(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := Cloud(one.d, nil); code != 0 {
 		t.Fatalf("a bare cloud answers %d", code)
@@ -35,6 +37,7 @@ func TestTheCloudVerbPrintsItsUsage(t *testing.T) {
 
 // A held claim older than the span reads stale, and a fresh one reads its age alone. [[spec/design_output/work#a-stale-group-is-yours]]
 func TestAClaimGoesStalePastTheSpan(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	now := testNow.Unix()
 	if got := one.d.staleClaim(stand{ref: ref{When: now - 13*hour}}, now); !got.Stale || got.Age != "13h" {

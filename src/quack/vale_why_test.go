@@ -8,6 +8,7 @@ import (
 
 // A root with no Vale answers the seam a lint that stands nowhere, with the reason the JS lint names. [[spec/tickets/drafts-lint-seam-carries-why]]
 func TestTheValeReasonReachesTheDraftsLint(t *testing.T) {
+	t.Parallel()
 	said := draftsLint(t.TempDir())("a draft", "level0-answer.md")
 	if said.Stands || said.Ran || said.Why != "no vale stands here" {
 		t.Errorf("draftsLint answers %+v under a root with no Vale", said)
@@ -16,6 +17,7 @@ func TestTheValeReasonReachesTheDraftsLint(t *testing.T) {
 
 // A Vale reading nothing names why: its stderr where it exits on one, the run's error, or that it answered nothing. [[spec/tickets/drafts-lint-seam-carries-why]]
 func TestTheValeReasonNamesWhyValeReadNothing(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		claim string
 		said  []byte

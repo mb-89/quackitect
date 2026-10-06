@@ -6,6 +6,7 @@ import "testing"
 
 // A tree with no branch and no loose ticket lists nothing open. [[spec/design_output/work#a-row-per-group]]
 func TestABareTreeListsNothingOpen(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	if code := one.branchSays("list"); code != 0 {
 		t.Fatalf("list answers %d: %s", code, one.errs.String())
@@ -15,6 +16,7 @@ func TestABareTreeListsNothingOpen(t *testing.T) {
 
 // A group's branch draws its row at todo, and its open child under it. [[spec/design_output/work#a-ticket-under-its-group]]
 func TestAGroupDrawsItsRowAndItsChild(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, map[string]string{"spec/tickets/loose.md": "---\nstate: open\n---\n"})
 	one.branch("g", map[string]string{ticketAt("g"): groupNote, ticketAt("kid"): childNote})
 	if code := one.branchSays("list"); code != 0 {
@@ -28,6 +30,7 @@ func TestAGroupDrawsItsRowAndItsChild(t *testing.T) {
 
 // The done flag lists a closed group with the read that opens it. [[spec/design_output/work#a-merged-branch-goes]]
 func TestTheDoneFlagNamesTheRead(t *testing.T) {
+	t.Parallel()
 	one := newTree(t, nil)
 	one.branch("g", map[string]string{ticketAt("g"): withField(groupNote, "state", closedState)})
 	one.branchSays("list", "--done")

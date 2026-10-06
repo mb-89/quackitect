@@ -10,6 +10,7 @@ import (
 
 // A findings file reads a section per row, and a missing section reads nil. [[spec/guidance/retro/read]]
 func TestRetroFindingsReadASectionPerRowAndAMissingSectionReadsNil(t *testing.T) {
+	t.Parallel()
 	read := retroFindingsOf("## stop\n\n- the panel waits for a file\n\n## keep\n")
 	if !reflect.DeepEqual(read["stop"], []string{"the panel waits for a file"}) {
 		t.Fatalf("stop reads %q", read["stop"])
@@ -24,6 +25,7 @@ func TestRetroFindingsReadASectionPerRowAndAMissingSectionReadsNil(t *testing.T)
 
 // A file a Windows editor writes ends each line on a carriage return too. [[spec/guidance/retro/read]]
 func TestRetroFindingsWithCarriageReturnsReadTheSameItems(t *testing.T) {
+	t.Parallel()
 	read := retroFindingsOf("## stop\r\n\r\n- the panel waits for a file\r\n\r\n## keep\r\n")
 	if !reflect.DeepEqual(read["stop"], []string{"the panel waits for a file"}) {
 		t.Fatalf("stop reads %q", read["stop"])
