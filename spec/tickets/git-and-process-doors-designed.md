@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -205,6 +205,15 @@ record:
         hash: ffaadf7c3fe494dd
         size: 17605
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: a3e099723b917221e3c1ec5504194677a59dbb5b
+    hash_after: a3e099723b917221e3c1ec5504194677a59dbb5b
+    answered:
+      - name: lint
+        exit: 0
+        said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -343,14 +352,19 @@ accept
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches src/proc/proc.go and src/proc/proc_contract_test.go alone, the process door the chapter names
+the one door the change reaches is the process door, and FakeRunner stands beside Real with its contract suite
+the header of src/proc/proc.go and each type point at spec/design_output/doors the-process-door, which names the approach
+the answer to an empty argv stands once, in namesNoProgram, and both runners return it
 
 ## tests-green
 
