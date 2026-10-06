@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: lint-without-vale
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: 9bf1118afce8b735
         size: 1640
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 09cf21ad3c5d · claude-code-remote · helper-4
+    hash_before: 04a830297d694745f5acb0ecc26b1974caf3a43a
+    hash_after: 04a830297d694745f5acb0ecc26b1974caf3a43a
+    inputs:
+      - name: design/draft
+        hash: 9bf1118afce8b735
+        size: 1640
+      - name: design/tests-red
+        hash: 9d657bfa5c2a59d2
+        size: 739
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -269,8 +281,11 @@ Each case fails on its own assertion. The check runs no changed part, a warning 
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept with points
+- changed-lint-without-merge-base: CI's check.yml checks out at depth one with no origin/main ref, so the changed door's merge base with origin/main finds nothing there; the approach names no fallback, and the implement step gives the door one (the files of HEAD's own commit, or an empty list with a line saying so) and a case for it
+- working-rule-strict-commit: guidance working rule 10 says a line at warning stands and only the push waits, and the commit's strict lint now refuses a staged file at warning; the rule and its table row name the commit as the gate
 
 # implement
 
