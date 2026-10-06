@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 step: implement/tests-green
 steps:
   - name: design
@@ -186,7 +186,30 @@ record:
         exit: 0
         said: "   89.4  in all"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 39485335ef4a308f66dbd087b3bb7b0aefb08170
+    hash_after: 39485335ef4a308f66dbd087b3bb7b0aefb08170
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/pull passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   89.9  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 34b83b8d5ff9d575
+        size: 959
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
 group: engine-verbs-hold
+reason: done
 ---
 
 # Ask
@@ -361,26 +384,33 @@ The ask layout stands once, in AskFrom in src/pull/process.go, and the retro min
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/pull/process_test.go src/quack/verb_config_test.go src/quack/verb_mint_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A new ticket and a tracked key each land through one verb. The mint verb takes each ask field of the named process as a flag, such as --gain, --breaks and a repeatable --done_when, and writes the Ask through pull.AskFrom in the order the process names them; naming --Ask beside an ask field comes back refused. The retro mint writes its Ask through the same AskFrom. The config verb writes the tracked layer under --tracked and the local layer otherwise, and its printed line and log row name the layer. The config design output names the tracked road.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft size list plus the config design output, which the gate row names, and the config verb test, whose usage line names the new flag.
+The mint reads the process through pull.ProcessAt and the verbs own disk door, and the config write keeps settingAt and orderedAt, so no new door opens.
+Each new function carries a link to spec/tickets/verbs-mint-tickets-and-keys.
+The ask layout stands once, in AskFrom in src/pull/process.go, and the retro mint and the mint verb both call it; the tracked flag word stands once as configTrackedFlag.
 
 # accept
 
