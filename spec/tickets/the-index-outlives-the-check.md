@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -165,6 +165,29 @@ record:
         exit: 0
         said: "    2.7  test/contract/runme-road.test.js ./RUNME.sh hands get to quack, which reads the verbs slice off the index"
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: a142eacc8c6e1df9a0005f12c4940fb89d88f991
+    hash_after: a142eacc8c6e1df9a0005f12c4940fb89d88f991
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/index passes; green, src/quack passes
+      - name: check
+        exit: 0
+        said: "   93.0  in all"
+    inputs:
+      - name: design/tests-red
+        hash: 8a9506635862836c
+        size: 722
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -320,26 +343,33 @@ accept with points
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/index/detach_test.go src/quack/ending_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The index door now starts in a session and process group of its own, and on Windows through a starter that exits at once. A check, a branch switch or a merge that ends its caller, or a taskkill /T over that caller, leaves the door answering, so a box no longer spends calls starting the server again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change stays in src/index, the files the ask names
+- the spawn reaches the process door, whose fake stands in q/qtest, and the Windows case drives the real thing once
+- the platform files name the approach and link the tickets
+- each fact stands on the ticket the comments link
 
 # accept
 
