@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -275,6 +275,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 934acab49d805a3bcf6451dc2c7befe82290de56
+    hash_after: 934acab49d805a3bcf6451dc2c7befe82290de56
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 reason: done
 ---
 
@@ -363,6 +375,7 @@ accept
 - [[spec/tickets/the-budget-reads-the-span]]: battery.budget reads a fifth over a clean check
 - [[spec/tickets/index-cases-wait-for-it]]: a ready step stands the binaries and the index door before the parts start
 - the branch took main in twice, and the second merge kept the table rule main carries
+- [[spec/tickets/vale-retries-its-timeout]]: the lint runs Vale again on its own timeout
 
 ### well
 
@@ -386,6 +399,7 @@ accept
 - 21:5x: the accept hand-back ran branch sync, and main conflicted in seven files, the check and the table rule among them
 - 22:01: the first check after the merge went red with no case named, and the rerun went green
 - no owner prompt turned the run, and the session started on the resume prompt level zero sends after a clear
+- 22:07: the tree check went red in the rules part, with Vale past its own cap, after the retro dropped the load note as a flicker
 
 ### improve
 
@@ -397,13 +411,15 @@ accept
 - review.go writes the stamp after its builds, and a review takes a worktree path of its own: `src/branches/review.go`
 - the budget cases run apart from the parts that load the cores, or read a budget sized for a loaded box: `test/level0/budget.test.js`
 - the stamp names the red part where a red carries no case: `src/quack/check.go`
+- the lint runs Vale again on E201: `src/modules/lsp/tools.go`
+- a retro weighs a red that a rerun clears as a defect: [[spec/guidance/cloud/cloud]]
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 <!-- the form is text -->
 
-The worry through the run was whether the review reds came from this group or from load. A lone review settled it twice. Two branches changed the check at once, and the merge cost more than any child. The helper script watch-bin.sh polled the binaries and the standing file, and it stands gone from the box.
+The worry through the run was whether the review reds came from this group or from load. A lone review settled it twice. Two branches changed the check at once, and the merge cost more than any child. The helper script watch-bin.sh polled the binaries and the standing file, and it stands gone from the box. The load note read as a flicker until the tree check itself went red, and the drop was wrong.
 
 ### checked
 
