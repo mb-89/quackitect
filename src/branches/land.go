@@ -54,16 +54,16 @@ func (d *Doors) landedAlone(one note, changes []string, also ...string) string {
 // The refusal a merge standing unresolved answers before anything stages. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (d *Doors) unmergedFault() string {
 	_, order := d.unmerged()
-	return mergeRefusal(order, nil)
+	return MergeRefusal(order, nil)
 }
 
 // The refusal a staged conflict marker answers before the commit. [[spec/design_output/work#no-commit-carries-a-marker]]
 func (d *Doors) stagedFault(only []string) string {
-	return mergeRefusal(nil, markedIn(d.quiet(append([]string{"diff", "--cached", "--unified=0"}, only...)...).Out))
+	return MergeRefusal(nil, MarkedIn(d.quiet(append([]string{"diff", "--cached", "--unified=0"}, only...)...).Out))
 }
 
 // The refusal every commit road answers, naming each file. [[spec/design_output/work#no-commit-carries-a-marker]]
-func mergeRefusal(unmerged, marked []string) string {
+func MergeRefusal(unmerged, marked []string) string {
 	if len(unmerged) == 0 && len(marked) == 0 {
 		return ""
 	}
@@ -79,7 +79,7 @@ func mergeRefusal(unmerged, marked []string) string {
 }
 
 // The openers a staged delta adds, each as its file and line. [[spec/design_output/work#no-commit-carries-a-marker]]
-func markedIn(delta string) []string {
+func MarkedIn(delta string) []string {
 	var out []string
 	file, at, binary := "", 0, false
 	for _, line := range splitRows(delta) {

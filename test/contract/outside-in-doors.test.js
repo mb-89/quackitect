@@ -25,8 +25,6 @@ const AT = "spec/config/styles/VoiceVale/OutsideInDoors.yml";
 const ROOTS = [
   "src/scripts/cli-doors.js",
   "src/scripts/cli-check.js",
-  "src/scripts/precommit.js",
-  "src/scripts/prepush.js",
   "src/scripts/trust.js",
   "src/scripts/copilot.js",
   "src/extension/extension.js",

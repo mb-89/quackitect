@@ -218,12 +218,11 @@ own:
 | the caller | its reach |
 |---|---|
 | the hook module | `$.process` for git, `$.fs` for the notes |
-| `src/scripts/precommit.js` | the git door, the disk door, and the delta on stdin |
+| `se-index hook pre-commit` | git under the root, the disk, and the staged delta |
 
-The hook script stands under `src/scripts` because a reach outside this tree
-goes through a door under `src/doors`, and `lib/private.js` reaches nothing.
-The shell hook pipes `git diff --cached --unified=0` in, and the script answers
-the exit code git reads. It reads the box through `boxOf`, the way `lint` does.
+The shell hook runs `se-index hook pre-commit`, which reads
+`git diff --cached --unified=0` itself through the commit guards' own body, and
+answers the exit code git reads. A box with no binary commits ungated.
 
 `./RUNME.sh` points `core.hooksPath` at `.githooks` once, the way it links the
 editor, and `doctor` names the path it finds. `RUNME.ps1` hands its arguments
@@ -263,7 +262,7 @@ way only where somebody writes the join on purpose.
 Every rule here reads strings, so every case hands one in.
 
 - `test/level0/private.test.js` drives the functions, the reader and the checks over strings and a fixture diff.
-- `test/level0/precommit.test.js` drives the hook script over a fake disk and a fake git.
+- `src/quack/hook_verb_test.go` drives the hook verb over a real repository and its bare origin.
 - `test/level0/hooks.test.js` drives the write door over a fake note, and the Bash door over a staged diff.
 - `test/level0/bash.test.js` drives the escape and the second door over the command line alone.
 

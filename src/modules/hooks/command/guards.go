@@ -103,15 +103,22 @@ func VersionGuard(command string) string {
 	}
 	var names []string
 	seen := map[string]bool{}
-	how := "rewrite"
+	drops := false
 	for _, one := range found {
 		if !seen[one.name] {
 			seen[one.name] = true
 			names = append(names, one.name)
 		}
-		if one.drop {
-			how = "delete"
-		}
+		drops = drops || one.drop
+	}
+	return VersionRefusal(names, drops)
+}
+
+// The refusal naming each version branch a command or a pushed ref rewrites, or deletes where drops holds. [[spec/tickets/git-hooks-run-in-go]]
+func VersionRefusal(names []string, drops bool) string {
+	how := "rewrite"
+	if drops {
+		how = "delete"
 	}
 	return strings.Join([]string{
 		strings.Join(names, ", ") + " is a version branch, and this command would " + how + " it.",
@@ -122,6 +129,9 @@ func VersionGuard(command string) string {
 		"The owner takes it off, in the repository's own branch rules.",
 	}, "\n")
 }
+
+// Whether a branch name is a version branch. [[spec/tickets/git-hooks-run-in-go]]
+func IsVersion(name string) bool { return version.MatchString(name) }
 
 // [[spec/design_output/work#a-version-branch-stands]]
 func versionsIn(rest []string) []versionRef {

@@ -55,7 +55,8 @@ A box reads the argument here before it asks about a ruling:
 | `.claude/skills/level0/lib` | modules, apart from what the hook module imports itself | ported |
 | `src/extension` | a generic renderer for the sidebar and its forms, beside the route drawing, the lens and the inset | shrinks |
 | the level zero hook module | forwards events, registers the tools the index lists, and spawns agents | shrinks |
-| `copilot.js`, `precommit.js`, `prepush.js` | calls into the `hooks` IO module, `quack hook <event>` | ported |
+| `copilot.js` | calls into the `hooks` IO module, `quack hook <event>` | ported |
+| the git hooks | `quack hook pre-commit` and `quack hook pre-push`, over the `hooks` IO module | ported |
 | `spec/config/level0.schema.json` | generated from the `q.Cfg` and `q.Show` declarations | generated |
 
 | area | what goes with no successor | what moves to Go | what stays |

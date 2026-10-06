@@ -266,6 +266,14 @@ func heldIn(text string) *hold {
 	}
 }
 
+// The hand of the open take, or nothing where every take stands closed. [[spec/tickets/git-hooks-run-in-go]]
+func HandIn(text string) string {
+	if held := heldIn(text); held != nil {
+		return held.Hand
+	}
+	return ""
+}
+
 // The first leaf of a route, its path joined by slashes. [[spec/design_output/work#a-group-is-a-ticket]]
 func firstLeaf(steps any, path string) string {
 	list := yaml.AsList(steps)

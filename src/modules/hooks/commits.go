@@ -21,9 +21,10 @@ const checkStamp = ".se/.runtime/check.json"
 
 // The first refusal of the commit guards, or nothing. [[spec/tickets/cage-commit-guards-port]]
 func (d *Door) commitGuards(line, root string, settings Settings, tree disk) string {
+	_, commits := command.CommitIn(line)
 	for _, guard := range []func() string{
-		func() string { return d.privateDelta(line, root, settings, tree) },
-		func() string { return d.testedDelta(line, root, tree) },
+		func() string { return when(commits, func() string { return d.privateDelta(root, settings, tree) }) },
+		func() string { return when(commits, func() string { return d.testedDelta(root, tree) }) },
 		func() string { return d.todoOnPush(line, root) },
 		func() string { return d.deskGuard(line, root, settings) },
 		func() string { return d.trunkGuard(line, root, settings, tree) },
@@ -33,6 +34,14 @@ func (d *Door) commitGuards(line, root string, settings Settings, tree disk) str
 		}
 	}
 	return ""
+}
+
+// The guard's answer where the gate holds, or nothing. [[spec/tickets/git-hooks-run-in-go]]
+func when(gate bool, guard func() string) string {
+	if !gate {
+		return ""
+	}
+	return guard()
 }
 
 // The findings the voice refuses over the message a commit carries, read off the command or the file it names. A door with no Voice reads none. [[spec/tickets/cage-commit-guards-port]]
@@ -53,10 +62,7 @@ func (d *Door) commitVoice(line, root string, tree disk) []command.Row {
 }
 
 // A commit's delta carries no private shape, no name the box answers, and no text out of a raw note. [[spec/design_output/private#both-doors-one-check]]
-func (d *Door) privateDelta(line, root string, settings Settings, tree disk) string {
-	if _, ok := command.CommitIn(line); !ok {
-		return ""
-	}
+func (d *Door) privateDelta(root string, settings Settings, tree disk) string {
 	added := command.AddedIn(d.git(root, "diff", "--cached", "--unified=0"))
 	if len(added) == 0 {
 		return ""
@@ -82,10 +88,7 @@ func (d *Door) privateDelta(line, root string, settings Settings, tree disk) str
 }
 
 // A change and the test proving it land together, and a merge in progress passes whole. [[spec/design_output/tree#the-rules-over-two-files]]
-func (d *Door) testedDelta(line, root string, tree disk) string {
-	if _, ok := command.CommitIn(line); !ok {
-		return ""
-	}
+func (d *Door) testedDelta(root string, tree disk) string {
 	merging := d.git(root, "rev-parse", "-q", "--verify", "MERGE_HEAD") != ""
 	found := command.UntestedIn(d.git(root, "diff", "--cached", "--unified=0"), tree.text, merging, command.HeldTests(tree))
 	if len(found) > 0 {
@@ -99,9 +102,14 @@ func (d *Door) todoOnPush(line, root string) string {
 	if _, pushes := command.TouchesGit(line); !pushes {
 		return ""
 	}
+	return d.todoIn(root, "HEAD", "HEAD", "--not", "--remotes")
+}
+
+// The refusal naming each tagged note the range carries, read at the tip. [[spec/tickets/git-hooks-run-in-go]]
+func (d *Door) todoIn(root, tip string, span ...string) string {
 	var carried []command.Note
-	for _, name := range command.NotesIn(d.git(root, "log", "--format=", "--name-only", "HEAD", "--not", "--remotes")) {
-		if text := d.git(root, "show", "HEAD:"+name); text != "" {
+	for _, name := range command.NotesIn(d.git(root, append([]string{"log", "--format=", "--name-only"}, span...)...)) {
+		if text := d.git(root, "show", tip+":"+name); text != "" {
 			carried = append(carried, command.Note{Name: name, Text: text})
 		}
 	}

@@ -21,7 +21,12 @@ func tipAge(one stand, now int64) int64 {
 
 // The span a claim goes stale past, the config's or the default. [[spec/design_output/work#a-stale-group-is-yours]]
 func (d *Doors) staleSpan() int64 {
-	if said := spanOf(d.config(staleKey)); said > 0 {
+	return StaleSpan(d.config(staleKey))
+}
+
+// The seconds a claim goes stale past, off the config's work.staleAfter or the default where it says nothing. [[spec/tickets/git-hooks-run-in-go]]
+func StaleSpan(config string) int64 {
+	if said := spanOf(config); said > 0 {
 		return int64(said)
 	}
 	return int64(spanOf(staleSpan))

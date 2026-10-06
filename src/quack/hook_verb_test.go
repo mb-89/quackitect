@@ -152,6 +152,7 @@ func TestHookPrePushRefusesAnUncheckedTip(t *testing.T) {
 func TestHookPrePushRefusesABranchAnotherBoxHolds(t *testing.T) {
 	t.Parallel()
 	root, sha := heldBranch(t)
+	stampsGreen(t, root, sha)
 	code, errs := prePushes(root, true, nil, pushLine("work/x", sha), time.Now())
 	if code != exitFailed || !strings.Contains(errs, "work/x stands in the hand of "+hookHolder) || !strings.Contains(errs, "branch sync") {
 		t.Fatalf("pre-push answers %d, %q, and wants a branch another box holds refused, naming the holder and main", code, errs)
@@ -161,9 +162,19 @@ func TestHookPrePushRefusesABranchAnotherBoxHolds(t *testing.T) {
 func TestHookPrePushRefusesAPlainPushOntoAStaleHold(t *testing.T) {
 	t.Parallel()
 	root, sha := heldBranch(t)
+	stampsGreen(t, root, sha)
 	code, errs := prePushes(root, true, nil, pushLine("work/x", sha), time.Now().Add(24*time.Hour))
 	if code != exitFailed || !strings.Contains(errs, "stale hold of "+hookHolder) || !strings.Contains(errs, "./RUNME.sh branch take x") {
 		t.Fatalf("pre-push answers %d, %q, and wants a plain push onto a stale hold refused, naming the take", code, errs)
+	}
+}
+
+func TestHookPrePushRefusesTheOwnersPushOntoABranchAnotherBoxHolds(t *testing.T) {
+	t.Parallel()
+	root, sha := heldBranch(t)
+	code, errs := prePushes(root, false, nil, pushLine("work/x", sha), time.Now())
+	if code != exitFailed || !strings.Contains(errs, "work/x stands in the hand of "+hookHolder) {
+		t.Fatalf("pre-push answers %d, %q, and wants the owner's terminal refused on a branch another box holds", code, errs)
 	}
 }
 

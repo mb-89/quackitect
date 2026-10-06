@@ -126,10 +126,9 @@ func handIn(tree disk) string {
 			break
 		}
 	}
-	var box, held map[string]any
-	_ = json.Unmarshal([]byte(tree.text(boxFile)), &box)
+	var held map[string]any
 	_ = json.Unmarshal([]byte(tree.text(sessionFile)), &held)
-	id := textOf(box, "id")
+	id := boxIDIn(tree)
 	if agent == "" || id == "" {
 		return ""
 	}
@@ -141,6 +140,13 @@ func handIn(tree disk) string {
 		parts = append(parts, "session "+session)
 	}
 	return strings.Join(append(parts, agent), handJoin)
+}
+
+// The id the box file under the tree names, or nothing. [[spec/tickets/git-hooks-run-in-go]]
+func boxIDIn(tree disk) string {
+	var box map[string]any
+	_ = json.Unmarshal([]byte(tree.text(boxFile)), &box)
+	return textOf(box, "id")
 }
 
 // A hold stands in the session's own hand where its hand matches, and every hold does where the session's hand reads empty. [[spec/tickets/the-retro-reads-its-hand]]

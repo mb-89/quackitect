@@ -179,6 +179,40 @@ func RedBattery(says string) string {
 	}, "\n")
 }
 
+// A cloud box pushes its own work branch alone, and trunk stands for the desk. [[spec/tickets/cloud-boxes-leave-trunk-alone]]
+func CloudLeavesTrunk() string {
+	return strings.Join([]string{
+		"A cloud box pushes its own work branch alone, and " + Trunk + " stands for the desk.",
+		"",
+		"Push your work branch. " + Trunk + " takes its work through",
+		"`./RUNME.sh branch merge <name>` on a desk, where the owner reads it first.",
+	}, "\n")
+}
+
+// The sha the check's stamp names, or nothing where it names none. [[spec/tickets/git-hooks-run-in-go]]
+func StampSha(stamp string) string {
+	var read struct {
+		Sha any `json:"sha"`
+	}
+	if json.Unmarshal([]byte(stamp), &read) != nil {
+		return ""
+	}
+	return textOf(read.Sha)
+}
+
+// The refusal a push past the check meets. [[spec/tickets/level0-runs-on-the-door]]
+func Unchecked(branch, says string) string {
+	if says == "" {
+		says = "the green check ran on no commit this tip stands on, or code changed since"
+	}
+	return strings.Join([]string{
+		branch + " takes a push the check has passed, and " + says + ".",
+		"",
+		"Run `./RUNME.sh check` after your last code commit. It runs level zero on a",
+		"fresh box beside the tests, and a red check pushes nothing.",
+	}, "\n")
+}
+
 // Each commit carries one helper's work, and the verb's check gates every landing on trunk. [[spec/design_output/work#a-landing-takes-the-verb]]
 func ThroughTheVerb(how string) string {
 	if how == HowPush {

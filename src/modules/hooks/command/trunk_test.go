@@ -3,7 +3,10 @@
 // [[spec/tickets/cage-commit-guards-port]]
 package command
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestTouchesGitReadsNestedGit(t *testing.T) {
 	for _, one := range []struct {
@@ -64,5 +67,26 @@ func TestBatteryReadsTheChecksStamp(t *testing.T) {
 		if green != one.green || says != one.says {
 			t.Errorf("Battery(%s) reads %v %q, want %v %q", one.stamp, green, says, one.green, one.says)
 		}
+	}
+}
+
+func TestStampShaReadsTheChecksCommit(t *testing.T) {
+	if said := StampSha(`{"sha":"abc","ok":true}`); said != "abc" {
+		t.Fatalf("StampSha answers %q, and wants abc", said)
+	}
+	if said := StampSha(""); said != "" {
+		t.Fatalf("StampSha answers %q over no stamp, and wants nothing", said)
+	}
+}
+
+func TestPushRefusalsNameTheBranchAndTheRoad(t *testing.T) {
+	if said := Unchecked("work/y", ""); !strings.HasPrefix(said, "work/y takes a push the check has passed, and the green check ran on no commit") {
+		t.Fatalf("Unchecked answers %q", said)
+	}
+	if said := CloudLeavesTrunk(); !strings.HasPrefix(said, "A cloud box pushes its own work branch alone, and main stands for the desk.") {
+		t.Fatalf("CloudLeavesTrunk answers %q", said)
+	}
+	if said := VersionRefusal([]string{"v1"}, true); !strings.HasPrefix(said, "v1 is a version branch, and this command would delete it.") || !IsVersion("v1") || IsVersion("main") {
+		t.Fatalf("VersionRefusal answers %q", said)
 	}
 }
