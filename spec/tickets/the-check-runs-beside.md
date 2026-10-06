@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: accept
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -167,6 +167,25 @@ record:
     hand: the engine
     hash_before: e3c746a0b800e4fb78532715b008a2d9ff9f0f37
     hash_after: e3c746a0b800e4fb78532715b008a2d9ff9f0f37
+  - step: accept
+    hand: box c46fdbdc0cdf · claude-code-remote
+    hash_before: 2c3f0b766545919a826f7190ba60f932afdb7122
+    hash_after: 2c3f0b766545919a826f7190ba60f932afdb7122
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/the-check-runs-beside already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 40924ce6fcecee9a
+        size: 619
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: [[spec/tickets/the-probe-starts-with-tests]]
+        hash: 2f27903492d3e8aa
+        size: 574
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -224,10 +243,7 @@ The check's parts block each other no more: every part starts at once, so the ch
 <!-- the form is verdict -->
 
 accept
-- every part starts at once after one ready step, and the wall time is that step and the slowest part
-- the design names the one wait, every part on the ready step, and why
-- TestReadyStep and TestBatteryRun prove the order over fake parts and the held clock
-- branch review answers check passes, and the tree check runs inside battery.budget
+- the diff since the last verdict carries ticket evidence alone, and the check stands green on the merge
 
 # retro
 
