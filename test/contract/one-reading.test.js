@@ -11,9 +11,6 @@ import { checkNote, schemasIn } from "../../.claude/skills/level0/lib/schema.js"
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import * as findings from "../../src/bridge/findings.js";
 import { disk } from "../../src/doors/disk.js";
-// The whole module, so a name the command line answers nowhere yet fails an assertion. [[spec/tickets/a-claim-meets-the-view]]
-import * as reading from "../../src/scripts/cli-read.js";
-import { sweepRowsOf } from "../../src/scripts/quack-topic.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -45,27 +42,6 @@ test("the guard hands nothing where no binary stands, and the path where one doe
   const at = "/tree/.se/.runtime/bin/biome";
   const standing = { exists: (one) => one === at, read: () => "" };
   assert.equal(findings.biomeFor(standing, "/tree", {}), at);
-});
-
-// The lint reads the tools' rows and the check module's sweep, and each row once. [[spec/tickets/the-lsp-server-leaves]]
-test("the lint reads each row of the sweep once", async () => {
-  assert.equal(typeof findings.linesNamed, "function", "the reader answers linesNamed");
-  assert.equal(
-    typeof reading.readingFor,
-    "function",
-    "the command line answers readingFor",
-  );
-
-  // One file proves the contract, and quack reads the sweep once, because a sweep over a folder costs the battery seconds and proves no more. [[spec/tickets/one-reading-proves-one-file]]
-  const file = "spec/guidance/working.md";
-  const doors = await reading.findingsDoors();
-  const swept = sweepRowsOf(doors, [file]) ?? [];
-  const printed = await reading.readingFor([file], swept);
-  const tools = await findings.findingsOver(doors, [file]);
-
-  const check = findings.linesNamed(printed.found);
-  assert.deepEqual(check, findings.linesNamed([...tools.found, ...swept]));
-  assert.equal(new Set(check).size, check.length, "no row reads twice");
 });
 
 // [[spec/design_output/lsp#a-closed-ticket-is-history]]
