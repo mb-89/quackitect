@@ -22,7 +22,7 @@ type retroScoreNote struct {
 	name, text string
 }
 
-func init() { register("retro score", retroScoreVerb(retroBox)) }
+func init() { register("retro score", retroScoreVerb(quietBox)) }
 
 // The verb: every improvement a retro mints, and how many stay open. [[spec/design_input/the-agent-pulls-tickets]]
 func retroScoreVerb(box func() boxDoors) twin {

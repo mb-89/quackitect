@@ -51,7 +51,7 @@ type retroRates struct {
 	order   []string
 }
 
-func init() { register("retro classes", retroClassesVerb(retroBox)) }
+func init() { register("retro classes", retroClassesVerb(quietBox)) }
 
 // The hand's record, read, or nil where it reads as no JSON. [[spec/guidance/retro/classify]]
 func retroRecordOf(text string) *retroRecord {

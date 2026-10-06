@@ -24,6 +24,7 @@ type diskDoors struct {
 	remove    func(path string) error
 	removeAll func(path string) error
 	rename    func(from, to string) error
+	appendTo  func(path string, data []byte) error
 }
 
 // The disk of the box itself. [[spec/tickets/quack-reaches-the-box-through-doors]]
@@ -37,13 +38,34 @@ func realDisk() diskDoors {
 		remove:    os.Remove,
 		removeAll: os.RemoveAll,
 		rename:    os.Rename,
+		appendTo:  realAppend,
 	}
 }
+
+// Appends to the file, made where none stands, so a line another writer lands in the meantime stays. [[spec/design_output/log#every-writer-appends]]
+func realAppend(path string, data []byte) error {
+	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, appendedMode)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.Write(data)
+	return err
+}
+
+// The mode an appended file takes where the append makes it. [[spec/design_output/log#every-writer-appends]]
+const appendedMode = 0o644
 
 // Whether a path stands. [[spec/tickets/quack-reaches-the-box-through-doors]]
 func (d diskDoors) stands(path string) bool {
 	_, err := d.stat(path)
 	return err == nil
+}
+
+// Whether a file stands at the path, a folder reading as none. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func (d diskDoors) standsFile(path string) bool {
+	said, err := d.stat(path)
+	return err == nil && !said.IsDir()
 }
 
 // A file's text, or nothing where it reads as none. [[spec/tickets/quack-reaches-the-box-through-doors]]

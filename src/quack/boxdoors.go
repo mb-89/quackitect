@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"io/fs"
 	"net/http"
@@ -81,6 +82,17 @@ func realBoxDoors(out, errs io.Writer) boxDoors {
 		out:  out,
 		errs: errs,
 	}
+}
+
+// The box doors a verb reaches outside a test, its runs writing to no stream. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func quietBox() boxDoors { return realBoxDoors(io.Discard, io.Discard) }
+
+// The line a failed start says: a runtime missing from the PATH names itself, since the install brings none. [[spec/tickets/bare-desk-names-missing-node]]
+func startFault(runtime string, err error) string {
+	if errors.Is(err, exec.ErrNotFound) {
+		return fmt.Sprintf("No %s stands on the PATH. Install %s, and run this again.", runtime, runtime)
+	}
+	return err.Error()
 }
 
 // Whether the box runs Windows. [[spec/tickets/box-verbs-port-to-go]]

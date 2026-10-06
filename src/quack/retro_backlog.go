@@ -35,7 +35,7 @@ func init() { register("retro backlog", retroBacklogVerb(retroBacklogLive)) }
 
 // The doors backlog runs on outside a test. [[spec/tickets/the-retro-reads-the-backlog]]
 func retroBacklogLive() retroBacklogDoors {
-	d := retroBox()
+	d := quietBox()
 	root := retroRootOf(d)
 	return retroBacklogDoors{root: root, disk: d.disk, git: retroCollectGitIn(d.run, root)}
 }

@@ -50,7 +50,7 @@ type retroMeasure struct {
 	pattern *regexp.Regexp
 }
 
-func init() { register("retro timeline", retroTimelineVerb(retroBox)) }
+func init() { register("retro timeline", retroTimelineVerb(quietBox)) }
 
 // The time a line carries in its source's field, in milliseconds, and NaN where it carries none. [[spec/guidance/retro/chapter]]
 func retroTimeOf(source retroSource, line string) float64 {

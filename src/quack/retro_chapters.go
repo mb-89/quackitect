@@ -32,7 +32,7 @@ type retroHeld struct {
 	count  int
 }
 
-func init() { register("retro chapters", retroChaptersVerb(retroBox)) }
+func init() { register("retro chapters", retroChaptersVerb(quietBox)) }
 
 // The cuts, read and checked: a start before an end, and each chapter opening where the one before closes. [[spec/guidance/retro/chapter]]
 func retroCutsOf(text string) ([]retroCut, []string) {

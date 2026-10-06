@@ -4,7 +4,6 @@
 package main
 
 import (
-	"io"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -43,6 +42,3 @@ func retroRootOf(d boxDoors) string {
 	}
 	return d.root
 }
-
-// The box doors a retro verb reaches outside a test. [[spec/tickets/quack-reaches-the-box-through-doors]]
-func retroBox() boxDoors { return realBoxDoors(io.Discard, io.Discard) }

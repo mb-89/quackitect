@@ -27,7 +27,7 @@ type fakeDisk struct {
 // The fake disk as the hand a verb takes. [[spec/tickets/quack-reaches-the-box-through-doors]]
 func newFakeDisk() diskDoors {
 	f := &fakeDisk{files: fstest.MapFS{}}
-	return diskDoors{read: f.read, write: f.write, stat: f.stat, list: f.list, makeAll: f.makeAll, remove: f.remove, removeAll: f.removeAll, rename: f.rename}
+	return diskDoors{read: f.read, write: f.write, stat: f.stat, list: f.list, makeAll: f.makeAll, remove: f.remove, removeAll: f.removeAll, rename: f.rename, appendTo: f.appendTo}
 }
 
 func fakeKey(at string) string {
@@ -57,6 +57,21 @@ func (f *fakeDisk) write(at string, data []byte, perm fs.FileMode) error {
 		return &fs.PathError{Op: "open", Path: at, Err: fs.ErrNotExist}
 	}
 	f.files[key] = &fstest.MapFile{Data: slices.Clone(data), Mode: perm, ModTime: time.Unix(0, 0)}
+	return nil
+}
+
+func (f *fakeDisk) appendTo(at string, data []byte) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	key := fakeKey(at)
+	if !f.folder(path.Dir(key)) || f.folder(key) {
+		return &fs.PathError{Op: "open", Path: at, Err: fs.ErrNotExist}
+	}
+	was := []byte{}
+	if held, ok := f.files[key]; ok {
+		was = held.Data
+	}
+	f.files[key] = &fstest.MapFile{Data: append(slices.Clone(was), data...), Mode: appendedMode, ModTime: time.Unix(0, 0)}
 	return nil
 }
 
@@ -253,6 +268,18 @@ var diskContract = map[string]func(t *testing.T, disk diskDoors, root string){
 		}
 		if err := disk.removeAll(filepath.Join(root, "none")); err != nil {
 			t.Fatalf("removeAll of nothing answers %v", err)
+		}
+	},
+	"appendTo adds to the end, makes the file, and refuses a missing folder": func(t *testing.T, disk diskDoors, root string) {
+		at := filepath.Join(root, "a.jsonl")
+		if err := disk.appendTo(at, []byte("one\n")); err != nil {
+			t.Fatal(err)
+		}
+		if err := disk.appendTo(at, []byte("two\n")); err != nil || disk.text(at) != "one\ntwo\n" {
+			t.Fatalf("appendTo answers %v, and the file reads %q", err, disk.text(at))
+		}
+		if err := disk.appendTo(filepath.Join(root, "none", "a.jsonl"), []byte("x")); err == nil {
+			t.Fatal("an append into no folder passes")
 		}
 	},
 	"rename moves a file and a folder with what it holds": func(t *testing.T, disk diskDoors, root string) {

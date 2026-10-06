@@ -104,11 +104,14 @@ func projectTargetsUnder(t *testing.T, root string) map[string]string {
 	return out
 }
 
+// The box a project case runs on: the environment the case sets, and the disk under its temp folder. [[spec/tickets/quack-reaches-the-box-through-doors]]
+func projectBox() boxDoors { return boxDoors{env: os.Getenv, disk: realDisk()} }
+
 // Runs the verb over a root, and answers what it prints. [[spec/tickets/config-verbs-port-to-go]]
 func runProject(t *testing.T, root string, dry bool) string {
 	t.Helper()
 	var out, errs strings.Builder
-	if code := projectVerb(func() (string, error) { return root, nil })(nil, dry, &out, &errs); code != 0 {
+	if code := projectVerb(func() (string, error) { return root, nil }, projectBox)(nil, dry, &out, &errs); code != 0 {
 		t.Fatalf("project answers exit status %d: %s", code, errs.String())
 	}
 	return out.String()
@@ -229,7 +232,7 @@ func TestProjectWritesTheWorkRootOffTheMethodSources(t *testing.T) {
 // Runs the verb under --check over a root, and answers its status and both streams. [[spec/design_output/projection#check-refuses-a-stale-one]]
 func checkProject(root string) (int, string, string) {
 	var out, errs strings.Builder
-	code := projectVerb(func() (string, error) { return root, nil })([]string{"project", projectCheck}, false, &out, &errs)
+	code := projectVerb(func() (string, error) { return root, nil }, projectBox)([]string{"project", projectCheck}, false, &out, &errs)
 	return code, out.String(), errs.String()
 }
 

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -31,7 +32,7 @@ func fixRan(root string, argv ...string) (int, string, string, []string) {
 		}
 		return 0
 	}
-	code := fixVerb(func() (string, error) { return root, nil }, run)(append([]string{"fix"}, argv...), false, &out, &errs)
+	code := fixVerb(func() (string, error) { return root, nil }, run, realDisk())(append([]string{"fix"}, argv...), false, &out, &errs)
 	return code, out.String(), errs.String(), ran
 }
 
@@ -82,7 +83,8 @@ func TestTheCalmNamesAFileItCannotWrite(t *testing.T) {
 		fmt.Fprint(said, shoutedRow)
 		return 0
 	}
-	refuse := func(string, []byte) error { return errors.New("the disk refuses") }
+	refuse := realDisk()
+	refuse.write = func(string, []byte, fs.FileMode) error { return errors.New("the disk refuses") }
 	err := calm(root, "vale", []string{"a.md"}, run, refuse)
 	if err == nil || !strings.Contains(err.Error(), "a.md") || !strings.Contains(err.Error(), "the disk refuses") {
 		t.Fatalf("the calm answers %v, and wants the file and the cause", err)
@@ -159,7 +161,7 @@ func TestACarriageReturnSurvivesTheCalm(t *testing.T) {
 func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
 	t.Parallel()
 	root, _ := filepath.Abs(filepath.Join("..", ".."))
-	vale := toolHere(root, "vale")
+	vale := toolHere(realDisk(), root, "vale")
 	if vale == "" {
 		t.Skip("no vale stands on this box")
 	}
@@ -171,7 +173,7 @@ func TestTheCalmCalmsTheShoutRealValeNames(t *testing.T) {
 		if err := os.WriteFile(at, []byte("# Notes\n\n"+shouted+"\n"), 0o644); err != nil {
 			t.Fatal(err)
 		}
-		if err := calm(root, vale, []string{at}, toolRuns, writeCalmed); err != nil {
+		if err := calm(root, vale, []string{at}, toolRuns, realDisk()); err != nil {
 			t.Fatal(err)
 		}
 		if got, _ := os.ReadFile(at); string(got) != "# Notes\n\n"+want+"\n" {

@@ -9,8 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
+	"io/fs"
 	"path/filepath"
 	"regexp"
 	"runtime"
@@ -48,10 +47,10 @@ var (
 // A tool run under a folder, writing to the streams, which answers its exit code. [[spec/tickets/config-verbs-port-to-go]]
 type fixRunner func(dir string, out, errs io.Writer, argv ...string) int
 
-func init() { register("fix", fixVerb(index.Root, toolRuns)) }
+func init() { register("fix", fixVerb(index.Root, toolRuns, realDisk())) }
 
 // fix over the root: the flags it knows, then the rounds over the paths, then biome. [[spec/tickets/the-small-faults-land]]
-func fixVerb(root func() (string, error), run fixRunner) twin {
+func fixVerb(root func() (string, error), run fixRunner, disk diskDoors) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		var paths, unknown []string
 		help := false
@@ -81,7 +80,7 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
-		vale := toolHere(at, "vale")
+		vale := toolHere(disk, at, "vale")
 		if vale == "" {
 			fmt.Fprintln(errs, "Vale is missing. Run ./RUNME.sh once and it installs.")
 			return exitUsage
@@ -90,17 +89,17 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 			return 0
 		}
 		for range fixRounds {
-			was := stampOf(at, paths)
-			if err := calm(at, vale, paths, run, writeCalmed); err != nil {
+			was := stampOf(disk, at, paths)
+			if err := calm(at, vale, paths, run, disk); err != nil {
 				fmt.Fprintln(errs, err)
 				return exitFailed
 			}
 			run(at, out, errs, append([]string{vale, "fix", "--apply", "--config=" + valeIni, valeParked}, paths...)...)
-			if stampOf(at, paths) == was {
+			if stampOf(disk, at, paths) == was {
 				break
 			}
 		}
-		if biome := toolHere(at, "biome"); biome != "" {
+		if biome := toolHere(disk, at, "biome"); biome != "" {
 			run(at, out, errs, append([]string{biome, "check", "--write", "--config-path=" + biomeFolder}, paths...)...)
 		}
 		fmt.Fprintln(out, "Run ./RUNME.sh lint to see what is left for a person.")
@@ -109,12 +108,12 @@ func fixVerb(root func() (string, error), run fixRunner) twin {
 }
 
 // The path the survey names for a tool where a file stands there, else the one in the runtime binary folder, else nothing. [[spec/design_output/tools#where-a-caller-looks]]
-func toolHere(root, name string) string {
+func toolHere(disk diskDoors, root, name string) string {
 	var said map[string]struct {
 		Path string `json:"path"`
 	}
-	if body, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(body, &said) == nil {
-		if at := said[name].Path; at != "" && standsHere(at) {
+	if body, err := disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil && json.Unmarshal(body, &said) == nil {
+		if at := said[name].Path; at != "" && disk.stands(at) {
 			return at
 		}
 	}
@@ -122,29 +121,19 @@ func toolHere(root, name string) string {
 	if runtime.GOOS == "windows" {
 		guess += ".exe"
 	}
-	if standsHere(guess) {
+	if disk.stands(guess) {
 		return guess
 	}
 	return ""
 }
 
-func standsHere(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
-}
-
-// A tool run with the caller's streams, answering its exit code. [[spec/tickets/the-small-faults-land]]
+// A tool run writing to the caller's streams, answering its exit code. [[spec/tickets/the-small-faults-land]]
 func toolRuns(dir string, out, errs io.Writer, argv ...string) int {
-	one := exec.Command(argv[0], argv[1:]...)
-	one.Dir, one.Stdin, one.Stdout, one.Stderr = dir, os.Stdin, out, errs
-	if err := one.Run(); err != nil {
-		if exit, ok := err.(*exec.ExitError); ok {
-			return exit.ExitCode()
-		}
-		fmt.Fprintln(errs, err)
-		return exitFailed
+	ran := realRun(out, errs)(argv, runOpts{cwd: dir, inherit: true})
+	if ran.fault != "" {
+		fmt.Fprintln(errs, ran.fault)
 	}
-	return 0
+	return ran.code
 }
 
 // One row of Vale's JSON the calm reads. [[spec/design_output/level0#the-fixer-calms-a-shout]]
@@ -156,7 +145,7 @@ type valeRow struct {
 }
 
 // Sentence-cases every shouted lead Vale names over the paths, since Vale reports that fix and applies none. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-func calm(root, vale string, paths []string, run fixRunner, write func(string, []byte) error) error {
+func calm(root, vale string, paths []string, run fixRunner, disk diskDoors) error {
 	var said strings.Builder
 	run(root, &said, io.Discard, append([]string{vale, "--config=" + valeIni, "--output=JSON", "--no-exit", valeParked}, paths...)...)
 	var read map[string][]valeRow
@@ -177,21 +166,18 @@ func calm(root, vale string, paths []string, run fixRunner, write func(string, [
 		if !filepath.IsAbs(path) {
 			path = filepath.Join(root, filepath.FromSlash(file))
 		}
-		was, err := os.ReadFile(path)
+		was, err := disk.read(path)
 		if err != nil {
 			continue
 		}
 		if now := calmed(string(was), shouts); now != string(was) {
-			if err := write(path, []byte(now)); err != nil {
+			if err := disk.write(path, []byte(now), calmedMode); err != nil {
 				return fmt.Errorf("the calm writes no %s: %w", file, err)
 			}
 		}
 	}
 	return nil
 }
-
-// Writes a calmed file over itself. [[spec/design_output/level0#the-fixer-calms-a-shout]]
-func writeCalmed(path string, text []byte) error { return os.WriteFile(path, text, calmedMode) }
 
 // The text with each shout sentence-cased where it stands at its line and column, the last first, so an earlier span keeps its column. [[spec/design_output/level0#the-fixer-calms-a-shout]]
 func calmed(text string, shouts []valeRow) string {
@@ -235,27 +221,29 @@ func sentenceCase(said string) string {
 }
 
 // What every prose file under the paths holds, so a round that changes nothing reads the same stamp. [[spec/tickets/the-small-faults-land]]
-func stampOf(root string, paths []string) string {
+func stampOf(disk diskDoors, root string, paths []string) string {
 	sum := sha256.New()
 	for _, one := range paths {
 		base := filepath.Join(root, filepath.FromSlash(one))
-		_ = filepath.WalkDir(base, func(at string, entry os.DirEntry, err error) error {
-			if err != nil {
-				return nil
-			}
-			if at != base && (walkSkips[entry.Name()] || strings.HasPrefix(entry.Name(), "_")) {
-				if entry.IsDir() {
-					return filepath.SkipDir
-				}
-				return nil
-			}
-			if entry.IsDir() || !proseFile.MatchString(entry.Name()) {
-				return nil
-			}
-			body, _ := os.ReadFile(at)
-			fmt.Fprintf(sum, "%s\x00%s\x00", at, body)
-			return nil
-		})
+		if said, err := disk.stat(base); err == nil {
+			stampInto(sum, disk, base, fs.FileInfoToDirEntry(said), true)
+		}
 	}
 	return fmt.Sprintf("%x", sum.Sum(nil))
+}
+
+// Writes each prose file under the entry into the stamp, past the folders the walk skips, in the order the disk lists them. [[spec/tickets/the-small-faults-land]]
+func stampInto(sum io.Writer, disk diskDoors, at string, entry fs.DirEntry, base bool) {
+	if !base && (walkSkips[entry.Name()] || strings.HasPrefix(entry.Name(), "_")) {
+		return
+	}
+	if !entry.IsDir() {
+		if proseFile.MatchString(entry.Name()) {
+			fmt.Fprintf(sum, "%s\x00%s\x00", at, disk.text(at))
+		}
+		return
+	}
+	for _, one := range disk.listed(at) {
+		stampInto(sum, disk, filepath.Join(at, one.Name()), one, false)
+	}
 }

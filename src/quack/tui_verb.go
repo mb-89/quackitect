@@ -139,7 +139,7 @@ func tuiOpens(d tuiDoors, exe, session, tab string, out, errs io.Writer) int {
 func tuiPlainRows(d tuiDoors, argv []string, session string, plain bool, out, errs io.Writer) int {
 	var read []string
 	if slices.Contains(argv, "--all") {
-		read = logFiles(filepath.FromSlash(d.root), "", time.Time{})
+		read = logFiles(realDisk(), filepath.FromSlash(d.root), "", time.Time{})
 	} else if tuiExists(session) {
 		read = []string{session}
 	}

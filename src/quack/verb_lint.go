@@ -8,8 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"slices"
@@ -41,6 +39,7 @@ type lintDoors struct {
 	box   func() []check.Finding
 	log   func(row map[string]any) error
 	now   func() time.Time
+	disk  diskDoors
 }
 
 func init() { register("lint", lintVerb(lintHere)) }
@@ -51,13 +50,15 @@ func lintHere() (lintDoors, error) {
 	if err != nil {
 		return lintDoors{}, err
 	}
+	hand := quietBox()
 	return lintDoors{
 		root:  root,
-		tools: func(where []string) []check.Finding { return toolsOver(root, where) },
+		tools: func(where []string) []check.Finding { return toolsOver(hand, root, where) },
 		sweep: func() ([]check.Finding, error) { return sweepRows(askIndex) },
-		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(root)) },
+		box:   func() []check.Finding { return check.SurveyFindsNode(lintTree(hand, root)) },
 		log:   keepsFloor(sliceMode(root, logFloorKey), appendsRow(root, time.Now)),
 		now:   time.Now,
+		disk:  hand.disk,
 	}, nil
 }
 
@@ -134,7 +135,7 @@ func lintReading(d lintDoors, asked []string) ([]check.Finding, string) {
 	where := []string{}
 	for _, one := range asked {
 		// A path the disk no longer holds carries no finding, so no source reads it. [[spec/design_output/level0#a-crash-writes-its-error]]
-		if _, err := os.Stat(filepath.Join(d.root, filepath.FromSlash(one))); one == lintWhole || err == nil {
+		if one == lintWhole || d.disk.stands(filepath.Join(d.root, filepath.FromSlash(one))) {
 			where = append(where, one)
 		}
 	}
@@ -229,15 +230,15 @@ func lintRows(found []check.Finding, refused int) []string {
 }
 
 // The lsp module's tools over the paths named: the whole tree's sweep where the tree is asked, and the files under each path otherwise. [[spec/design_output/lsp#one-checker-every-front-asks]]
-func toolsOver(root string, where []string) []check.Finding {
-	tree := lintTree(root)
+func toolsOver(hand boxDoors, root string, where []string) []check.Finding {
+	tree := lintTree(hand, root)
 	tools := lsp.ToolsAt(wall, root, lspChecks(root))
 	defer tools.Halt()
 	var said []lsp.Finding
 	if slices.Contains(where, lintWhole) {
 		said = tools.Sweep(tree)
 	} else {
-		said = tools.Over(tree, filesUnder(tree, root, where))
+		said = tools.Over(tree, filesUnder(hand.disk, tree, root, where))
 	}
 	out := make([]check.Finding, 0, len(said))
 	for _, one := range said {
@@ -247,7 +248,7 @@ func toolsOver(root string, where []string) []check.Finding {
 }
 
 // Each file the paths name: a file itself, and every file the tree holds under a folder. [[spec/design_output/tree#the-tree-handed-in]]
-func filesUnder(tree *check.Tree, root string, where []string) []string {
+func filesUnder(disk diskDoors, tree *check.Tree, root string, where []string) []string {
 	out := []string{}
 	add := func(file string) {
 		if !slices.Contains(out, file) {
@@ -255,7 +256,7 @@ func filesUnder(tree *check.Tree, root string, where []string) []string {
 		}
 	}
 	for _, at := range where {
-		if standsFile(filepath.Join(root, filepath.FromSlash(at))) {
+		if disk.standsFile(filepath.Join(root, filepath.FromSlash(at))) {
 			add(path.Clean(filepath.ToSlash(at)))
 			continue
 		}
@@ -269,24 +270,27 @@ func filesUnder(tree *check.Tree, root string, where []string) []string {
 }
 
 // The tree on the disk under the root, its paths the files git lists, and the survey this box wrote. [[spec/design_output/tree#the-tree-handed-in]]
-func lintTree(root string) *check.Tree {
-	tree := check.TreeOver(root, listedDisk{rootDisk{root}})
-	if said, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil {
+func lintTree(hand boxDoors, root string) *check.Tree {
+	tree := check.TreeOver(root, listedDisk{rootDisk{root}, hand.run})
+	if said, err := hand.disk.read(filepath.Join(root, filepath.FromSlash(check.ToolsAt))); err == nil {
 		tree.Survey = string(said)
 	}
 	return tree
 }
 
 // The disk under the root, whose paths are the files git tracks and the ones it leaves unignored. [[spec/design_output/tree#the-tree-handed-in]]
-type listedDisk struct{ rootDisk }
+type listedDisk struct {
+	rootDisk
+	run func(argv []string, o runOpts) ranResult
+}
 
 func (one listedDisk) Paths() []string {
-	said, err := exec.Command("git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard").Output()
-	if err != nil {
+	said := one.run([]string{"git", "-C", one.root, "ls-files", "-z", "--cached", "--others", "--exclude-standard"}, runOpts{})
+	if said.code != 0 || said.fault != "" {
 		return nil
 	}
 	out, seen := []string{}, map[string]bool{}
-	for _, file := range strings.Split(string(said), "\x00") {
+	for _, file := range strings.Split(said.stdout, "\x00") {
 		if file != "" && !seen[file] && one.Exists(file) {
 			seen[file] = true
 			out = append(out, file)

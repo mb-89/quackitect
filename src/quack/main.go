@@ -125,7 +125,7 @@ func main() {
 		return
 	}
 	if len(os.Args) > verbArgs && os.Args[1] == "verb" {
-		os.Exit(verbRoad(os.Args[3:]))
+		os.Exit(verbRoad(os.Args[3:], os.Stdout, os.Stderr))
 	}
 	if len(os.Args) == 2 && os.Args[1] == "config" {
 		if err := configs("."); err != nil {

@@ -54,7 +54,8 @@ func (fake *lintFake) verb(t *testing.T, files map[string]string) twin {
 				fake.rows = append(fake.rows, row)
 				return nil
 			},
-			now: func() time.Time { return logNow },
+			now:  func() time.Time { return logNow },
+			disk: realDisk(),
 		}, nil
 	})
 }

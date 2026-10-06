@@ -28,7 +28,9 @@ func logOver(t *testing.T, files map[string]string) (string, twin) {
 			t.Fatal(err)
 		}
 	}
-	return root, logVerb(func() (logDoors, error) { return logDoors{root: root, now: func() time.Time { return logNow }}, nil })
+	return root, logVerb(func() (logDoors, error) {
+		return logDoors{root: root, now: func() time.Time { return logNow }, disk: realDisk()}, nil
+	})
 }
 
 // One line of the log, stamped minutes before the case's now. [[spec/design_output/log#one-verb-reads-the-log]]

@@ -28,7 +28,7 @@ func configRoot(t *testing.T, tracked string) string {
 func configRan(root string, argv ...string) (int, string, string) {
 	var out, errs strings.Builder
 	at := func() time.Time { return time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC) }
-	code := configVerb(func() (string, error) { return root, nil }, at)(append([]string{"config"}, argv...), false, &out, &errs)
+	code := configVerb(func() (string, error) { return root, nil }, at, realDisk())(append([]string{"config"}, argv...), false, &out, &errs)
 	return code, out.String(), errs.String()
 }
 

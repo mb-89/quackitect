@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -20,7 +19,7 @@ import (
 	"quackitect/src/modules/edits"
 )
 
-func init() { register("split", splitVerb(index.Root, time.Now)) }
+func init() { register("split", splitVerb(index.Root, time.Now, realDisk())) }
 
 // The verb's word, which the journal names as the hand of the entry. [[spec/design_output/apply#the-journal-holds-both-halves]]
 const splitBy = "split"
@@ -40,7 +39,7 @@ type splitCut struct {
 }
 
 // [[spec/design_output/level0#a-verb-cuts-the-file]]
-func splitVerb(rootOf func() (string, error), now func() time.Time) twin {
+func splitVerb(rootOf func() (string, error), now func() time.Time, disk diskDoors) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		said := argv[1:]
 		if slices.Contains(said, "--help") {
@@ -59,7 +58,7 @@ func splitVerb(rootOf func() (string, error), now func() time.Time) twin {
 			return exitFailed
 		}
 		at := filepath.Join(root, from)
-		text, err := os.ReadFile(at)
+		text, err := disk.read(at)
 		if err != nil {
 			fmt.Fprintf(errs, "%s stands nowhere, so there is nothing to cut.\n", from)
 			return exitUsage
@@ -92,15 +91,15 @@ func splitVerb(rootOf func() (string, error), now func() time.Time) twin {
 		if slices.Contains(said, "--dry") {
 			return 0
 		}
-		return splitWrote(root, from, string(text), rest, targets, now(), out, errs)
+		return splitWrote(disk, root, from, string(text), rest, targets, now(), out, errs)
 	}
 }
 
 // One entry holds every target and the rest, so one undo puts the whole cut back. [[spec/design_output/apply#the-journal-holds-both-halves]]
-func splitWrote(root, from, was, rest string, targets []edits.Changed, at time.Time, out, errs io.Writer) int {
+func splitWrote(disk diskDoors, root, from, was, rest string, targets []edits.Changed, at time.Time, out, errs io.Writer) int {
 	files := make([]edits.Changed, 0, len(targets)+1)
 	for _, one := range targets {
-		stood, err := os.ReadFile(filepath.Join(root, one.File))
+		stood, err := disk.read(filepath.Join(root, one.File))
 		one.Was, one.Born = string(stood), err != nil
 		files = append(files, one)
 	}
@@ -109,12 +108,12 @@ func splitWrote(root, from, was, rest string, targets []edits.Changed, at time.T
 	// The entry names this run, so an undo takes this cut and no other. [[spec/design_output/apply#the-journal-holds-both-halves]]
 	on := splitBy + ":" + stamp
 	where := filepath.Join(root, filepath.FromSlash(edits.Journal), edits.NameOf(stamp))
-	if err := writesFile(where, journalText(edits.JournalOf(stamp, on, splitBy, files, ""))); err != nil {
+	if err := writesFile(disk, where, journalText(edits.JournalOf(stamp, on, splitBy, files, ""))); err != nil {
 		fmt.Fprintf(errs, "The journal would not write, so nothing did: %v\n", err)
 		return exitFailed
 	}
 	for _, one := range files {
-		if err := writesFile(filepath.Join(root, one.File), one.Made); err != nil {
+		if err := writesFile(disk, filepath.Join(root, one.File), one.Made); err != nil {
 			fmt.Fprintf(errs, "%s would not write, and %s holds the way back.\n%v\n", one.File, where, err)
 			return exitFailed
 		}
@@ -235,11 +234,11 @@ func wordAt(said []string, at int) string {
 }
 
 // Writes the text at the path, and makes the folder it stands in. [[spec/tickets/ticket-verbs-port-to-go]]
-func writesFile(at, text string) error {
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+func writesFile(disk diskDoors, at, text string) error {
+	if err := disk.makeAll(filepath.Dir(at), 0o755); err != nil {
 		return err
 	}
-	return os.WriteFile(at, []byte(text), 0o644)
+	return disk.write(at, []byte(text), 0o644)
 }
 
 // An entry as JSON.stringify writes it indented by two, with its line end. [[spec/design_output/apply#the-journal-holds-both-halves]]

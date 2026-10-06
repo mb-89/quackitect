@@ -72,7 +72,7 @@ func init() { register("retro collect", retroCollectVerb(retroCollectLive)) }
 
 // The doors collect runs on outside a test: the tree's root, home and temp as cli-doors.js reads them, the clock, git and the rename. [[spec/guidance/retro/collect]]
 func retroCollectLive() retroCollectDoors {
-	d := retroBox()
+	d := quietBox()
 	root := retroRootOf(d)
 	return retroCollectDoors{
 		root: root,

@@ -112,7 +112,7 @@ type retroCases struct {
 	values map[string]any
 }
 
-func init() { register("retro effect", retroEffectVerb(retroBox)) }
+func init() { register("retro effect", retroEffectVerb(quietBox)) }
 
 // A case keys on its file and its name, because two files share a name. [[spec/guidance/retro/effect]]
 func retroBatteryKey(one any) string {

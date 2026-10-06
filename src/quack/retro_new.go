@@ -21,7 +21,7 @@ const (
 )
 
 func init() {
-	register("retro new", retroNewVerb(retroBox, retroMintRunOver(realRun(io.Discard, io.Discard))))
+	register("retro new", retroNewVerb(quietBox, retroMintRunOver(realRun(io.Discard, io.Discard))))
 }
 
 // The verb: mints the retro off its route, writes the reason into its ask, opens it and pulls it. [[spec/design_input/the-agent-pulls-tickets]]

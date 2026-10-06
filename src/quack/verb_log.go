@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -27,6 +26,8 @@ const (
 	logOld = ".se/.log/old"
 	logEnd = ".jsonl"
 	noLog  = "No log stands yet. A writer starts one the next time it says a line."
+	// The mode the log's folder takes where an append makes it. [[spec/design_output/log#every-writer-appends]]
+	logFolderMode = 0o755
 )
 
 // The flags the verb reads. [[spec/design_output/log#one-verb-reads-the-log]]
@@ -87,16 +88,17 @@ var (
 	spaces      = regexp.MustCompile(`\s+`)
 )
 
-// What the verb reads: the root and the clock. [[spec/design_output/log#one-verb-reads-the-log]]
+// What the verb reads: the root, the clock and the disk. [[spec/design_output/log#one-verb-reads-the-log]]
 type logDoors struct {
 	root string
 	now  func() time.Time
+	disk diskDoors
 }
 
 // The doors over the tree's own root and the wall clock. [[spec/design_output/log#one-verb-reads-the-log]]
 func logHere() (logDoors, error) {
 	root, err := index.Root()
-	return logDoors{root: root, now: time.Now}, err
+	return logDoors{root: root, now: time.Now, disk: realDisk()}, err
 }
 
 // One row as its line holds it: the keys in the order the line writes them, each key's JSON, and the line. [[spec/design_output/log#what-one-line-looks-like]]
@@ -127,14 +129,14 @@ func logVerb(doors func() (logDoors, error)) twin {
 			return logSays(d, flagOf(said, logSay), errs)
 		}
 		now := d.now()
-		paths := logFiles(d.root, flagOf(said, logSince), now)
+		paths := logFiles(d.disk, d.root, flagOf(said, logSince), now)
 		if len(paths) == 0 {
 			fmt.Fprintln(out, noLog)
 			return 0
 		}
 		rows := []logLine{}
 		for _, path := range paths {
-			if text, err := os.ReadFile(path); err == nil {
+			if text, err := d.disk.read(path); err == nil {
 				rows = append(rows, logLinesOf(string(text))...)
 			}
 		}
@@ -185,14 +187,14 @@ func timeOf(name string) int64 {
 }
 
 // The files a span opens: every rotated file opening inside it, the newest one opening before it, since its later rows run on into the span, and the session file. [[spec/design_output/log#a-session-rotates-its-file]]
-func logFiles(root, since string, now time.Time) []string {
+func logFiles(disk diskDoors, root, since string, now time.Time) []string {
 	old := filepath.Join(root, filepath.FromSlash(logOld))
 	from := int64(0)
 	if seconds := spanOf(since); seconds > 0 {
 		from = now.UnixMilli() - seconds*msInSecond
 	}
 	rotated := []string{}
-	if found, err := os.ReadDir(old); err == nil {
+	if found, err := disk.list(old); err == nil {
 		for _, one := range found {
 			if !one.IsDir() && strings.HasSuffix(one.Name(), logEnd) {
 				rotated = append(rotated, one.Name())
@@ -216,15 +218,10 @@ func logFiles(root, since string, now time.Time) []string {
 	for _, name := range inside {
 		out = append(out, filepath.Join(old, name))
 	}
-	if here := filepath.Join(root, filepath.FromSlash(sessionLog)); standsFile(here) {
+	if here := filepath.Join(root, filepath.FromSlash(sessionLog)); disk.standsFile(here) {
 		out = append(out, here)
 	}
 	return out
-}
-
-func standsFile(path string) bool {
-	said, err := os.Stat(path)
-	return err == nil && !said.IsDir()
 }
 
 // One row a line holding a JSON object. A torn line drops alone, and the rows around it stand. [[spec/design_output/log#every-writer-appends]]
@@ -408,7 +405,7 @@ func logSays(d logDoors, text string, errs io.Writer) int {
 	}
 	line, err := sayLine(d.now(), values)
 	if err == nil {
-		err = appendsLine(filepath.Join(d.root, filepath.FromSlash(sessionLog)), line)
+		err = appendsLine(d.disk, filepath.Join(d.root, filepath.FromSlash(sessionLog)), line)
 	}
 	if err != nil {
 		fmt.Fprintln(errs, err)
@@ -418,17 +415,11 @@ func logSays(d logDoors, text string, errs io.Writer) int {
 }
 
 // Appends one line to the file, its folder made where none stands. [[spec/tickets/the-sidebar-writes-through-actions]]
-func appendsLine(at, line string) error {
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+func appendsLine(disk diskDoors, at, line string) error {
+	if err := disk.makeAll(filepath.Dir(at), logFolderMode); err != nil {
 		return err
 	}
-	file, err := os.OpenFile(at, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-	_, err = file.WriteString(line + "\n")
-	return err
+	return disk.appendTo(at, []byte(line+"\n"))
 }
 
 // The row --say writes, as rowOf shapes it: a level the ladder holds else info, the words on one line and cut, and the extra fields after, the detail cut. [[spec/design_output/log#what-one-line-looks-like]]

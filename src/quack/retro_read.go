@@ -29,7 +29,7 @@ type retroRow struct {
 	text string
 }
 
-func init() { register("retro read", retroReadVerb(retroBox)) }
+func init() { register("retro read", retroReadVerb(quietBox)) }
 
 // The text of a message's content: the string, or its text parts joined. [[spec/tickets/the-retro-finishes-its-asks]]
 func retroTextOf(content any) string {

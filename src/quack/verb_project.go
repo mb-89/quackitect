@@ -6,9 +6,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -26,35 +27,36 @@ const (
 // The flag that reads every target and writes none. [[spec/design_output/projection#check-refuses-a-stale-one]]
 const projectCheck = "--check"
 
-func init() { register("project", projectVerb(index.Root)) }
+func init() { register("project", projectVerb(index.Root, quietBox)) }
 
 // project over the method root the given func answers, and the work root SE_WORK_ROOT names. [[spec/design_output/projection#who-projects-and-when]]
-func projectVerb(root func() (string, error)) twin {
+func projectVerb(root func() (string, error), box func() boxDoors) twin {
 	return func(argv []string, dry bool, out, errs io.Writer) int {
 		method, err := root()
 		if err != nil {
 			fmt.Fprintln(errs, err)
 			return exitFailed
 		}
-		work := strings.TrimSpace(os.Getenv(workRootVar))
+		hand := box()
+		work := strings.TrimSpace(hand.env(workRootVar))
 		if work == "" {
 			work = method
 		}
 		entries := []projector.Entry{}
-		if text, err := os.ReadFile(filepath.Join(method, filepath.FromSlash(projector.Projections))); err == nil {
+		if text, err := hand.disk.read(filepath.Join(method, filepath.FromSlash(projector.Projections))); err == nil {
 			entries = projector.EntriesIn(string(text))
 		}
-		targets := projectDisk{root: work}
+		targets := projectDisk{root: work, disk: hand.disk}
 		var sources projector.Tree = targets
 		if filepath.Clean(method) != filepath.Clean(work) {
-			sources = projector.Inherits(projectDisk{root: method}, targets)
+			sources = projector.Inherits(projectDisk{root: method, disk: hand.disk}, targets)
 		}
 		said := projector.ReadAll(entries, sources, targets)
 		if slices.Contains(argv, projectCheck) {
 			return projectHolds(entries, said, out, errs)
 		}
 		if !dry {
-			if err := projectWrites(work, said); err != nil {
+			if err := projectWrites(hand.disk, work, said); err != nil {
 				fmt.Fprintln(errs, err)
 				return exitFailed
 			}
@@ -112,16 +114,16 @@ func staleIn(wanted, standing map[string]string) []string {
 }
 
 // Writes every wanted target that differs, and removes every standing one nothing wants. [[spec/design_output/projection#who-projects-and-when]]
-func projectWrites(work string, said projector.Result) error {
+func projectWrites(disk diskDoors, work string, said projector.Result) error {
 	for _, path := range projector.Paths(said.Wanted) {
 		at := filepath.Join(work, filepath.FromSlash(path))
-		if err := os.MkdirAll(filepath.Dir(at), projectedFolder); err != nil {
+		if err := disk.makeAll(filepath.Dir(at), projectedFolder); err != nil {
 			return err
 		}
 		if standing, held := said.Standing[path]; held && standing == said.Wanted[path] {
 			continue
 		}
-		if err := os.WriteFile(at, []byte(said.Wanted[path]), projectedFile); err != nil {
+		if err := disk.write(at, []byte(said.Wanted[path]), projectedFile); err != nil {
 			return err
 		}
 	}
@@ -129,7 +131,7 @@ func projectWrites(work string, said projector.Result) error {
 		if _, wanted := said.Wanted[path]; wanted {
 			continue
 		}
-		if err := os.Remove(filepath.Join(work, filepath.FromSlash(path))); err != nil && !os.IsNotExist(err) {
+		if err := disk.remove(filepath.Join(work, filepath.FromSlash(path))); err != nil && !errors.Is(err, fs.ErrNotExist) {
 			return err
 		}
 	}
@@ -137,7 +139,10 @@ func projectWrites(work string, said projector.Result) error {
 }
 
 // The tree under one root on disk. [[spec/design_output/vehicle#the-work-root-inherits]]
-type projectDisk struct{ root string }
+type projectDisk struct {
+	root string
+	disk diskDoors
+}
 
 // The disk path a relative path names under the root. [[spec/design_output/vehicle#the-work-root-inherits]]
 func (one projectDisk) at(path string) string {
@@ -146,19 +151,17 @@ func (one projectDisk) at(path string) string {
 
 // Whether the root holds the path. [[spec/design_output/vehicle#the-work-root-inherits]]
 func (one projectDisk) Exists(path string) bool {
-	_, err := os.Stat(one.at(path))
-	return err == nil
+	return one.disk.stands(one.at(path))
 }
 
 // The text the root holds at the path. [[spec/design_output/vehicle#the-work-root-inherits]]
 func (one projectDisk) Read(path string) string {
-	text, _ := os.ReadFile(one.at(path))
-	return string(text)
+	return one.disk.text(one.at(path))
 }
 
 // The names a folder under the root lists, none where it stands nowhere. [[spec/design_output/vehicle#the-work-root-inherits]]
 func (one projectDisk) List(folder string) []projector.Listed {
-	listed, err := os.ReadDir(one.at(folder))
+	listed, err := one.disk.list(one.at(folder))
 	if err != nil {
 		return nil
 	}

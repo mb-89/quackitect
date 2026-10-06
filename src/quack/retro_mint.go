@@ -64,7 +64,7 @@ type retroMintRecord struct {
 }
 
 func init() {
-	register("retro mint", retroMintVerb(retroBox, retroMintRunOver(realRun(io.Discard, io.Discard))))
+	register("retro mint", retroMintVerb(quietBox, retroMintRunOver(realRun(io.Discard, io.Discard))))
 }
 
 // Runs a program under the root through the box's runner, with ./RUNME.sh read as the root's own, and the env added over the caller's. [[spec/design_output/vehicle#the-work-root-inherits]]

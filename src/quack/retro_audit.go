@@ -11,7 +11,7 @@ import (
 // The process a trial runs, which the audit reads off each ticket. [[spec/design_output/work#an-experiment-decides]]
 const retroAuditExperiment = "spec/processes/experiment"
 
-func init() { register("retro audit", retroAuditVerb(retroBox)) }
+func init() { register("retro audit", retroAuditVerb(quietBox)) }
 
 // Every trial standing open under the root, by name. [[spec/design_output/work#an-experiment-decides]]
 func retroAuditOpenTrials(disk diskDoors, root string) []string {

@@ -13,7 +13,7 @@ import (
 // The report a retro draws. [[spec/guidance/retro/read]]
 const retroReportFile = "report.md"
 
-func init() { register("retro matrix", retroMatrixVerb(retroBox)) }
+func init() { register("retro matrix", retroMatrixVerb(quietBox)) }
 
 // The verb: refuses a column short of its findings, and writes the report. [[spec/guidance/retro/read]]
 func retroMatrixVerb(box func() boxDoors) twin {
