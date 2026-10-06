@@ -89,14 +89,6 @@ func Where(root, key string) (any, string, bool) {
 	return out, layer, layer != ""
 }
 
-// A shared key's value: the default file's, and its built-in where the file sets none, since no box sets a shared key for itself. [[spec/tickets/the-config-schema-gets-generated]]
-func Shared(root, key string) (any, bool) {
-	if said, found := valueIn(read(root, Tracked), key); found {
-		return said, true
-	}
-	return defaultIn(read(root, Schema), key)
-}
-
 // The map a named file holds at a key, read off that file and no layer. [[spec/design_output/config#the-go-reader]]
 func Map(root, path, key string) map[string]string {
 	said, found := valueIn(read(root, path), key)

@@ -5,13 +5,9 @@ package main
 
 import (
 	"encoding/json"
-	"reflect"
 	"strings"
 	"testing"
 )
-
-// The earlier battery report. [[spec/guidance/retro/effect]]
-const retroEffectEarlier = `{"parts":{"tests":1000,"rules":200},"total":1200,"slowest":[{"name":"steady","ms":100},{"name":"leaves","ms":60}]}`
 
 // The later battery report. [[spec/guidance/retro/effect]]
 const retroEffectLater = `{"parts":{"tests":1400,"rules":200},"total":1600,"slowest":[{"name":"steady","ms":110},{"name":"arrives","ms":90}]}`
@@ -83,55 +79,6 @@ func TestRetroEffectWithNoEarlierClassFixesMeasuresNothingAndSaysSo(t *testing.T
 	}
 }
 
-// The effect reads this retro's battery against the last retro's. [[spec/guidance/retro/effect]]
-func TestRetroEffectReadsThisRetrosBatteryAgainstTheLastRetros(t *testing.T) {
-	t.Parallel()
-	root := t.TempDir()
-	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
-	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})
-
-	said := retroBatteryEffectOf(root, "retro-b", "retro-a")
-
-	if said == nil {
-		t.Fatal("the effect reads no battery")
-	}
-	if said.Last != "retro-a" || said.Total != (retroBatteryTotal{Before: 1200, Now: 1600}) {
-		t.Fatalf("the effect reads %+v", said)
-	}
-	if !reflect.DeepEqual(said.Fresh, []retroCase{{Name: "arrives", Ms: 90}}) {
-		t.Fatalf("fresh reads %+v", said.Fresh)
-	}
-	if !reflect.DeepEqual(said.Gone, []retroCase{{Name: "leaves", Ms: 60}}) {
-		t.Fatalf("gone reads %+v", said.Gone)
-	}
-	if !reflect.DeepEqual(said.Slowest, []retroCase{{Name: "steady", Ms: 110}, {Name: "arrives", Ms: 90}}) {
-		t.Fatalf("slowest reads %+v", said.Slowest)
-	}
-}
-
-// A retro with no earlier one reads every part as new, and no report reads as nothing. [[spec/guidance/retro/effect]]
-func TestRetroEffectWithNoEarlierRetroReadsEveryPartAsNewAndNoReportAsNothing(t *testing.T) {
-	t.Parallel()
-	root := t.TempDir()
-	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
-
-	said := retroBatteryEffectOf(root, "retro-b", "")
-
-	if said == nil || said.Last != "" {
-		t.Fatalf("the effect reads %+v", said)
-	}
-	befores := []float64{}
-	for _, one := range said.Parts {
-		befores = append(befores, one.Before)
-	}
-	if !reflect.DeepEqual(befores, []float64{0, 0}) {
-		t.Fatalf("the parts read before %v, want [0 0]", befores)
-	}
-	if got := retroBatteryEffectOf(t.TempDir(), "retro-b", "retro-a"); got != nil {
-		t.Fatalf("no report reads %+v, want nil", got)
-	}
-}
-
 // The first retro has nothing to read against, so its battery stands as the baseline the next one reads. [[spec/guidance/retro/effect]]
 func TestRetroEffectOfAFirstRetroWritesItsBatteryAsTheBaselineAndNamesIt(t *testing.T) {
 	t.Parallel()
@@ -151,19 +98,5 @@ func TestRetroEffectOfAFirstRetroWritesItsBatteryAsTheBaselineAndNamesIt(t *test
 	}
 	if written.Last != "" || written.Battery == nil || !written.Battery.Baseline || written.Battery.Total.Now != 1600 {
 		t.Fatalf("effect.json holds %+v", written)
-	}
-}
-
-// A retro with an earlier one reads no baseline. [[spec/guidance/retro/effect]]
-func TestRetroEffectWithAnEarlierRetroReadsNoBaseline(t *testing.T) {
-	t.Parallel()
-	root := t.TempDir()
-	retroReadingLay(t, root, "retro-b", map[string]string{retroBattery: retroEffectLater})
-	retroReadingLay(t, root, "retro-a", map[string]string{retroBattery: retroEffectEarlier})
-
-	said := retroBatteryEffectOf(root, "retro-b", "retro-a")
-
-	if said == nil || said.Baseline {
-		t.Fatalf("the effect reads %+v, want no baseline", said)
 	}
 }

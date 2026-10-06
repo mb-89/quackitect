@@ -275,17 +275,6 @@ func TestRetroMintNamesAPromotionCarryingNoTicketByItsWhatOrItsPlace(t *testing.
 	}
 }
 
-// A promotion's name reads its what, and its place where the what stands empty. [[spec/tickets/a-promotion-names-its-fault]]
-func TestRetroMintPromotionNameReadsItsWhatOrItsPlace(t *testing.T) {
-	t.Parallel()
-	if got := retroMintPromotionName(retroMintPromotion{What: " the land rule "}, 0); got != `promotion "the land rule"` {
-		t.Fatalf("the name reads %q", got)
-	}
-	if got := retroMintPromotionName(retroMintPromotion{}, 2); got != "promotion 3" {
-		t.Fatalf("the name reads %q", got)
-	}
-}
-
 // A promotion's ticket stands checked by the mint alone: five faults, one a field it lacks. The classes half belongs to retro_classes_test.go. [[spec/tickets/a-promotion-ticket-reads-once]]
 func TestRetroMintChecksAPromotionsTicketAlone(t *testing.T) {
 	t.Parallel()

@@ -180,21 +180,6 @@ func TestWhereAnswersTheBuiltIn(t *testing.T) {
 	}
 }
 
-// A shared key reads the default file over its built-in, and no local file. [[spec/tickets/the-config-schema-gets-generated]]
-func TestSharedReadsTheDefaultFileThenTheBuiltIn(t *testing.T) {
-	root := rootWith(t, map[string]string{
-		Tracked: `{"migration": {"lsp": "shadow"}}`,
-		Local:   `{"migration": {"lsp": "new", "log": "new"}}`,
-		Schema:  `{"properties": {"migration": {"properties": {"lsp": {"default": "old"}, "log": {"default": "old"}}}}}`,
-	})
-	if said, _ := Shared(root, "migration.lsp"); said != "shadow" {
-		t.Fatalf("the lsp slice reads %v, and wants shadow", said)
-	}
-	if said, _ := Shared(root, "migration.log"); said != "old" {
-		t.Fatalf("the log slice reads %v, and wants its built-in old", said)
-	}
-}
-
 // A key the schema leaves out, or names with no default, holds no built-in. [[spec/tickets/the-config-schema-gets-generated]]
 func TestDefaultInHoldsNothingTheSchemaLeavesOut(t *testing.T) {
 	schema := map[string]any{"properties": map[string]any{"names": map[string]any{"properties": map[string]any{"words": map[string]any{"type": "number"}}}}}

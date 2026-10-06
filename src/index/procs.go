@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"      // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
 	"os/exec" // level0: OutsideInDoors - the index manager spawns the processes it places, per the model's process chapter
-	"slices"
 	"sync"
 	"time"
 
@@ -106,12 +105,6 @@ func (p *Placements) answered(instance string, up bool) {
 // Waits the span before the first spawn, so an index stopped inside it spawns nothing. [[spec/tickets/the-system-places-modules]]
 func (p *Placements) After(span time.Duration) *Placements {
 	p.after = span
-	return p
-}
-
-// Names the gap between two spawns, so a case stops the placements between two. [[spec/tickets/the-modules-start-together]]
-func (p *Placements) Gap(span time.Duration) *Placements {
-	p.gap = span
 	return p
 }
 
@@ -268,28 +261,6 @@ func reads(inputs []string, values map[string]any) []string {
 		}
 	}
 	return out
-}
-
-// Restarts the processes holding an instance of the topic, and no other. [[spec/design_output/model#a-module-rebuilds-alone]]
-func (p *Placements) Restart(topic string) error {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	if p.stopped {
-		return nil
-	}
-	for i, placed := range p.placed {
-		if i >= len(p.stops) || !slices.Contains(placed.Topics, topic) {
-			continue
-		}
-		p.stops[i]()
-		stop, err := placed.Start(p.bus, p.store)
-		if err != nil {
-			p.stops[i] = func() {}
-			return fmt.Errorf("%s starts again nowhere: %w", placed.Name, err)
-		}
-		p.stops[i] = stop
-	}
-	return nil
 }
 
 // Spawns the process, lands what it commits, and spawns it again after its wait once it exits. [[spec/design_output/model#a-process-ends]]

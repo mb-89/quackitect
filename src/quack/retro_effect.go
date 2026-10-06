@@ -4,7 +4,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -267,17 +266,6 @@ func retroBatteryValue(root, name, last string) *retroJSDict {
 	}
 	out.set("slowest", slowest)
 	return out
-}
-
-// The two batteries side by side, or nil where this retro holds none. [[spec/guidance/retro/effect]]
-func retroBatteryEffectOf(root, name, last string) *retroBatteryRecord {
-	value := retroBatteryValue(root, name, last)
-	if value == nil {
-		return nil
-	}
-	var out retroBatteryRecord
-	_ = json.Unmarshal([]byte(retroJSStringify(value)), &out)
-	return &out
 }
 
 // The retro before this one holding class fixes, by the time its collect ran. [[spec/guidance/retro/effect]]
