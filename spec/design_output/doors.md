@@ -198,13 +198,17 @@ family carries its fate:
 | a planted tree each case builds | `src/imports/imports_test.go`, `src/imports/analyzers_test.go` | builds once a package run |
 | the quack binary each case builds | `src/quack/manager_test.go` | builds once a package run |
 | the branch verbs over a bare origin and a clone a case | `src/branches/tree_test.go`, `src/branches/dispatch_test.go`, `src/branches/dispatch_write_test.go` | moves onto `FakeGit` and a fake process, under [[spec/tickets/branch-verbs-meet-fake-git]] |
-| the quack verbs spawning git or the binary | `src/quack/*_test.go` reaching `exec.Command` or `os.Args[0]` | moves onto the process door's fake, under [[spec/tickets/quack-spawns-meet-fake-process]] |
+| the quack verbs sleeping, or spawning the binary or go | `src/quack/check_test.go`, `src/quack/cli_test.go`, `src/quack/dump_test.go`, `src/quack/main_test.go`, `src/quack/split_test.go`, `src/quack/waits_test.go` | moves onto the process door's fake, under [[spec/tickets/quack-spawns-meet-fake-process]] |
 | the index and session suites driving the real door alone | `test/contract/index.test.js`, `test/contract/session.test.js` | run the fake beside the real door, under [[spec/tickets/index-session-suites-run-fakes]] |
 | the twins and goldens over the real tree | `src/quack/check_twins_test.go`, `src/quack/golden_test.go` | door tests of the tree the Go and the JavaScript both read |
-| the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go` | door tests of the index door |
-| the quack verbs over a repository a case | `src/quack/commit_test.go` and the ticket verbs' cases | move onto `FakeGit`, under [[spec/tickets/quack-repos-meet-fake-git]] |
+| the index door over a real listener | `src/index/door_test.go`, `src/index/reach_test.go`, `src/index/actions_test.go`, `src/index/failed_start_test.go`, `src/index/watch_test.go` | door tests of the index door |
+| the quack verbs over a repository a case | `src/quack/commit_test.go`, `src/quack/codec_test.go`, `src/quack/landing_test.go`, `src/quack/ticket_bless_test.go`, `src/quack/ticket_open_test.go`, `src/quack/ticket_route_test.go`, `src/quack/verb_mint_test.go` | move onto `FakeGit`, under [[spec/tickets/quack-repos-meet-fake-git]] |
 | the index's own reads of git | `src/index/files_test.go`, `src/index/sweep_test.go` | door tests of the index's git read |
 | the pull over a real repository | `src/pull/pull_test.go` | moves onto `FakeGit`, under [[spec/tickets/pull-meets-fake-git]] |
+| a real file watch stopped mid-add | `src/watcher/watcher_test.go`, `src/watcher/watchertest/watchertest_test.go`, `src/modules/files/watch_stop_test.go` | door tests of the file watch |
+| a wait on a session sleeping in a module test | `src/modules/index/call_test.go` | waits on a signal, under [[spec/tickets/caller-wait-meets-no-sleep]] |
+
+The check reads every code span naming a test file in these tables, and names a Go test that sleeps or spawns a process outside them. [[spec/guidance/code/testing]]
 
 The one state a module holds is `namePatterns` in
 `src/modules/check/private.go`, a memo of a pure compile, and it stands as the

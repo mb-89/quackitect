@@ -4,13 +4,12 @@
 package imports
 
 import (
+	"go/ast"
 	"go/parser"
 	"go/token"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
-	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -19,8 +18,14 @@ import (
 // The note whose tables list every test reaching a real door. [[spec/design_output/doors#one-contract-test-per-door]]
 const doorAudit = "spec/design_output/doors.md"
 
-// A code span in the audit naming a Go test file, or a glob of them.
-var auditedTest = regexp.MustCompile("`([^`]+_test\\.go)`")
+const plantedAudit = "| door | `a/listed_test.go` |\n| family | `b/*_test.go` |\n"
+
+const plantedQuiet = `package p
+
+import "testing"
+
+func TestQuiet(t *testing.T) {}
+`
 
 const plantedWaits = `package p
 
@@ -34,6 +39,7 @@ import (
 func TestWaits(t *testing.T) {
 	time.Sleep(time.Millisecond)
 	_ = run.Command("go")
+	_ = run.CommandContext(nil, "go")
 	_, _ = os.StartProcess("go", nil, nil)
 	_ = time.After(time.Second)
 }
@@ -45,9 +51,31 @@ func TestASleepAndASpawnAreNamedThroughTheirImportNames(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := []string{"time.Sleep", "exec.Command", "os.StartProcess"}
+	want := []string{"time.Sleep", "exec.Command", "exec.CommandContext", "os.StartProcess"}
 	if said := RealWaits(file); !slices.Equal(said, want) {
 		t.Fatalf("the real waits read %v, where %v stand", said, want)
+	}
+}
+
+// A test waiting on the box is named where no span of the audit matches it, by its path or a glob. [[spec/tickets/audit-guard-fires-on-plant]]
+func TestATestWaitingOutsideAPlantedAuditIsNamed(t *testing.T) {
+	t.Parallel()
+	parsed := func(text string) *ast.File {
+		file, err := parser.ParseFile(token.NewFileSet(), "p_test.go", text, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return file
+	}
+	files := map[string]*ast.File{
+		"a/listed_test.go": parsed(plantedWaits),
+		"b/globbed_test.go": parsed(plantedWaits),
+		"c/outside_test.go": parsed(plantedWaits),
+		"c/quiet_test.go":   parsed(plantedQuiet),
+	}
+	want := []string{"c/outside_test.go calls time.Sleep, exec.Command, exec.CommandContext, os.StartProcess"}
+	if said := UnauditedWaits(plantedAudit, files); !slices.Equal(said, want) {
+		t.Fatalf("the guard names %v, where %v stands", said, want)
 	}
 }
 
@@ -58,10 +86,7 @@ func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	listed := []string{}
-	for _, span := range auditedTest.FindAllStringSubmatch(string(note), -1) {
-		listed = append(listed, span[1])
-	}
+	files := map[string]*ast.File{}
 	err = filepath.WalkDir(filepath.Join(root, "src"), func(at string, entry fs.DirEntry, err error) error {
 		if err != nil || entry.IsDir() || !strings.HasSuffix(at, "_test.go") {
 			return err
@@ -75,16 +100,16 @@ func TestEveryTestWaitingOnTheBoxStandsInTheDoorAudit(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		waits := RealWaits(file)
-		if len(waits) > 0 && !slices.ContainsFunc(listed, func(glob string) bool { ok, _ := path.Match(glob, rel); return ok }) {
-			t.Errorf("%s calls %s outside the door tests %s lists, so wait on a fake clock or readiness, or list it there", rel, strings.Join(waits, ", "), doorAudit)
-		}
+		files[rel] = file
 		return nil
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(listed) == 0 {
+	if !strings.Contains(string(note), "_test.go`") {
 		t.Fatalf("%s lists no test file", doorAudit)
+	}
+	for _, line := range UnauditedWaits(string(note), files) {
+		t.Errorf("%s outside the door tests %s lists, so wait on a fake clock or readiness, or list it there", line, doorAudit)
 	}
 }
