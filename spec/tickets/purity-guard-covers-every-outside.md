@@ -131,6 +131,17 @@ record:
         hash: 3856e19de93035cd
         size: 649
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: ffe921e4b02958206339cf1ce3133aabb18f6f47
+    hash_after: ffe921e4b02958206339cf1ce3133aabb18f6f47
+    returns: 1
+    why: the tests name src/owns, which stands on work/doors-declare-what-they-own alone and on no commit of main; depends_on now holds the ticket until that group closes on main
+    answered:
+      - name: tests
+        exit: 1
+        said: FAIL
+depends_on: doors-declare-what-they-own
 ---
 
 # Ask
@@ -268,26 +279,31 @@ done_when 1 is the Discussion table; done_when 2 and 3 meet the walkaround_test.
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+go test ./src/imports
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- none: no test file lands before src/owns stands on main
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+src/owns, owns.yaml and the walkaround analyzer stand on origin/work/doors-declare-what-they-own alone. A test naming owns.Unheld or a run key builds on no commit of this branch, so it fails on the build and never on its own assertion. The ticket now carries depends_on: doors-declare-what-they-own, and tests-red opens on branch sync once that group merges.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+every done_when line meets a test the draft names, and none can fail on its assertion before src/owns lands
+the tests reach no door: they run the walkaround analyzer over planted packages through analysistest, as the doors branch's own cases do
 
 # gate
 
