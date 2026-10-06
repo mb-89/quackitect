@@ -116,8 +116,8 @@ steps:
         says: pass where the view shows the ask's number, or fail with what it shows
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
-group: tests-meet-the-doors-once
-depends_on: ["each-door-meets-one-test"]
+group: unfaked-doors-take-fakes
+depends_on: git-and-process-doors-designed
 step: design/draft
 record:
   - step: design/owner-read
