@@ -12,7 +12,7 @@ var RetroVerbs = []Verb{
 	{Name: "timeline", Doc: "the hours holding work, per source, with the idle stretches between"},
 	{Name: "chapters", Doc: "checks the cuts, and hands every chapter its lines"},
 	{Name: "matrix", Doc: "draws the report: the class fixes first, then the matrix"},
-	{Name: "read", Doc: "every owner prompt, fault and command of the chapter, with its file and line"},
+	{Name: "read", Doc: "every owner prompt, fault, refusal and command of the chapter, with its file and line"},
 	{Name: "effect", Doc: "counts the last retro's class patterns over this input"},
 	{Name: "classes", Doc: "counts each class's rate, and refuses a finding with no disposition"},
 	{Name: "mint", Doc: "mints one ticket a class standing open, and opens each draft"},

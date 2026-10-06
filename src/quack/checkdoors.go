@@ -47,21 +47,7 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 	scripts := filepath.Join(root, "src", "scripts")
 	survey := surveyAt(root)
 	d := checkDoors{root: root, now: time.Now, platform: runtime.GOOS, red: redHere(root), log: appendsRow(root, time.Now), out: out, errs: errs}
-	d.run = func(argv, env []string, quiet bool) (int, string, error) {
-		child := exec.Command(toolOf(survey, argv[0]), argv[1:]...)
-		child.Dir, child.Env = root, append(os.Environ(), env...)
-		var said bytes.Buffer
-		child.Stdout, child.Stderr = out, errs
-		if quiet {
-			child.Stdout, child.Stderr = &said, &said
-		}
-		err := child.Run()
-		var exited *exec.ExitError
-		if errors.As(err, &exited) {
-			return exited.ExitCode(), said.String(), nil
-		}
-		return 0, said.String(), err
-	}
+	d.run = runsUnder(root, survey, out, errs)
 	d.verb = verbOver(d.run, []string{self, "verb", scripts}, []string{lintEnv + "=" + d.at(lintFile)}, errs)
 	d.get = func(where string) ([]byte, error) {
 		answer, err := (&http.Client{Timeout: healthWait}).Get(where)
@@ -84,6 +70,25 @@ func checkDoorsOf(out, errs io.Writer) checkDoors {
 		return strings.TrimSpace(string(said))
 	}
 	return d
+}
+
+// A process under the root. A quiet run keeps both streams, and a loud one prints them and keeps the standard output too, so a red Go run names its cases. [[spec/tickets/ci-reds-name-their-cases]]
+func runsUnder(root string, survey map[string]string, out, errs io.Writer) func(argv, env []string, quiet bool) (int, string, error) {
+	return func(argv, env []string, quiet bool) (int, string, error) {
+		child := exec.Command(toolOf(survey, argv[0]), argv[1:]...)
+		child.Dir, child.Env = root, append(os.Environ(), env...)
+		var said bytes.Buffer
+		child.Stdout, child.Stderr = io.MultiWriter(out, &said), errs
+		if quiet {
+			child.Stdout, child.Stderr = &said, &said
+		}
+		err := child.Run()
+		var exited *exec.ExitError
+		if errors.As(err, &exited) {
+			return exited.ExitCode(), said.String(), nil
+		}
+		return 0, said.String(), err
+	}
 }
 
 // The tools the survey names, each by its path. [[spec/design_output/tools#where-a-caller-looks]]

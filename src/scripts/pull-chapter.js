@@ -18,6 +18,7 @@ import { formatted } from "./pull-format.js";
 import { excludes, handRule, ticketsHere } from "./pull-hand.js";
 import { PERSON, roleOf } from "./pull-hand-of.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
+import { LINK } from "./pull-stale.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 import { notesOf, processNameOf } from "./quack-topic.js";
 import { callOf } from "./tool-call.js";
@@ -196,9 +197,39 @@ export function formFaults(it, one, leaf, chapter, held) {
   return out;
 }
 
+// A list field marked home refuses each line naming no path, link or ticket that stands. [[spec/design_output/pull#the-fields-hold-their-forms]]
+function homeFaults(it, rows, where) {
+  const reads = inherits(it.disk, it.method ?? it.root, it.root);
+  return rows
+    .filter((row) => !namesHome(reads, row))
+    .map((row) => `${where} holds ${row}, which names no path, link or ticket.`);
+}
+
+// A home: a link resolving in the tree, a ticket in backticks, or a backticked path whose file or folder stands. [[spec/design_output/pull#the-fields-hold-their-forms]]
+function namesHome(reads, row) {
+  for (const [, link] of row.matchAll(LINK)) {
+    const said = link.trim();
+    if (reads.exists(said) || reads.exists(`${said}.md`)) return true;
+  }
+  for (const [, said] of row.matchAll(/`([^`]+)`/g)) {
+    if (/\s/.test(said)) continue;
+    if (!said.includes("/")) {
+      if (reads.exists(`spec/tickets/${said}.md`)) return true;
+      continue;
+    }
+    const folder = said.replace(/\/?[^/]*$/, "");
+    if (reads.exists(said) || (folder && folder !== "." && reads.exists(folder)))
+      return true;
+  }
+  return false;
+}
+
 // [[spec/design_output/pull#the-fields-hold-their-forms]]
 export function formFault(it, field, rows, where, one, held) {
   const form = String(field.form ?? "text");
+  if (form === "list" && rows.length && field.home === true) {
+    return homeFaults(it, rows, where);
+  }
   if (form === "text" || form === "list") {
     return rows.length
       ? []
