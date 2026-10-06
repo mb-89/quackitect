@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: d61667ab708468915f23383e7624f7d34e423686
+    hash_after: d61667ab708468915f23383e7624f7d34e423686
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "  100.4  in all"
+    inputs:
+      - name: design/tests-red
+        hash: f28dd0498cc38dea
+        size: 514
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -340,26 +363,33 @@ pass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/clock_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The wait cases in src/quack/waits_test.go polled served.Of through time.Sleep until an op ended, so a loaded box could turn them red. The manager saves each op as JSON through its op table, and an ended op lands there with its end. The cases now hand the manager a savedTable, which passes each saved row to the case, and ended reads the end off that row with no clock. The table takes one lock over its saves, reads and drops, and a full hand drops a row and never stalls the manager. The row for waits_test.go leaves the family table in the doors chapter, and the real-wait guard holds the file to no sleep.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches waits_test.go, and doors.md lost its row at tests-red
+- the cases reach no door
+- savedTable and ended point at this ticket
+- the saves a case holds stand once, as savesHeld
 
 # accept
 
