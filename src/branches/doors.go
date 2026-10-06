@@ -156,6 +156,15 @@ func (d *Doors) remove(rel string) {
 	_ = d.Disk.Remove(rel)
 }
 
+// A file at a whole path, or nothing where none stands. [[spec/design_output/doors#one-door-per-outside-thing]]
+func readFile(at string) string {
+	said, err := os.ReadFile(at)
+	if err != nil {
+		return ""
+	}
+	return string(said)
+}
+
 // The value of a box variable, the doors' env over the process's own. [[spec/design_output/pull#the-hand-rule]]
 func (d *Doors) env(key string) string {
 	if said, ok := d.Env[key]; ok {
