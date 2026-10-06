@@ -291,3 +291,24 @@ func TestTheExtensionsAreTheOnesTheTrackedSettingsRecommend(t *testing.T) {
 		t.Errorf("the settings recommend %v, the setup installs %v", said.Recommendations, editorExtensions)
 	}
 }
+
+// The setup workflow's last step runs the setup with --cloud, which writes the registrations and the cloud mark where no editor stands. [[spec/tickets/copilot-hooks-run-in-go]]
+func TestTheSetupVerbWritesTheCloudMarkUnderCloud(t *testing.T) {
+	t.Parallel()
+	d, runner, _, _ := setupBox(t, nil)
+	env := heldTree(t, d)
+	d.env = func(key string) string { return env[key] }
+	runner.answers["code"] = ranResult{missing: true}
+	runner.answers["code-insiders"] = ranResult{missing: true}
+	if code := setupVerb(d, []string{"--cloud"}); code != 0 {
+		t.Fatalf("the setup answers %d", code)
+	}
+	if mark, _ := readText(filepath.Join(d.root, filepath.FromSlash(copilotCloudMark))); mark != "cloud\n" {
+		t.Errorf("the cloud mark reads %q, and wants cloud under --cloud", mark)
+	}
+	for _, one := range copilotRegistrations() {
+		if !stands(filepath.Join(d.root, filepath.FromSlash(one.name))) {
+			t.Errorf("%s stands not under --cloud", one.name)
+		}
+	}
+}

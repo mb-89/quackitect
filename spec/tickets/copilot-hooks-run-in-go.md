@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: javascript-leaves
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,19 @@ record:
         hash: e1dd042af4ef6bcc
         size: 765
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box fb4ccb7cacc7 · claude-code-remote
+    hash_before: 428dc104b45b1432a432eb6a52acb4dcde7531b3
+    hash_after: 428dc104b45b1432a432eb6a52acb4dcde7531b3
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/quack fails
+    inputs:
+      - name: design/draft
+        hash: 517c62490a836544
+        size: 5375
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -285,26 +298,41 @@ Assumed: Copilot runs a hook at the root under a POSIX shell, and a box lacking 
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test src/quack/hook_verb_test.go
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- src/quack/hook_verb_test.go
+- src/quack/setup_verb_test.go
+- src/modules/hooks/copilot_test.go
+- src/modules/hooks/down_test.go
+- src/modules/edits/mutations_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+All seventeen tests the draft names fail on their own assertion, against stubs that return zero values.
+
+- The retry fault comes from a failing log, since a down door never faults: it refuses a guarded call or lets it through.
+- The real door's test runs the ask against a loopback test server, the one way to check the bearer token and the standing file.
+- The test builds the script path from parts, or its own grep would keep it red.
+- No Go port of the down door stood, so down.go ports it fresh.
+- ReplyOf returns a map, so a reply of nothing and an empty object stay apart.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- TestCopilotScriptsLeave and TestCopilotHooksNameNoScript fail on lines one and two, the TestHook cases on line three, and a live check answers line four
+- the hooks door, the log and the clock reach the tests as fakes, and the one real door case runs against a loopback test server
 
 # gate
 
