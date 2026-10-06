@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,24 @@ process_hash: 2b5ab398855a1aba
 group: code-is-pure-tests-behave
 depends_on: [black-box-tests-guard-reports]
 step: do
+record:
+  - step: do
+    hand: box 7b5a2726379b · claude-code-remote
+    hash_before: c4521dd1216f67e327e61ab6df5f31a10c65b09e
+    hash_after: c4521dd1216f67e327e61ab6df5f31a10c65b09e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/imports passes
+      - name: check
+        exit: 0
+        said: "  111.4  in all"
+    inputs:
+      - name: ask
+        hash: eeec35f4d88525d7
+        size: 597
+    def: df12650931d480c9
+reason: done
 ---
 
 # Ask
@@ -50,26 +68,32 @@ The baseline stands whole, and the guard holds new files alone.
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/imports/blackbox_test.go
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+No new code. The go-fixtures-move-home sweep (c4521dd) already meets this ask. The black-box baseline src/imports/baseline/blackbox.txt names no test file of src/imports, src/index, src/branches or src/quack. Every in-package test file in those four packages carries `// level0: InPackageTest - <why>`, and none stands unmarked, so no file waits on a sibling group ticket. The black-box guard tests pass, and ./RUNME.sh check exits 0 on c4521dd, which matches origin.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change follows the ask: each done_when line holds on c4521dd, by a baseline read and a per-file marker scan
+the cleanup: none revealed; the MagicNumber warnings in src/voice stand at warning, outside this ask
+one place: the baseline file owns the list, and this ticket points at it
 
 # Discussion
 
