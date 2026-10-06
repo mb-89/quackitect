@@ -124,10 +124,15 @@ func namesABranch(command string) bool {
 	return false
 }
 
-// The desk guard's text, off deskRefusal in lib/cloud.js. [[spec/design_output/work#a-desk-works-on-trunk]]
+// The message a desk refusal builds, off deskSaid in lib/cloud.js, before the failure door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func DeskSaid(what string) string {
+	return "A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + "."
+}
+
+// The desk refusal's text, off deskRefusal in lib/cloud.js, which the commit verb prints. [[spec/design_output/work#a-desk-works-on-trunk]]
 func DeskRefusal(what string) string {
 	return strings.Join([]string{
-		"A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + ".",
+		DeskSaid(what),
 		"Run git switch " + Trunk + ", and take a finished cloud branch in with ./RUNME.sh branch merge <name>.",
 	}, "\n")
 }

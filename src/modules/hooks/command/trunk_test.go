@@ -3,7 +3,21 @@
 // [[spec/tickets/cage-commit-guards-port]]
 package command
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
+
+// [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func TestDeskSaidBuildsTheMessageTheDeskRefusalOpensOn(t *testing.T) {
+	said := DeskSaid("this push lands nowhere on work/one")
+	if want := "A desk works on main alone, and a cloud box works each work/ branch, so this push lands nowhere on work/one."; said != want {
+		t.Errorf("DeskSaid answers %q, want %q", said, want)
+	}
+	if first, _, _ := strings.Cut(DeskRefusal("this push lands nowhere on work/one"), "\n"); first != said {
+		t.Errorf("the desk refusal opens on %q, want %q", first, said)
+	}
+}
 
 func TestTouchesGitReadsNestedGit(t *testing.T) {
 	for _, one := range []struct {

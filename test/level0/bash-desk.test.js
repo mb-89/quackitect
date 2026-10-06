@@ -11,6 +11,12 @@ import { NAMED, named, VERB_ALONE } from "./fixtures.js";
 
 const ROOT = "/tree";
 
+// The node the desk refusal raises, seeded so the door reads its remedy off the fake disk. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+const DESK_NODE = {
+  [`${ROOT}/spec/failures/desk-works-on-trunk.md`]:
+    '---\nkind: [[failure]]\nlevel: warn\nremedies: ["Run git switch main, and take a finished cloud branch in."]\n---\n\n# When\n\nA desk lands work on a work branch.\n',
+};
+
 // A call names its ticket at the head of its description, so a case wraps its command with the shared open one. [[spec/design_output/level0#a-shell-names-its-ticket]]
 const call = (command) => ({ command, description: `${NAMED}: drives the door` });
 
@@ -18,7 +24,7 @@ const call = (command) => ({ command, description: `${NAMED}: drives the door` }
 function box(branch, env = {}) {
   return {
     env,
-    disk: fakeDisk(named(ROOT)),
+    disk: fakeDisk({ ...named(ROOT), ...DESK_NODE }),
     proc: fakeProc({
       "git rev-parse --abbrev-ref HEAD": { stdout: `${branch}\n` },
       "git rev-parse -q --verify MERGE_HEAD": { stdout: "", exitCode: 1 },
@@ -33,10 +39,11 @@ function box(branch, env = {}) {
 const denied = (said) => String(said?.result?.deny ?? "");
 
 // [[spec/design_output/work#a-desk-works-on-trunk]]
-test("a desk's raw commit on a work branch refuses, and names main", async () => {
+test("a desk's raw commit on a work branch refuses through the failure door, and names main", async () => {
   const said = denied(await onBash(call("git commit -m x"), box("work/a-thing")));
   assert.match(said, /A desk works on main alone/);
-  assert.match(said, /git switch main/);
+  assert.match(said, /^failure desk-works-on-trunk at warn$/m);
+  assert.match(said, /^remedy: Run git switch main/m);
 });
 
 // [[spec/design_output/work#a-desk-works-on-trunk]]

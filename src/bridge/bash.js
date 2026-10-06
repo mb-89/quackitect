@@ -3,6 +3,7 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { join } from "node:path";
+import { failure } from "../doors/failure.js";
 import { indexToolsOf } from "./index-tools.js";
 import {
   commitIn,
@@ -14,7 +15,7 @@ import {
 } from "../../.claude/skills/level0/lib/bash.js";
 import {
   cloudHere,
-  deskRefusal,
+  deskSaid,
   onDesk,
 } from "../../.claude/skills/level0/lib/cloud.js";
 import { RULE as GIT_WRITE } from "../../.claude/skills/level0/lib/git-writes.js";
@@ -308,18 +309,16 @@ function versionGuard(command, _e, box) {
   return refusedVersion(found);
 }
 
-// A desk lands nothing on a work branch, and the verbs read the same answer. [[spec/design_output/work#a-desk-works-on-trunk]]
-function deskGuard(command, _e, box) {
+// A desk lands nothing on a work branch, and the refusal raises its node through the failure door, which writes its row. [[spec/design_output/work#a-desk-works-on-trunk]] [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+async function deskGuard(command, _e, box) {
   const touched = touchesGit(command);
   if (!touched.commits && !touched.pushes) return "";
   const branch = git(box, ["rev-parse", "--abbrev-ref", "HEAD"]);
   if (!onDesk(box, branch)) return "";
   const how = touched.commits ? "commit" : "push";
-  box.log.say("warn", "bash", `refused a ${how} on ${branch} at a desk`, {
-    tool: "Bash",
-    detail: command,
-  });
-  return deskRefusal(`this ${how} lands nowhere on ${branch}`).join("\n");
+  const failures = failure(box.disk, box.log, box.work);
+  const said = deskSaid(`this ${how} lands nowhere on ${branch}`);
+  return (await failures.raise("desk-works-on-trunk", said)).join("\n");
 }
 
 // [[spec/design_output/work#a-box-writes-its-branch]]

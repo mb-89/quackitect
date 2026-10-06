@@ -23,9 +23,14 @@ export function onDesk(it, branch) {
 }
 
 // [[spec/design_output/work#a-desk-works-on-trunk]]
+// The message a desk refusal builds, before the door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+export function deskSaid(what) {
+  return `A desk works on ${TRUNK} alone, and a cloud box works each ${WORK_BRANCH} branch, so ${what}.`;
+}
+
 export function deskRefusal(what, name = "<name>") {
   return [
-    `A desk works on ${TRUNK} alone, and a cloud box works each ${WORK_BRANCH} branch, so ${what}.`,
+    deskSaid(what),
     `Run git switch ${TRUNK}, and take a finished cloud branch in with ./RUNME.sh branch merge ${name}.`,
   ];
 }

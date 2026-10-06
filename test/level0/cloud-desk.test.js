@@ -8,6 +8,7 @@ import * as applied from "../../.claude/skills/level0/lib/apply.js";
 import {
   cloudHere,
   deskRefusal,
+  deskSaid,
   onDesk,
 } from "../../.claude/skills/level0/lib/cloud.js";
 import {
@@ -44,6 +45,16 @@ test("a desk's refusal says what stands undone, and names main and the merge", (
   assert.match(said, /git switch main/);
   assert.match(said, /\.\/RUNME\.sh branch merge one-group/);
   assert.match(deskRefusal("x").join("\n"), /branch merge <name>/);
+});
+
+// [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+test("deskSaid builds the message alone, and the desk refusal opens on it", () => {
+  const said = deskSaid("this commit lands nowhere on work/one-group");
+  assert.equal(
+    said,
+    "A desk works on main alone, and a cloud box works each work/ branch, so this commit lands nowhere on work/one-group.",
+  );
+  assert.equal(deskRefusal("this commit lands nowhere on work/one-group")[0], said);
 });
 
 // A reader holding the doors' flag answers the way the Bash door does. handDoors in src/scripts/pull-hand-of.js reads inCloud, because it sets that flag. [[spec/tickets/each-fact-keeps-one-owner]]
