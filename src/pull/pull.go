@@ -223,8 +223,9 @@ func (it *It) Pull(argv []string) int {
 		return it.takeBack(who, name, said.reason)
 	}
 	// A working todo holds the hand as a ticket does, so the pull answers it ahead of every road that hands work out. [[spec/tickets/the-todo-road-stands-first]]
-	working := it.workingTodo()
-	todo := working
+	// A helper's --as binds to the ticket the plan names, which holds no plain pull. [[spec/tickets/helpers-keep-the-plan-ticket]]
+	working := it.planWorking()
+	todo := it.workingTodo()
 	if held != nil || said.said != "" {
 		todo = ""
 	}

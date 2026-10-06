@@ -235,8 +235,16 @@ func (it *It) writeHold(hand string, held Hold) {
 
 func (it *It) dropHold(hand string) { it.remove(holdAt(hand)) }
 
-// The working todo the plan names. [[spec/tickets/the-todo-joins-the-queue]]
+// The working todo the plan names, which a ticket's name holds no pull behind. [[spec/tickets/pull-hands-the-working-ticket]]
 func (it *It) workingTodo() string {
+	if working := it.planWorking(); !namesTicket(it.Disk, working) {
+		return working
+	}
+	return ""
+}
+
+// The todo or the ticket the plan's working line names. [[spec/tickets/the-todo-joins-the-queue]]
+func (it *It) planWorking() string {
 	var plan struct {
 		Working string `json:"working"`
 	}

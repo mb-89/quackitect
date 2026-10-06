@@ -238,6 +238,14 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the pull answers %d:\n%s", code, out)
 		}
 	})
+	t.Run("a helper's --as takes the ticket the plan names over the queue head", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		_ = it.Disk.Write("spec/tickets/beta.md", childTicket)
+		_ = it.Disk.Write(planFile, `{"working":"beta"}`)
+		if code := it.Pulling([]string{"pull", "--as", "helper-1"}); code != 0 || !strings.HasPrefix(out.String(), "work  beta at do") {
+			t.Fatalf("the pull answers %d:\n%s", code, out)
+		}
+	})
 	t.Run("a working todo that is no ticket still holds the pull", func(t *testing.T) {
 		it, out, _ := cloudPull(t)
 		_ = it.Disk.Write(planFile, `{"working":"mend the lint"}`)
