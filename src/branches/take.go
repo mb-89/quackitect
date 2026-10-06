@@ -75,10 +75,9 @@ func (d *Doors) markOff(branch string) string {
 	return said.Out
 }
 
-// The refusal a desk meets where a verb moves it onto a work branch. [[spec/design_output/work#a-desk-works-on-trunk]]
-func deskRefusal(what string) string {
-	return "A desk works on " + trunk + " alone, and a cloud box works each " + workBranch + " branch, so " + what + ".\n" +
-		"Run git switch " + trunk + ", and take a finished cloud branch in with ./RUNME.sh branch merge <name>."
+// The message a desk refusal raises, before the failure door adds the id and the remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+func deskSaid(what string) string {
+	return "A desk works on " + trunk + " alone, and a cloud box works each " + workBranch + " branch, so " + what + "."
 }
 
 // Takes the next free branch, or the one named, and writes the claim. [[spec/design_output/work#why-a-routine-needs-this]]
@@ -88,7 +87,7 @@ func take(d *Doors, name string, argv []string) int {
 		name = word(argv, 2)
 	}
 	if !d.cloud() {
-		d.raises(failure.Raise(d.Failures, "desk-works-on-trunk", deskRefusal("branch take moves this box onto no branch")))
+		d.raises(failure.Raise(d.Failures, "desk-works-on-trunk", deskSaid("branch take moves this box onto no branch")))
 		return codeRefused
 	}
 	if d.dirty("") {

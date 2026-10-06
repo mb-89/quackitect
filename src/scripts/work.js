@@ -2,7 +2,8 @@
 // group ticket at spec/tickets/<name>.md.
 // [[spec/design_output/work#the-round-trip]]
 
-import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere, DESK_FAILURE, deskSaid } from "../../.claude/skills/level0/lib/cloud.js";
+import { failure } from "../doors/failure.js";
 import {
   STAMP,
   saysGreen,
@@ -211,7 +212,8 @@ function tell(it, what, code) {
 function take(it, name = "") {
   // A desk takes a cloud branch in by a merge alone, so it takes no branch at all. [[spec/design_output/work#a-desk-works-on-trunk]]
   if (!cloudHere(it)) {
-    console.error(deskRefusal("branch take moves this box onto no branch").join("\n"));
+    const said = deskSaid("branch take moves this box onto no branch");
+    console.error(failure(it.disk, it.log, it.root).lines(DESK_FAILURE, said).join("\n"));
     return 2;
   }
   if (dirty(it)) return 2;

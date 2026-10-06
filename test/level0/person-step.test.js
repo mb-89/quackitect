@@ -11,6 +11,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { onward } from "../../src/scripts/pull-writes.js";
 import { pulling } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
+import { DESK_NODE } from "./work-doors.js";
 
 const ROOT = "/tree";
 const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
@@ -96,6 +97,7 @@ function doors(more = {}) {
     [at(".se/.runtime/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
     [at("spec/tickets/one-group.md")]: GROUP,
     [at("spec/tickets/a-child.md")]: ASKS,
+    ...DESK_NODE,
   });
   return {
     proc: said.proc,

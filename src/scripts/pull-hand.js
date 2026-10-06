@@ -2,7 +2,8 @@
 // The offer, the hold, and the rules a hand meets on its way to one.
 // [[spec/design_output/pull#the-hand-out]]
 
-import { cloudHere, deskRefusal } from "../../.claude/skills/level0/lib/cloud.js";
+import { cloudHere, DESK_FAILURE, deskSaid } from "../../.claude/skills/level0/lib/cloud.js";
+import { failure } from "../doors/failure.js";
 import { entryNamed, ROUND } from "../../.claude/skills/level0/lib/schema.js";
 import { reRouted } from "../../.claude/skills/level0/lib/schema-mint.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
@@ -247,14 +248,17 @@ export function namedGroup(it, name) {
 export function branchTaken(it, named) {
   if (cloudHere(it)) return it.take(named);
   // A desk takes a cloud branch in by a merge alone. [[spec/design_output/work#a-desk-works-on-trunk]]
-  if (named) return deskRefused(`the pull takes no branch for ${named}`, named);
+  if (named) return deskRefused(it, `the pull takes no branch for ${named}`);
   // A done cloud branch stands ahead of the queue on a desk. [[spec/design_output/pull#an-empty-queue-hands-cleanup]]
   return it.ready?.() ? 0 : null;
 }
 
-// [[spec/design_output/work#a-desk-works-on-trunk]]
-export function deskRefused(what, name) {
-  say(REFUSED, deskRefusal(what, name));
+// The pull answers its code at once, so it prints the door's lines, and the row rides beside where a log stands. [[spec/tickets/the-twins-leave-whole]]
+export function deskRefused(it, what) {
+  const failures = failure(it.disk, it.log, it.root);
+  const said = deskSaid(what);
+  if (it.log) void failures.raise(DESK_FAILURE, said);
+  say(REFUSED, failures.lines(DESK_FAILURE, said));
   return 2;
 }
 

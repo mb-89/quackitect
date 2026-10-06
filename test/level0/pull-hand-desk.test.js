@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { pulling } from "../../src/scripts/work.js";
 import {
+  DESK_NODE,
   doorsSaying,
   GROUP_NOTE,
   groupRemote,
@@ -16,11 +17,6 @@ import {
   ROOT,
   ranGit,
 } from "./work-doors.js";
-
-const DESK_NODE = {
-  [`${ROOT}/spec/failures/desk-works-on-trunk.md`]:
-    '---\nkind: [[failure]]\nlevel: warn\nremedies: ["Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."]\n---\n\n# When\n\nA desk works a work branch.\n',
-};
 
 // The refusal raises its node through the failure door, so its remedy prints once. [[spec/tickets/the-twins-leave-whole]]
 test("a desk's pull raises desk-works-on-trunk, and prints its remedy once", () => {
@@ -42,6 +38,7 @@ test("a desk's pull on a work branch refuses, names main, and asks git nothing p
   const { it, outside } = doorsSaying(onBranch("work/one-group"), {
     [on("one-group")]: GROUP_NOTE,
     ...HAND,
+    ...DESK_NODE,
   });
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], { ...it, cloud: false }));

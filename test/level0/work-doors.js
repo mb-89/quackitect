@@ -105,6 +105,11 @@ Nothing yet.
 export const HAND = {
   [join(ROOT, ".se/.runtime/identity.json")]: JSON.stringify({ id: "d462e994b4cef" }),
 };
+// The node a desk refusal raises, which holds the remedy the refusal prints. [[spec/tickets/the-twins-leave-whole]]
+export const DESK_NODE = {
+  [join(ROOT, "spec/failures/desk-works-on-trunk.md")]:
+    '---\nkind: [[failure]]\nlevel: warn\nremedies: ["Run git switch main, and take a finished cloud branch in with ./RUNME.sh branch merge <name>."]\n---\n\n# When\n\nA desk works a work branch.\n',
+};
 export const GROUP_AT = "spec/tickets/one-group.md";
 export const on = (name) => join(ROOT, `spec/tickets/${name}.md`);
 

@@ -129,14 +129,6 @@ func DeskSaid(what string) string {
 	return "A desk works on " + Trunk + " alone, and a cloud box works each " + WorkBranch + " branch, so " + what + "."
 }
 
-// The desk refusal's text, off deskRefusal in lib/cloud.js, which the commit verb prints. [[spec/design_output/work#a-desk-works-on-trunk]]
-func DeskRefusal(what string) string {
-	return strings.Join([]string{
-		DeskSaid(what),
-		"Run git switch " + Trunk + ", and take a finished cloud branch in with ./RUNME.sh branch merge <name>.",
-	}, "\n")
-}
-
 // Whether the check's stamp answers green on the sha, and what it says, off stampOf and saysGreen in lib/runs.js. A stamp standing nowhere says no check ran. [[spec/design_output/work#the-battery-answers-first]]
 func Battery(stamp string, stands bool, sha string) (bool, string) {
 	const none = "no check has run here"

@@ -28,12 +28,8 @@ export function deskSaid(what) {
   return `A desk works on ${TRUNK} alone, and a cloud box works each ${WORK_BRANCH} branch, so ${what}.`;
 }
 
-export function deskRefusal(what, name = "<name>") {
-  return [
-    deskSaid(what),
-    `Run git switch ${TRUNK}, and take a finished cloud branch in with ./RUNME.sh branch merge ${name}.`,
-  ];
-}
+// The node a desk refusal raises, which holds its remedy. [[spec/design_output/failures#the-refusals-move-onto-nodes]]
+export const DESK_FAILURE = "desk-works-on-trunk";
 
 function truthy(said) {
   const held = String(said ?? "")

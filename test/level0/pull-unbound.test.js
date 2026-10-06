@@ -7,6 +7,7 @@ import { test } from "node:test";
 import { startOf } from "../../src/scripts/serve.js";
 import { pulling } from "../../src/scripts/work.js";
 import {
+  DESK_NODE,
   doorsSaying,
   GROUP_NOTE,
   groupRemote,
@@ -22,7 +23,7 @@ const SOON = GROUP_NOTE.replace("urgent: true\n", "");
 function onTrunk() {
   const said = doorsSaying(
     { ...groupRemote(SOON), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-    { [on("one-group")]: SOON, ...HAND },
+    { [on("one-group")]: SOON, ...HAND, ...DESK_NODE },
   );
   said.outside.proc.teach(startOf(ROOT), { exitCode: 0 });
   return said;
@@ -56,7 +57,8 @@ test("a desk on trunk at unbound naming a group passes the gate, and meets the m
   );
   assert.equal(asked.code, 2, asked.said);
   assert.doesNotMatch(asked.said, /binds to unbound/, "the gate lets it through");
-  assert.match(asked.said, /branch merge one-group/);
+  assert.match(asked.said, /no branch for one-group/);
+  assert.match(asked.said, /branch merge <name>/);
   assert.ok(!ranGit(named.outside).some((one) => one.startsWith("git switch")));
 });
 

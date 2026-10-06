@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { work } from "../../src/scripts/work.js";
 import {
+  DESK_NODE,
   doorsSaying,
   GROUP_NOTE,
   groupRemote,
@@ -21,7 +22,7 @@ import {
 test("branch take on a desk refuses, names main, and asks git nothing", () => {
   const { it, outside } = doorsSaying(
     { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
-    { [on("one-group")]: GROUP_NOTE, ...HAND },
+    { [on("one-group")]: GROUP_NOTE, ...HAND, ...DESK_NODE },
   );
 
   const { code, said } = heard(() => work(ROOT, ["take", "one-group"], it));

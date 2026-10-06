@@ -98,7 +98,7 @@ export function pull(it, argv) {
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const onTrunk = branch === TRUNK;
   // A desk works on trunk alone, so its pull on a work branch reads nothing further. [[spec/design_output/work#a-desk-works-on-trunk]]
-  if (onDesk(it, branch)) return deskRefused(`the pull hands nothing out on ${branch}`);
+  if (onDesk(it, branch)) return deskRefused(it, `the pull hands nothing out on ${branch}`);
   if (!onTrunk && !branch.startsWith("work/")) {
     console.error(
       `ticket pull runs on ${TRUNK} or a work branch, and this is ${branch}.`,
