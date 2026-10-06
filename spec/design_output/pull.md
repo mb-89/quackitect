@@ -344,6 +344,10 @@ stands before, or one of the words below:
 A todo of the plan stands before every ticket. It anchors at `true` or on
 another todo of the plan, and any other anchor reads as `last`.
 
+A box on a work branch takes a tagged ticket of its own group, or a private
+note, and no other. A gate parks its points under `todo` in its own group, so
+another group's box meets none of them.
+
 The place moves as the queue drains, because the todo holds the order and
 no number. Todos of the plan tied on every score keep the order the plan
 writes them in. The work tab posts `work/place` under `p` and a digit, the pull hands a

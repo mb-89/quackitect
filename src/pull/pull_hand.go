@@ -127,6 +127,21 @@ func (it *It) ticketsHere() []*Held {
 	return out
 }
 
+// The parked tickets a group's box takes: a private note, or a child of the group, since a gate parks its points under todo in its own group. [[spec/design_output/pull#a-todo-forces-a-place]]
+func taggedUnder(tagged, children []*Held) []*Held {
+	mine := map[*Held]bool{}
+	for _, one := range children {
+		mine[one] = true
+	}
+	out := []*Held{}
+	for _, one := range tagged {
+		if one.Private || mine[one] {
+			out = append(out, one)
+		}
+	}
+	return out
+}
+
 // The tickets a tag parks for the next pull. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 func taggedIn(list []*Held) []*Held {
 	out := []*Held{}
@@ -229,7 +244,8 @@ func (it *It) handOut(who *Who) int {
 	}
 	var pools [][]*Held
 	if who.Group != "" {
-		pools = append([][]*Held{tagged, it.sorted(heldChildren(all, who.Group), all)}, late...)
+		children := heldChildren(all, who.Group)
+		pools = append([][]*Held{taggedUnder(tagged, children), it.sorted(children, all)}, late...)
 	} else {
 		pools = [][]*Held{tagged, it.sorted(freeIn(all), all), notes}
 		it.cutForGroups(all)

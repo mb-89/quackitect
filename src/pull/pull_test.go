@@ -144,6 +144,15 @@ func TestPull(t *testing.T) {
 			t.Fatalf("the hold reads %+v", held)
 		}
 	})
+	// A gate parks its points under todo in the gate's own group, and another group's box takes none of them. [[spec/design_output/pull#a-todo-forces-a-place]]
+	t.Run("a parked ticket of another group stands past the group's own leaf", func(t *testing.T) {
+		it, out, _ := cloudPull(t)
+		foreign := strings.Replace(childTicket, "group: g\n", "group: h\ntodo: true\n", 1)
+		_ = it.Disk.Write("spec/tickets/beta.md", foreign)
+		if code := it.Pulling([]string{"pull"}); code != 0 || !strings.HasPrefix(out.String(), "work  alpha at do, leaf 1 of 1") {
+			t.Fatalf("the pull answers %d, and wants the group's own leaf:\n%s", code, out)
+		}
+	})
 	t.Run("a second pull refuses while one ticket stands in hand", func(t *testing.T) {
 		it, _, errs := cloudPull(t)
 		it.Pulling([]string{"pull"})

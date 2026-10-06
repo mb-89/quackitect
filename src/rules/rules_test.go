@@ -100,8 +100,8 @@ func TestTheMarkupHidesCodeAndFront(t *testing.T) {
 		t.Fatalf("the shouted lead answers %+v, and wants one row at 1:1-25", found)
 	}
 	for name, text := range map[string]string{
-		"a code block":    "Read this.\n\n```\nTHIS IS THE SHOUTED PART, and it follows.\n```\n",
-		"a code span":     "`THIS IS THE SHOUTED PART`, and it follows.\n",
+		"a code block":     "Read this.\n\n```\nTHIS IS THE SHOUTED PART, and it follows.\n```\n",
+		"a code span":      "`THIS IS THE SHOUTED PART`, and it follows.\n",
 		"the front matter": "---\ntitle: THIS IS THE SHOUTED PART, and it follows.\n---\n\nA line.\n",
 	} {
 		if found := ofRule(set.Lint(path, text), shouted); len(found) > 0 {
