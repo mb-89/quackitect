@@ -86,7 +86,16 @@ record:
   - step: sync
     hand: box 83c32b2b4d58 · claude-code-remote
     hash_before: c70c49dbe92c3c738ff866a2756c07420dc63ac0
-step: sync
+  - step: sync
+    hand: box 83c32b2b4d58 · claude-code-remote · helper-4
+    hash_before: 6ab5fa3bd4e1d3ccad53142e2f33d8873cc0cbd7
+    hash_after: 39484e1270aee1ef497f00d4ff06627bf71fd02b
+    answered:
+      - name: sync
+        exit: 0
+        said: work/failures-stand-registered already carries every commit on main.
+    def: 8a9850a81227554b
+step: split
 ---
 
 # Ask
@@ -109,8 +118,9 @@ Every failure the tree raises takes its registered name, the way a log call take
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
