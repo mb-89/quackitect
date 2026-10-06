@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -144,6 +144,16 @@ record:
         hash: 310d2ddd3fe31ac9
         size: 36
     def: 1246a42e29e7ae98
+  - step: retro/cloud
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: b4744d918a5b653e36973c48685829e3d9059d37
+    hash_after: b4744d918a5b653e36973c48685829e3d9059d37
+    inputs:
+      - name: retro/write
+        hash: 0a463b0335f6ff95
+        size: 3899
+    def: 4da1ca5da87d5bbc
+reason: done
 ---
 
 # Ask
@@ -294,20 +304,27 @@ The draft of each follow-up named work past its own ask, and every name it spoke
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- none: every tool the box survey names answered, and no host or right was refused in this window
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the commit door refused code with no test beside it twice, at 17:53 and 18:49 UTC, and a contract row answered each
+- LandingFollowsItsGate refused a ticket pull or commit chained after another command four times, and each ran alone after
+- the engine refused calls until the plan answered its three questions, several times
+- no conflict at sync and no test failing on this box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted with no group
+- the handover names the branch at done and the pull request against main with auto-merge on
 
 # Discussion
 
