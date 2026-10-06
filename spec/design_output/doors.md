@@ -189,6 +189,7 @@ declaration. A new door adds its declaration and nothing else.
 | `files` | the door's files, under the folder. With none named, every file standing in the folder is the door |
 | `contract` | the door's contract tests, as paths from the root. For details, see [[spec/design_output/doors#a-door-names-its-contract-tests]] |
 | `report` | `true` while walk-arounds of the door remain, so the guard lists them and refuses none |
+| `outside` | `true` where the files are their own outside, as a page bundle or a prototype no node door reaches. The names stand owned inside those files and nowhere else, and the doors verb lists each file |
 
 Several doors may own one name. A package's `door.go` owns `os` beside the
 files IO module, and each reads the disk for its own package.

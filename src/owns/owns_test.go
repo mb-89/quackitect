@@ -162,6 +162,24 @@ func TestAWholePackageImportIsAWalk(t *testing.T) {
 	}
 }
 
+func TestAnOutsideOwnsItsNamesInItsOwnFilesAlone(t *testing.T) {
+	t.Parallel()
+	page := "src/extension/drawing/owns.yaml"
+	standing := func(at string) bool { return exists(at) || at == "src/extension/drawing/route.mjs" }
+	doors, faults := Read(map[string]string{doorsAt: doorsJS, page: "page:\n  js: [setTimeout]\n  files: [route.mjs]\n  outside: true\n"}, standing)
+	if len(faults) != 0 {
+		t.Fatalf("the outside reads as faults: %v", faults)
+	}
+	text := "setTimeout(() => {}, 1);\n"
+	if walks := Walks("src/extension/drawing/route.mjs", text, doors); len(walks) != 0 {
+		t.Fatalf("the outside's own file reads as %v", walks)
+	}
+	walks := Walks("src/scripts/run.js", text, doors)
+	if len(walks) != 1 || !slices.Equal(walks[0].Doors, []string{"clock"}) || walks[0].Report {
+		t.Fatalf("a walk past the outside reads %+v, and wants the clock alone, refused", walks)
+	}
+}
+
 func TestAShadowingLocalIsNoWalk(t *testing.T) {
 	t.Parallel()
 	text := "package wait\n\nimport \"time\"\n\ntype clock struct{}\n\nfunc (clock) Now() int { return 0 }\n\nvar _ = time.Second\n\nfunc For() int {\n\ttime := clock{}\n\treturn time.Now()\n}\n"

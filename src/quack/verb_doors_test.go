@@ -93,6 +93,24 @@ func TestDoorsNamesADoorWithNoContract(t *testing.T) {
 	}
 }
 
+func TestDoorsListsADeclarationStandingAsItsOwnOutside(t *testing.T) {
+	t.Parallel()
+	root := t.TempDir()
+	seedFile(t, root, "src/extension/drawing/owns.yaml", "page:\n  js: [Date.now]\n  files: [route.mjs]\n  outside: true\n")
+	seedFile(t, root, "src/extension/drawing/route.mjs", "export const at = () => Date.now();\n")
+	seedFile(t, root, "src/modules/waits/owns.yaml", "waits:\n  go: [os]\n  report: true\n")
+	code, out, errs := doorsRan(root)
+	if want := "src/extension/drawing/route.mjs stands inside page, its own outside\n"; !strings.Contains(out, want) {
+		t.Errorf("doors prints %q, and wants %q", out, want)
+	}
+	if strings.Contains(out, "inside waits") {
+		t.Errorf("doors prints %q, and wants a door missing its contract kept off the outsides", out)
+	}
+	if code != 0 || strings.Contains(out+errs, "route.mjs:") {
+		t.Fatalf("doors answers %d, %q and %q, and wants no walk in the page's own file", code, out, errs)
+	}
+}
+
 func TestDoorsPassesAContractTestItsDoorNames(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()

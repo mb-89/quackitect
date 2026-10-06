@@ -27,6 +27,7 @@ const (
 	filesKey    = "files"
 	contractKey = "contract"
 	reportKey   = "report"
+	outsideKey  = "outside"
 )
 
 // Where a contract test stands: a Go test file ending so, or a file of the contract run. [[spec/design_output/doors#a-door-names-its-contract-tests]]
@@ -43,7 +44,7 @@ var (
 	markedAt = regexp.MustCompile(`(?://|/\*|#)\s*` + regexp.QuoteMeta(strings.TrimSpace(Marker)) + `(.*)$`)
 )
 
-// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, its contract tests, and whether it stands at report. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+// One door's declaration: its name, the folder its owns.yaml stands in, the names it owns in each language, its files, its contract tests, whether it stands at report, and whether it stands as its own outside. [[spec/design_output/doors#a-door-declares-what-it-owns]]
 type Door struct {
 	Name     string
 	At       string
@@ -53,6 +54,7 @@ type Door struct {
 	Files    []string
 	Contract []string
 	Report   bool
+	Outside  bool
 }
 
 // One use of an owned name outside every door owning it. [[spec/design_output/doors#nothing-walks-around-a-door]]
@@ -188,8 +190,15 @@ func readOne(at, text string, exists func(string) bool) ([]Door, []Fault) {
 				continue
 			}
 			open.Report = flag
+		case outsideKey:
+			flag, ok := value.(bool)
+			if !ok {
+				fault(line, rest+" reads as no flag: write true or false")
+				continue
+			}
+			open.Outside = flag
 		default:
-			fault(line, key+" is no key a declaration takes: write go, js, files, contract or report")
+			fault(line, key+" is no key a declaration takes: write go, js, files, contract, report or outside")
 		}
 	}
 	finish()
@@ -236,6 +245,9 @@ type claim struct {
 func claims(at string, doors []Door, names func(Door) []string) map[string]*claim {
 	out := map[string]*claim{}
 	for _, door := range doors {
+		if door.Outside && !door.Holds(at) {
+			continue
+		}
 		for _, name := range names(door) {
 			one := out[name]
 			if one == nil {

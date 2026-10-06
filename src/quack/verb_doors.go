@@ -24,6 +24,7 @@ const (
 	walkLine       = "%s:%d:%d: %s walks around %s\n"
 	markedWalk     = "%s:%d:%d: %s stands marked: %s\n"
 	contractLine   = "%s keeps the contract of %s\n"
+	outsideLine    = "%s stands inside %s, its own outside\n"
 	walksRefused   = "A walk-around reaches past its door. Reach it through the door, or mark the line: // " + owns.Marker + "<why the door cannot serve>"
 )
 
@@ -71,6 +72,14 @@ func doorsVerb(root func() (string, error)) twin {
 	}
 }
 
+// The files a declaration names, or its folder where it names none. [[spec/design_output/doors#a-door-declares-what-it-owns]]
+func ownFiles(door owns.Door) []string {
+	if door.Files != nil {
+		return door.Files
+	}
+	return []string{door.At}
+}
+
 // Every contract test a door names, then every walk-around and marked line of the files the lint's walk reaches: a door at report's walk-around and a marked line to out, a refusing door's to errs, and the count refused. [[spec/design_output/doors#nothing-walks-around-a-door]]
 func walksOver(root string, out, errs io.Writer) int {
 	declared, files := map[string]string{}, []string{}
@@ -108,6 +117,11 @@ func walksOver(root string, out, errs io.Writer) int {
 	for _, door := range doors {
 		for _, test := range door.Contract {
 			fmt.Fprintf(out, contractLine, test, door.Name)
+		}
+		if door.Outside {
+			for _, at := range ownFiles(door) {
+				fmt.Fprintf(out, outsideLine, at, door.Name)
+			}
 		}
 	}
 	refused := 0
