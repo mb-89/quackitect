@@ -179,7 +179,7 @@ const heldBy = (hand) => () => hand;
 
 // A beat carries no work, so an agent pushes it on any stamp. [[spec/tickets/beats-pass-the-push-gate]]
 test("an agent's beat lands where no stamp reaches it", () => {
-  const beat = refsIn("abc123 abc123 refs/beats/x 0000000000000000000000000000000000000000");
+  const beat = refsIn("abc123 abc123 refs/heads/beats/x 0000000000000000000000000000000000000000");
   assert.deepEqual(holds(beat, ""), { code: 0, said: "" });
 });
 
@@ -191,7 +191,7 @@ test("the stale reader reads the beat before the tip's age", () => {
     run: (args) => {
       const said = args.join(" ");
       if (said === "log -1 --format=%ct origin/work/x") return { ok: true, out: String(seconds - tipAgo) };
-      if (said === "log -1 --format=%ct %s refs/beats/x" && beat) return { ok: true, out: beat };
+      if (said === "log -1 --format=%ct %s origin/beats/x" && beat) return { ok: true, out: beat };
       return { ok: false, out: "" };
     },
   });

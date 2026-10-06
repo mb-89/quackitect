@@ -258,7 +258,7 @@ the tip, so nothing writes to a branch nobody holds.
 
 The tip's age reads a box dead late, and reads a live box that commits
 nothing dead. So a box holding a group beats: `branch beat` pushes a
-parentless commit on the empty tree to `refs/beats/<group>`, by force, with
+parentless commit on the empty tree to the branch `beats/<group>`, by force, with
 the clock door's time and the subject `<hand> beats`. `branch beat --end`
 writes `<hand> ends`. The take writes the first beat, a Stop command hook
 beats at each turn's end, and a SessionEnd command hook ends the hold.
@@ -272,8 +272,9 @@ beats at each turn's end, and a SessionEnd command hook ends the hold.
 A beat younger than half of `work.beatAfter` writes nothing, so a beat at
 every turn costs one push a span. The verb answers 0 and prints nothing off a
 branch this box holds, and on a refused push, since a Stop hook answering 2
-holds the turn. The fetch takes `+refs/beats/*:refs/beats/*`, and the list
-reads the refs it brings.
+holds the turn. The beat stands on a branch, since the cloud's git proxy
+refuses a push outside `refs/heads`. The fetch brings it with every branch,
+and the list reads the refs it brings.
 
 | verb | on a live hold | on a dead hold |
 |---|---|---|

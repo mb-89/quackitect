@@ -1,5 +1,5 @@
 // The beat: a box holding a group pushes a parentless commit on the empty tree
-// to refs/beats/<group>, so a hold reads whether its box still lives.
+// to the branch beats/<group>, so a hold reads whether its box still lives.
 // [[spec/design_output/work#a-hold-beats-with-its-session]]
 package branches
 
@@ -14,7 +14,9 @@ import (
 const (
 	beatKey   = "work.beatAfter"
 	beatSpan  = "10m"
-	beatRefs  = "refs/beats/"
+	beatsOn   = "beats/"
+	beatPush  = "refs/heads/" + beatsOn
+	beatRefs  = "refs/remotes/origin/" + beatsOn
 	beatsWord = "beats"
 	endsWord  = "ends"
 	endFlag   = "--end"
@@ -59,11 +61,10 @@ func (d *Doors) writeBeat(group, hand string, ended bool) bool {
 	if !commit.OK {
 		return d.beatFails(group, commit)
 	}
-	ref := beatRefs + group
-	if pushed := d.quiet("push", "-q", "-f", "origin", commit.Out+":"+ref); !pushed.OK {
+	if pushed := d.quiet("push", "-q", "-f", "origin", commit.Out+":"+beatPush+group); !pushed.OK {
 		return d.beatFails(group, pushed)
 	}
-	d.quiet("update-ref", ref, commit.Out)
+	d.quiet("update-ref", beatRefs+group, commit.Out)
 	d.beats = nil
 	return true
 }

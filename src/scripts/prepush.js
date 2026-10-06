@@ -40,7 +40,7 @@ export const STDIN = 0;
 export const ZEROS = /^0+$/;
 const HEADS = /^refs\/heads\//;
 // A beat names its box alive and carries no work, so no stamp gates it. [[spec/design_output/work#a-hold-beats-with-its-session]]
-const BEATS = "refs/beats/";
+const BEATS = "refs/heads/beats/";
 const ENDS = " ends";
 const BOX = /\bbox (\S+)/;
 
@@ -201,7 +201,7 @@ export function staleBy(repo, span, now, beatSpan = "") {
     if (!said.ok) return false;
     const when = Number(String(said.out).trim());
     const beat = repo.run(
-      ["log", "-1", "--format=%ct %s", `${BEATS}${branch.slice(WORK_BRANCH.length)}`],
+      ["log", "-1", "--format=%ct %s", `origin/beats/${branch.slice(WORK_BRANCH.length)}`],
       true,
     );
     if (beat.ok) {

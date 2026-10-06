@@ -73,7 +73,7 @@ func (d *Doors) loud(args ...string) Said { return d.git(false, args...) }
 
 // Refreshes the refs off origin, pruning the gone ones. [[spec/design_output/work#the-listing-reads-git-once]]
 func (d *Doors) fetch() {
-	d.quiet("fetch", "--prune", "origin", "+refs/heads/*:refs/remotes/origin/*", "+"+beatRefs+"*:"+beatRefs+"*")
+	d.quiet("fetch", "--prune", "origin")
 	d.beats = nil
 }
 

@@ -19,12 +19,12 @@ func (one *tree) beatOn(group, hand, word string, at time.Time) {
 	one.env = append(append([]string{}, kept...), fmt.Sprintf("GIT_COMMITTER_DATE=@%d +0000", at.Unix()))
 	sha := one.git("commit-tree", empty, "-m", hand+" "+word)
 	one.env = kept
-	one.git("push", "-q", "-f", "origin", sha+":refs/beats/"+group)
+	one.git("push", "-q", "-f", "origin", sha+":"+beatPush+group)
 }
 
 // The commit the beat ref on origin names, or nothing. [[spec/tickets/holds-beat-with-the-session]]
 func (one *tree) beatTip(group string) string {
-	said := one.git("ls-remote", "origin", "refs/beats/"+group)
+	said := one.git("ls-remote", "origin", beatPush+group)
 	return strings.TrimSpace(strings.Split(said+"\t", "\t")[0])
 }
 
