@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     steps:
@@ -166,6 +166,29 @@ record:
         exit: 0
         said: "test/level0/work-stands.test.js:16:1: correctness/noUnusedImports: Several of these imports are unused."
     def: f150b8c0dc20fe45
+  - step: implement/tests-green
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: 004df0d1821a1c0c1a04ca20c4d20a051448f39f
+    hash_after: 004df0d1821a1c0c1a04ca20c4d20a051448f39f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/modules/index passes
+      - name: check
+        exit: 0
+        said: "  104.6  in all"
+    inputs:
+      - name: design/tests-red
+        hash: bd05809591ad6e05
+        size: 753
+    def: ec253787263043a7
+  - step: accept
+    skipped: true
+    why: the delivery's acceptance reads this ticket
+  - step: view
+    skipped: true
+    why: the ask names no view the owner reads
+reason: done
 ---
 
 # Ask
@@ -329,26 +352,33 @@ The approach answers the ask: Book.Wait arms its span through the book's after f
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/modules/index/call_test.go
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Book.Wait in src/modules/index/call.go arms its span through the book's after field in place of time.After, and NewBook fills that field with time.After. The case on a wait with no handle hands in an after that signals the first time a wait arms, and it closes the held operations on that signal. Before, it slept a fifth of its span and hoped the wait read the open operations first, which a loaded box broke. The case leaves the doors chapter's family table, and a guard in call_test.go fails once the file sleeps or the chapter lists it again.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft's size list names
+- the wait reaches the clock alone, and the after field stands as its fake
+- Book.Wait points at the wait chapter of spec/design_output/model.md
+- the timer stands once, in the book's after field
 
 # accept
 
