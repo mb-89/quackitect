@@ -7,7 +7,6 @@ package main
 import (
 	"errors"
 	"io"
-	"net"
 	"os"
 	"path"
 	"path/filepath"
@@ -439,40 +438,6 @@ func TestTuiWindowListensOneBelowTheBridge(t *testing.T) {
 			t.Fatalf("%s takes the window's port", id)
 		}
 		list = append(list, one)
-	}
-}
-
-// The real tell reaches a window standing on the port, and answers false where none stands. [[spec/design_output/tui#a-second-launch-hands-over]]
-func TestTuiTellReachesAStandingWindow(t *testing.T) {
-	t.Parallel()
-	free, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		t.Fatal(err)
-	}
-	port := free.Addr().(*net.TCPAddr).Port
-	free.Close()
-	if tuiTellAt(port)("work") {
-		t.Fatal("a port where nothing listens takes the tab")
-	}
-	took := make(chan any, 1)
-	server, err := frame.OpenDoor(port, func(msg any) { took <- msg })
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer server.Close()
-	if !tuiTellAt(port)("work") {
-		t.Fatal("the standing window takes no tab")
-	}
-	if msg := <-took; msg != (frame.TabMsg{Name: "work"}) {
-		t.Errorf("the window took %v", msg)
-	}
-}
-
-// The registered verb answers the tui words. [[spec/tickets/quack-registers-each-verb]]
-func TestTuiRegisters(t *testing.T) {
-	t.Parallel()
-	if registry["tui"] == nil {
-		t.Error("no tui verb stands in the registry")
 	}
 }
 

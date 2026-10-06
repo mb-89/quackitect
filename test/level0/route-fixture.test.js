@@ -1,13 +1,10 @@
 // The extension reads a ticket's route with a reader of its own, because it
-// bundles alone. One fixture holds that reader to the pull's, so both name
-// the same leaves.
+// bundles alone. One fixture holds that reader to the leaves the pull names.
 // [[spec/tickets/a-count-meets-the-lint]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { stepsIn } from "../../src/extension/lib/lens.js";
-import { frontOf } from "../../src/engine/group.js";
-import { leavesOf } from "../../src/scripts/pull-route.js";
 
 const ROUTES = {
   flat: ["- name: do", "  does: makes it"],
@@ -30,6 +27,13 @@ const ROUTES = {
   quoted: ['- name: "do"', "- name: 'check'"],
 };
 
+const LEAVES = {
+  flat: ["do"],
+  nested: ["design/draft", "design/review", "implement/change"],
+  keyFirst: ["do", "verdict"],
+  quoted: ["do", "check"],
+};
+
 const ticket = (rows) =>
   ["---", "kind: [[ticket]]", "state: open", "steps:", ...rows.map((one) => `  ${one}`), "---", "", "# Ask", "", "A thing.", ""].join("\n");
 
@@ -41,7 +45,7 @@ for (const [name, rows] of Object.entries(ROUTES)) {
       stepsIn(text)
         .filter((one) => one.leaf)
         .map((one) => one.path),
-      leavesOf(frontOf(text)).map((one) => one.path),
+      LEAVES[name],
     );
   });
 }

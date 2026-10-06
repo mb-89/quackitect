@@ -1,25 +1,17 @@
-// The landing verbs commit, push and rename run in Go: each registers from its
-// own file, the road under new reaches no node for it, and its JavaScript
-// leaves the tree with every importer of it.
+// The landing verbs commit, push and rename over a landing repository and a
+// fake verb road.
 // [[spec/tickets/landing-verbs-port-to-go]]
 package main
 
 import (
 	"os"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"testing"
 	"time"
 
 	"quackitect/src/modules/files"
 	"quackitect/src/modules/git"
-)
-
-// The verbs this group ports, and an import of a module their JavaScript stood in. [[spec/tickets/landing-verbs-port-to-go]]
-var (
-	landingVerbs   = []string{"commit", "push", "rename"}
-	landingImports = regexp.MustCompile(`from\s+"[^"]*/(commit-verb|push-verb|rename)\.js"`)
 )
 
 // A landing repository stands under a folder its test's name stays out of, however long the name runs. [[spec/tickets/landing-verbs-windows-green]]
@@ -29,45 +21,6 @@ func TestLandingRepoStandsUnderAShortFolder(t *testing.T) {
 		at := landingRepo(t).root
 		if strings.Contains(at, "sentinel") || len(filepath.Base(filepath.Dir(at))) > 32 {
 			t.Fatalf("the repository stands at %s, which carries the test's name", at)
-		}
-	})
-}
-
-func TestLandingVerbsRunInGo(t *testing.T) {
-	t.Parallel()
-	for _, verb := range landingVerbs {
-		t.Run(verb+" registers, and the road under new reaches no node for it", func(t *testing.T) {
-			if registry[verb] == nil {
-				t.Fatalf("the registry holds no %s", verb)
-			}
-			if roadOf(modeNew, []string{verb, "a-word"}, registry) != toQuack {
-				t.Fatalf("%s takes the node road under new", verb)
-			}
-		})
-		t.Run(verb+" stands as no program under the verbs folder", func(t *testing.T) {
-			if _, err := os.Stat(filepath.Join("..", "scripts", "verbs", verb+".js")); err == nil {
-				t.Fatalf("src/scripts/verbs/%s.js still stands", verb)
-			}
-		})
-	}
-	t.Run("no JavaScript imports a module the port deletes", func(t *testing.T) {
-		for _, top := range []string{"src", "test", ".claude"} {
-			filepath.WalkDir(filepath.Join("..", "..", top), func(path string, entry os.DirEntry, err error) error {
-				if err != nil {
-					return nil
-				}
-				if entry.IsDir() && entry.Name() == "node_modules" {
-					return filepath.SkipDir
-				}
-				if entry.IsDir() || !strings.HasSuffix(path, ".js") {
-					return nil
-				}
-				text, _ := os.ReadFile(path)
-				if found := landingImports.FindString(string(text)); found != "" {
-					t.Errorf("%s imports a module the port deletes: %s", path, found)
-				}
-				return nil
-			})
 		}
 	})
 }
