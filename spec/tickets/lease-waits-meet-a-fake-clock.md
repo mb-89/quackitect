@@ -118,7 +118,7 @@ urgent: true
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -157,6 +157,15 @@ record:
         hash: ccf1c54a62d97aec
         size: 961
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: 09c392120aebff525f52b8670594110ebde60d99
+    hash_after: 09c392120aebff525f52b8670594110ebde60d99
+    answered:
+      - name: lint
+        exit: 0
+        said: "src/index/door.go:1:1: FileCeiling: A file holds 600 lines, and the file holds 613. Split it by topic."
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -310,14 +319,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint src/index src/quack/io_test.go spec/design_output/index.md
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the files the draft names, plus the door note, which owns the start's wait
+- the doors the change reaches stand faked in the cases: the spawn, the start clock and the pause, and the dog's clock
+- each changed function points at spec/design_output/index#a-door-comes-back or at this ticket
+- the start's wait stands described once, in the door note, and the code points at it
 
 ## tests-green
 
