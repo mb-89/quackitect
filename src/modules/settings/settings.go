@@ -141,6 +141,12 @@ var sections = map[string][]key{
 		{local: "deadline-fold", def: float64(watchdogDeadlineFold), doc: "The span a fold with a pending event commits within.", unit: "seconds"},
 		{local: "deadline-action", def: float64(watchdogDeadlineAction), doc: "The span an action's operation ends within.", unit: "seconds"},
 	},
+	"cloud": {
+		{local: "fleet-routine", def: "", doc: "The id of the stored routine that checks the fleet, which ./RUNME.sh cloud trigger names.", unit: "a routine id, opening on trig_"},
+	},
+	"fleet": {
+		{local: "idle-after", def: "30m", doc: "The age of a held box's tip past which ./RUNME.sh cloud fleet raises an idle wake.", unit: "a span, as 90m, 12h or 3d"},
+	},
 	"work": {
 		{local: "beat-after", def: "10m", doc: "The age of a box's last beat past which its hold reads dead, shorter than staleAfter.", unit: "a span, as 90m, 12h or 3d"},
 		{local: "stale-after", def: "30m", doc: "The age of a held group's tip that puts it under yours.", unit: "a span, as 90m, 12h or 3d"},

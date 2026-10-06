@@ -204,8 +204,8 @@ func empty(value any) bool {
 	return false
 }
 
-// hash_after on the last record item standing open, and over the last item's where none stands open. [[spec/tickets/go-writes-the-frontmatter]]
-func After(text, hash string) (string, error) {
+// hash_after on the open take, and the rows past it on the same item. [[spec/tickets/boxes-write-their-final-record]]
+func AfterWith(text, hash string, more Ordered) (string, error) {
 	one, err := split(text)
 	if err != nil {
 		return text, err
@@ -219,9 +219,15 @@ func After(text, hash string) (string, error) {
 		return one.String(), nil
 	}
 	row := field + after + ": " + Quote(hash)
+	past := []string{}
+	for _, pair := range more {
+		if !empty(pair.Value) {
+			past = append(past, field+pair.Key+": "+scalar(pair.Value))
+		}
+	}
 	for i := len(spans) - 1; i >= 0; i-- {
 		if one.holds(spans[i], before) && !one.holds(spans[i], after) {
-			one.splice(spans[i][1], spans[i][1], row)
+			one.splice(spans[i][1], spans[i][1], append([]string{row}, past...)...)
 			return one.String(), nil
 		}
 	}
@@ -231,7 +237,13 @@ func After(text, hash string) (string, error) {
 			one.rows[at] = row
 		}
 	}
+	one.splice(last[1], last[1], past...)
 	return one.String(), nil
+}
+
+// hash_after on the last record item standing open, and over the last item's where none stands open. [[spec/tickets/go-writes-the-frontmatter]]
+func After(text, hash string) (string, error) {
+	return AfterWith(text, hash, nil)
 }
 
 // Where each item of a block opens and ends. [[spec/tickets/go-writes-the-frontmatter]]
