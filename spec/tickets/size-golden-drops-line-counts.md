@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     steps:
@@ -177,6 +177,15 @@ record:
         hash: 6d000a52f89ddc69
         size: 817
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 3e1dc99ef689e03b149412ce49b281b46d4aee1d
+    hash_after: 3e1dc99ef689e03b149412ce49b281b46d4aee1d
+    answered:
+      - name: lint
+        exit: 0
+        said: "   89.8  in all"
+    def: f150b8c0dc20fe45
 group: engine-verbs-hold
 ---
 
@@ -324,14 +333,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+The change touches the draft's size list: textfaults.go, size.golden.json, check_twins_test.go through its child, and branches test.go; the readers' paths in src/tui/log landed with golden-readers-read-joined-paths.
+The test verb reads the tree through the Doors read and filesUnder it already owns, and goldenReaders reads a map the tests seed.
+sizeFaults and goldenReaders each carry a link to spec/tickets/size-golden-drops-line-counts.
+The code gate stands once in sizedFile, and the golden folder's name once in goldenFolder.
 
 ## tests-green
 

@@ -21,8 +21,11 @@ const (
 	cutError  = 160
 	asideAt   = runtimeFolder + "/red"
 	asideList = "sources.json"
-	redFlag   = "--red"
-	assertion = "assertion, "
+	// The folder a golden stands in, and the root a package path opens with. [[spec/tickets/size-golden-drops-line-counts]]
+	goldenFolder = "testdata"
+	srcRoot      = "src/"
+	redFlag      = "--red"
+	assertion    = "assertion, "
 )
 
 var (
@@ -42,7 +45,22 @@ var (
 // Runs the tests the branch changes, or the files named, and answers one word on them. [[spec/design_output/pull#the-test-verb]]
 // The packages that read a changed golden: the golden folder's own, and every package whose test text names that folder. [[spec/tickets/size-golden-drops-line-counts]]
 func goldenReaders(changed []string, tests map[string]string) []string {
-	return nil
+	var out []string
+	for _, one := range changed {
+		folder, _, golden := strings.Cut(one, "/"+goldenFolder+"/")
+		if !golden || !strings.HasPrefix(folder, srcRoot) {
+			continue
+		}
+		out = append(out, folder)
+		named := strings.TrimPrefix(folder, srcRoot) + "/" + goldenFolder
+		for file, text := range tests {
+			if strings.Contains(text, named) {
+				out = append(out, path.Dir(file))
+			}
+		}
+	}
+	sort.Strings(out)
+	return slices.Compact(out)
 }
 
 func testVerb(d *Doors, _ string, argv []string) int {
@@ -68,6 +86,11 @@ func testVerb(d *Doors, _ string, argv []string) int {
 		}
 	}
 	modules := goPackagesOf(changed)
+	for _, one := range goldenReaders(changed, d.goTestTexts(changed)) {
+		if !slices.Contains(modules, one) {
+			modules = append(modules, one)
+		}
+	}
 	if len(files) == 0 && len(modules) == 0 {
 		point := "the branch point"
 		if since != "" {
@@ -126,6 +149,20 @@ func goPackagesOf(paths []string) []string {
 }
 
 // The test functions the named Go test files hold. [[spec/design_output/pull#the-test-verb]]
+// Every Go test file under src by its text, read only where a change touches a golden. [[spec/tickets/size-golden-drops-line-counts]]
+func (d *Doors) goTestTexts(changed []string) map[string]string {
+	out := map[string]string{}
+	if !slices.ContainsFunc(changed, func(one string) bool { return strings.Contains(one, "/"+goldenFolder+"/") }) {
+		return out
+	}
+	for _, one := range d.filesUnder("src") {
+		if goTest.MatchString(one) {
+			out[one] = d.read(one)
+		}
+	}
+	return out
+}
+
 func (d *Doors) goTestNames(paths []string) []string {
 	var out []string
 	for _, one := range paths {
