@@ -18,6 +18,11 @@ test("the start road waits on the index's standing for the span it exports", () 
   assert.ok(START.includes("['standing']"), "the start road runs the index standing");
 });
 
+// A Windows box builds se-index.exe, so the road reads the binary with its suffix where it stands. [[spec/tickets/level0-smoke-runs-in-seconds]]
+test("the start road takes the index binary with .exe where it stands", () => {
+  assert.ok(START.includes("'.exe'"), "the start road names the Windows binary");
+});
+
 // [[spec/tickets/start-road-starts-the-index]]
 test("the start road runs no self-test of the bridge", () => {
   assert.ok(

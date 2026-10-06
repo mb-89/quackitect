@@ -4,12 +4,13 @@
 // against the index the start road brings up. It asks whether level zero runs.
 // [[spec/tickets/level0-runs-on-the-door]]
 
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { SESSION } from "../../.claude/skills/level0/lib/log.js";
-import { PLUGIN_FOLDER } from "../../.claude/skills/level0/lib/vehicle.js";
 import { HOOKS_FILE } from "../../.claude/skills/level0/hooks/cage.js";
 import { clearHeld, clearRun } from "./probe-clear.js";
-import { COLD, coldLines, coldPort, coldTree, logRows, stops, tail } from "./probe-cold.js";
+import { PLUGIN_FOLDER, POINTER } from "../../.claude/skills/level0/lib/vehicle.js";
+import { COLD, coldLines, coldPort, coldTree, logRows, stops, tail, takesDelta } from "./probe-cold.js";
 import { verbMain } from "./cli-main.js";
 
 // The module the plugin manifest names, which the client loads. [[spec/design_output/level0#the-bridgehead-and-the-server]]
@@ -33,8 +34,49 @@ export const DRY = {
   checks: ["door", "rules", "prompt", "tools", "guard", "canary", "quiet", "clear"],
 };
 
+// The smoke reads every check the dry probe reads but the clear, since it holds the clear road off. [[spec/tickets/level0-smoke-runs-in-seconds]]
+export const SMOKE = { checks: DRY.checks.filter((one) => one !== "clear") };
+
+// The folder of built tools the start road reads, and the suffix of the build an update keeps behind. [[spec/tickets/level0-smoke-runs-in-seconds]]
+const BIN = inRun("bin");
+const KEPT_OLD = ".old";
+
+// The tree as it stands, in seconds: a shared clone carrying the working change and the root's built tools, so the start road finds the index and installs nothing. [[spec/tickets/level0-smoke-runs-in-seconds]]
+export function smokeTree(root, it, say, { temp, tree, port, delta }) {
+  const cloned = it.proc.run(["git", "clone", "--quiet", "--shared", root, tree], {});
+  if (cloned.exitCode !== 0) {
+    say(`FAIL clone: ${tail(cloned.stderr)}`);
+    return false;
+  }
+  if (!takesDelta(it, temp, tree, delta, say)) return false;
+  const from = it.join(root, BIN);
+  const to = it.join(tree, BIN);
+  it.disk.makeDir(to);
+  for (const one of builtIn(it, from)) it.disk.copy(it.join(from, one), it.join(to, one));
+  it.disk.makeDir(it.join(tree, POINTER, ".."));
+  it.disk.write(it.join(tree, POINTER), `${JSON.stringify({ method: tree, port })}\n`);
+  return true;
+}
+
+function builtIn(it, from) {
+  try {
+    return it.disk
+      .list(from)
+      .filter((one) => one.kind === "file" && !one.name.endsWith(KEPT_OLD))
+      .map((one) => one.name);
+  } catch {
+    return [];
+  }
+}
+
 // The word that carries the working change into the clone. [[spec/tickets/the-check-takes-a-minute]]
 export const WORKING = "--working";
+
+// The word naming the commit the dry road runs at, which the Go probe verb resolves first. [[spec/tickets/probe-at-revision-guards-merges]]
+const AT = "--at";
+
+// The word the Go probe verb hands the entry for the smoke road. [[spec/tickets/level0-smoke-runs-in-seconds]]
+const SMOKE_WORD = "smoke";
 
 // The dry probe's own program, which the Go probe verb and the check start, since its session loads the plugin's JavaScript hook module in process. [[spec/tickets/probe-dry-entry]]
 export const ENTRY = ["src", "scripts", "probe-dry.js"];
@@ -48,14 +90,24 @@ export function deltaOf(here, at) {
 }
 
 // [[spec/tickets/level0-runs-on-the-door]]
-export async function probeDry(root, it, say = console.log, delta = "") {
+export function probeDry(root, it, say = console.log, delta = "", at = "") {
+  const stands = (from, doors, said, where) => coldTree(from, doors, said, { ...where, at });
+  return probed(root, it, say, delta, { stands, clears: true, checks: DRY.checks });
+}
+
+// [[spec/tickets/level0-smoke-runs-in-seconds]]
+export function probeSmoke(root, it, say = console.log, delta = "") {
+  return probed(root, it, say, delta, { stands: smokeTree, clears: false, checks: SMOKE.checks });
+}
+
+async function probed(root, it, say, delta, { stands, clears, checks: names }) {
   const temp = it.disk.tempDir("se-dry-");
   const tree = it.join(temp, "tree");
   const port = coldPort(it.pid);
   try {
-    if (!coldTree(root, it, say, { temp, tree, port, delta })) return 1;
-    const seen = await session(it, tree);
-    const checks = readsDry(logRows(it.disk, it.join(tree, SESSION)), seen);
+    if (!stands(root, it, say, { temp, tree, port, delta })) return 1;
+    const seen = await session(it, tree, clears);
+    const checks = readsDry(logRows(it.disk, it.join(tree, SESSION)), seen, names);
     for (const line of coldLines(checks)) say(line);
     return checks.every((one) => one.pass) ? 0 : 1;
   } finally {
@@ -170,7 +222,7 @@ export function engineOf(register, options = {}) {
 }
 
 // The session a client runs on a cold box: it starts, the owner's prompt arrives while the start road stands the door, the context reads, the answer opens on the canary, a read and a guarded call run, and the turn stops. [[spec/tickets/level0-runs-on-the-door]]
-async function session(it, tree) {
+async function session(it, tree, clears) {
   const env = { CLAUDE_CODE_REMOTE: "true", CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1" };
   const { $, seen } = harnessOf(it, tree, env);
   const loaded = await import(fileUrl(it.join(tree, PLUGIN_FOLDER, MODULE)));
@@ -214,7 +266,7 @@ async function session(it, tree) {
     description: "show the newest commit",
   });
   await raise("classic.Stop", {}, async () => ({}));
-  const cleared = await clearRun(it, tree, raise, seen, env);
+  const cleared = clears ? await clearRun(it, tree, raise, seen, env) : undefined;
   return {
     cleared,
     door: it.disk.exists(it.join(tree, HOOKS_FILE)),
@@ -233,17 +285,18 @@ function fileUrl(path) {
 }
 
 // [[spec/tickets/level0-runs-on-the-door]]
-export function readsDry(rows, seen) {
-  return [
-    { check: "door", ...doorStood(seen) },
-    { check: "rules", ...rulesHanded(rows, seen) },
-    { check: "prompt", ...promptHeld(seen) },
-    { check: "tools", ...toolsHeld(seen) },
-    { check: "guard", ...guardHeld(seen) },
-    { check: "canary", ...canaryHeard(rows) },
-    { check: "quiet", ...quietRun(rows, seen) },
-    { check: "clear", ...clearHeld(rows, seen) },
-  ];
+export function readsDry(rows, seen, names = DRY.checks) {
+  const reads = {
+    door: () => doorStood(seen),
+    rules: () => rulesHanded(rows, seen),
+    prompt: () => promptHeld(seen),
+    tools: () => toolsHeld(seen),
+    guard: () => guardHeld(seen),
+    canary: () => canaryHeard(rows),
+    quiet: () => quietRun(rows, seen),
+    clear: () => clearHeld(rows, seen),
+  };
+  return names.map((check) => ({ check, ...reads[check]() }));
 }
 
 function doorStood(seen) {
@@ -323,5 +376,8 @@ const shown = (said) => firstOf(JSON.stringify(said ?? null));
 // Run as its own program, the probe takes the working change where the words name it. [[spec/tickets/probe-dry-entry]]
 await verbMain(import.meta.url, async (words) => {
   const { it, root } = await import("./cli-doors.js");
-  return probeDry(root, it, console.log, words.includes(WORKING) ? deltaOf(it, root) : "");
+  const delta = words.includes(WORKING) ? deltaOf(it, root) : "";
+  if (words.includes(SMOKE_WORD)) return probeSmoke(root, it, console.log, delta);
+  const at = words.includes(AT) ? (words[words.indexOf(AT) + 1] ?? "") : "";
+  return probeDry(root, it, console.log, at ? "" : delta, at);
 });

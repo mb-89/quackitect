@@ -30,6 +30,17 @@ func TestEveryRetroVerbStandsAsAnAction(t *testing.T) {
 	}
 }
 
+// The read action's doc names every row the verb prints, the refusal among them. [[spec/tickets/retro-read-reads-every-record]]
+func TestTheReadActionNamesEveryRowItPrints(t *testing.T) {
+	t.Parallel()
+	want := "every owner prompt, fault, refusal and command of the chapter, with its file and line"
+	for _, one := range RetroVerbs {
+		if one.Name == "read" && one.Doc != want {
+			t.Fatalf("the action read reads the doc %q, and want %q", one.Doc, want)
+		}
+	}
+}
+
 // A retro action writes and declares no deadline, so a long collect answers within its caller's wait, however long it runs. [[spec/tickets/retro-verbs-become-actions]]
 func TestARetroActionWritesAndDeclaresNoDeadline(t *testing.T) {
 	c := q.New()

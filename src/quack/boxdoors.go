@@ -117,6 +117,10 @@ func realRun(out, errs io.Writer) func(argv []string, o runOpts) ranResult {
 			defer cancel()
 		}
 		child := exec.CommandContext(ctx, argv[0], argv[1:]...)
+		// A run inheriting the terminal keeps the terminal's group, so a Ctrl-C there still reaches the child. [[spec/tickets/the-check-ends-what-it-drops]]
+		if o.timeout > 0 && !o.inherit {
+			endsWhole(child)
+		}
 		child.Dir = o.cwd
 		if len(o.env) > 0 || o.environ != nil {
 			child.Env = o.environ

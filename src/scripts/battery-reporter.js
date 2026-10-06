@@ -25,6 +25,10 @@ export function rowOf(event, from) {
     // A TODO case fails by design and turns no run red, so the row marks it. [[spec/tickets/the-verbs-need-no-wrapper]]
     ...(said.todo !== undefined && said.todo !== false ? { todo: true } : {}),
     ...(event.type === FAIL ? { said: words } : {}),
+    // A red case names the line it stands at, so the check's log points at it. [[spec/tickets/ci-reds-name-their-cases]]
+    ...(event.type === FAIL && Number(said.line) > 0
+      ? { line: Number(said.line) }
+      : {}),
   };
 }
 

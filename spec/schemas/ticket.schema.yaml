@@ -201,6 +201,10 @@ frontmatter:
                   type: array
                   description: the words a choice takes
 
+                home:
+                  type: boolean
+                  description: a list whose every line names a path, a link or a ticket that stands
+
     process:
       x-link: true
       # [[spec/design_output/schema#a-finding-names-the-section]]

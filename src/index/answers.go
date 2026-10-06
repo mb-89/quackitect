@@ -96,7 +96,7 @@ func (one *door) answers(said call) (any, error) {
 		return map[string]int{"files": count}, err
 	case "stop":
 		go stopsSoon(one.clock, one.root)
-		return map[string]string{"stopping": one.root}, nil
+		return map[string]any{"stopping": one.root, "pid": pidOf()}, nil
 	case "standing":
 		var files int
 		one.db.QueryRow(`SELECT count(*) FROM file`).Scan(&files)

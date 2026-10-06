@@ -8,6 +8,7 @@ import (
 	"io"
 	"time"
 
+	settingsreader "quackitect/src/config"
 	"quackitect/src/index"
 	"quackitect/src/voice"
 )
@@ -66,6 +67,7 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 		MakeDir: func(path string) error { return disk.makeAll(path, voiceFolderMode) },
 		Vale:    outside.run,
 		Now:     outside.now,
+		Ceiling: settingsreader.Count(root, answerCeilingKey),
 	}
 }
 

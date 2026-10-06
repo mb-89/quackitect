@@ -5,8 +5,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -241,7 +243,7 @@ func retroMintVerb(box func() boxDoors, run retroMintRun) twin {
 				return exitFailed
 			}
 		}
-		if !retroMintWrites(disk, at, kept, errs) {
+		if !retroMintWrites(disk, at, kept, errs) || !retroMintKeeps(disk, home, argv[2], errs) {
 			return exitFailed
 		}
 		closed := 0
@@ -288,6 +290,37 @@ func retroMintWrites(disk diskDoors, at string, kept *retroMintNode, errs io.Wri
 	kept.write(&text, "")
 	text.WriteString("\n")
 	if err := disk.write(at, []byte(text.String()), 0o644); err != nil {
+		fmt.Fprintln(errs, err)
+		return false
+	}
+	return true
+}
+
+// Copies the classes, the rates and the collect time into the tracked folder, so a fresh box's effect measures against them; the collect time keeps its time alone, and a missing file stays missing. [[spec/tickets/retro-read-reads-every-record]]
+func retroMintKeeps(disk diskDoors, root, name string, errs io.Writer) bool {
+	home, into := retroHome(root, name), filepath.Join(root, filepath.FromSlash(retroKept), name)
+	if err := disk.makeAll(into, 0o777); err != nil {
+		fmt.Fprintln(errs, err)
+		return false
+	}
+	for _, file := range []string{retroClassesFile, retroRatesFile} {
+		text, err := disk.read(filepath.Join(home, file))
+		if errors.Is(err, fs.ErrNotExist) {
+			continue
+		}
+		if err == nil {
+			err = disk.write(filepath.Join(into, file), text, 0o644)
+		}
+		if err != nil {
+			fmt.Fprintln(errs, err)
+			return false
+		}
+	}
+	read, ok := retroJSParse(disk.text(filepath.Join(home, retroEffectCollected)))
+	if !ok {
+		return true
+	}
+	if err := retroJSWrite(disk, filepath.Join(into, retroEffectCollected), retroJSObject("at", retroJSField(read, "at"))); err != nil {
 		fmt.Fprintln(errs, err)
 		return false
 	}

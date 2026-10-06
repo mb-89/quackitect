@@ -161,6 +161,36 @@ func TestAServeBesideALiveDoorStandsNone(t *testing.T) {
 	}
 }
 
+// A stop returns once the door it stops has exited, so its caller removes a tree no running door holds. [[spec/tickets/smoke-waits-for-the-door]]
+func TestAStopWaitsOnTheDoorItStops(t *testing.T) {
+	root := t.TempDir()
+	bin := builtIndex(t, root, "the index build")
+	const doorPid = 4242
+	door := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var said call
+		json.NewDecoder(r.Body).Decode(&said)
+		writes(w, answer{Result: map[string]any{"stopping": root, "pid": doorPid}, ID: said.ID})
+	}))
+	t.Cleanup(door.Close)
+	port := door.Listener.Addr().(*net.TCPAddr).Port
+	standsAt(t, root, Standing{Port: port, Pid: doorPid, Root: root, Stamp: stampOf(bin)})
+	ran := fakeSpawn(t, nil)
+	var waited []int
+	was := awaits
+	awaits = func(pid int) { waited = append(waited, pid) }
+	t.Cleanup(func() { awaits = was })
+
+	if code := asks(qtest.Wall(), root, []string{"stop"}); code != 0 {
+		t.Fatalf("a stop answers %d, where the door takes it", code)
+	}
+	if len(waited) != 1 || waited[0] != doorPid {
+		t.Fatalf("a stop returns having waited on %v, where the door stands at pid %d", waited, doorPid)
+	}
+	if got := ran(); len(got) != 0 {
+		t.Fatalf("a stop starts %q beside a live door", got)
+	}
+}
+
 // A door leaving drops the standing file while it names that door, and leaves another door's file standing. [[spec/tickets/process-shadow-reads-clean]]
 func TestADoorDropsItsOwnStandingFileAlone(t *testing.T) {
 	root := t.TempDir()

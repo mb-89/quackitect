@@ -480,6 +480,7 @@ nests, and each field is the heading one level under it. A comment, an
 | `choice` | one line, among the options |
 | `verdict` | opens with `pass`, `pass with findings` or `fail`. A fail carries a finding, and a pass with findings carries a row a child, as `- <child-name>: <finding>` |
 | `checked` | one line per item of the checklist, where the leaf or a phase above carries one |
+| `list` with `home: true` | every line names a home that stands: a link resolving in the tree, a ticket name in backticks, or a path in backticks whose file or folder stands. A backticked span holding a space names none |
 
 The schema renders `checked` as an optional chapter under every leaf whose
 chain carries a checklist, and the ticket door lets the hand write it.

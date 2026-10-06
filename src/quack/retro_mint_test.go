@@ -380,3 +380,33 @@ func TestRetroMintMintsEveryPromotionAfterTheClasses(t *testing.T) {
 		t.Fatalf("the second run prints %q", again)
 	}
 }
+
+// The mint keeps the retro's classes, rates and collect time in the tracked folder, where the next box's effect finds them. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroMintKeepsTheClassesInTheTrackedFolder(t *testing.T) {
+	t.Parallel()
+	root, fake := retroMintTree(t, []map[string]any{retroMintFixedClass()}, nil)
+	retroMintWrite(t, root, ".se/.retro/"+retroMintName+"/rates.json", `{"hours":1,"classes":{}}`)
+
+	code, _, errs := retroMintRuns(root, fake)
+
+	kept := "spec/retros/" + retroMintName + "/"
+	if code != 0 || retroMintReadFile(t, root, kept+"classes.json") != retroMintReadFile(t, root, retroMintClasses) ||
+		retroMintReadFile(t, root, kept+"rates.json") != `{"hours":1,"classes":{}}` {
+		t.Fatalf("retro mint answers %d, %q, and the tracked folder reads %q", code, errs, retroMintReadFile(t, root, kept+"classes.json"))
+	}
+}
+
+// The mint keeps the collect time alone, leaving out the folders collect names, and skips a rates file that stands nowhere. [[spec/tickets/retro-read-reads-every-record]]
+func TestRetroMintKeepsTheCollectTimeAloneAndSkipsMissingRates(t *testing.T) {
+	t.Parallel()
+	root, fake := retroMintTree(t, []map[string]any{retroMintFixedClass()}, nil)
+	retroMintWrite(t, root, ".se/.retro/"+retroMintName+"/collected.json", `{"at":"2026-09-19T21:00:00.000Z","since":"","folders":["log"]}`)
+
+	code, _, errs := retroMintRuns(root, fake)
+
+	kept := "spec/retros/" + retroMintName + "/"
+	want := "{\n  \"at\": \"2026-09-19T21:00:00.000Z\"\n}\n"
+	if got := retroMintReadFile(t, root, kept+"collected.json"); code != 0 || got != want || retroMintReadFile(t, root, kept+"rates.json") != "" {
+		t.Fatalf("retro mint answers %d, %q, and the tracked collect time reads %q, want %q", code, errs, got, want)
+	}
+}

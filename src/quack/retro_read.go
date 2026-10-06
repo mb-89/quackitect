@@ -17,6 +17,13 @@ const (
 	retroShell   = "Bash"
 )
 
+// A prompt the owner queues mid-turn stands in an attachment of this type, from this origin; a tool result opening on the word refused carries a quiet refusal. [[spec/tickets/retro-read-reads-every-record]]
+const (
+	retroQueued  = "queued_command"
+	retroHuman   = "human"
+	retroRefused = "refused"
+)
+
 // A printed text keeps its first line, cut to this width, and the verb's line names the id at this place. [[spec/tickets/the-retro-finishes-its-asks]]
 const (
 	retroReadWidth = 200
@@ -55,7 +62,40 @@ func retroShortOf(text any) string {
 	return retroJSSlice(first, retroReadWidth)
 }
 
-// Every row one line earns: a fault, an owner prompt, or a shell command. [[spec/tickets/the-retro-finishes-its-asks]]
+// The prompt the owner queues mid-turn, where the line carries one from a human origin, or from no origin and not marked meta. [[spec/tickets/retro-read-reads-every-record]]
+func retroQueuedOf(read any) string {
+	attachment := retroJSField(read, "attachment")
+	if !retroJSSame(retroJSField(read, "type"), "attachment") || !retroJSSame(retroJSField(attachment, "type"), retroQueued) {
+		return ""
+	}
+	origin := retroJSField(attachment, "origin")
+	human := retroJSSame(retroJSField(origin, "kind"), retroHuman)
+	meta := retroJSTruthy(retroJSField(read, "isMeta")) || retroJSTruthy(retroJSField(attachment, "isMeta"))
+	if !human && (!retroJSNullish(origin) || meta) {
+		return ""
+	}
+	return retroShortOf(retroTextOf(retroJSField(attachment, "prompt")))
+}
+
+// The reason of a tool result carrying no error mark whose text opens on the word refused: its next line holding text, trimmed. [[spec/tickets/retro-read-reads-every-record]]
+func retroRefusalOf(one any) (string, bool) {
+	if !retroJSSame(retroJSField(one, "type"), "tool_result") || retroJSSame(retroJSField(one, "is_error"), true) {
+		return "", false
+	}
+	text := strings.TrimSpace(retroTextOf(retroJSField(one, "content")))
+	if !strings.HasPrefix(text, retroRefused) {
+		return "", false
+	}
+	lines := strings.Split(text, "\n")
+	for _, next := range lines[1:] {
+		if reason := strings.TrimSpace(next); reason != "" {
+			return retroJSSlice(reason, retroReadWidth), true
+		}
+	}
+	return retroShortOf(lines[0]), true
+}
+
+// Every row one line earns: a fault, an owner prompt typed or queued, a quiet refusal, or a shell command. [[spec/tickets/retro-read-reads-every-record]]
 func retroRowsOf(path, line string) []retroRow {
 	read, ok := retroJSParse(line)
 	if !ok || !retroJSTruthy(read) {
@@ -64,6 +104,7 @@ func retroRowsOf(path, line string) []retroRow {
 	content := retroJSField(retroJSField(read, "message"), "content")
 	parts := retroJSList(content)
 	rows := []retroRow{}
+	helper := slices.Contains(strings.Split(path, "/"), retroHelpers)
 	if retroFault.MatchString(line) {
 		var said any = retroJSNone{}
 		for _, one := range parts {
@@ -82,10 +123,16 @@ func retroRowsOf(path, line string) []retroRow {
 			text = line
 		}
 		rows = append(rows, retroRow{kind: "fault", text: retroShortOf(text)})
-	} else if retroJSSame(retroJSField(read, "type"), "user") &&
-		!slices.Contains(strings.Split(path, "/"), retroHelpers) &&
+	} else if retroJSSame(retroJSField(read, "type"), "user") && !helper &&
 		retroShortOf(retroTextOf(content)) != "" {
 		rows = append(rows, retroRow{kind: "prompt", text: retroShortOf(retroTextOf(content))})
+	} else if queued := retroQueuedOf(read); queued != "" && !helper {
+		rows = append(rows, retroRow{kind: "prompt", text: queued})
+	}
+	for _, one := range parts {
+		if reason, ok := retroRefusalOf(one); ok {
+			rows = append(rows, retroRow{kind: "refusal", text: reason})
+		}
 	}
 	for _, one := range parts {
 		if retroJSSame(retroJSField(one, "type"), "tool_use") && retroJSSame(retroJSField(one, "name"), retroShell) {

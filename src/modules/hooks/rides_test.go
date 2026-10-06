@@ -36,6 +36,16 @@ func TestAPlanFieldRidingACallReachesThePlanActionFirst(t *testing.T) {
 	}
 }
 
+// The ride waits on the plan past the call's default wait, so the plan file stands before the call answers on a slow disk. [[spec/tickets/plan-writes-off-go]]
+func TestARidingPlanWaitsOnThePlanPastTheDefaultWait(t *testing.T) {
+	t.Parallel()
+	c := &calls{}
+	hooks(t, ridingDoor(t, c), toolCall(map[string]any{tool.PlanArg: map[string]any{"working": "riding"}}))
+	if len(c.waits) != 2 || c.waits[0] != rideWait {
+		t.Errorf("the door waits %v, and wants the ride's own wait first", c.waits)
+	}
+}
+
 // [[spec/tickets/plan-writes-off-go]]
 func TestThePlanToolsOwnCallRidesNothing(t *testing.T) {
 	c := &calls{}

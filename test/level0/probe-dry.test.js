@@ -9,13 +9,17 @@ import { pathToFileURL } from "node:url";
 import { HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 import { RESUME } from "../../src/bridge/handover.js";
+import { coldTree } from "../../src/scripts/probe-cold.js";
 import { verbMain } from "../../src/scripts/cli-main.js";
 import {
   DRY,
   engineOf,
   harnessOf,
   readsDry,
+  SMOKE,
+  smokeTree,
 } from "../../src/scripts/probe-dry.js";
 
 const SENTENCE = "level0 holds this session: 75 rules, 6 notes, the stop hook on.";
@@ -69,6 +73,52 @@ test("a whole run passes every check the dry probe names", () => {
     DRY.checks,
   );
   assert.deepEqual(failing(rows, seen), []);
+});
+
+// [[spec/tickets/level0-smoke-runs-in-seconds]]
+test("the smoke stands the clone with the root's built tools and installs nothing", () => {
+  const disk = fakeDisk({
+    "/r/.se/.runtime/bin/se-index": "index",
+    "/r/.se/.runtime/bin/vale": "vale",
+    "/r/.se/.runtime/bin/se-index.old": "old",
+  });
+  const proc = fakeProc({ git: { exitCode: 0 } });
+  const it = { disk, proc, join: (...parts) => parts.join("/") };
+  const stood = smokeTree("/r", it, () => {}, { temp: "/t", tree: "/t/tree", port: 7001, delta: "" });
+  assert.equal(stood, true);
+  assert.deepEqual(
+    proc.ran.map((one) => one.argv),
+    [["git", "clone", "--quiet", "--shared", "/r", "/t/tree"]],
+    "one shared clone, and no install",
+  );
+  assert.equal(disk.read("/t/tree/.se/.runtime/bin/se-index"), "index");
+  assert.equal(disk.read("/t/tree/.se/.runtime/bin/vale"), "vale");
+  assert.equal(disk.exists("/t/tree/.se/.runtime/bin/se-index.old"), false, "a kept old build stays behind");
+  assert.deepEqual(JSON.parse(disk.read("/t/tree/.se/.runtime/vehicle.json")), { method: "/t/tree", port: 7001 });
+});
+
+// [[spec/tickets/probe-at-revision-guards-merges]]
+test("the cold tree checks the clone out at the revision it names", () => {
+  const proc = fakeProc({ git: { exitCode: 0 }, sh: { exitCode: 0 } });
+  const it = { disk: fakeDisk({}), proc, join: (...parts) => parts.join("/") };
+  coldTree("/r", it, () => {}, { temp: "/t", tree: "/t/tree", port: 7001, delta: "", at: "abc123" });
+  const runs = proc.ran.map((one) => one.argv.slice(0, 5).join(" "));
+  const at = runs.indexOf("git checkout --quiet --detach abc123");
+  assert.ok(at > 0, `the clone checks out the revision: ${runs.join("; ")}`);
+  assert.equal(proc.ran[at].init.cwd, "/t/tree");
+  assert.ok(at < runs.findIndex((one) => one.startsWith("sh ")), "the checkout comes before the install");
+});
+
+// [[spec/tickets/level0-smoke-runs-in-seconds]]
+test("the smoke reads every check but the clear", () => {
+  const { rows, seen } = whole();
+  delete seen.cleared;
+  const checks = readsDry(rows, seen, SMOKE.checks);
+  assert.deepEqual(
+    checks.map((one) => one.check),
+    DRY.checks.filter((one) => one !== "clear"),
+  );
+  assert.deepEqual(checks.filter((one) => !one.pass), []);
 });
 
 test("a context read handing no canary block fails the rules", () => {

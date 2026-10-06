@@ -271,3 +271,9 @@ terms:
   - {word: mechanize, means: "to turn a lesson into a check or a tool so it holds without anyone remembering it"}
   - {word: contradict, means: "to say the opposite of another claim so both cannot hold at once"}
   - {word: fallback, means: "the second road a step takes where its first road fails"}
+  - {word: pylib, means: "the owner's own python library whose tutorials are notebooks its tests run", source: "https://github.com/mb-89/pylib"}
+  - {word: pyqtgraph, means: "a python plotting library whose example explorer runs each example in its own process and whose tests run every example", source: "https://www.pyqtgraph.org"}
+  - {word: example, means: "a markdown file of prose between shell blocks that is a tutorial and a behavior test at once"}
+  - {word: developer case, means: "an example under the developer chapter that shows one edge a user does not care about"}
+  - {word: runme, means: "a vscode extension unrelated to the run script that opens a markdown file as a notebook with a run button per shell block", source: "https://runme.dev"}
+  - {word: notebook, means: "a document of prose and cells of code which runs one cell at a time"}

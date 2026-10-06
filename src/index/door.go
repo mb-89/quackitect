@@ -159,7 +159,7 @@ func claims(clock q.Clock, marker string) bool {
 
 // Runs the binary with serve over the root, and a case swaps it for a fake process. [[spec/design_output/index#a-door-comes-back]]
 var spawns = func(bin, root string) error {
-	one := exec.Command(bin, "serve")
+	one := Detached(exec.Command(bin, "serve"))
 	one.Dir = root
 	one.Env = append(os.Environ(), "QUACKITECT_ROOT="+root)
 	one.Stdout, one.Stderr = nil, nil

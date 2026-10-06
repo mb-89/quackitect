@@ -107,18 +107,14 @@ func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer stop()
-	pids := map[any]bool{}
+	// Two faults of a silent lease come from a kill, a restart and a second kill alone, so the alarm proves the restart. A child slower to start than its lease dies before it commits a pid, so the pid proves nothing on a slow runner. [[spec/tickets/level0-hooks-hold-no-rule]]
 	for end := time.Now().Add(20 * time.Second); time.Now().Before(end); time.Sleep(20 * time.Millisecond) {
 		dog.Check()
-		snap := store.Snapshot()
-		if pid := snap.Read("fake/pid"); pid != 0 {
-			pids[pid] = true
-		}
-		if alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm); len(pids) > 1 && len(alarms) == 1 && alarms[0].Part == "fake" {
+		if alarms, _ := store.Snapshot().Read(manager.AlarmsName).([]manager.Alarm); len(alarms) == 1 && alarms[0].Part == "fake" && alarms[0].Faults == 2 && alarms[0].Error == "the lease expires with no beat" {
 			return
 		}
 	}
-	t.Fatalf("the silent fake runs as %d process(es), and session/alarms reads %v: wants a restart, then the alarm", len(pids), store.Snapshot().Read(manager.AlarmsName))
+	t.Fatalf("session/alarms reads %v: wants one alarm for the fake after a restart and a second silence", store.Snapshot().Read(manager.AlarmsName))
 }
 
 type readsAll struct {

@@ -22,6 +22,17 @@ var (
 	stopAsk   sync.Once
 )
 
+// Waits until the process with the pid exits, and a case swaps it for a fake. [[spec/tickets/smoke-waits-for-the-door]]
+var awaits = awaitsExit
+
+// Waits on the door a stop answer names, so the caller of a stop meets no running door in the tree. [[spec/tickets/smoke-waits-for-the-door]]
+func awaitsStopped(result any) {
+	said, _ := result.(map[string]any)
+	if pid, ok := said["pid"].(float64); ok && pid > 0 && int(pid) != pidOf() {
+		awaits(int(pid))
+	}
+}
+
 // [[spec/design_output/index#a-door-comes-back]]
 func stopsSoon(clock q.Clock, root string) {
 	stopsAfter(clock, root, stopGraceDelay, stopBound, exits)
