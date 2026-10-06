@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box a694567529c5 · claude-code-remote
@@ -134,6 +134,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: 83e3d86872e522a7bf751f65d1f7ba0b6f9fdad9
+    hash_after: 83e3d86872e522a7bf751f65d1f7ba0b6f9fdad9
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: 1246a42e29e7ae98
 ---
 
 # Ask
@@ -216,38 +228,71 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/level0-smoke-runs-in-seconds]]: probe smoke runs level zero over the working tree with the model faked, inside the check, on the Linux and Windows runners
+- [[spec/tickets/probe-at-revision-guards-merges]] and [[spec/tickets/probe-at-stays-dry]]: probe dry takes --at a revision and stays dry
+- [[spec/tickets/merge-deny-every-connector]]: the settings deny the merge tool under every GitHub connector, so auto-merge is the one road to main
+- [[spec/tickets/runme-road-waits-on-ready]]: the road test waits on the index ready event
+- [[spec/tickets/the-check-ends-what-it-drops]], [[spec/tickets/ending-windows-tree-tested]] and [[spec/tickets/vale-call-takes-endswhole]]: a child the check gives up on ends with its whole tree
+- [[spec/tickets/the-index-outlives-the-check]] and [[spec/tickets/door-outlives-taskkill-tree]]: the index door stands apart from the process that starts it
+- [[spec/tickets/level0-claims-name-the-platform]], [[spec/tickets/platform-draft-names-checkdoors]] and [[spec/tickets/platform-red-line-tested]]: every level-zero line names its platform
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the handover named the ticket, the leaf and the exact test command, so the box after the clear lost no turn finding its place
+- a pipe held open by child and grandchild proves the tree kill with no timer, which kept the owner rule on tests whole
+- trivial children minted at the gate kept each change small enough to read whole
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- the owner prompt of the opening turn asked for the smoke, the ready wait and the ended child, and set the rules on timers and doors
+- 19:06 the hand-back met no index after the check, and the CLI waited minutes on the restart, the fault this group fixes
+- earlier in the run, three waits failed on the index restarting, for minutes each
+- 19:08 the agent ended its turn claiming a helper still ran, and the stop refused it, since a cloud box stops its helpers when the turn ends
+- 19:11 the agent ran git push in place of the push verb, and GitWritesThroughAVerb refused it
+- 19:12 the agent ran past the plan grace, and the engine refused a call until the plan stood
+- 19:13 the agent handed accept back with --pass beside a verdict field, and the pull refused it
+- 19:15 the agent wrote a scratch file through a shell heredoc, and ShellWritesNothing refused it
+- the door start in src/index/door.go waits on the door with a sleep loop, against the owner rule, and it stood on main before this group
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the index drop: src/index/detach.go lands with this group, and the next box after a check proves it
+- the turn end on a cloud box: .claude/skills/work/SKILL.md says to wait inside the turn on a background command
+- the push: .claude/skills/work/SKILL.md names ./RUNME.sh push at each push step
+- the accept hand-back: the pull verb prints the accept line with --fields alone, and no --pass
+- the heredoc: the agent passes JSON inline to the pull tool, which the work skill names
+- the sleep loop: a backlog ticket has the door start wait on the door ready event, in src/index/door.go
+- the became that skips an accept: a backlog ticket from the note became-skips-the-accept
+- the commit door over tests-red: a backlog ticket from the note implement-reads-the-red-tests
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The box weighed minting the sleep-loop fix into this group and kept it out, because the loop predates the group and the cloud rule stops work at the branch edge. It assumed a note marked became rides the retro into the backlog.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact points at the ticket that owns it
+- the retro adds no number past the times the run carries
+- the retro writes no file header
+- the badly list carries the owner prompt and each error with its time
+- the chapter names the agent, the box and the owner by role, and no path of the box
 
 ## cloud
 
