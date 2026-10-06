@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/owner-read
     skipped: true
@@ -156,6 +156,15 @@ record:
         hash: a98907ffdc8c3ac2
         size: 930
     def: dc4904ab364efa10
+  - step: implement/change
+    hand: box 57a5a484096e · claude-code-remote
+    hash_before: 54cbf4a63d1a885badc98b6ab4309724faeea686
+    hash_after: 54cbf4a63d1a885badc98b6ab4309724faeea686
+    answered:
+      - name: lint
+        exit: 0
+        said: "  114.8  in all"
+    def: f150b8c0dc20fe45
 ---
 
 # Ask
@@ -315,14 +324,19 @@ accept with points
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+the change touches no file the ask leaves out: it changes the tool list and routes in src/index, and the accept table and its wiring in src/quack, which the draft names.
+every door the change reaches has a fake: the index cases run over fakeManager with an Accepts of their own, and the quack cases read the real catalog with no IO.
+a comment names the approach the change implements: the comments on accepted in src/index/tools.go and on acceptsVerb in src/quack/accepts.go name it.
+every fact the change adds stands in one place: acceptsVerb owns the table, and the list, the routes and accepts read it.
 
 ## tests-green
 
