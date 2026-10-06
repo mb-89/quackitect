@@ -214,6 +214,9 @@ record:
     hand: box a694567529c5 · claude-code-remote
     hash_before: 72efc4be152ebd940efe9f7024feee7e0c408e76
     session: cse_01CC7ToBxZqmgbrgbZrD5Jj1
+    hash_after: 40e646ef17a0888437a796485525c27398331420
+    model: claude-opus-5-5
+    final: level-zero-smoke closes done on the stop wait for Windows, and the pull request watches CI
   - step: children
     hand: the engine
     hash_before: 47f08ac49f8c14545d74139207b632bf55028a51
