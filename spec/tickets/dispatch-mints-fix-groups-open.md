@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: engine-verbs-hold
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -144,6 +144,18 @@ record:
         hash: a9e49e10896a0dc7
         size: 1733
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box 57a5a484096e · claude-code-remote · helper-4
+    hash_before: 424afe23ad3a2683a4c6b93662107215a6621c14
+    hash_after: 424afe23ad3a2683a4c6b93662107215a6621c14
+    inputs:
+      - name: design/draft
+        hash: a9e49e10896a0dc7
+        size: 1733
+      - name: design/tests-red
+        hash: 8532ce005e537ef8
+        size: 652
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -260,8 +272,9 @@ The case reaches no door: fixGroup reads two tracked files through readFile, and
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # implement
 
