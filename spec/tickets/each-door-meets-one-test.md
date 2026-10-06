@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: tests-meet-the-doors-once
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box b4c8cb96d125 · claude-code-remote
+    hash_before: f0a74ef4413673673509f24766d1d82802fb6a22
+    hash_after: f0a74ef4413673673509f24766d1d82802fb6a22
+    inputs:
+      - name: ask
+        hash: 1daecf3515b870ee
+        size: 848
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -164,38 +173,74 @@ none
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The audit reads wall time, because a test reaching a real door pays real seconds. `go test -json ./src/...` times 1879 Go cases: 89 run past half a second and carry 113 of 192 seconds. `.se/scripts/doors-survey.sh` lists each test file by the doors it greps. The two lists together sort each slow file as a door test, a fixture built too often, or a move onto a fake.
+
+1. A new chapter, The door tests, in `spec/design_output/doors.md` holds the table: each door, its fake, its contract suite, and its one door test. A row per moved or deferred family names its fate.
+
+2. Three contained moves land here.
+   - `src/imports`: the two planted trees build once a package run, through `sync.OnceValue`, and every case reads the shared folder. The planted trees are read-only to `analysistest.Run`.
+   - `src/quack/manager_test.go`: `built` runs `go build` once a package run and copies the binary into the folder each case names. Three cases build the same binary today.
+   - `src/index/procs.go`: `Placements` takes its waits from a timer a case can swap, by a `Timer` builder beside `After` and `Gap`. The stop joins the spawner before it answers. The two cases that watch a real second for no spawn wait on the fake timer's ask instead, and assert after the joined stop.
+
+3. Each wider move becomes a child ticket in this group, with its ask:
+   - the branch verbs' cases onto a fake git and a fake process runner, because `newTree` builds a bare origin and a clone a case
+   - the quack verb cases still running a real process, onto the process door's fake
+   - the `test/level0` JavaScript cases spawning a process outside a contract, onto `src/doors/fake/proc.js`
+
+4. The module audit: the `onlyq` and `ioonly` analyzers already hold every module without the `io` flag off the disk, so each such module reads the index alone. The one module-held state the survey finds is `namePatterns` in `src/modules/check/private.go`, a memo of a pure compile, which the table names as the exception and keeps.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/imports/analyzers_test.go plantFlagged, every case in the file
+- src/imports/imports_test.go plant, every case in the file
+- src/quack/manager_test.go built, its three cases
+- src/index/procs.go NewPlacements, spawns and Start
+- src/quack/io.go ioProcesses, the one caller of NewPlacements outside tests
+- src/index/placements_test.go TestAStopDuringTheSpawnsStartsNoFurtherProcess and TestAStopInsideTheStartWindowSpawnsNothing
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/index/placements_test.go TestAStopJoinsTheSpawnerBeforeItAnswers
+- src/index/placements_test.go TestAStopDuringTheSpawnsStartsNoFurtherProcess, on the fake timer
+- src/index/placements_test.go TestAStopInsideTheStartWindowSpawnsNothing, on the fake timer
+- src/imports/imports_test.go TestThePlantedTreeBuildsOnce
+- src/quack/manager_test.go TestTheQuackBinaryBuildsOnce
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- spec/design_output/doors.md
+- src/imports/analyzers_test.go
+- src/imports/imports_test.go
+- src/quack/manager_test.go
+- src/index/procs.go
+- src/index/placements_test.go
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each file and function named stands opened: plantFlagged, plant, built, NewPlacements, spawns, Start, the two watch cases, namePatterns, and the doors note
+- callers come off a grep of NewPlacements, built, plant and plantFlagged
+- each done_when line meets a test or the table: the table decides the first, the three moves and the child tickets the next three, and the check the last
 
 ## tests-red
 
