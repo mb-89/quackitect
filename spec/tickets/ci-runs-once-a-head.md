@@ -82,7 +82,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
-step: accept
+step: retro/notes
 record:
   - step: sync
     hand: box d040db23b249 · claude-code-remote
@@ -106,6 +106,22 @@ record:
     hand: the engine
     hash_before: 26797bfdbd1b7a9445e7a987c5bf5094f087bc0e
     hash_after: 26797bfdbd1b7a9445e7a987c5bf5094f087bc0e
+  - step: accept
+    hand: box d040db23b249 · claude-code-remote
+    hash_before: 0ffa2fc8f83d1377910f94bbbad1989c0441c4c4
+    hash_after: 0ffa2fc8f83d1377910f94bbbad1989c0441c4c4
+    answered:
+      - name: sync/sync
+        exit: 0
+        said: work/ci-runs-once-a-head already carries every commit on main.
+    inputs:
+      - name: ask
+        hash: 2f604c4e87630f58
+        size: 204
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+    def: 07c43ae7253713ec
 ---
 
 # Ask
@@ -154,8 +170,9 @@ never waits behind the fleet's superseded ones.
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
 
 # retro
 
