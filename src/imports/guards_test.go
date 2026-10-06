@@ -17,6 +17,14 @@ func TestACompareNamesNewOffendersAndStaleLines(t *testing.T) {
 	}
 }
 
+func TestACompareKeysOnTheTextBeforeATab(t *testing.T) {
+	t.Parallel()
+	said := imports.Compare([]string{"go a"}, []string{"go a\t3 test lines", "go b\t4 test lines"})
+	if !slices.Equal(said.New, []string{"go b\t4 test lines"}) || len(said.Stale) != 0 {
+		t.Fatalf("the compare answers new %q and stale %q", said.New, said.Stale)
+	}
+}
+
 func TestTheBlackboxGuardNamesTrackedInPackageTests(t *testing.T) {
 	t.Parallel()
 	texts := map[string]string{"x/x_test.go": "package x\n", "y/y_test.go": "package y_test\n", "x/x.go": "package x\n"}

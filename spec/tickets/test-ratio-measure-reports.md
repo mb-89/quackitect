@@ -117,7 +117,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: code-is-pure-tests-behave
-step: design/tests-red
+step: gate
 record:
   - step: design/owner-read
     skipped: true
@@ -131,6 +131,22 @@ record:
         hash: d164b39d8d6d574f
         size: 655
     def: 7883b3d10633c780
+  - step: design/tests-red
+    hand: box 37997ca97a74 · claude-code-remote
+    hash_before: e84844a5da102bfc20e6e8625ae02907077d6d5b
+    hash_after: e84844a5da102bfc20e6e8625ae02907077d6d5b
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/imports fails
+    inputs:
+      - name: design/draft
+        hash: b2d022c3033253b7
+        size: 1440
+      - name: [[spec/design_output/model]]
+        hash: a1cec3f4220df26e
+        size: 77706
+    def: 08e16d07b0de477c
 ---
 
 # Ask
@@ -228,26 +244,32 @@ none
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### red
 
 <!-- every test file standing red until tests-green closes, one a line, which the check leaves out -->
-
 <!-- the form is list -->
+
+- `src/imports/ratio_test.go`
+- `src/imports/guards_test.go`
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Each case fails on its own assertion over the stub. A JavaScript test importing no source lands in its own folder, which holds no code, so a pure harness file reads past one to one at once. That is the shape the ask wants cut.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each done_when line meets a red case: the counts, the module mapping, and the report through the guards verb
+- the tests reach no door: they read a map
 
 # gate
 
