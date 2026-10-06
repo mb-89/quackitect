@@ -117,11 +117,20 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: level-zero-smoke
-step: design/draft
+step: design/tests-red
 record:
   - step: design/owner-read
     skipped: true
     why: the ask comes off no handover
+  - step: design/draft
+    hand: box a694567529c5 · claude-code-remote
+    hash_before: cb6508464eddc3f1e48615998f8a2845199dc9a8
+    hash_after: cb6508464eddc3f1e48615998f8a2845199dc9a8
+    inputs:
+      - name: ask
+        hash: 1ba74feccc7fa8db
+        size: 625
+    def: 7883b3d10633c780
 ---
 
 # Ask
@@ -153,38 +162,64 @@ The dry session clones a cold box and spends minutes, and a Windows box skips it
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+A smoke road joins the dry probe: probeSmoke in src/scripts/probe-dry.js stands the tree as it is with no install, and runs the same faked session without the clear road. It clones the working tree with git clone --shared, applies the working change as the dry probe does, and copies the root's built tools under .se/.runtime/bin into the clone through the disk door, so the start road finds the index and skips the install. The session runs as session() runs it, with the clear road held off by an option, and readsDry reads every check of DRY.checks past clear. A trial on this box runs the whole smoke in about six seconds, where the dry probe takes forty with its install and its clear road. The Go probe verb hands smoke to the same entry, as it hands dry, and level0Runs runs probe smoke --working on every platform, so the Windows job runs it too, and the check job auto-merge waits on carries it on both runners. The start road names the index binary with .exe where it stands, since a Windows box builds se-index.exe and the road reads it as missing and exits 9. The full dry probe stays a verb for a hand who wants the cold road.
 
 ### callers
 
 <!-- every caller of what the approach changes, one a line, as a file and a function -->
-
 <!-- the form is list -->
+
+- src/quack/check.go level0Runs
+- src/quack/probe_verb.go probeVerb
+- src/scripts/probe-dry.js probeDry and session
+- src/scripts/probe-dry.js verbMain entry
+- src/scripts/probe-dry.js readsDry
+- src/scripts/probe-cold.js coldTree (read, unchanged)
+- .claude/skills/level0/hooks/start.js START, run by .claude/skills/level0/hooks/level0.js startsOnce
 
 ### tests
 
 <!-- every test the change adds, one a line, as a file and a test name -->
-
 <!-- the form is list -->
+
+- src/quack/check_test.go TestCheckReads/level zero runs the smoke on the working tree, on Windows as on Linux
+- src/quack/probe_verb_test.go TestProbeVerb smoke road hands its words to the entry
+- test/level0/probe-dry.test.js the smoke stands the clone with the root's built tools and installs nothing
+- test/level0/probe-dry.test.js the smoke reads every check but the clear
+- test/level0/start-constants.test.js the start road takes the index binary with .exe where it stands
+- test/contract/check-workflow.test.js stands as it is, holding the check job on ubuntu-latest and windows-latest
 
 ### answers
 
 <!-- every finding an earlier review names, one a line, with the answer the approach gives it, or first on a first draft -->
-
 <!-- the form is list -->
+
+- first
 
 ### size
 
 <!-- every file the approach touches, one a line -->
-
 <!-- the form is list -->
+
+- src/scripts/probe-dry.js
+- test/level0/probe-dry.test.js
+- src/quack/probe_verb.go
+- src/quack/probe_verb_test.go
+- src/quack/check.go
+- src/quack/check_test.go
+- .claude/skills/level0/hooks/start.js
+- test/level0/start-constants.test.js
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- probe-dry.js, probe-cold.js coldTree, start.js START, level0.js startsOnce and caged, probe_verb.go and check.go stand opened, and a scratch run proved the clone with copied tools answers every check but clear in six seconds
+- grep finds level0Runs in check.go alone, probeDry in probe_verb.go and probe-dry.js, and START in level0.js startsOnce
+- the level0Runs line meets the check_test case, the workflow line meets check-workflow.test.js, and the check line its own command
 
 ## tests-red
 
