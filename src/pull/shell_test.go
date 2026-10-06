@@ -55,4 +55,8 @@ func TestTheShellRunsALineThroughShInTheRootAndReadsAProgramThatNeverStartsAsAFa
 	if _, _, err := ShellOver(nobody.Run, "the/root")("echo said"); err == nil {
 		t.Error("the shell reads a program that never starts as no fault")
 	}
+	killed := &proc.FakeRunner{Programs: map[string]proc.Program{"sh": func(proc.Command) proc.Said { return proc.Said{Err: "killed", Code: proc.Signalled} }}}
+	if _, _, err := ShellOver(killed.Run, "the/root")("echo said"); err == nil || err.Error() != "killed" {
+		t.Errorf("the shell reads a run a signal ends as %v, and wants its fault", err)
+	}
 }

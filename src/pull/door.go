@@ -152,11 +152,11 @@ func (one TreeDisk) Write(path, text string) error { return one.Tree.Write(path,
 
 func (one TreeDisk) Remove(path string) error { return one.Tree.Remove(path) }
 
-// A command line through sh -c in the root on a process runner: what it printed, its exit code, and a fault where its program fails to start. [[spec/design_output/doors#the-process-door]]
+// A command line through sh -c in the root on a process runner: what it printed, its exit code, and a fault where its program fails to start or a signal ends it. [[spec/design_output/doors#the-process-door]]
 func ShellOver(run proc.Runner, root string) Shell {
 	return func(line string) (string, int, error) {
 		said := run(proc.Command{Argv: []string{"sh", "-c", line}, Dir: root})
-		if said.Code == proc.NotStarted {
+		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
 			return "", 0, errors.New(said.Err)
 		}
 		return said.Out, said.Code, nil

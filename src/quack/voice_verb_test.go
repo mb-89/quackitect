@@ -178,3 +178,15 @@ func TestVoiceRunsValeAnswersTheFaultOfAValeThatNeverStarts(t *testing.T) {
 		t.Fatalf("a Vale that never starts answers %q %v, and wants the fault %q", said, err, want)
 	}
 }
+
+// A Vale a signal ends answers its fault, as one that never starts does. [[spec/tickets/signalled-meets-notstarted-readers]]
+func TestVoiceRunsValeAnswersTheFaultOfAValeASignalEnds(t *testing.T) {
+	t.Parallel()
+	fake := &proc.FakeRunner{Programs: map[string]proc.Program{taughtVale: func(proc.Command) proc.Said {
+		return proc.Said{Out: "{", Err: "killed", Code: proc.Signalled}
+	}}}
+	said, err := voiceRunsValeOver(fake.Run)([]string{taughtVale}, t.TempDir())
+	if err == nil || err.Error() != "killed" || said != "" {
+		t.Fatalf("a Vale a signal ends answers %q %v, and wants the fault killed", said, err)
+	}
+}

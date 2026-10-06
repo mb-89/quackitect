@@ -65,11 +65,11 @@ func voiceDoorsAt(root string, outside voiceOutside) voice.Doors {
 	}
 }
 
-// Runs Vale through the process door in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start answers its fault. [[spec/tickets/quack-spawns-meet-fake-process]]
+// Runs Vale through the process door in the folder with no input, and answers its stdout; a nonzero exit still answers, and a run that cannot start or a signal ends answers its fault. [[spec/tickets/quack-spawns-meet-fake-process]]
 func voiceRunsValeOver(run proc.Runner) func(argv []string, cwd string) (string, error) {
 	return func(argv []string, cwd string) (string, error) {
 		said := run(proc.Command{Argv: argv, Dir: cwd})
-		if said.Code == proc.NotStarted {
+		if said.Code == proc.NotStarted || said.Code == proc.Signalled {
 			return "", errors.New(said.Err)
 		}
 		return said.Out, nil
