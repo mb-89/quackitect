@@ -402,6 +402,13 @@ The draft's size list leaves out three files the approach touches, and the engin
 - `src/pull/*_test.go`
 - `src/quack/check.go`, where the gate runs the red packages apart
 
+## The draft's tests, in full
+
+The draft's tests list names `src/branches/parallel_test.go TestEveryBranchesTestRunsBesideTheOthers`, which stands nowhere, and the engine keeps that field closed. These tests stand in its place:
+
+- `src/imports/serial_test.go TestATestRunningAloneWithNothingBarringItIsNamed`
+- `src/imports/serial_test.go TestTheSlowPackagesRunEveryTestBesideTheOthers`
+
 ## The parallel tests share no state
 
 The race detector and shuffled repeats read the three packages whose tests now run in parallel. The check runs neither, so a hand runs this command after a change to those tests:
