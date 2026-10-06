@@ -33,6 +33,8 @@ export function fakeIndex(disk, root, join) {
         return method === "hashes" ? hashes(params) : null;
       },
       warm: () => ({ warmed: false, dead: "" }),
+      // [[spec/tickets/runme-road-waits-on-ready]]
+      ready: () => ({ ready: true, dead: "" }),
     },
     "index",
   );
