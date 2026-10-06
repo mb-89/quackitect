@@ -13,7 +13,7 @@ import {
   TODO,
   waitingOn,
 } from "../../src/scripts/work-stands.js";
-import { CHILD, doorsSaying, GROUP_NOTE, remoteSaying } from "./work-doors.js";
+import { GROUP_NOTE, remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
 const TAGGED = "---\nkind: [[ticket]]\ntodo: true\n---\n\n# Ask\n\nLater.\n";
