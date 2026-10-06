@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -139,6 +139,18 @@ record:
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
     def: cb5a549f0e587fc2
+  - step: retro/write
+    hand: box 34eba3f85616 · claude-code-remote
+    hash_before: b140f623e1469d1e8fb1d1190e0f5c38fe6c7c30
+    hash_after: b140f623e1469d1e8fb1d1190e0f5c38fe6c7c30
+    inputs:
+      - name: children
+        hash: 811c9dc59e3779b9
+        size: 0
+      - name: retro/notes
+        hash: 310d2ddd3fe31ac9
+        size: 36
+    def: e7ed0badf886b5b5
 cloud: true
 ---
 
@@ -224,38 +236,76 @@ accept
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the half-done merge of main an earlier box left behind lands, with the dead battery helper kept out of the retro effect file
+- `restated-tests-merge` closes: one table test over the verb list, one over the wiring names, the branches natives the port suites restated, the tui root restatements, the log-tab and frame moves, one window port test, and the import rules in src/imports
+- `tests-guidance-note-lands` closes: the note for a writer of tests with its rationale, testing rules 1 to 3 rescoped, the retro audit rule and its checklist line
+- a quoted tag in a note now reads as its bare word, in the JS guidance reader
+- a second merge of main lands after the doors branch merged, with its twelve conflicts resolved
+- the check, warm against warm on one box: 107.1 seconds at the group's start, 73.9 at its head
+- Go code lines: 74301 at the start, 78582 at the head, 78742 on main
+- Go test lines: 51112 at the start, 54609 at the head, 56826 on main
+- JS code lines: 35451 at the start, 21781 at the head, 35792 on main
+- JS test lines: 52211 at the start, 21207 at the head, 52652 on main
+- `.se/scripts/linecounts.sh` counts the lines at a commit, and its text stands in the thoughts chapter
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the audit branch mapped every restated test to the test restating it, so three helpers worked disjoint folders at once
+- each helper checked the audit's pairs before deleting, and caught several pairs the audit called covered that were not
+- a commit a helper, each through the commit verb, kept every landing green and pushed
 
 ### badly
 
 <!-- what did not go well, each error of the run and each owner prompt turning it, with its time -->
-
 <!-- the form is list -->
+
+- at the start the take refused, because an earlier box left a merge of main open with conflicts
+- the conflict markers in a Go file kept the index down, so the gate refused every write until a hand took one side through git
+- git rm, git add and git push came back refused, since the engine owns git writes
+- a partial commit came back refused while the merge stood open
+- an early stop claimed helpers still ran, and the stop hook refused it, since a cloud box ending its turn stops its helpers
+- the first hand-back named `go test`, which the engine read as not green
+- the minted note wrote its tags quoted, and the guidance tags test refused it as reaching no step
+- main moved during the accept gate, and the sync stopped on twelve conflicts
+- the doors branch replaced the branches template fixtures with fakes, so the code behind `branches-fixtures-copy-a-template` left, though its goal still holds
+- no owner prompt reached this run
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the take names an open merge and its files, and hands the merge to the box in place of a refusal, in `src/branches/take.go`
+- the gate passes `git checkout --ours` and `--theirs` on a conflicted file while the index stands down, in `.claude/skills/level0/hooks/start.js`
+- the hand-back reads a plain `go test` exit as green, as it reads the test verb, in `src/pull/pull_chapter.go`
+- the reader takes quoted tags, landed in `.claude/skills/level0/lib/guidance.js`
+- a cloud box waits on its helpers with a loop inside its turn, as [[spec/guidance/cloud/cloud]] rule 10 asks
+- a group syncs again right before accept, so a late main meets the review, as [[spec/guidance/cloud/cloud]] rule 3 asks
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The audit did most of the thinking, and the run went fastest where it trusted the audit's map and checked each pair anyway. The gate's refusals cost more turns than the work did. A dead index blocking the very write that would revive it is a loop worth breaking. The second merge showed a cost of long groups: a branch that cuts tests collides with every branch that edits them.
+
+The line count script reads each tracked Go or JS file at a commit through git show, and sums lines by language and by test or code. A file ending in _test.go or .test.js, or standing under test/, counts as test.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each fact stands once: the counts stand here, and the notes point at the guidance and the audit
+- each number carries its name beside it in the done list
+- the headers the change writes say what their file is for
+- the chapter carries the run's errors in order, and no owner prompt reached the run
+- the chapter names roles alone, with no name, address or box path
 
 ## cloud
 
