@@ -118,7 +118,7 @@ process: [[spec/processes/standard]]
 process_hash: 22b42ea1501e8967
 group: unfaked-doors-take-fakes
 depends_on: git-and-process-doors-designed
-step: gate
+step: implement/change
 record:
   - step: design/owner-read
     skipped: true
@@ -145,6 +145,18 @@ record:
         hash: aa8ef2545de3a91d
         size: 3995
     def: 08e16d07b0de477c
+  - step: gate
+    hand: box e97c7a20bbd2 · claude-code-remote · helper-4
+    hash_before: 31a4fc57fb787aaf4bcff1071d2fc64fe5b12c32
+    hash_after: 31a4fc57fb787aaf4bcff1071d2fc64fe5b12c32
+    inputs:
+      - name: design/draft
+        hash: aa8ef2545de3a91d
+        size: 3995
+      - name: design/tests-red
+        hash: 03f947eb682998f0
+        size: 905
+    def: dc4904ab364efa10
 ---
 
 # Ask
@@ -306,8 +318,16 @@ the one door the tests reach is the process door, and FakeRunner stands beside t
 ## verdict
 
 <!-- accept, accept with points naming a fix ticket a line, or reject with findings one a line -->
-
 <!-- the form is verdict -->
+
+accept
+- the approach answers the ask: Runner leaves src/modules/lsp/tools.go, Vale and Biome run through proc.Runner, and the halt and the wait move onto the process door through Halting, Command.Wait, FakeRunner.Halt, Ends and After
+- the red stands on its own assertion: the three process contract cases fail on both runners, and TestTheToolsRunThroughTheProcessDoorWithTheirWait fails on Wait alone, run here
+- implement fixes in place: src/modules/lsp/lsp_test.go calls fakeTools and toolsOver at its line 70, and the callers and size lists leave it out, so it moves onto taughtTools with the rest of tools_test.go
+- implement fixes in place: the throughTheDoor adapter in tools_test.go returns the lsp Runner type the change removes, so the case hands fake.Run to Tools.Run direct once Run takes proc.Runner
+- implement fixes in place: Ends is one channel a fake shares across its runs, so a run past its Wait answers its fault from Run through After and leaves Ends open, else one wait ends every run in flight
+- implement fixes in place: a killed process answers code -1 and an empty stderr, so the real runner writes the halt or the wait into Err, as tests-red seen says
+- done_when one meets no test on the absent type; the build after the removal and a search of tools.go decide it at accept
 
 # implement
 
