@@ -60,7 +60,8 @@ func (d *Doors) cloud() bool {
 func (d *Doors) handOf() string {
 	if !d.agent() {
 		d.boxOf()
-		if who := d.quiet("config", "user.name").Out; who != "" {
+		if who, _ := d.Repo.Config("user.name"); strings.TrimSpace(who) != "" {
+			who = strings.TrimSpace(who)
 			return byPerson + " " + who
 		}
 		return byPerson
@@ -116,11 +117,11 @@ func roleOf(hand string) string {
 
 // The id this box carries, off the box file under the work root or the identity under the method root. [[spec/tickets/one-writer-holds-a-branch]]
 func (d *Doors) boxIDHere() string {
-	for _, at := range []string{d.at(boxFile), d.methodAt(identity)} {
+	for _, text := range []string{d.read(boxFile), d.methodRead(identity)} {
 		var said struct {
 			ID any `json:"id"`
 		}
-		if json.Unmarshal([]byte(readFile(at)), &said) == nil && idOf(said.ID) != "" {
+		if json.Unmarshal([]byte(text), &said) == nil && idOf(said.ID) != "" {
 			return idOf(said.ID)
 		}
 	}

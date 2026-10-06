@@ -14,12 +14,13 @@ import (
 
 	"quackitect/src/index"
 	"quackitect/src/modules/check"
+	"quackitect/src/modules/git"
 	"quackitect/src/note"
 	"quackitect/src/pull"
 	"quackitect/src/yaml"
 )
 
-func init() { register("ticket update", ticketUpdate(index.Root)) }
+func init() { register("ticket update", ticketUpdate(index.Root, registeredRepo)) }
 
 // The flag that copies a new route over a person's edit. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
 const overFlag = "--over"
@@ -28,7 +29,7 @@ const overFlag = "--over"
 var processFlag = regexp.MustCompile(`^--process=(.+)$`)
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-func ticketUpdate(rootOf func() (string, error)) twin {
+func ticketUpdate(rootOf func() (string, error), repoAt func(root string) git.Repo) twin {
 	return func(argv []string, _ bool, out, errs io.Writer) int {
 		words := argv[min(1, len(argv)):]
 		said := argv[min(2, len(argv)):]
@@ -67,7 +68,7 @@ func ticketUpdate(rootOf func() (string, error)) twin {
 		}
 		// A person's edit past the reached leaves stops the copy, unless --over says to write over it. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
 		if !slices.Contains(words, overFlag) {
-			base, found := copiedBase(disk.Root, yaml.AsString(held.Get("process")), hash, disk)
+			base, found := copiedBase(repoAt(disk.Root), yaml.AsString(held.Get("process")), hash, disk)
 			if !found {
 				fmt.Fprintf(errs, "The process version %s copied stands nowhere in the history, so any drift stays unread. Run it again with %s to copy the new route over the route as it stands.\n", at, overFlag)
 				return 1
@@ -91,18 +92,26 @@ func ticketUpdate(rootOf func() (string, error)) twin {
 	}
 }
 
-// The route the version of its process a ticket copied held, off git's history of the process file under the root. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
-func copiedBase(root, carried, hash string, disk pull.Disk) ([]any, bool) {
+// The route the version of its process a ticket copied held, off the repository's history of the process file. [[spec/design_input/the-editor-draws-the-ticket#the-engine-answers-the-editor]]
+func copiedBase(repo git.Repo, carried, hash string, disk pull.Disk) ([]any, bool) {
 	own, why := pull.ProcessAt(disk, carried)
 	if why != "" {
 		return nil, false
 	}
-	log := func() (string, bool) { return gitIn(root, "log", "--format=%H", "--", own.Path) }
-	show := func(sha string) string {
-		if said, ok := gitIn(root, "show", sha+":"+own.Path); ok {
-			return said
+	log := func() (string, bool) {
+		commits, err := repo.History(own.Path)
+		if err != nil {
+			return "", false
 		}
-		return ""
+		var hashes []string
+		for _, one := range commits {
+			hashes = append(hashes, one.Hash)
+		}
+		return strings.Join(hashes, "\n"), true
+	}
+	show := func(sha string) string {
+		said, _ := repo.Show(sha, own.Path)
+		return said
 	}
 	return pull.DriftBase(log, show, hash)
 }

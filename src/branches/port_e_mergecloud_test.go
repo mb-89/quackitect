@@ -5,8 +5,9 @@
 package branches
 
 import (
-	"strings"
 	"testing"
+
+	"quackitect/src/proc"
 )
 
 // The merge takes a claude branch in, runs the check, pushes main and then deletes the branch. [[spec/tickets/work-verbs-port-to-go]]
@@ -20,7 +21,7 @@ func TestPEMergeTakesAClaudeBranchIn(t *testing.T) {
 	if one.read("src/thing.txt") != "thing\n" {
 		t.Fatal("main lacks the branch's work")
 	}
-	if one.peOriginTip("main") != one.git("rev-parse", "HEAD") {
+	if one.peOriginTip("main") != one.rev("HEAD") {
 		t.Fatal("main stays off origin")
 	}
 	if one.peOriginTip(peClaude) != "" {
@@ -34,7 +35,7 @@ func TestPERefusedTrunkPushKeepsTheClaudeBranch(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, nil, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
-	one.peOriginRefuses(`[ "$ref" = refs/heads/main ]`)
+	one.peOriginRefuses(func(ref, _ string) bool { return ref == "refs/heads/main" })
 	if code := one.branchSays("merge", peClaude); code != codeRed {
 		t.Fatalf("the merge answers %d", code)
 	}
@@ -49,13 +50,13 @@ func TestPETrunkCarriesTheClaudeBranch(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, nil, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
-	one.git("cherry-pick", "origin/"+peClaude)
-	one.git("push", "-q", "origin", "main")
-	was := one.git("rev-parse", "HEAD")
+	one.land("the claude branch, picked", map[string]string{"src/thing.txt": "thing\n"})
+	one.push("main")
+	was := one.rev("HEAD")
 	if code := one.branchSays("merge", peClaude); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
-	if one.git("rev-parse", "HEAD") != was {
+	if one.rev("HEAD") != was {
 		t.Fatal("something merges")
 	}
 	if one.peOriginTip(peClaude) != "" {
@@ -67,9 +68,22 @@ func TestPETrunkCarriesTheClaudeBranch(t *testing.T) {
 // The merge runs the install over the merged tree before the check. [[spec/tickets/work-verbs-port-to-go]]
 func TestPEMergeInstallsBeforeTheCheck(t *testing.T) {
 	t.Parallel()
-	one := peMergeTree(t, map[string]string{"src/scripts/install.sh": "mkdir -p .se && echo ok > .se/installed\n"}, nil)
+	one := peMergeTree(t, nil, nil)
 	one.peClaudeBranch(map[string]string{"src/thing.txt": "thing\n"})
-	one.d.Runme = []string{"sh", "-c", "test -f .se/installed"}
+	one.teach("sh", func(ran proc.Command) proc.Said {
+		if len(ran.Argv) == 2 && ran.Argv[1] == one.d.at("src/scripts/install.sh") && ran.Dir == one.root {
+			one.write(map[string]string{".se/installed": "ok\n"})
+			return proc.Said{}
+		}
+		return proc.Said{Code: 1}
+	})
+	one.teach("check", func(proc.Command) proc.Said {
+		if one.stands(".se/installed") {
+			return proc.Said{}
+		}
+		return proc.Said{Out: "no install ran", Code: 1}
+	})
+	one.d.Runme = []string{"check"}
 	if code := one.branchSays("merge", peClaude); code != codeOK {
 		t.Fatalf("the check meets no install: %d %s", code, one.errs.String())
 	}
@@ -82,7 +96,7 @@ func TestPEWorkMergePushesThenCloses(t *testing.T) {
 	if code := one.branchSays("merge", "g"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
-	if one.peOriginTip("main") != one.git("rev-parse", "HEAD") {
+	if one.peOriginTip("main") != one.rev("HEAD") {
 		t.Fatal("main stays off origin")
 	}
 	if one.peOriginTip("work/g") != "" {
@@ -94,7 +108,7 @@ func TestPEWorkMergePushesThenCloses(t *testing.T) {
 func TestPEWorkMergeKeepsTheBranchOnARefusedPush(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
-	one.peOriginRefuses(`[ "$ref" = refs/heads/main ]`)
+	one.peOriginRefuses(func(ref, _ string) bool { return ref == "refs/heads/main" })
 	if code := one.branchSays("merge", "g"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
@@ -108,7 +122,7 @@ func TestPEWorkMergeKeepsTheBranchOnARefusedPush(t *testing.T) {
 func TestPEWorkMergeGreenOnARefusedDelete(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
-	one.peOriginRefuses(`[ "$new" = 0000000000000000000000000000000000000000 ]`)
+	one.peOriginRefuses(func(_, to string) bool { return to == "" })
 	if code := one.branchSays("merge", "g"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
@@ -119,15 +133,15 @@ func TestPEWorkMergeGreenOnARefusedDelete(t *testing.T) {
 func TestPEMergeRefusesAPullAtTheTip(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
-	one.git("push", "-q", "origin", "main:refs/pull/7/head")
-	one.git("push", "-q", "origin", "origin/work/g:refs/pull/42/head")
-	was := one.git("rev-parse", "HEAD")
+	one.pushAt("main", "refs/pull/7/head")
+	one.pushAt("origin/work/g", "refs/pull/42/head")
+	was := one.rev("HEAD")
 	if code := one.branchSays("merge", "g"); code != codeRed {
 		t.Fatalf("the merge answers %d", code)
 	}
 	holds(t, one.errs.String(), "pull request #42")
 	holds(t, one.errs.String(), "branch merge g --closed")
-	if one.git("rev-parse", "HEAD") != was {
+	if one.rev("HEAD") != was {
 		t.Fatal("something merges")
 	}
 }
@@ -136,11 +150,11 @@ func TestPEMergeRefusesAPullAtTheTip(t *testing.T) {
 func TestPEMergeClosedRunsPastThePull(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
-	one.git("push", "-q", "origin", "origin/work/g:refs/pull/42/head")
+	one.pushAt("origin/work/g", "refs/pull/42/head")
 	if code := one.branchSays("merge", "g", "--closed"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
-	if parents := strings.Fields(one.git("rev-list", "--parents", "-n", "1", "HEAD")); len(parents) != 3 {
+	if one.parents("HEAD") != 2 {
 		t.Fatal("the merge runs no merge")
 	}
 }
@@ -149,11 +163,11 @@ func TestPEMergeClosedRunsPastThePull(t *testing.T) {
 func TestPEPullElsewhereLeavesTheMerge(t *testing.T) {
 	t.Parallel()
 	one := peMergeTree(t, nil, map[string]string{ticketAt("g"): peDone})
-	one.git("push", "-q", "origin", "main:refs/pull/7/head")
+	one.pushAt("main", "refs/pull/7/head")
 	if code := one.branchSays("merge", "g"); code != codeOK {
 		t.Fatalf("the merge answers %d: %s %s", code, one.out.String(), one.errs.String())
 	}
-	if parents := strings.Fields(one.git("rev-list", "--parents", "-n", "1", "HEAD")); len(parents) != 3 {
+	if one.parents("HEAD") != 2 {
 		t.Fatal("the merge runs no merge")
 	}
 }

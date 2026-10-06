@@ -6,7 +6,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"quackitect/src/modules/hooks/command"
 )
@@ -24,7 +23,7 @@ func init() {
 func pushVerb(d landingDoors) twin {
 	return func(_ []string, dry bool, out, errs io.Writer) int {
 		stamp, stands := rootDisk{d.root}.Read(checkStampAt)
-		head := strings.TrimSpace(gitRun(d.root, "rev-parse", "HEAD").out)
+		head, _ := d.git.Resolve("HEAD")
 		if green, says := command.Battery(stamp, stands, head); !green {
 			fmt.Fprintf(errs, "The push takes a green check, and %s.\n", says)
 			fmt.Fprintln(errs, "Run `./RUNME.sh check` on the commit you stand on, then push again.")
@@ -33,10 +32,10 @@ func pushVerb(d landingDoors) twin {
 		if dry {
 			return 0
 		}
-		branch := strings.TrimSpace(gitRun(d.root, "rev-parse", "--abbrev-ref", "HEAD").out)
-		if pushed := gitRun(d.root, "push", "origin", branch); !pushed.ok {
+		branch, _ := d.git.Head()
+		if pushed := d.git.Push(branch, false); !pushed.OK {
 			fmt.Fprintf(errs, "The push of %s comes back refused:\n", branch)
-			fmt.Fprintln(errs, pushed.said)
+			fmt.Fprintln(errs, pushed.Err)
 			return exitFailed
 		}
 		fmt.Fprintf(out, "%s stands pushed.\n", branch)

@@ -28,7 +28,7 @@ func TestTheUnblockHandsTheQuestionOn(t *testing.T) {
 		t.Fatal("the child stays open")
 	}
 	holds(t, one.read(ticketAt("next")), "# Discussion\n\n- [[spec/tickets/kid]] hands this over at `ask`, which waits for a person.\n  - which one\n  - and why\n")
-	holds(t, one.git("log", "-1", "--format=%s"), "kid: closes became next")
+	holds(t, one.subject("HEAD"), "kid: closes became next")
 }
 
 // A successor off the person route stands refused. [[spec/tickets/a-box-keeps-its-tickets]]

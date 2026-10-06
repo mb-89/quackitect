@@ -58,7 +58,7 @@ func (it *It) handBack(who *Who, name string, said verdict) int {
 		it.Say(Refused, fmt.Sprintf("%s stands at %s now, and the hold names %s.", held.Ticket, shown, held.Step), "The take is stale, so the hold drops. Pull again.")
 		return 1
 	}
-	if held.Hash != "" && !it.Git.Run("merge-base", "--is-ancestor", held.Hash, "HEAD").OK {
+	if held.Hash != "" && !it.Git.IsAncestor(held.Hash, "HEAD") {
 		it.dropHold(who.Hand)
 		it.Say(Refused, fmt.Sprintf("the take hash %s trails %s, so the hold drops. Pull again.", held.Hash[:min(shortSha, len(held.Hash))], who.Branch))
 		return 1
@@ -181,7 +181,7 @@ func (it *It) handFaults(one *Held, leaf *Leaf, hand string, held Hold) []string
 	}
 	if it.PersonSigns && !one.Private && RoleOf(hand) == Person {
 		tip := it.tipOf()
-		said := strings.TrimSpace(it.Git.Run("log", "-1", "--format=%G?", "HEAD").Out)
+		said := it.Git.Signature("HEAD")
 		if !contains(signed, said) {
 			if said == "" {
 				said = "no signature"

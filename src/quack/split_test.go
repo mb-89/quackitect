@@ -60,7 +60,11 @@ func TestMain(m *testing.M) {
 		main()
 		os.Exit(0)
 	}
-	os.Exit(m.Run())
+	code := m.Run()
+	for _, dir := range buildDirs.dirs {
+		os.RemoveAll(dir)
+	}
+	os.Exit(code)
 }
 
 // The pid the spawned command left past the one named, once it stands, so a case reads a restart by naming the pid before it. [[spec/tickets/kill-case-drives-live-split]]
