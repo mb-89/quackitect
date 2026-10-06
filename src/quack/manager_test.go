@@ -5,11 +5,13 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -161,17 +163,50 @@ func stopped(t *testing.T, bin, root string) {
 	}
 }
 
-// The root built into a folder, as the install builds it. [[spec/design_output/model#the-wiring-file]]
+// The root built into a folder, as the install builds it, copied off the one build this run takes. [[spec/design_output/model#the-wiring-file]]
 func built(t *testing.T, folder string) string {
 	t.Helper()
+	built, err := quackBinary()
+	if err != nil {
+		t.Fatalf("the root does not build: %v", err)
+	}
+	text, err := os.ReadFile(built)
+	if err != nil {
+		t.Fatal(err)
+	}
 	bin := binaryIn(folder, "quack")
+	if err := os.MkdirAll(folder, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(bin, text, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	return bin
+}
+
+// The one go build of the root this run takes, into a folder of its own that the run removes. [[spec/tickets/each-door-meets-one-test]]
+var quackBinary = sync.OnceValues(func() (string, error) {
+	dir, err := os.MkdirTemp("", "quack-built-")
+	if err != nil {
+		return "", err
+	}
+	buildDirs.Lock()
+	buildDirs.dirs = append(buildDirs.dirs, dir)
+	buildDirs.Unlock()
+	bin := binaryIn(dir, "quack")
 	quackBuilds.Add(1)
 	build := exec.Command("go", "build", "-o", bin, "./src/quack")
 	build.Dir = filepath.Join("..", "..")
 	if said, err := build.CombinedOutput(); err != nil {
-		t.Fatalf("the root does not build: %v\n%s", err, said)
+		return "", fmt.Errorf("%w\n%s", err, said)
 	}
-	return bin
+	return bin, nil
+})
+
+// The folders the shared build writes, which TestMain removes once the run ends. [[spec/tickets/each-door-meets-one-test]]
+var buildDirs struct {
+	sync.Mutex
+	dirs []string
 }
 
 // The go builds the quack binary takes this run, which one build serves. [[spec/tickets/each-door-meets-one-test]]
