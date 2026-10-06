@@ -19,21 +19,22 @@ import (
 	"quackitect/src/q"
 )
 
-// The lease a silent fake holds, the dog over it, and the poll and the cap of the wait on its real process, which both alarm cases share. [[spec/tickets/lease-waits-meet-a-fake-clock]]
+// The lease a silent fake holds, the dog over it, the poll of the wait on its real process, and the room the wait leaves under the suite's deadline for the report, which both alarm cases share. [[spec/tickets/lease-waits-meet-a-fake-clock]] [[spec/tickets/cold-runner-waits-meet-readiness]]
 const (
-	silentTerm = 200 * time.Millisecond
-	silentPoll = 20 * time.Millisecond
-	silentCap  = 20 * time.Second
+	silentTerm   = 200 * time.Millisecond
+	silentPoll   = 20 * time.Millisecond
+	silentMargin = 5 * time.Second
+	silentMark   = "fake/run"
 )
 
 var silentDog = manager.DogSettings{First: 10 * time.Millisecond, Cap: 20 * time.Millisecond, Faults: 2, Window: time.Minute}
 
-// Places one silent fake process under a dog on a fake clock, and polls until held answers true. The clock moves past the lease on each poll while the pid the fake last committed stands unexpired, so a slow spawn counts against no lease, and a beat landing late meets the next tick. The process and the bus stay real, so this is the door test of a placed process. [[spec/tickets/lease-waits-meet-a-fake-clock]]
-func silentRun(t *testing.T, part, fake, wants string, held func(snap q.Snapshot, pids int) bool) {
+// Places one silent fake process under a dog on a fake clock, and polls until held answers true. The clock moves past the lease on each poll while the run the fake last committed stands unexpired, so a slow spawn counts against no lease, and a beat landing late meets the next tick. A run commits a mark of its own, because Windows hands a killed process's pid to the next one. The alarm stops the restarts, so the wait ends on it. The process and the bus stay real, so this is the door test of a placed process. [[spec/tickets/lease-waits-meet-a-fake-clock]] [[spec/tickets/cold-runner-waits-meet-readiness]]
+func silentRun(t *testing.T, part, fake, wants string, held func(snap q.Snapshot, runs int) bool) {
 	t.Helper()
 	c := q.New()
 	as := manager.Registers(c)
-	hand := q.OutIn(c, "fake/pid", 0, q.IO(), q.Doc("the fake's pid"))
+	hand := q.OutIn(c, silentMark, 0, q.IO(), q.Doc("the fake's run, a mark no other run commits"))
 	if faults := c.Check(); len(faults) > 0 {
 		t.Fatalf("the catalog refuses: %v", faults)
 	}
@@ -51,27 +52,38 @@ func silentRun(t *testing.T, part, fake, wants string, held func(snap q.Snapshot
 		t.Fatal(err)
 	}
 	defer stop()
-	pids, expired := map[any]bool{}, map[any]bool{}
-	for end := time.Now().Add(silentCap); time.Now().Before(end); time.Sleep(silentPoll) {
+	runs, expired := map[any]bool{}, map[any]bool{}
+	for end := silentEnd(t); end.IsZero() || time.Now().Before(end); time.Sleep(silentPoll) {
 		snap := store.Snapshot()
-		pid := snap.Read("fake/pid")
-		if pid != 0 {
-			pids[pid] = true
+		run := snap.Read(silentMark)
+		if run != 0 {
+			runs[run] = true
 		}
-		if held(snap, len(pids)) {
+		if held(snap, len(runs)) {
 			return
 		}
-		if pid != 0 && !expired[pid] {
+		if alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm); len(alarms) > 0 {
+			break
+		}
+		if run != 0 && !expired[run] {
 			at.Tick(silentTerm + time.Millisecond)
 			if slices.Contains(dog.Check(), part) {
-				expired[pid] = true
+				expired[run] = true
 			}
 		}
 	}
-	t.Fatalf("the silent fake runs as %d process(es), and session/alarms reads %v: wants %s", len(pids), store.Snapshot().Read(manager.AlarmsName), wants)
+	t.Fatalf("the silent fake runs %d time(s), and session/alarms reads %v: wants %s", len(runs), store.Snapshot().Read(manager.AlarmsName), wants)
 }
 
-// The fake silent IO process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
+// The end of the wait on the real process: the suite's deadline less the margin, or none where the run sets no timeout. A loaded box slows the spawns and turns the case red on a hang alone. [[spec/tickets/cold-runner-waits-meet-readiness]]
+func silentEnd(t *testing.T) time.Time {
+	if end, ok := t.Deadline(); ok {
+		return end.Add(-silentMargin)
+	}
+	return time.Time{}
+}
+
+// The fake silent IO process: it commits its run, beats its lease once, and then lives on without a beat. [[spec/tickets/watchdogs-span-the-processes]]
 func TestFakeSilentIO(t *testing.T) {
 	t.Parallel()
 	if os.Getenv(index.BusEnv) == "" {
@@ -81,7 +93,7 @@ func TestFakeSilentIO(t *testing.T) {
 	if err != nil {
 		os.Exit(3)
 	}
-	if err := peer.Commit("fake", map[string]any{"fake/pid": os.Getpid()}); err != nil {
+	if err := peer.Commit("fake", map[string]any{silentMark: time.Now().UnixNano()}); err != nil {
 		os.Exit(4)
 	}
 	_ = peer.Beat(flag.Arg(0))
@@ -98,7 +110,7 @@ func TestASilentIOProcessReadsInTheAlarms(t *testing.T) {
 	})
 }
 
-// The fake silent module process: it commits its pid, beats its lease once, and then lives on without a beat. [[spec/tickets/module-silence-reads-alarms]]
+// The fake silent module process: it commits its run, beats its lease once, and then lives on without a beat. [[spec/tickets/module-silence-reads-alarms]]
 func TestFakeSilentModule(t *testing.T) {
 	t.Parallel()
 	if os.Getenv(index.BusEnv) == "" {
@@ -108,7 +120,7 @@ func TestFakeSilentModule(t *testing.T) {
 	if err != nil {
 		os.Exit(3)
 	}
-	if err := peer.Commit("fake", map[string]any{"fake/pid": os.Getpid()}); err != nil {
+	if err := peer.Commit("fake", map[string]any{silentMark: time.Now().UnixNano()}); err != nil {
 		os.Exit(4)
 	}
 	_ = peer.Beat(flag.Arg(0))
@@ -119,9 +131,9 @@ func TestFakeSilentModule(t *testing.T) {
 
 func TestASilentModuleProcessRestartsAndRaisesAnAlarm(t *testing.T) {
 	t.Parallel()
-	silentRun(t, "fake", "TestFakeSilentModule", "a restart, then the alarm", func(snap q.Snapshot, pids int) bool {
+	silentRun(t, "fake", "TestFakeSilentModule", "a restart, then the alarm", func(snap q.Snapshot, runs int) bool {
 		alarms, _ := snap.Read(manager.AlarmsName).([]manager.Alarm)
-		return pids > 1 && len(alarms) == 1 && alarms[0].Part == "fake"
+		return runs > 1 && len(alarms) == 1 && alarms[0].Part == "fake"
 	})
 }
 
