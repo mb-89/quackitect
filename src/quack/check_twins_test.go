@@ -28,7 +28,7 @@ import (
 var twinsUpdate = flag.Bool("twins", false, "write the twin golden files again off the tree")
 
 // The golden folder under the check module, from this package's folder. [[spec/tickets/check-names-meet-their-goldens]]
-var twinsAt = filepath.Join("..", "modules", "check", "testdata")
+var twinsAt = filepath.FromSlash("../modules/check/testdata")
 
 // The name the private twin looks for, as src/scripts/check-twins.js names it. [[spec/tickets/check-names-meet-their-goldens]]
 const twinName = "owner"

@@ -18,8 +18,8 @@ var update = flag.Bool("update", false, "write ParseRecord's section of the log 
 
 // The golden file, its fixture, and this reader's section. [[spec/tickets/the-log-topic-lands]]
 var (
-	logGoldenAt  = filepath.Join("..", "..", "quack", "testdata", "log.golden.json")
-	logFixtureAt = filepath.Join("..", "..", "quack", "testdata", "session.jsonl")
+	logGoldenAt  = filepath.FromSlash("../../quack/testdata/log.golden.json")
+	logFixtureAt = filepath.FromSlash("../../quack/testdata/session.jsonl")
 )
 
 const parseRecordSection = "src/tui/log ParseRecord"
