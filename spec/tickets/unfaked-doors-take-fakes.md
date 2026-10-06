@@ -83,7 +83,7 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 5d4a884bfb2491ff
 group: tests-meet-the-doors-once
-step: split
+step: children
 record:
   - step: sync
     hand: box e97c7a20bbd2 · claude-code-remote
@@ -94,6 +94,15 @@ record:
         exit: 0
         said: work/tests-meet-the-doors-once took 20 commit(s) from main.
     def: 8a9850a81227554b
+  - step: split
+    hand: box e97c7a20bbd2 · claude-code-remote
+    hash_before: dba685e0cb6568c83074770408f320007faa74a1
+    hash_after: dba685e0cb6568c83074770408f320007faa74a1
+    inputs:
+      - name: ask
+        hash: 5495474fd0152fe7
+        size: 964
+    def: cb8f90bc86fc7d39
 ---
 
 # Ask
@@ -121,14 +130,22 @@ Done when a design output names the git door and the process door with their fak
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/git-and-process-doors-designed]], standard, at its gate
+- [[spec/tickets/pull-meets-fake-git]], standard, waits for the design
+- [[spec/tickets/quack-repos-meet-fake-git]], standard, waits for the design
+- [[spec/tickets/quack-spawns-meet-fake-process]], standard, waits for the design
+- [[spec/tickets/branch-verbs-meet-fake-git]], standard, waits for the design
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each move reviews whole once the door it takes stands, and the branch verbs move, the widest, splits into a child group at its draft where one review cannot hold it
+- the children add up to the goal: the design names both doors, and the four moves narrow the four rows
+- each move names the design under depends_on, and the design builds the process door, which pull-meets-fake-git takes first
 
 # children
 
